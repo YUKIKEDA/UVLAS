@@ -77,8 +77,17 @@ jobs:
           ./out/vcpkg/bootstrap-vcpkg.sh -disableMetrics
           echo "VCPKG_ROOT=$GITHUB_WORKSPACE/out/vcpkg" >> "$GITHUB_ENV"
           echo "VCPKG_DEFAULT_BINARY_CACHE=$GITHUB_WORKSPACE/out/vcpkg-cache" >> "$GITHUB_ENV"
+      # The runner image ships GCC 14 and Ninja. Install only what is missing, so a
+      # package mirror that cannot be reached does not fail the job.
       - name: Tools
-        run: sudo apt-get update && sudo apt-get install -y ninja-build g++-14
+        run: |
+          missing=""
+          command -v ninja >/dev/null || missing="$missing ninja-build"
+          command -v g++-14 >/dev/null || missing="$missing g++-14"
+          if [ -n "$missing" ]; then
+            sudo apt-get update && sudo apt-get install -y $missing
+          fi
+          ninja --version
       - name: Compiler version
         run: g++-14 --version
       - name: Configure, build, test
