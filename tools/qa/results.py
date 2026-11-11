@@ -111,6 +111,11 @@ def check(case: str, executable: Path) -> int:
             "  qualify it with `results.py accept`; if its values differ from every "
             "qualified platform, that needs a result change record."
         )
+        # The values, so that a platform that exists only on a CI runner can be
+        # qualified from the log of the run.
+        print("  values on this platform:")
+        for name in sorted(values):
+            print(f"    {name} {values[name]}")
         return 1
     found = differences(load(path)["values"], values)
     if found:
