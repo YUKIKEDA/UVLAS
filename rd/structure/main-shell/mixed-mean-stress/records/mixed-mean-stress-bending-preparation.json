@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_bending.py": "f85f96c544fe5f689b62722f28c80052f5c3086e675a2374e24d7d45c5b80813",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_bending.py": "0ebaab97f08196e69687a1c93406dda37daa531e45c3560f37cebcc4984b6010",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_bending_coefficient.py": "332ce6bf79911d20405a7b857edd57c776db73f85bfed39802df315ce1c3ca52",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_thin_v6.py": "da7fe98b0c143174cc9f6ef01df5cb77def56e49edd0d30e6b0e402ab2f07783",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-bending-protocol.md": "097272e75288d49c7a86b4f2788380e63960986b70bb2ce4dacaf637c40de2cb",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-bending-coefficient-result.json": "6f8f1f8b3abb22db566767fb7737d2504bd106b5467044559bda00825bbbb2b7",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-disposition.json": "1cb21b0732f217705d433539c37fe77ffd553c343ce01dd3ed0a29659f6abad9"
+  }
+}

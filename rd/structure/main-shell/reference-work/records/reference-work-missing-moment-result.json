@@ -1,0 +1,41 @@
+{
+  "exact_checks": {
+    "divergence_corner": true,
+    "zero_normal_trace": true,
+    "parent_axis_exchange_pair": true
+  },
+  "current_mid_observation_ranks": [
+    35,
+    35,
+    35
+  ],
+  "with_one_internal_moment_ranks": [
+    36,
+    36,
+    36
+  ],
+  "current_projected_gradient_ranks": [
+    34,
+    34,
+    34
+  ],
+  "with_axis_symmetric_flux_pair_ranks": [
+    35,
+    35,
+    35
+  ],
+  "bubble_work_error": 5.174975630045405e-17,
+  "bilinear_cross_coefficient": "900719925474099/36028797018963968",
+  "missing_quartic_u0x_monomial_coefficient": "-197618498965019420788953504920785842182845159688871573674178165047209756833/758855036025675418327914807352937072907190171504742000488989222554259486408284569600",
+  "missing_quartic_coefficient_nonzero": true,
+  "internal_position_coordinates_added": 3,
+  "global_trace_coordinates_added": 0,
+  "new_local_stability_tested": false,
+  "nonlinear_tested": false,
+  "practical_geometry_mapping_closed": false,
+  "solver_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_missing_moment.py": "9283616057947d53a2d11fe955fb22156e369fb982d2f31dc5baf12601389503",
+    "rd/structure/main-shell/reference-work/reference-work-missing-moment-proposal.md": "21828a7678c5775fb064094c64fe67936485ce46dea827082f4f45f0e1c493a0"
+  }
+}

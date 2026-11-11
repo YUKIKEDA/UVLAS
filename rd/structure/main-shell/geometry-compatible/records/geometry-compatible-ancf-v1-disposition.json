@@ -1,0 +1,10 @@
+{
+  "adoption_candidate_qualified": false,
+  "main_shell_adopted": false,
+  "reason": "Both errors below 1% but coarse-screen exponential amplification exceeds 2; retain failure.",
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf.py": "c9ce170006bd8f14ff0079643e42b23e4aaa421fa5c50aca29eff92438c53deb",
+    "rd/structure/main-shell/geometry-compatible/geometry-compatible-ancf-candidate.md": "e14e82f373480cdc19987eee8a1b7e8b3e3477cff1467f6cda70afc549223442",
+    "build/analysis/geometry-compatible-ancf-screen-v1.json": "7fa51883729b208cbc2bd37e7e1d1da0f94eb2ee849eacfc84115b6170da444a"
+  }
+}

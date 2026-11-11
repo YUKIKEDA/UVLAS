@@ -1,0 +1,10 @@
+{
+  "same_pair_solution_hashes": true,
+  "independent_full_solve_repeated": false,
+  "independent_comparison_inherited": true,
+  "sources": {
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-pair-v2-result.json": "03b37037f353058855361c2f3288938c16db03158469bbe92d1187f82bfe8ca2",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-pair-result.json": "29b77b0e54b3f77de369af42bbcdf0a5b6899df2f493f9e6efd4e08f53156778",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-independent-result.json": "153bc7d81a8d86f6314ecde5131e6a77c201c7e618c5e919206213a81bf7a674"
+  }
+}

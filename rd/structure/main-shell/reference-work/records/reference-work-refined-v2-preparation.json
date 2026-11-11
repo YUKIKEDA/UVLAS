@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_refined_pair_v2.py": "537dcbdf8b84b51efb3e8758c4c0ba40cf0e3e6dd05a951e4866e02fa2895d68",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_refined_fit_v2.py": "d59549b988766f6df636b2c2135844abe30fa2f5e7c047a7cfbcddcc6b80c950",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-protocol.md": "9ccd10e24a708b7db4078704586a2a5e8b6a6068fbf986c2d1e30716bed926d5",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-v2-protocol.md": "e921dd75d5d15cc864b8c3b042c95ef2f6a10efabcdb209a8e5be0694eb683aa",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-pair-result.json": "29b77b0e54b3f77de369af42bbcdf0a5b6899df2f493f9e6efd4e08f53156778",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-independent-result.json": "153bc7d81a8d86f6314ecde5131e6a77c201c7e618c5e919206213a81bf7a674"
+  }
+}

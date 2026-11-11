@@ -1,0 +1,11 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/mixed-order-150/experiments/mixed_order_150.py": "b05663e86b4402d762c55bc4e204282c7403328e964cc564410315c5794ad9e6",
+    "rd/structure/main-shell/mixed-order-150/experiments/check_mixed_order_150.py": "4008a983a1f52134e2c0442e528e9294c9f28f38ffdaa72e5fc3e4f5ef3e4cbc",
+    "rd/structure/main-shell/mixed-order-150/experiments/audit_mixed_order_150.py": "989a00901755a0a21c2398b1652e62a90e87e1b24b83b157ef4a9da7a6bace82",
+    "rd/structure/main-shell/mixed-order-150/mixed-order-150-screening-contract.md": "9c5b0bb5819901a0d411db5f9eb761121d46c140a6b5eca8ec64df16dea5a903",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-order-150-protocol.md": "6d2399b27a405567424fc18670b4d048aeea6110d99d8809addf559e00288e33",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-result.json": "0b0c16862845be93148c5a842c89dc109737b4a3b2b68c600afeed38aef7418e"
+  }
+}

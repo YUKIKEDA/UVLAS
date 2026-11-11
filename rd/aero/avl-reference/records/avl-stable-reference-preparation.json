@@ -1,0 +1,25 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-collinear-kernel-experiment.md#6",
+  "source_sha256": "dbde8befa834514e88febd5bcb5aab356403a42ea37551513b291f811580505c",
+  "variants": [
+    {
+      "name": "measured",
+      "parent_path": "build/reference-avl/source-measured-corrected",
+      "path": "build/reference-avl/source-measured-stable",
+      "original_source_sha256": "ccbb18836d7fda5d1c9558564b881cebee87c9e38e7bf90e8f13ca6d2a0b8228",
+      "modified_source_sha256": "3264214aca32b507ea821795c7010545d0e261d93761b4c59843bb1055ae6b3d",
+      "patch": "build/third-party-gpl/avl/measured-stable.patch",
+      "patch_sha256": "8e7e0f7cb78fd5881207ac4d22d65b2d3af05e9bfbe5468f5d3b2f2f15d55984"
+    },
+    {
+      "name": "core0",
+      "parent_path": "build/reference-avl/source-core0-pairprobe",
+      "path": "build/reference-avl/source-core0-stable",
+      "original_source_sha256": "fe3b4dbe6d7f8d2e7a9f71a57c6e1b8f92526961a06af747d2411b30dc62cb12",
+      "modified_source_sha256": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f",
+      "patch": "build/third-party-gpl/avl/core0-stable.patch",
+      "patch_sha256": "fa56e39274221c5b4f1c4249ec488ffdd7b77c85a6e7148bb2958083bcf23670"
+    }
+  ],
+  "build_script_sha256": "3459dace0965d6ba62ad6d193462faa27ffdfbf1f8b75d97a888b44b69b8b902"
+}

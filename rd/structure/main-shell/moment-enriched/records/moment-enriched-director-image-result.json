@@ -1,0 +1,156 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "independent": false,
+      "TB_kernel": {
+        "ranks": [
+          50,
+          50,
+          50
+        ],
+        "columns": 186,
+        "nullity": 136,
+        "residual": 2.8258285786091346e-16,
+        "smallest_nonzero": 2.645751311064579
+      },
+      "ranks": [
+        70,
+        70,
+        70
+      ],
+      "outside": 1.17342380570877e-15,
+      "span": 2.2062572251924294e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "independent": true,
+      "TB_kernel": {
+        "ranks": [
+          50,
+          50,
+          50
+        ],
+        "columns": 186,
+        "nullity": 136,
+        "residual": 3.0368361588551365e-16,
+        "smallest_nonzero": 2.645751311064583
+      },
+      "ranks": [
+        70,
+        70,
+        70
+      ],
+      "outside": 1.2023842281914161e-15,
+      "span": 2.2599410324407573e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "independent": false,
+      "TB_kernel": {
+        "ranks": [
+          50,
+          50,
+          50
+        ],
+        "columns": 186,
+        "nullity": 136,
+        "residual": 2.8258285786091346e-16,
+        "smallest_nonzero": 2.645751311064579
+      },
+      "ranks": [
+        70,
+        70,
+        70
+      ],
+      "outside": 1.17342380570877e-15,
+      "span": 2.2062572251924294e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "independent": true,
+      "TB_kernel": {
+        "ranks": [
+          50,
+          50,
+          50
+        ],
+        "columns": 186,
+        "nullity": 136,
+        "residual": 3.0368361588551365e-16,
+        "smallest_nonzero": 2.645751311064583
+      },
+      "ranks": [
+        70,
+        70,
+        70
+      ],
+      "outside": 1.2023842281914161e-15,
+      "span": 2.2599410324407573e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "independent": false,
+      "TB_kernel": {
+        "ranks": [
+          50,
+          50,
+          50
+        ],
+        "columns": 186,
+        "nullity": 136,
+        "residual": 2.8258285786091346e-16,
+        "smallest_nonzero": 2.645751311064579
+      },
+      "ranks": [
+        70,
+        70,
+        70
+      ],
+      "outside": 1.17342380570877e-15,
+      "span": 2.2062572251924294e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "independent": true,
+      "TB_kernel": {
+        "ranks": [
+          50,
+          50,
+          50
+        ],
+        "columns": 186,
+        "nullity": 136,
+        "residual": 3.0368361588551365e-16,
+        "smallest_nonzero": 2.645751311064583
+      },
+      "ranks": [
+        70,
+        70,
+        70
+      ],
+      "outside": 1.2023842281914161e-15,
+      "span": 2.2599410324407573e-15,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_director_image.py": "f8b372b4d6a5e4e070e1954dc2702bf4115237f0fb49ff03c123e3f7042a64f7",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_thin.py": "7b7e35c7abe2e94af645c5f6331f134f0e2b523aa9e176c53c9961b3873b9db0",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-protocol.md": "7d730a1dd32a21ded8133fd7610891297cb4f09955b273fdb402b2fd8ece17cf"
+  }
+}

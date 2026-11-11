@@ -1,0 +1,24 @@
+---
+description: Issue番号の前の閉じる動詞は、否定文の中でもIssueを閉じる
+alwaysApply: true
+---
+
+# PRからIssueを閉じる
+
+GitHubは、閉じる動詞（`close(s/d)`、`fix(es/ed)`、`resolve(s/d)`）が番号のすぐ前にあると、否定文の中でもIssueを閉じる。
+
+- Issueを終えるPRは、`## Related` の下に、`Closes #N` だけの行を置く。
+- 終えないPRは、`#N` の前に閉じる動詞を決して置かない。`Part of #N` か `Refs #N` と書く。
+- その行は、PRの本文だけに置く。commitの本文には置かない。squashのメッセージは、commitの本文をつなげる。
+- PRを作った後、本文を直した後に、`gh pr view <n> --json closingIssuesReferences` を走らせ、一覧を意図と比べる。
+
+```text
+BAD   This does not close #16.     （#16 が閉じる）
+GOOD  Part of #16. 完了gateの条件はまだ満たしていない。
+```
+
+PRの本文自身が、Issueの条件が満たされていないと言うとき、そのPRはそのIssueを閉じない。PRを開く前に、満たされていない条件を、それ自身のIssueとロードマップの行へ移してIssueの文面を直すか、PRを `Part of #N` にする。どちらにするかは、その条件を利用者が定めたものなら、利用者が言う。
+
+親Issue（#16〜#24）は、子の行が全て閉じ、完了gateを満たしたPRだけが閉じる。子のPRは親を `Part of` で指す。
+
+手順：`.agents/skills/github-closing/SKILL.md`。

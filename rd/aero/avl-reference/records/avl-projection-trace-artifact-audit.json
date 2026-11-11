@@ -1,0 +1,14 @@
+{
+  "source_sha256": "e031b53b1359ddb6eed87c316fee4c83f740d518ac142316cfcf33f6cff0f189",
+  "result_sha256": "e22e9654f4e26404cc2ed98a57c4a8285a9e2262b3c623f338f20cb3e4e2a6eb",
+  "method_checks": 8,
+  "independent_gauss_cases": 12,
+  "uniform_analytic_cases": 8,
+  "projections": 80,
+  "projection_series": 24,
+  "actual_trace_pairs": 36,
+  "input_files": 80,
+  "known_error_decreasing_series": 24,
+  "field_direction_candidates": 0,
+  "all_criteria_pass": true
+}

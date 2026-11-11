@@ -1,0 +1,4 @@
+interface:
+  display_name: "ソルバー実装パッケージ"
+  short_description: "Implement an approved solver package from its adopted specification"
+  default_prompt: "$solver-package-implementation を使い、対象パッケージの決定を列挙し、製品コードと独立試験へ移してください。"

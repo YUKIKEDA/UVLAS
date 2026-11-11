@@ -1,0 +1,11 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-fixed-band-convergence-experiment.md",
+  "source_sha256": "0b333a31a2c63408aecf3e613e0e2af43c736a13bd79de48e3205307f2a42ab3",
+  "exporter_sha256": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b",
+  "original_source_sha256": "7ce4248c742d7896c53c8cdcea81ab02e976c4d7f061f5a6a584d9282c288aeb",
+  "modified_source_sha256": "5d187735eec5cb7f92df0f18808e1e54e5fb4001c1a51dffd9d7529a68c089fc",
+  "unchanged_kernel_sha256": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f",
+  "build_script_sha256": "c5f1e710ccf9aada79a15c6a145d408313b5926db6a903f6893bf42d06eec1fb",
+  "patch_sha256": "09c7999caa715d46f30ec2cedb8542aa0936834a4ee3dda4dddc5cfad44cb70e",
+  "original_executable_sha256": "a9f0f80ba10c0443b3f0a7256f548627d32c162be46947064d68a2be7ce778d6"
+}

@@ -1,0 +1,240 @@
+{
+  "records": [
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "error": [
+          0.0003858432544651452,
+          8.631649642036534e-05
+        ],
+        "kkt": [
+          2.212962175926791e-15,
+          6.715869631376501e-15
+        ],
+        "linear_residual": [
+          3.865035183155412e-14,
+          8.190948945698843e-14
+        ],
+        "local_rcond": 0.00379356952908953,
+        "global_rcond": 3.299646394856658e-05
+      },
+      "observed": {
+        "error": [
+          0.00038584325446385794,
+          8.63164964186125e-05
+        ],
+        "elastic_error": [
+          7.756004152843992e-05,
+          1.965976017641142e-05
+        ],
+        "stabilization_error": [
+          0.0003779675342848485,
+          8.404779226006077e-05
+        ],
+        "h1": [
+          0.4904301210520276,
+          2.128429086292794
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 13.437999999965541,
+      "artifact": "build/analysis/hybrid-gradient-refinement-20261104-102109/S4-k0.4-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "4265b5a403cec6dd3ded2221a47006986834c1a62888de44475f75dfa32b27ae"
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          0.008242337357193647,
+          0.0018488749354938902
+        ],
+        "kkt": [
+          1.9118952527680162e-13,
+          3.8528706143089686e-13
+        ],
+        "linear_residual": [
+          1.7246435419220811e-12,
+          5.247922057019746e-12
+        ],
+        "local_rcond": 0.0002038517804602163,
+        "global_rcond": 4.0074578406862787e-07
+      },
+      "observed": {
+        "error": [
+          0.008242337357335112,
+          0.0018488749357336517
+        ],
+        "elastic_error": [
+          0.007934922728124119,
+          0.001777281720522526
+        ],
+        "stabilization_error": [
+          0.002230050764180321,
+          0.0005095176286259435
+        ],
+        "h1": [
+          0.5059293325971697,
+          2.1306639480327325
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 13.077999999979511,
+      "artifact": "build/analysis/hybrid-gradient-refinement-20261104-102109/S4-k0.4-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "007633ad2543cb3ca006e23fda96eed66774abc30e17a99038f03f30a823e8a2"
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 8,
+      "h": 0.001,
+      "fit": {
+        "error": [
+          0.0001704907261450236,
+          3.772160759958607e-05
+        ],
+        "kkt": [
+          2.253238677220282e-14,
+          5.1237845650337247e-14
+        ],
+        "linear_residual": [
+          5.034786890433151e-13,
+          1.3673950810466228e-12
+        ],
+        "local_rcond": 0.0009770585511795445,
+        "global_rcond": 9.740798871520417e-07
+      },
+      "observed": {
+        "error": [
+          0.00017049072611840648,
+          3.772160754922803e-05
+        ],
+        "elastic_error": [
+          2.808676702657821e-05,
+          6.359593687146702e-06
+        ],
+        "stabilization_error": [
+          0.00016816129522091643,
+          3.718165198363812e-05
+        ],
+        "h1": [
+          0.49043408017563,
+          2.1284349073158566
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 69.23499999998603,
+      "artifact": "build/analysis/hybrid-gradient-refinement-20261104-102109/S4-k0.4-a0.2-n8-h0.001.npz",
+      "artifact_sha256": "6df1c28d4202155f23c5511a9b70cbb231577f29059b6cb92538dfa3ffc4745e"
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 8,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          0.0012980796845299145,
+          0.00028960573516109906
+        ],
+        "kkt": [
+          2.2085462492659863e-13,
+          5.198735025835882e-13
+        ],
+        "linear_residual": [
+          4.044873893546063e-12,
+          1.074303010518899e-11
+        ],
+        "local_rcond": 0.0001818667062416572,
+        "global_rcond": 9.578090847789988e-08
+      },
+      "observed": {
+        "error": [
+          0.0012980796844308837,
+          0.0002896057351594526
+        ],
+        "elastic_error": [
+          0.0008436640390457428,
+          0.00018548287003326684
+        ],
+        "stabilization_error": [
+          0.0009865302105628625,
+          0.00022241309934774355
+        ],
+        "h1": [
+          0.49109715862451575,
+          2.1284991363630423
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 68.39100000006147,
+      "artifact": "build/analysis/hybrid-gradient-refinement-20261104-102109/S4-k0.4-a0.2-n8-h0.0001.npz",
+      "artifact_sha256": "c3d6913914c521701968e5953a427c397a79c47721253870ec73bf7cd788e249"
+    }
+  ],
+  "stop_reason": null,
+  "all_numerical_checks": true,
+  "quartic_accuracy_gate_pass": false,
+  "thin_amplification": [
+    21.36188014686978,
+    21.4197171160318
+  ],
+  "exponential_additional_observation_only": true,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/check_hybrid_gradient_refinement.py": "b25576ab13fd21b921819b7af581d3a85852927486018852496005aad010afd0",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_fit_v2.py": "c633561674c72be01049073c43133f3860b6dc9f9ed094d3eb69c30b0dd05aad",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_fit.py": "a341da8db56c74bda3edc4c46b7584f24b4837d54e9dd2f87576270134970e90",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-ancf-protocol.md": "18a894ddb33c0e228fa7f66c9e4f49615a2172de625b0b724a611726f4dcdecc",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-refinement-preparation.json": "87a9e026179d7794a5b8b000633c769c0b7d88415d35a66fd8fd48be15daa768",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-shared-result.json": "943c0220bb26c21e4d8b9353280779d43e221a332579956cfc67501f14fabb7d"
+  },
+  "seconds": 164.2029999999795,
+  "peak_bytes": 1626951680
+}

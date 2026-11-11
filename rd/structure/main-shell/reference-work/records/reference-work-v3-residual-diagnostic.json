@@ -1,0 +1,47 @@
+{
+  "records": [
+    {
+      "h": 0.01,
+      "errors": {
+        "direct_root_residual": 2.7100878344508762e-11,
+        "extended_precision_root_product": 2.7320245742161485e-11,
+        "primary_tensor": 2.788296392107197e-11,
+        "rebuilt_QR_residual": 2.4627575117113645e-11,
+        "exact_admissible_polynomial_weak_operator": 2.0162435736478925e-12,
+        "exact_polynomial_strong_gradient": 1.4969648351635565e-13,
+        "independent_tensor": 2.7259278061477855e-11,
+        "reassociated_weak_gradient": 2.7238370519038965e-11
+      },
+      "reported_QR_error": 2.463013633729768e-11,
+      "reported_independent_error": 2.7259278061477884e-11,
+      "local_condition_estimate": 15625.866244699404
+    },
+    {
+      "h": 0.0001,
+      "errors": {
+        "direct_root_residual": 3.186079869928178e-07,
+        "extended_precision_root_product": 3.1643061902778835e-07,
+        "primary_tensor": 3.1736825079709595e-07,
+        "rebuilt_QR_residual": 2.9325790732865783e-07,
+        "exact_admissible_polynomial_weak_operator": 2.609795674937584e-08,
+        "exact_polynomial_strong_gradient": 1.5023416212899553e-11,
+        "independent_tensor": 3.166473724586708e-07,
+        "reassociated_weak_gradient": 3.1936189356694764e-07
+      },
+      "reported_QR_error": 2.9305886967059136e-07,
+      "reported_independent_error": 3.166473724586711e-07,
+      "local_condition_estimate": 152353886.57410708
+    }
+  ],
+  "new_global_solve": false,
+  "acceptance_thresholds_changed": false,
+  "failed_gate_overridden": false,
+  "unique_cause_proven": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/diagnose_reference_work_v3_residual.py": "347fb925587b301c3e612c2fde37e833854a049ac62963fbf1b46b7ff4020464",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit.py": "52d144a37ec016c468cd84c67709d55997d72e49c610cda01d1113fd19161a25",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-shared-result.json": "f196a795ca4bf3a4dc4fab5d8033cc083cc8272bd32a320788281978d235f22d",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8"
+  }
+}

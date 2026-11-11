@@ -1,0 +1,20 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_shared_space.py": "5e16cffed19ef7bb73c462362e6f93f94031cbcd9a0d983b3810f2be448b3f3d",
+    "rd/structure/main-shell/gsp-q3/experiments/check_gsp_q3_shared.py": "4ce3606e23b25ccfb93d8a0d8947bb1beea43a3efeba1d8ba1ad8cf3a956ed23",
+    "rd/structure/main-shell/gsp-q3/experiments/audit_gsp_q3_shared.py": "3d3684c65fb0c86b89b36381a33262438b59b9a53ee22103cde1f3425147b9b0",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_v2.py": "28ab1a6d10f82cb136901670aaa567104b440a76a9f0e09b76b9539700d7fb6c",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_basis_v2.py": "83c84a0c661f0a63e37744a1a3ee5d4b0bfc298308a699046f3356c3adcdb68b",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_shared_space.py": "877df9a8340b49edb934f28cf36e8c6e4380c0f44c2c9903db2cc847b6c721a5",
+    "rd/structure/main-shell/q3/experiments/q3_thin_expansion.py": "8120d2378e3f873f32d5b68c6ca99ffc11135ae7d274891245c4c26e8d66b513",
+    "rd/structure/main-shell/q3/experiments/q3_quartic_approximation.py": "80ccd7a4f0a77dff997021002242a5cc399a8459f93cf5048bd89fedf95477b7",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-shared-protocol.md": "dd38e4f43eba31c7a4a735543f2376ddb98f3cc6fed9e5c717c26409347907e8",
+    "rd/structure/main-shell/gsp-q3/gsp-q3-shared-and-membrane-contract.md": "66edb21d681cfefed57a2f6ae158f501f73b318aa13c1d404ee41374e90cd01f",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-result.json": "fb00fad52fd3f8ce9d8438bce6ac7f87f145ab2e4e14cb213dd00863dd288452",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-audit.json": "551a5683412ac7cbc33aa1d716d3adfd3d74bad4c4c81a2f40b452a38216fc00",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-v2-result.json": "1b1b49b4099339f4491338ac2e6e9b218d343a3c1bfbd7cf10691a5885cf3398",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-v2-audit.json": "57d875b78e40da93fa0a7357dbb34cce865b088fd22fe4a4f52df31c8af24415",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-result.json": "0b0c16862845be93148c5a842c89dc109737b4a3b2b68c600afeed38aef7418e"
+  }
+}

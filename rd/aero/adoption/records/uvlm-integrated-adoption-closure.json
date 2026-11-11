@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "uvlm_review_complete": true,
+  "uvlm_2_3_complete": true,
+  "uvlm_2_4_complete": true,
+  "j1_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "3 joint coupling, time, initialization, constrained nonlinear mechanics, full wake state and stability",
+  "immutable": {
+    "rd/aero/adoption/records/uvlm-integrated-adoption-audit.json": "3f0631cc2227a560bb345bf8c060e629710d3ad9b5b0ee6bd2b355375a2213ee",
+    "rd/aero/adoption/records/uvlm-integrated-adoption-disposition.json": "25e5eff677cf240aa741722d88edcac99525c13aae72790399c611577adfad54",
+    "rd/aero/adoption/records/uvlm-adoption-completion.md": "b8c9f26ead84c43b4410c91e06a7f9d5c04b5a1b3713ae3bab04f644c552f2ff",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+  },
+  "status_sync_source": {
+    "rd/aero/adoption/experiments/close_uvlm_integrated_adoption.py": "258ff42bccab63e6b70ed1d48f2e445fbf43f6ce3e5b10e15bcf29c20a172fc2"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

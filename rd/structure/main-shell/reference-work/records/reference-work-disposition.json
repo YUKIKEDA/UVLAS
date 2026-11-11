@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-04",
+  "status": "reference_work_formulated_two_implementations_rejected_local_numerical_gates",
+  "main_shell_adopted": false,
+  "roadmap_1_1_complete": false,
+  "waiting_for_user_confirmation": false,
+  "configurations": [
+    {
+      "name": "RW-1",
+      "adopted": false,
+      "attempts": 9,
+      "evaluated": 6,
+      "stopped": 3,
+      "reasons": [
+        "geometric_rank_threshold_disagreement",
+        "thin_objectivity"
+      ]
+    },
+    {
+      "name": "RW-2",
+      "adopted": false,
+      "attempts": 9,
+      "evaluated": 9,
+      "stopped": 0,
+      "all_work_checks_pass": true,
+      "all_required_ranks_pass": true,
+      "reasons": [
+        "reference_gradient",
+        "objectivity",
+        "independent_general_geometry_reproduction"
+      ]
+    }
+  ],
+  "global_comparison_executed": false,
+  "finite_thickness_executed": false,
+  "nonlinear_global_equilibrium_executed": false,
+  "reason_later_stages_not_executed": "necessary_local_gates_failed",
+  "all_independent_numeric_reproduction_checks": false,
+  "thresholds_relaxed": false,
+  "provenance_pass": true,
+  "physical_adoption_pass": false,
+  "completion_date_estimate_available": false,
+  "source_hash_checks": 31,
+  "artifact_hash_checks": 15,
+  "python_ast_files": 6,
+  "closure_failures": [],
+  "sources": {
+    "rd/structure/main-shell/reference-work/records/reference-work-local-audit.json": "27e2bc902164c232821b4d2dff3a721ce25fba028f86619f43b4d1c05ce8701d",
+    "rd/structure/main-shell/reference-work/records/reference-work-local-preparation.json": "d67964ca07ee7c4cb04fd54a81dc3539eb20b0d3f8d37b21327767447b9aed6f",
+    "rd/structure/main-shell/reference-work/records/reference-work-local-result.json": "ed1fa9d0f1a6b08518d33c2b09db4047c69b3a00805ad3e7192eb9b256d8b227",
+    "rd/structure/main-shell/reference-work/records/reference-work-projection-result.json": "7a67f9827bef5cbd8051f844cf11c1f8765d652d74c6a4d31ae9c3241c736d48",
+    "rd/structure/main-shell/reference-work/records/reference-work-sources.json": "76034c0ca2c1e2551fcfb600da8b0cc94a5229bbc051076ed58125ee051d3db4",
+    "rd/structure/main-shell/reference-work/records/reference-work-v2-local-audit.json": "d7d698c0ffd0e35991969b2366fe22efb85444241929656683687247eea67876",
+    "rd/structure/main-shell/reference-work/records/reference-work-v2-local-preparation.json": "b5faba33f8fc4fbc46fcb527cd279ddc7021923dff8bb80f7bd27fea5b5fef64",
+    "rd/structure/main-shell/reference-work/records/reference-work-v2-local-result.json": "0052a668b7ec90fb0c9d8d46b3377febe45b32dba52b3520733a81580d826af1",
+    "rd/structure/main-shell/reference-work/records/reference-work-protocol.md": "cf2d1075b291ce522de690acf8e47fb6c7863aeade067609001314958aafc9af",
+    "rd/structure/main-shell/reference-work/records/reference-work-results.md": "3ccf315d06a8edb9d85902172378443e09fc88d1c53cd761e94b4d308281d121",
+    "rd/structure/main-shell/reference-work/records/reference-work-v2-protocol.md": "c7a393d159d320494c0124ecc881aa45464e0a9d706b46131198dc19894a8f52",
+    "rd/structure/main-shell/reference-work/reference-work-ancf-formulation.md": "a4b5ba22f4edc83ec2766a711ff79c6d2a5aa305b2e7ad04303a317f1f836907",
+    "rd/structure/main-shell/review/main-shell-completion-outlook.md": "55d15b220423522110790ea62d18a9b489a3df28ee25a728bd1eda850025b038"
+  }
+}

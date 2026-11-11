@@ -1,0 +1,28 @@
+{
+  "records": [],
+  "stops": [
+    {
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "reason": "ValueError('full_trace_support_rank:[74, 74, 75]')"
+    }
+  ],
+  "all_cases": false,
+  "main_shell_adopted": false,
+  "R4_complete": false,
+  "seconds": 0.875,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_finite.py": "40a1ef1a7e31a64b724f5be51fe17e4a346a0a7a184dc27c8f2bc545463ddc0e",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v2.py": "73965360fb49ec149c0752d990769091d4384048e8ece81fbac9604660b01b27",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v3.py": "867ca79c990d05f4be9afbfa3002542da291e49e58d6690c06109af305e3a58d",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_particular.py": "e8dabca2064622efc070f2359f0b5aa6ad86046a55e2c5953cdb312a23129343",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_geometry.py": "39aceaa29c5a9451a2434eeb6569cb68cb5e34ad1fe605aab1d51ddbda041133",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_targets.py": "8bd0544ced200ae0e014d42436f6c39c116d261f94cbd19eb6b1be32ae8755a4",
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-general-protocol.md": "fee5c004555f1ee0d83536cca1c15884db09ef1c774781f0815660bfdf33a7ec",
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-shell-v1-rank-stop.json": "a3b8c5d98fff6f9349e32099f203bd963c5ad39cf18ef3c6d5fe80afa8b3ba13"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "groups": 13,
+  "records": [
+    "finite_error_distinct_from_corrected_reference_uncertainty",
+    "oscillation",
+    "false_plateau",
+    "complex_rotating",
+    "unstable_order",
+    "all_equal",
+    "nonfinite",
+    "additive_budget_pass",
+    "missing_is_not_zero",
+    "additive_budget_failure",
+    "different_observation_case_rejected",
+    "no_silent_budget_transfer",
+    "overlapping_estimates_rejected"
+  ],
+  "sources": {
+    "rd/aero/unsteady-reference/experiments/check_uvlm_error_certification.py": "72d96fbd1df80632605b74ac2a6d5a1851c5ec9e6de6f4c343b916408941ba79",
+    "rd/aero/unsteady-reference/experiments/uvlm_error_certification.py": "3f48683b4c7035f092a5e445f2ac0f30344a85eefeb6e7606fe7c029789e7266",
+    "rd/aero/unsteady-reference/records/uvlm-error-certification-contract.md": "82927cad9c737bc949ac31640f621a5128f9b7c5b144e60087ee97d0b3b06896"
+  },
+  "not_a_physical_validation_certificate": true
+}

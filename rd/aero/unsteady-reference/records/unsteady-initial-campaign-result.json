@@ -1,0 +1,313 @@
+{
+  "passed": false,
+  "failures": [
+    "raw time discretization exceeds 0.20%",
+    "M16/N96 frequency My difference exceeds 1%",
+    "full spatial budget not yet qualified"
+  ],
+  "records": [
+    {
+      "case": "unmodified_core_parameter_parity",
+      "bitwise_loads": true,
+      "uses_actual_computed_original_core": true,
+      "rounded_initial_fixture_not_bitwise": true
+    },
+    {
+      "case": "original_time_to_frequency",
+      "samples": 64,
+      "relative_difference": [
+        0.17571416376827614,
+        0.24564438325275217
+      ],
+      "fit_residual": [
+        2.2590878419813738e-05,
+        2.3476975430811254e-05
+      ]
+    },
+    {
+      "case": "original_time_to_frequency",
+      "samples": 128,
+      "relative_difference": [
+        0.0919385220877486,
+        0.12686137669231992
+      ],
+      "fit_residual": [
+        2.0778795000793227e-05,
+        2.1098692582970124e-05
+      ]
+    },
+    {
+      "case": "original_time_to_frequency",
+      "samples": 256,
+      "relative_difference": [
+        0.04693798411317146,
+        0.06440107573362239
+      ],
+      "fit_residual": [
+        1.988026551394475e-05,
+        1.993925069400321e-05
+      ]
+    },
+    {
+      "case": "original_time_to_frequency",
+      "samples": 512,
+      "relative_difference": [
+        0.023668199746872277,
+        0.032389768052890656
+      ],
+      "fit_residual": [
+        1.94375001654829e-05,
+        1.9371724976943893e-05
+      ]
+    },
+    {
+      "case": "original_time_to_frequency",
+      "samples": 1024,
+      "relative_difference": [
+        0.011872409608966086,
+        0.016227848328320648
+      ],
+      "fit_residual": [
+        1.921631336541245e-05,
+        1.9090151921497286e-05
+      ]
+    },
+    {
+      "case": "independent_first_order_time_extrapolation",
+      "previous_difference": [
+        0.0007369962735343269,
+        0.0010352320577838466
+      ],
+      "last_difference": [
+        0.00019166556792646415,
+        0.0002698544440411535
+      ],
+      "extrapolation_change": [
+        0.000549059084739908,
+        0.0007688865309761558
+      ],
+      "raw_time_qualified": false
+    },
+    {
+      "case": "reference_sensitivity",
+      "label": "cycles6",
+      "relative_difference": [
+        2.2463620005934036e-05,
+        2.252503126806571e-05
+      ]
+    },
+    {
+      "case": "reference_sensitivity",
+      "label": "amplitude1e-5",
+      "relative_difference": [
+        3.0709103562579093e-07,
+        3.9032244578665775e-07
+      ]
+    },
+    {
+      "case": "reference_sensitivity",
+      "label": "nu1e-13",
+      "relative_difference": [
+        2.5113771270347356e-12,
+        3.3337883151314715e-12
+      ]
+    },
+    {
+      "case": "reference_sensitivity",
+      "label": "core1e-3",
+      "relative_difference": [
+        1.1244220858275695e-05,
+        1.3061164229623537e-05
+      ]
+    },
+    {
+      "case": "reference_sensitivity",
+      "label": "core1e-4",
+      "relative_difference": [
+        1.1132024930941126e-07,
+        1.2931558486784708e-07
+      ]
+    },
+    {
+      "case": "frequency_spatial_comparison",
+      "m": 2,
+      "n": 8,
+      "relative_difference": [
+        0.0467000394000239,
+        0.07938254532944383
+      ]
+    },
+    {
+      "case": "frequency_spatial_comparison",
+      "m": 4,
+      "n": 24,
+      "relative_difference": [
+        0.025162929695158102,
+        0.04528515292358877
+      ]
+    },
+    {
+      "case": "frequency_spatial_comparison",
+      "m": 8,
+      "n": 48,
+      "relative_difference": [
+        0.012654073855624311,
+        0.02328155859166446
+      ]
+    },
+    {
+      "case": "frequency_spatial_comparison",
+      "m": 16,
+      "n": 48,
+      "relative_difference": [
+        0.006249235093464557,
+        0.011721996408597456
+      ]
+    },
+    {
+      "case": "frequency_spatial_comparison",
+      "m": 16,
+      "n": 96,
+      "relative_difference": [
+        0.00625700546263873,
+        0.011666574471068648
+      ]
+    }
+  ],
+  "sources": {
+    "rd/aero/unsteady-reference/experiments/assess_unsteady_initial.py": "3230a5d33e81b9fd80046b7ddd16a97ba3a4ee877639e93d1ab3c6ce2b12d337",
+    "rd/aero/unsteady-reference/experiments/probe_ptera_reference.py": "e93e19ae5b7434fadddf82c0dfa93ffee22956dcfd4218f9aa321e9ca8f91f67",
+    "rd/aero/unsteady-reference/experiments/check_ptera_exact_core_parity.py": "03c3bb9cf1d5cd8b7a63e8fe1775143dddbedabb8b3b38527cd54266d0245e84",
+    "rd/aero/unsteady-reference/experiments/run_unsteady_reference_campaign.py": "654ec26dd12d18db30fc6680bd29de2ecb4ae33d3b996c28bd754162e5a19105",
+    "rd/aero/unsteady-reference/experiments/run_unsteady_candidate_campaign.py": "35fa52218f3ecf0c37c32faa19e890d4dbda517a76b1a2d58d2ca7d829b216bc",
+    "rd/aero/unsteady-reference/experiments/run_ptera_frequency_campaign.py": "2caffe8a9bd232ccfa7d52e1c52371c38f1a81d61ae5039fa944ebedd0d49e69",
+    "rd/aero/unsteady-reference/experiments/run_ptera_time_extension.py": "543c1d68fe72cea80391995a2d9e277420d10a048fde3f4b1619ed97dd48139e",
+    "rd/aero/unsteady-reference/experiments/ptera_frequency_reference.py": "9664faf5e404fb84421e6728fe1ae6a4df8b389fc16b3e6086f3f9a4075f72d3",
+    "rd/aero/unsteady-reference/experiments/uvlm_harmonic_reference_v2.py": "5d89842b42cb48a953c8aa5d4ad733864ce91d889630e23e820974308e022f2b",
+    "rd/aero/unsteady-reference/experiments/extract_unsteady_reference.py": "bef0c441403fcc33ff53c95748bed62fac8ff2564a98f31ebb2bc67bae79c442",
+    "rd/aero/unsteady-reference/records/unsteady-independent-reference-protocol.md": "16504fad7c3570b2308fa05cb317d93363e95bfd833320ac6728859988f5f421",
+    "rd/aero/unsteady-reference/records/unsteady-frequency-reference-protocol.md": "b050b8588337ce203ec1357aeb94478d461022158369a12e81d6365e44d7ad46",
+    "rd/coupled/j1/records/harmonic-age-integral-result.json": "8fbde1efe2ff357fdfde53740258b47078a17c7cb7c4560bb0f048303c683606",
+    "rd/aero/unsteady-reference/records/frequency-acceleration-result.json": "c16686469c95bff256f4123723935818f8ede3ecaa519d2cc03713ac89fdbaff",
+    "build/reference-ptera/environment-manifest.json": "55f9e418367180e93d5eb57083dbd22e53afc6597201c9d95030ef8a77d10613",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware-5.1.0.dist-info/METADATA": "537c6390f7b6572744840c0289d015af99789dc52e6d43ed8f03dbe2df5a1462",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware-5.1.0.dist-info/RECORD": "938296e3e568ebebdc481d7d376a3ae508e7ae75839f828f6d9d9dd5d085afc7",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware-5.1.0.dist-info/WHEEL": "2b6eb4118ce7cd7b09601406aa623c553c4476265836f0d9c16f5c061f7efcc0",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware-5.1.0.dist-info/licenses/LICENSE.md": "054cb3d874f4786491e24e56633b190dcf3adef91c0aeaa00674b31441e80f88",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware-5.1.0.dist-info/top_level.txt": "0744f6af6259e8e5049539ed2926bf3e63478c1beb81aa6fec88c758cc87ce40",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/__init__.py": "772ab5b854f71fc5a8dfca9601eb92a36f1e4d588245eedb26cfd795122adb0d",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_aerodynamics_functions.py": "4a25d676287b1b693c360a5d25060fa08ea9fb63e78f7adb4e253d95c4191a6b",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_convergence_cache.py": "cc226effebabd4856ac76c140f9f3646a168c51740a55b5d0f4ac0afe4a0a6cd",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_convergence_meshing.py": "1ba8ead57053f2bcd7626719d703ba66ec30b5703a2609ceb2012780c7acc293",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_core.py": "fecb753ae2ad7969400ddd106ebd8a394657df7e498227af832e04d26858d675",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_coupled_unsteady_ring_vortex_lattice_method.py": "7683c329975d9089626a3d0aadbe7e273570ffdc79a148d448b31aebae3f8f61",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_fixed_point_relaxation.py": "8070b9a8cb736ff427ae6604ed0051d926302360e1edf7174c021ca87e5ecaac",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_functions.py": "c2085aaf1ca7daafd050d78f5c3a242bf5ebe7f702f5571023e527ee9f09989e",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_logging.py": "694166298d5de7fbf68095c76b5ab00acc10935a098d224cb9a1735fe2d70bcc",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_mujoco_model.py": "ec43e57919c5d60c8d719ea8b71f050341155befd968c94b46a3c17536106c96",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_oscillation.py": "86dbbc486678f9dad9268649e06eafa1190319747365fb7a7a0e5001b7f4c51f",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_panel.py": "5a0a7a6db4fe05018c8e54d73ab0f4b2bd3d72e5f42161b6ab8cf880a774830c",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_parameter_validation.py": "39b36a52e34ce4747b954d215b29a691d1d78aca11ee5ef390d8a1f9bf30d328",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_serialization.py": "8da72f23945c6e46c09f0339d9a8035cae4f2a8a362e28cb585adfacc53c4c0a",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_transformations.py": "c836df342e0bfc742ded85fe00d7222d35c5b4334f03511d98eb3424d2caf5f2",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/aeroelastic_unsteady_ring_vortex_lattice_method.py": "401f023f671ddea3c4705c41481537099fefe8ed9780ba066e7ad24ce859afd2",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/convergence.py": "bd1404e1f97de6bf79eeccdf6ad31002ebe1a3e86b46e2cf7a7f8db78a67a39b",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/free_flight_unsteady_ring_vortex_lattice_method.py": "e8fa65895af980dbdb38dcf09cf50aff678162674c40892eef7b9113e88b6201",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/__init__.py": "8f59a8cb90c663354238e7e73a61cc4c206fee1a4e6c59d18b57a9ca3c9b31e4",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/_airfoils/_removed.md": "59969693d121f66d80ab3d0c4fb71c3f68222c0d366e89f8599e95bff3e1fe73",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/_meshing.py": "4dccd787474963a636302c6d5ddd15c42870911c83d7985af669cbed8f8bce23",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/airfoil.py": "3587272f98e65dc876de23613b66cf89b84be98950bb0a839fa365ff8fb5d41d",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/airplane.py": "946a2f260e9257c6b1290eafac6503a45509d90a979ae9f10effd1393fd901ab",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/wing.py": "803ccfeba71667989f39dd5ea2cb4c9673fe3e85a5b8fc16ea24065cf49f6d1c",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/geometry/wing_cross_section.py": "83466ba83537dbc14f56ff5f6358d5f50ffe72918da649dd8c82b713f8a3c4fd",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/__init__.py": "9e72f1d95c186375f4fd79f0fb766d930b7c39b9be52fb0fbe8c7adf8f35a25d",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/aeroelastic_airplane_movement.py": "6f126ba1f187139d07577d3e5bb3b381c52209406b846c97a4ac17957606cc13",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/aeroelastic_movement.py": "e3e2612db433b519d589891609d8955eb0fb4b1ea49a4374816521ac928e7c2c",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/aeroelastic_wing_cross_section_movement.py": "67a8e0bc45e9a5fdf978255e3709eaf1fe6568d65a8ad68a4a42291df9e32916",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/aeroelastic_wing_movement.py": "8561823d34e2b0f19947f417fe06ca0ca5de83da587062cba7adeff1c0e72168",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/airplane_movement.py": "3996fd338cd7c996a9b67bdabe00d9585b692e89b232d304b28f33002cc4a995",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/free_flight_movement.py": "c67eacbfd6a1b328207e7f7c6fe73b956f172c09103d16b7b915bd6920604d87",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/free_flight_operating_point_movement.py": "254092f0ab0c9dbd8b63ef8c919efb5204e8f6f29b626a770b4db3ae71eac466",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/movement.py": "5bd36d63c31865181f1b517683898c5baee5e5980caa47ac03bb08e857ef0a4d",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/operating_point_movement.py": "8d0a83fcc656c842b06db28616fb0d7d446468dc528176efca0d3a3c594837c9",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/wing_cross_section_movement.py": "d6d6e214b5f9ace1669efc0fe53f812b2e7adef6faf9b06b31416eb0c6d8cfa0",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/movements/wing_movement.py": "d1759a185de7042341640893f1d61d1fdf99af6c895a0a4a4a308ca2103f1d6d",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/operating_point.py": "8013245869b89ffd0b2d9557c96c1fc0eaa11a1e302c37abc5b634e7d4d1e8b2",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/output.py": "f090e797b055b1994edb49ba5bf1c96650b2949ac457dbd6d5be270456bce0d1",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/problems.py": "5b79b9f9e4b2210ec4ad4a81699cb7e5c581272644155b6af789ca421543f86c",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/steady_horseshoe_vortex_lattice_method.py": "ef8ec45bdda43046516fa5f733af7c604069aa7f5b0b097ff109237c9bea34fd",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/steady_ring_vortex_lattice_method.py": "65e56bf6cdd26240377e9071f48f440726d58cfd3048e224ec660dff7aae75d4",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/trim.py": "ddbaff5d0a9d5a0f3fa9d1d047bd9b9f4d6ddc4bbed2e08ca06a2a4128c8e5d2",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/unsteady_ring_vortex_lattice_method.py": "b6b3d8b325168d4fe8fb2ff4b8109704e7b0e4c9884bed64d420a40eaabf972b"
+  },
+  "artifacts": {
+    "build/analysis/unsteady-2-3/original.json": "b9c736301c76f1c6a7691c55d41a3f84165b89e4b55b4c1e8ef52595ec11f562",
+    "build/analysis/unsteady-2-3/original.npz": "051fe7a0faa60473b12675831a71c2c4ed7c592321679fd31516f60c9a25eceb",
+    "build/analysis/unsteady-2-3/original-core-parity.json": "6c262708ed938da44c7c3fb2e4d835def6a7b0573317f7395f46ff68e5ff7873",
+    "build/analysis/unsteady-2-3/original-core-parity.npz": "4148a6917ad0d877920742b9df03add36af55cd76eee3334468c35fa051dbbb0",
+    "build/analysis/unsteady-2-3/original-core-exact-parity.json": "46869e1158c9b0acae38b11ad5bc25bbc7d2c40b2f7f4bc78dd4af1c42faf11d",
+    "build/analysis/unsteady-2-3/original-core-exact-parity.npz": "eb98b4417641923f46e9db8f2b4e6fb242b11092b278c67f17d4d9ec0fcf4b2b",
+    "build/analysis/unsteady-2-3/time64.json": "23b576b523d7e1e9d1e3ee6b2c1595fc91901754a0b193b5840e3746c1207988",
+    "build/analysis/unsteady-2-3/time64.npz": "c7baf1059c7961534ad1ad2b3af0ba03e783823a3d988c8dd8f33e4678ea4bf0",
+    "build/analysis/unsteady-2-3/time128.json": "1e6113839515b5794ceadfc44380c00440ca07d3c7dca0df080ed5060dd9add8",
+    "build/analysis/unsteady-2-3/time128.npz": "57058416d126a12d1fcbd795693a6d3d477ac671fdf5a7dcc90fbd15e4932e82",
+    "build/analysis/unsteady-2-3/time256.json": "e4e768bb2e5265905385aa50ea916008b4d31b31d70327f49d1bb33733e77a45",
+    "build/analysis/unsteady-2-3/time256.npz": "3d6fcd2b4e3cab52dceb21662c679c544c96702ea4c72b43bf513a39c716cf4e",
+    "build/analysis/unsteady-2-3/time512.json": "0eddeb0838745c0e23dc58c00d093d10689a40c64c5e24ea6916ea6c5c465223",
+    "build/analysis/unsteady-2-3/time512.npz": "223bc6690dbd514718bdde10f21196a671735775f83a9ddfc6090956d27311e3",
+    "build/analysis/unsteady-2-3/time1024.json": "c92e860e3b32635fe61b6c26b5bf56a0975ee13241de8a620258de3750f98e5f",
+    "build/analysis/unsteady-2-3/time1024.npz": "40f8965a55a7d0177458875dcbaf932ae791c25ac5495d69ace51d00a13f975d",
+    "build/analysis/unsteady-2-3/cycles6.json": "8dfa22f37ff01af35236d1c1a3c07408b90cfb60029a58cb2b11d1b705dfb5b6",
+    "build/analysis/unsteady-2-3/cycles6.npz": "6c57c2cbde555181ceea1c765291b4bbc3cc6b1ec38895b549f6e38bedc26984",
+    "build/analysis/unsteady-2-3/core1e-3.json": "5c813b00d45470d8cfcc307224ffd232a81adee2c71d414ecef9e51b63d8ddba",
+    "build/analysis/unsteady-2-3/core1e-3.npz": "f2a36fbdc35d48c20e4a28afb126096eefb4f59b4a60e06e837a0c2c13dab750",
+    "build/analysis/unsteady-2-3/core1e-4.json": "c46c306cff910d1d73564fec14616143f0e83b6c095dba7d5b9b508482e8a36c",
+    "build/analysis/unsteady-2-3/core1e-4.npz": "ce5cb6f2a2914f575fa1e0137ccd70d315f6093e1f9a7af39d57de7007bb005e",
+    "build/analysis/unsteady-2-3/amplitude1e-5.json": "e0a0f65937706ee190a9c54200e27b0a36db4fd957c5eb5b0e3d929bbc51074e",
+    "build/analysis/unsteady-2-3/amplitude1e-5.npz": "a47b077033f15eb15e11dd5f6283af97a3bd470433c64d9a97dea412f008c13d",
+    "build/analysis/unsteady-2-3/nu1e-13.json": "d84178425a38dcecb7e9239103c79098778eb09fed3f2597314545d0776dc72b",
+    "build/analysis/unsteady-2-3/nu1e-13.npz": "df48c801a7bc5653b143f36e18287b9928d21c61ee01436f8fa295fb73c7d142",
+    "build/analysis/unsteady-2-3/space4x24.json": "b43a5b6f41ecef01f0076a76b16641969686e4a419f4d786dc0f6122fb7bd3bc",
+    "build/analysis/unsteady-2-3/space4x24.npz": "29e810bcd266a4c013fb9e26cf7fd1b10b0a3973fce8e307c56cd3cbae2298c8",
+    "build/analysis/unsteady-2-3/space8x48.json": "6d3d9d45086ba81b2b57011cde99360254746d05a68b672b5c210fc750f56168",
+    "build/analysis/unsteady-2-3/space8x48.npz": "3970285f14219a567df8dfe6a3aa7ce23758d19eeb78209c935d72a6257d90bc",
+    "build/analysis/unsteady-2-3/candidate-m2-n8.json": "90a29cf4b5227329e35e3f127b4503cd8dc33b64e4d16e02762ec5882c782a6f",
+    "build/analysis/unsteady-2-3/candidate-m2-n8.npz": "368c48a71adfa9eb1a04c1604161f1fcce732da845135f0901b66a83e9a5f6d5",
+    "build/analysis/unsteady-2-3/candidate-m4-n24.json": "655cac640809a235c7a9cd81600626bab88b5efc7189d3d2bd3ad3786e55f475",
+    "build/analysis/unsteady-2-3/candidate-m4-n24.npz": "6784c31639b1a5bf502862a8f1e5c068f748cac258c293ac150bde06f8e40cc4",
+    "build/analysis/unsteady-2-3/candidate-m8-n48.json": "28e99782df3dcf4636e80bd1f17606014c410eb587307064e893902332077a51",
+    "build/analysis/unsteady-2-3/candidate-m8-n48.npz": "94c89fb871f5391932d6893a5367deba97753eaa33fbdec582c37f2db43c4f26",
+    "build/analysis/unsteady-2-3/candidate-m16-n48.json": "825fd063319f56b2c528a0656479213f6b7d1e6225c92874ec843d8aa5937f6b",
+    "build/analysis/unsteady-2-3/candidate-m16-n48.npz": "cea7cf3091aad6479e246b5be101238485b7f12b4acef60aae037b7e8521d5ba",
+    "build/analysis/unsteady-2-3/candidate-m16-n96.json": "a474e5e9508cf811330dc369b1860822aed92d7457a488c94bddcdf69be83e4e",
+    "build/analysis/unsteady-2-3/candidate-m16-n96.npz": "54432efde3765770e72a908f8f96129b2a78b11684c59e4baa2c5864b970e093",
+    "build/analysis/unsteady-2-3/ptera-frequency-m2-n8.json": "1b71cbb95cceb9bf12bc5490c6552dcbfc5136dd2cfc3014abfbe02ba3027091",
+    "build/analysis/unsteady-2-3/ptera-frequency-m2-n8.npz": "eb577e322e57895d767eb2a4582596afc65e738ef2b76de9865f4f0a02a577b0",
+    "build/analysis/unsteady-2-3/ptera-frequency-m4-n24.json": "76f221995a6cc947e1a302d714e130f9625e7f2fccb9a022d3ea667ea3e44d95",
+    "build/analysis/unsteady-2-3/ptera-frequency-m4-n24.npz": "d853542676c34e4eb42b784cd57afa83549cd4a228f9947762673c7f78a28dd1",
+    "build/analysis/unsteady-2-3/ptera-frequency-m8-n48.json": "5ea46dd84da8c3fdb86403888e54cc6a5310f059c1a5c4832612d0f2a7e64fde",
+    "build/analysis/unsteady-2-3/ptera-frequency-m8-n48.npz": "21308c930d820aeb8bd129350de9db21ae5b8755a78cbfc02cd5a6ecb22d6740",
+    "build/analysis/unsteady-2-3/ptera-frequency-m16-n48.json": "3bd7d227290441352fc448b6eef2005e9619af6fe71ae42498ef518a575d7e9e",
+    "build/analysis/unsteady-2-3/ptera-frequency-m16-n48.npz": "9175bd101ca45878db0f3a60f156f3727a70365f9352cfb284b94b6b4fd7a626",
+    "build/analysis/unsteady-2-3/ptera-frequency-m16-n96.json": "677587cbb6c78c1bb2c70c5f02c3c242225d2835730ba95f7f97a11b78e5ee47",
+    "build/analysis/unsteady-2-3/ptera-frequency-m16-n96.npz": "c007d5cab33bc22e92df5563736348ee823f45fa49802284375d934a1db95633",
+    "build/analysis/unsteady-2-3/candidate-quadrature8.json": "6101141ce0e40856f584d3a0b6597167fbf98451bf6b75e1904f77f21ffebad5",
+    "build/analysis/unsteady-2-3/candidate-quadrature8.npz": "fc2abee3b99160fbba2f06c727e78853686c29f0954dd94100d8cb4380bee0aa",
+    "build/analysis/unsteady-2-3/candidate-length128.json": "f1c90e4889f8d8cd09c966561788795daf98224812451ca7c89c2fcc514b425b",
+    "build/analysis/unsteady-2-3/candidate-length128.npz": "3b8ca31f331437d2f6754ad867c91630a62a9c2148beb8082a502656dd27812c",
+    "build/analysis/unsteady-2-3/candidate-length512.json": "a820f0d99e14c3208f633b3d3aeca1ddf250fc2cea429da275b0ce88d75beba1",
+    "build/analysis/unsteady-2-3/candidate-length512.npz": "ef5d0fd5f0f86c5fe0edd60f171041df88c9e45ebbdfbf3bc033effd2c318c5d",
+    "build/analysis/unsteady-2-3/candidate-core1e-4.json": "841103864a5f7ff30fffababd6b500e138c1063d696c648d9c24f1f88117061f",
+    "build/analysis/unsteady-2-3/candidate-core1e-4.npz": "a232dd46f86121508eeb819abc2ca2d3714b3f342b09b9c5ad55ca46b90af289",
+    "build/analysis/unsteady-2-3/ptera-frequency-quadrature8.json": "0e750131c3a2ad23a5f76d2df59b21ed58b270300ac3cbc15d8a71afebf629a4",
+    "build/analysis/unsteady-2-3/ptera-frequency-quadrature8.npz": "7ebd21faec6c73161a42b8f63c8b29c91fd0ba228432163b8bc25ddcbb2695f0",
+    "build/analysis/unsteady-2-3/ptera-frequency-length128.json": "55cd2ff1951826da9adb0b4af8faf139e9f7f4252c96d2ea76be73c25252a23d",
+    "build/analysis/unsteady-2-3/ptera-frequency-length128.npz": "119b69b5d178ee4e2aa35fc29c54a4c10ae4059a85ea5b3cb7df4f9a92437c72",
+    "build/analysis/unsteady-2-3/ptera-frequency-length512.json": "bbfc72cbc7b7b8c776567e2873f158dc8d07b9a178b93c1e2f8b07039ad39492",
+    "build/analysis/unsteady-2-3/ptera-frequency-length512.npz": "a16746f0b824d0967c522bfb0be1fc69fcd191566a4020e2e0f965e42c2fb815",
+    "build/analysis/unsteady-2-3/ptera-frequency-core1e-4.json": "49bf82c72ba10720efbd21a62a485ed32389a113fabd16e96644b9e350f08d56",
+    "build/analysis/unsteady-2-3/ptera-frequency-core1e-4.npz": "edaef660ffc0e470db8ce6df71e7e5f6cfad274cf5023cdcf5b4a994f1a17b9d"
+  },
+  "uvlm_2_3_complete": false,
+  "exploratory_moment_pole_sign_corrected_from_raw": true
+}

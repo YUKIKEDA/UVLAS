@@ -1,0 +1,4397 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-band-aligned-grid-experiment.md",
+  "source_sha256": "8181ed62b76b1b876a7e8e28996a102b89b75ff67c3c967a72a35976483b308a",
+  "input_manifest_sha256": "b03ef526cc2aa044e0f3277d74a7690c6efda35a7e96ba511150b2a803123ebd",
+  "parent_result_sha256": "ba45fd42d86960818d62ac01908f124f6d7c94d2575f050ee1bd6020a6abaf6c",
+  "preparation_sha256": "6ccdb72f15d4ebc88fa367d50d6cb991abb51fa4310eb2f0289493c1392362ce",
+  "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+  "reference_id": "AVL3.52/DP/zero-core-exterior-stable-v1",
+  "probe": [],
+  "processes": [
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N20",
+      "seconds": 0.32798551700000056,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 7213056,
+      "input_sha256": "57d3172a1fcdf0f219504a1f38e7262d44bddb2f17212741ce2a39640a49cc70",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "6e55ae20ea4b65063187521551a0b027b90c93a9143fb77612507009f684f8b5",
+      "resource_sha256": "0bb0719fbe2392a1bea7759c1a5074bff0d14ee0f74df02f919425482db694e1"
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160",
+      "seconds": 0.918724256,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 26734592,
+      "input_sha256": "4338b493600b92afcec46a821596a198f48a6f1107762f00d369f0b789409263",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "d15a518cb6a809d5c499022d8f9565a5da0aaf3c76fc44c701d800ebfb34c1eb",
+      "resource_sha256": "63a761b0deb94661e4fad4f877d00a806b21f81cf15da193310b144d1003e9fc"
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40",
+      "seconds": 0.5159047689999996,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 13430784,
+      "input_sha256": "86aecbdaaadb1ae2d1494069a06d1b78138875b9a12ee66047f70503e49e12db",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "6996d21de0633c21210939887df95187ae1619116af7309f8bb421961bef6991",
+      "resource_sha256": "830d954bbffa0733ebdb70f6cccf1c97993a33cd725c0a560151f2f89ac38700"
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160",
+      "seconds": 2.031496913,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73342976,
+      "input_sha256": "5bc522bc6db813cb3bdffd801244d78b08ec9466c6a08cb4f13c7f5b7938e961",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "75a99e7171582d4db53a820e646f167569363e30c9401aa4acf0aaa93326fe68",
+      "resource_sha256": "03525d9a92880a3da731e4354e8082d2b360056f9846c64b542fb660cac839b0"
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N80",
+      "seconds": 1.925150137000001,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73277440,
+      "input_sha256": "fc20488aa1580adbc5c2b6465a0598d92c5f80d1e35798ac57143c5638cf75f8",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "d146ab435986942c7ed1de163fc93a8e498eb12f79c4f533cf0e437d4df8ed94",
+      "resource_sha256": "809366696f1fdf94a4bebb81e5577623bd040f763aa2a90f3617f937fb4416fb"
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160",
+      "seconds": 14.362260542000001,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 243818496,
+      "input_sha256": "4a28485c9257b78b89fae3821500cce83682179890ef93e3467714d63d9e1af0",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "bc860b6489c70752d794556ee98d5cc0d82c32e4c0a88f159c6727588f42d956",
+      "resource_sha256": "ad4f54f2ddebc7e66d5e3e3c1cb9490393db87d35c493b83df8e907688526436"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N20",
+      "seconds": 0.9162079839999961,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 26873856,
+      "input_sha256": "92d3d84c5eaf58f7d10152c77b736580e27984568ed5449bedb6de846904fba0",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "5992f05bf744467d6a59a2a864a88b293c9aac1be423a9899c08c1105b44a472",
+      "resource_sha256": "4feedffd6ebbeced3e0839f2870917eb5f2d995c9f39c825b614c3006d9e060b"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N40",
+      "seconds": 2.432510188000002,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73461760,
+      "input_sha256": "76b933339cc608075b65ee423893e4d52589774d11dba7e8267da6ccc3803d2a",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "7efac38fb0a8ab3c1ed8441ca47b2703e19da7df03f1f137a9c4b64e583a1783",
+      "resource_sha256": "c3157e3651fe5b987bf52b0e4a55a540b8053d635a8141efdfcc6b44f37b490a"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80",
+      "seconds": 10.477905381,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 243666944,
+      "input_sha256": "1085b3dd5af52c6ea621b63be3ed6d3dfa90f3802873e163cfad87567ea7dd70",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "10059c12c6003328c1885810be4f6d22e1e4d1943ee90d7fd12d122975603c63",
+      "resource_sha256": "c9be054cf5717bbc040c062233e9b1ae490ac6700e880f3e8abb4e42a3b68dc3"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160",
+      "seconds": 44.930614683,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 894119936,
+      "input_sha256": "6875a852b03cc6481a299526bb81535fd11966f6fc83e61a1d598ba306b567ef",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "4970a07a791d37c91d3d1d205268cf21001d282f02c0805cb803501a8cc7f539",
+      "resource_sha256": "69ec45f8b390cf2fc2ce8c60c361a89742089271675acbae76f93ca80dcfdbe0"
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N20",
+      "seconds": 0.3208358680000032,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 7249920,
+      "input_sha256": "7543fab5680dbf1c99befa2320470b228a18704fafde013d7a1fdb216b9ab17f",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "38ff7e44d92c5fdd03608f29afb83f5a90672815001cf39ebde4e23cd92ed845",
+      "resource_sha256": "9785d86e1e267775689b7eac7d1c9e7461a67fbd42c2f8631f8af9dcbdbadee5"
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160",
+      "seconds": 0.861707741999993,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 27045888,
+      "input_sha256": "92fb8e4935a9bf22ec16f7f56ebdef45f1e71ed4c909cefbf46a4900f6b47216",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "871e42ddcd074ea8e142957c1ba30f5fbf11f75bfd88afcb1fe3b44d60745c28",
+      "resource_sha256": "ba035831a32296f329c1225e16117612f5ae1a347a68813fcd8796865cb6cbf0"
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40",
+      "seconds": 0.6173137459999936,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 13418496,
+      "input_sha256": "29f08c8662d4ff04170766bc957b36d4aee9dd6df991efe5eb10dadffead5325",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "b9e178e1b32878f1da58c4ad81cac56de5da85801a867ab71bb2e7086e6d1a40",
+      "resource_sha256": "1af1947e26795c3d20f09ed15c678eca2504072ff07559eeaccaa985727a7422"
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160",
+      "seconds": 1.9188461589999974,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73654272,
+      "input_sha256": "c4dbdffc42438778ed9b7c2988d3a65dd0e62b359a118d4e56e3c64364a65e90",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "77f3b1ceaaf7f09da61bc5a7102704d1c6175c24a55b71b0155e980272a67080",
+      "resource_sha256": "cf78fcf8a03742fb2b3650bc5f284ff90e151ffa0107461aa83d002162494223"
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N80",
+      "seconds": 2.1576590450000026,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73392128,
+      "input_sha256": "7a897f5f933a3564ae8a98d5bd1f824bc3460ddfc7b042baf26688a16b344593",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "476b397f4407f0ef89204d6336dc7eced501774a245b09708afec40a95b5ac44",
+      "resource_sha256": "dfc0d005f8168f26b011a74182f617aee8de54f68f18e627eecaec97b9e82c2b"
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160",
+      "seconds": 9.970837783999997,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 243924992,
+      "input_sha256": "e9804f4855983395acd3f33453b38e7a081cbd64c128eb8afa56f470fb9bd7b8",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "98d3c93be82ec9f476524c0e2b03c9f1688cfca6052b41e10f12c4f3d2fd409a",
+      "resource_sha256": "e994752d0f7d0f69c007ce826bad271c6de5fcc65a313cd1bece43ac2c9750e7"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N20",
+      "seconds": 0.7172879180000109,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 26861568,
+      "input_sha256": "c8ce4201f19bf5a749945d435f25c62f9eb6aacc1c9488c2ad7fb6e02e493d19",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "d419d32fa60543e095e3b45fd7bae64ff11352a9e17613dfd17a2c573846674e",
+      "resource_sha256": "fb36bfe498d266375dfc2a56ef652d89600045c0c2a508c136b010d52a0ab0a6"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N40",
+      "seconds": 1.8313846610000155,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73420800,
+      "input_sha256": "6bcc9ac0a18e102d72ecf2e3d00032375454761c1524d0ca24f09c484a928de0",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "13d11ead88a75952c4c2248939df9352c6ae6658936b6b17a52f7f630a3a03e1",
+      "resource_sha256": "79c7ccbc798aa005625f8999706af4cffea78159553eb13826ec915939b3e4fe"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80",
+      "seconds": 11.52250336900002,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 243679232,
+      "input_sha256": "162f6e31ba4add862957f9cdded48266b81a88f9c9699c421b3cb817fd28f381",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "a3280d425f156c2d003b2881d683120debe026ba8f7c67de0b8e86f733f91978",
+      "resource_sha256": "b2d800e8580ff43886c496a4f057df2a757934a410cda4607d685abbbf410552"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160",
+      "seconds": 43.23830905300002,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 894042112,
+      "input_sha256": "2f7f84fb11f1b65003c97740b560fae47d56f03f374e971007970331a7ac331b",
+      "session_sha256": "56f751f1fbca1ddff41cf0c03421065516ca0c7c590e4822baf5ef5325d02fe4",
+      "console_sha256": "fd193646de5a0d15c6e34a6be24e22c59c96c23f7c01b42e3fc5876570f05c80",
+      "resource_sha256": "af5cb09c56e8d13b88779a6cab0c98e369e79f389ba214e7ce91c159edb59d7e"
+    }
+  ],
+  "runs": [
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N20/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "22f664e816a3888020fcc20e1df0cb545a157225c61d231ef152728d6cb7276f",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "7d9d5e18390ee68a825e57510e679cefcebe7c96ab897efa855239fa3d86c8d5",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "590996b88b2f274f3da7fcd406caea868515a98076739b0c32a2c836310baf0d",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "22f664e816a3888020fcc20e1df0cb545a157225c61d231ef152728d6cb7276f",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "eb36b70b27af79b7626e46ec30632e8d0f89f5472ed0e9d1efa2a60d9d1cca80",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "9b63fe44de7eec51dd2c32285f8406f8cc63c63071f5871fa5921217956d74b8",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N20/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "b226d941bb1214f5557af1396fb6ee7feacb24bfba046cd7713fe04a83795011",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "b3ba7a7599191775a15bcb823a71d78c1f7712c222f93c1297b0f202f3839e04",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "5affe2a11e5cef29c667953abb2cd8f45bd2d72defe00b03e62d05e8c27ee20d",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "b226d941bb1214f5557af1396fb6ee7feacb24bfba046cd7713fe04a83795011",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "87884d26fd140a30d1bae09c1c39aa2bafe075ead92193eaf774ec35b0e45930",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "07475bec5bf039caf9c025f961e7311d7a8caeaf1a926ce4216fbe080e9bd7fc",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N20/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a79da46ae108e7604c087b84965158ce921e4e3090e0af8f86183875eaed1002",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "55d8ca4ab6cdbae32a428578c5c1f80bdcdac4ac94ac33af6779a07181838455",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "539f1df981613fd5baf7f991e17458706bc6917348fab8553fd9cff9953e34eb",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "a79da46ae108e7604c087b84965158ce921e4e3090e0af8f86183875eaed1002",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "6f6c9442846bbf0395b8419b7ecbe1e0255693dcfdfb070b5158b3eaa1152ef6",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "9da5340ad8b712ee153675c33890b018491a4c215d0c24053bd4512d8af50d01",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N20/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "d933edb35d42dcac6cadf61e9209fd049be50b232db31e727cff9b5c400d14cc",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "53b9b6cfe0763e9fa9d001c3d6faebe925cb76d286e5f35557170cad1c28b4e8",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "ba07f882727d4b3f77d075f4130e8d520b2183bf3e934c3b639f4e1d192b8302",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "d933edb35d42dcac6cadf61e9209fd049be50b232db31e727cff9b5c400d14cc",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "b61a8743ff7e72a5d5e7866106d9422c7bc08efabc8f06037c5a95c301c16a13",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "80df67d04709532e57212b0117f83128206176b0c48fb23914bdd0e0aa8679fe",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N20/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "4c41f3d2ef91764d16e3dc9ce6a833a3a5acab8a3888263c3739cf9acfc27245",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "011a78b7237ef4b1a08e6231d681773cf70befa49ef2e36af961592dac547f98",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "cbc93fa2f939e3a77750288e3ec2c14365c9a5ae7c697897921b63dd8adc8da4",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "4c41f3d2ef91764d16e3dc9ce6a833a3a5acab8a3888263c3739cf9acfc27245",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "a14e884e4f8140bd6f003b432384bf75e41eccb0c94b534480b850fe7035d7bd",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "9b922877bc42cfa8d67ce855a28f6280ef77871167869541f8d0904a8e3b5e7a",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5f263b953d7cca52623a1b207687d8841cbdc64d9a44fc8e1b2f370c02cce4f0",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "9c120bc3c5f6a1b24e12e79fa4a31ae4de221b1135d385d3f13511508188f049",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "64a335767a772a34bf7592a53b013f3c51f9fddcc8b85f32c73dbf175d290ab0",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "5f263b953d7cca52623a1b207687d8841cbdc64d9a44fc8e1b2f370c02cce4f0",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "281cdb8d88b8b3c8e724936ec2fe2d54499cf87235f46b48a22b837f28124179",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "6f2476876f8df6baf5d32c35dd863336486925454731e861a4b5e87119aabc42",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "02c8d6814050e53a19e8529a37c456db35c5e9df3ac3a0779147066a345f2f7d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "bcef14e19dfd90f34c28708632d60b9fdd34cdd782e0d96cfa6febf8407ea3b3",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "21055cb5bcd01097a627cb21da8f7d3c2685fe175ec4a2ce944eb5766abd15d5",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "036e15920d3de53376aebe266cbe31e303516fae3bb90bd238771d4807a95721",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "bcef14e19dfd90f34c28708632d60b9fdd34cdd782e0d96cfa6febf8407ea3b3",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "923be4ad7043d1fe03e2aa791aae700afb85c2999a20e72daf72a2ea879a83eb",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "ef9d8e371465903cb440bcec1070f2c0a2029daa7457103c1c6c30e6217337c6",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "02c8d6814050e53a19e8529a37c456db35c5e9df3ac3a0779147066a345f2f7d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "725cabe872d968ef5b123a6c09f12a0538df7e5964006efbe8c14e13a43c12ce",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "56478b9a0a6de32ee34dec1534a6c83403214e7a80fdb5f09f8335d6e1c850ce",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "a809469461591b01f40a1d8b674c226ea4a9f2126edf707b05e518eeff642cd9",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "725cabe872d968ef5b123a6c09f12a0538df7e5964006efbe8c14e13a43c12ce",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "0f1c853a3a117a9941bfcd0ee14d6c36728040ef9ae21597a826a63643d5b4b6",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "2218158362ff9f9d68e8e9c9cf1f1e7b5850084efca0a6b9ce750c735330b947",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "02c8d6814050e53a19e8529a37c456db35c5e9df3ac3a0779147066a345f2f7d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "f52fc6db41f931d01447ed5149be07faecac9cd7977986e21b52300009377605",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "eb5e84ea29dd18e6a02de8dc6c1b7624e31ffe07fcf117f02efd803b9ae32d38",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "48e5d4ab4732e2b37274089c70e36939486db9024979d3143b41aa07238246b6",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "f52fc6db41f931d01447ed5149be07faecac9cd7977986e21b52300009377605",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "df54321aafdfa61655adcfd81456bacea775fef1c8e8176a2614353f6210b83d",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "31750789bb2fe0ae71dc619a9c0d19cd516fd71310cdf53f41791f5b165cea6f",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "02c8d6814050e53a19e8529a37c456db35c5e9df3ac3a0779147066a345f2f7d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5d4b7d167771b2edac18bebf7c4a1eaee39ba08a5938f2b8782769067fb33a9d",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "b418581fc42dffa4a4cfd75f2046c441cd11c9fa18311dc01359de36fb93e5a7",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "53b274614747c991449a706d5ec6a857d98476fbcfc8b7cbeb332d3e0424515a",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "5d4b7d167771b2edac18bebf7c4a1eaee39ba08a5938f2b8782769067fb33a9d",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "fb4d1614fce250028811793446c5b190264090ce7bbf6f63e360e59e87084d8a",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "beb063877e9527b7d3497124415d5837a0c51e926c6a46b54d5cfe2051f32f25",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "02c8d6814050e53a19e8529a37c456db35c5e9df3ac3a0779147066a345f2f7d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "fc81e254f06bfe018bf260e2a1ab5ff556107852e07f3b4af21084aea1682ab0",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "203b2b650b3ad11eca282735bba10a8be7f6dcb25a6316462b214802a18108ac",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "2a5f7d7c7cf6f24e731b433266667c885bb794a84754bd73d74349368d89a922",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "fc81e254f06bfe018bf260e2a1ab5ff556107852e07f3b4af21084aea1682ab0",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "67acc1df3f47bd6676f275a7bdb1dfe4ce9d8003634691bdc1d636be4c239112",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "49554cf40307102588c5cd93a0eb081447862c8541104d69c11dbe9d9feccfaa",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "f05dc7500a3aaa264a8f30c06071c6cf51a2b23d010b1778550c01946f973e0c",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "cb7793070e1fe07751c290fdc595860232c2b3a66e42307152d38454c4a5d014",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "41142c4f67942d489ac04c01e36ab1e8374b5839d4674142dc4ce1e28df73fef",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "5fea83be54acf0038423735fe759fad9cd5550147239dd4a4a3e0752b9213751",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "cb7793070e1fe07751c290fdc595860232c2b3a66e42307152d38454c4a5d014",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "14eaedc2d6ba1feeb1a62bdee0cc499d02a988f093387790f48a4530fb45e3e4",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "710e36ec007968c32a11534d83286ed7d2be133a1051f22ade88eb323605280f",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "f05dc7500a3aaa264a8f30c06071c6cf51a2b23d010b1778550c01946f973e0c",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "6992241a6cdd2168db6954e7d192acc855e6c448d5c8f38a7f9d13c0b9458d22",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "200a60fbe2edb0eafb815f03f8c8612fc472f99a1fc796535b8cee65358754af",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "e856919685ee70f460fa07a4f817d59d4d935d5a05e3c5fb8a4e1509fb23847b",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "6992241a6cdd2168db6954e7d192acc855e6c448d5c8f38a7f9d13c0b9458d22",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "22243673cdbf3b88a6baf720881087759ec798f0f41942dbcbefad76ecefc7c8",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "3e0c1c4fabdc1d6f1bfe0d6a906aa1d1e7da8de2631bf6e703e4f53266f12afe",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "f05dc7500a3aaa264a8f30c06071c6cf51a2b23d010b1778550c01946f973e0c",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "6177fc1d24a8ef87b972a2b9621c9d9ef02e4bfec23072d0659f17208ab7d9a6",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "6801aaaecd099b1d1a39e1a796af5df507fd4ea924217a33ab1077addb184b25",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "0e9bcd82cacb4def996715c2f9fde82f0aa1ae732667397c963f10f96d9352b9",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "6177fc1d24a8ef87b972a2b9621c9d9ef02e4bfec23072d0659f17208ab7d9a6",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "c8b65062afc9a1d36c8e7fcc0bbfc2492fc8272be2bd60a496d396a0c493899a",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "b11aec3044d7b40ab3b4a8be8a5b6a60f5822cd573fa4fb60dfa1e8607264a2e",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "f05dc7500a3aaa264a8f30c06071c6cf51a2b23d010b1778550c01946f973e0c",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "bb2017d487b0814a5cfea3299fc68970f648ad8d01acf64f7c1f7a64e5cae2b8",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f9e2678d072de20e6155a039a61295935e4d84d88dfa41d846f01308450d103e",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "4d97805438e3665ad82857551a83e590861044ef6d733b4106b98b48ee462f43",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "bb2017d487b0814a5cfea3299fc68970f648ad8d01acf64f7c1f7a64e5cae2b8",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "7beeb3b5e91670883e8ee52e65039e30e10ed7be545b21d949a010868535cc56",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "4a4c3178af9d058ff9e27a64741d8f253a2b496cce43b712943180fff3b14350",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "f05dc7500a3aaa264a8f30c06071c6cf51a2b23d010b1778550c01946f973e0c",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "109e8ba8d5f4352d01b693354ebc003c916de3d1a8de9851f9d215fbc4ed97fc",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "83a4140767b7aec02c64c2a2fbacdc5bdc4c5883f3808f8ca71652d9dc792017",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "cd380bec415afe093ef37ac4a1f7cf68e1be43a4673f59dcdb83588e72158bbf",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "109e8ba8d5f4352d01b693354ebc003c916de3d1a8de9851f9d215fbc4ed97fc",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "6e3e72eddc4f3bda99603898eaa9da95bf03b610bc80e51831c3ee1c05fc295f",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "9fe07ebe88c296295e7b52463272acaf3d5d3aceac62d038f5a646a9a19b42f4",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "066127e74bf3f19016585a380163572e43ba85dfaab181ab5177f4a3971931ac",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "eafd5c95b8a578db79a2e6de763cf39ce0ed29994ec93abde75dd17a0c850e66",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f78a42e567de32a29b4d43c2bd0937994121358e95ada723f5447f0e01979d74",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "bbd2bfbe0a9b233e4c21b609b1c7b4a05b51e60411e00d02a540a6d5ce1738c4",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "eafd5c95b8a578db79a2e6de763cf39ce0ed29994ec93abde75dd17a0c850e66",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "bbcfa586aa9da079488a1cb0fba26c47f0273cd9864710a963f67c501603837b",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "359b122a51406d2a7d57d2018d13210a3c062184cf82e95435a94983b5227c7a",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "066127e74bf3f19016585a380163572e43ba85dfaab181ab5177f4a3971931ac",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a6112795cb67452ca520d4447bee071bb49dd3e14497a1e8ceae3f52e8a71052",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "cf3f7ca9fec3c9e715aa4ad1e5f06b71d98048e0d61f7f43941f6fce66861d53",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "aefe9377057b91b8f3fbec17e256e5895fcd4de6d8863b85971b537ef17c1021",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "a6112795cb67452ca520d4447bee071bb49dd3e14497a1e8ceae3f52e8a71052",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "cb8797d45b8177e9a96a481f22b2f6677c89a4a6090b16429ee4fd1452b737e9",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "e7b1ef0c75385ffd4c18878d3c9d6d35272196fb04b33f211e7b97e29eb4351a",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "066127e74bf3f19016585a380163572e43ba85dfaab181ab5177f4a3971931ac",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "f0a78954a78f3aebfeb3048e7acc655a226c1a5bcec2b3c6d84feea7bca4201a",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "bf7b57fc0125c233da472058c779f637a3395e45f34bf267d91d51052da7d684",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "799fdde098cc4f2357578ad24cd541740a260664ca13d1c11ec9be76cc36c122",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "f0a78954a78f3aebfeb3048e7acc655a226c1a5bcec2b3c6d84feea7bca4201a",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "aaa074266ab31d54e9d66e9f0900d332a2bc70dbc047976721ac9bcd2c4a84e0",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "ad029de85ec6ee9a0963119db3ea94b5cee89ed5ca22d1f2de75108a7c5157af",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "066127e74bf3f19016585a380163572e43ba85dfaab181ab5177f4a3971931ac",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "c6d89d4101fdb3d628a33fc96bf2ff01cba16ad8785903c7e19727f1903c545b",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f9665b11c08fa568368728e33f68d6d375746ccc8135670bd8840a44e097ad0f",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "4653dde559c0b46ed09761e8784d03783b7037a016c95947c237649dfb9ae88c",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "c6d89d4101fdb3d628a33fc96bf2ff01cba16ad8785903c7e19727f1903c545b",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "12ea96bafa9703b4fe3cc21a3f9f0808f95740b06e63893c12b253c620c0a9bf",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "35125e209a68e361a27f5950841cb107bd16f50f48236424d1e2bde3062951ec",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "066127e74bf3f19016585a380163572e43ba85dfaab181ab5177f4a3971931ac",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N80/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "438c89b6ef7a826018396969bfde82bae37985c218c78dd282a0c9ba4e4a4151",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "87f4659d2f73d0822544b489c9434c8a2ec8812a3323af4903b288b9beaa186a",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "be42f3a2b50d6a1900e55bfd8805925e7b47a7fc03742587b6be78100a4bc401",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "438c89b6ef7a826018396969bfde82bae37985c218c78dd282a0c9ba4e4a4151",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "d3a0cc86db9e05a04636af0f81d7c60e32542e770f2a6795595a15c44de996a9",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "a9ae646e7955a6737f1735eb4f0292cc7a9814ba24d273f1170013087ae8a377",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "4eafde4751a7b716392848ab0b9125ad28cdd17c09d4a9fe382c455016dd0ad5",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N80/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "eeeb424c592b87ebc7ef65775b2d17376f1c8d662f266a4e2d15537563e1ecf0",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "394a89273b51a0dd237b9962361173844e072e2ad9a2bf29b1319d80fb4415ca",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "dcafa7c07ae3437de6229c2bde7459242ec2067e460f289dfcb0f941b821bc62",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "eeeb424c592b87ebc7ef65775b2d17376f1c8d662f266a4e2d15537563e1ecf0",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "d2ef6f99449db6bca6548779fc9841a99310bc46cc4068b97167b6316db2df44",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "24ae3ca777faaaef4cbc32413d8667a9f2653adad415fab8d1da6ce06f5e9414",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "4eafde4751a7b716392848ab0b9125ad28cdd17c09d4a9fe382c455016dd0ad5",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N80/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "0a9ba91a62a95c25c91ce3ac7a62acdf262dd1299a25bf611837ee80fb3d075d",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "5d7a6255b5a5732bf9a541374a3aa3f05168431aa55ab7c0fe1033d27d981ecc",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "507ab4542c77311c62d065c23376e5486fd2bfdd51710d60c941c3c1eb8181d1",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "0a9ba91a62a95c25c91ce3ac7a62acdf262dd1299a25bf611837ee80fb3d075d",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "dde0b74d580f70d1be36012b72b3d0a19e6b90264bf37a9a58feff2c77f33f5f",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "0f8563215b379f3059b379b27699627ba5dabb923881ce16bfb391c7235aaeea",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "4eafde4751a7b716392848ab0b9125ad28cdd17c09d4a9fe382c455016dd0ad5",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N80/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5b0630b3ae734eada9c60facc6c6b4759c3dc126598861d94cde2721e9d66dd7",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f1f215d3f6930e7c21db6c923267cebf29cb64fc65be077f7e5747c876835f7f",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "bedf40ae50c8fe6af0464685de9de90db52f198b9e471f1e5978ea9d798f4361",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "5b0630b3ae734eada9c60facc6c6b4759c3dc126598861d94cde2721e9d66dd7",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "73c0e2cc62b9da6ff2098aa0efd003fecbd0359590030890aa01f5c0daa184f1",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "ca1ec4a479c8a334dc0cc4fc18b1cd66b7b87ecf9e1ef44280a4e4c880b19b06",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "4eafde4751a7b716392848ab0b9125ad28cdd17c09d4a9fe382c455016dd0ad5",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N80/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "866569291496133e93e13a7d3d6595dc8965288b36d0f3392216ab0a72d48ad0",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "aaf7a5b0bf9f27b806e97d66789d396e880048a55c159a7ed909b2a91596a87a",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "7e9f4f92ebba09c497f1e10c30741ac530cd39841d9f6f2917f5e606d1f6c07f",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "866569291496133e93e13a7d3d6595dc8965288b36d0f3392216ab0a72d48ad0",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "80460dfd7afa872d6aa6de93eae058fc33da2dbfa8d032f0b56ab28c22f44a5e",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "113f568ea7dc6a0acf7a5166f4c0ce35312a63969044829e0ef70efb3cd03e25",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "4eafde4751a7b716392848ab0b9125ad28cdd17c09d4a9fe382c455016dd0ad5",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "2ba93b79d3174685fd88fc186dc0ff1f74bdabcb59c4986d64c757e414e0a9fd",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "57e0d01143a6551223c19b83deed248395fcd24530edd3adc9d7c6b40c48acab",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "df03c46dd8b2af6c8cfd3f7bfda822e3bdc813965e860b8c1d499a42881925c1",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "2ba93b79d3174685fd88fc186dc0ff1f74bdabcb59c4986d64c757e414e0a9fd",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "3a2f3e61ca77122ba64e1671a0fd790fb51d63083179acf66f2ff36709be012b",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "92a603e97242e3b872a5e37df663cddd000ff99dafd90f3558d021b205d05b2e",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "09aa57e76491ac6aaa08c9f9a45e74ae152567508ee761e91be357008b0fc2ec",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "b713d2c341655987b502e5db37eba455ceb9a7aadd837e0f6a6d8ba7355ef180",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "ad43b5f0d86b51626de2ffeeaedb2ca1b0299ddbbb2f66eaf4410bc681152a05",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "09aa57e76491ac6aaa08c9f9a45e74ae152567508ee761e91be357008b0fc2ec",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "47cfec82db78594be146596fb37beef5069b4ce9d19671b484d572c3986f5de3",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "504c09c1016dd6b1c2a1ccf904b72e6c34b5d65f9a552b3069707bc1f038aa29",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "feee5cb7a01724974dbf595a47e9485f1343dbeb3f4dbcd77f29d55768e0764e",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d7357599d6bcbdd93208671775dc12c4e185003db6a6c6996ba643357273565c",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "0513ed36f62314e7908cae0a4a9a71e2dd438183e10e0c9a785f250644faffa2",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "feee5cb7a01724974dbf595a47e9485f1343dbeb3f4dbcd77f29d55768e0764e",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8076d479a69ad76e33b82df38a8e55a3ed4f57adc89f112f85d42e54d3700af8",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "56a53debdb6a83ef60c6f5b387ca853059a1b0b0c63d4aab907059488fb90c48",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "aeb4d7cd1b9dd787e9891c321288fe461a413df6b0778520d341ac184fe9b701",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "2b54faa4cceba341101335b88feafd67e3eb57e5758253c1b64321e734e89ab7",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "6924b0cf07cf51782242c43db4eece016beca63ba46d50844759d3fa1a4d1c31",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "aeb4d7cd1b9dd787e9891c321288fe461a413df6b0778520d341ac184fe9b701",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "f886920a47bd6dc8866ac6b7ad577e0655bb851b71d94c47eb1245a2a43bb054",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "270820589a55d1598f64227de2c95eb70113a31b84aeb1eaa895fb21eee92921",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "0d28f8f01a3e7a49852f5135c1dfc21ed9dc65afd240aa38a4f42129dcdb0837",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "99aa30e02ca86fbc64bf3487efe61cd2f0a9de5e9bbcf7b0854933e34f8d887a",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "5e3ef5f4babb66cd87082393a0e667ad6555112324864c9600e584d98467760a",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "0d28f8f01a3e7a49852f5135c1dfc21ed9dc65afd240aa38a4f42129dcdb0837",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8c8ec00c1d0e57c208c7011f5993d04bc13315c4146fb1b44affe29d7986cc40",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "18531fd9116fa53bd5d76526ef57ceebbbfdda3113f8e1e9a47f95e909ef5070",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N20/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "0997097642ce65143eab7d2e39a8bee5121990a9d9eb7d99e6e2afffeb80a50a",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "2c9860b95389c22a5f523ebcd0dc551b983d3387b408ae48c2611bbdd9ff567a",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "548120e7bca7992b3cff3309a44835e98174dc72d59ef1557c560f4d8bd8c6f0",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "0997097642ce65143eab7d2e39a8bee5121990a9d9eb7d99e6e2afffeb80a50a",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8767fc8908455c221c50c60cb863dcabdb89ee2438e07c348b14f68fa3fd4cff",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "e4a13058dd39dc6f55aa921b88ae1ce6226dca6b90df3e88f46fdd7f48df4b1f",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N20/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "2cd3f440f53c36302e55a278284a3eefa2ecc6aed964ef24048e9899dbcd495f",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "97db3168ca025c2771cf0095076b278f91bf628aa14d03a8eaa1171b28e80e1d",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "a32e0f0621d8810f39016d3873a984b57f94a1740c7bcbf29331690c2a39ce9c",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "2cd3f440f53c36302e55a278284a3eefa2ecc6aed964ef24048e9899dbcd495f",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "a7b0d3092b1e47ded8b0a0b2c0c92789b9c2d5bba365c9225831456568311c8f",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "5344a1568ca6da4e295af57709470f7e211957cc33bd4a2cf90e6e588e632bd5",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N20/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "b1170fdc4a86704b75fe679481482712c0a48be9b1209e7cb77bbbdb64d240f9",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "1824d81347adc642ba380d07c67225784f5f7f6e189c4bad9315a9e56f76b45a",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "25d92c816dec76f4e21858cfee573aaaf18c4ad7db62df204730742f72a5b14b",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "b1170fdc4a86704b75fe679481482712c0a48be9b1209e7cb77bbbdb64d240f9",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8f164534a6feab24a3c4b9fd0bde27850ea81001fcc9f0e5747151e7b6fb2eed",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "fff08f8ffdf055d7fe0a42942ae5e57eb99efd888cf539a128530d7a714be173",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N20/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "af8979414ba92ad29dac07ff5147cf6811ea76572e081c91d5ca7203bfbb0e0c",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "1cbc89839a1838dd4838551ddc4816529e3296380301371bd332e2ed66d9677b",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "abb98282b42dc261b22d677e5b0b9f0e1b1454d960e509d852519676476c459a",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "af8979414ba92ad29dac07ff5147cf6811ea76572e081c91d5ca7203bfbb0e0c",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "6dda3eced2f7261a698549d1b234460c9996e7e18f5e1b0adf53a050ae973437",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "a1f2829c94af5e7acfe2ede3ad68471d2c689ff8e6f15ed083588043d248b00c",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N20/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "8c60c9ea30312a3bf8331e75718cd8858eb3a535d88db951a3f50d508a897ee8",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "981e5dda18171d02bf022554e8618e5f73a2e885df2922f32e4cccef1c521a36",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "4a6067e5935c7c9c7b84a36a28e29b1dbf54c11b46db3ad80c939dcce0c61fb2",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "8c60c9ea30312a3bf8331e75718cd8858eb3a535d88db951a3f50d508a897ee8",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "173fc63d36a1cbf1fb484916483bf5e55ce7f85587aa8c7c357540495aafacb1",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "95a9d174c64b5831c914a6a5372cd6c383e7c0c432ef096dec5229cc16a84e6e",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N40/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "92404a3bcb73eb38db999c082bdb0105794c3c7ea3cbf28421eaa42a335bfe53",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "a7b2285bc869a9df05257e75f9c30b5b924b5e3c2545f4b135cc9f247e9a503c",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "6864f1a33bbcedac80794fb050dba2a96e8c224e0eb716acd25570cfd2187e89",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "92404a3bcb73eb38db999c082bdb0105794c3c7ea3cbf28421eaa42a335bfe53",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "c97d6a9d87b0ecef2261916a4bfe0ce1c1c4696b674dda9ef99608db782c5d3e",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "4befe8d5b302be30d8cbab4721f169de248534a258646d99c3bfc4d5457be829",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2008a3dc2b554be564e4fc120b549d23e067e59a955cd071317c7d179b76cfff",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N40/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "bc59139d45471c62a15a6fe3de0da10962d34ae223f7eda7ac857ef9feb1dcc9",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "0d9fd6292878263ee78982c414991bf0d0eb9cec92d0650d5f246dcf67f5d4a2",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "c0e5ad5c0b24846abe7de2218ec52a36af798776e8041600c3f305699ff6a18c",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "bc59139d45471c62a15a6fe3de0da10962d34ae223f7eda7ac857ef9feb1dcc9",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8fcd78a1c3c71169cbed225f755495435ea42be7a0550b37794efc279be747cb",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "1094c6a2a79e77b27d7a2f32ce1c8851758bea1d89e8069a75f5b21434ad295f",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2008a3dc2b554be564e4fc120b549d23e067e59a955cd071317c7d179b76cfff",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N40/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "621d05cfb84ad854df3b8a37fb02260960569a479b874db1cda0eb61c6a9db59",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f904379079654aca75650bb8487fcb06a1ffb6152e094a6c9d670db14acb054b",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "37d89c1202a0b4b45039474012d4ef5d7dd4deef1f7faeee255331acc7cde7a7",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "621d05cfb84ad854df3b8a37fb02260960569a479b874db1cda0eb61c6a9db59",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "2c3f566fdced46cfeac395662e4c80a67f1529f73a84d396d403f96aa4efd0c9",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "7c1aeaa360c795df2852135821afa946e0ccd038ce1c8cb84fbcac46ad05c3cc",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2008a3dc2b554be564e4fc120b549d23e067e59a955cd071317c7d179b76cfff",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N40/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "8c1c72d6a28898115930bf4e364b06d58c3b78b364a29f9abad3fb68806dff58",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "1df885b182eebc1f4dd69dc12fb80e5eb39a3f761dd2f3e1d9dbc0f6cf29f719",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "6a79509c8c24f7f2386aa861a5fad75731bd5ef17bc8b1615f4a5ff25e8b0422",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "8c1c72d6a28898115930bf4e364b06d58c3b78b364a29f9abad3fb68806dff58",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "17af15d655be419e471cc830c60d68f9ec9c107e661515980309d5a7011a48d3",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "b9fcb8cbb59b50875df57eb772622e479b89d41b9a2a1dcf4ebcfd609b7a3545",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2008a3dc2b554be564e4fc120b549d23e067e59a955cd071317c7d179b76cfff",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N40/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "06808553c414231e475d4e360fc4ff2c9507ee9ca39f8c514a21df76454f1b62",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "c915ff12ea0d8dfd5e365e7618c306612e787a5346793559344c9e7c7e2a5bdd",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "63302ff9b6c1f97861fd2d63524c14e29812b447da8e4315f666d4bb710eba21",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "06808553c414231e475d4e360fc4ff2c9507ee9ca39f8c514a21df76454f1b62",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "2b72cdadaad59782b62a35421288569a3d6c96643d0f7c6fc66d3fcf30a90bf9",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "c74fe4d724142792c3d078297e8aeea666dc6f09506439f961dd353414a11776",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2008a3dc2b554be564e4fc120b549d23e067e59a955cd071317c7d179b76cfff",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "48657eca3d58ae1113a870e8f3d3053d4f67f17cffc269d427caaa5fa83afc62",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "b2a9a674f7252a1370c8267b8e6089c43eae7393e4923e0e665aab1d732b14ab",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "64315ba0818471bb9f442a52291730450d1fae8e1ce69da93a3a07ccbeb4653a",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "48657eca3d58ae1113a870e8f3d3053d4f67f17cffc269d427caaa5fa83afc62",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "629a0ef74473e56e2ba5c6393a1f94958413f6e58748e918ec5111d441903b79",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "2a9bcd0dee23d0af98fdb3f654d551c129762c9ac7bdbad766f6b62c2fa91d82",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "aa7a585463fe6cafdb170042affefecd402cc37098bc0a4f448ba1db4061cd97",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a8399ac6d17f3d246d6f3991c9ce014c4b0f3205f5c5869908ef08ec2267ed6f",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "eafc66af89a7b82b2cad7322236bf5fe1477944c6ad423eb53d70a70c585dbee",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "2403d4965a6f2fa25e31759ab0efd7c1a7dc625debc5821e7c0622c75bef2bd8",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "a8399ac6d17f3d246d6f3991c9ce014c4b0f3205f5c5869908ef08ec2267ed6f",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "480c14f8cf39fe58521e11f7f6e7078a78895ce81e1bd69a095d33e74aeac394",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "3ce32c2999781a2bbe49cf0dd53b931e25ae87f898d000c54c7ec21a63722c07",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "aa7a585463fe6cafdb170042affefecd402cc37098bc0a4f448ba1db4061cd97",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "c48264d99d8a8d17f20800cbc535e5df81e99fbd5d4ed9db13e0526fd65c6ece",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "8e295aa48fb1dad7cc53df17a0f1f95f6f58959e6ea5ea74f60e30e4cf4879d4",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "abc20743afbd31b68bbeba416b0f07e02822ac0abe7bed6cfdb2e83585701f9e",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "c48264d99d8a8d17f20800cbc535e5df81e99fbd5d4ed9db13e0526fd65c6ece",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "2cd125ab582a05a186738cee0b639f20f269547d83cc5f0178b0489b408e9f73",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "f4e38bdf734a0a9e12e41730748fcb30e24a04e41e7fa971b87732d9ee87db5b",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "aa7a585463fe6cafdb170042affefecd402cc37098bc0a4f448ba1db4061cd97",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "c0dfc58c988d0e7a58deda35c3d8bbf9f08e64c11bf38a8b85953a09a9a30c06",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f9b62e30b579d82ce6357d1efa103d3205416852fc03794cb6fd7ebaaa71c053",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "e4c64e06f1349e02dc0f1fa02d97e034ff18d88dfd5d75d8bacee9f129740cef",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "c0dfc58c988d0e7a58deda35c3d8bbf9f08e64c11bf38a8b85953a09a9a30c06",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "348650b9f2844475eeec3ba1ae71bb88f4cc5557ae5fb622395a37e74ed5ca6c",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "e89f8e18a9ca1c456bb4d534713fe6c3cb03d960d2154ddf2e87fbba1e27bd29",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "aa7a585463fe6cafdb170042affefecd402cc37098bc0a4f448ba1db4061cd97",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "d302f50f8907959f25f2ea74631c28b7e16d533bf265423f22f41434147da287",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "846bd281fdc2491875b1b5a4d1230eb9cd3d848f6c521dd3198272fa82b530d7",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "e38673786b70381c6da7bc8612ee70c1ede2567af5a1335e89e3bbe728ec7dcf",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "d302f50f8907959f25f2ea74631c28b7e16d533bf265423f22f41434147da287",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "3c009f85540e7a532d688193f56d668fbfa85f63bed0288fc483df0ccd07cfbb",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "7c7bd9636bbc58d2291f125b851131e616e4c21f87e1b61908cb707c2aaee7f3",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "aa7a585463fe6cafdb170042affefecd402cc37098bc0a4f448ba1db4061cd97",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a12920583ddc63b008028691cda8ed6b4dd16ee230d90dee3626d3d251c4a37a",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "11a3b62ec5f86de33da6928ef120f7ebe06b59d46a251519374586b22ae6b0d4",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "c2e23f65d84cbdac15fbde8c70b3130c569e78d45124b97a0eb026cfa17e8983",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "a12920583ddc63b008028691cda8ed6b4dd16ee230d90dee3626d3d251c4a37a",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "7b6db280d2a73c57bdce1b0f62227241119233e6312f64471e97e545e21f2a57",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "f929a3ea40eaeaf2b6dfdc2623113d7c1ab774a19cd95959dc9a8a369c11b86e",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "0f924fc56c5a76728f4c046bd351a1eed137db5a19559b079cb50bc5fbe1476d",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d59499f42cc2df3f2203420d79ccfa080ab166ffc121389cd330d16f0a628f2d",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "82fc24e0d5da1aca47b2f683d8bc5c09d1cf9bf13d507543be6ab196781c7409",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "0f924fc56c5a76728f4c046bd351a1eed137db5a19559b079cb50bc5fbe1476d",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "7047ce8ec8e396031158551f15437f9aac189b4ca4c8bfe9575c27b16694591e",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "2898565a0df88a285c5c803e726582cb1ee3c0954f020277e6f9804d98d2d916",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "80eb6c52eed461a9cf856d16a58b8614688cbd06e8642fd7dd4b34c8c9518654",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "52ba7a2e7f8d50b4c5534727843db5a813bd96a61376fa7aa3752528d4eb072b",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "ba1a5cdd1193608adcdb28a7d5851c3bd02593604b740165f0bc17bf7f50da61",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "80eb6c52eed461a9cf856d16a58b8614688cbd06e8642fd7dd4b34c8c9518654",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "663282acdad7ce38370d701257fa16009d8022124daca02c081c9d5dff08e2b1",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "b217e7d40afd986fe37d326d015ee392a227d3d8613e1b05440275dd077cc283",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "abbc3e79a73fe372f80a7fac32681c30328be261ba01ed8e866b12e4ece3fd19",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "66406e1a5525a55f05fd4438a5836f77ff43262c95fe4aaad44e4ee3d316e008",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "193aca89fa33d419433a6c71dc1b12270c3d6d633651fc0e1f2e9089812e4e47",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "abbc3e79a73fe372f80a7fac32681c30328be261ba01ed8e866b12e4ece3fd19",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "0838b07df83c945b64f8a1614500b99d6cfcac58e9f6abe74d1cfe921f6adf9c",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "02f55ba48ff6f7ec55bbab95a3e5c9fd2f5b6ffb1ca3e69bbee96d02c93b1bba",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "c5d60e07dc85894e7cd4dc4fa9152dd87891068901a1362ac46e31af547c7def",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "b331e8648ae92f0c62c0c6832c5f433fddffbfe63b0ba4fac4f71df0265af8bc",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "ac36676861bf000fc23ea399d2812f6265c589cd262a4c0f2387ded84c79bbaf",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "c5d60e07dc85894e7cd4dc4fa9152dd87891068901a1362ac46e31af547c7def",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "934452d7e4b3ce661467243c77e9a79c9dd47b75d400afb948385050980c96ef",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "dcd7c9a3151644cdf1ac9c03c7f2fcc2e6149e23e336630bf04bc449292e60dd",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N20/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "6ad1aeed919600ad48d1c381c43c97cbe0bef512bd683cb03351f87917d26586",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "0aa7afbc0a576c6483a178a240ab46491e00ee2c517135f2bdee2a4e267ca5b4",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "2015da63b73f64561ed8ca4eba7a50aef12a30024189cf9d040ddd0cff2d2425",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "6ad1aeed919600ad48d1c381c43c97cbe0bef512bd683cb03351f87917d26586",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "1a7a23ebfa38a22d52314531bf08bc5144258fb1242c18f50e727327c81be34e",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "df47a9f5f2fc84dd681be16758cb352729b073fd119c5f4444727081c7dba513",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N20/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5ec9daa6f6f26b76a03a8c4e60407c8dc42491815c6bad7286222de30f2624e3",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "45a309a2a43d58740df223304f5a7d91e5c4b30c7ca00ff8e6632129172b8b93",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "7235e201d6a25e831f0f86a46a7621659cfa9f09013608fce158817e0bd9fb8c",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "5ec9daa6f6f26b76a03a8c4e60407c8dc42491815c6bad7286222de30f2624e3",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "b69e342870d7176ef7345cd5e75c14798e73078f82070dbfbe7af399853acb44",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "410585d48f36bde6b1d8a71a7d6402139d49f0d7a1a0fac5c05c757e1dfe8c94",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N20/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a70e053d46fbb6dc1a052b612e1a49acb8359e93afb62a3f3507ad350ec6dd3f",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "32d5b72f240d86f25cad60626c11fb249c143bcf326d9971badc4621aba9b931",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "af67e9faecd7b6b6be44acb323ff2b88020c0f3c211c40fc14cc4f4de854e607",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "a70e053d46fbb6dc1a052b612e1a49acb8359e93afb62a3f3507ad350ec6dd3f",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "07d86a8e52834b07b98459501db3e24bf6e72fc46334a8205238b0d5033cc096",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "ef4e5dd8d75e46cdefe6be973ee7717bef014f3f9a6c5a735f3074086d706725",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N20/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "3e0cc58600230d8b394a895091a8bace589525186a04ba7abd67e383902c297e",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "25e530158ba442063fd2f48d1b67a3794294db49778574d2223587ca95a3f807",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "d6e3cd5c1edd12f313d59064631150ab9d6a505ad8007770cc8f9139ffb24dcb",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "3e0cc58600230d8b394a895091a8bace589525186a04ba7abd67e383902c297e",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "4c58ee2ab88a104743dd7c5ae21c6fc80b624044007479737372a42368757d47",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "c091590c0d80366f9b329559150a80a47e7262f8ded538b66b8e176a186d51a4",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N20/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "7ec09297c1151af9cf73035d1e403328e5df1f4a56fdc2d8c63deef7a794f201",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d4089c5fa2dc67f33123c9b170dc3e897ed2de829c15a672a5445b95a30ee85f",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "68fbfe6fc4f3d9135170fb5f8f321fcd807e17fe9ceb87118246fc7f7c98d593",
+          "bytes": 23154
+        },
+        "after-total.txt": {
+          "sha256": "7ec09297c1151af9cf73035d1e403328e5df1f4a56fdc2d8c63deef7a794f201",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "7bb4db702d94d10fa97429c35a28a444c609eda79dbd66624843cbb2dc579ab2",
+          "bytes": 33004
+        },
+        "uv-forces.txt": {
+          "sha256": "137c371ca04f9598eac98e3006f6d3d778bd54567d05ea8d65acae9b0c68bf0e",
+          "bytes": 34080
+        },
+        "uv-strips.txt": {
+          "sha256": "1b97294971b9ead46e9069048586344189677ac83dcea31e19c11692f4df1dc1",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "b962144f3625c3fdd494fb40d16371e784987db08f3d389fa393dd6d56cca18c",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "705875e77851234974bb39c6837cd91d615a456deeeab3613f5e105ec8209525",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "a3e4bcb7fb8709e60b8c516d3c5dc8bc6a2c3b2f2ca8d6aa636ffde277628793",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "b962144f3625c3fdd494fb40d16371e784987db08f3d389fa393dd6d56cca18c",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "12e2861db529c5cbbc02c954ce835b30ecec387fec2563fd98b378c42fa291dc",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "c5b9415c3f0edf945b716892dd7a824c446f1dd094376f5ec6a131131ec1c969",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "62d7b9aeffaae08102f2ee252e2e53889da0614202a7ea7e4fdcabbd7768637c",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "b33800d23d55e740ba95e7ab6ddbd183dd5f8ba5b7b9481984baf84be25d082a",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d16592604f09b67a886ed3c2e47de0577c2a7ed2ad9f094fa734eb0cfb0541e2",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "569435d2fc7deefb73bb35d3b3df9e20e7bf841528c49427e4523055168a9890",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "b33800d23d55e740ba95e7ab6ddbd183dd5f8ba5b7b9481984baf84be25d082a",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "2e6de9af49d24589f61c7e0e8bca323ef628c6a47ab3e4edb1edfce70ee8961f",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "049f755b91f3fb62310c20164e51f715ead36f91999c660aa9fbb3dd7f8087d1",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "62d7b9aeffaae08102f2ee252e2e53889da0614202a7ea7e4fdcabbd7768637c",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "41b0388c1bb5216b79023d70f6eeac5862e92420e7774db55fd4f5d08207c7d0",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "86d349c1d1311ce523ac423ee0dbb05202b395de388c001061283fb6dae63862",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "445ea284431e9ab8287b0df8ce85daf11e38a762c8eb301eceb8f3bd656685db",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "41b0388c1bb5216b79023d70f6eeac5862e92420e7774db55fd4f5d08207c7d0",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8aff283d96f986c4b8019d863d612d468141add041138b9672ce47c4c4058858",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "2224514f74c7431ec4be49866f5d51138d4af5405bcb8965972e1b8d66c8c41c",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "62d7b9aeffaae08102f2ee252e2e53889da0614202a7ea7e4fdcabbd7768637c",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "fdadf1a0b99fb09595bb57b92c4e4d8c8d9293d7f9054cfcc5803014cd6a4f57",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "dba9ce8ae6a5fe2d9e6dc84f8678acfbd2031b6855de52301c665e6de518b174",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "a85dbd887446e00c2de6c319eb68cace85e863c92c9eee343ad1634712023feb",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "fdadf1a0b99fb09595bb57b92c4e4d8c8d9293d7f9054cfcc5803014cd6a4f57",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "dc797bb8cf48ad7e895f36b05089ac82ef3aab1b62cd089f86f3212273ad0507",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "ce638f0644b49bafd47af5ef6cc68d362983150e81acc12cf10ceae3536a1e89",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "62d7b9aeffaae08102f2ee252e2e53889da0614202a7ea7e4fdcabbd7768637c",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "af1bacbcb4280003cfa2e599c800a315442a7149dee962034fdf577eff591b8a",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "6f09be183f0bb5cfc97b1125df35f13e7a562b4e67d2c02f79a4e8b2a2971eca",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "8e540b9332f053381371fa5cda03cbd0c80488e2d68868309d80d217767ff865",
+          "bytes": 178974
+        },
+        "after-total.txt": {
+          "sha256": "af1bacbcb4280003cfa2e599c800a315442a7149dee962034fdf577eff591b8a",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "45164db266e2d952826aa8876d323bc687adce3b52be4f727bfd559ddf4b4e73",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "6e80a1e1433b7716c8a06cffb988d32bec2467173c3a010fd5cd60266ed148e5",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "62d7b9aeffaae08102f2ee252e2e53889da0614202a7ea7e4fdcabbd7768637c",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "0280dae8ddfdcde9c712bb316ca4f3dd3aac91a234fd93dcd476f024915f7857",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "1cb70f956d03443a3a4d6250539ebaef4ec7b6639c6564cb1c17f2ae2b38e160",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "e62bb6e56b2d30ed677ebde7ac10164aef483bc39377a3a807e2dafc63c08904",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "0280dae8ddfdcde9c712bb316ca4f3dd3aac91a234fd93dcd476f024915f7857",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "b747b88e5602cc82980ac30e7f4190acb4c5ea161172cac50752ae1d34c5594a",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "61b6e8d2088392594d07d19c323d96c546a68ec46f3768b9823f282243430aac",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "a730e44a1fc948fe3a174b574438b34fc03dfd5f5108238a4d9c4ead4e03d242",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "55d52fb942d0f7e149d42b99afefdb9cb0f8f822fdf95ca99ba685b486b22318",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "5dd0154e292e392db4d6a1dd7be7a6db09cf9b9efa1b3f7916de43b6a567dcfc",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "23b7d38acb3445c099199cd5be151c02da1fa130e7f691e367d6ab46e0895f5d",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "55d52fb942d0f7e149d42b99afefdb9cb0f8f822fdf95ca99ba685b486b22318",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "39a073cf7d5e39363792cfcbf9f0f773f5fb093e06b5ae16364bca1ee23be023",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "48d395f1722cbf9d853f5183da45f67aae35c3d4a39675253bece3cdf7ab8757",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "a730e44a1fc948fe3a174b574438b34fc03dfd5f5108238a4d9c4ead4e03d242",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "1c1a5e4e52b72c521e444203eb5a3440ccbe77bf50bcb5e774d5475bf1430d26",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d99fab61ea0528b7b524b635939de5a8e7e4e1e83bf6b471c40996d6e46f6a64",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "2bc433f3e4760949de1181908631ddbe07989cb50e45b223707178786436d034",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "1c1a5e4e52b72c521e444203eb5a3440ccbe77bf50bcb5e774d5475bf1430d26",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "078bbd143c5ea3a60dc3df976092770aa9937fe96b6f7508aa7521faa8366d7d",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "3c8a73b80078e38c84f9bb5e1ec79a4d029f4c6377e9e8c4f60dca06b2363b8e",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "a730e44a1fc948fe3a174b574438b34fc03dfd5f5108238a4d9c4ead4e03d242",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "07408c50d5a856b2dce5f163d0f3908bcf95259012fe45ca8bc132540d78afef",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "143dae6a242a5a89d3abf3165d0a1455c14cffc2735e482a1fae72670b1a6baa",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "95eb3190a58454b116e84edbcfb5827dcb63e26efd28d5cad6488e1d90942f4d",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "07408c50d5a856b2dce5f163d0f3908bcf95259012fe45ca8bc132540d78afef",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "05d0f03c57c9fd2ca360a16ea3a799975274b15f7862ddedfd5b671e8a1d6530",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "8d5bba237d2555a507e88b24ec63ce14201317178624a8d682480230a1b4a860",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "a730e44a1fc948fe3a174b574438b34fc03dfd5f5108238a4d9c4ead4e03d242",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5f6130bba4dceff08729380912edff1f2fac4920bd053e70d52bf9c35263f156",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "447d8a7a1d3d91f245278d70fd686fbb9b1d3f227789b068194c773a8555be22",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "33cabc4b691c1e3c94ea777e0be22c23a8b026017c1e3529e022179536dd6f4c",
+          "bytes": 66174
+        },
+        "after-total.txt": {
+          "sha256": "5f6130bba4dceff08729380912edff1f2fac4920bd053e70d52bf9c35263f156",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "208e256028874163fd41ff4d82203530772880a95fccc1257009a41a1dd785d1",
+          "bytes": 131824
+        },
+        "uv-forces.txt": {
+          "sha256": "fd8db1c1822b403a2ccfe6685c6f7ace9db2e4ae37685fe99f11bc9b051eef7a",
+          "bytes": 136140
+        },
+        "uv-strips.txt": {
+          "sha256": "a730e44a1fc948fe3a174b574438b34fc03dfd5f5108238a4d9c4ead4e03d242",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "813b58135d3bc8a2b05258ae659c744d03ef19b4f27ea63f115e52943de7c6b1",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "158680ad775ed51e5c01c189ff9c8053dd375240c029d0d019c0732b78141638",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "6907a84be60601e145fba74866401d5e535d76359351ed10a23ae81380608014",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "813b58135d3bc8a2b05258ae659c744d03ef19b4f27ea63f115e52943de7c6b1",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "bddfb1a0465b3ee0b66a3107ac24fd66db31a8a249e442a2f482b68e00bd1b70",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "0e77122c78add9d125354ce39aae40b1d3ab9691b06e5ebd5d5bc25262e6b7c0",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2cc3edf22da78476b2871837af531c40bf26bc8091f4172b374495700fa29d4d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "8a689bb9e6ef21828a32c056121488c98a3d78300463d166abf2659177375ae4",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "294d62e481968799eedfb2dfa7700c43838af7b4144073e19868c22e84125ac3",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "b9dbd7d5c5a23eb34180fbe5c0d9b3823964d341499c108cd2e7635d5879a969",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "8a689bb9e6ef21828a32c056121488c98a3d78300463d166abf2659177375ae4",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "46f00bdf73893f345c5cae203edc1b8a8f5b39efa4192e55435822a09eb76d56",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "70d69242d0685399ae16882eb09fc62734ec3aaaa5f46339b33ab94606d3c6e5",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2cc3edf22da78476b2871837af531c40bf26bc8091f4172b374495700fa29d4d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a53600d2fbdf0615a58e9dbdc2870e01a5d8d74923ec1cda13654c5274e67c77",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "226a378e5bbeda978cbbfdd359867d0c7cdcbaf175a253eee1fd01e6d5b78f9d",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "96cdb9a4ed5ed5bff73f3afb450fc513bc71c71672f8372f44dac522a86a6073",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "a53600d2fbdf0615a58e9dbdc2870e01a5d8d74923ec1cda13654c5274e67c77",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "b06ef887e546722a0797d1f05baa878198439aaa441632c1db1ed0fa6b52c478",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "8bf83736e168e2dc795aa361e55dbe3bf7b00b88f698c5c827e52e3af5b456ce",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2cc3edf22da78476b2871837af531c40bf26bc8091f4172b374495700fa29d4d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5a96506de29d867d7bc4ac0a6e6965990ba5c0f2af5fe7e01252420d454f26fd",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "278622290a2f8fab6f291d40c437f7bef56f66b1094964f3813d2292073c6279",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "7a91548261912b811f86ee5190ce591925b1e1c85deac4eed16ca0f6944afacd",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "5a96506de29d867d7bc4ac0a6e6965990ba5c0f2af5fe7e01252420d454f26fd",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "c428aa23f5bd1ecd889ddcf58d81c315c2c69fd5cace0d559b1464c79c6dc9ec",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "f2831dfd1bf20a004211080a90ff69fe907d0c0684e849ec3a628c328e3f2bd1",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2cc3edf22da78476b2871837af531c40bf26bc8091f4172b374495700fa29d4d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "84862d74b4d1b0f94d298d284b3f757062312e2182d271625bfc480177656825",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "6122534bcc100108a536716f63f321446ac8de7cc5680b51955213d53955c8ba",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "c30b5543d1044bc4e48d89a3d1707cba40d497a482fd7f72d21bb6a937407b36",
+          "bytes": 262014
+        },
+        "after-total.txt": {
+          "sha256": "84862d74b4d1b0f94d298d284b3f757062312e2182d271625bfc480177656825",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "ca508cc0283247d9b865db7681e1973e409b1f19c99ec194d5f7def437c41957",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "cc9d019688635329def98ffe7e1546f8b1202671996fec64ebd3aa8bc700924e",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "2cc3edf22da78476b2871837af531c40bf26bc8091f4172b374495700fa29d4d",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N80/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "860783ce94c3bffb852113ededcbbdabd97eaec6f7786f6a8e17ce4ced45cc41",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "60077fdb10c6df7340ae461faf7586678a035f32af46c400e1d0204f32b33f58",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "8f1e6275dc7dbe560539cddecc5e75d7f6a7cebad448e980ea52389c18fdd737",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "860783ce94c3bffb852113ededcbbdabd97eaec6f7786f6a8e17ce4ced45cc41",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "af34aa006aa03233bd0e1e22693ee7b693fe9be2795171a97f9fb3f96c742cc2",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "e6bac9966a952b0a8b96778949275cc9523b6d53185614053f285ac761f9bfa3",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "a29b4bd67f2b8f391de38f9043e4c073ebee3e781e6b9f6a734a0cd0d05e2ddb",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N80/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "499152487a8a2da90ef43948a7c3bceaee5387744a59982e9952cc6ed37a8197",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "17d8cbe795cf9850c103ffab1df2302bb097d4831c7eb483e75dc3ac785c2e05",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "c22d29a01a668af2b966cd95a7359112e8bc006caf17ce733f8506316e2ad6f1",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "499152487a8a2da90ef43948a7c3bceaee5387744a59982e9952cc6ed37a8197",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "3c3c0e48b355b9c0224923d002e252651cbf558e60997326ab6534ea98b0e506",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "e2e497193b697927676e8a8796a641ded200e48405b929639dd481f5943efa2a",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "a29b4bd67f2b8f391de38f9043e4c073ebee3e781e6b9f6a734a0cd0d05e2ddb",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N80/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a2ff97e26dd834413d3c86e9d03d9d2344c4a185e0cc84a5a7a49a1d135424ce",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d1b99810551269d5b94dcf1b2494b14c1e12b54b3d93f1ada612ba7782da36fc",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "4c69e838ffe3be3e4fffbaff2628afbcbfab1078e459620233b8723b3a277381",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "a2ff97e26dd834413d3c86e9d03d9d2344c4a185e0cc84a5a7a49a1d135424ce",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "f1180fc21b7d9fb159847daf7278b51ad035678ad48d535d8e0156aecd588ce6",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "48ea011ed60e6ded8f26303b27e373bbb54789ea3da9f3f7c077879a80393b8d",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "a29b4bd67f2b8f391de38f9043e4c073ebee3e781e6b9f6a734a0cd0d05e2ddb",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N80/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "ecb0bc41be18691e1a282c88b2ee44c5628659562a6e8ba8ce072f3e5bb187e1",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "eed1b6b2536d1a9ff9bb9d9703f1286203b5fd78864fc361caf64c84c1fee4ea",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "3caed8636415ac38925941118f3c94aee2bfe15660492890888e94f865a7e752",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "ecb0bc41be18691e1a282c88b2ee44c5628659562a6e8ba8ce072f3e5bb187e1",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "24261a7e51952564a767af5008d243b109ce206566a7db912eb8b7abf2224326",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "6b111369c4a17db93537eadde680d1de08b038e6d2e3cc7f925b05c70199248e",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "a29b4bd67f2b8f391de38f9043e4c073ebee3e781e6b9f6a734a0cd0d05e2ddb",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N80/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "cce395d95393b41afa44a8d4b41d9736979547c147c4a219e70b9f287d90a12c",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "10e3ffb0448146862b4d0d3dd45277d47291ea6a3b8ed2886675f2095d99d357",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "347982ef3e256b061539185043fb93e0cd6355c9ce5b7dfb423ac4a3e5ade383",
+          "bytes": 214494
+        },
+        "after-total.txt": {
+          "sha256": "cce395d95393b41afa44a8d4b41d9736979547c147c4a219e70b9f287d90a12c",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "3e871f16ea0f1ee7e1f47e7c3ab93e7021af48823d1851663a206b82bf8739fb",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "34ed494e9f6d2ad091e89edd5d2efd567eabb038c265dc6923829b83ee659b7a",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "a29b4bd67f2b8f391de38f9043e4c073ebee3e781e6b9f6a734a0cd0d05e2ddb",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "2073872316a5a056842825e625528a8734799fa756913f99df127eacdbef0451",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "6ad3b0bb93d648a81e3ecb72352e2ae5d5d9550d36d41a716e12a3b73f7d42bb",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "6651e3512d0b1d140bff350d430c330370070f4cf307e8ecfeb176bef15ad199",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "2073872316a5a056842825e625528a8734799fa756913f99df127eacdbef0451",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "68cbea9c4946e90897751ecee07daa2378f4f2d4735d764a7fffe471f0bd3dfc",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "008021130d3e8c61b11091e7693a908906f432c9a8486bca1e528bfac51d8663",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "8564bf10506c7fc49068ba0421ceb25e7d16e3ec97dd0e9102ccafd576b1fe9d",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "083506c7974d5c21bc1271170c9a10cba8ec6d0ab2a2515d8dd7e41274161bd4",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "7ebc4fe06c138a87ea3ad1dbe4d4a569b449e83c5f04165a21ec6083eb386ae6",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "8564bf10506c7fc49068ba0421ceb25e7d16e3ec97dd0e9102ccafd576b1fe9d",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "74dc0b9cec748bbca0c5721fb65f583d7822998383dfc8a6034a1ec16d48780b",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "d5ee4b283cb6586b93dd6f1f1f867afe313382b42affceeb80c1448850b05589",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "d1dc690dc634a95dcb5f41743bd8e5065f1c634a9c677503d1a20b78a2503005",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f76fc25bb5b847de0a634e305542f7229571cbacd708a192d4aaf2fd2b9d7344",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "beb6e95ebf63aa1701e11d150c698ae67aa215e21007119db73b4dfbb8bd2f0e",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "d1dc690dc634a95dcb5f41743bd8e5065f1c634a9c677503d1a20b78a2503005",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "9d61e768f4df1fb0e77130446474e50c9af8f5b49a7c7cd2ca66cea243cbb72a",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "e5de5a60c40e849d84682aeaf91ce97c65b93e74d51309c693b0fbdcd3bc93fd",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "41f9701401ca2c9326a76815178a7376954690d499604835860dd1204d88e866",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "dd3f8ea21af921bb17bd157cd36435cf9e2d1421507ba9b5faba85c1fc16e1d4",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "3b21a3737014ce64be9ade937b1b08bf642613955e20dac68bee27e210a16ce4",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "41f9701401ca2c9326a76815178a7376954690d499604835860dd1204d88e866",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "7c158237fe7228bd9ac3356bc4d3d8f0aa4bdfaba679090d6cd8db0f591dec40",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "f83c9e7bb71d2475388feddfa8d5df04fe4441b4d58d471ada58559bc2a20734",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "9fe93482aff4b8e67653e8e3a6cc94f2af78b3e80bd06070e4884d0e58ada664",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "c6a4c641bb2d322b4184e7f1fed7f9b1bcfa8f7e57f4780766dd872acfb5259f",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "95a9d0eed6b00c7dc20eb19e0d3ad0ebfbf535ddd528982bd2235baa5fa6819e",
+          "bytes": 428094
+        },
+        "after-total.txt": {
+          "sha256": "9fe93482aff4b8e67653e8e3a6cc94f2af78b3e80bd06070e4884d0e58ada664",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "8008b34cc2c26506db6356347d1fe2040bf4b8a96b22977832863c25d57340f3",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "70be11354eebfe585cc6b830b1310876c9b24dfce234a57861e0bd0be88cb480",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N20/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "eefa4e38455a5254869dbb2ad233f1c59723080a838bf861d9ebb4494ce32d71",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "367b7257d6c393e3ef4f6777a8adcad850d8f249377dc7cc213353a6ef5f2de6",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "d17dabdd42d6b0ce6b79ce497e999cfa0da2bf037f584483a255d4cfd19ecb76",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "eefa4e38455a5254869dbb2ad233f1c59723080a838bf861d9ebb4494ce32d71",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "a6185445d75fda9aec8a877c93adc265f9675ceb04716588aa4259dec98ba5fb",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "fb2da2218d00f3042a9eebd67c2dafaa451c241e104be4cde4e05fb7968b4b2e",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N20/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "e57a1ce6d1e898f8f8d0c069e0587566be8488ee3bc9d97b54adcaed2ffdd23d",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "a5182587454eca42af572a387c0d5e979127908838e8c497cc4a505254145a86",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "303b15fd79ce02d19909fdb3877ae6a4b6e25606941f9639b4228ac9709ef676",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "e57a1ce6d1e898f8f8d0c069e0587566be8488ee3bc9d97b54adcaed2ffdd23d",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "7d73233d72de79d06a96d68b51fdc3e3ccf99061bf9c94dda220c0242a25ca4e",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "a87abc5d78a96faa2b66e4d1bd56e65fa65083c5d69022afb5ca4658274b0d6e",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N20/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "9e7ddfeb6bb4e7f38e41e7334ceea784b7ccc39223bcf64b0cef178617c78cc6",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "a45dc8f44ca2d9ae321fdffa594e8aef895f51637da63e884554248776520662",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "62c167e7e518660de46f36e7bea1e5c1a7343d6bbda26e82c6bdb39c999e5c1d",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "9e7ddfeb6bb4e7f38e41e7334ceea784b7ccc39223bcf64b0cef178617c78cc6",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "72f04e8b4d8576b666f225a3ab7cb168c0745830a859f0570ed789b602fb5279",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "4d12804d926e5bf406c5ee91c27ac5b1160f1c60550034ce8de3c77a00d2097c",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N20/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a453d36f0f8b26c847e713d643b5941c96e5f0adbef5ef6ccdb6194c4b3dcfa4",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "156ec478c0742ac38299e9e247b6ca9201b1285f05884eb5aabbedef0eda6722",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "a4bbab6466d7a99591297697a7ac91cf74332ea0cde07d5d8b2f29100b6b97c7",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "a453d36f0f8b26c847e713d643b5941c96e5f0adbef5ef6ccdb6194c4b3dcfa4",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "03d19c87bcf3527ff49d2084c3133ee3f43b57936ba937d1e6c4945cc76ad277",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "edead5225950e97d52ff141cdf275c1ac0a73b4879733887c2ae385e596e1846",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N20/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "b3b3c91696966c424c45a75f0aedeb2e439ecf544699691f33b0e3ed8cca2b60",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "510819870b95bc71eb78b39649e0c4bb240fa8826d3eca954b6ca550377b6303",
+          "bytes": 7654
+        },
+        "elements.txt": {
+          "sha256": "5def2465cb2a5be1f2c0ed1527bec51c9ab8013010a57ef8bd24395d86d6a493",
+          "bytes": 95814
+        },
+        "after-total.txt": {
+          "sha256": "b3b3c91696966c424c45a75f0aedeb2e439ecf544699691f33b0e3ed8cca2b60",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "e1f2156e88462156fbfd93a3c491487e37ae415610522c4a40c8a06c3bb12053",
+          "bytes": 263584
+        },
+        "uv-forces.txt": {
+          "sha256": "728fff84588e7cd18bc186fad74e039f10fd27abf40683710bca2bf27786a32c",
+          "bytes": 272220
+        },
+        "uv-strips.txt": {
+          "sha256": "60bd34b6cb84eae65e93edf837c298b3220752bf856b2e2cc0a8216bf45bfa94",
+          "bytes": 1690
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N40/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "6a5303190d6758a8bbb198cf35c9184a9c7d90bbb029ce5cea0ba8f7ef12e72f",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "3b6d0094260850df29ae1aeff890f3051982049426683c829d0fd96bc72a908d",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "555b79652dbeb344ddd99fda8ea4cf778bc23b0cee8b3728764e2b8c5d166b91",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "6a5303190d6758a8bbb198cf35c9184a9c7d90bbb029ce5cea0ba8f7ef12e72f",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "70597375cde6e9317ed1e579892c138e380c0a6a389167e3051a43245aaf1669",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "d20813be6fee509742364814acce8892ae23c5dd1dc48b6dd179fba0c95efd71",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "0855af5021213eb50c9d770416f1cb4c09d6cb2aade040a1d1760cd0df462794",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N40/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "aa8266f40ab7daaa59a73d848d70e4a2afac00e904c289e15dc0b432d1ac48a3",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f45808f097a91719f4a28ceae191079fd919360966244d6461aa33009ef3b226",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "ee9a3479ca111e31978e17a3529e2d7af6a805eac221117233a4512508d6c2b1",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "aa8266f40ab7daaa59a73d848d70e4a2afac00e904c289e15dc0b432d1ac48a3",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "bf49ba1196a3412eb3d671675860d94d63f2df6d23131503cd4f10513eba0414",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "2e426ad05e6f00cff8e011573b288584c9c7c2e9c68adba0eccd541232d3ee42",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "0855af5021213eb50c9d770416f1cb4c09d6cb2aade040a1d1760cd0df462794",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N40/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "e4cb6884ca4cd39531fe781b2d4501c5b4c0cc5f14b29897c337f7a27d74a29e",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "d8c9a06cb4d3a8a1443265ab20b9e3f63cef51788c3abb38f45f820edfed741b",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "82db027453ebec4c236edf6565509367aee5dd83119edd69e9c462fff789e04c",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "e4cb6884ca4cd39531fe781b2d4501c5b4c0cc5f14b29897c337f7a27d74a29e",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "259c17ed78b25d14ef658c7b8413ab3e3e353edb9271accac0f387a842475b54",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "b8dfe7ec19945952cdd6a2b841b66d670014b2f249ae4462e6eeace0bf39ed30",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "0855af5021213eb50c9d770416f1cb4c09d6cb2aade040a1d1760cd0df462794",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N40/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "014874a36f4f1437b83865df0193f46c1cceebf0ceed3382a9be4e8db5871940",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "9c3fb12ff23a8dee16edb768090a8ee644ef360f828fb97350fb72edba2bf63a",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "319a61f9dd285d03e9231df710f409fdbd3c934bb8ea2b915a4f895799e7aab8",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "014874a36f4f1437b83865df0193f46c1cceebf0ceed3382a9be4e8db5871940",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "c391e3106e9491018bc43544bbd6fab948d1fcec04b966ff355cc8dc42a0295d",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "2c60bbd829768192b2fe08bd27fc20d28a0fdc343f4843a875a6251a1c7c11a2",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "0855af5021213eb50c9d770416f1cb4c09d6cb2aade040a1d1760cd0df462794",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N40/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "a2137840b8d658562487c8551cc3758981d2e1d717c1442de06c6ed55dde2e55",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "5226e2ceb4a5b0f95a673e5ecfb84f491be14c44c1e28f4d9197c8e2094d22de",
+          "bytes": 14194
+        },
+        "elements.txt": {
+          "sha256": "09fd5d6e48d6bd2fc40ed19713db54e344834a78ca4a64cf4a52af5a1c68f92b",
+          "bytes": 190734
+        },
+        "after-total.txt": {
+          "sha256": "a2137840b8d658562487c8551cc3758981d2e1d717c1442de06c6ed55dde2e55",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "47c075a814ee41f81cc0b0964433029ba7c1ef34dea54f89c3c0fe925bf4c5c3",
+          "bytes": 527104
+        },
+        "uv-forces.txt": {
+          "sha256": "4d7b02b3a648d7f6eff031e7a6f3209b21a7958eb51f5ff151487d8683a3366d",
+          "bytes": 544380
+        },
+        "uv-strips.txt": {
+          "sha256": "0855af5021213eb50c9d770416f1cb4c09d6cb2aade040a1d1760cd0df462794",
+          "bytes": 3310
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "72b76c1773b09a952efef5ee5b6b05fcfa9faba394cbcc049ba712b1b5c94531",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "f4cdccc052d96d3b2242a2401e27df20f219521a3bcb231c81eb409dacdb5d4c",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "d096a5ed77cbd251f01be71bea503e7923aa402b4ffd5be19b866a820a3bbddd",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "72b76c1773b09a952efef5ee5b6b05fcfa9faba394cbcc049ba712b1b5c94531",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "ba7dac92ecc10b7f24e314ee04e9e9f7904190ec7aa8577d96bca0d1db829f32",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "f21c6d396a7bafa0dd70cb8175019f00a41e42a36a39bead9979312d8b78c4a5",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc2b7fc78a99d711ba0bb5acf88866ec337c3cb739421c58381240f8e556ad4d",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "4b2de7ab3efd4e975b6681cde2e47f048aa4cc019c4f5a9d349f7471c78e4f7c",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "4210d72cea5f9d9ccd984470e7c1a0302db11f3e7b0324bd1299cc4817dcba12",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "ac5e1db01865ef59d7fc2ad657cdc5b340f10e09de6538d90f6c5a2ebbbcc9d8",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "4b2de7ab3efd4e975b6681cde2e47f048aa4cc019c4f5a9d349f7471c78e4f7c",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "0e497b7a9261234eb08413c3056253033ceb8e34759cdd189f56e8a8b6f54f41",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "fa6c6a5f2feb49cb02ea8604b8fb457e385453ca760e04f9446687eff372438d",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc2b7fc78a99d711ba0bb5acf88866ec337c3cb739421c58381240f8e556ad4d",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "aa98997f0e921207c43a8e7b4e6b343a45fa97cf688ee077b27a8d244f90ae63",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "a7f8cd6a7251b94c8ce8ba30b2f6fb81a342da0c3bb61a50763551e3fb542ffd",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "f960a8c67b8d34151ee8cd3003d147863c85a791b5d530106df5ea202c4742bc",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "aa98997f0e921207c43a8e7b4e6b343a45fa97cf688ee077b27a8d244f90ae63",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "104a9c455de4e6473562f06bfc99fd66ffa17e563260e342b5aba577571fe083",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "986c98b51678013e2dc5082e192d9c292c29357cca94e4053989984756e59f00",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc2b7fc78a99d711ba0bb5acf88866ec337c3cb739421c58381240f8e556ad4d",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5f08eb290aeeae06e9c63af87c5b8ca5a2b6c389a4dcbda6a7dba3d2afc93dc5",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "c30fd1ce106bbaf41edac4deac4906c5b4ceffe615f9e3a227b91e18e2960b93",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "6f278a3240db9b9185ac54c81981f2f71fc699bde7aff5bbe89da72922476fa0",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "5f08eb290aeeae06e9c63af87c5b8ca5a2b6c389a4dcbda6a7dba3d2afc93dc5",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "d84cd57cc000b75c80060dfbc8af397def95872c82bb4915aebd0844a5f0dc0b",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "f8a62b782daba1b6a0605987ef0a02b528db7b0089f1b3290c5f342efb4acd19",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc2b7fc78a99d711ba0bb5acf88866ec337c3cb739421c58381240f8e556ad4d",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "5dde216a235584b90d1ad8a1bcce45a9699c0a77c31a546ad861988ab3755267",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "4ed4ca4f85a9a72e5ec323bf852cba7fd3f428ad761626533bf42f429ffea443",
+          "bytes": 27274
+        },
+        "elements.txt": {
+          "sha256": "6e6261872efb0553998e04dac7c390a8d9dd4ea462532ae59f8f94a9b0573b95",
+          "bytes": 380574
+        },
+        "after-total.txt": {
+          "sha256": "5dde216a235584b90d1ad8a1bcce45a9699c0a77c31a546ad861988ab3755267",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "b02435cf944952d12bc9666657476d43345aa35bfa13a06e04d8b1a360a403aa",
+          "bytes": 1054144
+        },
+        "uv-forces.txt": {
+          "sha256": "ebd3c69ca4a1e90be03ab05e7cd7198edeb23874c1344c8eb961c9372d202192",
+          "bytes": 1088700
+        },
+        "uv-strips.txt": {
+          "sha256": "dc2b7fc78a99d711ba0bb5acf88866ec337c3cb739421c58381240f8e556ad4d",
+          "bytes": 6550
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": -2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a-2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "d76ffc281caa54e0ed45d633c10d65c7ddee8ac3aace2ca5bd3a69a2f99ba501",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "3195faf847970e2cc2b08280cda8b49ac91edc2d32b6e8be38d17fb73a899903",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "37f91a5740ccdf0804f476762c5b4ad50d1d4d0a0e4ac7342d6766dc880cf1ff",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "d76ffc281caa54e0ed45d633c10d65c7ddee8ac3aace2ca5bd3a69a2f99ba501",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "0082a15b278ec97310f9d36bf0474a20ce4790c8ac740a2c8ab969e83b4f411a",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "76060defab49f244866ec43e524200496644b4613af8aa86bd279de25a8266ec",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": -1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a-1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "cffc784322d5d1e3be287f10c0980cb629472412653954540a331876da35909f",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "51c66f76de78f2a68ac565bd7255507cfac1e3f910cbd3328b31e5f6ba313252",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "a4241a5710f2b40ee74449bbe23d1c1a1cf1c82c0d916263fa3e54fafd87844b",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "cffc784322d5d1e3be287f10c0980cb629472412653954540a331876da35909f",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "3c60865957851ea589231ade8ad90c5d17b0161e845ecc756d2e41225290a314",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "f3092329f4b9bc60ac0551d061fbc1c94a612904fb677fcc4d91a531378d32fd",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": 0,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a0",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "851ae1c9470622b0f2fee5c4c6b70ea098f14d68b7a4c531a849f56fdf8fb485",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "27f33d6de7e5febe3502d1e16238b3d08c44a2f97cfed8baf44dfda7d70a0a1f",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "b583d6082497bff4b7653e50fc3999b82f4e94ef366acd9d8a2c9dc6182dc814",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "851ae1c9470622b0f2fee5c4c6b70ea098f14d68b7a4c531a849f56fdf8fb485",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "16e2be340019e829c5cbe629754ccfba0af1bc91b658c3c5ca8b0ef46ffe4f8c",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "bdb6eb9c5ca6cbc861dd79ba33bdb7dfbfb6b28fac1162e3210540d90752073c",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": 1,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a1",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "1c96900b08df4959ef81f82617a73b4e19ed48b95a83864e71d0a97d1098dc59",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "9bb1f4710617af6dc40e52b5a600794a909a19e4b476d598dea8ff7f5d5222f1",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "3ffde7caa2dcd6dd96b7bd55b5ce73f933ff58b03a73ae8df8b162ecea99996c",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "1c96900b08df4959ef81f82617a73b4e19ed48b95a83864e71d0a97d1098dc59",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "95752ba8561212d512371bd0dc842d7a74ec7d4e1f5faa186763fdd257bc733b",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "649ee253005de50716e16015f663ea8564102142cf38ecc0409de46ec3f5217c",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        }
+      }
+    },
+    {
+      "variant": "core0-grid",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": 2,
+      "directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a2",
+      "reused": false,
+      "executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+      "after_export_equal": true,
+      "files": {
+        "total.txt": {
+          "sha256": "de12f22066b0cc8f2bd061ccde4e8fbad929523cee56808a86b1c2de132edcda",
+          "bytes": 1297
+        },
+        "strips.txt": {
+          "sha256": "01e4c88e6dc02cf817ee22a0c0b645d06292091cc82792722edd950d3e438178",
+          "bytes": 53434
+        },
+        "elements.txt": {
+          "sha256": "f7434d21f604bd33cc293e81f25880c2508d2daeaf368bad046e02217cc306cd",
+          "bytes": 760254
+        },
+        "after-total.txt": {
+          "sha256": "de12f22066b0cc8f2bd061ccde4e8fbad929523cee56808a86b1c2de132edcda",
+          "bytes": 1297
+        },
+        "uv-rows.txt": {
+          "sha256": "93bb42d97cea4b414500dd3a97730ac6facd2c6d03145209b566ea31afa28f10",
+          "bytes": 2108224
+        },
+        "uv-forces.txt": {
+          "sha256": "ed04184dbf075a7124bbd9b5000a765e37c0a836f9852135c14449473927f44c",
+          "bytes": 2177340
+        },
+        "uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        }
+      }
+    }
+  ],
+  "completed": true,
+  "stop_reason": null,
+  "seconds": 213.72515358400003
+}

@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "mode": "standard",
+      "h": 0.01,
+      "relative_differences": [
+        2.960669063910687e-16,
+        1.9581568029245054e-16,
+        5.173628838074793e-16
+      ],
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "h": 0.0001,
+      "relative_differences": [
+        2.9009218216094867e-16,
+        2.4013077747483196e-16,
+        3.7009155511500496e-16
+      ],
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "h": 0.01,
+      "relative_differences": [
+        2.6239900280940586e-16,
+        1.4232569082518524e-16,
+        1.994860174156363e-16
+      ],
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "h": 0.0001,
+      "relative_differences": [
+        1.6090562271536306e-16,
+        1.4680007182277233e-16,
+        1.8163936486659486e-16
+      ],
+      "passed": true
+    }
+  ],
+  "precision": 80,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_load_moments.py": "6f2e8eaa1fabb66b26657b037f913a2654d46623025b9e39951850799c9c39f3",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_continuum_loads.py": "74729d78ccdca5e449f041fdd7573170adb7c29f1ebc2c5d6de46566ef640917",
+    "rd/structure/main-shell/q3/experiments/developable_general_reference.py": "565f402b7838be9f41ede07bec3c00dbeff7d2e5289203ae2391cacb18ca9d6e",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-protocol.md": "edd86619e8b483a4e88077bc7baf167d26d9bd4cfe5e826071d5b7a5a0775af1"
+  }
+}

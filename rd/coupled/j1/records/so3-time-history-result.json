@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "physical_pose_twist_energy_and_power",
+      "pose_error": 3.1401849173675503e-16,
+      "twist_error": 7.473417450352271e-17,
+      "energy_difference": 2.7755575615628914e-17,
+      "power_difference": 6.938893903907228e-18
+    },
+    {
+      "case": "both_histories_remapped",
+      "h": 0.1,
+      "absolute_acceleration_error": 0.0006875216432736674,
+      "old_new_algorithmic_difference": 2.8264592731057157e-05
+    },
+    {
+      "case": "both_histories_remapped",
+      "h": 0.05,
+      "absolute_acceleration_error": 0.00017845287596432192,
+      "old_new_algorithmic_difference": 7.738479137406953e-06
+    },
+    {
+      "case": "both_histories_remapped",
+      "h": 0.025,
+      "absolute_acceleration_error": 4.540893849678809e-05,
+      "old_new_algorithmic_difference": 2.018100228827554e-06
+    },
+    {
+      "case": "both_histories_remapped",
+      "h": 0.0125,
+      "absolute_acceleration_error": 1.145001275069451e-05,
+      "old_new_algorithmic_difference": 5.148675804290977e-07
+    },
+    {
+      "case": "current_only_recenter_negative_control",
+      "wrong_relative_error": 2.5551573713585176,
+      "rejections": [
+        "branch",
+        "improper"
+      ]
+    }
+  ],
+  "final_order": 1.9876271070556053,
+  "scope": "SO3 chart component of SE3 pose/twist histories, physical inertia/power and branch guards",
+  "sources": {
+    "rd/coupled/j1/experiments/check_so3_time_history.py": "a8b6a1f00af31b659181de86af13d0359c89b6b37634ee6671027e68c0e01d3d",
+    "docs/specs/coupled/j1-discrete-equilibrium-and-chart-contract.md": "1391c72a73948ded6b44080e64920c48c32377eea1ec641963f3efce156efccc"
+  }
+}

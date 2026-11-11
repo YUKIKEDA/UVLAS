@@ -1,9 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/check_mixed_mean_stress_finite_full_v2.py": "839ff6fe61bccefc04cc13f45a3e60db678762264334e32c73ffcb016ad6bc1e",
-    "docs/verification/mixed-mean-stress-finite-full-v2-protocol.md": "f0bf795078fc67b0072ea46b8c234f07fa8e9559d28a04e0eebfb42bd1effe12",
-    "tools/design-experiments/mixed_mean_stress_finite.py": "e7c55de9ae90eca47fd4374b820ed59b224e07c8acf6e417616f85c7c54e9f7d",
-    "docs/verification/mixed-mean-stress-finite-full-result.json": "7a4b6fc3a4cc7b566763860ffa7daeb8094c87cf85988358a0a6f122efc276c6",
-    "docs/verification/mixed-mean-stress-finite-pair-result.json": "0a57646aa1cdc065c879bc9c7098f64c10e15278cbd8bbf0af34ee61d187571d"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "purpose": "Identify the observed five-dimensional q0 space, after the three-field hypothesis was falsified; no adoption threshold change.",
-  "sources": {
-    "tools/design-experiments/check_reference_work_thin_q0_space_v2.py": "029f2e5535ba6bb5b4814c6271effe95420abdf4d036bde7b86d31410758991e",
-    "docs/verification/reference-work-thin-q0-space-result.json": "7c6476928283c75a33276babed0d21c7bbdfa1b00a89bf8a419fb37b0ad8c743",
-    "docs/verification/reference-work-thin-global-v4-result.json": "b037674b6140b3eef4906b06df1e989ef3e960215788bf70a4dc1885610fe1f9"
-  }
-}

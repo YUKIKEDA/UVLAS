@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "prescribed_policy_and_both_circulations_restart",
+      "bitwise_state": true,
+      "policy_inherited": true
+    },
+    {
+      "case": "restart_semantics_and_atomic_rejection",
+      "negative_controls": [
+        "window_mismatch",
+        "missing_accepted_history",
+        "material_id_owner",
+        "checkpoint_checksum"
+      ]
+    },
+    {
+      "case": "qualification_covers_load_and_state_packet",
+      "negative_controls": 2
+    },
+    {
+      "case": "geometry_cache_and_immutable_core",
+      "hits": 1,
+      "misses": 5,
+      "core_change_rejected": true
+    }
+  ],
+  "failures": [],
+  "seconds": 0.1880000000819564,
+  "sources": {
+    "rd/aero/wake-loads/experiments/check_uvlm_wake_policy.py": "8fa50caad19dd41de8160eb68279b5f2a06b4c89f168e2bea83658e5bc7718cb",
+    "rd/aero/wake-loads/experiments/uvlm_wake_assembly_v2.py": "4263e6d56c8317b294c1459b8ca8ef509741abe9e2fbcdaf02aa75be5bc6a7cf",
+    "rd/aero/wake-loads/experiments/uvlm_wake_assembly.py": "ce80ea76feb147d955485074de8876f774a78a44ffa014e1d33a7d85ba3aeaf2",
+    "rd/aero/kernel/experiments/uvlm_surface_bindings.py": "c9fc857b3fd6d9ba02ef14677b6410b5f44845f89e224aec23e9f080c4a2eb6e",
+    "rd/aero/wake-loads/records/uvlm-wake-assembly-result.json": "569853cc55cd4daf4aeece22413981dccb0a2d9280bad8325517611a03d421d9"
+  }
+}

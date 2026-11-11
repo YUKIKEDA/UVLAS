@@ -1,0 +1,14 @@
+{
+  "source_sha256": "b72ea46fed230f48cdbe387c03209a497da57e38c6ff8e7489f500ed0dceea99",
+  "result_sha256": "1f191c10b1d2cab534c1e9187b6f94efe6c6c63766f22eb6019eafaa17a59d68",
+  "initial_failed_comparisons": 6,
+  "spacing_checks": 4,
+  "corrected_gate_checks": 8,
+  "fine_method_checks": 6,
+  "original_processes": 14,
+  "corrected_regression_processes": 18,
+  "fine_processes": 16,
+  "even_static_scope_only": true,
+  "reference_acceptance": false,
+  "all_criteria_pass": true
+}

@@ -1,0 +1,59 @@
+{
+  "records": [
+    {
+      "name": "flat",
+      "n": 2,
+      "difference": 1.2957811638645776e-15,
+      "moments": 4.675890504044084e-15,
+      "shared": 4.873662869095143e-16,
+      "support": 8.66980756093069e-15,
+      "extra_response": 38.098835910158506,
+      "global_scalar": 684,
+      "action_columns": 4,
+      "global_identity_allocated": false,
+      "seconds": 23.968999999924563,
+      "peak_bytes": 262565888,
+      "passed": true
+    },
+    {
+      "name": "curved-distorted",
+      "n": 2,
+      "difference": 1.355660512637301e-15,
+      "moments": 5.5948866226675106e-15,
+      "shared": 4.64651957395205e-16,
+      "support": 1.094690512242497e-14,
+      "extra_response": 38.098835910158506,
+      "global_scalar": 684,
+      "action_columns": 4,
+      "global_identity_allocated": false,
+      "seconds": 23.953000000095926,
+      "peak_bytes": 281157632,
+      "passed": true
+    },
+    {
+      "name": "quartic-reference",
+      "n": 1,
+      "difference": 1.731541320616612e-15,
+      "moments": 4.942625032762917e-15,
+      "shared": 0.0,
+      "support": 1.4012382430098054e-14,
+      "extra_response": 38.098835910158506,
+      "global_scalar": 201,
+      "action_columns": 4,
+      "global_identity_allocated": false,
+      "seconds": 3.655999999959022,
+      "peak_bytes": 304975872,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "efficient_load_adjoint_implemented": false,
+  "physical_PDE_acceptance": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_position_recovery_action.py": "44636891a3c504cc7251b34ec5b6fa196d4c7b7d8a81fa8e82e1c9a3b3aa119e",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_position_recovery_action.py": "b1c2246a964b89eaaca7888c49e310bac962467c26c866d98f97ec25f74ecde4",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_position_recovery.py": "be421f4139fd15940e34a8f8524c119bfcdf238c6088170490c0eb95379dc0c1",
+    "rd/structure/main-shell/moment-enriched/records/moment-position-recovery-action-preparation.json": "e7df7fa76a063327f4e1c0b5a1add223b42429e074422f4111b817047bfcee58"
+  }
+}

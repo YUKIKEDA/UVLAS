@@ -1,0 +1,14 @@
+{
+  "status": "frozen_before_execution",
+  "maximum_conditions": 30,
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3.py": "f1f8b51106db7e2627acf12a5da45f2cb407fde868d6c93c1b65436db415b733",
+    "rd/structure/main-shell/gsp-q3/experiments/check_gsp_q3_local.py": "7df9695fe433f72b77edc2791b375a63f370daaa634eea06b911f13f5345ec6f",
+    "rd/structure/main-shell/gsp-q3/experiments/audit_gsp_q3_local.py": "605b6c8e78d5770a6299cfa572babe7e26f961bb409cb33ab9d200b1f91d363d",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/q3/experiments/q3_thin_expansion.py": "8120d2378e3f873f32d5b68c6ca99ffc11135ae7d274891245c4c26e8d66b513",
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_local_v2.py": "9acd4a72205c2f83988d68311d708e401f12a6b76e1a55da6f954079ce021aa8",
+    "rd/structure/main-shell/gsp-q3/gsp-q3-formulation.md": "83aeb440831706bec0ffdacab8f7546cf30d20d0cf9baa0a8f1e59838a662bb3",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-protocol.md": "93d0b2f404a7748a4f14be9c398d01a6dfa0796fcb351d021ee4f781d8269419"
+  }
+}

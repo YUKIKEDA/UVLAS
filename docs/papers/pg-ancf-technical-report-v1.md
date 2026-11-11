@@ -436,21 +436,21 @@ $$
 
 | 対象 | 構成／検証の正本 |
 |---|---|
-| 最終採用範囲 | docs/main-shell-adopted-specification.md |
-| 一般多項式持上げ・原辞書・trace | tools/design-experiments/general_paired_polynomials.py |
-| 基底準備・幾何Gram・区間検証 | tools/design-experiments/mass_paired_ancf.py |
-| 参照グラフ・実法線厚さ | tools/design-experiments/polynomial_reference_surface.py |
-| 独立曲率参照 | tools/design-experiments/general_paired_fields.py |
-| 3D作用・主求積／別観測 | tools/design-experiments/exact_paired_finite.py |
-| 28配置の原結果 | docs/verification/mass-paired-quality-result.json、mass-paired-coefficient-input-result.json |
-| 独立PDEと台形訂正 | docs/verification/mass-paired-body-result.json、paired-shell-r5-domain-v2-result.json |
-| 接続／非線形／向き | docs/verification/mass-paired-interface-result.json、mass-paired-mechanics-result.json、mass-paired-orientation-result.json |
-| 新しい記号確認・集計・図 | tools/papers/prepare_pg_ancf_report.py、docs/papers/pg-ancf-assets/ |
+| 最終採用範囲 | docs/specs/structure/main-shell-adopted-specification.md |
+| 一般多項式持上げ・原辞書・trace | rd/structure/main-shell/paired-geometry/experiments/general_paired_polynomials.py |
+| 基底準備・幾何Gram・区間検証 | rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py |
+| 参照グラフ・実法線厚さ | rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py |
+| 独立曲率参照 | rd/structure/main-shell/paired-geometry/experiments/general_paired_fields.py |
+| 3D作用・主求積／別観測 | rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py |
+| 28配置の原結果 | rd/structure/main-shell/paired-geometry/records/mass-paired-quality-result.json、mass-paired-coefficient-input-result.json |
+| 独立PDEと台形訂正 | rd/structure/main-shell/paired-geometry/records/mass-paired-body-result.json、paired-shell-r5-domain-v2-result.json |
+| 接続／非線形／向き | rd/structure/main-shell/paired-geometry/records/mass-paired-interface-result.json、mass-paired-mechanics-result.json、mass-paired-orientation-result.json |
+| 新しい記号確認・集計・図 | rd/structure/main-shell/paired-geometry/report-tools/prepare_pg_ancf_report.py、docs/papers/pg-ancf-assets/ |
 
 原結果のsource／artifact hashを照合してから再集計する。数値実験の元スクリプトには旧成果物の上書き防止があるため、再実行は別の出力場所を持つ作業用checkoutで行い、旧resultを消して上書きしない。現在の再集計コマンドは次である。
 
 ```text
-build/design-fem-env/Scripts/python.exe tools/papers/prepare_pg_ancf_report.py --output-dir build/paper-regeneration-YYYYMMDD
+build/design-fem-env/Scripts/python.exe rd/structure/main-shell/paired-geometry/report-tools/prepare_pg_ancf_report.py --output-dir build/paper-regeneration-YYYYMMDD
 ```
 
 再集計に必要なのはNumPy 2.3.5、SymPy 1.14.0、Matplotlib 3.10.7。既存の元試験の再生成にはSciPy 1.16.3、python-flint等も必要で、元記録の環境を参照する。図表・記号計算・PDF組版の新規成果物と、変更していない元の数値試験を区別する。

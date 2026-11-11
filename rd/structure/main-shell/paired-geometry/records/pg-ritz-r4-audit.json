@@ -1,0 +1,25 @@
+{
+  "audit_passed": true,
+  "meaning": "rejection and evidence integrity only",
+  "accepted": false,
+  "R4_complete": false,
+  "main_shell_adopted": false,
+  "checked_sources": 389,
+  "checked_artifacts": 133,
+  "checked_links": 430,
+  "position_thin_ratio": [
+    34.409645195714475,
+    30.58708883354177,
+    37.80648833252942
+  ],
+  "mass_root_ranks": [
+    153,
+    159,
+    159
+  ],
+  "errors": [],
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-r4-disposition.json": "1a8eb3e854552425bd3dc8b70c1bccf66dc1edddc0cebe5004cc428375b0396d",
+    "rd/structure/main-shell/paired-geometry/experiments/audit_pg_ritz_r4.py": "bc99fee38d77a456749d7860262e8772011e15c5603cfdd865f0f729071d10f3"
+  }
+}

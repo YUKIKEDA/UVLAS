@@ -1,0 +1,430 @@
+{
+  "passed": false,
+  "records": [
+    {
+      "n": 1,
+      "h": 0.01,
+      "ns": 114,
+      "observation": {
+        "error": [
+          2.1584603774282437e-06,
+          6.603258589639952e-05,
+          0.00012273675760706367
+        ],
+        "position": [
+          5.2716013538625936e-08,
+          1.520298175982521e-06,
+          1.996982675845985e-06
+        ],
+        "stationarity": [
+          3.262217329518638e-17,
+          3.1260020746423847e-16,
+          6.462431390222248e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          0.00026341995844233063,
+          0.00026341995844233063,
+          0.0002634199584423307
+        ],
+        "position": [
+          0.0010192882920809657,
+          0.0010192882920809657,
+          0.0010192882920809657
+        ],
+        "stationarity": [
+          1.6342693901067547e-05,
+          1.6342693901067547e-05,
+          1.6342693901067547e-05
+        ]
+      },
+      "physical_vs_weak": 0.0002521385908792823,
+      "work_error": 5.778870737157337e-08,
+      "loads": {
+        "resultant": [
+          3.135014521575975e-22,
+          1.9815277009830289e-19,
+          6.67435492656787e-19
+        ],
+        "exact_external_work": 1.4885875544444301e-06
+      },
+      "stiffness_ranks": [
+        342,
+        342,
+        342
+      ],
+      "mass_root_ranks": [
+        114,
+        114,
+        114
+      ],
+      "rcond": 9.872525443244507e-05,
+      "mass_min": 7.688325146635346e-07,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": false,
+        "independent_physical_solution": false,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.7999999999999977,
+        0.3666666666666667,
+        0.4366666666666664
+      ],
+      "cold_quality_seconds": 8.109000000054948,
+      "artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.01.npz",
+      "artifact_sha256": "cbc1f5e2e45b8e6935fab4262d702f3389ed7df2a82bc5bc993397fe29747fe1"
+    },
+    {
+      "n": 1,
+      "h": 0.0001,
+      "ns": 114,
+      "observation": {
+        "error": [
+          4.405288939532224e-08,
+          1.2445594192017935e-06,
+          1.8603239911721096e-06
+        ],
+        "position": [
+          3.5983524380579255e-08,
+          1.0301854532120625e-06,
+          1.244130285810742e-06
+        ],
+        "stationarity": [
+          2.950423847101712e-17,
+          2.5252022682241337e-16,
+          5.753855259664837e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          0.0012943969736174002,
+          0.0012943969736174002,
+          0.0012943969736173996
+        ],
+        "position": [
+          0.04064360094124427,
+          0.04064360094124427,
+          0.04064360094124427
+        ],
+        "stationarity": [
+          1.145274151426938e-05,
+          1.145274151426938e-05,
+          1.1452741514269364e-05
+        ]
+      },
+      "physical_vs_weak": 0.001294396740461473,
+      "work_error": 1.6754635996567373e-06,
+      "loads": {
+        "resultant": [
+          1.4776817535168994e-18,
+          -7.897920488656308e-20,
+          3.1013471332717244e-18
+        ],
+        "exact_external_work": 1.4885750872609408e-08
+      },
+      "stiffness_ranks": [
+        342,
+        342,
+        342
+      ],
+      "mass_root_ranks": [
+        114,
+        114,
+        114
+      ],
+      "rcond": 3.0144298894866326e-07,
+      "mass_min": 3.1964982117450294e-07,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": false,
+        "physical_stationarity": false,
+        "independent_physical_solution": false,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.7999999999999977,
+        0.3666666666666667,
+        0.4366666666666664
+      ],
+      "cold_quality_seconds": 8.031000000075437,
+      "artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.0001.npz",
+      "artifact_sha256": "87a5dbb1d3b693f4b22e76a7479ce59f494e821a5dcd58fc5b625c75c4299c51"
+    },
+    {
+      "n": 2,
+      "h": 0.01,
+      "ns": 236,
+      "observation": {
+        "error": [
+          7.188917950059358e-08,
+          7.107601063593183e-07,
+          1.0222855475767124e-05
+        ],
+        "position": [
+          4.444555261369104e-10,
+          3.703037983611588e-09,
+          6.513887354678677e-08
+        ],
+        "stationarity": [
+          2.6772570705677006e-17,
+          2.425811560816886e-16,
+          4.851070537367113e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          6.594803560108356e-05,
+          6.594803560108356e-05,
+          6.594803560108356e-05
+        ],
+        "position": [
+          6.003884425558651e-05,
+          6.003884425558651e-05,
+          6.003884425558651e-05
+        ],
+        "stationarity": [
+          3.2885429531818497e-06,
+          3.2885429531818497e-06,
+          3.2885429531818497e-06
+        ]
+      },
+      "physical_vs_weak": 6.402117927063832e-05,
+      "work_error": 3.850195528827113e-09,
+      "loads": {
+        "resultant": [
+          2.701687685883946e-19,
+          3.5893021139900977e-20,
+          1.5899073117759234e-18
+        ],
+        "exact_external_work": 1.4885875544444367e-06
+      },
+      "stiffness_ranks": [
+        708,
+        708,
+        708
+      ],
+      "mass_root_ranks": [
+        236,
+        236,
+        236
+      ],
+      "rcond": 4.5629424019597896e-05,
+      "mass_min": 3.705167642665349e-08,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": false,
+        "independent_physical_solution": false,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.800000000000001,
+        0.3666666666666667,
+        0.43666666666666665
+      ],
+      "cold_quality_seconds": 48.67099999997299,
+      "artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.01.npz",
+      "artifact_sha256": "f7e12b9b128d2015c4ba84ed8fb2181d5c08c7b249b032270b27b50de7067e89"
+    },
+    {
+      "n": 2,
+      "h": 0.0001,
+      "ns": 236,
+      "observation": {
+        "error": [
+          8.12948640594586e-10,
+          7.85712173665411e-09,
+          1.1683644914887806e-07
+        ],
+        "position": [
+          3.6035005595512926e-10,
+          3.004760085656163e-09,
+          5.341116506448618e-08
+        ],
+        "stationarity": [
+          3.74879287178736e-17,
+          2.7594187375581697e-16,
+          6.078385408171042e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          0.00040870720633625696,
+          0.00040870720633625696,
+          0.0004087072063362567
+        ],
+        "position": [
+          0.00420366476446736,
+          0.00420366476446736,
+          0.00420366476446736
+        ],
+        "stationarity": [
+          2.3533764843741264e-06,
+          2.3533764843741264e-06,
+          2.353376484374126e-06
+        ]
+      },
+      "physical_vs_weak": 0.0004087071747865572,
+      "work_error": 1.670413778437188e-07,
+      "loads": {
+        "resultant": [
+          -1.6330475724551312e-18,
+          1.780754422704158e-20,
+          -1.3502900455218687e-18
+        ],
+        "exact_external_work": 1.4885750872613537e-08
+      },
+      "stiffness_ranks": [
+        708,
+        708,
+        708
+      ],
+      "mass_root_ranks": [
+        236,
+        236,
+        236
+      ],
+      "rcond": 2.1166584322568954e-07,
+      "mass_min": 2.5204100393151326e-08,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": false,
+        "independent_physical_solution": false,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.800000000000001,
+        0.3666666666666667,
+        0.43666666666666665
+      ],
+      "cold_quality_seconds": 48.98300000000745,
+      "artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.0001.npz",
+      "artifact_sha256": "0e84d019459cc5a5e1c10731c747970ea738ae12ad8f0e37b8d3a611ae1fe282"
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "thin_amplification",
+      "n": 1,
+      "quantity": "error",
+      "values": [
+        0.020409403784289175,
+        0.01884765532512114,
+        0.015157024085057346
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "n": 1,
+      "quantity": "position",
+      "values": [
+        0.6825919102212368,
+        0.6776206598723872,
+        0.6230050469935545
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        0.011308358869054468,
+        0.011054533964912787,
+        0.011428944625680589
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.8107674103800585,
+        0.8114310733387639,
+        0.8199583774828862
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        7.188917950059358e-08,
+        7.107601063593183e-07,
+        1.0222855475767124e-05
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        4.444555261369104e-10,
+        3.703037983611588e-09,
+        6.513887354678677e-08
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        8.12948640594586e-10,
+        7.85712173665411e-09,
+        1.1683644914887806e-07
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        3.6035005595512926e-10,
+        3.004760085656163e-09,
+        5.341116506448618e-08
+      ],
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "seconds": 146.51500000001397,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_shell_r5_domain.py": "2e36fa6ef9c5d4d1a5c8da3b74c4b460d091e7d2f7550cb3100049d0b08799c1",
+    "rd/structure/main-shell/paired-geometry/experiments/swept_taper_domain.py": "e29bcfa5e20b638e5ee0e344627fb4b73763358c5b511d5a385832bb0321f2fc",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_fields.py": "1b5eb312a92cb61274d952a42dc4aecdeb0229bbbf5031f5deb1ca13becf8a7f",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_body.py": "b71226f1331cb03a2118d77ccd6befb3794ff48adf33609896baab8a557b75a5",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-domain-protocol.md": "62c963e29b1478c7e41fa57c6f5e130cd3bcbca35f41b0d469c3e2c6309cafe2"
+  }
+}

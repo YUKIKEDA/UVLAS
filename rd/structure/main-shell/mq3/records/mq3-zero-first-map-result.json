@@ -1,0 +1,1320 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 9.410937156511861e-16,
+          "constraint_residual": 1.285801563751255e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 8.98705965457122e-16,
+          "constraint_residual": 1.2858013621352038e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 8.888627876702097e-16,
+          "constraint_residual": 1.2858013621352038e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 9.094116037148054e-16,
+          "constraint_residual": 1.2858015637233138e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 8.919301543388327e-16,
+          "constraint_residual": 1.2858015637233138e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112501037,
+      "solve_residual": 2.553410164970686e-16,
+      "derivative_residual": 1.9841686004522493e-16,
+      "derivative_difference": 2.299961339246896e-16,
+      "saved_difference": 2.9724147323139882e-15,
+      "zero_dependence": 2.6367436448915557e-16,
+      "linear_dependence": 2.37992199424424e-16,
+      "constant0": 6.439293542825908e-15,
+      "constant1": 1.7972303065499324e-15,
+      "zero_c": 0.0,
+      "rigid": 8.376203682541879e-17,
+      "work_error": 6.368908088256047e-15,
+      "moment0": 1.285801563751255e-15,
+      "moment1": 9.597554155125398e-16,
+      "finite_difference_errors": [
+        3.16753411936408e-16,
+        3.1675341193640794e-16,
+        3.167534119364081e-16
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0-n1-c0.npz",
+      "artifact_sha256": "71e58542eba9e1e2b7cf152b4962a0ee645815901d3405813aa45ad711a19d27"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.0277101403818616e-15,
+          "constraint_residual": 1.5370159272935336e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.0328471847476421e-15,
+          "constraint_residual": 1.537015416561301e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.0240357869984392e-15,
+          "constraint_residual": 1.537015416561301e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.0282182997431695e-15,
+          "constraint_residual": 1.5370159272350603e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.017022130592204e-15,
+          "constraint_residual": 1.5370159272350603e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112501037,
+      "solve_residual": 3.4927741160188536e-16,
+      "derivative_residual": 2.3870704098624093e-16,
+      "derivative_difference": 2.5678015126849186e-16,
+      "saved_difference": 3.1544190491890004e-15,
+      "zero_dependence": 3.566564901220895e-16,
+      "linear_dependence": 2.4063926586328834e-16,
+      "constant0": 4.884981308350689e-15,
+      "constant1": 3.8633756634586305e-15,
+      "zero_c": 0.0,
+      "rigid": 1.0793592705048713e-16,
+      "work_error": 5.365534504099573e-15,
+      "moment0": 1.5370159272935336e-15,
+      "moment1": 1.5339981274035916e-15,
+      "finite_difference_errors": [
+        3.7198971631748346e-16,
+        3.7198971631748356e-16,
+        3.7198971631748415e-16
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0-n2-c0.npz",
+      "artifact_sha256": "c35a0991dc21983b7c09edba07d76ed28b36057eedb6214de6c70970a80960b5"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.3630435643341e-15,
+          "constraint_residual": 1.473171815284461e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.286067927886507e-15,
+          "constraint_residual": 1.4731719379411845e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.283613208749407e-15,
+          "constraint_residual": 1.4731719379411845e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.2814934418303066e-15,
+          "constraint_residual": 1.4731718152956149e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.2905850380458557e-15,
+          "constraint_residual": 1.4731718152956149e-15
+        }
+      ],
+      "KKT_rcond": 0.38196601125010343,
+      "solve_residual": 2.5892489462462905e-16,
+      "derivative_residual": 2.4514418410828397e-16,
+      "derivative_difference": 2.2261161627302856e-16,
+      "saved_difference": 4.884802858068307e-15,
+      "zero_dependence": 2.724883602925099e-16,
+      "linear_dependence": 2.4083683966230877e-16,
+      "constant0": 5.329070518200751e-15,
+      "constant1": 3.600551875248266e-15,
+      "zero_c": 0.0,
+      "rigid": 8.1902445703814e-17,
+      "work_error": 1.0712234087457958e-14,
+      "moment0": 1.473171815284461e-15,
+      "moment1": 1.1216172090745168e-15,
+      "finite_difference_errors": [
+        3.75034297937297e-16,
+        3.750342979372971e-16,
+        3.7503429793729653e-16
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0-n2-c1.npz",
+      "artifact_sha256": "7f43cea4bc1dbb23e887cb2eda0056d428bdbd1a784401efdb03a2e811098976"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 9.591282771644393e-16,
+          "constraint_residual": 1.5115435044927558e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.0506130009819253e-15,
+          "constraint_residual": 1.5115428443497151e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.0427946539701384e-15,
+          "constraint_residual": 1.5115428443497151e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 9.607375944328884e-16,
+          "constraint_residual": 1.51154350445258e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 9.449450536470823e-16,
+          "constraint_residual": 1.51154350445258e-15
+        }
+      ],
+      "KKT_rcond": 0.38196601125010365,
+      "solve_residual": 3.090521417339227e-16,
+      "derivative_residual": 2.2911350977002096e-16,
+      "derivative_difference": 2.6239989216081634e-16,
+      "saved_difference": 3.0524391157836293e-15,
+      "zero_dependence": 3.051852462454344e-16,
+      "linear_dependence": 2.375120020902331e-16,
+      "constant0": 3.4416913763379853e-15,
+      "constant1": 3.266582579040649e-15,
+      "zero_c": 0.0,
+      "rigid": 1.0896359009599416e-16,
+      "work_error": 7.074786031616422e-15,
+      "moment0": 1.5115435044927558e-15,
+      "moment1": 1.0224122438734403e-15,
+      "finite_difference_errors": [
+        3.6586519540010462e-16,
+        3.6586519540010477e-16,
+        3.658651954001049e-16
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0-n2-c2.npz",
+      "artifact_sha256": "43b18bce49dd767637db7d36a90ffe4a420485b9e583557e19666bcfafe5a862"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.3277066707084508e-15,
+          "constraint_residual": 1.3705945312473773e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.268851566643231e-15,
+          "constraint_residual": 1.3705946656117764e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.2874159239823699e-15,
+          "constraint_residual": 1.3705946656117764e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.316009269768787e-15,
+          "constraint_residual": 1.3705945312950842e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            53,
+            53,
+            53
+          ],
+          "span_residual": 1.310158516882506e-15,
+          "constraint_residual": 1.3705945312950842e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112501038,
+      "solve_residual": 3.4933994436947786e-16,
+      "derivative_residual": 2.5545875634689267e-16,
+      "derivative_difference": 2.677074793766164e-16,
+      "saved_difference": 4.552764014153634e-15,
+      "zero_dependence": 2.4686886179230067e-16,
+      "linear_dependence": 2.399867182171765e-16,
+      "constant0": 5.10702591327572e-15,
+      "constant1": 3.5891931299106896e-15,
+      "zero_c": 0.0,
+      "rigid": 1.1026050391532281e-16,
+      "work_error": 8.897365069614692e-15,
+      "moment0": 1.3705945312473773e-15,
+      "moment1": 1.1984134995750563e-15,
+      "finite_difference_errors": [
+        3.8889093961149076e-16,
+        3.8889093961149056e-16,
+        3.8889093961149066e-16
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0-n2-c3.npz",
+      "artifact_sha256": "d43f24cb21dc195614ecdbb153f0e68ff0da8c8c10b22e06b5e074090e8bba66"
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.882653835691554e-16,
+          "constraint_residual": 1.2481996492601346e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.65022491322896e-16,
+          "constraint_residual": 1.5923591392546218e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.477876853770374e-16,
+          "constraint_residual": 1.4591810061500517e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 9.402111705164358e-16,
+          "constraint_residual": 1.1858276213897012e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            105,
+            105,
+            105
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.318487288329607e-16,
+          "constraint_residual": 1.538734770356427e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112501026,
+      "solve_residual": 3.20177847289862e-16,
+      "derivative_residual": 2.0641431971883222e-16,
+      "derivative_difference": 4.479559484485419e-16,
+      "saved_difference": 3.2136415809615962e-15,
+      "zero_dependence": 2.856262386722832e-16,
+      "linear_dependence": 3.090881347095031e-16,
+      "constant0": 6.8833827526759706e-15,
+      "constant1": 2.066298663554802e-15,
+      "zero_c": 0.0,
+      "rigid": 8.38242777714293e-17,
+      "work_error": 5.723658844750017e-15,
+      "moment0": 1.2481996492601346e-15,
+      "moment1": 8.586432912155022e-16,
+      "finite_difference_errors": [
+        2.6685161961817163e-06,
+        6.671276240370101e-07,
+        1.6678181855705378e-07
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0.4-n1-c0.npz",
+      "artifact_sha256": "07e4fc90078a5a7d9f5cd95dcfc161a15a36b87c06a9be1545d6f711ae43c9e6"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.327225423373679e-15,
+          "constraint_residual": 1.7176182779059188e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 9.466686162417277e-16,
+          "constraint_residual": 1.9074717889455232e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.96770903490172e-16,
+          "constraint_residual": 1.7973453523656416e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.322426390156388e-16,
+          "constraint_residual": 1.8757709471850062e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 8.69875825766826e-16,
+          "constraint_residual": 1.8916470713115456e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112501015,
+      "solve_residual": 4.218104759046475e-16,
+      "derivative_residual": 2.935598303685021e-16,
+      "derivative_difference": 8.206866539092448e-16,
+      "saved_difference": 2.407747269259106e-14,
+      "zero_dependence": 2.6977733019142603e-16,
+      "linear_dependence": 4.893358639788431e-16,
+      "constant0": 3.3306690738754696e-14,
+      "constant1": 3.7598326907860996e-15,
+      "zero_c": 0.0,
+      "rigid": 1.4073199613083414e-16,
+      "work_error": 7.51909164902199e-15,
+      "moment0": 1.7176182779059188e-15,
+      "moment1": 1.3075484832407546e-15,
+      "finite_difference_errors": [
+        2.7102409810588716e-06,
+        6.775587178128866e-07,
+        1.6938957881698185e-07
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0.4-n2-c0.npz",
+      "artifact_sha256": "c8d35b877e0f301a8cd76d2116760ab7a6866e13d2abe1040224d4a1f36ee157"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.2345734043392531e-15,
+          "constraint_residual": 5.645370227550534e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.262531611629891e-15,
+          "constraint_residual": 4.94385023257144e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.2491789194072747e-15,
+          "constraint_residual": 4.622890148572648e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.2699918299529993e-15,
+          "constraint_residual": 4.9773389128124555e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.2654128177459158e-15,
+          "constraint_residual": 4.049633287068609e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112500906,
+      "solve_residual": 3.8828307151969834e-16,
+      "derivative_residual": 2.532261028293018e-16,
+      "derivative_difference": 4.089836107680989e-15,
+      "saved_difference": 1.7019179307091567e-13,
+      "zero_dependence": 2.5990089756393346e-16,
+      "linear_dependence": 1.791356854691532e-15,
+      "constant0": 5.639932965095795e-14,
+      "constant1": 4.1469466233842905e-15,
+      "zero_c": 0.0,
+      "rigid": 4.0624404659515517e-16,
+      "work_error": 1.6584146336466906e-13,
+      "moment0": 5.645370227550534e-15,
+      "moment1": 1.3062897102808915e-15,
+      "finite_difference_errors": [
+        2.643520050292927e-06,
+        6.608787200112234e-07,
+        1.652196038873399e-07
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0.4-n2-c1.npz",
+      "artifact_sha256": "8e36f1f18d06f3f8964e6892af703c4a22904fbe7769f549bd1caffaae14461f"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.0427797550932335e-15,
+          "constraint_residual": 1.880918562322537e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.001479411756906e-15,
+          "constraint_residual": 2.1478601110375676e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.0810650659435214e-15,
+          "constraint_residual": 2.1312185268868537e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 9.14028362028946e-16,
+          "constraint_residual": 2.178174451087888e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 9.237149164934646e-16,
+          "constraint_residual": 2.0298851785146353e-15
+        }
+      ],
+      "KKT_rcond": 0.3819660112501017,
+      "solve_residual": 4.391533360073593e-16,
+      "derivative_residual": 2.762727244172568e-16,
+      "derivative_difference": 1.068635752894807e-15,
+      "saved_difference": 2.8080273659488427e-14,
+      "zero_dependence": 2.3267079011898695e-16,
+      "linear_dependence": 4.982560481227117e-16,
+      "constant0": 1.554312234475219e-14,
+      "constant1": 3.276267034660797e-15,
+      "zero_c": 0.0,
+      "rigid": 1.3334847963105455e-16,
+      "work_error": 1.3839212686603325e-14,
+      "moment0": 1.880918562322537e-15,
+      "moment1": 1.033480319473125e-15,
+      "finite_difference_errors": [
+        2.710240981025885e-06,
+        6.775587185990723e-07,
+        1.693895823163021e-07
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0.4-n2-c2.npz",
+      "artifact_sha256": "d5bc5159e0737d027fb1daad6e31045a6d14a855b5a103bcfe999a3eef4686c4"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "near": [
+        {
+          "h": 0.0,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.250181449554679e-15,
+          "constraint_residual": 5.904225756176577e-15
+        },
+        {
+          "h": -0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.3125635365407007e-15,
+          "constraint_residual": 4.877515294695392e-15
+        },
+        {
+          "h": 0.01,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.272770205486937e-15,
+          "constraint_residual": 7.245271573639956e-15
+        },
+        {
+          "h": -0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.2794702735087212e-15,
+          "constraint_residual": 7.808255724615944e-15
+        },
+        {
+          "h": 0.0001,
+          "basis_ranks": [
+            106,
+            106,
+            106
+          ],
+          "constraint_ranks": [
+            54,
+            54,
+            54
+          ],
+          "span_residual": 1.2976370299736501e-15,
+          "constraint_residual": 6.439096694483158e-15
+        }
+      ],
+      "KKT_rcond": 0.38196601125009333,
+      "solve_residual": 3.5514138560555353e-16,
+      "derivative_residual": 2.7272227737768796e-16,
+      "derivative_difference": 3.669776295709765e-15,
+      "saved_difference": 1.619974299893103e-13,
+      "zero_dependence": 3.82378349879352e-16,
+      "linear_dependence": 1.836213654983062e-15,
+      "constant0": 4.574118861455645e-14,
+      "constant1": 3.852901618351577e-15,
+      "zero_c": 0.0,
+      "rigid": 4.790212248432548e-16,
+      "work_error": 1.7530004544181265e-13,
+      "moment0": 5.904225756176577e-15,
+      "moment1": 1.2118835570899237e-15,
+      "finite_difference_errors": [
+        2.643520051376443e-06,
+        6.608787181871577e-07,
+        1.6521960121037464e-07
+      ],
+      "checks": {
+        "rank": true,
+        "span": true,
+        "full_constraints": true,
+        "condition": true,
+        "solve": true,
+        "derivative": true,
+        "saved_finite_h": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "rigid": true,
+        "work": true,
+        "moments": true,
+        "finite_difference": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-zero-first-20261103-103003/k0.4-n2-c3.npz",
+      "artifact_sha256": "671b684e512748176974288abf60d5194266dabcf1784c10ca0b6268c78032e4"
+    }
+  ],
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "physical_adoption": false,
+  "shared_thin_kernel_evaluated": false,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/check_mq3_zero_first_map.py": "d50d896f41a6d6a6454dd47c0650fa72f10f88411da5215520b8ee6d9612a195",
+    "rd/structure/main-shell/mq3/experiments/mq3_thickness_family.py": "5a6d414344f82e0f152d772b1de0e76e2c19f1c46cbb92f07976215255a23760",
+    "rd/structure/main-shell/mq3/experiments/mq3_independent.py": "2b56f136d3d44425aa60960be0345d25ce557a7a3362d1466d899226f794a3a6",
+    "rd/structure/main-shell/q3/experiments/q3_curved_independent.py": "0a716302cc4360b2012d56f7b34c3aff2a2622ddcad3d34a4b53c40b2ffbc113",
+    "rd/structure/main-shell/mq3/experiments/mq3_joint_moments.py": "d2f2f3f91ee7db26de0d6c0b4c7e8f62f0372c629eb8c4d41788045ed15f1ce0",
+    "rd/structure/main-shell/mq3/records/mq3-local-feasibility-result.json": "8f9594ba5d8d103b2c67000f7a50ada06cea7d107da9585dcbaeeb4ed1379a02",
+    "rd/structure/main-shell/mq3/mq3-zero-thickness-linearization.md": "08580c827cbb97e0a40617c1f3ff1bc6068430d5387627f408d9aec63cb7873b",
+    "rd/structure/main-shell/mq3/records/mq3-zero-first-map-protocol.md": "f61e99ea63ba9a92eec8d036863a27af322bed74c19404a78b33f72a56e37b30"
+  },
+  "seconds": 64.39000000001397,
+  "peak_bytes": 585125888
+}

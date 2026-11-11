@@ -1,0 +1,9 @@
+{
+  "status": "serialization_failed_after_five_observations",
+  "reason": "TypeError: Object of type bool is not JSON serializable",
+  "numerical_observations_not_used_as_saved_evidence": true,
+  "replacement": "mixed-mean-stress-thin-audit-v2.json",
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/audit_mixed_mean_stress_thin.py": "c74900eb1cfa226179b855a02ae091ddd8ccceeec2ac91397e3c8a250d9fefa7"
+  }
+}

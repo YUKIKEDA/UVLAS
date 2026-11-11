@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "uvlas",
+  "version-string": "0.1.0-dev",
+  "license": "Apache-2.0",
+  "builtin-baseline": "2ec0f1747d8186a5c9babe276e2ad57cd2b12d2a",
+  "dependencies": [
+    "boost-hash2",
+    "boost-multiprecision",
+    "eigen3",
+    "nlohmann-json",
+    "spectra"
+  ],
+  "features": {
+    "tests": {
+      "description": "Test framework. Never linked into the library, the CLI or the wheel.",
+      "dependencies": ["catch2"]
+    },
+    "python": {
+      "description": "CPython binding (IO4-02).",
+      "dependencies": ["pybind11"]
+    }
+  },
+  "overrides": [
+    { "name": "boost-hash2", "version": "1.92.0" },
+    { "name": "boost-multiprecision", "version": "1.92.0" },
+    { "name": "catch2", "version": "3.16.1" },
+    { "name": "eigen3", "version": "5.0.1" },
+    { "name": "nlohmann-json", "version": "3.12.0" },
+    { "name": "pybind11", "version": "3.1.0" },
+    { "name": "spectra", "version": "1.2.0" }
+  ]
+}

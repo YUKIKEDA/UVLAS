@@ -1,0 +1,8 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/check_mortar_equilibrium.py": "ca179d243c453435ecf1c150284921611e61f4b7387e6ec4efbd6f01cf36451c",
+    "rd/structure/main-shell/mortar/experiments/mortar_q4.py": "e836a825f48dbab5065be822e5c71096741368f2c48842124dd91052d5d249cd",
+    "rd/structure/main-shell/mortar/records/mortar-q4-equilibrium-protocol.md": "158ce030b93e92bc363c1c3fc41888ba306029af9abcc6424a0c5c254e983919",
+    "rd/structure/main-shell/mortar/records/mortar-q4-result.json": "8df6126cbe758482246aa6691759192fea73aef92ad1f9a86755bdb598d95302"
+  }
+}

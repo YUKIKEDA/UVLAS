@@ -1,0 +1,9 @@
+{
+  "reason": "Convert numpy boolean to Python bool before JSON serialization. The initial diagnostic completed n2/n4 but failed to serialize numpy.bool_; calculation/space/ranks/thresholds unchanged.",
+  "original_failure": "TypeError: Object of type bool is not JSON serializable",
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_q0_space.py": "efde61524acec703e589f4b2d0b0d91a396d0f090aa805d03f5000a8683eb5f9",
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_q0_space_v2.py": "59a817f1fa46225ffaa342d5238c2b6edd15a53422b74d1d36fb3f9c280b0c31",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-space-diagnostic-protocol.md": "826ff8aca9cc8df1440954f68eb07a7e73cc20b09c722f3833a977eca1852734"
+  }
+}

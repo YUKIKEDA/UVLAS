@@ -1,0 +1,64 @@
+{
+  "accepted": false,
+  "records": [
+    {
+      "module": "pg_ritz_shell_v4",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[368, 376, 380]"
+    },
+    {
+      "module": "pg_ritz_shell_v5",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[235, 237, 239]"
+    },
+    {
+      "module": "pg_ritz_shell_v6",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[195, 198, 198]"
+    },
+    {
+      "module": "pg_ritz_shell_v7",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[368, 376, 380]"
+    },
+    {
+      "module": "pg_ritz_shell_v8",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[374, 381, 383]"
+    },
+    {
+      "module": "pg_ritz_shell_v9",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[236, 237, 239]"
+    },
+    {
+      "module": "pg_ritz_shell_v10",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[236, 237, 239]"
+    },
+    {
+      "module": "pg_ritz_shell_particular_only",
+      "entrance_passed": false,
+      "reason": "general_PG_rank:[189, 192, 192]"
+    }
+  ],
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_split_screen.py": "ec1e4e66bde0e8f7e115e9b2353fb3edef26da467f1d393ee3055d577c0039ba",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v4.py": "86a25e58b4d1b7deec74eb48e05fdf452315b2ed69e61fbf380239ebf95ac5f2",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v5.py": "25f32cfbd41d5ff25dd0fc39bd49ce260599627f7ae8f1c869f2a882cfe5fc57",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v5.py": "4a35ecaa2345318e462ec867b5531ab9b5593f71466b32341e484645264be74f",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v6.py": "be04b6963522330ff44282cc42fc1f16f27f44d604e6cbcfafb9c0b15dff2c23",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v6.py": "9c39bee38a5067a8e7913f39175a2086e506ca3439538a754539d96356119601",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v7.py": "d450a4feaf78b2b61df651a46a731c34f3fe34179fc36d971cd7a9ec86a8eb44",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v7.py": "aec67c795fd1fe4896427de7889e1c692de38685edd1c620c83cbebf8b6c5803",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v8.py": "277a08c46b8c1092477b76e2c0abd31e3c609db4c77ce9801370cba9aefef4e5",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v8.py": "73a3552bdeb87814df217c2a9bd1e777b0bab856bafbd9d825da626bbfecf9fd",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v9.py": "f9566ebd8d4901ae7818bdc7049b081914e16cd4410ea53ce2dbb1b3f226ad4e",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v9.py": "3803e064e13c9f2ec7202a6adb0f22de888bd2b14c21d0a0ba603964f6f0219a",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v10.py": "3345e6bf54cc6d8c8bbf0122db91a2f95bf4ffd221c4bf36132012ee341b42b7",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v10.py": "21835856d8cd11232cf27c54301ab4967de53f69d7720139a881b269d46800f3",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_particular_only.py": "892c95da5cc4bfeaf708cd147e26701589938a76a2f81a943ab1d47345fe1692",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_particular_only.py": "c6b173d5bc7edc56cc07b6bf986279330a1d34d423adf264553ce71283dd89a6"
+  }
+}

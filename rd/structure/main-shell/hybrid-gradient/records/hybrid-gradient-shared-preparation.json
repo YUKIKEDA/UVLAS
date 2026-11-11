@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_fit.py": "a341da8db56c74bda3edc4c46b7584f24b4837d54e9dd2f87576270134970e90",
+    "rd/structure/main-shell/hybrid-gradient/experiments/check_hybrid_gradient_shared.py": "b93ad9a2b09760f91b5cbd7dcaa59c04422fe8e911ca523d6430c758c1e6ab18",
+    "rd/structure/main-shell/hybrid-gradient/experiments/audit_hybrid_gradient_shared.py": "1de3e73130b0ce68b09c675ecf5b57791037ee81fbf9bf037c007ac8371263ed",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-local-result.json": "f46312f6e03e3f7dcac25104540981b9b4d4f26a488a2e681ce034bca598861d",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-local-audit.json": "41352d517d2f45057312c5165f0662757f29dd6efcba124f7a0388e7442144e3",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-ancf-protocol.md": "18a894ddb33c0e228fa7f66c9e4f49615a2172de625b0b724a611726f4dcdecc"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-02",
+  "candidate": "T-E24-CG1",
+  "scope": "general curved primary shell in its current form",
+  "decision": "not_adopted",
+  "numeric_checks_pass": true,
+  "independent_audit_pass": true,
+  "predeclared_candidate_gate": {
+    "status": "failed",
+    "finest": [
+      {
+        "h": 0.001,
+        "lower": 0.7436362975343167,
+        "upper": 0.7437139490623428
+      },
+      {
+        "h": 0.0001,
+        "lower": 0.8998629037829793,
+        "upper": 0.900642522738186
+      }
+    ],
+    "thin_amplification": {
+      "lower": 1.9009402872025736,
+      "upper": 1.9010117763321848
+    }
+  },
+  "flat_candidate_status": "T-E24-G1 limited evidence retained",
+  "requirements_changed": false,
+  "product_shell_adopted": false,
+  "next_contract": "rd/structure/main-shell/q9-curved/q9-curved-membrane-compatibility-contract.md",
+  "sources_sha256": {
+    "rd/structure/main-shell/q9-curved/records/q9-developable-bending-approximation-result.json": "d1f2add37e413548c6ba5d277b8c123e580dea0315d74564980cbeb2f421edd8",
+    "rd/structure/main-shell/q9-curved/records/q9-developable-bending-approximation-audit.json": "f38e9f997080468bcb17d8de42fc6de229d302dda41102e5f47b77e73531ae05",
+    "rd/structure/main-shell/q9-curved/records/q9-developable-midmembrane-result.json": "28903d860e6e7fd64f7c4dcdc5bcff6bcdc8938f08b3624cc7110ac5bb9bccca",
+    "rd/structure/main-shell/q9-curved/records/q9-developable-membrane-polynomial-result.json": "e539b743303b6aa0631a0c03886efdbadec9077f2ec6913dad7de210d13cd41a"
+  }
+}

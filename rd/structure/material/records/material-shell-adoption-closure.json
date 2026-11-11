@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "material_1_2_complete": true,
+  "main_shell_adopted": true,
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "1.3 beam adoption and shell interface",
+  "immutable": {
+    "docs/specs/structure/material-shell-adopted-specification.md": "8ec70e11104e3b9f79d077ffb2735d881b90e7fb413d5649cc3f12cc48888ca1",
+    "rd/structure/material/records/material-shell-adoption-disposition.json": "a4bab336450fe1e117472285e198c140054e534a9d900eecfbe7f45d11bcb7c4",
+    "rd/structure/material/records/material-shell-adoption-results.md": "3abf8f76647303a8f531cd0d17a82547c8fb15a1693e70a84d8b9cc00680b7e8",
+    "rd/structure/material/records/material-shell-adoption-audit.json": "baf196ef0c6323b4ccd66b4547a36474a90381086bfb7a70ef201f25592c02bf"
+  },
+  "status_sync_source": {
+    "rd/structure/material/experiments/sync_material_shell_status.py": "1692ae0e0690bf64f7a90184dfe12d953f8ccee7e8e78f3315ce39d91c7acfcc"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ],
+  "checked_status_links": 20
+}

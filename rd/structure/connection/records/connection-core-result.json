@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "eccentric_rigid_body_on_attachment_frame",
+      "spatial_inertia_error": 7.583809605081805e-17,
+      "mass_derivative_error": 4.756366472786332e-12,
+      "power_identity_error": 9.882378111409888e-16
+    },
+    {
+      "case": "gravity_and_eccentric_wrench",
+      "metrics": {
+        "work": 1.5379624249942996e-16,
+        "tangent": 7.676456983981036e-12,
+        "eccentric_torque": 1.5915136663302356e-17
+      }
+    },
+    {
+      "case": "particle_separate_from_rigid_body",
+      "mass_rank": 3,
+      "zero_rotational_inertia_not_fabricated": true
+    },
+    {
+      "case": "prescribed_motion_velocity_acceleration",
+      "position": 2.82425821534429e-17,
+      "velocity": 3.6880726988814706e-17,
+      "acceleration": 1.1188630228279524e-16,
+      "mixed_derivative_error": 1.7589229566907917e-16,
+      "omitted_mixed_term_defect": 0.16791931493208306
+    },
+    {
+      "case": "linear_constraint_dependency_and_dual_reaction",
+      "ranks": [
+        3,
+        3,
+        3
+      ],
+      "independent_rows": [
+        0,
+        1,
+        3
+      ],
+      "all_time_rhs_checked": true,
+      "individual_dependent_multipliers_nonunique": true
+    },
+    {
+      "case": "SE3_weld_graph_global_redundancy",
+      "kept": [
+        "a",
+        "b"
+      ],
+      "redundant": [
+        "cycle",
+        "dup",
+        "reverse"
+      ],
+      "inconsistent_cycle_rejected": true
+    },
+    {
+      "case": "mass_ownership_and_atomic_failure",
+      "negative_controls": 4,
+      "no_partial_registration": true
+    },
+    {
+      "case": "attachment_degeneracy_rejection",
+      "rejected": 2,
+      "input_unchanged": true
+    }
+  ],
+  "failures": [],
+  "seconds": 0.015000000013969839,
+  "sources": {
+    "rd/structure/connection/experiments/check_connection_core.py": "2bf1a05eae4d096cdca96ff0c1f96e4ffb7a1a9baa601d5c9e3fa937cc4bdb3e",
+    "rd/structure/connection/experiments/connection_kinematics.py": "bce97cffc9b538e313e859f9d0337ed7cd84a7a29d16d405e7dac96faf02c685",
+    "rd/structure/beam/experiments/beam_se3_v2.py": "3c71924e347b844353523727510041f529a8b62cd3c31fec6f7b3f70120ada48",
+    "rd/structure/beam/experiments/beam_jet2.py": "0a352d90bb2ad09a27765bfda31a09f2295686ba61f9f742b383600369c81295",
+    "rd/structure/connection/records/connection-adoption-protocol.md": "79d04e595e6a0232457914e1595af41b05cee9e7073cb3146e51d23a11f4fbe3"
+  }
+}

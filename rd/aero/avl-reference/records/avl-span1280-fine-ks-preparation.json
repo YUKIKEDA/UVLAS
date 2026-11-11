@@ -1,0 +1,102 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-span1280-fine-experiment.md",
+  "protocol_sha256": "c8c58c4acd726d1fb8f6a6d0e68018dac267a7e49d0b2f67d2e33843e0cc1c28",
+  "source_sha256": "a5d50eb523b4038439e6121506a73929eb203f690566dfe50367105bf2287b14",
+  "capacity_audit_sha256": "b8286543cd8326a69f12f5bbe8b9d8bbb54665e5aa93dd8e0e15f43cd7a6ca34",
+  "parent_runs_sha256": "879b4a2b72f4f5b8cc64aa016552eb27a5305c04fc2fe2d767521f1105fade3f",
+  "capacity_preparation_sha256": "b91f7f8bcf2f3c5f89c18609ce8a042fb6fc70e75f3187804348237fc502da54",
+  "executable_sha256": "7f5b321f308be5d737b6999ba143fc239a8bc7056e281a889e68603fa20bf740",
+  "decks": [
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 1920,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V01-M3-N1280-half.avl",
+      "sha256": "cb0ec9309d65f183a9e22d1d7c8d84c0322c57c268c1786105664fcc1427f5e4",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/wing.avl",
+      "donor_sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815"
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 3840,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V01-M6-N1280-half.avl",
+      "sha256": "0d3ff96a90e1e18a91547220816a7f98a1933235e93875e1267d34b546794d61",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/wing.avl",
+      "donor_sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815"
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 7680,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V01-M12-N1280-half.avl",
+      "sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/wing.avl",
+      "donor_sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 15360,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V01-M24-N1280-half.avl",
+      "sha256": "09a43bd511b072de98b4b70b5294683e060c4088947523900819bcc6414f793f",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/wing.avl",
+      "donor_sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815"
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 1920,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V02-M3-N1280-half.avl",
+      "sha256": "325202e5864aee9a6bec66dde5279115217e78268198749ac1f61b3b20af5c5b",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/wing.avl",
+      "donor_sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb"
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 3840,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V02-M6-N1280-half.avl",
+      "sha256": "c10bd460fff21c1c6a7ca155fe16d038a203b8665e81b96de68e70b5e1db5a25",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/wing.avl",
+      "donor_sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb"
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 7680,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V02-M12-N1280-half.avl",
+      "sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/wing.avl",
+      "donor_sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 1280,
+      "native_strips": 640,
+      "native_unknowns": 15360,
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-span1280/FW-V02-M24-N1280-half.avl",
+      "sha256": "ca5b81249bc4198140e1abd6c295f2d239c59d873f56abcf9edc791ec40d129f",
+      "donor": "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/wing.avl",
+      "donor_sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb"
+    }
+  ],
+  "correction_protocol_sha256": "89568209808106d2bba6afb4d1d203bbaf010a2e34ddfbd1074494d2308164b5",
+  "failed_runs_sha256": "6102612a1f13adb2176caf440b0e8b4aebd494c34ba0a21fa881caae4866768a",
+  "load_sha256": "d3b3d3fdb109452c202c6bd492135e692a5d1bab0e192b20c499cfe5a33f0522"
+}

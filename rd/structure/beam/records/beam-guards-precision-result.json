@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "reference_and_current_section_tube",
+      "certificate": {
+        "jacobian_lower": 1.0,
+        "sufficient_not_necessary": true,
+        "formula": "Gamma_x+kappa_y*z-kappa_z*y"
+      },
+      "negative_controls": [
+        "collapse",
+        "inverted",
+        "tube",
+        "bounds_None",
+        "bounds_[0.0, 0.1]",
+        "bounds_[-0.1, 0.1]",
+        "bounds_[nan, 0.1]"
+      ]
+    },
+    {
+      "case": "retained_state_and_projection_precision",
+      "cases": [
+        {
+          "n": 8,
+          "h": 0.0001,
+          "retained_residual": 1.3807480731615445e-66,
+          "binary64_projection_residual": 6.108410677314668e-08,
+          "projection_qualified": false
+        },
+        {
+          "n": 16,
+          "h": 0.0001,
+          "retained_residual": 1.4646028370582982e-65,
+          "binary64_projection_residual": 2.6469779601696886e-07,
+          "projection_qualified": false
+        },
+        {
+          "n": 32,
+          "h": 0.0001,
+          "retained_residual": 1.2600583761507343e-65,
+          "binary64_projection_residual": 1.0180684462191113e-06,
+          "projection_qualified": false
+        }
+      ]
+    }
+  ],
+  "seconds": 0.01600000006146729,
+  "sources": {
+    "rd/structure/beam/experiments/check_beam_guards_precision.py": "89ca8a52652a8f164eeb00c30c8f7b7c8dc35b9dcfb41cef96e8db503dd105cd",
+    "rd/structure/beam/experiments/beam_admissibility.py": "b14a0feaab0ef481d0d402251076927190f0af14f480fb4a38db402e2842694e",
+    "rd/structure/beam/experiments/beam_section_input.py": "a26932cb4d1027863ea84812956a511a005edf53665ffc6e3571f21ce3159609",
+    "rd/structure/beam/experiments/check_beam_se3_physical_v4.py": "a24423ab75e512c7db1ed24426e13c0e65ac94b83505d9061364e247a6d14cef",
+    "rd/structure/beam/records/beam-se3-physical-v4-result.json": "95a8afeeee1f350736efaeedc2167754fb2a44c560fb7a69aca2c4158eed46d7"
+  }
+}

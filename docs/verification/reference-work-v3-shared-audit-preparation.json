@@ -1,7 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/audit_reference_work_v3_shared.py": "95da8005bc2f4b4024f930561dd43b7ca686b1293b3720f6f6a08021768b5722",
-    "tools/design-experiments/reference_work_ancf_v3.py": "5894f38dc299953f0cbb581f9a4f5f9cd3aba0f0cd2f75588f180a1fb271d3e4",
-    "docs/verification/reference-work-v3-shared-result.json": "fe4080b3c46b6cfde94f0b61c544d517b3b4ce816c3be83310d971f14ed0c881"
-  }
-}

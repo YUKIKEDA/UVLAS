@@ -1,0 +1,20 @@
+{
+  "status": "frozen_before_execution",
+  "shared_configurations": 4,
+  "additional_local_conditions": 24,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_additional_local.py": "b089140f801d53000a170299aba7bfb7db46897f9bb135a4010d8ee941848fbc",
+    "rd/structure/main-shell/mq3/experiments/audit_mq3i1_additional_local.py": "fee7f55854c93ee17cac1088c49cff0bd5daa8a4d4cf43d8ceec68926dbf2e93",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_shared_family.py": "a91342247e0ea44de76834f2faadbc79fe1acbe04b6af58f4578ad963c5d26ef",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_shared_space.py": "877df9a8340b49edb934f28cf36e8c6e4380c0f44c2c9903db2cc847b6c721a5",
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_shared.py": "5b145432e3ad1ca3765a5a98101eaca7a2ba8d4d965036a83a175e139c34e296",
+    "rd/structure/main-shell/mq3/experiments/audit_mq3i1_shared.py": "6c0ef228f399e189e2d4d6398d8d55854b64c4c7902e25f9a3b25cdcfb505174",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_moments_v2.py": "544096d7d9456e192522dd6d303b9fdad117586abc871ba5504b0eab470aceeb",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_pure_shear.py": "bb1eff85a7891017ecf4e26bcf4b0a70d65632bcb34228a1c51019ddf0b2a6dd",
+    "rd/structure/main-shell/mq3/mq3i1-shared-and-membrane-contract.md": "311d10fe261cc56bd1194872da9d182a5ab537c99d8f48f28f99a0bcd738305d",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-execution-protocol.md": "aa7df39f16bb61848c6ddf51f780f0770baff69ad68c5c65258be17b795505a6",
+    "rd/structure/main-shell/mq3/records/mq3i1-local-v2-result.json": "bf94f3a5ad8b84641cc238ca0d853e5361f5accc9ece75169a91b0941fe97244",
+    "rd/structure/main-shell/mq3/records/mq3-factor-v2-result.json": "845e5bee9529fdec3ab272a854815a2d4bd93af67d3139025f554ad6980d8b20",
+    "rd/structure/main-shell/mq3/records/mq3-shared-thin-space-result.json": "e6a8d81940980623d1047e18d60de068e3a96c3543a8996c53b7641c2b3033ac"
+  }
+}

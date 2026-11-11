@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "eps": 0.0,
+      "relative_error": 1.5604198294340012e-15
+    },
+    {
+      "eps": 0.02,
+      "relative_error": 1.453595256177723e-15
+    }
+  ],
+  "false_self_rejected": true,
+  "sources": {
+    "rd/aero/finite-wing/experiments/check_drag_material_self.py": "58df412523a21696e833b8b45f197354c7903431bc8542286fb44fc000c846a3",
+    "rd/aero/finite-wing/experiments/uvlm_drag_force_kernel.py": "1caa23762d3ac4dbcbf8aad62958c38858b3e4294b37c37cd436ffeca6cdb56e",
+    "rd/aero/finite-wing/experiments/check_finite_wing_specialization.py": "8f829e811063f75605b60a61b647401426b30bf52d55d27a5cd42bb49812c214",
+    "rd/aero/wake-loads/experiments/uvlm_wake_assembly_v2.py": "4263e6d56c8317b294c1459b8ca8ef509741abe9e2fbcdaf02aa75be5bc6a7cf"
+  },
+  "seconds": 3.375
+}

@@ -1,0 +1,10 @@
+{
+  "adoption_candidate_qualified": false,
+  "main_shell_adopted": false,
+  "reason": "Coarse-screen thin amplification still exceeds 2. Enrichment curvature is C2, unable to contain discontinuous curvature of baseline C0 directors.",
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v2.py": "dbce996da2bb76b43ed06aa6c57784f3f7b48efd0e781375aad6273d465d97d6",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-v2-protocol.md": "1ec854014709cf2547a3417c9a99f15973da63d67823700b1475879b7efc5b18",
+    "build/analysis/geometry-compatible-ancf-screen-v2.json": "8140a4afb36f86ca21b9786cb80690dd36315f673fd6b8b23a6437d396a47c83"
+  }
+}

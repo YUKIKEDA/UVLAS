@@ -1,0 +1,16 @@
+{
+  "source_sha256": "b07b5de3c8673e6bf51727a1cc81989c659e1727ad9ec0753fd54e31ea104db6",
+  "evidence_sha256": {
+    "plate-modal-exact-reference-result.json": "aba8aa196ab006611b2da34dfe2b1938eafa9ea29aa374d9f56a037dc9467713",
+    "plate-modal-reference-reevaluation.json": "1084b47165349e66585dec154419a55f6b272423d843417e2613a2f5cebe0d84",
+    "q9-shear-gradient-compatibility-result.json": "173c467f01cf3d905cbb848e2392a8e4e6408f93a1af75c002ab02a4d714b7d1",
+    "q9-shear-gradient-compatibility-audit.json": "fa08800c561485e35d2ae68dfe8c42659ac822443500d885d4af280ad9b93592",
+    "modal-reference-and-shear-space-results.md": "b7efc083f5384fc2572c76f20d86fe10be0ceaf036776c652e9de65d20043410"
+  },
+  "modal_reference_version": "MR-R1",
+  "modal_reference_accuracy_closed": true,
+  "independent_observation_audits_pass": true,
+  "P_S36_adopted": false,
+  "shared_shear_space_diagnostic_completed": true,
+  "product_shell_adopted": false
+}

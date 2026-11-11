@@ -1,0 +1,287 @@
+{
+  "records": [
+    {
+      "kind": "baseline",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "error": [
+        1.7327692676561413e-13,
+        0.000358093481219135
+      ],
+      "h1": [
+        0.46462136829144635,
+        1.988090847835187
+      ],
+      "error_difference": 2.0257959570787643e-15,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "error": [
+        2.746631074718278e-13,
+        9.529680183897407e-05
+      ],
+      "h1": [
+        0.46462136829144385,
+        1.988028562126866
+      ],
+      "error_difference": 5.8706339058665824e-15,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "error": [
+        1.667097020539306e-11,
+        0.00036271276273032346
+      ],
+      "h1": [
+        0.46462136829143774,
+        1.9880911872054627
+      ],
+      "error_difference": 4.312622713491556e-13,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "error": [
+        2.8764171427251016e-11,
+        9.585737090737097e-05
+      ],
+      "h1": [
+        0.46462136829160544,
+        1.9880279429476788
+      ],
+      "error_difference": 1.4328629937112238e-13,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        1.7659378098560966e-13,
+        0.0003679412301916779
+      ],
+      "h1": [
+        0.46462136829144624,
+        1.9880892000407515
+      ],
+      "error_difference": 7.800834631033204e-16,
+      "h1_difference": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        3.293628219211831e-13,
+        0.00010331173130331568
+      ],
+      "h1": [
+        0.4646213682914482,
+        1.9880326006729259
+      ],
+      "error_difference": 6.0834787983336e-15,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        1.6559693622044208e-11,
+        0.00041492070183262293
+      ],
+      "h1": [
+        0.46462136829143236,
+        1.988090552961919
+      ],
+      "error_difference": 3.1394871398740923e-13,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        2.961163371127134e-11,
+        0.00010409985199594223
+      ],
+      "h1": [
+        0.46462136829104017,
+        1.9880320389146842
+      ],
+      "error_difference": 1.1857118643477216e-13,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "error": [
+        0.021189120020619782,
+        0.00471792975107758
+      ],
+      "h1": [
+        0.49174175107926077,
+        2.1288022859235123
+      ],
+      "error_difference": 1.6167622796103842e-15,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "error": [
+        0.00619958826843378,
+        0.0013856232441744817
+      ],
+      "h1": [
+        0.4903756756401939,
+        2.1282839859689515
+      ],
+      "error_difference": 7.270659768687793e-16,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "error": [
+        0.037007948537376475,
+        0.008323210578854627
+      ],
+      "h1": [
+        0.5030351629242958,
+        2.131129787655453
+      ],
+      "error_difference": 7.617517727709355e-14,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "error": [
+        0.029407199839171918,
+        0.006627496560209891
+      ],
+      "h1": [
+        0.5344646976140086,
+        2.1351873226314413
+      ],
+      "error_difference": 4.776040674059345e-14,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        0.025015888066990285,
+        0.004796100312310907
+      ],
+      "h1": [
+        0.4924194507198993,
+        2.1288601075488134
+      ],
+      "error_difference": 2.1163626406917047e-16,
+      "h1_difference": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        0.007966435252054484,
+        0.0014875380522668955
+      ],
+      "h1": [
+        0.49049284782679475,
+        2.1282986101645776
+      ],
+      "error_difference": 2.1618991319360958e-16,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "baseline",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        0.06227601419082388,
+        0.012507907901576291
+      ],
+      "h1": [
+        0.5044412308040094,
+        2.13130160639504
+      ],
+      "error_difference": 3.563122019656362e-14,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        0.033247593593626085,
+        0.006740164467374859
+      ],
+      "h1": [
+        0.5327744187497258,
+        2.1340957796176547
+      ],
+      "error_difference": 1.6714667844253128e-13,
+      "h1_difference": 0.0,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/audit_hybrid_gradient_shared.py": "1de3e73130b0ce68b09c675ecf5b57791037ee81fbf9bf037c007ac8371263ed",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-shared-result.json": "943c0220bb26c21e4d8b9353280779d43e221a332579956cfc67501f14fabb7d",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-ancf-protocol.md": "18a894ddb33c0e228fa7f66c9e4f49615a2172de625b0b724a611726f4dcdecc"
+  },
+  "seconds": 13.937999999965541
+}

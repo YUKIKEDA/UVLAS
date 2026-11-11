@@ -1,0 +1,744 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "primary": {
+        "error": [
+          1.4082078365428544e-13,
+          9.335691141512981e-14,
+          1.0989454859974548e-05
+        ],
+        "elastic": [
+          1.380008358607636e-13,
+          9.147824411342467e-14,
+          1.0988729700610742e-05
+        ],
+        "stabilization": [
+          2.80403710877308e-14,
+          1.8634477800493322e-14,
+          1.2624454971832844e-07
+        ],
+        "position_error": [
+          1.5458960100193538e-14,
+          1.655508073542769e-14,
+          1.5707532102837825e-07
+        ],
+        "constraints": {
+          "zero": 5.740677421319531e-16,
+          "jump": 4.680047007519033e-15,
+          "work": 3.023878100814548e-15,
+          "fluctuation": 5.714136518377455e-14
+        }
+      },
+      "independent": {
+        "error": [
+          1.4086589077682575e-13,
+          9.343466647739433e-14,
+          1.0989454860318862e-05
+        ],
+        "elastic": [
+          1.3804843637594935e-13,
+          9.155915753220244e-14,
+          1.0988729700954995e-05
+        ],
+        "stabilization": [
+          2.803263095936708e-14,
+          1.8626797141088184e-14,
+          1.2624454972559866e-07
+        ],
+        "position_error": [
+          1.556909754888755e-14,
+          1.6687064492321775e-14,
+          1.5707532109264555e-07
+        ],
+        "constraints": {
+          "zero": 8.024849106229141e-16,
+          "jump": 5.401358489495804e-15,
+          "work": 2.9943846741518332e-15,
+          "fluctuation": 7.323425227078215e-14
+        }
+      },
+      "fit_error": [
+        1.4207736834894837e-13,
+        9.40565965241724e-14,
+        1.0989454861331502e-05
+      ],
+      "kkt": [
+        2.040835488480137e-14,
+        1.2119485244388273e-14,
+        2.8913902294060794e-14
+      ],
+      "q01_columns": 144,
+      "objective_ranks": [
+        144,
+        144,
+        144
+      ],
+      "global_q2_ranks": [
+        120,
+        120,
+        120
+      ],
+      "interface": {
+        "ranks": [
+          132,
+          132,
+          132
+        ],
+        "columns": 276,
+        "nullity": 144,
+        "residual": 7.606784848396974e-16,
+        "smallest_nonzero": 0.031537665062792875
+      },
+      "local_q2_ranks": [
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ]
+      ],
+      "geometry_difference": 1.1102230246251565e-16,
+      "checks": {
+        "interface": true,
+        "local": true,
+        "constraints": true,
+        "objective_full_rank": true,
+        "kkt": true,
+        "projection": true,
+        "independent_energy": true,
+        "independent_position": true,
+        "geometry": true,
+        "stress_certificate": true,
+        "resources": true
+      },
+      "seconds": 15.98499999998603,
+      "artifact": "build/analysis/mixed-mean-stress-bending-20261104-170413/k0-n2-a0.npz",
+      "artifact_sha256": "0f70e9711d3cb8497e10b21b54e395c5c85229fc388cc70d69ae7e79d8e9bc61"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "primary": {
+        "error": [
+          9.902462157662236e-14,
+          7.211103251323218e-14,
+          1.163838920569729e-05
+        ],
+        "elastic": [
+          9.823485207484214e-14,
+          7.149567335999791e-14,
+          1.163742178273839e-05
+        ],
+        "stabilization": [
+          1.248156705815202e-14,
+          9.400515992482225e-15,
+          1.500585017159107e-07
+        ],
+        "position_error": [
+          2.787633107327963e-14,
+          3.1073962595880404e-14,
+          1.9151990382929272e-07
+        ],
+        "constraints": {
+          "zero": 7.448831980321481e-16,
+          "jump": 9.002878733112549e-15,
+          "work": 3.953886777892388e-15,
+          "fluctuation": 9.871544330938706e-14
+        }
+      },
+      "independent": {
+        "error": [
+          9.907307702573112e-14,
+          7.203615953424758e-14,
+          1.1638389206133225e-05
+        ],
+        "elastic": [
+          9.828340798886263e-14,
+          7.142243987740212e-14,
+          1.1637421783174138e-05
+        ],
+        "stabilization": [
+          1.248384177411853e-14,
+          9.38314245881671e-15,
+          1.5005850173324836e-07
+        ],
+        "position_error": [
+          2.8002088470188407e-14,
+          3.115252719360271e-14,
+          1.9151990383622595e-07
+        ],
+        "constraints": {
+          "zero": 8.553580437796312e-16,
+          "jump": 1.0511532645122095e-14,
+          "work": 3.945521203207261e-15,
+          "fluctuation": 1.324513429135486e-13
+        }
+      },
+      "fit_error": [
+        1.0081168774285743e-13,
+        7.158474461565184e-14,
+        1.16383892066305e-05
+      ],
+      "kkt": [
+        1.2486726777044603e-14,
+        8.703677800866941e-15,
+        2.704913381949371e-14
+      ],
+      "q01_columns": 144,
+      "objective_ranks": [
+        144,
+        144,
+        144
+      ],
+      "global_q2_ranks": [
+        120,
+        120,
+        120
+      ],
+      "interface": {
+        "ranks": [
+          132,
+          132,
+          132
+        ],
+        "columns": 276,
+        "nullity": 144,
+        "residual": 6.785385956703795e-16,
+        "smallest_nonzero": 0.033871842237706326
+      },
+      "local_q2_ranks": [
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ]
+      ],
+      "geometry_difference": 2.220446049250313e-16,
+      "checks": {
+        "interface": true,
+        "local": true,
+        "constraints": true,
+        "objective_full_rank": true,
+        "kkt": true,
+        "projection": true,
+        "independent_energy": true,
+        "independent_position": true,
+        "geometry": true,
+        "stress_certificate": true,
+        "resources": true
+      },
+      "seconds": 16.125,
+      "artifact": "build/analysis/mixed-mean-stress-bending-20261104-170413/k0-n2-a0.2.npz",
+      "artifact_sha256": "3f6c65cc77c538bf71dc73405c1da05322d7e63b16fb6846c514677069ebe853"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "primary": {
+        "error": [
+          1.3309219147808646e-11,
+          0.004313124880872672,
+          0.00027502718208882097
+        ],
+        "elastic": [
+          1.312782974202662e-11,
+          0.004269792597408876,
+          0.0002722717791241646
+        ],
+        "stabilization": [
+          2.189840311245901e-12,
+          0.0006098503202551121,
+          3.883335139129296e-05
+        ],
+        "position_error": [
+          5.39880307410894e-13,
+          0.00043833267040892357,
+          6.631712366872608e-06
+        ],
+        "constraints": {
+          "zero": 9.24161745796321e-16,
+          "jump": 1.01010881032216e-14,
+          "work": 3.737529244452392e-15,
+          "fluctuation": 1.0756774747107346e-13
+        }
+      },
+      "independent": {
+        "error": [
+          1.3309263810424286e-11,
+          0.004313124880873173,
+          0.0002750271820893336
+        ],
+        "elastic": [
+          1.3127874988822364e-11,
+          0.004269792597409381,
+          0.00027227177912468386
+        ],
+        "stabilization": [
+          2.189840508649388e-12,
+          0.0006098503202551144,
+          3.8833351391282526e-05
+        ],
+        "position_error": [
+          5.400361260491074e-13,
+          0.00043833267040888974,
+          6.631712366833929e-06
+        ],
+        "constraints": {
+          "zero": 1.106546577477712e-15,
+          "jump": 1.1884087019062723e-14,
+          "work": 3.742684407985376e-15,
+          "fluctuation": 1.498787294521637e-13
+        }
+      },
+      "fit_error": [
+        1.330836748733747e-11,
+        0.004313124880872611,
+        0.00027502718208820926
+      ],
+      "kkt": [
+        8.369635953295805e-15,
+        7.95444637082992e-15,
+        3.274098227413953e-14
+      ],
+      "q01_columns": 92,
+      "objective_ranks": [
+        92,
+        92,
+        92
+      ],
+      "global_q2_ranks": [
+        120,
+        120,
+        120
+      ],
+      "interface": {
+        "ranks": [
+          180,
+          180,
+          180
+        ],
+        "columns": 272,
+        "nullity": 92,
+        "residual": 3.4710159219053353e-16,
+        "smallest_nonzero": 0.00010821691773028602
+      },
+      "local_q2_ranks": [
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ]
+      ],
+      "geometry_difference": 1.1102230246251565e-16,
+      "checks": {
+        "interface": true,
+        "local": true,
+        "constraints": true,
+        "objective_full_rank": true,
+        "kkt": true,
+        "projection": true,
+        "independent_energy": true,
+        "independent_position": true,
+        "geometry": true,
+        "stress_certificate": true,
+        "resources": true
+      },
+      "seconds": 17.67200000002049,
+      "artifact": "build/analysis/mixed-mean-stress-bending-20261104-170413/k0.4-n2-a0.npz",
+      "artifact_sha256": "7000f7cd64a99c0c44a31e585975bb31978c32271c1cffc876d8444976b1f8da"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "primary": {
+        "error": [
+          3.4248305396976547e-10,
+          0.005949631817683627,
+          0.00032525691656884134
+        ],
+        "elastic": [
+          3.396118318436551e-10,
+          0.005900642662066163,
+          0.0003225749108463219
+        ],
+        "stabilization": [
+          4.42543323105687e-11,
+          0.0007619284353521092,
+          4.168319407576294e-05
+        ],
+        "position_error": [
+          2.8715499996576886e-11,
+          0.0010959313784595036,
+          1.3575500431385497e-05
+        ],
+        "constraints": {
+          "zero": 6.925816293263583e-16,
+          "jump": 8.04530075861297e-15,
+          "work": 3.2125532668806483e-15,
+          "fluctuation": 9.39157661122234e-14
+        }
+      },
+      "independent": {
+        "error": [
+          3.424831349963495e-10,
+          0.005949631817684008,
+          0.00032525691656937406
+        ],
+        "elastic": [
+          3.396119100521746e-10,
+          0.005900642662066548,
+          0.00032257491084685514
+        ],
+        "stabilization": [
+          4.425435919365945e-11,
+          0.0007619284353521116,
+          4.1683194075792614e-05
+        ],
+        "position_error": [
+          2.8715409896914263e-11,
+          0.001095931378459401,
+          1.3575500431277053e-05
+        ],
+        "constraints": {
+          "zero": 8.860112832058431e-16,
+          "jump": 9.430594480876392e-15,
+          "work": 3.2189744158293318e-15,
+          "fluctuation": 1.2678231378628866e-13
+        }
+      },
+      "fit_error": [
+        3.4248269408196647e-10,
+        0.0059496318176829365,
+        0.0003252569165643106
+      ],
+      "kkt": [
+        1.2359851912511874e-14,
+        7.855285650719499e-15,
+        2.6822751060035012e-14
+      ],
+      "q01_columns": 84,
+      "objective_ranks": [
+        84,
+        84,
+        84
+      ],
+      "global_q2_ranks": [
+        120,
+        120,
+        120
+      ],
+      "interface": {
+        "ranks": [
+          180,
+          180,
+          180
+        ],
+        "columns": 264,
+        "nullity": 84,
+        "residual": 3.3486977165461775e-16,
+        "smallest_nonzero": 0.00015318168178663703
+      },
+      "local_q2_ranks": [
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ]
+      ],
+      "geometry_difference": 2.220446049250313e-16,
+      "checks": {
+        "interface": true,
+        "local": true,
+        "constraints": true,
+        "objective_full_rank": true,
+        "kkt": true,
+        "projection": true,
+        "independent_energy": true,
+        "independent_position": true,
+        "geometry": true,
+        "stress_certificate": true,
+        "resources": true
+      },
+      "seconds": 47.21900000004098,
+      "artifact": "build/analysis/mixed-mean-stress-bending-20261104-170413/k0.4-n2-a0.2.npz",
+      "artifact_sha256": "00f25e62fda1796f34ca47a8e27863ce74ffb757e75e5db66b09736a9381525b"
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "primary": {
+        "error": [
+          1.0083289123328423e-08,
+          0.0007902862252088329,
+          4.828573640308385e-05
+        ],
+        "elastic": [
+          1.0057014199699153e-08,
+          0.0007856600332626977,
+          4.8014231888769706e-05
+        ],
+        "stabilization": [
+          7.274509823231473e-10,
+          8.538518541575507e-05,
+          5.1133038360288895e-06
+        ],
+        "position_error": [
+          2.1661371945468963e-10,
+          2.7428326609842967e-05,
+          3.7862684605498175e-07
+        ],
+        "constraints": {
+          "zero": 2.7184916673115996e-16,
+          "jump": 1.5935776404903445e-14,
+          "work": 6.5164094563760225e-15,
+          "fluctuation": 1.9552107054398463e-13
+        }
+      },
+      "independent": {
+        "error": [
+          1.0083289164823671e-08,
+          0.0007902862252096263,
+          4.8285736404091687e-05
+        ],
+        "elastic": [
+          1.0057014240199428e-08,
+          0.000785660033263496,
+          4.80142318897809e-05
+        ],
+        "stabilization": [
+          7.274509975773963e-10,
+          8.53851854157542e-05,
+          5.113303836050886e-06
+        ],
+        "position_error": [
+          2.166137717013473e-10,
+          2.7428326609767883e-05,
+          3.786268460301267e-07
+        ],
+        "constraints": {
+          "zero": 3.510058706519416e-16,
+          "jump": 1.8711538203761406e-14,
+          "work": 6.521113865002777e-15,
+          "fluctuation": 2.487157793904085e-13
+        }
+      },
+      "fit_error": [
+        1.0083298148463667e-08,
+        0.0007902862252095241,
+        4.828573640194318e-05
+      ],
+      "kkt": [
+        1.772836273920945e-14,
+        1.2323584000240822e-14,
+        6.349302039359936e-14
+      ],
+      "q01_columns": 216,
+      "objective_ranks": [
+        216,
+        216,
+        216
+      ],
+      "global_q2_ranks": [
+        480,
+        480,
+        480
+      ],
+      "interface": {
+        "ranks": [
+          840,
+          840,
+          840
+        ],
+        "columns": 1056,
+        "nullity": 216,
+        "residual": 3.684434823964273e-16,
+        "smallest_nonzero": 2.8482394567735813e-06
+      },
+      "local_q2_ranks": [
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ],
+        [
+          150,
+          150,
+          150
+        ]
+      ],
+      "geometry_difference": 2.220446049250313e-16,
+      "checks": {
+        "interface": true,
+        "local": true,
+        "constraints": true,
+        "objective_full_rank": true,
+        "kkt": true,
+        "projection": true,
+        "independent_energy": true,
+        "independent_position": true,
+        "geometry": true,
+        "stress_certificate": true,
+        "resources": true
+      },
+      "seconds": 190.35899999993853,
+      "artifact": "build/analysis/mixed-mean-stress-bending-20261104-170413/k0.4-n4-a0.2.npz",
+      "artifact_sha256": "c9e57eb173180589162e54bdc1108f19e063c1593dbb7d46d570051167f6acef"
+    }
+  ],
+  "stops": [],
+  "all_numerical_checks": true,
+  "necessary_accuracy_gate": false,
+  "main_shell_adopted": false,
+  "finite_h_global_executed": false,
+  "geometry_conditional": true,
+  "kinds": [
+    "quartic",
+    "quintic",
+    "exponential"
+  ],
+  "seconds": 287.39100000006147,
+  "peak_bytes": 1155969024,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_bending.py": "0ebaab97f08196e69687a1c93406dda37daa531e45c3560f37cebcc4984b6010",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_bending.py": "f85f96c544fe5f689b62722f28c80052f5c3086e675a2374e24d7d45c5b80813",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_thin_v6.py": "da7fe98b0c143174cc9f6ef01df5cb77def56e49edd0d30e6b0e402ab2f07783",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-bending-protocol.md": "097272e75288d49c7a86b4f2788380e63960986b70bb2ce4dacaf637c40de2cb",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-bending-coefficient-result.json": "6f8f1f8b3abb22db566767fb7737d2504bd106b5467044559bda00825bbbb2b7"
+  }
+}

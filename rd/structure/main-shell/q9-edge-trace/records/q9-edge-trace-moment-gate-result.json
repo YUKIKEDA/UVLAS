@@ -1,0 +1,46 @@
+{
+  "source_sha256": "a6f39d4c7258dfd7b7fc063cb77d38a6c4373899c19c93681a48c2346b1515ff",
+  "parent_sha256": "899b79cf7d3660c7849918d0fca02e30f3fbd09f1c673f65cbe017e8b9cf78ba",
+  "protocol_sha256": "207e4466b1ed1f745855cb84ec6e18ee2d2d04538e017e94f810e49a447aebbe",
+  "contract_sha256": "029c902a405f84e34258da0977f7a4606c38908c47d10b9052e21f825b7528ca",
+  "dependencies": {
+    "q9_edge_trace_moment.py": "03871a53c40353ec117aa1a0c841d944a8c9c40fc5977a08f610f6e092db1c77",
+    "q9_edge_trace24.py": "06ac2acc5c9062991637d68ef53b0f57f21204508c23522de8ead77db43447a7",
+    "check_q9_edge_moment_shared_space_v2.py": "d5690f8eb082135fca177f50965e58d53b88614f4022edf0decc48a7aa2a1151",
+    "check_q9_curved_strain_screen.py": "5148b342d6243ef13a396342685db02b49f108ad63feb82d758e748af7c2c444",
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_independent_load.py": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96"
+  },
+  "local_cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "ranks": {
+        "1e-09": 74,
+        "1e-10": 74,
+        "1e-11": 74
+      },
+      "value": 2.498740838059201e-16,
+      "work": 3.3265848238145604e-16,
+      "rigid": 1.295497801153608e-16,
+      "symmetry": 1.1436801558404879e-16,
+      "minimum_eigenvalue": -4.219030593075287e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": false,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-201915/RECT-h0.1.npz",
+      "artifact_sha256": "e7b30b4f85a1bd1cb836fd07f171db087496bc72379fef5482e4168d56863d51"
+    }
+  ],
+  "shared_cases": [],
+  "stop_reason": "TypeError('Object of type bool is not JSON serializable')",
+  "seconds": 0.125,
+  "peak_bytes": 66842624,
+  "all_criteria_pass": false,
+  "product_shell_adopted": false
+}

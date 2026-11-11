@@ -1,8 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/reference_work_ancf.py": "11c56a0ba745cfd3e008784d29c359ca890fb8e1468736f7e7cf84f26f44e79c",
-    "tools/design-experiments/check_reference_work_local.py": "462bbd32f5deca47874cfafa3879d43419a1651e5814553dcf8cbb14f1891d22",
-    "docs/reference-work-ancf-formulation.md": "a4b5ba22f4edc83ec2766a711ff79c6d2a5aa305b2e7ad04303a317f1f836907",
-    "docs/verification/reference-work-protocol.md": "cf2d1075b291ce522de690acf8e47fb6c7863aeade067609001314958aafc9af"
-  }
-}

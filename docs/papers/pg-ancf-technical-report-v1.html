@@ -552,48 +552,48 @@ $$</div>
 <tbody>
 <tr>
 <td>最終採用範囲</td>
-<td>docs/main-shell-adopted-specification.md</td>
+<td>docs/specs/structure/main-shell-adopted-specification.md</td>
 </tr>
 <tr>
 <td>一般多項式持上げ・原辞書・trace</td>
-<td>tools/design-experiments/general_paired_polynomials.py</td>
+<td>rd/structure/main-shell/paired-geometry/experiments/general_paired_polynomials.py</td>
 </tr>
 <tr>
 <td>基底準備・幾何Gram・区間検証</td>
-<td>tools/design-experiments/mass_paired_ancf.py</td>
+<td>rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py</td>
 </tr>
 <tr>
 <td>参照グラフ・実法線厚さ</td>
-<td>tools/design-experiments/polynomial_reference_surface.py</td>
+<td>rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py</td>
 </tr>
 <tr>
 <td>独立曲率参照</td>
-<td>tools/design-experiments/general_paired_fields.py</td>
+<td>rd/structure/main-shell/paired-geometry/experiments/general_paired_fields.py</td>
 </tr>
 <tr>
 <td>3D作用・主求積／別観測</td>
-<td>tools/design-experiments/exact_paired_finite.py</td>
+<td>rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py</td>
 </tr>
 <tr>
 <td>28配置の原結果</td>
-<td>docs/verification/mass-paired-quality-result.json、mass-paired-coefficient-input-result.json</td>
+<td>rd/structure/main-shell/paired-geometry/records/mass-paired-quality-result.json、mass-paired-coefficient-input-result.json</td>
 </tr>
 <tr>
 <td>独立PDEと台形訂正</td>
-<td>docs/verification/mass-paired-body-result.json、paired-shell-r5-domain-v2-result.json</td>
+<td>rd/structure/main-shell/paired-geometry/records/mass-paired-body-result.json、paired-shell-r5-domain-v2-result.json</td>
 </tr>
 <tr>
 <td>接続／非線形／向き</td>
-<td>docs/verification/mass-paired-interface-result.json、mass-paired-mechanics-result.json、mass-paired-orientation-result.json</td>
+<td>rd/structure/main-shell/paired-geometry/records/mass-paired-interface-result.json、mass-paired-mechanics-result.json、mass-paired-orientation-result.json</td>
 </tr>
 <tr>
 <td>新しい記号確認・集計・図</td>
-<td>tools/papers/prepare_pg_ancf_report.py、docs/papers/pg-ancf-assets/</td>
+<td>rd/structure/main-shell/paired-geometry/report-tools/prepare_pg_ancf_report.py、docs/papers/pg-ancf-assets/</td>
 </tr>
 </tbody>
 </table>
 <p>原結果のsource／artifact hashを照合してから再集計する。数値実験の元スクリプトには旧成果物の上書き防止があるため、再実行は別の出力場所を持つ作業用checkoutで行い、旧resultを消して上書きしない。現在の再集計コマンドは次である。</p>
-<pre><code class="language-text">build/design-fem-env/Scripts/python.exe tools/papers/prepare_pg_ancf_report.py --output-dir build/paper-regeneration-YYYYMMDD
+<pre><code class="language-text">build/design-fem-env/Scripts/python.exe rd/structure/main-shell/paired-geometry/report-tools/prepare_pg_ancf_report.py --output-dir build/paper-regeneration-YYYYMMDD
 </code></pre>
 <p>再集計に必要なのはNumPy 2.3.5、SymPy 1.14.0、Matplotlib 3.10.7。既存の元試験の再生成にはSciPy 1.16.3、python-flint等も必要で、元記録の環境を参照する。図表・記号計算・PDF組版の新規成果物と、変更していない元の数値試験を区別する。</p>
 <h2>付録B. 先行研究の確認範囲</h2>

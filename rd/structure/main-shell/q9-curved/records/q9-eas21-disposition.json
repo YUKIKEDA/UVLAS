@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-02",
+  "candidate": "EAS21-linear-homogeneous",
+  "disposition": "not_adopted_as_primary_shell_in_current_form",
+  "absolute_gate_pass": true,
+  "thin_uniformity_gate_pass": false,
+  "thin_amplification": 87.86851828534195,
+  "threshold": 2,
+  "product_implementation_authorized": false,
+  "next_action": "Separate membrane, shear and bending residuals and element means in saved shared solutions",
+  "evidence_sha256": {
+    "q9-eas21-feasibility-result.json": "de2ddb00aecd6e6bdf3626ed4776ad323091e851add8acd5a5def4a525cf7021",
+    "q9-eas21-shared-approximation-result.json": "130340b47d324bb7912e6b34c9022afd3fa7e5c1edeaffe1e9ec98e198efcffa",
+    "q9-eas21-audit-result.json": "288a9685bc143e8c1112689b3588e411d338f8eea71f7b7641a7a0acdffa4414",
+    "q9-eas21-shared-work-result.json": "5a96db7b678b6280454aec3e493b7c98b264184f535b8306884d1afd79859c82"
+  }
+}

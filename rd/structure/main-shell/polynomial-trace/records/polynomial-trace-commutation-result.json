@@ -1,0 +1,189 @@
+{
+  "records": [
+    {
+      "kind": "weak",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "mid_strain_defect": 1.613279552216382e-17,
+      "normalized_mid_defect": 8.616440498319363e-14,
+      "scaled_stabilization": 4.364927611099986e-28,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "mid_strain_defect": 5.642597240506525e-16,
+      "normalized_mid_defect": 3.0136812502216884e-10,
+      "scaled_stabilization": 3.451286013814285e-24,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "mid_strain_defect": 4.458097803200515e-17,
+      "normalized_mid_defect": 1.850847370623629e-13,
+      "scaled_stabilization": 7.285245039460027e-28,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "mid_strain_defect": 1.024780726287262e-15,
+      "normalized_mid_defect": 4.254533651892702e-10,
+      "scaled_stabilization": 5.967091114981437e-24,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "mid_strain_defect": 4.43109290283173e-08,
+      "normalized_mid_defect": 0.00023500244076686346,
+      "scaled_stabilization": 2.9507209698093244e-09,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "mid_strain_defect": 4.431092895862286e-08,
+      "normalized_mid_defect": 0.023500244039723988,
+      "scaled_stabilization": 2.9506004715187674e-05,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "mid_strain_defect": 8.987497358085619e-08,
+      "normalized_mid_defect": 0.0003698831079383271,
+      "scaled_stabilization": 8.084906502244428e-09,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "mid_strain_defect": 8.987497327609602e-08,
+      "normalized_mid_defect": 0.03698831066840776,
+      "scaled_stabilization": 8.084611827587441e-05,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "mid_strain_defect": 1.8425076151233308e-17,
+      "normalized_mid_defect": 9.84073542096264e-14,
+      "scaled_stabilization": 4.364927611099986e-28,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "mid_strain_defect": 5.635940485290271e-16,
+      "normalized_mid_defect": 3.0101259125770784e-10,
+      "scaled_stabilization": 3.451286013814285e-24,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "mid_strain_defect": 4.483065932749627e-17,
+      "normalized_mid_defect": 1.8612132708271166e-13,
+      "scaled_stabilization": 7.285245039460027e-28,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "mid_strain_defect": 1.0208143847363316e-15,
+      "normalized_mid_defect": 4.2380667793506406e-10,
+      "scaled_stabilization": 5.967091114981437e-24,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "mid_strain_defect": 4.4519729744197345e-08,
+      "normalized_mid_defect": 0.00023610981267130536,
+      "scaled_stabilization": 2.9507209698093244e-09,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "mid_strain_defect": 4.431626737257517e-08,
+      "normalized_mid_defect": 0.023503075260680368,
+      "scaled_stabilization": 2.9506004715187674e-05,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "mid_strain_defect": 8.863135126000809e-08,
+      "normalized_mid_defect": 0.00036476494355051854,
+      "scaled_stabilization": 8.084906502244428e-09,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "mid_strain_defect": 8.831462282074508e-08,
+      "normalized_mid_defect": 0.036346143830518284,
+      "scaled_stabilization": 8.084611827587441e-05,
+      "exact_reference_mid_strain": 0.0,
+      "scope": "L2 reduction of exact quartic isometry, not a solved minimum"
+    }
+  ],
+  "finite_h_lower_bound": false,
+  "unique_cause_proven": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/diagnose_polynomial_trace_commutation.py": "a3ed0e783c4cba0cae806403921058184743ea853024d6cf840a1ee9744252c9",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-commutation-protocol.md": "97f4ba1a52e5e866ebc54b30a9d1ef2b72d299e8a74f37fcecc7448faf56e591",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-commutation-preparation.json": "405a46f8b5fa6bd6596a35012ddd0ac1019d50b63baba6b1c1665799a626246c"
+  }
+}

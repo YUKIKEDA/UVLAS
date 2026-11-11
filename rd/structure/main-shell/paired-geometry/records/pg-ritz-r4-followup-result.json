@@ -1,0 +1,104 @@
+{
+  "rejection_reproduced": true,
+  "accepted": false,
+  "R4_complete": false,
+  "records": [
+    {
+      "case": "protected_reference_lift",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "error": [
+        2.4033495266499913e-06,
+        4.8550302868547e-06,
+        1.013399503382112e-05
+      ],
+      "position": [
+        1.5982435116766458e-07,
+        3.8898875600883157e-07,
+        6.219190295887961e-07
+      ]
+    },
+    {
+      "case": "protected_reference_lift",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "error": [
+        2.3195590591494336e-06,
+        4.765494639536867e-06,
+        9.990024199918353e-06
+      ],
+      "position": [
+        5.499499217314613e-06,
+        1.1898033635291037e-05,
+        2.3512574535926837e-05
+      ]
+    },
+    {
+      "case": "independent_full_trace_lift_mass_root",
+      "n": 2,
+      "h": 0.01,
+      "dofs": 159,
+      "rank": [
+        159,
+        159,
+        159
+      ],
+      "rcond": 2.895210347575207e-06,
+      "trace": 0.0
+    },
+    {
+      "case": "independent_full_trace_lift_mass_root",
+      "n": 2,
+      "h": 0.0001,
+      "dofs": 159,
+      "rank": [
+        153,
+        159,
+        159
+      ],
+      "rcond": 2.89468067130848e-10,
+      "trace": 0.0
+    }
+  ],
+  "position_thin_ratio": [
+    34.409645195714475,
+    30.58708883354177,
+    37.80648833252942
+  ],
+  "sources": {
+    "build/analysis/pg-ritz-protected-elliptic-n4-h0.01.npz": "15ad06dea618d140a5aaee4ec9bd31bd4dfeae3486f809f11552e4353c396213",
+    "build/analysis/pg-ritz-protected-elliptic-n4-h0.0001.npz": "35001b1de4b945a09aafccca9c1608abbb08c9d45456da6ad4002c4fdd487e5d",
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_r4_followup.py": "52696288c342e00104359e0df8de2a11fe0bcf3a6cf34c19d4ac828d7f5844d5",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_clamped_kernel.py": "f24b7842f21df89fef937d7e115db47939a9a01e48289474f96dc7f3d119f6c6",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_trace_prelift.py": "aa919eb3c817389cc25a10a6dda22732dac64f7c126f7f60e4c2116ee772c997",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_trace_nullspace.py": "58f135b68a3e61e644ec04951b06b31b3bda150b3a4dd3ad177b7aa760762cd4",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_nested.py": "547cc34681e6ca7beb733fbcbb739dc49ae0af24772c75d69b1526337e4cbfa4",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v9.py": "3803e064e13c9f2ec7202a6adb0f22de888bd2b14c21d0a0ba603964f6f0219a",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_coarse.py": "d1f81152313f38b6d659884f55a24fbaaeb084d60be40053be71590529329218",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_exact.py": "35ea2fc88552cdfb9a7aeb3e26c815830390b7e8e1785539c29ee12f90ac11a8",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_clamp.py": "6ea477f786352ec4b2f0b8596886cfcb0658d7f1c86181b269c98a1fc631af9e",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_particular_v2.py": "220d984d218a9d8e3d3a41627f2d01451c9a805d33f1a18e91842edd249a0206",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_polynomial_curvature_exact.py": "b481f7237d68a26230a955803460a12bdf989d0d0a6caa1a1228c00931137000",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_geometry.py": "39aceaa29c5a9451a2434eeb6569cb68cb5e34ad1fe605aab1d51ddbda041133",
+    "rd/structure/main-shell/reference-work/experiments/stable_curvature_profiles.py": "2738c0ab7129b2f5252962b25f7129431b3217043ba7afb7665cd12a3ea15fac",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v3.py": "b157961e1555a04e87411ba9a10274291025eb4f7c83b76c5c74cc9582755849",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v4.py": "562c99943190c1da5d228ba36a562f098b60fba83eebb57ea91e9e28665cfc95",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_particular.py": "e8dabca2064622efc070f2359f0b5aa6ad86046a55e2c5953cdb312a23129343",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_finite_v3.py": "42e2cba222da23c1bdd32a2b0a4b2ee6e20e742cd397a12b90ee1349a52bf3ef",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_trace.py": "40a12cc73d87ebbac8d26ae321868a78776c7e271f7f33b36d2ba57c10319bf6",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_targets.py": "8bd0544ced200ae0e014d42436f6c39c116d261f94cbd19eb6b1be32ae8755a4",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v2.py": "73965360fb49ec149c0752d990769091d4384048e8ece81fbac9604660b01b27",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v3.py": "867ca79c990d05f4be9afbfa3002542da291e49e58d6690c06109af305e3a58d"
+  }
+}

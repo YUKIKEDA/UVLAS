@@ -1,0 +1,11 @@
+---
+description: 文書とコードの言語
+alwaysApply: true
+---
+
+# 言語
+
+- 日本語：`docs/`、`rd/`、Rules、自作のSkill、AGENTS.md、CONTRIBUTING.md、IssueとPRの本文、commitの本文。常体で書く。
+- 英語：コード、コメント、識別子、commitの件名、PRの題名、`.github/` のテンプレート見出し、CMakeとスクリプトのメッセージ。
+- 利用者への返答は日本語。
+- 図はMermaid、数式は `$…$` と `$$…$$`。ASCIIの図を描かない。

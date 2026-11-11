@@ -1,0 +1,4 @@
+interface:
+  display_name: "ソルバーR&D"
+  short_description: "Choose solver methods with bounded, discriminating experiments"
+  default_prompt: "$solver-rd を使い、現在の未達原因を切り分け、次の識別実験と採否判断まで進めてください。"

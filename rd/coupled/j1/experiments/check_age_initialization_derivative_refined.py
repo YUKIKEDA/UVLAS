@@ -1,0 +1,3 @@
+import sys,pathlib;sys.path.insert(0,str(next(p for p in pathlib.Path(__file__).resolve().parents if (p/'rd_paths.py').is_file())));import rd_paths
+from pathlib import Path
+p=rd_paths.sibling('check_age_initialization_derivative.py');source=p.read_text(encoding='utf-8').replace('for R in [20,40,80,160]:','for R in [640,1280,2560,5120]:').replace("'rd/coupled/j1/records/age-initialization-derivative-result.json'","'rd/coupled/j1/records/age-initialization-derivative-refined-result.json'").replace('paths=[Path(__file__),','paths=[Path(__file__),p,ROOT/\'rd/coupled/j1/records/age-initialization-derivative-initial-result.json\',ROOT/\'rd/coupled/j1/records/age-initialization-derivative-extension.md\',');exec(compile(source,str(p),'exec'))

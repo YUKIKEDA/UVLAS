@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "quadrature_32_64_error": 2.0060212996736167e-15,
+  "full_implicit_load_tangent_error": 1.7099294738278722e-12,
+  "work_force_moment_preserved": true,
+  "adopted": false,
+  "sources": {
+    "rd/aero/finite-wing/experiments/check_edge_load_integral.py": "7e66ef59dfc72bef4a724c2ac32bb8fa821002ab6e924b2b40041543580536e9",
+    "rd/aero/kernel/experiments/uvlm_edge_load_integral.py": "700b5d9c420ebfc16f7fa800b3ef5dafd17aae97cb3cc5383c08120227fb6be9",
+    "rd/aero/finite-wing/records/finite-wing-drag-diagnostic-protocol.md": "835f5c644acc94533e628edfb8d43a5fe58a0dc09bb45d10d09a6c9d7ca2f4cd"
+  },
+  "seconds": 4.045999999972992
+}

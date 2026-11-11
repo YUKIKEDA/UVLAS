@@ -1,9 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/check_joint_mortar_tying_equilibrium.py": "2322ece11ee2bbbd8580a892af2239c4366deed71f0ef5a727d1af3174181708",
-    "tools/design-experiments/joint_mortar_tying_q4.py": "1aef0fe01e80a4a9393a726bc3dc633191b5e8b7140d80e99760cbfa025b752e",
-    "tools/design-experiments/tying_mid_projection_q4_v2.py": "30e333c486415cf2af9ac7b98ae2c918f03f5e63bea0c6f37516b5297bc2fc26",
-    "docs/verification/joint-mortar-tying-q4-equilibrium-protocol.md": "06080ea7a15947dbd8a44bebff145fcd9bdd70d563b765747e2efe2157b640e0",
-    "docs/verification/joint-mortar-tying-q4-result.json": "1149e98b4d6c5d48316dcb10d06808074cde1f6b40f733c86518a4350c6ab318"
-  }
-}

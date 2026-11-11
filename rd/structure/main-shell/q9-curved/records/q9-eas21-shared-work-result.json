@@ -1,0 +1,36 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "constant_error": 4.218847493575595e-15,
+      "exterior_work_error": 2.4685202737126296e-15,
+      "checks": {
+        "constant": true,
+        "shared_work": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.0001,
+      "constant_error": 5.88418203051333e-15,
+      "exterior_work_error": 6.075494850145353e-13,
+      "checks": {
+        "constant": true,
+        "shared_work": true
+      }
+    }
+  ],
+  "all_checks_pass": true,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/q9-curved/experiments/check_q9_eas21_shared_work.py": "f711ab77feaa31319e08d953557fbce6af1ea2c44375300d12e4a8bab37b2567",
+    "rd/structure/main-shell/q9-curved/experiments/q9_eas21.py": "8e5ffe706ef89d8d76092c60f76ed3df03e0b0b2b00457741c38479ecb4b3127",
+    "rd/structure/main-shell/q9-curved/experiments/audit_q9_curved_strain_screen.py": "b2c7c704dc6d59fd101ccb5b720eb33e4476596a4309885011355074d1585b31",
+    "rd/structure/main-shell/q9-curved/experiments/q9_developable_bending_approximation.py": "442be8ef780eed68fb8e41f6206826cb43784d204e457117df3be51091cacf15",
+    "rd/structure/main-shell/q9-curved/records/q9-eas21-shared-work-experiment.md": "159c002e2afce705496038f049f6042357e16bdfc7dbee1da0d546523cb1ecbe"
+  },
+  "seconds": 0.8429999999934807
+}

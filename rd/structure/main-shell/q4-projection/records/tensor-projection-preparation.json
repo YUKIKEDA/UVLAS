@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/tensor_projection_basis.py": "945a8d962bacb881080c6f4d8ca3f3b5c42cd9eb328ecf88c499ccc7e685a098",
+    "rd/structure/main-shell/q4-projection/experiments/tensor_mid_projection_q4.py": "8073b584cf0aa43b8659a13b9707be30a6f65f79164ad88cb0c71cd48cc82b09",
+    "rd/structure/main-shell/q4-projection/experiments/check_tensor_projection.py": "5189b51e8044c776cbd7aad8b5f85b32f48f88aa99ea9f5c8bcea5a568405d73",
+    "rd/structure/main-shell/q4-projection/experiments/audit_tensor_projection.py": "5d3580e5d68efaf3c4d48f5bccceb5eb3b24146d442ce4913f42327ff2b51ca4",
+    "rd/structure/main-shell/q4-projection/tensor-projection-formulation.md": "cacddaedcef2e06f945d360792eda873366120ad11d19748b5dea614a6f90331",
+    "rd/structure/main-shell/q4-projection/records/tensor-projection-protocol.md": "f1c91eec05da16a5eedb67193aa7dedab938509c5984157664789070d7be2599"
+  }
+}

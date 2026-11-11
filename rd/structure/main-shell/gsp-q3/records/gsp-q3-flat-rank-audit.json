@@ -1,0 +1,35 @@
+{
+  "records": [
+    {
+      "space": "selected_203",
+      "rational_rank": 138,
+      "nullity": 6,
+      "exact_zero": true,
+      "independent": true,
+      "matches_modular_lower_bound": true,
+      "passed": true,
+      "witness": "build/analysis/gsp-flat-certificate-20261103-140953/selected-complete-rational-kernel.json",
+      "witness_sha256": "f8c116a2847f6c1d7c7d2d1e274dee2be7b609e60bda745743eff896a7766728"
+    },
+    {
+      "space": "negative_control_Q222",
+      "rational_rank": 126,
+      "nullity": 18,
+      "exact_zero": true,
+      "independent": true,
+      "matches_modular_lower_bound": true,
+      "passed": true,
+      "witness": "build/analysis/gsp-flat-certificate-20261103-140953/reduced-complete-rational-kernel.json",
+      "witness_sha256": "2acc325dd627913b4175649700cc49b956d617894dbaa5f319e60a2ecf65f595"
+    }
+  ],
+  "all_checks_pass": true,
+  "scope": "affine_positive_thickness_only",
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/audit_gsp_q3_flat_rank.py": "859e7db9cacc51d50ea2f96519c2d3a3d2eef493e93169e728da3c1eb91fac32",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-result.json": "08242c53d69064e2df2b4ca9d78473c5c2bf657a95220f99207b78681f2d00cc",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-audit-protocol.md": "af76bd9d2fb312c79a1c55fa5beb5fc82b69ddaf6903381f58aa70b30a29ac21",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-audit-preparation.json": "d769714f87b9f656d1164009be56aba445758ca0c08b3a646a62bfda6d1fc871"
+  },
+  "seconds": 0.5310000000172295
+}

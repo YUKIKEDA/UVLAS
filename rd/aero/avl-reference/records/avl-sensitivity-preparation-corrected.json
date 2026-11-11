@@ -1,0 +1,12 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-solve-sensitivity-experiment.md",
+  "source_sha256": "25db3fee8ef87fc6560f692811250ee8d68f85bd4a948c01c4e94b60ce442bb6",
+  "adapter_sha256": "15537f7cc4be2003453063193ff3942ca7dbd7653c80675b6ef674d05a18d3f2",
+  "parent_source_sha256": "5d187735eec5cb7f92df0f18808e1e54e5fb4001c1a51dffd9d7529a68c089fc",
+  "modified_source_sha256": "513a83783b9c9b5aa1f89fa344342b3762bd04863802ba443fd71d0ef8f335da",
+  "unchanged_kernel_sha256": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f",
+  "build_script_sha256": "5f3f8f0785dc3256ac534b36666bb9d350fe3d2a768295c5948bffab8940b9ae",
+  "patch_sha256": "7a6977e1a9931936277097c02d08db08a1c680d743cd1c34cf5b8181c942ffea",
+  "parent_executable_sha256": "1c0ede0488fc06b84dbf48e3c6e5d511560b64435de2b551e9fafa84a1b28891",
+  "lapack_manifest_sha256": "774d28cc353617abf1797a24aa60c65dbbc52aab9e9c829b2ad0eb275277b3e4"
+}

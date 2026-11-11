@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-04",
+  "status": "two_polynomial_trace_variants_rejected_thin_amplification",
+  "main_shell_adopted": false,
+  "roadmap_1_1_complete": false,
+  "waiting_for_user_confirmation": false,
+  "configurations": [
+    {
+      "kind": "weak",
+      "adopted": false,
+      "reason": "thin_amplification_exceeds_2",
+      "thin_amplification": 26.341285191716125,
+      "finest_errors": [
+        3.914657268342183e-08,
+        3.6034907727562215e-07
+      ]
+    },
+    {
+      "kind": "potential",
+      "adopted": false,
+      "reason": "thin_amplification_exceeds_2",
+      "thin_amplification": 83.6471060124538,
+      "finest_errors": [
+        3.289523060904521e-08,
+        3.181972133566538e-07
+      ]
+    }
+  ],
+  "local_cases": 18,
+  "global_comparison_cases": 16,
+  "finite_thickness_cases": 8,
+  "nonlinear_global_equilibria": 2,
+  "all_independent_observations_reproduced": true,
+  "independent_global_best_approximation_resolve": false,
+  "thresholds_relaxed": false,
+  "stabilization_tuned_after_results": false,
+  "source_hash_checks": 121,
+  "artifact_hash_checks": 60,
+  "python_ast_files": 16,
+  "closure_failures": [],
+  "closure_pass": true,
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-commutation-preparation.json": "405a46f8b5fa6bd6596a35012ddd0ac1019d50b63baba6b1c1665799a626246c",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-commutation-result.json": "7ae8e1a1ac773204c2a530cb3cadb7bdbbf33f2820ea51beaddc52a27a494c09",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-equilibrium-preparation.json": "48008b4cfb374a3f870b9607597ae39406fb70d1d878d6ceaf964f545079e587",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-audit.json": "b6e8a64ecf58cadea0ef33033e016a3f44731d5b97ad1d07d1b5656ecf42912f",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-preparation.json": "e8041f712ec5235fb6a631ebd25794f17cb5b7c2586937c315b3ceed148f10cb",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-result.json": "748bcc3774681d7ef363656479c8dd3e52bb962d58688cf16b49d547ac57e6d1",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-potential-equilibrium-preparation.json": "48008b4cfb374a3f870b9607597ae39406fb70d1d878d6ceaf964f545079e587",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-potential-equilibrium-result.json": "cd4e167c854ec139cdfcc8a5fd8c6105c90e883c7c87adc7714fb671cf2c4b04",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-potential-refinement-audit.json": "9d0397d7b09af151675c70158bd74e9beeb500956aa2413b926db73f7d450880",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-potential-refinement-preparation.json": "544eb248a948dc7ad3f67c9fd2e441d6f2cddcf116edb86ac8dc9e6c9f9cbf8b",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-potential-refinement-result.json": "3de963f686c6290e61bca139c7c52f7f7837a09f73c9744fcc8138428a180da5",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-audit.json": "f19ce15244eb58ccdf30c9d22c4032ac5127f90803699a9db2de07d1832e3d87",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-preparation.json": "0b355df2b11510e973c1030e80409c767d9be67e898a9141ffae85111931f9c0",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-result.json": "8b6b2a0829973a8e55b5a1f41542879affc8ca4df2b983688e02b53d065b7e7e",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-v1-failure.json": "6519c6434c93c3bf7c41fe08fc4222f340cd901e188887a4a92bf3860217051c",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-v2-preparation.json": "a8247ee4875f66a2dbad61651ccc3e57ad49e87fa9d303b3446bb4557abf839f",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-sources.json": "c0c128cf48c9f2dd2d1de6a54b1e77bc7e172170728baebd952faf28ae36bdc2",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-equilibrium-preparation.json": "48008b4cfb374a3f870b9607597ae39406fb70d1d878d6ceaf964f545079e587",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-equilibrium-result.json": "1cf14344d6f8f0983c9c346afa5a87340776b5de558c51519d4ae5eac21e87aa",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-refinement-audit.json": "64e273d14d126e5952cef124c3a9378fe0dd724fa17a94b696983791047dcd83",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-refinement-preparation.json": "c6de6b696ecc1de791efa524f60f9ab18a5d3dc59ea99aa9ec382701f8597765",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-refinement-result.json": "921b14c89e7ebb9b8d8b435784b45f508a498cc032ee5589f3491dc255527d3d",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-results.md": "574a4b1356f05fee9584c8e4d3e77d0522bd5046bf240595c272d9289283cb16",
+    "rd/structure/main-shell/polynomial-trace/polynomial-trace-stabilization-formulation.md": "6f9a642343dd0f1e8d97169917586388aafb85f038b3311442da4d97872e6948",
+    "rd/structure/main-shell/reference-work/curved-work-commutation-design.md": "e81e0c3f69aceb6a8fa1810547141810f67907baa748a3eb5c5031b2d2d1c08f",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-commutation-protocol.md": "97f4ba1a52e5e866ebc54b30a9d1ef2b72d299e8a74f37fcecc7448faf56e591",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-equilibrium-protocol.md": "0e916cf5b5962839cb286fc6800a39d2a7808ce0f800e05bf7f54bab5fa970bc",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-v2-protocol.md": "1f1eef28275b8701b73a51dd4329034ffd1089f5df42f8f5383415cea3c8b6b0"
+  }
+}

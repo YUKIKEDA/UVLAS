@@ -1,0 +1,179 @@
+{
+  "passed": false,
+  "records": [
+    {
+      "case": "large_bending_two_axes_three_slenderness",
+      "cases": [
+        {
+          "h": 0.1,
+          "axis": 1,
+          "n": 1,
+          "total_rotation": 1.8,
+          "element_rotation": 1.8,
+          "strain_error": 4.440892098500626e-16,
+          "wrench_dual_error": 1.1358420446900501e-14,
+          "circle_error": 1.1102230246251565e-16,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 1.1358420446900501e-14
+        },
+        {
+          "h": 0.1,
+          "axis": 1,
+          "n": 4,
+          "total_rotation": 4.5,
+          "element_rotation": 1.125,
+          "strain_error": 2.220446049250313e-16,
+          "wrench_dual_error": 1.091392486810906e-15,
+          "circle_error": 1.3877787807814457e-17,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 1.091392486810906e-15
+        },
+        {
+          "h": 0.1,
+          "axis": 2,
+          "n": 1,
+          "total_rotation": 1.8,
+          "element_rotation": 1.8,
+          "strain_error": 4.440892098500626e-16,
+          "wrench_dual_error": 4.252345333378937e-14,
+          "circle_error": 1.1102230246251565e-16,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 4.252345333378937e-14
+        },
+        {
+          "h": 0.1,
+          "axis": 2,
+          "n": 4,
+          "total_rotation": 4.5,
+          "element_rotation": 1.125,
+          "strain_error": 2.220446049250313e-16,
+          "wrench_dual_error": 2.310623556966556e-15,
+          "circle_error": 1.3877787807814457e-17,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 2.310623556966556e-15
+        },
+        {
+          "h": 0.01,
+          "axis": 1,
+          "n": 1,
+          "total_rotation": 1.8,
+          "element_rotation": 1.8,
+          "strain_error": 4.440892098500626e-16,
+          "wrench_dual_error": 1.1301016373188284e-14,
+          "circle_error": 1.1102230246251565e-16,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 1.1301016373188284e-14
+        },
+        {
+          "h": 0.01,
+          "axis": 1,
+          "n": 4,
+          "total_rotation": 4.5,
+          "element_rotation": 1.125,
+          "strain_error": 2.220446049250313e-16,
+          "wrench_dual_error": 1.0977985945235537e-15,
+          "circle_error": 1.3877787807814457e-17,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 1.0977985945235537e-15
+        },
+        {
+          "h": 0.01,
+          "axis": 2,
+          "n": 1,
+          "total_rotation": 1.8,
+          "element_rotation": 1.8,
+          "strain_error": 4.440892098500626e-16,
+          "wrench_dual_error": 4.141620273555743e-12,
+          "circle_error": 1.1102230246251565e-16,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 4.141620273555743e-12
+        },
+        {
+          "h": 0.01,
+          "axis": 2,
+          "n": 4,
+          "total_rotation": 4.5,
+          "element_rotation": 1.125,
+          "strain_error": 2.220446049250313e-16,
+          "wrench_dual_error": 8.536446056488177e-14,
+          "circle_error": 1.3877787807814457e-17,
+          "precision_digits": 16,
+          "binary64_wrench_dual_error": 8.536446056488177e-14
+        },
+        {
+          "h": 0.0001,
+          "axis": 1,
+          "n": 1,
+          "total_rotation": 1.8,
+          "element_rotation": 1.8,
+          "strain_error": 6e-80,
+          "wrench_dual_error": 5.401676545917248e-79,
+          "circle_error": 1.1102230246251565e-16,
+          "precision_digits": 80,
+          "binary64_wrench_dual_error": 1.1444561096982608e-14
+        },
+        {
+          "h": 0.0001,
+          "axis": 1,
+          "n": 4,
+          "total_rotation": 4.5,
+          "element_rotation": 1.125,
+          "strain_error": 4e-80,
+          "wrench_dual_error": 2.5545227468922977e-79,
+          "circle_error": 1.3877787807814457e-17,
+          "precision_digits": 80,
+          "binary64_wrench_dual_error": 1.0913924868109063e-15
+        },
+        {
+          "h": 0.0001,
+          "axis": 2,
+          "n": 1,
+          "total_rotation": 1.8,
+          "element_rotation": 1.8,
+          "strain_error": 6e-80,
+          "wrench_dual_error": 2.205814966808073e-16,
+          "circle_error": 1.1102230246251565e-16,
+          "precision_digits": 80,
+          "binary64_wrench_dual_error": 4.1405473111111824e-08
+        },
+        {
+          "h": 0.0001,
+          "axis": 2,
+          "n": 4,
+          "total_rotation": 4.5,
+          "element_rotation": 1.125,
+          "strain_error": 4e-80,
+          "wrench_dual_error": 1.7646519734464586e-16,
+          "circle_error": 1.3877787807814457e-17,
+          "precision_digits": 80,
+          "binary64_wrench_dual_error": 8.248982762147666e-10
+        }
+      ]
+    },
+    {
+      "case": "axial_torsion_constant_strain",
+      "passed": true
+    }
+  ],
+  "failures": [
+    {
+      "reason": "AssertionError()",
+      "traceback": "Traceback (most recent call last):\n  File \"<repo>\\tools\\design-experiments\\check_beam_se3_physical_v3.py\", line 135, in main\n    linear.append(dict(h=h,n=n,tip=float(u[-5]),exact=exact,error=err,residual=res,root_rcond=cond));assert res<=1e-8\n                                                                                                            ^^^^^^^^^\nAssertionError\n"
+    }
+  ],
+  "seconds": 0.2029999999795109,
+  "sources": {
+    "rd/structure/beam/experiments/check_beam_se3_physical_v3.py": "462a92ab9a2ca0de4a1ba2b2ab70b4955ec2c7e83fb8887d8f380481dc0e5293",
+    "rd/structure/beam/experiments/check_beam_se3_physical_v2.py": "498a8883543daa464e4a7f37eea81965d563b2a060a0a0d039150203ee9ff4a7",
+    "rd/structure/beam/records/beam-se3-physical-v2-result.json": "8a89624c93e4203660c029ae80bdabf98b1b9607337a0adf8ebc7362ea876114",
+    "rd/structure/beam/experiments/beam_se3_high_precision.py": "094efaf6b130b92de6fbdcc611ac0ff9bae27385f02ab42f297b8f28097a5782",
+    "rd/structure/beam/experiments/beam_jet2_decimal.py": "21a60956a1710c7fdb9e93d9f328bebb3bb942fafc89fab0f1a9fb389e184b2a",
+    "rd/structure/beam/experiments/beam_decimal_reference.py": "1f3d19351dc89f9e7c5bb1bd2026bb9254a5068dab13c4b44b6c9fe357162457",
+    "rd/structure/beam/records/beam-se3-precision-addendum.md": "61f2c0f289141f7edd3108ea111182c85031163fa58a5871aa5499cf9ec87a78",
+    "rd/structure/beam/experiments/check_beam_se3_physical.py": "4ae420e42ef8f73b91712ce2e283454c199311faadf7fa16fe1f56a562bc645e",
+    "rd/structure/beam/records/beam-se3-physical-result.json": "2dc2816e0d605f68a8b6d0e2d08607e74086bb6025dd43c8c389565e285a47ad",
+    "rd/structure/beam/experiments/beam_se3_v2.py": "3c71924e347b844353523727510041f529a8b62cd3c31fec6f7b3f70120ada48",
+    "rd/structure/beam/experiments/beam_jet2.py": "0a352d90bb2ad09a27765bfda31a09f2295686ba61f9f742b383600369c81295",
+    "rd/structure/beam/records/beam-se3-adoption-protocol.md": "ad7c1923c65d018f55114c5a5ec8db575fee6e0d14088f69a63cd167163d5c1b"
+  }
+}

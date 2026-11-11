@@ -1,0 +1,67 @@
+{
+  "history": [
+    {
+      "iteration": 0,
+      "residual": 1.4360075052796026,
+      "min_F": 0.9954826466864634,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 1,
+      "residual": 0.058870209856769815,
+      "min_F": 1.0088294935600617,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 2,
+      "residual": 0.001184556611898485,
+      "min_F": 1.0090251960488525,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 3,
+      "residual": 7.362859168669884e-07,
+      "min_F": 1.0090269600260093,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 4,
+      "residual": 1.165443403480903e-12,
+      "min_F": 1.0090269668239853
+    }
+  ],
+  "metrics": {
+    "displacement": 7.185854288000056e-10,
+    "equilibrium": 1.165443403480903e-12,
+    "support_reaction": 6.2185068899847e-13,
+    "independent_equilibrium": 1.1654120728431554e-12,
+    "internal_pointwise_flux": 1.0071238814555167e-12,
+    "flux_dual": 1.6289071921301287e-15,
+    "tangent": 4.447031803534363e-15,
+    "min_F": 1.0090269668239853
+  },
+  "checks": {
+    "newton": true,
+    "displacement": true,
+    "identities": true,
+    "orientation": true,
+    "resources": true
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "artifact": {
+    "path": "build/analysis/polynomial-trace-weak-equilibrium-20261104-105344.npz",
+    "sha256": "38b24db1b2fc4362feb3fcf9fe6259b38b01715c54356d30042fd9f8bccb4133"
+  },
+  "manufactured_Ku_load": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/check_polynomial_trace_equilibrium_weak.py": "8b7197bccc9456a5bd6eb6c49fbbc52488532dea165b0b70c033017fcf1860ef",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-equilibrium-protocol.md": "0e916cf5b5962839cb286fc6800a39d2a7808ce0f800e05bf7f54bab5fa970bc",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-equilibrium-preparation.json": "48008b4cfb374a3f870b9607597ae39406fb70d1d878d6ceaf964f545079e587",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-result.json": "748bcc3774681d7ef363656479c8dd3e52bb962d58688cf16b49d547ac57e6d1"
+  },
+  "seconds": 8.84299999999348,
+  "peak_bytes": 1004859392
+}

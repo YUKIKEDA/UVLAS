@@ -1,0 +1,4 @@
+interface:
+  display_name: "ソルバー実装レビュー"
+  short_description: "Review solver changes against numerical contracts and evidence"
+  default_prompt: "$solver-implementation-review を使い、実装を採用仕様・不変条件・独立検証に照らしてレビューし、重大な不整合から報告してください。"

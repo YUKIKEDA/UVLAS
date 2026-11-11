@@ -1,0 +1,12 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/mixed-order-150/experiments/mixed_order_150_finite.py": "58fc627e418c12c5ca31cfc155edf20e13bb4f4c9d520197dbd1ef1c9049b309",
+    "rd/structure/main-shell/mixed-order-150/experiments/check_mixed_order_150_finite.py": "66a42c04e448524921c2de9963af52dcf8133c97fce71baff7fa71c99775434e",
+    "rd/structure/main-shell/mixed-order-150/experiments/audit_mixed_order_150_finite.py": "a2993b511279d902ddfce04b3a675674a4d5b2ba2bebeb2a974a156b9523949f",
+    "rd/structure/main-shell/mixed-order-150/experiments/mixed_order_150.py": "b05663e86b4402d762c55bc4e204282c7403328e964cc564410315c5794ad9e6",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-order-150-finite-protocol.md": "d970b9d60c68ada2b4426422942b39a213453efd986b01a1b3f82362c8ffc13b",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-order-150-result.json": "3530ff1625320bb92ed0c4688229adb674532635e79279565930a452adf8a64b",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-order-150-audit.json": "df2d7738b192df50f6f3dfda698e9a79e525f5b6b17b257f40e7d9981e1bcad6"
+  }
+}

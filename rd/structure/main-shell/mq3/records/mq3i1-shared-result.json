@@ -1,0 +1,1912 @@
+{
+  "records": [
+    {
+      "baseline_source": "mq3-shared-thin-space-result.json",
+      "baseline_quartic_error": 8.407354543123323e-15,
+      "relative_reduction": 0.6669271120498043,
+      "progress_gate_passed": null,
+      "metric": "covariant",
+      "work": true,
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        204,
+        204,
+        204
+      ],
+      "full_ranks11": [
+        204,
+        204,
+        204
+      ],
+      "partial_ranks9": {
+        "membrane": [
+          84,
+          84,
+          84
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          42,
+          42,
+          42
+        ]
+      },
+      "partial_ranks11": {
+        "membrane": [
+          84,
+          84,
+          84
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          42,
+          42,
+          42
+        ]
+      },
+      "nullity": 48,
+      "anchor_shifts": [
+        4.478640776807386e-15,
+        4.6420710212283345e-15
+      ],
+      "anchor_orthogonality": [
+        8.663700629163038e-15,
+        9.583334033283856e-15
+      ],
+      "kernel_residual": 7.436476727473393e-17,
+      "projector_difference": 2.26884359923671e-14,
+      "control0": 5.145593118208301e-16,
+      "control1": 1.2013447353470628e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 1.9276161419509578e-15,
+            "h1": 1.1547005383792603,
+            "unconstrained_h1": 1.1547005383792615,
+            "multiplier": 0.0,
+            "kkt": 1.97515396018789e-16,
+            "H1_ranks": [
+              174,
+              174,
+              174
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 168,
+            "positive_metric_dimension": 174
+          },
+          "observed_error": 2.003902676401709e-15,
+          "observed_h1": 1.154700538379243,
+          "reference_h1": 1.1547005383792517,
+          "h1_bound": 2.3094010767585034,
+          "zero_constraint": 2.5956206579954046e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 2.7754209224461207e-15,
+            "h1": 0.46462136829144673,
+            "unconstrained_h1": 0.464621368291447,
+            "multiplier": 0.0,
+            "kkt": 1.762705856609804e-16,
+            "H1_ranks": [
+              174,
+              174,
+              174
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 168,
+            "positive_metric_dimension": 174
+          },
+          "observed_error": 2.800261857699284e-15,
+          "observed_h1": 0.46462136829144535,
+          "reference_h1": 0.4646213682914477,
+          "h1_bound": 0.9292427365828954,
+          "zero_constraint": 1.3542596854170796e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "checks": {
+        "anchor": true,
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 13.094000000040978,
+      "map_keys": [
+        "1b0c2a33441bca739410f7b6ab274b66350b9724553707ef323920f2f1c3867d",
+        "f6aa6fea866071d5fe8f710383a794509a62da7a87bacb4da536d343d6ec6c3f",
+        "8a3f3a1f446b8f2ed11392bbe035893cfc4ef124ed9013c7d4a90131cf5e0cd2",
+        "58ef63a2793b64f7cae58a1210634a35c8f8d18a5469ae2b51649e97c76f7f62"
+      ],
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/covariant-w1-k0-a0-n2.npz",
+      "artifact_sha256": "d116e3933eedc849e3e60b1662cbd04c12f7957538b1a873324d485cbd27cf46"
+    },
+    {
+      "baseline_source": "mq3-factor-v2-result.json",
+      "baseline_quartic_error": 9.53194666795918e-06,
+      "relative_reduction": 1.0598188993071744e-12,
+      "progress_gate_passed": null,
+      "metric": "covariant",
+      "work": true,
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        204,
+        204,
+        204
+      ],
+      "full_ranks11": [
+        204,
+        204,
+        204
+      ],
+      "partial_ranks9": {
+        "membrane": [
+          84,
+          84,
+          84
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          42,
+          42,
+          42
+        ]
+      },
+      "partial_ranks11": {
+        "membrane": [
+          84,
+          84,
+          84
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          42,
+          42,
+          42
+        ]
+      },
+      "nullity": 48,
+      "anchor_shifts": [
+        4.245247001077605e-15,
+        4.596988305991795e-15
+      ],
+      "anchor_orthogonality": [
+        9.053449620730164e-15,
+        9.370084439747171e-15
+      ],
+      "kernel_residual": 7.56676732323911e-17,
+      "projector_difference": 2.4333569623258343e-14,
+      "control0": 5.143605640722312e-16,
+      "control1": 1.1599311712903014e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 1.8666366436143494e-15,
+            "h1": 1.1547005383792521,
+            "unconstrained_h1": 1.1547005383792497,
+            "multiplier": 0.0,
+            "kkt": 2.1929200553935445e-16,
+            "H1_ranks": [
+              174,
+              174,
+              174
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 168,
+            "positive_metric_dimension": 174
+          },
+          "observed_error": 2.3418101927286025e-15,
+          "observed_h1": 1.1547005383792521,
+          "reference_h1": 1.1547005383792517,
+          "h1_bound": 2.3094010767585034,
+          "zero_constraint": 2.618283574044179e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 9.531946667990853e-06,
+            "h1": 0.46462144888121953,
+            "unconstrained_h1": 0.4646214488812188,
+            "multiplier": 0.0,
+            "kkt": 3.3393905844733077e-16,
+            "H1_ranks": [
+              174,
+              174,
+              174
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 168,
+            "positive_metric_dimension": 174
+          },
+          "observed_error": 9.531946667949078e-06,
+          "observed_h1": 0.4646214488812199,
+          "reference_h1": 0.4646213682914477,
+          "h1_bound": 0.9292427365828954,
+          "zero_constraint": 1.3941238660084688e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "checks": {
+        "anchor": true,
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 12.889999999955762,
+      "map_keys": [
+        "d80b36f03430eea7eae558bb17e5dddca98f63b0cb93561deb3793f6059832ad",
+        "301c4addd23fc6aaf02179b585b97539447b8d1e106f2aa5a1a468f9d68cafdd",
+        "1145c789bb79cf3e07055b1372e8a9b83ed1e67e90fdd603250108c376e6bfc0",
+        "78289040cbd1dafb911e7fdb2f2d1e5392530bab3e46b29dd2cef550733f5aa7"
+      ],
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/covariant-w1-k0-a0.2-n2.npz",
+      "artifact_sha256": "69ec010c3bb6caf6ffcffd90ce9124f85d3c9a012ee1fc583a3e18a4b375b8d3"
+    },
+    {
+      "baseline_source": "mq3-factor-v2-result.json",
+      "baseline_quartic_error": 0.32998292727154477,
+      "relative_reduction": -6.926378803839839e-09,
+      "progress_gate_passed": false,
+      "metric": "covariant",
+      "work": true,
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        242,
+        242,
+        242
+      ],
+      "full_ranks11": [
+        242,
+        242,
+        242
+      ],
+      "partial_ranks9": {
+        "membrane": [
+          114,
+          114,
+          114
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          56,
+          56,
+          56
+        ]
+      },
+      "partial_ranks11": {
+        "membrane": [
+          114,
+          114,
+          114
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          56,
+          56,
+          56
+        ]
+      },
+      "nullity": 10,
+      "anchor_shifts": [
+        8.200790027544563e-09,
+        5.004386475931989e-10
+      ],
+      "anchor_orthogonality": [
+        3.027834576008074e-15,
+        2.5538033067076397e-15
+      ],
+      "kernel_residual": 8.306876052006776e-17,
+      "projector_difference": 1.01465630266248e-08,
+      "control0": 7.440910894336955e-16,
+      "control1": 2.160803027739221e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 1.8511559608495766e-15,
+            "h1": 1.2336900743609178,
+            "unconstrained_h1": 1.233690074360918,
+            "multiplier": 0.0,
+            "kkt": 2.6205782593663453e-16,
+            "H1_ranks": [
+              136,
+              136,
+              136
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 130,
+            "positive_metric_dimension": 136
+          },
+          "observed_error": 2.068906027911205e-15,
+          "observed_h1": 1.2336900743609165,
+          "reference_h1": 1.2336900743609103,
+          "h1_bound": 2.4673801487218205,
+          "zero_constraint": 3.739112195722076e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 0.3299829295571314,
+            "h1": 0.8325629834350742,
+            "unconstrained_h1": 0.8325629834350741,
+            "multiplier": 0.0,
+            "kkt": 3.418082148343174e-16,
+            "H1_ranks": [
+              136,
+              136,
+              136
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 130,
+            "positive_metric_dimension": 136
+          },
+          "observed_error": 0.32998292955713154,
+          "observed_h1": 0.8325629834350737,
+          "reference_h1": 0.4904348764631308,
+          "h1_bound": 0.9808697529262616,
+          "zero_constraint": 2.381928178692986e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "checks": {
+        "anchor": true,
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 13.0,
+      "map_keys": [
+        "fe04dc9a071a26f52b443e55bedb6f1cb51b8882ff80c34c519fcb05995a6b7b",
+        "3e7d6f08a49eebc8502e929e5941423c901779bead4951a50489546301fb2241",
+        "a686abb3681c0d11d40aaa9ec7e58415c9c24e741789dcf1ec2703dc9359646a",
+        "ff1085bb946f47fcc8bc3261c68bbe1760abaa27355a0c187b87274d128ae7ae"
+      ],
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/covariant-w1-k0.4-a0-n2.npz",
+      "artifact_sha256": "8f536d08b9a0b945120b3c68c5fbd3eacee74ab3883e5e9cf0d7cdcbe69fbbeb"
+    },
+    {
+      "baseline_source": "mq3-factor-v2-result.json",
+      "baseline_quartic_error": 0.5963330679529363,
+      "relative_reduction": 7.771561172376096e-16,
+      "progress_gate_passed": false,
+      "metric": "covariant",
+      "work": true,
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        245,
+        245,
+        245
+      ],
+      "full_ranks11": [
+        245,
+        245,
+        245
+      ],
+      "partial_ranks9": {
+        "membrane": [
+          118,
+          118,
+          118
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          64,
+          64,
+          64
+        ]
+      },
+      "partial_ranks11": {
+        "membrane": [
+          118,
+          118,
+          118
+        ],
+        "shear": [
+          78,
+          78,
+          78
+        ],
+        "normal": [
+          64,
+          64,
+          64
+        ]
+      },
+      "nullity": 7,
+      "anchor_shifts": [
+        2.2328777876667007e-12,
+        1.80510324129938e-12
+      ],
+      "anchor_orthogonality": [
+        1.2589394493324596e-15,
+        1.010703104609279e-15
+      ],
+      "kernel_residual": 1.0013931766657442e-16,
+      "projector_difference": 4.295866746038685e-12,
+      "control0": 1.4452022916397713e-15,
+      "control1": 4.267185825652799e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 3.8451055229755485e-15,
+            "h1": 1.2336900743609067,
+            "unconstrained_h1": 1.2336900743609067,
+            "multiplier": 0.0,
+            "kkt": 8.67287761588813e-17,
+            "H1_ranks": [
+              133,
+              133,
+              133
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 127,
+            "positive_metric_dimension": 133
+          },
+          "observed_error": 3.819216294739017e-15,
+          "observed_h1": 1.2336900743609016,
+          "reference_h1": 1.2336900743609103,
+          "h1_bound": 2.4673801487218205,
+          "zero_constraint": 6.782739149027888e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 0.5963330679529361,
+            "h1": 0.8924546492723062,
+            "unconstrained_h1": 0.8924546492723039,
+            "multiplier": 0.0,
+            "kkt": 2.9862343638893283e-16,
+            "H1_ranks": [
+              133,
+              133,
+              133
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 127,
+            "positive_metric_dimension": 133
+          },
+          "observed_error": 0.5963330679529358,
+          "observed_h1": 0.8924546492723059,
+          "reference_h1": 0.4904348764631308,
+          "h1_bound": 0.9808697529262616,
+          "zero_constraint": 6.82738130361624e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "checks": {
+        "anchor": true,
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 12.875,
+      "map_keys": [
+        "76d0c177075fef0adcf87377a98eea75ab4f8ba9bce213dede7e07676da23274",
+        "3d3c06306c1811f2b1d5a953d991311afb967325a751984ab9e340c3fbb6b4cc",
+        "6e6c16897704dac503079d6513d9d62f2061d8d2bf727e90bc6fdcc003eb3124",
+        "d827d2e955a10ff198005c2a23f72b564d29db36d129a528edcbdf13246f3716"
+      ],
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/covariant-w1-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "7cfbfa596402fa7bdb33b8a7666846a24ca73bae60f1c2d5e777d8e9023a5a4a"
+    }
+  ],
+  "maps": {
+    "1b0c2a33441bca739410f7b6ab274b66350b9724553707ef323920f2f1c3867d": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/1b0c2a33441bca739410f7b6ab274b66350b9724553707ef323920f2f1c3867d.npz",
+      "artifact_sha256": "8f56672a0c15e77158046517fa36e808ecf69d60455c79c1d40cb6d5de95c14f",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.1544776966471564e-15,
+            "residual": 2.130629873857404e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.1376988643490088e-15,
+            "residual": 2.1306298738165557e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.1565111321435111e-15,
+            "residual": 2.1306298738165557e-15
+          }
+        ],
+        "zero_dependence": 2.689486267497146e-16,
+        "linear_dependence": 3.000655110762279e-16,
+        "constant": 6.217248937900877e-15,
+        "zero_c": 0.0,
+        "work": 7.850771036529868e-15,
+        "moments": 2.130629873857404e-15,
+        "rigid": 1.1953942569478635e-16,
+        "derivative": 2.655333384337998e-16,
+        "solve": 1.5001796080514807e-16
+      }
+    },
+    "f6aa6fea866071d5fe8f710383a794509a62da7a87bacb4da536d343d6ec6c3f": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/f6aa6fea866071d5fe8f710383a794509a62da7a87bacb4da536d343d6ec6c3f.npz",
+      "artifact_sha256": "751a0a89e71aa1ed2a2738e38b1fa3406cfc53527b40435b48cb519bb76a332a",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.286044701205581e-15,
+            "residual": 1.9050029820350184e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.211621398000802e-15,
+            "residual": 1.905002982022778e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.2952244519423234e-15,
+            "residual": 1.905002982022778e-15
+          }
+        ],
+        "zero_dependence": 2.981573893192737e-16,
+        "linear_dependence": 2.8777295171810636e-16,
+        "constant": 6.377634412610878e-15,
+        "zero_c": 0.0,
+        "work": 9.923687846003866e-15,
+        "moments": 1.9050029820350184e-15,
+        "rigid": 1.2381941586286263e-16,
+        "derivative": 2.5813941320691063e-16,
+        "solve": 1.4926153979697134e-16
+      }
+    },
+    "8a3f3a1f446b8f2ed11392bbe035893cfc4ef124ed9013c7d4a90131cf5e0cd2": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/8a3f3a1f446b8f2ed11392bbe035893cfc4ef124ed9013c7d4a90131cf5e0cd2.npz",
+      "artifact_sha256": "272f1097d399989c13998e369a8264af77ef3a02c87911218fe476a3ee3c9589",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.297788378067238e-15,
+            "residual": 2.083653997941464e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.2731852341706381e-15,
+            "residual": 2.083653998022127e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.5336412376800076e-15,
+            "residual": 2.083653998022127e-15
+          }
+        ],
+        "zero_dependence": 2.7569540982648803e-16,
+        "linear_dependence": 2.940273311898183e-16,
+        "constant": 3.594460613099866e-15,
+        "zero_c": 0.0,
+        "work": 6.702868389745565e-15,
+        "moments": 2.083653997941464e-15,
+        "rigid": 9.470533900359073e-17,
+        "derivative": 2.9919021920640524e-16,
+        "solve": 1.4889966153054744e-16
+      }
+    },
+    "58ef63a2793b64f7cae58a1210634a35c8f8d18a5469ae2b51649e97c76f7f62": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/58ef63a2793b64f7cae58a1210634a35c8f8d18a5469ae2b51649e97c76f7f62.npz",
+      "artifact_sha256": "7e2104158745d8da02d1159ef27ba3cfcc7e0986ad666eae25e7bd7f776e0779",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.337878975364824e-15,
+            "residual": 2.4186065500086746e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.3364701170632805e-15,
+            "residual": 2.4186065499749524e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.2033992112499011e-15,
+            "residual": 2.4186065499749524e-15
+          }
+        ],
+        "zero_dependence": 2.6614677891516606e-16,
+        "linear_dependence": 3.1392423346734454e-16,
+        "constant": 6.401291760838391e-15,
+        "zero_c": 0.0,
+        "work": 9.842365434959847e-15,
+        "moments": 2.4186065500086746e-15,
+        "rigid": 2.4928216785047826e-16,
+        "derivative": 2.635780175502888e-16,
+        "solve": 1.626103045824642e-16
+      }
+    },
+    "d80b36f03430eea7eae558bb17e5dddca98f63b0cb93561deb3793f6059832ad": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/d80b36f03430eea7eae558bb17e5dddca98f63b0cb93561deb3793f6059832ad.npz",
+      "artifact_sha256": "7d5e91a0bad28ab37fbc8e43ed18743aade4bb74c18bf78f8f75a9e90636a6e0",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.1534509052748648e-15,
+            "residual": 1.7198158766241754e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.0973806133972849e-15,
+            "residual": 1.7198158766965548e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.105974555515538e-15,
+            "residual": 1.7198158766965548e-15
+          }
+        ],
+        "zero_dependence": 2.7680155077208923e-16,
+        "linear_dependence": 2.8960904362672196e-16,
+        "constant": 4.440892098500626e-15,
+        "zero_c": 0.0,
+        "work": 5.4340249349646486e-15,
+        "moments": 2.218212645260702e-15,
+        "rigid": 9.675916364497199e-17,
+        "derivative": 2.7540341273502836e-16,
+        "solve": 1.553586535441908e-16
+      }
+    },
+    "301c4addd23fc6aaf02179b585b97539447b8d1e106f2aa5a1a468f9d68cafdd": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/301c4addd23fc6aaf02179b585b97539447b8d1e106f2aa5a1a468f9d68cafdd.npz",
+      "artifact_sha256": "2b505f3a25d980eb53ecf62ab383eec384fbccc8f1ba007ef03707fab3418c4c",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.405332103013548e-15,
+            "residual": 2.24068153206875e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.3655662338892646e-15,
+            "residual": 2.240681532036302e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.4052213090391405e-15,
+            "residual": 2.240681532036302e-15
+          }
+        ],
+        "zero_dependence": 3.177182803892139e-16,
+        "linear_dependence": 3.0326021547315466e-16,
+        "constant": 5.329070518200751e-15,
+        "zero_c": 0.0,
+        "work": 1.083894933321713e-14,
+        "moments": 2.24068153206875e-15,
+        "rigid": 1.699490207777322e-16,
+        "derivative": 2.6580987570777335e-16,
+        "solve": 1.358128090449598e-16
+      }
+    },
+    "1145c789bb79cf3e07055b1372e8a9b83ed1e67e90fdd603250108c376e6bfc0": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/1145c789bb79cf3e07055b1372e8a9b83ed1e67e90fdd603250108c376e6bfc0.npz",
+      "artifact_sha256": "be5e7446538ba7b82d1899129973945ac49a716e6e53954bd1bd4ddf678fcab9",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.125666974618045e-15,
+            "residual": 2.391890118522077e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.1358657317985997e-15,
+            "residual": 2.3918901184729754e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.472241085571583e-15,
+            "residual": 2.3918901184729754e-15
+          }
+        ],
+        "zero_dependence": 2.746809181360694e-16,
+        "linear_dependence": 3.0836090943655425e-16,
+        "constant": 4.218847493575595e-15,
+        "zero_c": 0.0,
+        "work": 6.829591623335979e-15,
+        "moments": 2.391890118522077e-15,
+        "rigid": 1.5411016643179356e-16,
+        "derivative": 3.09227612382446e-16,
+        "solve": 1.587383065258212e-16
+      }
+    },
+    "78289040cbd1dafb911e7fdb2f2d1e5392530bab3e46b29dd2cef550733f5aa7": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/78289040cbd1dafb911e7fdb2f2d1e5392530bab3e46b29dd2cef550733f5aa7.npz",
+      "artifact_sha256": "8ec22daecaf7328860c982ea2a722a4f47d7b4bb01433cc1472b559fce68e7d2",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.3602782924403304e-15,
+            "residual": 2.1747992971006962e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.3916533386499671e-15,
+            "residual": 2.1747992970922294e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              53,
+              53,
+              53
+            ],
+            "span": 1.4233347709199662e-15,
+            "residual": 2.1747992970922294e-15
+          }
+        ],
+        "zero_dependence": 3.104620619737841e-16,
+        "linear_dependence": 2.902550811810408e-16,
+        "constant": 5.88418203051333e-15,
+        "zero_c": 0.0,
+        "work": 8.517441827278131e-15,
+        "moments": 2.1747992971006962e-15,
+        "rigid": 1.2597794470738174e-16,
+        "derivative": 2.870433240725978e-16,
+        "solve": 1.6534068725014176e-16
+      }
+    },
+    "fe04dc9a071a26f52b443e55bedb6f1cb51b8882ff80c34c519fcb05995a6b7b": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/fe04dc9a071a26f52b443e55bedb6f1cb51b8882ff80c34c519fcb05995a6b7b.npz",
+      "artifact_sha256": "801b1a2d3b794c7898c6d66674feb757e43c383740b1e96f16c7c45bf29b2431",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.2659057598082276e-15,
+            "residual": 2.557228981427016e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.3117704095121966e-15,
+            "residual": 2.5757826354155583e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.2803049425172767e-15,
+            "residual": 2.694478499087037e-15
+          }
+        ],
+        "zero_dependence": 4.610529824309018e-16,
+        "linear_dependence": 3.980549870132716e-16,
+        "constant": 5.442807343116939e-14,
+        "zero_c": 0.0,
+        "work": 1.1016060558345666e-14,
+        "moments": 2.557228981427016e-15,
+        "rigid": 1.7048369611795113e-16,
+        "derivative": 4.3397755357796403e-16,
+        "solve": 1.6780398763564025e-16
+      }
+    },
+    "3e7d6f08a49eebc8502e929e5941423c901779bead4951a50489546301fb2241": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/3e7d6f08a49eebc8502e929e5941423c901779bead4951a50489546301fb2241.npz",
+      "artifact_sha256": "b07d610ff0431391f4a8bbec323a8d2680e30094d05e3832d185577ea5b379a3",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.164816453118807e-15,
+            "residual": 3.696278637423728e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.0707365110269072e-15,
+            "residual": 4.087367333735294e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.011930249646681e-15,
+            "residual": 3.3695136428696187e-15
+          }
+        ],
+        "zero_dependence": 1.115603541757442e-15,
+        "linear_dependence": 6.457685602795651e-16,
+        "constant": 7.609216995576837e-14,
+        "zero_c": 0.0,
+        "work": 1.0474883879536061e-14,
+        "moments": 3.696278637423728e-15,
+        "rigid": 3.825937490452662e-16,
+        "derivative": 1.153283174166777e-15,
+        "solve": 1.7327109054323218e-16
+      }
+    },
+    "a686abb3681c0d11d40aaa9ec7e58415c9c24e741789dcf1ec2703dc9359646a": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/a686abb3681c0d11d40aaa9ec7e58415c9c24e741789dcf1ec2703dc9359646a.npz",
+      "artifact_sha256": "3713a0ff1d8314308ffb4582b478007fb73b3a63fe19bf481104c38a8e0e8c9d",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.725665814100776e-15,
+            "residual": 2.218204776051154e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.2222820541389564e-15,
+            "residual": 2.318493811727327e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.268885906665307e-15,
+            "residual": 2.561954816830696e-15
+          }
+        ],
+        "zero_dependence": 3.8732449248585713e-16,
+        "linear_dependence": 4.169336439776167e-16,
+        "constant": 3.0274413533221776e-14,
+        "zero_c": 0.0,
+        "work": 1.0142317670227589e-14,
+        "moments": 2.218204776051154e-15,
+        "rigid": 2.378053612344766e-16,
+        "derivative": 4.4026033059274576e-16,
+        "solve": 1.7164603224363775e-16
+      }
+    },
+    "ff1085bb946f47fcc8bc3261c68bbe1760abaa27355a0c187b87274d128ae7ae": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/ff1085bb946f47fcc8bc3261c68bbe1760abaa27355a0c187b87274d128ae7ae.npz",
+      "artifact_sha256": "dcf3474d6f1119c9fffb45431a4cc7251f401ab6c9c8067938e5eab0b96d2a6d",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.3036692172605437e-15,
+            "residual": 2.8858295697989003e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.3404396095400259e-15,
+            "residual": 3.2714838133610564e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              105,
+              105,
+              105
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.3986999751253475e-15,
+            "residual": 3.430214709247766e-15
+          }
+        ],
+        "zero_dependence": 4.185307491240298e-16,
+        "linear_dependence": 4.822802574923349e-16,
+        "constant": 1.0803025939659927e-13,
+        "zero_c": 0.0,
+        "work": 1.017494225066832e-14,
+        "moments": 2.8858295697989003e-15,
+        "rigid": 3.6330960651534693e-16,
+        "derivative": 5.301896055022843e-16,
+        "solve": 1.71501635537984e-16
+      }
+    },
+    "76d0c177075fef0adcf87377a98eea75ab4f8ba9bce213dede7e07676da23274": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/76d0c177075fef0adcf87377a98eea75ab4f8ba9bce213dede7e07676da23274.npz",
+      "artifact_sha256": "ed2ef496cb29a2d801278ec20ef38e56cd8ab4c6d9e1f74996e81b9e3f88679d",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.0468032196743226e-15,
+            "residual": 3.756531545464724e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.116034718025051e-15,
+            "residual": 3.1674015744773196e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.2686754158505223e-15,
+            "residual": 3.9104465074321356e-15
+          }
+        ],
+        "zero_dependence": 5.169274248163082e-16,
+        "linear_dependence": 5.542029365471757e-16,
+        "constant": 3.241851231905457e-14,
+        "zero_c": 0.0,
+        "work": 7.86580950179693e-15,
+        "moments": 3.756531545464724e-15,
+        "rigid": 3.6619014814868916e-16,
+        "derivative": 7.36059202206989e-16,
+        "solve": 1.6525036239286515e-16
+      }
+    },
+    "3d3c06306c1811f2b1d5a953d991311afb967325a751984ab9e340c3fbb6b4cc": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/3d3c06306c1811f2b1d5a953d991311afb967325a751984ab9e340c3fbb6b4cc.npz",
+      "artifact_sha256": "932bbbddab1fb5c0d82969c3b58e1346bf5b7a81c80f38a0b55de9d026588aa1",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.955304815702986e-15,
+            "residual": 6.40304301676028e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.9217228973097613e-15,
+            "residual": 7.109270512192082e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.8637032288420884e-15,
+            "residual": 6.0753474307417565e-15
+          }
+        ],
+        "zero_dependence": 5.085894259539298e-16,
+        "linear_dependence": 1.8177583412089487e-15,
+        "constant": 1.0755551463132177e-13,
+        "zero_c": 0.0,
+        "work": 1.6255273966963657e-13,
+        "moments": 6.40304301676028e-15,
+        "rigid": 6.809587505860695e-16,
+        "derivative": 5.817949896590763e-15,
+        "solve": 1.7985106452097662e-16
+      }
+    },
+    "6e6c16897704dac503079d6513d9d62f2061d8d2bf727e90bc6fdcc003eb3124": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/6e6c16897704dac503079d6513d9d62f2061d8d2bf727e90bc6fdcc003eb3124.npz",
+      "artifact_sha256": "5e2a38421e2cda70a2d8ce6832a11e3e0c5603b09fc2dc9b35cdc1b4cf716be4",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.3783677303165994e-15,
+            "residual": 5.228168778579189e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.3958077683697023e-15,
+            "residual": 3.3010292236129298e-15
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 1.2607745836236917e-15,
+            "residual": 3.252319343874553e-15
+          }
+        ],
+        "zero_dependence": 3.887368026514645e-16,
+        "linear_dependence": 5.79624095857829e-16,
+        "constant": 3.1909847452846785e-14,
+        "zero_c": 0.0,
+        "work": 1.3494408520437349e-14,
+        "moments": 5.228168778579189e-15,
+        "rigid": 3.274854605514854e-16,
+        "derivative": 9.546008386279218e-16,
+        "solve": 1.7039616574485895e-16
+      }
+    },
+    "d827d2e955a10ff198005c2a23f72b564d29db36d129a528edcbdf13246f3716": {
+      "artifact": "build/analysis/mq3i1-shared-20261103-125116/maps/d827d2e955a10ff198005c2a23f72b564d29db36d129a528edcbdf13246f3716.npz",
+      "artifact_sha256": "14449936099128cfbae9ed47615253d5ade2f517cf82ba8675e32dff808dd802",
+      "existing": false,
+      "validation": {
+        "rank": true,
+        "span": true,
+        "constraints": true,
+        "zero_dependence": true,
+        "linear_dependence": true,
+        "constant": true,
+        "zero_c": true,
+        "work": true,
+        "moments": true,
+        "rigid": true,
+        "derivative": true,
+        "solve": true,
+        "derivative_solve": true
+      },
+      "metrics": {
+        "near": [
+          {
+            "h": 0.0,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.447560006189848e-15,
+            "residual": 9.378963157241597e-15
+          },
+          {
+            "h": -0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.376291046970302e-15,
+            "residual": 1.0248570447362531e-14
+          },
+          {
+            "h": 0.0001,
+            "basis_ranks": [
+              106,
+              106,
+              106
+            ],
+            "constraint_ranks": [
+              54,
+              54,
+              54
+            ],
+            "span": 2.6067389422995635e-15,
+            "residual": 7.045623364531823e-15
+          }
+        ],
+        "zero_dependence": 7.371937538480527e-16,
+        "linear_dependence": 1.892376654688991e-15,
+        "constant": 6.324617405860755e-14,
+        "zero_c": 0.0,
+        "work": 1.948073922685536e-13,
+        "moments": 9.378963157241597e-15,
+        "rigid": 4.615559783371782e-16,
+        "derivative": 8.675173255979424e-15,
+        "solve": 1.8162792654697473e-16
+      }
+    }
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "both_curved_improved": false,
+  "physical_adoption": false,
+  "finite_thickness_lower_bound": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_shared.py": "5b145432e3ad1ca3765a5a98101eaca7a2ba8d4d965036a83a175e139c34e296",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_shared_space.py": "877df9a8340b49edb934f28cf36e8c6e4380c0f44c2c9903db2cc847b6c721a5",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_shared_family.py": "a91342247e0ea44de76834f2faadbc79fe1acbe04b6af58f4578ad963c5d26ef",
+    "rd/structure/main-shell/mq3/experiments/check_mq3_zero_first_map.py": "d50d896f41a6d6a6454dd47c0650fa72f10f88411da5215520b8ee6d9612a195",
+    "rd/structure/main-shell/q3/experiments/q3_thin_expansion.py": "8120d2378e3f873f32d5b68c6ca99ffc11135ae7d274891245c4c26e8d66b513",
+    "rd/structure/main-shell/q3/experiments/check_q3_thin_limit.py": "3a5ea2540f1b46d891b3f31faa2212d7ca4de04acb289ed879219c966b6210ca",
+    "rd/structure/main-shell/mq3/records/mq3-zero-first-map-result.json": "fc6c1156ce2d140e67740ff07dbb778eab7774cfc6d13e46bd8ac91ab149e75a",
+    "rd/structure/main-shell/mq3/mq3i1-shared-and-membrane-contract.md": "311d10fe261cc56bd1194872da9d182a5ab537c99d8f48f28f99a0bcd738305d",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-preparation.json": "6581e24a60e7285e7d1f391a639df913a209a2e4b097c2d1bd1b545c0d720287",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-execution-protocol.md": "aa7df39f16bb61848c6ddf51f780f0770baff69ad68c5c65258be17b795505a6",
+    "rd/structure/main-shell/mq3/records/mq3i1-additional-local-result.json": "db876b55354fd661de2a256db1dd4a65d8945662614c5955ed9ccdd7ee2ca452",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_moments_v2.py": "544096d7d9456e192522dd6d303b9fdad117586abc871ba5504b0eab470aceeb"
+  },
+  "seconds": 51.95299999997951,
+  "peak_bytes": 474226688
+}

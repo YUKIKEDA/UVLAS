@@ -1,0 +1,187 @@
+{
+  "records": [
+    {
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          4.122101627258764e-12,
+          2.5281820501313693e-12,
+          9.660675277996387e-06
+        ],
+        "direct_kkt": [
+          1.1144369629948808e-13,
+          5.5106143489821354e-14,
+          2.7040176612971623e-13
+        ],
+        "raw_full_rcond": 3.541170731371362e-07,
+        "preconditioned_full_rcond": 0.9999999992858613,
+        "linear_residual": [
+          1.8500315163965469e-16,
+          1.5836867471375207e-16,
+          1.1073197973981017e-16
+        ],
+        "basis_map_rhs_relative_residual": [
+          1.6369016436315037e-12,
+          7.301464200517275e-13,
+          4.747734908777339e-12
+        ],
+        "basis_map_backward_error": [
+          2.0222384329197352e-18,
+          1.4046127604506056e-18,
+          2.1551988751097555e-18
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              4.122101627258764e-12,
+              2.5281820501313693e-12,
+              9.660675277996387e-06
+            ],
+            "direct_kkt": [
+              1.1144369629948808e-13,
+              5.5106143489821354e-14,
+              2.7040176612971623e-13
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "global_coordinates": 1962,
+        "local_condensation_factors_used": false,
+        "rebuilt_original_operator": true
+      },
+      "observed": {
+        "error": [
+          3.90403228542788e-12,
+          2.5041896049291263e-12,
+          9.660675270076434e-06
+        ],
+        "recovered_position_error": [
+          9.359462424025261e-14,
+          7.10853073409605e-06,
+          1.8449147369750114e-07
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "field_difference": [
+        2.0920652470331627e-13,
+        2.2236974403138983e-13,
+        1.7298695039268326e-13
+      ],
+      "error_difference": 2.6608251074399016e-12,
+      "position_difference": 1.4796651350702596e-13,
+      "checks": {
+        "original_stationarity": true,
+        "linear": true,
+        "preconditioned_condition": true,
+        "basis_map_backward_error": true,
+        "fields": true,
+        "error": true,
+        "position": true,
+        "resources": true
+      },
+      "seconds": 28.313000000081956,
+      "artifact": "build/analysis/mixed-mean-stress-finite-full-v2-20261104-185957/h0.01.npz",
+      "artifact_sha256": "9e02b985b521b958ad7a244b0d94df1fcaafb8a2a1441b9c39b82b46f4a554e3"
+    },
+    {
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          3.788533266997336e-08,
+          2.7953883381683746e-08,
+          1.0989809852345955e-05
+        ],
+        "direct_kkt": [
+          8.320424166405698e-10,
+          7.435055539266064e-10,
+          2.21319791271274e-09
+        ],
+        "raw_full_rcond": 4.574352476461029e-11,
+        "preconditioned_full_rcond": 0.999989942672662,
+        "linear_residual": [
+          1.559108817166341e-16,
+          2.545938382453065e-16,
+          2.5940721942205345e-16
+        ],
+        "basis_map_rhs_relative_residual": [
+          3.4452616984705786e-08,
+          1.078829469571893e-08,
+          3.354563371192584e-08
+        ],
+        "basis_map_backward_error": [
+          4.260246965073057e-18,
+          2.0774494563611433e-18,
+          1.5240546439412397e-18
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              3.788533266997336e-08,
+              2.7953883381683746e-08,
+              1.0989809852345955e-05
+            ],
+            "direct_kkt": [
+              8.320424166405698e-10,
+              7.435055539266064e-10,
+              2.21319791271274e-09
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "global_coordinates": 1962,
+        "local_condensation_factors_used": false,
+        "rebuilt_original_operator": true
+      },
+      "observed": {
+        "error": [
+          3.8842586611381174e-08,
+          2.2635640184288673e-08,
+          1.0990039852237048e-05
+        ],
+        "recovered_position_error": [
+          4.596645460709838e-09,
+          7.1094365311605065e-06,
+          2.0920874897198546e-07
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "field_difference": [
+        4.309336305938151e-09,
+        3.9696830060377865e-09,
+        5.659354576488663e-09
+      ],
+      "error_difference": 3.036134935863924e-09,
+      "position_difference": 4.592063404756861e-09,
+      "checks": {
+        "original_stationarity": true,
+        "linear": true,
+        "preconditioned_condition": true,
+        "basis_map_backward_error": true,
+        "fields": true,
+        "error": true,
+        "position": true,
+        "resources": true
+      },
+      "seconds": 27.79599999997299,
+      "artifact": "build/analysis/mixed-mean-stress-finite-full-v2-20261104-185957/h0.0001.npz",
+      "artifact_sha256": "37ba22d205bc84626038c313e06925f13b500466895036bebd3ed5c5a14d5251"
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "independent_global_resolve": true,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "raw_basis_condition_failure_resolved": false,
+  "seconds": 56.14100000006147,
+  "peak_bytes": 1910792192,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_finite_full_v2.py": "c8a27575c40d5b75231119be0b61ca7321d08c3c0be1d22ee947c86dad45e214",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_finite.py": "8eaf11dc5a49ae05531f96ff74e60822f2402d4a80ef3f2502413d69a3788828",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-pair-result.json": "0c1a54b39e56df73ecd08b0ad1624853425073602a81b29f696a1d0e280b6007",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-full-result.json": "cc222cc33dcd68976516c977ab8fd4cd0fcc261c84d9247040ad0595f5fb4708",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-full-v2-protocol.md": "f0bf795078fc67b0072ea46b8c234f07fa8e9559d28a04e0eebfb42bd1effe12"
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "protocol": "rd/structure/main-shell/q9-plate/records/q9-independent-load-experiment.md",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "scipy": "1.16.3",
+  "skfem": "12.0.2",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "inputs": {
+    "a": 1.0,
+    "b": 1.0,
+    "Y": 1.0,
+    "nu": 0.3,
+    "rho": 1.0,
+    "kappa": 0.001
+  },
+  "cases": [
+    {
+      "h": 0.1,
+      "comparison": {
+        "stiffness": {
+          "relative": 1.1612894717497096e-14,
+          "maximum": 8.587856988040435e-14
+        },
+        "mass": {
+          "relative": 6.3917853452002016e-15,
+          "maximum": 1.0201090843967607e-14
+        },
+        "force": 2.861656425918262e-15
+      },
+      "rigid_load_work": 0.0,
+      "solutions": {
+        "own_q": {
+          "status": "evaluated",
+          "condition": 547.3855584734381,
+          "residual": 1.4926564466737206e-14,
+          "displacement_relative": 5.046117955991219e-15,
+          "energy_relative": 1.021405182655144e-14,
+          "strain_error": 6.166399856011306e-19,
+          "normalized_strain_error": 6.1663998560113065e-15,
+          "criteria_pass": true
+        },
+        "external_p": {
+          "status": "evaluated",
+          "condition": 42327.25116802986,
+          "residual": 1.7174500188963816e-13,
+          "displacement_relative": 1.8228453500060833e-12,
+          "energy_relative": 3.992361996552063e-13,
+          "strain_error": 5.66885270279413e-17,
+          "normalized_strain_error": 5.66885270279413e-13,
+          "criteria_pass": true
+        },
+        "external_in_q": {
+          "status": "evaluated",
+          "condition": 547.3855584737227,
+          "residual": 1.4155246391238454e-14,
+          "displacement_relative": 9.500707204925398e-13,
+          "energy_relative": 3.7214675785435247e-13,
+          "strain_error": 5.940072652504957e-17,
+          "normalized_strain_error": 5.940072652504957e-13,
+          "criteria_pass": true
+        }
+      },
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        },
+        "stiffness_reduced": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "comparison_pass": true
+    },
+    {
+      "h": 0.01,
+      "comparison": {
+        "stiffness": {
+          "relative": 4.967912343679594e-13,
+          "maximum": 4.348935984060438e-12
+        },
+        "mass": {
+          "relative": 6.378022481910172e-15,
+          "maximum": 1.021560467569017e-14
+        },
+        "force": 2.7664394784844874e-14
+      },
+      "rigid_load_work": 0.0,
+      "solutions": {
+        "own_q": {
+          "status": "evaluated",
+          "condition": 52222.66463990607,
+          "residual": 1.2087739299533317e-12,
+          "displacement_relative": 2.564316513615011e-12,
+          "energy_relative": 3.3357760997887453e-12,
+          "strain_error": 1.819299715760149e-17,
+          "normalized_strain_error": 1.819299715760149e-12,
+          "criteria_pass": true
+        },
+        "external_p": {
+          "status": "evaluated",
+          "condition": 406589072.4178942,
+          "residual": 1.6975943658324435e-10,
+          "displacement_relative": 1.3010357224020789e-08,
+          "energy_relative": 5.450012663388293e-09,
+          "strain_error": 1.3383699111296744e-13,
+          "normalized_strain_error": 1.3383699111296742e-08,
+          "criteria_pass": false
+        },
+        "external_in_q": {
+          "status": "evaluated",
+          "condition": 52222.66588829427,
+          "residual": 1.264933039160385e-12,
+          "displacement_relative": 1.5564758315398667e-08,
+          "energy_relative": 1.3971287682323918e-08,
+          "strain_error": 6.643201732394214e-14,
+          "normalized_strain_error": 6.6432017323942135e-09,
+          "criteria_pass": true
+        }
+      },
+      "comparison_pass": true
+    },
+    {
+      "h": 0.001,
+      "comparison": {
+        "stiffness": {
+          "relative": 4.6768899156341066e-11,
+          "maximum": 2.9720549751723767e-10
+        },
+        "mass": {
+          "relative": 6.384966376436633e-15,
+          "maximum": 1.0223834544988496e-14
+        },
+        "force": 2.4565615961370773e-13
+      },
+      "rigid_load_work": 0.0,
+      "solutions": {
+        "stopped": "matrix_or_force_comparison_failed"
+      },
+      "comparison_pass": false
+    }
+  ],
+  "limitation": "Linear homogeneous single element; no nonlinear, laminate, curved or convergence evidence"
+}

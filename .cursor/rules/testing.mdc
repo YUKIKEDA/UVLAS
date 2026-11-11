@@ -1,0 +1,49 @@
+---
+description: 試験の枠組み、層、構成、名前
+alwaysApply: false
+globs: "tests/**"
+---
+
+# 試験
+
+何を確かめるかは `numeric-tests`、`spec-checks`、`reference-data` に従う。ここは、試験の書き方である。
+
+## 枠組み
+
+- Catch2 v3（ADR 0004）。`uvlas_add_test()`（`tests/CMakeLists.txt`）で登録し、1実行ファイルが1つのCTestの試験になる。
+- 走らせるのは `ctest --preset <preset>`、一部だけなら `-R <名前>` か `-L <ラベル>`。終了コードと、走った件数を読む。0件の実行は合格ではない（Presetがエラーにする）。
+- 試験は、Debug、Release、Linuxのsanitizerのビルドで走る。
+
+## 層とラベル
+
+| ラベル | 内容 |
+|---|---|
+| `unit` | 型、検査付きの演算、失敗の契約など、一つの部品 |
+| `property` | 不変量：剛体運動、仮想仕事、順方向と随伴の一致、ビット一致 |
+| `negative` | 拒否されるべき入力と、失敗後の親の不変 |
+| `integration` | 部品の結合、ファイルを含む経路、CLI |
+| `verification` | 独立な参照との数値比較。対応する受入ケース（`V-PG` など）もラベルに付ける |
+
+コンパイルが通らないことの保証（別の種類のIDの混用）は、コンパイルして失敗を確かめる試験で守る。
+
+## 構成
+
+- `tests/<module>/` は `src/<module>/` に対応させる。`foo.cpp` の試験は `foo_test.cpp`。
+- 試験の名前（`TEST_CASE` の文）は英語で、対象、状況、期待を言う。条番号かケースIDをタグに付ける。
+- 各試験は自分の状態を持つ。試験は並列に走る。共有のファイルや一時ディレクトリを使うなら、試験ごとに固有の名前にする。
+- 試験は、試験用の経路を製品のコードに要求しない。
+
+## 何を確かめるか
+
+- 人が書いた系列（解法ごと、失敗の種類ごと、精度の表現ごと）は、全ての成員を試す。一つ二つで代表させない。
+- 範囲を値へ写す検査は、各範囲の両端で試す。
+- 誤検出を直したら、その隣の形も試す：まだ報告されるべき形と、直しが新しく届く形。
+- 表明する状態は、共有の後片付けが走る前に読む。
+
+```cpp
+// BAD: one failure kind stands for all seventeen
+TEST_CASE("solve_linear reports failures") { /* singular matrix only */ }
+
+// GOOD: each kind has the input that causes it, and the parent is checked after each
+TEST_CASE("solve_linear rejects a non-finite right-hand side with Nonfinite", "[negative][N4-08]")
+```

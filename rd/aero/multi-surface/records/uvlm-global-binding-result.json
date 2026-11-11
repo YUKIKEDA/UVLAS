@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "groups": 4,
+  "records": [
+    {
+      "case": "global_shared_edge_and_oriented_TE"
+    },
+    {
+      "case": "shared_position_field_work_and_rigid_wrench",
+      "work_difference": 0.0,
+      "rigid_work_difference": 1.3877787807814457e-17
+    },
+    {
+      "case": "shared_TE_vertex_single_release_owner"
+    },
+    {
+      "case": "alias_and_topology_negative_controls",
+      "rejected": 3
+    }
+  ],
+  "scope": "global shared material binding/topology/dual map; full nonlinear fluid assembly remains the previously validated operator composition",
+  "sources": {
+    "rd/aero/multi-surface/experiments/check_uvlm_global_binding.py": "4c26190d04459e111d8391252b833320d9186443c740b19c13be113e9222323f",
+    "rd/aero/multi-surface/experiments/uvlm_global_binding_witness.py": "c5f32f78e723828c6f61515d1ceca4b5d73033fed814b6d9aeaa9291ab549c5a",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+  }
+}

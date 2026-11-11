@@ -1,0 +1,84 @@
+{
+  "comparisons": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "quartic": 1.9301317498733127e-14,
+      "exponential": 1.0989454861783785e-05,
+      "previous_quartic": 2.3630639246455146e-14,
+      "previous_exponential": 1.0989488030436026e-05,
+      "required": false,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "quartic": 5.3719932616094305e-14,
+      "exponential": 1.1651883198657303e-05,
+      "previous_quartic": 3.143766460857181e-14,
+      "previous_exponential": 1.165195037548547e-05,
+      "required": false,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "quartic": 7.658417871715763e-13,
+      "exponential": 0.0002757360347548091,
+      "previous_quartic": 3.8941739669651905e-13,
+      "previous_exponential": 0.000275736034754783,
+      "required": false,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "quartic": 2.73729167254429e-12,
+      "exponential": 0.002536979760220546,
+      "previous_quartic": 0.14681502287457357,
+      "previous_exponential": 0.03152233592318463,
+      "required": true,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "quartic": 4.597096875125967e-12,
+      "exponential": 0.0026207250274054537,
+      "previous_quartic": 0.14681791649351345,
+      "previous_exponential": 0.031525691506255414,
+      "required": true,
+      "passed": true
+    }
+  ],
+  "retained_first_case_basis_comparison": {
+    "gradient": 8.831812723079886e-12,
+    "stabilization": 2.7492126877876404e-13
+  },
+  "checks": {
+    "local": true,
+    "director": true,
+    "global_numerics": true,
+    "tensor_audit": true,
+    "comparisons": true,
+    "basis_version_agreement": true
+  },
+  "all_necessary_checks_pass": true,
+  "finite_h_adoption": false,
+  "main_shell_adopted": false,
+  "geometry_conditional": true,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/assess_moment_enriched_thin.py": "3a7cd209ba7433d67246105c96fc1d57a3ac7b23205443d44e0d9f09fc5be9a2",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-global-v2-result.json": "8db54f8bdd7728caa4665dca9672b4a5beb38a89ee482e0bfe9006a0af4ac27a",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-global-v4-result.json": "e5c4285f3bc0cd102a11fbb9e5af45843077f96454751be2d9118bb4b10de1b4",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-global-v2-audit.json": "802b17b2a5f900e0631f2d402db910584d3a075d1dfedd9ced8c2a711f75784a",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-global-result.json": "1f263d34bbfeeeab418d2fef5e4be554f698c9038db8a96be91dad7036419e2a",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-local-result.json": "bc513fcd1f307b1c4b3226d59da29ee0fd0bc701ec6f6d2bd353e4e0c19a2c7d",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-director-image-result.json": "2e9a3499530212bebdaba741bad02e55b83592732d3b4ba92b0773aba5b26c07"
+  }
+}

@@ -1,0 +1,1348 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-symmetric-solve-sensitivity-experiment.md",
+  "protocol_sha256": "547ffd44a449cfe652e328c9db09530c494d184e7837b4f952a328b836d79f56",
+  "execution_protocol": "rd/aero/avl-reference/records/avl-symmetric-solve-sensitivity-experiment.md",
+  "execution_protocol_sha256": "547ffd44a449cfe652e328c9db09530c494d184e7837b4f952a328b836d79f56",
+  "source_sha256": "c33eb3dd363c0f620aa83bd0e8c2b8359e6b949ae6f8e66ad21a747d6e2767d4",
+  "dependency_sha256": {
+    "avl_reference_resources.py": "aab04fd953ef8e6dce10951e16a7342fceae70a1089e749fb28fb7b976941ecf",
+    "avl_symmetric_solve_watchdog.py": "b464ed86ad6ef855172e31dd70a3023aecab4de00fbe44dd967bbc290537b8bf",
+    "avl_span1280_watchdog.py": "cff867c82faad9ce7677ba3b44e097337a9b18c1c80d6e4e3f4fb1f62e7d1495",
+    "run_avl_span320.py": "ea1954f46d446fa7835819be9baa5b8437a9552f81b340c7ebcc87949613ae30"
+  },
+  "preparation_sha256": "4e50f5d433b15253e5dd979cbaae73d0a8e6fd1b8b8bae806093201fd9df6602",
+  "gate_sha256": {
+    "avl-tip-redistribution-artifact-audit.json": "d9cda27410388f10aa0dff3f8514f148c7bca4ad96dfb45e4c4a5e420ead6c3d",
+    "avl-symmetric-solve-watchdog-result.json": "a734901c37ebae680b3c81f1f94804c51e854c08cef480f4a7b8ebcb15336cd9",
+    "avl-symmetric-solve-small-check.json": "dbbe23d5e6e8c2804b7b9021a8f79b4df0aed55e1dfa12741665f0f7ad106344"
+  },
+  "executable_sha256": "7cc18f714a9c045f71c51751241e65b8211aff9b106c3fddf92e9e292444559f",
+  "stage": "main",
+  "build_script_sha256": "e9dd4c4392e26653cd4aa6e1149b48b0bc7cf5065b662bbd0502039553e833b1",
+  "build_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "build_resource_sha256": "545e25e3fb3b5f79c640916c5ed6636ae44d050a7e4b8c65bc914c7e22ee1bf3",
+  "root": "build/analysis/avl-symmetric-solve-main-20261031-175931",
+  "runs": [
+    {
+      "case": "FW-V01",
+      "allocation": "uniform",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/out",
+      "geometry_directory": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "3e73c7b0dee629c8b9efc499156d0a23be84577b33175062d30823ef6d9cbb9e",
+        "uv-forces.txt": "4fa0d4e06d88bf9333409a6973c8b27d470a7ea0662bbded02e3c093d0c648d2"
+      },
+      "input": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-uniform-weights.npz",
+      "weight_sha256": "8143e5894bf96e594e344f7d770804e573970ccc45df9752c82a76215beafad4",
+      "original_reproduction_error": 1.7960146644824706e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.940356291780688e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 0.0
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.3877787807814457e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.467950752955584e-14,
+          "transpose_error": 6.38378239159465e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50",
+      "directory": "build/analysis/avl-symmetric-solve-main-20261031-175931/FW-V01-uniform",
+      "seconds": 106.817119569,
+      "memory_before": {
+        "mem_total": 25102798848,
+        "mem_available": 24188338176,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 69980160
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1461452800
+          }
+        ],
+        "effective_available": 24188338176
+      },
+      "memory_after": {
+        "mem_total": 25102798848,
+        "mem_available": 24125018112,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 70684672
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1520021504
+          }
+        ],
+        "effective_available": 24125018112
+      },
+      "minimum_effective_available": 19886206976,
+      "maximum_swap_used": 0,
+      "peak_resident_bytes": 4377976832,
+      "maximum_group_live_bytes": 4379725824,
+      "minor_faults": 1072574,
+      "major_faults": 45,
+      "exit_code": 0,
+      "stopped": null,
+      "files": {
+        "after.zip": {
+          "sha256": "0ce482ebcf6b5082170dd632f454298a672c0206284508b6ce5de7dd6807bd93",
+          "bytes": 1729349
+        },
+        "console.txt": {
+          "sha256": "01070b09899689600c56b2da5d889316ea16bda1ccf0546d9b530bdd08dfb3d0",
+          "bytes": 33833
+        },
+        "resource.txt": {
+          "sha256": "16e78842e85834776a1f41125174c022ba310a0e46e1ff2b8cc212b2cdaaf05f",
+          "bytes": 828
+        },
+        "session.txt": {
+          "sha256": "34522e80caaa1cf4870808e48274102daeb817f3dcce6026a15e2b4f90d53152",
+          "bytes": 208
+        },
+        "wing.avl": {
+          "sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50",
+          "bytes": 892
+        },
+        "out/elements.txt": {
+          "sha256": "a95d950a7a72447ed7370e6fc841fcfb4b7fe65af6e67796b6962c967de6f171",
+          "bytes": 1709694
+        },
+        "out/strips.txt": {
+          "sha256": "16629c553a3fef733983a4b74aaba00d8e967f9825b6ccf420b7523b89d498b6",
+          "bytes": 210394
+        },
+        "out/total.txt": {
+          "sha256": "f759a9fa12838e69d144d0b9bf0fb5e4d4a7508ae5f09713891f01d4495f19bc",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "476fdae3d8e799d264a5aed336c05693297677599aee1bdfdc813b1162392ab0",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "cf485716dc896c7b23ef4cc0c9f02ac28ea366f80486ca2e0abfbc1c5a0402c1",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "3f40cdc8d4437650290a656670b15a6411af0adcc021066eb024e900618f95e1",
+          "bytes": 51910
+        },
+        "uq/uq-guard-tests.txt": {
+          "sha256": "a2b0b1f88eaa2bb20d1a4f2c8bf8ead666aaf566a398b790fe819e481e08d99c",
+          "bytes": 175
+        },
+        "uq/uq-meta.txt": {
+          "sha256": "68ab0f3148c7e1077a41124b12908f0ea80045504e9cb6386e28e69e48b0abca",
+          "bytes": 105
+        },
+        "uq/uq-residual-cross.txt": {
+          "sha256": "2ea67963711df82d85143eff4940b652be35ead869b690657ff4a0267339dd9c",
+          "bytes": 3208
+        },
+        "uq/uq-vectors.txt": {
+          "sha256": "f5233b6b921b3cf9b158533377ee32b3111cf490f2675898e83d20bcd7d5d418",
+          "bytes": 1935408
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "parent_outputs_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "probe_meta": {
+        "N": 7680,
+        "REAL_BITS": 64,
+        "QUAD_BITS": 128,
+        "QUAD_DIGITS": 33,
+        "STATE_UNCHANGED": 1
+      },
+      "archive_members": {
+        "total.txt": {
+          "sha256": "f759a9fa12838e69d144d0b9bf0fb5e4d4a7508ae5f09713891f01d4495f19bc",
+          "bytes": 1351
+        },
+        "strips.txt": {
+          "sha256": "16629c553a3fef733983a4b74aaba00d8e967f9825b6ccf420b7523b89d498b6",
+          "bytes": 210394
+        },
+        "elements.txt": {
+          "sha256": "a95d950a7a72447ed7370e6fc841fcfb4b7fe65af6e67796b6962c967de6f171",
+          "bytes": 1709694
+        },
+        "uv-rows.txt": {
+          "sha256": "cf485716dc896c7b23ef4cc0c9f02ac28ea366f80486ca2e0abfbc1c5a0402c1",
+          "bytes": 4216384
+        },
+        "uv-forces.txt": {
+          "sha256": "476fdae3d8e799d264a5aed336c05693297677599aee1bdfdc813b1162392ab0",
+          "bytes": 4354620
+        },
+        "uv-strips.txt": {
+          "sha256": "3f40cdc8d4437650290a656670b15a6411af0adcc021066eb024e900618f95e1",
+          "bytes": 51910
+        },
+        "uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        }
+      }
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "tip-rich",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-rich/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-rich/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "71fa5d7f76f87856b852e7a29dd0cba5838a2c0125bb568b13bd62eef3424b9d",
+        "uv-forces.txt": "6b1131efdcfc66f21b6c4b55bf9320a0a543a71fc17d3de15440887ae2f21791"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-rich/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-tip-rich-weights.npz",
+      "weight_sha256": "c7129f29e29df38f2e0193a32bfbb7b88c71bff01ff325cb0e7968bae41e6d4b",
+      "original_reproduction_error": 1.9505034468464417e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.0816681711721685e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 1.742096381270251e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.1522358588089698e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 4.1668925254700895e-14,
+          "transpose_error": 6.800116025829084e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "3c3ce05fe66e18b6efaa852d70b7ac703d386aeec436e4cf9dbc4a2adeddd158",
+      "directory": "build/analysis/avl-symmetric-solve-main-20261031-175931/FW-V01-tip-rich",
+      "seconds": 105.241191788,
+      "memory_before": {
+        "mem_total": 25102798848,
+        "mem_available": 24138932224,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 77795328
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1527332864
+          }
+        ],
+        "effective_available": 24138932224
+      },
+      "memory_after": {
+        "mem_total": 25102798848,
+        "mem_available": 24124366848,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 77856768
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1526497280
+          }
+        ],
+        "effective_available": 24124366848
+      },
+      "minimum_effective_available": 19866124288,
+      "maximum_swap_used": 0,
+      "peak_resident_bytes": 4377739264,
+      "maximum_group_live_bytes": 4379652096,
+      "minor_faults": 1072573,
+      "major_faults": 45,
+      "exit_code": 0,
+      "stopped": null,
+      "files": {
+        "after.zip": {
+          "sha256": "11a47af2ecfffcf5f00dea0cf71b91626925c02ef7de6ec15a811fe7de6239dd",
+          "bytes": 1731075
+        },
+        "console.txt": {
+          "sha256": "d6b0db72b9562b5960a2d577317011dbb1105463a748cdf22d0ca9e67c8a7ca6",
+          "bytes": 33833
+        },
+        "resource.txt": {
+          "sha256": "67329689d6bb74ddbf080ebec60dc4f278b22de0e63a7ab139c03c5ed1b022de",
+          "bytes": 828
+        },
+        "session.txt": {
+          "sha256": "34522e80caaa1cf4870808e48274102daeb817f3dcce6026a15e2b4f90d53152",
+          "bytes": 208
+        },
+        "wing.avl": {
+          "sha256": "3c3ce05fe66e18b6efaa852d70b7ac703d386aeec436e4cf9dbc4a2adeddd158",
+          "bytes": 894
+        },
+        "out/elements.txt": {
+          "sha256": "7d282b7dcd1f1c610b8e1b63c8d530caa86be3d36e6047a85e3138982d731029",
+          "bytes": 1709694
+        },
+        "out/strips.txt": {
+          "sha256": "703be2b6e91e0c2afbfaaf3d063d916cfd518f33cf35365818d00892baaba615",
+          "bytes": 210394
+        },
+        "out/total.txt": {
+          "sha256": "d216e8a1abdd136c0c0077cd7858af3682dc7b3512f34614d85b77ac48c5a801",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "e05812d4a64d931f69f7e18d8f1b7d05b666b03a95015482b26bfe4580d2bd0b",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "981f75c808d6963930b6555c1260e62aa05c0b6ae144f332ca2ebec03d417684",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "399ca457f32fd37c338bd984a81996e3da58bf126c251f14c87e21265dfda266",
+          "bytes": 51910
+        },
+        "uq/uq-guard-tests.txt": {
+          "sha256": "a2b0b1f88eaa2bb20d1a4f2c8bf8ead666aaf566a398b790fe819e481e08d99c",
+          "bytes": 175
+        },
+        "uq/uq-meta.txt": {
+          "sha256": "68ab0f3148c7e1077a41124b12908f0ea80045504e9cb6386e28e69e48b0abca",
+          "bytes": 105
+        },
+        "uq/uq-residual-cross.txt": {
+          "sha256": "dd35af998204d0711662b523c5fbc05e7f4be4180dc5f8615b10066ceb25d710",
+          "bytes": 3208
+        },
+        "uq/uq-vectors.txt": {
+          "sha256": "5aa163c046381310e76a04c54f8799ca5e42cb48242a892ba757efec9cbeb593",
+          "bytes": 1935408
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "parent_outputs_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "probe_meta": {
+        "N": 7680,
+        "REAL_BITS": 64,
+        "QUAD_BITS": 128,
+        "QUAD_DIGITS": 33,
+        "STATE_UNCHANGED": 1
+      },
+      "archive_members": {
+        "total.txt": {
+          "sha256": "d216e8a1abdd136c0c0077cd7858af3682dc7b3512f34614d85b77ac48c5a801",
+          "bytes": 1351
+        },
+        "strips.txt": {
+          "sha256": "703be2b6e91e0c2afbfaaf3d063d916cfd518f33cf35365818d00892baaba615",
+          "bytes": 210394
+        },
+        "elements.txt": {
+          "sha256": "7d282b7dcd1f1c610b8e1b63c8d530caa86be3d36e6047a85e3138982d731029",
+          "bytes": 1709694
+        },
+        "uv-rows.txt": {
+          "sha256": "981f75c808d6963930b6555c1260e62aa05c0b6ae144f332ca2ebec03d417684",
+          "bytes": 4216384
+        },
+        "uv-forces.txt": {
+          "sha256": "e05812d4a64d931f69f7e18d8f1b7d05b666b03a95015482b26bfe4580d2bd0b",
+          "bytes": 4354620
+        },
+        "uv-strips.txt": {
+          "sha256": "399ca457f32fd37c338bd984a81996e3da58bf126c251f14c87e21265dfda266",
+          "bytes": 51910
+        },
+        "uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        }
+      }
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "tip-poor",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "329adb22e1daf2618caf09eccf903aa62fa9c0bed3c89a37ac7e2bbc44f6b0ff",
+        "uv-forces.txt": "d0251363c9b89831a44a389713f1291369c423270c7ab9ffe2a18fda7be6b3b5"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-tip-poor-weights.npz",
+      "weight_sha256": "327080489c2560dd683c555b57ab5363cc32db121a4ce7468fcdfc289fefde93",
+      "original_reproduction_error": 1.6787346637684516e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 1.6653345369377348e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 3.4416913763379853e-15
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.9081958235744878e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.9356105180354817e-14,
+          "transpose_error": 8.326672684688674e-17
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "c7486d758a1b15bcd076e41c785c20b3e7c68eab425efa0fb1763e15a822f466",
+      "directory": "build/analysis/avl-symmetric-solve-main-20261031-175931/FW-V01-tip-poor",
+      "seconds": 103.66992853300002,
+      "memory_before": {
+        "mem_total": 25102798848,
+        "mem_available": 24153956352,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 79761408
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1528221696
+          }
+        ],
+        "effective_available": 24153956352
+      },
+      "memory_after": {
+        "mem_total": 25102798848,
+        "mem_available": 24135520256,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 79478784
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1527001088
+          }
+        ],
+        "effective_available": 24135520256
+      },
+      "minimum_effective_available": 19876335616,
+      "maximum_swap_used": 0,
+      "peak_resident_bytes": 4377677824,
+      "maximum_group_live_bytes": 4379607040,
+      "minor_faults": 1072573,
+      "major_faults": 45,
+      "exit_code": 0,
+      "stopped": null,
+      "files": {
+        "after.zip": {
+          "sha256": "c6f4f6803e688a54bfa3a5073b0c7435f7ba9cb0bd5d3cc089300b482249db55",
+          "bytes": 1729302
+        },
+        "console.txt": {
+          "sha256": "3bbc6519badaeb53e78478c34d270ef9dcbe3c69f68aac21a196f6c5643bd672",
+          "bytes": 33833
+        },
+        "resource.txt": {
+          "sha256": "c506779ccdc44eb803415ae6244e4ef67f8d8ef4c1711570c386f147db8ad493",
+          "bytes": 828
+        },
+        "session.txt": {
+          "sha256": "34522e80caaa1cf4870808e48274102daeb817f3dcce6026a15e2b4f90d53152",
+          "bytes": 208
+        },
+        "wing.avl": {
+          "sha256": "c7486d758a1b15bcd076e41c785c20b3e7c68eab425efa0fb1763e15a822f466",
+          "bytes": 892
+        },
+        "out/elements.txt": {
+          "sha256": "16534c1babdd94053f68ca20047bb906f6e21b354b3dfc3624dafbd58a1192f3",
+          "bytes": 1709694
+        },
+        "out/strips.txt": {
+          "sha256": "3abf511c5d1dc222b35d614bb3c49ee9d232c6995e650fa184b7a461039efa96",
+          "bytes": 210394
+        },
+        "out/total.txt": {
+          "sha256": "4a539ed4ef727e22ecb71ab1c950073ce2575f42b6640f557120c9ba4adc44df",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "69f5611a2863845abbb7d93869f949cd4e058fd5483296c346784237b45a8a7c",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "cd17fbc31156dd22942b41aa2bcefaaa0ea966a246aa7b92c6a2a897ca212d1e",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "9f8ba41e9b4542f1b63a44fdfaa0c4bbcb0cd9b68ff9ed7b09d16e9128e9ed84",
+          "bytes": 51910
+        },
+        "uq/uq-guard-tests.txt": {
+          "sha256": "a2b0b1f88eaa2bb20d1a4f2c8bf8ead666aaf566a398b790fe819e481e08d99c",
+          "bytes": 175
+        },
+        "uq/uq-meta.txt": {
+          "sha256": "68ab0f3148c7e1077a41124b12908f0ea80045504e9cb6386e28e69e48b0abca",
+          "bytes": 105
+        },
+        "uq/uq-residual-cross.txt": {
+          "sha256": "22d2cf527ae45d6fedb8feb98c018581279fdd7a4e86f26b39b78816bf91f958",
+          "bytes": 3208
+        },
+        "uq/uq-vectors.txt": {
+          "sha256": "8b10b911a13060703124ccba8ef95f1c309376623f852e9f5b4178b12aa59d45",
+          "bytes": 1935408
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "parent_outputs_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "probe_meta": {
+        "N": 7680,
+        "REAL_BITS": 64,
+        "QUAD_BITS": 128,
+        "QUAD_DIGITS": 33,
+        "STATE_UNCHANGED": 1
+      },
+      "archive_members": {
+        "total.txt": {
+          "sha256": "4a539ed4ef727e22ecb71ab1c950073ce2575f42b6640f557120c9ba4adc44df",
+          "bytes": 1351
+        },
+        "strips.txt": {
+          "sha256": "3abf511c5d1dc222b35d614bb3c49ee9d232c6995e650fa184b7a461039efa96",
+          "bytes": 210394
+        },
+        "elements.txt": {
+          "sha256": "16534c1babdd94053f68ca20047bb906f6e21b354b3dfc3624dafbd58a1192f3",
+          "bytes": 1709694
+        },
+        "uv-rows.txt": {
+          "sha256": "cd17fbc31156dd22942b41aa2bcefaaa0ea966a246aa7b92c6a2a897ca212d1e",
+          "bytes": 4216384
+        },
+        "uv-forces.txt": {
+          "sha256": "69f5611a2863845abbb7d93869f949cd4e058fd5483296c346784237b45a8a7c",
+          "bytes": 4354620
+        },
+        "uv-strips.txt": {
+          "sha256": "9f8ba41e9b4542f1b63a44fdfaa0c4bbcb0cd9b68ff9ed7b09d16e9128e9ed84",
+          "bytes": 51910
+        },
+        "uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "uniform",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/out",
+      "geometry_directory": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "6b8f17952551b6f4bcbe37592e8671df92ebf61fc87e22ba11ea77d6aec783fb",
+        "uv-forces.txt": "6191e9a83e312a3d5045316f416d9de2f6c4a50d978f9ae4bf44383d8c23030f"
+      },
+      "input": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-uniform-weights.npz",
+      "weight_sha256": "e5722ae54bdfbc4c910d52c1b83bc02204332d372fdc79ae65245242ab9de73b",
+      "original_reproduction_error": 2.1195489222080182e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 1.8735013540549517e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 2.68258168010076e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.0711917464156784e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.4701842094309043e-14,
+          "transpose_error": 1.6306400674181987e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa",
+      "directory": "build/analysis/avl-symmetric-solve-main-20261031-175931/FW-V02-uniform",
+      "seconds": 100.84969870699996,
+      "memory_before": {
+        "mem_total": 25102798848,
+        "mem_available": 24157396992,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 80502784
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1528549376
+          }
+        ],
+        "effective_available": 24157396992
+      },
+      "memory_after": {
+        "mem_total": 25102798848,
+        "mem_available": 24236679168,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 81780736
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1528774656
+          }
+        ],
+        "effective_available": 24236679168
+      },
+      "minimum_effective_available": 19873697792,
+      "maximum_swap_used": 0,
+      "peak_resident_bytes": 4377718784,
+      "maximum_group_live_bytes": 4379701248,
+      "minor_faults": 1072572,
+      "major_faults": 45,
+      "exit_code": 0,
+      "stopped": null,
+      "files": {
+        "after.zip": {
+          "sha256": "36921839c24bdc3c4751dd4ef7c477cef501aca962183fb031b3dc3e45767a5f",
+          "bytes": 2001540
+        },
+        "console.txt": {
+          "sha256": "d539b2e21bef53b235fdaed3728d49c5498e4544bdbd184dfea1009f10b61af0",
+          "bytes": 33833
+        },
+        "resource.txt": {
+          "sha256": "344ef53465700603eb6a6365e9abfdb7e19aae16abc99a80da21907436855ff7",
+          "bytes": 827
+        },
+        "session.txt": {
+          "sha256": "34522e80caaa1cf4870808e48274102daeb817f3dcce6026a15e2b4f90d53152",
+          "bytes": 208
+        },
+        "wing.avl": {
+          "sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa",
+          "bytes": 1074
+        },
+        "out/elements.txt": {
+          "sha256": "25f8f50f6211918ea24f4e70d3219477efb3d7b3c37fbfb55df314be536435e4",
+          "bytes": 1709694
+        },
+        "out/strips.txt": {
+          "sha256": "c631221ffbebc97659d415e17a844a818c3f171691ffd19001f9cad5639a1682",
+          "bytes": 210394
+        },
+        "out/total.txt": {
+          "sha256": "8b2c66a8d9ac5f513e250fa29fa9d8d65e92d7d8e77a299ccec558f52a2ec61f",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "64d370b1754a3dd81b340250437b02d5fb666c3f1db40b75fa6cae9f2f020f59",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "69ef2408f9173089a3ced4aa0ebb1ddcd99ce4a4a0fbedd2ff04a5593db6d48b",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "178bc7807ba69a3db1404c9d486c4b92acc8cafac0d0514c821aad0106d566f2",
+          "bytes": 51910
+        },
+        "uq/uq-guard-tests.txt": {
+          "sha256": "a2b0b1f88eaa2bb20d1a4f2c8bf8ead666aaf566a398b790fe819e481e08d99c",
+          "bytes": 175
+        },
+        "uq/uq-meta.txt": {
+          "sha256": "68ab0f3148c7e1077a41124b12908f0ea80045504e9cb6386e28e69e48b0abca",
+          "bytes": 105
+        },
+        "uq/uq-residual-cross.txt": {
+          "sha256": "f99ddaf2716676f3aabb0f979fe548689a6c4138eae03c1f6d8aab73aff02396",
+          "bytes": 3208
+        },
+        "uq/uq-vectors.txt": {
+          "sha256": "4602be0ec6db4187c26eb6bb9febd7681ac5358b115047d23708a6a16f7465e4",
+          "bytes": 1935408
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "parent_outputs_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "probe_meta": {
+        "N": 7680,
+        "REAL_BITS": 64,
+        "QUAD_BITS": 128,
+        "QUAD_DIGITS": 33,
+        "STATE_UNCHANGED": 1
+      },
+      "archive_members": {
+        "total.txt": {
+          "sha256": "8b2c66a8d9ac5f513e250fa29fa9d8d65e92d7d8e77a299ccec558f52a2ec61f",
+          "bytes": 1351
+        },
+        "strips.txt": {
+          "sha256": "c631221ffbebc97659d415e17a844a818c3f171691ffd19001f9cad5639a1682",
+          "bytes": 210394
+        },
+        "elements.txt": {
+          "sha256": "25f8f50f6211918ea24f4e70d3219477efb3d7b3c37fbfb55df314be536435e4",
+          "bytes": 1709694
+        },
+        "uv-rows.txt": {
+          "sha256": "69ef2408f9173089a3ced4aa0ebb1ddcd99ce4a4a0fbedd2ff04a5593db6d48b",
+          "bytes": 4216384
+        },
+        "uv-forces.txt": {
+          "sha256": "64d370b1754a3dd81b340250437b02d5fb666c3f1db40b75fa6cae9f2f020f59",
+          "bytes": 4354620
+        },
+        "uv-strips.txt": {
+          "sha256": "178bc7807ba69a3db1404c9d486c4b92acc8cafac0d0514c821aad0106d566f2",
+          "bytes": 51910
+        },
+        "uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "tip-rich",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-rich/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-rich/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "755c398a8bc19717cd53eef56ebfc12d0f1d031f8d144cecd08d405727785163",
+        "uv-forces.txt": "51314e22170963dc448d68c01d567a408a57ee13983cfb8135f3e5fdb575dd9a"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-rich/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-tip-rich-weights.npz",
+      "weight_sha256": "dffaf233a9c331b3789ec69262ede5260aea841209173187d86936a72705523e",
+      "original_reproduction_error": 1.2573123292987562e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.498001805406602e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 1.742096381270252e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 9.389190813724468e-17,
+          "fold_error": 0.0,
+          "symmetry_error": 4.168106831903273e-14,
+          "transpose_error": 5.134781488891349e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "76f1028a367740afd9a456c25eae082b170808c482e5a4b25530d8765e44d991",
+      "directory": "build/analysis/avl-symmetric-solve-main-20261031-175931/FW-V02-tip-rich",
+      "seconds": 105.11394317400004,
+      "memory_before": {
+        "mem_total": 25102798848,
+        "mem_available": 24248668160,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 81649664
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1528643584
+          }
+        ],
+        "effective_available": 24248668160
+      },
+      "memory_after": {
+        "mem_total": 25102798848,
+        "mem_available": 24150265856,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 81756160
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1530613760
+          }
+        ],
+        "effective_available": 24150265856
+      },
+      "minimum_effective_available": 19876159488,
+      "maximum_swap_used": 0,
+      "peak_resident_bytes": 4377874432,
+      "maximum_group_live_bytes": 4379742208,
+      "minor_faults": 1072573,
+      "major_faults": 45,
+      "exit_code": 0,
+      "stopped": null,
+      "files": {
+        "after.zip": {
+          "sha256": "021d0b9a58720978105559f1548bb5d7ddb2d2d81c9c0d5505f31e365f1ffe49",
+          "bytes": 2002014
+        },
+        "console.txt": {
+          "sha256": "8639fd85d59c8a4fcd679c580b2b0a8c47141764a7b3cb3413d11bfda4ce2edb",
+          "bytes": 33833
+        },
+        "resource.txt": {
+          "sha256": "233c771a2b11e2cefdf313bec19d78d30fc917d22839aa73f8dca7e54897eeb6",
+          "bytes": 828
+        },
+        "session.txt": {
+          "sha256": "34522e80caaa1cf4870808e48274102daeb817f3dcce6026a15e2b4f90d53152",
+          "bytes": 208
+        },
+        "wing.avl": {
+          "sha256": "76f1028a367740afd9a456c25eae082b170808c482e5a4b25530d8765e44d991",
+          "bytes": 1076
+        },
+        "out/elements.txt": {
+          "sha256": "ddc2bd98bc912f53a2afc1f054a089944d4d44c3b5947da12bb8e308e475d598",
+          "bytes": 1709694
+        },
+        "out/strips.txt": {
+          "sha256": "87587a842d3b5206f58a91779e2aac63e655c7f3730cb99edbc71bd563173d66",
+          "bytes": 210394
+        },
+        "out/total.txt": {
+          "sha256": "af5c940615aea05f8d3a5296317273baa9975e772e1b4191ae7bc0bd7aebae09",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "68964d4a357d0592e520f12e0a7c39e72a316de1ff0490f0423d143f8069a8ca",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "66be074b80c6887a3200ac78ef9748eadd4a75970ebefd90f0de75e1d647a5e3",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "030e81c01765488251d58a6c571994fbe957fea064760bc61ef683affe844344",
+          "bytes": 51910
+        },
+        "uq/uq-guard-tests.txt": {
+          "sha256": "a2b0b1f88eaa2bb20d1a4f2c8bf8ead666aaf566a398b790fe819e481e08d99c",
+          "bytes": 175
+        },
+        "uq/uq-meta.txt": {
+          "sha256": "68ab0f3148c7e1077a41124b12908f0ea80045504e9cb6386e28e69e48b0abca",
+          "bytes": 105
+        },
+        "uq/uq-residual-cross.txt": {
+          "sha256": "9bbe2aa9230e8cfc27bb77031e41a2eeca11777ee073b83bc5f775ff94afd355",
+          "bytes": 3208
+        },
+        "uq/uq-vectors.txt": {
+          "sha256": "52be36470bb19338972158434dbecf1b78fe63963a90b4d0d4dfb6473b3eb055",
+          "bytes": 1935408
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "parent_outputs_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "probe_meta": {
+        "N": 7680,
+        "REAL_BITS": 64,
+        "QUAD_BITS": 128,
+        "QUAD_DIGITS": 33,
+        "STATE_UNCHANGED": 1
+      },
+      "archive_members": {
+        "total.txt": {
+          "sha256": "af5c940615aea05f8d3a5296317273baa9975e772e1b4191ae7bc0bd7aebae09",
+          "bytes": 1351
+        },
+        "strips.txt": {
+          "sha256": "87587a842d3b5206f58a91779e2aac63e655c7f3730cb99edbc71bd563173d66",
+          "bytes": 210394
+        },
+        "elements.txt": {
+          "sha256": "ddc2bd98bc912f53a2afc1f054a089944d4d44c3b5947da12bb8e308e475d598",
+          "bytes": 1709694
+        },
+        "uv-rows.txt": {
+          "sha256": "66be074b80c6887a3200ac78ef9748eadd4a75970ebefd90f0de75e1d647a5e3",
+          "bytes": 4216384
+        },
+        "uv-forces.txt": {
+          "sha256": "68964d4a357d0592e520f12e0a7c39e72a316de1ff0490f0423d143f8069a8ca",
+          "bytes": 4354620
+        },
+        "uv-strips.txt": {
+          "sha256": "030e81c01765488251d58a6c571994fbe957fea064760bc61ef683affe844344",
+          "bytes": 51910
+        },
+        "uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "tip-poor",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-poor/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-poor/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "3ec46626ff834a64d26db18e246c5ce5e836c0f490bf891af85a8f3190c4a570",
+        "uv-forces.txt": "22e6f942be0b9e9c58027e85026f868fc702bc01ba40dbf1d184e220050eee1f"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-poor/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-tip-poor-weights.npz",
+      "weight_sha256": "3ca67b28d59e6eb172dae74ec277072afb0920a1d28e8aff15f4e39f539b4da8",
+      "original_reproduction_error": 1.7312294974405724e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.498001805406602e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 4.9960036108132044e-15
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.5439038936193583e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.9413784735931046e-14,
+          "transpose_error": 9.020562075079397e-17
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "7be0e6fc05be06c335d8b322f040bc8d49851d6b2c5dead4dc4072b84cd2f07f",
+      "directory": "build/analysis/avl-symmetric-solve-main-20261031-175931/FW-V02-tip-poor",
+      "seconds": 100.13877061899996,
+      "memory_before": {
+        "mem_total": 25102798848,
+        "mem_available": 24165396480,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 81567744
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1530425344
+          }
+        ],
+        "effective_available": 24165396480
+      },
+      "memory_after": {
+        "mem_total": 25102798848,
+        "mem_available": 24170717184,
+        "swap_used": 0,
+        "cgroup_known": true,
+        "cgroup_unknown_reason": null,
+        "cgroups": [
+          {
+            "path": "/sys/fs/cgroup/non-systemd",
+            "maximum": null,
+            "current": 81416192
+          },
+          {
+            "path": "/sys/fs/cgroup",
+            "maximum": null,
+            "current": 1530929152
+          }
+        ],
+        "effective_available": 24170717184
+      },
+      "minimum_effective_available": 19873931264,
+      "maximum_swap_used": 0,
+      "peak_resident_bytes": 4377817088,
+      "maximum_group_live_bytes": 4379742208,
+      "minor_faults": 1072573,
+      "major_faults": 45,
+      "exit_code": 0,
+      "stopped": null,
+      "files": {
+        "after.zip": {
+          "sha256": "59f9855ad9f187d8f9ab81b511868e9dfd40f301895cf44c32eeb37c7225387d",
+          "bytes": 2001396
+        },
+        "console.txt": {
+          "sha256": "36bb33aedf11f8bd8ffa52ac8f449894614b7d98d9296f957697f8b13448e854",
+          "bytes": 33833
+        },
+        "resource.txt": {
+          "sha256": "338cbdead5ad7852a983555416928a006e67ef826f3212566bddba18f71c4f7a",
+          "bytes": 827
+        },
+        "session.txt": {
+          "sha256": "34522e80caaa1cf4870808e48274102daeb817f3dcce6026a15e2b4f90d53152",
+          "bytes": 208
+        },
+        "wing.avl": {
+          "sha256": "7be0e6fc05be06c335d8b322f040bc8d49851d6b2c5dead4dc4072b84cd2f07f",
+          "bytes": 1074
+        },
+        "out/elements.txt": {
+          "sha256": "ab75a269b1ef613eae8517ccffbaf4e984a6a21886031880b1039f5c81ca8451",
+          "bytes": 1709694
+        },
+        "out/strips.txt": {
+          "sha256": "b41201e79dc9d907be660824014cb232c074abe7942488c6734f52603e9c2c49",
+          "bytes": 210394
+        },
+        "out/total.txt": {
+          "sha256": "55807cfa6a6b5e97f77fd3261897c06c221b03a7d411b8307140d0c6087622d8",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "dd110d9209c0dbe6031bd2a3f0df5a8a6fdd851691761e542526b9f7f472df45",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "3d21c3bc7f71e1eb2eabafa0a579ac381152635a32815c3e39ac4cf123a9d25c",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "b07132a96f8fe0bbbeabdd9498fed8c8f9b3e4762c2d00441282ec142f89b4d8",
+          "bytes": 51910
+        },
+        "uq/uq-guard-tests.txt": {
+          "sha256": "a2b0b1f88eaa2bb20d1a4f2c8bf8ead666aaf566a398b790fe819e481e08d99c",
+          "bytes": 175
+        },
+        "uq/uq-meta.txt": {
+          "sha256": "68ab0f3148c7e1077a41124b12908f0ea80045504e9cb6386e28e69e48b0abca",
+          "bytes": 105
+        },
+        "uq/uq-residual-cross.txt": {
+          "sha256": "fcef1aecc4dd7dd3d0917f5a93db497d5b59341db222ce5891b496e6903664e1",
+          "bytes": 3208
+        },
+        "uq/uq-vectors.txt": {
+          "sha256": "9f70976edff606a75c01045c70088616f4698e530954e85b242fcfba2238f4ee",
+          "bytes": 1935408
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "parent_outputs_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      },
+      "probe_meta": {
+        "N": 7680,
+        "REAL_BITS": 64,
+        "QUAD_BITS": 128,
+        "QUAD_DIGITS": 33,
+        "STATE_UNCHANGED": 1
+      },
+      "archive_members": {
+        "total.txt": {
+          "sha256": "55807cfa6a6b5e97f77fd3261897c06c221b03a7d411b8307140d0c6087622d8",
+          "bytes": 1351
+        },
+        "strips.txt": {
+          "sha256": "b41201e79dc9d907be660824014cb232c074abe7942488c6734f52603e9c2c49",
+          "bytes": 210394
+        },
+        "elements.txt": {
+          "sha256": "ab75a269b1ef613eae8517ccffbaf4e984a6a21886031880b1039f5c81ca8451",
+          "bytes": 1709694
+        },
+        "uv-rows.txt": {
+          "sha256": "3d21c3bc7f71e1eb2eabafa0a579ac381152635a32815c3e39ac4cf123a9d25c",
+          "bytes": 4216384
+        },
+        "uv-forces.txt": {
+          "sha256": "dd110d9209c0dbe6031bd2a3f0df5a8a6fdd851691761e542526b9f7f472df45",
+          "bytes": 4354620
+        },
+        "uv-strips.txt": {
+          "sha256": "b07132a96f8fe0bbbeabdd9498fed8c8f9b3e4762c2d00441282ec142f89b4d8",
+          "bytes": 51910
+        },
+        "uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        }
+      }
+    }
+  ],
+  "completed": true,
+  "stop_reason": null,
+  "stage_memory_before": {
+    "mem_total": 25102798848,
+    "mem_available": 24188686336,
+    "swap_used": 0,
+    "cgroup_known": true,
+    "cgroup_unknown_reason": null,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/non-systemd",
+        "maximum": null,
+        "current": 69873664
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "maximum": null,
+        "current": 1460109312
+      }
+    ],
+    "effective_available": 24188686336
+  },
+  "seconds": 637.838328447,
+  "total_bytes": 86312290,
+  "reference_acceptance": false
+}

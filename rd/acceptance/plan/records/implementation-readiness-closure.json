@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "preimplementation_initial_package_ready": true,
+  "practical_acceptance_plan_complete": true,
+  "initial_implementation_review_complete": true,
+  "implementation_start_allowed_packages": [
+    "IM-00"
+  ],
+  "product_implementation_started": false,
+  "experimental_reference_qualified": false,
+  "product_performance_qualified": false,
+  "all_product_acceptance_complete": false,
+  "current_work": "IM-00 product numerical representations, solvers and state contracts; not started",
+  "risks": [
+    "R-01",
+    "R-02",
+    "R-03",
+    "R-04",
+    "R-05",
+    "R-06",
+    "R-07"
+  ],
+  "immutable": {
+    "rd/acceptance/plan/records/implementation-readiness-audit.json": "3266ff9a4cafe1c2ac0e83d4cc39188f6433cf16e190cbd212bdceb8bbf32226",
+    "rd/acceptance/plan/records/implementation-readiness-disposition.json": "e35865c70c56c96bc9561822d30ec66276c88511587bb673e975a88d2550ebb4",
+    "docs/plans/implementation-start-review.md": "81f345ed94e0ccaaef53c523695cfc359c328e23de8fc9193c1a341edea8b868",
+    "docs/requirements/practical-acceptance-plan.md": "050213606ad95a1cab93ece3a0500f5b7444cafcb24f9b5e064f4f0466890c0f",
+    "rd/acceptance/plan/records/practical-acceptance-plan-completion.md": "4c92546bd248c47962ad12f568cb9090a31bbeda777238003eebe17730fde45b"
+  },
+  "status_sync_source": {
+    "rd/acceptance/plan/experiments/close_implementation_readiness.py": "ee912cff22b69e2b2f25fda09a7b1e4b2da3e65eb9394b76fc97c83c925c9e23"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

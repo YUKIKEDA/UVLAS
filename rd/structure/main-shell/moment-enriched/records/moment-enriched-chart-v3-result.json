@@ -1,0 +1,120 @@
+{
+  "records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 2.744483521144726e-13,
+        "force": 6.398047257939364e-12,
+        "tangent": 2.4476294369838203e-13,
+        "reference": 7.087435020691698e-16,
+        "orthogonal": 2.4509167746608535e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 3.2208646571425292e-12,
+        "force": 6.396521891526768e-11,
+        "tangent": 2.197925497643807e-12,
+        "reference": 7.087482276831991e-16,
+        "orthogonal": 2.4509167746608535e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 3.280026414344967e-11,
+        "force": 6.396571188564028e-10,
+        "tangent": 2.1767324144473588e-11,
+        "reference": 7.087482724800461e-16,
+        "orthogonal": 2.4509167746608535e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.6018154205101983e-13,
+        "force": 4.640484211079308e-12,
+        "tangent": 4.685352759704577e-13,
+        "reference": 6.990298601964651e-16,
+        "orthogonal": 2.4509167746608535e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 8.94861364877992e-13,
+        "force": 4.6539307589386106e-11,
+        "tangent": 4.341965494584318e-12,
+        "reference": 6.990268128282547e-16,
+        "orthogonal": 2.4509167746608535e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 8.526008158200726e-12,
+        "force": 4.6542618578948695e-10,
+        "tangent": 4.3011607554702154e-11,
+        "reference": 6.990268818912774e-16,
+        "orthogonal": 2.4509167746608535e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.7599488039469015e-13,
+        "force": 7.620874113652037e-12,
+        "tangent": 7.282454829827457e-14,
+        "reference": 1.343421106779645e-15,
+        "orthogonal": 3.242858923101175e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 2.255020326001266e-12,
+        "force": 7.635124813310726e-11,
+        "tangent": 8.807824707355198e-13,
+        "reference": 1.3434282275780873e-15,
+        "orthogonal": 3.242858923101175e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 2.308813543974108e-11,
+        "force": 7.636571942782562e-10,
+        "tangent": 8.972319690161789e-12,
+        "reference": 1.3434283970641793e-15,
+        "orthogonal": 3.242858923101175e-15
+      },
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "passed": true,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_chart_v3.py": "8b5f87c94f8ed44a05469d87399a868c62c565323990d8b832a9dc9666e2abae",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-local-v2-result.json": "76dc00cb91c414fe2f6d3da60c63175e944641afaa5bda40766a181d80c944f6"
+  }
+}

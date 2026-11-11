@@ -1,0 +1,12 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/reference_work_refined_fit_v2.py": "d59549b988766f6df636b2c2135844abe30fa2f5e7c047a7cfbcddcc6b80c950",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit.py": "52d144a37ec016c468cd84c67709d55997d72e49c610cda01d1113fd19161a25",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-protocol.md": "9ccd10e24a708b7db4078704586a2a5e8b6a6068fbf986c2d1e30716bed926d5",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-v2-protocol.md": "e921dd75d5d15cc864b8c3b042c95ef2f6a10efabcdb209a8e5be0694eb683aa",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-shared-result.json": "fc32be175c12f6736bd45553088bb6eaebd994756f83cc806692d90b5e0296fc",
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_refined_finite.py": "01729799ac0867b073559cfef50480a44697ba176fae3a6fce3be6feec2611fe",
+    "rd/structure/main-shell/reference-work/experiments/audit_reference_work_refined_finite.py": "e2861534271ede535005c08da84bf8eac913885f88f04895c04adbe00b21b660"
+  }
+}

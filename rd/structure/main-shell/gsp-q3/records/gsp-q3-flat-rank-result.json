@@ -1,0 +1,68 @@
+{
+  "records": [
+    {
+      "space": "selected_203",
+      "rows": 203,
+      "columns": 144,
+      "modular_ranks": {
+        "1000003": 138,
+        "1000033": 138,
+        "1000037": 138
+      },
+      "null_directions": 6,
+      "null_independence_ranks": {
+        "1000003": 6,
+        "1000033": 6,
+        "1000037": 6
+      },
+      "exact_kernel": true,
+      "proven_rational_rank": 138,
+      "checks": {
+        "exact_kernel": true,
+        "independent": true,
+        "rank_matches_upper": true
+      },
+      "artifact": "build/analysis/gsp-flat-certificate-20261103-140953/selected.npz",
+      "artifact_sha256": "fe886fc2d4c65c47a9d58816a59072c8292f79d8e387bad53ad75ae20a775224"
+    },
+    {
+      "space": "negative_control_Q222",
+      "rows": 162,
+      "columns": 144,
+      "modular_ranks": {
+        "1000003": 126,
+        "1000033": 126,
+        "1000037": 126
+      },
+      "null_directions": 15,
+      "null_independence_ranks": {
+        "1000003": 15,
+        "1000033": 15,
+        "1000037": 15
+      },
+      "exact_kernel": true,
+      "proven_rational_rank": null,
+      "checks": {
+        "exact_kernel": true,
+        "independent": true,
+        "rank_matches_upper": false
+      },
+      "artifact": "build/analysis/gsp-flat-certificate-20261103-140953/reduced.npz",
+      "artifact_sha256": "6a59d3d65b83bc50b23de18f3698bc071956a3dd07585194832720b7fe523e4b"
+    }
+  ],
+  "prime_checks": {
+    "1000003": true,
+    "1000033": true,
+    "1000037": true
+  },
+  "all_checks_pass": false,
+  "scope": "affine_positive_thickness_only",
+  "curved_uniform_accuracy_proven": false,
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/certify_gsp_q3_flat_rank.py": "ee0cd324922b41ffc64187db473124387abad1b7f68a12b3f5248d964478b767",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-protocol.md": "b10bf3080b25dc38548ca32869f1b7c12c56081731ab532f9c332a86b2e0e985",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-preparation.json": "452c9979ffaa516d022fc1ce32301f6cb7d6b0aae705aa3d20a0ac1fe5c65c52"
+  },
+  "seconds": 0.5160000000032596
+}

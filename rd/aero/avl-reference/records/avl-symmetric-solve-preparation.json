@@ -1,0 +1,588 @@
+{
+  "source_sha256": "25b375f1d5df76a9f058e0a37a9123a238eab02a47e9b82901392f05dec1c402",
+  "protocol": "rd/aero/avl-reference/records/avl-symmetric-solve-sensitivity-experiment.md",
+  "protocol_sha256": "547ffd44a449cfe652e328c9db09530c494d184e7837b4f952a328b836d79f56",
+  "weights_sha256": "b82754ca049488edeae756c412a43665fc4452a34432a84586e1d039a670aacc",
+  "parent": "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64",
+  "target": "build/reference-avl/source-symmetry16000-solve-probe",
+  "parent_executable_sha256": "7f5b321f308be5d737b6999ba143fc239a8bc7056e281a889e68603fa20bf740",
+  "source_files": {
+    "ADIMEN.INC": {
+      "parent": "a5219cf37211f1bc466deff3c51be66e7e59e3300a4966d3314b4e365c7ed69e",
+      "probe": "a5219cf37211f1bc466deff3c51be66e7e59e3300a4966d3314b4e365c7ed69e"
+    },
+    "aero.f": {
+      "parent": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6",
+      "probe": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6"
+    },
+    "aic.f": {
+      "parent": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f",
+      "probe": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f"
+    },
+    "AINDEX.INC": {
+      "parent": "6283370c4341161d4f974d7d11cc961dd820305c1d5f000f42f472fa877feff7",
+      "probe": "6283370c4341161d4f974d7d11cc961dd820305c1d5f000f42f472fa877feff7"
+    },
+    "ainput.f": {
+      "parent": "c4408d58c3217be4abfa482c51146be8355ed3220020d6f86e00aba994651bd3",
+      "probe": "c4408d58c3217be4abfa482c51146be8355ed3220020d6f86e00aba994651bd3"
+    },
+    "airutil.f": {
+      "parent": "d81ce8cc13ed092f0038eade905bcbf6f436a1690ac44fb3c6e13368fe8e5ed1",
+      "probe": "d81ce8cc13ed092f0038eade905bcbf6f436a1690ac44fb3c6e13368fe8e5ed1"
+    },
+    "amake.f": {
+      "parent": "014758cdc3cdaa69ae3a5a0abdc85ad4c84fb9ee472ec5f96c189420643b3ff6",
+      "probe": "014758cdc3cdaa69ae3a5a0abdc85ad4c84fb9ee472ec5f96c189420643b3ff6"
+    },
+    "amass.f": {
+      "parent": "54f4e1d27ce919c26dcf6ade95cae828b076661c36e6518d6192c39eb4e06d3e",
+      "probe": "54f4e1d27ce919c26dcf6ade95cae828b076661c36e6518d6192c39eb4e06d3e"
+    },
+    "amode.f": {
+      "parent": "f3aecac48f154860e636e3235ab2cc57c80b369b39cbac2b55f8a60b8378ea4b",
+      "probe": "f3aecac48f154860e636e3235ab2cc57c80b369b39cbac2b55f8a60b8378ea4b"
+    },
+    "aoml.f": {
+      "parent": "d30d6c9e3bafde44cbf785a4dbf718185bb15ce94065ccc700797a4397765aae",
+      "probe": "d30d6c9e3bafde44cbf785a4dbf718185bb15ce94065ccc700797a4397765aae"
+    },
+    "aoper.f": {
+      "parent": "4280580c4c0a6160d82320f59ca4c72afa3620c1b9e3d5724a019a1468f9135a",
+      "probe": "a4080f64b71ff2d15ab823478cc28b2bcc2c20404a409f4fb8a39f52b7d5b83f"
+    },
+    "aoutmrf.f": {
+      "parent": "82384d13a4c6ef3a04ec7647a7dcca2be519b449013675adf209f23bf7234003",
+      "probe": "82384d13a4c6ef3a04ec7647a7dcca2be519b449013675adf209f23bf7234003"
+    },
+    "aoutput.f": {
+      "parent": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9",
+      "probe": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9"
+    },
+    "aoutput_bug.f": {
+      "parent": "cddaaa0f48695474f86ccd35b4283b358f3ef4f59c75a73f1e4b7ffddf3716a8",
+      "probe": "cddaaa0f48695474f86ccd35b4283b358f3ef4f59c75a73f1e4b7ffddf3716a8"
+    },
+    "aplotmd.f": {
+      "parent": "edd810b6e4fcd1a25f712ceecdb7ea0dac9fc530139fd7bdc880f89006e150dc",
+      "probe": "edd810b6e4fcd1a25f712ceecdb7ea0dac9fc530139fd7bdc880f89006e150dc"
+    },
+    "aplottp.f": {
+      "parent": "f8ead0c48d2e40bf4003413dbea88a7b5b858eb042503083a0f42029e4268ad6",
+      "probe": "f8ead0c48d2e40bf4003413dbea88a7b5b858eb042503083a0f42029e4268ad6"
+    },
+    "aplotvl.f": {
+      "parent": "83ecf66d2f936505b3d8b6a90109b57fef598c70a35e48b670e9c4bb5ad5cfce",
+      "probe": "83ecf66d2f936505b3d8b6a90109b57fef598c70a35e48b670e9c4bb5ad5cfce"
+    },
+    "arrow3d.f": {
+      "parent": "efbc406db10a0bfa64d27ebe6b7f62b4a1c8868f49e791eb6edae88c5a93483c",
+      "probe": "efbc406db10a0bfa64d27ebe6b7f62b4a1c8868f49e791eb6edae88c5a93483c"
+    },
+    "asetup.f": {
+      "parent": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf",
+      "probe": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf"
+    },
+    "atime.f": {
+      "parent": "e6117e27365e43431d784def548fe3330454265a140722a4adfbffe034e3645e",
+      "probe": "e6117e27365e43431d784def548fe3330454265a140722a4adfbffe034e3645e"
+    },
+    "atpforc.f": {
+      "parent": "21153c1a3623177d4bfcbcd799f0bdedade0081a4955b6e1f4e7c649a9dbf65a",
+      "probe": "21153c1a3623177d4bfcbcd799f0bdedade0081a4955b6e1f4e7c649a9dbf65a"
+    },
+    "atrim.f": {
+      "parent": "8476c4231d429cb0259bc6ecf87bd9086cb5050b2ba9c5b5e1a69e9474589f6b",
+      "probe": "8476c4231d429cb0259bc6ecf87bd9086cb5050b2ba9c5b5e1a69e9474589f6b"
+    },
+    "autil.f": {
+      "parent": "e88ec69b68a92c4480d13a20d16e53517e51a02fd435d34b44d43294e005865a",
+      "probe": "e88ec69b68a92c4480d13a20d16e53517e51a02fd435d34b44d43294e005865a"
+    },
+    "avl.f": {
+      "parent": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a",
+      "probe": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a"
+    },
+    "AVL.INC": {
+      "parent": "95b675cca17eeba2740435e94a8c7202b09b19bc121f5730cfb9404db5f5962b",
+      "probe": "95b675cca17eeba2740435e94a8c7202b09b19bc121f5730cfb9404db5f5962b"
+    },
+    "AVLPLT.INC": {
+      "parent": "986c02a734d845176c658f2a9f42f205ce1775802eacf2d5066103a6c67d4234",
+      "probe": "986c02a734d845176c658f2a9f42f205ce1775802eacf2d5066103a6c67d4234"
+    },
+    "avl_heap.f90": {
+      "parent": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966",
+      "probe": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966"
+    },
+    "avl_heap_inc.f90": {
+      "parent": "61b72cebd61aaca40ce24502d433e2297139d394d4a6dec1e0963d99be0a3f86",
+      "probe": "61b72cebd61aaca40ce24502d433e2297139d394d4a6dec1e0963d99be0a3f86"
+    },
+    "ba_trans.f": {
+      "parent": "1d96c668c1ed80edc7d1519739d7ab64c86ca2d5235acbf4edca8952d03c6e49",
+      "probe": "1d96c668c1ed80edc7d1519739d7ab64c86ca2d5235acbf4edca8952d03c6e49"
+    },
+    "cdcl.f": {
+      "parent": "ce2711def9b2ead1a4782a0a4285fa2a9422ac7a23778334a8e6332048fba133",
+      "probe": "ce2711def9b2ead1a4782a0a4285fa2a9422ac7a23778334a8e6332048fba133"
+    },
+    "dtest.f": {
+      "parent": "b3797686b5e6bea6606310ab034c92ae779f78a5689fe6490e457be8257a53c5",
+      "probe": "b3797686b5e6bea6606310ab034c92ae779f78a5689fe6490e457be8257a53c5"
+    },
+    "getvm.f": {
+      "parent": "0b96359c604864a4887d47ce34cdb0688dbed48944db611b39800abf36942561",
+      "probe": "0b96359c604864a4887d47ce34cdb0688dbed48944db611b39800abf36942561"
+    },
+    "hidden.f": {
+      "parent": "7e2067ec26f7dddcdb4335d1791822cbea005bf712afa272717e888a6f019ee9",
+      "probe": "7e2067ec26f7dddcdb4335d1791822cbea005bf712afa272717e888a6f019ee9"
+    },
+    "limits.f": {
+      "parent": "ee5be7c8c366b134e7b6c91370f21830241fedb936484f9bfde76dbddb049ae0",
+      "probe": "ee5be7c8c366b134e7b6c91370f21830241fedb936484f9bfde76dbddb049ae0"
+    },
+    "limits2.f": {
+      "parent": "e54047eb86e957391354d9a7cddc2f87c84bf1ea0a4a31ba76f4d761cdbb68fd",
+      "probe": "e54047eb86e957391354d9a7cddc2f87c84bf1ea0a4a31ba76f4d761cdbb68fd"
+    },
+    "MASKS.INC": {
+      "parent": "b5ce0ae28ab0f41f8cf9fde42ff24490f537d5c6bc865c63cd2d30c881f390d9",
+      "probe": "b5ce0ae28ab0f41f8cf9fde42ff24490f537d5c6bc865c63cd2d30c881f390d9"
+    },
+    "matrix-lapackdp.f": {
+      "parent": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259",
+      "probe": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259"
+    },
+    "matrix-lapacksp.f": {
+      "parent": "a6007b27c936363d7782dea3c00ec8f769b4478bde3e8d2316b724fca300fa2e",
+      "probe": "a6007b27c936363d7782dea3c00ec8f769b4478bde3e8d2316b724fca300fa2e"
+    },
+    "matrix-lapacksubs.f": {
+      "parent": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564",
+      "probe": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564"
+    },
+    "matrix-linpack.f": {
+      "parent": "781cd5fcf42276f01647c52402a1a8a4f51bd90c248a2dd2f913e49b534577e2",
+      "probe": "781cd5fcf42276f01647c52402a1a8a4f51bd90c248a2dd2f913e49b534577e2"
+    },
+    "matrix.f": {
+      "parent": "8fb855c52b8e650827e1b348ffa0e18420a7af173a90287b410e4daee772b335",
+      "probe": "8fb855c52b8e650827e1b348ffa0e18420a7af173a90287b410e4daee772b335"
+    },
+    "movie.f": {
+      "parent": "5bd5c43b0001d05bef589a1fbe1ebf33de4185f6f755ffc736594a98e61428cf",
+      "probe": "5bd5c43b0001d05bef589a1fbe1ebf33de4185f6f755ffc736594a98e61428cf"
+    },
+    "obsetup.f": {
+      "parent": "618705cae4b701fff26086d7343dc541d0255c955d1d91b9daa209ee1ec37474",
+      "probe": "618705cae4b701fff26086d7343dc541d0255c955d1d91b9daa209ee1ec37474"
+    },
+    "plsubs.f": {
+      "parent": "d07878f8ee8dacfa9987d6b27eda8ae4275cb115571842ca2507d27a6071a03b",
+      "probe": "d07878f8ee8dacfa9987d6b27eda8ae4275cb115571842ca2507d27a6071a03b"
+    },
+    "pltops.f": {
+      "parent": "c2ef34b204be3581c9d9ec6e77b10525c5b71e68e3ca8a0e6b1eb5cddffc09e7",
+      "probe": "c2ef34b204be3581c9d9ec6e77b10525c5b71e68e3ca8a0e6b1eb5cddffc09e7"
+    },
+    "plutil.f": {
+      "parent": "e9b3a8f7e1024fa6592518205c35f100792afe0c2e546dd3f3a7a017becd4944",
+      "probe": "e9b3a8f7e1024fa6592518205c35f100792afe0c2e546dd3f3a7a017becd4944"
+    },
+    "second.f": {
+      "parent": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c",
+      "probe": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c"
+    },
+    "second_g77.f": {
+      "parent": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c",
+      "probe": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c"
+    },
+    "second_ifc.f": {
+      "parent": "d5a18e587d53dbe039318d67e38eacf901ce30961ee77c8c1a1fafd3020214a8",
+      "probe": "d5a18e587d53dbe039318d67e38eacf901ce30961ee77c8c1a1fafd3020214a8"
+    },
+    "sgutil.f": {
+      "parent": "db0680f8cc84efc14a6b885effdef2c882ac11e3610c41d6bce96c183f6fde33",
+      "probe": "db0680f8cc84efc14a6b885effdef2c882ac11e3610c41d6bce96c183f6fde33"
+    },
+    "spline.f": {
+      "parent": "5ef039d273e75115b158fcd769ce638744ec37185de1e9663d2238dc758eba2f",
+      "probe": "5ef039d273e75115b158fcd769ce638744ec37185de1e9663d2238dc758eba2f"
+    },
+    "unitset.f": {
+      "parent": "e6aef6bab251b730843f33188a9b75ca2329a3bc4c2bd50e9ff5426410b0fc79",
+      "probe": "e6aef6bab251b730843f33188a9b75ca2329a3bc4c2bd50e9ff5426410b0fc79"
+    },
+    "userio.f": {
+      "parent": "9ed3f0a93f49e0ac01864589ad2578569746a15e7a6ba97a5d8c3fa95303d93b",
+      "probe": "9ed3f0a93f49e0ac01864589ad2578569746a15e7a6ba97a5d8c3fa95303d93b"
+    },
+    "uvl_grid_export.f": {
+      "parent": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b",
+      "probe": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b"
+    },
+    "uvl_measurement.f": {
+      "parent": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29",
+      "probe": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29"
+    },
+    "uvl_pair_probe.f": {
+      "parent": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16",
+      "probe": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16"
+    },
+    "uvl_symmetry_export.f": {
+      "parent": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468",
+      "probe": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468"
+    },
+    "uvl_symmetry_guard.f": {
+      "parent": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80",
+      "probe": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80"
+    },
+    "vorvel.f": {
+      "parent": "d47173a6be368e7ecdada2ad9539d28de5fc8eca14a3c2a29572b3b7a1208676",
+      "probe": "d47173a6be368e7ecdada2ad9539d28de5fc8eca14a3c2a29572b3b7a1208676"
+    },
+    "vorvelc.f": {
+      "parent": "646747bac2b52e2f2ccec4713a98d5bc76ef42ab98827baf870b8849246df2bd",
+      "probe": "646747bac2b52e2f2ccec4713a98d5bc76ef42ab98827baf870b8849246df2bd"
+    }
+  },
+  "adapter_sha256": "dad20b7d6738b3fc072f187b4a5f0a3b961e442b9ccd88a62997e4c120499f06",
+  "new_adapter": "uvl_sym_solve_probe.f",
+  "build_script_sha256": "e9dd4c4392e26653cd4aa6e1149b48b0bc7cf5065b662bbd0502039553e833b1",
+  "patch_sha256": "4ff16e7145b48b25e53e0b34165acbccebc0c1f6fa9561a7da07602c2c26abe3",
+  "recompiled_objects": [
+    "aoper.o",
+    "uvl_sym_solve_probe.o"
+  ],
+  "reused_object_sha256": {
+    "avl_heap_inc.o": "ba90e7e6aa5ecef9ff7f2cb06f26e57a91a9424efb823298f1aacb9694759aa4",
+    "avl_heap.o": "e68625e19348d8daa160966ebc9ced4f825d11b155d61aa5dcb08b19f69556dd",
+    "avl.o": "ffceebd440bebc1dfbab0d888ccd240778e1798ab9c9eb02d32e829577850238",
+    "amode.o": "b38ee733d1390ba6e1755947019cc17727bdce5a93accd6043d0ec28248201ba",
+    "amass.o": "88461890c4d3454b91ef0678f9188337bb7bb612af2846a4dcb7990fc7bbbcc9",
+    "asetup.o": "f9ebc634af2f79b5aa0f4e35af65e273dc10970103d03043ec2484557f335ed0",
+    "amake.o": "9b48aaa667573336895e2c4c627d05d03d39b3af4fab912adae087ea4a25fd42",
+    "ainput.o": "d3e5abe42263f0f5552d0f80c25b928972ae28ab344b1c2d4f41f3b935685968",
+    "aoutput.o": "76c3f67b2ec88bcb524c39aa702cb15c2dae11db4b84e70bb9793e98b0f01a09",
+    "aoutmrf.o": "605cecb9e8a7b844dca9463db7026ccb37ffdfd723f4ab31a69618cefb2f4c5c",
+    "aero.o": "ee4104d6b3f823ccab8d70e4f47095cba110bdf0b66728721a363db37ad972d9",
+    "atrim.o": "d042346eaa74a980fc9badd49a2660e923640e91f294553d23cd440ab222e86a",
+    "atpforc.o": "b87c321c222ef9e74dddbbe09a1cf0312e7a04498bcbc8193533ec5c849fadb1",
+    "aic.o": "8bc1d5eeff8acab009aba94d05bb532951c4e65142fd25c0773c48592eb75643",
+    "cdcl.o": "ef41ecb35fcf4ee5a0c84a8719e70339a7374e5336eae3c923f2548b32ed4b24",
+    "airutil.o": "a0e44a7a6d70c4b335ce52528bfe2f66bdf63dcfc58fcfc919ce11bb62a1cae2",
+    "autil.o": "6fd194edbde8cc7094c031a11b1d5f3321d6a43adc4e5461ffab3ca9b3298af6",
+    "aoml.o": "21db40669a1d78d50cb324815cba2bfc5498a2b5107bf1a8eac0175f3c666613",
+    "aplotvl.o": "60a59468cd0d7d142c20f4c804f1e507200267ac6051818a106e688352f8093b",
+    "aplottp.o": "54e165f783da85e663da991c5a8eab3353b67b6397234cd46e25cf21a317f413",
+    "aplotmd.o": "ec0b21fc6e92141c26658373d109865b5704243eb8a875bf0f22532dfd42192e",
+    "limits.o": "97408a29621a3801629400631be14520209991128bd16c13ce52c1c8cb661417",
+    "pltops.o": "c8c03a3d644a60d6b4a86b9e654e024c22e9af6ade8b16f4080fb6c23eaeb0d5",
+    "hidden.o": "d4ae2ebcbd69b2c74101db30a2b1520c4b490199bfe5f930f7d5ec4802ef77cb",
+    "plsubs.o": "00abb89b443d20f369758d6924183d0e8d0951d1de7a6297bbc58f363851958c",
+    "obsetup.o": "284ba2c6e2c85ed7676b70e46ad25b06626a0a6865a0b99681ff56f8ae623387",
+    "userio.o": "4f9520bb5ec29ade2797bf8db2151befd07f6e34eb9715eb1b0f73f3413e9c9a",
+    "plutil.o": "fc194e180e92fac22d4a8216e7365a596fd215b65c62597a13cf1f58b041a7f5",
+    "arrow3d.o": "bac3c624aac4738a79cedce6865415db5f1c4c17ab82e459b3de563a0e3284a3",
+    "getvm.o": "4b472f819fe4a63862622eebc6243b4e381b4d4318e125915b5f0b833653998a",
+    "spline.o": "c6d040b6e586e1d77453e73cb6a722be216504092ebb52dd38baf12e59f8d30c",
+    "sgutil.o": "cf8cf977edaa05a3e7692d5672c619145fa8cd38788dc313a310d0debcf8c85d",
+    "second.o": "e44261b2aa47f722b9959f1a427480510ed6f237a2a838f433214bfe882ecef9",
+    "matrix-lapackdp.o": "213f64f764c8b1ae8d22f76fc93b97d4c3668ece18dc2cf978af868c1998927e",
+    "matrix-lapacksubs.o": "737122752b863f5caf65024de5cf8afeb395e3ce6e3c19070891345a5ee81cbf",
+    "uvl_measurement.o": "7e2d29c3addf1683d7a883b689bb68c9e95518c90183127f3b250bc04f8574f7",
+    "uvl_pair_probe.o": "ea37ebef39075f3406673a1d7ba88076e13d2bc81319d2c728748fdc096cc4bf",
+    "uvl_grid_export.o": "d0876c9d1c747727265a7b77541317982733e1ee50d81eba2858ecdee093a45f",
+    "uvl_symmetry_export.o": "bd74b4ac6c27f0c1df25bab31d3021adbfc41d84a94f69f7543401ff8e154c83",
+    "uvl_symmetry_guard.o": "06f332eedace92aafea281ff06b99cdb9b54ef2a392b9e71f7b4a00f78a9ad19"
+  },
+  "compiler_sha256": "7564cac4a7d02785e005665954fc981338b200686ab9b8bfe6df15da0f2cc1f3",
+  "link_inputs": {
+    "<repo>/build/reference-avl/source-baseline/plotlib/libPlt_gDP.a": "1e4e52ffe866d2b3455e59c32e82df27e6e9140cba9aac79ec36a8b957f96911",
+    "<repo>/build/reference-avl/source-baseline/eispack/libeispack.a": "b73f95dc39ef0cb03cb722c084be6ef54a41b20fe6046dfad9f7ddb86e4f0b1a"
+  },
+  "cases": [
+    {
+      "case": "FW-V01",
+      "allocation": "small",
+      "m": 6,
+      "n": 40,
+      "native_unknowns": 120,
+      "raw_directory": "build/analysis/avl-capacity16000-ks1000-20261031-152156/FW-V01-M6-N40/out",
+      "geometry_directory": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-small-geometry",
+      "geometry_files": {
+        "uv-rows.txt": "b2e52aa1c37dbaeab7fb8dfcb926d1e036fb21dbd234caa4daf9e5e6bbcbd847",
+        "uv-forces.txt": "0d56af930e2be9f0ace431ef64fa4675e5bbb5ea3fa800e85a2c7a68eb92ac1c"
+      },
+      "input": "build/analysis/avl-capacity16000-ks1000-20261031-152156/FW-V01-M6-N40/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-small-weights.npz",
+      "weight_sha256": "f61712837543af57b6c636741b4b0f6c37928e4654d8f6d6e18e5f311bec93c2",
+      "original_reproduction_error": 2.0732912406691917e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.1434170007846155e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 2.6645352591003757e-15,
+          "transpose_error": 0.0
+        },
+        {
+          "kind": "variable",
+          "direct_error": 5.273559366969494e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 4.973799150320701e-14,
+          "transpose_error": 1.5450962917226532e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "b0f07124d3ee358dd345327fc4406e03c1d503a92a445f5c276012cd7adaa93d"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "small",
+      "m": 6,
+      "n": 40,
+      "native_unknowns": 120,
+      "raw_directory": "build/analysis/avl-capacity16000-ks1000-20261031-152156/FW-V02-M6-N40/out",
+      "geometry_directory": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-small-geometry",
+      "geometry_files": {
+        "uv-rows.txt": "7bf1bc73f1eeb7a6a685c41e812ca32edc0e30667742e036dbe4957eeb21b95e",
+        "uv-forces.txt": "1c40b88310564f8fee1516c99e9deab21d68e9b82c6d83795a2764f51b670133"
+      },
+      "input": "build/analysis/avl-capacity16000-ks1000-20261031-152156/FW-V02-M6-N40/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-small-weights.npz",
+      "weight_sha256": "341a17dd89a82e8b2590e0171ec6a9440b8a9f7a737c5f1de17e18da03632837",
+      "original_reproduction_error": 2.1211536635936334e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.1434170007846155e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 2.6645352591003757e-15,
+          "transpose_error": 1.388043029969913e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 5.273559366969494e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 4.973799150320701e-14,
+          "transpose_error": 3.0901925834453015e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "2d7b28f152342ba9d820d793bc4bd37a14f18f3416d9e96b2daa3c1f06bd0b77"
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "uniform",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/out",
+      "geometry_directory": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "3e73c7b0dee629c8b9efc499156d0a23be84577b33175062d30823ef6d9cbb9e",
+        "uv-forces.txt": "4fa0d4e06d88bf9333409a6973c8b27d470a7ea0662bbded02e3c093d0c648d2"
+      },
+      "input": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-uniform-weights.npz",
+      "weight_sha256": "8143e5894bf96e594e344f7d770804e573970ccc45df9752c82a76215beafad4",
+      "original_reproduction_error": 1.7960146644824706e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.940356291780688e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 0.0
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.3877787807814457e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.467950752955584e-14,
+          "transpose_error": 6.38378239159465e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "uniform",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/out",
+      "geometry_directory": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "6b8f17952551b6f4bcbe37592e8671df92ebf61fc87e22ba11ea77d6aec783fb",
+        "uv-forces.txt": "6191e9a83e312a3d5045316f416d9de2f6c4a50d978f9ae4bf44383d8c23030f"
+      },
+      "input": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-uniform-weights.npz",
+      "weight_sha256": "e5722ae54bdfbc4c910d52c1b83bc02204332d372fdc79ae65245242ab9de73b",
+      "original_reproduction_error": 2.1195489222080182e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 1.8735013540549517e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 2.68258168010076e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.0711917464156784e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.4701842094309043e-14,
+          "transpose_error": 1.6306400674181987e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa"
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "tip-rich",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-rich/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-rich/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "71fa5d7f76f87856b852e7a29dd0cba5838a2c0125bb568b13bd62eef3424b9d",
+        "uv-forces.txt": "6b1131efdcfc66f21b6c4b55bf9320a0a543a71fc17d3de15440887ae2f21791"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-rich/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-tip-rich-weights.npz",
+      "weight_sha256": "c7129f29e29df38f2e0193a32bfbb7b88c71bff01ff325cb0e7968bae41e6d4b",
+      "original_reproduction_error": 1.9505034468464417e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.0816681711721685e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 1.742096381270251e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.1522358588089698e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 4.1668925254700895e-14,
+          "transpose_error": 6.800116025829084e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "3c3ce05fe66e18b6efaa852d70b7ac703d386aeec436e4cf9dbc4a2adeddd158"
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "tip-poor",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "329adb22e1daf2618caf09eccf903aa62fa9c0bed3c89a37ac7e2bbc44f6b0ff",
+        "uv-forces.txt": "d0251363c9b89831a44a389713f1291369c423270c7ab9ffe2a18fda7be6b3b5"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-tip-poor-weights.npz",
+      "weight_sha256": "327080489c2560dd683c555b57ab5363cc32db121a4ce7468fcdfc289fefde93",
+      "original_reproduction_error": 1.6787346637684516e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 1.6653345369377348e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 3.4416913763379853e-15
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.9081958235744878e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.9356105180354817e-14,
+          "transpose_error": 8.326672684688674e-17
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "c7486d758a1b15bcd076e41c785c20b3e7c68eab425efa0fb1763e15a822f466"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "tip-rich",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-rich/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-rich/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "755c398a8bc19717cd53eef56ebfc12d0f1d031f8d144cecd08d405727785163",
+        "uv-forces.txt": "51314e22170963dc448d68c01d567a408a57ee13983cfb8135f3e5fdb575dd9a"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-rich/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-tip-rich-weights.npz",
+      "weight_sha256": "dffaf233a9c331b3789ec69262ede5260aea841209173187d86936a72705523e",
+      "original_reproduction_error": 1.2573123292987562e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.498001805406602e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 1.742096381270252e-16
+        },
+        {
+          "kind": "variable",
+          "direct_error": 9.389190813724468e-17,
+          "fold_error": 0.0,
+          "symmetry_error": 4.168106831903273e-14,
+          "transpose_error": 5.134781488891349e-16
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "76f1028a367740afd9a456c25eae082b170808c482e5a4b25530d8765e44d991"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "tip-poor",
+      "m": 12,
+      "n": 1280,
+      "native_unknowns": 7680,
+      "raw_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-poor/out",
+      "geometry_directory": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-poor/physical-fullwing",
+      "geometry_files": {
+        "uv-rows.txt": "3ec46626ff834a64d26db18e246c5ce5e836c0f490bf891af85a8f3190c4a570",
+        "uv-forces.txt": "22e6f942be0b9e9c58027e85026f868fc702bc01ba40dbf1d184e220050eee1f"
+      },
+      "input": "build/analysis/avl-tip-redistribution-20261031-171922/FW-V02-tip-poor/wing.avl",
+      "weight_path": "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-tip-poor-weights.npz",
+      "weight_sha256": "3ca67b28d59e6eb172dae74ec277072afb0920a1d28e8aff15f4e39f539b4da8",
+      "original_reproduction_error": 1.7312294974405724e-16,
+      "trials": [
+        {
+          "kind": "constant",
+          "direct_error": 2.498001805406602e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 5.329070518200751e-15,
+          "transpose_error": 4.9960036108132044e-15
+        },
+        {
+          "kind": "variable",
+          "direct_error": 1.5439038936193583e-16,
+          "fold_error": 0.0,
+          "symmetry_error": 3.9413784735931046e-14,
+          "transpose_error": 9.020562075079397e-17
+        }
+      ],
+      "all_criteria_pass": true,
+      "input_sha256": "7be0e6fc05be06c335d8b322f040bc8d49851d6b2c5dead4dc4072b84cd2f07f"
+    }
+  ]
+}

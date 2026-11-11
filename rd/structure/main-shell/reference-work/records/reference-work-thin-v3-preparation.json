@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/reference_work_exact_isometry_v3.py": "ba276c4728bbf54a096fd13e506888c39e5abb1d037ed6c4e76b5b2a0ad433bd",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_thin_limit_v3.py": "ee31f3bd3be26f4819e795154195126cfdab71c9c543cc034283ed6763b9dedf",
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_global_v4.py": "0569fcae6a9acde171c2b8ac6b60dc7b1e443a0947cf6b0aa355b53075000165",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-v3-protocol.md": "6aaa0fb8439cb7069af5dec763948aef6b20c295e6390748782a58a6fdc094e8",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-v2-protocol.md": "96d0d86045212e07820e8cd993cb86faf31b444d3c47c6d6f625626e8fa9500f",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-global-v3-result.json": "dd4b8aa2a489ea1996bd4add1d0fa8e37a44f149be8011ac31d9ced122286b84"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "structural_1_5_complete": true,
+  "structural_review_complete": true,
+  "product_implementation_start": false,
+  "main_shell_adopted": true,
+  "material_1_2_complete": true,
+  "beam_1_3_complete": true,
+  "connection_1_4_complete": true,
+  "decisions": [
+    "SI-D01",
+    "SI-D02",
+    "SI-D03",
+    "SI-D04",
+    "SI-D05",
+    "SI-D06",
+    "SI-D07",
+    "SI-D08",
+    "SI-D09"
+  ],
+  "metrics": {
+    "new_verification_groups": 25,
+    "combined_original_residual": 4.860783171788634e-11,
+    "combined_constraint": 5.648553558213181e-16,
+    "combined_wrench_error": 1.3952763831264342e-13,
+    "whole_residual_tangent_error": 6.999930423979702e-13,
+    "independent_support_series_error": 6.110667527536862e-13,
+    "independent_damped_support_response_error": 8.90538034933604e-13,
+    "restart_operator_difference": 0.0,
+    "finest_cut_force_error": 0.0031837781202339937,
+    "finest_cut_moment_error": 0.009140220538233478,
+    "pressure_symmetrization_defect": 0.5894815633968952
+  },
+  "next_work": "2 UVLM model adoption",
+  "specification": "docs/specs/structure/structural-adopted-specification.md",
+  "production_time_integration_complete": false,
+  "production_numerical_types_complete": false,
+  "real_world_acceptance_complete": false
+}

@@ -1,0 +1,68 @@
+{
+  "source_sha256": "90b239f79550db80416b784d4afbca7696d07cf021fee3e60fcde79db9757023",
+  "result_sha256": "8210107395ee7b802d462e8c30d52c818ef226dec95831ba7cd7234317629c9c",
+  "runs_sha256": "47b85c3239d7147485f32ec055c993423728d30c3bb208d4a03f79b0f908910e",
+  "raw_files_verified": 170,
+  "systems": 8,
+  "criteria": 11,
+  "solve_status": [
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V01-M4-N12",
+      "dgetrs_calls": 55,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V02-M8-N24",
+      "dgetrs_calls": 55,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V01-M16-N96",
+      "dgetrs_calls": 55,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V01-M32-N96",
+      "dgetrs_calls": 55,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V01-M12-N160",
+      "dgetrs_calls": 56,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V01-M24-N160",
+      "dgetrs_calls": 56,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V02-M12-N160",
+      "dgetrs_calls": 56,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    },
+    {
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V02-M24-N160",
+      "dgetrs_calls": 56,
+      "info": 0,
+      "evidence": "Inferred from the unconditional nonzero-INFO abort guard, normal US completion, and successful post-US output; not a separately logged per-call INFO array.",
+      "refinement_steps": 2
+    }
+  ],
+  "previous_attempts_preserved": true,
+  "all_criteria_pass": true
+}

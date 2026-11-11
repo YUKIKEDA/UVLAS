@@ -1,0 +1,266 @@
+{
+  "records": [
+    {
+      "kind": "S4",
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.6855240298467317e-15,
+        "force": 7.388604284939706e-15,
+        "tangent": 1.3869395720025758e-14,
+        "weak_gradient": 2.882382384870138e-15,
+        "constant_P_work": 2.032494131724626e-15,
+        "flux_dual": 1.0740297969816096e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 8.427673675083342e-16,
+        "force": 9.28427026892457e-15,
+        "tangent": 3.413358416956065e-14,
+        "weak_gradient": 3.058488210319776e-15,
+        "constant_P_work": 3.907709879499574e-15,
+        "flux_dual": 1.0346239120345083e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.4485065049024244e-15,
+        "force": 9.223750579900549e-15,
+        "tangent": 1.6254096596226857e-14,
+        "weak_gradient": 2.858755696399995e-15,
+        "constant_P_work": 3.181707856705964e-15,
+        "flux_dual": 1.1313871291603313e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.881432804576482e-15,
+        "force": 6.487292885047701e-15,
+        "tangent": 6.859498587741725e-15,
+        "weak_gradient": 4.026455563930764e-15,
+        "constant_P_work": 8.317350506893756e-15,
+        "flux_dual": 1.1770679854859914e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.7104057251763427e-15,
+        "force": 5.317889285870138e-15,
+        "tangent": 2.4499167514370125e-14,
+        "weak_gradient": 3.911483504087608e-15,
+        "constant_P_work": 6.625102171302593e-14,
+        "flux_dual": 1.0941763565360104e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 0.0,
+        "force": 6.662395207430274e-15,
+        "tangent": 7.655992842966094e-16,
+        "weak_gradient": 3.81557362341628e-15,
+        "constant_P_work": 7.592611834887553e-13,
+        "flux_dual": 1.1433340698520304e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 3.852653194505365e-15,
+        "force": 1.0330273409531047e-14,
+        "tangent": 3.344926397043487e-14,
+        "weak_gradient": 3.9767233590798275e-15,
+        "constant_P_work": 1.3242285344860039e-14,
+        "flux_dual": 2.6693720751983905e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 2.0938495784899634e-16,
+        "force": 8.582944531786838e-15,
+        "tangent": 4.4212308900691654e-14,
+        "weak_gradient": 3.805605473300674e-15,
+        "constant_P_work": 1.6798236055101312e-13,
+        "flux_dual": 1.80740809201956e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S4",
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.9629841328402513e-15,
+        "force": 1.2811852231031813e-14,
+        "tangent": 3.746808324162856e-16,
+        "weak_gradient": 3.912244332919921e-15,
+        "constant_P_work": 1.9912113528969888e-12,
+        "flux_dual": 2.387481779572912e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 4.145030904014067e-15,
+        "force": 6.6621607039611254e-15,
+        "tangent": 4.489573709591447e-15,
+        "weak_gradient": 3.1426267550078465e-15,
+        "constant_P_work": 3.3843824424331945e-15,
+        "flux_dual": 1.7460344525078134e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.7271019617157534e-15,
+        "force": 6.4910293656726966e-15,
+        "tangent": 2.004230199668385e-15,
+        "weak_gradient": 3.107359992887156e-15,
+        "constant_P_work": 3.385650257400489e-15,
+        "flux_dual": 1.4362218098435752e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 3.084110748574777e-16,
+        "force": 7.396108276366476e-15,
+        "tangent": 8.768505208843136e-16,
+        "weak_gradient": 3.368145146716175e-15,
+        "constant_P_work": 2.985723714502736e-15,
+        "flux_dual": 1.2892568203955888e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.3984130878413224e-15,
+        "force": 5.083428144033662e-15,
+        "tangent": 8.88594763683126e-15,
+        "weak_gradient": 3.6154430369011655e-15,
+        "constant_P_work": 8.256964165574834e-15,
+        "flux_dual": 2.6450479730156695e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.8728812210926327e-15,
+        "force": 4.24739165701447e-15,
+        "tangent": 8.74667131553155e-15,
+        "weak_gradient": 3.0769986952511725e-15,
+        "constant_P_work": 6.621599741585361e-14,
+        "flux_dual": 2.0738738912601966e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 2.809321929838482e-15,
+        "force": 4.570607887494884e-15,
+        "tangent": 1.2321693540461333e-14,
+        "weak_gradient": 4.26157440178138e-15,
+        "constant_P_work": 7.59158262675296e-13,
+        "flux_dual": 2.280949112253685e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 2.5450203391543482e-15,
+        "force": 9.275212774913788e-15,
+        "tangent": 7.850473801556386e-15,
+        "weak_gradient": 3.0230299160542792e-15,
+        "constant_P_work": 1.3171754984640728e-14,
+        "flux_dual": 1.778714938747092e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.4682873599226687e-15,
+        "force": 6.670122141574168e-15,
+        "tangent": 1.5419922501553293e-14,
+        "weak_gradient": 4.258489821343156e-15,
+        "constant_P_work": 1.6809659364671538e-13,
+        "flux_dual": 1.5354542322602545e-15
+      },
+      "passed": true
+    },
+    {
+      "kind": "S3+",
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 5.506077839478449e-15,
+        "force": 8.18956109046689e-15,
+        "tangent": 2.50323311379012e-15,
+        "weak_gradient": 3.6167922667606994e-15,
+        "constant_P_work": 1.991220446941863e-12,
+        "flux_dual": 1.8408948033715917e-15
+      },
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/audit_hybrid_gradient_local.py": "b382ea7bb3c3e931eecc917438b41cf4f36087a66f1dc4e77d8eede83bb3bd91",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-local-result.json": "f46312f6e03e3f7dcac25104540981b9b4d4f26a488a2e681ce034bca598861d",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-ancf-protocol.md": "18a894ddb33c0e228fa7f66c9e4f49615a2172de625b0b724a611726f4dcdecc"
+  },
+  "seconds": 9.23499999998603,
+  "physical_adoption": false
+}

@@ -1,0 +1,41 @@
+{
+  "passed": false,
+  "reason": "prespecified_asymptotic_order_not_met_on_initial_grid",
+  "intervals": [
+    20,
+    40,
+    80,
+    160
+  ],
+  "relative_errors": [
+    [
+      0.002792847913001766,
+      0.003163176865599676
+    ],
+    [
+      0.0005640420557585679,
+      0.0005689969621437456
+    ],
+    [
+      0.00027631538120603935,
+      0.00021275178669691877
+    ],
+    [
+      0.00015027403359891815,
+      0.00012490810635334008
+    ]
+  ],
+  "observed_orders": [
+    0.8787201303559105,
+    0.7683041389839139
+  ],
+  "finest_one_percent_target_met": true,
+  "sources": {
+    "rd/coupled/j1/experiments/publish_age_initialization_initial.py": "64e1e65841c3746a8b4bae06501b5bb4b36e0a52d7dca261f3ed5847dcfac460",
+    "rd/coupled/j1/experiments/check_age_initialization_derivative.py": "9e4e01182d5e5067c9c6486416f48ab641623e8583e74dfce828d3a776b78beb",
+    "docs/specs/coupled/j1-initialization-output-derivative-addendum.md": "6b2159b633a0412b5221546b075eb9938718c69d306a63602b638ce73c16f05f"
+  },
+  "artifacts": {
+    "build/analysis/age-initialization-derivative-diagnostic.log": "331eee9f4bbdfc96439aa81f6c429fc141cbebffd61fc68857940a566bf6a489"
+  }
+}

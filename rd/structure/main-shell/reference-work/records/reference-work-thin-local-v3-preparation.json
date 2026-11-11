@@ -1,0 +1,8 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_local_v3.py": "8a898b90d282db27ca170723e5f11ade8a184c402f37dc0bd99a01165e535900",
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_global_v2.py": "577c782328efca0345dc3213f1a1fff56a4f18f624cfe57458bbeeede4139915",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-local-v2-verifier-defects.json": "5eaf3a4bd2a36d97ada027f2979eac066de9185906548fcb7a9e946c510355b3",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-preparation.json": "6d3c7f5fe03d2c4b948e62ac839c112bdb1d62aa100026ba9a645943fb06bc02"
+  }
+}

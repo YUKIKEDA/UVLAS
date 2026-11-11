@@ -1,0 +1,143 @@
+{
+  "records": [
+    {
+      "h": 0.01,
+      "metrics": {
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              3.330045390160092e-11,
+              9.660692352176564e-06
+            ],
+            "direct_kkt": [
+              1.273738150220061e-12,
+              4.026120707085948e-12
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "full_rcond": 3.390708409627973e-07,
+        "error": [
+          3.330045390160092e-11,
+          9.660692352176564e-06
+        ],
+        "direct_kkt": [
+          1.273738150220061e-12,
+          4.026120707085948e-12
+        ]
+      },
+      "observed": {
+        "error": [
+          3.335935591333478e-11,
+          9.660692346331015e-06
+        ],
+        "elastic_error": [
+          3.332415242132317e-11,
+          8.655111836948886e-06
+        ],
+        "stabilization_error": [
+          1.5321528490869185e-12,
+          4.291621570032235e-06
+        ],
+        "h1": [
+          0.46462136829145567,
+          1.9880861280779372
+        ]
+      },
+      "field_difference": 4.3087676747683275e-13,
+      "error_difference": 6.100077851856896e-12,
+      "checks": {
+        "stationarity": true,
+        "error": true,
+        "fields": true,
+        "resources": true
+      },
+      "seconds": 16.68799999996554,
+      "artifact": "build/analysis/reference-work-refined-independent-20261104-122403/h0.01.npz",
+      "artifact_sha256": "62819b8356da79b96ab59c2c8554468c5462e3077cda1d6ad3eb148b85270e09"
+    },
+    {
+      "h": 0.0001,
+      "metrics": {
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              4.180423882752313e-07,
+              1.1066892680285676e-05
+            ],
+            "direct_kkt": [
+              1.6048137870767942e-08,
+              5.036048703053456e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "error": [
+              3.4294746549913935e-08,
+              1.098975540167154e-05
+            ],
+            "direct_kkt": [
+              8.256728340945047e-10,
+              1.7214486485029301e-09
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "full_rcond": 4.764306458085363e-11,
+        "error": [
+          3.4294746549913935e-08,
+          1.098975540167154e-05
+        ],
+        "direct_kkt": [
+          8.256728340945047e-10,
+          1.7214486485029301e-09
+        ]
+      },
+      "observed": {
+        "error": [
+          3.8679929087919426e-08,
+          1.0989884095571799e-05
+        ],
+        "elastic_error": [
+          3.86796935263677e-08,
+          1.0989022887197374e-05
+        ],
+        "stabilization_error": [
+          1.349924173564556e-10,
+          1.375805900346354e-07
+        ],
+        "h1": [
+          0.4646213682912785,
+          1.9880876241682472
+        ]
+      },
+      "field_difference": 2.4899075731525426e-12,
+      "error_difference": 3.7227567439167854e-09,
+      "checks": {
+        "stationarity": true,
+        "error": true,
+        "fields": true,
+        "resources": true
+      },
+      "seconds": 17.45400000002701,
+      "artifact": "build/analysis/reference-work-refined-independent-20261104-122403/h0.0001.npz",
+      "artifact_sha256": "db273769400f3b0265705a24eda241adf8417a28d5b985c0fb2774cffabbe25b"
+    }
+  ],
+  "stop_reason": null,
+  "all_checks_pass": true,
+  "independent_global_resolve": true,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_refined_independent.py": "d3d3f79c6e225e6eacdc46dd62ececab0210369b192ba751f18ae075a9f7e378",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_refined_fit.py": "eba95c94600431cf58d42d5ed167b9f52351bf4f075211bc00ef7ba3223624e0",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-pair-result.json": "29b77b0e54b3f77de369af42bbcdf0a5b6899df2f493f9e6efd4e08f53156778",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-protocol.md": "9ccd10e24a708b7db4078704586a2a5e8b6a6068fbf986c2d1e30716bed926d5",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-preparation.json": "b1798a83521eba4f1c89ed23cac23c65dcf2051c299857c173f0f8354972ebb3"
+  },
+  "seconds": 34.15700000000652,
+  "peak_bytes": 1324027904
+}

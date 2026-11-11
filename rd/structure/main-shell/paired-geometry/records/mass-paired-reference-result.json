@@ -1,0 +1,572 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.05,
+      "metrics": {
+        "reference_jacobian": 5.4623755810157896e-17,
+        "target_physical_strain": 1.0053044841791604e-16,
+        "v_ss": 1.2750196302117978e-16,
+        "v_tt": 0.0,
+        "d_s": 7.367031111584513e-17,
+        "d_t": 0.0,
+        "unit_normal": 1.1102230246251565e-16,
+        "real_normal_thickness": 1.3265135388341847e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 2.7755575615628914e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.4000000000000001,
+        "max_half_thickness_curvature": 0.011500000000000003,
+        "global_det_J_lower": 0.02442830625,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.01,
+      "metrics": {
+        "reference_jacobian": 4.457497451975428e-17,
+        "target_physical_strain": 1.1838938511323573e-16,
+        "v_ss": 1.2750196302117978e-16,
+        "v_tt": 0.0,
+        "d_s": 7.367031111584513e-17,
+        "d_t": 0.0,
+        "unit_normal": 1.1102230246251565e-16,
+        "real_normal_thickness": 4.5222597775709517e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 2.7755575615628914e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.4000000000000001,
+        "max_half_thickness_curvature": 0.002300000000000001,
+        "global_det_J_lower": 0.00497702645,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.0001,
+      "metrics": {
+        "reference_jacobian": 4.4916064672257597e-17,
+        "target_physical_strain": 1.4164011716244664e-16,
+        "v_ss": 1.2750196302117978e-16,
+        "v_tt": 0.0,
+        "d_s": 7.367031111584513e-17,
+        "d_t": 0.0,
+        "unit_normal": 1.1102230246251565e-16,
+        "real_normal_thickness": 4.12875091093721e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 2.7755575615628914e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.4000000000000001,
+        "max_half_thickness_curvature": 2.3000000000000007e-05,
+        "global_det_J_lower": 4.999770002645e-05,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.05,
+      "metrics": {
+        "reference_jacobian": 1.182268473900428e-16,
+        "target_physical_strain": 1.6892480480340957e-16,
+        "v_ss": 1.2742072682881572e-16,
+        "v_tt": 0.0,
+        "d_s": 1.954611968841845e-16,
+        "d_t": 7.07585346900846e-18,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 2.6555714591003217e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 1.1102230246251565e-16
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.447213595499958,
+        "max_half_thickness_curvature": 0.012857390870623793,
+        "global_det_J_lower": 0.02436126326896881,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.01,
+      "metrics": {
+        "reference_jacobian": 1.0891353201663492e-16,
+        "target_physical_strain": 1.7619231906210504e-16,
+        "v_ss": 1.2742072682881572e-16,
+        "v_tt": 0.0,
+        "d_s": 1.954611968841845e-16,
+        "d_t": 7.07585346900846e-18,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 4.366052913073759e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 1.1102230246251565e-16
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.447213595499958,
+        "max_half_thickness_curvature": 0.0025714781741247588,
+        "global_det_J_lower": 0.004974318280758752,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.0001,
+      "metrics": {
+        "reference_jacobian": 1.0914533763353359e-16,
+        "target_physical_strain": 2.0293018107053936e-16,
+        "v_ss": 1.2742072682881572e-16,
+        "v_tt": 0.0,
+        "d_s": 1.954611968841845e-16,
+        "d_t": 7.07585346900846e-18,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 3.273491664109557e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 1.1102230246251565e-16
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.447213595499958,
+        "max_half_thickness_curvature": 2.5714781741247586e-05,
+        "global_det_J_lower": 4.999742855488837e-05,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.05,
+      "metrics": {
+        "reference_jacobian": 1.0181313394258016e-16,
+        "target_physical_strain": 2.327044020502093e-16,
+        "v_ss": 1.212946751751173e-16,
+        "v_tt": 0.0,
+        "d_s": 1.763096052542755e-16,
+        "d_t": 1.4906828084271515e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 5.1893605571317974e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 2.7755575615628914e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.41206795556073034,
+        "max_half_thickness_curvature": 0.011846953722370998,
+        "global_det_J_lower": 0.02441116107169395,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.01,
+      "metrics": {
+        "reference_jacobian": 8.015610101638087e-17,
+        "target_physical_strain": 1.4982046889833817e-16,
+        "v_ss": 1.212946751751173e-16,
+        "v_tt": 0.0,
+        "d_s": 1.763096052542755e-16,
+        "d_t": 1.4906828084271515e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 1.6027537693850018e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 2.7755575615628914e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.41206795556073034,
+        "max_half_thickness_curvature": 0.0023693907444742,
+        "global_det_J_lower": 0.004976334162617758,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.0001,
+      "metrics": {
+        "reference_jacobian": 6.648584536255166e-17,
+        "target_physical_strain": 9.849987544777769e-17,
+        "v_ss": 1.212946751751173e-16,
+        "v_tt": 0.0,
+        "d_s": 1.763096052542755e-16,
+        "d_t": 1.4906828084271515e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 2.427435734025017e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 2.7755575615628914e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.41206795556073034,
+        "max_half_thickness_curvature": 2.3693907444741997e-05,
+        "global_det_J_lower": 4.9997630637325587e-05,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.05,
+      "metrics": {
+        "reference_jacobian": 1.4038050853438199e-16,
+        "target_physical_strain": 1.7795437298432237e-16,
+        "v_ss": 1.214099606464564e-16,
+        "v_tt": 0.0,
+        "d_s": 2.182613898520978e-16,
+        "d_t": 1.576190953883486e-17,
+        "unit_normal": 4.440892098500626e-16,
+        "real_normal_thickness": 4.013823538953871e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 1.3877787807814457e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.4580392996239515,
+        "max_half_thickness_curvature": 0.013168629864188607,
+        "global_det_J_lower": 0.024345903827103065,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.01,
+      "metrics": {
+        "reference_jacobian": 1.348939173008609e-16,
+        "target_physical_strain": 1.3594602026133665e-16,
+        "v_ss": 1.214099606464564e-16,
+        "v_tt": 0.0,
+        "d_s": 2.182613898520978e-16,
+        "d_t": 1.576190953883486e-17,
+        "unit_normal": 4.440892098500626e-16,
+        "real_normal_thickness": 4.8911900836351594e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 1.3877787807814457e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.4580392996239515,
+        "max_half_thickness_curvature": 0.002633725972837722,
+        "global_det_J_lower": 0.004973697422834122,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.0001,
+      "metrics": {
+        "reference_jacobian": 1.0408150630705859e-16,
+        "target_physical_strain": 1.3495123583867195e-16,
+        "v_ss": 1.214099606464564e-16,
+        "v_tt": 0.0,
+        "d_s": 2.182613898520978e-16,
+        "d_t": 1.576190953883486e-17,
+        "unit_normal": 4.440892098500626e-16,
+        "real_normal_thickness": 3.8014417587674395e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 1.3877787807814457e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.4580392996239515,
+        "max_half_thickness_curvature": 2.633725972837721e-05,
+        "global_det_J_lower": 4.999736630870973e-05,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.05,
+      "metrics": {
+        "reference_jacobian": 1.0768319808964668e-16,
+        "target_physical_strain": 1.6504939593394335e-16,
+        "v_ss": 1.1607723986984291e-16,
+        "v_tt": 1.2384221897385868e-17,
+        "d_s": 1.6529930810692953e-16,
+        "d_t": 4.804055660318092e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 4.3247401367990036e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 5.551115123125783e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.7856207736560943,
+        "max_half_thickness_curvature": 0.02258659724261271,
+        "global_det_J_lower": 0.023883423997244364,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.01,
+      "metrics": {
+        "reference_jacobian": 1.6486360668340149e-16,
+        "target_physical_strain": 1.7697439163159735e-16,
+        "v_ss": 1.1607723986984291e-16,
+        "v_tt": 1.2384221897385868e-17,
+        "d_s": 1.6529930810692953e-16,
+        "d_t": 4.804055660318092e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 4.7143709343572476e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 5.551115123125783e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.7856207736560943,
+        "max_half_thickness_curvature": 0.0045173194485225426,
+        "global_det_J_lower": 0.004954928836389774,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.0001,
+      "metrics": {
+        "reference_jacobian": 1.253582444828266e-16,
+        "target_physical_strain": 1.0947522489879678e-16,
+        "v_ss": 1.1607723986984291e-16,
+        "v_tt": 1.2384221897385868e-17,
+        "d_s": 1.6529930810692953e-16,
+        "d_t": 4.804055660318092e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 5.506191064223336e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 5.551115123125783e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.7856207736560943,
+        "max_half_thickness_curvature": 4.5173194485225426e-05,
+        "global_det_J_lower": 4.999548278258234e-05,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.05,
+      "metrics": {
+        "reference_jacobian": 8.947153412215734e-17,
+        "target_physical_strain": 2.528045337441249e-16,
+        "v_ss": 1.2652044160709335e-16,
+        "v_tt": 6.740163230513729e-17,
+        "d_s": 2.1458738230613828e-16,
+        "d_t": 4.981351513375955e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 5.4084460030776626e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 5.551115123125783e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.8378329189044795,
+        "max_half_thickness_curvature": 0.02408769641850379,
+        "global_det_J_lower": 0.023810120607043555,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.01,
+      "metrics": {
+        "reference_jacobian": 7.889726781902961e-17,
+        "target_physical_strain": 1.3713393845115124e-16,
+        "v_ss": 1.2652044160709335e-16,
+        "v_tt": 6.740163230513729e-17,
+        "d_s": 2.1458738230613828e-16,
+        "d_t": 4.981351513375955e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 4.396593090281399e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 5.551115123125783e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.8378329189044795,
+        "max_half_thickness_curvature": 0.004817539283700758,
+        "global_det_J_lower": 0.004951940650586742,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "analytic_jets_and_reference",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.0001,
+      "metrics": {
+        "reference_jacobian": 6.526745491543643e-17,
+        "target_physical_strain": 1.668665639232294e-16,
+        "v_ss": 1.2652044160709335e-16,
+        "v_tt": 6.740163230513729e-17,
+        "d_s": 2.1458738230613828e-16,
+        "d_t": 4.981351513375955e-17,
+        "unit_normal": 2.220446049250313e-16,
+        "real_normal_thickness": 4.458258226972652e-17,
+        "membrane_ss_st": 0.0,
+        "transverse_constraints": 5.551115123125783e-17
+      },
+      "certificate": {
+        "hessian_frobenius_upper": 0.8378329189044795,
+        "max_half_thickness_curvature": 4.817539283700758e-05,
+        "global_det_J_lower": 4.9995182576759726e-05,
+        "sufficient_not_necessary": true,
+        "domain": "s,t in [0,1]; zeta in [-1,1]"
+      }
+    },
+    {
+      "case": "same_full_basis_reference_and_trace",
+      "metrics": {
+        "reference_position": 5.109061221937669e-15,
+        "reference_gradient": 4.525990761422917e-14,
+        "physical_basis_derivatives": 6.62182576720488e-16,
+        "trace_holdout": 6.654691232414539e-16
+      },
+      "full_dimension": 171,
+      "homogeneous_dimension": 114,
+      "trace_ranks": [
+        57,
+        57,
+        57
+      ],
+      "exact_kernel_dimension_identity": true
+    },
+    {
+      "case": "fixed_global_reference_frame_covariance",
+      "error": 4.654620473293894e-16
+    },
+    {
+      "case": "invalid_reference_negative_controls",
+      "rejected": 4
+    }
+  ],
+  "stops": [],
+  "seconds": 13.187000000034459,
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_reference.py": "32979ab95bfb0dfa9d21a1359da9637d7917301325f74e738111b53b5475cfe0",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_reference_admissibility.py": "0c14ec76b1fa1905c31358e27c8536026de26a15829511f76b2f5f5a08079af5",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_fields.py": "1b5eb312a92cb61274d952a42dc4aecdeb0229bbbf5031f5deb1ca13becf8a7f",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py": "793e5aafa760bcec8deae2b4eca8ac0e13eea36e59530a325a18184b833735fb",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_mechanics.py": "01e67324f576468ca22f6c7a6511f38fca17813344630c6090aad7f2fe1c1cff"
+  }
+}

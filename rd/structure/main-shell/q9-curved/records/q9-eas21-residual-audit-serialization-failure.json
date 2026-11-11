@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-02",
+  "status": "failed_during_json_serialization",
+  "source": "rd/structure/main-shell/q9-curved/experiments/audit_q9_eas21_residual.py",
+  "source_sha256": "d7a1b80aa4b0ec1c81d112ab1f92248dffd777c54dfe23dd09f3cdd64b810ad0",
+  "reason": "numpy.bool_ values in checks are not directly JSON serializable; four numerical comparisons printed before serialization failed",
+  "result_file_created": false,
+  "followup": "audit_q9_eas21_residual_v2.py explicitly casts check values to Python bool; no numerical formulas or tolerances changed"
+}

@@ -1,0 +1,55 @@
+{
+  "records": [
+    {
+      "n": 2,
+      "q0_ranks": [
+        5,
+        5,
+        5
+      ],
+      "q01_dimensions": 35,
+      "known_fields": [
+        "cylindrical quadratic",
+        "cylindrical cubic",
+        "quadratic y-dependent twisting",
+        "linear rotation-like field",
+        "linear y-dependent twisting"
+      ],
+      "span_difference": 2.493936808048445e-13,
+      "all_three_positions_and_y_dependence_retained_before_rank": true,
+      "checks": {
+        "q0_dimension": true,
+        "span": true
+      }
+    },
+    {
+      "n": 4,
+      "q0_ranks": [
+        5,
+        5,
+        5
+      ],
+      "q01_dimensions": 65,
+      "known_fields": [
+        "cylindrical quadratic",
+        "cylindrical cubic",
+        "quadratic y-dependent twisting",
+        "linear rotation-like field",
+        "linear y-dependent twisting"
+      ],
+      "span_difference": 2.039578832141904e-12,
+      "all_three_positions_and_y_dependence_retained_before_rank": true,
+      "checks": {
+        "q0_dimension": true,
+        "span": true
+      }
+    }
+  ],
+  "geometry_conditional": true,
+  "all_checks_pass": true,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_q0_space_v2.py": "049d9f3c82a4f6ed5dc4c5ade5a4894de8e6f72606cc7d71eb6cd1eeb755a078",
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_global_v4.py": "0569fcae6a9acde171c2b8ac6b60dc7b1e443a0947cf6b0aa355b53075000165",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-global-v4-result.json": "e5c4285f3bc0cd102a11fbb9e5af45843077f96454751be2d9118bb4b10de1b4"
+  }
+}

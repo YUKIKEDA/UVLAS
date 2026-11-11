@@ -1,0 +1,344 @@
+{
+  "source_sha256": "e1ccb00fff6d3bc879f7bea27b03bf34c3746f760022a9c4cee735977a86c2c2",
+  "result_sha256": "68bf0d1f38fc775bd36d9a7791a8d2b73101bdc1e6a9a0ee78545405bd06a7fb",
+  "parent_input_files": 80,
+  "meshes": 40,
+  "series": 12,
+  "overlays": 100,
+  "manufactured_checks": 12,
+  "rejected_inputs": 8,
+  "method_checks": 6,
+  "initial_result_preserved": true,
+  "decimal_to_exact_comparison": [
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "chord",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "chord",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "chord",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "span",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "span",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "span",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "diagonal",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "diagonal",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "direction": "diagonal",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "chord",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "chord",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "chord",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "span",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "span",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "span",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "diagonal",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "diagonal",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "direction": "diagonal",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "chord",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "chord",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "chord",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "span",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "span",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "span",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "diagonal",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "diagonal",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "direction": "diagonal",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "chord",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "chord",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "chord",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "span",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "span",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "span",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "diagonal",
+      "pair": 0,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "diagonal",
+      "pair": 1,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "direction": "diagonal",
+      "pair": 2,
+      "l1_difference": 0.0,
+      "l2_difference": 0.0,
+      "linf_difference": 0.0
+    }
+  ],
+  "all_criteria_pass": true,
+  "diagnostic_candidates": {
+    "field": 0,
+    "trace": 4,
+    "cell": 0
+  }
+}

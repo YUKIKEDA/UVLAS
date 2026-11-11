@@ -1,0 +1,1891 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          2.0869032484158147e-08,
+          4.536058106107223e-06,
+          2.4618155234785804e-05
+        ],
+        "position": [
+          9.982005239238304e-12,
+          2.115053663767421e-09,
+          1.2445684498876025e-08
+        ],
+        "projection_field_energy_difference": [
+          3.1523378252922045e-16,
+          2.391425278648157e-13,
+          7.913364507013098e-11
+        ],
+        "projection_field_position_difference": [
+          7.527455959029196e-16,
+          1.0673198950855657e-15,
+          5.592150209281499e-14
+        ],
+        "stationarity": [
+          1.1027578532186088e-17,
+          4.053367661614054e-17,
+          4.72623876455387e-16
+        ],
+        "elastic_energy": [
+          0.043061168017233024,
+          0.022043560030835203,
+          0.014708041049918281
+        ],
+        "external_work": [
+          0.0430611680172331,
+          0.02204356003083524,
+          0.014708041049918292
+        ],
+        "relative_work_defect": [
+          1.7725444166408401e-15,
+          1.731295508443505e-15,
+          7.076632993160345e-16
+        ],
+        "relative_force_moment_balance": [
+          1.1139653314271908e-16,
+          3.9645791299609454e-17,
+          9.214776462805873e-17
+        ],
+        "relative_reaction_resultant_difference": [
+          1.0062220338876918e-16,
+          3.750907987999988e-17,
+          2.6276837739612997e-16
+        ],
+        "fixed_boundary": 1.666272625926819e-19
+      },
+      "load_difference": 1.3825861427114528e-09,
+      "rcond": 4.209880687035791e-07,
+      "linear": 2.762642406995463e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 10.547000000020489,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/rational-a0-n2-h0.01.npz",
+      "artifact_sha256": "66567e0ed5a46efda2d575570ddf7dc83dc6d31b796a4ce0a80e83f1c72e0d2a",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          4.692269183867726e-16,
+          8.061491167845807e-16,
+          5.606419928091887e-13
+        ],
+        "position": [
+          1.635264458103319e-15,
+          4.841780498660072e-15,
+          7.764537237280598e-16
+        ],
+        "projection_field_energy_difference": [
+          4.530047115094342e-16,
+          8.040258791676898e-16,
+          2.193421441767841e-16
+        ],
+        "projection_field_position_difference": [
+          2.0779704822640407e-15,
+          5.362643188499615e-15,
+          6.652557303665912e-16
+        ],
+        "stationarity": [
+          7.402808467153017e-18,
+          6.37438629243733e-18,
+          7.128404427380647e-18
+        ],
+        "elastic_energy": [
+          0.025000048369902713,
+          7.20799089891571,
+          0.3870301578430908
+        ],
+        "external_work": [
+          0.02500004836990275,
+          7.207990898915715,
+          0.38703015784309097
+        ],
+        "relative_work_defect": [
+          1.5265537052894219e-15,
+          6.161067849251397e-16,
+          4.3028547083219606e-16
+        ],
+        "relative_force_moment_balance": [
+          6.726681313947726e-17,
+          1.9256321693011518e-15,
+          1.908254057404201e-16
+        ],
+        "relative_reaction_resultant_difference": [
+          7.360950527363579e-17,
+          1.9853920907703938e-15,
+          1.6045361918259393e-16
+        ],
+        "fixed_boundary": 3.677076316739631e-24
+      },
+      "load_difference": 8.001179287607399e-15,
+      "rcond": 4.209880687035791e-07,
+      "linear": 3.3880207858808764e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 16.20299999997951,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/standard-a0-n2-h0.01.npz",
+      "artifact_sha256": "d9e0917f7602990081ec56c94b8eb1e199cbaba099a9832b718534b135843a7b",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          2.0871122992394122e-08,
+          4.5365235333344326e-06,
+          2.4620100148812123e-05
+        ],
+        "position": [
+          9.749620654026043e-12,
+          2.0654135053568474e-09,
+          1.2145107819011764e-08
+        ],
+        "projection_field_energy_difference": [
+          2.6288567415937435e-13,
+          1.4879823284891906e-12,
+          8.018150067982299e-11
+        ],
+        "projection_field_position_difference": [
+          1.0161769732527378e-15,
+          2.8213056603103848e-14,
+          8.455498378751786e-14
+        ],
+        "stationarity": [
+          1.1355822906264768e-15,
+          4.9308255072267845e-15,
+          4.490904124501026e-14
+        ],
+        "elastic_energy": [
+          0.043061068381522925,
+          0.022043507852174668,
+          0.014708005998802986
+        ],
+        "external_work": [
+          0.04306106838152294,
+          0.022043507852174748,
+          0.014708005998803151
+        ],
+        "relative_work_defect": [
+          3.2228154872648904e-16,
+          3.619990086426324e-15,
+          1.1204695608038836e-14
+        ],
+        "relative_force_moment_balance": [
+          8.504827933410522e-15,
+          1.7484929179394588e-15,
+          4.842795573998894e-15
+        ],
+        "relative_reaction_resultant_difference": [
+          8.50392377187155e-15,
+          1.7494507956467578e-15,
+          4.8158726416406234e-15
+        ],
+        "fixed_boundary": 1.0892314306098268e-19
+      },
+      "load_difference": 1.3825836251822164e-09,
+      "rcond": 7.795326628223829e-09,
+      "linear": 2.5749787708009615e-14,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 10.922000000020489,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/rational-a0-n2-h0.0001.npz",
+      "artifact_sha256": "5f2248a566bdf01d63a77ab424feaad45f5289e407b44c87eadfbb4a8d0d9fd3",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          8.607572614304326e-16,
+          2.1959413866377593e-16,
+          5.606989800308585e-13
+        ],
+        "position": [
+          2.9880959144496004e-15,
+          1.791719528180508e-15,
+          9.83538203234129e-16
+        ],
+        "projection_field_energy_difference": [
+          8.538907789267738e-16,
+          2.382333749270935e-16,
+          5.659464038017206e-16
+        ],
+        "projection_field_position_difference": [
+          3.5339790685852794e-15,
+          1.933202326717319e-15,
+          1.1209835438529945e-15
+        ],
+        "stationarity": [
+          1.1535438679733314e-17,
+          1.029602716053449e-17,
+          9.268973142019196e-18
+        ],
+        "elastic_energy": [
+          0.025000000004837004,
+          7.207977209346296,
+          0.3870293599188681
+        ],
+        "external_work": [
+          0.025000000004836993,
+          7.207977209346296,
+          0.38702935991886855
+        ],
+        "relative_work_defect": [
+          4.163336341538814e-16,
+          0.0,
+          1.1474302878292123e-15
+        ],
+        "relative_force_moment_balance": [
+          5.887988795803591e-15,
+          7.604931584657724e-14,
+          1.8859025385849498e-14
+        ],
+        "relative_reaction_resultant_difference": [
+          5.864329040077558e-15,
+          7.578627832692105e-14,
+          1.8804156035866964e-14
+        ],
+        "fixed_boundary": 2.0324086144369313e-24
+      },
+      "load_difference": 8.07468229926068e-15,
+      "rcond": 7.795326628223829e-09,
+      "linear": 3.0484626295601586e-14,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 16.56200000003446,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/standard-a0-n2-h0.0001.npz",
+      "artifact_sha256": "7e3e34ae9dbbf820b6dbeb4b7cbc6206ebcae20d060cba43e623b4ba3f037dd6",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          1.0223679048169244e-10,
+          2.208033373483149e-08,
+          8.09080652420949e-07
+        ],
+        "position": [
+          1.2987693261517106e-14,
+          2.7867582219327536e-12,
+          1.0783150256189262e-10
+        ],
+        "projection_field_energy_difference": [
+          3.76345990446407e-16,
+          1.3980515178706043e-15,
+          1.1548457186775547e-14
+        ],
+        "projection_field_position_difference": [
+          5.181772441098919e-16,
+          1.0021113092572876e-15,
+          1.8438716019081573e-15
+        ],
+        "stationarity": [
+          1.54523515622508e-17,
+          5.059728056800918e-17,
+          3.666525116252016e-16
+        ],
+        "elastic_energy": [
+          0.043061168017233066,
+          0.022043560031288753,
+          0.014708041058822648
+        ],
+        "external_work": [
+          0.043061168017233115,
+          0.022043560031288795,
+          0.014708041058822653
+        ],
+        "relative_work_defect": [
+          1.1279828105896243e-15,
+          1.8886860091722363e-15,
+          3.538316494438047e-16
+        ],
+        "relative_force_moment_balance": [
+          6.124228831367626e-17,
+          7.774164108769339e-17,
+          7.416795199899304e-17
+        ],
+        "relative_reaction_resultant_difference": [
+          3.273581670951959e-17,
+          8.426823906908739e-17,
+          6.195777738927337e-17
+        ],
+        "fixed_boundary": 3.0027317980164947e-19
+      },
+      "load_difference": 2.3627206732140793e-13,
+      "rcond": 1.5404017726459885e-07,
+      "linear": 5.150728017412911e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 103.18800000008196,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/rational-a0-n4-h0.01.npz",
+      "artifact_sha256": "c0d2318e80919ea1af6412350b7ec43cf1cb64e9c1f593464fb1565e7dc23f3d",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          6.59486981463336e-16,
+          2.3104527587248e-16,
+          2.2246068924044222e-15
+        ],
+        "position": [
+          2.143041814607615e-15,
+          1.766700040818678e-15,
+          5.808347491173348e-16
+        ],
+        "projection_field_energy_difference": [
+          6.53445060852666e-16,
+          2.281555963972774e-16,
+          2.5635330838402264e-16
+        ],
+        "projection_field_position_difference": [
+          2.3027551930636416e-15,
+          1.8039010122794236e-15,
+          5.528408446903217e-16
+        ],
+        "stationarity": [
+          6.346654566513412e-18,
+          6.4619830872610144e-18,
+          5.931751356304167e-18
+        ],
+        "elastic_energy": [
+          0.025000048369902727,
+          7.2079908989157015,
+          0.3870301578430911
+        ],
+        "external_work": [
+          0.025000048369902737,
+          7.207990898915707,
+          0.3870301578430912
+        ],
+        "relative_work_defect": [
+          4.163328287152966e-16,
+          7.393281419101686e-16,
+          2.8685698055479714e-16
+        ],
+        "relative_force_moment_balance": [
+          9.367214140563677e-17,
+          2.0928653318283962e-15,
+          4.107640108591593e-16
+        ],
+        "relative_reaction_resultant_difference": [
+          8.525032572301865e-17,
+          2.3012837676048482e-15,
+          3.542809744132248e-16
+        ],
+        "fixed_boundary": 3.8192479845221825e-24
+      },
+      "load_difference": 1.5654123205110683e-14,
+      "rcond": 1.5404017726459885e-07,
+      "linear": 4.570066025985737e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 144.14100000006147,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/standard-a0-n4-h0.01.npz",
+      "artifact_sha256": "a64e9edfbd4eede85b27802f0538cd84d3604f86dd16128f83016d4ea333668d",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          1.0225083742035997e-10,
+          2.2082398319288064e-08,
+          8.09161213670892e-07
+        ],
+        "position": [
+          1.192179109689444e-14,
+          2.5501571127753014e-12,
+          9.86985900344576e-11
+        ],
+        "projection_field_energy_difference": [
+          9.978662373348496e-13,
+          9.871169546928596e-12,
+          4.5720615398295353e-11
+        ],
+        "projection_field_position_difference": [
+          1.046826400295097e-15,
+          2.174202543887566e-14,
+          1.10564780576687e-13
+        ],
+        "stationarity": [
+          1.0888832942098466e-15,
+          4.7804727791300604e-15,
+          4.7962457247163656e-14
+        ],
+        "elastic_energy": [
+          0.04306106838152294,
+          0.022043507852628364,
+          0.014708006007709485
+        ],
+        "external_work": [
+          0.04306106838152292,
+          0.022043507852628392,
+          0.01470800600770931
+        ],
+        "relative_work_defect": [
+          4.834223230897334e-16,
+          1.259126986557154e-15,
+          1.1912360586596126e-14
+        ],
+        "relative_force_moment_balance": [
+          8.682127455958578e-15,
+          4.400942172195589e-15,
+          1.2723382117916704e-15
+        ],
+        "relative_reaction_resultant_difference": [
+          8.671300556248492e-15,
+          4.413461110182299e-15,
+          1.267137097120546e-15
+        ],
+        "fixed_boundary": 2.9775855073948827e-19
+      },
+      "load_difference": 2.362668076612547e-13,
+      "rcond": 3.5829216446165965e-09,
+      "linear": 4.145868293834641e-13,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 100.23499999998603,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/rational-a0-n4-h0.0001.npz",
+      "artifact_sha256": "16c2bb0e818c9b32692b4103a0eff0ba7c8aa0667784a592286cb894ecf255d4",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          7.544571522698033e-16,
+          4.825826970156708e-16,
+          2.2307338594542325e-15
+        ],
+        "position": [
+          2.4201773621646476e-15,
+          2.8236995267084406e-15,
+          5.8647530151953225e-16
+        ],
+        "projection_field_energy_difference": [
+          7.489483739745666e-16,
+          4.911389516761682e-16,
+          3.279244671100657e-16
+        ],
+        "projection_field_position_difference": [
+          2.552046172799135e-15,
+          3.101462284726257e-15,
+          5.902698038047364e-16
+        ],
+        "stationarity": [
+          5.218659602918747e-18,
+          5.320493189639099e-18,
+          4.757535499233941e-18
+        ],
+        "elastic_energy": [
+          0.02500000000483702,
+          7.20797720934631,
+          0.38702935991886844
+        ],
+        "external_work": [
+          0.025000000004836997,
+          7.207977209346311,
+          0.38702935991886844
+        ],
+        "relative_work_defect": [
+          9.71445146359056e-16,
+          1.232215910100906e-16,
+          0.0
+        ],
+        "relative_force_moment_balance": [
+          3.0468534522240608e-15,
+          6.892099338982443e-14,
+          1.4971122529781757e-14
+        ],
+        "relative_reaction_resultant_difference": [
+          3.022547240116752e-15,
+          6.865899099128396e-14,
+          1.4905506916422116e-14
+        ],
+        "fixed_boundary": 4.7575002125303286e-24
+      },
+      "load_difference": 1.5615062135774002e-14,
+      "rcond": 3.5829216446165965e-09,
+      "linear": 2.2208883461180355e-13,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 141.31299999996554,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/standard-a0-n4-h0.0001.npz",
+      "artifact_sha256": "ac87a1c1527230bbd563cf583ab82b2dae3772ed812bf2c671f0f36242218877",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          2.0869032457002522e-08,
+          4.536058106079467e-06,
+          2.4618155234791168e-05
+        ],
+        "position": [
+          9.981992166409642e-12,
+          2.1150534648562386e-09,
+          1.2445684022322238e-08
+        ],
+        "projection_field_energy_difference": [
+          2.940472926037112e-16,
+          2.391415306078732e-13,
+          7.913362257069768e-11
+        ],
+        "projection_field_position_difference": [
+          7.617838089892115e-16,
+          1.0780242896565928e-15,
+          5.573924746886307e-14
+        ],
+        "stationarity": [
+          1.1748241627887379e-17,
+          4.196055999188994e-17,
+          6.913791522769013e-16
+        ],
+        "elastic_energy": [
+          0.0430611680172331,
+          0.022043560030835258,
+          0.014708041049918266
+        ],
+        "external_work": [
+          0.0430611680172331,
+          0.022043560030835244,
+          0.014708041049918297
+        ],
+        "relative_work_defect": [
+          0.0,
+          6.295620030703638e-16,
+          2.1229898979481056e-15
+        ],
+        "relative_force_moment_balance": [
+          5.511285443668952e-17,
+          3.859985122278796e-17,
+          1.5423168552428402e-17
+        ],
+        "relative_reaction_resultant_difference": [
+          6.769217375050906e-17,
+          4.6603296876473697e-17,
+          2.579940468785193e-16
+        ],
+        "fixed_boundary": 2.829090043829363e-19
+      },
+      "load_difference": 1.4645325032617128e-09,
+      "rcond": 2.997494643546921e-07,
+      "linear": 4.628284082865167e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 13.358999999938533,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/rational-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "f459e4f157bc49b539ec51504b0a7b2d880c02247f7485115c8fc9f7c11a0a9a",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          4.353254839987998e-16,
+          8.548067401638899e-16,
+          5.606421463924153e-13
+        ],
+        "position": [
+          1.4469348514354424e-15,
+          4.847076672748791e-15,
+          7.829466764185874e-16
+        ],
+        "projection_field_energy_difference": [
+          4.1995349712294136e-16,
+          8.394064603778723e-16,
+          3.0397153012235327e-16
+        ],
+        "projection_field_position_difference": [
+          1.882959295917192e-15,
+          5.440024991380547e-15,
+          7.843850552072078e-16
+        ],
+        "stationarity": [
+          5.939612637628284e-18,
+          5.790757627362836e-18,
+          5.7339864057266445e-18
+        ],
+        "elastic_energy": [
+          0.025000048369902685,
+          7.2079908989157015,
+          0.3870301578430911
+        ],
+        "external_work": [
+          0.025000048369902748,
+          7.207990898915712,
+          0.3870301578430911
+        ],
+        "relative_work_defect": [
+          2.497996972291784e-15,
+          1.4786562838203371e-15,
+          0.0
+        ],
+        "relative_force_moment_balance": [
+          1.6952279944365957e-16,
+          1.542401006037588e-15,
+          9.950296675469645e-17
+        ],
+        "relative_reaction_resultant_difference": [
+          1.8325591913063144e-16,
+          1.5621507037161668e-15,
+          1.3187831146526838e-16
+        ],
+        "fixed_boundary": 3.657689271132919e-24
+      },
+      "load_difference": 1.1880369864798875e-14,
+      "rcond": 2.997494643546921e-07,
+      "linear": 2.9551132696808985e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 20.31299999996554,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/standard-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "bb771607b05b436d56368967a30b1e4a647513ea8fdd0e1eba5bb39258c08677",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          2.087112300412936e-08,
+          4.536523533152676e-06,
+          2.4620100150487646e-05
+        ],
+        "position": [
+          9.74962753565275e-12,
+          2.065413507347549e-09,
+          1.2145107820141736e-08
+        ],
+        "projection_field_energy_difference": [
+          4.492293583504616e-13,
+          1.6116280038566389e-12,
+          8.153448024996985e-11
+        ],
+        "projection_field_position_difference": [
+          1.383382658537881e-15,
+          9.598726897972104e-15,
+          5.207422904784887e-14
+        ],
+        "stationarity": [
+          9.473178678009522e-16,
+          3.516145663793164e-15,
+          4.5883543014384855e-14
+        ],
+        "elastic_energy": [
+          0.04306106838152289,
+          0.022043507852174772,
+          0.014708005998803366
+        ],
+        "external_work": [
+          0.043061068381522925,
+          0.022043507852174786,
+          0.014708005998803373
+        ],
+        "relative_work_defect": [
+          8.057038718162232e-16,
+          6.295634932915316e-16,
+          4.717766571805704e-16
+        ],
+        "relative_force_moment_balance": [
+          6.285959008618438e-15,
+          1.2241817896800201e-14,
+          4.3789956605516965e-15
+        ],
+        "relative_reaction_resultant_difference": [
+          6.281932140030275e-15,
+          1.2247501106515628e-14,
+          4.441745407736528e-15
+        ],
+        "fixed_boundary": 1.8973538018496328e-19
+      },
+      "load_difference": 1.4645297947977447e-09,
+      "rcond": 3.6414062092788764e-09,
+      "linear": 6.384585931526542e-14,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 13.594000000040978,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/rational-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "223d5c6d653c56e5d8f68e6d8545ac05d87a70e3bf09e2ae2d5fc6816981f08a",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          6.843359135484982e-16,
+          6.466843125119863e-16,
+          5.607121575766482e-13
+        ],
+        "position": [
+          2.2452627619123984e-15,
+          3.656330034943839e-15,
+          8.639567067188245e-16
+        ],
+        "projection_field_energy_difference": [
+          6.660187122307692e-16,
+          6.394663018239479e-16,
+          4.2067733673381367e-16
+        ],
+        "projection_field_position_difference": [
+          2.7870150521926777e-15,
+          4.1989404936503776e-15,
+          9.12446122791443e-16
+        ],
+        "stationarity": [
+          5.070314866279509e-18,
+          4.7691013479838384e-18,
+          5.166227384034217e-18
+        ],
+        "elastic_energy": [
+          0.025000000004836993,
+          7.207977209346297,
+          0.387029359918868
+        ],
+        "external_work": [
+          0.025000000004836983,
+          7.20797720934631,
+          0.3870293599188684
+        ],
+        "relative_work_defect": [
+          4.163336341538816e-16,
+          1.7251022741412714e-15,
+          1.004001501850561e-15
+        ],
+        "relative_force_moment_balance": [
+          8.301139809603509e-15,
+          6.709520423008887e-14,
+          2.064143103556354e-14
+        ],
+        "relative_reaction_resultant_difference": [
+          8.293979179731016e-15,
+          6.670025553073352e-14,
+          2.0613619044878873e-14
+        ],
+        "fixed_boundary": 2.9726803263624432e-24
+      },
+      "load_difference": 1.2059533040458211e-14,
+      "rcond": 3.6414062092788764e-09,
+      "linear": 4.2367104614220875e-14,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 20.57799999997951,
+      "artifact": "build/analysis/pg-physical-pde-full-20261104-231048/standard-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "664f956313cc50aaa7491d2101ba3188eba32babc064f9ffc5329ff0cd5d6ed4",
+      "execution_route": "original_passed"
+    },
+    {
+      "execution_route": "six_rhs_shared_geometry",
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          1.0222886485253182e-10,
+          2.2080132594727758e-08,
+          8.090806200951161e-07
+        ],
+        "position": [
+          1.5913807751733193e-14,
+          2.9095862108194062e-12,
+          1.0785983885396296e-10
+        ],
+        "projection_field_energy_difference": [
+          3.950286400432931e-16,
+          1.7678453990574037e-15,
+          1.353687598866913e-14
+        ],
+        "projection_field_position_difference": [
+          4.549127769996666e-16,
+          4.512804066640043e-16,
+          1.2426543404947986e-15
+        ],
+        "stationarity": [
+          2.028577670525559e-17,
+          1.40594588663467e-16,
+          1.0565502380977425e-15
+        ],
+        "elastic_energy": [
+          0.04306116801723302,
+          0.022043560031288774,
+          0.014708041058822655
+        ],
+        "external_work": [
+          0.043061168017233115,
+          0.022043560031288788,
+          0.014708041058822648
+        ],
+        "relative_work_defect": [
+          2.2559656211792515e-15,
+          6.295620030574115e-16,
+          4.717755325917394e-16
+        ],
+        "relative_force_moment_balance": [
+          7.187098320151069e-17,
+          3.498666776441848e-17,
+          4.204904724922334e-17
+        ],
+        "relative_reaction_resultant_difference": [
+          5.9496113115109e-17,
+          5.266657179431711e-17,
+          3.692896885598426e-17
+        ],
+        "fixed_boundary": 3.866705404215881e-19
+      },
+      "load_difference": 2.3845361927300516e-13,
+      "rcond": 1.6540057344794077e-07,
+      "linear": 3.819254869721094e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 238.06299999984913,
+      "commutation_error": 3.985914838456944e-16,
+      "load_value_error": 0.0,
+      "basis_cache_error": 0.0,
+      "plane_kernel_error": 2.6789200099697946e-14,
+      "preparation_manifest": "build/analysis/pg-physical-preparations/acd3ad65c7ce0f986e47735385f88bfb89b1564a814b184f599277e6e2db6a01-plane.json",
+      "artifact": "build/analysis/pg-physical-pde-batch-v3-20261104-235149/rational-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "8a03180fd69f4ab5c62e534af3bda6b29117fa9be313a470ba420171c0f2d90d"
+    },
+    {
+      "execution_route": "six_rhs_shared_geometry",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "metrics": {
+        "error": [
+          7.949778018047404e-16,
+          1.0630495104153184e-15,
+          2.220509939017636e-15
+        ],
+        "position": [
+          2.601304421414105e-15,
+          6.1378770547947376e-15,
+          5.798333081302669e-16
+        ],
+        "projection_field_energy_difference": [
+          7.961739981114691e-16,
+          1.0676987870492547e-15,
+          3.3096901317224e-16
+        ],
+        "projection_field_position_difference": [
+          2.3322862936190534e-15,
+          6.202578142272825e-15,
+          9.61663537591457e-16
+        ],
+        "stationarity": [
+          5.282588207052279e-18,
+          6.2516467289444926e-18,
+          4.281075242474643e-18
+        ],
+        "elastic_energy": [
+          0.025000048369902734,
+          7.2079908989157095,
+          0.3870301578430908
+        ],
+        "external_work": [
+          0.025000048369902748,
+          7.207990898915717,
+          0.38703015784309114
+        ],
+        "relative_work_defect": [
+          5.55110438287062e-16,
+          9.857708558802237e-16,
+          8.605709416643921e-16
+        ],
+        "relative_force_moment_balance": [
+          9.094296633148328e-17,
+          1.0479663282935268e-15,
+          2.416086725004995e-16
+        ],
+        "relative_reaction_resultant_difference": [
+          9.559442554340057e-17,
+          1.1077948195939608e-15,
+          8.567027062222304e-17
+        ],
+        "fixed_boundary": 3.866705404215881e-19
+      },
+      "load_difference": 2.362539776394126e-14,
+      "rcond": 1.6540057344794077e-07,
+      "linear": 3.819254869721094e-15,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 238.06299999984913,
+      "commutation_error": 3.985914838456944e-16,
+      "load_value_error": 0.0,
+      "basis_cache_error": 0.0,
+      "plane_kernel_error": 2.6789200099697946e-14,
+      "preparation_manifest": "build/analysis/pg-physical-preparations/acd3ad65c7ce0f986e47735385f88bfb89b1564a814b184f599277e6e2db6a01-plane.json",
+      "artifact": "build/analysis/pg-physical-pde-batch-v3-20261104-235149/standard-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "a4368933c832d654e8df9ac83224af5951348293146207417d38e708c53be073"
+    },
+    {
+      "execution_route": "six_rhs_shared_geometry",
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          1.0225523749850072e-10,
+          2.2082396592566604e-08,
+          8.091612159973604e-07
+        ],
+        "position": [
+          1.1918657833783467e-14,
+          2.5502688322475145e-12,
+          9.869859109711034e-11
+        ],
+        "projection_field_energy_difference": [
+          1.3744816599674132e-12,
+          3.639198625295732e-12,
+          6.071232342345387e-11
+        ],
+        "projection_field_position_difference": [
+          1.4893949232366131e-15,
+          2.912572319717049e-14,
+          9.768993727009632e-15
+        ],
+        "stationarity": [
+          1.5404230236256449e-15,
+          6.472882509485195e-15,
+          8.112704261361123e-14
+        ],
+        "elastic_energy": [
+          0.04306106838152297,
+          0.022043507852628583,
+          0.014708006007708288
+        ],
+        "external_work": [
+          0.04306106838152296,
+          0.022043507852628524,
+          0.014708006007708713
+        ],
+        "relative_work_defect": [
+          1.6114077436324437e-16,
+          2.6756448464339256e-15,
+          2.889632023481474e-14
+        ],
+        "relative_force_moment_balance": [
+          2.2725380588834017e-15,
+          5.357136206012506e-16,
+          3.2933149153916093e-15
+        ],
+        "relative_reaction_resultant_difference": [
+          2.287323616198634e-15,
+          5.32569557796397e-16,
+          3.306290787133506e-15
+        ],
+        "fixed_boundary": 2.718975760686304e-19
+      },
+      "load_difference": 2.38449889878369e-13,
+      "rcond": 2.788418985868577e-09,
+      "linear": 2.4064647699502224e-13,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 220.40600000007544,
+      "commutation_error": 4.3402140178486756e-16,
+      "load_value_error": 0.0,
+      "basis_cache_error": 0.0,
+      "plane_kernel_error": 2.6789179530213863e-14,
+      "preparation_manifest": "build/analysis/pg-physical-preparations/3ab445da20c658c576e39252c7ecdadd2fe9de5611c030066a00e08aa69328bc-plane.json",
+      "artifact": "build/analysis/pg-physical-pde-batch-v3-20261104-235149/rational-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "b7c50918ed7fcb376a9f008559d0edbacf213170744298eaa9c1eeae202f4956"
+    },
+    {
+      "execution_route": "six_rhs_shared_geometry",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          7.375290116423915e-16,
+          6.665891891679834e-16,
+          2.2296637276928514e-15
+        ],
+        "position": [
+          2.4310179372143185e-15,
+          3.748151565068002e-15,
+          5.86219703839652e-16
+        ],
+        "projection_field_energy_difference": [
+          7.469306958995813e-16,
+          6.615377797349748e-16,
+          3.714562169616675e-16
+        ],
+        "projection_field_position_difference": [
+          2.884936813165743e-15,
+          3.867218099596783e-15,
+          7.956109905718071e-16
+        ],
+        "stationarity": [
+          3.0715982378974046e-18,
+          3.4715268133682605e-18,
+          2.778109609888638e-18
+        ],
+        "elastic_energy": [
+          0.02500000000483696,
+          7.207977209346303,
+          0.3870293599188685
+        ],
+        "external_work": [
+          0.02500000000483699,
+          7.2079772093463115,
+          0.3870293599188684
+        ],
+        "relative_work_defect": [
+          1.2490009024616464e-15,
+          1.2322159101009072e-15,
+          2.868575719573028e-16
+        ],
+        "relative_force_moment_balance": [
+          9.848819696836688e-15,
+          4.713937138210231e-14,
+          1.869076648974781e-14
+        ],
+        "relative_reaction_resultant_difference": [
+          9.863975553498501e-15,
+          4.6925721746530006e-14,
+          1.8761334612006545e-14
+        ],
+        "fixed_boundary": 2.718975760686304e-19
+      },
+      "load_difference": 2.3648758625887782e-14,
+      "rcond": 2.788418985868577e-09,
+      "linear": 2.4064647699502224e-13,
+      "checks": {
+        "geometry": true,
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "projection": true,
+        "load": true,
+        "work": true,
+        "balance": true,
+        "reaction": true,
+        "boundary": true,
+        "resources": true
+      },
+      "configuration_elapsed": 220.40600000007544,
+      "commutation_error": 4.3402140178486756e-16,
+      "load_value_error": 0.0,
+      "basis_cache_error": 0.0,
+      "plane_kernel_error": 2.6789179530213863e-14,
+      "preparation_manifest": "build/analysis/pg-physical-preparations/3ab445da20c658c576e39252c7ecdadd2fe9de5611c030066a00e08aa69328bc-plane.json",
+      "artifact": "build/analysis/pg-physical-pde-batch-v3-20261104-235149/standard-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "807c795ead4320f193e93c1fb2bea19b778d967dfc7f04ec41df37777ed7bfa2"
+    }
+  ],
+  "accuracy": [
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "error",
+      "target": 0,
+      "thick": 2.0869032484158147e-08,
+      "thin": 2.0871122992394122e-08,
+      "numerical_floor": false,
+      "ratio": 1.000100172743397,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "error",
+      "target": 0,
+      "thick": 1.0223679048169244e-10,
+      "thin": 1.0225083742035997e-10,
+      "numerical_floor": false,
+      "ratio": 1.0001373961232678,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "error",
+      "target": 1,
+      "thick": 4.536058106107223e-06,
+      "thin": 4.5365235333344326e-06,
+      "numerical_floor": false,
+      "ratio": 1.000102606099023,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "error",
+      "target": 1,
+      "thick": 2.208033373483149e-08,
+      "thin": 2.2082398319288064e-08,
+      "numerical_floor": false,
+      "ratio": 1.0000935033175389,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "error",
+      "target": 2,
+      "thick": 2.4618155234785804e-05,
+      "thin": 2.4620100148812123e-05,
+      "numerical_floor": false,
+      "ratio": 1.000079003239998,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "error",
+      "target": 2,
+      "thick": 8.09080652420949e-07,
+      "thin": 8.09161213670892e-07,
+      "numerical_floor": false,
+      "ratio": 1.0000995713464436,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "position",
+      "target": 0,
+      "thick": 9.982005239238304e-12,
+      "thin": 9.749620654026043e-12,
+      "numerical_floor": false,
+      "ratio": 0.976719649044184,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "position",
+      "target": 0,
+      "thick": 1.2987693261517106e-14,
+      "thin": 1.192179109689444e-14,
+      "numerical_floor": true,
+      "ratio": 0.91792983225274,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "position",
+      "target": 1,
+      "thick": 2.115053663767421e-09,
+      "thin": 2.0654135053568474e-09,
+      "numerical_floor": false,
+      "ratio": 0.9765300714298888,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "position",
+      "target": 1,
+      "thick": 2.7867582219327536e-12,
+      "thin": 2.5501571127753014e-12,
+      "numerical_floor": false,
+      "ratio": 0.9150980851889771,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "position",
+      "target": 2,
+      "thick": 1.2445684498876025e-08,
+      "thin": 1.2145107819011764e-08,
+      "numerical_floor": false,
+      "ratio": 0.9758489233845349,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "position",
+      "target": 2,
+      "thick": 1.0783150256189262e-10,
+      "thin": 9.86985900344576e-11,
+      "numerical_floor": false,
+      "ratio": 0.9153038554554783,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "error",
+      "target": 0,
+      "thick": 2.0869032457002522e-08,
+      "thin": 2.087112300412936e-08,
+      "numerical_floor": false,
+      "ratio": 1.0001001746070952,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "error",
+      "target": 0,
+      "thick": 1.0222886485253182e-10,
+      "thin": 1.0225523749850072e-10,
+      "numerical_floor": false,
+      "ratio": 1.0002579765118877,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "error",
+      "target": 1,
+      "thick": 4.536058106079467e-06,
+      "thin": 4.536523533152676e-06,
+      "numerical_floor": false,
+      "ratio": 1.0001026060650735,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "error",
+      "target": 1,
+      "thick": 2.2080132594727758e-08,
+      "thin": 2.2082396592566604e-08,
+      "numerical_floor": false,
+      "ratio": 1.0001025355182598,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "error",
+      "target": 2,
+      "thick": 2.4618155234791168e-05,
+      "thin": 2.4620100150487646e-05,
+      "numerical_floor": false,
+      "ratio": 1.0000790033078404,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "error",
+      "target": 2,
+      "thick": 8.090806200951161e-07,
+      "thin": 8.091612159973604e-07,
+      "numerical_floor": false,
+      "ratio": 1.0000996141796534,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "position",
+      "target": 0,
+      "thick": 9.981992166409642e-12,
+      "thin": 9.74962753565275e-12,
+      "numerical_floor": false,
+      "ratio": 0.9767216176006608,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "position",
+      "target": 0,
+      "thick": 1.5913807751733193e-14,
+      "thin": 1.1918657833783467e-14,
+      "numerical_floor": true,
+      "ratio": 0.748950723781704,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "position",
+      "target": 1,
+      "thick": 2.1150534648562386e-09,
+      "thin": 2.065413507347549e-09,
+      "numerical_floor": false,
+      "ratio": 0.9765301642093177,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "position",
+      "target": 1,
+      "thick": 2.9095862108194062e-12,
+      "thin": 2.5502688322475145e-12,
+      "numerical_floor": false,
+      "ratio": 0.8765056772554954,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "position",
+      "target": 2,
+      "thick": 1.2445684022322238e-08,
+      "thin": 1.2145107820141736e-08,
+      "numerical_floor": false,
+      "ratio": 0.9758489608412525,
+      "passed": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "position",
+      "target": 2,
+      "thick": 1.0785983885396296e-10,
+      "thin": 9.869859109711034e-11,
+      "numerical_floor": false,
+      "ratio": 0.9150634021504843,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "error",
+      "target": 0,
+      "thick": 4.692269183867726e-16,
+      "thin": 8.607572614304326e-16,
+      "numerical_floor": true,
+      "ratio": 1.834415775611856,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "error",
+      "target": 0,
+      "thick": 6.59486981463336e-16,
+      "thin": 7.544571522698033e-16,
+      "numerical_floor": true,
+      "ratio": 1.144006134276886,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "error",
+      "target": 1,
+      "thick": 8.061491167845807e-16,
+      "thin": 2.1959413866377593e-16,
+      "numerical_floor": true,
+      "ratio": 0.272398907462248,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "error",
+      "target": 1,
+      "thick": 2.3104527587248e-16,
+      "thin": 4.825826970156708e-16,
+      "numerical_floor": true,
+      "ratio": 2.0886932017689075,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "error",
+      "target": 2,
+      "thick": 5.606419928091887e-13,
+      "thin": 5.606989800308585e-13,
+      "numerical_floor": true,
+      "ratio": 1.0001016463668448,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "error",
+      "target": 2,
+      "thick": 2.2246068924044222e-15,
+      "thin": 2.2307338594542325e-15,
+      "numerical_floor": true,
+      "ratio": 1.0027541796578667,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "position",
+      "target": 0,
+      "thick": 1.635264458103319e-15,
+      "thin": 2.9880959144496004e-15,
+      "numerical_floor": true,
+      "ratio": 1.827286039051677,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "position",
+      "target": 0,
+      "thick": 2.143041814607615e-15,
+      "thin": 2.4201773621646476e-15,
+      "numerical_floor": true,
+      "ratio": 1.1293187774816122,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "position",
+      "target": 1,
+      "thick": 4.841780498660072e-15,
+      "thin": 1.791719528180508e-15,
+      "numerical_floor": true,
+      "ratio": 0.3700538528494535,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "position",
+      "target": 1,
+      "thick": 1.766700040818678e-15,
+      "thin": 2.8236995267084406e-15,
+      "numerical_floor": true,
+      "ratio": 1.5982902934671104,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "field": "position",
+      "target": 2,
+      "thick": 7.764537237280598e-16,
+      "thin": 9.83538203234129e-16,
+      "numerical_floor": true,
+      "ratio": 1.266705501149219,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "field": "position",
+      "target": 2,
+      "thick": 5.808347491173348e-16,
+      "thin": 5.8647530151953225e-16,
+      "numerical_floor": true,
+      "ratio": 1.0097111138938728,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "error",
+      "target": 0,
+      "thick": 4.353254839987998e-16,
+      "thin": 6.843359135484982e-16,
+      "numerical_floor": true,
+      "ratio": 1.5720097690177608,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "error",
+      "target": 0,
+      "thick": 7.949778018047404e-16,
+      "thin": 7.375290116423915e-16,
+      "numerical_floor": true,
+      "ratio": 0.9277353530728406,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "error",
+      "target": 1,
+      "thick": 8.548067401638899e-16,
+      "thin": 6.466843125119863e-16,
+      "numerical_floor": true,
+      "ratio": 0.7565269225509373,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "error",
+      "target": 1,
+      "thick": 1.0630495104153184e-15,
+      "thin": 6.665891891679834e-16,
+      "numerical_floor": true,
+      "ratio": 0.6270537567977962,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "error",
+      "target": 2,
+      "thick": 5.606421463924153e-13,
+      "thin": 5.607121575766482e-13,
+      "numerical_floor": true,
+      "ratio": 1.0001248767768949,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "error",
+      "target": 2,
+      "thick": 2.220509939017636e-15,
+      "thin": 2.2296637276928514e-15,
+      "numerical_floor": true,
+      "ratio": 1.0041223813117743,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "position",
+      "target": 0,
+      "thick": 1.4469348514354424e-15,
+      "thin": 2.2452627619123984e-15,
+      "numerical_floor": true,
+      "ratio": 1.5517372877465554,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "position",
+      "target": 0,
+      "thick": 2.601304421414105e-15,
+      "thin": 2.4310179372143185e-15,
+      "numerical_floor": true,
+      "ratio": 0.9345380406852897,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "position",
+      "target": 1,
+      "thick": 4.847076672748791e-15,
+      "thin": 3.656330034943839e-15,
+      "numerical_floor": true,
+      "ratio": 0.7543371565588055,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "position",
+      "target": 1,
+      "thick": 6.1378770547947376e-15,
+      "thin": 3.748151565068002e-15,
+      "numerical_floor": true,
+      "ratio": 0.6106592770769252,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "field": "position",
+      "target": 2,
+      "thick": 7.829466764185874e-16,
+      "thin": 8.639567067188245e-16,
+      "numerical_floor": true,
+      "ratio": 1.1034681323009112,
+      "passed": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "field": "position",
+      "target": 2,
+      "thick": 5.798333081302669e-16,
+      "thin": 5.86219703839652e-16,
+      "numerical_floor": true,
+      "ratio": 1.0110141925616152,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "seconds": 283.844000000041,
+  "peak_bytes": 1064288256,
+  "manufactured_fields_forbidden_during_solve": true,
+  "main_shell_adopted": false,
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-batch-v2-result.json": "8c33864097fff2dbd185d454742aaab680a88966890ee6f69c63ae397a5b383e",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-batch-result.json": "0219139c5b04daa861d49834fe4375c3d3be8db820a6dc421f3e5639dff302d1",
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_physical_pde_batch_v3.py": "23bc1d0fc4e108d489fa6d2ff3df5c385df79c7b54ea733d913a2bd6795eacbe",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_physical_pde_observe_batch_v3.py": "d8a2f66902bef7128e94d5a8ae188304361e8f3702a4b79118b80994e26c7e30",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_physical_pde_batch_v3.py": "3a37adac001cd3dc72ed85bf3c42ce46146f80b70035eea43f2b1bedf6629015",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-batch-protocol.md": "6757a59d0d9cbf64d186e5feae5f6bcdd2d2df7188c18137679beaf2ad0be52b",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-plane-result.json": "00f1d14289ff77cc7bfe7d5871311b6f92a8212f1c7f2b8372e8dec6ce8df74b",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-result.json": "9a278ebb84c29797638cef04654c9f5f39106945f0661c271624c1e21dbff97f",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-candidate-result.json": "23bfe026f26544fe8872bfcbe8601a5abb8c3ba3d1182c2126ea54ecbb99e549",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-spatial-result.json": "cbcf7a3e80eee5b332d8780063240ce45f2647014e61a78d3d88adb3b41d4623",
+    "build/analysis/pg-physical-preparations/acd3ad65c7ce0f986e47735385f88bfb89b1564a814b184f599277e6e2db6a01-plane.json": "2deb40b180e94929ae94ba0cefcaec5f6e045c2e6648fd4d0dd2e8d8732fc675",
+    "build/analysis/paired-geometry-ancf-qualified-20261104-222016/rational-a0.2-n4-h0.01.npz": "404211a5ee879735aea9be38a4254e8f0f34b454e792d14c850ba35b45585bc5",
+    "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0.2-n4-h0.01.npz": "32276ea8e967a4aa2b5768f4f3677c27935311d0fd514119ac7283f37200bd41",
+    "build/analysis/pg-physical-preparations/3ab445da20c658c576e39252c7ecdadd2fe9de5611c030066a00e08aa69328bc-plane.json": "42daf990fa190a1a4673ac6224adf28c69aa3de45ffdd8c96c03b91e0b3ce9f6",
+    "build/analysis/paired-geometry-ancf-qualified-20261104-222016/rational-a0.2-n4-h0.0001.npz": "71b5d280764b80b7e95c7ff1fd73b57e50ddcf9b228c6c2f91a1f5d48d0d5a58",
+    "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0.2-n4-h0.0001.npz": "f4c775363ca56f26cdea26faa6288e1c0b7d343d0b0e2e15fa84d51e9dc055f8"
+  }
+}

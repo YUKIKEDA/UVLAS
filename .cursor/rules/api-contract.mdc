@@ -1,0 +1,28 @@
+---
+description: 処理のI/Fが守る約束：所有、失敗、状態、依存、境界
+alwaysApply: true
+---
+
+# I/Fの契約
+
+処理の形と型は採用仕様（N4-03、N4-08、IO4-02）にある。この規則は、試験とレビューが守らせる約束の一覧である。公開APIの互換性は、まだ固定していない。
+
+- **所有する結果。** 処理は、所有する結果と診断を返す。返した結果は、`Workspace` の内部の一時配列を参照しない。借用した `span<const T>` は、同期の呼出しのあいだだけ有効である。
+- **親は読取り専用。** 処理は親状態を `const` で受ける。成功しても失敗しても、親を書き換えない。失敗とキャンセルの後、最後の確定状態は変わらない。これを試験する。
+- **失敗は値。** 戻り値は `std::expected<Result, Failure>`。失敗を、空の正常な結果で代替しない。未収束、精度の未解決、被覆の未認定は、区別された失敗である。
+- **例外は外へ出ない。** ライブラリの外、Pythonの側、プロセスの外へ例外を越えさせない。内部の例外と `bad_alloc` は、入口で `Failure` に変える。
+- **入力で落ちない。** 不正な入力は `InvalidInput` であり、アサートや未定義動作ではない。空の配列、0×0の系、ゼロ右辺は合法で、NaNやゼロ除算を生まない。
+- **一つの確定。** 資格を得た試行だけが、親番号と候補のハッシュを照合して、一回だけ確定する。二重の確定、別の親への確定、資格取得後の変更は拒否する。
+- **cacheの同一性は世代で。** ポインタ、配列の長さ、寸法で同一性を決めない。右辺だけの変更でも、行列の世代を照合する。
+- **依存の型を外へ出さない。** Eigen、Spectra、Boost、nlohmann/json、pybind11の型は、モジュールの公開ヘッダの関数の形、失敗の型に現れない。それらの版は、このソルバーのI/Fの一部ではない。境界で、寸法と配置を検査して受け渡す。
+- **端の振る舞いは一つ。** 同じ不正な入力は、float64でも `TwoWord` でも、逐次でも並列でも、CLIでもPythonでも、同じ種類の失敗を返す。
+- **決定的。** 同じ入力、同じ版、同じ環境で、同じバイトの結果を返す。スレッド数に依らない（`performance`）。
+- **Pythonの境界。** 返す結果は所有するオブジェクト。NumPyのviewは所有者を保持し、読取り専用。非連続の配列と型の不一致は、明示のコピーか拒否にする。利用者のcallbackを、数値の反復の中で呼ばない。
+
+```cpp
+// BAD: failure hidden in an empty result; the caller cannot tell it from "no rows"
+std::vector<double> solve(const Matrix& a, std::span<const double> b);
+
+// GOOD: the failure is a value with its kind and context
+std::expected<Solution, Failure> solve_linear(const Operator& a, const Rhs& b, const Limits& limits);
+```

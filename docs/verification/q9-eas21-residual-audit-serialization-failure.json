@@ -1,9 +1,0 @@
-{
-  "date": "2026-11-02",
-  "status": "failed_during_json_serialization",
-  "source": "tools/design-experiments/audit_q9_eas21_residual.py",
-  "source_sha256": "bff9af38fec4e0a1fdaa5ac248547b99e483b46233d34935759a8264cca9953d",
-  "reason": "numpy.bool_ values in checks are not directly JSON serializable; four numerical comparisons printed before serialization failed",
-  "result_file_created": false,
-  "followup": "audit_q9_eas21_residual_v2.py explicitly casts check values to Python bool; no numerical formulas or tolerances changed"
-}

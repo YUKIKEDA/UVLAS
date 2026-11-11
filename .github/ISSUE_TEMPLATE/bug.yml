@@ -1,0 +1,43 @@
+name: Bug
+description: Behavior that contradicts an adopted specification or a test
+title: "[bug] "
+labels: ["type:bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happens, what the specification says, and the smallest input that shows it.
+    validations:
+      required: true
+  - type: input
+    id: roadmap
+    attributes:
+      label: Roadmap ID
+      description: The row in docs/roadmap.md. Example - IM00-2
+      placeholder: IM00-2
+    validations:
+      required: true
+  - type: input
+    id: spec
+    attributes:
+      label: Specification
+      description: Adopted specification and decision IDs this Issue implements or touches.
+      placeholder: "docs/specs/foundation/numerical-foundation-adoption-specification.md N4-02"
+  - type: textarea
+    id: depends
+    attributes:
+      label: Depends on
+      placeholder: "IM00-1 or #12"
+  - type: textarea
+    id: dod
+    attributes:
+      label: Definition of done
+      description: Checkable outcomes. Name the independent reference, the tolerances and the negative controls.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional. Work left outside this Issue, and the roadmap row that names when.

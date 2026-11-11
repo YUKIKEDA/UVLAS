@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "meaning": "current status synchronized, evidence fixed; 2.3 remains open",
+  "uvlm_2_2_complete": true,
+  "uvlm_2_3_complete": false,
+  "uvlm_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "2.3 induced-drag common limit, unsteady pitch/frequency extension, general setting/error rules",
+  "immutable": {
+    "rd/aero/unsteady-reference/records/uvlm-reference-campaign-audit.json": "9c5c3e0bc52a5f4d7999c98c61a075f4bef4d514cf35be4cde2946a72f7acaaa",
+    "rd/aero/unsteady-reference/records/uvlm-independent-reference-progress.md": "eb25a4e9d786d42ac6a567198697230591fa786546aea7faeb7b211ffa6fefba",
+    "rd/aero/unsteady-reference/records/uvlm-reference-campaign-summary-2026-11-05.md": "5be041c08f4de0b3f434958abb86ef423fa9d4659e560c9fc879244627a14a4a"
+  },
+  "status_sync_source": {
+    "rd/aero/unsteady-reference/experiments/sync_reference_campaign_status.py": "f2cefbfc37e315f2a1a69cbd2527795f1aa6cddd12bf3483c5e5da41975c893f"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ],
+  "checked_status_links": 7
+}

@@ -1,0 +1,26 @@
+{
+  "accepted": false,
+  "R4_complete": false,
+  "parameters": [
+    0.4,
+    0.2,
+    0.07,
+    0.1,
+    -0.06,
+    0.025
+  ],
+  "n": 1,
+  "h": 0.01,
+  "clamped_stiffness_ranks": [
+    341,
+    342,
+    342
+  ],
+  "expected_dofs": 342,
+  "extended_stop": "uncertified_coefficient_basis",
+  "next": "exact RREF pivoting and verified reference-L2 coordinate conditioning",
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_polynomials_v1.py": "772044aa2651181681aaec83b48473f95116f23ebddf66c87ba7052c7f64b6c3",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_ancf_v1.py": "1bcf44d8cfe84bd16ba355097552cdd1f3bc8e68d90a611e39fb1d58f712bbad"
+  }
+}

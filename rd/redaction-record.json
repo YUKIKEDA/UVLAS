@@ -1,0 +1,375 @@
+{
+ "schema": "uvlas.rd-redaction/1",
+ "note": "Written once, when the R&D material was prepared for the repository. files: text redacted in place. externalized: files that are kept in the evidence bundles instead of the repository. evidence: evidence files whose text was redacted. pristine_sha256 is the hash before the change.",
+ "files": {
+  "rd/planning/knowledge-validation.md": {
+   "pristine_sha256": "e5254c805ddee40cf90a4426bbee109127ee0443bc9104c44eead72c3de5ee52",
+   "sha256": "e5254c805ddee40cf90a4426bbee109127ee0443bc9104c44eead72c3de5ee52",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/records/avl-span1280-capacity-ks-preparation.json": {
+   "pristine_sha256": "b91f7f8bcf2f3c5f89c18609ce8a042fb6fc70e75f3187804348237fc502da54",
+   "sha256": "b91f7f8bcf2f3c5f89c18609ce8a042fb6fc70e75f3187804348237fc502da54",
+   "replacements": 2
+  },
+  "rd/aero/avl-reference/records/avl-span1280-capacity-preparation.json": {
+   "pristine_sha256": "d61f0e35a4da3684aa3489de5ca6cbeca73d80c4f5b9fe6208febb73954c5f68",
+   "sha256": "d61f0e35a4da3684aa3489de5ca6cbeca73d80c4f5b9fe6208febb73954c5f68",
+   "replacements": 2
+  },
+  "rd/aero/avl-reference/records/avl-symmetric-solve-preparation.json": {
+   "pristine_sha256": "4e50f5d433b15253e5dd979cbaae73d0a8e6fd1b8b8bae806093201fd9df6602",
+   "sha256": "4e50f5d433b15253e5dd979cbaae73d0a8e6fd1b8b8bae806093201fd9df6602",
+   "replacements": 2
+  },
+  "rd/structure/beam/records/beam-se3-physical-result.json": {
+   "pristine_sha256": "2dc2816e0d605f68a8b6d0e2d08607e74086bb6025dd43c8c389565e285a47ad",
+   "sha256": "2dc2816e0d605f68a8b6d0e2d08607e74086bb6025dd43c8c389565e285a47ad",
+   "replacements": 1
+  },
+  "rd/structure/beam/records/beam-se3-physical-v2-result.json": {
+   "pristine_sha256": "8a89624c93e4203660c029ae80bdabf98b1b9607337a0adf8ebc7362ea876114",
+   "sha256": "8a89624c93e4203660c029ae80bdabf98b1b9607337a0adf8ebc7362ea876114",
+   "replacements": 1
+  },
+  "rd/structure/beam/records/beam-se3-physical-v3-result.json": {
+   "pristine_sha256": "81019d672f67498b928e9b51382b0a6530d7fe78ddb3ad5d0f6b5b249f996a5d",
+   "sha256": "81019d672f67498b928e9b51382b0a6530d7fe78ddb3ad5d0f6b5b249f996a5d",
+   "replacements": 1
+  },
+  "rd/structure/material/records/material-shell-integration-result.json": {
+   "pristine_sha256": "fa0e0ebdc6a1b77babb8c3994119ef9b89fe4e099281b611823757ae18eb7c99",
+   "sha256": "fa0e0ebdc6a1b77babb8c3994119ef9b89fe4e099281b611823757ae18eb7c99",
+   "replacements": 5
+  },
+  "rd/aero/avl-reference/experiments/audit_avl_span1280_capacity.py": {
+   "pristine_sha256": "a05884bb1cfe7721acab06c50bb1935ce70c4714775a2880666d50b16e88efc3",
+   "sha256": "a05884bb1cfe7721acab06c50bb1935ce70c4714775a2880666d50b16e88efc3",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/audit_avl_span1280_ksmax.py": {
+   "pristine_sha256": "1cf4a945a54940ff747bc1a1528d25cd45b185c664e2ae6e5f04aaeef8081aa2",
+   "sha256": "1cf4a945a54940ff747bc1a1528d25cd45b185c664e2ae6e5f04aaeef8081aa2",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/audit_avl_symmetric_solve.py": {
+   "pristine_sha256": "d8cef18321cf0fe96e3c87619c6160a1f006de08026951bc8b8cb9ef74cad9f8",
+   "sha256": "d8cef18321cf0fe96e3c87619c6160a1f006de08026951bc8b8cb9ef74cad9f8",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_grid_export.py": {
+   "pristine_sha256": "0b333a31a2c63408aecf3e613e0e2af43c736a13bd79de48e3205307f2a42ab3",
+   "sha256": "0b333a31a2c63408aecf3e613e0e2af43c736a13bd79de48e3205307f2a42ab3",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_pair_probe.py": {
+   "pristine_sha256": "354901742875f1acf89675ecff19c7ce9cf64e469ad29dc7a905b2bb5184ff03",
+   "sha256": "354901742875f1acf89675ecff19c7ce9cf64e469ad29dc7a905b2bb5184ff03",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_sensitivity.py": {
+   "pristine_sha256": "25db3fee8ef87fc6560f692811250ee8d68f85bd4a948c01c4e94b60ce442bb6",
+   "sha256": "25db3fee8ef87fc6560f692811250ee8d68f85bd4a948c01c4e94b60ce442bb6",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_span1280_capacity.py": {
+   "pristine_sha256": "cdb4ad062ad66fa8693dfbc6b132ee2637947af735f0e854e89eb6a565b7254a",
+   "sha256": "cdb4ad062ad66fa8693dfbc6b132ee2637947af735f0e854e89eb6a565b7254a",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_span1280_ksmax.py": {
+   "pristine_sha256": "ff12fc22ff911554a4e1e6e5b771b3f30f7ac26bd4c4dac2b8ce2adbd8f4c714",
+   "sha256": "ff12fc22ff911554a4e1e6e5b771b3f30f7ac26bd4c4dac2b8ce2adbd8f4c714",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_span320.py": {
+   "pristine_sha256": "548e1806d6d624cbce9075bda6526258ce00f6fc103e26084c30ba09959ffa78",
+   "sha256": "548e1806d6d624cbce9075bda6526258ce00f6fc103e26084c30ba09959ffa78",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_stable_reference.py": {
+   "pristine_sha256": "dbde8befa834514e88febd5bcb5aab356403a42ea37551513b291f811580505c",
+   "sha256": "dbde8befa834514e88febd5bcb5aab356403a42ea37551513b291f811580505c",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_symmetric_solve_probe.py": {
+   "pristine_sha256": "25b375f1d5df76a9f058e0a37a9123a238eab02a47e9b82901392f05dec1c402",
+   "sha256": "25b375f1d5df76a9f058e0a37a9123a238eab02a47e9b82901392f05dec1c402",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_symmetry.py": {
+   "pristine_sha256": "0fe62c4bd33f9427c7d95e839c742c811665da73aca3058b942c8bdec1bd0873",
+   "sha256": "0fe62c4bd33f9427c7d95e839c742c811665da73aca3058b942c8bdec1bd0873",
+   "replacements": 1
+  },
+  "rd/aero/avl-reference/experiments/prepare_avl_symmetry_pi.py": {
+   "pristine_sha256": "0325a8334777513aa827eb60e3ab9907b73681ecab93a337c22a58ecfdad17e9",
+   "sha256": "0325a8334777513aa827eb60e3ab9907b73681ecab93a337c22a58ecfdad17e9",
+   "replacements": 2
+  },
+  "rd/structure/main-shell/paired-geometry/report-tools/render_pg_ancf_pdf.cjs": {
+   "pristine_sha256": "c6cddfd1c4151bf2887a977313d97bdbbadac5526fc64d65bbbfc34e5cf234c3",
+   "sha256": "c6cddfd1c4151bf2887a977313d97bdbbadac5526fc64d65bbbfc34e5cf234c3",
+   "replacements": 1
+  }
+ },
+ "externalized": {
+  "build/third-party-gpl/avl/baseline.patch": {
+   "name": "build/third-party-gpl/avl/baseline.patch",
+   "pristine_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/capacity-ks1000.patch": {
+   "name": "build/third-party-gpl/avl/capacity-ks1000.patch",
+   "pristine_sha256": "638b6b720325baa1571ea10543210259dac174ee7a234b8a49e9ce0f7679c9b0",
+   "sha256": "638b6b720325baa1571ea10543210259dac174ee7a234b8a49e9ce0f7679c9b0",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/capacity16000.patch": {
+   "name": "build/third-party-gpl/avl/capacity16000.patch",
+   "pristine_sha256": "e06627b059e855ea75df6a1294fa19d99587a1411c6d7f6a8de1a9d249f7e587",
+   "sha256": "e06627b059e855ea75df6a1294fa19d99587a1411c6d7f6a8de1a9d249f7e587",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/capacity8000.patch": {
+   "name": "build/third-party-gpl/avl/capacity8000.patch",
+   "pristine_sha256": "b2b30700b786e2f3f248f12a8fc06c9801a27dd2d4adde56bf2b220680de75d1",
+   "sha256": "b2b30700b786e2f3f248f12a8fc06c9801a27dd2d4adde56bf2b220680de75d1",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/core0-corrected.patch": {
+   "name": "build/third-party-gpl/avl/core0-corrected.patch",
+   "pristine_sha256": "24290c4c614f4cc4a823940af38df3ab4cd09304bc8f1c7101b6d0b87ca681d5",
+   "sha256": "24290c4c614f4cc4a823940af38df3ab4cd09304bc8f1c7101b6d0b87ca681d5",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/core0-stable.patch": {
+   "name": "build/third-party-gpl/avl/core0-stable.patch",
+   "pristine_sha256": "fa56e39274221c5b4f1c4249ec488ffdd7b77c85a6e7148bb2958083bcf23670",
+   "sha256": "fa56e39274221c5b4f1c4249ec488ffdd7b77c85a6e7148bb2958083bcf23670",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/core0.patch": {
+   "name": "build/third-party-gpl/avl/core0.patch",
+   "pristine_sha256": "b52f8b4be04152efda4f753af2387d924437ab921245fc571db21063d1a9c3fd",
+   "sha256": "b52f8b4be04152efda4f753af2387d924437ab921245fc571db21063d1a9c3fd",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/grid-export.patch": {
+   "name": "build/third-party-gpl/avl/grid-export.patch",
+   "pristine_sha256": "09c7999caa715d46f30ec2cedb8542aa0936834a4ee3dda4dddc5cfad44cb70e",
+   "sha256": "09c7999caa715d46f30ec2cedb8542aa0936834a4ee3dda4dddc5cfad44cb70e",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/measured-corrected.patch": {
+   "name": "build/third-party-gpl/avl/measured-corrected.patch",
+   "pristine_sha256": "4f945945d98fc957e4dabc621a769fd54274d5e68ed46e96e310b4d6421d0ddb",
+   "sha256": "4f945945d98fc957e4dabc621a769fd54274d5e68ed46e96e310b4d6421d0ddb",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/measured-stable.patch": {
+   "name": "build/third-party-gpl/avl/measured-stable.patch",
+   "pristine_sha256": "8e7e0f7cb78fd5881207ac4d22d65b2d3af05e9bfbe5468f5d3b2f2f15d55984",
+   "sha256": "8e7e0f7cb78fd5881207ac4d22d65b2d3af05e9bfbe5468f5d3b2f2f15d55984",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/measured.patch": {
+   "name": "build/third-party-gpl/avl/measured.patch",
+   "pristine_sha256": "1b9482990423dcd892217c3e6523cd500e2457dffd078ca64ac020d1059a40a3",
+   "sha256": "1b9482990423dcd892217c3e6523cd500e2457dffd078ca64ac020d1059a40a3",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/solve-sensitivity-corrected.patch": {
+   "name": "build/third-party-gpl/avl/solve-sensitivity-corrected.patch",
+   "pristine_sha256": "7a6977e1a9931936277097c02d08db08a1c680d743cd1c34cf5b8181c942ffea",
+   "sha256": "7a6977e1a9931936277097c02d08db08a1c680d743cd1c34cf5b8181c942ffea",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/solve-sensitivity.patch": {
+   "name": "build/third-party-gpl/avl/solve-sensitivity.patch",
+   "pristine_sha256": "7a6977e1a9931936277097c02d08db08a1c680d743cd1c34cf5b8181c942ffea",
+   "sha256": "7a6977e1a9931936277097c02d08db08a1c680d743cd1c34cf5b8181c942ffea",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/source-core0-grid8000-spacing-pi64.patch": {
+   "name": "build/third-party-gpl/avl/source-core0-grid8000-spacing-pi64.patch",
+   "pristine_sha256": "10adfa41e21e15287a244114ef536270cdcfcb06fb9cf25c1cc09d77946345c4",
+   "sha256": "10adfa41e21e15287a244114ef536270cdcfcb06fb9cf25c1cc09d77946345c4",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/source-symmetry8000-spacing-pi64.patch": {
+   "name": "build/third-party-gpl/avl/source-symmetry8000-spacing-pi64.patch",
+   "pristine_sha256": "3bece1bac26162036f58283a88afbbacb0baa7edfe36190d564487a14e6c6308",
+   "sha256": "3bece1bac26162036f58283a88afbbacb0baa7edfe36190d564487a14e6c6308",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/symmetric-solve-probe.patch": {
+   "name": "build/third-party-gpl/avl/symmetric-solve-probe.patch",
+   "pristine_sha256": "4ff16e7145b48b25e53e0b34165acbccebc0c1f6fa9561a7da07602c2c26abe3",
+   "sha256": "4ff16e7145b48b25e53e0b34165acbccebc0c1f6fa9561a7da07602c2c26abe3",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/symmetry-export.patch": {
+   "name": "build/third-party-gpl/avl/symmetry-export.patch",
+   "pristine_sha256": "e22bcec12797d3a3c80353c0e1e971707588596281a35293cba0094305dbbb1b",
+   "sha256": "e22bcec12797d3a3c80353c0e1e971707588596281a35293cba0094305dbbb1b",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_grid_export.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_grid_export.f",
+   "pristine_sha256": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b",
+   "sha256": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_measurement.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_measurement.f",
+   "pristine_sha256": "cbc18aad57c9eb993666417ac9409bf44740e9d7f958576345f3a040f996488d",
+   "sha256": "cbc18aad57c9eb993666417ac9409bf44740e9d7f958576345f3a040f996488d",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_pair_probe.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_pair_probe.f",
+   "pristine_sha256": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16",
+   "sha256": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_sensitivity.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_sensitivity.f",
+   "pristine_sha256": "15537f7cc4be2003453063193ff3942ca7dbd7653c80675b6ef674d05a18d3f2",
+   "sha256": "15537f7cc4be2003453063193ff3942ca7dbd7653c80675b6ef674d05a18d3f2",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_spacing_driver.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_spacing_driver.f",
+   "pristine_sha256": "a96a5d2090215865940a5a5ff9b443d04c14c2057df97eecbce73fe26c149157",
+   "sha256": "a96a5d2090215865940a5a5ff9b443d04c14c2057df97eecbce73fe26c149157",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_sym_solve_probe.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_sym_solve_probe.f",
+   "pristine_sha256": "dad20b7d6738b3fc072f187b4a5f0a3b961e442b9ccd88a62997e4c120499f06",
+   "sha256": "dad20b7d6738b3fc072f187b4a5f0a3b961e442b9ccd88a62997e4c120499f06",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_symmetry_export.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_symmetry_export.f",
+   "pristine_sha256": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468",
+   "sha256": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468",
+   "license": "GPL-2.0-or-later"
+  },
+  "build/third-party-gpl/avl/reference_avl_symmetry_guard.f": {
+   "name": "build/third-party-gpl/avl/reference_avl_symmetry_guard.f",
+   "pristine_sha256": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80",
+   "sha256": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80",
+   "license": "GPL-2.0-or-later"
+  }
+ },
+ "evidence": {
+  "build/analysis/age-initialization-derivative-diagnostic.log": {
+   "pristine_sha256": "331eee9f4bbdfc96439aa81f6c429fc141cbebffd61fc68857940a566bf6a489",
+   "sha256": "331eee9f4bbdfc96439aa81f6c429fc141cbebffd61fc68857940a566bf6a489",
+   "replacements": 2
+  },
+  "build/analysis/age-initialization-derivative.log": {
+   "pristine_sha256": "95db0d0ab1d2ed3b5390a60740f7ad003527b22aaf90de8f93ab28dbbb252a6c",
+   "sha256": "95db0d0ab1d2ed3b5390a60740f7ad003527b22aaf90de8f93ab28dbbb252a6c",
+   "replacements": 2
+  },
+  "build/analysis/connection-modal-exploration.log": {
+   "pristine_sha256": "5f7f8cae8b2f815af6da4edc6c6953cb91373196eddfdbe8e1e2293667fe1052",
+   "sha256": "5f7f8cae8b2f815af6da4edc6c6953cb91373196eddfdbe8e1e2293667fe1052",
+   "replacements": 1
+  },
+  "build/analysis/io-binding-linux-configure.log": {
+   "pristine_sha256": "2835cd11b418d121f694c6774dca4ef343fdbd4be969f07eda2dd7522023a428",
+   "sha256": "2835cd11b418d121f694c6774dca4ef343fdbd4be969f07eda2dd7522023a428",
+   "replacements": 3
+  },
+  "build/analysis/io-binding-linux-tests.log": {
+   "pristine_sha256": "dd6bd6c169771a6803e78f9379a346333ffa5bfdaaeed69377a3549d7e5a5f1d",
+   "sha256": "dd6bd6c169771a6803e78f9379a346333ffa5bfdaaeed69377a3549d7e5a5f1d",
+   "replacements": 6
+  },
+  "build/analysis/io-binding-windows-build.log": {
+   "pristine_sha256": "59ca18d45a9434bfe536f5390518c0cb55cda43f8cd753306a04e582c18b1253",
+   "sha256": "59ca18d45a9434bfe536f5390518c0cb55cda43f8cd753306a04e582c18b1253",
+   "replacements": 5
+  },
+  "build/analysis/io-binding-windows-configure.log": {
+   "pristine_sha256": "4bc595de2abe64bb80a639f7799aa0e5102e10e9836280bb7c6719d2d819c543",
+   "sha256": "4bc595de2abe64bb80a639f7799aa0e5102e10e9836280bb7c6719d2d819c543",
+   "replacements": 2
+  },
+  "build/analysis/io-binding-windows-tests.log": {
+   "pristine_sha256": "612fab864012cedb1334b2ffefb2ad8b1c2d20e84ecef351e83d9021d07df642",
+   "sha256": "612fab864012cedb1334b2ffefb2ad8b1c2d20e84ecef351e83d9021d07df642",
+   "replacements": 6
+  },
+  "build/analysis/material-birth-derivative.log": {
+   "pristine_sha256": "fa6716b9aa873a6f1dc53f05a01f311b5f269f1d7f2b4040be6d80ab19e3cec4",
+   "sha256": "fa6716b9aa873a6f1dc53f05a01f311b5f269f1d7f2b4040be6d80ab19e3cec4",
+   "replacements": 5
+  },
+  "build/analysis/numeric-capacity-linux-build.log": {
+   "pristine_sha256": "1d98f1d0c9ab4d6b6ba3d0b24f41a94f06755535f9f63c843c0a3a780fc20f7a",
+   "sha256": "1d98f1d0c9ab4d6b6ba3d0b24f41a94f06755535f9f63c843c0a3a780fc20f7a",
+   "replacements": 1
+  },
+  "build/analysis/numeric-capacity-windows-build.log": {
+   "pristine_sha256": "4438d744e38d00133581050c3f6265fbd7420a871b7b07bf6212fd8aacdb3de0",
+   "sha256": "4438d744e38d00133581050c3f6265fbd7420a871b7b07bf6212fd8aacdb3de0",
+   "replacements": 5
+  },
+  "build/analysis/numeric-contracts-linux-build.log": {
+   "pristine_sha256": "10a999f4917beabc2988e2ed859d10aff0b69ebb5279d996dd6352cbfcb813b5",
+   "sha256": "10a999f4917beabc2988e2ed859d10aff0b69ebb5279d996dd6352cbfcb813b5",
+   "replacements": 1
+  },
+  "build/analysis/numeric-contracts-linux-tests.log": {
+   "pristine_sha256": "6d67a1a36d4d52a88f1afe68e8f6d28a2cde9fbab561bb40984e7154e0698cd9",
+   "sha256": "6d67a1a36d4d52a88f1afe68e8f6d28a2cde9fbab561bb40984e7154e0698cd9",
+   "replacements": 11
+  },
+  "build/analysis/numeric-contracts-windows-build.log": {
+   "pristine_sha256": "6c38b5682f0c4e512a99dab7eaeb0ce2a03dea014fd26de53960585935c73e8c",
+   "sha256": "6c38b5682f0c4e512a99dab7eaeb0ce2a03dea014fd26de53960585935c73e8c",
+   "replacements": 9
+  },
+  "build/analysis/numeric-contracts-windows-tests.log": {
+   "pristine_sha256": "75ee909c8aa8574bfd3b6a502a6de93f93b48735a3f7ab759fc3a5871734ecb2",
+   "sha256": "75ee909c8aa8574bfd3b6a502a6de93f93b48735a3f7ab759fc3a5871734ecb2",
+   "replacements": 11
+  },
+  "build/analysis/structural-combined-exploration.log": {
+   "pristine_sha256": "6c420784e084ba02d66d213816192d22834768bf5aadaec38de1a928e0580198",
+   "sha256": "6c420784e084ba02d66d213816192d22834768bf5aadaec38de1a928e0580198",
+   "replacements": 3
+  },
+  "build/analysis/structural-load-damping-qualified.log": {
+   "pristine_sha256": "728edef58c47a77217dbf54321dc1e70e5a1971a9943cdb3d84716fcba29e7ae",
+   "sha256": "728edef58c47a77217dbf54321dc1e70e5a1971a9943cdb3d84716fcba29e7ae",
+   "replacements": 1
+  },
+  "build/analysis/uvlm-induction-exploration.log": {
+   "pristine_sha256": "6efb1c5262e109475b9a24576c1b42d93313a5d3ad5152e501ac093150fa2311",
+   "sha256": "6efb1c5262e109475b9a24576c1b42d93313a5d3ad5152e501ac093150fa2311",
+   "replacements": 1
+  },
+  "build/analysis/uvlm-induction-qualified-v2.log": {
+   "pristine_sha256": "19fc5e7b50ba2df3ccf2e6aee1d8d0c326283db62b81ca1d823dc947bb3a7f12",
+   "sha256": "19fc5e7b50ba2df3ccf2e6aee1d8d0c326283db62b81ca1d823dc947bb3a7f12",
+   "replacements": 1
+  },
+  "build/analysis/uvlm-induction-qualified.log": {
+   "pristine_sha256": "3ecdaf84e0df5cce84c2a0058f0a13a8647122f3bf60f1bd6eadc2a839566c29",
+   "sha256": "3ecdaf84e0df5cce84c2a0058f0a13a8647122f3bf60f1bd6eadc2a839566c29",
+   "replacements": 1
+  },
+  "build/analysis/uvlm-wake-assembly-exploration.log": {
+   "pristine_sha256": "96a1a69fc75f9f84094d7f76f71921998423fd122bf77923b605a952d42d6fcb",
+   "sha256": "96a1a69fc75f9f84094d7f76f71921998423fd122bf77923b605a952d42d6fcb",
+   "replacements": 1
+  }
+ }
+}

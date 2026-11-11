@@ -1,0 +1,58 @@
+{
+  "local_records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "observations": {
+        "energy": 5.881996589970621e-16,
+        "force": 3.3700880799614494e-15,
+        "tangent": 1.1644567895268978e-15
+      },
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "observations": {
+        "energy": 2.9410155289300433e-15,
+        "force": 3.615144895276354e-15,
+        "tangent": 1.8194484029001029e-16
+      },
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "observations": {
+        "energy": 5.2080486376652495e-15,
+        "force": 4.132976199480031e-15,
+        "tangent": 7.960086091976378e-16
+      },
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "observations": {
+        "energy": 3.336287567589927e-08,
+        "force": 1.4447968047724521e-07,
+        "tangent": 5.568385726492051e-07
+      },
+      "passed": false
+    }
+  ],
+  "interfaces": [],
+  "records": [],
+  "all_reproduction_checks": false,
+  "stop_reason": "ValueError('local_independent_audit_failed')",
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/audit_mortar_q4.py": "db9fe4b431d405b7a0c86da8c61363055d9847fbde8b0a15174d64fa718c7a73",
+    "rd/structure/main-shell/mortar/experiments/mortar_q4.py": "e836a825f48dbab5065be822e5c71096741368f2c48842124dd91052d5d249cd",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/mortar/records/mortar-q4-result.json": "8df6126cbe758482246aa6691759192fea73aef92ad1f9a86755bdb598d95302",
+    "rd/structure/main-shell/mortar/records/mortar-q4-protocol.md": "81af22d1d6e7d8b3084ff033ef7fb15749fb6ae316389370dc1564d020423f4f"
+  },
+  "seconds": 0.18700000003445894
+}

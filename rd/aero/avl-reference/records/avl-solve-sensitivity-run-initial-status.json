@@ -1,0 +1,21 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-solve-sensitivity-experiment.md",
+  "source_sha256": "85a105471b09a0e11370ba8526744474ebb6ee4300cd463f728d6182bc0292aa",
+  "preparation_sha256": "7e438f7fbd479f7f20917a305e9672a3a895c2794b125302c11b12af682b346a",
+  "parents": {
+    "original": {
+      "path": "rd/aero/avl-reference/records/avl-fixed-band-grid-runs.json",
+      "sha256": "2fdfaff2fbe04aa34e882a7fc084541f9e936ea469772a777751307c5a67f763"
+    },
+    "aligned": {
+      "path": "rd/aero/avl-reference/records/avl-band-aligned-grid-runs.json",
+      "sha256": "3aa03a7d754efcc55018f5cd194396ba0bcb4ef39b7d34780ea7a03cdd936251"
+    }
+  },
+  "executable_sha256": "a12b9e758853f094d322c3e7321ff327910ccce3fe7364a73c03a9056d6e836a",
+  "runs": [],
+  "completed": false,
+  "stop_reason": "FileNotFoundError(2, 'No such file or directory')",
+  "seconds": 0.03277201000000218,
+  "total_bytes": 0
+}

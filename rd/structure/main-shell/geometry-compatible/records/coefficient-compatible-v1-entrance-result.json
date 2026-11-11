@@ -1,0 +1,57 @@
+{
+  "accepted": false,
+  "R4_complete": false,
+  "n1": {
+    "ns": 233,
+    "ranks": {
+      "r": [
+        57,
+        57,
+        57
+      ],
+      "d": [
+        174,
+        174,
+        174
+      ],
+      "c": [
+        2,
+        2,
+        2
+      ]
+    }
+  },
+  "n2": {
+    "ns": 497,
+    "ranks": {
+      "r": [
+        114,
+        114,
+        114
+      ],
+      "d": [
+        377,
+        377,
+        377
+      ],
+      "c": [
+        6,
+        6,
+        6
+      ]
+    },
+    "mass_root_ranks": [
+      497,
+      497,
+      497
+    ],
+    "mass_root_rcond_thick": 0.37257016443888186,
+    "mass_root_rcond_thin": 0.3725709674836024
+  },
+  "n4": {
+    "reason": "coefficient_dictionary_rank:[846,849,849]"
+  },
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/coefficient_compatible_ancf.py": "cc32052397e89ca163455c34a227eb17fc1b25932e3a6ee87dfde8f38e9953d9"
+  }
+}

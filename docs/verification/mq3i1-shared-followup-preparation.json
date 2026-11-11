@@ -1,8 +1,0 @@
-{
-  "status": "frozen_before_followup",
-  "sources": {
-    "tools/design-experiments/compare_mq3i1_shared_operators.py": "9df0ddb8e026952ecdf7e39b46e17d90de8d35a6fdfad8960b3efc9a830e2682",
-    "docs/verification/mq3i1-shared-followup-protocol.md": "8e00d53455a6ed550eb6d8454f4f8247386c7a6a2b46dcb7a51c2c8f22de39fe",
-    "docs/verification/mq3i1-shared-result.json": "0d55e0bbb0711a0772a88231eb163ab5a78762ac7b1598755c919e2d45e09b45"
-  }
-}

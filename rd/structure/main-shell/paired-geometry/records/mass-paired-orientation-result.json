@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "independent_nonlinear_volume_quadrature",
+      "orders": [
+        45,
+        49
+      ],
+      "metrics": {
+        "U": 1.0954196915284193e-13,
+        "f": 1.7194075345620256e-13,
+        "K": 9.287067229177714e-14,
+        "M": 2.48467500643824e-14
+      }
+    },
+    {
+      "case": "reversed_normal_layer_order",
+      "mass_error": 5.26716024345123e-16,
+      "forgotten_layer_flip_defect": 0.29747208717308476
+    },
+    {
+      "case": "all_six_faces_reversed_chart_virtual_work",
+      "errors": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "wrong_signed_measure_defects": [
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    }
+  ],
+  "stops": [],
+  "seconds": 67.54700000002049,
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_orientation_quadrature.py": "1b55b0326d121ef114f11490f58ea77b9f1adc4d42313d0135a8e0051b4ea8c6",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_mechanics.py": "01e67324f576468ca22f6c7a6511f38fca17813344630c6090aad7f2fe1c1cff",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e"
+  }
+}

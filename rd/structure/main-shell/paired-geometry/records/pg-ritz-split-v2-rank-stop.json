@@ -1,0 +1,14 @@
+{
+  "accepted": false,
+  "reason": "general_PG_rank:[235,237,239]",
+  "parameters": [
+    0.4,
+    0.2,
+    0
+  ],
+  "n": 2,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v5.py": "4a35ecaa2345318e462ec867b5531ab9b5593f71466b32341e484645264be74f",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v6.py": "be04b6963522330ff44282cc42fc1f16f27f44d604e6cbcfafb9c0b15dff2c23"
+  }
+}

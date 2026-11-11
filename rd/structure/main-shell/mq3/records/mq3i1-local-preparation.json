@@ -1,0 +1,15 @@
+{
+  "status": "frozen_before_execution",
+  "maximum_conditions": 30,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/mq3i1_moments.py": "347f06487abebdcec4374a6fbdf4529341156f06778558f2534790f34bf52e3f",
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_local.py": "7fe01dda5cdb6231c6d33a10bd9b928af33a399f47b130b5dccf15a57769afa2",
+    "rd/structure/main-shell/mq3/experiments/audit_mq3i1_local.py": "e0ecda1c800eee107938ac28c803fe49b25a6bd3e2f2654906af56a577c85fde",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/mq3/experiments/mq3_interior_stationarity.py": "722fd820d288a85858813a41798b1d3996b7db1ccc8dcbbc78bdbd73fd74068e",
+    "rd/structure/main-shell/q3/experiments/q3_thin_expansion.py": "8120d2378e3f873f32d5b68c6ca99ffc11135ae7d274891245c4c26e8d66b513",
+    "rd/structure/main-shell/q3/experiments/q3_curved_independent.py": "0a716302cc4360b2012d56f7b34c3aff2a2622ddcad3d34a4b53c40b2ffbc113",
+    "rd/structure/main-shell/mq3/mq3-interior-moment-alternative.md": "9fd4c84ebd04452f29c62d019d5355264e6d2f9fc1eea7108ed4c5b9640cb79c",
+    "rd/structure/main-shell/mq3/records/mq3i1-local-execution-protocol.md": "e09676ce1fce4bd8e40520003696238d620792625f73af704d52bc0cb07d7a5c"
+  }
+}

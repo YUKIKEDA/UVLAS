@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "uvlm_2_1_complete": true,
+  "uvlm_review_complete": false,
+  "structural_review_complete": true,
+  "product_implementation_start": false,
+  "current_work": "2.2 wake assembly state topology and loads",
+  "immutable": {
+    "docs/specs/aero/uvlm-induction-adopted-specification.md": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+    "rd/aero/kernel/records/uvlm-induction-adoption-disposition.json": "5a9578eef946e1c6156e571dcab24cd9a451b41164d82989bc12adb68172c280",
+    "rd/aero/kernel/records/uvlm-induction-adoption-results.md": "3df9267b8c07c8d32d63456cbdc2e6c4b41624bb16e4a46f485e3c7a83d70922",
+    "rd/aero/kernel/records/uvlm-induction-adoption-audit.json": "529720e3ebbaed040d2d971b73145df56c3e8cd5832e3c4c76dbe07a70f8d530"
+  },
+  "status_sync_source": {
+    "rd/aero/kernel/experiments/sync_uvlm_induction_status.py": "3017276259d1d1ff2c83dd76b5c173a24d20630b88169b9846cac3a89b4a9219"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ],
+  "checked_status_links": 24
+}

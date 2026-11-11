@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "max_individual_point_derivative_relative_error": 5.5120387977533193e-14,
+  "field_relative_error": 7.625098526200105e-15,
+  "scalar_seconds_including_first_compile": 0.7650000000139698,
+  "previous_seconds": 11.719000000040978,
+  "sources": {
+    "rd/coupled/j1/experiments/check_age_scalar.py": "1ebc7a4265b834efe8bc2efe90c041004c1217be93188bae8e118ca053248934",
+    "rd/coupled/j1/experiments/uvlm_age_scalar.py": "9d45edf27d0e719410da4434ab6dd730863ff31a802131726302c91e247ec7af",
+    "rd/aero/unsteady-reference/experiments/uvlm_frequency_fast.py": "cf882a9dcdb7de4789b2c6d5d53ac4ccb382ddd346de6cab6489892aaa7ba304"
+  }
+}

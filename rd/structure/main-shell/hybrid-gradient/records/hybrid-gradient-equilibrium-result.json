@@ -1,0 +1,67 @@
+{
+  "history": [
+    {
+      "iteration": 0,
+      "residual": 1.4945648877350146,
+      "min_F": 0.9954826466864634,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 1,
+      "residual": 0.05821103173973253,
+      "min_F": 1.0088017071801747,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 2,
+      "residual": 0.0009550879612718469,
+      "min_F": 1.0090221961601664,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 3,
+      "residual": 6.013535698722428e-07,
+      "min_F": 1.009026961752728,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 4,
+      "residual": 8.744411512993844e-13,
+      "min_F": 1.0090269668239908
+    }
+  ],
+  "metrics": {
+    "displacement": 4.111686827102422e-10,
+    "equilibrium": 8.744411512993844e-13,
+    "support_reaction": 5.395054915647302e-13,
+    "independent_equilibrium": 8.778068335747871e-13,
+    "internal_pointwise_flux": 6.145756635650169e-13,
+    "flux_dual": 1.2547016333715808e-15,
+    "tangent": 7.730811284862401e-15,
+    "min_F": 1.0090269668239908
+  },
+  "checks": {
+    "newton": true,
+    "displacement": true,
+    "identities": true,
+    "orientation": true,
+    "resources": true
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "artifact": {
+    "path": "build/analysis/hybrid-gradient-equilibrium-20261104-102515.npz",
+    "sha256": "353ac1303929e55ab55a235b1b4b9ccf0ef0897e8bd13f4298dc38866b5846c3"
+  },
+  "manufactured_Ku_load": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/check_hybrid_gradient_equilibrium.py": "d0475466a72aa8ca13a47cafef2768a266d3a4b21bd7d9ba04b8cc6d11f0299c",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-equilibrium-protocol.md": "a48cf32e358a545237afea460df4d51ee1d26699ae17bc29029e32bf0addf6e4",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-equilibrium-preparation.json": "6ce5e7776a339b9ef5b915a337ce081074543787c4e2e9d3e99b988bcebe9595",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-local-result.json": "f46312f6e03e3f7dcac25104540981b9b4d4f26a488a2e681ce034bca598861d"
+  },
+  "seconds": 6.592999999993481,
+  "peak_bytes": 893386752
+}

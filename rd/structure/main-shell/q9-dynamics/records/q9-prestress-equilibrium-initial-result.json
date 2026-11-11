@@ -1,0 +1,62 @@
+{
+  "protocol": "rd/structure/main-shell/q9-dynamics/records/q9-prestress-equilibrium-experiment.md",
+  "all_criteria_pass": false,
+  "stopped": "equilibrium_failed",
+  "equilibrium": {
+    "eligible": false,
+    "reason": "line_search_failed",
+    "history": [
+      {
+        "iteration": 0,
+        "residual": 0.6681757227532935,
+        "candidate_physical_step": 0.024749167667145546,
+        "potential": 5962.910423259729,
+        "x": [
+          1.0,
+          1.0,
+          1.0,
+          0.05
+        ],
+        "accepted_step": 1.0
+      },
+      {
+        "iteration": 1,
+        "residual": 0.0036475981874750374,
+        "candidate_physical_step": 6.884528687143764e-05,
+        "potential": -2113.89668770166,
+        "x": [
+          1.0020097732722062,
+          0.9993970680183382,
+          0.9993970680183382,
+          -0.0001422808635212769
+        ],
+        "accepted_step": 1.0
+      },
+      {
+        "iteration": 2,
+        "residual": 6.855364157390679e-08,
+        "candidate_physical_step": 7.111250631900043e-10,
+        "potential": -2114.008400000029,
+        "x": [
+          1.0020000001835598,
+          0.9993992194911578,
+          0.9993992194911577,
+          -1.3867743774338432e-09
+        ],
+        "accepted_step": 0.000244140625
+      },
+      {
+        "iteration": 3,
+        "residual": 6.853690651165769e-08,
+        "candidate_physical_step": 7.109515917792527e-10,
+        "potential": -2114.0084000000606,
+        "x": [
+          1.002000000183515,
+          0.9993992194911677,
+          0.9993992194911676,
+          -1.3864358095001833e-09
+        ]
+      }
+    ]
+  }
+}

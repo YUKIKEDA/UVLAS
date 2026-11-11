@@ -1,0 +1,15 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/covariant_projection_basis.py": "d52422663d51b12e4ad5bd114a8d44ccb80bf80a980d6762c3611f54d53e7ae5",
+    "rd/structure/main-shell/q4-projection/experiments/covariant_mid_projection_q4.py": "a0f3a899b1e23f98656daad07391df05e7b3b68530004ad387bdac34dd5fd0c9",
+    "rd/structure/main-shell/q4-projection/experiments/check_covariant_projection.py": "cdfb0562d6535f7dbaa85cf00d99c98c8b72afb1ae85a35124780cfaeabed5be",
+    "rd/structure/main-shell/q4-projection/experiments/audit_covariant_projection.py": "a603f4aaf0aec6f82f35bad620a887f869aca9975281f5890a17b5c6411589ec",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_basis_v2.py": "83c84a0c661f0a63e37744a1a3ee5d4b0bfc298308a699046f3356c3adcdb68b",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/q4-projection/covariant-projection-formulation.md": "23f8d9d1bbfa0f7104f20d1871e0025f7590cf9a00850060e3697ec7e833088c",
+    "rd/structure/main-shell/q4-projection/records/covariant-projection-protocol.md": "6d0ba772f5b742d161a7e29e8d9c4cd11a505c15ef9495206eec1faa3544045a",
+    "rd/structure/main-shell/q4-projection/records/mid-projection-result.json": "4208badfb8441d6f57756e772c259b2acddaec6924f45eaa30da56cea51cccee",
+    "rd/structure/main-shell/q4-projection/records/mid-projection-audit.json": "755b0d5e77b4917766b358b6881da08086a1edcfdaac749da303e094de5f84fc"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_finite_curved.py": "ad501460a08057b67d056307dd63dcaaa535f69a5bbc4d5970262e0653e518ad",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-curved-protocol.md": "89ba9292e31e889d43cabfd88be5ee290d2d670aaf83729bba16e22983cf9cfc",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_finite.py": "8eaf11dc5a49ae05531f96ff74e60822f2402d4a80ef3f2502413d69a3788828",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-pair-disposition.json": "cd9cd818509875fd58075e2fdc5fd96910f916486108504908eee1ccec931d06"
+  }
+}

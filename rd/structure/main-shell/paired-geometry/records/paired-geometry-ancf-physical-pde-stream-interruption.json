@@ -1,0 +1,10 @@
+{
+  "interrupted": true,
+  "reason": "Stop after reference preparation (178.266s) to apply exact support contraction before QR and eliminate unused derivatives in load-value evaluation; no new configuration accepted.",
+  "main_shell_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_physical_pde_stream.py": "7735b11953d059ccd7081604c876e6351ff9baec0b01671b0ddbea93b499f258",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_physical_pde_observe_v2.py": "326998ba44fbb5a97fe67c45e15304eeafed0b4f08e4aaa6117203f94af55f34",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-stream-protocol.md": "990ae11ea3ea7df93b96f50fef796a3e6da52e948445914436745348bb847e72"
+  }
+}

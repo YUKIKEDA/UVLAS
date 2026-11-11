@@ -1,0 +1,17 @@
+{
+  "R4_1_bounded_physical_load_path_accepted": true,
+  "R4_complete": false,
+  "main_shell_adopted": false,
+  "product_implementation_started": false,
+  "scope": "parabolic cylinder; homogeneous isotropic linear statics; body and all applicable surface forces",
+  "energy_quantity": "a(u,u)=2U",
+  "next": "general reference surface, Ritz lift, second derivatives, physical normal thickness and complete traces",
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-batch-v3-result.json": "741674a055c377d53d8fd5aadebea807073508e1fc52a27a5c7045ed83d814d7",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-results.md": "f31ad070ae0b2a03bcd486fc93fbbd7710bf31a94dabc2b3dc518a51cae9c544",
+    "rd/structure/main-shell/paired-geometry/paired-geometry-ancf-physical-load-contract.md": "eab4fe68a100808b8226d385a2cd2401239ca490824dc3e2564d8c8d8464bd9f",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-load-moment-audit.json": "0f9c165afc34201261a0d551c223f262a733f1ee1c8e1b55dce4ca9767f64a31",
+    "rd/structure/main-shell/paired-geometry/experiments/close_pg_physical_pde.py": "b6d1fb71962d0bd96d0d1c837afcf44c78f3bf2a0f1f338a7c672a4984281a4e",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-candidate-audit.json": "67922b2ba65d43b034d9c803f2b130b105e9cfd85b6f29f89f1fabff512f4ce9"
+  }
+}

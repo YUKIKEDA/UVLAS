@@ -1,0 +1,9 @@
+{
+  "mathematical_recovery_unchanged": true,
+  "global_identity_allocated": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/moment_position_recovery_action.py": "b1c2246a964b89eaaca7888c49e310bac962467c26c866d98f97ec25f74ecde4",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_position_recovery.py": "be421f4139fd15940e34a8f8524c119bfcdf238c6088170490c0eb95379dc0c1",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-pair-protocol.md": "244942e80e260a59695a7c8d7b945e323ec2cee4f46e22744a8f7b6ba05967de"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "scope": "actual spatial heave/pitch operators and a linear acceleration constraint; not full transient/free-wake adoption",
+  "full_block_residual": 7.339220519606034e-16,
+  "schur_acceleration_difference": 2.2351400383409363e-17,
+  "added_heave_mass": 17.69784224018575,
+  "physical_noncirculatory_wrench_difference": 5.551115123125783e-17,
+  "acceleration_constraint_residual": 1.734723475976807e-17,
+  "wrong_sign_negative_control_relative": 3.3259058366659295,
+  "sources": {
+    "rd/coupled/j1/experiments/check_coupled_added_mass.py": "86d218b1b70b60073a437ec603f0fc04ad4bc9a6523aa8cfa2f8eec72f270301",
+    "docs/specs/coupled/coupled-initialization-residual-contract.md": "c29c689cf2ae47bd5881d8f413d1ddad8cd77974631e2e25fc40579f5b387a3a",
+    "rd/aero/unsteady-reference/experiments/uvlm_frequency_fast.py": "cf882a9dcdb7de4789b2c6d5d53ac4ccb382ddd346de6cab6489892aaa7ba304"
+  }
+}

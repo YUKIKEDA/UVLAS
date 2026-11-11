@@ -1,0 +1,12 @@
+{
+  "adoption_candidate_qualified": false,
+  "exploratory_quadrature_invalid": true,
+  "reason": "Seven Gauss points underintegrate degree-seven curvature and leave the auxiliary anchor rank-deficient; independent quadrature exposed the alias. Fine quadrature and explicit anchor-rank checks required.",
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v4.py": "5622def39843d3b79dc511b767889894f0cb50dbcaf1930f879b52a795dd352f",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_worksolve.py": "f7cea8364e97e3cc666f2645e0068e692499dd229ef4e480a66ba2106167921a",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-v4-protocol.md": "11b0f8becfddc8365a36dbecfc3bd358204ba79672d4fe31f91a5f8f0cf39853",
+    "build/analysis/geometry-compatible-ancf-work-screen.json": "3abaf3aea92b592ae21ad0161a120e826a3c2cbd8d2c522b2dcb5d2cddca66cb"
+  }
+}

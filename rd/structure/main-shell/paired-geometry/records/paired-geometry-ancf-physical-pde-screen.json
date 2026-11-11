@@ -1,0 +1,98 @@
+{
+  "records": [
+    {
+      "h": 0.01,
+      "n": 2,
+      "amplitude": 0.0,
+      "mode": "rational",
+      "observation": {
+        "error": [
+          2.0869032484158147e-08,
+          4.536058106107223e-06,
+          2.4618155234785804e-05
+        ],
+        "position": [
+          9.982005239238304e-12,
+          2.115053663767421e-09,
+          1.2445684498876025e-08
+        ],
+        "stationarity": [
+          1.1027578532186088e-17,
+          4.053367661614054e-17,
+          4.72623876455387e-16
+        ],
+        "energy": [
+          0.043061168017233024,
+          0.022043560030835203,
+          0.014708041049918281
+        ]
+      },
+      "load_difference": 1.3825861427114528e-09,
+      "rcond": 4.209880687035791e-07,
+      "linear": 2.762642406995463e-15,
+      "checks": {
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "load_independent": true,
+        "resources": true
+      },
+      "seconds": 9.812000000034459,
+      "artifact": "build/analysis/pg-physical-pde-20261104-230506/n2-h0.01.npz",
+      "artifact_sha256": "ad05962d1bc515fa6e384ddf282e01f79e0cde9b9274caa4a1b309ace2f95559"
+    },
+    {
+      "h": 0.0001,
+      "n": 2,
+      "amplitude": 0.0,
+      "mode": "rational",
+      "observation": {
+        "error": [
+          2.0871122992394122e-08,
+          4.5365235333344326e-06,
+          2.4620100148812123e-05
+        ],
+        "position": [
+          9.749620654026043e-12,
+          2.0654135053568474e-09,
+          1.2145107819011764e-08
+        ],
+        "stationarity": [
+          1.1355822906264768e-15,
+          4.9308255072267845e-15,
+          4.490904124501026e-14
+        ],
+        "energy": [
+          0.043061068381522925,
+          0.022043507852174668,
+          0.014708005998802986
+        ]
+      },
+      "load_difference": 1.3825836251822164e-09,
+      "rcond": 7.795326628223829e-09,
+      "linear": 2.5749787708009615e-14,
+      "checks": {
+        "condition": true,
+        "linear": true,
+        "equilibrium": true,
+        "load_independent": true,
+        "resources": true
+      },
+      "seconds": 9.875,
+      "artifact": "build/analysis/pg-physical-pde-20261104-230506/n2-h0.0001.npz",
+      "artifact_sha256": "a6be56dd52638b43e7d4a000c4719e33ea66372c75c1ad03e01f17ec24af11dc"
+    }
+  ],
+  "stops": [],
+  "passed": true,
+  "seconds": 19.734000000054948,
+  "peak_bytes": 202539008,
+  "main_shell_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_physical_pde_screen.py": "be921cd891124c8081a9e4c94ef8f08b959a184829c0f29a6ebcce8c4653c88f",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_physical_pde.py": "973e2bce7fe54c641b59b2df7d3790a45747e907225ac51afdcff21296386892",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_continuum_loads.py": "74729d78ccdca5e449f041fdd7573170adb7c29f1ebc2c5d6de46566ef640917",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-protocol.md": "edd86619e8b483a4e88077bc7baf167d26d9bd4cfe5e826071d5b7a5a0775af1",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-candidate-audit.json": "67922b2ba65d43b034d9c803f2b130b105e9cfd85b6f29f89f1fabff512f4ce9"
+  }
+}

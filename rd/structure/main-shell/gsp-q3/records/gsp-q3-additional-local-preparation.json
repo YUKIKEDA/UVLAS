@@ -1,0 +1,13 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/check_gsp_q3_additional_local.py": "62c0386d9cdf646d80c9bf112ecd7aeba5509a21747e44a768e91b48a442c6bc",
+    "rd/structure/main-shell/gsp-q3/experiments/audit_gsp_q3_additional_local.py": "29bd7502ebadb7509d819aaa5c4d68df922604e203a5ee7548d40777261060c5",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_v2.py": "28ab1a6d10f82cb136901670aaa567104b440a76a9f0e09b76b9539700d7fb6c",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_basis_v2.py": "83c84a0c661f0a63e37744a1a3ee5d4b0bfc298308a699046f3356c3adcdb68b",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-protocol.md": "7f5df194a55daa952bad8f5e59a5a7cef2504fae62d383aa9c07d55838315968",
+    "rd/structure/main-shell/gsp-q3/gsp-q3-shared-and-membrane-contract.md": "66edb21d681cfefed57a2f6ae158f501f73b318aa13c1d404ee41374e90cd01f",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-v2-result.json": "1b1b49b4099339f4491338ac2e6e9b218d343a3c1bfbd7cf10691a5885cf3398",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-v2-audit.json": "57d875b78e40da93fa0a7357dbb34cce865b088fd22fe4a4f52df31c8af24415"
+  }
+}

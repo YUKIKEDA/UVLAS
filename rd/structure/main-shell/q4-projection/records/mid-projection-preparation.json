@@ -1,0 +1,13 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/midsurface_projection_q4.py": "b73705da9fa012aef72988d4739fa4fbc832682d652f19a733eb909992414af3",
+    "rd/structure/main-shell/q4-projection/experiments/check_mid_projection.py": "40102df17afb3fcba9c1ce618f1b22cf6d8daa3c6ae3c4f61e49c294cffcda79",
+    "rd/structure/main-shell/q4-projection/experiments/audit_mid_projection.py": "13a7ba5f00274ccf198ac54a903759adff2bee38d8159cb420c2175808b01bd9",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/q4-projection/mid-projection-formulation.md": "de215c239ef3bb29246958fdf3371bc3e283342299fa4657f1a9a4c0de6a7294",
+    "rd/structure/main-shell/q4-projection/records/mid-projection-protocol.md": "0f47092426abea3fc67ecc3681a41e12da2978dd9993d272a6ce67af895ae60c",
+    "rd/structure/main-shell/q4-projection/records/qem-conservative-result.json": "e5dd0afe56750d4364e96800419d42da46a33891b3dc18df801507374957ab04",
+    "rd/structure/main-shell/q4-projection/records/qem-conservative-audit.json": "e904edaa118ba41a505b1c8d036804acf9722faaaa8cb3f6981d5c5e21810741"
+  }
+}

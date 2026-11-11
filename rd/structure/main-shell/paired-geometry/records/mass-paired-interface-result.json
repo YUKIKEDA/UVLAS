@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "elements": [
+        1,
+        1
+      ],
+      "trace": {
+        "ranks": [
+          116,
+          116,
+          116
+        ],
+        "scalar_dimension": 228,
+        "independent_interface_holdout": 1.0208671315054356e-15,
+        "fixed_holdout": 3.8036240823657863e-13
+      },
+      "stiffness_ranks": [
+        684,
+        684,
+        684
+      ],
+      "rcond": 0.00022281128474365268,
+      "equilibrium": 6.807067305695979e-15,
+      "interface_work": 2.2112069667032075e-16,
+      "solution_error": 2.817273767832533e-14,
+      "checks": {
+        "physical_equilibrium": true,
+        "interface_work": true,
+        "physical_solution": true,
+        "root_rcond": true
+      },
+      "artifact": "build/analysis/mass-paired-interface-20261105-120930/n1-1.npz",
+      "artifact_sha256": "533232f1f1638f26559f55cb1b552ca2ad4f27cdd30689608a8b8cb21bbd521c"
+    },
+    {
+      "elements": [
+        1,
+        2
+      ],
+      "trace": {
+        "ranks": [
+          171,
+          171,
+          171
+        ],
+        "scalar_dimension": 350,
+        "independent_interface_holdout": 1.7917637461882713e-15,
+        "fixed_holdout": 5.222489107836736e-13
+      },
+      "stiffness_ranks": [
+        1050,
+        1050,
+        1050
+      ],
+      "rcond": 0.0001297119632648985,
+      "equilibrium": 1.0074251189494293e-14,
+      "interface_work": 3.8150662588849475e-16,
+      "solution_error": 3.036714578369151e-14,
+      "checks": {
+        "physical_equilibrium": true,
+        "interface_work": true,
+        "physical_solution": true,
+        "root_rcond": true
+      },
+      "artifact": "build/analysis/mass-paired-interface-20261105-120930/n1-2.npz",
+      "artifact_sha256": "1ad8cb471711a5d97a85dfda5dceea4aabf51f1d5eae1ae4669f76a723ae60d8"
+    }
+  ],
+  "stops": [],
+  "seconds": 153.920999999973,
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_interface.py": "0eb764b84c8ab1e9c215538bbb570d39a8548170a57446c2cae752c81e42f453",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_body.py": "b71226f1331cb03a2118d77ccd6befb3794ff48adf33609896baab8a557b75a5"
+  }
+}

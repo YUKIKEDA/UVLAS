@@ -1,0 +1,6404 @@
+{
+  "protocol": "rd/aero/wake-loads/records/uvlm-column-update-convergence.md",
+  "source_sha256": "937a55f74e2c53b70251ea7e07f21620ffb8ce4d07b5666ebbc079a89a8d526b",
+  "dependency_sha256": {
+    "check_uvlm_residual_trace.py": "95844655e031916095537b956df6c4fd400bf1ad7d4575fc1f85c9feda713895",
+    "check_uvlm_local_pressure_refinement.py": "b90b57d686a72e531de595157dbfab4257b124bfc43b3da0f1aed340ff782e8f",
+    "check_uvlm_local_pressure_pitch.py": "231e09154f71cc0415c2be27e9bbc48758d8a44de4b336ed3cfbf5f3a34f0a45",
+    "check_uvlm_graded_wake_pressure.py": "24c6a216f8e46370727904b5ccc91b7bdc2595035124c355472c3c3c24fa1826",
+    "check_uvlm_bound_grading.py": "cda7518d4e3458ebd9f9cec94021c9f89ed1f5ac1f2a15560e5daf2f177fc638",
+    "check_uvlm_trailing_edge.py": "9a7d1faf4a9345402f3df11ba34929b82f68ff73ae2abe6d56ae9f19b4f4f9c9",
+    "check_uvlm_harmonic_heave.py": "1f2b41839d49d15d00156083d89c085e37fa90703034b7eedaf825a29ccc3714",
+    "check_aerogrid_geometry.py": "260436bdca8d1e5ddacbd772a171f98290b07be7f58a649eb7dc06522f408617",
+    "check_vortex_core_load.py": "7c139bfb2e239132eb02fa43979b312f4126f44c88bb93a4d32860b5c7b2d616",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1",
+    "check_q9_interface_reparameterization.py": "becc74504f8d45f769a0a4e66c6f9cca28360ee97fcc7662e14bdd4a5fa9088c",
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_independent_load.py": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96"
+  },
+  "baseline_result_sha256": "eefcd0038cbe93b677360f5417e9b5b6cbb88f74ccf1c7e412091cc43619420c",
+  "U": 8.0,
+  "rho": 1.2,
+  "c": 1.0,
+  "span": 10000.0,
+  "length": 160.0,
+  "modes": [
+    {
+      "name": "heave-quarter",
+      "H": 0.001,
+      "alpha": 0.0,
+      "xp": 0.25
+    },
+    {
+      "name": "pitch-quarter",
+      "H": 0.0,
+      "alpha": 0.001,
+      "xp": 0.25
+    },
+    {
+      "name": "pitch-mid",
+      "H": 0.0,
+      "alpha": 0.001,
+      "xp": 0.5
+    }
+  ],
+  "qualification": {
+    "synthetic_direct_difference": 2.4234328398982743e-16,
+    "unsafe_denominator_refused": true,
+    "high_low_addition_exact": true,
+    "float64_projection_loses_low": true,
+    "aero_matrix_hash_equal": true,
+    "aero_direct_solution_difference": 1.6203013223754847e-15,
+    "aero_observation_difference": 1.3821095106885671e-13,
+    "blocked_compensated_difference": 0.0
+  },
+  "saved_comparisons": [
+    {
+      "k": 0.1,
+      "input_hashes_equal": true,
+      "observation_differences": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "k": 0.5,
+      "input_hashes_equal": true,
+      "observation_differences": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "k": 1.0,
+      "input_hashes_equal": true,
+      "observation_differences": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "selected_representation": "float64",
+      "float64_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            3.221521604523722e-11,
+            3.06636743379313e-11,
+            2.7645838220051114e-11
+          ],
+          "blocked_BLAS_relative": [
+            3.364405754498125e-11,
+            3.047947520495883e-11,
+            2.8762558417322593e-11
+          ],
+          "componentwise_backward": [
+            8.127818278586742e-16,
+            7.381599022994012e-16,
+            7.254869477359096e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            6.552127754229148e-12,
+            1.5121455103322662e-12,
+            1.8934030947852282e-12
+          ],
+          "blocked_BLAS_relative": [
+            6.718597398679293e-12,
+            3.3813687519833067e-12,
+            2.0690144900314102e-12
+          ],
+          "componentwise_backward": [
+            8.32474530255297e-17,
+            7.450908075722786e-17,
+            8.192225031665204e-17
+          ]
+        }
+      ],
+      "high_low_history": [],
+      "selected_accuracy": {
+        "corrections": 1,
+        "compensated_relative": [
+          6.552127754229148e-12,
+          1.5121455103322662e-12,
+          1.8934030947852282e-12
+        ],
+        "blocked_BLAS_relative": [
+          6.718597398679293e-12,
+          3.3813687519833067e-12,
+          2.0690144900314102e-12
+        ],
+        "componentwise_backward": [
+          8.32474530255297e-17,
+          7.450908075722786e-17,
+          8.192225031665204e-17
+        ]
+      },
+      "float64_projection_compensated_relative": [
+        6.552127754229148e-12,
+        1.5121455103322662e-12,
+        1.8934030947852282e-12
+      ],
+      "Decimal_rows": [
+        {
+          "row": 0,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 2,
+          "normalized_difference": 0.0
+        }
+      ],
+      "m": 2048,
+      "k": 0.1,
+      "input_sha256": [
+        "2307efa77a7cb25f156738723ec22df41afaa79411b5034edfb87a094b550b98",
+        "3cb1accc5146c1c74f45464be6302251ecadfe16d366828f8c04a49aa2b77c8a"
+      ],
+      "base_sha256": "d63fa84548a6571a86592b205fb0d0df7e28f593eb9f4da2b13a03592d3c49f2",
+      "inputs_unchanged": true,
+      "denominator": [
+        1.1385264165591849,
+        0.3476428766311563
+      ],
+      "relative_denominator": 0.8662470342394434,
+      "integral_error_estimate": 9.379361716693138e-13
+    },
+    {
+      "selected_representation": "float64",
+      "float64_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            2.0193014278823797e-11,
+            2.0662660998658023e-11,
+            2.082142391170081e-11
+          ],
+          "blocked_BLAS_relative": [
+            1.907724325263321e-11,
+            2.1171587246344537e-11,
+            2.0775467571517234e-11
+          ],
+          "componentwise_backward": [
+            7.777423181892794e-16,
+            7.602615022633902e-16,
+            7.663297501551197e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            1.1963372290359293e-12,
+            6.065953613086003e-13,
+            1.2086599550723832e-12
+          ],
+          "blocked_BLAS_relative": [
+            1.2743954689041992e-12,
+            1.268972523818244e-12,
+            1.065690352000029e-12
+          ],
+          "componentwise_backward": [
+            8.022627173829787e-17,
+            7.299451577840572e-17,
+            7.129131765656079e-17
+          ]
+        }
+      ],
+      "high_low_history": [],
+      "selected_accuracy": {
+        "corrections": 1,
+        "compensated_relative": [
+          1.1963372290359293e-12,
+          6.065953613086003e-13,
+          1.2086599550723832e-12
+        ],
+        "blocked_BLAS_relative": [
+          1.2743954689041992e-12,
+          1.268972523818244e-12,
+          1.065690352000029e-12
+        ],
+        "componentwise_backward": [
+          8.022627173829787e-17,
+          7.299451577840572e-17,
+          7.129131765656079e-17
+        ]
+      },
+      "float64_projection_compensated_relative": [
+        1.1963372290359293e-12,
+        6.065953613086003e-13,
+        1.2086599550723832e-12
+      ],
+      "Decimal_rows": [
+        {
+          "row": 0,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 2,
+          "normalized_difference": 0.0
+        }
+      ],
+      "m": 2048,
+      "k": 0.5,
+      "input_sha256": [
+        "78715a564616d4e948c8ebaf545a637100a1a83f59129ef7c0649a7c5fa86a14",
+        "05ad48e7c82a4e8cf0b2a9fb16ca1c9a1c05683d757c99e91283632f7d9f4405"
+      ],
+      "base_sha256": "d63fa84548a6571a86592b205fb0d0df7e28f593eb9f4da2b13a03592d3c49f2",
+      "inputs_unchanged": true,
+      "denominator": [
+        1.5799647543254336,
+        1.0430682942746072
+      ],
+      "relative_denominator": 0.863119512621705,
+      "integral_error_estimate": 4.214329236777987e-12
+    },
+    {
+      "selected_representation": "float64",
+      "float64_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            1.712402451088265e-11,
+            1.8233620628979175e-11,
+            1.7074526360867162e-11
+          ],
+          "blocked_BLAS_relative": [
+            1.724256968199561e-11,
+            1.7594770640001215e-11,
+            1.629156278348742e-11
+          ],
+          "componentwise_backward": [
+            8.833076333852074e-16,
+            7.610930990101727e-16,
+            7.67533924182188e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            7.388776156334611e-13,
+            1.0911661480456718e-12,
+            1.0209674772439623e-12
+          ],
+          "blocked_BLAS_relative": [
+            1.4993371796811946e-12,
+            1.6911788251533667e-12,
+            1.500079539273076e-12
+          ],
+          "componentwise_backward": [
+            7.779894409686078e-17,
+            8.433601020990479e-17,
+            7.40007205543003e-17
+          ]
+        }
+      ],
+      "high_low_history": [],
+      "selected_accuracy": {
+        "corrections": 1,
+        "compensated_relative": [
+          7.388776156334611e-13,
+          1.0911661480456718e-12,
+          1.0209674772439623e-12
+        ],
+        "blocked_BLAS_relative": [
+          1.4993371796811946e-12,
+          1.6911788251533667e-12,
+          1.500079539273076e-12
+        ],
+        "componentwise_backward": [
+          7.779894409686078e-17,
+          8.433601020990479e-17,
+          7.40007205543003e-17
+        ]
+      },
+      "float64_projection_compensated_relative": [
+        7.388776156334611e-13,
+        1.0911661480456718e-12,
+        1.0209674772439623e-12
+      ],
+      "Decimal_rows": [
+        {
+          "row": 0,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1024,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2046,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2047,
+          "column": 2,
+          "normalized_difference": 0.0
+        }
+      ],
+      "m": 2048,
+      "k": 1.0,
+      "input_sha256": [
+        "4698f62b2104b27bf6560b08e37d4789c8fc34719152fe75a2fe0d77a530568b",
+        "3a82b9d0c09c52baa25a9e34d91b0232f7b02044d1d66dc23de895c7ea9b7ab9"
+      ],
+      "base_sha256": "d63fa84548a6571a86592b205fb0d0df7e28f593eb9f4da2b13a03592d3c49f2",
+      "inputs_unchanged": true,
+      "denominator": [
+        2.0044988121407896,
+        1.5895949614907727
+      ],
+      "relative_denominator": 0.8881764982798867,
+      "integral_error_estimate": 7.84350668844957e-12
+    },
+    {
+      "selected_representation": "high_low_float64",
+      "float64_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            6.706697553208e-11,
+            6.946068527416907e-11,
+            7.800237519047949e-11
+          ],
+          "blocked_BLAS_relative": [
+            6.20896836596088e-11,
+            6.405937010155894e-11,
+            8.320952727366743e-11
+          ],
+          "componentwise_backward": [
+            9.01948705468291e-16,
+            8.353172094717748e-16,
+            8.717441573921665e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            1.7098877104693742e-11,
+            1.532725320419554e-11,
+            8.46516050629176e-12
+          ],
+          "blocked_BLAS_relative": [
+            1.8296757730252935e-11,
+            1.7081823020026892e-11,
+            1.1098580800265285e-11
+          ],
+          "componentwise_backward": [
+            8.255110094947094e-17,
+            8.356761519328058e-17,
+            7.835502771769639e-17
+          ]
+        }
+      ],
+      "high_low_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            6.706697553208e-11,
+            6.946068527416907e-11,
+            7.800237519047949e-11
+          ],
+          "blocked_BLAS_relative": [
+            6.20896836596088e-11,
+            6.405937010155894e-11,
+            8.320952727366743e-11
+          ],
+          "componentwise_backward": [
+            9.01948705468291e-16,
+            8.353172094717748e-16,
+            8.717441573921665e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            5.103611742066208e-23,
+            6.644286373682125e-23,
+            5.37626815366733e-23
+          ],
+          "blocked_BLAS_relative": [
+            3.1388463421693716e-12,
+            2.534608290605281e-12,
+            5.057165569451315e-12
+          ],
+          "componentwise_backward": [
+            6.2735747818169325e-28,
+            6.347008481506234e-28,
+            6.715564355909347e-28
+          ]
+        }
+      ],
+      "selected_accuracy": {
+        "corrections": 1,
+        "compensated_relative": [
+          5.103611742066208e-23,
+          6.644286373682125e-23,
+          5.37626815366733e-23
+        ],
+        "blocked_BLAS_relative": [
+          3.1388463421693716e-12,
+          2.534608290605281e-12,
+          5.057165569451315e-12
+        ],
+        "componentwise_backward": [
+          6.2735747818169325e-28,
+          6.347008481506234e-28,
+          6.715564355909347e-28
+        ]
+      },
+      "float64_projection_compensated_relative": [
+        1.7098877104693742e-11,
+        1.532725320419554e-11,
+        8.46516050629176e-12
+      ],
+      "Decimal_rows": [
+        {
+          "row": 0,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 2,
+          "normalized_difference": 0.0
+        }
+      ],
+      "m": 4096,
+      "k": 0.1,
+      "input_sha256": [
+        "8ab8b7f97bc415b3f69ae4c6a70a4bfcd29a10931d441605302c68bed4988cbd",
+        "de478c4580657fb266760e41169a13270d7f799114ed58f1e7ffba69fa0aad6d"
+      ],
+      "base_sha256": "c37f5c1a7d30c15777a84494917796d458b2f802a833de539be73a9f6ccfe5fb",
+      "inputs_unchanged": true,
+      "denominator": [
+        1.138526417864215,
+        0.3476962220195868
+      ],
+      "relative_denominator": 0.8662271345954634,
+      "integral_error_estimate": 1.164755705110766e-12
+    },
+    {
+      "selected_representation": "float64",
+      "float64_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            2.9289526257619683e-11,
+            3.666993178071794e-11,
+            3.305022925695002e-11
+          ],
+          "blocked_BLAS_relative": [
+            2.9871515618579134e-11,
+            3.79682581987833e-11,
+            3.4078018378432397e-11
+          ],
+          "componentwise_backward": [
+            8.5507116887119595e-16,
+            8.884869194501944e-16,
+            8.908015860405384e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            5.594514585145542e-12,
+            2.9658318895510464e-12,
+            6.196269665618959e-12
+          ],
+          "blocked_BLAS_relative": [
+            8.044183583801754e-12,
+            3.994567120815522e-12,
+            5.749591799109384e-12
+          ],
+          "componentwise_backward": [
+            7.796372429572242e-17,
+            7.545084245799234e-17,
+            6.948971318155283e-17
+          ]
+        }
+      ],
+      "high_low_history": [],
+      "selected_accuracy": {
+        "corrections": 1,
+        "compensated_relative": [
+          5.594514585145542e-12,
+          2.9658318895510464e-12,
+          6.196269665618959e-12
+        ],
+        "blocked_BLAS_relative": [
+          8.044183583801754e-12,
+          3.994567120815522e-12,
+          5.749591799109384e-12
+        ],
+        "componentwise_backward": [
+          7.796372429572242e-17,
+          7.545084245799234e-17,
+          6.948971318155283e-17
+        ]
+      },
+      "float64_projection_compensated_relative": [
+        5.594514585145542e-12,
+        2.9658318895510464e-12,
+        6.196269665618959e-12
+      ],
+      "Decimal_rows": [
+        {
+          "row": 0,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 2,
+          "normalized_difference": 0.0
+        }
+      ],
+      "m": 4096,
+      "k": 0.5,
+      "input_sha256": [
+        "2543bbc39e3de01cb6e8605f1f958b88c6a5471c695a1584ba476e93bfcb3776",
+        "973fbb3d8ea6e0de549f501fac95f7d11bd619d6420250bb1f7e78127be538c2"
+      ],
+      "base_sha256": "c37f5c1a7d30c15777a84494917796d458b2f802a833de539be73a9f6ccfe5fb",
+      "inputs_unchanged": true,
+      "denominator": [
+        1.579964783454296,
+        1.0433350162906443
+      ],
+      "relative_denominator": 0.863094790231329,
+      "integral_error_estimate": 5.1493449113607356e-12
+    },
+    {
+      "selected_representation": "float64",
+      "float64_history": [
+        {
+          "corrections": 0,
+          "compensated_relative": [
+            3.596936350172192e-11,
+            3.274681360275451e-11,
+            3.020492251023961e-11
+          ],
+          "blocked_BLAS_relative": [
+            3.646029707456003e-11,
+            3.04292316929632e-11,
+            2.897734052111711e-11
+          ],
+          "componentwise_backward": [
+            1.0928450382480933e-15,
+            9.56106764952914e-16,
+            9.970646369983425e-16
+          ]
+        },
+        {
+          "corrections": 1,
+          "compensated_relative": [
+            1.6548360892796623e-12,
+            2.355730727687051e-12,
+            1.5430903949562473e-12
+          ],
+          "blocked_BLAS_relative": [
+            2.373797165908644e-12,
+            2.918712178657528e-12,
+            2.2595034258752764e-12
+          ],
+          "componentwise_backward": [
+            7.911546902697589e-17,
+            8.341588610795978e-17,
+            7.635728066104884e-17
+          ]
+        }
+      ],
+      "high_low_history": [],
+      "selected_accuracy": {
+        "corrections": 1,
+        "compensated_relative": [
+          1.6548360892796623e-12,
+          2.355730727687051e-12,
+          1.5430903949562473e-12
+        ],
+        "blocked_BLAS_relative": [
+          2.373797165908644e-12,
+          2.918712178657528e-12,
+          2.2595034258752764e-12
+        ],
+        "componentwise_backward": [
+          7.911546902697589e-17,
+          8.341588610795978e-17,
+          7.635728066104884e-17
+        ]
+      },
+      "float64_projection_compensated_relative": [
+        1.6548360892796623e-12,
+        2.355730727687051e-12,
+        1.5430903949562473e-12
+      ],
+      "Decimal_rows": [
+        {
+          "row": 0,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 2048,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4094,
+          "column": 2,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 0,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 1,
+          "normalized_difference": 0.0
+        },
+        {
+          "row": 4095,
+          "column": 2,
+          "normalized_difference": 0.0
+        }
+      ],
+      "m": 4096,
+      "k": 1.0,
+      "input_sha256": [
+        "a12fe8777b1b96275f20ee50a4054aa81e2d808050c20fa1a370627e11d2fa12",
+        "69dc503d9be3859d2cb44b74ee44b2d3779a83d3ae86e20d0cec750a141549f3"
+      ],
+      "base_sha256": "c37f5c1a7d30c15777a84494917796d458b2f802a833de539be73a9f6ccfe5fb",
+      "inputs_unchanged": true,
+      "denominator": [
+        2.004498917163793,
+        1.5901283889638584
+      ],
+      "relative_denominator": 0.8881525404317943,
+      "integral_error_estimate": 9.51596082392951e-12
+    }
+  ],
+  "continuous_cases": [
+    {
+      "m": 2048,
+      "k": 0.1,
+      "mode": "heave-quarter",
+      "loads": [
+        [
+          -0.005896574606860965,
+          -0.04014885521473773
+        ],
+        [
+          -0.00060425841825636,
+          2.847635937722236e-07
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            -0.014693420614860217,
+            -0.07974643201311235
+          ],
+          "reference": [
+            -0.014659741101303808,
+            -0.0795612239320191
+          ],
+          "normalized_error": 0.0012255562025298085,
+          "integral": [
+            -3.480861836144371e-05,
+            -0.00016311291530676775
+          ],
+          "left_trace": [
+            -0.00024738693753815534,
+            -0.0011779676938103946
+          ],
+          "right_trace": [
+            -0.00043306598533763614,
+            -0.002001697970274693
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            -0.007429816294207884,
+            -0.04819591891825995
+          ],
+          "reference": [
+            -0.007445290546488829,
+            -0.04823853832712527
+          ],
+          "normalized_error": 0.00029519312510011664,
+          "integral": [
+            -7.975055226684078e-05,
+            -0.0003596898096800255
+          ],
+          "left_trace": [
+            -0.00043306598533763614,
+            -0.002001697970274693
+          ],
+          "right_trace": [
+            -0.0006210948268706394,
+            -0.0027388090929191364
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            -0.003549766064892828,
+            -0.03160452680937986
+          ],
+          "reference": [
+            -0.0035622721745881573,
+            -0.03162653584248969
+          ],
+          "normalized_error": 0.0001648049089555088,
+          "integral": [
+            -0.00014456695774916535,
+            -0.000615506589232209
+          ],
+          "left_trace": [
+            -0.0006210948268706394,
+            -0.0027388090929191364
+          ],
+          "right_trace": [
+            -0.0008181496044023485,
+            -0.0033683233432313837
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            -0.0013711705222408772,
+            -0.021009104986638452
+          ],
+          "reference": [
+            -0.0013527933725576305,
+            -0.020958544555768722
+          ],
+          "normalized_error": 0.0003502384403086018,
+          "integral": [
+            -0.00018109152744978172,
+            -0.0007169677900909237
+          ],
+          "left_trace": [
+            -0.0008181496044023485,
+            -0.0033683233432313837
+          ],
+          "right_trace": [
+            -0.0009901092149672182,
+            -0.0037697947249630617
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            -0.00029010247334689763,
+            -0.013735649654103881
+          ],
+          "reference": [
+            -0.00030407886604001157,
+            -0.01375873978203586
+          ],
+          "normalized_error": 0.00017572018140436153,
+          "integral": [
+            -0.00015758451104446478,
+            -0.0005803631855842537
+          ],
+          "left_trace": [
+            -0.0009901092149672182,
+            -0.0037697947249630617
+          ],
+          "right_trace": [
+            -0.0011107147032301142,
+            -0.003952897348599542
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            9.033082569970613e-05,
+            -0.008435513030373107
+          ],
+          "reference": [
+            6.853379511562533e-05,
+            -0.008448928978549406
+          ],
+          "normalized_error": 0.0001666333747359176,
+          "integral": [
+            -0.00011501408605349526,
+            -0.00039895889520803177
+          ],
+          "left_trace": [
+            -0.0011107147032301142,
+            -0.003952897348599542
+          ],
+          "right_trace": [
+            -0.001189565536170682,
+            -0.004017764458788563
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.00010135268485325677,
+            -0.0038778135245688705
+          ],
+          "reference": [
+            0.0001008140490007667,
+            -0.00386849786727365
+          ],
+          "normalized_error": 6.075010674290979e-05,
+          "integral": [
+            -6.0470854241671576e-05,
+            -0.0002011955182393573
+          ],
+          "left_trace": [
+            -0.001189565536170682,
+            -0.004017764458788563
+          ],
+          "right_trace": [
+            -0.0012292767612516093,
+            -0.004025867233380691
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.00012170425773633083,
+            -0.005554518189719602
+          ],
+          "reference": [
+            0.00010440459911771552,
+            -0.005558725785269795
+          ],
+          "normalized_error": 0.00011591139116577914,
+          "integral": [
+            -0.00011896534524721409,
+            -0.00040149245798201113
+          ],
+          "left_trace": [
+            -0.0011502460223399606,
+            -0.003991800737953888
+          ],
+          "right_trace": [
+            -0.0012292767612516093,
+            -0.004025867233380691
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.00010135268485325677,
+            -0.0038778135245688705
+          ],
+          "reference": [
+            0.0001008140490007667,
+            -0.00386849786727365
+          ],
+          "normalized_error": 6.075010674290979e-05,
+          "integral": [
+            -6.0470854241671576e-05,
+            -0.0002011955182393573
+          ],
+          "left_trace": [
+            -0.001189565536170682,
+            -0.004017764458788563
+          ],
+          "right_trace": [
+            -0.0012292767612516093,
+            -0.004025867233380691
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            8.04120362629771e-05,
+            -0.002723641180543532
+          ],
+          "reference": [
+            8.056944961200185e-05,
+            -0.0027143930230956238
+          ],
+          "normalized_error": 6.0218079564599496e-05,
+          "integral": [
+            -3.0483169363836167e-05,
+            -0.00010065233595916244
+          ],
+          "left_trace": [
+            -0.0012093557004042117,
+            -0.0040248710516791264
+          ],
+          "right_trace": [
+            -0.0012292767612516093,
+            -0.004025867233380691
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            6.557846012427415e-05,
+            -0.0019206914632851116
+          ],
+          "reference": [
+            6.020990409666478e-05,
+            -0.0019120761261944724
+          ],
+          "normalized_error": 6.60880816821577e-05,
+          "integral": [
+            -1.530370224103058e-05,
+            -5.0329982061791784e-05
+          ],
+          "left_trace": [
+            -0.0012192961534592045,
+            -0.004026427073486078
+          ],
+          "right_trace": [
+            -0.0012292767612516093,
+            -0.004025867233380691
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 0.1,
+      "mode": "pitch-quarter",
+      "loads": [
+        [
+          0.20429574893373464,
+          -0.009408445401842915
+        ],
+        [
+          0.00022530719742092737,
+          -0.0060373622377298125
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.4068936581934392,
+            -0.04844434360630103
+          ],
+          "reference": [
+            0.40595077826820813,
+            -0.04833481162996445
+          ],
+          "normalized_error": 0.0023218651300177485,
+          "integral": [
+            0.0008329688857363158,
+            -0.00013492349922188273
+          ],
+          "left_trace": [
+            0.006013531937975667,
+            -0.000978971901556254
+          ],
+          "right_trace": [
+            0.010225022844312948,
+            -0.0016501942579358196
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.24567704897376558,
+            -0.01481318039912895
+          ],
+          "reference": [
+            0.24589788346401878,
+            -0.014875589629306487
+          ],
+          "normalized_error": 0.0009315451004235298,
+          "integral": [
+            0.0018383243245833926,
+            -0.0002956692805442552
+          ],
+          "left_trace": [
+            0.010225022844312948,
+            -0.0016501942579358196
+          ],
+          "right_trace": [
+            0.014004592878419184,
+            -0.002249315066588888
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.16069179630819946,
+            0.0034818582269227714
+          ],
+          "reference": [
+            0.16080809474661828,
+            0.0034378339843866585
+          ],
+          "normalized_error": 0.0007731187728054374,
+          "integral": [
+            0.0031498164251259793,
+            -0.0005082355798528567
+          ],
+          "left_trace": [
+            0.014004592878419184,
+            -0.002249315066588888
+          ],
+          "right_trace": [
+            0.017250691518869436,
+            -0.002806739638553193
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.10633082688219389,
+            0.012313159473584183
+          ],
+          "reference": [
+            0.10606883598944146,
+            0.01235705101391795
+          ],
+          "normalized_error": 0.0024876062460281474,
+          "integral": [
+            0.003675384714292691,
+            -0.0006094442299870412
+          ],
+          "left_trace": [
+            0.017250691518869436,
+            -0.002806739638553193
+          ],
+          "right_trace": [
+            0.019344028232917733,
+            -0.0032852924257120606
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.06911351924720181,
+            0.01399751234187881
+          ],
+          "reference": [
+            0.06923595872550994,
+            0.013952031062601308
+          ],
+          "normalized_error": 0.001700700912745155,
+          "integral": [
+            0.0029806081835419915,
+            -0.0005204143792415055
+          ],
+          "left_trace": [
+            0.019344028232917733,
+            -0.0032852924257120606
+          ],
+          "right_trace": [
+            0.02031984409530696,
+            -0.0036627029320786026
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.04222681963367318,
+            0.011207359903397312
+          ],
+          "reference": [
+            0.04230479800163324,
+            0.011120241820214573
+          ],
+          "normalized_error": 0.001522390258773221,
+          "integral": [
+            0.0020523015191387895,
+            -0.0003805086852637842
+          ],
+          "left_trace": [
+            0.02031984409530696,
+            -0.0036627029320786026
+          ],
+          "right_trace": [
+            0.020683605062771632,
+            -0.003956419903579305
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.019351881900121402,
+            0.005800765478179344
+          ],
+          "reference": [
+            0.019305572949664035,
+            0.005785953567279897
+          ],
+          "normalized_error": 0.0006330738803677585,
+          "integral": [
+            0.0010362130183554166,
+            -0.00020210783018604877
+          ],
+          "left_trace": [
+            0.020683605062771632,
+            -0.003956419903579305
+          ],
+          "right_trace": [
+            0.020743974548297555,
+            -0.004133450187051538
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.027749180901589315,
+            0.00798619781228525
+          ],
+          "reference": [
+            0.02777886875567322,
+            0.00790938588822347
+          ],
+          "normalized_error": 0.001072259131021926,
+          "integral": [
+            0.0020669449626080183,
+            -0.0003960306054282755
+          ],
+          "left_trace": [
+            0.02053412670165832,
+            -0.003803250755074572
+          ],
+          "right_trace": [
+            0.020743974548297555,
+            -0.004133450187051538
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.019351881900121402,
+            0.005800765478179344
+          ],
+          "reference": [
+            0.019305572949664035,
+            0.005785953567279897
+          ],
+          "normalized_error": 0.0006330738803677585,
+          "integral": [
+            0.0010362130183554166,
+            -0.00020210783018604877
+          ],
+          "left_trace": [
+            0.020683605062771632,
+            -0.003956419903579305
+          ],
+          "right_trace": [
+            0.020743974548297555,
+            -0.004133450187051538
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.013582813548534935,
+            0.004169912109750717
+          ],
+          "reference": [
+            0.013536494067775243,
+            0.004158122990992802
+          ],
+          "normalized_error": 0.0006223464746455954,
+          "integral": [
+            0.000518503264496782,
+            -0.00010215235669337078
+          ],
+          "left_trace": [
+            0.020729033109353586,
+            -0.004040608680271324
+          ],
+          "right_trace": [
+            0.020743974548297555,
+            -0.004133450187051538
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.009572377706665936,
+            0.0030008690216073914
+          ],
+          "reference": [
+            0.009531985293882146,
+            0.0029636209117051508
+          ],
+          "normalized_error": 0.0007154315450352257,
+          "integral": [
+            0.0002593017614390392,
+            -5.136465048360007e-05
+          ],
+          "left_trace": [
+            0.020741783444922054,
+            -0.004085497216302281
+          ],
+          "right_trace": [
+            0.020743974548297555,
+            -0.004133450187051538
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 0.1,
+      "mode": "pitch-mid",
+      "loads": [
+        [
+          0.2028216052820194,
+          -0.0194456592055275
+        ],
+        [
+          0.050779643913360956,
+          -0.010898705848213194
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.4032203030397242,
+            -0.06838095160957909
+          ],
+          "reference": [
+            0.4022858429928822,
+            -0.06822511761296923
+          ],
+          "normalized_error": 0.0023218009096972413,
+          "integral": [
+            0.0008242667311459552,
+            -0.00017570172804857477
+          ],
+          "left_trace": [
+            0.005951685203591127,
+            -0.0012734638250088528
+          ],
+          "right_trace": [
+            0.01011675634797854,
+            -0.0021506187505044927
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.24381959490021363,
+            -0.02686216012869393
+          ],
+          "reference": [
+            0.24403656082739658,
+            -0.0269352242110878
+          ],
+          "normalized_error": 0.0009324669872876373,
+          "integral": [
+            0.001818386686516683,
+            -0.0003855917329642616
+          ],
+          "left_trace": [
+            0.01011675634797854,
+            -0.0021506187505044927
+          ],
+          "right_trace": [
+            0.013849319171701525,
+            -0.002934017339818672
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.1598043547919762,
+            -0.004419273475422193
+          ],
+          "reference": [
+            0.15991752670297124,
+            -0.0044687999762357666
+          ],
+          "normalized_error": 0.0007721869435512096,
+          "integral": [
+            0.0031136746856886884,
+            -0.000662112227160909
+          ],
+          "left_trace": [
+            0.013849319171701525,
+            -0.002934017339818672
+          ],
+          "right_trace": [
+            0.017046154117768848,
+            -0.003648820474361039
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.10598803425163378,
+            0.007060883226924543
+          ],
+          "reference": [
+            0.10573063764630206,
+            0.00711741487497577
+          ],
+          "normalized_error": 0.0024868515640373325,
+          "integral": [
+            0.0036301118324302425,
+            -0.0007886861775097721
+          ],
+          "left_trace": [
+            0.017046154117768848,
+            -0.003648820474361039
+          ],
+          "right_trace": [
+            0.01909650092917593,
+            -0.004227741106952826
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.06904099362886505,
+            0.010563599928352844
+          ],
+          "reference": [
+            0.06915993900899996,
+            0.010512346117092342
+          ],
+          "normalized_error": 0.0016864345184794448,
+          "integral": [
+            0.0029412120557808737,
+            -0.0006655051756375692
+          ],
+          "left_trace": [
+            0.01909650092917593,
+            -0.004227741106952826
+          ],
+          "right_trace": [
+            0.020042165419499432,
+            -0.004650927269228488
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.04224940234009807,
+            0.00909848164580397
+          ],
+          "reference": [
+            0.04232193145041215,
+            0.00900800957557722
+          ],
+          "normalized_error": 0.0015098366418444635,
+          "integral": [
+            0.0020235479976254147,
+            -0.00048024840906579183
+          ],
+          "left_trace": [
+            0.020042165419499432,
+            -0.004650927269228488
+          ],
+          "right_trace": [
+            0.020386213678728962,
+            -0.004960861018276446
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.01937722007133489,
+            0.004831312097037085
+          ],
+          "reference": [
+            0.019330776461914227,
+            0.004818829100461483
+          ],
+          "normalized_error": 0.0006261970496653861,
+          "integral": [
+            0.0010210953047949988,
+            -0.0002524067097458883
+          ],
+          "left_trace": [
+            0.020386213678728962,
+            -0.004960861018276446
+          ],
+          "right_trace": [
+            0.020436655357984654,
+            -0.005139916995396711
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.027779606966023405,
+            0.006597568264855296
+          ],
+          "reference": [
+            0.027804969905452653,
+            0.0065197044419060225
+          ],
+          "normalized_error": 0.001066282522708927,
+          "integral": [
+            0.002037203626296214,
+            -0.0004964037199237777
+          ],
+          "left_trace": [
+            0.020246565196073332,
+            -0.004801200939563044
+          ],
+          "right_trace": [
+            0.020436655357984654,
+            -0.005139916995396711
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.01937722007133489,
+            0.004831312097037085
+          ],
+          "reference": [
+            0.019330776461914227,
+            0.004818829100461483
+          ],
+          "normalized_error": 0.0006261970496653861,
+          "integral": [
+            0.0010210953047949988,
+            -0.0002524067097458883
+          ],
+          "left_trace": [
+            0.020386213678728962,
+            -0.004960861018276446
+          ],
+          "right_trace": [
+            0.020436655357984654,
+            -0.005139916995396711
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.01360291655760153,
+            0.0034890018146150146
+          ],
+          "reference": [
+            0.013556636430178242,
+            0.0034795247352188956
+          ],
+          "normalized_error": 0.0006151107305478575,
+          "integral": [
+            0.0005108824721558232,
+            -0.00012731544068316137
+          ],
+          "left_trace": [
+            0.020426694184252532,
+            -0.005046826443191106
+          ],
+          "right_trace": [
+            0.020436655357984654,
+            -0.005139916995396711
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.009588772321696715,
+            0.0025206961557864022
+          ],
+          "reference": [
+            0.009547037769906314,
+            0.002485601880156532
+          ],
+          "normalized_error": 0.0007100093380227117,
+          "integral": [
+            0.00025547583587878125,
+            -6.394714599904802e-05
+          ],
+          "left_trace": [
+            0.020436959406557254,
+            -0.005092103984673801
+          ],
+          "right_trace": [
+            0.020436655357984654,
+            -0.005139916995396711
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 0.5,
+      "mode": "heave-quarter",
+      "loads": [
+        [
+          0.023983057229047797,
+          -0.14429729753080467
+        ],
+        [
+          -0.015093781027101322,
+          9.516747519214275e-06
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            -0.026786341426009937,
+            -0.2865548813724969
+          ],
+          "reference": [
+            -0.026605260356522595,
+            -0.28591866025339274
+          ],
+          "normalized_error": 0.0023036049502978438,
+          "integral": [
+            -0.0001552349933408083,
+            -0.00057721974799902
+          ],
+          "left_trace": [
+            -0.0010920683254629162,
+            -0.004202946477348015
+          ],
+          "right_trace": [
+            -0.0019483124633162064,
+            -0.0070326581649707166
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.020004903575240207,
+            -0.17321596900578806
+          ],
+          "reference": [
+            0.019944420340559897,
+            -0.17335452585367955
+          ],
+          "normalized_error": 0.0008663864026529493,
+          "integral": [
+            -0.0003646547738984391,
+            -0.001246966924782079
+          ],
+          "left_trace": [
+            -0.0019483124633162064,
+            -0.0070326581649707166
+          ],
+          "right_trace": [
+            -0.002882702769735157,
+            -0.009374502906787716
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.046119950703724835,
+            -0.1136172622954153
+          ],
+          "reference": [
+            0.046052837405898356,
+            -0.11365607905010364
+          ],
+          "normalized_error": 0.0005047540438660557,
+          "integral": [
+            -0.0006876983008899084,
+            -0.00206319233497391
+          ],
+          "left_trace": [
+            -0.002882702769735157,
+            -0.009374502906787716
+          ],
+          "right_trace": [
+            -0.003985062798381466,
+            -0.01105383090371896
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.055589813717783265,
+            -0.07541003185033057
+          ],
+          "reference": [
+            0.055715784163716774,
+            -0.07531858717214626
+          ],
+          "normalized_error": 0.0010134249846713366,
+          "integral": [
+            -0.0009086419422244741,
+            -0.0022917806796276855
+          ],
+          "left_trace": [
+            -0.003985062798381466,
+            -0.01105383090371896
+          ],
+          "right_trace": [
+            -0.005118722358888667,
+            -0.011716231291709706
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.051273076828865706,
+            -0.04942745635793726
+          ],
+          "reference": [
+            0.05117583482214333,
+            -0.04944469492596097
+          ],
+          "normalized_error": 0.0006429568345252398,
+          "integral": [
+            -0.0008375550525386116,
+            -0.0017585133736480556
+          ],
+          "left_trace": [
+            -0.005118722358888667,
+            -0.011716231291709706
+          ],
+          "right_trace": [
+            -0.006076093907085696,
+            -0.011650980244763864
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.03802255199021279,
+            -0.03046555615058791
+          ],
+          "reference": [
+            0.037807458166878895,
+            -0.030362861890950877
+          ],
+          "normalized_error": 0.0015517679365785815,
+          "integral": [
+            -0.0006441613803418482,
+            -0.001150883725705888
+          ],
+          "left_trace": [
+            -0.006076093907085696,
+            -0.011650980244763864
+          ],
+          "right_trace": [
+            -0.006830909382893534,
+            -0.011324168407657306
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.019084908950036044,
+            -0.013941974510182501
+          ],
+          "reference": [
+            0.019046706297251956,
+            -0.013902195978647497
+          ],
+          "normalized_error": 0.00035906433835831926,
+          "integral": [
+            -0.0003526486360587536,
+            -0.0005596577838867774
+          ],
+          "left_trace": [
+            -0.006830909382893534,
+            -0.011324168407657306
+          ],
+          "right_trace": [
+            -0.007291166599332207,
+            -0.01104413422217242
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.026551373309705636,
+            -0.020087829163124998
+          ],
+          "reference": [
+            0.02635718146948719,
+            -0.019976357208862684
+          ],
+          "normalized_error": 0.00145775872518909,
+          "integral": [
+            -0.000684155277160561,
+            -0.0011310265767254057
+          ],
+          "left_trace": [
+            -0.006436716827916235,
+            -0.011519041278883762
+          ],
+          "right_trace": [
+            -0.007291166599332207,
+            -0.01104413422217242
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.019084908950036044,
+            -0.013941974510182501
+          ],
+          "reference": [
+            0.019046706297251956,
+            -0.013902195978647497
+          ],
+          "normalized_error": 0.00035906433835831926,
+          "integral": [
+            -0.0003526486360587536,
+            -0.0005596577838867774
+          ],
+          "left_trace": [
+            -0.006830909382893534,
+            -0.011324168407657306
+          ],
+          "right_trace": [
+            -0.007291166599332207,
+            -0.01104413422217242
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.013643116809230313,
+            -0.009787743927789503
+          ],
+          "reference": [
+            0.013610215983435942,
+            -0.009754696800891229
+          ],
+          "normalized_error": 0.00030359608921350415,
+          "integral": [
+            -0.00017917629134465735,
+            -0.0002780955899101732
+          ],
+          "left_trace": [
+            -0.007048599959446071,
+            -0.011197821597038459
+          ],
+          "right_trace": [
+            -0.007291166599332207,
+            -0.01104413422217242
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.00977485762824959,
+            -0.006944912947795499
+          ],
+          "reference": [
+            0.009673702147513553,
+            -0.00687141571340262
+          ],
+          "normalized_error": 0.0008140435773545352,
+          "integral": [
+            -9.03411350988409e-05,
+            -0.0001385709412528439
+          ],
+          "left_trace": [
+            -0.007165323337282813,
+            -0.011125432501870485
+          ],
+          "right_trace": [
+            -0.007291166599332207,
+            -0.01104413422217242
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 0.5,
+      "mode": "pitch-quarter",
+      "loads": [
+        [
+          0.14738540772454625,
+          0.09613170608463574
+        ],
+        [
+          0.0056524189225581455,
+          -0.03017817822412175
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.3203177473838403,
+            0.04223881649734724
+          ],
+          "reference": [
+            0.31959099186817325,
+            0.04227047932289888
+          ],
+          "normalized_error": 0.002256522619703233,
+          "integral": [
+            0.0006548372447664455,
+            -7.880944483050432e-05
+          ],
+          "left_trace": [
+            0.004748980640762015,
+            -0.0006457003916965883
+          ],
+          "right_trace": [
+            0.008006814397846514,
+            -0.0008605499646156668
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.18777717297362337,
+            0.09780259609968443
+          ],
+          "reference": [
+            0.18794597956210027,
+            0.09777965296527479
+          ],
+          "normalized_error": 0.0008041102714130338,
+          "integral": [
+            0.0014292943119592076,
+            -0.0001249784321023963
+          ],
+          "left_trace": [
+            0.008006814397846514,
+            -0.0008605499646156668
+          ],
+          "right_trace": [
+            0.010815854293456982,
+            -0.0007616787125173051
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.11291426758060616,
+            0.13007070755716413
+          ],
+          "reference": [
+            0.11298664651904809,
+            0.13006051161136317
+          ],
+          "normalized_error": 0.0004242624259462643,
+          "integral": [
+            0.0024070414858486755,
+            -0.00012187256265259106
+          ],
+          "left_trace": [
+            0.010815854293456982,
+            -0.0007616787125173051
+          ],
+          "right_trace": [
+            0.013046362305400353,
+            -0.000458913790925061
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.06260804213230296,
+            0.13661712758177316
+          ],
+          "reference": [
+            0.062453608198264114,
+            0.1365838057438986
+          ],
+          "normalized_error": 0.0010519541491809674,
+          "integral": [
+            0.002746101651307823,
+            -7.510404213676244e-05
+          ],
+          "left_trace": [
+            0.013046362305400353,
+            -0.000458913790925061
+          ],
+          "right_trace": [
+            0.014275592474353236,
+            -0.00035882528427927716
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.03104641140714978,
+            0.11888780440360956
+          ],
+          "reference": [
+            0.03111228707265571,
+            0.11886345979404098
+          ],
+          "normalized_error": 0.0005715905527407841,
+          "integral": [
+            0.0021772909004408353,
+            -7.166545048568684e-05
+          ],
+          "left_trace": [
+            0.014275592474353236,
+            -0.00035882528427927716
+          ],
+          "right_trace": [
+            0.014689027202104264,
+            -0.0006784942409137127
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.013814777499560133,
+            0.08594507635674778
+          ],
+          "reference": [
+            0.013819632968612267,
+            0.08575443088916306
+          ],
+          "normalized_error": 0.0021955497930833197,
+          "integral": [
+            0.0014729644162794126,
+            -9.33080310179641e-05
+          ],
+          "left_trace": [
+            0.014689027202104264,
+            -0.0006784942409137127
+          ],
+          "right_trace": [
+            0.014739623103373385,
+            -0.0012561974451436695
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.004736785517428747,
+            0.04283137265986659
+          ],
+          "reference": [
+            0.004716108774925834,
+            0.04273597622977189
+          ],
+          "normalized_error": 0.001270983181172593,
+          "integral": [
+            0.0007359821021365592,
+            -7.457633488116322e-05
+          ],
+          "left_trace": [
+            0.014739623103373385,
+            -0.0012561974451436695
+          ],
+          "right_trace": [
+            0.014689717526395496,
+            -0.0017690994813434233
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.007748194540066203,
+            0.059597375030183926
+          ],
+          "reference": [
+            0.007733819696196745,
+            0.059385360073918515
+          ],
+          "normalized_error": 0.0027669493815429716,
+          "integral": [
+            0.0014731042157332835,
+            -0.0001283925302616827
+          ],
+          "left_trace": [
+            0.014737399696864823,
+            -0.000916801255507889
+          ],
+          "right_trace": [
+            0.014689717526395496,
+            -0.0017690994813434233
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.004736785517428747,
+            0.04283137265986659
+          ],
+          "reference": [
+            0.004716108774925834,
+            0.04273597622977189
+          ],
+          "normalized_error": 0.001270983181172593,
+          "integral": [
+            0.0007359821021365592,
+            -7.457633488116322e-05
+          ],
+          "left_trace": [
+            0.014739623103373385,
+            -0.0012561974451436695
+          ],
+          "right_trace": [
+            0.014689717526395496,
+            -0.0017690994813434233
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.0030865271146710543,
+            0.030567145461552994
+          ],
+          "reference": [
+            0.003069930736751365,
+            0.030477960540806464
+          ],
+          "normalized_error": 0.001181197715189221,
+          "integral": [
+            0.00036768373569448715,
+            -4.044188579915524e-05
+          ],
+          "left_trace": [
+            0.014722121581166862,
+            -0.0014810176869550639
+          ],
+          "right_trace": [
+            0.014689717526395496,
+            -0.0017690994813434233
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.0021002246362303097,
+            0.021810469047203795
+          ],
+          "reference": [
+            0.002077305013598799,
+            0.02164207664483781
+          ],
+          "normalized_error": 0.0022128257986176714,
+          "integral": [
+            0.00018374150885872733,
+            -2.1111316089808172e-05
+          ],
+          "left_trace": [
+            0.014708094174990213,
+            -0.0016137570207232425
+          ],
+          "right_trace": [
+            0.014689717526395496,
+            -0.0017690994813434233
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 0.5,
+      "mode": "pitch-mid",
+      "loads": [
+        [
+          0.15338117203180812,
+          0.06005738170193447
+        ],
+        [
+          0.04022426667373477,
+          -0.015161453611758219
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.31362116202733764,
+            -0.02939990384577698
+          ],
+          "reference": [
+            0.3129396767790426,
+            -0.02920918574044931
+          ],
+          "normalized_error": 0.00225157285192705,
+          "integral": [
+            0.0006160284964312437,
+            -0.00022311438183025915
+          ],
+          "left_trace": [
+            0.004475963559396287,
+            -0.001696437011033592
+          ],
+          "right_trace": [
+            0.007519736282017461,
+            -0.002618714505858346
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.19277839886743345,
+            0.054498603848237445
+          ],
+          "reference": [
+            0.19293208464724024,
+            0.0544410215018549
+          ],
+          "normalized_error": 0.0008186874796709164,
+          "integral": [
+            0.0013381306184845987,
+            -0.00043672016329791624
+          ],
+          "left_trace": [
+            0.007519736282017461,
+            -0.002618714505858346
+          ],
+          "right_trace": [
+            0.010095178601023193,
+            -0.0031053044392142346
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.12444425525653742,
+            0.10166639198331028
+          ],
+          "reference": [
+            0.12449985587052266,
+            0.10164649184883726
+          ],
+          "normalized_error": 0.0003674283851384129,
+          "integral": [
+            0.0022351169106261974,
+            -0.0006376706463960684
+          ],
+          "left_trace": [
+            0.010095178601023193,
+            -0.0031053044392142346
+          ],
+          "right_trace": [
+            0.012050096605804987,
+            -0.003222371516854801
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.07650549556174875,
+            0.11776461961919042
+          ],
+          "reference": [
+            0.0763825542391933,
+            0.11775415895086208
+          ],
+          "normalized_error": 0.0008790781483518481,
+          "integral": [
+            0.0025189411657517025,
+            -0.0006480492120436842
+          ],
+          "left_trace": [
+            0.012050096605804987,
+            -0.003222371516854801
+          ],
+          "right_trace": [
+            0.012995911884631069,
+            -0.0032878831072067037
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.04386468061436622,
+            0.10653094031412509
+          ],
+          "reference": [
+            0.04390624577819154,
+            0.10650228606255076
+          ],
+          "normalized_error": 0.0004382463030140775,
+          "integral": [
+            0.0019679021373061796,
+            -0.0005112937938977007
+          ],
+          "left_trace": [
+            0.012995911884631069,
+            -0.0032878831072067037
+          ],
+          "right_trace": [
+            0.01317000372533284,
+            -0.0035912393021046785
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.023320415497113403,
+            0.07832868731910081
+          ],
+          "reference": [
+            0.023271497510331994,
+            0.07816371541642533
+          ],
+          "normalized_error": 0.002109900476512436,
+          "integral": [
+            0.0013119240711939512,
+            -0.00038102896244443643
+          ],
+          "left_trace": [
+            0.01317000372533284,
+            -0.0035912393021046785
+          ],
+          "right_trace": [
+            0.013031895757650002,
+            -0.0040872395470579964
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.009508012754937503,
+            0.039345879032321084
+          ],
+          "reference": [
+            0.009477785349238824,
+            0.03926042723511002
+          ],
+          "normalized_error": 0.001180215236040803,
+          "integral": [
+            0.0006478199431218709,
+            -0.00021449078085285754
+          ],
+          "left_trace": [
+            0.013031895757650002,
+            -0.0040872395470579964
+          ],
+          "right_trace": [
+            0.012866925876562444,
+            -0.004530133036886528
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.014386037867492573,
+            0.05457541773940257
+          ],
+          "reference": [
+            0.014323115063568537,
+            0.05439127077170283
+          ],
+          "normalized_error": 0.0025338616930006075,
+          "integral": [
+            0.0013020653964431416,
+            -0.00041114917444303394
+          ],
+          "left_trace": [
+            0.013128220489885763,
+            -0.00379656157522883
+          ],
+          "right_trace": [
+            0.012866925876562444,
+            -0.004530133036886528
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.009508012754937503,
+            0.039345879032321084
+          ],
+          "reference": [
+            0.009477785349238824,
+            0.03926042723511002
+          ],
+          "normalized_error": 0.001180215236040803,
+          "integral": [
+            0.0006478199431218709,
+            -0.00021449078085285754
+          ],
+          "left_trace": [
+            0.013031895757650002,
+            -0.0040872395470579964
+          ],
+          "right_trace": [
+            0.012866925876562444,
+            -0.004530133036886528
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.006497306316978546,
+            0.02812020947960565
+          ],
+          "reference": [
+            0.0064724847326103506,
+            0.028039286340583655
+          ],
+          "normalized_error": 0.0011021399349469237,
+          "integral": [
+            0.0003228896628583227,
+            -0.00010996578327669853
+          ],
+          "left_trace": [
+            0.012959971591305344,
+            -0.0042804730862146785
+          ],
+          "right_trace": [
+            0.012866925876562444,
+            -0.004530133036886528
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.004543939043292165,
+            0.020074240810255124
+          ],
+          "reference": [
+            0.004495730550477185,
+            0.01992422271648716
+          ],
+          "normalized_error": 0.0020517415591082386,
+          "integral": [
+            0.00016115622508401715,
+            -5.575405140301909e-05
+          ],
+          "left_trace": [
+            0.01291676334066951,
+            -0.004395115146190864
+          ],
+          "right_trace": [
+            0.012866925876562444,
+            -0.004530133036886528
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 1.0,
+      "mode": "heave-quarter",
+      "loads": [
+        [
+          0.1929613952127936,
+          -0.26038637112394725
+        ],
+        [
+          -0.060358063015973025,
+          3.106672433213914e-05
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.08569926498248617,
+            -0.5170138533904877
+          ],
+          "reference": [
+            0.0859454266809328,
+            -0.5158895903893974
+          ],
+          "normalized_error": 0.0022005682880795303,
+          "integral": [
+            -0.0002086927963830907,
+            -0.0010321543141459271
+          ],
+          "left_trace": [
+            -0.001460114658876196,
+            -0.0075522531517819335
+          ],
+          "right_trace": [
+            -0.0026317226102671528,
+            -0.012520428531833331
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.1965044372242347,
+            -0.31255812949589334
+          ],
+          "reference": [
+            0.1964108449315078,
+            -0.31278754333678277
+          ],
+          "normalized_error": 0.0006708436549614459,
+          "integral": [
+            -0.0004971186923694244,
+            -0.0022012664246842655
+          ],
+          "left_trace": [
+            -0.0026317226102671528,
+            -0.012520428531833331
+          ],
+          "right_trace": [
+            -0.003963873628007017,
+            -0.016409911920467816
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.260801679189872,
+            -0.20505470352491342
+          ],
+          "reference": [
+            0.26067931602489314,
+            -0.205072267806722
+          ],
+          "normalized_error": 0.0003727061908365917,
+          "integral": [
+            -0.0009601017873800878,
+            -0.0035583971032380154
+          ],
+          "left_trace": [
+            -0.003963873628007017,
+            -0.016409911920467816
+          ],
+          "right_trace": [
+            -0.00564729951802738,
+            -0.018761681335810004
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.27334256507106663,
+            -0.13595099596276786
+          ],
+          "reference": [
+            0.2735375857596446,
+            -0.13589905272538286
+          ],
+          "normalized_error": 0.0006607584363647723,
+          "integral": [
+            -0.0013143889911615646,
+            -0.003805376423569498
+          ],
+          "left_trace": [
+            -0.00564729951802738,
+            -0.018761681335810004
+          ],
+          "right_trace": [
+            -0.007563415592852489,
+            -0.01896521576937787
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.2381616401695264,
+            -0.08926990589935889
+          ],
+          "reference": [
+            0.23796979808180804,
+            -0.08921419605728598
+          ],
+          "normalized_error": 0.0007860420769279619,
+          "integral": [
+            -0.0012647618889826753,
+            -0.0027742872863864318
+          ],
+          "left_trace": [
+            -0.007563415592852489,
+            -0.01896521576937787
+          ],
+          "right_trace": [
+            -0.009390714537976502,
+            -0.017830534271090003
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.17215544549899803,
+            -0.055206675073988146
+          ],
+          "reference": [
+            0.171658007933891,
+            -0.05478440746081604
+          ],
+          "normalized_error": 0.003621203673491942,
+          "integral": [
+            -0.001016586692250557,
+            -0.0017155904809346098
+          ],
+          "left_trace": [
+            -0.009390714537976502,
+            -0.017830534271090003
+          ],
+          "right_trace": [
+            -0.011028609609231159,
+            -0.0163724304186096
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.08570153855012386,
+            -0.02517612341925799
+          ],
+          "reference": [
+            0.08554024177599796,
+            -0.02508405076668123
+          ],
+          "normalized_error": 0.001209151465829615,
+          "integral": [
+            -0.0005782725546180064,
+            -0.0007940710322382066
+          ],
+          "left_trace": [
+            -0.011028609609231159,
+            -0.0163724304186096
+          ],
+          "right_trace": [
+            -0.01217038949375901,
+            -0.015347010952182221
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.11935761576054406,
+            -0.03645257285633572
+          ],
+          "reference": [
+            0.118868846500043,
+            -0.036043799060960974
+          ],
+          "normalized_error": 0.004148271802887204,
+          "integral": [
+            -0.001106960075213537,
+            -0.0016336583333676742
+          ],
+          "left_trace": [
+            -0.010146381324529328,
+            -0.017181216802022465
+          ],
+          "right_trace": [
+            -0.01217038949375901,
+            -0.015347010952182221
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.08570153855012386,
+            -0.02517612341925799
+          ],
+          "reference": [
+            0.08554024177599796,
+            -0.02508405076668123
+          ],
+          "normalized_error": 0.001209151465829615,
+          "integral": [
+            -0.0005782725546180064,
+            -0.0007940710322382066
+          ],
+          "left_trace": [
+            -0.011028609609231159,
+            -0.0163724304186096
+          ],
+          "right_trace": [
+            -0.01217038949375901,
+            -0.015347010952182221
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.06115840447700484,
+            -0.017668034446030958
+          ],
+          "reference": [
+            0.06100383736604551,
+            -0.017600622962225237
+          ],
+          "normalized_error": 0.0010978365640623453,
+          "integral": [
+            -0.00029616973386348543,
+            -0.0003906645629572348
+          ],
+          "left_trace": [
+            -0.011548327046170074,
+            -0.01589333991353932
+          ],
+          "right_trace": [
+            -0.01217038949375901,
+            -0.015347010952182221
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.04365015897039835,
+            -0.01260987390606064
+          ],
+          "reference": [
+            0.04331790653864876,
+            -0.012398252827013524
+          ],
+          "normalized_error": 0.002564601456236642,
+          "integral": [
+            -0.00015000888662503295,
+            -0.00019363295645208193
+          ],
+          "left_trace": [
+            -0.011839959725347552,
+            -0.01563060961878377
+          ],
+          "right_trace": [
+            -0.01217038949375901,
+            -0.015347010952182221
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 1.0,
+      "mode": "pitch-quarter",
+      "loads": [
+        [
+          0.09403104312799526,
+          0.2266738833311118
+        ],
+        [
+          0.022623678771916914,
+          -0.06035384251668156
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.2971360752768263,
+            0.15285199362564447
+          ],
+          "reference": [
+            0.29645088760030913,
+            0.1527503276406153
+          ],
+          "normalized_error": 0.0020770889544589302,
+          "integral": [
+            0.0006204235553949418,
+            -1.2637892173421444e-05
+          ],
+          "left_trace": [
+            0.004506183906241635,
+            -0.00026414136389601496
+          ],
+          "right_trace": [
+            0.007576075572695066,
+            8.721979224789804e-05
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.1562814690848481,
+            0.23691069938199316
+          ],
+          "reference": [
+            0.15644300471744005,
+            0.2369151335298955
+          ],
+          "normalized_error": 0.0005691880444855418,
+          "integral": [
+            0.0013491925588375428,
+            8.445962478450839e-05
+          ],
+          "left_trace": [
+            0.007576075572695066,
+            8.721979224789804e-05
+          ],
+          "right_trace": [
+            0.010186892776714834,
+            0.0010905643524164556
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.061554434668033224,
+            0.2872124427549934
+          ],
+          "reference": [
+            0.06162442057848897,
+            0.28723506127663356
+          ],
+          "normalized_error": 0.0002503653887827596,
+          "integral": [
+            0.002259249445909112,
+            0.0003676067990746951
+          ],
+          "left_trace": [
+            0.010186892776714834,
+            0.0010905643524164556
+          ],
+          "right_trace": [
+            0.01220449043044825,
+            0.0025556580179939285
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            -0.008724116022557774,
+            0.29129137638527336
+          ],
+          "reference": [
+            -0.008847614085225938,
+            0.29113577523073114
+          ],
+          "normalized_error": 0.0006820272383920543,
+          "integral": [
+            0.0025598827081870245,
+            0.0006207888362653395
+          ],
+          "left_trace": [
+            0.01220449043044825,
+            0.0025556580179939285
+          ],
+          "right_trace": [
+            0.013264315685842309,
+            0.0035044629429797397
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            -0.045423893301170255,
+            0.24951777182000234
+          ],
+          "reference": [
+            -0.045355762781195415,
+            0.2495225520873814
+          ],
+          "normalized_error": 0.00026930202393749697,
+          "integral": [
+            0.00201952458847503,
+            0.0005280285286954589
+          ],
+          "left_trace": [
+            0.013264315685842309,
+            0.0035044629429797397
+          ],
+          "right_trace": [
+            0.013610624410402441,
+            0.003364128950717217
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            -0.04903239584873133,
+            0.17906055286539765
+          ],
+          "reference": [
+            -0.04899479959213415,
+            0.17875229125097095
+          ],
+          "normalized_error": 0.0016754989162662307,
+          "integral": [
+            0.00136608858722795,
+            0.0003003248669175464
+          ],
+          "left_trace": [
+            0.013610624410402441,
+            0.003364128950717217
+          ],
+          "right_trace": [
+            0.01370052002081325,
+            0.002497165868609209
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.028913645642228116,
+            0.088989783892477
+          ],
+          "reference": [
+            -0.02887903172504111,
+            0.08878849015773198
+          ],
+          "normalized_error": 0.00218758380684047,
+          "integral": [
+            0.0006861717937895267,
+            0.00010438605707522662
+          ],
+          "left_trace": [
+            0.01370052002081325,
+            0.002497165868609209
+          ],
+          "right_trace": [
+            0.013758700230577098,
+            0.0015883107388034736
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            -0.0377083133331486,
+            0.12390926858394488
+          ],
+          "reference": [
+            -0.03766831083123042,
+            0.12353632278050196
+          ],
+          "normalized_error": 0.002904223757726964,
+          "integral": [
+            0.0013703092049824562,
+            0.0002438480457566769
+          ],
+          "left_trace": [
+            0.013663799069617375,
+            0.0030382076010189605
+          ],
+          "right_trace": [
+            0.013758700230577098,
+            0.0015883107388034736
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.028913645642228116,
+            0.088989783892477
+          ],
+          "reference": [
+            -0.02887903172504111,
+            0.08878849015773198
+          ],
+          "normalized_error": 0.00218758380684047,
+          "integral": [
+            0.0006861717937895267,
+            0.00010438605707522662
+          ],
+          "left_trace": [
+            0.01370052002081325,
+            0.002497165868609209
+          ],
+          "right_trace": [
+            0.013758700230577098,
+            0.0015883107388034736
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            -0.02126381865361769,
+            0.06347353283718046
+          ],
+          "reference": [
+            -0.021220239491597705,
+            0.06328302247798519
+          ],
+          "normalized_error": 0.002544676629930084,
+          "integral": [
+            0.00034341714859546584,
+            4.662063562425141e-05
+          ],
+          "left_trace": [
+            0.013720833487072391,
+            0.0021098493775642477
+          ],
+          "right_trace": [
+            0.013758700230577098,
+            0.0015883107388034736
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            -0.015349180524774247,
+            0.04525632632754279
+          ],
+          "reference": [
+            -0.0152888653600058,
+            0.04492341296407705
+          ],
+          "normalized_error": 0.004405377753992039,
+          "integral": [
+            0.0001718209216323128,
+            2.170073162655304e-05
+          ],
+          "left_trace": [
+            0.013735284679465625,
+            0.0018730250738291114
+          ],
+          "right_trace": [
+            0.013758700230577098,
+            0.0015883107388034736
+          ]
+        }
+      ]
+    },
+    {
+      "m": 2048,
+      "k": 1.0,
+      "mode": "pitch-mid",
+      "loads": [
+        [
+          0.14227139193119356,
+          0.16157729055012454
+        ],
+        [
+          0.043102011000721814,
+          -0.01995175319806726
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.31856089152244776,
+            0.023598530278022594
+          ],
+          "reference": [
+            0.31793724427054226,
+            0.023777930043265935
+          ],
+          "normalized_error": 0.002035403131897376,
+          "integral": [
+            0.0005682503562991691,
+            -0.00027067647070990326
+          ],
+          "left_trace": [
+            0.004141155241522586,
+            -0.0021522046518414983
+          ],
+          "right_trace": [
+            0.006918144920128278,
+            -0.0030428873407104345
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.2054075783909067,
+            0.15877116700801985
+          ],
+          "reference": [
+            0.20554571595031698,
+            0.1587182476956998
+          ],
+          "normalized_error": 0.0005696228419261384,
+          "integral": [
+            0.0012249128857451871,
+            -0.00046585698138655785
+          ],
+          "left_trace": [
+            0.006918144920128278,
+            -0.0030428873407104345
+          ],
+          "right_trace": [
+            0.009195924369713079,
+            -0.0030119136277004985
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.12675485446550122,
+            0.2359487668737652
+          ],
+          "reference": [
+            0.12679424958471225,
+            0.2359669943249531
+          ],
+          "normalized_error": 0.0001620438374339707,
+          "integral": [
+            0.002019223999064091,
+            -0.0005219924767348082
+          ],
+          "left_trace": [
+            0.009195924369713079,
+            -0.0030119136277004985
+          ],
+          "right_trace": [
+            0.010792665550941405,
+            -0.0021347623159585724
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.05961152524520874,
+            0.2573036273945812
+          ],
+          "reference": [
+            0.059536782354685215,
+            0.25716101204938546
+          ],
+          "normalized_error": 0.0006099887359659473,
+          "integral": [
+            0.0022312854603966314,
+            -0.00033055526962703425
+          ],
+          "left_trace": [
+            0.010792665550941405,
+            -0.0021347623159585724
+          ],
+          "right_trace": [
+            0.011373461787629185,
+            -0.0012368409993647282
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.014116516741211307,
+            0.22720029534516245
+          ],
+          "reference": [
+            0.01413668673925658,
+            0.22721900307305984
+          ],
+          "normalized_error": 0.00012083959430427354,
+          "integral": [
+            0.0017033341162293598,
+            -0.00016554329290114863
+          ],
+          "left_trace": [
+            0.011373461787629185,
+            -0.0012368409993647282
+          ],
+          "right_trace": [
+            0.011262945775908315,
+            -0.001093504617055284
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            -0.005993534473981699,
+            0.16525888409690057
+          ],
+          "reference": [
+            -0.006080297608661412,
+            0.1650561893857669
+          ],
+          "normalized_error": 0.0013349034879440202,
+          "integral": [
+            0.0011119419141653103,
+            -0.00012857275331610644
+          ],
+          "left_trace": [
+            0.011262945775908315,
+            -0.001093504617055284
+          ],
+          "right_trace": [
+            0.01094336761850546,
+            -0.0015959417360431908
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.0074882610046971085,
+            0.08269575303766233
+          ],
+          "reference": [
+            -0.0074939712810416234,
+            0.08251747746606167
+          ],
+          "normalized_error": 0.0021527071210161028,
+          "integral": [
+            0.0005416036551350247,
+            -9.413170098432492e-05
+          ],
+          "left_trace": [
+            0.01094336761850546,
+            -0.0015959417360431908
+          ],
+          "right_trace": [
+            0.010716102857137345,
+            -0.0022484419992420818
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            -0.007868909393012382,
+            0.11479612536986078
+          ],
+          "reference": [
+            -0.007951099206219668,
+            0.1145253730152617
+          ],
+          "normalized_error": 0.0024647187317696946,
+          "integral": [
+            0.0010935691861790713,
+            -0.00016456653758524249
+          ],
+          "left_trace": [
+            0.011127203738485043,
+            -0.0012570965994866555
+          ],
+          "right_trace": [
+            0.010716102857137345,
+            -0.0022484419992420818
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.0074882610046971085,
+            0.08269575303766233
+          ],
+          "reference": [
+            -0.0074939712810416234,
+            0.08251747746606167
+          ],
+          "normalized_error": 0.0021527071210161028,
+          "integral": [
+            0.0005416036551350247,
+            -9.413170098432492e-05
+          ],
+          "left_trace": [
+            0.01094336761850546,
+            -0.0015959417360431908
+          ],
+          "right_trace": [
+            0.010716102857137345,
+            -0.0022484419992420818
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            -0.005974217534366654,
+            0.05905652422567294
+          ],
+          "reference": [
+            -0.005969280150086328,
+            0.05888286673742888
+          ],
+          "normalized_error": 0.0022620789488847826,
+          "integral": [
+            0.00026937471512959455,
+            -5.104550511505728e-05
+          ],
+          "left_trace": [
+            0.010833751725529873,
+            -0.0018634856008205828
+          ],
+          "right_trace": [
+            0.010716102857137345,
+            -0.0022484419992420818
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            -0.004436640782175007,
+            0.04210385785102777
+          ],
+          "reference": [
+            -0.00445938872534361,
+            0.041823849757323665
+          ],
+          "normalized_error": 0.0036579505078984807,
+          "integral": [
+            0.00013431869997605455,
+            -2.670750748646743e-05
+          ],
+          "left_trace": [
+            0.010775294748128737,
+            -0.0020346273308668316
+          ],
+          "right_trace": [
+            0.010716102857137345,
+            -0.0022484419992420818
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 0.1,
+      "mode": "heave-quarter",
+      "loads": [
+        [
+          -0.00589818649630623,
+          -0.04014797352694154
+        ],
+        [
+          -0.0006037410696901317,
+          1.2676585275216711e-07
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            -0.014655504986513686,
+            -0.07957562967063067
+          ],
+          "reference": [
+            -0.014659741101303808,
+            -0.0795612239320191
+          ],
+          "normalized_error": 9.775818756493218e-05,
+          "integral": [
+            -3.4811091103345824e-05,
+            -0.00016311052315119722
+          ],
+          "left_trace": [
+            -0.0002475086373295731,
+            -0.0011784332215925295
+          ],
+          "right_trace": [
+            -0.0004327922522359968,
+            -0.0020003838124409297
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            -0.007456536352926594,
+            -0.04829948083499015
+          ],
+          "reference": [
+            -0.007445290546488829,
+            -0.04823853832712527
+          ],
+          "normalized_error": 0.00040345979348986035,
+          "integral": [
+            -7.975638074957023e-05,
+            -0.0003596842300752114
+          ],
+          "left_trace": [
+            -0.0004327922522359968,
+            -0.0020003838124409297
+          ],
+          "right_trace": [
+            -0.0006212374787655171,
+            -0.002739111924337737
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            -0.0035503010362125755,
+            -0.03159879641243148
+          ],
+          "reference": [
+            -0.0035622721745881573,
+            -0.03162653584248969
+          ],
+          "normalized_error": 0.0001966947759552974,
+          "integral": [
+            -0.00014457811305687365,
+            -0.0006154964598263224
+          ],
+          "left_trace": [
+            -0.0006212374787655171,
+            -0.002739111924337737
+          ],
+          "right_trace": [
+            -0.0008183013756518769,
+            -0.0033685045603186847
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            -0.0013577365326425932,
+            -0.020977526855773906
+          ],
+          "reference": [
+            -0.0013527933725576305,
+            -0.020958544555768722
+          ],
+          "normalized_error": 0.0001277041993895437,
+          "integral": [
+            -0.00018110657022613296,
+            -0.0007169547702711792
+          ],
+          "left_trace": [
+            -0.0008183013756518769,
+            -0.0033685045603186847
+          ],
+          "right_trace": [
+            -0.0009899785074695,
+            -0.0037693150557687478
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            -0.00029496849680895465,
+            -0.013749346389973402
+          ],
+          "reference": [
+            -0.00030407886604001157,
+            -0.01375873978203586
+          ],
+          "normalized_error": 8.519313486198574e-05,
+          "integral": [
+            -0.00015759875837813636,
+            -0.0005803513664482844
+          ],
+          "left_trace": [
+            -0.0009899785074695,
+            -0.0037693150557687478
+          ],
+          "right_trace": [
+            -0.0011106576635217969,
+            -0.003952628841436455
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            6.934731715888596e-05,
+            -0.00845394002543501
+          ],
+          "reference": [
+            6.853379511562533e-05,
+            -0.008448928978549406
+          ],
+          "normalized_error": 3.305112843230545e-05,
+          "integral": [
+            -0.00011502561552257133,
+            -0.0003989499788035031
+          ],
+          "left_trace": [
+            -0.0011106576635217969,
+            -0.003952628841436455
+          ],
+          "right_trace": [
+            -0.0011897252913954258,
+            -0.004017685593596889
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.00010179889986103992,
+            -0.0038729847741948787
+          ],
+          "reference": [
+            0.0001008140490007667,
+            -0.00386849786727365
+          ],
+          "normalized_error": 2.990703231176424e-05,
+          "integral": [
+            -6.047767874776363e-05,
+            -0.00020119060009022194
+          ],
+          "left_trace": [
+            -0.0011897252913954258,
+            -0.004017685593596889
+          ],
+          "right_trace": [
+            -0.0012294332088100273,
+            -0.004025761853546268
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.00010444879054408858,
+            -0.005564084810584238
+          ],
+          "reference": [
+            0.00010440459911771552,
+            -0.005558725785269795
+          ],
+          "normalized_error": 3.489067393439129e-05,
+          "integral": [
+            -0.00011897819106084477,
+            -0.00040148295862153186
+          ],
+          "left_trace": [
+            -0.0011502246253205551,
+            -0.0039915982749815174
+          ],
+          "right_trace": [
+            -0.0012294332088100273,
+            -0.004025761853546268
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.00010179889986103992,
+            -0.0038729847741948787
+          ],
+          "reference": [
+            0.0001008140490007667,
+            -0.00386849786727365
+          ],
+          "normalized_error": 2.990703231176424e-05,
+          "integral": [
+            -6.047767874776363e-05,
+            -0.00020119060009022194
+          ],
+          "left_trace": [
+            -0.0011897252913954258,
+            -0.004017685593596889
+          ],
+          "right_trace": [
+            -0.0012294332088100273,
+            -0.004025761853546268
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            8.119945089916918e-05,
+            -0.0027189507471972085
+          ],
+          "reference": [
+            8.056944961200185e-05,
+            -0.0027143930230956238
+          ],
+          "normalized_error": 2.9954815928568445e-05,
+          "integral": [
+            -3.048672550382452e-05,
+            -0.00010064982139209374
+          ],
+          "left_trace": [
+            -0.0012095147014349918,
+            -0.004024778597742873
+          ],
+          "right_trace": [
+            -0.0012294332088100273,
+            -0.004025761853546268
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            6.682868504695137e-05,
+            -0.0019161701187955652
+          ],
+          "reference": [
+            6.020990409666478e-05,
+            -0.0019120761261944724
+          ],
+          "normalized_error": 5.066804149739995e-05,
+          "integral": [
+            -1.530553192225867e-05,
+            -5.032870619405299e-05
+          ],
+          "left_trace": [
+            -0.0012194544840882049,
+            -0.004026327946755204
+          ],
+          "right_trace": [
+            -0.0012294332088100273,
+            -0.004025761853546268
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 0.1,
+      "mode": "pitch-quarter",
+      "loads": [
+        [
+          0.20429214661689668,
+          -0.00941694569296782
+        ],
+        [
+          0.00022583848966521274,
+          -0.0060346973831244145
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.406020688845299,
+            -0.04831396037855507
+          ],
+          "reference": [
+            0.40595077826820813,
+            -0.04833481162996445
+          ],
+          "normalized_error": 0.00017845059702348786,
+          "integral": [
+            0.0008329581613294164,
+            -0.00013493706830424034
+          ],
+          "left_trace": [
+            0.006015920426782126,
+            -0.000979464159952721
+          ],
+          "right_trace": [
+            0.010218315188593143,
+            -0.001649326212828553
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.24620821885660907,
+            -0.014903638598688134
+          ],
+          "reference": [
+            0.24589788346401878,
+            -0.014875589629306487
+          ],
+          "normalized_error": 0.001264881863500819,
+          "integral": [
+            0.00183829934080069,
+            -0.0002957012338397148
+          ],
+          "left_trace": [
+            0.010218315188593143,
+            -0.001649326212828553
+          ],
+          "right_trace": [
+            0.014006178361459717,
+            -0.002249855434093193
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.1606634119626165,
+            0.003478964984039878
+          ],
+          "reference": [
+            0.16080809474661828,
+            0.0034378339843866585
+          ],
+          "normalized_error": 0.0009351599302351295,
+          "integral": [
+            0.0031497713557504152,
+            -0.0005082964370838093
+          ],
+          "left_trace": [
+            0.014006178361459717,
+            -0.002249855434093193
+          ],
+          "right_trace": [
+            0.0172516734899308,
+            -0.0028073312680757787
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.10616621900676769,
+            0.012348934105443736
+          ],
+          "reference": [
+            0.10606883598944146,
+            0.01235705101391795
+          ],
+          "normalized_error": 0.0009151060354948159,
+          "integral": [
+            0.003675327136582151,
+            -0.0006095259302061737
+          ],
+          "left_trace": [
+            0.0172516734899308,
+            -0.0028073312680757787
+          ],
+          "right_trace": [
+            0.019341564533197225,
+            -0.003285127234862131
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.06918443654832404,
+            0.013985331712151907
+          ],
+          "reference": [
+            0.06923595872550994,
+            0.013952031062601308
+          ],
+          "normalized_error": 0.0007987905050979572,
+          "integral": [
+            0.002980556211528988,
+            -0.0005204915731372638
+          ],
+          "left_trace": [
+            0.019341564533197225,
+            -0.003285127234862131
+          ],
+          "right_trace": [
+            0.020318473039637335,
+            -0.0036627176691655552
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.042329446461959526,
+            0.011129622482238402
+          ],
+          "reference": [
+            0.04230479800163324,
+            0.011120241820214573
+          ],
+          "normalized_error": 0.00034340048332978245,
+          "integral": [
+            0.0020522627018506948,
+            -0.0003805707959517381
+          ],
+          "left_trace": [
+            0.020318473039637335,
+            -0.0036627176691655552
+          ],
+          "right_trace": [
+            0.020683290614425733,
+            -0.0039572366420123775
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.019327515057065234,
+            0.0057964598830151995
+          ],
+          "reference": [
+            0.019305572949664035,
+            0.005785953567279897
+          ],
+          "normalized_error": 0.00031676739814817244,
+          "integral": [
+            0.0010361918398627918,
+            -0.00020214441221600064
+          ],
+          "left_trace": [
+            0.020683290614425733,
+            -0.0039572366420123775
+          ],
+          "right_trace": [
+            0.020743525872904747,
+            -0.004134285114760898
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.027805641773433292,
+            0.007916191380640413
+          ],
+          "reference": [
+            0.02777886875567322,
+            0.00790938588822347
+          ],
+          "normalized_error": 0.00035969311644391534,
+          "integral": [
+            0.002066903888712445,
+            -0.00039609958594303705
+          ],
+          "left_trace": [
+            0.020533103688286758,
+            -0.0038033646639000804
+          ],
+          "right_trace": [
+            0.020743525872904747,
+            -0.004134285114760898
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.019327515057065234,
+            0.0057964598830151995
+          ],
+          "reference": [
+            0.019305572949664035,
+            0.005785953567279897
+          ],
+          "normalized_error": 0.00031676739814817244,
+          "integral": [
+            0.0010361918398627918,
+            -0.00020214441221600064
+          ],
+          "left_trace": [
+            0.020683290614425733,
+            -0.0039572366420123775
+          ],
+          "right_trace": [
+            0.020743525872904747,
+            -0.004134285114760898
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.013558967685876375,
+            0.00416723379567711
+          ],
+          "reference": [
+            0.013536494067775243,
+            0.004158122990992802
+          ],
+          "normalized_error": 0.0003157572950293792,
+          "integral": [
+            0.0005184924697314346,
+            -0.00010217139482516113
+          ],
+          "left_trace": [
+            0.02072865034018781,
+            -0.004041438792157521
+          ],
+          "right_trace": [
+            0.020743525872904747,
+            -0.004134285114760898
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.009549145870745585,
+            0.0030005185270403703
+          ],
+          "reference": [
+            0.009531985293882146,
+            0.0029636209117051508
+          ],
+          "normalized_error": 0.000529856637516699,
+          "integral": [
+            0.00025929629694096,
+            -5.137443681701901e-05
+          ],
+          "left_trace": [
+            0.020741366976582284,
+            -0.0040863327805381235
+          ],
+          "right_trace": [
+            0.020743525872904747,
+            -0.004134285114760898
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 0.1,
+      "mode": "pitch-mid",
+      "loads": [
+        [
+          0.2028175999928201,
+          -0.019453939074703226
+        ],
+        [
+          0.05077930322044763,
+          -0.010898150460336953
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.4023568125986706,
+            -0.06820786779621275
+          ],
+          "reference": [
+            0.4022858429928822,
+            -0.06822511761296923
+          ],
+          "normalized_error": 0.00017899632524241623,
+          "integral": [
+            0.0008242553885535798,
+            -0.00017571469909203978
+          ],
+          "left_trace": [
+            0.005954043267449733,
+            -0.0012740724653508533
+          ],
+          "right_trace": [
+            0.010110117125534144,
+            -0.0021494221659387855
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.24434408476837746,
+            -0.026978508807435665
+          ],
+          "reference": [
+            0.24403656082739658,
+            -0.0269352242110878
+          ],
+          "normalized_error": 0.0012648951398765921,
+          "integral": [
+            0.0018183602456132977,
+            -0.00038562229135851746
+          ],
+          "left_trace": [
+            0.010110117125534144,
+            -0.0021494221659387855
+          ],
+          "right_trace": [
+            0.013850868991768338,
+            -0.0029346334151776274
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.15977583670356332,
+            -0.004420734119068045
+          ],
+          "reference": [
+            0.15991752670297124,
+            -0.0044687999762357666
+          ],
+          "normalized_error": 0.0009352471519361501,
+          "integral": [
+            0.0031136268274861915,
+            -0.0006621705520403906
+          ],
+          "left_trace": [
+            0.013850868991768338,
+            -0.0029346334151776274
+          ],
+          "right_trace": [
+            0.01704709814601783,
+            -0.00364945740815545
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.10582678487360708,
+            0.007104552391500278
+          ],
+          "reference": [
+            0.10573063764630206,
+            0.00711741487497577
+          ],
+          "normalized_error": 0.0009153896809047825,
+          "integral": [
+            0.0036300504940256165,
+            -0.0007887646227739696
+          ],
+          "left_trace": [
+            0.01704709814601783,
+            -0.00364945740815545
+          ],
+          "right_trace": [
+            0.01909406990632985,
+            -0.004227455998804318
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.06911069442412185,
+            0.010547995114658577
+          ],
+          "reference": [
+            0.06915993900899996,
+            0.010512346117092342
+          ],
+          "normalized_error": 0.0007915853001907444,
+          "integral": [
+            0.0029411565219344556,
+            -0.0006655794147493354
+          ],
+          "left_trace": [
+            0.01909406990632985,
+            -0.004227455998804318
+          ],
+          "right_trace": [
+            0.020040808623756887,
+            -0.0046508748795246685
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.04234678329124921,
+            0.009016137475879673
+          ],
+          "reference": [
+            0.04232193145041215,
+            0.00900800957557722
+          ],
+          "normalized_error": 0.00034045850475787636,
+          "integral": [
+            0.002023506297970053,
+            -0.00048030829065261394
+          ],
+          "left_trace": [
+            0.020040808623756887,
+            -0.0046508748795246685
+          ],
+          "right_trace": [
+            0.020385859291576876,
+            -0.004961658040411599
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.01935296478203044,
+            0.0048282136894663595
+          ],
+          "reference": [
+            0.019330776461914227,
+            0.004818829100461483
+          ],
+          "normalized_error": 0.00031368916006377026,
+          "integral": [
+            0.0010210724201758499,
+            -0.00025244206223855607
+          ],
+          "left_trace": [
+            0.020385859291576876,
+            -0.004961658040411599
+          ],
+          "right_trace": [
+            0.02043616757070224,
+            -0.005140725578147465
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.027831753971069552,
+            0.006525170177994354
+          ],
+          "reference": [
+            0.027804969905452653,
+            0.0065197044419060225
+          ],
+          "normalized_error": 0.0003559383445139895,
+          "integral": [
+            0.0020371593409472337,
+            -0.0004964703255984203
+          ],
+          "left_trace": [
+            0.020245547531956617,
+            -0.00480126423264546
+          ],
+          "right_trace": [
+            0.02043616757070224,
+            -0.005140725578147465
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.01935296478203044,
+            0.0048282136894663595
+          ],
+          "reference": [
+            0.019330776461914227,
+            0.004818829100461483
+          ],
+          "normalized_error": 0.00031368916006377026,
+          "integral": [
+            0.0010210724201758499,
+            -0.00025244206223855607
+          ],
+          "left_trace": [
+            0.020385859291576876,
+            -0.004961658040411599
+          ],
+          "right_trace": [
+            0.02043616757070224,
+            -0.005140725578147465
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.01357926754860088,
+            0.0034874961088777086
+          ],
+          "reference": [
+            0.013556636430178242,
+            0.0034795247352188956
+          ],
+          "normalized_error": 0.0003124214091355467,
+          "integral": [
+            0.0005108707883554782,
+            -0.00012733385017318466
+          ],
+          "left_trace": [
+            0.020426271664829063,
+            -0.005047633441593239
+          ],
+          "right_trace": [
+            0.02043616757070224,
+            -0.005140725578147465
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.009565853042005497,
+            0.002521475997341698
+          ],
+          "reference": [
+            0.009547037769906314,
+            0.002485601880156532
+          ],
+          "normalized_error": 0.0005274589553913064,
+          "integral": [
+            0.0002554699139603957,
+            -6.39566133655323e-05
+          ],
+          "left_trace": [
+            0.020436503355560236,
+            -0.005092914767226925
+          ],
+          "right_trace": [
+            0.02043616757070224,
+            -0.005140725578147465
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 0.5,
+      "mode": "heave-quarter",
+      "loads": [
+        [
+          0.023968919441880898,
+          -0.14428182103330134
+        ],
+        [
+          -0.015086685894112578,
+          4.830911699463258e-06
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            -0.026605044395463608,
+            -0.28596720090675726
+          ],
+          "reference": [
+            -0.026605260356522595,
+            -0.28591866025339274
+          ],
+          "normalized_error": 0.00016904226679483866,
+          "integral": [
+            -0.00015523510528596838,
+            -0.0005771934528241222
+          ],
+          "left_trace": [
+            -0.0010925367923123898,
+            -0.004204457819449814
+          ],
+          "right_trace": [
+            -0.0019468661242559246,
+            -0.007028047723609234
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.0198751262633481,
+            -0.17354519539568897
+          ],
+          "reference": [
+            0.019944420340559897,
+            -0.17335452585367955
+          ],
+          "normalized_error": 0.0011625960773609316,
+          "integral": [
+            -0.00036465603922348447,
+            -0.0012469043159798552
+          ],
+          "left_trace": [
+            -0.0019468661242559246,
+            -0.007028047723609234
+          ],
+          "right_trace": [
+            -0.0028832215923709657,
+            -0.00937503536244339
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.04611158545995764,
+            -0.11358381518156488
+          ],
+          "reference": [
+            0.046052837405898356,
+            -0.11365607905010364
+          ],
+          "normalized_error": 0.0006063222224486183,
+          "integral": [
+            -0.0006877045185309559,
+            -0.00206307233501786
+          ],
+          "left_trace": [
+            -0.0028832215923709657,
+            -0.00937503536244339
+          ],
+          "right_trace": [
+            -0.003985635896973041,
+            -0.011053660326861703
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.05567920542769244,
+            -0.07535928732508965
+          ],
+          "reference": [
+            0.055715784163716774,
+            -0.07531858717214626
+          ],
+          "normalized_error": 0.0003562635618459561,
+          "integral": [
+            -0.0009086580318803619,
+            -0.0022916168259547007
+          ],
+          "left_trace": [
+            -0.003985635896973041,
+            -0.011053660326861703
+          ],
+          "right_trace": [
+            -0.005117269276517483,
+            -0.011714987447587375
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.05124681399461161,
+            -0.04946041084954601
+          ],
+          "reference": [
+            0.05117583482214333,
+            -0.04944469492596097
+          ],
+          "normalized_error": 0.00047329579210784274,
+          "integral": [
+            -0.000837579556016294,
+            -0.0017583555528484186
+          ],
+          "left_trace": [
+            -0.005117269276517483,
+            -0.011714987447587375
+          ],
+          "right_trace": [
+            -0.006074893360700095,
+            -0.011650226811095237
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.03782382097001032,
+            -0.03038663035864217
+          ],
+          "reference": [
+            0.037807458166878895,
+            -0.030362861890950877
+          ],
+          "normalized_error": 0.00018786600998703127,
+          "integral": [
+            -0.0006441909465276787,
+            -0.001150755431308516
+          ],
+          "left_trace": [
+            -0.006074893360700095,
+            -0.011650226811095237
+          ],
+          "right_trace": [
+            -0.006831650656904337,
+            -0.011322563264136748
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.01907211880752763,
+            -0.013925699922208977
+          ],
+          "reference": [
+            0.019046706297251956,
+            -0.013902195978647497
+          ],
+          "normalized_error": 0.00022536115896775117,
+          "integral": [
+            -0.0003526732377662151,
+            -0.000559581995930791
+          ],
+          "left_trace": [
+            -0.006831650656904337,
+            -0.011322563264136748
+          ],
+          "right_trace": [
+            -0.007291898700712588,
+            -0.011042419713465371
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.026370695810617146,
+            -0.019996194851143574
+          ],
+          "reference": [
+            0.02635718146948719,
+            -0.019976357208862684
+          ],
+          "normalized_error": 0.00015627298380239399,
+          "integral": [
+            -0.0006841966609910163,
+            -0.0011308837333536032
+          ],
+          "left_trace": [
+            -0.006435709715386247,
+            -0.011518322678090309
+          ],
+          "right_trace": [
+            -0.007291898700712588,
+            -0.011042419713465371
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.01907211880752763,
+            -0.013925699922208977
+          ],
+          "reference": [
+            0.019046706297251956,
+            -0.013902195978647497
+          ],
+          "normalized_error": 0.00022536115896775117,
+          "integral": [
+            -0.0003526732377662151,
+            -0.000559581995930791
+          ],
+          "left_trace": [
+            -0.006831650656904337,
+            -0.011322563264136748
+          ],
+          "right_trace": [
+            -0.007291898700712588,
+            -0.011042419713465371
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.013633815229118046,
+            -0.009775656586380637
+          ],
+          "reference": [
+            0.013610215983435942,
+            -0.009754696800891229
+          ],
+          "normalized_error": 0.00020548972878037985,
+          "integral": [
+            -0.00017919015242197172,
+            -0.0002780561840484603
+          ],
+          "left_trace": [
+            -0.00704934724382329,
+            -0.01119615242686031
+          ],
+          "right_trace": [
+            -0.007291898700712588,
+            -0.011042419713465371
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.009771088725867759,
+            -0.006937879267146646
+          ],
+          "reference": [
+            0.009673702147513553,
+            -0.00687141571340262
+          ],
+          "normalized_error": 0.0007676095891553845,
+          "integral": [
+            -9.03486674504892e-05,
+            -0.00013855071382347486
+          ],
+          "left_trace": [
+            -0.007166070758667587,
+            -0.01112373468395343
+          ],
+          "right_trace": [
+            -0.007291898700712588,
+            -0.011042419713465371
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 0.5,
+      "mode": "pitch-quarter",
+      "loads": [
+        [
+          0.14737700455611677,
+          0.09610983004870796
+        ],
+        [
+          0.005653556637444104,
+          -0.0301687446087018
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.31963942286434316,
+            0.04225730458146069
+          ],
+          "reference": [
+            0.31959099186817325,
+            0.04227047932289888
+          ],
+          "normalized_error": 0.00015569164713206832,
+          "integral": [
+            0.0006548110055641281,
+            -7.882275083843201e-05
+          ],
+          "left_trace": [
+            0.004750726216288846,
+            -0.0006459958041479034
+          ],
+          "right_trace": [
+            0.008001480786953988,
+            -0.0008606265536551494
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.18817129476496022,
+            0.09779423766097115
+          ],
+          "reference": [
+            0.18794597956210027,
+            0.09777965296527479
+          ],
+          "normalized_error": 0.001065736881485644,
+          "integral": [
+            0.001429232335819507,
+            -0.00012501110722560344
+          ],
+          "left_trace": [
+            0.008001480786953988,
+            -0.0008606265536551494
+          ],
+          "right_trace": [
+            0.010816646160430888,
+            -0.0007618239260219823
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.11288500692611544,
+            0.1300588528174186
+          ],
+          "reference": [
+            0.11298664651904809,
+            0.13006051161136317
+          ],
+          "normalized_error": 0.0005900328925430486,
+          "integral": [
+            0.002406924594713154,
+            -0.00012193886021904533
+          ],
+          "left_trace": [
+            0.010816646160430888,
+            -0.0007618239260219823
+          ],
+          "right_trace": [
+            0.013046478277839248,
+            -0.00045918908703891507
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.06251259609465087,
+            0.13660311577563072
+          ],
+          "reference": [
+            0.062453608198264114,
+            0.1365838057438986
+          ],
+          "normalized_error": 0.0004132771320666225,
+          "integral": [
+            0.0027459458424627923,
+            -7.520194076672933e-05
+          ],
+          "left_trace": [
+            0.013046478277839248,
+            -0.00045918908703891507
+          ],
+          "right_trace": [
+            0.014273622089044412,
+            -0.0003592366841760677
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.031092512566912967,
+            0.11890452441338092
+          ],
+          "reference": [
+            0.03111228707265571,
+            0.11886345979404098
+          ],
+          "normalized_error": 0.00037094975080796927,
+          "integral": [
+            0.0021771453313800568,
+            -7.176910266032997e-05
+          ],
+          "left_trace": [
+            0.014273622089044412,
+            -0.0003592366841760677
+          ],
+          "right_trace": [
+            0.014687673495242097,
+            -0.0006784988215970474
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.013835219685186452,
+            0.08579671556053658
+          ],
+          "reference": [
+            0.013819632968612267,
+            0.08575443088916306
+          ],
+          "normalized_error": 0.0005188292557771575,
+          "integral": [
+            0.0014728509049749753,
+            -9.340177010408662e-05
+          ],
+          "left_trace": [
+            0.014687673495242097,
+            -0.0006784988215970474
+          ],
+          "right_trace": [
+            0.014738388596858703,
+            -0.0012576339394831
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.004726906408641323,
+            0.04278983374829519
+          ],
+          "reference": [
+            0.004716108774925834,
+            0.04273597622977189
+          ],
+          "normalized_error": 0.000715224454082747,
+          "integral": [
+            0.0007359186150343209,
+            -7.463883269126884e-05
+          ],
+          "left_trace": [
+            0.014738388596858703,
+            -0.0012576339394831
+          ],
+          "right_trace": [
+            0.014688369068379108,
+            -0.0017706888370783833
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.007746899825596456,
+            0.05942831834443766
+          ],
+          "reference": [
+            0.007733819696196745,
+            0.059385360073918515
+          ],
+          "normalized_error": 0.0005847068660969024,
+          "integral": [
+            0.0014729820642767322,
+            -0.000128505344609944
+          ],
+          "left_trace": [
+            0.014736177539805755,
+            -0.0009167517555562099
+          ],
+          "right_trace": [
+            0.014688369068379108,
+            -0.0017706888370783833
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.004726906408641323,
+            0.04278983374829519
+          ],
+          "reference": [
+            0.004716108774925834,
+            0.04273597622977189
+          ],
+          "normalized_error": 0.000715224454082747,
+          "integral": [
+            0.0007359186150343209,
+            -7.463883269126884e-05
+          ],
+          "left_trace": [
+            0.014738388596858703,
+            -0.0012576339394831
+          ],
+          "right_trace": [
+            0.014688369068379108,
+            -0.0017706888370783833
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.0030790908480848042,
+            0.030530449357835415
+          ],
+          "reference": [
+            0.003069930736751365,
+            0.030477960540806464
+          ],
+          "normalized_error": 0.0006937775114317778,
+          "integral": [
+            0.00036765126037144,
+            -4.0475450548914984e-05
+          ],
+          "left_trace": [
+            0.014720826053177802,
+            -0.001482543955242973
+          ],
+          "right_trace": [
+            0.014688369068379108,
+            -0.0017706888370783833
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.0020950753814632547,
+            0.021781478569829947
+          ],
+          "reference": [
+            0.002077305013598799,
+            0.02164207664483781
+          ],
+          "normalized_error": 0.0018298177901270663,
+          "integral": [
+            0.0001837250476051874,
+            -2.112896212319552e-05
+          ],
+          "left_trace": [
+            0.014706770067766023,
+            -0.0016153250896943285
+          ],
+          "right_trace": [
+            0.014688369068379108,
+            -0.0017706888370783833
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 0.5,
+      "mode": "pitch-mid",
+      "loads": [
+        [
+          0.15336923441658706,
+          0.060039374790382495
+        ],
+        [
+          0.04022419376806258,
+          -0.015157693183181347
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.3129881617654773,
+            -0.029234495645228578
+          ],
+          "reference": [
+            0.3129396767790426,
+            -0.02920918574044931
+          ],
+          "normalized_error": 0.00017401710814298206,
+          "integral": [
+            0.0006160022292426363,
+            -0.00022312111404446247
+          ],
+          "left_trace": [
+            0.004477592018210748,
+            -0.0016971102590103572
+          ],
+          "right_trace": [
+            0.007514764255890007,
+            -0.0026176384845574578
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.19314007633079724,
+            0.054407938812048716
+          ],
+          "reference": [
+            0.19293208464724024,
+            0.0544410215018549
+          ],
+          "normalized_error": 0.0010505835756648618,
+          "integral": [
+            0.0013380683260136334,
+            -0.0004367371862205668
+          ],
+          "left_trace": [
+            0.007514764255890007,
+            -0.0026176384845574578
+          ],
+          "right_trace": [
+            0.010095840762338147,
+            -0.00310558276663283
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.12441290329110476,
+            0.10166289902202746
+          ],
+          "reference": [
+            0.12449985587052266,
+            0.10164649184883726
+          ],
+          "normalized_error": 0.0005505521975339751,
+          "integral": [
+            0.002234998465080416,
+            -0.0006377069439735095
+          ],
+          "left_trace": [
+            0.010095840762338147,
+            -0.00310558276663283
+          ],
+          "right_trace": [
+            0.012050069303595987,
+            -0.003222604168754341
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.07643239745157404,
+            0.11776329394435849
+          ],
+          "reference": [
+            0.0763825542391933,
+            0.11775415895086208
+          ],
+          "normalized_error": 0.0003610299747665715,
+          "integral": [
+            0.002518781334492705,
+            -0.0006481061472554046
+          ],
+          "left_trace": [
+            0.012050069303595987,
+            -0.003222604168754341
+          ],
+          "right_trace": [
+            0.012994304769915041,
+            -0.0032879835460729112
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.043904216065565896,
+            0.10653942170099409
+          ],
+          "reference": [
+            0.04390624577819154,
+            0.10650228606255076
+          ],
+          "normalized_error": 0.0003228457377992545,
+          "integral": [
+            0.0019677504423759786,
+            -0.0005113579908724344
+          ],
+          "left_trace": [
+            0.012994304769915041,
+            -0.0032879835460729112
+          ],
+          "right_trace": [
+            0.013168950155067074,
+            -0.0035910555243708567
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.023291174927688993,
+            0.07820005797087609
+          ],
+          "reference": [
+            0.023271497510331994,
+            0.07816371541642533
+          ],
+          "normalized_error": 0.0005067502379477208,
+          "integral": [
+            0.0013118031683430561,
+            -0.00038109062793121614
+          ],
+          "left_trace": [
+            0.013168950155067074,
+            -0.0035910555243708567
+          ],
+          "right_trace": [
+            0.013030475932632618,
+            -0.004088274755517287
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.00949493611052327,
+            0.03930840876774272
+          ],
+          "reference": [
+            0.009477785349238824,
+            0.03926042723511002
+          ],
+          "normalized_error": 0.0006634719706846986,
+          "integral": [
+            0.0006477503055927661,
+            -0.00021453433167396702
+          ],
+          "left_trace": [
+            0.013030475932632618,
+            -0.004088274755517287
+          ],
+          "right_trace": [
+            0.01286539439320096,
+            -0.004531293765444726
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.01433957377825071,
+            0.054429269631651865
+          ],
+          "reference": [
+            0.014323115063568537,
+            0.05439127077170283
+          ],
+          "normalized_error": 0.0005391949952935965,
+          "integral": [
+            0.0013019328990289793,
+            -0.0004112262779483447
+          ],
+          "left_trace": [
+            0.013127250110959193,
+            -0.003796332425078787
+          ],
+          "right_trace": [
+            0.01286539439320096,
+            -0.004531293765444726
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.00949493611052327,
+            0.03930840876774272
+          ],
+          "reference": [
+            0.009477785349238824,
+            0.03926042723511002
+          ],
+          "normalized_error": 0.0006634719706846986,
+          "integral": [
+            0.0006477503055927661,
+            -0.00021453433167396702
+          ],
+          "left_trace": [
+            0.013030475932632618,
+            -0.004088274755517287
+          ],
+          "right_trace": [
+            0.01286539439320096,
+            -0.004531293765444726
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.006487544655364331,
+            0.028086535211240285
+          ],
+          "reference": [
+            0.0064724847326103506,
+            0.028039286340583655
+          ],
+          "normalized_error": 0.0006457148029044457,
+          "integral": [
+            0.00032285372226594736,
+            -0.00010998949656102988
+          ],
+          "left_trace": [
+            0.012958489242221979,
+            -0.004281582061958051
+          ],
+          "right_trace": [
+            0.01286539439320096,
+            -0.004531293765444726
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.004537847562929193,
+            0.02004700875304323
+          ],
+          "reference": [
+            0.004495730550477185,
+            0.01992422271648716
+          ],
+          "normalized_error": 0.00169021518674226,
+          "integral": [
+            0.00016113788074256503,
+            -5.5766640579064234e-05
+          ],
+          "left_trace": [
+            0.012915252378099127,
+            -0.004396258760682686
+          ],
+          "right_trace": [
+            0.01286539439320096,
+            -0.004531293765444726
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 1.0,
+      "mode": "heave-quarter",
+      "loads": [
+        [
+          0.19292514907878136,
+          -0.2603447266779487
+        ],
+        [
+          -0.0603383475466598,
+          1.5423283328645787e-05
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.08595159935923993,
+            -0.5159900121667194
+          ],
+          "reference": [
+            0.0859454266809328,
+            -0.5158895903893974
+          ],
+          "normalized_error": 0.0001923735485283222,
+          "integral": [
+            -0.00020867960435996274,
+            -0.001032109233502003
+          ],
+          "left_trace": [
+            -0.0014606533488933004,
+            -0.007554958737539328
+          ],
+          "right_trace": [
+            -0.0026295426559052237,
+            -0.012512495488889394
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.1963184832440814,
+            -0.31310972232350176
+          ],
+          "reference": [
+            0.1964108449315078,
+            -0.31278754333678277
+          ],
+          "normalized_error": 0.0009074433802206965,
+          "integral": [
+            -0.0004970887961820564,
+            -0.0022011575382493045
+          ],
+          "left_trace": [
+            -0.0026295426559052237,
+            -0.012512495488889394
+          ],
+          "right_trace": [
+            -0.003964381431715061,
+            -0.016410657307829996
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.26077883324848755,
+            -0.20497998317557325
+          ],
+          "reference": [
+            0.26067931602489314,
+            -0.205072267806722
+          ],
+          "normalized_error": 0.0004091980441262695,
+          "integral": [
+            -0.0009600501871467192,
+            -0.0035581829052260218
+          ],
+          "left_trace": [
+            -0.003964381431715061,
+            -0.016410657307829996
+          ],
+          "right_trace": [
+            -0.005647854882823613,
+            -0.018760973249694335
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.2734886774915904,
+            -0.13594181991805993
+          ],
+          "reference": [
+            0.2735375857596446,
+            -0.13589905272538286
+          ],
+          "normalized_error": 0.00021271083044354064,
+          "integral": [
+            -0.0013143321136066016,
+            -0.0038050719163998724
+          ],
+          "left_trace": [
+            -0.005647854882823613,
+            -0.018760973249694335
+          ],
+          "right_trace": [
+            -0.007560317934548559,
+            -0.018964430270774046
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.23812084580623294,
+            -0.08931567607699957
+          ],
+          "reference": [
+            0.23796979808180804,
+            -0.08921419605728598
+          ],
+          "normalized_error": 0.0007160191890825438,
+          "integral": [
+            -0.0012647257363232888,
+            -0.0027739791506833484
+          ],
+          "left_trace": [
+            -0.007560317934548559,
+            -0.018964430270774046
+          ],
+          "right_trace": [
+            -0.009387638020192865,
+            -0.017830536236830587
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            0.17172070453441027,
+            -0.05484284396186619
+          ],
+          "reference": [
+            0.171658007933891,
+            -0.05478440746081604
+          ],
+          "normalized_error": 0.00047565251682250625,
+          "integral": [
+            -0.0010165803618069032,
+            -0.0017153249341442325
+          ],
+          "left_trace": [
+            -0.009387638020192865,
+            -0.017830536236830587
+          ],
+          "right_trace": [
+            -0.011029530549581223,
+            -0.016368655137819554
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.08563590076451186,
+            -0.0251437841434295
+          ],
+          "reference": [
+            0.08554024177599796,
+            -0.02508405076668123
+          ],
+          "normalized_error": 0.00073422718427244,
+          "integral": [
+            -0.0005782889325251664,
+            -0.0007939041206655889
+          ],
+          "left_trace": [
+            -0.011029530549581223,
+            -0.016368655137819554
+          ],
+          "right_trace": [
+            -0.012171318474430568,
+            -0.015343034481849583
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            0.11893332941305974,
+            -0.03608680575944594
+          ],
+          "reference": [
+            0.118868846500043,
+            -0.036043799060960974
+          ],
+          "normalized_error": 0.0005046149238633874,
+          "integral": [
+            -0.0011069765821595803,
+            -0.0016333506052782318
+          ],
+          "left_trace": [
+            -0.01014350611192681,
+            -0.01718108341950785
+          ],
+          "right_trace": [
+            -0.012171318474430568,
+            -0.015343034481849583
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            0.08563590076451186,
+            -0.0251437841434295
+          ],
+          "reference": [
+            0.08554024177599796,
+            -0.02508405076668123
+          ],
+          "normalized_error": 0.00073422718427244,
+          "integral": [
+            -0.0005782889325251664,
+            -0.0007939041206655889
+          ],
+          "left_trace": [
+            -0.011029530549581223,
+            -0.016368655137819554
+          ],
+          "right_trace": [
+            -0.012171318474430568,
+            -0.015343034481849583
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            0.061098909412174995,
+            -0.01765039334286569
+          ],
+          "reference": [
+            0.06100383736604551,
+            -0.017600622962225237
+          ],
+          "normalized_error": 0.0006986433884144409,
+          "integral": [
+            -0.00029618148726057305,
+            -0.00039057640648342495
+          ],
+          "left_trace": [
+            -0.01154927740472459,
+            -0.015889432890373683
+          ],
+          "right_trace": [
+            -0.012171318474430568,
+            -0.015343034481849583
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            0.043603462936367056,
+            -0.012609938266459942
+          ],
+          "reference": [
+            0.04331790653864876,
+            -0.012398252827013524
+          ],
+          "normalized_error": 0.002314205253951297,
+          "integral": [
+            -0.00015001622630588104,
+            -0.00019358720469864158
+          ],
+          "left_trace": [
+            -0.011840919407398346,
+            -0.015626647744010225
+          ],
+          "right_trace": [
+            -0.012171318474430568,
+            -0.015343034481849583
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 1.0,
+      "mode": "pitch-quarter",
+      "loads": [
+        [
+          0.09402836171395185,
+          0.22663493804108012
+        ],
+        [
+          0.02262164054000848,
+          -0.06033617193247712
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.2964980053229239,
+            0.15272830277510568
+          ],
+          "reference": [
+            0.29645088760030913,
+            0.1527503276406153
+          ],
+          "normalized_error": 0.0001559604261076317,
+          "integral": [
+            0.0006203944190614078,
+            -1.2653929434452977e-05
+          ],
+          "left_trace": [
+            0.004507806044129223,
+            -0.0002642231493315516
+          ],
+          "right_trace": [
+            0.007571019074040774,
+            8.590783311965035e-05
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.15665026947047977,
+            0.23700713016211086
+          ],
+          "reference": [
+            0.15644300471744005,
+            0.2369151335298955
+          ],
+          "normalized_error": 0.0007987274338045102,
+          "integral": [
+            0.0013491231675263617,
+            8.441991886662441e-05
+          ],
+          "left_trace": [
+            0.007571019074040774,
+            8.590783311965035e-05
+          ],
+          "right_trace": [
+            0.01018751937225027,
+            0.0010908979068499094
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.061528512813952524,
+            0.2871901277315204
+          ],
+          "reference": [
+            0.06162442057848897,
+            0.28723506127663356
+          ],
+          "normalized_error": 0.0003605249384369575,
+          "integral": [
+            0.0022591165467864055,
+            0.00036752534029063644
+          ],
+          "left_trace": [
+            0.01018751937225027,
+            0.0010908979068499094
+          ],
+          "right_trace": [
+            0.012204414069788887,
+            0.002555792474350441
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            -0.008801782884867949,
+            0.2912037820663769
+          ],
+          "reference": [
+            -0.008847614085225938,
+            0.29113577523073114
+          ],
+          "normalized_error": 0.00028155546031859423,
+          "integral": [
+            0.0025597020158246962,
+            0.0006206652571828509
+          ],
+          "left_trace": [
+            0.012204414069788887,
+            0.002555792474350441
+          ],
+          "right_trace": [
+            0.013262374107386506,
+            0.0035031339024172332
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            -0.045380550026634346,
+            0.249573270923605
+          ],
+          "reference": [
+            -0.045355762781195415,
+            0.2495225520873814
+          ],
+          "normalized_error": 0.00022259196530668982,
+          "integral": [
+            0.0020193524442937726,
+            0.0005278920605793303
+          ],
+          "left_trace": [
+            0.013262374107386506,
+            0.0035031339024172332
+          ],
+          "right_trace": [
+            0.013609087134379005,
+            0.0033640113720110167
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            -0.048996931052840205,
+            0.17884093306684223
+          ],
+          "reference": [
+            -0.04899479959213415,
+            0.17875229125097095
+          ],
+          "normalized_error": 0.00047839059895213824,
+          "integral": [
+            0.0013659526486109316,
+            0.0003001952073409661
+          ],
+          "left_trace": [
+            0.013609087134379005,
+            0.0033640113720110167
+          ],
+          "right_trace": [
+            0.013699092850593852,
+            0.0024950324609020933
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.02889699475559853,
+            0.08889957241160434
+          ],
+          "reference": [
+            -0.02887903172504111,
+            0.08878849015773198
+          ],
+          "normalized_error": 0.0012051933739759602,
+          "integral": [
+            0.0006860965269568094,
+            0.00010429440808602395
+          ],
+          "left_trace": [
+            0.013699092850593852,
+            0.0024950324609020933
+          ],
+          "right_trace": [
+            0.013757176485747157,
+            0.0015858580132989142
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            -0.037679050316167945,
+            0.12362911780030998
+          ],
+          "reference": [
+            -0.03766831083123042,
+            0.12353632278050196
+          ],
+          "normalized_error": 0.0007232929546832382,
+          "integral": [
+            0.0013701635944107684,
+            0.000243685910575106
+          ],
+          "left_trace": [
+            0.013662294772057028,
+            0.0030383818917005556
+          ],
+          "right_trace": [
+            0.013757176485747157,
+            0.0015858580132989142
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.02889699475559853,
+            0.08889957241160434
+          ],
+          "reference": [
+            -0.02887903172504111,
+            0.08878849015773198
+          ],
+          "normalized_error": 0.0012051933739759602,
+          "integral": [
+            0.0006860965269568094,
+            0.00010429440808602395
+          ],
+          "left_trace": [
+            0.013699092850593852,
+            0.0024950324609020933
+          ],
+          "right_trace": [
+            0.013757176485747157,
+            0.0015858580132989142
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            -0.021242890533705046,
+            0.06339226304738667
+          ],
+          "reference": [
+            -0.021220239491597705,
+            0.06328302247798519
+          ],
+          "normalized_error": 0.0014526589119428783,
+          "integral": [
+            0.0003433789470571128,
+            4.657067920561906e-05
+          ],
+          "left_trace": [
+            0.013719355154767443,
+            0.00210753188906057
+          ],
+          "right_trace": [
+            0.013757176485747157,
+            0.0015858580132989142
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            -0.015325800428777977,
+            0.045189601021399406
+          ],
+          "reference": [
+            -0.0152888653600058,
+            0.04492341296407705
+          ],
+          "normalized_error": 0.003499196790932218,
+          "integral": [
+            0.0001718017155960215,
+            2.167418597529622e-05
+          ],
+          "left_trace": [
+            0.01373378358310487,
+            0.0018706208181610102
+          ],
+          "right_trace": [
+            0.013757176485747157,
+            0.0015858580132989142
+          ]
+        }
+      ]
+    },
+    {
+      "m": 4096,
+      "k": 1.0,
+      "mode": "pitch-mid",
+      "loads": [
+        [
+          0.142259648983647,
+          0.16154875637159333
+        ],
+        [
+          0.04310196589925552,
+          -0.01994512701874642
+        ]
+      ],
+      "pressure_profile": [
+        {
+          "lower": 0.05,
+          "upper": 0.15,
+          "pressure": [
+            0.31798590516273384,
+            0.023730799733425945
+          ],
+          "reference": [
+            0.31793724427054226,
+            0.023777930043265935
+          ],
+          "normalized_error": 0.00021247775739215724,
+          "integral": [
+            0.0005682245179714173,
+            -0.0002706812378099537
+          ],
+          "left_trace": [
+            0.004142642706905899,
+            -0.0021529628337163837
+          ],
+          "right_trace": [
+            0.006913633410064468,
+            -0.003042216039102698
+          ]
+        },
+        {
+          "lower": 0.15,
+          "upper": 0.3,
+          "pressure": [
+            0.20572989028150013,
+            0.15872969958123542
+          ],
+          "reference": [
+            0.20554571595031698,
+            0.1587182476956998
+          ],
+          "normalized_error": 0.0007105695177816145,
+          "integral": [
+            0.0012248509684808476,
+            -0.00046586946569570194
+          ],
+          "left_trace": [
+            0.006913633410064468,
+            -0.003042216039102698
+          ],
+          "right_trace": [
+            0.009196424014321504,
+            -0.0030117664201075897
+          ]
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.5,
+          "pressure": [
+            0.12672322112607448,
+            0.23594513193762676
+          ],
+          "reference": [
+            0.12679424958471225,
+            0.2359669943249531
+          ],
+          "normalized_error": 0.0002774310079208202,
+          "integral": [
+            0.002019103999999722,
+            -0.0005220203860158695
+          ],
+          "left_trace": [
+            0.009196424014321504,
+            -0.0030117664201075897
+          ],
+          "right_trace": [
+            0.010792450349082983,
+            -0.0021344508380731425
+          ]
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.7,
+          "pressure": [
+            0.05957038648802974,
+            0.2572183270868616
+          ],
+          "reference": [
+            0.059536782354685215,
+            0.25716101204938546
+          ],
+          "normalized_error": 0.00025170139901650523,
+          "integral": [
+            0.002231118987423043,
+            -0.0003306027219171174
+          ],
+          "left_trace": [
+            0.010792450349082983,
+            -0.0021344508380731425
+          ],
+          "right_trace": [
+            0.011372294623749368,
+            -0.001237973665276279
+          ]
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.85,
+          "pressure": [
+            0.014149661424923844,
+            0.2272443519043552
+          ],
+          "reference": [
+            0.01413668673925658,
+            0.22721900307305984
+          ],
+          "normalized_error": 0.00012508395649493922,
+          "integral": [
+            0.001703171010212951,
+            -0.0001656027270915071
+          ],
+          "left_trace": [
+            0.011372294623749368,
+            -0.001237973665276279
+          ],
+          "right_trace": [
+            0.011262177629330789,
+            -0.0010936226871966297
+          ]
+        },
+        {
+          "lower": 0.85,
+          "upper": 0.95,
+          "pressure": [
+            -0.006066754919237642,
+            0.16513022207637587
+          ],
+          "reference": [
+            -0.006080297608661412,
+            0.1650561893857669
+          ],
+          "normalized_error": 0.00045566395783243265,
+          "integral": [
+            0.0011118075581592068,
+            -0.00012863602619509205
+          ],
+          "left_trace": [
+            0.011262177629330789,
+            -0.0010936226871966297
+          ],
+          "right_trace": [
+            0.010941710213198546,
+            -0.001597131323552795
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.007488019564470422,
+            0.08261362637574665
+          ],
+          "reference": [
+            -0.0074939712810416234,
+            0.08251747746606167
+          ],
+          "normalized_error": 0.001162640010736624,
+          "integral": [
+            0.0005415242938255172,
+            -9.418162208037321e-05
+          ],
+          "left_trace": [
+            0.010941710213198546,
+            -0.001597131323552795
+          ],
+          "right_trace": [
+            0.010714346867139516,
+            -0.002249900607163482
+          ]
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "pressure": [
+            -0.007945717962902707,
+            0.11460741636044842
+          ],
+          "reference": [
+            -0.007951099206219668,
+            0.1145253730152617
+          ],
+          "normalized_error": 0.0007161923557969731,
+          "integral": [
+            0.001093419448870873,
+            -0.00016465174074445287
+          ],
+          "left_trace": [
+            0.011126418244075325,
+            -0.0012568889631764067
+          ],
+          "right_trace": [
+            0.010714346867139516,
+            -0.002249900607163482
+          ]
+        },
+        {
+          "lower": 0.95,
+          "upper": 1.0,
+          "pressure": [
+            -0.007488019564470422,
+            0.08261362637574665
+          ],
+          "reference": [
+            -0.0074939712810416234,
+            0.08251747746606167
+          ],
+          "normalized_error": 0.001162640010736624,
+          "integral": [
+            0.0005415242938255172,
+            -9.418162208037321e-05
+          ],
+          "left_trace": [
+            0.010941710213198546,
+            -0.001597131323552795
+          ],
+          "right_trace": [
+            0.010714346867139516,
+            -0.002249900607163482
+          ]
+        },
+        {
+          "lower": 0.975,
+          "upper": 1.0,
+          "pressure": [
+            -0.005968163180660929,
+            0.058979664711669794
+          ],
+          "reference": [
+            -0.005969280150086328,
+            0.05888286673742888
+          ],
+          "normalized_error": 0.001260474198998062,
+          "integral": [
+            0.00026933357524196937,
+            -5.1073422415237226e-05
+          ],
+          "left_trace": [
+            0.010832035803586295,
+            -0.00186482633353285
+          ],
+          "right_trace": [
+            0.010714346867139516,
+            -0.002249900607163482
+          ]
+        },
+        {
+          "lower": 0.9875,
+          "upper": 1.0,
+          "pressure": [
+            -0.004424934694684909,
+            0.042037116454784716
+          ],
+          "reference": [
+            -0.00445938872534361,
+            0.041823849757323665
+          ],
+          "normalized_error": 0.002812914841927187,
+          "integral": [
+            0.00013429765901955132,
+            -2.6722615199364158e-05
+          ],
+          "left_trace": [
+            0.010773553731255282,
+            -0.0020360411178415466
+          ],
+          "right_trace": [
+            0.010714346867139516,
+            -0.002249900607163482
+          ]
+        }
+      ]
+    }
+  ],
+  "pressure_refinement": [
+    {
+      "k": 0.1,
+      "mode": "heave-quarter",
+      "maximum": 0.001139063122726639,
+      "lower": 0.05,
+      "upper": 0.15
+    },
+    {
+      "k": 0.1,
+      "mode": "pitch-quarter",
+      "maximum": 0.0021872254234599708,
+      "lower": 0.15,
+      "upper": 0.3
+    },
+    {
+      "k": 0.1,
+      "mode": "pitch-mid",
+      "maximum": 0.002188184445534275,
+      "lower": 0.15,
+      "upper": 0.3
+    },
+    {
+      "k": 0.5,
+      "mode": "heave-quarter",
+      "maximum": 0.0021417430404221836,
+      "lower": 0.05,
+      "upper": 0.15
+    },
+    {
+      "k": 0.5,
+      "mode": "pitch-quarter",
+      "maximum": 0.0022013234822314477,
+      "lower": 0.9,
+      "upper": 1.0
+    },
+    {
+      "k": 0.5,
+      "mode": "pitch-mid",
+      "maximum": 0.0020816256212281108,
+      "lower": 0.05,
+      "upper": 0.15
+    },
+    {
+      "k": 1.0,
+      "mode": "heave-quarter",
+      "maximum": 0.0036470217198503966,
+      "lower": 0.9,
+      "upper": 1.0
+    },
+    {
+      "k": 1.0,
+      "mode": "pitch-quarter",
+      "maximum": 0.002180964528323331,
+      "lower": 0.9,
+      "upper": 1.0
+    },
+    {
+      "k": 1.0,
+      "mode": "pitch-mid",
+      "maximum": 0.001850556075409327,
+      "lower": 0.05,
+      "upper": 0.15
+    }
+  ],
+  "checks": {
+    "synthetic_update": true,
+    "unsafe_denominator": true,
+    "high_low_addition": true,
+    "aero_update_equivalence": true,
+    "blocked_residual_equivalence": true,
+    "saved_input_equivalence": true,
+    "saved_observation_equivalence": true,
+    "immutable_inputs": true,
+    "compensated_residual": true,
+    "backward_error": true,
+    "Decimal_residual": true,
+    "local_pressure": true,
+    "local_space_change": true
+  },
+  "all_criteria_pass": true,
+  "numpy": "2.3.5",
+  "scipy": "1.16.3",
+  "seconds": 125.73399999999674,
+  "peak_process_working_bytes": 413310976,
+  "resource_callback_override": "previous.budget=budget; numerical helper unchanged; declared 300s/512MiB",
+  "limits": "same P0 local means and finite planar diagnostic; not point pressure, general 3D, solver or product precision adoption"
+}

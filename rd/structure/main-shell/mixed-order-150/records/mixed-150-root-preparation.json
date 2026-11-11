@@ -1,0 +1,9 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/mixed-order-150/experiments/diagnose_mixed_150_kernel.py": "2753a3f032bb4909e4560ece9b37bb325fcaa1f1bda84dc91319dc66b8c8f9d6",
+    "rd/structure/main-shell/mixed-order-150/experiments/mixed_order_150.py": "b05663e86b4402d762c55bc4e204282c7403328e964cc564410315c5794ad9e6",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-order-150-result.json": "3530ff1625320bb92ed0c4688229adb674532635e79279565930a452adf8a64b",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-150-root-protocol.md": "ac576c5676eb51571a7d4101af89f646a4772aade39467d5bccdcbd241c493b4"
+  }
+}

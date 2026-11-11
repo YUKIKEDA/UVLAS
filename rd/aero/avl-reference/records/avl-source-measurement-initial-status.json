@@ -1,0 +1,208 @@
+{
+  "parent_sha256": "45f3b88d0830e3f3284ad1dd10a5441857cb573f62939294d5da0ab1602fe3be",
+  "analysis_source_sha256": "76e47685d5bae4e918f2c22f886aa9160ad93e2e88391b77ce414438b16edb03",
+  "error": "force row shape assertion failed: logging COMMON declared in AERO instead of SFFORC",
+  "all_criteria_pass": false,
+  "incomplete_force_records": [
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M4-N12-a-2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M4-N12-a-1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M4-N12-a0",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M4-N12-a1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M4-N12-a2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M8-N24-a-2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M8-N24-a-1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M8-N24-a0",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M8-N24-a1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V01-M8-N24-a2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M4-N12-a-2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M4-N12-a-1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M4-N12-a0",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M4-N12-a1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M4-N12-a2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M8-N24-a-2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M8-N24-a-1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M8-N24-a0",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M8-N24-a1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/measured-FW-V02-M8-N24-a2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M4-N12-a-2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M4-N12-a-1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M4-N12-a0",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M4-N12-a1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M4-N12-a2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M8-N24-a-2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M8-N24-a-1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M8-N24-a0",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M8-N24-a1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V01-M8-N24-a2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M4-N12-a-2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M4-N12-a-1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M4-N12-a0",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M4-N12-a1",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M4-N12-a2",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M8-N24-a-2",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M8-N24-a-1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M8-N24-a0",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M8-N24-a1",
+      "expected": 576,
+      "actual": 0
+    },
+    {
+      "case": "build/analysis/avl-source-20261030-211712/core0-FW-V02-M8-N24-a2",
+      "expected": 576,
+      "actual": 0
+    }
+  ]
+}

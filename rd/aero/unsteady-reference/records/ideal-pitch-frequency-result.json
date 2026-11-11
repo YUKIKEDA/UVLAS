@@ -1,0 +1,498 @@
+{
+  "passed": false,
+  "scope": "FW-V01 infinitesimal heave/pitch k=.05,.2,.8; actual finite RM-core candidate versus ideal-core independent extrapolated reference, both closed wake128m",
+  "rigorous_error_bound": false,
+  "records": [
+    {
+      "k": 0.05,
+      "motion": "heave",
+      "observable": "Fz",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8137986090271012,
+        0.8005293008727671
+      ],
+      "chord_orders": [
+        0.911027884010001,
+        0.9467605859736037
+      ],
+      "candidate": [
+        -26.429002541542406,
+        -752.47661976829
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 1.168108739776761e-06,
+      "reference_limit": [
+        -26.689821157620308,
+        -749.9518899338325
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 0.2130933990249721,
+        "width": 0.07734057001023062,
+        "mixed": 0.09702387089475954,
+        "quadrature": 1.1539886049595477e-10
+      },
+      "reference_relative_uncertainty": 0.0005163167257544673,
+      "finite_candidate_to_reference_limit": 0.0033822972934060168,
+      "combined_relative_indicator": 0.003898614019160484
+    },
+    {
+      "k": 0.05,
+      "motion": "heave",
+      "observable": "My",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8759256702914621,
+        0.8559197098179238
+      ],
+      "chord_orders": [
+        0.9344555953596355,
+        0.9633916950490132
+      ],
+      "candidate": [
+        32.99782288834348,
+        863.4604793873509
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 9.664746701198139e-07,
+      "reference_limit": [
+        33.40744614427675,
+        859.2047474899038
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 0.32541399042158703,
+        "width": 0.19371378132633638,
+        "mixed": 0.1618596828996494,
+        "quadrature": 9.639769446139053e-11
+      },
+      "reference_relative_uncertainty": 0.0007919803545867211,
+      "finite_candidate_to_reference_limit": 0.00497223963177373,
+      "combined_relative_indicator": 0.005764219986360452
+    },
+    {
+      "k": 0.05,
+      "motion": "pitch",
+      "observable": "Fz",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8177245443666511,
+        0.8059504777081721
+      ],
+      "chord_orders": [
+        0.9120782200559147,
+        0.9489605674689207
+      ],
+      "candidate": [
+        8430.452774012972,
+        924.5894314864543
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 1.174533474687368e-06,
+      "reference_limit": [
+        8402.747988741217,
+        915.1540812327082
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 2.424944718305133,
+        "width": 1.134412183830272,
+        "mixed": 1.066675231756572,
+        "quadrature": 1.3086552876547103e-09
+      },
+      "reference_relative_uncertainty": 0.000547301621370624,
+      "finite_candidate_to_reference_limit": 0.0034625997881377085,
+      "combined_relative_indicator": 0.004009901409508332
+    },
+    {
+      "k": 0.05,
+      "motion": "pitch",
+      "observable": "My",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8777526536890108,
+        0.8589012308836859
+      ],
+      "chord_orders": [
+        0.9190999101486623,
+        0.9552495809111273
+      ],
+      "candidate": [
+        -9671.92852110993,
+        -1318.393744492572
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 9.745439098571635e-07,
+      "reference_limit": [
+        -9625.186555848531,
+        -1303.4354201921597
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 3.893585996432449,
+        "width": 2.1694469640321534,
+        "mixed": 1.7970483103629238,
+        "quadrature": 1.1316410440805418e-09
+      },
+      "reference_relative_uncertainty": 0.0008092297246898389,
+      "finite_candidate_to_reference_limit": 0.005052703058010968,
+      "combined_relative_indicator": 0.005861932782700807
+    },
+    {
+      "k": 0.2,
+      "motion": "heave",
+      "observable": "Fz",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8077558636349724,
+        0.796907502698316
+      ],
+      "chord_orders": [
+        0.9216287607984739,
+        0.9547552781514076
+      ],
+      "candidate": [
+        -89.38105738746384,
+        -2683.9218565866036
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 9.90247232226704e-07,
+      "reference_limit": [
+        -93.44580428971122,
+        -2673.1600533081696
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 1.642681479570855,
+        "width": 0.24245761557720633,
+        "mixed": 0.38394866192867483,
+        "quadrature": 1.5394773073678291e-09
+      },
+      "reference_relative_uncertainty": 0.0008483227995951915,
+      "finite_candidate_to_reference_limit": 0.004300837927847822,
+      "combined_relative_indicator": 0.005149160727443014
+    },
+    {
+      "k": 0.2,
+      "motion": "heave",
+      "observable": "My",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8793473165623688,
+        0.8643270481357845
+      ],
+      "chord_orders": [
+        0.9409844792018736,
+        0.9676106428582928
+      ],
+      "candidate": [
+        114.17325955348167,
+        3046.6485892472315
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 7.384139078332863e-07,
+      "reference_limit": [
+        120.76575104147489,
+        3028.7686357087314
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 2.3624026203303394,
+        "width": 0.6936744980835058,
+        "mixed": 0.6000766281894647,
+        "quadrature": 1.293659585841552e-09
+      },
+      "reference_relative_uncertainty": 0.0012061835304700834,
+      "finite_candidate_to_reference_limit": 0.006286865513000895,
+      "combined_relative_indicator": 0.0074930490434709784
+    },
+    {
+      "k": 0.2,
+      "motion": "pitch",
+      "observable": "Fz",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8542418631206382,
+        0.8641234480883703
+      ],
+      "chord_orders": [
+        0.9239447520253905,
+        0.9572027868107756
+      ],
+      "candidate": [
+        7710.895958861184,
+        4146.663133135059
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 1.0999008367963134e-06,
+      "reference_limit": [
+        7687.906665989203,
+        4110.193999240737
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 5.3422254271472065,
+        "width": 2.2869798580173537,
+        "mixed": 0.9886312270417351,
+        "quadrature": 4.67086480125386e-09
+      },
+      "reference_relative_uncertainty": 0.0009885492297234753,
+      "finite_candidate_to_reference_limit": 0.004945178295985585,
+      "combined_relative_indicator": 0.00593372752570906
+    },
+    {
+      "k": 0.2,
+      "motion": "pitch",
+      "observable": "My",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8928081993016578,
+        0.8913295749364072
+      ],
+      "chord_orders": [
+        0.9258835094459631,
+        0.9591625673127763
+      ],
+      "candidate": [
+        -8674.999035916375,
+        -5814.1020414687355
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 9.236185006558417e-07,
+      "reference_limit": [
+        -8636.740432972456,
+        -5755.045332950214
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 8.694798269363387,
+        "width": 1.959817252025363,
+        "mixed": 1.7801377782259986,
+        "quadrature": 4.113350845110596e-09
+      },
+      "reference_relative_uncertainty": 0.0011981230825032759,
+      "finite_candidate_to_reference_limit": 0.006779988361739808,
+      "combined_relative_indicator": 0.007978111444243085
+    },
+    {
+      "k": 0.8,
+      "motion": "heave",
+      "observable": "Fz",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8051635929816787,
+        0.8555956079076888
+      ],
+      "chord_orders": [
+        0.9586919616226043,
+        0.97569648507802
+      ],
+      "candidate": [
+        4619.050960072609,
+        -8463.405379119442
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 1.3122862010727607e-06,
+      "reference_limit": [
+        4581.457102284475,
+        -8407.288068809785
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 10.33794613898452,
+        "width": 1.365381392863845,
+        "mixed": 1.1096800305876524,
+        "quadrature": 2.727846171791882e-08
+      },
+      "reference_relative_uncertainty": 0.0013382343009532757,
+      "finite_candidate_to_reference_limit": 0.007054726220432001,
+      "combined_relative_indicator": 0.008392960521385277
+    },
+    {
+      "k": 0.8,
+      "motion": "heave",
+      "observable": "My",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8992246582854507,
+        0.9323768337902969
+      ],
+      "chord_orders": [
+        0.9756391406769599,
+        0.9865710968287408
+      ],
+      "candidate": [
+        -5724.5700017731815,
+        9374.692469640135
+      ],
+      "passed": false,
+      "reference_native_core_family_change_at_m64n192": 1.4511681424450796e-06,
+      "reference_limit": [
+        -5661.129225336966,
+        9284.09665022637
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 15.092954548436264,
+        "width": 2.7641049789188274,
+        "mixed": 1.723225630585465,
+        "quadrature": 3.798199733549638e-08
+      },
+      "reference_relative_uncertainty": 0.0018006595007157193,
+      "finite_candidate_to_reference_limit": 0.010171084440388261,
+      "combined_relative_indicator": 0.01197174394110398
+    },
+    {
+      "k": 0.8,
+      "motion": "pitch",
+      "observable": "Fz",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8839916921122706,
+        0.9507050092075428
+      ],
+      "chord_orders": [
+        0.9692127507356015,
+        0.9816736735567396
+      ],
+      "candidate": [
+        721.771193059194,
+        17335.833608538687
+      ],
+      "passed": true,
+      "reference_native_core_family_change_at_m64n192": 1.4054103046640112e-06,
+      "reference_limit": [
+        755.1493514051117,
+        17201.319341533414
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 19.757527236762662,
+        "width": 4.269809563372327,
+        "mixed": 2.079252727363181,
+        "quadrature": 3.229833419525097e-08
+      },
+      "reference_relative_uncertainty": 0.0015162481519707368,
+      "finite_candidate_to_reference_limit": 0.008049397208971838,
+      "combined_relative_indicator": 0.009565645360942576
+    },
+    {
+      "k": 0.8,
+      "motion": "pitch",
+      "observable": "My",
+      "width_resolved": true,
+      "chord_resolved": true,
+      "width_orders": [
+        0.8913748405553723,
+        0.9302931455381035
+      ],
+      "chord_orders": [
+        0.9681104670422771,
+        0.9817064242677305
+      ],
+      "candidate": [
+        1965.6315919208946,
+        -23925.53586839314
+      ],
+      "passed": false,
+      "reference_native_core_family_change_at_m64n192": 1.5146851919816142e-06,
+      "reference_limit": [
+        1903.0184349269875,
+        -23697.38257584656
+      ],
+      "absolute_uncertainty_components": {
+        "chord": 33.87677507745697,
+        "width": 4.405370256228147,
+        "mixed": 5.027948790492925,
+        "quadrature": 4.4911277885799643e-08
+      },
+      "reference_relative_uncertainty": 0.0018217672254292434,
+      "finite_candidate_to_reference_limit": 0.009951721587859721,
+      "combined_relative_indicator": 0.011773488813288964
+    }
+  ],
+  "whole_uvlm_complete": false,
+  "sources": {
+    "build/analysis/frequency-delta/candidate-m128-n192-k0.05.json": "499852bf5c4da80c5d7d3dd655d613c9da5bff1cf0d482fc35fa21294d26a5f1",
+    "build/analysis/frequency-delta/candidate-m128-n192-k0.05.npz": "7a87bc7419e1b8d1d25c8d8bbd9fb6af5c73cc1af074e3f8430fcb3fb6369e03",
+    "build/analysis/frequency-delta/candidate-m128-n192-k0.2.json": "802b83eb05b3bfa5cc6c3344ed10e0d73cb5b7744e98a69bd9a90f9d5c389d74",
+    "build/analysis/frequency-delta/candidate-m128-n192-k0.2.npz": "1fdecf39fb0fd0ba6de0bb359046c3fef2a67c76ec34748a4903f89e5d62dd75",
+    "build/analysis/frequency-delta/candidate-m128-n192-k0.8.json": "36a7715ff2f1699d0e194d498c4812fd3029ae66d514d2b22f04d3b2a491df47",
+    "build/analysis/frequency-delta/candidate-m128-n192-k0.8.npz": "c3e77ccdcda37bb8635e61c27f687e7fcb10f9868712ef12812c190c564d0db4",
+    "build/analysis/frequency-delta/reference-m64-n192-k0.05.json": "cd55fcdc64f3bcf7652461f9b57a3d07e341f1123775fd519a6b4222925bbd16",
+    "build/analysis/frequency-delta/reference-m64-n192-k0.05.npz": "88aee8010f71f937db8bb8166bc154d24fb098f4eab842efeba323cc249175a4",
+    "build/analysis/frequency-delta/reference-m64-n192-k0.2.json": "a430f0e86e9ba12a65798f608ed6b741622552865988b5a3fa39c9e6f64fb15b",
+    "build/analysis/frequency-delta/reference-m64-n192-k0.2.npz": "0bf26d7ecabfe3f81024eb882785a0e0045ff2a235a6171d588b488396416b07",
+    "build/analysis/frequency-delta/reference-m64-n192-k0.8.json": "b7ab1ad6e8c534e33708fe53296ebc042109104c3d8e306f6b92d746c7d43efd",
+    "build/analysis/frequency-delta/reference-m64-n192-k0.8.npz": "b1614e0319fe195dfbdd58b081c878dca1c3f018bef65c1cadcee5812a67ad1e",
+    "build/analysis/frequency-ideal-reference/reference-m16-n192-k0.05.json": "45d7cd14807a41df858e4f7894a51f88fa4d5656f480ca8d6b8fc7e16b9c7b43",
+    "build/analysis/frequency-ideal-reference/reference-m16-n192-k0.05.npz": "a11353b8372564d83292422d5dbe32805ab25173112a0ce225c37787968e4f60",
+    "build/analysis/frequency-ideal-reference/reference-m16-n192-k0.2.json": "c9fa689d5af1880f1a937281b47d00cb6cafbcaf2ed396f183a1baf048b793b4",
+    "build/analysis/frequency-ideal-reference/reference-m16-n192-k0.2.npz": "eeb0cb3e8613485735d1dd067b89164500a90388cf48273564ab2f875378bd38",
+    "build/analysis/frequency-ideal-reference/reference-m16-n192-k0.8.json": "24040f0f8a1c61124a3e48898ce38ff490627cdc6dafa8fda79cf835395adbd3",
+    "build/analysis/frequency-ideal-reference/reference-m16-n192-k0.8.npz": "177ab27e554677bd3a0583197efcb4e9bfe1619e3083fc072c02d68374896c1c",
+    "build/analysis/frequency-ideal-reference/reference-m16-n384-k0.05.json": "dde0987624df4c1fc929274192dbf9bc6681066b44e9ec80d9302befe3f8b148",
+    "build/analysis/frequency-ideal-reference/reference-m16-n384-k0.05.npz": "58a4b1d72ee83db8cec331f8dcf1ed93650e6924753cf0f84c332f06f1b218e5",
+    "build/analysis/frequency-ideal-reference/reference-m16-n384-k0.2.json": "61202ce3b028189ae610603512f42bbeabb97fad3965f74a682e4b103c0029a3",
+    "build/analysis/frequency-ideal-reference/reference-m16-n384-k0.2.npz": "f3bd542e06ceda683c77f4b49602029c713711a49af0b2b90289c4c40021ba45",
+    "build/analysis/frequency-ideal-reference/reference-m16-n384-k0.8.json": "e9395ebc621c9b2636dc25b296fd3539397720f8e8adcb09fe0a046319eb65c4",
+    "build/analysis/frequency-ideal-reference/reference-m16-n384-k0.8.npz": "396217b7dfee09a0a65ccb9af60195ac03e7f861be74eb0aa00c55e3b05b1690",
+    "build/analysis/frequency-ideal-reference/reference-m16-n48-k0.05.json": "55149f40137e68eb6d936dfce6aae1045a8ac3ccc0eee1da332694a66b73dbb1",
+    "build/analysis/frequency-ideal-reference/reference-m16-n48-k0.05.npz": "adf548353fb17943a20ea37d013f08b9980daea3d5c0963dc3e1f06d50f0d723",
+    "build/analysis/frequency-ideal-reference/reference-m16-n48-k0.2.json": "4b69d02323c2192ad98282e178a791de9342431d24af08b415e9a57a99be28a5",
+    "build/analysis/frequency-ideal-reference/reference-m16-n48-k0.2.npz": "3307190d2b6383fe0895da0580407a6b96480a5d4f9e0950341b56d733b5c3b8",
+    "build/analysis/frequency-ideal-reference/reference-m16-n48-k0.8.json": "46517e34028f073e76500773cbdbcc8d688dd7f932f0d1867cecde4a57b463fe",
+    "build/analysis/frequency-ideal-reference/reference-m16-n48-k0.8.npz": "fd0e274028707c320978881d17cf0942cc858a56622e3cf9a4046f85cd71f9ac",
+    "build/analysis/frequency-ideal-reference/reference-m16-n96-k0.05.json": "5448b7c6bbae6231ef1d2655801e407210a9b05e92a02a964cb3179126ca2f9e",
+    "build/analysis/frequency-ideal-reference/reference-m16-n96-k0.05.npz": "6bebac768976ed573bdb46f2b9d09d9346dd89cc8767eaf7e19a3cd61a6d9f25",
+    "build/analysis/frequency-ideal-reference/reference-m16-n96-k0.2.json": "3ee157831c964defbc2d1fde3c3d32fd124dfac6b8b45686968db9a48ad07d4f",
+    "build/analysis/frequency-ideal-reference/reference-m16-n96-k0.2.npz": "30533234353462c0dd41e6bd26d028856ae1063338820ce5c417a505c4f56fb6",
+    "build/analysis/frequency-ideal-reference/reference-m16-n96-k0.8.json": "2075399ded1f66e865ab5401510b3dc4c18fccf717a3af98f65a70bf3b623e42",
+    "build/analysis/frequency-ideal-reference/reference-m16-n96-k0.8.npz": "66c08b855f08ddda1a6dceb631d75ddd33cd0e055e57c4780e4934e73bb07754",
+    "build/analysis/frequency-ideal-reference/reference-m32-n192-k0.05.json": "7e750e43dcebea406d94beca9c03cfba6ac74fa491638a82d3fce330281d076f",
+    "build/analysis/frequency-ideal-reference/reference-m32-n192-k0.05.npz": "41f9fd84562c083c0fb6903cb60c2835dc47dafd4ca77fe5b1766c35fffa194f",
+    "build/analysis/frequency-ideal-reference/reference-m32-n192-k0.2.json": "ea8ea22e62636ce01634980e28220627101c2dd5d8a7e4799574d2cf1844e03b",
+    "build/analysis/frequency-ideal-reference/reference-m32-n192-k0.2.npz": "60904acd4c60a3454c42a5b5e4edfaa064c4a0e6fe3f9886338dbd046c36efad",
+    "build/analysis/frequency-ideal-reference/reference-m32-n192-k0.8.json": "d48e7c0ee0a8815d6de687d7c8024393a72901b0f94d71e6ef842fcdcdf65904",
+    "build/analysis/frequency-ideal-reference/reference-m32-n192-k0.8.npz": "6874936df817bc9e5bd983245b93b81907ff6af35179c191100dc3a14e68fcd9",
+    "build/analysis/frequency-ideal-reference/reference-m32-n96-k0.05.json": "b70ae49c89e50733fead525d9793dcdc0512a7099623248b2d9ccda3c768d7f1",
+    "build/analysis/frequency-ideal-reference/reference-m32-n96-k0.05.npz": "5c13cfcaf597a8b8bea3c5eb846a28a44a0beb5e249a56964e352205464c1d3d",
+    "build/analysis/frequency-ideal-reference/reference-m32-n96-k0.2.json": "196248b7a41d5995db555ac928050d516e1532763d9173df0b1205784d688f99",
+    "build/analysis/frequency-ideal-reference/reference-m32-n96-k0.2.npz": "6a74a8103289df0cba96a226ca0afec35bc217c005429dbffa353ab8d92145e9",
+    "build/analysis/frequency-ideal-reference/reference-m32-n96-k0.8.json": "eef931e4360d988f6da072ffb8b4f91b7131321a02864d0c3300bc785516f8b1",
+    "build/analysis/frequency-ideal-reference/reference-m32-n96-k0.8.npz": "73ce70f1e89c7b767b814a0677076a7048898ffa7f089d3cc9e129308d80ab69",
+    "build/analysis/frequency-ideal-reference/reference-m64-n192-k0.05.json": "6973989b120d811a0f60c7866892315677b1af0af8196af2c45f6aeb54031456",
+    "build/analysis/frequency-ideal-reference/reference-m64-n192-k0.05.npz": "a27b2fb75d7851f60be9a62a2bb49cb0fe035c01d8b76715faa9bfb0806b5711",
+    "build/analysis/frequency-ideal-reference/reference-m64-n192-k0.2.json": "1dab2b38604e529042b349eec964dbeb2a7dcced3ee337ae16b0c47feee49106",
+    "build/analysis/frequency-ideal-reference/reference-m64-n192-k0.2.npz": "bb60fd8842914475a14d6c2453f7a05228e896b4a34f7cbf3aa656f03e9c27c6",
+    "build/analysis/frequency-ideal-reference/reference-m64-n192-k0.8.json": "5e0f2913659e332ee412e2286821700e12b49314216b73ba6a3f88cdfe0a52c0",
+    "build/analysis/frequency-ideal-reference/reference-m64-n192-k0.8.npz": "b33bb6b2d3b2339994c6c3ee83acbfda5b1990fb13f21aebe768e8855bf13581",
+    "build/analysis/frequency-ideal-reference/reference-m8-n192-k0.05.json": "fb12163c2337180a15a70f1e3b7c5359a9d4a66801a844504db049443ecade70",
+    "build/analysis/frequency-ideal-reference/reference-m8-n192-k0.05.npz": "bd212ac47ac4a1be7268beba1de5ca4dfaf46d65cd4446fccd420d1075532d65",
+    "build/analysis/frequency-ideal-reference/reference-m8-n192-k0.2.json": "4ca57790457d94266c95522e337d3a0b74d667716f7b21b6bdcc0f57f729d27b",
+    "build/analysis/frequency-ideal-reference/reference-m8-n192-k0.2.npz": "a921bb4cc54a664b79a658ccefc9de46474cbbf5da09f20f6d3a16e04e75b59d",
+    "build/analysis/frequency-ideal-reference/reference-m8-n192-k0.8.json": "e1d0f84d0bd2fb407fdad1d3dc864b642188723652ce1563ee9b11ee0d28f07c",
+    "build/analysis/frequency-ideal-reference/reference-m8-n192-k0.8.npz": "f457a5283d69db40702a2f78e399016525f29137502c0c1847f0fb073042172d",
+    "build/analysis/frequency-ideal-reference-q24/reference-m16-n96-k0.05.json": "66abd7639b198081412f0ba3c1072571dd32d3b60c684421c52bcf4aa044563c",
+    "build/analysis/frequency-ideal-reference-q24/reference-m16-n96-k0.05.npz": "0cabe978b45a5d0a86870cfa0600874c1bf2488fb80224b65117e4bc72aef23a",
+    "build/analysis/frequency-ideal-reference-q24/reference-m16-n96-k0.2.json": "12333ee08bb7379b61c8d67b3e771395fa3559a291b664be6b63a3e85bcaaa52",
+    "build/analysis/frequency-ideal-reference-q24/reference-m16-n96-k0.2.npz": "8fcad1749a39f4ddb6c72f63555738bc8af32c2e809ff5fc42e1436f0dc91181",
+    "build/analysis/frequency-ideal-reference-q24/reference-m16-n96-k0.8.json": "bda20cade51e0b8fcc27c96174213949eb89f1675b481ff92fe74baea4ae092b",
+    "build/analysis/frequency-ideal-reference-q24/reference-m16-n96-k0.8.npz": "5a8b6a08162718377749beadec92a7c45b52636b29c74ce4756dca3424bb88af",
+    "build/analysis/frequency-ideal-reference-q24/reference-m64-n192-k0.05.json": "a770da0e31b3380f43762c24b6ade77df543f9b254ec1d713ecb179a8eb1c0ce",
+    "build/analysis/frequency-ideal-reference-q24/reference-m64-n192-k0.05.npz": "ae1fe9bb90d75a4e4ff6cdb4f15e7516ed163f73a6a262ef2d25302c5f075cf7",
+    "build/analysis/frequency-ideal-reference-q24/reference-m64-n192-k0.2.json": "f93eecc5c2c3bebe8bfcb764d3449c15fc9762b42f27245d25d94522293b1894",
+    "build/analysis/frequency-ideal-reference-q24/reference-m64-n192-k0.2.npz": "2658708d456be749a03c630c543289dbc9cbd2dc725e0d08900c8bfa9a10afff",
+    "build/analysis/frequency-ideal-reference-q24/reference-m64-n192-k0.8.json": "aabe42ae9dc9746d16c61b6aced83ad8ce8282cd1c99842c90a169cb940a0d47",
+    "build/analysis/frequency-ideal-reference-q24/reference-m64-n192-k0.8.npz": "50b4d5ba4542cdbaba28a0533e346c34ac229a1cf66fb03e648d00b87a07cc30",
+    "rd/aero/unsteady-reference/records/ideal-frequency-quadrature-protocol.md": "0bf4e0e651965446c4bfa7b8fd269d2fba3b2e6e2eff34041876321df580da3a",
+    "rd/aero/unsteady-reference/records/ideal-pitch-frequency-assessment-policy.md": "96af7ca71b5b903495ebc10334365bbd93fcfa1759b60fcc51f0c24ecfda3679",
+    "rd/aero/unsteady-reference/records/ptera-core-model-diagnostic.md": "fd693eb95b6eeebedb329400aaeea25cb599cdb1c1aa4ad0073b5d1efaf66cfe",
+    "rd/aero/unsteady-reference/records/ptera-scalar-reference-result.json": "5077198cbc8b89772dd48b543a612e6f77598630bf491e62f68a30a110340e9c",
+    "rd/aero/unsteady-reference/experiments/assess_ideal_pitch_frequency.py": "5ef1688b19acdf7097e931107838eadcb323d39c70f1349bfba92d00f5b628be",
+    "rd/aero/unsteady-reference/experiments/launch_ptera_ideal_frequency.py": "1c93419f8487bc7ff4813ce4c12db795619c6275b3c18d2bfeda486d9f88f55e",
+    "rd/aero/unsteady-reference/experiments/run_ptera_ideal_frequency.py": "a944ecfb832fea81b79fff8058698572efa6dee70af4dbcd52fde8d570daf748",
+    "rd/aero/unsteady-reference/experiments/run_ptera_ideal_quadrature.py": "df5d93d208851e3122ccf159874bb5b8fdf1a3bc53b7aca3299de4c5f1848a28"
+  }
+}

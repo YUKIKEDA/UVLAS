@@ -1,0 +1,453 @@
+{
+  "audit_passed": true,
+  "physical_PDE_bounded_acceptance": true,
+  "R4_complete": false,
+  "main_shell_adopted": false,
+  "checked_sources": 298,
+  "checked_artifacts": 119,
+  "checked_links": 437,
+  "resource_route_equivalence": {
+    "position": 3.594486385935497e-16,
+    "strain": 6.041707659303808e-15
+  },
+  "max_isolated_series_difference": 7.414689936009122e-18,
+  "spatial": [
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": false,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": false
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "h": 0.01,
+      "numerical_floor": true,
+      "decreased": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "h": 0.0001,
+      "numerical_floor": true,
+      "decreased": true
+    }
+  ],
+  "errors": [],
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-physical-pde-disposition.json": "70d13232e7a3682e938e6211082c20a55f1f3870bdf9590524c61b3d161c47e5",
+    "rd/structure/main-shell/paired-geometry/experiments/audit_pg_physical_pde.py": "cfb634617b5f2b4e11e4c7f24a3d0dd9b23b48d51839a06a312d47552a0bda13"
+  }
+}

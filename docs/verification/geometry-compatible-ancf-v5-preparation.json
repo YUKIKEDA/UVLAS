@@ -1,8 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/stable_curvature_profiles.py": "06d02f7499f7665a322cc38827e174325590fdd445b9c15f6d4abde038ea5619",
-    "tools/design-experiments/geometry_compatible_ancf_v5.py": "674c6398cd19e37c8b59593c6bd2587adbedd29265d1167fcd34d51d3263e884",
-    "tools/design-experiments/geometry_compatible_ancf_stable_solve.py": "ddf019c32d93a9bd9eaee642e8adbfba54c4cf88e1a10e831c22769c54291cdf",
-    "docs/verification/geometry-compatible-ancf-v5-protocol.md": "e82948a6018c0d04843832e6db08665ff00f32f5d13c146cf41ac861d82307a7"
-  }
-}

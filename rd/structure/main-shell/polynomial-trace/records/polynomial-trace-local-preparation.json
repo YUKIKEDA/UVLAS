@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/polynomial-trace/experiments/check_polynomial_trace_local.py": "c49aa11077854bfd4092cd93ce50e9d4cec20a530c9a6580172e904c35a052ec",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/polynomial-trace/polynomial-trace-stabilization-formulation.md": "6f9a642343dd0f1e8d97169917586388aafb85f038b3311442da4d97872e6948",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604"
+  }
+}

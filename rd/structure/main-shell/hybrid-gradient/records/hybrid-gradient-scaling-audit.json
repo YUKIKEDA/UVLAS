@@ -1,0 +1,31 @@
+{
+  "records": [
+    {
+      "h": 0.01,
+      "integral": 0.0014000200001531252,
+      "closed_form": 0.0014000200001531246,
+      "relative_difference": 4.440892098500626e-16
+    },
+    {
+      "h": 0.001,
+      "integral": 0.0001400000200000015,
+      "closed_form": 0.00014000002000000153,
+      "relative_difference": 2.220446049250313e-16
+    },
+    {
+      "h": 0.0001,
+      "integral": 1.4000000019999998e-05,
+      "closed_form": 1.4000000020000003e-05,
+      "relative_difference": 3.3306690738754696e-16
+    }
+  ],
+  "all_checks_pass": true,
+  "total_error_amplification": 21.36188014686978,
+  "physical_reconstructed_strain_error_amplification": 102.30683960134964,
+  "claim": "For bounded c and scaled bending energy with fixed positive tau, r trace jump is O(h); no full ANCF impossibility or unique causal proof is claimed.",
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/audit_hybrid_gradient_scaling.py": "43d1928be0f1cc8ece7c742577c1861a00d1ba7337ad3a3c2440e8ee1ef348d1",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-refinement-result.json": "75d3ce967173b4270c0261a6cbbd038b89242d2c9a357c48a577df814ba28862",
+    "rd/structure/main-shell/hybrid-gradient/hybrid-gradient-ancf-formulation.md": "1827ae17888007a097c57c375035732f734e612580fa3a819281dafcb67543bc"
+  }
+}

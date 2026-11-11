@@ -1,0 +1,130 @@
+{
+  "source_sha256": "c08211515aa3306596123c3dc91adf4464ce404a865df2ff93a0c8326129ea55",
+  "watchdog_sha256": "b464ed86ad6ef855172e31dd70a3023aecab4de00fbe44dd967bbc290537b8bf",
+  "termination_sha256": "cff867c82faad9ce7677ba3b44e097337a9b18c1c80d6e4e3f4fb1f62e7d1495",
+  "cases": [
+    {
+      "stage": "small",
+      "case": "normal",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "boundary",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "time",
+      "reason": "per_process_time_limit",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "stage",
+      "reason": "stage_time_limit",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "rss",
+      "reason": "process_group_rss_limit",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "console",
+      "reason": "console_limit",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "disk",
+      "reason": "disk_limit",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "floor",
+      "reason": "available_floor",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "swap",
+      "reason": "swap_increase_limit",
+      "passed": true
+    },
+    {
+      "stage": "small",
+      "case": "cgroup",
+      "reason": "unknown_cgroup",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "normal",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "boundary",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "time",
+      "reason": "per_process_time_limit",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "stage",
+      "reason": "stage_time_limit",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "rss",
+      "reason": "process_group_rss_limit",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "console",
+      "reason": "console_limit",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "disk",
+      "reason": "disk_limit",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "floor",
+      "reason": "available_floor",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "swap",
+      "reason": "swap_increase_limit",
+      "passed": true
+    },
+    {
+      "stage": "main",
+      "case": "cgroup",
+      "reason": "unknown_cgroup",
+      "passed": true
+    }
+  ],
+  "start_cases": 3,
+  "real_termination": true,
+  "all_criteria_pass": true
+}

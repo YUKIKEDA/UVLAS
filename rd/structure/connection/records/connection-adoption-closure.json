@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "connection_1_4_complete": true,
+  "beam_1_3_complete": true,
+  "material_1_2_complete": true,
+  "main_shell_adopted": true,
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "1.5 loads damping recovery and structural integration",
+  "immutable": {
+    "docs/specs/structure/connection-adopted-specification.md": "dbe318730a5024f9095e10f4ad1bbe5c70d2033f4e8ae812edb466a5ef5f7056",
+    "rd/structure/connection/records/connection-adoption-disposition.json": "5c403b784e0fc1b56862cd427df3c3ddc5950324629c22f0e153e6bf68c37523",
+    "rd/structure/connection/records/connection-adoption-results.md": "25b545d3776e231939455e089b40cc97afbf1aabe00f215aec83b81a7659cfe4",
+    "rd/structure/connection/records/connection-adoption-audit.json": "b66b3208bc8ef2925128d2c4d30b23edcfbaacf49261a4bc7cabf4c2350861bd"
+  },
+  "status_sync_source": {
+    "rd/structure/connection/experiments/sync_connection_adoption_status.py": "94500da440664af93ccda2565d6ef6b7040afc49d1a60787eb8819d342b8f698"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ],
+  "checked_status_links": 23
+}

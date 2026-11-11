@@ -1,8 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/check_mortar_equilibrium.py": "4c0a10b7b709874d78fde2a6b1622fd31cfb4e67333ea69bc0eea22548c7ba4e",
-    "tools/design-experiments/mortar_q4.py": "805a8e889c2a3e3e249a048830eb6a0b626470c57cc2a8043fb8290a673df523",
-    "docs/verification/mortar-q4-equilibrium-protocol.md": "158ce030b93e92bc363c1c3fc41888ba306029af9abcc6424a0c5c254e983919",
-    "docs/verification/mortar-q4-result.json": "dc0c9cb9c6e71a48993e255d26d7b43fac7da606390e451a267fc1eae8705f94"
-  }
-}

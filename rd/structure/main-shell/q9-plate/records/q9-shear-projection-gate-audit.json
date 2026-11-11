@@ -1,0 +1,51 @@
+{
+  "source_sha256": "45988c766dbb9382349bc5632ba29e43c887806ef2dc93d35df9205966bc5121",
+  "result_sha256": "b2dfadc4149c2ecb8eb8e084f0ec78db175e7bb7e7c0a990f24bc5b6c65831f8",
+  "audit_protocol_sha256": "afd4bdae350ae40146cee41d1565869b902b866d8301c2f29c7c5eec6b9d06d5",
+  "dependency_sha256": {
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1"
+  },
+  "cases": [
+    {
+      "case": "RECT",
+      "rank": {
+        "1e-11": 75,
+        "1e-10": 75,
+        "1e-09": 75
+      },
+      "condensation_difference": 1.206169351855168e-16,
+      "patch_maximum": 3.7214544570331385e-14,
+      "rigid": 4.657041099107879e-16,
+      "independent_full_matrix_difference": 7.673777685779447e-16
+    },
+    {
+      "case": "SKEW",
+      "rank": {
+        "1e-11": 75,
+        "1e-10": 75,
+        "1e-09": 75
+      },
+      "condensation_difference": 1.5772332150375343e-16,
+      "patch_maximum": 6.145179640736238e-14,
+      "rigid": 6.801906907484911e-16,
+      "independent_full_matrix_difference": 7.255792063569658e-16
+    },
+    {
+      "case": "TRAP",
+      "rank": {
+        "1e-11": 75,
+        "1e-10": 75,
+        "1e-09": 75
+      },
+      "condensation_difference": 1.6081678055701457e-16,
+      "patch_maximum": 7.339119606707253e-14,
+      "rigid": 4.80763616275926e-16,
+      "independent_full_matrix_difference": 7.58475069773331e-16
+    }
+  ],
+  "seconds": 0.0629999999946449,
+  "peak_bytes": 75182080,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

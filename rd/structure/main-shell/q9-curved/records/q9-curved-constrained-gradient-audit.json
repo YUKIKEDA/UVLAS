@@ -1,0 +1,179 @@
+{
+  "source_sha256": "e34048a2a661b178c169e84740d1e7a74e72a22759723e5146370f9eb53c56f3",
+  "parent_sha256": "ae06f13d1286701ec44c710c1c4877693ac22e421804b0e7ca8ac90959b30b33",
+  "protocol_sha256": "29f42f8b44b83009442f20668abd4b0af8738ec2cf064cc43d95a045f7736fbf",
+  "dependencies": {
+    "q9_curved_constrained_gradient.py": "c0629577b7aa249f34e9cc7ee16d7aae5a738fa9979a67d6d36764e5d51235ac",
+    "q9_edge_trace_moment.py": "03871a53c40353ec117aa1a0c841d944a8c9c40fc5977a08f610f6e092db1c77",
+    "audit_q9_curved_strain_screen.py": "b2c7c704dc6d59fd101ccb5b720eb33e4476596a4309885011355074d1585b31",
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1"
+  },
+  "cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "psi": 0.0,
+      "mean": 0.0,
+      "gram": 0.0,
+      "coefficients": 5.981999805016916e-16,
+      "boundary_work": 2.690962250114877e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "psi": 0.0,
+      "mean": 0.0,
+      "gram": 0.0,
+      "coefficients": 3.756110787446146e-16,
+      "boundary_work": 4.267808518503603e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "psi": 2.837776045776699e-17,
+      "mean": 1.7130186609758165e-17,
+      "gram": 7.774304358310593e-17,
+      "coefficients": 5.878342017175766e-16,
+      "boundary_work": 1.966980118472956e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "psi": 2.837776045776699e-17,
+      "mean": 1.0865593423441049e-18,
+      "gram": 0.0,
+      "coefficients": 2.9073347354729446e-16,
+      "boundary_work": 4.968032085639192e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "psi": 3.858546461748084e-17,
+      "mean": 4.321208983014771e-17,
+      "gram": 7.113332858681175e-18,
+      "coefficients": 3.1023033871349024e-16,
+      "boundary_work": 1.8532098081783388e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "psi": 3.858546461748084e-17,
+      "mean": 0.0,
+      "gram": 0.0,
+      "coefficients": 2.276341855835922e-16,
+      "boundary_work": 4.619619355315971e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "psi": 1.0340543626880407e-16,
+      "mean": 2.6710465947683057e-17,
+      "gram": 1.4141571236512825e-16,
+      "coefficients": 7.873148567381414e-16,
+      "boundary_work": 1.785274641206518e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "psi": 1.1969212374706607e-16,
+      "mean": 2.841336835314411e-17,
+      "gram": 1.0208903565670924e-16,
+      "coefficients": 3.319867476008111e-16,
+      "boundary_work": 7.80630227452542e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "psi": 1.160280215061541e-16,
+      "mean": 2.3151489684350588e-17,
+      "gram": 3.9743292360966875e-18,
+      "coefficients": 4.4394878225252705e-16,
+      "boundary_work": 1.936180299260557e-15,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "psi": 1.1757658634908949e-16,
+      "mean": 3.213373794181468e-17,
+      "gram": 1.0389605875270052e-16,
+      "coefficients": 4.2364189315294236e-16,
+      "boundary_work": 1.8252894189332396e-14,
+      "checks": {
+        "psi": true,
+        "mean": true,
+        "gram": true,
+        "coefficients": true,
+        "boundary_work": true
+      }
+    }
+  ],
+  "stop_reason": null,
+  "seconds": 9.813000000023749,
+  "peak_bytes": 121856000,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

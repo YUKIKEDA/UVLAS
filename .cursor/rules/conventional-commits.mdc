@@ -1,0 +1,13 @@
+---
+description: commitメッセージの形式
+alwaysApply: true
+---
+
+# commitメッセージ
+
+`type(scope): subject`。scopeは省略できる。
+
+- type：`feat` `fix` `docs` `style` `refactor` `test` `chore` `build` `ci`。`perf` は使わない（性能の変更は `refactor` か `feat`）。
+- subjectは英語、命令形、文末にピリオドを付けない。本文は日本語でよい。
+- 本文には何を、なぜ変えたかを書く。数値の挙動を変えたなら、どの式・契約に基づくかを書く。
+- `Closes #N` はcommit本文に書かない。PRの `## Related` に書く。commitからIssueを指すときは `Refs #N`。

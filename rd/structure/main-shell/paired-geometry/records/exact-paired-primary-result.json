@@ -1,0 +1,456 @@
+{
+  "all_cases": false,
+  "records": [
+    {
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "ns": 232,
+      "observation": {
+        "error": [
+          1.1886649500711146e-09,
+          2.387656325472664e-07,
+          1.3488264751606662e-06
+        ],
+        "position": [
+          1.1236787621851456e-11,
+          2.225487285866177e-09,
+          1.298982750033803e-08
+        ],
+        "stationarity": [
+          4.429820869645646e-18,
+          6.868623415656793e-18,
+          1.7113748909775394e-15
+        ]
+      },
+      "equivalence": {
+        "full_3d_operator": 4.585106665524195e-16,
+        "mass_4_versus_7": 8.34330115529331e-16
+      },
+      "coarse_inclusion": [
+        {
+          "r": 1.5077869385295918e-15,
+          "d": 3.640960373881025e-15
+        },
+        {
+          "r": 1.8673027946372013e-14,
+          "d": 8.806632720875575e-14
+        },
+        {
+          "r": 2.290721154481281e-13,
+          "d": 8.878290504491007e-12
+        }
+      ],
+      "rcond": 1.4090865921941987e-05,
+      "mass_min": 0.014761532467732057,
+      "mass_root_ranks": [
+        232,
+        232,
+        232
+      ],
+      "stiffness_ranks": [
+        696,
+        696,
+        696
+      ],
+      "fixed": 1.9009481723552107e-21,
+      "trace": 1.202923208883629e-14,
+      "checks": {
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true,
+        "resource": true
+      },
+      "cold_preparation": 3.375,
+      "solve_seconds": 5.469000000040978,
+      "seconds": 7.609000000054948,
+      "cold_case_seconds": 10.984000000054948,
+      "canonical": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "exact_rank": 226,
+        "exact_r_rank": 110,
+        "exact_d_kernel": 116,
+        "numeric_guide_ranks": [
+          226,
+          226,
+          226
+        ],
+        "numeric_position_guide": [
+          110,
+          110,
+          110
+        ],
+        "pure_d_r_exactly_zero": true,
+        "arithmetic": "arb192",
+        "max_coefficient_radius": 2.018360491512442e-33,
+        "precision_bits": 192,
+        "attempted_precisions": [
+          192
+        ],
+        "seconds": 2.8119999999180436,
+        "coefficient_source_sha256": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+        "artifact": "build/analysis/exact-paired-space/ae0766bc8c5845fd.npz",
+        "artifact_sha256": "c855fb7856ad3bd179e03190a1846ad4f9832e95e53d8fe3f2f7c147bf97fe27",
+        "runtime_cache_hit": false
+      },
+      "artifact": "build/analysis/exact-paired-primary-20261105-104955/p(0.4, 0.2, 0.0)-n2-h0.01.npz",
+      "artifact_sha256": "5ad68d8720fc0522d2b8f22fb9b2a25cc78a2d8b47971399f8f253c872b407c7"
+    },
+    {
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "ns": 232,
+      "observation": {
+        "error": [
+          1.4567943268497485e-11,
+          2.9113946255552376e-09,
+          1.6872137471061417e-08
+        ],
+        "position": [
+          8.461498206032054e-12,
+          1.6657364432895976e-09,
+          1.0106291141489785e-08
+        ],
+        "stationarity": [
+          4.096598381739431e-18,
+          6.280858466587414e-18,
+          3.21034774892122e-17
+        ]
+      },
+      "equivalence": {
+        "full_3d_operator": 5.12409800691788e-16,
+        "mass_4_versus_7": 8.559297074272026e-16
+      },
+      "coarse_inclusion": [
+        {
+          "r": 1.5077869385295918e-15,
+          "d": 3.640960373881025e-15
+        },
+        {
+          "r": 1.8673027946372013e-14,
+          "d": 8.806632720875575e-14
+        },
+        {
+          "r": 2.290721154481281e-13,
+          "d": 8.878290504491007e-12
+        }
+      ],
+      "rcond": 4.146233382699189e-06,
+      "mass_min": 0.24849110530806065,
+      "mass_root_ranks": [
+        232,
+        232,
+        232
+      ],
+      "stiffness_ranks": [
+        696,
+        696,
+        696
+      ],
+      "fixed": 1.9332000894152057e-21,
+      "trace": 2.7098151308472197e-15,
+      "checks": {
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true,
+        "resource": true
+      },
+      "cold_preparation": 3.375,
+      "solve_seconds": 5.625,
+      "seconds": 7.687999999965541,
+      "cold_case_seconds": 11.062999999965541,
+      "canonical": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "exact_rank": 226,
+        "exact_r_rank": 110,
+        "exact_d_kernel": 116,
+        "numeric_guide_ranks": [
+          226,
+          226,
+          226
+        ],
+        "numeric_position_guide": [
+          110,
+          110,
+          110
+        ],
+        "pure_d_r_exactly_zero": true,
+        "arithmetic": "arb192",
+        "max_coefficient_radius": 2.018360491512442e-33,
+        "precision_bits": 192,
+        "attempted_precisions": [
+          192
+        ],
+        "seconds": 2.8119999999180436,
+        "coefficient_source_sha256": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+        "artifact": "build/analysis/exact-paired-space/ae0766bc8c5845fd.npz",
+        "artifact_sha256": "c855fb7856ad3bd179e03190a1846ad4f9832e95e53d8fe3f2f7c147bf97fe27",
+        "runtime_cache_hit": false
+      },
+      "artifact": "build/analysis/exact-paired-primary-20261105-104955/p(0.4, 0.2, 0.0)-n2-h0.0001.npz",
+      "artifact_sha256": "b43a4204fdf7ef810d5ed64c845094e25ada9b6fc37833437e4df7badbc116f8"
+    },
+    {
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "ns": 508,
+      "observation": {
+        "error": [
+          5.8122516698801104e-12,
+          1.1606593616382594e-09,
+          4.410056391022215e-08
+        ],
+        "position": [
+          1.4577618412160962e-14,
+          2.9253467447716446e-12,
+          1.1177579157953284e-10
+        ],
+        "stationarity": [
+          3.415457621945578e-18,
+          3.0646612766254024e-17,
+          1.1341856110302983e-16
+        ]
+      },
+      "equivalence": {
+        "full_3d_operator": 4.36421630805652e-16,
+        "mass_4_versus_7": 9.21491769587556e-16
+      },
+      "coarse_inclusion": [
+        {
+          "r": 1.8104854813755135e-15,
+          "d": 5.168929977270736e-15
+        },
+        {
+          "r": 3.430602200776988e-14,
+          "d": 1.8809237765333526e-13
+        },
+        {
+          "r": 4.3874859798600244e-13,
+          "d": 1.7011281054599362e-11
+        }
+      ],
+      "rcond": 2.6869687105531736e-06,
+      "mass_min": 0.0010115296370943184,
+      "mass_root_ranks": [
+        508,
+        508,
+        508
+      ],
+      "stiffness_ranks": [
+        1524,
+        1524,
+        1524
+      ],
+      "fixed": 2.713005918892798e-21,
+      "trace": 4.934102004414448e-14,
+      "checks": {
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true,
+        "resource": true
+      },
+      "cold_preparation": 22.968999999924563,
+      "solve_seconds": 58.34400000004098,
+      "seconds": 73.71900000004098,
+      "cold_case_seconds": 96.68799999996554,
+      "canonical": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "exact_rank": 488,
+        "exact_r_rank": 226,
+        "exact_d_kernel": 262,
+        "numeric_guide_ranks": [
+          488,
+          488,
+          488
+        ],
+        "numeric_position_guide": [
+          226,
+          226,
+          226
+        ],
+        "pure_d_r_exactly_zero": true,
+        "arithmetic": "arb192",
+        "max_coefficient_radius": 4.443095765909251e-28,
+        "precision_bits": 192,
+        "attempted_precisions": [
+          192
+        ],
+        "seconds": 19.468999999924563,
+        "coefficient_source_sha256": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+        "artifact": "build/analysis/exact-paired-space/1e008c6fed66c0a6.npz",
+        "artifact_sha256": "a39780c3a6106ff24d0ee3f3175f1e782de38166efe57967a8b104e0c5ace7b2",
+        "runtime_cache_hit": false
+      },
+      "artifact": "build/analysis/exact-paired-primary-20261105-104955/p(0.4, 0.2, 0.0)-n4-h0.01.npz",
+      "artifact_sha256": "f3fa67f3778635a2ab71f11c5743dfad39a4ba3913c9f44a3b8afd8f26594ef7"
+    },
+    {
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "ns": 508,
+      "observation": {
+        "error": [
+          5.93712813441484e-14,
+          1.1857556695311795e-11,
+          4.5065608013086373e-10
+        ],
+        "position": [
+          1.2744910689342509e-14,
+          2.55923460984186e-12,
+          9.781456088525058e-11
+        ],
+        "stationarity": [
+          3.471049609624905e-18,
+          1.8285844480575708e-17,
+          5.63322852958855e-17
+        ]
+      },
+      "equivalence": {
+        "full_3d_operator": 5.126138189132368e-16,
+        "mass_4_versus_7": 8.685081521278601e-16
+      },
+      "coarse_inclusion": [
+        {
+          "r": 1.8104854813755135e-15,
+          "d": 5.168929977270736e-15
+        },
+        {
+          "r": 3.430602200776988e-14,
+          "d": 1.8809237765333526e-13
+        },
+        {
+          "r": 4.3874859798600244e-13,
+          "d": 1.7011281054599362e-11
+        }
+      ],
+      "rcond": 2.399321089215375e-07,
+      "mass_min": 0.24694002260024744,
+      "mass_root_ranks": [
+        508,
+        508,
+        508
+      ],
+      "stiffness_ranks": [
+        1524,
+        1524,
+        1524
+      ],
+      "fixed": 3.736571072333496e-21,
+      "trace": 2.971025562210008e-15,
+      "checks": {
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true,
+        "resource": true
+      },
+      "cold_preparation": 22.968999999924563,
+      "solve_seconds": 58.40700000000652,
+      "seconds": 73.70299999997951,
+      "cold_case_seconds": 96.67199999990407,
+      "canonical": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "exact_rank": 488,
+        "exact_r_rank": 226,
+        "exact_d_kernel": 262,
+        "numeric_guide_ranks": [
+          488,
+          488,
+          488
+        ],
+        "numeric_position_guide": [
+          226,
+          226,
+          226
+        ],
+        "pure_d_r_exactly_zero": true,
+        "arithmetic": "arb192",
+        "max_coefficient_radius": 4.443095765909251e-28,
+        "precision_bits": 192,
+        "attempted_precisions": [
+          192
+        ],
+        "seconds": 19.468999999924563,
+        "coefficient_source_sha256": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+        "artifact": "build/analysis/exact-paired-space/1e008c6fed66c0a6.npz",
+        "artifact_sha256": "a39780c3a6106ff24d0ee3f3175f1e782de38166efe57967a8b104e0c5ace7b2",
+        "runtime_cache_hit": false
+      },
+      "artifact": "build/analysis/exact-paired-primary-20261105-104955/p(0.4, 0.2, 0.0)-n4-h0.0001.npz",
+      "artifact_sha256": "a77495a49b7df0a3a10f748e62b44929c6af7be4a35a308c1964f06f81790d5b"
+    }
+  ],
+  "stops": [
+    {
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "reason": "ValueError('coarse_inclusion_jet')"
+    }
+  ],
+  "R4_complete": false,
+  "main_shell_adopted": false,
+  "seconds": 200.21899999992456,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_exact_paired_primary.py": "4a57a1dc08e81c2c33057b581b611cf60a8bf25a1a2a5b20eb41cebb1842663a",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_protected.py": "58982ec1d12dddbbabe674fbfa150e57233e4b7012b69fa881d9cb32dee34ba3",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_ancf.py": "93f39b311ae1940900d47975361eb1db8f79c5229b5d2a848ba116be75ed98bd",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_exact_polynomials.py": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_coarse_polynomials.py": "69f12ab8ec786276146300395d83ab63a10bedb33e055d39cbdca9ee56cedd87",
+    "rd/structure/main-shell/paired-geometry/records/exact-paired-r4-protocol.md": "d8e0d5f0e4f114fcadc3d3c2c372eafe3a444064bf1e877c45baae73b85f8cd7"
+  }
+}

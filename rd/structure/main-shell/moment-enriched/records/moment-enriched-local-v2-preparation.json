@@ -1,0 +1,10 @@
+{
+  "reason": "Correct nested completion-rank metadata access in the verifier; no operator or threshold change.",
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_local_v2.py": "730203f470bafa22da5354b3d8aa0247d47c8bd6d03627edf0847cfb71d04521",
+    "rd/structure/main-shell/moment-enriched/experiments/audit_moment_enriched_local_v2.py": "160786074a94b4c84c978ca20f65415aa7e63a5a7014f09dad1fe22bf97f541c",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-local-result.json": "ecc9224d3ab04aedcda0509c8b1ea8d2f8db055b2926154de560b13672953abc",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-local-preparation.json": "a3860d4877c42f8ad7854539c35de97862995eef53368e7671d421d8c74fa905"
+  }
+}

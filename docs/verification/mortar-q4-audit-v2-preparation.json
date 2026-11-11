@@ -1,9 +1,0 @@
-{
-  "sources": {
-    "tools/design-experiments/audit_mortar_q4_v2.py": "d159d8ecb39aaa47414c6f7c533210b0d15ddde5b31f9bb08279847db1982364",
-    "tools/design-experiments/mortar_q4.py": "805a8e889c2a3e3e249a048830eb6a0b626470c57cc2a8043fb8290a673df523",
-    "docs/verification/mortar-q4-result.json": "dc0c9cb9c6e71a48993e255d26d7b43fac7da606390e451a267fc1eae8705f94",
-    "docs/verification/mortar-q4-audit.json": "79c0b1d8126cce9b05af834750d82caa139c8a4cb8963c7b5a854c4383dc99b4",
-    "docs/verification/mortar-q4-audit-v2-protocol.md": "53f9abe6fb044e52777461e07344daa2697b223e86c60fe5f7bf2f727256a709"
-  }
-}

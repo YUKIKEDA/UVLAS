@@ -1,0 +1,301 @@
+{
+  "kind": "design_reference_fixture_not_product_schema",
+  "specification": "finite-wing-load-reference-specification.md",
+  "solver_runs_performed": false,
+  "generator_sha256": "d532da325703141cafb864bf4a65abd61e37c1099d66d7e73377c7e23ea3f070",
+  "reference": {
+    "version": "AVL 3.52",
+    "url": "https://web.mit.edu/drela/Public/web/avl/avl3.52.tgz",
+    "archive_sha256": "0b588ecea9222f5b625d0af0c87ae31daf3cdba1532cf0bbb36f93d6e854849b",
+    "archive_bytes": 1769840,
+    "audited_files": [
+      {
+        "archive_member": "AVL3.52rel09032025/version_notes.txt",
+        "sha256": "d858448dbf93d3d88e026290273806a14d96766b4e5d8bc2686b153c6553a75a",
+        "bytes": 25522
+      },
+      {
+        "archive_member": "AVL3.52rel09032025/src/avl.f",
+        "sha256": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a",
+        "bytes": 30010
+      },
+      {
+        "archive_member": "AVL3.52rel09032025/src/aero.f",
+        "sha256": "11b732770f883cc5e51482cd40528d3283ac44eb50c2cd63629bae720b1ff226",
+        "bytes": 54124
+      },
+      {
+        "archive_member": "AVL3.52rel09032025/src/aic.f",
+        "sha256": "ccbb18836d7fda5d1c9558564b881cebee87c9e38e7bf90e8f13ca6d2a0b8228",
+        "bytes": 21143
+      },
+      {
+        "archive_member": "AVL3.52rel09032025/src/aoper.f",
+        "sha256": "cc7fb951d748cbfa7e1e4a737dda283ac6752d301a68c11cdbdc01c39efc68af",
+        "bytes": 51685
+      },
+      {
+        "archive_member": "AVL3.52rel09032025/src/aoutput.f",
+        "sha256": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9",
+        "bytes": 68073
+      },
+      {
+        "archive_member": "AVL3.52rel09032025/avl_doc-AVL350-04242025.txt",
+        "sha256": "c108cb367a28d1e9d76975a198de0daa5b59e4aa4a155335d084242f4c988d4e",
+        "bytes": 94362
+      }
+    ],
+    "executable_status": "not acquired or built",
+    "source_core_audit_copy_status": "not created",
+    "required_trailing_leg_forces": true,
+    "required_geometric_moment_axes": true,
+    "wake_direction": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  "density": 1.2,
+  "speed": 20.0,
+  "mach": 0.0,
+  "sideslip_deg": 0.0,
+  "angles_deg": [
+    -2.0,
+    -1.0,
+    0.0,
+    1.0,
+    2.0
+  ],
+  "strip_boundaries_y": [
+    -4.0,
+    -3.6,
+    -3.2,
+    -2.8,
+    -2.4,
+    -2.0,
+    -1.5999999999999996,
+    -1.1999999999999997,
+    -0.7999999999999998,
+    -0.3999999999999999,
+    0.0,
+    0.40000000000000036,
+    0.8000000000000007,
+    1.2000000000000002,
+    1.6000000000000005,
+    2.0,
+    2.4000000000000004,
+    2.8000000000000007,
+    3.2,
+    3.6000000000000005,
+    4.0
+  ],
+  "wake_lengths_over_reference_chord": [
+    20,
+    40,
+    80,
+    160
+  ],
+  "cases": [
+    {
+      "id": "FW-V01",
+      "leading_edge_sweep_deg": 35.0,
+      "dihedral_deg": 0.0,
+      "sections": [
+        {
+          "x_le": 2.800830152838839,
+          "y": -4.0,
+          "z": 0.0,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.0,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "reference_area_xy": 8.4,
+      "reference_span_y": 8.0,
+      "reference_chord": 1.1142857142857143,
+      "moment_origin": [
+        0.375,
+        0.0,
+        0.0
+      ],
+      "decks": [
+        {
+          "m": 4,
+          "n": 12,
+          "path": "fixtures/avl-fw/FW-V01-M4-N12.avl",
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd"
+        },
+        {
+          "m": 4,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V01-M4-N96.avl",
+          "sha256": "3c2f25adea26c0d816f38b9beb80bd781a2ee79dc1956e2d4ed2c92e10ce77ab"
+        },
+        {
+          "m": 8,
+          "n": 24,
+          "path": "fixtures/avl-fw/FW-V01-M8-N24.avl",
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a"
+        },
+        {
+          "m": 8,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V01-M8-N96.avl",
+          "sha256": "119d99d605dcb60fc4866818fcaae1d8a51a845c66f5a477b1f34672cda376c6"
+        },
+        {
+          "m": 16,
+          "n": 48,
+          "path": "fixtures/avl-fw/FW-V01-M16-N48.avl",
+          "sha256": "2bd91bed270ac39bfcbb283149e935246acd3c2988255fb4cb62a2461adb37c8"
+        },
+        {
+          "m": 16,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V01-M16-N96.avl",
+          "sha256": "2ba834643e7c3e23de1511adc7b6f530ee6ab2bee3aec36ed46172db645f5c8a"
+        },
+        {
+          "m": 32,
+          "n": 12,
+          "path": "fixtures/avl-fw/FW-V01-M32-N12.avl",
+          "sha256": "96f06d2fee35c7ddacd56adeeaf3fb048364154a3b8b4fd2fad7d5b3e76d1359"
+        },
+        {
+          "m": 32,
+          "n": 24,
+          "path": "fixtures/avl-fw/FW-V01-M32-N24.avl",
+          "sha256": "802cec5c077500c10639e52144d2f78fcff819656f27b8671b70ecf07be26207"
+        },
+        {
+          "m": 32,
+          "n": 48,
+          "path": "fixtures/avl-fw/FW-V01-M32-N48.avl",
+          "sha256": "6f4b14e55277161b7abedcfcdfa079ad6a476f41bfebf1b4412827e358c77e4a"
+        },
+        {
+          "m": 32,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V01-M32-N96.avl",
+          "sha256": "594be0e5c1a6b537352444837dcc942823529121e32532f131c7f3e436c3f211"
+        }
+      ]
+    },
+    {
+      "id": "FW-V02",
+      "leading_edge_sweep_deg": 35.0,
+      "dihedral_deg": 5.0,
+      "sections": [
+        {
+          "x_le": 2.800830152838839,
+          "y": -4.0,
+          "z": 0.34995465410369603,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.34995465410369603,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "reference_area_xy": 8.4,
+      "reference_span_y": 8.0,
+      "reference_chord": 1.1142857142857143,
+      "moment_origin": [
+        0.375,
+        0.0,
+        0.0
+      ],
+      "decks": [
+        {
+          "m": 4,
+          "n": 12,
+          "path": "fixtures/avl-fw/FW-V02-M4-N12.avl",
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea"
+        },
+        {
+          "m": 4,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V02-M4-N96.avl",
+          "sha256": "35aa8dbff5cea245b969ece008cacf6ef137a83c78333fc74f719de7fd48fbb3"
+        },
+        {
+          "m": 8,
+          "n": 24,
+          "path": "fixtures/avl-fw/FW-V02-M8-N24.avl",
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6"
+        },
+        {
+          "m": 8,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V02-M8-N96.avl",
+          "sha256": "3a32a59813b117469fae0ebd98d9a41cef9490a06633e2321ccd75454857f6fc"
+        },
+        {
+          "m": 16,
+          "n": 48,
+          "path": "fixtures/avl-fw/FW-V02-M16-N48.avl",
+          "sha256": "eed7cc25e61b8d6787253d9cef2cb9b923d231ac4c4b1b9fa4e5599a0ca12a90"
+        },
+        {
+          "m": 16,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V02-M16-N96.avl",
+          "sha256": "f9f79eb13c30499a977a2a40ee04c8f8834fa234698aad1f938c8181e6d1f2e2"
+        },
+        {
+          "m": 32,
+          "n": 12,
+          "path": "fixtures/avl-fw/FW-V02-M32-N12.avl",
+          "sha256": "fd0fa53143b151aca268b5b5ea72be0e70a161d6635275f12ba32a1999c022cc"
+        },
+        {
+          "m": 32,
+          "n": 24,
+          "path": "fixtures/avl-fw/FW-V02-M32-N24.avl",
+          "sha256": "6c287403aab0f37cef074a30ee65ad99bbf7c06367b3cded4c06c338119dc814"
+        },
+        {
+          "m": 32,
+          "n": 48,
+          "path": "fixtures/avl-fw/FW-V02-M32-N48.avl",
+          "sha256": "9ef7c4abcb8a4c04562741b470bf2c81196666b48a1178ee775c3801957452b2"
+        },
+        {
+          "m": 32,
+          "n": 96,
+          "path": "fixtures/avl-fw/FW-V02-M32-N96.avl",
+          "sha256": "ad98d2f45ef0cde2038610e137319eb669891ee47bed1d2b369020f75f318b4a"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "decks not parsed by AVL yet",
+    "no reference numerical outputs",
+    "reference option session, residual and conservative strip extraction still required"
+  ]
+}

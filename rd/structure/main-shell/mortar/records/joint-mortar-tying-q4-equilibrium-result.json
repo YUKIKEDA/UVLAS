@@ -1,0 +1,79 @@
+{
+  "history": [
+    {
+      "iteration": 0,
+      "residual": 1.098457091245814,
+      "min_F": 0.9991219774602873,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 1,
+      "residual": 0.3194680821179408,
+      "min_F": 1.0061248882082483,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 2,
+      "residual": 0.172639528887622,
+      "min_F": 1.0082435572034891,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 3,
+      "residual": 0.01644996373266394,
+      "min_F": 1.0088973288867042,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 4,
+      "residual": 0.0005926908201345293,
+      "min_F": 1.009023649071738,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 5,
+      "residual": 2.1289977186875203e-07,
+      "min_F": 1.0090269649423382,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 6,
+      "residual": 3.1373483507777584e-13,
+      "min_F": 1.009026966823981
+    }
+  ],
+  "metrics": {
+    "displacement": 5.8848651423975834e-09,
+    "constraint": 5.235653510820132e-17,
+    "free_equilibrium": 3.137387742823819e-13,
+    "support_reaction": 1.1820199652424193e-13,
+    "interface_reaction": 8.167113062852696e-13,
+    "independent_equilibrium": 3.1787788677607464e-13,
+    "tangent": 2.3044225949650152e-15,
+    "min_F": 1.009026966823981
+  },
+  "checks": {
+    "newton": true,
+    "displacement": true,
+    "identities": true,
+    "orientation": true,
+    "resources": true
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "artifact": {
+    "path": "build/analysis/joint-mortar-tying-equilibrium-20261104-011604.npz",
+    "sha256": "40e60e4ae33d8adc576b93367c57f916b8e860e8f78acb3f97ffab2051370edf"
+  },
+  "manufactured_Ku_load": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/check_joint_mortar_tying_equilibrium.py": "6789817927d8789cb21e8a47b610a0de72f59e36de2336312c92e7b611aa33ea",
+    "rd/structure/main-shell/mortar/experiments/joint_mortar_tying_q4.py": "a39064297019a3ba57d0395033ba5a00fdf52f9361be228d7e6ea077193ea1c3",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-equilibrium-protocol.md": "06080ea7a15947dbd8a44bebff145fcd9bdd70d563b765747e2efe2157b640e0",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-equilibrium-preparation.json": "f0da612aafaeba547160ae536a44ad1d7ad98aabac55b07980f7d3aab73c48df",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-result.json": "aa95ec2435542f69952b228aebbb49d3f115be487259dbbdf0960c2aa1356873"
+  },
+  "seconds": 17.82799999997951,
+  "peak_bytes": 161800192
+}

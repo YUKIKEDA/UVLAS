@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "R4_complete": true,
+  "main_shell_adopted": false,
+  "product_implementation_start": false,
+  "checked_new_links": 23,
+  "immutable": {
+    "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-results.md": "77e6e5fbd8489b8f06d25c745ac942e944ff9183eccf226dd9ec64d5423edb57",
+    "rd/structure/main-shell/paired-geometry/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "rd/structure/main-shell/paired-geometry/paired-reference-local-global-contract.md": "6ef49ef388c89d8712249a8249075f09a6fa01372460956374178972dccfd189",
+    "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-protocol.md": "b79e12995e0a1171ec9925b0025a4348f29beeb510c6aec678502d227b7790ed",
+    "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-disposition.json": "40c77b31287106d64657402db02a6ce3523cfc17e37b34b520ebe6e9e865d626",
+    "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-audit.json": "2af9e42f35928cb0d213f126fd481d03703ce6995b3c52e75ea1c8045cd9f0c9"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

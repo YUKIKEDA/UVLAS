@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit.py": "52d144a37ec016c468cd84c67709d55997d72e49c610cda01d1113fd19161a25",
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_v3_shared.py": "ed3aed73a641a44b3482ed6f06fbaa944a3cbb5cbc9f69127d467964fd8f4ce9",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_coefficients.py": "1f4591a1b0f832ae065b94f64d6a7892a788bf13d25574b9d1493b52786d3420",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-local-result.json": "14444484b5fdc6c7825acfe58be09fec72367002a6d3819b8a24bc3a9c19ba30",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-local-audit.json": "22d8f4cfb928b8f3312f3ca7d493f83313bb179e8bbce95a4f27f1e9ed9d5e83"
+  }
+}

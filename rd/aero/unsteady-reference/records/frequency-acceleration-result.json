@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "point_derivative_50_directions",
+      "max_relative_error": 1.9318457813836712e-14
+    },
+    {
+      "case": "bound_matrix",
+      "relative_error": 0.0
+    },
+    {
+      "case": "frequency_field_and_load",
+      "field_error": 2.887432655729543e-10,
+      "load_error": 8.886895510826416e-11
+    }
+  ],
+  "sources": {
+    "rd/aero/unsteady-reference/experiments/check_frequency_acceleration.py": "29d1a05e8c50d708dc67cc56d2c6df0de49599cf18daeb56bcbfccdf22825dc7",
+    "rd/aero/unsteady-reference/experiments/uvlm_frequency_fast.py": "cf882a9dcdb7de4789b2c6d5d53ac4ccb382ddd346de6cab6489892aaa7ba304",
+    "rd/aero/unsteady-reference/experiments/uvlm_harmonic_reference_v2.py": "5d89842b42cb48a953c8aa5d4ad733864ce91d889630e23e820974308e022f2b"
+  },
+  "seconds": 12.953000000095926
+}

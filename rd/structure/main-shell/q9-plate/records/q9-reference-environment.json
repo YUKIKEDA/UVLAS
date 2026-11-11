@@ -1,0 +1,30 @@
+{
+  "recorded": "2026-10-29",
+  "purpose": "Limited preimplementation reference experiment; not product dependencies",
+  "python": "3.12.14",
+  "platform": "Windows x86_64",
+  "numpy": {
+    "version": "2.3.5",
+    "origin": "Inherited bundled workspace runtime through system-site-packages",
+    "archive_sha256": null
+  },
+  "downloaded_packages": [
+    {
+      "name": "scipy",
+      "version": "1.16.3",
+      "url": "https://files.pythonhosted.org/packages/c2/7f/acbd28c97e990b421af7d6d6cd416358c9c293fc958b8529e0bd5d2a2a19/scipy-1.16.3-cp312-cp312-win_amd64.whl",
+      "sha256": "56edc65510d1331dae01ef9b658d428e33ed48b4f77b1d51caf479a0253f96dc"
+    },
+    {
+      "name": "scikit-fem",
+      "version": "12.0.2",
+      "url": "https://files.pythonhosted.org/packages/5b/13/d46cf943bd1b04b1b010094eb08493d6660c99c49652fa46cf7c3bf36ab5/scikit_fem-12.0.2-py3-none-any.whl",
+      "sha256": "34cd891f80072c0c1eb759a2371e82f0eeec91ff7c08acab96d27b6edbbe1b05"
+    }
+  ],
+  "requirements": "rd/requirements-reference.txt",
+  "scripts": [
+    "rd/structure/main-shell/q9-plate/experiments/check_q9_independent_load.py",
+    "rd/structure/main-shell/q9-plate/experiments/check_q9_preintegral_reference.py"
+  ]
+}

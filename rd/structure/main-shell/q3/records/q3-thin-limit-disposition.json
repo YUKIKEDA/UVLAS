@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-03",
+  "roadmap_location": "1.structural_adoption/1.1_primary_shell/shared_thin_constraint_diagnosis",
+  "status": "diagnosis_complete",
+  "conditions": 12,
+  "first_order_fits": 24,
+  "element_audit_cases": 84,
+  "distorted_curved_rd_nullities": [
+    1,
+    1,
+    1
+  ],
+  "mode_identified": "previous_quadratic_bending_field",
+  "physical_adoption": false,
+  "finite_thickness_lower_bound": false,
+  "previous_Q3_rejection_maintained": true,
+  "C_equilibrium": "deferred_for_rejected_candidate",
+  "next_action": "Compare primary-source membrane/shear reconstructions before defining an ANCF candidate",
+  "next_contract": "rd/structure/main-shell/mq3/curved-shell-joint-redesign-contract.md",
+  "evidence_sha256": {
+    "q3-thin-limit-result.json": "424c37db6df7cffa939f45948bbd18afd6f510b9381f69a4e3ad56026642b46c",
+    "q3-thin-limit-audit.json": "d00228d81da10eb81f7fae28a181dcd18ff3d75d85c0029d8b33f25d35710ef4"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "audit_passed": true,
+  "R1_only": true,
+  "checked_source_files": 124,
+  "checked_artifacts": 65,
+  "checked_document_links": 415,
+  "numerical_cases": 3,
+  "new_global_solve": false,
+  "main_shell_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-cause-disposition.json": "908ca736220e14b3575c059d870c90f0543b64e519eb0626d178962efb6a1c7f",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-curved-audit.json": "e7d136d4b31a9a6c39bad7ea7d6a7e8d4609bc6139495585a4509731bf2faafd"
+  }
+}

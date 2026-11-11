@@ -5,13 +5,10 @@
 
 namespace {
 
-constexpr std::string_view usage =
-    "Usage: uvlas --help | --version\n"
-    "Development build: solver commands are not implemented.\n";
+constexpr std::string_view usage = "Usage: uvlas --help | --version | --build-info\n"
+                                   "Development build: solver commands are not implemented.\n";
 
-} // namespace
-
-int main(int argc, char* argv[]) {
+int run(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Expected exactly one option.\n" << usage;
         return 2;
@@ -31,6 +28,22 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    if (option == "--build-info") {
+        std::cout << uvlas::build_info_json();
+        return 0;
+    }
+
     std::cerr << "Unknown option: " << option << '\n' << usage;
     return 2;
+}
+
+} // namespace
+
+// No exception leaves the process: an unexpected one ends it with exit code 1.
+int main(int argc, char* argv[]) {
+    try {
+        return run(argc, argv);
+    } catch (...) {
+        return 1;
+    }
 }

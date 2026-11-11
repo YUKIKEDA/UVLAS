@@ -1,0 +1,85 @@
+{
+  "records": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "error": 0.0497850345192797,
+      "error_difference": 1.3426759704060487e-14,
+      "h1": 0.49790124789008133,
+      "h1_difference": 2.6645352591003757e-15,
+      "svd": {
+        "rank": 828,
+        "columns": 828,
+        "qr_objective": 0.049785034519263874,
+        "svd_objective": 0.04978503451926353,
+        "objective_difference": 3.469446951953614e-16,
+        "energy_change": 3.439433490353202e-13,
+        "observed_error": 0.049785034519279445,
+        "observation_difference": 2.5673907444456745e-16
+      },
+      "checks": {
+        "observation": true,
+        "h1": true
+      }
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "error": 0.5705412295614786,
+      "error_difference": 2.899902540320909e-13,
+      "h1": 0.9250427539946411,
+      "h1_difference": 2.6645352591003757e-15,
+      "svd": {
+        "rank": 828,
+        "columns": 828,
+        "qr_objective": 0.5705412295582003,
+        "svd_objective": 0.5705412295581029,
+        "objective_difference": 9.736655925962623e-14,
+        "energy_change": 9.306991897055828e-11,
+        "observed_error": 0.5705412295615213,
+        "observation_difference": 4.2743586448068527e-14
+      },
+      "checks": {
+        "observation": true,
+        "h1": true
+      }
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "error": 0.05528516139715016,
+      "error_difference": 2.3227947343329447e-13,
+      "h1": 0.5305021193504517,
+      "h1_difference": 5.662137425588298e-15,
+      "svd": null,
+      "checks": {
+        "observation": true,
+        "h1": true
+      }
+    },
+    {
+      "n": 8,
+      "h": 0.0001,
+      "error": 0.32753830952638296,
+      "error_difference": 9.760525720992064e-13,
+      "h1": 0.6712575089749138,
+      "h1_difference": 3.4416913763379853e-15,
+      "svd": null,
+      "checks": {
+        "observation": true,
+        "h1": true
+      }
+    }
+  ],
+  "all_checks_pass": true,
+  "independent_full_resolve": false,
+  "condensed_svd_resolves": 2,
+  "sources": {
+    "rd/structure/main-shell/q3/experiments/audit_q3_quartic_shared_approximation.py": "a306941699b50f2d6ea8225be3bbecb7438dd74e876dd82462244edf4a821507",
+    "rd/structure/main-shell/q3/experiments/q3_curved_independent.py": "0a716302cc4360b2012d56f7b34c3aff2a2622ddcad3d34a4b53c40b2ffbc113",
+    "rd/structure/main-shell/q3/experiments/developable_general_reference.py": "565f402b7838be9f41ede07bec3c00dbeff7d2e5289203ae2391cacb18ca9d6e",
+    "rd/structure/main-shell/q3/records/q3-quartic-shared-approximation-result.json": "e8a15f841932764deac778138713e018ce37fd5443b9cf15e0e9ed7901d32ed2",
+    "rd/structure/main-shell/q3/records/q3-quartic-shared-approximation-experiment.md": "8fe52b1589c869f1acb0571eb03e7c515d7c2d43206c5514438b0adc28ae9b28"
+  },
+  "seconds": 1.9380000000237487
+}

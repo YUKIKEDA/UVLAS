@@ -1,0 +1,1896 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999979,
+        "solve": 2.223774993403764e-16,
+        "constant": 2.886579864025407e-15,
+        "work": 6.77007006588353e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.284584082431571e-16,
+        "affine_stress_adjoint": 7.152116438357883e-16,
+        "idempotence": 5.778871856755746e-16,
+        "energy_adjoint": 5.098199511504191e-16,
+        "adjoint_pairing": 1.3855933859851639e-15,
+        "energy_upper_violation": 2.9490532714737826e-15,
+        "rigid": 7.030326047244826e-17,
+        "raw_patch": 6.568405480919725e-16,
+        "patch": 1.6223160066303714e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 8.847092935568083e-16,
+        "basis_invariance": 1.0290014278931707e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 2.7755575615628914e-17,
+        "full_tangent_derivative": 4.025904274157925e-16,
+        "finite_rigid": 1.3505795330092691e-15,
+        "work11": 8.879015960500492e-16
+      },
+      "axis_metrics": {
+        "swap": 8.772122618484489e-16,
+        "s": 7.742508257791761e-16,
+        "t": 8.847092935568083e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-state.npz",
+      "state_sha256": "a25db6075f66b531eed6df739f4b7965098c73cdee628a9be9f177f0fe3d5cea",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-h0.01.npz",
+      "artifact_sha256": "69fc415201b364b81934b86fd7cfb8125ae5903cbf6097d9e83e7c233e005dc3",
+      "seconds": 1.2809999999590218
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999979,
+        "solve": 2.2237768655784035e-16,
+        "constant": 2.886579864025407e-15,
+        "work": 6.770070023879483e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.284649944149798e-16,
+        "affine_stress_adjoint": 7.152064424751636e-16,
+        "idempotence": 5.778871407909243e-16,
+        "energy_adjoint": 5.098197324510324e-16,
+        "adjoint_pairing": 1.3855931095792272e-15,
+        "energy_upper_violation": 2.8555650338196646e-15,
+        "rigid": 7.030355047381516e-17,
+        "raw_patch": 6.568405480919725e-16,
+        "patch": 1.6223160066303714e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 8.847097907035092e-16,
+        "basis_invariance": 1.0289981800660922e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 1.7688036169843842e-15,
+        "finite_rigid": 1.3686074107147281e-15,
+        "work11": 8.879015927632332e-16
+      },
+      "axis_metrics": {
+        "swap": 8.772133921377662e-16,
+        "s": 7.742507355022587e-16,
+        "t": 8.847097907035092e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-state.npz",
+      "state_sha256": "a25db6075f66b531eed6df739f4b7965098c73cdee628a9be9f177f0fe3d5cea",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-h0.001.npz",
+      "artifact_sha256": "45e284f60e0abf5ded4712a5f06ab03f81432dc12c95e6e53da51753944e621e",
+      "seconds": 1.297000000020489
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999979,
+        "solve": 2.2237768789335223e-16,
+        "constant": 2.886579864025407e-15,
+        "work": 6.770070023447327e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.284648423792079e-16,
+        "affine_stress_adjoint": 7.152063974145052e-16,
+        "idempotence": 5.778871433024343e-16,
+        "energy_adjoint": 5.098197330869147e-16,
+        "adjoint_pairing": 1.3855931099820397e-15,
+        "energy_upper_violation": 2.90281268938399e-15,
+        "rigid": 7.030355337383685e-17,
+        "raw_patch": 6.568405480919725e-16,
+        "patch": 1.6223160066303714e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 8.847097934077048e-16,
+        "basis_invariance": 1.029008143581154e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 4.430426724667374e-15,
+        "finite_rigid": 1.347362772899329e-15,
+        "work11": 8.879015927341574e-16
+      },
+      "axis_metrics": {
+        "swap": 8.772134014240775e-16,
+        "s": 7.742507357224335e-16,
+        "t": 8.847097934077048e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-state.npz",
+      "state_sha256": "a25db6075f66b531eed6df739f4b7965098c73cdee628a9be9f177f0fe3d5cea",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-h0.0001.npz",
+      "artifact_sha256": "ca3130b0a5d694c15787642664cc04e60785a7ec66b5a61d153f32d031bbdb68",
+      "seconds": 1.297000000020489
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999977,
+        "solve": 2.902184222772431e-16,
+        "constant": 1.9984014443252818e-15,
+        "work": 6.428649395091581e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.442028068961414e-16,
+        "affine_stress_adjoint": 8.601425514696923e-16,
+        "idempotence": 5.682709789656859e-16,
+        "energy_adjoint": 5.302227282794886e-16,
+        "adjoint_pairing": 1.2563312179271994e-15,
+        "energy_upper_violation": 2.9922243425798863e-15,
+        "rigid": 5.413985359962852e-17,
+        "raw_patch": 1.219871476016225e-15,
+        "patch": 2.394088088695845e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "axes": 9.34519806906603e-16,
+        "basis_invariance": 1.0133981630940134e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 1.448843394472404e-15,
+        "finite_rigid": 2.1583800637271206e-15,
+        "work11": 9.777782884515455e-16
+      },
+      "axis_metrics": {
+        "swap": 8.693143588098565e-16,
+        "s": 9.34519806906603e-16,
+        "t": 8.696385479114409e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-state.npz",
+      "state_sha256": "dbb10b6c01e43ed27f7cdd293e2cd868c3470fa551b5170b64cad5296ea9cf4f",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-h0.01.npz",
+      "artifact_sha256": "854235213549d7733ae76e8ace69e985edd51c9b8b067b1f036c93c76fa308da",
+      "seconds": 1.25
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999977,
+        "solve": 2.9021881638669034e-16,
+        "constant": 1.9984014443252818e-15,
+        "work": 6.428649342415181e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.442188290994249e-16,
+        "affine_stress_adjoint": 8.6015583419043605e-16,
+        "idempotence": 5.682714893542706e-16,
+        "energy_adjoint": 5.302235329014737e-16,
+        "adjoint_pairing": 1.2563308151829774e-15,
+        "energy_upper_violation": 2.7849049496790064e-15,
+        "rigid": 5.414007692684608e-17,
+        "raw_patch": 1.219871476016225e-15,
+        "patch": 2.394088088695845e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "axes": 9.345197029114169e-16,
+        "basis_invariance": 1.0133850916442094e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 3.3628957050431955e-15,
+        "finite_rigid": 2.139512884023571e-15,
+        "work11": 9.777782844296713e-16
+      },
+      "axis_metrics": {
+        "swap": 8.693147131197874e-16,
+        "s": 9.345197029114169e-16,
+        "t": 8.696391828802984e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-state.npz",
+      "state_sha256": "dbb10b6c01e43ed27f7cdd293e2cd868c3470fa551b5170b64cad5296ea9cf4f",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-h0.001.npz",
+      "artifact_sha256": "77bc8fe014c19e4c731f10de60d690aa74f7fec67f87bbae4bdfb17b95943704",
+      "seconds": 1.25
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999977,
+        "solve": 2.9021882050008706e-16,
+        "constant": 1.9984014443252818e-15,
+        "work": 6.428649342089906e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.442190320085332e-16,
+        "affine_stress_adjoint": 8.601560631661519e-16,
+        "idempotence": 5.682714891649269e-16,
+        "energy_adjoint": 5.302235376909061e-16,
+        "adjoint_pairing": 1.2563308104054338e-15,
+        "energy_upper_violation": 2.826359468535511e-15,
+        "rigid": 5.414007916012444e-17,
+        "raw_patch": 1.219871476016225e-15,
+        "patch": 2.394088088695845e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "axes": 9.345197031778935e-16,
+        "basis_invariance": 1.0134143425198904e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 3.1881721820695848e-15,
+        "finite_rigid": 2.1575427529040075e-15,
+        "work11": 9.777782843998287e-16
+      },
+      "axis_metrics": {
+        "swap": 8.693147217741302e-16,
+        "s": 9.345197031778935e-16,
+        "t": 8.696391849075454e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-state.npz",
+      "state_sha256": "dbb10b6c01e43ed27f7cdd293e2cd868c3470fa551b5170b64cad5296ea9cf4f",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-h0.0001.npz",
+      "artifact_sha256": "7af67f468d36d12fbdb71d9eeba8d358297a9a429f108e827447a8ff361c9c8b",
+      "seconds": 1.25
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999978,
+        "solve": 2.3354372826479736e-16,
+        "constant": 2.220446049250313e-15,
+        "work": 6.432550376627039e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.818135683459312e-16,
+        "affine_stress_adjoint": 7.680545086627729e-16,
+        "idempotence": 5.938110159695387e-16,
+        "energy_adjoint": 4.940719105472834e-16,
+        "adjoint_pairing": 1.2208507298571903e-15,
+        "energy_upper_violation": 3.477578096072884e-15,
+        "rigid": 6.957745129698828e-17,
+        "raw_patch": 6.602933814898368e-16,
+        "patch": 1.5798700738269084e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "axes": 9.264298895480947e-16,
+        "basis_invariance": 1.0500558855692861e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 4.339298020050453e-17,
+        "finite_rigid": 1.4546813473670453e-15,
+        "work11": 8.172074797972568e-16
+      },
+      "axis_metrics": {
+        "swap": 7.887558423943572e-16,
+        "s": 8.201211666699055e-16,
+        "t": 9.264298895480947e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-state.npz",
+      "state_sha256": "da92c7ed6a74a2af169b920f78b73954a925027a7084c97742c52520102263b1",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-h0.01.npz",
+      "artifact_sha256": "6521944571f8af7644317803787197e9340f589c2cbe55bf44980fc276063415",
+      "seconds": 1.2809999999590218
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999978,
+        "solve": 2.335436160389816e-16,
+        "constant": 2.220446049250313e-15,
+        "work": 6.432550276119215e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.818240387610107e-16,
+        "affine_stress_adjoint": 7.680628960957793e-16,
+        "idempotence": 5.938114618367892e-16,
+        "energy_adjoint": 4.940717167304154e-16,
+        "adjoint_pairing": 1.2208495810270377e-15,
+        "energy_upper_violation": 3.48245175945453e-15,
+        "rigid": 6.957773830438802e-17,
+        "raw_patch": 6.602933814898368e-16,
+        "patch": 1.5798700738269084e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "axes": 9.26430741942364e-16,
+        "basis_invariance": 1.0500772566505822e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 2.7755575615628914e-17,
+        "full_tangent_derivative": 1.9603838452544883e-15,
+        "finite_rigid": 1.4439710090429667e-15,
+        "work11": 8.172074712070338e-16
+      },
+      "axis_metrics": {
+        "swap": 7.887562627084623e-16,
+        "s": 8.20122156547657e-16,
+        "t": 9.26430741942364e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-state.npz",
+      "state_sha256": "da92c7ed6a74a2af169b920f78b73954a925027a7084c97742c52520102263b1",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-h0.001.npz",
+      "artifact_sha256": "d41d1a0d1aa284bf128f2d2595c99965fc39d1e82efa7946e1cdff80df0a3dc8",
+      "seconds": 1.2820000000065193
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999978,
+        "solve": 2.335436152508967e-16,
+        "constant": 2.220446049250313e-15,
+        "work": 6.432550275286278e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.818241211607277e-16,
+        "affine_stress_adjoint": 7.680628549797919e-16,
+        "idempotence": 5.93811465493818e-16,
+        "energy_adjoint": 4.940717144021421e-16,
+        "adjoint_pairing": 1.220849575128455e-15,
+        "energy_upper_violation": 3.4050751675924346e-15,
+        "rigid": 6.957774117446997e-17,
+        "raw_patch": 6.602933814898368e-16,
+        "patch": 1.5798700738269084e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "axes": 9.26430749160247e-16,
+        "basis_invariance": 1.0500828582671374e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 1.197673147761587e-15,
+        "finite_rigid": 1.4641217056271424e-15,
+        "work11": 8.172074711370272e-16
+      },
+      "axis_metrics": {
+        "swap": 7.887562639321328e-16,
+        "s": 8.201221604417417e-16,
+        "t": 9.26430749160247e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-state.npz",
+      "state_sha256": "da92c7ed6a74a2af169b920f78b73954a925027a7084c97742c52520102263b1",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-h0.0001.npz",
+      "artifact_sha256": "f1e7c9f932a65edfbd1f3f0a1f4171107aa836a86d08de3a640f8067d02e7cef",
+      "seconds": 1.2650000000139698
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999978,
+        "solve": 2.7250254418555745e-16,
+        "constant": 2.4424906541753444e-15,
+        "work": 6.129555290286233e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.568967250211643e-16,
+        "affine_stress_adjoint": 8.679095850229016e-16,
+        "idempotence": 5.871605271270602e-16,
+        "energy_adjoint": 5.20424915078702e-16,
+        "adjoint_pairing": 1.2950892185022407e-15,
+        "energy_upper_violation": 3.8037884507413996e-15,
+        "rigid": 7.065683549421301e-17,
+        "raw_patch": 1.254788077253679e-15,
+        "patch": 3.1110408476845438e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "axes": 9.589804777546877e-16,
+        "basis_invariance": 1.027203176879558e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 0.0,
+        "full_tangent_derivative": 9.498241221666013e-16,
+        "finite_rigid": 3.98547661704384e-15,
+        "work11": 9.655493373263459e-16
+      },
+      "axis_metrics": {
+        "swap": 8.917089054642455e-16,
+        "s": 9.589804777546877e-16,
+        "t": 8.836314154974096e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-state.npz",
+      "state_sha256": "c4b565879d829181b068c1a0a9a8ad0fd903e7cfc1902001d7a643991bada969",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-h0.01.npz",
+      "artifact_sha256": "1e4020158e9fc6defcd1af7f25f1bd6ac311a56472476c1310ad9df5bd162c9b",
+      "seconds": 1.25
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999978,
+        "solve": 2.725025526691128e-16,
+        "constant": 2.4424906541753444e-15,
+        "work": 6.129555228335526e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.569165005849589e-16,
+        "affine_stress_adjoint": 8.679187934136577e-16,
+        "idempotence": 5.871609371267762e-16,
+        "energy_adjoint": 5.204254058503975e-16,
+        "adjoint_pairing": 1.2950885758277712e-15,
+        "energy_upper_violation": 3.5463968276009446e-15,
+        "rigid": 7.065712695407897e-17,
+        "raw_patch": 1.254788077253679e-15,
+        "patch": 3.1110408476845438e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "axes": 9.589805444978306e-16,
+        "basis_invariance": 1.0271981400961723e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 1.684460120261695e-15,
+        "finite_rigid": 3.985461979275514e-15,
+        "work11": 9.655493338237185e-16
+      },
+      "axis_metrics": {
+        "swap": 8.917098455174542e-16,
+        "s": 9.589805444978306e-16,
+        "t": 8.83631246530871e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-state.npz",
+      "state_sha256": "c4b565879d829181b068c1a0a9a8ad0fd903e7cfc1902001d7a643991bada969",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-h0.001.npz",
+      "artifact_sha256": "33c28ede277b1ebeac7a6a23d9a582279adc8d9f13c2bde4b0c487e792dd6814",
+      "seconds": 1.25
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999999999999978,
+        "solve": 2.7250255258215584e-16,
+        "constant": 2.4424906541753444e-15,
+        "work": 6.129555227829059e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.569167437071285e-16,
+        "affine_stress_adjoint": 8.679190101372999e-16,
+        "idempotence": 5.871609420591859e-16,
+        "energy_adjoint": 5.204254104045538e-16,
+        "adjoint_pairing": 1.2950885681948448e-15,
+        "energy_upper_violation": 3.705367515397355e-15,
+        "rigid": 7.065712986868569e-17,
+        "raw_patch": 1.254788077253679e-15,
+        "patch": 3.1110408476845438e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "axes": 9.589805433064696e-16,
+        "basis_invariance": 1.0271986562898432e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 3.647240058626089e-15,
+        "finite_rigid": 3.985608964680349e-15,
+        "work11": 9.65549333787777e-16
+      },
+      "axis_metrics": {
+        "swap": 8.917098524366123e-16,
+        "s": 9.589805433064696e-16,
+        "t": 8.836312470365369e-16
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-state.npz",
+      "state_sha256": "c4b565879d829181b068c1a0a9a8ad0fd903e7cfc1902001d7a643991bada969",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-h0.0001.npz",
+      "artifact_sha256": "20a23a09e183a494e4b915ebc91383bc9e2e95d9f10d627fa71862f83a2bace4",
+      "seconds": 1.2349999999860302
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9969076639814068,
+        "solve": 2.5548946387842684e-16,
+        "constant": 1.5543122344752192e-15,
+        "work": 6.041478833447504e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 5.940008114937029e-16,
+        "affine_stress_adjoint": 6.128547983953037e-16,
+        "idempotence": 5.776336946039274e-16,
+        "energy_adjoint": 4.454326644568941e-16,
+        "adjoint_pairing": 1.6748301179894135e-15,
+        "energy_upper_violation": 1.6228548569674097e-15,
+        "rigid": 7.325870959474644e-17,
+        "raw_patch": 6.999461633836737e-16,
+        "patch": 1.938154599248369e-15,
+        "patch_energy": 6.661338147750939e-16,
+        "axes": 2.124067364095695e-14,
+        "basis_invariance": 1.0865708818458484e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 1.3582458706557147e-15,
+        "finite_rigid": 3.0189241635055983e-15,
+        "work11": 9.459074348477501e-16
+      },
+      "axis_metrics": {
+        "swap": 1.0544297080947823e-15,
+        "s": 1.0365966692711686e-15,
+        "t": 2.124067364095695e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-state.npz",
+      "state_sha256": "2aedd561c5db4fa63dbe6a33f9f43f27470808fc1c6256c5c8785e5a7a7799c3",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-h0.01.npz",
+      "artifact_sha256": "352ce7bec6e79bfadeb13311fea7ddd4c8d8e659d28b5b13b93776cbf2135e3b",
+      "seconds": 1.327999999979511
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9996903354841097,
+        "solve": 3.454149911665802e-16,
+        "constant": 3.3306690738754696e-15,
+        "work": 5.256957964847335e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 6.925691856259996e-16,
+        "affine_stress_adjoint": 6.809300889991878e-16,
+        "idempotence": 5.933341745643837e-16,
+        "energy_adjoint": 5.243612223474502e-16,
+        "adjoint_pairing": 1.7396783389004748e-15,
+        "energy_upper_violation": 2.162202164226402e-15,
+        "rigid": 7.06228715877791e-17,
+        "raw_patch": 7.194841676163569e-16,
+        "patch": 1.6915623627227116e-15,
+        "patch_energy": 6.661338147750939e-16,
+        "axes": 2.1246401333671974e-14,
+        "basis_invariance": 1.0601085031059101e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 6.938893903907228e-18,
+        "full_tangent_derivative": 2.145408990968314e-17,
+        "finite_rigid": 3.0747355951910924e-15,
+        "work11": 7.512189300805385e-16
+      },
+      "axis_metrics": {
+        "swap": 1.048202477772816e-15,
+        "s": 1.0391113225782597e-15,
+        "t": 2.1246401333671974e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-state.npz",
+      "state_sha256": "2aedd561c5db4fa63dbe6a33f9f43f27470808fc1c6256c5c8785e5a7a7799c3",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-h0.001.npz",
+      "artifact_sha256": "3f1591614c224496ae99bb3346a390ca4b635f7a243721c357fac8cf97877c88",
+      "seconds": 1.327999999979511
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999690292326647,
+        "solve": 2.746275193385708e-16,
+        "constant": 2.220446049250313e-15,
+        "work": 5.664324369979808e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 5.842639074087792e-16,
+        "affine_stress_adjoint": 6.189722365640519e-16,
+        "idempotence": 5.958777977751602e-16,
+        "energy_adjoint": 5.192987895596598e-16,
+        "adjoint_pairing": 1.9488604673409473e-15,
+        "energy_upper_violation": 2.1404259809067505e-15,
+        "rigid": 6.916263001381278e-17,
+        "raw_patch": 7.19603117122874e-16,
+        "patch": 1.6486086235229676e-15,
+        "patch_energy": 6.661338147750939e-16,
+        "axes": 2.1244926783520118e-14,
+        "basis_invariance": 1.0693806630010305e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 5.921376128781102e-17,
+        "finite_rigid": 3.1045808509247204e-15,
+        "work11": 7.94478968981871e-16
+      },
+      "axis_metrics": {
+        "swap": 1.007045865815305e-15,
+        "s": 1.0590659303998419e-15,
+        "t": 2.1244926783520118e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-state.npz",
+      "state_sha256": "2aedd561c5db4fa63dbe6a33f9f43f27470808fc1c6256c5c8785e5a7a7799c3",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-h0.0001.npz",
+      "artifact_sha256": "f4b1b9f9063e6332e1452625f49158d5885fa160cddeacba41dbe4ecf86ea2d6",
+      "seconds": 1.3130000000237487
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9970419096453629,
+        "solve": 2.829945156566602e-16,
+        "constant": 1.7763568394002505e-15,
+        "work": 4.919001164151925e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.244990963072409e-16,
+        "affine_stress_adjoint": 7.489336833915538e-16,
+        "idempotence": 5.718723442633706e-16,
+        "energy_adjoint": 4.561123052925327e-16,
+        "adjoint_pairing": 1.596208861627138e-15,
+        "energy_upper_violation": 1.3701712302867623e-15,
+        "rigid": 6.718124809874931e-17,
+        "raw_patch": 1.3192604997174543e-15,
+        "patch": 3.038591238446177e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "axes": 4.088737009029351e-14,
+        "basis_invariance": 1.0836207830465442e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 0.0,
+        "full_tangent_derivative": 3.795062734197539e-17,
+        "finite_rigid": 1.7584096391394811e-15,
+        "work11": 8.172028478300917e-16
+      },
+      "axis_metrics": {
+        "swap": 1.099972118771594e-14,
+        "s": 4.088737009029351e-14,
+        "t": 2.9150682248473225e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-state.npz",
+      "state_sha256": "f7f0a9458c578129c0dade24f4ec81683fdac3def77d41c26644d9ebd196ca22",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-h0.01.npz",
+      "artifact_sha256": "22b2a524f2760c54fa07817b39536f9c521fbe20a01d62451ba9f1da12ab49de",
+      "seconds": 1.297000000020489
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9997037966762485,
+        "solve": 2.6625983384735756e-16,
+        "constant": 1.5543122344752192e-15,
+        "work": 4.931538363533142e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.506382863661731e-16,
+        "affine_stress_adjoint": 7.44657727352074e-16,
+        "idempotence": 5.605677869370269e-16,
+        "energy_adjoint": 4.925850775186982e-16,
+        "adjoint_pairing": 1.7043932319493943e-15,
+        "energy_upper_violation": 2.925172750645139e-15,
+        "rigid": 6.90671761996462e-17,
+        "raw_patch": 1.3198138187099601e-15,
+        "patch": 3.4264127800133017e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "axes": 4.096918622847581e-14,
+        "basis_invariance": 1.075350636165861e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 6.938893903907228e-18,
+        "full_tangent_derivative": 8.675735211908398e-16,
+        "finite_rigid": 1.7660235123913447e-15,
+        "work11": 8.424651195540939e-16
+      },
+      "axis_metrics": {
+        "swap": 1.0985510400284166e-14,
+        "s": 4.096918622847581e-14,
+        "t": 2.93073185808457e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-state.npz",
+      "state_sha256": "f7f0a9458c578129c0dade24f4ec81683fdac3def77d41c26644d9ebd196ca22",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-h0.001.npz",
+      "artifact_sha256": "4163c62e341f99533bd30db00c36bdaee13fd477c28f60c458b2d406c5aa3f80",
+      "seconds": 1.3119999999762513
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999703757189605,
+        "solve": 2.454610785182568e-16,
+        "constant": 1.9984014443252818e-15,
+        "work": 5.279894828505892e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.729212510356257e-16,
+        "affine_stress_adjoint": 7.369673743449397e-16,
+        "idempotence": 5.868222266139116e-16,
+        "energy_adjoint": 4.800190848152106e-16,
+        "adjoint_pairing": 1.6742953715289572e-15,
+        "energy_upper_violation": 2.3680159121181942e-15,
+        "rigid": 6.836096285623741e-17,
+        "raw_patch": 1.2784712618766084e-15,
+        "patch": 3.117978803306073e-15,
+        "patch_energy": 1.2212453270876722e-15,
+        "axes": 4.095721991977889e-14,
+        "basis_invariance": 1.0745809175129448e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 8.595458623599152e-16,
+        "finite_rigid": 1.7653673452094126e-15,
+        "work11": 8.521087217235735e-16
+      },
+      "axis_metrics": {
+        "swap": 1.098674764409488e-14,
+        "s": 4.095721991977889e-14,
+        "t": 2.939876307145769e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-state.npz",
+      "state_sha256": "f7f0a9458c578129c0dade24f4ec81683fdac3def77d41c26644d9ebd196ca22",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-h0.0001.npz",
+      "artifact_sha256": "ed68868a77f87ff808dc7f757182424ae55f0e4eff0cff2d2024208ce00bc01d",
+      "seconds": 1.297000000020489
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9969076639814081,
+        "solve": 2.687229920046871e-16,
+        "constant": 2.6645352591003757e-15,
+        "work": 6.460656027179205e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 6.604953917919742e-16,
+        "affine_stress_adjoint": 6.018347140849207e-16,
+        "idempotence": 5.685100718751445e-16,
+        "energy_adjoint": 4.587278604614798e-16,
+        "adjoint_pairing": 1.8608563928664534e-15,
+        "energy_upper_violation": 1.6835129211428515e-15,
+        "rigid": 8.433290363831545e-17,
+        "raw_patch": 6.965485422041932e-16,
+        "patch": 1.890899068367297e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 6.11402708454185e-14,
+        "basis_invariance": 1.0906112540144506e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 0.0,
+        "full_tangent_derivative": 9.61233346594109e-16,
+        "finite_rigid": 2.8560307605098505e-15,
+        "work11": 7.672322218373569e-16
+      },
+      "axis_metrics": {
+        "swap": 6.11402708454185e-14,
+        "s": 1.3383440599706564e-15,
+        "t": 6.112796981799988e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-state.npz",
+      "state_sha256": "62b18a3e0f40de589be621429101c69aa98bceb6e93197f1d34e6a9f27076f7f",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-h0.01.npz",
+      "artifact_sha256": "e30cea24ed409f29fc6ced76cd4f0eb141aca2a12f9512699c37a794212f508e",
+      "seconds": 1.2809999999590218
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9996903354841098,
+        "solve": 2.5212817480381276e-16,
+        "constant": 2.6645352591003757e-15,
+        "work": 5.94800161121915e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 6.527611695130477e-16,
+        "affine_stress_adjoint": 6.7866235624309425e-16,
+        "idempotence": 5.241203624187192e-16,
+        "energy_adjoint": 4.364372375559539e-16,
+        "adjoint_pairing": 1.975691708124474e-15,
+        "energy_upper_violation": 1.8202736919074294e-15,
+        "rigid": 7.113205540300797e-17,
+        "raw_patch": 7.202800355844486e-16,
+        "patch": 1.5591945534964281e-15,
+        "patch_energy": 7.771561172376096e-16,
+        "axes": 6.116029219196633e-14,
+        "basis_invariance": 1.0837527236547616e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 6.938893903907228e-18,
+        "full_tangent_derivative": 4.273654710008916e-16,
+        "finite_rigid": 2.857574725902863e-15,
+        "work11": 7.103383747290102e-16
+      },
+      "axis_metrics": {
+        "swap": 6.116029219196633e-14,
+        "s": 1.3354903042880097e-15,
+        "t": 6.113980846466258e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-state.npz",
+      "state_sha256": "62b18a3e0f40de589be621429101c69aa98bceb6e93197f1d34e6a9f27076f7f",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-h0.001.npz",
+      "artifact_sha256": "71293437662eab66c8f34b1a39d5f9557e25873d2a283f52c8b4dcae60672085",
+      "seconds": 1.3130000000237487
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999690292326646,
+        "solve": 2.698952564211355e-16,
+        "constant": 1.7763568394002505e-15,
+        "work": 5.983612384322972e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 5.568352481086233e-16,
+        "affine_stress_adjoint": 6.190386768265614e-16,
+        "idempotence": 5.792166234709801e-16,
+        "energy_adjoint": 4.801913252483406e-16,
+        "adjoint_pairing": 1.997572050934907e-15,
+        "energy_upper_violation": 2.7478057206250547e-15,
+        "rigid": 8.099955566330282e-17,
+        "raw_patch": 7.149697526867281e-16,
+        "patch": 1.6159551118259568e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 6.11500762770253e-14,
+        "basis_invariance": 1.0969785575796233e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 6.938893903907228e-18,
+        "full_tangent_derivative": 3.1237404505454164e-16,
+        "finite_rigid": 2.835514927374828e-15,
+        "work11": 6.621887061670185e-16
+      },
+      "axis_metrics": {
+        "swap": 6.11500762770253e-14,
+        "s": 1.3559520387391653e-15,
+        "t": 6.11270976225227e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-state.npz",
+      "state_sha256": "62b18a3e0f40de589be621429101c69aa98bceb6e93197f1d34e6a9f27076f7f",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-h0.0001.npz",
+      "artifact_sha256": "ba8fd4cc542796745d4c827e0934931a6549725797d8f7f903e60a87412079fb",
+      "seconds": 1.297000000020489
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9970419096453632,
+        "solve": 2.6669379925086273e-16,
+        "constant": 1.5543122344752192e-15,
+        "work": 5.581024699835345e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 7.519497875638921e-16,
+        "affine_stress_adjoint": 7.664660588964027e-16,
+        "idempotence": 5.944971883670107e-16,
+        "energy_adjoint": 4.817434461339527e-16,
+        "adjoint_pairing": 1.869214143895543e-15,
+        "energy_upper_violation": 1.666908907337107e-15,
+        "rigid": 7.225085175844003e-17,
+        "raw_patch": 1.344519869236704e-15,
+        "patch": 3.355894391395124e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 9.18000872235947e-14,
+        "basis_invariance": 1.1002689443727428e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 6.938893903907228e-18,
+        "full_tangent_derivative": 9.925548689439811e-16,
+        "finite_rigid": 2.7140616044186157e-15,
+        "work11": 7.106448772232075e-16
+      },
+      "axis_metrics": {
+        "swap": 9.18000872235947e-14,
+        "s": 4.635095861715478e-14,
+        "t": 7.562119771505323e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-state.npz",
+      "state_sha256": "6d0f40b1e85385a48be50b7146dcc626a1413e0939c68d4620346c20bc366f09",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-h0.01.npz",
+      "artifact_sha256": "974811b72d66ba8eea1489a72055a68f8007edef74e3eed86ee6dbd6af16b546",
+      "seconds": 1.312000000034459
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9997037966762485,
+        "solve": 2.872519623535477e-16,
+        "constant": 2.6645352591003757e-15,
+        "work": 6.499794508869983e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.481750033861857e-16,
+        "affine_stress_adjoint": 7.925596842634548e-16,
+        "idempotence": 5.737342469919109e-16,
+        "energy_adjoint": 4.717478870339739e-16,
+        "adjoint_pairing": 1.9890553062066784e-15,
+        "energy_upper_violation": 1.5735133703999272e-15,
+        "rigid": 8.083422917065058e-17,
+        "raw_patch": 1.3293456958714193e-15,
+        "patch": 3.655738186815796e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "axes": 9.180836271266481e-14,
+        "basis_invariance": 1.1028681098500684e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 1.3877787807814457e-17,
+        "full_tangent_derivative": 9.552072102000243e-16,
+        "finite_rigid": 2.6880131120829504e-15,
+        "work11": 8.964831707901467e-16
+      },
+      "axis_metrics": {
+        "swap": 9.180836271266481e-14,
+        "s": 4.6360712933303175e-14,
+        "t": 7.564871264850554e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-state.npz",
+      "state_sha256": "6d0f40b1e85385a48be50b7146dcc626a1413e0939c68d4620346c20bc366f09",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-h0.001.npz",
+      "artifact_sha256": "957989856aeb7a898ee2c52f78c67beaaa3e2f54124ffe0d694887c97f344353",
+      "seconds": 1.312999999965541
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "metrics": {
+        "rcond": 0.9999703757189604,
+        "solve": 2.6440695868561785e-16,
+        "constant": 2.886579864025407e-15,
+        "work": 4.8767248115783e-16,
+        "raw_agreement": 0.0,
+        "affine_strain": 8.062610891866153e-16,
+        "affine_stress_adjoint": 7.923348273397644e-16,
+        "idempotence": 6.090494116738733e-16,
+        "energy_adjoint": 4.871797617501394e-16,
+        "adjoint_pairing": 1.9817543184009323e-15,
+        "energy_upper_violation": 1.851251076005618e-15,
+        "rigid": 7.226523266518645e-17,
+        "raw_patch": 1.3046915208368552e-15,
+        "patch": 3.3514465469785818e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "axes": 9.180530463830586e-14,
+        "basis_invariance": 1.1058202200834515e-15,
+        "current_orientation_violation": 0.0,
+        "energy_force_derivative": 6.938893903907228e-18,
+        "full_tangent_derivative": 1.149469148134679e-15,
+        "finite_rigid": 2.739993775500076e-15,
+        "work11": 7.506478094732123e-16
+      },
+      "axis_metrics": {
+        "swap": 9.180530463830586e-14,
+        "s": 4.6370874579596506e-14,
+        "t": 7.565278417563764e-14
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "local_rank": true,
+        "fields": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-state.npz",
+      "state_sha256": "6d0f40b1e85385a48be50b7146dcc626a1413e0939c68d4620346c20bc366f09",
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-h0.0001.npz",
+      "artifact_sha256": "8fed76b9201ea707e94ca8af0ac0cdde126949c95c5cfd694116ffc1acfa14b2",
+      "seconds": 1.2810000000172295
+    }
+  ],
+  "states": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "preparation": {
+        "stress_ranks_svd": [
+          203,
+          203,
+          203
+        ],
+        "stress_ranks_qr": [
+          203,
+          203,
+          203
+        ],
+        "active_columns": 227,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 6.3439999999827705,
+          "coefficient_bytes": 4210056,
+          "coefficient_max": 13.228756555322953
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.0228561880474384e-15,
+          "gram_identity": 3.097569437797617e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.2570134382278102e-15,
+          "gram_identity": 3.02633037647026e-15
+        }
+      ],
+      "differential": {
+        "derivative": 6.169065371655834e-16,
+        "zero_dependence": 1.9087275115924153e-16,
+        "first_linearity": 2.6438580841910175e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 0.0,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-state.npz",
+      "artifact_sha256": "a25db6075f66b531eed6df739f4b7965098c73cdee628a9be9f177f0fe3d5cea"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "preparation": {
+        "stress_ranks_svd": [
+          203,
+          203,
+          203
+        ],
+        "stress_ranks_qr": [
+          203,
+          203,
+          203
+        ],
+        "active_columns": 227,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 5.51600000000326,
+          "coefficient_bytes": 4210056,
+          "coefficient_max": 13.22875655532297
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.2949532698017591e-15,
+          "gram_identity": 3.1767540950587814e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.5581185993774529e-15,
+          "gram_identity": 3.199043188604386e-15
+        }
+      ],
+      "differential": {
+        "derivative": 6.144501787510298e-16,
+        "zero_dependence": 1.873662192671848e-16,
+        "first_linearity": 2.6285441961119404e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 0.0,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-state.npz",
+      "artifact_sha256": "dbb10b6c01e43ed27f7cdd293e2cd868c3470fa551b5170b64cad5296ea9cf4f"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "preparation": {
+        "stress_ranks_svd": [
+          203,
+          203,
+          203
+        ],
+        "stress_ranks_qr": [
+          203,
+          203,
+          203
+        ],
+        "active_columns": 227,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 8.90700000000652,
+          "coefficient_bytes": 4210056,
+          "coefficient_max": 13.228756555322965
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.0289985291647227e-15,
+          "gram_identity": 3.1646071465051045e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.3576591022860777e-15,
+          "gram_identity": 3.173788374356688e-15
+        }
+      ],
+      "differential": {
+        "derivative": 7.540757663860119e-16,
+        "zero_dependence": 1.8818393400999131e-16,
+        "first_linearity": 2.7204891439876384e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 0.0,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-state.npz",
+      "artifact_sha256": "da92c7ed6a74a2af169b920f78b73954a925027a7084c97742c52520102263b1"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "preparation": {
+        "stress_ranks_svd": [
+          203,
+          203,
+          203
+        ],
+        "stress_ranks_qr": [
+          203,
+          203,
+          203
+        ],
+        "active_columns": 227,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 7.827999999979511,
+          "coefficient_bytes": 4210056,
+          "coefficient_max": 13.228756555322981
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.2753199522551208e-15,
+          "gram_identity": 3.5793757280584645e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.4793997822584324e-15,
+          "gram_identity": 3.372083349897427e-15
+        }
+      ],
+      "differential": {
+        "derivative": 6.65601427296525e-16,
+        "zero_dependence": 1.8988569925693328e-16,
+        "first_linearity": 2.7201247634909987e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 0.0,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-state.npz",
+      "artifact_sha256": "c4b565879d829181b068c1a0a9a8ad0fd903e7cfc1902001d7a643991bada969"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "preparation": {
+        "stress_ranks_svd": [
+          211,
+          211,
+          211
+        ],
+        "stress_ranks_qr": [
+          211,
+          211,
+          211
+        ],
+        "active_columns": 239,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 14.85999999998603,
+          "coefficient_bytes": 4375944,
+          "coefficient_max": 13.282659740338977
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 9.938893104802086e-16,
+          "gram_identity": 3.3932399026257125e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.194834508093952e-15,
+          "gram_identity": 4.113672248770946e-15
+        }
+      ],
+      "differential": {
+        "derivative": 8.416658646680481e-16,
+        "zero_dependence": 2.0592388495566815e-16,
+        "first_linearity": 2.92173324925166e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 7.70960508162671e-16,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-state.npz",
+      "artifact_sha256": "2aedd561c5db4fa63dbe6a33f9f43f27470808fc1c6256c5c8785e5a7a7799c3"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "preparation": {
+        "stress_ranks_svd": [
+          211,
+          211,
+          211
+        ],
+        "stress_ranks_qr": [
+          211,
+          211,
+          211
+        ],
+        "active_columns": 239,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 13.545999999972992,
+          "coefficient_bytes": 4375944,
+          "coefficient_max": 13.269811552188566
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.2434354758582629e-15,
+          "gram_identity": 3.537733090991813e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.4313439672986677e-15,
+          "gram_identity": 5.774756814044032e-15
+        }
+      ],
+      "differential": {
+        "derivative": 7.628478781840495e-16,
+        "zero_dependence": 2.0821289719616044e-16,
+        "first_linearity": 2.9131568233073333e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 6.424734036585734e-16,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-state.npz",
+      "artifact_sha256": "f7f0a9458c578129c0dade24f4ec81683fdac3def77d41c26644d9ebd196ca22"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "preparation": {
+        "stress_ranks_svd": [
+          211,
+          211,
+          211
+        ],
+        "stress_ranks_qr": [
+          211,
+          211,
+          211
+        ],
+        "active_columns": 239,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 17.90700000000652,
+          "coefficient_bytes": 4375944,
+          "coefficient_max": 13.28265971844075
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.0004519812716637e-15,
+          "gram_identity": 3.2754760998959976e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.1814211283130357e-15,
+          "gram_identity": 4.050791634979811e-15
+        }
+      ],
+      "differential": {
+        "derivative": 8.213826450044735e-16,
+        "zero_dependence": 1.966582224549443e-16,
+        "first_linearity": 2.957196573469553e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 5.45859814587554e-16,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-state.npz",
+      "artifact_sha256": "62b18a3e0f40de589be621429101c69aa98bceb6e93197f1d34e6a9f27076f7f"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "preparation": {
+        "stress_ranks_svd": [
+          211,
+          211,
+          211
+        ],
+        "stress_ranks_qr": [
+          211,
+          211,
+          211
+        ],
+        "active_columns": 239,
+        "generated_columns": 263,
+        "coefficient_preparation": {
+          "digits": 120,
+          "seconds": 17.389999999955762,
+          "coefficient_bytes": 4375944,
+          "coefficient_max": 13.269811552188576
+        }
+      },
+      "basis_gates": [
+        {
+          "order": 9,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.2309130307322682e-15,
+          "gram_identity": 3.414324802084458e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            211,
+            211,
+            211
+          ],
+          "span": 1.3711720840718335e-15,
+          "gram_identity": 5.795467945145806e-15
+        }
+      ],
+      "differential": {
+        "derivative": 7.704884108165135e-16,
+        "zero_dependence": 2.154552372196856e-16,
+        "first_linearity": 2.9230020465213e-16,
+        "zero_c": 0.0,
+        "constant_derivative": 4.078032458439095e-16,
+        "near_rcond_violation_-0.0001": 0.0,
+        "near_rcond_violation_0.0001": 0.0
+      },
+      "passed": true,
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-state.npz",
+      "artifact_sha256": "6d0f40b1e85385a48be50b7146dcc626a1413e0939c68d4620346c20bc366f09"
+    }
+  ],
+  "preparation_failure": null,
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "physical_adoption": false,
+  "shared_bending_evaluated": false,
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_basis_v2.py": "83c84a0c661f0a63e37744a1a3ee5d4b0bfc298308a699046f3356c3adcdb68b",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3.py": "f1f8b51106db7e2627acf12a5da45f2cb407fde868d6c93c1b65436db415b733",
+    "rd/structure/main-shell/gsp-q3/experiments/check_gsp_q3_additional_local.py": "62c0386d9cdf646d80c9bf112ecd7aeba5509a21747e44a768e91b48a442c6bc",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_v2.py": "28ab1a6d10f82cb136901670aaa567104b440a76a9f0e09b76b9539700d7fb6c",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/q3/experiments/q3_thin_expansion.py": "8120d2378e3f873f32d5b68c6ca99ffc11135ae7d274891245c4c26e8d66b513",
+    "rd/structure/main-shell/gsp-q3/gsp-q3-formulation.md": "83aeb440831706bec0ffdacab8f7546cf30d20d0cf9baa0a8f1e59838a662bb3",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-protocol.md": "7f5df194a55daa952bad8f5e59a5a7cef2504fae62d383aa9c07d55838315968",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-preparation.json": "bc3db539b0ab08ae21d9384bd79af0665e550e19a5a35dac1345482ae916e2be"
+  },
+  "seconds": 405.60999999998603,
+  "peak_bytes": 612294656
+}

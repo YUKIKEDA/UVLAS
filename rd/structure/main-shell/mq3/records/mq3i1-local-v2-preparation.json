@@ -1,0 +1,15 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/mq3i1_pure_shear.py": "bb1eff85a7891017ecf4e26bcf4b0a70d65632bcb34228a1c51019ddf0b2a6dd",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_moments_v2.py": "544096d7d9456e192522dd6d303b9fdad117586abc871ba5504b0eab470aceeb",
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_local_v2.py": "9acd4a72205c2f83988d68311d708e401f12a6b76e1a55da6f954079ce021aa8",
+    "rd/structure/main-shell/mq3/experiments/audit_mq3i1_local_v2.py": "ad8f35e6ebfee92f9725a1ffeeda8bc6e2b67642794faf1d43bef0ae582eb573",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/mq3/experiments/mq3_interior_stationarity.py": "722fd820d288a85858813a41798b1d3996b7db1ccc8dcbbc78bdbd73fd74068e",
+    "rd/structure/main-shell/mq3/mq3-interior-moment-alternative.md": "9fd4c84ebd04452f29c62d019d5355264e6d2f9fc1eea7108ed4c5b9640cb79c",
+    "rd/structure/main-shell/mq3/records/mq3i1-local-execution-protocol.md": "e09676ce1fce4bd8e40520003696238d620792625f73af704d52bc0cb07d7a5c",
+    "rd/structure/main-shell/mq3/records/mq3i1-v2-pure-shear-protocol.md": "754fd2373bf43adb9330ca98424b86d10311a95bcb5aec42c74da7044a810135",
+    "rd/structure/main-shell/mq3/records/mq3i1-local-result.json": "5e60725c26d4bcb856cc9506d5f3e99e3fc734e67e3eab6a1c2681a42ee96186"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "h": 0.1,
+      "layers": 1,
+      "physical_mass": 0.06000000000000001,
+      "child_patch_count": 3,
+      "rigid_energy_error": 7.771561172376096e-16,
+      "volume_error": 3.9968028886505635e-15,
+      "min_child_mass_eigenvalue": 0.015999999999999535
+    },
+    {
+      "h": 0.1,
+      "layers": 2,
+      "physical_mass": 0.06000000000000001,
+      "child_patch_count": 6,
+      "rigid_energy_error": 3.3306690738754696e-16,
+      "volume_error": 3.9968028886505635e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999952
+    },
+    {
+      "h": 0.1,
+      "layers": 4,
+      "physical_mass": 0.06000000000000001,
+      "child_patch_count": 12,
+      "rigid_energy_error": 5.551115123125783e-16,
+      "volume_error": 4.218847493575595e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999953
+    },
+    {
+      "h": 0.05,
+      "layers": 1,
+      "physical_mass": 0.030000000000000006,
+      "child_patch_count": 3,
+      "rigid_energy_error": 1.9984014443252818e-15,
+      "volume_error": 1.1102230246251565e-15,
+      "min_child_mass_eigenvalue": 0.015999999999999535
+    },
+    {
+      "h": 0.05,
+      "layers": 2,
+      "physical_mass": 0.030000000000000006,
+      "child_patch_count": 6,
+      "rigid_energy_error": 8.881784197001252e-16,
+      "volume_error": 1.1102230246251565e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999953
+    },
+    {
+      "h": 0.05,
+      "layers": 4,
+      "physical_mass": 0.030000000000000006,
+      "child_patch_count": 12,
+      "rigid_energy_error": 2.3314683517128287e-15,
+      "volume_error": 1.3322676295501878e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999953
+    }
+  ],
+  "sources": {
+    "rd/structure/connection/experiments/check_connection_partition_mass.py": "bc009a9e69ad020b66e71bfd6ff28fb6b46bb319280c50cffd7ecb8e1b837e43",
+    "rd/structure/connection/experiments/connection_shell.py": "f78d9f16b871e263e1b525721d4f8c1442ef7d09838ca993bbf83d26f3c44727",
+    "rd/structure/connection/experiments/check_connection_fold.py": "bdd02cedf9f6d1f070a8283c5441bed1aa9a786046c6fb70c99c944b4fb24af4"
+  },
+  "seconds": 9.202999999979511
+}
