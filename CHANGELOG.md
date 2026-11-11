@@ -8,7 +8,9 @@
 
 ### 結果に影響する変更
 
-なし（解析の能力が、まだ無い）。
+解析の能力が、まだ無いため、解析結果への影響はない。
+
+- [0001](docs/quality/result-changes/0001-linux-gcc14-platform.md)：プラットフォーム `linux-x64-gnu14.2-sse2` を認定した。標準数学ライブラリの2関数が、Windowsと1ulp異なる。
 
 ### 追加
 

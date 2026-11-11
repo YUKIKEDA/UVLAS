@@ -2,6 +2,7 @@
 
     python tools/qa/results.py check  --case numeric-canary --run <executable>
     python tools/qa/results.py accept --case numeric-canary --run <executable> [--record NNNN]
+    python tools/qa/results.py accept --case numeric-canary --output <saved output> --record NNNN
     python tools/qa/results.py platforms
 
 A case program prints "platform <key>" and then one "name value" line per
@@ -47,9 +48,14 @@ def run_case(executable: Path) -> tuple[str, dict[str, str]]:
     )
     if done.returncode != 0:
         raise ResultError(f"{executable} exited with {done.returncode}: {done.stderr.strip()}")
+    return parse_output(done.stdout)
+
+
+def parse_output(text: str) -> tuple[str, dict[str, str]]:
+    """The platform key and the values from the output of a case program."""
     platform = ""
     values: dict[str, str] = {}
-    for line in done.stdout.splitlines():
+    for line in text.splitlines():
         name, _, value = line.strip().partition(" ")
         if not name:
             continue
@@ -133,8 +139,7 @@ def check(case: str, executable: Path) -> int:
     return 0
 
 
-def accept(case: str, executable: Path, record: str | None) -> int:
-    platform, values = run_case(executable)
+def accept(case: str, platform: str, values: dict[str, str], record: str | None) -> int:
     path = baseline_path(case, platform)
     others: dict[str, dict[str, Any]] = (
         {p.stem: load(p) for p in sorted((BASELINES / case).glob("*.json")) if p != path}
@@ -179,6 +184,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("mode", choices=("check", "accept", "platforms"))
     parser.add_argument("--case")
     parser.add_argument("--run", type=Path, help="The case program built from this tree")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        help="accept: the saved output of the case program, for a platform that exists "
+        "only on a CI runner",
+    )
     parser.add_argument("--record", help="Number of the result change record, for example 0001")
     args = parser.parse_args(argv)
     try:
@@ -188,11 +199,20 @@ def main(argv: list[str] | None = None) -> int:
             ):
                 print(f"{case.name}: " + ", ".join(sorted(p.stem for p in case.glob("*.json"))))
             return 0
-        if not args.case or not args.run:
-            parser.error("--case and --run are required")
+        if not args.case:
+            parser.error("--case is required")
         if args.mode == "check":
+            if not args.run:
+                parser.error("check needs --run")
             return check(args.case, args.run)
-        return accept(args.case, args.run, args.record)
+        if bool(args.run) == bool(args.output):
+            parser.error("accept needs exactly one of --run and --output")
+        platform, values = (
+            run_case(args.run)
+            if args.run
+            else parse_output(args.output.read_text(encoding="utf-8-sig"))
+        )
+        return accept(args.case, platform, values, args.record)
     except (ResultError, OSError, ValueError, subprocess.TimeoutExpired) as error:
         print(f"results: {error}", file=sys.stderr)
         return 2
