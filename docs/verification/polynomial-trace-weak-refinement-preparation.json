@@ -1,0 +1,31 @@
+{
+  "kind": "weak",
+  "sources": {
+    "tools/design-experiments/check_polynomial_trace_refinement_weak.py": "659ab91790c3b351c477b5c376594cfced200d30e56e004795c778d3a0aa6990",
+    "tools/design-experiments/audit_polynomial_trace_refinement_weak.py": "76ec68545086cd05cd7c6b18bbd013819be9b1cff8b017abd7696fb3c39fbaf7",
+    "tools/design-experiments/polynomial_trace_fit.py": "286a8fe802a8b59e8e70f613833d2dc65d477a9b7398dce1d5aacca96e43e4e7",
+    "tools/design-experiments/polynomial_trace_fit_v2.py": "71a69113e1b36d2a717a30288ee63d7367c6d189bf0ba5c01c6cc996ec41450f",
+    "tools/design-experiments/polynomial_trace_ancf.py": "cc8e33bdc4c32d9b91d694a78ddff30b1316a766d5ee3e8f59fa9a87e9aae2c6",
+    "docs/verification/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604",
+    "docs/verification/polynomial-trace-shared-result.json": "a7bb8a6643c066fe93554d2b66c91c1ea7054bec70e145c1ba5e989724792b07"
+  },
+  "cases": [
+    [
+      4,
+      0.01
+    ],
+    [
+      4,
+      0.0001
+    ],
+    [
+      8,
+      0.001
+    ],
+    [
+      8,
+      0.0001
+    ]
+  ],
+  "thresholds_unchanged": true
+}

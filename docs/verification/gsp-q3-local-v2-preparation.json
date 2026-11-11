@@ -1,0 +1,14 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "tools/design-experiments/gsp_q3_v2.py": "82135b41ad8c32e88a61e63bf8a9874983d4e5ac1670712ef213daaf64f9faed",
+    "tools/design-experiments/check_gsp_q3_local_v2.py": "675c7de98e4eaa08ad59bee0393215dc0de74331e8857607c334d64cc9ece029",
+    "tools/design-experiments/audit_gsp_q3_local_v2.py": "8d0c1dfdb377b9d07a8dfd9cf29bcb9a2d07147609eee63271b38f631c3689a1",
+    "tools/design-experiments/gsp_q3_basis_v2.py": "4826deee9dd17064f1650408d58d5699d2d87949f5d7eb3e8b5aa8c1018b7e0d",
+    "tools/design-experiments/gsp_q3.py": "fd491cbb7d01784540ee4a7461ba51e23aaccbac8f680c02437f5693c432aef4",
+    "docs/verification/gsp-q3-local-v2-protocol.md": "7b90202c4e29ca6ac38d0ac2fac14513594b098e9502c7fd50e5dcb31594376e",
+    "docs/verification/gsp-q3-local-protocol.md": "93d0b2f404a7748a4f14be9c398d01a6dfa0796fcb351d021ee4f781d8269419",
+    "docs/verification/gsp-q3-basis-v2-result.json": "32639d2c35951bbef7c0b59fec3dead73b0f1eaefd38286d73690707e4ddad4a",
+    "docs/verification/gsp-q3-basis-v2-audit.json": "fa019ee0749563e7b79c030cdbd14830283d90b4b0f87f9d91f3137a224fe45a"
+  }
+}

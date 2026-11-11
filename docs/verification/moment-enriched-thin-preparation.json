@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-04",
+  "primary_mid_dimension": 36,
+  "director_mid_dimension": 35,
+  "sources": {
+    "tools/design-experiments/moment_enriched_thin.py": "2cba4e8b15acc9b00af75cf50e368d12affcf1c05d3a145fb713d8e3361b3683",
+    "tools/design-experiments/moment_enriched_exact_isometry.py": "fdd45bded4a06111fc1cbda8be17e751eb275fd090db4292da89683542d72287",
+    "tools/design-experiments/check_moment_enriched_thin_local.py": "daac9a69e1662106162a04e7963a930e2e4576d199084f67b6223c2bdb6ce750",
+    "tools/design-experiments/check_moment_enriched_thin_global.py": "9a64d76dd4f67635821a40e3e8ff403e8c1540723190226aac87cf910f52f31a",
+    "tools/design-experiments/audit_moment_enriched_thin_global.py": "5eff07561b69d73b11a2654ffb7d0ba6f85e243469579c3fdc2e0dc11154a0c4",
+    "tools/design-experiments/moment_enriched_ancf.py": "7cd471191740fd624eab4ca1481c2d35444c49e9a4ae691e4f0fb893588aac24",
+    "docs/moment-enriched-thin-formulation.md": "d2b74a3b54b0cbd6ff283a7edddff3ca14e9f3e513814d8dc1de175a4a6ccff1",
+    "docs/verification/moment-enriched-thin-protocol.md": "7d730a1dd32a21ded8133fd7610891297cb4f09955b273fdb402b2fd8ece17cf",
+    "docs/verification/moment-enriched-disposition.json": "5bf6319be6524efbfa5f3e3cbb9bef48123245e05bd47b31de6b63270788257c"
+  }
+}

@@ -1,0 +1,2337 @@
+{
+  "source_sha256": "4eaffaef39ed7bdab68f7797a3126be0396b6541bd3931bca6efc27612fcb9b3",
+  "protocol_sha256": "6c397f9b9f2bc23df830fc5e28e4ef2e8b6f7578a69b3f38f5ab7c9ccd019df7",
+  "dependency_sha256": {
+    "q9_trace_shear.py": "92db045fa88677ae8fbdad39ed6b7e616c95ea2df76caee21214b90dc1a8bb71",
+    "check_q9_curved_load.py": "f018f5bc52d34249052f4163faef0b41814e45dc508581ec0ee351e0d5bac28c",
+    "check_q9_independent_load.py": "1c541fade6d865aecaf7fbfa99fa8dbbf0f68f44a0ba0f51da36004e3ff4003d",
+    "check_q9_plate_convergence.py": "909db42a881612996ce1381432bc03153c18f7b0107876a56a986f84316ffd9d"
+  },
+  "cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1341545505650302e-15,
+      "work_error": 5.576428781460045e-16,
+      "work_quadrature": 2.908283573529998e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R0-P0-G-COV.npz",
+      "artifact_sha256": "4c26097680d35c953046230167c0acf809d48e3e86a74a6ebe6b71ba1b5df930"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 6.149232807442666e-16,
+      "work_quadrature": 2.8834469966704817e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R0-P0-C-COV.npz",
+      "artifact_sha256": "d721a0191fd6719f9b93d3e386631f7ed82fcaa9de080c83d36f6e3b6fea5c1c"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 8.920892878740759e-16,
+      "work_error": 6.993864312133702e-16,
+      "work_quadrature": 2.87226029101166e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.163336342344337e-17,
+        "value": 6.661338147750939e-16,
+        "work": 1.0198591541096923e-15,
+        "raw_work": 1.0374620438298439e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R0-P1-G-COV.npz",
+      "artifact_sha256": "4684c63217f9aab0587c70c37034949f14aaef3303fb0d5f6c672f6f7c522220"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 8.265183130682394e-16,
+      "work_quadrature": 2.8400971641470243e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.163336342344337e-17,
+        "value": 0.0,
+        "work": 1.0685876085432511e-15,
+        "raw_work": 1.0374620438298439e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R0-P1-C-COV.npz",
+      "artifact_sha256": "5123e6d369054afe5567df8db3b74781d4cebc51fa94674dcbcc985ecd2fc210"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1918818977570117e-15,
+      "work_error": 1.4067029212795835e-15,
+      "work_quadrature": 2.4041183394090343e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.677613769070831e-16,
+        "value": 1.1102230246251565e-15,
+        "work": 3.045485081073745e-15,
+        "raw_work": 2.9311324179176256e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R1-P0-G-COV.npz",
+      "artifact_sha256": "596c2930d81973ef187f77987f6d6fcb676489481fc63fe8c25fe96701e0d846"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.268821781059678e-16,
+      "work_error": 1.375166286633777e-15,
+      "work_quadrature": 2.3750269955742545e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.677613769070831e-16,
+        "value": 8.881784197001252e-16,
+        "work": 3.0436796013982132e-15,
+        "raw_work": 2.9311324179176256e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R1-P0-C-COV.npz",
+      "artifact_sha256": "bb3a210d5445329bd9c37c97cd2814a122713e0eb38aeb2a1f67449ba4eb16a9"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.4318819560159386e-15,
+      "work_error": 7.556620746617382e-16,
+      "work_quadrature": 2.562732550734195e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 1.2212453270876722e-15,
+        "work": 2.8861336173858096e-15,
+        "raw_work": 2.9584718644721122e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R1-P1-G-COV.npz",
+      "artifact_sha256": "32fb631f4c78eb01d8ac0d34330eccfc31653d4fd4ed67f76ed0911e1226725e"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.48950812332139e-16,
+      "work_error": 7.743988858334973e-16,
+      "work_quadrature": 2.491539255496098e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.9326717249071945e-15,
+        "raw_work": 2.9584718644721122e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.1-R1-P1-C-COV.npz",
+      "artifact_sha256": "440382c30501d8b7b6f43a158ae910f94c610e77d36daffe2e5fb7c276a189ef"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1141096493849194e-15,
+      "work_error": 1.1291683528919006e-15,
+      "work_quadrature": 2.528142404486968e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R0-P0-G-COV.npz",
+      "artifact_sha256": "a38e8b58a5b575ffa87010e1dc88ebe38d439d116b1f9ff88b137eea8ea49984"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 1.1588676544123316e-15,
+      "work_quadrature": 2.6574139970426906e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R0-P0-C-COV.npz",
+      "artifact_sha256": "e47396c7dc68829e780488e7c9ea4d005698b8d1bb0a32ac9b64aa5ccf0f14d3"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.1141096493849194e-15,
+      "work_error": 1.1987345791140858e-15,
+      "work_quadrature": 3.094018086229834e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.204170427930421e-18,
+        "value": 2.220446049250313e-16,
+        "work": 1.4067916288840622e-15,
+        "raw_work": 1.4291332301684962e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R0-P1-G-COV.npz",
+      "artifact_sha256": "d045c0d17572d42678c945f49a3e065fd18e76f62703edbf4e75617d72143697"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 1.3813437113107762e-15,
+      "work_quadrature": 3.2222815770246104e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.204170427930421e-18,
+        "value": 0.0,
+        "work": 1.4353298466681247e-15,
+        "raw_work": 1.4291332301684962e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R0-P1-C-COV.npz",
+      "artifact_sha256": "9649f3c7f3da65bf0593f321f8c1ee13345ecf1fc30109e201244d2329fb4086"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.363799092695187e-15,
+      "work_error": 1.089528534666962e-15,
+      "work_quadrature": 2.5268862970804386e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 2.640657471084427e-15,
+        "raw_work": 2.6498700015158414e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R1-P0-G-COV.npz",
+      "artifact_sha256": "dbf80a858b7d2b4a76e04487d80753a79dde32be02576cd267c206e8473fe9c8"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 5.765517136865431e-16,
+      "work_error": 1.0780612114352147e-15,
+      "work_quadrature": 2.5632080285839908e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 7.771561172376096e-16,
+        "work": 2.6693971506889214e-15,
+        "raw_work": 2.6498700015158414e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R1-P0-C-COV.npz",
+      "artifact_sha256": "90ae9d99ed11acc8bfad2aa45199a44f558c2707a2268875efc4f54f8424a1ca"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.0379124625241714e-15,
+      "work_error": 1.2301026053068619e-15,
+      "work_quadrature": 2.3332894613595424e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 2.5797610194487434e-15,
+        "raw_work": 2.5053975941537937e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R1-P1-G-COV.npz",
+      "artifact_sha256": "dd35862c8c0666ffe8adf138c4bfd197f5458e5e2e0d1c88709503f0b88f2abf"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.245091855145455e-16,
+      "work_error": 1.2117205137505112e-15,
+      "work_quadrature": 2.330297960720795e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 7.771561172376096e-16,
+        "work": 2.5908118038047646e-15,
+        "raw_work": 2.5053975941537937e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/RECT-h0.01-R1-P1-C-COV.npz",
+      "artifact_sha256": "11f77a2980dbc13192aacd93e0a0a647191100840529f312fda6d4748a71f8d4"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1443916996305594e-15,
+      "work_error": 5.450463841218959e-16,
+      "work_quadrature": 2.8630422263861356e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R0-P0-G-COV.npz",
+      "artifact_sha256": "7723c29ff3213dbc62c8b32d3e8cb7ce050fb6f0a5d1a254a70143a891fc4f7b"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 7.510691584075473e-16,
+      "work_error": 5.222346126551754e-16,
+      "work_quadrature": 2.8491364864296832e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R0-P0-C-COV.npz",
+      "artifact_sha256": "c6b6a16368ae1832fe465faf1ae166723fc981ad0a18950f3cb0499461d4a86b"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 8.920892878740759e-16,
+      "work_error": 6.907637322330884e-16,
+      "work_quadrature": 2.9788437045241593e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.163336342344337e-17,
+        "value": 6.661338147750939e-16,
+        "work": 1.0681295499932329e-15,
+        "raw_work": 1.058428327262619e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R0-P1-G-COV.npz",
+      "artifact_sha256": "d0bfa3ad2487b8a6e9387c5375954962f14ff1bbae1978cce7f8b226e73d375b"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 7.510691584075473e-16,
+      "work_error": 7.229507321538438e-16,
+      "work_quadrature": 2.974702762684747e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.163336342344337e-17,
+        "value": 0.0,
+        "work": 1.0682334339957842e-15,
+        "raw_work": 1.058428327262619e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R0-P1-C-COV.npz",
+      "artifact_sha256": "968735d1107fbd65c1ab9beb377e7cd8fea921b23678fa3a930ea455cfa0f445"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.348409554181231e-15,
+      "work_error": 6.356477896907957e-16,
+      "work_quadrature": 1.9680716271730153e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 1.2212453270876722e-15,
+        "work": 2.124690400375395e-15,
+        "raw_work": 2.004109511512307e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R1-P0-G-COV.npz",
+      "artifact_sha256": "e377e5a76ff1fe652f37b6808be59a53443e93fd2f9558e1fc6182eb27fac3f0"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.225017742319268e-16,
+      "work_error": 7.855925548398316e-16,
+      "work_quadrature": 1.7389910395893929e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 9.992007221626409e-16,
+        "work": 2.0790384576585763e-15,
+        "raw_work": 2.004109511512307e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R1-P0-C-COV.npz",
+      "artifact_sha256": "b6c6252e98c4d089fae726f1b9aa573d368e1f99048077dab28d5d018b0ecd58"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.403868666780279e-15,
+      "work_error": 1.110871076565443e-15,
+      "work_quadrature": 1.7293727393698775e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.2212453270876722e-15,
+        "work": 1.809198825540915e-15,
+        "raw_work": 2.0809897914305105e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R1-P1-G-COV.npz",
+      "artifact_sha256": "831665d886bb7cd1185e9233e6ee2e7aadf5561e69a2ab5b8e4c4999e608a4d2"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.29779795275592e-16,
+      "work_error": 1.0626141221086581e-15,
+      "work_quadrature": 1.6705227175502205e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 9.992007221626409e-16,
+        "work": 1.9057977540094865e-15,
+        "raw_work": 2.0809897914305105e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.1-R1-P1-C-COV.npz",
+      "artifact_sha256": "ea26ea80f5da0bc6322265cbbc210032bd16946cbc99b38a3cc8e6c5bc1875ac"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.169203622808368e-15,
+      "work_error": 1.0690949744789216e-15,
+      "work_quadrature": 2.5035446629250316e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R0-P0-G-COV.npz",
+      "artifact_sha256": "69f599e6cb2b96feb6fcbc1aca0678a90217113921571bf9a99ac6df2c9029e2"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 5.635475559608569e-16,
+      "work_error": 1.085941509725547e-15,
+      "work_quadrature": 2.502816782473577e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R0-P0-C-COV.npz",
+      "artifact_sha256": "c37c36b0f01c0733711d78ea64400586c01b3b2f44b4dc4226ad0d94d1354b3b"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.169203622808368e-15,
+      "work_error": 1.10987836391522e-15,
+      "work_quadrature": 2.909993477317057e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.204170427930421e-18,
+        "value": 2.220446049250313e-16,
+        "work": 1.40076249543955e-15,
+        "raw_work": 1.4231987439786935e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R0-P1-G-COV.npz",
+      "artifact_sha256": "b0e2d20633edf2eab66ffef63a07450be860ac783f3c239530a67a005c7b44ff"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.635475559608569e-16,
+      "work_error": 1.282592566796855e-15,
+      "work_quadrature": 2.985600802476661e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.204170427930421e-18,
+        "value": 0.0,
+        "work": 1.428104696426105e-15,
+        "raw_work": 1.4231987439786935e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R0-P1-C-COV.npz",
+      "artifact_sha256": "00ee61b02cdb2c07f102f2c3cdc00c2f4f69f39e0e075a7502e728a4bfc96863"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.2996186487296062e-15,
+      "work_error": 1.9895706315006797e-15,
+      "work_quadrature": 1.4568271625940117e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 2.629486866731454e-15,
+        "raw_work": 2.5410475513963858e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R1-P0-G-COV.npz",
+      "artifact_sha256": "8fea28e8cab425125023841b041ca3242596ab93428c18881b39c3c35af2a236"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 7.618584934159608e-16,
+      "work_error": 2.1232275284274934e-15,
+      "work_quadrature": 1.5821753895910934e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.781428403194967e-15,
+        "raw_work": 2.5410475513963858e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R1-P0-C-COV.npz",
+      "artifact_sha256": "01c61652d549527f38b9d0ad5cc59cbbba22f0e130647ba0cb0d4d9d35cd769b"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.3981646154695828e-15,
+      "work_error": 8.292187001298487e-16,
+      "work_quadrature": 1.3850413617361102e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 2.119436311280028e-15,
+        "raw_work": 2.2537193770415807e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R1-P1-G-COV.npz",
+      "artifact_sha256": "397650a7e0e2e48ef4107a4bff6514b7a0a3d30c48266250444b6b7653cb0f53"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.754005941680556e-16,
+      "work_error": 6.707044151572922e-16,
+      "work_quadrature": 1.4641467811991147e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.1102230246251565e-15,
+        "work": 2.1333629944762873e-15,
+        "raw_work": 2.2537193770415807e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SKEW-h0.01-R1-P1-C-COV.npz",
+      "artifact_sha256": "c5690a071b30fa8b429f6ccb9d118729b3791d43e4618b9186ce3711991751d6"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.3018703849882205e-15,
+      "work_error": 4.252297730287526e-16,
+      "work_quadrature": 2.7447958789023473e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R0-P0-G-COV.npz",
+      "artifact_sha256": "8f32ef7fb53e2c94b4fda04f4f2ab805f4e825bdcf11ce100639ed7a474aa9bc"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 1.7699263328467308e-15,
+      "work_quadrature": 2.74050752118201e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R0-P0-C-COV.npz",
+      "artifact_sha256": "649c37e2ecc944690d06db72ad8d77f6702142237f57307932660648b71f8651"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 9.097526322795459e-16,
+      "work_error": 1.3855280901677353e-15,
+      "work_quadrature": 2.7041815151417388e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.163336342344337e-17,
+        "value": 6.661338147750939e-16,
+        "work": 1.0480252410030044e-15,
+        "raw_work": 1.2553027999696105e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R0-P1-G-COV.npz",
+      "artifact_sha256": "9190904a6d9778e04088d5e2dce3262e289d068d2a59aa340ce4c0e08b56acd5"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 1.8912934267953518e-15,
+      "work_quadrature": 2.6020098370570525e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.163336342344337e-17,
+        "value": 0.0,
+        "work": 9.658481016165502e-16,
+        "raw_work": 1.2553027999696105e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R0-P1-C-COV.npz",
+      "artifact_sha256": "cc2669f86ca4d9e325672d869518d9427e694ba10272adb04d01830fc8a17e64"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.4825048384498168e-15,
+      "work_error": 5.323637196153118e-16,
+      "work_quadrature": 1.3077354551575303e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 1.2212453270876722e-15,
+        "work": 2.233781181678507e-15,
+        "raw_work": 2.0910209313835568e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R1-P0-G-COV.npz",
+      "artifact_sha256": "73b3ef200125f329f51f0acdaa3aad7132860c2383d2293e04e724791f937dd6"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.268821781059678e-16,
+      "work_error": 2.470752136526649e-15,
+      "work_quadrature": 1.597377203077656e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.5412026182063944e-15,
+        "raw_work": 2.0910209313835568e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R1-P0-C-COV.npz",
+      "artifact_sha256": "2bc73b3aaa1235d1f44016d5bd91df6cd6dfeb1e5be121549f590e7130120d2b"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.383496629384589e-15,
+      "work_error": 6.79153206414428e-16,
+      "work_quadrature": 1.3931858100321777e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.2212453270876722e-15,
+        "work": 2.227869832821291e-15,
+        "raw_work": 1.9726203165467425e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R1-P1-G-COV.npz",
+      "artifact_sha256": "c08d8cfe3c2038c61e803adbae75c20b176907c5c01833137fbf39aecacb54e3"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.48950812332139e-16,
+      "work_error": 2.6138797233727553e-15,
+      "work_quadrature": 1.7628953260460644e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.456263554567242e-15,
+        "raw_work": 1.9726203165467425e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.1-R1-P1-C-COV.npz",
+      "artifact_sha256": "3559e69414be29094015109929e7b61f54fb42fe3eda4757265802913378b715"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1854286548426332e-15,
+      "work_error": 4.771283114052222e-16,
+      "work_quadrature": 2.4346777245241547e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R0-P0-G-COV.npz",
+      "artifact_sha256": "946fb1507c02c956d7946bb51d54729ac4ae3a78ba0cf51e985ace200be2b258"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 2.015176360520995e-15,
+      "work_quadrature": 2.37876218957453e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R0-P0-C-COV.npz",
+      "artifact_sha256": "bd7fbbcb447c275c3922890d11e4f8da105bdc17c32f269f712433d2ef652c21"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.1149905246833567e-15,
+      "work_error": 5.777512632201057e-16,
+      "work_quadrature": 2.782912510659019e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.204170427930421e-18,
+        "value": 2.220446049250313e-16,
+        "work": 1.3034675072530409e-15,
+        "raw_work": 1.3036908624074478e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R0-P1-G-COV.npz",
+      "artifact_sha256": "d2ef4b2f3b38ea957bbb9858a30339e5f4833d0560660ea2332d3496bd6462ce"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 2.09721276594117e-15,
+      "work_quadrature": 2.5306028855890314e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.204170427930421e-18,
+        "value": 0.0,
+        "work": 1.3084583350140745e-15,
+        "raw_work": 1.3036908624074478e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R0-P1-C-COV.npz",
+      "artifact_sha256": "6e38a44eb4314d925212ae69d36198b510c34ab691e844c6f45c0feb7ff081e6"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1634696014434177e-15,
+      "work_error": 6.752058198959864e-16,
+      "work_quadrature": 2.048311177466187e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 1.2212453270876722e-15,
+        "work": 3.2115579754165896e-15,
+        "raw_work": 3.2095346913890115e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R1-P0-G-COV.npz",
+      "artifact_sha256": "2a575c146a2d718a0bb2479dff063282d713ad780fd8bf9ca9fa6998dcc3303a"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 5.765517136865431e-16,
+      "work_error": 3.2336385471784095e-15,
+      "work_quadrature": 2.0258047645818728e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 7.771561172376096e-16,
+        "work": 2.474030119753436e-15,
+        "raw_work": 3.2095346913890115e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R1-P0-C-COV.npz",
+      "artifact_sha256": "dd2c0c555f6f97f51586300ffa24a63ada2e581ec4fc937cee913215ff2df9fa"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.2122467321713202e-15,
+      "work_error": 6.608060827687851e-16,
+      "work_quadrature": 1.9667529665938778e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 3.2179199373709953e-15,
+        "raw_work": 3.3241524410106067e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R1-P1-G-COV.npz",
+      "artifact_sha256": "13963b0f7492c554d1c0b53a06a4a02099d29785ebc59a72e4c2e7ee5f7509e2"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.245091855145455e-16,
+      "work_error": 3.14408640390931e-15,
+      "work_quadrature": 1.981865572186888e-15,
+      "value_gate": true,
+      "work_gate": true,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 7.771561172376096e-16,
+        "work": 2.2811346989663603e-15,
+        "raw_work": 3.3241524410106067e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/TRAP-h0.01-R1-P1-C-COV.npz",
+      "artifact_sha256": "081603d074d1705ffcce347a6a61a50b5acbd4ee9609a9c7e55e320e6b2fed12"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.056320416100363e-15,
+      "work_error": 0.02870361469941634,
+      "work_quadrature": 1.7277847256340768e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R0-P0-G-COV.npz",
+      "artifact_sha256": "8d298aff038607596572fa74aecefc9468cf0147e9ee8d4b27e71e54f8d348a7"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 0.008748067762841876,
+      "work_quadrature": 2.973970430740042e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R0-P0-C-COV.npz",
+      "artifact_sha256": "4af81a6fcee0db1c9de09726ec19db277615f580cecbf1eec0a5886a267fc5d1"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.0046496111480464e-15,
+      "work_error": 0.03460771462023152,
+      "work_quadrature": 2.070647574687753e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.3306690738754696e-16,
+        "value": 1.1102230246251565e-15,
+        "work": 1.9581905255743766e-15,
+        "raw_work": 1.6177477697956636e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R0-P1-G-COV.npz",
+      "artifact_sha256": "8706383cabce295d015e5259353eedf0ff1271d2561e6d082561b683236d53af"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 0.008722621968714775,
+      "work_quadrature": 1.83177673250517e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.3306690738754696e-16,
+        "value": 0.0,
+        "work": 1.7000892241645152e-15,
+        "raw_work": 1.6177477697956636e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R0-P1-C-COV.npz",
+      "artifact_sha256": "555fa5a575e6719b666a4d38547d7dda28627b9d430d86b22b60b877de8e9d11"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.2767777573075436e-15,
+      "work_error": 0.018134276305653983,
+      "work_quadrature": 1.082595683469901e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.7296554733501353e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 2.2606329624937345e-15,
+        "raw_work": 1.7864428756274597e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R1-P0-G-COV.npz",
+      "artifact_sha256": "25205b0e7f4a929f71a241303dbca5a7741f5872ae4da64415f586069f71b29b"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.268821781059678e-16,
+      "work_error": 0.007612118822944376,
+      "work_quadrature": 1.1633439298954148e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.7296554733501353e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.5567989460512603e-15,
+        "raw_work": 1.7864428756274597e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R1-P0-C-COV.npz",
+      "artifact_sha256": "22997e0913d9be08d26b27b4771a0939cbfda85d1353c2d1b685000a564e1e54"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.1105834507055861e-15,
+      "work_error": 0.019470212068850197,
+      "work_quadrature": 1.154897088043699e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.423544863740858e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 2.1319095001222636e-15,
+        "raw_work": 1.6768762454404445e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R1-P1-G-COV.npz",
+      "artifact_sha256": "3e9e38bd44d8823d908ff1caf3c12c86c8362c7ccb3026fde50f205a6a358aa1"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.268821781059678e-16,
+      "work_error": 0.00751642665458544,
+      "work_quadrature": 1.398294735732919e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.423544863740858e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.4763441791766627e-15,
+        "raw_work": 1.6768762454404445e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.1-R1-P1-C-COV.npz",
+      "artifact_sha256": "ef93015201a110817743156e69af524fa121c2777d2f67b172d6ee65c927da7a"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.1026305856485009e-15,
+      "work_error": 0.02869541180261126,
+      "work_quadrature": 1.7269970209419992e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R0-P0-G-COV.npz",
+      "artifact_sha256": "3044f5f7fb58adbd26447f01c8265e6c298a10b4d36bf094b97e05fda4c3f06c"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 0.008746338187992938,
+      "work_quadrature": 1.339913924983867e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R0-P0-C-COV.npz",
+      "artifact_sha256": "313aaf2bca4ac3054a77fcaf3f8a504ad06057b19a23cef7ae88363312db4801"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.3796911545752705e-15,
+      "work_error": 0.03459825055289402,
+      "work_quadrature": 2.0693025955860115e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 8.881784197001252e-16,
+        "work": 2.0116306790481322e-15,
+        "raw_work": 4.706470697617389e-16
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R0-P1-G-COV.npz",
+      "artifact_sha256": "c4a225a77980ca3ad9b1ccafe868b97f8265d3b66d29ce0281840eee4695c089"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 0.008721128373357995,
+      "work_quadrature": 1.1126365477284392e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.996003610813204e-16,
+        "value": 0.0,
+        "work": 9.411778551545361e-16,
+        "raw_work": 4.706470697617389e-16
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R0-P1-C-COV.npz",
+      "artifact_sha256": "2d9e5733c3856ecc5a03b2cb7f3c40782636b47f971f233d1e403937a48ddbf7"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 1.194875432846153e-15,
+      "work_error": 0.018131638011037395,
+      "work_quadrature": 1.0821813499118478e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.1573279854279154e-15,
+        "work": 1.5711181412073237e-15,
+        "raw_work": 1.3953729781416704e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R1-P0-G-COV.npz",
+      "artifact_sha256": "07a11cdcb6e7d1cce3b2097dac817055135d5af08299e2c60396d074638625b3"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 5.765517136865431e-16,
+      "work_error": 0.007610711478849027,
+      "work_quadrature": 1.7446681460304592e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 7.771561172376096e-16,
+        "work": 1.692154671150099e-15,
+        "raw_work": 1.3953729781416704e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R1-P0-C-COV.npz",
+      "artifact_sha256": "4471725c0f31150df3d527e40d1f31964b221e06c5b1799fb57d62e848065942"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 1.2715757465678147e-15,
+      "work_error": 0.019466337042764768,
+      "work_quadrature": 1.154008896277173e-12,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 1.7205479093961843e-15,
+        "raw_work": 1.4074015185959225e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R1-P1-G-COV.npz",
+      "artifact_sha256": "044c9f169f04342d981f1b8b706298771642903df80428a10bfc43c7dce759f6"
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.420876771853221e-16,
+      "work_error": 0.007517053493074198,
+      "work_quadrature": 1.5214008314866059e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 3.885780586188048e-16,
+        "value": 7.771561172376096e-16,
+        "work": 1.9793435302961e-15,
+        "raw_work": 1.4074015185959225e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/SADDLE-h0.01-R1-P1-C-COV.npz",
+      "artifact_sha256": "549ba6f38f1f68ebfdf14f40348f84a6c48fe6ca92fd248ac414043eae7a62fb"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 0.011753260344378468,
+      "work_error": 0.027701370770972004,
+      "work_quadrature": 5.202803739642305e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R0-P0-G-COV.npz",
+      "artifact_sha256": "16a5819bfd4d43b376e3214935825d8de6732a829e713d6281cb80ae5b22a3e0"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 0.007944106720716278,
+      "work_quadrature": 1.9041257391018807e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R0-P0-C-COV.npz",
+      "artifact_sha256": "34bfe12023d372b74d0a665febb321e882b8b284426ae81134b955dad44c5793"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 0.011753260344378682,
+      "work_error": 0.03333232885644919,
+      "work_quadrature": 6.206985972151682e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.551115123125783e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 1.4041985350449634e-15,
+        "raw_work": 1.2263240870403333e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R0-P1-G-COV.npz",
+      "artifact_sha256": "659f793677c8987ea3c099ec5549cb6aa93be50fe7fb28e4e59e5cf132d3dfe0"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 0.008173303796894025,
+      "work_quadrature": 1.9874960780790195e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.551115123125783e-16,
+        "value": 5.551115123125783e-16,
+        "work": 1.492881713504847e-15,
+        "raw_work": 1.2263240870403333e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R0-P1-C-COV.npz",
+      "artifact_sha256": "26ee7f47c2168a20a6f2ab05f9c34ae617441e774f94e7bfbd15e2ae77ee59e5"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 0.011270689178800756,
+      "work_error": 0.017814971046679895,
+      "work_quadrature": 4.0465648127007853e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.540638698369293e-16,
+        "value": 1.3322676295501878e-15,
+        "work": 1.9053272643758914e-15,
+        "raw_work": 1.9261870826505178e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R1-P0-G-COV.npz",
+      "artifact_sha256": "624d382f29d6abea46ad6bb3477f6b226bac27f869ebd1b52635202c21de354c"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 6.268821781059678e-16,
+      "work_error": 0.006915610260869669,
+      "work_quadrature": 1.6840773961672225e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.540638698369293e-16,
+        "value": 8.881784197001252e-16,
+        "work": 1.9556175066608706e-15,
+        "raw_work": 1.9261870826505178e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R1-P0-C-COV.npz",
+      "artifact_sha256": "7805fd416c6ab9b99ff96cc034d3cc6ff9667a5759cb46616be41063b4eca9c1"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 0.011270689178800758,
+      "work_error": 0.01913299693439563,
+      "work_quadrature": 4.042231520998759e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 1.5543122344752192e-15,
+        "work": 1.901757972300338e-15,
+        "raw_work": 1.9559405731708606e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R1-P1-G-COV.npz",
+      "artifact_sha256": "efbbbd577d30ea9b18d29900e22cbb8c70a816274167e84d2f0eecd9ca5d20fb"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.22894577110842e-16,
+      "work_error": 0.00704546728536254,
+      "work_quadrature": 1.4152919083850314e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 4.440892098500626e-16,
+        "value": 6.661338147750939e-16,
+        "work": 1.886999441689502e-15,
+        "raw_work": 1.9559405731708606e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.1-R1-P1-C-COV.npz",
+      "artifact_sha256": "984e2510692b21617e9c69104ff97e1814f296bdfde89d598eb86b2a00043ad9"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 0.011729656332164785,
+      "work_error": 0.02769212349027949,
+      "work_quadrature": 5.087088478167647e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R0-P0-G-COV.npz",
+      "artifact_sha256": "9e28fca42b14ddbe8ef627e6786515c2aaacb2067b47975bcab52620a09703b3"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 4.440892098500626e-16,
+      "work_error": 0.007942959517677923,
+      "work_quadrature": 2.404091537346621e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 0.0,
+        "value": 0.0,
+        "work": 0.0,
+        "raw_work": 0.0
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R0-P0-C-COV.npz",
+      "artifact_sha256": "41201c17d17b880cc995b80b77cff80a6e46272c31e4b168b549f5171a64928d"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 0.011729656332164341,
+      "work_error": 0.03332228800336759,
+      "work_quadrature": 6.174718410617366e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.551115123125783e-16,
+        "value": 1.5543122344752192e-15,
+        "work": 4.353728234584079e-16,
+        "raw_work": 1.5816151741463197e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R0-P1-G-COV.npz",
+      "artifact_sha256": "e315f7982b91003a8a304bddce9c7999585559353b76895676518ae4b036dd45"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": false,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 6.661338147750939e-16,
+      "work_error": 0.008172364617794895,
+      "work_quadrature": 1.4326462580305983e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.551115123125783e-16,
+        "value": 4.440892098500626e-16,
+        "work": 1.588866035315766e-15,
+        "raw_work": 1.5816151741463197e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R0-P1-C-COV.npz",
+      "artifact_sha256": "e9395326dbaf2095771417bed751629238ae01ed6d6ff24718a47793dfdb40d2"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "G-COV",
+      "value_error": 0.010971904492508172,
+      "work_error": 0.01781027579592431,
+      "work_quadrature": 4.0573225235356226e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 6.661338147750939e-16,
+        "value": 1.5543122344752192e-15,
+        "work": 1.3703787090158308e-15,
+        "raw_work": 2.614999802989835e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R1-P0-G-COV.npz",
+      "artifact_sha256": "620a6eaf0c92a6000005165ec2fbb758dbd8b26df9a8be99d40d8796913ff8e4"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": false,
+      "scheme": "C-COV",
+      "value_error": 5.765517136865431e-16,
+      "work_error": 0.00691480320416233,
+      "work_quadrature": 2.0764408806478628e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 6.661338147750939e-16,
+        "value": 7.771561172376096e-16,
+        "work": 2.162832715183784e-15,
+        "raw_work": 2.614999802989835e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R1-P0-C-COV.npz",
+      "artifact_sha256": "a8bcd7ba32b0bd7e5e3e5b2b54364f751dcad856d25f1784a70e634ef55042a8"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "G-COV",
+      "value_error": 0.010971904492508604,
+      "work_error": 0.019128098260482403,
+      "work_quadrature": 4.062654787315668e-14,
+      "value_gate": false,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.551115123125783e-16,
+        "value": 1.7763568394002505e-15,
+        "work": 1.8124710910425257e-15,
+        "raw_work": 1.393159520221236e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R1-P1-G-COV.npz",
+      "artifact_sha256": "2fc00d4e8aaf533a31105620e690db978450fd2b1841a3c8fad67a40f2b79737"
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "rotated": true,
+      "reparameterized": true,
+      "scheme": "C-COV",
+      "value_error": 5.291917790047225e-16,
+      "work_error": 0.007046160396723431,
+      "work_quadrature": 2.01977299839488e-15,
+      "value_gate": true,
+      "work_gate": false,
+      "integration_gate": true,
+      "coordinate_defects": {
+        "geometry": 5.551115123125783e-16,
+        "value": 7.771561172376096e-16,
+        "work": 1.5759483479180787e-15,
+        "raw_work": 1.393159520221236e-15
+      },
+      "checks": {
+        "geometry": true,
+        "affine": true,
+        "construction": true,
+        "objectivity": true,
+        "work_covariance": true,
+        "raw_work_covariance": true
+      },
+      "artifact": "build/analysis/q9-curved-strain-screen-20261102-190203/NORMAL-C-h0.01-R1-P1-C-COV.npz",
+      "artifact_sha256": "718ed140f19253704c53d38d33c8bd065fd91e8b1c0a7400bc77fdb8ead274d4"
+    }
+  ],
+  "stop_reason": null,
+  "seconds": 7.375,
+  "peak_bytes": 93335552,
+  "diagnostic_checks_pass": true,
+  "product_shell_adopted": false
+}

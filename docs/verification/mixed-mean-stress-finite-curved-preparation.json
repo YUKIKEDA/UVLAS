@@ -1,0 +1,8 @@
+{
+  "sources": {
+    "tools/design-experiments/check_mixed_mean_stress_finite_curved.py": "a1a4c93d13faf5ce104e8888758bad8e7dd466507b9cebb03346796cbad4e495",
+    "docs/verification/mixed-mean-stress-finite-curved-protocol.md": "89ba9292e31e889d43cabfd88be5ee290d2d670aaf83729bba16e22983cf9cfc",
+    "tools/design-experiments/mixed_mean_stress_finite.py": "e7c55de9ae90eca47fd4374b820ed59b224e07c8acf6e417616f85c7c54e9f7d",
+    "docs/verification/mixed-mean-stress-finite-pair-disposition.json": "24a5c0804d2a3561704a68f5b013e4e08eb6edde27c3b356cbf7e53547bf5914"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "records": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "parts_difference": 3.6242422230643376e-19,
+      "mean_difference": 1.9402348448043817e-20,
+      "membrane_mean_difference": 9.354420111239679e-20,
+      "total_difference": 2.6129272356900657e-17,
+      "reconstruction": 1.514935020041903e-16,
+      "checks": {
+        "parts": true,
+        "element_mean": true,
+        "membrane_mean": true,
+        "total": true,
+        "reconstruction": true
+      }
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "parts_difference": 3.0422712959943254e-15,
+      "mean_difference": 2.3038211963144484e-15,
+      "membrane_mean_difference": 2.289401307420391e-15,
+      "total_difference": 4.232725281383409e-15,
+      "reconstruction": 0.0,
+      "checks": {
+        "parts": true,
+        "element_mean": true,
+        "membrane_mean": true,
+        "total": true,
+        "reconstruction": true
+      }
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "parts_difference": 4.275832243907059e-18,
+      "mean_difference": 3.090029131142891e-18,
+      "membrane_mean_difference": 2.206467888038249e-18,
+      "total_difference": 2.609240948303615e-15,
+      "reconstruction": 3.5456419072370496e-16,
+      "checks": {
+        "parts": true,
+        "element_mean": true,
+        "membrane_mean": true,
+        "total": true,
+        "reconstruction": true
+      }
+    },
+    {
+      "n": 8,
+      "h": 0.0001,
+      "parts_difference": 3.6799176986873627e-16,
+      "mean_difference": 4.056610190990295e-16,
+      "membrane_mean_difference": 3.484151443917949e-16,
+      "total_difference": 1.3716458524548614e-14,
+      "reconstruction": 4.542489105808431e-16,
+      "checks": {
+        "parts": true,
+        "element_mean": true,
+        "membrane_mean": true,
+        "total": true,
+        "reconstruction": true
+      }
+    }
+  ],
+  "all_checks_pass": true,
+  "independent_resolve": false,
+  "sources": {
+    "tools/design-experiments/audit_q9_eas21_residual_v2.py": "96a8295bc88841fc23b440d7211dd208519d8baaa7aceb1efcefdf906a81f010",
+    "tools/design-experiments/audit_q9_eas21.py": "eb9ca9ee1d0f2fb4afd0644579be7d9b9b5b1724a8215e2e23a984d3c71b682e",
+    "tools/design-experiments/audit_q9_curved_strain_screen.py": "2a092c9ae927b8676ce989a2d92d8eff0d9f9b93fae0b9e9bd27890a2b9245ec",
+    "docs/verification/q9-eas21-residual-result.json": "a75f23e3fe246ca13e3214b43924b137ba3f8f2d8ab77d6c5992a7f9b2ce3e34",
+    "docs/verification/q9-eas21-shared-approximation-result.json": "00c01d3ddc43ea3bc6b87ca160290a7b06283877297d209701e7add0b9622b92",
+    "docs/verification/q9-eas21-residual-experiment.md": "1fc88364eafabb10cd6eb8fec071cccd95d3acedcc405d885f8c87b605c41a37"
+  },
+  "seconds": 21.625
+}

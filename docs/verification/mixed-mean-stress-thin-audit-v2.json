@@ -1,0 +1,145 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        6.7064446183009815e-15,
+        8.4403656915882e-15,
+        3.972417519215227e-08
+      ],
+      "difference": 5.558824289577181e-15,
+      "work": 2.9799932138367283e-15,
+      "shared": 1.1445577671589463e-15,
+      "support": 5.49172878202892e-16,
+      "stabilization": 1.0348433002484544e-14,
+      "fluctuation": 4.142371675293812e-13,
+      "completion_space_sensitivity": [],
+      "checks": {
+        "position_error": true,
+        "work": true,
+        "shared": true,
+        "support": true,
+        "stabilization": true,
+        "thickness_fluctuation": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        6.2304502975306256e-15,
+        7.776220395327949e-15,
+        5.395626177326012e-08
+      ],
+      "difference": 4.079429555174312e-15,
+      "work": 3.965350899502249e-15,
+      "shared": 1.3208921796519692e-15,
+      "support": 4.2293838700134344e-16,
+      "stabilization": 1.3376719356011566e-14,
+      "fluctuation": 5.6207672646789e-13,
+      "completion_space_sensitivity": [],
+      "checks": {
+        "position_error": true,
+        "work": true,
+        "shared": true,
+        "support": true,
+        "stabilization": true,
+        "thickness_fluctuation": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        5.097808101609753e-14,
+        0.00015819720254324832,
+        2.2717774143829216e-06
+      ],
+      "difference": 4.574791066802586e-16,
+      "work": 3.738204899660636e-15,
+      "shared": 1.0166764493664899e-15,
+      "support": 5.44758191835429e-16,
+      "stabilization": 1.0765449757575407e-14,
+      "fluctuation": 4.601196417167254e-13,
+      "completion_space_sensitivity": [],
+      "checks": {
+        "position_error": true,
+        "work": true,
+        "shared": true,
+        "support": true,
+        "stabilization": true,
+        "thickness_fluctuation": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        3.023932071217945e-12,
+        0.00022017447423112397,
+        2.6833209471286775e-06
+      ],
+      "difference": 4.661273788192551e-16,
+      "work": 3.204775116308747e-15,
+      "shared": 1.1228669719362342e-15,
+      "support": 4.881601707300799e-16,
+      "stabilization": 1.0650213015774639e-14,
+      "fluctuation": 5.088606765513406e-13,
+      "completion_space_sensitivity": [],
+      "checks": {
+        "position_error": true,
+        "work": true,
+        "shared": true,
+        "support": true,
+        "stabilization": true,
+        "thickness_fluctuation": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "error": [
+        3.409329050047262e-11,
+        7.051800335439007e-06,
+        1.021440782063173e-07
+      ],
+      "difference": 1.226520648283172e-16,
+      "work": 6.518472173467407e-15,
+      "shared": 4.2709046074975904e-15,
+      "support": 6.530416598783632e-16,
+      "stabilization": 1.8134779800695657e-14,
+      "fluctuation": 1.0265825852014958e-12,
+      "completion_space_sensitivity": [],
+      "checks": {
+        "position_error": true,
+        "work": true,
+        "shared": true,
+        "support": true,
+        "stabilization": true,
+        "thickness_fluctuation": true
+      },
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_audit_checks": true,
+  "independent_global_resolve": false,
+  "seconds": 114.98399999993853,
+  "sources": {
+    "tools/design-experiments/audit_mixed_mean_stress_thin_v2.py": "dce47172c7d281c173bc522e2e5acee853798130602c45abfc5d1fff5dd6fce6",
+    "docs/verification/mixed-mean-stress-thin-v6-result.json": "5575b0464d2e2b2657b764dc9f71019c8148401daa92f67ccc895589bf89e340",
+    "tools/design-experiments/mixed_mean_stress_thin_v6.py": "b1bb040c7daf93cceefd29acd2da410536ef0cc898efaf6679bc05b04266359c",
+    "tools/design-experiments/mixed_mean_stress_space_v4.py": "327a5dd769db68e17795b01fa2e6411f00821eb1856a6fc206774aa42cfd14c8",
+    "tools/design-experiments/mixed_mean_stress_basis.py": "e4d229e54b8e400e86e2a387f9fa836e4cb60850e30a51bed8b74dab0010e5a4"
+  }
+}

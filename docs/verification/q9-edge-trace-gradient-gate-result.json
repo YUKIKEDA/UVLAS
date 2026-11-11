@@ -1,0 +1,468 @@
+{
+  "source_sha256": "c85047fd631ee809d97cb7ca0e90b5a27eb90ec226416d44e6eb96863ab204fa",
+  "parent_sha256": "e5d0afffeab91f212e078c57d608b1a2db7b1381a795fce4d0bccd36addd50b9",
+  "protocol_sha256": "f0af8c61a06fe13b246e3d32daf92878e54f7de74012e1385c18a56caa4477f0",
+  "contract_sha256": "8bf9f2aa7ff58ba6a5feb63a5e6783b66b29f800dc8aac11f569ab01cd8b9621",
+  "dependencies": {
+    "q9_edge_trace_gradient.py": "5d557ab2dddfcae82a5039f0a06ad6e537073d3294b272a12488aee70d765fbe",
+    "q9_edge_trace_moment.py": "3fb5ac5d74845a6074eb859e561e062f3d014546e13ea3d67e54b2d85fcb466c",
+    "q9_edge_trace24.py": "51a096b6fdf34bca78e9d7c56122753ab6b082ab80a28d491f9f3800891c7a5b",
+    "check_q9_edge_moment_shared_space_v2.py": "7ab03aadc263757fc3f1280e5ca57c2b7b96d39d3d0df5c7a704fab02b6a7d88",
+    "check_q9_curved_strain_screen.py": "4eaffaef39ed7bdab68f7797a3126be0396b6541bd3931bca6efc27612fcb9b3",
+    "check_q9_curved_load.py": "f018f5bc52d34249052f4163faef0b41814e45dc508581ec0ee351e0d5bac28c",
+    "check_q9_independent_load.py": "1c541fade6d865aecaf7fbfa99fa8dbbf0f68f44a0ba0f51da36004e3ff4003d"
+  },
+  "local_cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "ranks": {
+        "1e-09": 75,
+        "1e-10": 75,
+        "1e-11": 75
+      },
+      "value": 2.520464803421749e-16,
+      "work": 3.079593620941044e-16,
+      "rigid": 2.327332677117125e-16,
+      "symmetry": 1.1530304107861922e-16,
+      "minimum_eigenvalue": -3.823535904723061e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": true,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-202248/RECT-h0.1.npz",
+      "artifact_sha256": "b945d8ff305131c79a63c5213beb00ff7957e36c51b3341f3a65c5c6293d0422"
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "ranks": {
+        "1e-09": 75,
+        "1e-10": 75,
+        "1e-11": 75
+      },
+      "value": 2.4987408380591994e-16,
+      "work": 2.640038713466711e-16,
+      "rigid": 1.4704007439168067e-16,
+      "symmetry": 1.261065824750916e-16,
+      "minimum_eigenvalue": -3.3748492333406654e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": true,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-202248/RECT-h0.01.npz",
+      "artifact_sha256": "1608b7c049a766397eb5054325cab2f3d9fe28f416faa8825184fb267d22c5f6"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "ranks": {
+        "1e-09": 75,
+        "1e-10": 75,
+        "1e-11": 75
+      },
+      "value": 4.546335539274441e-16,
+      "work": 2.7889525125234817e-16,
+      "rigid": 2.2112996660078373e-16,
+      "symmetry": 1.2064704115184198e-16,
+      "minimum_eigenvalue": -6.804933597422603e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": true,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-202248/SKEW-h0.1.npz",
+      "artifact_sha256": "f36756aed2cb5cda38e389d77a528a0237e253e8ec7bede1a9a08404d05db109"
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "ranks": {
+        "1e-09": 75,
+        "1e-10": 75,
+        "1e-11": 75
+      },
+      "value": 4.506713092057345e-16,
+      "work": 1.8697142779563526e-16,
+      "rigid": 1.561423377330118e-16,
+      "symmetry": 1.1571416870168722e-16,
+      "minimum_eigenvalue": -4.418607827106374e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": true,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-202248/SKEW-h0.01.npz",
+      "artifact_sha256": "d22362c256d4978fbba7aad8a7b9bbc551c175f8186078f7ea028b385ad784bf"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "ranks": {
+        "1e-09": 75,
+        "1e-10": 75,
+        "1e-11": 75
+      },
+      "value": 4.449688887833438e-16,
+      "work": 2.2077692213116786e-16,
+      "rigid": 2.337797846234026e-16,
+      "symmetry": 1.1631600901190536e-16,
+      "minimum_eigenvalue": -5.488105103520407e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": true,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-202248/TRAP-h0.1.npz",
+      "artifact_sha256": "daff6cb8c8b4437b074a1f6765aaa6d55dd563df8ad21361c1f2ef36b2530790"
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "ranks": {
+        "1e-09": 75,
+        "1e-10": 75,
+        "1e-11": 75
+      },
+      "value": 4.449688887833438e-16,
+      "work": 2.2926019925692534e-16,
+      "rigid": 2.6224863504529562e-16,
+      "symmetry": 1.1983616505735028e-16,
+      "minimum_eigenvalue": -7.557847962571607e-16,
+      "checks": {
+        "value": true,
+        "work": true,
+        "rank": true,
+        "rigid": true,
+        "symmetry": true,
+        "positive": true
+      },
+      "artifact": "build/analysis/q9-edge-trace-moment-20261102-202248/TRAP-h0.01.npz",
+      "artifact_sha256": "c2376f2e83de3aa146580c5e281f72f425681950cd473ba7d769c3884089bbc5"
+    }
+  ],
+  "shared_cases": [
+    {
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.1,
+      "w_dofs": 9,
+      "ranks": {
+        "1e-09": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6050213114291824e-15
+        },
+        "1e-10": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6050213114291824e-15
+        },
+        "1e-11": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6050213114291824e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.1,
+      "w_dofs": 49,
+      "ranks": {
+        "1e-09": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.153628341016894e-15
+        },
+        "1e-10": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.153628341016894e-15
+        },
+        "1e-11": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.153628341016894e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.01,
+      "w_dofs": 9,
+      "ranks": {
+        "1e-09": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.7643907901242053e-15
+        },
+        "1e-10": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.7643907901242053e-15
+        },
+        "1e-11": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.7643907901242053e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.01,
+      "w_dofs": 49,
+      "ranks": {
+        "1e-09": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.1650098023941038e-15
+        },
+        "1e-10": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.1650098023941038e-15
+        },
+        "1e-11": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.1650098023941038e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.001,
+      "w_dofs": 9,
+      "ranks": {
+        "1e-09": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5686329046830354e-15
+        },
+        "1e-10": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5686329046830354e-15
+        },
+        "1e-11": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5686329046830354e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.001,
+      "w_dofs": 49,
+      "ranks": {
+        "1e-09": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.206070163219487e-15
+        },
+        "1e-10": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.206070163219487e-15
+        },
+        "1e-11": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.206070163219487e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "RECT",
+      "n": 2,
+      "h": 0.01,
+      "w_dofs": 9,
+      "ranks": {
+        "1e-09": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4299818854592536e-15
+        },
+        "1e-10": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4299818854592536e-15
+        },
+        "1e-11": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4299818854592536e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "RECT",
+      "n": 4,
+      "h": 0.01,
+      "w_dofs": 49,
+      "ranks": {
+        "1e-09": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.9540878855273856e-15
+        },
+        "1e-10": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.9540878855273856e-15
+        },
+        "1e-11": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.9540878855273856e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "SKEW",
+      "n": 2,
+      "h": 0.01,
+      "w_dofs": 9,
+      "ranks": {
+        "1e-09": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6615257430979072e-15
+        },
+        "1e-10": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6615257430979072e-15
+        },
+        "1e-11": {
+          "direction": 36,
+          "combined": 36,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6615257430979072e-15
+        }
+      },
+      "all_w_retained": true
+    },
+    {
+      "geometry": "SKEW",
+      "n": 4,
+      "h": 0.01,
+      "w_dofs": 49,
+      "ranks": {
+        "1e-09": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.208518196646897e-15
+        },
+        "1e-10": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.208518196646897e-15
+        },
+        "1e-11": {
+          "direction": 128,
+          "combined": 128,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.208518196646897e-15
+        }
+      },
+      "all_w_retained": true
+    }
+  ],
+  "stop_reason": null,
+  "seconds": 10.73399999999674,
+  "peak_bytes": 73965568,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

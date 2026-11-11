@@ -1,0 +1,11 @@
+{
+  "reason": "Retain complete known geometric null identities before resolving complementary mixed and shared equations. No FE space/objective/threshold changes.",
+  "sources": {
+    "tools/design-experiments/mixed_mean_stress_thin_v7.py": "fc7c18dcb37eb50916b1e22a7420b0c433b35adce3cb413165257372808e4fdb",
+    "tools/design-experiments/mixed_mean_stress_bending_v2.py": "90732eab4e034e23e877ec5600d412b4b21940f14ecb84f8ffd3c10b4c5cf964",
+    "tools/design-experiments/mixed_mean_stress_geometric_kernel.py": "5ef779c16808e8ad985834e915913328afd60b0139b53b424f3dd0e1776851b5",
+    "docs/verification/mixed-mean-stress-bending-result.json": "7394f2a0e44014fffa4846fd9fcb0d0a6dc8e583f0946a64f70cdfe973a83c66",
+    "docs/verification/mixed-mean-stress-bending-basis-v2.md": "1b53ea36c837c68dbd9425c75961268e739879452ba958ecab20b7e401f6bdef",
+    "docs/verification/mixed-mean-stress-bending-protocol.md": "097272e75288d49c7a86b4f2788380e63960986b70bb2ce4dacaf637c40de2cb"
+  }
+}

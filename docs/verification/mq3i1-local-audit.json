@@ -1,0 +1,482 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.745202897715357e-16,
+        "constraints": 1.1305480786994532e-16,
+        "surface_work": 2.0290301324625695e-16,
+        "patch_error": 2.132901682117022e-15,
+        "constant": 5.329070518200751e-15,
+        "patch_energy": 2.7755575615628914e-15,
+        "LU_vs_QR": 2.8291681791881735e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.74523190160408e-16,
+        "constraints": 1.1305477610555726e-16,
+        "surface_work": 1.953441062123456e-17,
+        "patch_error": 2.132901682117022e-15,
+        "constant": 5.329070518200751e-15,
+        "patch_energy": 2.7755575615628914e-15,
+        "LU_vs_QR": 2.8291714296139897e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.745232180036601e-16,
+        "constraints": 1.1305477699051299e-16,
+        "surface_work": 2.0348308144462757e-18,
+        "patch_error": 2.132901682117022e-15,
+        "constant": 5.329070518200751e-15,
+        "patch_energy": 2.7755575615628914e-15,
+        "LU_vs_QR": 2.8291714599212146e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.963525262093224e-16,
+        "constraints": 1.124040368345567e-16,
+        "surface_work": 6.007211840893719e-17,
+        "patch_error": 2.5738894536803807e-15,
+        "constant": 4.6629367034256575e-15,
+        "patch_energy": 4.218847493575595e-15,
+        "LU_vs_QR": 2.8537444903677256e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.963550389897254e-16,
+        "constraints": 1.1240406058799658e-16,
+        "surface_work": 6.211389949512728e-18,
+        "patch_error": 2.5738894536803807e-15,
+        "constant": 4.6629367034256575e-15,
+        "patch_energy": 4.218847493575595e-15,
+        "LU_vs_QR": 2.8537472560901805e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.963550654531787e-16,
+        "constraints": 1.1240405964015488e-16,
+        "surface_work": 6.212259159501041e-19,
+        "patch_error": 2.5738894536803807e-15,
+        "constant": 4.6629367034256575e-15,
+        "patch_energy": 4.218847493575595e-15,
+        "LU_vs_QR": 2.853747284388349e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.126378957815657e-16,
+        "constraints": 1.0426573357450619e-16,
+        "surface_work": 9.461612965919577e-17,
+        "patch_error": 4.521933401828505e-15,
+        "constant": 5.551115123125783e-15,
+        "patch_energy": 3.552713678800501e-15,
+        "LU_vs_QR": 2.90804212220636e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.126409082109911e-16,
+        "constraints": 1.0426578577136083e-16,
+        "surface_work": 9.410586051657659e-18,
+        "patch_error": 4.521933401828505e-15,
+        "constant": 5.551115123125783e-15,
+        "patch_energy": 3.552713678800501e-15,
+        "LU_vs_QR": 2.9080448500100495e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.126409376599062e-16,
+        "constraints": 1.0426578556476808e-16,
+        "surface_work": 9.67972877845757e-19,
+        "patch_error": 4.521933401828505e-15,
+        "constant": 5.551115123125783e-15,
+        "patch_energy": 3.552713678800501e-15,
+        "LU_vs_QR": 2.9080448771458825e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.072652867560037e-16,
+        "constraints": 1.1254718372281947e-16,
+        "surface_work": 7.553290576823101e-17,
+        "patch_error": 2.570952759457388e-15,
+        "constant": 4.884981308350689e-15,
+        "patch_energy": 2.4424906541753444e-15,
+        "LU_vs_QR": 3.0909868581282174e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.072684101397399e-16,
+        "constraints": 1.125472352194317e-16,
+        "surface_work": 8.21982180420499e-18,
+        "patch_error": 2.570952759457388e-15,
+        "constant": 4.884981308350689e-15,
+        "patch_energy": 2.4424906541753444e-15,
+        "LU_vs_QR": 3.090990262175144e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.072684410725287e-16,
+        "constraints": 1.1254723542847932e-16,
+        "surface_work": 8.118591630987198e-19,
+        "patch_error": 2.570952759457388e-15,
+        "constant": 4.884981308350689e-15,
+        "patch_energy": 2.4424906541753444e-15,
+        "LU_vs_QR": 3.090990296790455e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.24078837957599e-16,
+        "constraints": 1.285433868611612e-16,
+        "surface_work": 7.974934161989779e-17,
+        "patch_error": 5.101255241452297e-15,
+        "constant": 5.995204332975845e-15,
+        "patch_energy": 4.884981308350689e-15,
+        "LU_vs_QR": 3.223628415869194e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.240819913491535e-16,
+        "constraints": 1.2854350924202827e-16,
+        "surface_work": 7.970013951816768e-18,
+        "patch_error": 5.101255241452297e-15,
+        "constant": 5.995204332975845e-15,
+        "patch_energy": 4.884981308350689e-15,
+        "LU_vs_QR": 3.223632301042867e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 7.240820249639419e-16,
+        "constraints": 1.2854351106958815e-16,
+        "surface_work": 8.225423339451014e-19,
+        "patch_error": 5.101255241452297e-15,
+        "constant": 5.995204332975845e-15,
+        "patch_energy": 4.884981308350689e-15,
+        "LU_vs_QR": 3.223632342532108e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0117556403645923e-15,
+        "constraints": 4.551916095767853e-16,
+        "surface_work": 3.207081040833965e-16,
+        "patch_error": 4.2511480990713924e-15,
+        "constant": 1.7485253696325476e-14,
+        "patch_energy": 1.5543122344752192e-15,
+        "LU_vs_QR": 4.615012533424948e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0854756719847538e-15,
+        "constraints": 5.424393690929413e-16,
+        "surface_work": 1.431843559026889e-16,
+        "patch_error": 5.498919118220686e-15,
+        "constant": 1.298368693374713e-14,
+        "patch_energy": 3.3306690738754696e-15,
+        "LU_vs_QR": 5.116697439150954e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0002800112024498e-15,
+        "constraints": 4.655763730651004e-16,
+        "surface_work": 2.5794721489326336e-16,
+        "patch_error": 4.587719037286415e-15,
+        "constant": 1.6209256159527285e-14,
+        "patch_energy": 1.5543122344752192e-15,
+        "LU_vs_QR": 4.414706190455363e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    }
+  ],
+  "preparation_failure_audit": {
+    "C_ranks": [
+      86,
+      86,
+      86
+    ],
+    "A_kernel_ranks": [
+      20,
+      20,
+      20
+    ],
+    "kernel_dimension": 20,
+    "agrees": true,
+    "confirmed": false
+  },
+  "primary_complete": false,
+  "primary_conditions": 18,
+  "all_reproduction_checks": false,
+  "physical_adoption": false,
+  "stop_reason": null,
+  "independent_basis_implementation": false,
+  "sources": {
+    "tools/design-experiments/audit_mq3i1_local.py": "cc4a101beb4207b36c350517f6cc48c5271800c42b2a22980526f0220d8d51bf",
+    "tools/design-experiments/mq3i1_moments.py": "c6999f5b0a268866a19dd95f4c8a5c3b32a560bd34b55cb9fea6ff978eac62ba",
+    "docs/verification/mq3i1-local-result.json": "f17d07aacfaef29535128a5f992c56277cf33f59bafacf8f0d18fd427b84a460",
+    "docs/verification/mq3i1-local-execution-protocol.md": "e09676ce1fce4bd8e40520003696238d620792625f73af704d52bc0cb07d7a5c"
+  },
+  "seconds": 15.172000000020489
+}

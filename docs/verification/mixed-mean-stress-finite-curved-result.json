@@ -1,0 +1,1024 @@
+{
+  "records": [
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "fit": {
+        "local_rcond": 6.515352302510436e-05,
+        "global_rcond": 9.876918387406021e-05,
+        "initial_linear_residual": [
+          2.674915785729456e-14,
+          1.5903689774808767e-14,
+          8.490634095013686e-14
+        ],
+        "error": [
+          3.4179747985355674e-11,
+          0.0006357061357382519,
+          4.2200144417255514e-05
+        ],
+        "direct_kkt": [
+          1.2422135227039569e-12,
+          7.526230721079772e-13,
+          3.91813377233919e-12
+        ],
+        "compressed_error": [
+          3.1424944489434856e-11,
+          0.0006357061357362396,
+          4.220014454308956e-05
+        ],
+        "compressed_kkt": [
+          3.7119283128246354e-15,
+          1.9979070611130377e-15,
+          6.514136771550684e-15
+        ],
+        "linear_residual": [
+          2.674915785729456e-14,
+          1.5903689774808767e-14,
+          8.490634095013686e-14
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.781703341156504e-14,
+          1.7517405093376046e-14,
+          8.416544286964593e-14
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              3.4179747985355674e-11,
+              0.0006357061357382519,
+              4.2200144417255514e-05
+            ],
+            "direct_kkt": [
+              1.2422135227039569e-12,
+              7.526230721079772e-13,
+              3.91813377233919e-12
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          3.5372638051465e-11,
+          0.0006357061357327101,
+          4.2200144454600384e-05
+        ],
+        "recovered_position_error": [
+          1.9700628189436163e-06,
+          1.710138150118324e-05,
+          3.698007532067446e-07
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": true
+      },
+      "seconds": 11.797000000020489,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n2-a0-h0.01.npz",
+      "artifact_sha256": "85b2cb47b7ce741f86470c13570ca278e1b52425b2b9e9077f0bac1c6d11a112"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "fit": {
+        "local_rcond": 1.9570409280963756e-07,
+        "global_rcond": 8.182015110532943e-07,
+        "initial_linear_residual": [
+          1.5340095631665575e-12,
+          8.599153959229404e-13,
+          6.909501283840472e-12
+        ],
+        "error": [
+          4.6296165456239483e-08,
+          0.004301178248553122,
+          0.0002743049146770461
+        ],
+        "direct_kkt": [
+          1.054437376631524e-09,
+          4.936601004440781e-10,
+          1.7878196831038037e-09
+        ],
+        "compressed_error": [
+          2.555981376862271e-07,
+          0.004301178565639886,
+          0.000274305839313815
+        ],
+        "compressed_kkt": [
+          1.1638738660359928e-09,
+          6.803318951507083e-10,
+          3.369690560045162e-09
+        ],
+        "linear_residual": [
+          1.5340095631665575e-12,
+          1.5126673461381144e-12,
+          6.909501283840472e-12
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.879309520309028e-08,
+          1.776857353355173e-08,
+          8.063559238881925e-08
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.848052005199949e-07,
+              0.004301178377713389,
+              0.0002743033965738801
+            ],
+            "direct_kkt": [
+              6.51467577330526e-09,
+              4.004930276614678e-09,
+              1.889915183978492e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "error": [
+              4.6296165456239483e-08,
+              0.004301178248553122,
+              0.0002743049146770461
+            ],
+            "direct_kkt": [
+              1.054437376631524e-09,
+              4.936601004440781e-10,
+              1.7878196831038037e-09
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          4.884143192634751e-08,
+          0.004301178594021216,
+          0.00027430413972432473
+        ],
+        "recovered_position_error": [
+          1.970238612834069e-06,
+          0.00042933466078174726,
+          6.538195900146576e-06
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": true
+      },
+      "seconds": 10.203000000095926,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n2-a0-h0.0001.npz",
+      "artifact_sha256": "539d40222686047365d0921b9c86e8264cc082db5ab9a00c3478b12dfba5a5c5"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "fit": {
+        "local_rcond": 6.349550853306508e-05,
+        "global_rcond": 9.202457379233401e-05,
+        "initial_linear_residual": [
+          2.4402968650602913e-14,
+          1.2556698839423172e-14,
+          7.243909217925519e-14
+        ],
+        "error": [
+          6.605197561824812e-12,
+          0.0009066799891070134,
+          4.829077462902863e-05
+        ],
+        "direct_kkt": [
+          1.737993925300457e-13,
+          1.2088050896769925e-13,
+          5.117067441471643e-13
+        ],
+        "compressed_error": [
+          7.330516532550515e-12,
+          0.0009066799891084678,
+          4.829077460680585e-05
+        ],
+        "compressed_kkt": [
+          3.728524412414355e-15,
+          4.275623604060774e-15,
+          1.083503913271004e-14
+        ],
+        "linear_residual": [
+          2.4402968650602913e-14,
+          1.2556698839423172e-14,
+          7.243909217925519e-14
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.5557429440866642e-14,
+          1.3847474877639232e-14,
+          7.223043626420282e-14
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              6.605197561824812e-12,
+              0.0009066799891070134,
+              4.829077462902863e-05
+            ],
+            "direct_kkt": [
+              1.737993925300457e-13,
+              1.2088050896769925e-13,
+              5.117067441471643e-13
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          6.052687494991974e-12,
+          0.000906679989107113,
+          4.82907746366703e-05
+        ],
+        "recovered_position_error": [
+          3.396535702588941e-06,
+          2.729324094613043e-05,
+          4.696625234869464e-07
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": true
+      },
+      "seconds": 41.75,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n2-a0.2-h0.01.npz",
+      "artifact_sha256": "6cb9206c731ef1eb3594dba0faded4651033bfc767d1ac3a9d7d58585557803f"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "fit": {
+        "local_rcond": 1.8339251770444602e-07,
+        "global_rcond": 7.656715580611768e-07,
+        "initial_linear_residual": [
+          2.36761270615067e-12,
+          1.3856979053861894e-12,
+          8.025375306048011e-12
+        ],
+        "error": [
+          4.210865498812717e-08,
+          0.0050920467215759425,
+          0.0002798001310227661
+        ],
+        "direct_kkt": [
+          6.132322026860402e-10,
+          5.644610532661109e-10,
+          1.8338135212646856e-09
+        ],
+        "compressed_error": [
+          2.2044754642393299e-07,
+          0.005092046519675929,
+          0.00027979914015937527
+        ],
+        "compressed_kkt": [
+          1.1500238850583288e-09,
+          7.166507905929537e-10,
+          3.1652935763885354e-09
+        ],
+        "linear_residual": [
+          2.36761270615067e-12,
+          3.837053459759688e-12,
+          8.025375306048011e-12
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.231356959367769e-08,
+          1.408595846624512e-08,
+          6.043836466034002e-08
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.535455470491515e-07,
+              0.005092046823646478,
+              0.00027979977620645535
+            ],
+            "direct_kkt": [
+              5.015084922941404e-09,
+              3.283850612721641e-09,
+              1.5629607026689712e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "error": [
+              4.210865498812717e-08,
+              0.0050920467215759425,
+              0.0002798001310227661
+            ],
+            "direct_kkt": [
+              6.132322026860402e-10,
+              5.644610532661109e-10,
+              1.8338135212646856e-09
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          4.73066624944476e-08,
+          0.005092046715443262,
+          0.0002797997055590629
+        ],
+        "recovered_position_error": [
+          3.3968389768444992e-06,
+          0.0006081443305214213,
+          7.488401066970609e-06
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": true
+      },
+      "seconds": 10.047000000020489,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n2-a0.2-h0.0001.npz",
+      "artifact_sha256": "e0102e7708222179e7199448dc3f6774f13d20fc4b9333d71cc68cfd01d5f616"
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "fit": {
+        "local_rcond": 0.0002186027702778313,
+        "global_rcond": 3.654119216646766e-05,
+        "initial_linear_residual": [
+          3.753756406365461e-14,
+          3.6701708697297037e-14,
+          1.3031848680859142e-13
+        ],
+        "error": [
+          1.3810998554113831e-11,
+          1.4523930776025686e-05,
+          1.082718232156888e-06
+        ],
+        "direct_kkt": [
+          2.348656186930263e-13,
+          1.509610318002082e-13,
+          7.523660276255021e-13
+        ],
+        "compressed_error": [
+          1.323950870651812e-11,
+          1.4523930789096944e-05,
+          1.0827183042659679e-06
+        ],
+        "compressed_kkt": [
+          3.3158242046096952e-15,
+          2.3276544244248118e-15,
+          7.964622085111027e-15
+        ],
+        "linear_residual": [
+          3.753756406365461e-14,
+          3.6701708697297037e-14,
+          1.3031848680859142e-13
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          3.9791388183954976e-14,
+          3.741157447562135e-14,
+          1.271056351063182e-13
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.3810998554113831e-11,
+              1.4523930776025686e-05,
+              1.082718232156888e-06
+            ],
+            "direct_kkt": [
+              2.348656186930263e-13,
+              1.509610318002082e-13,
+              7.523660276255021e-13
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          1.4688437607255078e-11,
+          1.452393077676751e-05,
+          1.082718168819744e-06
+        ],
+        "recovered_position_error": [
+          3.923094198454144e-08,
+          2.9563699510228804e-07,
+          6.587659602462334e-09
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": true
+      },
+      "seconds": 63.06200000003446,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n4-a0-h0.01.npz",
+      "artifact_sha256": "78fa43f758e7137df79060ffea22e014b9c67e928633250728feffb8e81893a3"
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "fit": {
+        "local_rcond": 2.2214648984023435e-07,
+        "global_rcond": 2.90428715719767e-07,
+        "initial_linear_residual": [
+          3.810723146513471e-12,
+          2.529628991866061e-12,
+          1.0183317109405864e-11
+        ],
+        "error": [
+          4.317709009321254e-08,
+          0.0005019168144181968,
+          3.243160095505923e-05
+        ],
+        "direct_kkt": [
+          3.590474821699814e-10,
+          2.5485541410624395e-10,
+          1.1444662026282559e-09
+        ],
+        "compressed_error": [
+          3.2864339656771573e-07,
+          0.0005019166835743623,
+          3.2442694793015824e-05
+        ],
+        "compressed_kkt": [
+          7.528889316060918e-10,
+          4.683114642992113e-10,
+          2.1360299172916677e-09
+        ],
+        "linear_residual": [
+          3.810723146513471e-12,
+          2.529628991866061e-12,
+          1.0183317109405864e-11
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          3.609006392771503e-08,
+          2.275961693127106e-08,
+          9.863941004066802e-08
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              2.463350609224205e-07,
+              0.0005019170042505329,
+              3.243979582176939e-05
+            ],
+            "direct_kkt": [
+              4.204151490840551e-09,
+              2.768223216536393e-09,
+              1.2087834553685975e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "error": [
+              4.317709009321254e-08,
+              0.0005019168144181968,
+              3.243160095505923e-05
+            ],
+            "direct_kkt": [
+              3.590474821699814e-10,
+              2.5485541410624395e-10,
+              1.1444662026282559e-09
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          4.668020919293221e-08,
+          0.0005019169715883217,
+          3.243099014995327e-05
+        ],
+        "recovered_position_error": [
+          3.9235060592710014e-08,
+          1.1526994470753236e-05,
+          1.778447453915091e-07
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": true
+      },
+      "seconds": 61.875,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n4-a0-h0.0001.npz",
+      "artifact_sha256": "7c9ff7347d11b90f7eb0048f38267a66676f5cf36c844a9ed5ca521d15bc6662"
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "fit": {
+        "local_rcond": 0.00018246989401370255,
+        "global_rcond": 3.442140853701327e-05,
+        "initial_linear_residual": [
+          4.37359131360464e-14,
+          3.058547279476951e-14,
+          1.2351152619098796e-13
+        ],
+        "error": [
+          1.4947942814703315e-11,
+          2.2336140132219316e-05,
+          1.573940987130685e-06
+        ],
+        "direct_kkt": [
+          2.4292857842064123e-13,
+          1.669792923092911e-13,
+          5.787508208046571e-13
+        ],
+        "compressed_error": [
+          1.2828699839815096e-11,
+          2.2336140135125662e-05,
+          1.5739410223149997e-06
+        ],
+        "compressed_kkt": [
+          3.4803824794523762e-15,
+          3.817146147895411e-15,
+          8.172948505923048e-15
+        ],
+        "linear_residual": [
+          4.37359131360464e-14,
+          3.058547279476951e-14,
+          1.2351152619098796e-13
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          4.392748120309183e-14,
+          3.157330301364181e-14,
+          1.2965456580636896e-13
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.4947942814703315e-11,
+              2.2336140132219316e-05,
+              1.573940987130685e-06
+            ],
+            "direct_kkt": [
+              2.4292857842064123e-13,
+              1.669792923092911e-13,
+              5.787508208046571e-13
+            ]
+          }
+        ],
+        "stop_reason": null
+      },
+      "observed": {
+        "error": [
+          1.5378321793798527e-11,
+          2.2336140134217674e-05,
+          1.5739409842965326e-06
+        ],
+        "recovered_position_error": [
+          2.001747016031547e-07,
+          1.013990958731371e-06,
+          2.1257549975419355e-08
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "local_ranks": [
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ],
+        [
+          552,
+          552,
+          552
+        ]
+      ],
+      "checks": {
+        "local_ranks": true,
+        "local_condition": true,
+        "global_condition": true,
+        "linear": true,
+        "compressed_stationarity": true,
+        "original_stationarity": true,
+        "independent": true,
+        "recovery_action": true,
+        "resources": false
+      },
+      "seconds": 183.03200000000652,
+      "artifact": "build/analysis/mixed-mean-stress-finite-curved-20261104-190601/n4-a0.2-h0.01.npz",
+      "artifact_sha256": "56f25d391d3d08a92bf292d0f4b26e0adb814f8f20d273ec3c7cab04328c6773"
+    }
+  ],
+  "stops": [
+    {
+      "n": 4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "reason": "RuntimeError('MMS1_finite_curved_numerical_gate')"
+    }
+  ],
+  "all_numerical_checks": false,
+  "accuracy": [],
+  "finite_projection_accuracy_gate": false,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "independent_global_resolve": false,
+  "kinds": [
+    "quartic",
+    "quintic",
+    "exponential"
+  ],
+  "seconds": 381.96899999992456,
+  "peak_bytes": 1280274432,
+  "sources": {
+    "tools/design-experiments/check_mixed_mean_stress_finite_curved.py": "a1a4c93d13faf5ce104e8888758bad8e7dd466507b9cebb03346796cbad4e495",
+    "tools/design-experiments/mixed_mean_stress_finite.py": "e7c55de9ae90eca47fd4374b820ed59b224e07c8acf6e417616f85c7c54e9f7d",
+    "tools/design-experiments/mixed_mean_stress_element_v2.py": "9fd4b155cbc6c782c20697a6b5d9378de83ab753127a31dde2281f2733077542",
+    "docs/verification/mixed-mean-stress-finite-curved-protocol.md": "89ba9292e31e889d43cabfd88be5ee290d2d670aaf83729bba16e22983cf9cfc",
+    "docs/verification/mixed-mean-stress-finite-pair-disposition.json": "24a5c0804d2a3561704a68f5b013e4e08eb6edde27c3b356cbf7e53547bf5914"
+  }
+}

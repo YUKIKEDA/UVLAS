@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "scope": "fixed-age initial derivative with actual aero operators and added-mass block; material-tail negative control",
+  "records": [
+    {
+      "intervals": 640,
+      "relative_acceleration_and_GammaDot_errors": [
+        2.05595815884259e-05,
+        1.7459118670958226e-05
+      ]
+    },
+    {
+      "intervals": 1280,
+      "relative_acceleration_and_GammaDot_errors": [
+        6.097155355444472e-06,
+        5.166498530312088e-06
+      ]
+    },
+    {
+      "intervals": 2560,
+      "relative_acceleration_and_GammaDot_errors": [
+        1.6742139689852698e-06,
+        1.4154794485715717e-06
+      ]
+    },
+    {
+      "intervals": 5120,
+      "relative_acceleration_and_GammaDot_errors": [
+        4.3981744819983343e-07,
+        3.712921895411706e-07
+      ]
+    }
+  ],
+  "final_orders": [
+    1.928507175665784,
+    1.9306639305612328
+  ],
+  "naive_material_tail_spurious_initial_derivative": 0.00034568016563367546,
+  "sources": {
+    "tools/design-experiments/check_age_initialization_derivative_refined.py": "b746dbab943ffa681c7519b1c95e26332a17d3521fe14d013aa204a9019d9916",
+    "tools/design-experiments/check_age_initialization_derivative.py": "11301e57d2d67a5dc0b19e5ff59e64dd773d09cce7b5142a9ec240e5af1a7a9f",
+    "docs/verification/age-initialization-derivative-initial-result.json": "63728377ac694569db27ac6dce728d9ea1d0c6936096131f90c180d5c7310a29",
+    "docs/verification/age-initialization-derivative-extension.md": "f5e7260c3a9af61b7971ff99f1df93ce64bedb5ff61703867a7c8bd67effa6f4",
+    "docs/j1-initialization-output-derivative-addendum.md": "6b2159b633a0412b5221546b075eb9938718c69d306a63602b638ce73c16f05f",
+    "docs/verification/coupled-bdf2-prescribed-result.json": "77f0e05d632096dbdbd804a48bff5e85fe4bd5613f25f66418e3d94e4c5fa2bb"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-04",
+  "status": "mixed_volume_stress_trace_redesign_closed_two_variants_rejected",
+  "main_shell_adopted": false,
+  "roadmap_1_1_complete": false,
+  "waiting_for_user_confirmation": false,
+  "configurations": [
+    {
+      "name": "S3+",
+      "adopted": false,
+      "reason": "three_spurious_flat_zero_modes"
+    },
+    {
+      "name": "S4_tau_2_5_Lc_0_5",
+      "adopted": false,
+      "reason": "finite_thickness_amplification_exceeds_2",
+      "finest_accuracy_pass": true
+    }
+  ],
+  "local_cases": 18,
+  "global_comparison_cases": 16,
+  "finite_thickness_cases": 4,
+  "nonlinear_global_equilibrium_solved": true,
+  "all_independent_audits_reproduced": true,
+  "independent_global_best_approximation_resolve": false,
+  "finite_thickness_numerical_checks": true,
+  "finest_quartic_errors": [
+    0.00017049072611840648,
+    0.0012980796844308837
+  ],
+  "thin_amplification": 21.36188014686978,
+  "physical_strain_only_amplification": 102.30683960134964,
+  "thresholds_relaxed": false,
+  "stabilization_tuned_after_results": false,
+  "source_hash_checks": 65,
+  "artifact_hash_checks": 39,
+  "python_ast_files": 12,
+  "closure_failures": [],
+  "closure_pass": true,
+  "sources": {
+    "docs/verification/hybrid-gradient-equilibrium-preparation.json": "d7f5daf3a5c30b899f1cfddf9ec4451be8366078cc1d5d80507479da9e65bc81",
+    "docs/verification/hybrid-gradient-equilibrium-result.json": "c1c24bca8c27a2652e7b6bc1c4089c9c8aad1f91d685cb5c8b8da4be15d9b053",
+    "docs/verification/hybrid-gradient-local-audit.json": "16ded920677dc0b46462cb8a7bf9db56915954ab563ce377f7657697b9e754bc",
+    "docs/verification/hybrid-gradient-local-preparation.json": "3ed604aa765fe54950132706c3abbfd822f418051d6700f5ab73c5060d8e86ae",
+    "docs/verification/hybrid-gradient-local-result.json": "92587816fa5aa04678acf0dfe37e22768e8385de8cef02c38e1be2835515b5ff",
+    "docs/verification/hybrid-gradient-refinement-audit.json": "72c8b27cb8e12ff8b235e476216fbe298d129494a7f541ea78ec8fb660b8ffda",
+    "docs/verification/hybrid-gradient-refinement-preparation.json": "c3d8c255de1f9e58da65a015834ebf0c86e78c464f83119056b4ffab74ebc794",
+    "docs/verification/hybrid-gradient-refinement-result.json": "6818693c7d9686d36fa37b69603fd263a7ceed7099ec984bc2bce3813d227408",
+    "docs/verification/hybrid-gradient-scaling-audit.json": "79b9e5eb3d26c4cd917545be5579cc6621a658594690ecb7323e2067096d4099",
+    "docs/verification/hybrid-gradient-shared-audit.json": "bd64e13fcef8af1f34e3809b7ec5e03ff7a2e24b6aa3ea5ed50eefb74e54372e",
+    "docs/verification/hybrid-gradient-shared-preparation.json": "cff9e63091b687c8d3f3d85a4cab5acfe7146c2d11fb6f5119a334274c5dbb0c",
+    "docs/verification/hybrid-gradient-shared-result.json": "1d5ee3f64e971f0d2a221cc1f794b852e29134b626660b9840f05f7d969a5276",
+    "docs/verification/hybrid-gradient-sources.json": "be7b6985d95cc8f6851a2623983381e80a934d30b0925fadf114cfbf97971b41",
+    "docs/verification/hybrid-gradient-ancf-results.md": "ea964b1e7b600f673d6a1aec4247cd46154429a5bc7a2daa1436177efd69bcdf"
+  }
+}

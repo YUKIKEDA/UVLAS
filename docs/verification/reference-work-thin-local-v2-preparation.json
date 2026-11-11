@@ -1,0 +1,7 @@
+{
+  "sources": {
+    "tools/design-experiments/check_reference_work_thin_local_v2.py": "70dc80b359d7049869576c4bb0cefabbba59bce67eb48c9cfbf1eceb4b89606b",
+    "docs/verification/reference-work-thin-preparation.json": "936dbddce887e2589f1056aa26961f305d8119a55200b2cd9248e3194c91bbde",
+    "docs/verification/reference-work-thin-local-v1-failure.json": "e28451c54f4146425e43b4fd0741425f3556a34d2d4501aa90229a7563b76635"
+  }
+}

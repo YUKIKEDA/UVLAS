@@ -1,0 +1,71 @@
+{
+  "records": [
+    {
+      "n": 1,
+      "cell": 0,
+      "metrics": {
+        "direct_decimal_field": 2.1570573174616936e-16,
+        "clenshaw_field": 2.8680650267920046e-16
+      },
+      "grams": [
+        {
+          "order": 9,
+          "identity_error": 5.003946702370678e-16,
+          "primary_difference": 4.750481556494826e-16
+        },
+        {
+          "order": 11,
+          "identity_error": 3.2115046039954383e-15,
+          "primary_difference": 5.484566619162799e-16
+        },
+        {
+          "order": 13,
+          "identity_error": 1.537580856432828e-15,
+          "primary_difference": 4.967957353871418e-16
+        }
+      ],
+      "checks": {
+        "fields": true,
+        "gram_reproduction": true
+      }
+    },
+    {
+      "n": 2,
+      "cell": 0,
+      "metrics": {
+        "direct_decimal_field": 2.1477313075056236e-16,
+        "clenshaw_field": 2.955453023967441e-16
+      },
+      "grams": [
+        {
+          "order": 9,
+          "identity_error": 5.242912729569244e-16,
+          "primary_difference": 4.967343404530819e-16
+        },
+        {
+          "order": 11,
+          "identity_error": 3.603922816809633e-15,
+          "primary_difference": 5.570761363806211e-16
+        },
+        {
+          "order": 13,
+          "identity_error": 1.6670507814014349e-15,
+          "primary_difference": 5.1188423631484e-16
+        }
+      ],
+      "checks": {
+        "fields": true,
+        "gram_reproduction": true
+      }
+    }
+  ],
+  "all_reproduction_checks": true,
+  "primary_complete": true,
+  "physical_adoption": false,
+  "seconds": 45.23499999998603,
+  "sources": {
+    "tools/design-experiments/audit_gsp_q3_basis_v2.py": "6d14dfb9ad0290ed362e578618dae74a652ddaa939f82f2ff7b6bba9bbec1f52",
+    "tools/design-experiments/gsp_q3_basis_v2.py": "4826deee9dd17064f1650408d58d5699d2d87949f5d7eb3e8b5aa8c1018b7e0d",
+    "docs/verification/gsp-q3-basis-v2-result.json": "32639d2c35951bbef7c0b59fec3dead73b0f1eaefd38286d73690707e4ddad4a"
+  }
+}

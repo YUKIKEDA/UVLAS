@@ -1,0 +1,75 @@
+{
+  "all_checks_pass": true,
+  "independent_resolve": false,
+  "local": [
+    {
+      "name": "RECT",
+      "operator_difference": 8.511565735004692e-16,
+      "boundary_difference": 4.120180116349361e-15
+    },
+    {
+      "name": "SADDLE",
+      "operator_difference": 5.446056869029185e-16,
+      "boundary_difference": 7.827823305966124e-15
+    },
+    {
+      "name": "NORMAL-C",
+      "operator_difference": 7.025197563030204e-16,
+      "boundary_difference": 1.8233832127081815e-14
+    },
+    {
+      "name": "parabolic-0",
+      "operator_difference": 5.538119363015265e-16,
+      "boundary_difference": 3.7406567651044323e-13
+    },
+    {
+      "name": "parabolic-1",
+      "operator_difference": 6.444412192081303e-16,
+      "boundary_difference": 3.5427537775971316e-13
+    },
+    {
+      "name": "parabolic-2",
+      "operator_difference": 5.619942739523639e-16,
+      "boundary_difference": 5.699198228630556e-13
+    },
+    {
+      "name": "parabolic-3",
+      "operator_difference": 6.750366027319586e-16,
+      "boundary_difference": 5.366143725353538e-13
+    }
+  ],
+  "observations": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "error": 0.0005937561185509981,
+      "difference": 9.324138683375338e-18
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "error": 0.052172470359912175,
+      "difference": 2.067790383364354e-14
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "error": 0.0009394718626479168,
+      "difference": 6.857036639884573e-15
+    },
+    {
+      "n": 8,
+      "h": 0.0001,
+      "error": 0.009279814123479958,
+      "difference": 2.6294938448856442e-14
+    }
+  ],
+  "sources": {
+    "tools/design-experiments/audit_q9_eas21.py": "eb9ca9ee1d0f2fb4afd0644579be7d9b9b5b1724a8215e2e23a984d3c71b682e",
+    "tools/design-experiments/audit_q9_curved_strain_screen.py": "2a092c9ae927b8676ce989a2d92d8eff0d9f9b93fae0b9e9bd27890a2b9245ec",
+    "docs/verification/q9-eas21-audit-experiment.md": "9e5ce4e681c1915f4260d2b363e8ab1e5d7f4ebe5968b631cc029f62a0eaa00e",
+    "docs/verification/q9-eas21-feasibility-result.json": "025e024b29f43dfdd9dd76408a012fdc4aedf32f53bd2181b0b0c759f08b530f",
+    "docs/verification/q9-eas21-shared-approximation-result.json": "00c01d3ddc43ea3bc6b87ca160290a7b06283877297d209701e7add0b9622b92"
+  },
+  "seconds": 22.35899999999674
+}

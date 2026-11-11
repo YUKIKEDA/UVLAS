@@ -1,0 +1,76 @@
+{
+  "records": [
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "kernel_dimension": 4,
+      "two_mode_containment": 6.217307193634858e-16,
+      "projector_difference": 1.4142135623730963,
+      "restricted_columns": 62,
+      "restricted_ranks": [
+        62,
+        62,
+        62
+      ],
+      "restricted_error": 0.1513273086336419,
+      "full_kernel_error": 0.03766770798342994,
+      "h1": 0.5308490034724177,
+      "checks": {
+        "modes_in_kernel": true,
+        "restricted_rank": true,
+        "sphere": true
+      },
+      "artifact": "build/analysis/mixed-order-150-20261103-214907/k0.4-a0/shared.npz",
+      "artifact_sha256": "31bc4d001ba62f82390147e220d508dfe7ba6d234d7da902725b6685c2d7c9ee"
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "kernel_dimension": 2,
+      "two_mode_containment": 3.4761343961815007e-16,
+      "projector_difference": 1.1412141851928672e-16,
+      "restricted_columns": 62,
+      "restricted_ranks": [
+        62,
+        62,
+        62
+      ],
+      "restricted_error": 0.1517194896744288,
+      "full_kernel_error": 0.15171948967442891,
+      "h1": 0.5294894980342069,
+      "checks": {
+        "modes_in_kernel": true,
+        "restricted_rank": true,
+        "sphere": true,
+        "whole_kernel_two_modes": true,
+        "restricted_reproduces_full_fit": true
+      },
+      "artifact": "build/analysis/mixed-order-150-20261103-214907/k0.4-a0.2/shared.npz",
+      "artifact_sha256": "9c0a052a2077e166439017621b96d10c0d615926fa9e88a26e94bfd801ce2798"
+    }
+  ],
+  "exact_sector_bound": {
+    "kappa": "2/5",
+    "nu": "3/10",
+    "alpha": "-17923/104870",
+    "beta": "10591/10487",
+    "relaxed_relative_error_squared": "6479878/300609855",
+    "relaxed_relative_error": 0.14681884647009852,
+    "scope": "global_quadratic_cubic_bending_sector_plus_arbitrary_normal_shear_c_field",
+    "full_discrete_kernel_equivalence": "numerical_2x2_distorted_only_not_an_exact_global_kernel_certificate",
+    "finite_h_lower_bound": false
+  },
+  "checks": {
+    "local_sector_bound_positive": true,
+    "bound_below_restricted_fits": true
+  },
+  "all_checks_pass": true,
+  "candidate_changed": false,
+  "sources": {
+    "tools/design-experiments/diagnose_mixed_150_kernel.py": "f0d8b09fe3e6d93526ab811351f5499f72f5d3e6d523a10eb87b5d3bde31f70e",
+    "tools/design-experiments/mixed_order_150.py": "ff250a9bf9bfd21106bd4d65cd9167d039e91cf4784aa16728a7f35b383e67da",
+    "docs/verification/mixed-order-150-result.json": "38c31e988af44cc7a0feca1ad303c62141adbfc9a715881e733b44a08a89c921",
+    "docs/verification/mixed-150-root-protocol.md": "ac576c5676eb51571a7d4101af89f646a4772aade39467d5bccdcbd241c493b4",
+    "docs/verification/mixed-150-root-preparation.json": "a943e1467892dec14d0010c534e59cea20daa99b2e98a456e8e28f86858327d9"
+  }
+}

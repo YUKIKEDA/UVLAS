@@ -1,0 +1,2714 @@
+{
+  "protocol": "docs/verification/avl-source-measurement-experiment.md",
+  "source_sha256": "0f3654db0284df9d4f32438223e31fa76598aba3789a722a0b36492efb9a7ade",
+  "parent_result_sha256": "83a8c2f131104d614c8bbbd8452552cdb8329b995c80f6fa101b909ebeb59a38",
+  "official_result_sha256": "be822a29f289027853867833cc72bdde320aa2f7b5a6ea4a16cda7aaa36bec16",
+  "cases": [
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004048073907220481,
+          -1.324648398783046e-14,
+          -0.1457987037060265
+        ],
+        "moment": [
+          -1.996316523547592e-13,
+          0.1490680690575361,
+          9.510729877260093e-15
+        ],
+        "lift": -0.1458511628170545,
+        "drag": 0.00104269344924589
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001012326817877769,
+          -3.31281954857798e-15,
+          -0.07294378723732309
+        ],
+        "moment": [
+          -9.987898095392689e-14,
+          0.07457946632458325,
+          2.37838381259535e-15
+        ],
+        "lift": -0.07295034508428866,
+        "drag": 0.0002608719863404056
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001012326817877769,
+          -3.31281954857798e-15,
+          0.07294378723732309
+        ],
+        "moment": [
+          9.987898095392689e-14,
+          -0.07457946632458325,
+          2.37838381259535e-15
+        ],
+        "lift": 0.07295034508428866,
+        "drag": 0.0002608719863404056
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004048073907220481,
+          -1.324648398783046e-14,
+          0.1457987037060265
+        ],
+        "moment": [
+          1.996316523547592e-13,
+          -0.1490680690575361,
+          9.510729877260093e-15
+        ],
+        "lift": 0.1458511628170545,
+        "drag": 0.00104269344924589
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004104634364082363,
+          -2.313667022590038e-14,
+          -0.1467477658806549
+        ],
+        "moment": [
+          -8.902539892340772e-14,
+          0.1506962867124955,
+          4.580701662708526e-15
+        ],
+        "lift": -0.1468016207801266,
+        "drag": 0.001019289239720028
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001026471240293221,
+          -5.785948231488459e-15,
+          -0.07341860757235616
+        ],
+        "moment": [
+          -4.453935050635627e-14,
+          0.07539407138745739,
+          1.145488817867616e-15
+        ],
+        "lift": -0.07342533995609367,
+        "drag": 0.0002550164756606807
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001026471240293221,
+          -5.785948231488459e-15,
+          0.07341860757235616
+        ],
+        "moment": [
+          4.453935050635627e-14,
+          -0.07539407138745739,
+          1.145488817867616e-15
+        ],
+        "lift": 0.07342533995609367,
+        "drag": 0.0002550164756606807
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004104634364082363,
+          -2.313667022590038e-14,
+          0.1467477658806549
+        ],
+        "moment": [
+          8.902539892340772e-14,
+          -0.1506962867124955,
+          4.580701662708526e-15
+        ],
+        "lift": 0.1468016207801266,
+        "drag": 0.001019289239720028
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004044745165836211,
+          2.500200025311317e-14,
+          -0.1455190232893848
+        ],
+        "moment": [
+          -2.010838327445863e-13,
+          0.1481643112795904,
+          2.027669481971528e-14
+        ],
+        "lift": -0.1455715366027669,
+        "drag": 0.001036259457072504
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001011494378982059,
+          1.598067923651303e-14,
+          -0.07282172889937374
+        ],
+        "moment": [
+          -1.005140523764603e-13,
+          0.07428526011203072,
+          7.770212695924067e-15
+        ],
+        "lift": -0.07282829080835343,
+        "drag": 0.0002595740867286881
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001011494378982059,
+          -2.291737763102097e-14,
+          0.07285744134940002
+        ],
+        "moment": [
+          1.003362432201726e-13,
+          -0.07460096390982245,
+          -3.02517308892105e-15
+        ],
+        "lift": 0.0728639978192006,
+        "drag": 0.0002601973549214178
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004044745165836211,
+          -5.274398268400454e-14,
+          0.1456618295793706
+        ],
+        "moment": [
+          2.003737887418255e-13,
+          -0.14942674183431,
+          -1.300901152480414e-15
+        ],
+        "lift": 0.1457142558990193,
+        "drag": 0.001041243324718961
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004101264075266845,
+          -6.661927682682228e-15,
+          -0.1464628349395127
+        ],
+        "moment": [
+          -8.958056464582892e-14,
+          0.1497739060290389,
+          9.53814663969682e-15
+        ],
+        "lift": -0.1465167457898318,
+        "drag": 0.00101271352900583
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.00102562841137504,
+          2.59710635430125e-15,
+          -0.07329418325524209
+        ],
+        "moment": [
+          -4.477456139141342e-14,
+          0.07509419196340199,
+          3.628419789560196e-15
+        ],
+        "lift": -0.07330091988001293,
+        "drag": 0.00025368767245898
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.00102562841137504,
+          -1.444881591623889e-14,
+          0.07333041715402051
+        ],
+        "moment": [
+          4.470427798558205e-14,
+          -0.07541717915563323,
+          -1.342674064581917e-15
+        ],
+        "lift": 0.07333714826019308,
+        "drag": 0.0002543200411872684
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004101264075266845,
+          -4.073392624180834e-14,
+          0.1466077263892021
+        ],
+        "moment": [
+          8.92657529925206e-14,
+          -0.1510654612878224,
+          -3.979218908182038e-16
+        ],
+        "lift": 0.1466615489755648,
+        "drag": 0.001017770167676485
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004048073907220481,
+          -1.324648398783046e-14,
+          -0.1457987037060265
+        ],
+        "moment": [
+          -1.996316523547592e-13,
+          0.1490680690575361,
+          9.510729877260093e-15
+        ],
+        "lift": -0.1458511628170545,
+        "drag": 0.00104269344924589
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 6.245004513516506e-17,
+      "native_residual_relative": 6.245004513516506e-17,
+      "residual_difference": 3.469446951953614e-17,
+      "force_difference": 8.326672684688674e-17,
+      "moment_difference": 4.756453012981998e-18,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.1493439541521928,
+      "coefficient_force_from_records": [
+        -0.004048073907220482,
+        -1.3246449673542603e-14,
+        -0.14579870370602657
+      ],
+      "coefficient_moment_from_records": [
+        -1.9963640880777217e-13,
+        0.1490680690575361,
+        9.5108539629389e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001012326817877769,
+          -3.31281954857798e-15,
+          -0.07294378723732309
+        ],
+        "moment": [
+          -9.987898095392689e-14,
+          0.07457946632458325,
+          2.37838381259535e-15
+        ],
+        "lift": -0.07295034508428866,
+        "drag": 0.0002608719863404056
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.7755575615628914e-17,
+      "native_residual_relative": 2.42861286636753e-17,
+      "residual_difference": 3.122502256758253e-17,
+      "force_difference": 4.336808689942018e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0746833517122991,
+      "coefficient_force_from_records": [
+        -0.0010123268178777686,
+        -3.3127790825872973e-15,
+        -0.07294378723732309
+      ],
+      "coefficient_moment_from_records": [
+        -9.987848047845976e-14,
+        0.07457946632458326,
+        2.3783772755051375e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001012326817877769,
+          -3.31281954857798e-15,
+          0.07294378723732309
+        ],
+        "moment": [
+          9.987898095392689e-14,
+          -0.07457946632458325,
+          2.37838381259535e-15
+        ],
+        "lift": 0.07295034508428866,
+        "drag": 0.0002608719863404056
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.7755575615628914e-17,
+      "native_residual_relative": 2.42861286636753e-17,
+      "residual_difference": 3.122502256758253e-17,
+      "force_difference": 4.336808689942018e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0746833517122991,
+      "coefficient_force_from_records": [
+        -0.0010123268178777686,
+        -3.3127790825872973e-15,
+        0.07294378723732309
+      ],
+      "coefficient_moment_from_records": [
+        9.987848047845976e-14,
+        -0.07457946632458326,
+        2.3783772755051375e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004048073907220481,
+          -1.324648398783046e-14,
+          0.1457987037060265
+        ],
+        "moment": [
+          1.996316523547592e-13,
+          -0.1490680690575361,
+          9.510729877260093e-15
+        ],
+        "lift": 0.1458511628170545,
+        "drag": 0.00104269344924589
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 6.245004513516506e-17,
+      "native_residual_relative": 6.245004513516506e-17,
+      "residual_difference": 3.469446951953614e-17,
+      "force_difference": 8.326672684688674e-17,
+      "moment_difference": 4.756453012981998e-18,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.1493439541521928,
+      "coefficient_force_from_records": [
+        -0.004048073907220482,
+        -1.3246449673542603e-14,
+        0.14579870370602657
+      ],
+      "coefficient_moment_from_records": [
+        1.9963640880777217e-13,
+        -0.1490680690575361,
+        9.5108539629389e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004104634364082363,
+          -2.313667022590038e-14,
+          -0.1467477658806549
+        ],
+        "moment": [
+          -8.902539892340772e-14,
+          0.1506962867124955,
+          4.580701662708526e-15
+        ],
+        "lift": -0.1468016207801266,
+        "drag": 0.001019289239720028
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 5.273559366969494e-16,
+      "native_residual_relative": 4.996003610813204e-16,
+      "residual_difference": 1.0408340855860843e-16,
+      "force_difference": 1.9034989414319416e-19,
+      "moment_difference": 5.551115123125783e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.1543495948198587,
+      "coefficient_force_from_records": [
+        -0.004104634364082363,
+        -2.3136479876006236e-14,
+        -0.1467477658806549
+      ],
+      "coefficient_moment_from_records": [
+        -8.90233630759376e-14,
+        0.15069628671249555,
+        4.580786907616991e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001026471240293221,
+          -5.785948231488459e-15,
+          -0.07341860757235616
+        ],
+        "moment": [
+          -4.453935050635627e-14,
+          0.07539407138745739,
+          1.145488817867616e-15
+        ],
+        "lift": -0.07342533995609367,
+        "drag": 0.0002550164756606807
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 1.97758476261356e-16,
+      "native_residual_relative": 1.8388068845354155e-16,
+      "residual_difference": 7.28583859910259e-17,
+      "force_difference": 1.3877787807814457e-17,
+      "moment_difference": 6.725756717619969e-19,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07718655329585777,
+      "coefficient_force_from_records": [
+        -0.0010264712402932212,
+        -5.785956176233894e-15,
+        -0.07341860757235615
+      ],
+      "coefficient_moment_from_records": [
+        -4.4538677930684506e-14,
+        0.07539407138745739,
+        1.1454531180159209e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001026471240293221,
+          -5.785948231488459e-15,
+          0.07341860757235616
+        ],
+        "moment": [
+          4.453935050635627e-14,
+          -0.07539407138745739,
+          1.145488817867616e-15
+        ],
+        "lift": 0.07342533995609367,
+        "drag": 0.0002550164756606807
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 1.97758476261356e-16,
+      "native_residual_relative": 1.8388068845354155e-16,
+      "residual_difference": 7.28583859910259e-17,
+      "force_difference": 1.3877787807814457e-17,
+      "moment_difference": 6.725756717619969e-19,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07718655329585777,
+      "coefficient_force_from_records": [
+        -0.0010264712402932212,
+        -5.785956176233894e-15,
+        0.07341860757235615
+      ],
+      "coefficient_moment_from_records": [
+        4.4538677930684506e-14,
+        -0.07539407138745739,
+        1.1454531180159209e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004104634364082363,
+          -2.313667022590038e-14,
+          0.1467477658806549
+        ],
+        "moment": [
+          8.902539892340772e-14,
+          -0.1506962867124955,
+          4.580701662708526e-15
+        ],
+        "lift": 0.1468016207801266,
+        "drag": 0.001019289239720028
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 5.273559366969494e-16,
+      "native_residual_relative": 4.996003610813204e-16,
+      "residual_difference": 1.0408340855860843e-16,
+      "force_difference": 1.9034989414319416e-19,
+      "moment_difference": 5.551115123125783e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.1543495948198587,
+      "coefficient_force_from_records": [
+        -0.004104634364082363,
+        -2.3136479876006236e-14,
+        0.1467477658806549
+      ],
+      "coefficient_moment_from_records": [
+        8.90233630759376e-14,
+        -0.15069628671249555,
+        4.580786907616991e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004044745165836211,
+          2.500200025311317e-14,
+          -0.1455190232893848
+        ],
+        "moment": [
+          -2.010838327445863e-13,
+          0.1481643112795904,
+          2.027669481971528e-14
+        ],
+        "lift": -0.1455715366027669,
+        "drag": 0.001036259457072504
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 4.85722573273506e-17,
+      "native_residual_relative": 5.750337272319994e-17,
+      "residual_difference": 3.3285006695304986e-17,
+      "force_difference": 5.551115123125783e-17,
+      "moment_difference": 9.237177894769903e-19,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.14918141478640717,
+      "coefficient_force_from_records": [
+        -0.004044745165836211,
+        2.5002555382372835e-14,
+        -0.14551902328938474
+      ],
+      "coefficient_moment_from_records": [
+        -2.0108290902679682e-13,
+        0.1481643112795904,
+        2.0276535796842226e-14
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001011494378982059,
+          1.598067923651303e-14,
+          -0.07282172889937374
+        ],
+        "moment": [
+          -1.005140523764603e-13,
+          0.07428526011203072,
+          7.770212695924067e-15
+        ],
+        "lift": -0.07282829080835343,
+        "drag": 0.0002595740867286881
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.42861286636753e-17,
+      "native_residual_relative": 3.10623922417097e-17,
+      "residual_difference": 1.56396163381034e-17,
+      "force_difference": 6.940401420877327e-19,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07460206964975448,
+      "coefficient_force_from_records": [
+        -0.001011494378982059,
+        1.597998519637094e-14,
+        -0.07282172889937374
+      ],
+      "coefficient_moment_from_records": [
+        -1.0051407532788622e-13,
+        0.07428526011203075,
+        7.770325317273478e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001011494378982059,
+          -2.291737763102097e-14,
+          0.07285744134940002
+        ],
+        "moment": [
+          1.003362432201726e-13,
+          -0.07460096390982245,
+          -3.02517308892105e-15
+        ],
+        "lift": 0.0728639978192006,
+        "drag": 0.0002601973549214178
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.42861286636753e-17,
+      "native_residual_relative": 3.10623922417097e-17,
+      "residual_difference": 1.56396163381034e-17,
+      "force_difference": 1.8299693057869e-19,
+      "moment_difference": 1.3001947075126674e-18,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07460206964975448,
+      "coefficient_force_from_records": [
+        -0.001011494378982059,
+        -2.291756062795155e-14,
+        0.07285744134940002
+      ],
+      "coefficient_moment_from_records": [
+        1.0033754341488011e-13,
+        -0.07460096390982245,
+        -3.025068050533262e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004044745165836211,
+          -5.274398268400454e-14,
+          0.1456618295793706
+        ],
+        "moment": [
+          2.003737887418255e-13,
+          -0.14942674183431,
+          -1.300901152480414e-15
+        ],
+        "lift": 0.1457142558990193,
+        "drag": 0.001041243324718961
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 4.85722573273506e-17,
+      "native_residual_relative": 5.750337272319994e-17,
+      "residual_difference": 3.3285006695304986e-17,
+      "force_difference": 5.239907151327108e-19,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.14918141478640717,
+      "coefficient_force_from_records": [
+        -0.004044745165836211,
+        -5.2744506674719675e-14,
+        0.1456618295793706
+      ],
+      "coefficient_moment_from_records": [
+        2.0037725904400346e-13,
+        -0.14942674183431004,
+        -1.3010696943903976e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004101264075266845,
+          -6.661927682682228e-15,
+          -0.1464628349395127
+        ],
+        "moment": [
+          -8.958056464582892e-14,
+          0.1497739060290389,
+          9.53814663969682e-15
+        ],
+        "lift": -0.1465167457898318,
+        "drag": 0.00101271352900583
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 3.677613769070831e-16,
+      "native_residual_relative": 3.6077504915812963e-16,
+      "residual_difference": 1.8678092926494028e-16,
+      "force_difference": 2.3829740505176547e-18,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.154178068351479,
+      "coefficient_force_from_records": [
+        -0.004101264075266843,
+        -6.664310656732746e-15,
+        -0.1464628349395127
+      ],
+      "coefficient_moment_from_records": [
+        -8.957707635542688e-14,
+        0.14977390602903887,
+        9.538411729261331e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.00102562841137504,
+          2.59710635430125e-15,
+          -0.07329418325524209
+        ],
+        "moment": [
+          -4.477456139141342e-14,
+          0.07509419196340199,
+          3.628419789560196e-15
+        ],
+        "lift": -0.07330091988001293,
+        "drag": 0.00025368767245898
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 1.8388068845354155e-16,
+      "native_residual_relative": 2.553465522792814e-16,
+      "residual_difference": 1.1254611473462614e-16,
+      "force_difference": 9.446275760997614e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07710077699752221,
+      "coefficient_force_from_records": [
+        -0.0010256284113750397,
+        2.59616172672515e-15,
+        -0.07329418325524209
+      ],
+      "coefficient_moment_from_records": [
+        -4.4778073122540895e-14,
+        0.075094191963402,
+        3.628477082039204e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.00102562841137504,
+          -1.444881591623889e-14,
+          0.07333041715402051
+        ],
+        "moment": [
+          4.470427798558205e-14,
+          -0.07541717915563323,
+          -1.342674064581917e-15
+        ],
+        "lift": 0.07333714826019308,
+        "drag": 0.0002543200411872684
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 1.8388068845354155e-16,
+      "native_residual_relative": 2.553465522792814e-16,
+      "residual_difference": 1.1254611473462614e-16,
+      "force_difference": 6.407217341637897e-19,
+      "moment_difference": 2.776739085181884e-18,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07710077699752221,
+      "coefficient_force_from_records": [
+        -0.0010256284113750397,
+        -1.4449456637973054e-14,
+        0.07333041715402051
+      ],
+      "coefficient_moment_from_records": [
+        4.4701501246496865e-14,
+        -0.07541717915563323,
+        -1.342714515230369e-15
+      ]
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004101264075266845,
+          -4.073392624180834e-14,
+          0.1466077263892021
+        ],
+        "moment": [
+          8.92657529925206e-14,
+          -0.1510654612878224,
+          -3.979218908182038e-16
+        ],
+        "lift": 0.1466615489755648,
+        "drag": 0.001017770167676485
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 3.677613769070831e-16,
+      "native_residual_relative": 3.6077504915812963e-16,
+      "residual_difference": 1.8678092926494028e-16,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 5.551115123125783e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.154178068351479,
+      "coefficient_force_from_records": [
+        -0.004101264075266843,
+        -4.0734531874777253e-14,
+        0.14660772638920208
+      ],
+      "coefficient_moment_from_records": [
+        8.927150728134499e-14,
+        -0.15106546128782244,
+        -3.9785140014076325e-16
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004048073907219782,
+          -1.324646027090794e-14,
+          -0.1457987037059952
+        ],
+        "moment": [
+          -1.996325197164972e-13,
+          0.1490680690575055,
+          9.510485931771284e-15
+        ],
+        "lift": -0.1458511628170232,
+        "drag": 0.001042693449245496
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 7.632783294297951e-17,
+      "native_residual_relative": 1.0408340855860843e-16,
+      "residual_difference": 4.85722573273506e-17,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.1493439541521547,
+      "coefficient_force_from_records": [
+        -0.004048073907219782,
+        -1.3246575341972425e-14,
+        -0.14579870370599524
+      ],
+      "coefficient_moment_from_records": [
+        -1.9963341918481736e-13,
+        0.14906806905750553,
+        9.510687377429231e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001012326817877594,
+          -3.312673858911052e-15,
+          -0.07294378723730742
+        ],
+        "moment": [
+          -9.988017357631662e-14,
+          0.07457946632456794,
+          2.378421082045029e-15
+        ],
+        "lift": -0.07295034508427296,
+        "drag": 0.0002608719863403072
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 4.5102810375396984e-17,
+      "native_residual_relative": 5.898059818321144e-17,
+      "residual_difference": 2.0816681711721685e-17,
+      "force_difference": 4.336808689942018e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07468335171228008,
+      "coefficient_force_from_records": [
+        -0.0010123268178775936,
+        -3.3126748570423244e-15,
+        -0.07294378723730742
+      ],
+      "coefficient_moment_from_records": [
+        -9.987811020405711e-14,
+        0.07457946632456795,
+        2.3784119889273345e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001012326817877594,
+          -3.312673858911052e-15,
+          0.07294378723730742
+        ],
+        "moment": [
+          9.988017357631662e-14,
+          -0.07457946632456794,
+          2.378421082045029e-15
+        ],
+        "lift": 0.07295034508427296,
+        "drag": 0.0002608719863403072
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 4.5102810375396984e-17,
+      "native_residual_relative": 5.898059818321144e-17,
+      "residual_difference": 2.0816681711721685e-17,
+      "force_difference": 4.336808689942018e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07468335171228008,
+      "coefficient_force_from_records": [
+        -0.0010123268178775936,
+        -3.3126748570423244e-15,
+        0.07294378723730742
+      ],
+      "coefficient_moment_from_records": [
+        9.987811020405711e-14,
+        -0.07457946632456795,
+        2.3784119889273345e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004048073907219782,
+          -1.324646027090794e-14,
+          0.1457987037059952
+        ],
+        "moment": [
+          1.996325197164972e-13,
+          -0.1490680690575055,
+          9.510485931771284e-15
+        ],
+        "lift": 0.1458511628170232,
+        "drag": 0.001042693449245496
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 7.632783294297951e-17,
+      "native_residual_relative": 1.0408340855860843e-16,
+      "residual_difference": 4.85722573273506e-17,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.1493439541521547,
+      "coefficient_force_from_records": [
+        -0.004048073907219782,
+        -1.3246575341972425e-14,
+        0.14579870370599524
+      ],
+      "coefficient_moment_from_records": [
+        1.9963341918481736e-13,
+        -0.14906806905750553,
+        9.510687377429231e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004104634364080622,
+          -2.313631193096369e-14,
+          -0.1467477658805762
+        ],
+        "moment": [
+          -8.901359467225478e-14,
+          0.1506962867124256,
+          4.581548695655781e-15
+        ],
+        "lift": -0.1468016207800479,
+        "drag": 0.001019289239719021
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 4.579669976578771e-16,
+      "native_residual_relative": 4.926614671774132e-16,
+      "residual_difference": 2.0122792321330962e-16,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.15434959481975302,
+      "coefficient_force_from_records": [
+        -0.004104634364080622,
+        -2.3136751060646166e-14,
+        -0.14674776588057617
+      ],
+      "coefficient_moment_from_records": [
+        -8.901184079978395e-14,
+        0.15069628671242563,
+        4.581214923202287e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001026471240292786,
+          -5.785676122154154e-15,
+          -0.07341860757231677
+        ],
+        "moment": [
+          -4.453322476408172e-14,
+          0.07539407138742239,
+          1.145712858082164e-15
+        ],
+        "lift": -0.07342533995605426,
+        "drag": 0.0002550164756604284
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.1163626406917047e-16,
+      "native_residual_relative": 2.185751579730777e-16,
+      "residual_difference": 9.020562075079397e-17,
+      "force_difference": 2.168404344971009e-19,
+      "moment_difference": 2.461992014706656e-19,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07718655329580493,
+      "coefficient_force_from_records": [
+        -0.0010264712402927863,
+        -5.785760271344344e-15,
+        -0.07341860757231677
+      ],
+      "coefficient_moment_from_records": [
+        -4.453297856488025e-14,
+        0.07539407138742239,
+        1.1457220676495333e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001026471240292786,
+          -5.785676122154154e-15,
+          0.07341860757231677
+        ],
+        "moment": [
+          4.453322476408172e-14,
+          -0.07539407138742239,
+          1.145712858082164e-15
+        ],
+        "lift": 0.07342533995605426,
+        "drag": 0.0002550164756604284
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.1163626406917047e-16,
+      "native_residual_relative": 2.185751579730777e-16,
+      "residual_difference": 9.020562075079397e-17,
+      "force_difference": 2.168404344971009e-19,
+      "moment_difference": 2.461992014706656e-19,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07718655329580493,
+      "coefficient_force_from_records": [
+        -0.0010264712402927863,
+        -5.785760271344344e-15,
+        0.07341860757231677
+      ],
+      "coefficient_moment_from_records": [
+        4.453297856488025e-14,
+        -0.07539407138742239,
+        1.1457220676495333e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004104634364080622,
+          -2.313631193096369e-14,
+          0.1467477658805762
+        ],
+        "moment": [
+          8.901359467225478e-14,
+          -0.1506962867124256,
+          4.581548695655781e-15
+        ],
+        "lift": 0.1468016207800479,
+        "drag": 0.001019289239719021
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 4.579669976578771e-16,
+      "native_residual_relative": 4.926614671774132e-16,
+      "residual_difference": 2.0122792321330962e-16,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.15434959481975302,
+      "coefficient_force_from_records": [
+        -0.004104634364080622,
+        -2.3136751060646166e-14,
+        0.14674776588057617
+      ],
+      "coefficient_moment_from_records": [
+        8.901184079978395e-14,
+        -0.15069628671242563,
+        4.581214923202287e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004044745165835506,
+          2.500674363761779e-14,
+          -0.1455190232893532
+        ],
+        "moment": [
+          -2.010892537554487e-13,
+          0.1481643112795595,
+          2.027681679245968e-14
+        ],
+        "lift": -0.1455715366027353,
+        "drag": 0.001036259457072108
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 6.245004513516506e-17,
+      "native_residual_relative": 7.153023832973116e-17,
+      "residual_difference": 5.355958732078392e-17,
+      "force_difference": 9.849581455009792e-19,
+      "moment_difference": 2.7755575615628914e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.149181414786369,
+      "coefficient_force_from_records": [
+        -0.004044745165835506,
+        2.500575867947229e-14,
+        -0.1455190232893532
+      ],
+      "coefficient_moment_from_records": [
+        -2.0108751784240824e-13,
+        0.14816431127955954,
+        2.0276963661922502e-14
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.001011494378981882,
+          1.598074699914881e-14,
+          -0.07282172889935797
+        ],
+        "moment": [
+          -1.005192023367796e-13,
+          0.07428526011201525,
+          7.770585390420859e-15
+        ],
+        "lift": -0.07282829080833765,
+        "drag": 0.0002595740867285891
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 3.8163916471489756e-17,
+      "native_residual_relative": 3.553133807142339e-17,
+      "residual_difference": 2.216515816375053e-17,
+      "force_difference": 4.336808689942018e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0746020696497354,
+      "coefficient_force_from_records": [
+        -0.0010114943789818825,
+        1.598091494107712e-14,
+        -0.07282172889935797
+      ],
+      "coefficient_moment_from_records": [
+        -1.0051618361510765e-13,
+        0.07428526011201526,
+        7.770473882062656e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.001011494378981882,
+          -2.291847538572062e-14,
+          0.07285744134938424
+        ],
+        "moment": [
+          1.003379779436486e-13,
+          -0.0746009639098069,
+          -3.025149371998527e-15
+        ],
+        "lift": 0.0728639978191848,
+        "drag": 0.0002601973549213189
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 3.8163916471489756e-17,
+      "native_residual_relative": 3.553133807142339e-17,
+      "residual_difference": 2.216515816375053e-17,
+      "force_difference": 4.336808689942018e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0746020696497354,
+      "coefficient_force_from_records": [
+        -0.0010114943789818825,
+        -2.2918530253792332e-14,
+        0.07285744134938424
+      ],
+      "coefficient_moment_from_records": [
+        1.0033957913551588e-13,
+        -0.07460096390980692,
+        -3.025120958580823e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004044745165835506,
+          -5.274560898726327e-14,
+          0.145661829579339
+        ],
+        "moment": [
+          2.003786676516017e-13,
+          -0.149426741834279,
+          -1.301141709837434e-15
+        ],
+        "lift": 0.1457142558989878,
+        "drag": 0.001041243324718565
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 6.245004513516506e-17,
+      "native_residual_relative": 7.153023832973116e-17,
+      "residual_difference": 5.355958732078392e-17,
+      "force_difference": 3.7485241405987396e-19,
+      "moment_difference": 5.551115123125783e-17,
+      "force_records": 144,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.149181414786369,
+      "coefficient_force_from_records": [
+        -0.004044745165835506,
+        -5.274598383967733e-14,
+        0.145661829579339
+      ],
+      "coefficient_moment_from_records": [
+        2.0037973545732133e-13,
+        -0.14942674183427895,
+        -1.301147427309828e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "coefficients": {
+        "force": [
+          -0.004101264075265085,
+          -6.65764508410091e-15,
+          -0.1464628349394335
+        ],
+        "moment": [
+          -8.961115269962017e-14,
+          0.1497739060289687,
+          9.5390783759388e-15
+        ],
+        "lift": -0.1465167457897525,
+        "drag": 0.001012713529004821
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 5.342948306008566e-16,
+      "native_residual_relative": 5.962315737699855e-16,
+      "residual_difference": 2.2886491421632293e-16,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 4.191291076581689e-19,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.15417806835137265,
+      "coefficient_force_from_records": [
+        -0.004101264075265085,
+        -6.658625602728672e-15,
+        -0.14646283493943346
+      ],
+      "coefficient_moment_from_records": [
+        -8.961122791194302e-14,
+        0.1497739060289687,
+        9.539497505046459e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "coefficients": {
+        "force": [
+          -0.0010256284113746,
+          2.599122292715715e-15,
+          -0.07329418325520244
+        ],
+        "moment": [
+          -4.479039074313171e-14,
+          0.07509419196336681,
+          3.629240564486085e-15
+        ],
+        "lift": -0.07330091987997328,
+        "drag": 0.0002536876724587276
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.8449465006019636e-16,
+      "native_residual_relative": 3.338571891273352e-16,
+      "residual_difference": 1.511843696565783e-16,
+      "force_difference": 5.001599568010687e-19,
+      "moment_difference": 1.3877787807814457e-17,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07710077699746905,
+      "coefficient_force_from_records": [
+        -0.0010256284113746,
+        2.599622452672516e-15,
+        -0.07329418325520244
+      ],
+      "coefficient_moment_from_records": [
+        -4.4794097696609017e-14,
+        0.07509419196336682,
+        3.629269039036375e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "coefficients": {
+        "force": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "moment": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lift": 0.0,
+        "drag": 0.0
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 0.0,
+      "native_residual_relative": 0.0,
+      "residual_difference": 0.0,
+      "force_difference": 0.0,
+      "moment_difference": 0.0,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.0,
+      "coefficient_force_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "coefficient_moment_from_records": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "coefficients": {
+        "force": [
+          -0.0010256284113746,
+          -1.445436228797751e-14,
+          0.07333041715398085
+        ],
+        "moment": [
+          4.47164481549682e-14,
+          -0.07541717915559791,
+          -1.343882780597649e-15
+        ],
+        "lift": 0.07333714826015338,
+        "drag": 0.0002543200411870156
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 2.8449465006019636e-16,
+      "native_residual_relative": 3.338571891273352e-16,
+      "residual_difference": 1.511843696565783e-16,
+      "force_difference": 1.0616295952194595e-19,
+      "moment_difference": 1.765994243856271e-18,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.07710077699746905,
+      "coefficient_force_from_records": [
+        -0.0010256284113746,
+        -1.4454256125017987e-14,
+        0.07333041715398085
+      ],
+      "coefficient_moment_from_records": [
+        4.4718214149212053e-14,
+        -0.07541717915559791,
+        -1.3438485198795847e-15
+      ]
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "coefficients": {
+        "force": [
+          -0.004101264075265085,
+          -4.074522227319292e-14,
+          0.1466077263891228
+        ],
+        "moment": [
+          8.930574650015816e-14,
+          -0.1510654612877517,
+          -4.007141349288276e-16
+        ],
+        "lift": 0.1466615489754856,
+        "drag": 0.001017770167675475
+      },
+      "options": {
+        "trailing": "T",
+        "viscous": "F",
+        "body": "F"
+      },
+      "measurement_recompute_unchanged": true,
+      "residual_relative": 5.342948306008566e-16,
+      "native_residual_relative": 5.962315737699855e-16,
+      "residual_difference": 2.2886491421632293e-16,
+      "force_difference": 2.7755575615628914e-17,
+      "moment_difference": 7.922206708466765e-19,
+      "force_records": 576,
+      "force_ids_complete": true,
+      "all_finite": true,
+      "gamma_over_U_l2": 0.15417806835137265,
+      "coefficient_force_from_records": [
+        -0.004101264075265085,
+        -4.07456932283959e-14,
+        0.14660772638912278
+      ],
+      "coefficient_moment_from_records": [
+        8.930495427948731e-14,
+        -0.1510654612877517,
+        -4.0075026838379884e-16
+      ]
+    }
+  ],
+  "output_comparisons": [
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "outputs_equal": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "outputs_equal": true
+    }
+  ],
+  "official_comparisons": [
+    {
+      "case": "FW-V01",
+      "maximum_absolute_difference": 1.3877787807814457e-17,
+      "eligible": true
+    },
+    {
+      "case": "FW-V02",
+      "maximum_absolute_difference": 2.7755575615628914e-17,
+      "eligible": true
+    }
+  ],
+  "core_sensitivity": [
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "delta_deg": 1,
+      "slopes": {
+        "measured": {
+          "lift": 4.179746887352672,
+          "moment_y": -4.27308865873667
+        },
+        "core0": {
+          "lift": 4.179746887351772,
+          "moment_y": -4.273088658735793
+        }
+      },
+      "lift_difference": 2.1525818749423985e-13,
+      "moment_difference": 2.05359717231601e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "delta_deg": 2,
+      "slopes": {
+        "measured": {
+          "lift": 4.178328033246313,
+          "moment_y": -4.270485608580759
+        },
+        "core0": {
+          "lift": 4.178328033245416,
+          "moment_y": -4.270485608579882
+        }
+      },
+      "lift_difference": 2.1469358000601115e-13,
+      "moment_difference": 2.0527691241543862e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "delta_deg": 1,
+      "slopes": {
+        "measured": {
+          "lift": 4.206962088797456,
+          "moment_y": -4.3197620908093475
+        },
+        "core0": {
+          "lift": 4.206962088795199,
+          "moment_y": -4.319762090807342
+        }
+      },
+      "lift_difference": 5.36669809525925e-13,
+      "moment_difference": 4.642632694864759e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "delta_deg": 2,
+      "slopes": {
+        "measured": {
+          "lift": 4.205556648190629,
+          "moment_y": -4.317130608459689
+        },
+        "core0": {
+          "lift": 4.205556648188375,
+          "moment_y": -4.3171306084576875
+        }
+      },
+      "lift_difference": 5.360043908025229e-13,
+      "moment_difference": 4.637233244880586e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "delta_deg": 1,
+      "slopes": {
+        "measured": {
+          "lift": 4.173776622980343,
+          "moment_y": -4.26527613204574
+        },
+        "core0": {
+          "lift": 4.173776622979439,
+          "moment_y": -4.265276132044852
+        }
+      },
+      "lift_difference": 2.1663009617632472e-13,
+      "moment_difference": 2.0823468216444202e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "delta_deg": 2,
+      "slopes": {
+        "measured": {
+          "lift": 4.172361635618947,
+          "moment_y": -4.262677841070002
+        },
+        "core0": {
+          "lift": 4.172361635618044,
+          "moment_y": -4.262677841069115
+        }
+      },
+      "lift_difference": 2.1649069081736752e-13,
+      "moment_difference": 2.081532488173445e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "delta_deg": 1,
+      "slopes": {
+        "measured": {
+          "lift": 4.200871210192793,
+          "moment_y": -4.311833166923974
+        },
+        "core0": {
+          "lift": 4.200871210190519,
+          "moment_y": -4.3118331669219545
+        }
+      },
+      "lift_difference": 5.41465048329256e-13,
+      "moment_difference": 4.684127720644012e-13,
+      "eligible": true
+    },
+    {
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "delta_deg": 2,
+      "slopes": {
+        "measured": {
+          "lift": 4.1994697337249045,
+          "moment_y": -4.309206514660517
+        },
+        "core0": {
+          "lift": 4.199469733722635,
+          "moment_y": -4.309206514658499
+        }
+      },
+      "lift_difference": 5.403767633112498e-13,
+      "moment_difference": 4.684921785739548e-13,
+      "eligible": true
+    }
+  ],
+  "checks": {
+    "all_runs_complete": true,
+    "options": true,
+    "measurement_recompute": true,
+    "original_vs_measured": true,
+    "original_vs_official": true,
+    "residual": true,
+    "residual_agreement": true,
+    "force_sum": true,
+    "moment_sum": true,
+    "records_complete": true,
+    "core_sensitivity": true,
+    "runtime_budget": true,
+    "memory_budget": true,
+    "output_budget": true
+  },
+  "all_criteria_pass": true,
+  "limitations": "reference instrumentation only; no fixed-strip conservation, full grid convergence or UVLAS load comparison"
+}

@@ -1,0 +1,121 @@
+{
+  "passed": true,
+  "scope": "FW-V01 and FW-V02 small-angle second-order induced drag coefficient D/alpha^2; midpoint near and far common limit",
+  "reference_uncertainty_is_rigorous_bound": false,
+  "old_log_energy_comparison_remains_failed": true,
+  "whole_uvlm_complete": false,
+  "records": [
+    {
+      "dihedral": 0,
+      "reference_finite_width_series": [
+        1526.7886220711273,
+        1529.3069039474694,
+        1530.3662478286897,
+        1530.8654112166937
+      ],
+      "width_orders": [
+        1.249268786894068,
+        1.0855869627033485
+      ],
+      "neighbor_width_limits": [
+        1531.1354439579502,
+        1531.3102037272167
+      ],
+      "chord_correction": 1.2236036372707986,
+      "reference_limit": 1532.5338073644875,
+      "reference_absolute_uncertainty_components": {
+        "width_extrapolation": 0.2621396538997942,
+        "chord_remainder": 0.9553420413665208,
+        "mixed_chord_span": 0.4924083428377344,
+        "core_fine": 0.01572626135248356,
+        "core_chord": 0.022196203159182915
+      },
+      "reference_relative_uncertainty": 0.0011404723955952692,
+      "candidate_raw_near": 1544.922748460137,
+      "material_self_roundoff_correction": 3.516660694618266e-05,
+      "candidate_near": 1544.922783626744,
+      "candidate_trefftz": 1530.3183221796323,
+      "same_width_near_far": 0.009543414095905423,
+      "candidate_to_reference_limit": 0.008083982358315363,
+      "combined_relative_indicator": 0.009224454753910632,
+      "material_self_sample_matrix_difference": 1.295021851728448e-16,
+      "passed": true
+    },
+    {
+      "dihedral": 5,
+      "reference_finite_width_series": [
+        1520.0961549560045,
+        1522.611702933935,
+        1523.6683073426536,
+        1524.1658950159817
+      ],
+      "width_orders": [
+        1.251437371057586,
+        1.086412683375287
+      ],
+      "neighbor_width_limits": [
+        1524.4335273964537,
+        1524.6088039254532
+      ],
+      "chord_correction": 1.2028666734227045,
+      "reference_limit": 1525.811670598876,
+      "reference_absolute_uncertainty_components": {
+        "width_extrapolation": 0.26291479349936253,
+        "chord_remainder": 0.9604926672514011,
+        "mixed_chord_span": 0.487298905486341,
+        "core_fine": 0.01547353697037579,
+        "core_chord": 0.021719904188557848
+      },
+      "reference_relative_uncertainty": 0.0011455540949624494,
+      "candidate_raw_near": 1538.1958592870094,
+      "material_self_roundoff_correction": 3.559132011147871e-05,
+      "candidate_near": 1538.1958948783295,
+      "candidate_trefftz": 1523.594815378364,
+      "same_width_near_far": 0.009583308733128959,
+      "candidate_to_reference_limit": 0.0081164828648825,
+      "combined_relative_indicator": 0.00926203695984495,
+      "material_self_sample_matrix_difference": 1.0884737098237094e-16,
+      "passed": true
+    }
+  ],
+  "sources": {
+    "build/analysis/drag-common-limit/far-reference-series.json": "f3361b4f19dd1d4b705eeea08fe54354861cfc8a3f959270c52a9bb553bafa12",
+    "build/analysis/drag-common-limit/reference-d0-m16-n384-core1e-10.npz": "8b040cbd3179d550826ab8d45397bdcec290184e0040e376ed89edb152160d95",
+    "build/analysis/drag-common-limit/reference-d0-m8-n192-core1e-10.npz": "d1664b9735ac60ac249d25376f44b8b7909904f3328c38db927b4d4fb6e1b790",
+    "build/analysis/drag-common-limit/reference-d0-m8-n384-core1e-10.npz": "cac9f494fe5ca9ca8acc130c72b86d1a4ebe8d6b1e719840b014d610dd57f1bd",
+    "build/analysis/drag-common-limit/reference-d0-m8-n768-core1e-09.npz": "87ada93e3e207f97635286dac8c17f56cc1fe3d713fc57005a8ea4444d60fa11",
+    "build/analysis/drag-common-limit/reference-d0-m8-n768-core1e-10.npz": "79aa63d93600ffa823356963e732d41a2c3342d94df3a4d3bc65d51d05f72517",
+    "build/analysis/drag-common-limit/reference-d0-m8-n96-core1e-10.npz": "77edc202f1ea5826a999d1527c79fbeefac79047c135ca6bc15c3064ef9c54b7",
+    "build/analysis/drag-common-limit/reference-d5-m16-n384-core1e-10.npz": "9812ad1a4e02f35c1d237fa0c94973380e8b33d5ac00b92352d4b7b5f30c865e",
+    "build/analysis/drag-common-limit/reference-d5-m8-n192-core1e-10.npz": "f815d4c45789424b3a72eeba7c3056d3ad6192e9578ff34bb614bf589a4ea02b",
+    "build/analysis/drag-common-limit/reference-d5-m8-n384-core1e-10.npz": "a2b9db5b85126040ca584301227234ff418a06b58ed49505fa6f48fea84a6785",
+    "build/analysis/drag-common-limit/reference-d5-m8-n768-core1e-09.npz": "c2dfdf15908d45c8ec66b4ca5f1e5aa2cb56fb2ebfdaf064d5f7d217e25b9a5b",
+    "build/analysis/drag-common-limit/reference-d5-m8-n768-core1e-10.npz": "8d4c715017057913f048d5a5c71727c67333aeace8ac8cf24a6fac0ce757ef1d",
+    "build/analysis/drag-common-limit/reference-d5-m8-n96-core1e-10.npz": "f36114dabd523f66dd8fd9b993cfcc0c57b81677e0e5f9dccb3123981fe4bbc2",
+    "build/analysis/drag-common-limit-v2/candidate-d0-m128-n192.json": "4744d35f9a119678cd91d885469a2d7ca5a3e6b41daa5aa47006ace3ca76339f",
+    "build/analysis/drag-common-limit-v2/candidate-d0-m128-n192.npz": "0d51ff14069c5ba060b75e2812157ff11fee39c8ff7bce4191a69be418a02ea4",
+    "build/analysis/drag-common-limit-v2/candidate-d5-m128-n192.json": "5b286a8c8fdea63f8840ce43d41ac2ff1866fe266e0799f337ebfc8404ae3f00",
+    "build/analysis/drag-common-limit-v2/candidate-d5-m128-n192.npz": "48c42c991544f25bb434d5336f1529e0e19dc841ac7a62c6d211f57813879bf6",
+    "build/analysis/finite-wing-2-3/reference-d0-m16-n192.npz": "4207f2c9b2ce050af818c3e01848aaedecdbedafe9cd07d8f75e46f73b943bd6",
+    "build/analysis/finite-wing-2-3/reference-d0-m16-n96.npz": "5aaf1b7b4a880b4529dc8e344de4138c9b1cfc4c81e98394be2b6d8761a91944",
+    "build/analysis/finite-wing-2-3/reference-d0-m32-n192.npz": "61c500490f9603ee0e2c29bcc26f6d013476163b9002831be19a4dc42d205e50",
+    "build/analysis/finite-wing-2-3/reference-d0-m32-n96.npz": "84e456758b1adef5fdfcc6f2f58c23f8518f11ecd042aed683bfbf1577133084",
+    "build/analysis/finite-wing-2-3/reference-d0-span384.npz": "0701e47e61e92d5bb8a3136df0acd2b78ef9b036778fc11c9df8e1f6b2b8e15d",
+    "build/analysis/finite-wing-2-3/reference-d5-m16-n192.npz": "a0107627d09f77fa40aefeef04e1123953dc80b463604d30f1fdb111c982615b",
+    "build/analysis/finite-wing-2-3/reference-d5-m16-n96.npz": "a580f465dbf1f22dfcae5b656eb1f670b84146f32d38037095870c57a8237891",
+    "build/analysis/finite-wing-2-3/reference-d5-m32-n192.npz": "ccda80cbbf64de63e6204089e16d69b3321a64cdb255983e33ff64464cb39f5d",
+    "build/analysis/finite-wing-2-3/reference-d5-m32-n96.npz": "2acb37424c46083b2e7553c22d3e453924c0c3e37f83b21f0461bbc20c6bf36f",
+    "build/analysis/finite-wing-2-3/reference-d5-span384.npz": "8cdf49ede87e5713e492983ca8e8962eeca8bf7d24f0babd7336b602b0c22cb8",
+    "docs/verification/drag-common-limit-assessment-policy.md": "f573ce4f677f175161aca26c1e26ad678b9e88e58f798cdff9c0dbb517a38ea0",
+    "docs/verification/drag-material-self-result.json": "21b1803b64595d2a8b59ee6df951a29706e50c3ee7531651c8c9f027c6274761",
+    "docs/verification/drag-reference-continuum-protocol.md": "4968d0e35cc8d1cb5feabb22ad7721ee6ac78e3d50db9f08866884cddfecfc0a",
+    "docs/verification/induced-drag-common-limit-protocol.md": "662a9773f3378615a92d07f19fba1c1cf7bb918d0b97fd8650b434c936579c6c",
+    "docs/verification/trefftz-midpoint-operator-result.json": "d5151b3b7175cbc2c73fcd04b0d6e469cb667be52f0357618d2d9245ccc03a9c",
+    "tools/design-experiments/assess_drag_common_limit.py": "d949f66e6e7803164a2c1dbffbaf3483ea3dadf999a4215f997245d354535d89",
+    "tools/design-experiments/run_drag_final_chord.py": "284e570fee08a732dbd140b7fa5cd3fa0e6f40e39f7f6e484ceadbabe5e14aea",
+    "tools/design-experiments/run_drag_reference_convergence.py": "5605124141dedb42f64eddbb4490f56351d1da62d097b6c37b757722fd5810d4",
+    "tools/design-experiments/run_steady_drag_common_limit_v2.py": "b26ce791368a9e49c88373aa133f88c74ac2ea06da69546372bbd4d5bac59b12",
+    "tools/design-experiments/uvlm_drag_force_kernel.py": "dfe8f7bc931b48ae8e73179131feac8dbde2f6c2820d1042ca06bbc08cca2ced"
+  },
+  "artifacts": {}
+}

@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-04",
+  "source_roles": [
+    {
+      "title": "The domain interface method: a general-purpose non-intrusive technique for non-conforming domain decomposition problems",
+      "authors": "M. Cafiero; O. Lloberas-Valls; J. Cante; J. Oliver",
+      "doi": "10.1007/s00466-015-1239-x",
+      "year": 2016,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4922449/",
+      "checked_scope": "Abstract and introduction on interface multiplier work and LBB/inf-sup; introductory discussion of mortar, weak continuity and interface equilibrium.",
+      "role": "General interface variational principle only. UVLAS does not reproduce DIM interface triangulation or stabilization and does not inherit its convergence claims."
+    },
+    {
+      "title": "Discrete Korn's inequality for shells",
+      "authors": "Sheng Zhang",
+      "version": "arXiv:1412.3654v1, 2014-12-11",
+      "url": "https://arxiv.org/abs/1412.3654",
+      "checked_scope": "Abstract only: piecewise discontinuous Naghdi/Koiter shell spaces.",
+      "role": "Reason to inspect stability beyond local rank; no ANCF theorem or proof imported."
+    },
+    {
+      "title": "Higher-order MITC and ANCF quadrature sources previously checked",
+      "local_manifest": "docs/verification/main-shell-projection-sources.json",
+      "role": "The joint bulk operator reuses the explicitly independent UVLAS extension, not the published MITC16 element.",
+      "manifest_sha256": "46dad617acc0e36304b2ac616364d616ebe1cd2c1da8d259d29561c2dbdabed3"
+    }
+  ],
+  "independent_uvlas_constructions": [
+    "Q4 EL2 mortar p0/p1 with physical constant-Piola work enrichment",
+    "Joint reference-fixed oblique bulk strain projection and objective mortar",
+    "KKT total tangent and physical reaction recovery"
+  ]
+}

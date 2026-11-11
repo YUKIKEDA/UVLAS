@@ -1,0 +1,841 @@
+{
+  "records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "nscalar": 185,
+      "ni": 125,
+      "mixed_dimension": 280,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        549,
+        549,
+        549
+      ],
+      "gram_error": 3.564336992195095e-14,
+      "metrics": {
+        "reference_gradient": 5.328279539235482e-13,
+        "constant_P_work": 3.575283693399848e-15,
+        "rigid": 2.2025500490018593e-17,
+        "energy_force": 7.239875178698482e-15,
+        "force_tangent": 4.188272738925478e-15,
+        "rotation_energy": 9.546847276710807e-13,
+        "rotation_force": 1.1204202725261447e-11,
+        "flux_dual": 1.5605348309293182e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.995513091267334e-15,
+        "vertical_error_work": 8.897814051737527e-16,
+        "top_bottom_error_work": 5.311173398136019e-16,
+        "weak_commutation": 7.183497637847092e-15,
+        "body_work": 7.27545066472296e-15,
+        "decomposition": 4.399140239263597e-15
+      },
+      "polynomial": {
+        "fields": 46,
+        "gradient_error": 4.81546822541612e-15,
+        "stabilization_residual": 1.2280835628999742e-14,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/flat-0.01.npz",
+      "artifact_sha256": "b01a20da0ca8d6d44f37790a1205587dd50adbb5d3d944a9a95268eaee612d79"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "nscalar": 185,
+      "ni": 125,
+      "mixed_dimension": 280,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        549,
+        549,
+        549
+      ],
+      "gram_error": 3.564336992195095e-14,
+      "metrics": {
+        "reference_gradient": 5.289653521208497e-12,
+        "constant_P_work": 3.464427523937867e-15,
+        "rigid": 2.1855124924045818e-17,
+        "energy_force": 8.636382319979396e-15,
+        "force_tangent": 7.114347703873421e-15,
+        "rotation_energy": 1.4090758652362594e-11,
+        "rotation_force": 1.1191868216876458e-10,
+        "flux_dual": 1.5978396213894675e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.995513091267334e-15,
+        "vertical_error_work": 8.897814051737527e-16,
+        "top_bottom_error_work": 5.311173398136019e-16,
+        "weak_commutation": 7.183497637847092e-15,
+        "body_work": 7.27545066472296e-15,
+        "decomposition": 4.399140239263597e-15
+      },
+      "polynomial": {
+        "fields": 46,
+        "gradient_error": 4.7537781553309674e-15,
+        "stabilization_residual": 1.2280835628999742e-14,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/flat-0.001.npz",
+      "artifact_sha256": "456bd5879d72d9b2da8087183c99ccd1d0925c7cf0d4d7be16325d2a9290eba5"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "nscalar": 185,
+      "ni": 125,
+      "mixed_dimension": 280,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        549,
+        549,
+        549
+      ],
+      "gram_error": 3.564336992195095e-14,
+      "metrics": {
+        "reference_gradient": 5.176646788063436e-11,
+        "constant_P_work": 3.604717283207353e-15,
+        "rigid": 2.127331150179492e-17,
+        "energy_force": 3.98493809048701e-15,
+        "force_tangent": 3.0587211273581903e-15,
+        "rotation_energy": 7.951276229403077e-11,
+        "rotation_force": 1.1804183475565929e-09,
+        "flux_dual": 1.3849975402206831e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.995513091267334e-15,
+        "vertical_error_work": 8.897814051737527e-16,
+        "top_bottom_error_work": 5.311173398136019e-16,
+        "weak_commutation": 7.183497637847092e-15,
+        "body_work": 7.27545066472296e-15,
+        "decomposition": 4.399140239263597e-15
+      },
+      "polynomial": {
+        "fields": 46,
+        "gradient_error": 4.7712058676186526e-15,
+        "stabilization_residual": 1.2280835628999742e-14,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": false,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/flat-0.0001.npz",
+      "artifact_sha256": "234740562e9324b7069c5641e5fce6bca9adc2676ce50df45a6740dc5a9ab45f"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "nscalar": 185,
+      "ni": 125,
+      "mixed_dimension": 280,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        549,
+        549,
+        549
+      ],
+      "gram_error": 3.564336992195095e-14,
+      "metrics": {
+        "reference_gradient": 3.854480301293928e-13,
+        "constant_P_work": 1.3301994038547535e-15,
+        "rigid": 2.0807037539202245e-17,
+        "energy_force": 1.0788074689248094e-14,
+        "force_tangent": 8.428078305939162e-16,
+        "rotation_energy": 7.248654618004095e-13,
+        "rotation_force": 1.5928712493596546e-11,
+        "flux_dual": 1.9753864927927816e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.995513091267334e-15,
+        "vertical_error_work": 8.897814051737527e-16,
+        "top_bottom_error_work": 5.311173398136019e-16,
+        "weak_commutation": 7.183497637847092e-15,
+        "body_work": 7.27545066472296e-15,
+        "decomposition": 4.399140239263597e-15
+      },
+      "polynomial": null,
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/curved-distorted-0.01.npz",
+      "artifact_sha256": "5928f6d2e2ae52e0456d3b0cd612fd40bb39d9f3ad55998a8d491ba4c84fc216"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "nscalar": 185,
+      "ni": 125,
+      "mixed_dimension": 280,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        549,
+        549,
+        549
+      ],
+      "gram_error": 3.564336992195095e-14,
+      "metrics": {
+        "reference_gradient": 3.985399916788119e-12,
+        "constant_P_work": 1.5678712237823361e-15,
+        "rigid": 2.147581625107224e-17,
+        "energy_force": 6.305114719362082e-16,
+        "force_tangent": 5.306817317444367e-15,
+        "rotation_energy": 5.978609254563395e-12,
+        "rotation_force": 1.273825802969083e-10,
+        "flux_dual": 2.0782251810937654e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.995513091267334e-15,
+        "vertical_error_work": 8.897814051737527e-16,
+        "top_bottom_error_work": 5.311173398136019e-16,
+        "weak_commutation": 7.183497637847092e-15,
+        "body_work": 7.27545066472296e-15,
+        "decomposition": 4.399140239263597e-15
+      },
+      "polynomial": null,
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/curved-distorted-0.001.npz",
+      "artifact_sha256": "da5d17f4108b634c3b7d3a1254e1eebc5dd6e50e95d3f11d6758c2a8e7ea66b1"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "nscalar": 185,
+      "ni": 125,
+      "mixed_dimension": 280,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        549,
+        549,
+        549
+      ],
+      "gram_error": 3.564336992195095e-14,
+      "metrics": {
+        "reference_gradient": 3.57710968230613e-11,
+        "constant_P_work": 1.24163769348454e-15,
+        "rigid": 2.0298615999555205e-17,
+        "energy_force": 2.531178365254222e-15,
+        "force_tangent": 3.5075652088535642e-15,
+        "rotation_energy": 1.3349439437484802e-10,
+        "rotation_force": 1.5348400205484546e-09,
+        "flux_dual": 1.5583850214744932e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.995513091267334e-15,
+        "vertical_error_work": 8.897814051737527e-16,
+        "top_bottom_error_work": 5.311173398136019e-16,
+        "weak_commutation": 7.183497637847092e-15,
+        "body_work": 7.27545066472296e-15,
+        "decomposition": 4.399140239263597e-15
+      },
+      "polynomial": null,
+      "checks": {
+        "rank": true,
+        "identities": false,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/curved-distorted-0.0001.npz",
+      "artifact_sha256": "253fd417f462e58a3420485842cd947e701391df23ef28d79b9bc21285fc542a"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "nscalar": 200,
+      "ni": 131,
+      "mixed_dimension": 283,
+      "mixed_completion_ranks": [
+        3,
+        3,
+        3
+      ],
+      "face_dimensions": [
+        28,
+        28,
+        15,
+        18,
+        18,
+        18
+      ],
+      "face_completion_ranks": [
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "ranks": [
+        594,
+        594,
+        594
+      ],
+      "gram_error": 7.737743453915453e-11,
+      "metrics": {
+        "reference_gradient": 1.5409300298537608e-09,
+        "constant_P_work": 5.793436987460308e-13,
+        "rigid": 1.951443270051829e-13,
+        "energy_force": 6.286888672823491e-16,
+        "force_tangent": 2.1041388780558205e-15,
+        "rotation_energy": 3.489469880194776e-09,
+        "rotation_force": 1.2790035107965149e-08,
+        "flux_dual": 2.591497093752548e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 3.026064031102837e-15,
+        "vertical_error_work": 3.529365636350953e-11,
+        "top_bottom_error_work": 2.5114718856448487e-14,
+        "weak_commutation": 5.007806842490146e-11,
+        "body_work": 5.054783195157246e-11,
+        "decomposition": 5.625421848767329e-12
+      },
+      "polynomial": null,
+      "checks": {
+        "rank": true,
+        "identities": false,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/quartic-reference-0.01.npz",
+      "artifact_sha256": "650b2ba554b06399b2f2808222621c2fd73df7bb1605fb37c7a07e04a4842396"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "nscalar": 200,
+      "ni": 131,
+      "mixed_dimension": 283,
+      "mixed_completion_ranks": [
+        3,
+        3,
+        3
+      ],
+      "face_dimensions": [
+        28,
+        28,
+        15,
+        18,
+        18,
+        18
+      ],
+      "face_completion_ranks": [
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "ranks": [
+        594,
+        594,
+        594
+      ],
+      "gram_error": 7.737743453915453e-11,
+      "metrics": {
+        "reference_gradient": 1.5406545995002738e-08,
+        "constant_P_work": 7.02263381559011e-14,
+        "rigid": 6.141131071780561e-14,
+        "energy_force": 2.28264178217365e-15,
+        "force_tangent": 3.812454200383091e-15,
+        "rotation_energy": 3.482618520593934e-08,
+        "rotation_force": 1.2815348215644706e-07,
+        "flux_dual": 2.1870197391696606e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 3.026064031102837e-15,
+        "vertical_error_work": 3.529365636350953e-11,
+        "top_bottom_error_work": 2.5114718856448487e-14,
+        "weak_commutation": 5.007806842490146e-11,
+        "body_work": 5.054783195157246e-11,
+        "decomposition": 5.625421848767329e-12
+      },
+      "polynomial": null,
+      "checks": {
+        "rank": true,
+        "identities": false,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/quartic-reference-0.001.npz",
+      "artifact_sha256": "4ea213f117a1537226c3896700b4214041efe6170b1de28788c83d961ec5ac88"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "nscalar": 200,
+      "ni": 131,
+      "mixed_dimension": 283,
+      "mixed_completion_ranks": [
+        3,
+        3,
+        3
+      ],
+      "face_dimensions": [
+        28,
+        28,
+        15,
+        18,
+        18,
+        18
+      ],
+      "face_completion_ranks": [
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "ranks": [
+        594,
+        594,
+        594
+      ],
+      "gram_error": 7.737743453915453e-11,
+      "metrics": {
+        "reference_gradient": 1.5406314143351435e-07,
+        "constant_P_work": 4.026420068019856e-14,
+        "rigid": 5.854812764437388e-14,
+        "energy_force": 1.4513316839521887e-15,
+        "force_tangent": 6.111463156733712e-16,
+        "rotation_energy": 3.4828298204706195e-07,
+        "rotation_force": 1.2819121427930227e-06,
+        "flux_dual": 1.854380057447068e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 3.026064031102837e-15,
+        "vertical_error_work": 3.529365636350953e-11,
+        "top_bottom_error_work": 2.5114718856448487e-14,
+        "weak_commutation": 5.007806842490146e-11,
+        "body_work": 5.054783195157246e-11,
+        "decomposition": 5.625421848767329e-12
+      },
+      "polynomial": null,
+      "checks": {
+        "rank": true,
+        "identities": false,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/reference-work-v2-local-20261104-112549/quartic-reference-0.0001.npz",
+      "artifact_sha256": "bfd91dbe5577873dbace8919eff064ca0e3381577ca1837fc52a6a3c34a31ba6"
+    }
+  ],
+  "stops": [],
+  "all_local_checks": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_reference_work_v2_local.py": "75d9bd1f7595edcbbe64a97f80ed6f872ca960667ed4d97df2215ef97279c796",
+    "tools/design-experiments/reference_work_ancf_v2.py": "855011e0402ea8d796eab7c5efd9e82e37472e6f78e5a8ec9d9b220cdfbef6cc",
+    "docs/reference-work-ancf-formulation.md": "a4b5ba22f4edc83ec2766a711ff79c6d2a5aa305b2e7ad04303a317f1f836907",
+    "docs/verification/reference-work-v2-protocol.md": "c7a393d159d320494c0124ecc881aa45464e0a9d706b46131198dc19894a8f52",
+    "docs/verification/reference-work-v2-local-preparation.json": "eacd10ce9d3057d8c1c0455e2387d48fbdebebccebff6efb06cede63134f3bc0"
+  },
+  "seconds": 11.14000000001397,
+  "peak_bytes": 338702336
+}

@@ -1,0 +1,69 @@
+{
+  "records": [
+    {
+      "n": 2,
+      "q01_dimension": 36,
+      "native": {
+        "ranks": [
+          6,
+          6,
+          6
+        ],
+        "forward": 2.3722178319386597e-12,
+        "reverse": 2.372214894197369e-12,
+        "passed": true
+      },
+      "polynomial": {
+        "ranks": [
+          6,
+          6,
+          6
+        ],
+        "forward": 2.1022450259938008e-12,
+        "reverse": 2.1022438203444255e-12,
+        "passed": true
+      },
+      "seconds": 7.155999999959022,
+      "peak_bytes": 714448896,
+      "passed": true
+    },
+    {
+      "n": 4,
+      "q01_dimension": 66,
+      "native": {
+        "ranks": [
+          6,
+          6,
+          6
+        ],
+        "forward": 4.0758961320071405e-12,
+        "reverse": 4.075897893232638e-12,
+        "passed": true
+      },
+      "polynomial": {
+        "ranks": [
+          6,
+          6,
+          6
+        ],
+        "forward": 4.228525430104149e-12,
+        "reverse": 4.228484890120756e-12,
+        "passed": true
+      },
+      "seconds": 30.43799999996554,
+      "peak_bytes": 791855104,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "six_field_hypothesis_verified": true,
+  "geometry_conditional": true,
+  "finite_h_lower_bound": false,
+  "sources": {
+    "tools/design-experiments/check_moment_enriched_q0_space_v2.py": "6b8fd8e6596f2f5cca36872b81ba305f4fc1541737a2a851ea913fbce889b7f3",
+    "tools/design-experiments/check_moment_enriched_thin_global_v2.py": "0a8f83ebb0e7a36506104e7f7b0bc423415b94694046644bcfec621d71b3851c",
+    "tools/design-experiments/moment_enriched_exact_isometry_v2.py": "37ffb5f7ec8f887e951bf460b5b4779401574b6a10be798e7ea4158600544c85",
+    "docs/verification/moment-enriched-thin-space-diagnostic-protocol.md": "826ff8aca9cc8df1440954f68eb07a7e73cc20b09c722f3833a977eca1852734",
+    "docs/verification/moment-enriched-thin-global-v2-result.json": "0d493d21f7efd804d2412ba2524557d9ae354f0a7b68b8d700fe221e4f9e390b"
+  }
+}

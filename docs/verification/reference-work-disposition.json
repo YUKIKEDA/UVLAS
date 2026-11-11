@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-04",
+  "status": "reference_work_formulated_two_implementations_rejected_local_numerical_gates",
+  "main_shell_adopted": false,
+  "roadmap_1_1_complete": false,
+  "waiting_for_user_confirmation": false,
+  "configurations": [
+    {
+      "name": "RW-1",
+      "adopted": false,
+      "attempts": 9,
+      "evaluated": 6,
+      "stopped": 3,
+      "reasons": [
+        "geometric_rank_threshold_disagreement",
+        "thin_objectivity"
+      ]
+    },
+    {
+      "name": "RW-2",
+      "adopted": false,
+      "attempts": 9,
+      "evaluated": 9,
+      "stopped": 0,
+      "all_work_checks_pass": true,
+      "all_required_ranks_pass": true,
+      "reasons": [
+        "reference_gradient",
+        "objectivity",
+        "independent_general_geometry_reproduction"
+      ]
+    }
+  ],
+  "global_comparison_executed": false,
+  "finite_thickness_executed": false,
+  "nonlinear_global_equilibrium_executed": false,
+  "reason_later_stages_not_executed": "necessary_local_gates_failed",
+  "all_independent_numeric_reproduction_checks": false,
+  "thresholds_relaxed": false,
+  "provenance_pass": true,
+  "physical_adoption_pass": false,
+  "completion_date_estimate_available": false,
+  "source_hash_checks": 31,
+  "artifact_hash_checks": 15,
+  "python_ast_files": 6,
+  "closure_failures": [],
+  "sources": {
+    "docs/verification/reference-work-local-audit.json": "a3f54f62f490fdef500c0ee303c9d5a7452363ff048d1366015fd3797835b410",
+    "docs/verification/reference-work-local-preparation.json": "f35fcb2eff6b628060e386faf49def114ef5453a4bcb2fe67b68e804a53d7c3c",
+    "docs/verification/reference-work-local-result.json": "a0a8b49e0f052d53d98caa052c4d7fe81284057e3ebb2a0c1023143c25c23308",
+    "docs/verification/reference-work-projection-result.json": "4124f13c64426c3f583d56cbcaf6ffc836e9f85000a9112b4912fb1817abeb46",
+    "docs/verification/reference-work-sources.json": "76034c0ca2c1e2551fcfb600da8b0cc94a5229bbc051076ed58125ee051d3db4",
+    "docs/verification/reference-work-v2-local-audit.json": "61391749847540a2eb62736dc9581c081967418a76ffddbfba3aac9fa517fe5a",
+    "docs/verification/reference-work-v2-local-preparation.json": "eacd10ce9d3057d8c1c0455e2387d48fbdebebccebff6efb06cede63134f3bc0",
+    "docs/verification/reference-work-v2-local-result.json": "d06a20705fd529382e956763bc5e0fc588fb77d3a9edc58530a371c41d21b7d1",
+    "docs/verification/reference-work-protocol.md": "cf2d1075b291ce522de690acf8e47fb6c7863aeade067609001314958aafc9af",
+    "docs/verification/reference-work-results.md": "85954c02d0f1eead558fe3398257c581468ea16313287313ce28bfecd3d58f7a",
+    "docs/verification/reference-work-v2-protocol.md": "c7a393d159d320494c0124ecc881aa45464e0a9d706b46131198dc19894a8f52",
+    "docs/reference-work-ancf-formulation.md": "a4b5ba22f4edc83ec2766a711ff79c6d2a5aa305b2e7ad04303a317f1f836907",
+    "docs/main-shell-completion-outlook.md": "ce0018ddadceed3a9abb3f9c14f5f337545ee948698f5e03c42aedf5606cc4d7"
+  }
+}

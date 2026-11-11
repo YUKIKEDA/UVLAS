@@ -1,0 +1,15 @@
+{
+  "sources": {
+    "tools/design-experiments/polynomial_trace_fit.py": "286a8fe802a8b59e8e70f613833d2dc65d477a9b7398dce1d5aacca96e43e4e7",
+    "tools/design-experiments/polynomial_trace_fit_v2.py": "71a69113e1b36d2a717a30288ee63d7367c6d189bf0ba5c01c6cc996ec41450f",
+    "tools/design-experiments/polynomial_trace_ancf.py": "cc8e33bdc4c32d9b91d694a78ddff30b1316a766d5ee3e8f59fa9a87e9aae2c6",
+    "tools/design-experiments/check_polynomial_trace_shared.py": "ca6467550fd257545d8521871249b62d9cffc0115307bc2ff0151fcc5d041406",
+    "tools/design-experiments/audit_polynomial_trace_shared.py": "33b3362a33686e389aa2ed4a6be0d1a4d2b102311bf971dc46f2628d60f36385",
+    "tools/design-experiments/hybrid_gradient_fit.py": "cc503556db3eefc1e855ecd4599882ec8e927b91f7a33e2ea3ec4205d5b6936c",
+    "tools/design-experiments/hybrid_gradient_fit_v2.py": "864ff2fa22672fc055b445f8ed445364b23e749701f1b4a0ecd4db4cad517186",
+    "docs/verification/polynomial-trace-local-result.json": "aad5961db674d4be53640b82c7109c1a424408ee7827973c79cdc375dc661a39",
+    "docs/verification/polynomial-trace-local-audit.json": "d5d73469d75679dcee17e7670824c7a6fb06faca9f4d7467755e56c154e76e8a",
+    "docs/verification/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604",
+    "docs/verification/hybrid-gradient-shared-result.json": "1d5ee3f64e971f0d2a221cc1f794b852e29134b626660b9840f05f7d969a5276"
+  }
+}

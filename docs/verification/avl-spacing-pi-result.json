@@ -1,0 +1,71 @@
+{
+  "protocol": "docs/verification/avl-symmetry-spacing-pi-addendum.md",
+  "source_sha256": "a27c8a7a0843c61e5f9fa3675ed903f486e219b7e86c55590f0fed447ca60322",
+  "pi80": "3.1415926535897932384626433832795028841971693993751058209749445923078164062862090",
+  "pi160": "3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844609550582231725359408128481117450",
+  "pi_difference": "1.371965174657882932017851913486717693352906155390449417768274640591871518882550E-81",
+  "records": [
+    {
+      "n": 3,
+      "old_mirror_error": 4.489664195972409e-11,
+      "new_mirror_error": 1.1102230246251565e-16,
+      "new_reference_error": 5.551115123125783e-17,
+      "old_midpoint": 0.4999999999775517,
+      "new_midpoint": 0.49999999999999994
+    },
+    {
+      "n": 5,
+      "old_mirror_error": 4.489664195972409e-11,
+      "new_mirror_error": 1.1102230246251565e-16,
+      "new_reference_error": 5.551115123125783e-17,
+      "old_midpoint": 0.4999999999775517,
+      "new_midpoint": 0.49999999999999994
+    },
+    {
+      "n": 9,
+      "old_mirror_error": 4.489664195972409e-11,
+      "new_mirror_error": 1.1102230246251565e-16,
+      "new_reference_error": 7.824134049865595e-17,
+      "old_midpoint": 0.4999999999775517,
+      "new_midpoint": 0.49999999999999994
+    },
+    {
+      "n": 17,
+      "old_mirror_error": 4.489664195972409e-11,
+      "new_mirror_error": 2.220446049250313e-16,
+      "new_reference_error": 1.3456935716532404e-16,
+      "old_midpoint": 0.4999999999775517,
+      "new_midpoint": 0.49999999999999994
+    },
+    {
+      "n": 33,
+      "old_mirror_error": 4.489664195972409e-11,
+      "new_mirror_error": 2.220446049250313e-16,
+      "new_reference_error": 1.5706946433988635e-16,
+      "old_midpoint": 0.4999999999775517,
+      "new_midpoint": 0.49999999999999994
+    },
+    {
+      "n": 65,
+      "old_mirror_error": 4.489664195972409e-11,
+      "new_mirror_error": 2.220446049250313e-16,
+      "new_reference_error": 1.5917914521762482e-16,
+      "old_midpoint": 0.4999999999775517,
+      "new_midpoint": 0.49999999999999994
+    }
+  ],
+  "observed_old_geometry_difference": 1.7958967646336532e-11,
+  "predicted_old_geometry_difference": 1.795865678388964e-11,
+  "old_new_coordinate_envelope": 1.7968636867904635e-11,
+  "checks": {
+    "pi_self": true,
+    "new_spacing": true,
+    "new_symmetry": true,
+    "old_geometry_explained": true
+  },
+  "all_criteria_pass": true,
+  "files": {
+    "spacing-old.txt": "2340554ef2f7faeb96090080d6345785308fdd176ddaa1ac47ebee8d177fe9aa",
+    "spacing-pi64.txt": "19db5f50c9637fb4a330611dea8992d7b0a4ab118ea0ee99d58350c33a79edbe"
+  }
+}

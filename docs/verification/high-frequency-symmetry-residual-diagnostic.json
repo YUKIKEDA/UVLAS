@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "scope": "uncondensed physical unique-edge residual versus rounded ring-column diagnostic",
+  "ring_sample_residuals": [
+    3.977574881190728e-11,
+    5.767414962198264e-11
+  ],
+  "unique_edge_residuals": [
+    4.279918905894047e-12,
+    6.2016307361507304e-12
+  ],
+  "sources": {
+    "tools/design-experiments/diagnose_high_frequency_symmetric.py": "b458694fa596aa1417131d9b41ec49fd6811d834cc958924779fb688c9822787",
+    "tools/design-experiments/run_high_frequency_final_bounded.py": "8b177ec6bbddd0ff0df38ab09ca264e7b22ae4654b4c0f122732a3e767ec2949",
+    "tools/design-experiments/run_high_frequency_final_symmetric.py": "55ed6530e0344d142b128f1dd68ca82748aed4645c8ac65b1c43ee92e18cd3d4"
+  },
+  "artifacts": {
+    "build/analysis/high-frequency-final/symmetry-diagnostic-m128.npz": "c4c2f8f2ebca3936ca43832cbdba3381b0326b40c6662575783b5ac1c575e419"
+  }
+}

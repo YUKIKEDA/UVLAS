@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "meaning": "current status synchronized, evidence fixed; 2.3 remains open",
+  "uvlm_2_2_complete": true,
+  "uvlm_2_3_complete": false,
+  "uvlm_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "2.3 induced-drag common limit, unsteady pitch/frequency extension, general setting/error rules",
+  "immutable": {
+    "docs/verification/uvlm-reference-campaign-audit.json": "ad76e8fa9360992f9612ba5f1db320505541f6f4804fb62f3b309258f58302bc",
+    "docs/verification/uvlm-independent-reference-progress.md": "ce8e081b430ce222677ae04be2ac5daa746a7591614700a51f0f2771260a912a",
+    "docs/verification/uvlm-reference-campaign-summary-2026-11-05.md": "6f48d946a9dbb98390d986248b9dc7fe069a78c546591debf073a677060b92ae"
+  },
+  "status_sync_source": {
+    "tools/design-experiments/sync_reference_campaign_status.py": "59a1197fdad19700952d76c9c1d69388c2d28dffde035b1f83fdccfb6e9c98c1"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "docs/preimplementation-plan.md",
+    "docs/structural-model-adoption-review.md",
+    "docs/requirements-evidence-map.md",
+    "docs/design-decisions.md",
+    "docs/roadmap.md"
+  ],
+  "checked_status_links": 7
+}

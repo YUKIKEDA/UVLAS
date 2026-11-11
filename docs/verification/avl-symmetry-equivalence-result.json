@@ -1,0 +1,445 @@
+{
+  "protocol": "docs/verification/avl-symmetry-reduction-experiment.md",
+  "source_sha256": "33fb38f2bd97965481e264cb480faaf1bc854bf39f87db924fc772bb5a218def",
+  "dependency_sha256": {
+    "avl_symmetry_reconstruction.py": "ae2235ca74ebb88801f55f33022c1f05464359a7eb3a0322c0be543058dacd7c",
+    "check_avl_conservative_observation.py": "d7c1c37e1984d89df436005bf4966b03dc12cdc8c54dd230862e0a1c76cc3b19",
+    "check_q9_plate_convergence.py": "909db42a881612996ce1381432bc03153c18f7b0107876a56a986f84316ffd9d"
+  },
+  "preparation_sha256": "4a63bb4235c2391eeeb0079aa08edccebdea5a81eae57ffbc024d6c29a4c02ff",
+  "regression_runs_sha256": "3af880cd2f641ca2d7f2b7e4499d061126464d530254edb2f5019aaea5c6dee7",
+  "records": [
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "physical_n": 40,
+      "native_unknowns": 120,
+      "physical_panels": 240,
+      "raw_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M6-N40/out",
+      "derived_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M6-N40/physical-fullwing",
+      "reference_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a1",
+      "geometry_difference": 1.7958523557126682e-11,
+      "point_difference": 1.7958523557126682e-11,
+      "gamma_difference": 6.482171570343365e-13,
+      "gamma_eligible": true,
+      "velocity_difference": 2.0122792321330962e-16,
+      "force_difference": 4.997348021507086e-13,
+      "global_coefficient_difference": 5.408867798095685e-13,
+      "conservative_band_difference": 1.0254547211374643e-11,
+      "residual_relative": 1.4224732503009818e-16,
+      "guard_cases_pass": true,
+      "raw_total_semantics": "AERO explicitly doubles/zeros totals; equivalence also checks individual forces",
+      "derivation": {
+        "kind": "derived-by-symmetry",
+        "raw_kind": "native-half",
+        "native_unknowns": 120,
+        "physical_panels": 240,
+        "reflection": [
+          1,
+          -1,
+          1
+        ],
+        "swapped_endpoints": true,
+        "swapped_legs": true,
+        "total_file_role": "unchanged native half-mode FT, already containing physical full-wing totals",
+        "parent_sha256": {
+          "uv-rows.txt": "fe9ff4955e40a7b01391cccef85dfda0bf4341105a5fbcd9fd782a001ce4eeb1",
+          "uv-forces.txt": "29c4b53a8de35b32010ea69035cae90d23dd5c59f77edda8d2ff0e73b1f80406",
+          "uv-strips.txt": "a8b5ae6a7111303922856a306792eaa968ddc78eb8c47b3ca61765a318a91cda",
+          "total.txt": "35f210d5c1ab679db442b9f1c2b9509ce1818d93370bf32b7605589a23b7b4c6",
+          "uh-meta.txt": "8839418b20392892502404c937cc8472716e463b0a11782ca17c2e30d7fa07a7"
+        }
+      },
+      "files": {
+        "derivation.json": {
+          "sha256": "2d32f6340ed1c1b2db64670c73ad7f2477e86cc83b7cf5f26b3561e3d8a82ee4",
+          "bytes": 797
+        },
+        "total.txt": {
+          "sha256": "35f210d5c1ab679db442b9f1c2b9509ce1818d93370bf32b7605589a23b7b4c6",
+          "bytes": 1351
+        },
+        "uv-forces.txt": {
+          "sha256": "6aa0f9a12acf74de67c925f47b6e6e10fcda56a4bc1b04f8667ff190eed8ada6",
+          "bytes": 111432
+        },
+        "uv-rows.txt": {
+          "sha256": "54e13f5576dc2040ea0867b140bd1e4b49c4957fd9c91b9b611fe6ed8a71ab0b",
+          "bytes": 117440
+        },
+        "uv-strips.txt": {
+          "sha256": "6a40fe6fac15651fdddb05d63e642f9f2bb01f36b4c5bcae9565a096dba91289",
+          "bytes": 2412
+        }
+      },
+      "eligible": false
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 160,
+      "native_unknowns": 1920,
+      "physical_panels": 3840,
+      "raw_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N160/out",
+      "derived_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N160/physical-fullwing",
+      "reference_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a1",
+      "geometry_difference": 1.7958523557126682e-11,
+      "point_difference": 1.7958523557126682e-11,
+      "gamma_difference": 4.4510781779111275e-13,
+      "gamma_eligible": true,
+      "velocity_difference": 5.88418203051333e-15,
+      "force_difference": 5.027469868364165e-14,
+      "global_coefficient_difference": 1.231514890065455e-13,
+      "conservative_band_difference": 2.252004138725283e-12,
+      "residual_relative": 2.942091015256665e-15,
+      "guard_cases_pass": true,
+      "raw_total_semantics": "AERO explicitly doubles/zeros totals; equivalence also checks individual forces",
+      "derivation": {
+        "kind": "derived-by-symmetry",
+        "raw_kind": "native-half",
+        "native_unknowns": 1920,
+        "physical_panels": 3840,
+        "reflection": [
+          1,
+          -1,
+          1
+        ],
+        "swapped_endpoints": true,
+        "swapped_legs": true,
+        "total_file_role": "unchanged native half-mode FT, already containing physical full-wing totals",
+        "parent_sha256": {
+          "uv-rows.txt": "12cebeeb026ce87227a74e7dc0bffcd6d27b8a360962e009d0dc3a3c93efd031",
+          "uv-forces.txt": "487071ae0ef4c28adbcfb58f437ab6e08310a80baa6243138d8ae38e0a8ad412",
+          "uv-strips.txt": "c3065a02bbb4f0bb6eb42220e840cc895d37892c6339288a5e6d4e853f096017",
+          "total.txt": "5023548d542ba80f1922d0fa167fc191c0e6df806b8e94dcc07fb47ef0cd3fae",
+          "uh-meta.txt": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a"
+        }
+      },
+      "files": {
+        "derivation.json": {
+          "sha256": "1239c2dcc532cd265050c329488b3c2dbf1e261e78459b71bf431dec98239a96",
+          "bytes": 799
+        },
+        "total.txt": {
+          "sha256": "5023548d542ba80f1922d0fa167fc191c0e6df806b8e94dcc07fb47ef0cd3fae",
+          "bytes": 1351
+        },
+        "uv-forces.txt": {
+          "sha256": "971e0f16e491db8759de045be2a32288816d4230accea62d9f7f849c68a2215d",
+          "bytes": 1801421
+        },
+        "uv-rows.txt": {
+          "sha256": "545e56e9701f75884f57a5a146c585f679fe3a6f87b19c24286e5cee480413f5",
+          "bytes": 1882511
+        },
+        "uv-strips.txt": {
+          "sha256": "676167909cbb8f7af748b622265f8bc5ba7d1430318c0580e8c5a54053bd50e2",
+          "bytes": 9844
+        }
+      },
+      "eligible": false
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 320,
+      "native_unknowns": 3840,
+      "physical_panels": 7680,
+      "raw_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N320/out",
+      "derived_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N320/physical-fullwing",
+      "reference_directory": "build/analysis/avl-span320-20261031-123619/new-FW-V01-M24-N320/out",
+      "geometry_difference": 1.7958523557126682e-11,
+      "point_difference": 1.7958523557126682e-11,
+      "gamma_difference": 6.011261367150356e-13,
+      "gamma_eligible": true,
+      "velocity_difference": 3.68594044175552e-14,
+      "force_difference": 2.5619155234746227e-14,
+      "global_coefficient_difference": 6.178391132038996e-14,
+      "conservative_band_difference": 1.1221856777154926e-12,
+      "residual_relative": 1.527250548249981e-14,
+      "guard_cases_pass": true,
+      "raw_total_semantics": "AERO explicitly doubles/zeros totals; equivalence also checks individual forces",
+      "derivation": {
+        "kind": "derived-by-symmetry",
+        "raw_kind": "native-half",
+        "native_unknowns": 3840,
+        "physical_panels": 7680,
+        "reflection": [
+          1,
+          -1,
+          1
+        ],
+        "swapped_endpoints": true,
+        "swapped_legs": true,
+        "total_file_role": "unchanged native half-mode FT, already containing physical full-wing totals",
+        "parent_sha256": {
+          "uv-rows.txt": "587be19172354fc159db04bd06df22380ee442eb608caedecf82954ff02d0fab",
+          "uv-forces.txt": "b57d52d475764b2c63d780616b7ae2b4ae5610f09c66761984f66195dd6f191d",
+          "uv-strips.txt": "7f3b93f693a00d29578e68a3267c267e4e8228e0afabfaff715cd404c01495fe",
+          "total.txt": "86a51c9cc9234760e7be7f09a9148e04c87d75a4c10c007c08faa880441f0356",
+          "uh-meta.txt": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff"
+        }
+      },
+      "files": {
+        "derivation.json": {
+          "sha256": "f9fcccb7b50394bac7b98a36109d6092be0fcf07ce7ab33e456141ece7893398",
+          "bytes": 799
+        },
+        "total.txt": {
+          "sha256": "86a51c9cc9234760e7be7f09a9148e04c87d75a4c10c007c08faa880441f0356",
+          "bytes": 1351
+        },
+        "uv-forces.txt": {
+          "sha256": "0542b7de3a23a619897360ac84819f19518c7d63ba5416bc2c40f5e4201f516e",
+          "bytes": 3613859
+        },
+        "uv-rows.txt": {
+          "sha256": "5186f9a0dfd4d7dbefb548fa1df4564d7df324a604d14234861559ddabbf81bc",
+          "bytes": 3765927
+        },
+        "uv-strips.txt": {
+          "sha256": "bc844d562967946347aa9414df4f4b04ea86482c6ef6db687caf29aa26accdd8",
+          "bytes": 19764
+        }
+      },
+      "eligible": false
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "physical_n": 40,
+      "native_unknowns": 120,
+      "physical_panels": 240,
+      "raw_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M6-N40/out",
+      "derived_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M6-N40/physical-fullwing",
+      "reference_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a1",
+      "geometry_difference": 1.7958967646336532e-11,
+      "point_difference": 1.7958967646336532e-11,
+      "gamma_difference": 6.458631372774359e-13,
+      "gamma_eligible": true,
+      "velocity_difference": 1.1829588957706916e-13,
+      "force_difference": 4.999056724130924e-13,
+      "global_coefficient_difference": 5.420802695610405e-13,
+      "conservative_band_difference": 1.0230205571559736e-11,
+      "residual_relative": 1.0256552551712872e-16,
+      "guard_cases_pass": true,
+      "raw_total_semantics": "AERO explicitly doubles/zeros totals; equivalence also checks individual forces",
+      "derivation": {
+        "kind": "derived-by-symmetry",
+        "raw_kind": "native-half",
+        "native_unknowns": 120,
+        "physical_panels": 240,
+        "reflection": [
+          1,
+          -1,
+          1
+        ],
+        "swapped_endpoints": true,
+        "swapped_legs": true,
+        "total_file_role": "unchanged native half-mode FT, already containing physical full-wing totals",
+        "parent_sha256": {
+          "uv-rows.txt": "a673337c553ac6cc950741bc58b902671567509a8ee0fcd5a73bf82776c5b91c",
+          "uv-forces.txt": "d5ae4d0bd175809df5c67d12db4c1fba3bc9216089d569ae81fa3c1219d88f6d",
+          "uv-strips.txt": "15346a806315f4e75c76e96f86d367b2f7cd085f83764b04b8dc730761f27cc0",
+          "total.txt": "a44c0f28ca2300823bb8eb421918d176723fee3a4db63b601d6e07760d2ca2ca",
+          "uh-meta.txt": "8839418b20392892502404c937cc8472716e463b0a11782ca17c2e30d7fa07a7"
+        }
+      },
+      "files": {
+        "derivation.json": {
+          "sha256": "c89fab46971f49301d2b3d135db443211b4789b73b650e72b6de2c6d9d438f8a",
+          "bytes": 797
+        },
+        "total.txt": {
+          "sha256": "a44c0f28ca2300823bb8eb421918d176723fee3a4db63b601d6e07760d2ca2ca",
+          "bytes": 1351
+        },
+        "uv-forces.txt": {
+          "sha256": "58ffdba611db85e7b195a06ef22db7c2a85815859e3bc685003da92bb9a308ae",
+          "bytes": 111432
+        },
+        "uv-rows.txt": {
+          "sha256": "dcb1369f7f70bc1c388df1466771f995bfbe8fb91cd40f34a2a772308ffd8a40",
+          "bytes": 117442
+        },
+        "uv-strips.txt": {
+          "sha256": "d3db8d93e80d5817598afbc0b16e1da2b30ec13518c0848e5607f4bd90395c60",
+          "bytes": 2412
+        }
+      },
+      "eligible": false
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 160,
+      "native_unknowns": 1920,
+      "physical_panels": 3840,
+      "raw_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N160/out",
+      "derived_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N160/physical-fullwing",
+      "reference_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a1",
+      "geometry_difference": 1.7958967646336532e-11,
+      "point_difference": 1.7958967646336532e-11,
+      "gamma_difference": 4.432617467520217e-13,
+      "gamma_eligible": true,
+      "velocity_difference": 1.1276491893030816e-12,
+      "force_difference": 5.061137056325271e-14,
+      "global_coefficient_difference": 1.2370660051885807e-13,
+      "conservative_band_difference": 2.24745222432432e-12,
+      "residual_relative": 2.8793563670512223e-15,
+      "guard_cases_pass": true,
+      "raw_total_semantics": "AERO explicitly doubles/zeros totals; equivalence also checks individual forces",
+      "derivation": {
+        "kind": "derived-by-symmetry",
+        "raw_kind": "native-half",
+        "native_unknowns": 1920,
+        "physical_panels": 3840,
+        "reflection": [
+          1,
+          -1,
+          1
+        ],
+        "swapped_endpoints": true,
+        "swapped_legs": true,
+        "total_file_role": "unchanged native half-mode FT, already containing physical full-wing totals",
+        "parent_sha256": {
+          "uv-rows.txt": "d9567f732f0068cc346ab87e0e181998bd03aedd4f1b99baac70d08c69e7dd53",
+          "uv-forces.txt": "040dc03816e9c5ac024c4b2becb449a0bf7b3e00857e18eeed25939c0c42054f",
+          "uv-strips.txt": "ba789ce4da9747ce220a34b7c625d056ae6897c5b9718b6041655a5cf8a3503a",
+          "total.txt": "a66bcd322f34948b960d11a43a53e4ad8aaff862fafbf7a29ea110f32b04f5af",
+          "uh-meta.txt": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a"
+        }
+      },
+      "files": {
+        "derivation.json": {
+          "sha256": "13b84ce98ec64ebedf60cf64552a19db9ffada306a93cabd3135c6021a7f133b",
+          "bytes": 799
+        },
+        "total.txt": {
+          "sha256": "a66bcd322f34948b960d11a43a53e4ad8aaff862fafbf7a29ea110f32b04f5af",
+          "bytes": 1351
+        },
+        "uv-forces.txt": {
+          "sha256": "e11e3ef2e6fc6006451b8281c3f5471045392be42bfd00dd2b0916f37199e336",
+          "bytes": 1801421
+        },
+        "uv-rows.txt": {
+          "sha256": "830f978187726dfbf892b1f2574da7280176f2da267e3bf8d44a2db9d1c208d8",
+          "bytes": 1882547
+        },
+        "uv-strips.txt": {
+          "sha256": "d28cb28d9ec7450ef035566046015f2dd59d6a0eb8119f338d3775f6a82325e6",
+          "bytes": 9844
+        }
+      },
+      "eligible": false
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 320,
+      "native_unknowns": 3840,
+      "physical_panels": 7680,
+      "raw_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N320/out",
+      "derived_directory": "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N320/physical-fullwing",
+      "reference_directory": "build/analysis/avl-span320-20261031-123619/new-FW-V02-M24-N320/out",
+      "geometry_difference": 1.7958967646336532e-11,
+      "point_difference": 1.7958967646336532e-11,
+      "gamma_difference": 5.985868268068573e-13,
+      "gamma_eligible": true,
+      "velocity_difference": 2.9870732623504814e-12,
+      "force_difference": 2.5789269943740992e-14,
+      "global_coefficient_difference": 6.207534486435407e-14,
+      "conservative_band_difference": 1.1198542093637798e-12,
+      "residual_relative": 1.5510176151235788e-14,
+      "guard_cases_pass": true,
+      "raw_total_semantics": "AERO explicitly doubles/zeros totals; equivalence also checks individual forces",
+      "derivation": {
+        "kind": "derived-by-symmetry",
+        "raw_kind": "native-half",
+        "native_unknowns": 3840,
+        "physical_panels": 7680,
+        "reflection": [
+          1,
+          -1,
+          1
+        ],
+        "swapped_endpoints": true,
+        "swapped_legs": true,
+        "total_file_role": "unchanged native half-mode FT, already containing physical full-wing totals",
+        "parent_sha256": {
+          "uv-rows.txt": "e3cab957eac7691b631153e38df108b76115ddc7c24a0d964257257454125254",
+          "uv-forces.txt": "4ed786873ab09a501dd76ec2b1aa835a7cc78656072343172c4d27ac5059622c",
+          "uv-strips.txt": "dab67a631484964082ababf9f7ad5264b8a6d81e5b3ba11a81986ea03346bdc0",
+          "total.txt": "cdd7296739967f5ea2200ba8363684d7713246489a13ae007a1158483d519129",
+          "uh-meta.txt": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff"
+        }
+      },
+      "files": {
+        "derivation.json": {
+          "sha256": "0d98b4a8e6bdfda3c17576a98d0131049ec00532f2fe897f39389874e343fbed",
+          "bytes": 799
+        },
+        "total.txt": {
+          "sha256": "cdd7296739967f5ea2200ba8363684d7713246489a13ae007a1158483d519129",
+          "bytes": 1351
+        },
+        "uv-forces.txt": {
+          "sha256": "578cfded4b5ebdb2c7cd57417ef69c4b6eb6c014806b75fbdd376083bc45233a",
+          "bytes": 3613861
+        },
+        "uv-rows.txt": {
+          "sha256": "5b82e6b170c9a88f419959af482acdd9f2c08c9f7cb301a757807c1c0b0e371e",
+          "bytes": 3766121
+        },
+        "uv-strips.txt": {
+          "sha256": "e94a3054d3a256e5c396a08eec1729b8f00881bdec6cc7215d70a3c69a769752",
+          "bytes": 19764
+        }
+      },
+      "eligible": false
+    }
+  ],
+  "matrix": [
+    {
+      "case": "FW-V01",
+      "full_unknowns": 240,
+      "half_unknowns": 120,
+      "maximum_matrix_difference": 4.236211381680732e-11,
+      "matrix_eligible": true,
+      "rhs_difference": 0.0,
+      "block_symmetry_difference": 6.304978761306756e-10,
+      "eligible": true
+    },
+    {
+      "case": "FW-V02",
+      "full_unknowns": 240,
+      "half_unknowns": 120,
+      "maximum_matrix_difference": 4.223799088265423e-11,
+      "matrix_eligible": true,
+      "rhs_difference": 6.938893903907228e-18,
+      "block_symmetry_difference": 6.280886921672391e-10,
+      "eligible": true
+    }
+  ],
+  "synthetic": {
+    "axial_moment_error": 0.0,
+    "paired_force_error": 0.0,
+    "paired_moment_error": 0.0
+  },
+  "checks": {
+    "native_half_output_invariance": true,
+    "full_controls": true,
+    "six_full_equivalences": false,
+    "two_matrix_blocks": true,
+    "vector_reflection": true,
+    "resource_budget": true
+  },
+  "all_criteria_pass": false,
+  "completed": true,
+  "stop_reason": null,
+  "reference_convergence_accepted": false,
+  "scope": "even static two-wing reference only; antisymmetric/dynamic modes unverified",
+  "seconds": 4.312999999994645,
+  "peak_process_working_bytes": 131436544
+}

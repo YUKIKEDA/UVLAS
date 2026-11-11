@@ -1,0 +1,91 @@
+{
+  "passed": false,
+  "scope": "same ideal kernel; noncontact harmonic interaction; finite-epsilon cores remain different",
+  "records": [
+    {
+      "dihedral": 0,
+      "m": 2,
+      "n": 8,
+      "errors": {
+        "A": 7.483153890660062e-10,
+        "gamma": 1.1544711266279256e-09,
+        "dual": 9.31418045389295e-10
+      },
+      "passed": false
+    },
+    {
+      "dihedral": 0,
+      "m": 4,
+      "n": 16,
+      "errors": {
+        "A": 5.403127869343342e-10,
+        "gamma": 2.374838257954686e-09,
+        "dual": 1.6552089008069018e-09
+      },
+      "passed": false
+    },
+    {
+      "dihedral": 0,
+      "m": 8,
+      "n": 32,
+      "errors": {
+        "A": 9.873173090962702e-11,
+        "gamma": 3.688334573021839e-10,
+        "dual": 2.0714487023717104e-10
+      },
+      "passed": true
+    },
+    {
+      "dihedral": 5,
+      "m": 2,
+      "n": 8,
+      "errors": {
+        "A": 2.11274841293281e-09,
+        "gamma": 3.543080786393773e-09,
+        "dual": 3.7183823823184334e-09
+      },
+      "passed": false
+    },
+    {
+      "dihedral": 5,
+      "m": 4,
+      "n": 16,
+      "errors": {
+        "A": 1.6919561025004022e-09,
+        "gamma": 2.866493169189237e-09,
+        "dual": 4.161669303417587e-10
+      },
+      "passed": false
+    },
+    {
+      "dihedral": 5,
+      "m": 8,
+      "n": 32,
+      "errors": {
+        "A": 2.5754074252654877e-09,
+        "gamma": 4.342300862446043e-09,
+        "dual": 8.460686137008157e-10
+      },
+      "passed": false
+    }
+  ],
+  "sources": {
+    "build/analysis/multiple-surface-harmonic-ideal/candidate-d0-m2-n8.npz": "eef6cc4542e78191bdf41dac5a8652b771e44c1e3781a0dc49f5e419ed17047c",
+    "build/analysis/multiple-surface-harmonic-ideal/reference-d0-m2-n8.npz": "499d0bfc2d1740cc0fde90ac0222ed8f1e445a705d0b3b0e48d9d6de7f942dfb",
+    "build/analysis/multiple-surface-harmonic-ideal/candidate-d0-m4-n16.npz": "7c9aac9c65eaf365aa8267a290a540c52d5ec9f973feb05481de67d0d350e0d7",
+    "build/analysis/multiple-surface-harmonic-ideal/reference-d0-m4-n16.npz": "d5bbfaaaf0f7b15e70dc1397f65f95c1835296b625291c767ff5ee3c2ccf5a0d",
+    "build/analysis/multiple-surface-harmonic-ideal/candidate-d0-m8-n32.npz": "70ac0aaa6d42e1211bc3aa73081373504ce55096350239e8c286fa49b3faa715",
+    "build/analysis/multiple-surface-harmonic-ideal/reference-d0-m8-n32.npz": "ea69e10e8a4539ca5ff8fa424d09c50e9b48ee10652ac5acfb300badfd512f35",
+    "build/analysis/multiple-surface-harmonic-ideal/candidate-d5-m2-n8.npz": "514e264532f0375ac28cde6ed6ac7c4dc954ff4694578d77ed12c77692570624",
+    "build/analysis/multiple-surface-harmonic-ideal/reference-d5-m2-n8.npz": "9771d889e060247df1b8fe36a78fd832614fcad0845bf2b2c84ec29a49566960",
+    "build/analysis/multiple-surface-harmonic-ideal/candidate-d5-m4-n16.npz": "6fbe61611cc5099766b2b6a39b166eb51cff100d94d654ade3d31af28c96214f",
+    "build/analysis/multiple-surface-harmonic-ideal/reference-d5-m4-n16.npz": "420bc006a5f9e2781479f7ca4dd4b5b931bd518d57e49711bd70f93e8c2fdfae",
+    "build/analysis/multiple-surface-harmonic-ideal/candidate-d5-m8-n32.npz": "a8e9bc937349a7f6adb4833713437b120bfdd8ac731b1cb69d00947874607eaa",
+    "build/analysis/multiple-surface-harmonic-ideal/reference-d5-m8-n32.npz": "51d39612eb33037cb2f35c9a09f60311de5d64c963de3432095c20d630940774",
+    "tools/design-experiments/assess_multiple_surface_harmonic_ideal.py": "db6bd196cc7fda6a983d840842228fa3e1c7e34e5e3e080a9c107fca61817c01",
+    "tools/design-experiments/run_multiple_surface_harmonic_ideal.py": "04223957ba09633808f23126509e33236657a1720cc4a8b17a386d37a23ef484",
+    "tools/design-experiments/run_multiple_surface_harmonic.py": "3ecbc3dc4e1bf02b4b47744652905184dc1b4a76b12cfa1a90fc8beac59bdd60",
+    "docs/verification/ptera-core-model-diagnostic.md": "fd693eb95b6eeebedb329400aaeea25cb599cdb1c1aa4ad0073b5d1efaf66cfe",
+    "docs/verification/multiple-surface-harmonic-result.json": "10d40948f3f9a837dc740137e37fd918976fd303e220cbdbedbe57d82c73a671"
+  }
+}

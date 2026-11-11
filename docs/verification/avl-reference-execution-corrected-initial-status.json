@@ -1,0 +1,8 @@
+{
+  "error": "result path still targeted original result; overwrite guard prevented write",
+  "source_sha256": "a88a78d7f823049ff9402453a33e7c3b415c38bd203bfb910dfb1c4f5704e68a",
+  "source_archive": "build/analysis/run_avl_reference_smoke_corrected_initial.py",
+  "run_directory": "build/analysis/avl-smoke-corrected-20261030-210455-000336",
+  "completed_runs": 3,
+  "original_result_preserved": true
+}

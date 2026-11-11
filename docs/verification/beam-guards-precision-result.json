@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "reference_and_current_section_tube",
+      "certificate": {
+        "jacobian_lower": 1.0,
+        "sufficient_not_necessary": true,
+        "formula": "Gamma_x+kappa_y*z-kappa_z*y"
+      },
+      "negative_controls": [
+        "collapse",
+        "inverted",
+        "tube",
+        "bounds_None",
+        "bounds_[0.0, 0.1]",
+        "bounds_[-0.1, 0.1]",
+        "bounds_[nan, 0.1]"
+      ]
+    },
+    {
+      "case": "retained_state_and_projection_precision",
+      "cases": [
+        {
+          "n": 8,
+          "h": 0.0001,
+          "retained_residual": 1.3807480731615445e-66,
+          "binary64_projection_residual": 6.108410677314668e-08,
+          "projection_qualified": false
+        },
+        {
+          "n": 16,
+          "h": 0.0001,
+          "retained_residual": 1.4646028370582982e-65,
+          "binary64_projection_residual": 2.6469779601696886e-07,
+          "projection_qualified": false
+        },
+        {
+          "n": 32,
+          "h": 0.0001,
+          "retained_residual": 1.2600583761507343e-65,
+          "binary64_projection_residual": 1.0180684462191113e-06,
+          "projection_qualified": false
+        }
+      ]
+    }
+  ],
+  "seconds": 0.01600000006146729,
+  "sources": {
+    "tools/design-experiments/check_beam_guards_precision.py": "04bb77a07cd21ef5d9b3657f85ed6c52f59614962f78e5e511278d74f6b6d2c4",
+    "tools/design-experiments/beam_admissibility.py": "0bc77749d6e4782a72fb43cd009d42cbae8f66667e932658a357b6580ad13b20",
+    "tools/design-experiments/beam_section_input.py": "ff5c822c82b69915f9a30ba10aa2042075a95928bd181424763555b99befd668",
+    "tools/design-experiments/check_beam_se3_physical_v4.py": "f3551f1a20e4719a397863f6b1de0b4574fcadf0b2a908f4f518b17a1d19dbe5",
+    "docs/verification/beam-se3-physical-v4-result.json": "fb705e3ed073b2501f42bc50159cc336d3f0752867c152080fa0aa1f91f59d87"
+  }
+}

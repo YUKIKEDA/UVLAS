@@ -1,0 +1,17 @@
+{
+  "source_sha256": "ace0867759a5e9e1e3953fe23690d79649a91fde67a88c63170523de3595787d",
+  "evidence_sha256": {
+    "q9-curved-strain-screen-result.json": "d880dfbb4a2150a974b5864ea44e64d4ec3075a9a48d8d022de92468c9b88332",
+    "q9-curved-strain-screen-audit.json": "898d069584c212059453975888a5b6f499dc1f47234cd2f71fbeeeb208504b73",
+    "q9-curved-strain-boundary-result.json": "0dfb9c031cddf183e4c007ca9e89663b31596926eeb353915ecb3eb249196c28",
+    "q9-curved-strain-boundary-audit.json": "7e96c397d545fa17ebc058a793e6cfa9a7c6687216f23eee7586aa26d21b20f9",
+    "q9-curved-strain-screen-results.md": "60b7da8ae9f9c362cce4fee99c492c07f9b102b6d13a8396034b47d804692e12"
+  },
+  "screen_diagnostic_completed": true,
+  "independent_audits_pass": true,
+  "G_COV_accepted": false,
+  "C_COV_accepted": false,
+  "flat_T_S36_evidence_retained": true,
+  "next_work": "geometry-dependent edge reduction and work-consistent extension feasibility",
+  "product_shell_adopted": false
+}

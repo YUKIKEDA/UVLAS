@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "scope": "discrete midpoint far observer and prescribed circulation continuum, not finite-wing accuracy",
+  "records": [
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 32,
+      "drag": 0.4540904079486305,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.03639022619146903
+    },
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 64,
+      "drag": 0.46241209452990195,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.01873105880119097
+    },
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 128,
+      "drag": 0.46676152596267195,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.009501278638996191
+    },
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 256,
+      "drag": 0.46898410927223916,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.004784810370313974
+    },
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 512,
+      "drag": 0.47010746377969115,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.002400978067573445
+    },
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 1024,
+      "drag": 0.47067216913841625,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.0012026360778190082
+    },
+    {
+      "case": "prescribed_elliptic_circulation",
+      "n": 2048,
+      "drag": 0.4709552804188073,
+      "exact": 0.47123889803846897,
+      "relative_error": 0.0006018552815615363
+    },
+    {
+      "case": "independent_full_3D_filament_limit",
+      "relative_error": 1.8542648172470422e-07
+    },
+    {
+      "case": "transverse_rotation_scale_translation_reversal",
+      "errors": [
+        5.46229728115577e-14,
+        0.0,
+        0.0
+      ],
+      "reversal": 0.0
+    }
+  ],
+  "sources": {
+    "tools/design-experiments/check_trefftz_midpoint.py": "ecaf1f3b7f6edfa9d4c60bd6994ba9222d4fe7ed8911fcd1af2b4810c3e849f8",
+    "tools/design-experiments/trefftz_observations.py": "de0ee82e5a1b256c8523c476dc86f7edf659fd07476d27d74d6f0493baf80bd6",
+    "docs/verification/induced-drag-common-limit-protocol.md": "662a9773f3378615a92d07f19fba1c1cf7bb918d0b97fd8650b434c936579c6c"
+  },
+  "seconds": 0.4220000000204891
+}

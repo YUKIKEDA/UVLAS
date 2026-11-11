@@ -1,0 +1,83 @@
+{
+  "records": [
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        8.140971896699472e-08,
+        1.6534037885674406e-06
+      ],
+      "h1": [
+        0.49043487645653056,
+        2.12843558541814
+      ],
+      "error_difference": 1.0699909501580033e-14,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        6.1907255027555215e-06,
+        4.1862168123484054e-05
+      ],
+      "h1": [
+        0.49043489205775204,
+        2.1284352957784836
+      ],
+      "error_difference": 3.5278339915957493e-10,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.001,
+      "error": [
+        1.00177387674058e-07,
+        3.6104828946351756e-07
+      ],
+      "h1": [
+        0.49043487646462647,
+        2.1284361399719365
+      ],
+      "error_difference": 5.290659873604872e-13,
+      "h1_difference": 4.440892098500626e-16,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        9.737262803497642e-07,
+        2.9209930099279458e-06
+      ],
+      "h1": [
+        0.49043487649161943,
+        2.128436128683537
+      ],
+      "error_difference": 8.016786625864468e-10,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/audit_reference_work_refined_finite.py": "7aa54b09b9f42b80690fba29551e7d75aac88efc04c3b556e1aa47f6842e62b7",
+    "tools/design-experiments/reference_work_ancf_v3.py": "5894f38dc299953f0cbb581f9a4f5f9cd3aba0f0cd2f75588f180a1fb271d3e4",
+    "docs/verification/reference-work-refined-finite-result.json": "60a1902b3843dd3216ed314c2913f207f07cf0a2ae1fbe01d7b0536d4749baf8",
+    "docs/verification/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8"
+  },
+  "seconds": 65.60899999993853
+}

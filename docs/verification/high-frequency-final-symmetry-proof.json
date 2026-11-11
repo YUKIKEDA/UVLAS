@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "m": 2,
+      "n": 8,
+      "core": 0.0,
+      "errors": {
+        "gamma": 2.8151706605296387e-15,
+        "transfer": 1.3266559952966396e-15
+      }
+    },
+    {
+      "m": 2,
+      "n": 8,
+      "core": 1e-06,
+      "errors": {
+        "gamma": 2.9378580060679243e-15,
+        "transfer": 1.8770774858084686e-15
+      }
+    },
+    {
+      "m": 2,
+      "n": 8,
+      "core": 1e-05,
+      "errors": {
+        "gamma": 3.0419206325678955e-15,
+        "transfer": 1.8373264907168514e-15
+      }
+    },
+    {
+      "m": 4,
+      "n": 24,
+      "core": 0.0,
+      "errors": {
+        "gamma": 1.8342175845756675e-14,
+        "transfer": 8.383262620583976e-15
+      }
+    },
+    {
+      "m": 4,
+      "n": 24,
+      "core": 1e-06,
+      "errors": {
+        "gamma": 1.8405600391341003e-14,
+        "transfer": 7.341910477935247e-15
+      }
+    },
+    {
+      "m": 4,
+      "n": 24,
+      "core": 1e-05,
+      "errors": {
+        "gamma": 1.8298332830547056e-14,
+        "transfer": 9.059658831890448e-15
+      }
+    }
+  ],
+  "sources": {
+    "tools/design-experiments/run_high_frequency_final_symmetric.py": "55ed6530e0344d142b128f1dd68ca82748aed4645c8ac65b1c43ee92e18cd3d4",
+    "tools/design-experiments/uvlm_rm_scalar_symmetric.py": "4e7eb24348694a909e6b5e5a9d39e691b4e0b9f570ecb902127fe3a2b7d06525",
+    "docs/verification/high-frequency-final-space-core-protocol.md": "33fdec27d13eabbbdded627449f7b2efff108f203302917733bb5b5e5c90a929"
+  }
+}

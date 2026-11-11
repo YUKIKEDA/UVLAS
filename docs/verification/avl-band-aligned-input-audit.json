@@ -1,0 +1,11 @@
+{
+  "protocol": "docs/verification/avl-band-aligned-grid-experiment.md",
+  "source_sha256": "c41396d46bd438454707ff03abcd7165609272faad52b861e8308cd80dba60b7",
+  "fixture_sha256": "541f14d5904eaec01715da706fb935517b101a64e52ba183e18ea9acdd58fb1f",
+  "parent_fixture_sha256": "c8845096c378cdd8da6e272e06d3c104f0d41c5a2c5e041c9ff62bd457da0a1c",
+  "physical_shape_unchanged": true,
+  "cases": 2,
+  "decks": 20,
+  "sections_per_deck": 21,
+  "max_unknowns": 3840
+}

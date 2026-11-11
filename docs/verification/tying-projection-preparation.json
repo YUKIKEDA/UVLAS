@@ -1,0 +1,12 @@
+{
+  "sources": {
+    "tools/design-experiments/tying_projection_basis.py": "305abfff0b05c8c83fdc9da22a828d8845478ab92deef9ba172d05df7ff3ff22",
+    "tools/design-experiments/tying_projection_operator.py": "2ab9fd4e7a2b5cdd34404dbd1ea0fc55735700718522e57b69a59c91aafb5dc9",
+    "tools/design-experiments/tying_mid_projection_q4.py": "1a06ca47282862e72b7f59cf71990e8685422e247950036750b9d8a3a22320f4",
+    "tools/design-experiments/check_tying_projection.py": "859a8960e37b2603916800f916a59a67b3ea964a45f8bbb23476195eb5612ec9",
+    "tools/design-experiments/audit_tying_projection.py": "7063f29f70b4d5b58f0f2672098c40567de9b27b25a9614d0ce5f0e741c4adb0",
+    "tools/design-experiments/qem_el2_q4.py": "4e9f6a0ee21f98354dc4cae32a33358a4a2ca49ae223e68629290b05e22ec780",
+    "docs/tying-projection-formulation.md": "eae21324ade9ebaff2e31328318cb88f683e27fe3b8b84ba5397ea0acb74de43",
+    "docs/verification/tying-projection-protocol.md": "da51738316fe016a4a36ff4eed82ada2d222352d5383919deea0107c7884b065"
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "source_sha256": "c3ff402bef9a703f91e845886df73cd9d98856129f6444368ff725138101a661",
+  "executable_sha256": "7f5b321f308be5d737b6999ba143fc239a8bc7056e281a889e68603fa20bf740",
+  "protocol_sha256": "89568209808106d2bba6afb4d1d203bbaf010a2e34ddfbd1074494d2308164b5",
+  "display_protocol_sha256": "bd146be1b404dae020271ba3fbd53a5da967bd69a5dc3fa3b945fb7ed7bcf282",
+  "cases": [
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V01-M3",
+      "strips": 640,
+      "vortices_console_numeric": 1920,
+      "i4_display_overflow": false,
+      "peak_bytes": 5439488,
+      "files": {
+        "console.txt": {
+          "sha256": "e5acefc56dae2bcf921959ac741251310e6af52decedc9c5e841817e277efc44",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "2b48546e0acc2889c16e6e75111b04e5d45e89c031f77059f6c2d6e74ccb6546",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "cb0ec9309d65f183a9e22d1d7c8d84c0322c57c268c1786105664fcc1427f5e4",
+          "bytes": 891
+        }
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V01-M6",
+      "strips": 640,
+      "vortices_console_numeric": 3840,
+      "i4_display_overflow": false,
+      "peak_bytes": 5869568,
+      "files": {
+        "console.txt": {
+          "sha256": "6ab065d7b4bc519d8ac6d8b1dcdd3b531b24b89913dc3905e8903f935a4a6be4",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "7ddce87008b2cb9fa38dd0d89bbf408ec3d772d651288e20697d559eb694db04",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "0d3ff96a90e1e18a91547220816a7f98a1933235e93875e1267d34b546794d61",
+          "bytes": 891
+        }
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V01-M12",
+      "strips": 640,
+      "vortices_console_numeric": 7680,
+      "i4_display_overflow": false,
+      "peak_bytes": 6848512,
+      "files": {
+        "console.txt": {
+          "sha256": "e904e1734b9a32be3aa185150eab8393c2d682bf46c6c63891c1e6515d81ba5a",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "8a6944afe7552e3d6d583dbad01920736d4ac270a2f58b1025aef7f15cfd9ebf",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50",
+          "bytes": 892
+        }
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V01-M24",
+      "strips": 640,
+      "vortices_console_numeric": null,
+      "i4_display_overflow": true,
+      "peak_bytes": 9105408,
+      "files": {
+        "console.txt": {
+          "sha256": "1c63d4751a2b47f606ca239f5df351a96e7ece86361eb8ee8c08b2af7100d0a6",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "3e049a1856233033e1e8631532ce1c3e2a81f593e25c5c8848e869aa98518d60",
+          "bytes": 824
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "09a43bd511b072de98b4b70b5294683e060c4088947523900819bcc6414f793f",
+          "bytes": 892
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V02-M3",
+      "strips": 640,
+      "vortices_console_numeric": 1920,
+      "i4_display_overflow": false,
+      "peak_bytes": 5292032,
+      "files": {
+        "console.txt": {
+          "sha256": "f3696d972d2bb18e29a4b4ba81ae68504324ca49d324bf3cdfd9b625b704a88b",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "24f2b0ed7e8b7cede6a20489fb14bfd3044f96084422a20c63b3918c707cd9f3",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "325202e5864aee9a6bec66dde5279115217e78268198749ac1f61b3b20af5c5b",
+          "bytes": 1073
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V02-M6",
+      "strips": 640,
+      "vortices_console_numeric": 3840,
+      "i4_display_overflow": false,
+      "peak_bytes": 5877760,
+      "files": {
+        "console.txt": {
+          "sha256": "83179cdcf79f15567c58f289c37fba83c3bba36a0dae2b69bb74bcfe83406efe",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "4878ebaa26679d7b86a240516d167f8ccc28d0ec25c3d3d7a8bc859104be26f9",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "c10bd460fff21c1c6a7ca155fe16d038a203b8665e81b96de68e70b5e1db5a25",
+          "bytes": 1073
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V02-M12",
+      "strips": 640,
+      "vortices_console_numeric": 7680,
+      "i4_display_overflow": false,
+      "peak_bytes": 6852608,
+      "files": {
+        "console.txt": {
+          "sha256": "622dc08498910f2098183a29579b992bc549797bdfa68df2227c3ff68d423215",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "3baa341790cc5da135affc0b8a4284c26b96fe1978399c3fbb302a7fa830e257",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa",
+          "bytes": 1074
+        }
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "directory": "build/analysis/avl-span1280-load-20261031-152154/FW-V02-M24",
+      "strips": 640,
+      "vortices_console_numeric": null,
+      "i4_display_overflow": true,
+      "peak_bytes": 8978432,
+      "files": {
+        "console.txt": {
+          "sha256": "b9f42b595270704a9ef8248105e5c5a4622e6a655697735a27468eeb35408ac3",
+          "bytes": 1253
+        },
+        "resource.txt": {
+          "sha256": "7309f6ed366fd83c3ce23f10ef3e4168e1b463b40831b57b7240d3b890644146",
+          "bytes": 824
+        },
+        "session.txt": {
+          "sha256": "fd1e7109e91df6920ea53c72e255cebdc97ac18c55ec8a6954f83a8bdd8d20b9",
+          "bytes": 19
+        },
+        "wing.avl": {
+          "sha256": "ca5b81249bc4198140e1abd6c295f2d239c59d873f56abcf9edc791ec40d129f",
+          "bytes": 1074
+        }
+      }
+    }
+  ],
+  "seconds": 1.302055638000013,
+  "total_bytes": 24622,
+  "no_solve": true,
+  "all_criteria_pass": true
+}

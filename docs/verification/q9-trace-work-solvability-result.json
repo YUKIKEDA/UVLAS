@@ -1,0 +1,780 @@
+{
+  "source_sha256": "12f520d785f21cafb2670de34c11f2b4730845d0e7b68820a03e5ea4e51b4b66",
+  "parent_sha256": "64f9e8d5fadb0d59a728957cac3ed7671ae19f5afa77921eb55a34c89697381a",
+  "protocol_sha256": "207e4466b1ed1f745855cb84ec6e18ee2d2d04538e017e94f810e49a447aebbe",
+  "contract_sha256": "029c902a405f84e34258da0977f7a4606c38908c47d10b9052e21f825b7528ca",
+  "dependencies": {
+    "check_q9_edge_moment_shared_space_v2.py": "7ab03aadc263757fc3f1280e5ca57c2b7b96d39d3d0df5c7a704fab02b6a7d88",
+    "q9_edge_moment.py": "8d2a8fcc0acbfcd08ff4ea1c0aae26a6e88ce0981f98b59902129d3f76232668",
+    "check_q9_curved_strain_screen.py": "4eaffaef39ed7bdab68f7797a3126be0396b6541bd3931bca6efc27612fcb9b3",
+    "check_q9_independent_load.py": "1c541fade6d865aecaf7fbfa99fa8dbbf0f68f44a0ba0f51da36004e3ff4003d"
+  },
+  "cases": [
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5143178440686857e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5143178440686857e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5143178440686857e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747439008
+        },
+        "1e-10": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747439008
+        },
+        "1e-11": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747439008
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4658964007276207e-15
+        },
+        "1e-10": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4658964007276207e-15
+        },
+        "1e-11": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4658964007276207e-15
+        }
+      },
+      "w_dofs": 9,
+      "boundary_audit": 9.039203992212391e-16,
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.1
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.1422870209941968e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.1422870209941968e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.1422870209941968e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.001328478677406682
+        },
+        "1e-10": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.001328478677406682
+        },
+        "1e-11": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.001328478677406682
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.8143407880658835e-15
+        },
+        "1e-10": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.8143407880658835e-15
+        },
+        "1e-11": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.8143407880658835e-15
+        }
+      },
+      "w_dofs": 49,
+      "boundary_audit": 1.2137854556404343e-15,
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.1
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.575864390429276e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.575864390429276e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.575864390429276e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747438662
+        },
+        "1e-10": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747438662
+        },
+        "1e-11": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747438662
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.3307664663736448e-15
+        },
+        "1e-10": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.3307664663736448e-15
+        },
+        "1e-11": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.3307664663736448e-15
+        }
+      },
+      "w_dofs": 9,
+      "boundary_audit": 7.761830942504569e-16,
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.01
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.2228607731803447e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.2228607731803447e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.2228607731803447e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.0013284786774067422
+        },
+        "1e-10": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.0013284786774067422
+        },
+        "1e-11": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.0013284786774067422
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.8769304566404235e-15
+        },
+        "1e-10": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.8769304566404235e-15
+        },
+        "1e-11": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.8769304566404235e-15
+        }
+      },
+      "w_dofs": 49,
+      "boundary_audit": 1.0565975155389092e-15,
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.01
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6940387709673066e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6940387709673066e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6940387709673066e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747438
+        },
+        "1e-10": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747438
+        },
+        "1e-11": {
+          "direction": 42,
+          "combined": 47,
+          "compatible_w": 4,
+          "projected_w": 4,
+          "range_defect": 0.0015776443747438
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5714145974326372e-15
+        },
+        "1e-10": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5714145974326372e-15
+        },
+        "1e-11": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5714145974326372e-15
+        }
+      },
+      "w_dofs": 9,
+      "boundary_audit": 1.0898930166247915e-15,
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.001
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.3398714458411813e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.3398714458411813e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.3398714458411813e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.0013284786774067987
+        },
+        "1e-10": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.0013284786774067987
+        },
+        "1e-11": {
+          "direction": 148,
+          "combined": 175,
+          "compatible_w": 22,
+          "projected_w": 22,
+          "range_defect": 0.0013284786774067987
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.7718365703682143e-15
+        },
+        "1e-10": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.7718365703682143e-15
+        },
+        "1e-11": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.7718365703682143e-15
+        }
+      },
+      "w_dofs": 49,
+      "boundary_audit": 1.1037562961552681e-15,
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.001
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6463868420707752e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6463868420707752e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6463868420707752e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4399157324808549e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4399157324808549e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4399157324808549e-15
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.2238729551547869e-15
+        },
+        "1e-10": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.2238729551547869e-15
+        },
+        "1e-11": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.2238729551547869e-15
+        }
+      },
+      "w_dofs": 9,
+      "boundary_audit": 1.265509860121902e-15,
+      "geometry": "RECT",
+      "n": 2,
+      "h": 0.01
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.0157587620402764e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.0157587620402764e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.0157587620402764e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.944082410050115e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.944082410050115e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.944082410050115e-15
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.6005302587827576e-15
+        },
+        "1e-10": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.6005302587827576e-15
+        },
+        "1e-11": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.6005302587827576e-15
+        }
+      },
+      "w_dofs": 49,
+      "boundary_audit": 1.3022874016833197e-15,
+      "geometry": "RECT",
+      "n": 4,
+      "h": 0.01
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6350723195168254e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6350723195168254e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.6350723195168254e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4822704654942358e-15
+        },
+        "1e-10": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4822704654942358e-15
+        },
+        "1e-11": {
+          "direction": 40,
+          "combined": 40,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.4822704654942358e-15
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5656881076577658e-15
+        },
+        "1e-10": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5656881076577658e-15
+        },
+        "1e-11": {
+          "direction": 32,
+          "combined": 32,
+          "compatible_w": 9,
+          "projected_w": 9,
+          "range_defect": 1.5656881076577658e-15
+        }
+      },
+      "w_dofs": 9,
+      "boundary_audit": 1.286075911735758e-15,
+      "geometry": "SKEW",
+      "n": 2,
+      "h": 0.01
+    },
+    {
+      "interior": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.311241745133986e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.311241745133986e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.311241745133986e-15
+        }
+      },
+      "interior_work": {
+        "1e-09": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.196927137075944e-15
+        },
+        "1e-10": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.196927137075944e-15
+        },
+        "1e-11": {
+          "direction": 144,
+          "combined": 144,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 2.196927137075944e-15
+        }
+      },
+      "edge_work": {
+        "1e-09": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.804067752533726e-15
+        },
+        "1e-10": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.804067752533726e-15
+        },
+        "1e-11": {
+          "direction": 112,
+          "combined": 112,
+          "compatible_w": 49,
+          "projected_w": 49,
+          "range_defect": 1.804067752533726e-15
+        }
+      },
+      "w_dofs": 49,
+      "boundary_audit": 1.2308368472658744e-15,
+      "geometry": "SKEW",
+      "n": 4,
+      "h": 0.01
+    }
+  ],
+  "stop_reason": null,
+  "seconds": 9.686999999976251,
+  "peak_bytes": 76836864,
+  "diagnostic_checks_pass": true,
+  "product_shell_adopted": false,
+  "edge_work_all_w": true
+}

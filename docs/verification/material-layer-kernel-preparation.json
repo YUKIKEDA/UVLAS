@@ -1,0 +1,8 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "tools/design-experiments/check_material_layer_kernel.py": "94387cf57555a6d16900105bbc99aa92c8cd48715ae4beb96cf4a697017b9164",
+    "docs/material-layer-adoption-contract.md": "89ff9f31d4b402ef9e5f8eb46b1ac32bbb13b6e4cbfefb4e2ece86f12cac4771",
+    "docs/verification/material-layer-kernel-protocol.md": "081d3fcd23fd45432602ec10815156aca5214dbaf71aa982078c9da86318d141"
+  }
+}

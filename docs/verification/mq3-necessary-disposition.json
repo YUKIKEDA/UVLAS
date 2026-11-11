@@ -1,0 +1,178 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "necessary_constraint_diagnostic_complete",
+  "quartic_problems": 14,
+  "quadratic_controls": 14,
+  "work_traces": 2,
+  "all_primary_checks": true,
+  "all_alternate_evaluation_checks": true,
+  "summary": [
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "N",
+      "nullity": 196,
+      "quartic_error": 0.0002305475269772635,
+      "full_zero_kernel_error": 0.03722665666722867,
+      "H1_nullity": 126,
+      "objective_nonuniqueness": 6
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "NM",
+      "nullity": 166,
+      "quartic_error": 0.014570340306418848,
+      "full_zero_kernel_error": 0.03722665666722867,
+      "H1_nullity": 96,
+      "objective_nonuniqueness": 4
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "NMS",
+      "nullity": 136,
+      "quartic_error": 0.014726577354036001,
+      "full_zero_kernel_error": 0.03722665666722867,
+      "H1_nullity": 70,
+      "objective_nonuniqueness": 4
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "N",
+      "nullity": 196,
+      "quartic_error": 0.00023054794034931564,
+      "full_zero_kernel_error": 0.32998292727154477,
+      "H1_nullity": 126,
+      "objective_nonuniqueness": 6
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "NM",
+      "nullity": 166,
+      "quartic_error": 0.014570341367970125,
+      "full_zero_kernel_error": 0.32998292727154477,
+      "H1_nullity": 96,
+      "objective_nonuniqueness": 4
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "NMS",
+      "nullity": 136,
+      "quartic_error": 0.01472657738834926,
+      "full_zero_kernel_error": 0.32998292727154477,
+      "H1_nullity": 70,
+      "objective_nonuniqueness": 4
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "NMSW",
+      "nullity": 112,
+      "quartic_error": 0.01573811660907999,
+      "full_zero_kernel_error": 0.32998292727154477,
+      "H1_nullity": 48,
+      "objective_nonuniqueness": 2
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "N",
+      "nullity": 188,
+      "quartic_error": 0.00031247895672151336,
+      "full_zero_kernel_error": 0.596333067952935,
+      "H1_nullity": 126,
+      "objective_nonuniqueness": 0
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "NM",
+      "nullity": 158,
+      "quartic_error": 0.016243288279366355,
+      "full_zero_kernel_error": 0.596333067952935,
+      "H1_nullity": 96,
+      "objective_nonuniqueness": 0
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "NMS",
+      "nullity": 128,
+      "quartic_error": 0.01652002094366763,
+      "full_zero_kernel_error": 0.596333067952935,
+      "H1_nullity": 68,
+      "objective_nonuniqueness": 0
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "level": "N",
+      "nullity": 188,
+      "quartic_error": 0.00031244577073353776,
+      "full_zero_kernel_error": 0.5963330679529363,
+      "H1_nullity": 126,
+      "objective_nonuniqueness": 0
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "level": "NM",
+      "nullity": 158,
+      "quartic_error": 0.016243413829256762,
+      "full_zero_kernel_error": 0.5963330679529363,
+      "H1_nullity": 96,
+      "objective_nonuniqueness": 0
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "level": "NMS",
+      "nullity": 128,
+      "quartic_error": 0.016519755107372937,
+      "full_zero_kernel_error": 0.5963330679529363,
+      "H1_nullity": 68,
+      "objective_nonuniqueness": 0
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "level": "NMSW",
+      "nullity": 104,
+      "quartic_error": 0.01783095548036597,
+      "full_zero_kernel_error": 0.5963330679529363,
+      "H1_nullity": 47,
+      "objective_nonuniqueness": 0
+    }
+  ],
+  "physical_adoption": false,
+  "relaxations_are_candidate_solutions": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "finite_thickness_lower_bound": false,
+  "work_preservation_requirement_maintained": true,
+  "next": "docs/mq3-interior-stationarity-diagnostic.md",
+  "next_executed": false,
+  "verification": {
+    "mq3-necessary-preparation_source_hashes": 9,
+    "mq3-necessary-result_source_hashes": 7,
+    "mq3-necessary-audit_source_hashes": 4,
+    "artifact_hashes": 30,
+    "python_syntax": 3,
+    "local_markdown_links": 381
+  },
+  "documents": {
+    "README.md": "9c5420fdf28de485043bb47324fd31371167bafe6244ae3b0e039d39efff336f",
+    "docs/roadmap.md": "845d2c4d754d3798c99a2087ac3ca06364f0626d1cc56d5dd30f1cebc97f887f",
+    "docs/preimplementation-plan.md": "9aa7d4fa0be94a570e20718412f4c6df047cbfe3cc4c08be84178f84bd7c145c",
+    "docs/structural-model-adoption-review.md": "002530d317e230a45d9df708c8c17ef127166785e02fb71d1c224d3184388b5f",
+    "docs/requirements-evidence-map.md": "7e7635a548bda7aeeb05dc682a1b96f3da479d80e39bff41621c751fe5951bc1",
+    "docs/design-decisions.md": "df79ee58733a913600a4c03df465b93cfe121bce66969ccf4cabf24c16947b2d",
+    "docs/verification/mq3-necessary-results.md": "74514ca4b45d002a80e848bcb90c231af3dcac20ab64a7186fc322513e0ec855",
+    "docs/mq3-interior-stationarity-diagnostic.md": "333ffde8ff4a2675b079ddab7b635a532028f26cc77607560c4d8b3641f9c115",
+    "docs/verification/mq3-necessary-audit-protocol.md": "11c81a89c6a28d6083113bd253b61abbfdbd49e4846a2bb60d86a76f3878e67e"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "two_formulation_families_reviewed_one_trial_selected",
+  "primary_sources": 4,
+  "reviewed_families": 2,
+  "selected_trial": "GSP-Q3",
+  "alternative_not_selected": "Q4_r_Q3_d_Q2_c_150_coordinate_compatible_kinematics",
+  "product_scope_changed": false,
+  "old_MQ3I1_not_adopted": true,
+  "internal_rules_changed": [
+    "no pointwise raw zz/thickness-difference retention",
+    "replace strong assumed-strain edge trace by conforming-displacement weak work"
+  ],
+  "work_and_accuracy_requirements_maintained": true,
+  "formulation_defined": [
+    "kinematics",
+    "203_reference_stress_fields_and_geometry_enrichment",
+    "normalized_compliance_Gram",
+    "R_and_R_adjoint",
+    "energy_and_internal_force",
+    "consistent_material_and_geometric_tangent",
+    "thickness_derivative",
+    "internal_interfaces_and_cost",
+    "next_local_gates"
+  ],
+  "certificate": {
+    "affine_positive_thickness_only": true,
+    "selected_stress_rank": 138,
+    "selected_kernel": 6,
+    "negative_control_rank": 126,
+    "negative_control_kernel": 18,
+    "primary_checker_extra_negative_control_assumption_retained": true,
+    "independent_rational_elimination_passed": true
+  },
+  "physical_adoption": false,
+  "curved_local_test_executed": false,
+  "shared_general_bending_test_executed": false,
+  "thin_uniformity_proven": false,
+  "next": "GSP-Q3 stress-space/Gram/R-adjoint gate and 30 curved local conditions",
+  "verification": {
+    "gsp-q3-flat-rank-preparation_source_hashes": 2,
+    "gsp-q3-flat-rank-result_source_hashes": 3,
+    "gsp-q3-flat-rank-audit-preparation_source_hashes": 3,
+    "gsp-q3-flat-rank-audit_source_hashes": 4,
+    "certificate_artifact_hashes": 4,
+    "python_syntax": 2,
+    "local_markdown_links": 398
+  },
+  "documents": {
+    "README.md": "48321458129a541e0be3dc69dab2720e44a263448ae68cb34ac030459675b6aa",
+    "docs/roadmap.md": "4a2c40673b9cfc76daec56e86d558eae77b61f374fb524fc96f8b0c80364def3",
+    "docs/preimplementation-plan.md": "a2fb5a3d19720ccb1ecc6f29b5c74de0654c9cc1e109c3e8ad578c35d0e9f0e6",
+    "docs/structural-model-adoption-review.md": "73e0951761f6b59ac1e1ba54d3ae3855cbc311958390cdd15a29c90ebfff1042",
+    "docs/requirements-evidence-map.md": "289210e90a023fa3c2205c375e68a763174b33fa1c7de4c32807c14769310e92",
+    "docs/design-decisions.md": "041d605cedc34e6db2e95f0de82d737e8d4faf8f81fb8fbfea3c3ffcfb30321c",
+    "docs/main-shell-formulation-review-results.md": "e823e9c8fc91b473b8980d004b52818518ec41a038c2dccdcb096905ea344226",
+    "docs/gsp-q3-formulation.md": "c4b83b14ed876b9a23fb5aca816b8b21fe537bb2e6c5df68878a52cde5b36d1a",
+    "docs/verification/gsp-q3-flat-rank-results.md": "7ff4d21267a5b68446dda174600677f0207c7c3d4879603e01c5824783481d3e",
+    "docs/verification/gsp-q3-flat-rank-protocol.md": "b10bf3080b25dc38548ca32869f1b7c12c56081731ab532f9c332a86b2e0e985",
+    "docs/verification/gsp-q3-flat-rank-audit-protocol.md": "af76bd9d2fb312c79a1c55fa5beb5fc82b69ddaf6903381f58aa70b30a29ac21"
+  },
+  "source_manifest_sha256": "ed5d533d8b69cffe9922c22cbe395fd05052b9d10b7d2afd818b56aa28569d79"
+}

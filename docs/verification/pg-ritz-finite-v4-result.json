@@ -1,0 +1,647 @@
+{
+  "all_cases": true,
+  "records": [
+    {
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "observation": {
+        "error": [
+          2.312973789383194e-08,
+          4.667140344545993e-06,
+          2.505940203032812e-05
+        ],
+        "position": [
+          1.1231497593635514e-11,
+          2.224491420983195e-09,
+          1.298416679245616e-08
+        ],
+        "stationarity": [
+          3.5222690512500847e-17,
+          8.657662174398186e-16,
+          1.5190274264216904e-13
+        ]
+      },
+      "rcond": 1.3834737780555346e-06,
+      "mass_min": 1.4131634746924813e-05,
+      "seconds": 20.969000000040978,
+      "execution_route": "cylinder_reference_branch_v2"
+    },
+    {
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "observation": {
+        "error": [
+          2.3132040980438444e-08,
+          4.667617324214615e-06,
+          2.5061380155445713e-05
+        ],
+        "position": [
+          1.0971342631640823e-11,
+          2.1724380337368386e-09,
+          1.2671827861610297e-08
+        ],
+        "stationarity": [
+          3.578886768976073e-15,
+          6.410814576003323e-14,
+          7.228797982233964e-14
+        ]
+      },
+      "rcond": 1.3851090775169858e-08,
+      "mass_min": 1.4131739681899256e-09,
+      "seconds": 22.780999999959022,
+      "execution_route": "cylinder_reference_branch_v2"
+    },
+    {
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "observation": {
+        "error": [
+          1.1310218598005494e-10,
+          2.2688087303141907e-08,
+          8.193668231287137e-07
+        ],
+        "position": [
+          1.457659689601871e-14,
+          2.923777433463692e-12,
+          1.1171795382493498e-10
+        ],
+        "stationarity": [
+          6.442144584798061e-16,
+          2.4178842088189452e-15,
+          2.7040230678937414e-14
+        ]
+      },
+      "rcond": 3.6837162718662876e-07,
+      "mass_min": 1.2826548681313798e-05,
+      "seconds": 252.9529999999795,
+      "execution_route": "cylinder_reference_branch_v2"
+    },
+    {
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "observation": {
+        "error": [
+          1.1574056105753691e-10,
+          2.2690396680940054e-08,
+          8.194488872016165e-07
+        ],
+        "position": [
+          1.3357727971868496e-14,
+          2.675762638607872e-12,
+          1.022630064246612e-10
+        ],
+        "stationarity": [
+          5.695466863873877e-14,
+          2.421862061069636e-13,
+          2.794435622958801e-12
+        ]
+      },
+      "rcond": 3.6836021396713487e-09,
+      "mass_min": 1.2826608654095436e-09,
+      "seconds": 243.4220000000205,
+      "execution_route": "cylinder_reference_branch_v2"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.0019163005621314817,
+          0.0022722410267708537,
+          0.002501851180421229
+        ],
+        "position": [
+          0.001582516125271547,
+          0.002020010012598327,
+          0.002314984246086921
+        ],
+        "stationarity": [
+          1.6786360401666198e-15,
+          2.0318694407957754e-15,
+          1.0794020021550444e-14
+        ]
+      },
+      "rcond": 7.840512580105663e-05,
+      "mass_min": 1.350054303111246e-05,
+      "fixed": 6.265062253707487e-16,
+      "trace_defect": 3.883432213336393e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 27.905999999959022,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.2, 0.0)-n2-h0.01.npz",
+      "artifact_sha256": "012429bd1b03fdef049cfe0e019de5c3be31dd91e1ad399e118be18f47f2fdc1"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.0009591878688037777,
+          0.0011437320693920734,
+          0.0012670713401923244
+        ],
+        "position": [
+          0.0022358178715142737,
+          0.0032087355966581286,
+          0.0037980318687495297
+        ],
+        "stationarity": [
+          1.331425110905799e-14,
+          1.5716414067384682e-14,
+          1.807658951897689e-14
+        ]
+      },
+      "rcond": 1.9455596806499645e-05,
+      "mass_min": 1.6431993561087957e-09,
+      "fixed": 2.4275286641950444e-16,
+      "trace_defect": 3.2827135427958817e-14,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 28.26500000001397,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.2, 0.0)-n2-h0.0001.npz",
+      "artifact_sha256": "b275efe813e3abc8ad0773e111d0732643e6600ca1c7a0116dc0c632c07e8a6b"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.0013297051038718233,
+          0.001541250391051058,
+          0.001662968143885203
+        ],
+        "position": [
+          0.00046839632340059655,
+          0.0006496138931086793,
+          0.000758534443005743
+        ],
+        "stationarity": [
+          6.815526634151647e-16,
+          8.554898012085464e-16,
+          1.110450706919331e-15
+        ]
+      },
+      "rcond": 3.203104470097352e-05,
+      "mass_min": 1.3487648533375784e-05,
+      "fixed": 8.519419267001126e-16,
+      "trace_defect": 1.7279199891341468e-12,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 228.6720000000205,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.2, 0.0)-n4-h0.01.npz",
+      "artifact_sha256": "85fc65bf96fd98d3a3e60351bfda74f3fe7265e63280fff6ae1dc52b0a4bbd72"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.0006424651685301879,
+          0.0007889865104703779,
+          0.0008889210865835099
+        ],
+        "position": [
+          0.006722212046128921,
+          0.010698799754992227,
+          0.013671906861005985
+        ],
+        "stationarity": [
+          1.131685697051399e-14,
+          1.4953081697822677e-14,
+          1.746713214344485e-14
+        ]
+      },
+      "rcond": 2.7107653184509156e-06,
+      "mass_min": 1.5220547218210752e-09,
+      "fixed": 1.24286838416518e-16,
+      "trace_defect": 1.681483066481965e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 145.875,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.2, 0.0)-n4-h0.0001.npz",
+      "artifact_sha256": "f6521fb69fac2e7d9d0151b3a555ba10592c7d2af9bfbf78ae026f1606bade27"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "observation": {
+        "error": [
+          7.33446320986983e-05,
+          0.00017220575462947955,
+          0.0027229523775864984
+        ],
+        "position": [
+          7.169451361188975e-06,
+          1.7562652663290226e-05,
+          0.0002764536675583564
+        ],
+        "stationarity": [
+          1.0970227508520645e-17,
+          1.5157229907108624e-15,
+          2.6214266126294574e-13
+        ]
+      },
+      "rcond": 0.00053821597445514,
+      "mass_min": 1.6465613529054772e-05,
+      "fixed": 1.028975624324524e-17,
+      "trace_defect": 1.9972511434774928e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 11.656000000075437,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.0, 0.07)-n2-h0.01.npz",
+      "artifact_sha256": "9c07f58925aab456de84ed4dffa2012d66bd33e3f448add8420845e8557cd42b"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.00018493063837723132,
+          0.0007063704762890523,
+          0.007629287194626389
+        ],
+        "position": [
+          5.9527122513268356e-06,
+          1.9432221098388e-05,
+          0.0003199885667491466
+        ],
+        "stationarity": [
+          6.565605982840711e-16,
+          3.1362674446812856e-15,
+          2.5288624288792205e-14
+        ]
+      },
+      "rcond": 1.0638547948683859e-05,
+      "mass_min": 1.666336194595572e-09,
+      "fixed": 1.2959604092990795e-19,
+      "trace_defect": 1.445167095200943e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 11.531000000075437,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.0, 0.07)-n2-h0.0001.npz",
+      "artifact_sha256": "adaacd3951eda735f60908607995273ba7dd281a43968eeb29047a93d23a1940"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.0001516125992749582,
+          0.0006108138928828818,
+          0.006457454213702745
+        ],
+        "position": [
+          5.154422628754584e-06,
+          1.0821235411195346e-05,
+          0.00023720094855019625
+        ],
+        "stationarity": [
+          2.481814397437807e-17,
+          2.1106514229030315e-16,
+          9.522737837428658e-16
+        ]
+      },
+      "rcond": 0.00022320425827915133,
+      "mass_min": 1.7155628755186768e-05,
+      "fixed": 2.074298984531056e-17,
+      "trace_defect": 8.996656088147557e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 119.21899999992456,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.0, 0.07)-n4-h0.01.npz",
+      "artifact_sha256": "dfc24a4d6a7fe4495ec7141e295249fafb2f8c15de302112bd15ac5fb99481c7"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "observation": {
+        "error": [
+          0.0002310071985156394,
+          0.0012197762984255606,
+          0.009501907692549997
+        ],
+        "position": [
+          1.0821321700422423e-05,
+          3.226055503266362e-05,
+          0.0005377634446327465
+        ],
+        "stationarity": [
+          5.127792824679808e-16,
+          1.8951521519133565e-15,
+          2.38256671558045e-14
+        ]
+      },
+      "rcond": 3.991404840434862e-06,
+      "mass_min": 1.7188926942760554e-09,
+      "fixed": 1.3459353531870832e-18,
+      "trace_defect": 2.0299324113992455e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 119.96899999992456,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, 0.0, 0.07)-n4-h0.0001.npz",
+      "artifact_sha256": "3634439682125ce9282267ac2347dee3b32d485164899582271bb8666018f159"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": true,
+      "observation": {
+        "error": [
+          0.000748746382470963,
+          0.000808436609498672,
+          0.0008910555002987434
+        ],
+        "position": [
+          0.0009147325619520819,
+          0.0010588068190299142,
+          0.0011669742883609483
+        ],
+        "stationarity": [
+          1.0458863701682232e-15,
+          1.3808502810001327e-15,
+          1.1717977101217717e-14
+        ]
+      },
+      "rcond": 9.771513453565388e-05,
+      "mass_min": 1.7471232185772574e-05,
+      "fixed": 6.910162546336363e-16,
+      "trace_defect": 5.768785195947835e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 13.65700000000652,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, -0.2, 0.07)-n2-h0.01.npz",
+      "artifact_sha256": "30f4ccbf2881039093e16c62fa4d71c2d8f9d8c7d6e8636a0cad2c1c252129e0"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": true,
+      "observation": {
+        "error": [
+          0.0008101702454404472,
+          0.0009207824170537852,
+          0.0010287889188273732
+        ],
+        "position": [
+          0.003316079899691693,
+          0.003888678062469474,
+          0.0044675553838287385
+        ],
+        "stationarity": [
+          6.930992392232342e-15,
+          8.278355151961957e-15,
+          9.930881807015549e-15
+        ]
+      },
+      "rcond": 2.334242619334851e-05,
+      "mass_min": 1.923371014604694e-09,
+      "fixed": 3.124670661103224e-16,
+      "trace_defect": 9.9707649776649e-14,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 13.655999999959022,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, -0.2, 0.07)-n2-h0.0001.npz",
+      "artifact_sha256": "05d7ef3de8870dcde8c3a7a8e1bfea9844ccc2467167e3bb8fc275fa211bb55c"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": true,
+      "observation": {
+        "error": [
+          0.002564718178060704,
+          0.003068618114838191,
+          0.0034036241890494532
+        ],
+        "position": [
+          0.001884909304980079,
+          0.00223249069332856,
+          0.002477286341108302
+        ],
+        "stationarity": [
+          1.0370821998730637e-15,
+          1.2593103921749192e-15,
+          1.2970251800090573e-15
+        ]
+      },
+      "rcond": 6.144303223062705e-05,
+      "mass_min": 1.759586373029712e-05,
+      "fixed": 7.189005792572478e-16,
+      "trace_defect": 2.0652865603942425e-12,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 144.545999999973,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, -0.2, 0.07)-n4-h0.01.npz",
+      "artifact_sha256": "92fddd6384e4267dc568677346957668373b173a55c11a7f0f83fe67ab3f79ca"
+    },
+    {
+      "execution_route": "general_reference_clamped_v3",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": true,
+      "observation": {
+        "error": [
+          0.0012660940056762532,
+          0.0015645262163214706,
+          0.0017601485703421633
+        ],
+        "position": [
+          0.029766545498232384,
+          0.03865600300623065,
+          0.04440009012066111
+        ],
+        "stationarity": [
+          8.544111935694666e-15,
+          1.345834392948199e-14,
+          1.3444469370834033e-14
+        ]
+      },
+      "rcond": 4.313392523714378e-06,
+      "mass_min": 2.0659467387309985e-09,
+      "fixed": 2.6432510152017696e-16,
+      "trace_defect": 2.1404641909449796e-13,
+      "checks": {
+        "stationarity": true,
+        "condition": true,
+        "mass": true,
+        "fixed": true,
+        "trace": true
+      },
+      "seconds": 144.98399999993853,
+      "artifact": "build/analysis/pg-ritz-general-20261105-004745/p(0.4, -0.2, 0.07)-n4-h0.0001.npz",
+      "artifact_sha256": "38dac4a267977c11ef94b5fd0dbeaa6536a4ae6898de4fa497d3ece90812b128"
+    }
+  ],
+  "stops": [],
+  "R4_complete": false,
+  "main_shell_adopted": false,
+  "seconds": 1048.4220000000205,
+  "sources": {
+    "docs/verification/pg-ritz-finite-v3-result.json": "126833793aa012e94962d36ff4a29166d6324dc10fe65edb11568fb2cb4d7abd",
+    "tools/design-experiments/check_pg_ritz_finite_v4.py": "2effac89068ef286f71bad17beac7690d11b2bbaae4c5454000e08c3a93a9870",
+    "tools/design-experiments/pg_ritz_shell_v3.py": "a50b76970ec3b628dc4dcfa0ed4217524854ea2503bf9bbac0f14e8faa78006b",
+    "tools/design-experiments/pg_ritz_lift_v4.py": "f37423aa3d17dd4b8930e8be678d71dacf5aad58985514f8875f155059f0942b",
+    "tools/design-experiments/pg_ritz_clamp.py": "419553e3d5169c4ca86b56a7fb65bf88f8d46da691e54fee6d302e419214b9f6",
+    "tools/design-experiments/pg_ritz_trace_v2.py": "dfef7440af256452d5164aa10b3e66545104f5cf309059c6a7c4e84a6c38bfba",
+    "tools/design-experiments/pg_trace_nullspace.py": "4ee491796ace22370eefeb1d46e00f3bd008b66c0a540d1ec4cdc7d2ae894d53",
+    "tools/design-experiments/check_pg_ritz_finite_v3.py": "55d7b324163a5f990d803a12e6cbb233e7944cbab29c6d1ebddeb36098be0886"
+  }
+}

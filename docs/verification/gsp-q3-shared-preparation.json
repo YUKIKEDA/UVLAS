@@ -1,0 +1,20 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "tools/design-experiments/gsp_q3_shared_space.py": "c84e319969daedfa232d2357e65e82a5837d6c87a586217261aa3e56b7511d9f",
+    "tools/design-experiments/check_gsp_q3_shared.py": "a54a7dc9295046689c726641fb60ad879a5b06b41be320f39489790ee2460015",
+    "tools/design-experiments/audit_gsp_q3_shared.py": "933feb0f2fcce33ec1b77943007df440acfbfc5052aea60b35a36b04b4ea28b6",
+    "tools/design-experiments/gsp_q3_v2.py": "82135b41ad8c32e88a61e63bf8a9874983d4e5ac1670712ef213daaf64f9faed",
+    "tools/design-experiments/gsp_q3_basis_v2.py": "4826deee9dd17064f1650408d58d5699d2d87949f5d7eb3e8b5aa8c1018b7e0d",
+    "tools/design-experiments/mq3i1_shared_space.py": "a6b494a6b67716f32b5fd3ea329853f125d048c3efdca323eafdbeecd0653382",
+    "tools/design-experiments/q3_thin_expansion.py": "c645d0a7c0e893bce0d0d2ab9e26a849df6e36faa0ba54b3657a4f9cbabfec73",
+    "tools/design-experiments/q3_quartic_approximation.py": "dc4c23ca559cdd994de1b4a53bd45ce500088b4d39a209a5e0d0b79197454781",
+    "docs/verification/gsp-q3-shared-protocol.md": "dd38e4f43eba31c7a4a735543f2376ddb98f3cc6fed9e5c717c26409347907e8",
+    "docs/gsp-q3-shared-and-membrane-contract.md": "c0e02b89bc5a635d3341fe82829dbd6642297477bc69c0a2d0257bb485f63d58",
+    "docs/verification/gsp-q3-additional-local-result.json": "dd6b3f778278454ee0846bd8cac75750fc2d1472242e6268153fa1b3b54e17cc",
+    "docs/verification/gsp-q3-additional-local-audit.json": "edbb40dcca34c7accd8b41680cc404b7497ea5ce4fa2412b5e3422ffb01e9a79",
+    "docs/verification/gsp-q3-local-v2-result.json": "0453c840cb51be43540abe47a05d038f9a85192ae11199d8521f1f708a7435cc",
+    "docs/verification/gsp-q3-local-v2-audit.json": "e1f2fa339c95a3c06041db0393e5f53c176069f8281523772675ede03a98144b",
+    "docs/verification/mq3i1-shared-result.json": "0d55e0bbb0711a0772a88231eb163ab5a78762ac7b1598755c919e2d45e09b45"
+  }
+}

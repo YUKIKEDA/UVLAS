@@ -1,0 +1,33 @@
+{
+  "all_checks_pass": true,
+  "checked_source_files": 106,
+  "checked_artifacts": 56,
+  "parsed_python": [
+    "tools/design-experiments/moment_position_recovery_action.py",
+    "tools/design-experiments/check_moment_position_recovery_action.py",
+    "tools/design-experiments/mixed_mean_stress_finite.py",
+    "tools/design-experiments/check_mixed_mean_stress_finite_pair.py",
+    "tools/design-experiments/check_mixed_mean_stress_finite_full.py",
+    "tools/design-experiments/check_mixed_mean_stress_finite_full_v2.py",
+    "tools/design-experiments/audit_mixed_mean_stress_finite_pair.py"
+  ],
+  "checked_document_links": 415,
+  "recomputed_field_differences": [
+    [
+      2.0920652470331627e-13,
+      2.2236974403138983e-13,
+      1.7298695039268326e-13
+    ],
+    [
+      4.309336305938151e-09,
+      3.9696830060377865e-09,
+      5.659354576488663e-09
+    ]
+  ],
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "sources": {
+    "docs/verification/mixed-mean-stress-finite-pair-disposition.json": "24a5c0804d2a3561704a68f5b013e4e08eb6edde27c3b356cbf7e53547bf5914",
+    "tools/design-experiments/audit_mixed_mean_stress_finite_pair.py": "7fd10b839e748efe8364124fb72817ab3f5645bf52f0407bf2819d073c29fef3"
+  }
+}

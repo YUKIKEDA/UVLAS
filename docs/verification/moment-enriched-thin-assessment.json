@@ -1,0 +1,84 @@
+{
+  "comparisons": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "quartic": 1.9301317498733127e-14,
+      "exponential": 1.0989454861783785e-05,
+      "previous_quartic": 2.3630639246455146e-14,
+      "previous_exponential": 1.0989488030436026e-05,
+      "required": false,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "quartic": 5.3719932616094305e-14,
+      "exponential": 1.1651883198657303e-05,
+      "previous_quartic": 3.143766460857181e-14,
+      "previous_exponential": 1.165195037548547e-05,
+      "required": false,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "quartic": 7.658417871715763e-13,
+      "exponential": 0.0002757360347548091,
+      "previous_quartic": 3.8941739669651905e-13,
+      "previous_exponential": 0.000275736034754783,
+      "required": false,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "quartic": 2.73729167254429e-12,
+      "exponential": 0.002536979760220546,
+      "previous_quartic": 0.14681502287457357,
+      "previous_exponential": 0.03152233592318463,
+      "required": true,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "quartic": 4.597096875125967e-12,
+      "exponential": 0.0026207250274054537,
+      "previous_quartic": 0.14681791649351345,
+      "previous_exponential": 0.031525691506255414,
+      "required": true,
+      "passed": true
+    }
+  ],
+  "retained_first_case_basis_comparison": {
+    "gradient": 8.831812723079886e-12,
+    "stabilization": 2.7492126877876404e-13
+  },
+  "checks": {
+    "local": true,
+    "director": true,
+    "global_numerics": true,
+    "tensor_audit": true,
+    "comparisons": true,
+    "basis_version_agreement": true
+  },
+  "all_necessary_checks_pass": true,
+  "finite_h_adoption": false,
+  "main_shell_adopted": false,
+  "geometry_conditional": true,
+  "sources": {
+    "tools/design-experiments/assess_moment_enriched_thin.py": "4bc86e8a485754c73021ef65a2b398b62430a1f5b9cd67812baa74d00a74fdf7",
+    "docs/verification/moment-enriched-thin-global-v2-result.json": "0d493d21f7efd804d2412ba2524557d9ae354f0a7b68b8d700fe221e4f9e390b",
+    "docs/verification/reference-work-thin-global-v4-result.json": "b037674b6140b3eef4906b06df1e989ef3e960215788bf70a4dc1885610fe1f9",
+    "docs/verification/moment-enriched-thin-global-v2-audit.json": "6001b5f43e7aa0d3c670d16b9ecc0a7e9fc4311d2349edc70123616b14e30c03",
+    "docs/verification/moment-enriched-thin-global-result.json": "2b1b3e8dac62b81fa3799166227f90e463e689ded3e14fc8cb595f3017c90ca1",
+    "docs/verification/moment-enriched-thin-local-result.json": "33ad291a046a8ee033e4646cbf69164e29fd3fa78c9f7d7aee42bb718bdb68de",
+    "docs/verification/moment-enriched-director-image-result.json": "c9ab4f4056ab2296cabcf44733139ad8895bad060411a8fbbc6ee0e7883b5fab"
+  }
+}

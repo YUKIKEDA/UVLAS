@@ -1,0 +1,113 @@
+{
+  "interface_records": [
+    {
+      "amplitude": 0.0,
+      "rows": 35,
+      "unknowns": 20,
+      "exact_rank": 16,
+      "sector_dimension": 4,
+      "expected_rank": 16,
+      "edges": [
+        {
+          "cells": [
+            0,
+            1
+          ],
+          "a": "1/2",
+          "b": "0",
+          "x_varies": false
+        },
+        {
+          "cells": [
+            0,
+            2
+          ],
+          "a": "0",
+          "b": "1/2",
+          "x_varies": true
+        },
+        {
+          "cells": [
+            1,
+            3
+          ],
+          "a": "1/2",
+          "b": "1/2",
+          "x_varies": true
+        },
+        {
+          "cells": [
+            2,
+            3
+          ],
+          "a": "1/2",
+          "b": "0",
+          "x_varies": false
+        }
+      ],
+      "passed": true,
+      "scope": "ideal_bilinear_geometry_y_independent_cubic_W_quartic_U_sector"
+    },
+    {
+      "amplitude": 0.2,
+      "rows": 53,
+      "unknowns": 20,
+      "exact_rank": 18,
+      "sector_dimension": 2,
+      "expected_rank": 18,
+      "edges": [
+        {
+          "cells": [
+            0,
+            1
+          ],
+          "a": "1/2",
+          "b": "900719925474099/9007199254740992",
+          "x_varies": true
+        },
+        {
+          "cells": [
+            0,
+            2
+          ],
+          "a": "0",
+          "b": "5404319552844595/9007199254740992",
+          "x_varies": true
+        },
+        {
+          "cells": [
+            1,
+            3
+          ],
+          "a": "5404319552844595/9007199254740992",
+          "b": "3602879701896397/9007199254740992",
+          "x_varies": true
+        },
+        {
+          "cells": [
+            2,
+            3
+          ],
+          "a": "5404319552844595/9007199254740992",
+          "b": "-900719925474099/9007199254740992",
+          "x_varies": true
+        }
+      ],
+      "passed": true,
+      "scope": "ideal_bilinear_geometry_y_independent_cubic_W_quartic_U_sector"
+    }
+  ],
+  "tensor_bound_squared": 0.021555773678810296,
+  "exact_bound_squared": 0.021555773678810362,
+  "bound_difference": 6.591949208711867e-17,
+  "stationarity": 2.3201926491189795e-16,
+  "all_checks_pass": true,
+  "full_discrete_kernel_exactly_certified": false,
+  "finite_h_lower_bound": false,
+  "sources": {
+    "tools/design-experiments/audit_mixed_150_root_v2.py": "d0d2321915bf24bdbfa68eedf2ec4ae81ee62700148883ce9f1cbbcf6bea87b2",
+    "tools/design-experiments/mixed_order_150.py": "ff250a9bf9bfd21106bd4d65cd9167d039e91cf4784aa16728a7f35b383e67da",
+    "docs/verification/mixed-150-root-diagnostic.json": "9336350c47b4e473033e9fe64cc1484bb394dbcfc6c19a775839a5b6ca16d9ac",
+    "docs/verification/mixed-150-root-audit-protocol.md": "85378b94412067a5d0e644ccd6c01a0ef0396cbfa07d5505c91264c5066c213a"
+  }
+}

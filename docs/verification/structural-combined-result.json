@@ -1,0 +1,124 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "combined_actual_nonlinear_equilibrium",
+      "history": [
+        {
+          "load": 0.25,
+          "iteration": 0,
+          "original_residual": 1.0,
+          "constraint": 0.0
+        },
+        {
+          "load": 0.25,
+          "iteration": 1,
+          "original_residual": 0.007013163750635863,
+          "constraint": 1.159247502324591e-08
+        },
+        {
+          "load": 0.25,
+          "iteration": 2,
+          "original_residual": 0.00029394704963448437,
+          "constraint": 1.0731157600526883e-09
+        },
+        {
+          "load": 0.25,
+          "iteration": 3,
+          "original_residual": 2.0008416011853593e-09,
+          "constraint": 6.2178873889848696e-15
+        },
+        {
+          "load": 0.25,
+          "iteration": 4,
+          "original_residual": 1.660746716078832e-14,
+          "constraint": 1.1760523077033926e-18
+        },
+        {
+          "load": 0.5,
+          "iteration": 0,
+          "original_residual": 0.4999999999999986,
+          "constraint": 1.1760523077033926e-18
+        },
+        {
+          "load": 0.5,
+          "iteration": 1,
+          "original_residual": 0.0027841511344317824,
+          "constraint": 3.354046438818335e-09
+        },
+        {
+          "load": 0.5,
+          "iteration": 2,
+          "original_residual": 1.3670273910713834e-05,
+          "constraint": 1.2554769774151934e-10
+        },
+        {
+          "load": 0.5,
+          "iteration": 3,
+          "original_residual": 9.659720125680525e-12,
+          "constraint": 5.028580497964605e-17
+        },
+        {
+          "load": 1.0,
+          "iteration": 0,
+          "original_residual": 0.4999999999993248,
+          "constraint": 5.028580497964605e-17
+        },
+        {
+          "load": 1.0,
+          "iteration": 1,
+          "original_residual": 0.005264293739081569,
+          "constraint": 5.70051401826517e-09
+        },
+        {
+          "load": 1.0,
+          "iteration": 2,
+          "original_residual": 1.9241135078383616e-05,
+          "constraint": 4.153367412620062e-10
+        },
+        {
+          "load": 1.0,
+          "iteration": 3,
+          "original_residual": 4.860783171788634e-11,
+          "constraint": 5.648553558213181e-16
+        }
+      ],
+      "global_wrench_error": 1.3952763831264342e-13,
+      "elastic_support_retained": true,
+      "eccentric_mass_gravity": true,
+      "current_pressure": true
+    },
+    {
+      "case": "whole_original_residual_directional_tangent",
+      "relative_error": 6.999930423979702e-13,
+      "off_equilibrium_test": true,
+      "nonsymmetric_load_tangent_retained": true
+    },
+    {
+      "case": "coupled_linearized_KKT_vs_independent_elimination",
+      "state_difference": 1.6054755949359193e-10,
+      "original_residual": 2.2031069438751066e-12
+    },
+    {
+      "case": "same_equilibrium_mass_stiffness_damping",
+      "reduced_mass_min": 0.0013458506456371026,
+      "reduced_damping_min": 0.024551401800246595,
+      "stiffness_asymmetry": 3.704491729496357e-06
+    }
+  ],
+  "failures": [],
+  "artifact": {
+    "artifact": "build/analysis/structural-combined-snapshot.npz",
+    "artifact_sha256": "ec47a3c9f304f0a675502397284e8775a9e15d7b8d6310d2b08c0ed88a150c10"
+  },
+  "seconds": 12.0,
+  "sources": {
+    "tools/design-experiments/check_structural_combined.py": "d5847317af245a27b572227203ac1c913a06262da3604b4366e8e077bbbfbbf3",
+    "tools/design-experiments/check_connection_beam_shell.py": "5569b39e7601a55e8f601a8270f8affd83c73b67202ccb2a9cbbf62f6fa34780",
+    "tools/design-experiments/structural_load_damping.py": "3dab95dea804181771906c07889fc00ae7bf9f3163a81428a93eccc63a96e347",
+    "tools/design-experiments/check_structural_load_damping.py": "5a0957ea38b867106cf246508c8ad9437c3d4062e8228a6afb7721913b4c9be0",
+    "docs/verification/structural-load-damping-result.json": "a7aca9eac2bc45224df652a9e16f13dd169d91ccde5f8f20811b7a49b1aca261",
+    "docs/verification/connection-adoption-audit.json": "17cc8ba6c9cfe58515fed35bcd117f28bb31f22ea8e50f874e35bd151f64cd5e",
+    "docs/verification/structural-final-integration-protocol.md": "866eaeb93cd31d5f2927a9c3f8a72f2b7c64cf25def7485c0005ed300819527f"
+  }
+}

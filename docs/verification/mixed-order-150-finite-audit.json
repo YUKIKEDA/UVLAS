@@ -1,0 +1,58 @@
+{
+  "records": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "observed": {
+        "error": 0.0036427591745955023,
+        "h1": 0.4904835013441841
+      },
+      "error_difference": 6.936291818693263e-15,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "observed": {
+        "error": 0.0564931928868859,
+        "h1": 0.4958974340461587
+      },
+      "error_difference": 7.96793186985667e-14,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "observed": {
+        "error": 0.00183270330631425,
+        "h1": 0.49061275899804424
+      },
+      "error_difference": 1.0514397512373375e-13,
+      "h1_difference": 4.440892098500626e-16,
+      "passed": true
+    },
+    {
+      "n": 8,
+      "h": 0.0001,
+      "observed": {
+        "error": 0.009081517726566138,
+        "h1": 0.4913558698517196
+      },
+      "error_difference": 2.112667679687874e-13,
+      "h1_difference": 4.440892098500626e-16,
+      "passed": true
+    }
+  ],
+  "all_reproduction_checks": true,
+  "primary_complete": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/audit_mixed_order_150_finite.py": "9027903a1c54c6ab41ebfc48eb9844d6b03b86be8d6be5640c5b9d0269f736d6",
+    "tools/design-experiments/mixed_order_150_finite.py": "d8fadb6ce69648f862fe5a4bf7a85e3bfefa268d217c19141dfbf2015346b472",
+    "docs/verification/mixed-order-150-finite-result.json": "afe4bf891cd5256fe8e00bc331ccbe202be97e676ecc72678c63de2e3c3c81ef"
+  },
+  "seconds": 4.202999999979511
+}

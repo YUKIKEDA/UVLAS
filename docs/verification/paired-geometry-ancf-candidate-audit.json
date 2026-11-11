@@ -1,0 +1,21 @@
+{
+  "audit_passed": true,
+  "adoption_candidate_qualified": true,
+  "main_shell_adopted": false,
+  "checked_source_files": 231,
+  "checked_artifacts": 94,
+  "parsed_python_files": 84,
+  "checked_document_links": 445,
+  "errors": [],
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "openblas_threads": "1"
+  },
+  "sources": {
+    "docs/verification/paired-geometry-ancf-candidate-disposition.json": "a2f3e310da1dad921a063fdfe6639bb3dc09631e1e3fee3229c03621bffbe3c2",
+    "tools/design-experiments/audit_paired_gc_candidate.py": "6611f4d12e5b3c0240edd9a8e418e58909c5723de69a13793c5dc131bee2817e"
+  }
+}

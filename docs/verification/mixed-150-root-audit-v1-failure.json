@@ -1,0 +1,8 @@
+{
+  "status": "serialization_failure_before_result_write",
+  "error": "TypeError: Object of type bool is not JSON serializable",
+  "cause": "numpy.bool_ in all_checks_pass",
+  "source_sha256": "dfea601b20559762803205c784372168233eb6901eac1c64649508f802d70647",
+  "source": "tools/design-experiments/audit_mixed_150_root.py",
+  "physics_criteria_changed": false
+}

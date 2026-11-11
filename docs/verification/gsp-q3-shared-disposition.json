@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "GSP_Q3_current_form_not_adopted_shared_progress_gate_failed",
+  "additional_local_conditions": 24,
+  "additional_shared_edge_checks": 24,
+  "shared_configurations": 4,
+  "shared_maps": 16,
+  "all_numerical_checks": true,
+  "all_alternate_evaluation_checks": true,
+  "both_curved_improved": false,
+  "physical_adoption": false,
+  "membrane_convergence_executed": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "finite_thickness_lower_bound": false,
+  "summary": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "nullity": 48,
+      "old_quartic_error": 2.800261857699284e-15,
+      "new_quartic_error": 2.955744956458146e-15,
+      "relative_reduction": -0.0555244854445891,
+      "progress_gate": null
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "nullity": 32,
+      "old_quartic_error": 9.531946667949078e-06,
+      "new_quartic_error": 0.0417880734623579,
+      "relative_reduction": -4383.002021629979,
+      "progress_gate": null
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "nullity": 8,
+      "old_quartic_error": 0.32998292955713154,
+      "new_quartic_error": 0.33003691715085176,
+      "relative_reduction": -0.00016360723202457628,
+      "progress_gate": false
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "nullity": 1,
+      "old_quartic_error": 0.5963330679529358,
+      "new_quartic_error": 0.5963639300120865,
+      "relative_reduction": -5.175305682225684e-05,
+      "progress_gate": false
+    }
+  ],
+  "next": "mixed_order_150_kinematic_screening_contract_only_not_executed",
+  "source_hash_closure_pass": true,
+  "artifact_hash_closure_pass": true,
+  "python_ast_pass": true,
+  "new_links_pass": true,
+  "verified_source_count": 25,
+  "sources": {
+    "docs/verification/gsp-q3-additional-local-preparation.json": "7a606aca5df21103b6454bcf994a8f9ad33a70b7524749e128bdebb3604831b2",
+    "docs/verification/gsp-q3-additional-local-result.json": "dd6b3f778278454ee0846bd8cac75750fc2d1472242e6268153fa1b3b54e17cc",
+    "docs/verification/gsp-q3-additional-local-audit.json": "edbb40dcca34c7accd8b41680cc404b7497ea5ce4fa2412b5e3422ffb01e9a79",
+    "docs/verification/gsp-q3-shared-preparation.json": "7e97f819c753f30a6b94c962fac14ef08ffe7c9d1ccfe24d25c703dd6fc3395d",
+    "docs/verification/gsp-q3-shared-result.json": "1d6068506b84d0d0320a1c677ba75c0c9fc85308e7db9a27f8b5eb2a4ae7cdab",
+    "docs/verification/gsp-q3-shared-audit.json": "fee02efb1f4fce8defcec29bf11be2eafb32e1302c30103cbde68c07a06e324e",
+    "docs/verification/gsp-q3-additional-local-results.md": "1973151d65bb09e226ca5eb5eaf766f6f022e25e5c6ab41c25b11c6540b70c99",
+    "docs/verification/gsp-q3-shared-results.md": "7bbb3e703ef1a2b2fed2b231d99839bfc790520d2e11f571bfd42a45afb7e3e1",
+    "docs/mixed-order-150-screening-contract.md": "f1f6630cb81e49d80c0afc9753d0c9fffaddafbb46b49e5c029eaa422b6737e4"
+  }
+}

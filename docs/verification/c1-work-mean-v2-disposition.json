@@ -1,0 +1,10 @@
+{
+  "adoption_candidate_qualified": false,
+  "main_shell_adopted": false,
+  "reason": "Regular n4 screen failed accuracy; vertex/detail work completion did not yield a sufficiently rich curved bending space.",
+  "sources": {
+    "tools/design-experiments/c1_work_mean_v2.py": "fff86daa49d69d951dda839ab847617c43f5b80e9a207c60f1a386ac630e1a89",
+    "docs/verification/c1-work-mean-v2-protocol.md": "b4a6e48f91778b2ad1c0e97bc31e95550f95d849988170b3bcc83c0b924298cb",
+    "build/analysis/c1-work-mean-screen-v2.json": "55f0f81e6fae6011081886da6253c7f24b97ded5003f8b622cde05550f974fd1"
+  }
+}

@@ -1,0 +1,934 @@
+{
+  "passed": true,
+  "meaning": "planning coverage and frozen input/reference availability, not product acceptance",
+  "case_count": 19,
+  "requirement_count": 37,
+  "all_requirements_mapped": true,
+  "all_product_acceptance_complete": false,
+  "cases": [
+    {
+      "id": "V-PG",
+      "requirements": [
+        "GEO-01",
+        "MAT-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "STR-01"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/paired-shell-r5-domain-v2-result.json",
+          "result_sha256": "906ca0edb9318ca4f024a9af96b9473853334b548a531fba00b9f2ab5d2f91ef",
+          "fixture_sources": {
+            "tools/design-experiments/check_paired_shell_r5_domain_v2.py": "72515139d06ece3ac5b7c00c84125b3613a6d31b77f48a1131b934f3840eade4",
+            "tools/design-experiments/check_paired_shell_r5_domain.py": "8c2fc314073636ea02d280877cb3e47477a8b4934415e916e668b29392c13b51",
+            "tools/design-experiments/swept_taper_domain.py": "c4047af9fa078f448bdead110d5da511927170ba6954cd588f0c2c381d5ef97f",
+            "tools/design-experiments/mass_paired_ancf.py": "45e85b54665ad1555aa85e4a24c9901d824427748205f66e49102a046257e62b",
+            "tools/design-experiments/check_mass_paired_body.py": "008432b408d049b23752df8000d02b5c3d688637118b58222caeb8557cfd4071",
+            "tools/design-experiments/exact_paired_finite.py": "2d92c260516962da34fd84d0590ed3559549ccbbc46fa2fc22e50b7228d43720"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-MAT",
+      "requirements": [
+        "MAT-01",
+        "MAT-02",
+        "OUT-02",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/material-layer-kernel-result.json",
+          "result_sha256": "4a8ab7da2c292b35901b9ff5d6b2a3b442c759e43b0b68a1e3da7c2c667fd200",
+          "fixture_sources": {
+            "tools/design-experiments/check_material_layer_kernel.py": "94387cf57555a6d16900105bbc99aa92c8cd48715ae4beb96cf4a697017b9164"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/material-shell-integration-v2-result.json",
+          "result_sha256": "96081fc5d6fd8d9373e9ef52eaea3b250c0e4d960182d06c4afe29f1d5a620e1",
+          "fixture_sources": {
+            "tools/design-experiments/check_material_shell_integration_v2.py": "a44ac95698812562e078e5524f55817131f42ac7e61febb9c93f38e2251cac8b",
+            "tools/design-experiments/check_material_shell_integration.py": "13b837f7e1ae162fa3d2343751c8389c09e771befa4461450bcb1e0e8a7e5eed",
+            "tools/design-experiments/material_equivalent_input.py": "f6308ac36c114104101d5f92be09a1b6c6e395bf1b257ec48d280f15f68c0134",
+            "tools/design-experiments/mass_paired_ancf.py": "45e85b54665ad1555aa85e4a24c9901d824427748205f66e49102a046257e62b",
+            "tools/design-experiments/exact_paired_finite.py": "2d92c260516962da34fd84d0590ed3559549ccbbc46fa2fc22e50b7228d43720",
+            "tools/design-experiments/pg_ritz_mechanics.py": "6a0fd5db2fa58606bbcc03056b56ce5d8ca03feacc126906b6a2ae7b9dc3f013"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/structural-layer-damping-result.json",
+          "result_sha256": "7c91938f1ac7e4cc1f6a33674042f5c75ef9d6e2044966fe69e56f20c279f62e",
+          "fixture_sources": {
+            "tools/design-experiments/check_structural_layer_damping.py": "7376222d1f3f537b4c76eec551ba6553ddb8f3feacf1bf1e24e7d503d050c29b",
+            "tools/design-experiments/structural_layer_damping.py": "1f8879ea04b29aff963bd2992cb029b88ab3ad8e850747682346bd6c864d4c23",
+            "tools/design-experiments/material_equivalent_input.py": "f6308ac36c114104101d5f92be09a1b6c6e395bf1b257ec48d280f15f68c0134",
+            "tools/design-experiments/structural_load_damping.py": "3dab95dea804181771906c07889fc00ae7bf9f3163a81428a93eccc63a96e347"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-BEAM",
+      "requirements": [
+        "OUT-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "STR-03",
+        "STR-04"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/beam-se3-physical-v4-result.json",
+          "result_sha256": "fb705e3ed073b2501f42bc50159cc336d3f0752867c152080fa0aa1f91f59d87",
+          "fixture_sources": {
+            "tools/design-experiments/check_beam_se3_physical_v4.py": "f3551f1a20e4719a397863f6b1de0b4574fcadf0b2a908f4f518b17a1d19dbe5",
+            "tools/design-experiments/check_beam_se3_physical_v3.py": "aea4d8b200fc4989d04c1f74aaaadf7724aea7a8659ed74e1dc9eb7486ffe1c6",
+            "tools/design-experiments/check_beam_se3_physical_v2.py": "4a92961036df4c3350860bfd02801746f8adef80974c2b36c9e857aaefe3130b",
+            "tools/design-experiments/beam_se3_high_precision.py": "f7a1c32e6d6633dfe0acb4d5be2d37c6cba4276f912a17000df7985004c26ba0",
+            "tools/design-experiments/beam_jet2_decimal.py": "0fa8e21352aec6cd4f33958578f102ecf8ae533cb94e6e74cb08da4d04a56e1f",
+            "tools/design-experiments/beam_decimal_reference.py": "1ba5a641f813206a959f5cd1b8571a10c077fd599650692e3a708d025d27b839",
+            "tools/design-experiments/check_beam_se3_physical.py": "b50405dd425cd9aca33d2935c5cd9a8a4446e9738d43a07240d07205c5aaf5ac",
+            "tools/design-experiments/beam_se3_v2.py": "02e811686d29afe6eb114f9cc770214da9ece47a859848cc7d04f6f9bde3f475",
+            "tools/design-experiments/beam_jet2.py": "8224ba8d5c8f33e879eb5987fbbbf33ab220066fda8cf847be07f32c2607fc4b"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/beam-section-interface-result.json",
+          "result_sha256": "594493088d14c13f177b5040ca37261d8a754d530519741759c2994e46f3fd73",
+          "fixture_sources": {
+            "tools/design-experiments/check_beam_section_and_interface.py": "c7e9b437ef1eedf00a5843db5dcd96050dc3b13a91880c579a066896cdb5e58e",
+            "tools/design-experiments/beam_se3_v2.py": "02e811686d29afe6eb114f9cc770214da9ece47a859848cc7d04f6f9bde3f475",
+            "tools/design-experiments/beam_se3_high_precision.py": "f7a1c32e6d6633dfe0acb4d5be2d37c6cba4276f912a17000df7985004c26ba0",
+            "tools/design-experiments/beam_jet2_decimal.py": "0fa8e21352aec6cd4f33958578f102ecf8ae533cb94e6e74cb08da4d04a56e1f",
+            "tools/design-experiments/beam_section_input.py": "ff5c822c82b69915f9a30ba10aa2042075a95928bd181424763555b99befd668",
+            "tools/design-experiments/beam_decimal_reference.py": "1ba5a641f813206a959f5cd1b8571a10c077fd599650692e3a708d025d27b839",
+            "tools/design-experiments/check_beam_se3_physical_v4.py": "f3551f1a20e4719a397863f6b1de0b4574fcadf0b2a908f4f518b17a1d19dbe5"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-JOINT",
+      "requirements": [
+        "BC-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "STR-02",
+        "STR-03",
+        "STR-04"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/connection-beam-shell-result.json",
+          "result_sha256": "553d3de2296eea2b23f98b140aaa79d0974f4d84854a4f6e9ba43f2ef6429b3f",
+          "fixture_sources": {
+            "tools/design-experiments/check_connection_beam_shell.py": "5569b39e7601a55e8f601a8270f8affd83c73b67202ccb2a9cbbf62f6fa34780",
+            "tools/design-experiments/connection_shell.py": "55a37a5f7e0ddbc02c5ec3a1fd7c27835f2642d90f08f3413865d24207097654",
+            "tools/design-experiments/connection_exact_trace.py": "c04e2874a350742efcc493c5cf9f0a2232b589bc65b74e8ec2a6a3092f69e28e",
+            "tools/design-experiments/connection_kinematics.py": "b858ed3ed60294e98c3608073499cfdd7a2a0dbab2d5e045b174ba5a8d7b02b8",
+            "tools/design-experiments/beam_se3_v2.py": "02e811686d29afe6eb114f9cc770214da9ece47a859848cc7d04f6f9bde3f475"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/structural-combined-result.json",
+          "result_sha256": "b3a3d43f887b205c30b409bc2e6790c983e42f53dbb3927103637a976fe26277",
+          "fixture_sources": {
+            "tools/design-experiments/check_structural_combined.py": "d5847317af245a27b572227203ac1c913a06262da3604b4366e8e077bbbfbbf3",
+            "tools/design-experiments/check_connection_beam_shell.py": "5569b39e7601a55e8f601a8270f8affd83c73b67202ccb2a9cbbf62f6fa34780",
+            "tools/design-experiments/structural_load_damping.py": "3dab95dea804181771906c07889fc00ae7bf9f3163a81428a93eccc63a96e347",
+            "tools/design-experiments/check_structural_load_damping.py": "5a0957ea38b867106cf246508c8ad9437c3d4062e8228a6afb7721913b4c9be0"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-LOAD",
+      "requirements": [
+        "BC-01",
+        "IO-02",
+        "LOAD-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/uvlm-known-input-result.json",
+          "result_sha256": "0f1fd77860c5c4bcdf5f3a1a4e17d843157c615167ffbd90d4ad1d566a22a95d",
+          "fixture_sources": {
+            "tools/design-experiments/check_uvlm_known_input.py": "c1708e442de7ddbe73b4cc433d38e3b01354fc28f96947c6a28901242e7a6210",
+            "tools/design-experiments/uvlm_known_input.py": "781c0febea9099153ad70a36ced3f9015c5c8bc088085f4e707c76da80d01bae"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/structural-history-state-result.json",
+          "result_sha256": "61b09cef6f9087c555549863cb85e14879778e320a4c04d6f4126bbac9583aa4",
+          "fixture_sources": {
+            "tools/design-experiments/check_structural_history_state.py": "87f53d31a935b159285bc69dc86d14bf2ebc866ad176c2418f6bbef932a6db20",
+            "tools/design-experiments/structural_history_state.py": "17a0262cc3e4bffc1fe2262c7df74856f1ecfa3504a347045c3552f2c6f78268",
+            "tools/design-experiments/structural_load_damping.py": "3dab95dea804181771906c07889fc00ae7bf9f3163a81428a93eccc63a96e347",
+            "tools/design-experiments/check_structural_combined.py": "d5847317af245a27b572227203ac1c913a06262da3604b4366e8e077bbbfbbf3"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-RECOVER",
+      "requirements": [
+        "OUT-01",
+        "OUT-02",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/structural-recovery-result.json",
+          "result_sha256": "1dcc5f1a99c4db3d8cf7b4fd6f8a61e39a7742f497ee5559cdc1009537e19d39",
+          "fixture_sources": {
+            "tools/design-experiments/check_structural_recovery.py": "a6753c890d52e7351dca5b23273a004944da8bd5d243001d4f95a979189479de",
+            "tools/design-experiments/structural_recovery.py": "f86cbd58e07b616e27749ba5cf39715f1824ce600633b233cbb428168558e790",
+            "tools/design-experiments/material_equivalent_input.py": "f6308ac36c114104101d5f92be09a1b6c6e395bf1b257ec48d280f15f68c0134",
+            "tools/design-experiments/check_beam_se3_physical_v4.py": "f3551f1a20e4719a397863f6b1de0b4574fcadf0b2a908f4f518b17a1d19dbe5",
+            "tools/design-experiments/connection_shell.py": "55a37a5f7e0ddbc02c5ec3a1fd7c27835f2642d90f08f3413865d24207097654",
+            "tools/design-experiments/check_material_shell_integration.py": "13b837f7e1ae162fa3d2343751c8389c09e771befa4461450bcb1e0e8a7e5eed"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-AERO",
+      "requirements": [
+        "GEO-01",
+        "PHY-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/high-frequency-final-result.json",
+          "result_sha256": "df6e496328a20c0e220741eaf4a0e6669c997b7bbe2d08fe49fe5a93ceb1b323",
+          "fixture_sources": {
+            "tools/design-experiments/assess_high_frequency_final.py": "ce5f9bfd837dec801ed6cd9b9586d1d7e61d2d0db48ad310890314a8958641c2",
+            "tools/design-experiments/run_high_frequency_final_qualified.py": "00f015f3a362c84343083b02a0700501b5599f8dd3a8552fca06f7431e6bd131",
+            "tools/design-experiments/run_high_frequency_final_bounded.py": "8b177ec6bbddd0ff0df38ab09ca264e7b22ae4654b4c0f122732a3e767ec2949"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/drag-common-limit-result.json",
+          "result_sha256": "00b77f82e57fa701324c21abdf91ec9aec42bde02be3f62301df31958fda20c9",
+          "fixture_sources": {
+            "tools/design-experiments/assess_drag_common_limit.py": "d949f66e6e7803164a2c1dbffbaf3483ea3dadf999a4215f997245d354535d89",
+            "tools/design-experiments/run_drag_final_chord.py": "284e570fee08a732dbd140b7fa5cd3fa0e6f40e39f7f6e484ceadbabe5e14aea",
+            "tools/design-experiments/run_drag_reference_convergence.py": "5605124141dedb42f64eddbb4490f56351d1da62d097b6c37b757722fd5810d4",
+            "tools/design-experiments/run_steady_drag_common_limit_v2.py": "b26ce791368a9e49c88373aa133f88c74ac2ea06da69546372bbd4d5bac59b12",
+            "tools/design-experiments/uvlm_drag_force_kernel.py": "dfe8f7bc931b48ae8e73179131feac8dbde2f6c2820d1042ca06bbc08cca2ced"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-MULTI",
+      "requirements": [
+        "PHY-02",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-05",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/multiple-surface-harmonic-refined-result.json",
+          "result_sha256": "8bbe6022eea5b9bf08d6d213f94ee229abbf91ccc0f976d77a667378cdb5b6cd",
+          "fixture_sources": {
+            "tools/design-experiments/assess_multiple_surface_harmonic_refined.py": "bbac49fb856e8c0b1f5140922450decbe69f4338871a64f7053c0653e9d49b3b",
+            "tools/design-experiments/run_multiple_surface_harmonic_refined.py": "3a7af3251ff1b7a189b9f5372f98c5680d9d315e6f786bd0a6a850b5cf051f09"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/uvlm-global-binding-result.json",
+          "result_sha256": "1e7a44f6cf80b31b82af80a6f18d966b68a4c8ed653ea654666def4cc4f9adb1",
+          "fixture_sources": {
+            "tools/design-experiments/check_uvlm_global_binding.py": "10359ab300e9d72253b17b767439cc7ca9207bf96ebdb808f6a431f0e6109eeb",
+            "tools/design-experiments/uvlm_global_binding_witness.py": "44296b83b1def137ccfab2092278886ed97d88a9a967b05f5f839944b44ef030"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-J1",
+      "requirements": [
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-05",
+        "QUAL-06",
+        "QUAL-07",
+        "SOL-01",
+        "SOL-02",
+        "SOL-03"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/pg-uvlm-free-step-result.json",
+          "result_sha256": "15e2092f7c0fc7f7e607d8e7db528ec75fa98363a8a6d442df68dc0720d12f15",
+          "fixture_sources": {
+            "tools/design-experiments/check_pg_uvlm_free_step.py": "a42df06323d07957f1bfd8e2044dcc58aba9da3d0d3ef8252c6b9b85ca5780fa",
+            "tools/design-experiments/pg_uvlm_free_step.py": "dddf9560595918a6c669d9ee1688ecfb3bc6ec72045d77978fa947928c06e331"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/coupled-bdf2-prescribed-result.json",
+          "result_sha256": "77f0e05d632096dbdbd804a48bff5e85fe4bd5613f25f66418e3d94e4c5fa2bb",
+          "fixture_sources": {
+            "tools/design-experiments/check_coupled_bdf2_prescribed.py": "00cf14d5c119ad61d8fb533264c777404780ea36072ab42bad3dc3b38a3381bc",
+            "tools/design-experiments/uvlm_age_scalar.py": "cf03bf86767202ee5fdadebc5f5a899af74c7b72f626e184fd94351a4bf9ac67",
+            "tools/design-experiments/uvlm_frequency_fast.py": "55db651c619f8e47b1dcdadc219fc9d5dca32604ad85880ebc1d3d0f7a88b7a0"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-SEARCH",
+      "requirements": [
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-06",
+        "QUAL-07",
+        "RUN-02",
+        "SOL-03"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/static-branch-continuation-result.json",
+          "result_sha256": "68dbd66a7742e91457c0aacd7b6d93a2fa3a5dfe1f7cf41d4b07a4091f9c65fe",
+          "fixture_sources": {
+            "tools/design-experiments/check_static_branch_continuation.py": "748a868780fd084224342cfed1e2686acb8ba41242a8e7fe8048f16ec4ac9716"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        },
+        {
+          "result": "docs/verification/flutter-search-control-result.json",
+          "result_sha256": "7f24fe055a37836815490adc478f46da9480df42e2b5f254b4dc41dc82f5c189",
+          "fixture_sources": {
+            "tools/design-experiments/check_flutter_search.py": "a7256e58ef99f10d822e4f30b5cb7482c0cc516468197a383075b5f25f47c7be",
+            "tools/design-experiments/flutter_search_witness.py": "b1e77844bfcd00e7b661b2c552d45fa61be8c0b8b09cb1e11a8987ae60dd644d"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-STATE",
+      "requirements": [
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "RUN-01",
+        "RUN-02"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": true,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": [
+        {
+          "result": "docs/verification/coupled-checkpoint-result.json",
+          "result_sha256": "21a1f4bece326a49a1f3dd0034e36652e3fe0447cdd9e804df4e1f7cc6a6c982",
+          "fixture_sources": {
+            "tools/design-experiments/check_coupled_checkpoint.py": "49c924f09604b42310f29dc4c5bd7888019f9fa6a9e0691b631b9e80d44ad0dc",
+            "tools/design-experiments/coupled_checkpoint_witness.py": "70018468e06fb7b396cde35344a0c4f3b2ff5a4aea0ba7d3213505a45207d1ec"
+          },
+          "meaning": "frozen design/reference witness; product migration must execute the same inputs independently"
+        }
+      ]
+    },
+    {
+      "id": "V-USE",
+      "requirements": [
+        "API-01",
+        "API-02",
+        "DIST-01",
+        "DIST-02",
+        "ENV-01",
+        "ENV-02",
+        "IO-01",
+        "IO-02",
+        "IO-03",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "P-CURVED-BOX",
+      "requirements": [
+        "GEO-01",
+        "MAT-01",
+        "OUT-01",
+        "OUT-02",
+        "PHY-02",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "SOL-01",
+        "SOL-02",
+        "SOL-03",
+        "STR-01",
+        "STR-02",
+        "STR-03"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "X-S10-GVT-LE",
+      "requirements": [
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "STR-01",
+        "STR-03",
+        "STR-04"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": false,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "X-S10-GVT-TE",
+      "requirements": [
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "STR-01",
+        "STR-03",
+        "STR-04"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": false,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "X-S10-STATIC",
+      "requirements": [
+        "GEO-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "SOL-01"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": false,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "X-S10-FLUTTER",
+      "requirements": [
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-06",
+        "QUAL-07",
+        "SOL-03"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": false,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "X-S10-DECAY",
+      "requirements": [
+        "LOAD-01",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07",
+        "SOL-02"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": false,
+      "product_accepted": false,
+      "design_evidence": []
+    },
+    {
+      "id": "PERF-FL-01",
+      "requirements": [
+        "PERF-01",
+        "PERF-02",
+        "PERF-03",
+        "QUAL-01",
+        "QUAL-02",
+        "QUAL-03",
+        "QUAL-04",
+        "QUAL-07"
+      ],
+      "specification": "docs/practical-acceptance-plan.md",
+      "specified": true,
+      "reference_fixture_available": false,
+      "experimental_reference_qualified": null,
+      "product_accepted": false,
+      "design_evidence": []
+    }
+  ],
+  "requirement_coverage": {
+    "BC-01": [
+      "V-JOINT",
+      "V-LOAD"
+    ],
+    "RUN-01": [
+      "V-STATE"
+    ],
+    "QUAL-01": [
+      "V-PG",
+      "V-MAT",
+      "V-BEAM",
+      "V-JOINT",
+      "V-LOAD",
+      "V-RECOVER",
+      "V-AERO",
+      "V-MULTI",
+      "V-J1",
+      "V-SEARCH",
+      "V-STATE",
+      "V-USE",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE",
+      "X-S10-STATIC",
+      "X-S10-FLUTTER",
+      "X-S10-DECAY",
+      "PERF-FL-01"
+    ],
+    "SOL-03": [
+      "V-J1",
+      "V-SEARCH",
+      "P-CURVED-BOX",
+      "X-S10-FLUTTER"
+    ],
+    "SOL-02": [
+      "V-J1",
+      "P-CURVED-BOX",
+      "X-S10-DECAY"
+    ],
+    "QUAL-07": [
+      "V-PG",
+      "V-MAT",
+      "V-BEAM",
+      "V-JOINT",
+      "V-LOAD",
+      "V-RECOVER",
+      "V-AERO",
+      "V-MULTI",
+      "V-J1",
+      "V-SEARCH",
+      "V-STATE",
+      "V-USE",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE",
+      "X-S10-STATIC",
+      "X-S10-FLUTTER",
+      "X-S10-DECAY",
+      "PERF-FL-01"
+    ],
+    "PERF-02": [
+      "PERF-FL-01"
+    ],
+    "QUAL-04": [
+      "V-PG",
+      "V-MAT",
+      "V-BEAM",
+      "V-JOINT",
+      "V-LOAD",
+      "V-RECOVER",
+      "V-AERO",
+      "V-MULTI",
+      "V-J1",
+      "V-SEARCH",
+      "V-STATE",
+      "V-USE",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE",
+      "X-S10-STATIC",
+      "X-S10-FLUTTER",
+      "X-S10-DECAY",
+      "PERF-FL-01"
+    ],
+    "ENV-01": [
+      "V-USE"
+    ],
+    "STR-04": [
+      "V-BEAM",
+      "V-JOINT",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE"
+    ],
+    "PHY-01": [
+      "V-AERO"
+    ],
+    "SOL-01": [
+      "V-J1",
+      "P-CURVED-BOX",
+      "X-S10-STATIC"
+    ],
+    "IO-01": [
+      "V-USE"
+    ],
+    "PERF-01": [
+      "PERF-FL-01"
+    ],
+    "IO-02": [
+      "V-LOAD",
+      "V-USE"
+    ],
+    "STR-01": [
+      "V-PG",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE"
+    ],
+    "GEO-01": [
+      "V-PG",
+      "V-AERO",
+      "P-CURVED-BOX",
+      "X-S10-STATIC"
+    ],
+    "API-01": [
+      "V-USE"
+    ],
+    "DIST-01": [
+      "V-USE"
+    ],
+    "PHY-02": [
+      "V-MULTI",
+      "P-CURVED-BOX"
+    ],
+    "OUT-02": [
+      "V-MAT",
+      "V-RECOVER",
+      "P-CURVED-BOX"
+    ],
+    "ENV-02": [
+      "V-USE"
+    ],
+    "DIST-02": [
+      "V-USE"
+    ],
+    "QUAL-03": [
+      "V-PG",
+      "V-MAT",
+      "V-BEAM",
+      "V-JOINT",
+      "V-LOAD",
+      "V-RECOVER",
+      "V-AERO",
+      "V-MULTI",
+      "V-J1",
+      "V-SEARCH",
+      "V-STATE",
+      "V-USE",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE",
+      "X-S10-STATIC",
+      "X-S10-FLUTTER",
+      "X-S10-DECAY",
+      "PERF-FL-01"
+    ],
+    "RUN-02": [
+      "V-SEARCH",
+      "V-STATE"
+    ],
+    "OUT-01": [
+      "V-BEAM",
+      "V-RECOVER",
+      "P-CURVED-BOX"
+    ],
+    "API-02": [
+      "V-USE"
+    ],
+    "PERF-03": [
+      "PERF-FL-01"
+    ],
+    "STR-03": [
+      "V-BEAM",
+      "V-JOINT",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE"
+    ],
+    "MAT-02": [
+      "V-MAT"
+    ],
+    "LOAD-01": [
+      "V-LOAD",
+      "X-S10-DECAY"
+    ],
+    "IO-03": [
+      "V-USE"
+    ],
+    "QUAL-06": [
+      "V-J1",
+      "V-SEARCH",
+      "X-S10-FLUTTER"
+    ],
+    "QUAL-02": [
+      "V-PG",
+      "V-MAT",
+      "V-BEAM",
+      "V-JOINT",
+      "V-LOAD",
+      "V-RECOVER",
+      "V-AERO",
+      "V-MULTI",
+      "V-J1",
+      "V-SEARCH",
+      "V-STATE",
+      "V-USE",
+      "P-CURVED-BOX",
+      "X-S10-GVT-LE",
+      "X-S10-GVT-TE",
+      "X-S10-STATIC",
+      "X-S10-FLUTTER",
+      "X-S10-DECAY",
+      "PERF-FL-01"
+    ],
+    "STR-02": [
+      "V-JOINT",
+      "P-CURVED-BOX"
+    ],
+    "MAT-01": [
+      "V-PG",
+      "V-MAT",
+      "P-CURVED-BOX"
+    ],
+    "QUAL-05": [
+      "V-MULTI",
+      "V-J1"
+    ]
+  },
+  "sources": {
+    "docs/verification/paired-shell-r5-domain-v2-result.json": "906ca0edb9318ca4f024a9af96b9473853334b548a531fba00b9f2ab5d2f91ef",
+    "tools/design-experiments/check_paired_shell_r5_domain_v2.py": "72515139d06ece3ac5b7c00c84125b3613a6d31b77f48a1131b934f3840eade4",
+    "tools/design-experiments/check_paired_shell_r5_domain.py": "8c2fc314073636ea02d280877cb3e47477a8b4934415e916e668b29392c13b51",
+    "tools/design-experiments/swept_taper_domain.py": "c4047af9fa078f448bdead110d5da511927170ba6954cd588f0c2c381d5ef97f",
+    "tools/design-experiments/mass_paired_ancf.py": "45e85b54665ad1555aa85e4a24c9901d824427748205f66e49102a046257e62b",
+    "tools/design-experiments/check_mass_paired_body.py": "008432b408d049b23752df8000d02b5c3d688637118b58222caeb8557cfd4071",
+    "tools/design-experiments/exact_paired_finite.py": "2d92c260516962da34fd84d0590ed3559549ccbbc46fa2fc22e50b7228d43720",
+    "docs/verification/material-layer-kernel-result.json": "4a8ab7da2c292b35901b9ff5d6b2a3b442c759e43b0b68a1e3da7c2c667fd200",
+    "tools/design-experiments/check_material_layer_kernel.py": "94387cf57555a6d16900105bbc99aa92c8cd48715ae4beb96cf4a697017b9164",
+    "docs/verification/material-shell-integration-v2-result.json": "96081fc5d6fd8d9373e9ef52eaea3b250c0e4d960182d06c4afe29f1d5a620e1",
+    "tools/design-experiments/check_material_shell_integration_v2.py": "a44ac95698812562e078e5524f55817131f42ac7e61febb9c93f38e2251cac8b",
+    "tools/design-experiments/check_material_shell_integration.py": "13b837f7e1ae162fa3d2343751c8389c09e771befa4461450bcb1e0e8a7e5eed",
+    "tools/design-experiments/material_equivalent_input.py": "f6308ac36c114104101d5f92be09a1b6c6e395bf1b257ec48d280f15f68c0134",
+    "tools/design-experiments/pg_ritz_mechanics.py": "6a0fd5db2fa58606bbcc03056b56ce5d8ca03feacc126906b6a2ae7b9dc3f013",
+    "docs/verification/structural-layer-damping-result.json": "7c91938f1ac7e4cc1f6a33674042f5c75ef9d6e2044966fe69e56f20c279f62e",
+    "tools/design-experiments/check_structural_layer_damping.py": "7376222d1f3f537b4c76eec551ba6553ddb8f3feacf1bf1e24e7d503d050c29b",
+    "tools/design-experiments/structural_layer_damping.py": "1f8879ea04b29aff963bd2992cb029b88ab3ad8e850747682346bd6c864d4c23",
+    "tools/design-experiments/structural_load_damping.py": "3dab95dea804181771906c07889fc00ae7bf9f3163a81428a93eccc63a96e347",
+    "docs/verification/beam-se3-physical-v4-result.json": "fb705e3ed073b2501f42bc50159cc336d3f0752867c152080fa0aa1f91f59d87",
+    "tools/design-experiments/check_beam_se3_physical_v4.py": "f3551f1a20e4719a397863f6b1de0b4574fcadf0b2a908f4f518b17a1d19dbe5",
+    "tools/design-experiments/check_beam_se3_physical_v3.py": "aea4d8b200fc4989d04c1f74aaaadf7724aea7a8659ed74e1dc9eb7486ffe1c6",
+    "tools/design-experiments/check_beam_se3_physical_v2.py": "4a92961036df4c3350860bfd02801746f8adef80974c2b36c9e857aaefe3130b",
+    "tools/design-experiments/beam_se3_high_precision.py": "f7a1c32e6d6633dfe0acb4d5be2d37c6cba4276f912a17000df7985004c26ba0",
+    "tools/design-experiments/beam_jet2_decimal.py": "0fa8e21352aec6cd4f33958578f102ecf8ae533cb94e6e74cb08da4d04a56e1f",
+    "tools/design-experiments/beam_decimal_reference.py": "1ba5a641f813206a959f5cd1b8571a10c077fd599650692e3a708d025d27b839",
+    "tools/design-experiments/check_beam_se3_physical.py": "b50405dd425cd9aca33d2935c5cd9a8a4446e9738d43a07240d07205c5aaf5ac",
+    "tools/design-experiments/beam_se3_v2.py": "02e811686d29afe6eb114f9cc770214da9ece47a859848cc7d04f6f9bde3f475",
+    "tools/design-experiments/beam_jet2.py": "8224ba8d5c8f33e879eb5987fbbbf33ab220066fda8cf847be07f32c2607fc4b",
+    "docs/verification/beam-section-interface-result.json": "594493088d14c13f177b5040ca37261d8a754d530519741759c2994e46f3fd73",
+    "tools/design-experiments/check_beam_section_and_interface.py": "c7e9b437ef1eedf00a5843db5dcd96050dc3b13a91880c579a066896cdb5e58e",
+    "tools/design-experiments/beam_section_input.py": "ff5c822c82b69915f9a30ba10aa2042075a95928bd181424763555b99befd668",
+    "docs/verification/connection-beam-shell-result.json": "553d3de2296eea2b23f98b140aaa79d0974f4d84854a4f6e9ba43f2ef6429b3f",
+    "tools/design-experiments/check_connection_beam_shell.py": "5569b39e7601a55e8f601a8270f8affd83c73b67202ccb2a9cbbf62f6fa34780",
+    "tools/design-experiments/connection_shell.py": "55a37a5f7e0ddbc02c5ec3a1fd7c27835f2642d90f08f3413865d24207097654",
+    "tools/design-experiments/connection_exact_trace.py": "c04e2874a350742efcc493c5cf9f0a2232b589bc65b74e8ec2a6a3092f69e28e",
+    "tools/design-experiments/connection_kinematics.py": "b858ed3ed60294e98c3608073499cfdd7a2a0dbab2d5e045b174ba5a8d7b02b8",
+    "docs/verification/structural-combined-result.json": "b3a3d43f887b205c30b409bc2e6790c983e42f53dbb3927103637a976fe26277",
+    "tools/design-experiments/check_structural_combined.py": "d5847317af245a27b572227203ac1c913a06262da3604b4366e8e077bbbfbbf3",
+    "tools/design-experiments/check_structural_load_damping.py": "5a0957ea38b867106cf246508c8ad9437c3d4062e8228a6afb7721913b4c9be0",
+    "docs/verification/uvlm-known-input-result.json": "0f1fd77860c5c4bcdf5f3a1a4e17d843157c615167ffbd90d4ad1d566a22a95d",
+    "tools/design-experiments/check_uvlm_known_input.py": "c1708e442de7ddbe73b4cc433d38e3b01354fc28f96947c6a28901242e7a6210",
+    "tools/design-experiments/uvlm_known_input.py": "781c0febea9099153ad70a36ced3f9015c5c8bc088085f4e707c76da80d01bae",
+    "docs/verification/structural-history-state-result.json": "61b09cef6f9087c555549863cb85e14879778e320a4c04d6f4126bbac9583aa4",
+    "tools/design-experiments/check_structural_history_state.py": "87f53d31a935b159285bc69dc86d14bf2ebc866ad176c2418f6bbef932a6db20",
+    "tools/design-experiments/structural_history_state.py": "17a0262cc3e4bffc1fe2262c7df74856f1ecfa3504a347045c3552f2c6f78268",
+    "docs/verification/structural-recovery-result.json": "1dcc5f1a99c4db3d8cf7b4fd6f8a61e39a7742f497ee5559cdc1009537e19d39",
+    "tools/design-experiments/check_structural_recovery.py": "a6753c890d52e7351dca5b23273a004944da8bd5d243001d4f95a979189479de",
+    "tools/design-experiments/structural_recovery.py": "f86cbd58e07b616e27749ba5cf39715f1824ce600633b233cbb428168558e790",
+    "docs/verification/high-frequency-final-result.json": "df6e496328a20c0e220741eaf4a0e6669c997b7bbe2d08fe49fe5a93ceb1b323",
+    "tools/design-experiments/assess_high_frequency_final.py": "ce5f9bfd837dec801ed6cd9b9586d1d7e61d2d0db48ad310890314a8958641c2",
+    "tools/design-experiments/run_high_frequency_final_qualified.py": "00f015f3a362c84343083b02a0700501b5599f8dd3a8552fca06f7431e6bd131",
+    "tools/design-experiments/run_high_frequency_final_bounded.py": "8b177ec6bbddd0ff0df38ab09ca264e7b22ae4654b4c0f122732a3e767ec2949",
+    "docs/verification/drag-common-limit-result.json": "00b77f82e57fa701324c21abdf91ec9aec42bde02be3f62301df31958fda20c9",
+    "tools/design-experiments/assess_drag_common_limit.py": "d949f66e6e7803164a2c1dbffbaf3483ea3dadf999a4215f997245d354535d89",
+    "tools/design-experiments/run_drag_final_chord.py": "284e570fee08a732dbd140b7fa5cd3fa0e6f40e39f7f6e484ceadbabe5e14aea",
+    "tools/design-experiments/run_drag_reference_convergence.py": "5605124141dedb42f64eddbb4490f56351d1da62d097b6c37b757722fd5810d4",
+    "tools/design-experiments/run_steady_drag_common_limit_v2.py": "b26ce791368a9e49c88373aa133f88c74ac2ea06da69546372bbd4d5bac59b12",
+    "tools/design-experiments/uvlm_drag_force_kernel.py": "dfe8f7bc931b48ae8e73179131feac8dbde2f6c2820d1042ca06bbc08cca2ced",
+    "docs/verification/multiple-surface-harmonic-refined-result.json": "8bbe6022eea5b9bf08d6d213f94ee229abbf91ccc0f976d77a667378cdb5b6cd",
+    "tools/design-experiments/assess_multiple_surface_harmonic_refined.py": "bbac49fb856e8c0b1f5140922450decbe69f4338871a64f7053c0653e9d49b3b",
+    "tools/design-experiments/run_multiple_surface_harmonic_refined.py": "3a7af3251ff1b7a189b9f5372f98c5680d9d315e6f786bd0a6a850b5cf051f09",
+    "docs/verification/uvlm-global-binding-result.json": "1e7a44f6cf80b31b82af80a6f18d966b68a4c8ed653ea654666def4cc4f9adb1",
+    "tools/design-experiments/check_uvlm_global_binding.py": "10359ab300e9d72253b17b767439cc7ca9207bf96ebdb808f6a431f0e6109eeb",
+    "tools/design-experiments/uvlm_global_binding_witness.py": "44296b83b1def137ccfab2092278886ed97d88a9a967b05f5f839944b44ef030",
+    "docs/verification/pg-uvlm-free-step-result.json": "15e2092f7c0fc7f7e607d8e7db528ec75fa98363a8a6d442df68dc0720d12f15",
+    "tools/design-experiments/check_pg_uvlm_free_step.py": "a42df06323d07957f1bfd8e2044dcc58aba9da3d0d3ef8252c6b9b85ca5780fa",
+    "tools/design-experiments/pg_uvlm_free_step.py": "dddf9560595918a6c669d9ee1688ecfb3bc6ec72045d77978fa947928c06e331",
+    "docs/verification/coupled-bdf2-prescribed-result.json": "77f0e05d632096dbdbd804a48bff5e85fe4bd5613f25f66418e3d94e4c5fa2bb",
+    "tools/design-experiments/check_coupled_bdf2_prescribed.py": "00cf14d5c119ad61d8fb533264c777404780ea36072ab42bad3dc3b38a3381bc",
+    "tools/design-experiments/uvlm_age_scalar.py": "cf03bf86767202ee5fdadebc5f5a899af74c7b72f626e184fd94351a4bf9ac67",
+    "tools/design-experiments/uvlm_frequency_fast.py": "55db651c619f8e47b1dcdadc219fc9d5dca32604ad85880ebc1d3d0f7a88b7a0",
+    "docs/verification/static-branch-continuation-result.json": "68dbd66a7742e91457c0aacd7b6d93a2fa3a5dfe1f7cf41d4b07a4091f9c65fe",
+    "tools/design-experiments/check_static_branch_continuation.py": "748a868780fd084224342cfed1e2686acb8ba41242a8e7fe8048f16ec4ac9716",
+    "docs/verification/flutter-search-control-result.json": "7f24fe055a37836815490adc478f46da9480df42e2b5f254b4dc41dc82f5c189",
+    "tools/design-experiments/check_flutter_search.py": "a7256e58ef99f10d822e4f30b5cb7482c0cc516468197a383075b5f25f47c7be",
+    "tools/design-experiments/flutter_search_witness.py": "b1e77844bfcd00e7b661b2c552d45fa61be8c0b8b09cb1e11a8987ae60dd644d",
+    "docs/verification/coupled-checkpoint-result.json": "21a1f4bece326a49a1f3dd0034e36652e3fe0447cdd9e804df4e1f7cc6a6c982",
+    "tools/design-experiments/check_coupled_checkpoint.py": "49c924f09604b42310f29dc4c5bd7888019f9fa6a9e0691b631b9e80d44ad0dc",
+    "tools/design-experiments/coupled_checkpoint_witness.py": "70018468e06fb7b396cde35344a0c4f3b2ff5a4aea0ba7d3213505a45207d1ec",
+    "docs/product-requirements.md": "8b73b30e3022f8b36601acb96df1fe4d15b00bc585e498f8c9799344756809ad",
+    "docs/acceptance-criteria.md": "8cf936661c210eea6a9314ce1437341de6a1f39b4cf4211077bf2b72b24705c7",
+    "docs/practical-acceptance-plan.md": "836f2e857edf212dcdbbe5640608cb40bc14962fb01e4ebd362151ba26b0257d",
+    "docs/verification/s10-reference-metadata-result.json": "650004b40e7a96353edaea8f35e5fc07bb9b30ed4c5fb37e47248293b56ae7ff",
+    "docs/verification/numerical-foundation-adoption-closure.json": "c6783c53fe4d5965a17d429bab015911d0d50acb97d0989de75dd1507eebcb7a",
+    "tools/design-experiments/build_acceptance_case_catalog.py": "90958d20254a93857dacca05fd3760c2985c472cee4e676183748e95a1bcdf67"
+  },
+  "artifacts": {}
+}

@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "h": 0.1,
+      "layers": 1,
+      "physical_mass": 0.06000000000000001,
+      "child_patch_count": 3,
+      "rigid_energy_error": 7.771561172376096e-16,
+      "volume_error": 3.9968028886505635e-15,
+      "min_child_mass_eigenvalue": 0.015999999999999535
+    },
+    {
+      "h": 0.1,
+      "layers": 2,
+      "physical_mass": 0.06000000000000001,
+      "child_patch_count": 6,
+      "rigid_energy_error": 3.3306690738754696e-16,
+      "volume_error": 3.9968028886505635e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999952
+    },
+    {
+      "h": 0.1,
+      "layers": 4,
+      "physical_mass": 0.06000000000000001,
+      "child_patch_count": 12,
+      "rigid_energy_error": 5.551115123125783e-16,
+      "volume_error": 4.218847493575595e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999953
+    },
+    {
+      "h": 0.05,
+      "layers": 1,
+      "physical_mass": 0.030000000000000006,
+      "child_patch_count": 3,
+      "rigid_energy_error": 1.9984014443252818e-15,
+      "volume_error": 1.1102230246251565e-15,
+      "min_child_mass_eigenvalue": 0.015999999999999535
+    },
+    {
+      "h": 0.05,
+      "layers": 2,
+      "physical_mass": 0.030000000000000006,
+      "child_patch_count": 6,
+      "rigid_energy_error": 8.881784197001252e-16,
+      "volume_error": 1.1102230246251565e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999953
+    },
+    {
+      "h": 0.05,
+      "layers": 4,
+      "physical_mass": 0.030000000000000006,
+      "child_patch_count": 12,
+      "rigid_energy_error": 2.3314683517128287e-15,
+      "volume_error": 1.3322676295501878e-15,
+      "min_child_mass_eigenvalue": 0.01599999999999953
+    }
+  ],
+  "sources": {
+    "tools/design-experiments/check_connection_partition_mass.py": "d32c147c60ac39bd7559b7dd39829d6e47858d55ff0756ccdc6622a793e984c5",
+    "tools/design-experiments/connection_shell.py": "55a37a5f7e0ddbc02c5ec3a1fd7c27835f2642d90f08f3413865d24207097654",
+    "tools/design-experiments/check_connection_fold.py": "e607e9dd7dc7199a9d91d6a3dc18949ad3b27f99d9caf0f7bc85b32467ff9214"
+  },
+  "seconds": 9.202999999979511
+}

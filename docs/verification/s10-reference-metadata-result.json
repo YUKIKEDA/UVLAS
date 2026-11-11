@@ -1,0 +1,272 @@
+{
+  "passed": true,
+  "experimental_reference_qualified": false,
+  "product_acceptance_complete": false,
+  "scope": "public metadata, units and availability; no experimental accuracy pass",
+  "records": {
+    "published_modes": {
+      "LE": {
+        "frequencies": [
+          4.31,
+          28.9,
+          37.5
+        ],
+        "marker_coordinates_shape": [
+          3,
+          32
+        ],
+        "mode_count": 3
+      },
+      "TE": {
+        "frequencies": [
+          4.27,
+          27.4,
+          38.7
+        ],
+        "marker_coordinates_shape": [
+          3,
+          32
+        ],
+        "mode_count": 3
+      }
+    },
+    "dynamic_pressure": {
+      "run": "S10_raw_data_Type_static_ID_4012_rAoA_3_vel_20_TipWeight_FPS_TE_II_ver_1.mat",
+      "column_11_exact_match": true,
+      "factor_to_Pa": 98100.0,
+      "implied_density_quantiles": [
+        1.225146271450878,
+        1.2254384493400448,
+        1.225696634554204
+      ],
+      "meaning": "internal unit consistency only; not calibration uncertainty or independently measured density"
+    },
+    "model_conm2": {
+      "LE": {
+        "count": 318,
+        "sum_mass": 0.0411505,
+        "largest": [
+          {
+            "eid": 433,
+            "node": 60,
+            "cid": 0,
+            "mass": 0.0087,
+            "offset": [
+              -0.0213,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "eid": 204,
+            "node": 106370,
+            "cid": 0,
+            "mass": 0.005,
+            "offset": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "eid": 205,
+            "node": 60,
+            "cid": 0,
+            "mass": 0.0035,
+            "offset": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "eid": 104,
+            "node": 105796,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 105,
+            "node": 101622,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 155,
+            "node": 101618,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 156,
+            "node": 2899,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 157,
+            "node": 2900,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          }
+        ],
+        "scope": "CONM2 only; not total FE model mass; read-only metadata diagnostic, not an importer"
+      },
+      "TE": {
+        "count": 318,
+        "sum_mass": 0.0411505,
+        "largest": [
+          {
+            "eid": 433,
+            "node": 60,
+            "cid": 0,
+            "mass": 0.0087,
+            "offset": [
+              0.0223,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "eid": 203,
+            "node": 101338,
+            "cid": 0,
+            "mass": 0.005,
+            "offset": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "eid": 205,
+            "node": 60,
+            "cid": 0,
+            "mass": 0.0035,
+            "offset": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "eid": 104,
+            "node": 105796,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 105,
+            "node": 101622,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 155,
+            "node": 101618,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 156,
+            "node": 2899,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "eid": 157,
+            "node": 2900,
+            "cid": 0,
+            "mass": 0.00015,
+            "offset": [
+              0.0,
+              0.0,
+              0.005
+            ]
+          }
+        ],
+        "scope": "CONM2 only; not total FE model mass; read-only metadata diagnostic, not an importer"
+      }
+    },
+    "sensor_location_availability": {
+      "missing_in_inspected_static_fields": {
+        "strain_sensor_x_location_LE": true,
+        "strain_sensor_x_location_TE": true
+      },
+      "sensor_loc_m_in_public_raw_zip": false,
+      "meaning": "availability audit; do not invent x from y"
+    }
+  },
+  "remaining": [
+    "measurement/calibration/time/geometry uncertainty",
+    "camera marker and coordinate registration",
+    "configuration mass/fuse correspondence",
+    "strain sensor x and sensor axes",
+    "pre-flutter stationary small-amplitude intervals and attached-flow applicability"
+  ],
+  "sources": {
+    "tools/design-experiments/inspect_s10_public_resources.py": "d77abb52d89a762950da6b9783a438426063148086390d581eeeaa6dfbee6c0d",
+    "tools/design-experiments/reassess_s10_case_inputs.py": "960db8ba7fd1833ea275b4b519c1f7fdf12bc4e9e6908af1d5f845699a6a2d6b",
+    "tools/design-experiments/diagnose_s10_reference_metadata.py": "5fb16e5403fab2e84a97417690f2acd49fa34a5c072f547df90ba4461061a1d8"
+  },
+  "artifacts": {
+    "build/analysis/s10-reassessment/Run_Numbers.xlsx": "cbda4ca2453f6cdfa2d40abe7ca1dc9ff3b9be3e79fe9262e289dc1cfb33b633",
+    "build/analysis/s10-reassessment/public-inspection.json": "a023c0d262a307528fe530f9be5bcd9979856adea62819aea318a31f3b78e19e",
+    "build/analysis/s10-reassessment/case-input-audit.json": "b8ced9b8824c075b8580666dc6fde12b07cb59e41abb41685d85aa0fbd3430e6",
+    "build/analysis/s10-reassessment/S10_raw_data_Type_Flutter_ID_4030_rAoA_0_vel_20p_TipWeight_FPS_LE_II_ver_1.mat": "8dbced6ffd68bf0749aefc24737ac49dcd069841adf26049d92fe62476c17b50",
+    "build/analysis/s10-reassessment/S10_raw_data_Type_GVT_ID_4003_rAoA_0_vel_0_TipWeight_FPS_TE_II_ver_1.mat": "2ec4eefe166933ee8843df25161b0aca6e2072bf41eca5850dc971a2a34c3ffb",
+    "build/analysis/s10-reassessment/S10_raw_data_Type_GVT_ID_4004_rAoA_0_vel_0_TipWeight_FPS_LE_II_ver_1.mat": "a0504930b425b97c1c2ac0005d959ac785e7ec5017e414bca4d3537f23b7c3e1",
+    "build/analysis/s10-reassessment/S10_raw_data_Type_static_ID_4012_rAoA_3_vel_20_TipWeight_FPS_TE_II_ver_1.mat": "ebcdd2ba36f7361684e9a6005141aa11bb06e5356507a1239ee1b170f67eb3f1",
+    "build/reference-audit/s10-analyzed.zip": "30ce89ac7e36a88c45e44bfa53e1cb9f79bbaf9a303d02c6d205a244f1b4da96",
+    "build/reference-audit/s10-metadata.json": "27b646b53c9bf2e50ad34b374d0aef52f6fb624f26de71d400a9e495592be728",
+    "build/reference-audit/s10-readme.pdf": "a23423f2f27520ffd85b51e96f59d3eb171737fd145b88d8fba8cb91e884e8d8",
+    "build/reference-audit/s10-readme.txt": "500ebb17d51a76fe3b6fc31fea86ba5203806a08b9c85bd4d2399a70a2a7363e",
+    "build/reference-audit/S10_LE.nas": "6c31652d70ff8b82dfa49748dc72b7f17c4a2d4590252a0929f95bb12c12022e",
+    "build/reference-audit/S10_TE.nas": "971cf64eb9694b720be906204da178c19c6af118297c27553af60d0256c46adf"
+  }
+}

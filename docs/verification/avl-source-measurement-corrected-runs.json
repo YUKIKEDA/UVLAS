@@ -1,0 +1,3735 @@
+{
+  "protocol": "docs/verification/avl-source-measurement-experiment.md",
+  "source_sha256": "d308f35c8b7084afbd98d8f896617261eeb9905c4a664a43f04b5cadb077a308",
+  "input_manifest_sha256": "c8845096c378cdd8da6e272e06d3c104f0d41c5a2c5e041c9ff62bd457da0a1c",
+  "preparation_sha256": "6e852599e072b670766734d2a028d36620d68ce25ec8d6c8c4077ad0c990529f",
+  "build_script_sha256": "d7e2a77cc54c839ce819699fbd1ca74cc06fe3fe47df617c029b79f8eb950812",
+  "compiler": "GNU Fortran (conda-forge gcc 14.4.0-7) 14.4.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nx86_64-conda-linux-gnu-gcc (conda-forge gcc 14.4.0-7) 14.4.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "toolchain_lock_sha256": "b1f4ef18c07af01166c4ce25d532e640beaf66cb706150ab65d4ceb1c87b312c",
+  "initial_result_sha256": "d96c4716ba0ad600be6bfc6109b064374839954fa93b4d71f0e15b6790472cd1",
+  "baseline_runs_reused": 20,
+  "runs": [
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M4-N12-a-2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.1907980459999976,
+      "exit_code": 0,
+      "peak_resident_bytes": 6889472,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "b24fcbfda39a621c9fa42675bd0e56810fa44d47caf73015fb3073b5a557ba2f",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "d7524e1be775dd3db6a34a4941310c3d594e19377bb7d3787f3037c44354ec21",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "3c9286f489aef18dfafa1723bc24c468f886c76072307890a1f4aabf5240da71",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "5d30b1fca164a77e58d4a301d16e8c7fc0ff3301063fa84b6a191dadc8a1d217",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "b24fcbfda39a621c9fa42675bd0e56810fa44d47caf73015fb3073b5a557ba2f",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "1027b644fada1240bea172407ec0ab000e9050db3badb2564dbcc43430d2b624",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "7082ff8beac2f9e4d870ac9992a06b3bdea10ec8e582d4d0962df877b6e92b82",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "d7524e1be775dd3db6a34a4941310c3d594e19377bb7d3787f3037c44354ec21",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "3c9286f489aef18dfafa1723bc24c468f886c76072307890a1f4aabf5240da71",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M4-N12-a-1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.18675770600000874,
+      "exit_code": 0,
+      "peak_resident_bytes": 6705152,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "bed7ba13a9d20697e0952442cbf8ae34fd903e8bc903c0c4508650ab92a8c550",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "70e47cb39fb28c2fed9140e03c353ca415629a356c700271ac4e900dabfa836c",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "2490e956bf229103a8ba62ce59927c76f48adbfcc919d702e15a0ae7eacb7099",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "9a06bcb2675c81eff88b562da2e0ebe5283cfdf895f1d108e7e005c4a199891f",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "bed7ba13a9d20697e0952442cbf8ae34fd903e8bc903c0c4508650ab92a8c550",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "7f7967434696244f1ca6e2345e3313a23f35956bd270e432c31dc94e55f525bd",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "ebacface844e0905d1332c2645c2c0287d776ac93778f12d7f5317bdb44dc6e3",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "70e47cb39fb28c2fed9140e03c353ca415629a356c700271ac4e900dabfa836c",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "2490e956bf229103a8ba62ce59927c76f48adbfcc919d702e15a0ae7eacb7099",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M4-N12-a0",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.18355388399999129,
+      "exit_code": 0,
+      "peak_resident_bytes": 6811648,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "45ca48f652927b5aa2f8124f26988c7475ce86320959b685f0728cc8d29deb4e",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "d605fdbafdf07943b6d7a47f7c60dfe335b20ba9c7e4577d9b417511b2a5fd49",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "c0db4e3a9775baf6dab4ab196c5819ed8296b544c51a10dd184994d83c5f6958",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "c2927a534bfaf041db094252dd27453e496f1fd5d99b3fe267647f3b28efdb58",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "45ca48f652927b5aa2f8124f26988c7475ce86320959b685f0728cc8d29deb4e",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "5997fce30328a217ffba2e0509d41401bcd7a9a9e96dd8b660206222520e67db",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "6fcf3f05bc7f380701eaf5feb4d7a5d31d18902b80106b1c8188eaa49f6edf38",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "d605fdbafdf07943b6d7a47f7c60dfe335b20ba9c7e4577d9b417511b2a5fd49",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "c0db4e3a9775baf6dab4ab196c5819ed8296b544c51a10dd184994d83c5f6958",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M4-N12-a1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.266803498999991,
+      "exit_code": 0,
+      "peak_resident_bytes": 6893568,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "b2067d8790bc0e7aef63293e3696ae05279a784ea678b4ee40eb578ed60ae6c1",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "73c53c37615117ef5cc5990915cc0f2944051b805c59e46a1ad75175bd7e424e",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "f8a71108ba1e8895a8a3d01d9cea212d06638964d77d89211b6fb9928edbfa3e",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "e8ac6c91144cb60d78acc549e8e81922d6d89adc97facd33491ca670c494c7cb",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "b2067d8790bc0e7aef63293e3696ae05279a784ea678b4ee40eb578ed60ae6c1",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "e7e82c4b6af4fc23d2bd95d2fe19e30049ba37cf20869fce5469e53e42bd72f4",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "ff8190884a85395480ad14afe3f8af8054dd0f57fc24d344475c2864c922ae1a",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "73c53c37615117ef5cc5990915cc0f2944051b805c59e46a1ad75175bd7e424e",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "f8a71108ba1e8895a8a3d01d9cea212d06638964d77d89211b6fb9928edbfa3e",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M4-N12-a2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.1858107410000116,
+      "exit_code": 0,
+      "peak_resident_bytes": 6848512,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "1d273f03f4acdfd021bf1e4c03a8ff2fcfea1af036eabd041c678aeb8639ab78",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "4610c31641610e11f687c1d3a46e7a4fb56ee28ff35085252d3a9fe92f293f21",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "850bfbb5cb0d4e5036896f0177538bcd9e65f9662f47ea22dcaeae50b9ade23a",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "ed239a3e5466ff3591c0d1c0de241334ee0cf6e1e7e8f02769c2524545a8021b",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "1d273f03f4acdfd021bf1e4c03a8ff2fcfea1af036eabd041c678aeb8639ab78",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "d7d0ba30990e3ebac9247f9a4ddba322c77d44ce77cde1498103d7f7bae0e907",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "e3507d7bea286b393ced59c1aa08b7b9c85500496e2314eef5f131954ca3fdd2",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "4610c31641610e11f687c1d3a46e7a4fb56ee28ff35085252d3a9fe92f293f21",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "850bfbb5cb0d4e5036896f0177538bcd9e65f9662f47ea22dcaeae50b9ade23a",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M8-N24-a-2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.33752124299999764,
+      "exit_code": 0,
+      "peak_resident_bytes": 11141120,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "46d172e6893d30e9dce82501c7b2453ad24fbc6b55fc2b61b55e99aea84bc4bf",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "64c08b2f5e0f987a93aab06d1e48d3591fc6b676f5499f5f57a6821defdf1bee",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "dbcd1fc0155c62ccf3f07d296cf36147a5dc4fa59c5f0da906b81a9813f571a6",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "a10e3900b2173b8ed264e5a1b8cdf7342a3dcaa391bc0ddd40318738be4064fd",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "46d172e6893d30e9dce82501c7b2453ad24fbc6b55fc2b61b55e99aea84bc4bf",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "843c39aea23bc66d48542b97a4799d6e4d647657e278cdea87a1a9b2ed619a40",
+          "bytes": 799
+        },
+        "session.txt": {
+          "sha256": "7082ff8beac2f9e4d870ac9992a06b3bdea10ec8e582d4d0962df877b6e92b82",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "64c08b2f5e0f987a93aab06d1e48d3591fc6b676f5499f5f57a6821defdf1bee",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "dbcd1fc0155c62ccf3f07d296cf36147a5dc4fa59c5f0da906b81a9813f571a6",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M8-N24-a-1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.29804689900001335,
+      "exit_code": 0,
+      "peak_resident_bytes": 10977280,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "f41302242f1890ff21ad21d3643e07f4877ca93467638590ccaa31721bcd4c94",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "3f12393bc6294e898325f9f4d8e91c77c57c78d8705f28c6a1f0f4b84c2acaba",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "0d25cab619e083bc66ebf80050808f29a06421d775a271d2d090ce0fe8b7183d",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "1b75107c76e94fb43c322aace302d498546f8082d61134e1068ed300d57d1ea1",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "f41302242f1890ff21ad21d3643e07f4877ca93467638590ccaa31721bcd4c94",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "53fe2f82c468d74b922e891a44ce26ec1b67bed1498c8774a5337fecd812446b",
+          "bytes": 800
+        },
+        "session.txt": {
+          "sha256": "ebacface844e0905d1332c2645c2c0287d776ac93778f12d7f5317bdb44dc6e3",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "3f12393bc6294e898325f9f4d8e91c77c57c78d8705f28c6a1f0f4b84c2acaba",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "0d25cab619e083bc66ebf80050808f29a06421d775a271d2d090ce0fe8b7183d",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M8-N24-a0",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.24783921599998848,
+      "exit_code": 0,
+      "peak_resident_bytes": 11198464,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "3ddc50a0f2f3eed4ac9bea528da917ce27a161b40f4422cc1fbd093af3927caa",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "39575874d3c19a07e99373762bcfc6ad343b09d125419019cfa90eff49228677",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "4698857708833dde99add9fdeb4f9f84871760455b593afcfffc916e2f19e16e",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "e3f05e1e1341ecfc395f025c975c380b07c309d254b822902d9d18cfbf3a2098",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "3ddc50a0f2f3eed4ac9bea528da917ce27a161b40f4422cc1fbd093af3927caa",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "7b2ecfdbf0548b701ffa1001fdf1a4e0acf26d55f65d67f961e827380b7b2267",
+          "bytes": 800
+        },
+        "session.txt": {
+          "sha256": "6fcf3f05bc7f380701eaf5feb4d7a5d31d18902b80106b1c8188eaa49f6edf38",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "39575874d3c19a07e99373762bcfc6ad343b09d125419019cfa90eff49228677",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "4698857708833dde99add9fdeb4f9f84871760455b593afcfffc916e2f19e16e",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M8-N24-a1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.4323930980000057,
+      "exit_code": 0,
+      "peak_resident_bytes": 11096064,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "de2c4686d3aab98923041309d0d5328ed46428d96702c379eb9f8816945eb5c7",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "5a09453be53fb1ee405cf82cec73e18e8bb806b5bca1276940f24ebeb41d7d6f",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "b1cab2f5044cfdc9ee7b55a13b9e3e89f6605f99156c92a41c16e63faaa8c7b0",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "dc9366e424ab787f7d0b3e555c058050070e7e5e0cea02a54badd1b694018558",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "de2c4686d3aab98923041309d0d5328ed46428d96702c379eb9f8816945eb5c7",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "bd9fc0c6a2a16f20b56d6df59aec827e2d02b185347d36e5f7f750a2f4ef66f1",
+          "bytes": 799
+        },
+        "session.txt": {
+          "sha256": "ff8190884a85395480ad14afe3f8af8054dd0f57fc24d344475c2864c922ae1a",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "5a09453be53fb1ee405cf82cec73e18e8bb806b5bca1276940f24ebeb41d7d6f",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "b1cab2f5044cfdc9ee7b55a13b9e3e89f6605f99156c92a41c16e63faaa8c7b0",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V01-M8-N24-a2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.1736667640000178,
+      "exit_code": 0,
+      "peak_resident_bytes": 11104256,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "e33b0fec87c920aca8647c395cc6593fa0956989277bd5439ab202ffd917a97a",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "3789ed13a3d19ae4036f6eb957702dc289ebd2e505d9e6c6cdec0500862883b3",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "9732235c024d875e548d875fa6cfc01ed41a63649229825662e121978ce32080",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "be94176a07b69aaa9ee603aef61cd9ee53fa6cbc2598b23b66c4cd3645c16cfb",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "e33b0fec87c920aca8647c395cc6593fa0956989277bd5439ab202ffd917a97a",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "354e67b4149c5bbe6d6ce8d91932ebb43f07b3edbe513b43739e81a64b80c75a",
+          "bytes": 800
+        },
+        "session.txt": {
+          "sha256": "e3507d7bea286b393ced59c1aa08b7b9c85500496e2314eef5f131954ca3fdd2",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "3789ed13a3d19ae4036f6eb957702dc289ebd2e505d9e6c6cdec0500862883b3",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "9732235c024d875e548d875fa6cfc01ed41a63649229825662e121978ce32080",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M4-N12-a-2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.3632365189999973,
+      "exit_code": 0,
+      "peak_resident_bytes": 6754304,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "898c920284dcd6b5be3d54593cc80a4c66249879ea9bb1b079df81c0fd140cac",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "907f789ae7b6dec5b9b592d4bca3c2e0416883b62e0a1e6f9015c83235b45475",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "2fd80288ec75127e0d6bdbd24fbf1092e52aba28e1cca6e61469a47ba4da4e2f",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "779cf77803b0961a90a8f29deb54dac0aad8aa488e0bc712dfb79d69b210a760",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "898c920284dcd6b5be3d54593cc80a4c66249879ea9bb1b079df81c0fd140cac",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "414cfe2f74425340b00606d3640c0882d4b76f4bdae5da60d82c1b5f35d8b3ea",
+          "bytes": 797
+        },
+        "session.txt": {
+          "sha256": "7082ff8beac2f9e4d870ac9992a06b3bdea10ec8e582d4d0962df877b6e92b82",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "907f789ae7b6dec5b9b592d4bca3c2e0416883b62e0a1e6f9015c83235b45475",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "2fd80288ec75127e0d6bdbd24fbf1092e52aba28e1cca6e61469a47ba4da4e2f",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M4-N12-a-1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.23038299099999904,
+      "exit_code": 0,
+      "peak_resident_bytes": 6688768,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "10dabcd41844491ab7138cd9685eb29a9fd5d70737e6d81d74c1fa2a483ea97e",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "78941d6b7bbe617e032b7b4d2dd254db3d7efadedbbacc4641e48cb3e32eb078",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "54696fa878e1c843710775a2a66d2ede710acdf419566f0843b4bce61d315e09",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "1d8493042b293535e9283b8dd4a4e9fa8434f74ba5210becf22f97cbbe3fff6d",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "10dabcd41844491ab7138cd9685eb29a9fd5d70737e6d81d74c1fa2a483ea97e",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "b6591e2899ff4788523cf42a6aaf9faf5e10b9a794ef7cf11ed5ff5e748d64be",
+          "bytes": 797
+        },
+        "session.txt": {
+          "sha256": "ebacface844e0905d1332c2645c2c0287d776ac93778f12d7f5317bdb44dc6e3",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "78941d6b7bbe617e032b7b4d2dd254db3d7efadedbbacc4641e48cb3e32eb078",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "54696fa878e1c843710775a2a66d2ede710acdf419566f0843b4bce61d315e09",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M4-N12-a0",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.2794814899999949,
+      "exit_code": 0,
+      "peak_resident_bytes": 6627328,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c08339f5db3be238a47b283b6f4ab93952029283b958c91eb10eae60221cf904",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "823c2054a7daac7fdad7e7a8e89c3e458721664c66eb0f34496dc0f8ff4936f3",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "a341ea2ee6063453bfd66809ed3134fcab442ea0ed67931fd388ab2e7709ddbc",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "a77cbfb889b9a8005dc62b5d1b6edaab8c481ec33e1d9f442d83fdedb275e499",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "c08339f5db3be238a47b283b6f4ab93952029283b958c91eb10eae60221cf904",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "521e533b85a847299d7465433786dd484c4efdd13daf248d21c9f94e87762cfb",
+          "bytes": 797
+        },
+        "session.txt": {
+          "sha256": "6fcf3f05bc7f380701eaf5feb4d7a5d31d18902b80106b1c8188eaa49f6edf38",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "823c2054a7daac7fdad7e7a8e89c3e458721664c66eb0f34496dc0f8ff4936f3",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "a341ea2ee6063453bfd66809ed3134fcab442ea0ed67931fd388ab2e7709ddbc",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M4-N12-a1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.28521007500000906,
+      "exit_code": 0,
+      "peak_resident_bytes": 6602752,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c32d23338878344700be6a1c153d8b820b18828ecc5127962bf224d648ded237",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "8d532820bc71e84f08935aef38c70169f6d42c6776bd5e24c076279184a5b6fb",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "fdda25f4b329d9745a64ea0ac70069444fb5ebb0a02b2ac17d8a9f8414485a2c",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "7f806316a411277388c4017b4f7e45e0d1edad7b8b0664d46ffda4d648e46567",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "c32d23338878344700be6a1c153d8b820b18828ecc5127962bf224d648ded237",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "83dd4b167161973fbd84f636868509ffdebe8ca22ad01c4581b943ce5662f345",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "ff8190884a85395480ad14afe3f8af8054dd0f57fc24d344475c2864c922ae1a",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "8d532820bc71e84f08935aef38c70169f6d42c6776bd5e24c076279184a5b6fb",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "fdda25f4b329d9745a64ea0ac70069444fb5ebb0a02b2ac17d8a9f8414485a2c",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M4-N12-a2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.29879180800000427,
+      "exit_code": 0,
+      "peak_resident_bytes": 6565888,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "83d0e0d8a602259b55fe83feb333c8834d84b03042cd57bafa3d6f1c464f44fd",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "88ba53234f6d120bf65e9fadbd503b10b25103e17363e5522e1841b4edf2ab4f",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "24e282681071ed10fbdb2ddcb4409b998506656e608c7ec6ea2fad0bf6c681a1",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "f2e706e7b3cb74e7275e244bf7785e7ad2817f900064bb29b4963f0ae8437446",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "83d0e0d8a602259b55fe83feb333c8834d84b03042cd57bafa3d6f1c464f44fd",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "4a4c744e42a6e66f02c2fec76d2399a4c7042a758af669ad82b37bec5b110d15",
+          "bytes": 798
+        },
+        "session.txt": {
+          "sha256": "e3507d7bea286b393ced59c1aa08b7b9c85500496e2314eef5f131954ca3fdd2",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "88ba53234f6d120bf65e9fadbd503b10b25103e17363e5522e1841b4edf2ab4f",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "24e282681071ed10fbdb2ddcb4409b998506656e608c7ec6ea2fad0bf6c681a1",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M8-N24-a-2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.8968262730000163,
+      "exit_code": 0,
+      "peak_resident_bytes": 11001856,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "9310b881307681162b0bee95798668c0f3c3bffa3ac1770d28843cb324235edc",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "aa0bc51c48d97798ffed538351e955f5f7c14533658e31c25bd217cfcef4cb6a",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "96a36879f1e79c50a94345f8276ec4b13612dc9b417717bc9e238236f5ad1970",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "f8b5a8cc49645726be6a4a8dbdf850a829c5a4cb104554ba44500a59fdf9a7b6",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "9310b881307681162b0bee95798668c0f3c3bffa3ac1770d28843cb324235edc",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "b348e144a560e061107c537a1fb451289b7c3cfa3bf0b33d544a3fc90cde28e9",
+          "bytes": 799
+        },
+        "session.txt": {
+          "sha256": "7082ff8beac2f9e4d870ac9992a06b3bdea10ec8e582d4d0962df877b6e92b82",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "aa0bc51c48d97798ffed538351e955f5f7c14533658e31c25bd217cfcef4cb6a",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "96a36879f1e79c50a94345f8276ec4b13612dc9b417717bc9e238236f5ad1970",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M8-N24-a-1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.33700403100002063,
+      "exit_code": 0,
+      "peak_resident_bytes": 11059200,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "64d66c0ccdac3762eb34b582e2fbcade8cbd503f576a981e0dff7d8d606e9220",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "01e9031ce379da42ccb48a57a876d3818af8b28b84eb4ff4f7d6373755d3c1c4",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "18eaa022eb7b896bc358bb3e42ae39299bc6e73af2a1b317d0af72b1cc02877b",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "07ebfaf362953c9c32df0be5ff1cfd65da1a2d3d40b7c5b88ec51abbecc8b063",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "64d66c0ccdac3762eb34b582e2fbcade8cbd503f576a981e0dff7d8d606e9220",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "9490e6286f27924e6bdf1c5e66955ce96521c088e5033b2ccb8e915cecbaba47",
+          "bytes": 800
+        },
+        "session.txt": {
+          "sha256": "ebacface844e0905d1332c2645c2c0287d776ac93778f12d7f5317bdb44dc6e3",
+          "bytes": 175
+        },
+        "strips.txt": {
+          "sha256": "01e9031ce379da42ccb48a57a876d3818af8b28b84eb4ff4f7d6373755d3c1c4",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "18eaa022eb7b896bc358bb3e42ae39299bc6e73af2a1b317d0af72b1cc02877b",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M8-N24-a0",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.3165830270000072,
+      "exit_code": 0,
+      "peak_resident_bytes": 11100160,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "edf874737ae29820e351efa7cbfc048b0e34b74de804645aaf42da27e7a8006a",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "11ce532f11de6539928d089a29c9d67b199df8a20601b9db6427c35efc89eb45",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "196453c3bd55dd6deae599ca968fc92a14b40d93b3c411b1877eebee310fc6ec",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "daa4852df117038915d31a0fa26ea4ace63b72216023434a03d184ec45e633ac",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "edf874737ae29820e351efa7cbfc048b0e34b74de804645aaf42da27e7a8006a",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "7734b7be44e12e1edfa7807054d5555957593141bce7b77e60f8096bc7786979",
+          "bytes": 800
+        },
+        "session.txt": {
+          "sha256": "6fcf3f05bc7f380701eaf5feb4d7a5d31d18902b80106b1c8188eaa49f6edf38",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "11ce532f11de6539928d089a29c9d67b199df8a20601b9db6427c35efc89eb45",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "196453c3bd55dd6deae599ca968fc92a14b40d93b3c411b1877eebee310fc6ec",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M8-N24-a1",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.19401125699999966,
+      "exit_code": 0,
+      "peak_resident_bytes": 11243520,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "77e2248a09916a828f8aacc409483928b07c4e1adc97cc32f40e6a59d6cda126",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "c0e65f3e04c981d68522504d5e7bd653fbbe71860561382ee525753a3cd0a17c",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "75be5e8e09ea320086a555d0448f619cd5f2b58a499b0c72a6207b91616ebecd",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "be2d314ca5ad324da2482feaa277795e98d2c3a5ec1efd904ee6008bae949daf",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "77e2248a09916a828f8aacc409483928b07c4e1adc97cc32f40e6a59d6cda126",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "4a7d6d2cb07063a6ee71a676af317578f1f49dc30a6db6570db3f55ebf170385",
+          "bytes": 800
+        },
+        "session.txt": {
+          "sha256": "ff8190884a85395480ad14afe3f8af8054dd0f57fc24d344475c2864c922ae1a",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "c0e65f3e04c981d68522504d5e7bd653fbbe71860561382ee525753a3cd0a17c",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "75be5e8e09ea320086a555d0448f619cd5f2b58a499b0c72a6207b91616ebecd",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-20261030-211712/baseline-FW-V02-M8-N24-a2",
+      "executable_sha256": "a61ebb2e89d39e59935e9fec52f8c2042aaa8fed4fdeffb9e9bb750c0af663b5",
+      "seconds": 0.5044615779999901,
+      "exit_code": 0,
+      "peak_resident_bytes": 11051008,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "d94d1cd081c5c9c1453f03cb196fe88955bb1f76b5d4e8e66772720060761cd2",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "c99ce8684d4886958008920e82b506741d26cdf4ca7effb27cff812386c64b74",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "14bd366f79a6f1cf67e8ccb4bd5799dff78b6a7d7dc85f01cac59d6124458585",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "f18209ae30f87c3e15f78767fb816d16214ed13ef7c30e0c4fe09d27df334c7d",
+          "bytes": 29007
+        },
+        "elements.txt": {
+          "sha256": "d94d1cd081c5c9c1453f03cb196fe88955bb1f76b5d4e8e66772720060761cd2",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "1bb17d00710b2078f1cf4a80c9a6bc9ab08edd31ceaf9798460559b83c75b3bd",
+          "bytes": 799
+        },
+        "session.txt": {
+          "sha256": "e3507d7bea286b393ced59c1aa08b7b9c85500496e2314eef5f131954ca3fdd2",
+          "bytes": 174
+        },
+        "strips.txt": {
+          "sha256": "c99ce8684d4886958008920e82b506741d26cdf4ca7effb27cff812386c64b74",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "14bd366f79a6f1cf67e8ccb4bd5799dff78b6a7d7dc85f01cac59d6124458585",
+          "bytes": 1297
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M4-N12-a-2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.24184888199999932,
+      "exit_code": 0,
+      "peak_resident_bytes": 6787072,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "b24fcbfda39a621c9fa42675bd0e56810fa44d47caf73015fb3073b5a557ba2f",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "d7524e1be775dd3db6a34a4941310c3d594e19377bb7d3787f3037c44354ec21",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "3c9286f489aef18dfafa1723bc24c468f886c76072307890a1f4aabf5240da71",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "1f4a142069fb9c5901a55c138b57cf9ecf8f2a34deaccbc53bb3f97f8f7474f5",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "b24fcbfda39a621c9fa42675bd0e56810fa44d47caf73015fb3073b5a557ba2f",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "1a8b5568aef12941a9dc03be647d9d902c01e23b7d88bc16308d57a671c4b8aa",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "d7524e1be775dd3db6a34a4941310c3d594e19377bb7d3787f3037c44354ec21",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "3c9286f489aef18dfafa1723bc24c468f886c76072307890a1f4aabf5240da71",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "244c46abe037387e627cbdec7674a29ef52d01b0190c9d8d3a02e0d74c075066",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "f4e6d603fa285428a3758aa8552073fc294f78784707fb6b2914a288cfc7d07d",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "4b108a1ee40a934c6315182aa651446aab9a77b582d08d3f551e4256bb620a7e",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M4-N12-a-1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.24441871900000223,
+      "exit_code": 0,
+      "peak_resident_bytes": 6791168,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "bed7ba13a9d20697e0952442cbf8ae34fd903e8bc903c0c4508650ab92a8c550",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "70e47cb39fb28c2fed9140e03c353ca415629a356c700271ac4e900dabfa836c",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "2490e956bf229103a8ba62ce59927c76f48adbfcc919d702e15a0ae7eacb7099",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "a0dc6d04af35817f17737a24b0626b2a4800929ff3ebe08499cda5fb4f26dd23",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "bed7ba13a9d20697e0952442cbf8ae34fd903e8bc903c0c4508650ab92a8c550",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "6c7be2ed3fe55bdb233520f15fb18bfd3773b43e9195ebdfd3c478f16277f3ff",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "70e47cb39fb28c2fed9140e03c353ca415629a356c700271ac4e900dabfa836c",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "2490e956bf229103a8ba62ce59927c76f48adbfcc919d702e15a0ae7eacb7099",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "4dbe5bd4d9f38ef22f523c2d6c8e82532a8b57b054c8fd78347bda6f2e78fa61",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "f4e6d603fa285428a3758aa8552073fc294f78784707fb6b2914a288cfc7d07d",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "3a3dd7975106c9b5e827e378c03e2e73345a8e707af395aebb44dde7ab7a7e7f",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M4-N12-a0",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.33287134300000076,
+      "exit_code": 0,
+      "peak_resident_bytes": 6922240,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "45ca48f652927b5aa2f8124f26988c7475ce86320959b685f0728cc8d29deb4e",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "d605fdbafdf07943b6d7a47f7c60dfe335b20ba9c7e4577d9b417511b2a5fd49",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "c0db4e3a9775baf6dab4ab196c5819ed8296b544c51a10dd184994d83c5f6958",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "68386593b72771b6ac1295f88903436de2db41961db1b9452113ff3fc8f0cd1c",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "45ca48f652927b5aa2f8124f26988c7475ce86320959b685f0728cc8d29deb4e",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "984a58e8965579f194a176790dca13e9ca21a234b9f0d4b8a39e6ade58067f18",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "d605fdbafdf07943b6d7a47f7c60dfe335b20ba9c7e4577d9b417511b2a5fd49",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "c0db4e3a9775baf6dab4ab196c5819ed8296b544c51a10dd184994d83c5f6958",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "768afeea96f2149fe742b12ce7e4f424e02d64097cce4182b5ed73a43d6be686",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "f4e6d603fa285428a3758aa8552073fc294f78784707fb6b2914a288cfc7d07d",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "7c743444c1387103f05aaa0c4a7a9d49529c1b31c9cfeedc0480bb3ab92ca58f",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M4-N12-a1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.28599786699999896,
+      "exit_code": 0,
+      "peak_resident_bytes": 6676480,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "b2067d8790bc0e7aef63293e3696ae05279a784ea678b4ee40eb578ed60ae6c1",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "73c53c37615117ef5cc5990915cc0f2944051b805c59e46a1ad75175bd7e424e",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "f8a71108ba1e8895a8a3d01d9cea212d06638964d77d89211b6fb9928edbfa3e",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "8c15d4ba6a598a9732163bc21886a58fed73dc54042b283b53c5dba2a68953e6",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "b2067d8790bc0e7aef63293e3696ae05279a784ea678b4ee40eb578ed60ae6c1",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "90318eea47b9d0a77aa9f95b2f1da87e0ea5b63bb4cdae8c701dd0b72741fb6f",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "73c53c37615117ef5cc5990915cc0f2944051b805c59e46a1ad75175bd7e424e",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "f8a71108ba1e8895a8a3d01d9cea212d06638964d77d89211b6fb9928edbfa3e",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "b9faf5a944ef99cd6e5eb72854211f2e0f37108b25915484a3773fd27ea38249",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "f4e6d603fa285428a3758aa8552073fc294f78784707fb6b2914a288cfc7d07d",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "88f58d1da0247456544773b9526577db5afd16e4a09c8f203c239f8096e44429",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M4-N12-a2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.337547942999997,
+      "exit_code": 0,
+      "peak_resident_bytes": 6852608,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "1d273f03f4acdfd021bf1e4c03a8ff2fcfea1af036eabd041c678aeb8639ab78",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "4610c31641610e11f687c1d3a46e7a4fb56ee28ff35085252d3a9fe92f293f21",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "850bfbb5cb0d4e5036896f0177538bcd9e65f9662f47ea22dcaeae50b9ade23a",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "889674b384e9e9ad2a033345c062d9fb79d7d832d3616498a319220e78ba2dc2",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "1d273f03f4acdfd021bf1e4c03a8ff2fcfea1af036eabd041c678aeb8639ab78",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "f5ca6349f774ffff62dacbaa47179b554d6da4a2acce0ba80d5126ed2aaf0278",
+          "bytes": 807
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "4610c31641610e11f687c1d3a46e7a4fb56ee28ff35085252d3a9fe92f293f21",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "850bfbb5cb0d4e5036896f0177538bcd9e65f9662f47ea22dcaeae50b9ade23a",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "229e77e55a7b7a70b60b3e3bca8d0f3c6b69170649720302a39a1e617273630a",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "f4e6d603fa285428a3758aa8552073fc294f78784707fb6b2914a288cfc7d07d",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "31e67531904a1bc41393e7072987c288cac88601f75528ac40cdd5c7da7304a1",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M8-N24-a-2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.4312153799999976,
+      "exit_code": 0,
+      "peak_resident_bytes": 11005952,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "46d172e6893d30e9dce82501c7b2453ad24fbc6b55fc2b61b55e99aea84bc4bf",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "64c08b2f5e0f987a93aab06d1e48d3591fc6b676f5499f5f57a6821defdf1bee",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "dbcd1fc0155c62ccf3f07d296cf36147a5dc4fa59c5f0da906b81a9813f571a6",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "a8efbe261750f42b66243c47a85abdcfa72da88d1f15773c2c0ae2a1ed8ca53b",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "46d172e6893d30e9dce82501c7b2453ad24fbc6b55fc2b61b55e99aea84bc4bf",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "47a3f57e5f1775839bd2042062a094d32e0766894cbdc220000031cf16e93526",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "64c08b2f5e0f987a93aab06d1e48d3591fc6b676f5499f5f57a6821defdf1bee",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "dbcd1fc0155c62ccf3f07d296cf36147a5dc4fa59c5f0da906b81a9813f571a6",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "d9a53051255b57fd644dc10e7001000d668fc260ab5911988e04ae8d0144b4fd",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "beb97f16148861b69bb0c9e38ba10ecd408528a36b649d214b30f399deff9935",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "9af36ba338675931dbc3e101f3844cafaffc2ccb0f4dcb2e5912577780fc3eab",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M8-N24-a-1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.5153406980000028,
+      "exit_code": 0,
+      "peak_resident_bytes": 11010048,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "f41302242f1890ff21ad21d3643e07f4877ca93467638590ccaa31721bcd4c94",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "3f12393bc6294e898325f9f4d8e91c77c57c78d8705f28c6a1f0f4b84c2acaba",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "0d25cab619e083bc66ebf80050808f29a06421d775a271d2d090ce0fe8b7183d",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "e4935bc5bced3b4781fc739c5e3fd303619b4c1bc31270ec378cdc87664eb39f",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "f41302242f1890ff21ad21d3643e07f4877ca93467638590ccaa31721bcd4c94",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "e12ccefe29c38fbf61899a0639db074d606134c838003e67be8794c521239a33",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "3f12393bc6294e898325f9f4d8e91c77c57c78d8705f28c6a1f0f4b84c2acaba",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "0d25cab619e083bc66ebf80050808f29a06421d775a271d2d090ce0fe8b7183d",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "08c8bf56f2e6a8597061c59a4ce779e984486f5e1d13ade732f11f77fc62b8a3",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "beb97f16148861b69bb0c9e38ba10ecd408528a36b649d214b30f399deff9935",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "83cd9f2fd9b3625613dea500d42e7d484a07d01422292c588dc31315cd2d8d4a",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M8-N24-a0",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.4835901309999997,
+      "exit_code": 0,
+      "peak_resident_bytes": 11100160,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "3ddc50a0f2f3eed4ac9bea528da917ce27a161b40f4422cc1fbd093af3927caa",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "39575874d3c19a07e99373762bcfc6ad343b09d125419019cfa90eff49228677",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "4698857708833dde99add9fdeb4f9f84871760455b593afcfffc916e2f19e16e",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "6056c4fddef8955e9a32212d008f777c7648fd4549f9950ebf89cc33fe8a2926",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "3ddc50a0f2f3eed4ac9bea528da917ce27a161b40f4422cc1fbd093af3927caa",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "640111fe9b1bc04338b17d4e30b750f3d1e0d1b416b4b1b1109277f64b8caea0",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "39575874d3c19a07e99373762bcfc6ad343b09d125419019cfa90eff49228677",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "4698857708833dde99add9fdeb4f9f84871760455b593afcfffc916e2f19e16e",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "1e847dda653a6cf00e2d93c8b81b94704435f0a773ac4e5c3ad0d91639463d02",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "beb97f16148861b69bb0c9e38ba10ecd408528a36b649d214b30f399deff9935",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "c29286827d83a49ee97c0a49ab8061a5e068dfbbe3ffad6c6c426c975530e7db",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M8-N24-a1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.4080150330000052,
+      "exit_code": 0,
+      "peak_resident_bytes": 11132928,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "de2c4686d3aab98923041309d0d5328ed46428d96702c379eb9f8816945eb5c7",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "5a09453be53fb1ee405cf82cec73e18e8bb806b5bca1276940f24ebeb41d7d6f",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "b1cab2f5044cfdc9ee7b55a13b9e3e89f6605f99156c92a41c16e63faaa8c7b0",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "f614f21a0ae06e878fd7f0ad8204df42d3e121c2deb827672709f6512b91258b",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "de2c4686d3aab98923041309d0d5328ed46428d96702c379eb9f8816945eb5c7",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "1396c5c95457444b33436f1a64171d235e1d6a59de22c74e52e28684d514a1f1",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "5a09453be53fb1ee405cf82cec73e18e8bb806b5bca1276940f24ebeb41d7d6f",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "b1cab2f5044cfdc9ee7b55a13b9e3e89f6605f99156c92a41c16e63faaa8c7b0",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "63f8cc11ed1b58b6fadb68a76c993090d1e7cd104c889926358d2393b8d1cffb",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "beb97f16148861b69bb0c9e38ba10ecd408528a36b649d214b30f399deff9935",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "bde30459b126dcbfccec4b79bcd3fd11056e621c4e35715fb36774b1fa82c25f",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V01-M8-N24-a2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.3485131410000051,
+      "exit_code": 0,
+      "peak_resident_bytes": 11030528,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "e33b0fec87c920aca8647c395cc6593fa0956989277bd5439ab202ffd917a97a",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "3789ed13a3d19ae4036f6eb957702dc289ebd2e505d9e6c6cdec0500862883b3",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "9732235c024d875e548d875fa6cfc01ed41a63649229825662e121978ce32080",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "bf0ba251a5e8cd86dcabcc09a96d0644abad723aba2767623f5121b7c3fa35bd",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "e33b0fec87c920aca8647c395cc6593fa0956989277bd5439ab202ffd917a97a",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "5fe72771a0e4b493c442afb1fc4b4fde80fb87dcc989d1770bc6e434c50f33a2",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "3789ed13a3d19ae4036f6eb957702dc289ebd2e505d9e6c6cdec0500862883b3",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "9732235c024d875e548d875fa6cfc01ed41a63649229825662e121978ce32080",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "6d466789975ad39e2e4161af0b9f8f79c735fa289772445678e35238f77b4bff",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "beb97f16148861b69bb0c9e38ba10ecd408528a36b649d214b30f399deff9935",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "bb693d4979a13a9fdc8dafd3d928cd200896b84c5765f8a76f3f3e542a3e2422",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M4-N12-a-2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.24986781200000507,
+      "exit_code": 0,
+      "peak_resident_bytes": 6967296,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "898c920284dcd6b5be3d54593cc80a4c66249879ea9bb1b079df81c0fd140cac",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "907f789ae7b6dec5b9b592d4bca3c2e0416883b62e0a1e6f9015c83235b45475",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "2fd80288ec75127e0d6bdbd24fbf1092e52aba28e1cca6e61469a47ba4da4e2f",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "50a95bc90c2d788d34b95077b0ce802f08a196a27d30845955760bd991888b2a",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "898c920284dcd6b5be3d54593cc80a4c66249879ea9bb1b079df81c0fd140cac",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "d62ef3c1e2d3ef924ddcdb4bb3e0522e451f79e1f4c0323e59f0aa2bf50de53b",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "907f789ae7b6dec5b9b592d4bca3c2e0416883b62e0a1e6f9015c83235b45475",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "2fd80288ec75127e0d6bdbd24fbf1092e52aba28e1cca6e61469a47ba4da4e2f",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "431515a26eae654d9009a1314865585f1d8c4529340e98dbeaafb5428f3520a9",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "42e63e253c983be059c5a47bb3d1ade87b233295d8566c1e7861ba2742bb25a2",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "6aa90ca50908ea4c2240c2f390660d2a09b7adca02300944d2730bfb213b4971",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M4-N12-a-1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.24944959000000466,
+      "exit_code": 0,
+      "peak_resident_bytes": 6918144,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "10dabcd41844491ab7138cd9685eb29a9fd5d70737e6d81d74c1fa2a483ea97e",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "78941d6b7bbe617e032b7b4d2dd254db3d7efadedbbacc4641e48cb3e32eb078",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "54696fa878e1c843710775a2a66d2ede710acdf419566f0843b4bce61d315e09",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "9fee20903545b3e9cf8ebb2746839d2602fb02d61b34b4de96d41086328cf598",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "10dabcd41844491ab7138cd9685eb29a9fd5d70737e6d81d74c1fa2a483ea97e",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "57dafe1470cbe271f01e4321b26edd989b5d70075e85907fd3db529d86783cb2",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "78941d6b7bbe617e032b7b4d2dd254db3d7efadedbbacc4641e48cb3e32eb078",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "54696fa878e1c843710775a2a66d2ede710acdf419566f0843b4bce61d315e09",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "0cc4ce9b5f44ab39d3574c46af004d65fa6d79ae6997ce6fc6348b1befe0933b",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "42e63e253c983be059c5a47bb3d1ade87b233295d8566c1e7861ba2742bb25a2",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "241a4cf6b2e2e15e3dd61786e4f851bdb11f4ab3c92abcc541af41d786413372",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M4-N12-a0",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.28472022500000094,
+      "exit_code": 0,
+      "peak_resident_bytes": 6860800,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c08339f5db3be238a47b283b6f4ab93952029283b958c91eb10eae60221cf904",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "823c2054a7daac7fdad7e7a8e89c3e458721664c66eb0f34496dc0f8ff4936f3",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "a341ea2ee6063453bfd66809ed3134fcab442ea0ed67931fd388ab2e7709ddbc",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "b318301c67b7afa368a39bf08a4573fe2b00ac3b27d88480c94fbdb57b83098b",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "c08339f5db3be238a47b283b6f4ab93952029283b958c91eb10eae60221cf904",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "f2bad701b456c63fa51c18087d657c265e57bbbe5a16b6ee21f058e281f1941f",
+          "bytes": 807
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "823c2054a7daac7fdad7e7a8e89c3e458721664c66eb0f34496dc0f8ff4936f3",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "a341ea2ee6063453bfd66809ed3134fcab442ea0ed67931fd388ab2e7709ddbc",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "f37c6b17f1a7046ab3309b59be6a4e251b5418154b5f679d04b02ed5d31489db",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "42e63e253c983be059c5a47bb3d1ade87b233295d8566c1e7861ba2742bb25a2",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "24d801b79b53a3ac5aa959231f2eb4c169722f3e2dd941c91fd7b464d0640cf6",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M4-N12-a1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.21846856300000184,
+      "exit_code": 0,
+      "peak_resident_bytes": 6856704,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c32d23338878344700be6a1c153d8b820b18828ecc5127962bf224d648ded237",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "8d532820bc71e84f08935aef38c70169f6d42c6776bd5e24c076279184a5b6fb",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "fdda25f4b329d9745a64ea0ac70069444fb5ebb0a02b2ac17d8a9f8414485a2c",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "55090f4aebaaafb221a5a0e9943e7f303fd744a8770fc76990f56c6c54fc0139",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "c32d23338878344700be6a1c153d8b820b18828ecc5127962bf224d648ded237",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "9b5e9d5e15ee73b4a8c1358702e04cb04b18e6f83894c2c313341c6da4dcc1c1",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "8d532820bc71e84f08935aef38c70169f6d42c6776bd5e24c076279184a5b6fb",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "fdda25f4b329d9745a64ea0ac70069444fb5ebb0a02b2ac17d8a9f8414485a2c",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "01c0a34eb0c8f642cd69e5df2c2df4ad05bebf7e4ce47e00cea1a3187f88eca8",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "42e63e253c983be059c5a47bb3d1ade87b233295d8566c1e7861ba2742bb25a2",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "39da60d11e306c5adcedf89beafca7dc9086a22e3ffbb4d0790fce6514dffd21",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M4-N12-a2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.18940732000000082,
+      "exit_code": 0,
+      "peak_resident_bytes": 6737920,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "83d0e0d8a602259b55fe83feb333c8834d84b03042cd57bafa3d6f1c464f44fd",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "88ba53234f6d120bf65e9fadbd503b10b25103e17363e5522e1841b4edf2ab4f",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "24e282681071ed10fbdb2ddcb4409b998506656e608c7ec6ea2fad0bf6c681a1",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "a0e08e3c7d43042fd9e878472a1bf0e734d7f341ac3b7fd96195fe35ddead21a",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "83d0e0d8a602259b55fe83feb333c8834d84b03042cd57bafa3d6f1c464f44fd",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "e3d01bfb03342e77c205543fef9c5c6547e3233883ba081bc215d20a0e4347e5",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "88ba53234f6d120bf65e9fadbd503b10b25103e17363e5522e1841b4edf2ab4f",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "24e282681071ed10fbdb2ddcb4409b998506656e608c7ec6ea2fad0bf6c681a1",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "cca6c2e4714a55523afd0515df72f18160dcba3d897eec3e31858ef0932c851f",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "42e63e253c983be059c5a47bb3d1ade87b233295d8566c1e7861ba2742bb25a2",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "1a5d02e4ffd60584de7104a68fe843ada6e754fb05d71e7229375e371059f749",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M8-N24-a-2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.40706623200000536,
+      "exit_code": 0,
+      "peak_resident_bytes": 11149312,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "9310b881307681162b0bee95798668c0f3c3bffa3ac1770d28843cb324235edc",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "aa0bc51c48d97798ffed538351e955f5f7c14533658e31c25bd217cfcef4cb6a",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "96a36879f1e79c50a94345f8276ec4b13612dc9b417717bc9e238236f5ad1970",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "8d9abc96b45a1c3b2273cae40b03a6a31ba62e4538c8561087723713f208180a",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "9310b881307681162b0bee95798668c0f3c3bffa3ac1770d28843cb324235edc",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "2869d5c832476ad59ad0da9356a54987686bbed4dc4ae223ec7aa254bf9bd733",
+          "bytes": 810
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "aa0bc51c48d97798ffed538351e955f5f7c14533658e31c25bd217cfcef4cb6a",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "96a36879f1e79c50a94345f8276ec4b13612dc9b417717bc9e238236f5ad1970",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "2c9cbe4890b2142682e9892f04005ebdd43d8df5c223e8e2064c48be92cbbaa6",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "f6854418d6d96c06264f66c8cad530e1c35548f65259f2103746fa22f8e58742",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "8e59ce784e56807eb7c061056ce0955b8e89585893cbae6c456c4f61e7070a45",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M8-N24-a-1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.44726575200000696,
+      "exit_code": 0,
+      "peak_resident_bytes": 11059200,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "64d66c0ccdac3762eb34b582e2fbcade8cbd503f576a981e0dff7d8d606e9220",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "01e9031ce379da42ccb48a57a876d3818af8b28b84eb4ff4f7d6373755d3c1c4",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "18eaa022eb7b896bc358bb3e42ae39299bc6e73af2a1b317d0af72b1cc02877b",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "2792d3798e32c49c3c9bf8a423ea90cea31f25f7df017e6307ea4d310180f704",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "64d66c0ccdac3762eb34b582e2fbcade8cbd503f576a981e0dff7d8d606e9220",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "7f3a5469bf6b801a0dfd49412f91c7d76029a3010b86e7b8aefa30dbd0ea7c54",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "01e9031ce379da42ccb48a57a876d3818af8b28b84eb4ff4f7d6373755d3c1c4",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "18eaa022eb7b896bc358bb3e42ae39299bc6e73af2a1b317d0af72b1cc02877b",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "d974d925a6f264f5dab24e06ab174ee86144c77ff32a4bb49e8a4d2b308e5723",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "f6854418d6d96c06264f66c8cad530e1c35548f65259f2103746fa22f8e58742",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "1ac3efaa2692cd5c76dd790656c31d744e9f7e797329968446963e556be9e759",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M8-N24-a0",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.6985198200000013,
+      "exit_code": 0,
+      "peak_resident_bytes": 11165696,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "edf874737ae29820e351efa7cbfc048b0e34b74de804645aaf42da27e7a8006a",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "11ce532f11de6539928d089a29c9d67b199df8a20601b9db6427c35efc89eb45",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "196453c3bd55dd6deae599ca968fc92a14b40d93b3c411b1877eebee310fc6ec",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "b9daca611f165eb70dc8bf974eaae96b306d56f2c3f63dbfc9710b39a5754be3",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "edf874737ae29820e351efa7cbfc048b0e34b74de804645aaf42da27e7a8006a",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "5836ac5eb07d669f7bc1cea90f92921ab866154ff86cf14abc0d1e50b83464ea",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "11ce532f11de6539928d089a29c9d67b199df8a20601b9db6427c35efc89eb45",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "196453c3bd55dd6deae599ca968fc92a14b40d93b3c411b1877eebee310fc6ec",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "cb602c104249ee2f797f72b8d87d1a3d7b97d8221aa8d941e455dec9a6f946c5",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "f6854418d6d96c06264f66c8cad530e1c35548f65259f2103746fa22f8e58742",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "4c3067d974d877e23dd339903ce457589f2eaf0ca25a78c3283abe438e2ae474",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M8-N24-a1",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.34971580900000276,
+      "exit_code": 0,
+      "peak_resident_bytes": 11112448,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "77e2248a09916a828f8aacc409483928b07c4e1adc97cc32f40e6a59d6cda126",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "c0e65f3e04c981d68522504d5e7bd653fbbe71860561382ee525753a3cd0a17c",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "75be5e8e09ea320086a555d0448f619cd5f2b58a499b0c72a6207b91616ebecd",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "7180f7cee9d6e4529cced702f83a6a1892352775865bc39f964bd3d0d650c98f",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "77e2248a09916a828f8aacc409483928b07c4e1adc97cc32f40e6a59d6cda126",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "061de3732ce313a7f7998439aee1253c92a01ebb6a8347dae6ce86fa7ac6e13f",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "c0e65f3e04c981d68522504d5e7bd653fbbe71860561382ee525753a3cd0a17c",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "75be5e8e09ea320086a555d0448f619cd5f2b58a499b0c72a6207b91616ebecd",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "bf8ee71b62c203c5f2d5a7b0ca9ce058d2e5be938e84461e8a79b209a30062d5",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "f6854418d6d96c06264f66c8cad530e1c35548f65259f2103746fa22f8e58742",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "d452919ecc4cab17380c0c543a742fd8734a4a9908b53801383903765130e437",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "measured",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/measured-FW-V02-M8-N24-a2",
+      "executable_sha256": "b30b04de4b1ec56b67632cd2ea71604fe7bc93dc65d4ed451004355d430d798d",
+      "seconds": 0.42745354100000554,
+      "exit_code": 0,
+      "peak_resident_bytes": 11153408,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "d94d1cd081c5c9c1453f03cb196fe88955bb1f76b5d4e8e66772720060761cd2",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "c99ce8684d4886958008920e82b506741d26cdf4ca7effb27cff812386c64b74",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "14bd366f79a6f1cf67e8ccb4bd5799dff78b6a7d7dc85f01cac59d6124458585",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "b80cd727e28abba36fa09e7ee423bcb7e472f1e8b94bd1a0c4ca2935df1adbf8",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "d94d1cd081c5c9c1453f03cb196fe88955bb1f76b5d4e8e66772720060761cd2",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "f280ef6b69fd9269d2bdd5974d88a09931ddcee6b95dc5da241e1a2ce976c349",
+          "bytes": 811
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "c99ce8684d4886958008920e82b506741d26cdf4ca7effb27cff812386c64b74",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "14bd366f79a6f1cf67e8ccb4bd5799dff78b6a7d7dc85f01cac59d6124458585",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "4c4e08b8f06e32f415266895e10fc53090e07d8163596b799628bb1ed9cb64f8",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "f6854418d6d96c06264f66c8cad530e1c35548f65259f2103746fa22f8e58742",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "9afdc25e57e4325faac76b2f28f1e5447a2de5ceba6b014a8d0bfa3b16ad8f89",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M4-N12-a-2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.2851989809999935,
+      "exit_code": 0,
+      "peak_resident_bytes": 6877184,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "e78cac3990a0f4e3907875bcb6dc1b24e4826010390d820e08438266c394b4bf",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "f30a33f413ee5022bc14c7afadc0286bc03c4b9ede20cb7f0205dfbc6089933a",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "d97d6ea999181b25f1813d8b7e0e003d4044e4fa50ea6cd556e24d0254bf0341",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "15a0b3dc227ff2e742516edb1cce3df596972a005d3d4ee75d5f479ca5e2784a",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "e78cac3990a0f4e3907875bcb6dc1b24e4826010390d820e08438266c394b4bf",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "a6f38418314b6747957e597b522ffbd904797e728feed41c658fbed56e91b837",
+          "bytes": 804
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "f30a33f413ee5022bc14c7afadc0286bc03c4b9ede20cb7f0205dfbc6089933a",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "d97d6ea999181b25f1813d8b7e0e003d4044e4fa50ea6cd556e24d0254bf0341",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "8c84667434067854405bc878701a985e6de8a0bca2c0c900a42da1433fae2b93",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "316ae0515a991dd1d827a1570d802d144a14157ea05325c2cd35c6497482d36f",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "779a612fcd5bf829dfd9afdc9a4c7b99088456b1e89d5ed33c7bd7476286e62c",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M4-N12-a-1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.25910806699999966,
+      "exit_code": 0,
+      "peak_resident_bytes": 6893568,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "125138b5ba8edda4705d47b5bf8690a6d1a128ff8e3c7044395d8ed78d292301",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "2b312832b7bc112dc3aabe5f4dbb3c611a47c36b09d5530bc01e0f737795d262",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "66dc06c49424f4e361fe745b3b4bec107cfb439e930d0a2821eb97291df077d2",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "551ddb583534ed786c424d47920f32be18e2c46fcbaf88e5bd0c0e8e6ffc717d",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "125138b5ba8edda4705d47b5bf8690a6d1a128ff8e3c7044395d8ed78d292301",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "61acf16461b0107ddc2140f1373639c54d141388623d7f77f36fc1b0dd60a0e8",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "2b312832b7bc112dc3aabe5f4dbb3c611a47c36b09d5530bc01e0f737795d262",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "66dc06c49424f4e361fe745b3b4bec107cfb439e930d0a2821eb97291df077d2",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "3874fbb5ac7136a6775c996c12d320a9dae995fc3d81ecedb289da0e21ab7e85",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "316ae0515a991dd1d827a1570d802d144a14157ea05325c2cd35c6497482d36f",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "d6b604dad3d5bbeed196f6a40fc78e70ac14fdfac9bbe71595f82f7b8b8e9f39",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M4-N12-a0",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.18416123299999754,
+      "exit_code": 0,
+      "peak_resident_bytes": 6774784,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "45ca48f652927b5aa2f8124f26988c7475ce86320959b685f0728cc8d29deb4e",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "d605fdbafdf07943b6d7a47f7c60dfe335b20ba9c7e4577d9b417511b2a5fd49",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "c0db4e3a9775baf6dab4ab196c5819ed8296b544c51a10dd184994d83c5f6958",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "68386593b72771b6ac1295f88903436de2db41961db1b9452113ff3fc8f0cd1c",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "45ca48f652927b5aa2f8124f26988c7475ce86320959b685f0728cc8d29deb4e",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "268794c60ff0a760fc9bb03c164dbf1f021abbe4868f760faec7dcd7a6864d6d",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "d605fdbafdf07943b6d7a47f7c60dfe335b20ba9c7e4577d9b417511b2a5fd49",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "c0db4e3a9775baf6dab4ab196c5819ed8296b544c51a10dd184994d83c5f6958",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "768afeea96f2149fe742b12ce7e4f424e02d64097cce4182b5ed73a43d6be686",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "316ae0515a991dd1d827a1570d802d144a14157ea05325c2cd35c6497482d36f",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "7c743444c1387103f05aaa0c4a7a9d49529c1b31c9cfeedc0480bb3ab92ca58f",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M4-N12-a1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.23192296599999906,
+      "exit_code": 0,
+      "peak_resident_bytes": 6852608,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "49b8307882a63adc4388e3dac1f048590e75dbf7ecf751a43d6b429e3db9e674",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "312d3ed7758d087ed600f3394606aca2c99066613f385d4e9362e6f37f6fb1d0",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "57cff6549c13d0236f6494cc4e940007e595af19ccdc55a7a3c6bd89864510d8",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "01879b47691c6819600e4239b6d911826085ee5ba5eb40f2897ecd404182bb6c",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "49b8307882a63adc4388e3dac1f048590e75dbf7ecf751a43d6b429e3db9e674",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "4741858a53a312a8db01ebf81ad1de45c469180cb603d8c9c6872d8b046480fd",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "312d3ed7758d087ed600f3394606aca2c99066613f385d4e9362e6f37f6fb1d0",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "57cff6549c13d0236f6494cc4e940007e595af19ccdc55a7a3c6bd89864510d8",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "40a5decbfd43d65e0c39027a69beff2b89f97c0d2906cf601ad9d5cb3491a10b",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "316ae0515a991dd1d827a1570d802d144a14157ea05325c2cd35c6497482d36f",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "1b75c91442bc4c0a84b33e06681619f199eecf04d32e176d7edf2991d1fce859",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M4-N12-a2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.2518101940000008,
+      "exit_code": 0,
+      "peak_resident_bytes": 6672384,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "27d867c41134cfa8227b649546c448f6629d71d39bfb3aa9e7aa2c58a5a6f918",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "1930f2e0f6b60ee5f356235135fa8653f86fcd963d2974cd3361e36937cb34ff",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "1e6d4882adee4ccfa1a4634250728a207afe2fa1898691131a112d07e805cd6c",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "de69c231f37e66dc2a5d679cb00abfd85f7e6cd5d674f9529baf58a47e7883a5",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "27d867c41134cfa8227b649546c448f6629d71d39bfb3aa9e7aa2c58a5a6f918",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "74f9f44964bd54b6c795ec50236d9c789771ebbda1cb21341d1a2e43607f188f",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "1930f2e0f6b60ee5f356235135fa8653f86fcd963d2974cd3361e36937cb34ff",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "1e6d4882adee4ccfa1a4634250728a207afe2fa1898691131a112d07e805cd6c",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "fc0078746af031e4183278addd78b3dc57c3f716ad68dcca078b120db6327c8b",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "316ae0515a991dd1d827a1570d802d144a14157ea05325c2cd35c6497482d36f",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "c9e8c093e81798b82feb2e7049e49d0a582a5ecfc08baf75af4dbab2181b742c",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M8-N24-a-2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.49526427899999703,
+      "exit_code": 0,
+      "peak_resident_bytes": 11079680,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "648394feb44bb30a852cf8f8ddfdbf38efb19d1d464318e46fc786c9c5ab3697",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "65c47873b281f462304c82c0e183282c21173b359b26d87109dd2d50148ea59a",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "2e055762c22d28a148fc9ab5e2edc864e9b025440b1cbd8be4baa9215b4ae515",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "7058baf7fb302dbe2944d029e17ec7d4cb8b8cfb96b8519c52d08cb3bb1d31a3",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "648394feb44bb30a852cf8f8ddfdbf38efb19d1d464318e46fc786c9c5ab3697",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "f268c97b4187f22c5437b9d8734142cf46f8a822700f5558b48d678e5e8cd161",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "65c47873b281f462304c82c0e183282c21173b359b26d87109dd2d50148ea59a",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "2e055762c22d28a148fc9ab5e2edc864e9b025440b1cbd8be4baa9215b4ae515",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "4734d805849d5472a704ab20e07ae839efd59a4442c907f3a87eb3791fa5bf1c",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "5663941970c2427ec56eeae45dcad4ca2c9767a4d05aa826e482772cbb6b526b",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "d66ae82c1af7d1c37c27e5c3400533ef5458c61f73ec0b625c440158a7096aa1",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M8-N24-a-1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.4741792250000003,
+      "exit_code": 0,
+      "peak_resident_bytes": 11145216,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "e68d20e722cd8cb1d0d0a29851f8aa6f5616cfb5cd2127d3633b3eeb57564cb2",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "25332cf292215fad578970b5be895f0aa9b2b64d40597f04cd98b4451723caa1",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "b81ceed9957fbcaaadfdb4db47395e50b0d069e02a7e1d2b742a8d36bae68b5f",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "610f874715b0d37473f64fba3812d3eb7c9bf8729b96ef770dfae6e8cd615bc4",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "e68d20e722cd8cb1d0d0a29851f8aa6f5616cfb5cd2127d3633b3eeb57564cb2",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "d421707f72c2e1722095b2c80b5a4f17fcea4aeb6170dd33387eb36fe1974f0f",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "25332cf292215fad578970b5be895f0aa9b2b64d40597f04cd98b4451723caa1",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "b81ceed9957fbcaaadfdb4db47395e50b0d069e02a7e1d2b742a8d36bae68b5f",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "1aa6da4bd04b148e0de93947a4f26a8b0a31491bc7773c5619dbdef24f73d947",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "5663941970c2427ec56eeae45dcad4ca2c9767a4d05aa826e482772cbb6b526b",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "2db9f55a1e994a37511c38ffe3bc750d36d11ee1443ddd4520961c14b7255a02",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M8-N24-a0",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.4031812160000072,
+      "exit_code": 0,
+      "peak_resident_bytes": 11112448,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "3ddc50a0f2f3eed4ac9bea528da917ce27a161b40f4422cc1fbd093af3927caa",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "39575874d3c19a07e99373762bcfc6ad343b09d125419019cfa90eff49228677",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "4698857708833dde99add9fdeb4f9f84871760455b593afcfffc916e2f19e16e",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "6056c4fddef8955e9a32212d008f777c7648fd4549f9950ebf89cc33fe8a2926",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "3ddc50a0f2f3eed4ac9bea528da917ce27a161b40f4422cc1fbd093af3927caa",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "90dfa1b3f136fdf2b3bf9a1af00a81c99664e80314c920a6e180b55ce8fd96fa",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "39575874d3c19a07e99373762bcfc6ad343b09d125419019cfa90eff49228677",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "4698857708833dde99add9fdeb4f9f84871760455b593afcfffc916e2f19e16e",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "1e847dda653a6cf00e2d93c8b81b94704435f0a773ac4e5c3ad0d91639463d02",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "5663941970c2427ec56eeae45dcad4ca2c9767a4d05aa826e482772cbb6b526b",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "c29286827d83a49ee97c0a49ab8061a5e068dfbbe3ffad6c6c426c975530e7db",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M8-N24-a1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.47763084700000036,
+      "exit_code": 0,
+      "peak_resident_bytes": 11223040,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "0e130bd66dcd0d367c9f4bdb187588422ec5333b3d775e7344c4b1383f022995",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "c3acbd6382b7e4e728b6fa32a0908079d9989b6a9a6bbf5b1bf91c9f8f522cba",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "4af566453dbad9730c28055f77469f692fc4424553d30b5ad577cd0114251378",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "641d89f37b3cfb8195221ef464d753790265afefe4e1043eb9f47b87162ff8f6",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "0e130bd66dcd0d367c9f4bdb187588422ec5333b3d775e7344c4b1383f022995",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "08bf848a3a26a20171991159933a757c3a24575697676fc764177eeefb6dec9c",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "c3acbd6382b7e4e728b6fa32a0908079d9989b6a9a6bbf5b1bf91c9f8f522cba",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "4af566453dbad9730c28055f77469f692fc4424553d30b5ad577cd0114251378",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "c72d230803b9b1ed95182e304b4ff6ea86bc85a39d966ef646d88393a8442e29",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "5663941970c2427ec56eeae45dcad4ca2c9767a4d05aa826e482772cbb6b526b",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "fb978e36a7507aa43dc659e6e4cb04c22aff32be2d6841c55227b7ed03e9c5fa",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V01",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V01-M8-N24-a2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.4739151739999983,
+      "exit_code": 0,
+      "peak_resident_bytes": 11177984,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c1f18a1d5e963888ee7c8386706f5b3d6d4a8cfe3a5bef129183f1aec4f92e4b",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "49f80fbc3a58144ebc9215847397d43a61dab31db917c19c0b3e890f62c1f9f6",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "8eb5e27c4d13e7430e8fe766c0d51eb7e97a49817bf33e35d54cbd70d043b9d5",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "d0afbfcf8dcda7f89735bd60cc66f85fb87e7124f9703f2b651c585c9b5649c4",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "c1f18a1d5e963888ee7c8386706f5b3d6d4a8cfe3a5bef129183f1aec4f92e4b",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "586516a01602ce682deccf3ae1e2752247efc8d663a10d33ef33a557d1ab600b",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "49f80fbc3a58144ebc9215847397d43a61dab31db917c19c0b3e890f62c1f9f6",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "8eb5e27c4d13e7430e8fe766c0d51eb7e97a49817bf33e35d54cbd70d043b9d5",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "8ae037bb03728a66ec1538ee564aeaf65ce3c00c926d21bc97bebd12ab27d885",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "5663941970c2427ec56eeae45dcad4ca2c9767a4d05aa826e482772cbb6b526b",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "fb5d09a3b7bdb1b31473dd1acf55936c39433c1cc6e7a7ba7f8b91a5bcda705b",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "6535a547a94e268d89be23f0f60accb59287081c1ecc8cedf4b38c5dcec51b9a",
+          "bytes": 288
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M4-N12-a-2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.28958401500000264,
+      "exit_code": 0,
+      "peak_resident_bytes": 6803456,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c103ec477171b805dcfcb14ebd705ebb9e58dddfdde472021ebcdc1e22e72009",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "1ce8411cba6b889af7d3356f9e54cc02b92414b9ad38e9ca26a7d40820e8e702",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "8b9d508565e3b0a30ca0c4fdb106e84ae3b47c22f8212ddb8c9b72fcc2449028",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "924c47b944a485b49b39eb1a6740d776a6785a62582ab24504b922d5cc56e4e7",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "c103ec477171b805dcfcb14ebd705ebb9e58dddfdde472021ebcdc1e22e72009",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "b9de70c0b76d25dbce34a1acfaf1fe00bb022a9a35fe10b1aea19fefbf545ef8",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "1ce8411cba6b889af7d3356f9e54cc02b92414b9ad38e9ca26a7d40820e8e702",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "8b9d508565e3b0a30ca0c4fdb106e84ae3b47c22f8212ddb8c9b72fcc2449028",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "11b0369fc23480f9c170a267e8d8fbda1fa278e17d50b9aae48cd33fac268bb4",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "e5b7446a3c41eaa8ed1dfb24fa1de66e313505b2eb10fbda9df9e14a7a704e17",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "77354435491843d6cd468f62f42af1c7e2135e1c93eee524ca841671953ed1cf",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M4-N12-a-1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.18828346699999088,
+      "exit_code": 0,
+      "peak_resident_bytes": 6914048,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "b2c8e7c68af7ee982259093398bec57484886fe64b092341dfc4f3a5a6c09d75",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "f39b8423f6de3d53619e75b30597566ea4ee397095e1e6340238477230d372ad",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "59e04ab683fc11b9e901e11f8ef89e0c0d86b6585be1265648c6b208c9aca390",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "cc85d9ff80282951d7b44e5483083b01fb65ff9baccd047a6a6a6dc0fabde761",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "b2c8e7c68af7ee982259093398bec57484886fe64b092341dfc4f3a5a6c09d75",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "eeb7d3b26de3c1540d3d023d306f04e93ba7a033db49c9ed3a344bf5590406b8",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "f39b8423f6de3d53619e75b30597566ea4ee397095e1e6340238477230d372ad",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "59e04ab683fc11b9e901e11f8ef89e0c0d86b6585be1265648c6b208c9aca390",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "b5b93dc167e5ca636d0549f0bf7d92eb8a5cb7e6144ae12becb9c13704dec343",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "e5b7446a3c41eaa8ed1dfb24fa1de66e313505b2eb10fbda9df9e14a7a704e17",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "9fa934a9fe91c2d0665426a925aa8317897a5486920f18403a3a6e99eb6e6a8b",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M4-N12-a0",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.29763263099999904,
+      "exit_code": 0,
+      "peak_resident_bytes": 6848512,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "c08339f5db3be238a47b283b6f4ab93952029283b958c91eb10eae60221cf904",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "823c2054a7daac7fdad7e7a8e89c3e458721664c66eb0f34496dc0f8ff4936f3",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "a341ea2ee6063453bfd66809ed3134fcab442ea0ed67931fd388ab2e7709ddbc",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "b318301c67b7afa368a39bf08a4573fe2b00ac3b27d88480c94fbdb57b83098b",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "c08339f5db3be238a47b283b6f4ab93952029283b958c91eb10eae60221cf904",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "f01d9060bbf6a6e6f55b7b45fa77b5ca46a5205e71ce304534bc5881e74c4a03",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "823c2054a7daac7fdad7e7a8e89c3e458721664c66eb0f34496dc0f8ff4936f3",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "a341ea2ee6063453bfd66809ed3134fcab442ea0ed67931fd388ab2e7709ddbc",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "f37c6b17f1a7046ab3309b59be6a4e251b5418154b5f679d04b02ed5d31489db",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "e5b7446a3c41eaa8ed1dfb24fa1de66e313505b2eb10fbda9df9e14a7a704e17",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "24d801b79b53a3ac5aa959231f2eb4c169722f3e2dd941c91fd7b464d0640cf6",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M4-N12-a1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.19397689400000218,
+      "exit_code": 0,
+      "peak_resident_bytes": 6868992,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "472f1e3e795d7d5fa6a68375d63ea56e0b5511d4566d2637a808fbe4dc8669d6",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "c6b1ca843a1672c1cd987bbdff00c4b3539a97c3f0c6ab6b65ed5aabc1e6516b",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "5e73d314a104f43f563cd1029c43c879f18797e990821ddbf6dcbae967ab92fa",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "08c24d6fe23781ba0fcd77663e3c386f272faecf9ca10032ff0f22c8a2d7e2ad",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "472f1e3e795d7d5fa6a68375d63ea56e0b5511d4566d2637a808fbe4dc8669d6",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "718d22a6b9157da7523b2bd4fe4c898dce833aa8c99e426569bbb5cc31d7ba58",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "c6b1ca843a1672c1cd987bbdff00c4b3539a97c3f0c6ab6b65ed5aabc1e6516b",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "5e73d314a104f43f563cd1029c43c879f18797e990821ddbf6dcbae967ab92fa",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "5f1cbdfb0f7e86b9843435b06f3a2c370455c39c14390e67cd2252f92b3ba0da",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "e5b7446a3c41eaa8ed1dfb24fa1de66e313505b2eb10fbda9df9e14a7a704e17",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "96aa59be79274185a5c6fa3e1618f9ea5b1eb50d1ad6428a9b4e7d94cd0313c2",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 4,
+      "n": 12,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M4-N12-a2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.3434471129999963,
+      "exit_code": 0,
+      "peak_resident_bytes": 6852608,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "f9d9814c1c8632a006ef3f5d180ca1460def32c7fce44fc1445cb69a2a6c9cfa",
+          "bytes": 16326
+        },
+        "before-strips.txt": {
+          "sha256": "201b23770e2a36d25ae5062b8a18afe6d211ad2ae1a4c65b036ddc65dfbb5227",
+          "bytes": 5038
+        },
+        "before-total.txt": {
+          "sha256": "e6d170aa86959dd775c0e4c4dd6edf99b22c09ada032e71e14199446b14c5323",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "d66035bdc06bb42ed9ffd68c8d55c978b8e2ec4f6a94a097844c07f16c68b22f",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "f9d9814c1c8632a006ef3f5d180ca1460def32c7fce44fc1445cb69a2a6c9cfa",
+          "bytes": 16326
+        },
+        "resource.txt": {
+          "sha256": "03e63efcfed23dab38a37d0f9ce9313c71d816e76a64b60708fe6326e43a4c68",
+          "bytes": 805
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "201b23770e2a36d25ae5062b8a18afe6d211ad2ae1a4c65b036ddc65dfbb5227",
+          "bytes": 5038
+        },
+        "total.txt": {
+          "sha256": "e6d170aa86959dd775c0e4c4dd6edf99b22c09ada032e71e14199446b14c5323",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "f462215c7f0248abb34fc067a6a2248a4c5d14609940d31a725306de40056f0f",
+          "bytes": 27276
+        },
+        "uv-matrix.txt": {
+          "sha256": "e5b7446a3c41eaa8ed1dfb24fa1de66e313505b2eb10fbda9df9e14a7a704e17",
+          "bytes": 103700
+        },
+        "uv-rows.txt": {
+          "sha256": "2dc02eb99db2e567b4308ff1a1d13c3e0b43c6ba9e3923cb3a99660401f5d9f3",
+          "bytes": 26416
+        },
+        "wing.avl": {
+          "sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+          "bytes": 321
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M8-N24-a-2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.4552756599999981,
+      "exit_code": 0,
+      "peak_resident_bytes": 11067392,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "e3f1a982b700e603e7496c1ceb23dd42ffed2e479e3a7494c160efa2742d2af5",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "f3579e02006f2a5966985ecf202b9f5131825fa7f0b07f32c0a8d82294b4852a",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "2c0bb02b0b1a377d3c38fbce4e4455337a54526e2569850d5190b51d94881358",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "defdf6eaebedea163a694bd5c3e1938e049003ffc8ca05fcad78d6bfd402f568",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "e3f1a982b700e603e7496c1ceb23dd42ffed2e479e3a7494c160efa2742d2af5",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "ff8c56e436f5b5064fd7021d9b829d26bc551fa0e461de9cf9921e92088aabee",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "ecbf8f5e065d2860fc6d2a14ca092c4064fdceb2b25c0ea206dd001f24ecabe9",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "f3579e02006f2a5966985ecf202b9f5131825fa7f0b07f32c0a8d82294b4852a",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "2c0bb02b0b1a377d3c38fbce4e4455337a54526e2569850d5190b51d94881358",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "83dfcac818b549c81b8378dcb48e606eaf27d3264a12f467816679ed938d7a5f",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "7062c9486bdcbf2273d14cc883df1503ef7e2fae63e2c6179052ec6b51317c62",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "ad43a023384013f2a89642607dcd08c77aa00243857a718c49af0aaa09ff9a76",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": -1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M8-N24-a-1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.3976018179999983,
+      "exit_code": 0,
+      "peak_resident_bytes": 11161600,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "a52eaa09bcebeb83c38987367abf28d7c0c1093889dc888d5bece4862e1fcdbf",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "efb30ab77ddb1927abded108e1b229e260526291876d732ca619ede3b4da869d",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "811deb46708af06ad6ebf725f14e60bf880a587cf9e2a6554ef7e1d142c8c9e4",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "2bab2f2bb665209568aa750c18109fda84d1a71a8bfa17d49f41b0b68e0fa3b1",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "a52eaa09bcebeb83c38987367abf28d7c0c1093889dc888d5bece4862e1fcdbf",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "19e3288325fb8a8c0a7c07c0a459b6b54524076f2c6afbbc3499ac03b8c5f582",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "92312400aa22fc52af56567b3f05fe3d2c6aaf65091d85e9124d4fe4189e35e2",
+          "bytes": 178
+        },
+        "strips.txt": {
+          "sha256": "efb30ab77ddb1927abded108e1b229e260526291876d732ca619ede3b4da869d",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "811deb46708af06ad6ebf725f14e60bf880a587cf9e2a6554ef7e1d142c8c9e4",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "a2d080e8495f4423efce1d18f7fb7bb369069fa935c2cf5d02b47b43adaa494e",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "7062c9486bdcbf2273d14cc883df1503ef7e2fae63e2c6179052ec6b51317c62",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "b5e4a47fcde53a747cf7406be0e060392d373f5c30dfa9ef8206a8f82af9ddbd",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 0,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M8-N24-a0",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.4548228370000089,
+      "exit_code": 0,
+      "peak_resident_bytes": 10969088,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "edf874737ae29820e351efa7cbfc048b0e34b74de804645aaf42da27e7a8006a",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "11ce532f11de6539928d089a29c9d67b199df8a20601b9db6427c35efc89eb45",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "196453c3bd55dd6deae599ca968fc92a14b40d93b3c411b1877eebee310fc6ec",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "b9daca611f165eb70dc8bf974eaae96b306d56f2c3f63dbfc9710b39a5754be3",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "edf874737ae29820e351efa7cbfc048b0e34b74de804645aaf42da27e7a8006a",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "00e95be1e83dac94d6a035285c5788abab83fc575ab579c6a06fde2e9d639525",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "5279a8c211ce647428b045e4d45e786c3393e39d81de650e90cdf7fb75f83f4f",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "11ce532f11de6539928d089a29c9d67b199df8a20601b9db6427c35efc89eb45",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "196453c3bd55dd6deae599ca968fc92a14b40d93b3c411b1877eebee310fc6ec",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "cb602c104249ee2f797f72b8d87d1a3d7b97d8221aa8d941e455dec9a6f946c5",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "7062c9486bdcbf2273d14cc883df1503ef7e2fae63e2c6179052ec6b51317c62",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "4c3067d974d877e23dd339903ce457589f2eaf0ca25a78c3283abe438e2ae474",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 1,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M8-N24-a1",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.5118556439999935,
+      "exit_code": 0,
+      "peak_resident_bytes": 11018240,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "34818c580ebf6a2d7692be4cb56fcc254dde21939aba1c7fda5ba7478d7ef71f",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "f5f98326f37eceddfe45d492d920feda9db9aff8239d2eec576ec2fd60499c0f",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "d342c885540be074a07376492379207ebf6e3b66e2f3ba5d0ca1fbe0434538bf",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "506a87a8f291d67045f8d038eef06885164b7e62550dbbf4ef5da5deccd20a83",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "34818c580ebf6a2d7692be4cb56fcc254dde21939aba1c7fda5ba7478d7ef71f",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "a99e42ff6d51dbaac244fcf4098e0c77a2dd993a3d920a57f7b5e53fb13f923a",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "c1d5bd961658738a80a7779e0adb06389c2bf2bcc40a5e1eebdf63ab3b0933a3",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "f5f98326f37eceddfe45d492d920feda9db9aff8239d2eec576ec2fd60499c0f",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "d342c885540be074a07376492379207ebf6e3b66e2f3ba5d0ca1fbe0434538bf",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "1746ee248bd71767a8cfd29975efd328d21857c2ecf2662c7443712a45c2e81d",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "7062c9486bdcbf2273d14cc883df1503ef7e2fae63e2c6179052ec6b51317c62",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "e670e64d565cdd471f7eeed740862bb3cbe817c3b592371ee1f90942d19a6444",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    },
+    {
+      "variant": "core0",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "alpha": 2,
+      "directory": "build/analysis/avl-source-corrected-20261030-212210/core0-FW-V02-M8-N24-a2",
+      "executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e",
+      "seconds": 0.4631848189999914,
+      "exit_code": 0,
+      "peak_resident_bytes": 11112448,
+      "files": {
+        "before-elements.txt": {
+          "sha256": "fdf41f517e172bc0d4d61120128a2924684d8257d60f1cda3f0c81ed6251c97d",
+          "bytes": 48366
+        },
+        "before-strips.txt": {
+          "sha256": "73c874e0cab80890c71473353a231b93b3e0b88ad9bc7fe27f60298d657f9b9c",
+          "bytes": 8962
+        },
+        "before-total.txt": {
+          "sha256": "6af2c55d63997bab09abe5eefd9f1c70d520bc7146bad8c6c55e00a463342b8f",
+          "bytes": 1297
+        },
+        "console.txt": {
+          "sha256": "f34e518cead61f7989a2c88af904778b9f0bfe788c966903ca8328ddfb98b36a",
+          "bytes": 30594
+        },
+        "elements.txt": {
+          "sha256": "fdf41f517e172bc0d4d61120128a2924684d8257d60f1cda3f0c81ed6251c97d",
+          "bytes": 48366
+        },
+        "resource.txt": {
+          "sha256": "66eb289f7a0a763cc57c8523e57804a4931a10075c670e1ed6bcb14418864df3",
+          "bytes": 808
+        },
+        "session.txt": {
+          "sha256": "38ad627ba314727aeb5fe8d907ce1cfadcfa27824318dc57eac823f03a04959c",
+          "bytes": 177
+        },
+        "strips.txt": {
+          "sha256": "73c874e0cab80890c71473353a231b93b3e0b88ad9bc7fe27f60298d657f9b9c",
+          "bytes": 8962
+        },
+        "total.txt": {
+          "sha256": "6af2c55d63997bab09abe5eefd9f1c70d520bc7146bad8c6c55e00a463342b8f",
+          "bytes": 1297
+        },
+        "uv-forces.txt": {
+          "sha256": "fa76c39a928b70153e545fc8d8c239a0fb7c0b1f7ef4c5ba5bd411018d292c2e",
+          "bytes": 108924
+        },
+        "uv-matrix.txt": {
+          "sha256": "7062c9486bdcbf2273d14cc883df1503ef7e2fae63e2c6179052ec6b51317c62",
+          "bytes": 1658900
+        },
+        "uv-rows.txt": {
+          "sha256": "84a228dbf8a534a41d8f7f1df2006df9f0588d087e282ca4fb77df52414a859b",
+          "bytes": 105472
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        }
+      }
+    }
+  ],
+  "seconds": 59.998541169000006,
+  "completed": true
+}

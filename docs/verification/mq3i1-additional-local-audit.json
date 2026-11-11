@@ -1,0 +1,715 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.575753412045954e-16,
+        "constraints": 1.1290403756026102e-16,
+        "Qs_full_constraints": 3.677525131467161e-15,
+        "Qs_membrane": 1.7317510124257142e-31,
+        "surface_work": 8.930303351777827e-17,
+        "patch_error": 2.112344734176119e-15,
+        "constant": 6.217248937900877e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 2.718359986276392e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.575786110707764e-16,
+        "constraints": 1.1290409394199844e-16,
+        "Qs_full_constraints": 3.677525131467161e-15,
+        "Qs_membrane": 1.7317510124257142e-31,
+        "surface_work": 8.628694489537384e-18,
+        "patch_error": 2.112344734176119e-15,
+        "constant": 6.217248937900877e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 2.7183630323098215e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.575786429014292e-16,
+        "constraints": 1.1290409312103945e-16,
+        "Qs_full_constraints": 3.677525131467161e-15,
+        "Qs_membrane": 1.7317510124257142e-31,
+        "surface_work": 9.0342157899662e-19,
+        "patch_error": 2.112344734176119e-15,
+        "constant": 6.217248937900877e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 2.7183630609415527e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.607823236702119e-16,
+        "constraints": 9.863983666952394e-17,
+        "Qs_full_constraints": 3.939524370298766e-15,
+        "Qs_membrane": 1.9632724100283832e-31,
+        "surface_work": 1.0606787749178356e-16,
+        "patch_error": 4.1447120321492625e-15,
+        "constant": 6.361489865831207e-15,
+        "patch_energy": 4.773959005888173e-15,
+        "LU_vs_QR": 3.216540671151063e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.607854258756638e-16,
+        "constraints": 9.863990525232137e-17,
+        "Qs_full_constraints": 3.939524370298766e-15,
+        "Qs_membrane": 1.9632724100283832e-31,
+        "surface_work": 1.0153394360518362e-17,
+        "patch_error": 4.1447120321492625e-15,
+        "constant": 6.361489865831207e-15,
+        "patch_energy": 4.773959005888173e-15,
+        "LU_vs_QR": 3.216544918519223e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.607854571077757e-16,
+        "constraints": 9.863990449827053e-17,
+        "Qs_full_constraints": 3.939524370298766e-15,
+        "Qs_membrane": 1.9632724100283832e-31,
+        "surface_work": 1.0562313023938949e-18,
+        "patch_error": 4.1447120321492625e-15,
+        "constant": 6.361489865831207e-15,
+        "patch_energy": 4.773959005888173e-15,
+        "LU_vs_QR": 3.216544959746748e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.898544223910014e-16,
+        "constraints": 1.0952496919147027e-16,
+        "Qs_full_constraints": 4.000919564180548e-15,
+        "Qs_membrane": 1.8824412755368033e-31,
+        "surface_work": 7.400404664292054e-17,
+        "patch_error": 2.2705420082093584e-15,
+        "constant": 3.3306690738754696e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 3.760517312466187e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.898577808591268e-16,
+        "constraints": 1.0952498465629325e-16,
+        "Qs_full_constraints": 4.000919564180548e-15,
+        "Qs_membrane": 1.8824412755368033e-31,
+        "surface_work": 7.057146309975663e-18,
+        "patch_error": 2.2705420082093584e-15,
+        "constant": 3.3306690738754696e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 3.7605227117468356e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.898578149275985e-16,
+        "constraints": 1.0952498566734057e-16,
+        "Qs_full_constraints": 4.000919564180548e-15,
+        "Qs_membrane": 1.8824412755368033e-31,
+        "surface_work": 7.459497739385195e-19,
+        "patch_error": 2.2705420082093584e-15,
+        "constant": 3.3306690738754696e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 3.7605227659758755e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.456574678364719e-16,
+        "constraints": 1.210234162355919e-16,
+        "Qs_full_constraints": 4.1171395641454575e-15,
+        "Qs_membrane": 1.689669941039687e-31,
+        "surface_work": 1.0225621164886401e-16,
+        "patch_error": 3.4227785597849646e-15,
+        "constant": 6.361489865831197e-15,
+        "patch_energy": 4.6629367034256575e-15,
+        "LU_vs_QR": 2.9624790246055786e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.456606457844304e-16,
+        "constraints": 1.210234626395874e-16,
+        "Qs_full_constraints": 4.1171395641454575e-15,
+        "Qs_membrane": 1.689669941039687e-31,
+        "surface_work": 9.972320536243595e-18,
+        "patch_error": 3.4227785597849646e-15,
+        "constant": 6.361489865831197e-15,
+        "patch_energy": 4.6629367034256575e-15,
+        "LU_vs_QR": 2.962482120113694e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 6.456606769897717e-16,
+        "constraints": 1.210234641088847e-16,
+        "Qs_full_constraints": 4.1171395641454575e-15,
+        "Qs_membrane": 1.689669941039687e-31,
+        "surface_work": 1.0349248919403682e-18,
+        "patch_error": 3.4227785597849646e-15,
+        "constant": 6.361489865831197e-15,
+        "patch_energy": 4.6629367034256575e-15,
+        "LU_vs_QR": 2.9624821562304817e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1308716656146529e-15,
+        "constraints": 4.707325914261102e-16,
+        "Qs_full_constraints": 2.2235650302304993e-15,
+        "Qs_membrane": 1.602188246802589e-18,
+        "surface_work": 9.894117770231054e-17,
+        "patch_error": 5.167925273897802e-15,
+        "constant": 3.653769710889843e-14,
+        "patch_energy": 1.3322676295501878e-15,
+        "LU_vs_QR": 4.348854006140652e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1159204590687993e-15,
+        "constraints": 4.924427554450267e-16,
+        "Qs_full_constraints": 2.2235650302304993e-15,
+        "Qs_membrane": 1.602188246802589e-18,
+        "surface_work": 4.513064110435719e-17,
+        "patch_error": 6.103131655977945e-15,
+        "constant": 3.964254759363122e-14,
+        "patch_energy": 1.9984014443252818e-15,
+        "LU_vs_QR": 4.498904251544102e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0686692026169492e-15,
+        "constraints": 4.940381597155305e-16,
+        "Qs_full_constraints": 2.2235650302304993e-15,
+        "Qs_membrane": 1.602188246802589e-18,
+        "surface_work": 5.313823242332804e-17,
+        "patch_error": 4.890367233517042e-15,
+        "constant": 3.9708178094988025e-14,
+        "patch_energy": 1.7763568394002505e-15,
+        "LU_vs_QR": 4.546322805018694e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.2620639128290707e-15,
+        "constraints": 5.377190883427618e-16,
+        "Qs_full_constraints": 1.5058958788968179e-15,
+        "Qs_membrane": 7.278665715196548e-18,
+        "surface_work": 1.1686209555965139e-16,
+        "patch_error": 2.0294690951992146e-14,
+        "constant": 9.477043715760969e-14,
+        "patch_energy": 5.88418203051333e-15,
+        "LU_vs_QR": 4.625273245660917e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 2.0698141377999368e-15,
+        "constraints": 4.706186957725124e-16,
+        "Qs_full_constraints": 1.5058958788968179e-15,
+        "Qs_membrane": 7.278665715196548e-18,
+        "surface_work": 4.89057600621586e-17,
+        "patch_error": 2.2931247048594607e-14,
+        "constant": 9.56900845453662e-14,
+        "patch_energy": 7.549516567451064e-15,
+        "LU_vs_QR": 4.589427352047936e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.6175463017518787e-15,
+        "constraints": 4.243803270602613e-16,
+        "Qs_full_constraints": 1.5058958788968179e-15,
+        "Qs_membrane": 7.278665715196548e-18,
+        "surface_work": 5.113925168844763e-17,
+        "patch_error": 2.3189064726449763e-14,
+        "constant": 9.783004335376852e-14,
+        "patch_energy": 6.8833827526759706e-15,
+        "LU_vs_QR": 4.246758584240927e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.732563195027561e-15,
+        "constraints": 4.897702450439249e-16,
+        "Qs_full_constraints": 3.433268539488149e-15,
+        "Qs_membrane": 1.0109306238968934e-18,
+        "surface_work": 8.376315845487468e-17,
+        "patch_error": 5.2776620571450756e-15,
+        "constant": 2.959417778432488e-14,
+        "patch_energy": 2.4424906541753444e-15,
+        "LU_vs_QR": 5.055149024773137e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.4238716572508934e-15,
+        "constraints": 4.220158283723164e-16,
+        "Qs_full_constraints": 3.433268539488149e-15,
+        "Qs_membrane": 1.0109306238968934e-18,
+        "surface_work": 4.079697882626035e-17,
+        "patch_error": 6.275541644018089e-15,
+        "constant": 2.2362584603096564e-14,
+        "patch_energy": 3.3306690738754696e-15,
+        "LU_vs_QR": 4.56457385292065e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.2451100620676958e-15,
+        "constraints": 4.488573575751188e-16,
+        "Qs_full_constraints": 3.433268539488149e-15,
+        "Qs_membrane": 1.0109306238968934e-18,
+        "surface_work": 5.327267749587287e-17,
+        "patch_error": 6.704277926501655e-15,
+        "constant": 2.3821754537020014e-14,
+        "patch_energy": 1.7763568394002505e-15,
+        "LU_vs_QR": 4.1260417021050697e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.2536797595855265e-15,
+        "constraints": 5.24152922352753e-16,
+        "Qs_full_constraints": 1.5385311076026911e-15,
+        "Qs_membrane": 9.433839610382555e-18,
+        "surface_work": 1.1316822746570474e-16,
+        "patch_error": 3.021732786678052e-14,
+        "constant": 1.1108366830547833e-13,
+        "patch_energy": 7.105427357601002e-15,
+        "LU_vs_QR": 5.143909881631235e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.883197577895363e-15,
+        "constraints": 4.928838752593657e-16,
+        "Qs_full_constraints": 1.5385311076026911e-15,
+        "Qs_membrane": 9.433839610382555e-18,
+        "surface_work": 4.583782091660608e-17,
+        "patch_error": 2.6993140740799737e-14,
+        "constant": 9.563958845865076e-14,
+        "patch_energy": 6.772360450213455e-15,
+        "LU_vs_QR": 5.028937995683825e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 2.4786961938009603e-15,
+        "constraints": 4.582934563525246e-16,
+        "Qs_full_constraints": 1.5385311076026911e-15,
+        "Qs_membrane": 9.433839610382555e-18,
+        "surface_work": 4.182745552728518e-17,
+        "patch_error": 2.4771982269227503e-14,
+        "constant": 1.1393376942508081e-13,
+        "patch_energy": 5.218048215738236e-15,
+        "LU_vs_QR": 4.535181763171117e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constraints": true,
+        "Qs_full_constraints": true,
+        "Qs_membrane": true,
+        "surface_work": true,
+        "patch_error": true,
+        "constant": true,
+        "patch_energy": true,
+        "LU_vs_QR": true
+      }
+    }
+  ],
+  "preparation_failure_audit": null,
+  "primary_complete": true,
+  "primary_conditions": 24,
+  "all_reproduction_checks": true,
+  "physical_adoption": false,
+  "stop_reason": null,
+  "independent_basis_implementation": false,
+  "sources": {
+    "tools/design-experiments/audit_mq3i1_additional_local.py": "21597740c37b916e46939937a2960d86258b24bfe49d5bef8de6a60197605472",
+    "tools/design-experiments/mq3i1_moments_v2.py": "d81165b98da2f457883203f2d15480ae8f6a902288d8cd17d8211f8968d5e671",
+    "docs/verification/mq3i1-additional-local-result.json": "14f4cc4679dd618751061f155031cb737b174a4c60cc00573eb6e9d9fe618be6",
+    "docs/verification/mq3i1-local-execution-protocol.md": "e09676ce1fce4bd8e40520003696238d620792625f73af704d52bc0cb07d7a5c",
+    "docs/verification/mq3i1-v2-pure-shear-protocol.md": "754fd2373bf43adb9330ca98424b86d10311a95bcb5aec42c74da7044a810135"
+  },
+  "seconds": 26.360000000044238
+}

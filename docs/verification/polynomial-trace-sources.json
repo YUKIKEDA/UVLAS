@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-04",
+  "sources": [
+    {
+      "title": "Equilibrated tractions for the Hybrid High-Order method",
+      "authors": "D. A. Di Pietro and A. Ern",
+      "year": 2015,
+      "doi": "10.1016/j.crma.2014.12.009",
+      "url": "https://www.numdam.org/item/10.1016/j.crma.2014.12.009.pdf",
+      "read_scope": "Sections 2–3; equations 4, 7, 16–19",
+      "used_for": "Potential reconstruction, polynomial-consistent stabilization, and the adjoint correction needed for equilibrated numerical tractions",
+      "not_transferred": "The original symmetric-gradient reconstruction, complete polynomial spaces, polyhedral geometry, and its stability theorem do not establish thin-shell robustness of this curved ANCF modification."
+    }
+  ],
+  "prior_source_record": "hybrid-gradient-sources.json",
+  "public_element_reproduced": false
+}

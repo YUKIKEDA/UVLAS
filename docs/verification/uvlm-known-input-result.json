@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "groups": 5,
+  "records": [
+    {
+      "case": "space_time_derivatives_and_divergence",
+      "spatial_relative": 3.5245170267701087e-11,
+      "temporal_relative": 3.712537366909786e-10
+    },
+    {
+      "case": "C1_knots_and_component_monotonicity"
+    },
+    {
+      "case": "coefficient_restart_bitwise"
+    },
+    {
+      "case": "invalid_input_rejections",
+      "rejected": [
+        "range",
+        "duplicate",
+        "missing",
+        "gust_divergence",
+        "nonfinite_time",
+        "saved_discontinuity",
+        "mutation"
+      ]
+    },
+    {
+      "case": "adopted_assembly_input_restart_and_identity",
+      "next_state_and_load_bitwise": true
+    }
+  ],
+  "sources": {
+    "tools/design-experiments/check_uvlm_known_input.py": "c1708e442de7ddbe73b4cc433d38e3b01354fc28f96947c6a28901242e7a6210",
+    "tools/design-experiments/uvlm_known_input.py": "781c0febea9099153ad70a36ced3f9015c5c8bc088085f4e707c76da80d01bae",
+    "docs/uvlm-integrated-specification.md": "319f30141f8e8d68ecbc2bcd22de641a6ef375afea0c480d7e73f63f9ec2baec",
+    "docs/verification/uvlm-wake-policy-result.json": "5dca52f1a9733636114ce3fe4f0c91937c80ddde2238554e1b2f8a77e101c8c8"
+  }
+}

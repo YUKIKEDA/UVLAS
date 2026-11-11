@@ -1,0 +1,12 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "tools/design-experiments/gsp_q3_basis_v2.py": "4826deee9dd17064f1650408d58d5699d2d87949f5d7eb3e8b5aa8c1018b7e0d",
+    "tools/design-experiments/check_gsp_q3_basis_v2.py": "916f73a57bd7c2478abdff3e19cb8e0e78dc02e5227f330f9384681e6c313ab7",
+    "tools/design-experiments/audit_gsp_q3_basis_v2.py": "6d14dfb9ad0290ed362e578618dae74a652ddaa939f82f2ff7b6bba9bbec1f52",
+    "tools/design-experiments/gsp_q3.py": "fd491cbb7d01784540ee4a7461ba51e23aaccbac8f680c02437f5693c432aef4",
+    "docs/gsp-q3-basis-v2-contract.md": "da286ac93d0556d822b43f3b0c1c38ff0de45cc9332c8f8005136e7ddba30e67",
+    "docs/verification/gsp-q3-basis-v2-protocol.md": "b6e993271d1d0d5109eb8b1a910568e7cd82119c643382f1fc3a5c209562e93c",
+    "docs/verification/gsp-q3-local-result.json": "baa4d0dabd6b0858f413aec159d4c0ae7233f5f5f05adaba0410d163507eba6e"
+  }
+}

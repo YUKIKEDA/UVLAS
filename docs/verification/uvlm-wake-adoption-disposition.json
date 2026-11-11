@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "uvlm_2_2_complete": true,
+  "uvlm_review_complete": false,
+  "structural_review_complete": true,
+  "product_implementation_start": false,
+  "verification_groups": 16,
+  "adopted_model": "uvlm_wake_assembly_v2.Model",
+  "decisions": [
+    "UW-D01",
+    "UW-D02",
+    "UW-D03",
+    "UW-D04",
+    "UW-D05",
+    "UW-D06",
+    "UW-D07",
+    "UW-D08"
+  ],
+  "next_work": "2.3 independent finite-wing and unsteady references and error budgets",
+  "default_core_radius_selected": false,
+  "finite_wing_reference_qualified": false,
+  "product_time_integrator_adopted": false
+}

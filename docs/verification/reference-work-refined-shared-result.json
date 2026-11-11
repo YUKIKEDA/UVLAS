@@ -1,0 +1,867 @@
+{
+  "records": [
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "fit": {
+        "compressed_error": [
+          2.463013633729768e-11,
+          9.660692777199088e-06
+        ],
+        "kkt": [
+          2.9392175188671943e-15,
+          3.468101701561847e-15
+        ],
+        "linear_residual": [
+          2.7406854227367303e-14,
+          3.8125307385886695e-14
+        ],
+        "local_rcond": 6.399645205840792e-05,
+        "global_rcond": 0.0001858181446026448,
+        "initial_compressed_kkt": [
+          2.9392175188671943e-15,
+          3.468101701561847e-15
+        ],
+        "initial_linear_residual": [
+          2.7406854227367303e-14,
+          3.8125307385886695e-14
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.8281554333146987e-14,
+          3.8067107551974513e-14
+        ],
+        "error": [
+          2.788296392107197e-11,
+          9.66069235063212e-06
+        ],
+        "direct_kkt": [
+          1.0535934132286994e-12,
+          3.1356972459828697e-12
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              2.788296392107197e-11,
+              9.66069235063212e-06
+            ],
+            "direct_kkt": [
+              1.0535934132286994e-12,
+              3.1356972459828697e-12
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          2.7259278061477884e-11,
+          9.660692338950724e-06
+        ],
+        "elastic_error": [
+          2.7237199414204804e-11,
+          8.6551116802976e-06
+        ],
+        "stabilization_error": [
+          1.0969086123332955e-12,
+          4.291621869344651e-06
+        ],
+        "h1": [
+          0.4646213682914774,
+          1.9880861280780573
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 6.530999999959022,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0-a0-n2-h0.01.npz",
+      "artifact_sha256": "9e78e39036abba7625455c00a81d8894da844c4aead597f56ce54b19d39fbd96"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "fit": {
+        "compressed_error": [
+          4.28801272593677e-07,
+          1.1060181345470859e-05
+        ],
+        "kkt": [
+          2.5964987677224814e-09,
+          7.197772082214288e-09
+        ],
+        "linear_residual": [
+          1.0420350350599142e-12,
+          2.602038487820173e-12
+        ],
+        "local_rcond": 6.563665834107789e-09,
+        "global_rcond": 2.257017580011046e-06,
+        "initial_compressed_kkt": [
+          2.1789771979032147e-13,
+          6.762192644193391e-13
+        ],
+        "initial_linear_residual": [
+          1.0420350350599142e-12,
+          2.602038487820173e-12
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          5.810847429902174e-08,
+          1.6844712222754713e-07
+        ],
+        "error": [
+          3.4889392942888696e-08,
+          1.0989761375260972e-05
+        ],
+        "direct_kkt": [
+          8.14825815929679e-10,
+          1.6866579589165324e-09
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              3.1736825079709595e-07,
+              1.1035943511247738e-05
+            ],
+            "direct_kkt": [
+              1.1970947115715593e-08,
+              3.8473680014764725e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "correction_linear_residual": [
+              7.802221237972293e-13,
+              1.4012151343917531e-12
+            ],
+            "error": [
+              3.4889392942888696e-08,
+              1.0989761375260972e-05
+            ],
+            "direct_kkt": [
+              8.14825815929679e-10,
+              1.6866579589165324e-09
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          3.495717234400264e-08,
+          1.0989913432533799e-05
+        ],
+        "elastic_error": [
+          3.49569532484373e-08,
+          1.098905221431863e-05
+        ],
+        "stabilization_error": [
+          1.237654025636148e-10,
+          1.375815596861205e-07
+        ],
+        "h1": [
+          0.46462136829136236,
+          1.9880876241700236
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 7.390999999945052,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0-a0-n2-h0.0001.npz",
+      "artifact_sha256": "257e1cc136c6209e97e4d55e5605b808bc8aaaf37d84a9132463b987ed8795fa"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "fit": {
+        "compressed_error": [
+          1.6149061235238177e-11,
+          1.0387166706255776e-05
+        ],
+        "kkt": [
+          2.1852944346711074e-15,
+          4.1770926234404596e-15
+        ],
+        "linear_residual": [
+          1.3273352125101307e-14,
+          2.1321141347583393e-14
+        ],
+        "local_rcond": 5.297568157161304e-05,
+        "global_rcond": 0.0001769184495453729,
+        "initial_compressed_kkt": [
+          2.1852944346711074e-15,
+          4.1770926234404596e-15
+        ],
+        "initial_linear_residual": [
+          1.3273352125101307e-14,
+          2.1321141347583393e-14
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          1.6544355968324344e-14,
+          2.1048452759983993e-14
+        ],
+        "error": [
+          1.555542379076977e-11,
+          1.0387166705366992e-05
+        ],
+        "direct_kkt": [
+          5.656708111839439e-13,
+          1.0871981597340716e-12
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.555542379076977e-11,
+              1.0387166705366992e-05
+            ],
+            "direct_kkt": [
+              5.656708111839439e-13,
+              1.0871981597340716e-12
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          1.558866720850886e-11,
+          1.038716670616502e-05
+        ],
+        "elastic_error": [
+          1.556835230339519e-11,
+          9.462598235097579e-06
+        ],
+        "stabilization_error": [
+          7.95582739260368e-13,
+          4.2839779204369465e-06
+        ],
+        "h1": [
+          0.4646213682913847,
+          1.9880862103024508
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 6.202999999979511,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "c61d614010c1cc68dfbcc64ade8779387aff4a8a74bde3ffd126d5a049fcdf12"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "fit": {
+        "compressed_error": [
+          8.400921000149073e-08,
+          1.1651961811653058e-05
+        ],
+        "kkt": [
+          4.046778478902618e-13,
+          9.365913411330458e-13
+        ],
+        "linear_residual": [
+          1.3406430473937487e-12,
+          1.740137486318977e-12
+        ],
+        "local_rcond": 5.691211962820322e-09,
+        "global_rcond": 2.80993687672827e-06,
+        "initial_compressed_kkt": [
+          4.046778478902618e-13,
+          9.365913411330458e-13
+        ],
+        "initial_linear_residual": [
+          1.3406430473937487e-12,
+          1.740137486318977e-12
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          1.3404707235850729e-12,
+          1.7464722796145194e-12
+        ],
+        "error": [
+          8.829097965817946e-08,
+          1.1654112740385003e-05
+        ],
+        "direct_kkt": [
+          2.8941530030044603e-09,
+          7.999577192977106e-09
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              8.829097965817946e-08,
+              1.1654112740385003e-05
+            ],
+            "direct_kkt": [
+              2.8941530030044603e-09,
+              7.999577192977106e-09
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          8.41054241365174e-08,
+          1.1654203083978227e-05
+        ],
+        "elastic_error": [
+          8.407857748204973e-08,
+          1.165299024788306e-05
+        ],
+        "stabilization_error": [
+          2.1248947687930774e-09,
+          1.6813032251777614e-07
+        ],
+        "h1": [
+          0.46462136752086136,
+          1.9880876030865213
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 5.905999999959022,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "37f9970515081f168ee58e1a091f65d5ef3c3c51f1f141b37a61981ddf40d94f"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "fit": {
+        "compressed_error": [
+          8.936035180536666e-12,
+          4.229118154477953e-05
+        ],
+        "kkt": [
+          4.839402733763311e-15,
+          1.0948104642184505e-14
+        ],
+        "linear_residual": [
+          1.5266266846408426e-14,
+          6.61323615251614e-14
+        ],
+        "local_rcond": 6.468921666868602e-05,
+        "global_rcond": 8.750300297509556e-05,
+        "initial_compressed_kkt": [
+          4.839402733763311e-15,
+          1.0948104642184505e-14
+        ],
+        "initial_linear_residual": [
+          1.5266266846408426e-14,
+          6.61323615251614e-14
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          1.7571975838128925e-14,
+          6.656327107583427e-14
+        ],
+        "error": [
+          1.020806687393308e-11,
+          4.229118166146696e-05
+        ],
+        "direct_kkt": [
+          3.5142230931472674e-13,
+          8.31460011857769e-13
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.020806687393308e-11,
+              4.229118166146696e-05
+            ],
+            "direct_kkt": [
+              3.5142230931472674e-13,
+              8.31460011857769e-13
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          9.209898022771716e-12,
+          4.22911816287232e-05
+        ],
+        "elastic_error": [
+          9.199613262512066e-12,
+          1.6563100315684003e-05
+        ],
+        "stabilization_error": [
+          4.351291877896604e-13,
+          3.891282245592374e-05
+        ],
+        "h1": [
+          0.49043487646311473,
+          2.1284313085861726
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 6.156000000075437,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0.4-a0-n2-h0.01.npz",
+      "artifact_sha256": "970f11ae938178bf7d49f4d1bf3f2a5270cabb80960259e4ec5f7accc8de7ba8"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "fit": {
+        "compressed_error": [
+          3.02091121316061e-07,
+          0.0002750417180392151
+        ],
+        "kkt": [
+          1.655885486078041e-09,
+          4.945397687861484e-09
+        ],
+        "linear_residual": [
+          1.2903596086577914e-12,
+          4.686874907405361e-12
+        ],
+        "local_rcond": 2.738938801980178e-07,
+        "global_rcond": 8.161463564638446e-07,
+        "initial_compressed_kkt": [
+          3.4172200207708114e-13,
+          1.4580276936825933e-12
+        ],
+        "initial_linear_residual": [
+          1.2903596086577914e-12,
+          4.686874907405361e-12
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          3.4622880625608364e-08,
+          1.0527482850673134e-07
+        ],
+        "error": [
+          4.3987305035744264e-08,
+          0.0002750427615027098
+        ],
+        "direct_kkt": [
+          7.278186958217926e-10,
+          2.0284082028544538e-09
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              2.4360253994808454e-07,
+              0.0002750432307518863
+            ],
+            "direct_kkt": [
+              8.68799249606119e-09,
+              2.7493325153058974e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "correction_linear_residual": [
+              9.981788475928215e-13,
+              2.4596639685254097e-12
+            ],
+            "error": [
+              4.3987305035744264e-08,
+              0.0002750427615027098
+            ],
+            "direct_kkt": [
+              7.278186958217926e-10,
+              2.0284082028544538e-09
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          4.836285530798421e-08,
+          0.00027504326861749965
+        ],
+        "elastic_error": [
+          4.835864987711045e-08,
+          0.00027170192974679686
+        ],
+        "stabilization_error": [
+          6.377739443263356e-10,
+          4.274179434306361e-05
+        ],
+        "h1": [
+          0.4904348763612017,
+          2.1284203960746484
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 6.967999999993481,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0.4-a0-n2-h0.0001.npz",
+      "artifact_sha256": "a044d939825e8b020b84c0de106b03e1e96421a64372a47987e6928bde1d73dc"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "fit": {
+        "compressed_error": [
+          1.1695114714255053e-08,
+          4.880951607671772e-05
+        ],
+        "kkt": [
+          3.686362433557534e-15,
+          8.029224058894251e-15
+        ],
+        "linear_residual": [
+          2.3198285780166886e-14,
+          5.6255106988867824e-14
+        ],
+        "local_rcond": 6.189091295234898e-05,
+        "global_rcond": 8.270057575197209e-05,
+        "initial_compressed_kkt": [
+          3.686362433557534e-15,
+          8.029224058894251e-15
+        ],
+        "initial_linear_residual": [
+          2.3198285780166886e-14,
+          5.6255106988867824e-14
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.3763812510711225e-14,
+          5.649885465777868e-14
+        ],
+        "error": [
+          1.1695135627654828e-08,
+          4.880951608325068e-05
+        ],
+        "direct_kkt": [
+          4.333801798704766e-13,
+          1.628390707406087e-12
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              1.1695135627654828e-08,
+              4.880951608325068e-05
+            ],
+            "direct_kkt": [
+              4.333801798704766e-13,
+              1.628390707406087e-12
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          1.1695148078067027e-08,
+          4.880951606045207e-05
+        ],
+        "elastic_error": [
+          1.1558539087745455e-08,
+          1.9506395895958e-05
+        ],
+        "stabilization_error": [
+          1.782319478930582e-09,
+          4.474225494100271e-05
+        ],
+        "h1": [
+          0.4904348764619043,
+          2.128431798078524
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 6.108999999938533,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0.4-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "08d9a6ccd9c2dd54fffd1873b87e37209d3eda52ac25a00dceed6e72791d7a40"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "fit": {
+        "compressed_error": [
+          5.560036454071965e-07,
+          0.0003164738804879875
+        ],
+        "kkt": [
+          1.2123834941803147e-09,
+          2.93717865311402e-09
+        ],
+        "linear_residual": [
+          2.4878346613158455e-12,
+          4.769077670849623e-12
+        ],
+        "local_rcond": 2.297042629904509e-07,
+        "global_rcond": 7.650599886109097e-07,
+        "initial_compressed_kkt": [
+          7.475220202659875e-13,
+          2.0193201451452394e-12
+        ],
+        "initial_linear_residual": [
+          1.2764051409948975e-12,
+          4.769077670849623e-12
+        ],
+        "pre_correction_system_residual_at_final_solution": [
+          2.247431716776799e-08,
+          5.909375441259062e-08
+        ],
+        "error": [
+          5.24697902206779e-07,
+          0.0003164757305421747
+        ],
+        "direct_kkt": [
+          7.992617416377114e-10,
+          1.5749070601158835e-09
+        ],
+        "correction_history": [
+          {
+            "iteration": 0,
+            "error": [
+              5.387315847663157e-07,
+              0.00031647586178967216
+            ],
+            "direct_kkt": [
+              4.422797245722544e-09,
+              1.49474885573831e-08
+            ]
+          },
+          {
+            "iteration": 1,
+            "alpha": 1.0,
+            "correction_linear_residual": [
+              2.4878346613158455e-12,
+              3.0203867152329162e-12
+            ],
+            "error": [
+              5.24697902206779e-07,
+              0.0003164757305421747
+            ],
+            "direct_kkt": [
+              7.992617416377114e-10,
+              1.5749070601158835e-09
+            ]
+          }
+        ],
+        "correction_stop_reason": null,
+        "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+        "FE_operator_changed": false
+      },
+      "observed": {
+        "error": [
+          5.248195986778151e-07,
+          0.00031647503522421746
+        ],
+        "elastic_error": [
+          5.19621278926579e-07,
+          0.000310990372164483
+        ],
+        "stabilization_error": [
+          7.368403926936517e-08,
+          5.866375662337048e-05
+        ],
+        "h1": [
+          0.4904348765556983,
+          2.1284253588370374
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "direct_kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 7.140999999945052,
+      "artifact": "build/analysis/reference-work-refined-shared-20261104-122642/k0.4-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "e9f0b07b4fc1dd086d8fd3d0764e5dad3d4c1c6cbe8616ea108a597b884fb08e"
+    }
+  ],
+  "stop_reason": null,
+  "all_global_checks": true,
+  "all_curved_improved": true,
+  "comparisons": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "ratios": [
+        155.49831536044465,
+        0.02697812958246794
+      ]
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "ratios": [
+        2044.0122300724095,
+        0.030299219001393766
+      ]
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "ratios": [
+        88.2870051809436,
+        0.028230504911699716
+      ]
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "ratios": [
+        4984.426151840404,
+        0.028087784081561075
+      ]
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "ratios": [
+        4.346522183936636e-10,
+        0.008963927794617617
+      ]
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "ratios": [
+        1.3068234587291242e-06,
+        0.033045333409970366
+      ]
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "ratios": [
+        4.6750881067057783e-07,
+        0.010176917262378097
+      ]
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "ratios": [
+        8.427315162935474e-06,
+        0.025301995962465035
+      ]
+    }
+  ],
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_reference_work_refined_shared.py": "43909bc795b869f88be89877b02f3a45f57901c09a59711ef99e92bdf7a6b7bb",
+    "tools/design-experiments/reference_work_refined_fit_v2.py": "3366646d5eb6f01abff969306d7ce1bba3e0ec6e536b11ff75ce9e88c5ac861a",
+    "tools/design-experiments/reference_work_ancf_v3.py": "5894f38dc299953f0cbb581f9a4f5f9cd3aba0f0cd2f75588f180a1fb271d3e4",
+    "docs/verification/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8",
+    "docs/verification/reference-work-refined-shared-preparation.json": "514cb551cb8a93b7dd4f9e7cbf59ff47c69b4e53a7c9f5686924f13f0da9ac02"
+  },
+  "seconds": 52.53099999995902,
+  "peak_bytes": 705232896
+}

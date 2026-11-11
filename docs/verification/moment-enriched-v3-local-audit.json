@@ -1,0 +1,247 @@
+{
+  "records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 4.694944799077112e-13,
+        "force": 8.221821016600796e-12,
+        "tangent": 5.147781631571559e-13,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.476297571150495e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.567825859988878e-15,
+        "vertical_error_work": 9.228092801469926e-16,
+        "top_bottom_error_work": 3.684712399172272e-16,
+        "weak_commutation": 1.9249994906794195e-15,
+        "body_work": 1.9011632603970007e-15,
+        "decomposition": 1.216986573164493e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 3.8272779178222624e-15,
+        "stabilization_residual": 8.7538249064455e-15,
+        "passed": true
+      },
+      "reference_gradient": 3.9586304101466926e-14,
+      "gram": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 4.739251620086941e-12,
+        "force": 8.206095530574419e-11,
+        "tangent": 4.431247034743534e-12,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.447311480812935e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.567825859988878e-15,
+        "vertical_error_work": 9.228092801469926e-16,
+        "top_bottom_error_work": 3.684712399172272e-16,
+        "weak_commutation": 1.9249994906794195e-15,
+        "body_work": 1.9011632603970007e-15,
+        "decomposition": 1.216986573164493e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 3.866904738884761e-15,
+        "stabilization_residual": 8.7538249064455e-15,
+        "passed": true
+      },
+      "reference_gradient": 5.148791019062016e-13,
+      "gram": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 4.7520979392908986e-11,
+        "force": 8.204429906285094e-10,
+        "tangent": 4.352504297606021e-11,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.474124260293505e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.567825859988878e-15,
+        "vertical_error_work": 9.228092801469926e-16,
+        "top_bottom_error_work": 3.684712399172272e-16,
+        "weak_commutation": 1.9249994906794195e-15,
+        "body_work": 1.9011632603970007e-15,
+        "decomposition": 1.216986573164493e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 3.83999155215587e-15,
+        "stabilization_residual": 8.7538249064455e-15,
+        "passed": true
+      },
+      "reference_gradient": 4.4184296165812804e-12,
+      "gram": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.4229763692998267e-12,
+        "force": 8.751289505597764e-12,
+        "tangent": 5.000921566850117e-11,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.478238118957069e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.567825859988878e-15,
+        "vertical_error_work": 9.228092801469926e-16,
+        "top_bottom_error_work": 3.684712399172272e-16,
+        "weak_commutation": 1.9249994906794195e-15,
+        "body_work": 1.9011632603970007e-15,
+        "decomposition": 1.216986573164493e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 3.5763677601745274e-14,
+      "gram": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 2.159418173186713e-12,
+        "force": 5.321780239428557e-11,
+        "tangent": 1.1488493944481302e-11,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.463336587315863e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.567825859988878e-15,
+        "vertical_error_work": 9.228092801469926e-16,
+        "top_bottom_error_work": 3.684712399172272e-16,
+        "weak_commutation": 1.9249994906794195e-15,
+        "body_work": 1.9011632603970007e-15,
+        "decomposition": 1.216986573164493e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 4.129171027743963e-13,
+      "gram": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 2.1513090215817334e-11,
+        "force": 5.3217555458414e-10,
+        "tangent": 1.1877381868686678e-10,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.476764835495577e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.567825859988878e-15,
+        "vertical_error_work": 9.228092801469926e-16,
+        "top_bottom_error_work": 3.684712399172272e-16,
+        "weak_commutation": 1.9249994906794195e-15,
+        "body_work": 1.9011632603970007e-15,
+        "decomposition": 1.216986573164493e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 3.924987539468313e-12,
+      "gram": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 4.727441663181795e-11,
+        "force": 9.67409832970412e-10,
+        "tangent": 1.3158680001365263e-09,
+        "face_transform": 2.856518274316219e-14,
+        "gradient": 5.591105267365597e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5685066377729224e-15,
+        "vertical_error_work": 9.389114137435996e-16,
+        "top_bottom_error_work": 3.730174453882441e-16,
+        "weak_commutation": 1.927734754020407e-15,
+        "body_work": 1.9053554706180547e-15,
+        "decomposition": 1.2314891124564211e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 8.980764587969402e-14,
+      "gram": 1.1716040279244663e-15,
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 3.369627661884145e-11,
+        "force": 9.78331691754796e-10,
+        "tangent": 1.2926946584944656e-09,
+        "face_transform": 2.856518274316219e-14,
+        "gradient": 5.574155564004725e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5685066377729224e-15,
+        "vertical_error_work": 9.389114137435996e-16,
+        "top_bottom_error_work": 3.730174453882441e-16,
+        "weak_commutation": 1.927734754020407e-15,
+        "body_work": 1.9053554706180547e-15,
+        "decomposition": 1.2314891124564211e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 8.213278538529214e-13,
+      "gram": 1.1716040279244663e-15,
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 2.703809167807795e-11,
+        "force": 1.3774264483040793e-09,
+        "tangent": 1.3025183892568424e-09,
+        "face_transform": 2.856518274316219e-14,
+        "gradient": 5.585277935835711e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5685066377729224e-15,
+        "vertical_error_work": 9.389114137435996e-16,
+        "top_bottom_error_work": 3.730174453882441e-16,
+        "weak_commutation": 1.927734754020407e-15,
+        "body_work": 1.9053554706180547e-15,
+        "decomposition": 1.2314891124564211e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 8.69397867965208e-12,
+      "gram": 1.1716040279244663e-15,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "parent_stops_rechecked": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/audit_moment_enriched_local_v3.py": "be067e8887902dc5474b339c8e7b49460931f46cc22a2bcee6c2b5b7fdd11c73",
+    "tools/design-experiments/moment_enriched_ancf.py": "7cd471191740fd624eab4ca1481c2d35444c49e9a4ae691e4f0fb893588aac24",
+    "docs/verification/moment-enriched-local-v2-result.json": "beff673720a17b3672a4f2236595c61c13d8f04693085b0abcc4abd310aff6b7",
+    "docs/verification/moment-enriched-protocol.md": "84ec6760b9806cde4fcb26ff0186d36b3d0f000d49f668a3518cddb5febecfc9"
+  },
+  "seconds": 9.48499999998603
+}

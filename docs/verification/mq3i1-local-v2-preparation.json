@@ -1,0 +1,15 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "tools/design-experiments/mq3i1_pure_shear.py": "301b9c6df0f5b4bbbd429c9ebcab669a8f862ce9638683990ce7cb72e797e943",
+    "tools/design-experiments/mq3i1_moments_v2.py": "d81165b98da2f457883203f2d15480ae8f6a902288d8cd17d8211f8968d5e671",
+    "tools/design-experiments/check_mq3i1_local_v2.py": "0315a1aa0e250986cb2d966fafed94402215e781fdc63dc24ebb44133cbb7ce9",
+    "tools/design-experiments/audit_mq3i1_local_v2.py": "42525d9227d658f959ea45eb9756e87d7af5b876b0e42476ec113857beff1220",
+    "tools/design-experiments/mq3_factor_family.py": "e995b30cbb7439aeb60cb9c1765185b2918998648541e6db173f01627fbd670a",
+    "tools/design-experiments/mq3_interior_stationarity.py": "a1c347d32c529f74c753cdef64beedb6345942599ca3535713de25955e3d1dd9",
+    "docs/mq3-interior-moment-alternative.md": "d8d241f798818f6ac0b875b66f8fa61c4961203f11e0912838d7565d750799d2",
+    "docs/verification/mq3i1-local-execution-protocol.md": "e09676ce1fce4bd8e40520003696238d620792625f73af704d52bc0cb07d7a5c",
+    "docs/verification/mq3i1-v2-pure-shear-protocol.md": "754fd2373bf43adb9330ca98424b86d10311a95bcb5aec42c74da7044a810135",
+    "docs/verification/mq3i1-local-result.json": "f17d07aacfaef29535128a5f992c56277cf33f59bafacf8f0d18fd427b84a460"
+  }
+}

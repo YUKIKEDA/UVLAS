@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "tools/design-experiments/check_reference_work_refined_shared.py": "43909bc795b869f88be89877b02f3a45f57901c09a59711ef99e92bdf7a6b7bb",
+    "tools/design-experiments/audit_reference_work_refined_shared.py": "087dfc9a6e884713043f1f095c42998cbde3934e5ac9dbdd42250769907377a3",
+    "tools/design-experiments/reference_work_refined_fit_v2.py": "3366646d5eb6f01abff969306d7ce1bba3e0ec6e536b11ff75ce9e88c5ac861a",
+    "docs/verification/reference-work-refined-protocol.md": "9ccd10e24a708b7db4078704586a2a5e8b6a6068fbf986c2d1e30716bed926d5",
+    "docs/verification/reference-work-refined-v2-protocol.md": "e921dd75d5d15cc864b8c3b042c95ef2f6a10efabcdb209a8e5be0694eb683aa",
+    "docs/verification/reference-work-refined-reference-transfer.json": "d19077b058d50e03bacaa673d63d6a55bed18d1cd1382ae681ed0fa0113f70a0"
+  }
+}

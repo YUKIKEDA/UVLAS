@@ -1,0 +1,43 @@
+{
+  "repository": "https://github.com/projectchrono/chrono",
+  "revision": "d26ed26d8344ae9aee4c1d26bf6d481076750b1a",
+  "observed_commit_date": "2026-10-29T07:56:33Z",
+  "files": [
+    {
+      "path": "src/chrono/fea/ChElementShellANCF_3423.cpp",
+      "url": "https://raw.githubusercontent.com/projectchrono/chrono/d26ed26d8344ae9aee4c1d26bf6d481076750b1a/src/chrono/fea/ChElementShellANCF_3423.cpp",
+      "sha256": "010159b88def539feb57963247d75c8de8aaff750ea0d948d173853b1a220f74",
+      "bytes": 82745
+    },
+    {
+      "path": "src/chrono/fea/ChElementShellANCF_3423.h",
+      "url": "https://raw.githubusercontent.com/projectchrono/chrono/d26ed26d8344ae9aee4c1d26bf6d481076750b1a/src/chrono/fea/ChElementShellANCF_3423.h",
+      "sha256": "589a0a842bd11eacb9b615159997fd541d97b73cb0efc07201d12ff3d6a730fb",
+      "bytes": 20390
+    },
+    {
+      "path": "src/chrono/fea/ChElementShellANCF_3833.h",
+      "url": "https://raw.githubusercontent.com/projectchrono/chrono/d26ed26d8344ae9aee4c1d26bf6d481076750b1a/src/chrono/fea/ChElementShellANCF_3833.h",
+      "sha256": "e58a8bca8b4c05b0238ccdac3b22eafb0cf172d60cbb9a550c97be4a11d16dd3",
+      "bytes": 29403
+    },
+    {
+      "path": "src/chrono/fea/ChNodeFEAxyzDD.h",
+      "url": "https://raw.githubusercontent.com/projectchrono/chrono/d26ed26d8344ae9aee4c1d26bf6d481076750b1a/src/chrono/fea/ChNodeFEAxyzDD.h",
+      "sha256": "0f0087c35340ef7552387ed9048082d23c53ac94161ea7e4e8ba6f65bb3d2c8a",
+      "bytes": 9724
+    },
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/projectchrono/chrono/d26ed26d8344ae9aee4c1d26bf6d481076750b1a/LICENSE",
+      "sha256": "5f625eb4c9e0ddf86db9d1ed9b6adb5b30296ea81919282b2f38c977136bf079",
+      "bytes": 1485
+    },
+    {
+      "path": "src/chrono/fea/ChElementShellANCF_3833.cpp",
+      "url": "https://raw.githubusercontent.com/projectchrono/chrono/d26ed26d8344ae9aee4c1d26bf6d481076750b1a/src/chrono/fea/ChElementShellANCF_3833.cpp",
+      "sha256": "de2ba62b687ac4414e9168f242c1ffe5cda1857abc888e31300a5d5f94208219",
+      "bytes": 185637
+    }
+  ]
+}

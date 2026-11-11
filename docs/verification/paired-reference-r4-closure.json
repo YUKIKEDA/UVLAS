@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "R4_complete": true,
+  "main_shell_adopted": false,
+  "product_implementation_start": false,
+  "checked_new_links": 23,
+  "immutable": {
+    "docs/verification/paired-reference-r4-results.md": "c105eaae73e8c901c6b9e8c7aef0f1cc4cb8af2b93fac9a34af26fa185195b96",
+    "docs/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "docs/paired-reference-local-global-contract.md": "2a75e7f2e1400099973eb076d36bf51caf55cead115d80007ef95d823496cafd",
+    "docs/verification/paired-reference-r4-protocol.md": "b79e12995e0a1171ec9925b0025a4348f29beeb510c6aec678502d227b7790ed",
+    "docs/verification/paired-reference-r4-disposition.json": "ab1f741c40f0ccf0b41e5ba1dc3811dcf46514b33176ce8ffa0372364eabb574",
+    "docs/verification/paired-reference-r4-audit.json": "345e3f15dcebb79f2aea865c1dc77be72c8fec7c87f2cabf40bc75db0b07aed9"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "docs/preimplementation-plan.md",
+    "docs/structural-model-adoption-review.md",
+    "docs/requirements-evidence-map.md",
+    "docs/design-decisions.md",
+    "docs/roadmap.md"
+  ]
+}

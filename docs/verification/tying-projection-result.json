@@ -1,0 +1,19 @@
+{
+  "local_records": [],
+  "records": [],
+  "conservative_local_pass": false,
+  "native_work_pass": false,
+  "all_shared_numerical_checks": false,
+  "stop_reason": "ValueError('constrained_tying_rank_failed')",
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_tying_projection.py": "859a8960e37b2603916800f916a59a67b3ea964a45f8bbb23476195eb5612ec9",
+    "tools/design-experiments/tying_mid_projection_q4.py": "1a06ca47282862e72b7f59cf71990e8685422e247950036750b9d8a3a22320f4",
+    "tools/design-experiments/covariant_projection_basis.py": "bac7ccd21d1b7f14ea87b51957f37056d08c4834019043b44f8fadf4029923ef",
+    "docs/tying-projection-formulation.md": "eae21324ade9ebaff2e31328318cb88f683e27fe3b8b84ba5397ea0acb74de43",
+    "docs/verification/tying-projection-protocol.md": "da51738316fe016a4a36ff4eed82ada2d222352d5383919deea0107c7884b065",
+    "docs/verification/tying-projection-preparation.json": "5dc4db6b31ae20d579fcddf57e0b0c20ae396696fc986f7addbd020cf80faa7f"
+  },
+  "seconds": 0.10999999998603016,
+  "peak_bytes": 93700096
+}

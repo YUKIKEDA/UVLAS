@@ -1,0 +1,11 @@
+{
+  "reason": "Separate the complete 105-dimensional director image and 30-dimensional odd homogeneous kernel before the position solve; eliminate shared homogeneous image before global q0 kernel extraction. No physical DOFs or equations removed.",
+  "sources": {
+    "tools/design-experiments/check_mixed_mean_stress_thin_v6.py": "570823b19e882405afd13965ffb4bcb49fa202fa8efadb91b267463c676a5c33",
+    "tools/design-experiments/mixed_mean_stress_thin_v6.py": "b1bb040c7daf93cceefd29acd2da410536ef0cc898efaf6679bc05b04266359c",
+    "tools/design-experiments/mixed_mean_stress_space_v4.py": "327a5dd769db68e17795b01fa2e6411f00821eb1856a6fc206774aa42cfd14c8",
+    "docs/verification/mixed-mean-stress-thin-v5-result.json": "fa9c413981153585164b5e90b9c631527cee558a2e7344705f22b7f2187ade2b",
+    "docs/verification/mixed-mean-stress-gauge-v6.md": "8b918b575573e058d4c624ac6a44b00c3e580e073fd615db1871cd5a2a93f531",
+    "docs/verification/mixed-mean-stress-protocol.md": "1efb045fc1e82946fe630e12d24c239826f2b18ae13142e84e81a2fa46219b7f"
+  }
+}

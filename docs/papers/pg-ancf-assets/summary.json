@@ -1,0 +1,223 @@
+{
+  "quality_count": 28,
+  "quality_rhs_count": 84,
+  "quality_finest_max_energy": 9.563214875446522e-06,
+  "quality_finest_max_position": 5.4666867965311195e-08,
+  "quality_max_stationarity": 7.449074316872561e-12,
+  "quality_max_case_seconds": 154.31299999996554,
+  "groups": [
+    {
+      "group": "G1",
+      "n": 4,
+      "max_energy": 8.193648573931124e-07,
+      "max_position": 1.0225004954495281e-10,
+      "max_thin_amplification": 1.360525455967972,
+      "max_dofs": 1305
+    },
+    {
+      "group": "G2",
+      "n": 4,
+      "max_energy": 4.410056390888216e-08,
+      "max_position": 1.117757912561768e-10,
+      "max_thin_amplification": 1.0,
+      "max_dofs": 1530
+    },
+    {
+      "group": "G3",
+      "n": 4,
+      "max_energy": 8.196357253796662e-07,
+      "max_position": 1.1011948125876737e-10,
+      "max_thin_amplification": 1.003036968557526,
+      "max_dofs": 1365
+    },
+    {
+      "group": "G4",
+      "n": 4,
+      "max_energy": 4.343268345404781e-08,
+      "max_position": 1.0766311589485795e-10,
+      "max_thin_amplification": 1.0,
+      "max_dofs": 1545
+    },
+    {
+      "group": "G5",
+      "n": 2,
+      "max_energy": 8.035147436213315e-06,
+      "max_position": 5.4666867965311195e-08,
+      "max_thin_amplification": 0.8294960998199663,
+      "max_dofs": 708
+    },
+    {
+      "group": "G6",
+      "n": 2,
+      "max_energy": 6.156902699359686e-06,
+      "max_position": 5.386093567765432e-08,
+      "max_thin_amplification": 0.7833330061137312,
+      "max_dofs": 711
+    },
+    {
+      "group": "G7",
+      "n": 2,
+      "max_energy": 9.563214875446522e-06,
+      "max_position": 5.4120524940237534e-08,
+      "max_thin_amplification": 0.8534733044789157,
+      "max_dofs": 714
+    }
+  ],
+  "physical": [
+    {
+      "domain": "rectangle",
+      "n": 1,
+      "h": 0.01,
+      "energy": 7.361892000131993e-05,
+      "position": 0.000991845419570842,
+      "stationarity": 6.313367004144435e-16,
+      "discrete_load_agreement": 3.167563635281721e-13
+    },
+    {
+      "domain": "rectangle",
+      "n": 1,
+      "h": 0.0001,
+      "energy": 7.544519608011938e-07,
+      "position": 6.974497592644049e-05,
+      "stationarity": 3.3413985152232865e-14,
+      "discrete_load_agreement": 3.865371981806807e-10
+    },
+    {
+      "domain": "rectangle",
+      "n": 2,
+      "h": 0.01,
+      "energy": 1.4423694423663308e-05,
+      "position": 4.927876383170233e-05,
+      "stationarity": 7.010651315626893e-16,
+      "discrete_load_agreement": 6.410953366781318e-13
+    },
+    {
+      "domain": "rectangle",
+      "n": 2,
+      "h": 0.0001,
+      "energy": 1.4784199027234822e-07,
+      "position": 1.0726003330632022e-05,
+      "stationarity": 3.5505706778756545e-14,
+      "discrete_load_agreement": 1.639969983759569e-09
+    },
+    {
+      "domain": "taper",
+      "n": 1,
+      "h": 0.01,
+      "energy": 7.626405352226331e-05,
+      "position": 0.0009885156512809928,
+      "stationarity": 5.814331057834295e-16,
+      "discrete_load_agreement": 3.5280948310554165e-13
+    },
+    {
+      "domain": "taper",
+      "n": 1,
+      "h": 0.0001,
+      "energy": 7.781351203603755e-07,
+      "position": 8.46233499229436e-05,
+      "stationarity": 1.3921496827447693e-14,
+      "discrete_load_agreement": 6.4904738406897e-10
+    },
+    {
+      "domain": "taper",
+      "n": 2,
+      "h": 0.01,
+      "energy": 1.5825043617951426e-05,
+      "position": 5.6505563321544314e-05,
+      "stationarity": 6.323634829114615e-16,
+      "discrete_load_agreement": 1.2452510470105587e-12
+    },
+    {
+      "domain": "taper",
+      "n": 2,
+      "h": 0.0001,
+      "energy": 1.601476364316399e-07,
+      "position": 1.4253455449706585e-05,
+      "stationarity": 2.6908608506021413e-14,
+      "discrete_load_agreement": 2.095004390264202e-09
+    }
+  ],
+  "geometry_parameters": [
+    [
+      0.4,
+      0.0,
+      0.0
+    ],
+    [
+      0.4,
+      0.2,
+      0.0
+    ],
+    [
+      0.4,
+      0.0,
+      0.07
+    ],
+    [
+      0.4,
+      -0.2,
+      0.07
+    ],
+    [
+      0.4,
+      0.2,
+      0.07,
+      0.1,
+      -0.06,
+      0.025
+    ],
+    [
+      0.4,
+      0.2,
+      0.07,
+      0.1,
+      -0.06,
+      0.025,
+      0.0,
+      1.0,
+      0.2
+    ]
+  ],
+  "sources": {
+    "docs/verification/mass-paired-quality-result.json": "942e9651318ecd2ba6eb0e1c62fc891f2efbebc5a9f2cda7438d99ca986e4862",
+    "tools/design-experiments/check_mass_paired_quality.py": "24c4ae7af5500660dfc8eeb1dc96fd89441b2a4b5d101710fac3876ca74ede52",
+    "docs/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "tools/design-experiments/mass_paired_ancf.py": "45e85b54665ad1555aa85e4a24c9901d824427748205f66e49102a046257e62b",
+    "tools/design-experiments/general_paired_polynomials.py": "79575c8fc68a07206e58c024076e9393414cf3fe36487cddb4576616661a4c7e",
+    "tools/design-experiments/general_paired_ancf.py": "c23f943500f5dbc71d1ad544a4ac0c9af58f643431f62711614e300801bdfb7c",
+    "tools/design-experiments/polynomial_reference_surface.py": "fa496b514b9d14dfd801251afc35dbe2220cedc5215fcedef06078c8b455fda2",
+    "tools/design-experiments/general_paired_fields.py": "8f5e27f18520d2137bd8ce2cb0f341c4298a483932595543b527267c61675b4e",
+    "tools/design-experiments/exact_paired_finite.py": "2d92c260516962da34fd84d0590ed3559549ccbbc46fa2fc22e50b7228d43720",
+    "tools/design-experiments/paired_exact_polynomials.py": "d74958b04f886b61aedd43faa75e9363fd8ebe9d0addf9e8419284433afc9246",
+    "tools/design-experiments/coefficient_compatible_ancf.py": "e6e658bfdd580e222b189fa846ec89ad88c36a9df5bb465ea68aca2fb3151c08",
+    "tools/design-experiments/exact_paired_ancf.py": "a52f68d138530fd1564e057329ee8138210c9d9622565eef1c7ffa1736ee4676",
+    "tools/design-experiments/check_exact_paired_primary.py": "3b10f2de737d56df861422a29a162d3f9941ebb781dd3a85e4cf62aa71c933a5",
+    "docs/verification/mass-paired-coefficient-input-result.json": "f48c16fe68c89df73b8d637743fe45f239a89276d42cdbf360bef7e8960a4753",
+    "tools/design-experiments/check_mass_paired_coefficient_input.py": "05c6f630664159ad10921770846597f51bf3bf5497e28fbdc8ba7a0c428633a2",
+    "tools/design-experiments/paired_reference_admissibility.py": "9814316ccf4a0a5ae41d5ed9fa7c0905d8d049840e1176a4514745a04c5cb84f",
+    "docs/verification/mass-paired-reference-result.json": "c086933c1e51393f97971344caa7faff80e83f4f0efc94fe7a471ab32bf26fdd",
+    "tools/design-experiments/check_mass_paired_reference.py": "dc99572e559c25e71761d7dd284f5446c837f08c7f1c068a3e32e3b059efdd24",
+    "tools/design-experiments/mass_paired_mechanics.py": "c121876837813042d84e7a593d72aab56c2737f6ea213dfc8896e201cb273f0b",
+    "docs/verification/paired-lift-exact-result.json": "2330c40b8fb17b8b01bfd5078bab1007b14fab7a9c07b62b0b5b34d04d41bd2f",
+    "tools/design-experiments/check_paired_lift_exact.py": "59b971630da0f39277cae4e0d3e515e2fe81b9896d978f7cb5494868f5737230",
+    "docs/verification/mass-paired-body-result.json": "fe3928dcbd914e39df6052d84c022b67af681da5248127953cf824484a7aed3f",
+    "tools/design-experiments/check_mass_paired_body.py": "008432b408d049b23752df8000d02b5c3d688637118b58222caeb8557cfd4071",
+    "docs/verification/mass-paired-interface-result.json": "497c2db45dd82117351bf635f7d9f2b8d1edb9776858a627b5ce831f4cc64cc8",
+    "tools/design-experiments/check_mass_paired_interface.py": "5d52cc0d6f949d6516366c56cacd29cb33600948800cb21d4e1291fcdb9de17b",
+    "docs/verification/mass-paired-mechanics-result.json": "3cf8ce329f73f6a3ece434b2e3cb8029001a42c07cafd9a746108d3ebbbd1929",
+    "tools/design-experiments/check_mass_paired_mechanics.py": "a40f537c23247282fb15bd3c14899de4e6bf21e09d18a35621322fa31254137c",
+    "tools/design-experiments/pg_ritz_mechanics.py": "6a0fd5db2fa58606bbcc03056b56ce5d8ca03feacc126906b6a2ae7b9dc3f013",
+    "tools/design-experiments/pg_ritz_state_reference.py": "e6efb54d85a633aff84137246c7d76050a39db2d7a61b102dda5d06b4b8c362a",
+    "docs/verification/mass-paired-orientation-result.json": "604d9efa792b0efd20fbebebb9ca2e9e6f411fe2ec6f4767608251b4d538df8a",
+    "tools/design-experiments/check_mass_paired_orientation_quadrature.py": "03cdb878265e087f99e2a41e0d78eb2a546a3dc2ed86c7767a31e3f3777da324",
+    "docs/verification/paired-shell-r5-domain-v2-result.json": "906ca0edb9318ca4f024a9af96b9473853334b548a531fba00b9f2ab5d2f91ef",
+    "tools/design-experiments/check_paired_shell_r5_domain_v2.py": "72515139d06ece3ac5b7c00c84125b3613a6d31b77f48a1131b934f3840eade4",
+    "tools/design-experiments/check_paired_shell_r5_domain.py": "8c2fc314073636ea02d280877cb3e47477a8b4934415e916e668b29392c13b51",
+    "docs/verification/paired-shell-r5-domain-result.json": "49169952a2ca2b22bd9adf941704a110814cc1408b30b6043d1af65b6e65f555",
+    "tools/design-experiments/swept_taper_domain.py": "c4047af9fa078f448bdead110d5da511927170ba6954cd588f0c2c381d5ef97f",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.01.npz": "cbc1f5e2e45b8e6935fab4262d702f3389ed7df2a82bc5bc993397fe29747fe1",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.0001.npz": "87a5dbb1d3b693f4b22e76a7479ce59f494e821a5dcd58fc5b625c75c4299c51",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.01.npz": "f7e12b9b128d2015c4ba84ed8fb2181d5c08c7b249b032270b27b50de7067e89",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.0001.npz": "0e84d019459cc5a5e1c10731c747970ea738ae12ad8f0e37b8d3a611ae1fe282"
+  }
+}

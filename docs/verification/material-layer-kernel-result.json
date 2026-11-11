@@ -1,0 +1,71 @@
+{
+  "records": [
+    {
+      "case": "Mandel_engineering_bridge",
+      "metrics": {
+        "energy": 0.0,
+        "compliance": 1.0404786006524282e-16
+      },
+      "passed": true
+    },
+    {
+      "case": "curved_reference_fiber_axis",
+      "metrics": {
+        "orthogonal": 2.795076269212341e-16,
+        "determinant": 4.440892098500626e-16,
+        "objective": 2.485118780863752e-16,
+        "Mandel_orthogonal": 7.536377538859932e-16,
+        "material_tensor": 7.410741937918042e-18
+      },
+      "passed": true
+    },
+    {
+      "case": "parallel_fiber_negative_control",
+      "metrics": {
+        "rejection_failure": 0.0
+      },
+      "passed": true
+    },
+    {
+      "case": "normal_stress_Schur_and_recovery",
+      "metrics": {
+        "stress_normal": 0.0,
+        "stress": 0.0,
+        "compliance_route": 2.1568913141074446e-16,
+        "recovery": 0.0,
+        "energy": 0.0
+      },
+      "omitting_Schur_detected": true,
+      "passed": true
+    },
+    {
+      "case": "layer_moments_vs_tensor_quadrature",
+      "metrics": {
+        "energy": 8.470329472543003e-22,
+        "force": 2.7107509376408435e-19
+      },
+      "passed": true
+    },
+    {
+      "case": "homogeneous_layer_subdivision",
+      "metrics": {
+        "matrix": 1.7699948607126696e-16,
+        "initial_load": 1.0842050159151315e-19,
+        "constant": 5.293955920339377e-23,
+        "energy": 8.470329472543003e-22,
+        "force": 2.235548765782621e-19
+      },
+      "passed": true
+    }
+  ],
+  "all_checks_pass": true,
+  "material_point_contract_only": true,
+  "element_plane_stress_adopted": false,
+  "real_material_validation": false,
+  "sources": {
+    "tools/design-experiments/check_material_layer_kernel.py": "94387cf57555a6d16900105bbc99aa92c8cd48715ae4beb96cf4a697017b9164",
+    "docs/material-layer-adoption-contract.md": "89ff9f31d4b402ef9e5f8eb46b1ac32bbb13b6e4cbfefb4e2ece86f12cac4771",
+    "docs/verification/material-layer-kernel-protocol.md": "081d3fcd23fd45432602ec10815156aca5214dbaf71aa982078c9da86318d141",
+    "docs/verification/material-layer-kernel-preparation.json": "c473209ae1f1cbbbfd06d1b5c8d3a30a5be86382b2dd1307ecbd54f19b21f2c3"
+  }
+}

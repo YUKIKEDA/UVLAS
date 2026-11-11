@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "prescribed_policy_and_both_circulations_restart",
+      "bitwise_state": true,
+      "policy_inherited": true
+    },
+    {
+      "case": "restart_semantics_and_atomic_rejection",
+      "negative_controls": [
+        "window_mismatch",
+        "missing_accepted_history",
+        "material_id_owner",
+        "checkpoint_checksum"
+      ]
+    },
+    {
+      "case": "qualification_covers_load_and_state_packet",
+      "negative_controls": 2
+    },
+    {
+      "case": "geometry_cache_and_immutable_core",
+      "hits": 1,
+      "misses": 5,
+      "core_change_rejected": true
+    }
+  ],
+  "failures": [],
+  "seconds": 0.1880000000819564,
+  "sources": {
+    "tools/design-experiments/check_uvlm_wake_policy.py": "a4c41add77e396583e5debe4d1d01ac0db91e6af7b818153675112f4dc2b4f68",
+    "tools/design-experiments/uvlm_wake_assembly_v2.py": "233b0219d6db9baf2cccc7dede170593503d7b7ca48c5c7ced93e944a47069d6",
+    "tools/design-experiments/uvlm_wake_assembly.py": "053d4caaa78b28e927c22b7c5ddf81f494cb9e8ebe8066af720ed00430dbbb6f",
+    "tools/design-experiments/uvlm_surface_bindings.py": "41a257ae546181723687a047cbcfbd5eaed8f3a5ddc1c66e79addf5af238d093",
+    "docs/verification/uvlm-wake-assembly-result.json": "70d1de2dcaeb7156a237e601ab7ccaa4b25c4dd3b643f0876f8aef8d2543190a"
+  }
+}

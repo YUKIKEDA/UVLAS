@@ -1,0 +1,36 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "constant_error": 4.218847493575595e-15,
+      "exterior_work_error": 2.4685202737126296e-15,
+      "checks": {
+        "constant": true,
+        "shared_work": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.0001,
+      "constant_error": 5.88418203051333e-15,
+      "exterior_work_error": 6.075494850145353e-13,
+      "checks": {
+        "constant": true,
+        "shared_work": true
+      }
+    }
+  ],
+  "all_checks_pass": true,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_q9_eas21_shared_work.py": "b4fdb97578931b56083f5b97d623736bac19193c092bc9a675a304ecfcfbfc1e",
+    "tools/design-experiments/q9_eas21.py": "40fda95a868f82ab0b2c7a6b9579a951be3aa5daa82c075bb7ab90d49a818c9e",
+    "tools/design-experiments/audit_q9_curved_strain_screen.py": "2a092c9ae927b8676ce989a2d92d8eff0d9f9b93fae0b9e9bd27890a2b9245ec",
+    "tools/design-experiments/q9_developable_bending_approximation.py": "1a2ba004be731c6f5ce5303bab606495f1bd24d5a691ce3330d56b802d83f742",
+    "docs/verification/q9-eas21-shared-work-experiment.md": "159c002e2afce705496038f049f6042357e16bdfc7dbee1da0d546523cb1ecbe"
+  },
+  "seconds": 0.8429999999934807
+}

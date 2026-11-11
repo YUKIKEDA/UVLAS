@@ -1,0 +1,43 @@
+{
+  "connection_1_4_complete": true,
+  "main_shell_adopted": true,
+  "material_1_2_complete": true,
+  "beam_1_3_complete": true,
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "decisions": [
+    "CN-D01",
+    "CN-D02",
+    "CN-D03",
+    "CN-D04",
+    "CN-D05",
+    "CN-D06",
+    "CN-D07",
+    "CN-D08",
+    "CN-D09"
+  ],
+  "metrics": {
+    "core_groups": 8,
+    "physical_affine_joints": 4,
+    "nonaffine_cases": 18,
+    "nonlinear_beam_shell_cases": 2,
+    "modal_refinements": 3,
+    "finest_fold_errors": [
+      0.0032486788244433518,
+      0.001668894104897678
+    ],
+    "unresolved_single_thickness_errors": [
+      0.017976242189134628,
+      0.009780051768313203
+    ],
+    "max_nonlinear_original_residual": 1.224803033822114e-10,
+    "independent_axial_series_error": 1.1080025785759062e-12,
+    "finest_axial_modal_error": 0.001002090309984105,
+    "max_modal_formulation_difference": 1.0166194892486839e-11,
+    "max_nonaffine_holdout_gap": 1.0658141036401503e-12
+  },
+  "next_work": "1.5 loads damping recovery and structural integration",
+  "specification": "docs/connection-adopted-specification.md",
+  "scope": "fixed-reference full-position bonded interfaces; explicit rigid shoes; prescribed supports; particles and eccentric rigid bodies",
+  "arbitrary_joint_stress_validation": false
+}

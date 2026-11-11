@@ -1,0 +1,79 @@
+{
+  "failed_guard": "interior_decomposition_auxiliary",
+  "rank_unisolvence_passed": true,
+  "metrics": {
+    "dimensions": {
+      "total": 52,
+      "membrane": 16,
+      "shear": 32,
+      "mixed": 4
+    },
+    "ranks": {
+      "D": [
+        54,
+        54,
+        54
+      ],
+      "membrane_field": [
+        34,
+        34,
+        34
+      ],
+      "shear_field": [
+        72,
+        72,
+        72
+      ],
+      "D_on_membrane": [
+        18,
+        18,
+        18
+      ],
+      "D_on_shear": [
+        40,
+        40,
+        41
+      ],
+      "pure_in_kernel": [
+        48,
+        48,
+        48
+      ]
+    },
+    "orthogonality": 8.980583323916525e-15,
+    "reconstruction": 2.9191618718969234e-11,
+    "whitened_gram": 2.0435435023686068e-15,
+    "field_gram_split": 4.525744657461704e-15,
+    "constraint_residual": 2.60523676596237e-12
+  },
+  "checks": {
+    "rank": false,
+    "decomposition": true,
+    "constraints": true
+  },
+  "primary_preparation_failure": {
+    "report": {
+      "geometry_ranks": [
+        1,
+        1,
+        1
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        20,
+        20,
+        20
+      ],
+      "coefficient_dimension": 106,
+      "constraints": 86,
+      "kernel_dimension": 20,
+      "moments": 22
+    },
+    "artifact": "build/analysis/mq3i1-local-20261103-123334/preparation-failure.npz",
+    "artifact_sha256": "a5a191bc1f68ec08be0b4b7cd86f237f07632668d45900ca5914ba001f5c7762"
+  }
+}

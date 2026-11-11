@@ -1,0 +1,111 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "finite_two_surface_independent_assembly",
+      "matrix_error": 9.2612745341822e-16,
+      "wake_basis_error": 8.100828400979996e-15,
+      "circulation_error": 1.2210471428063124e-15,
+      "original_residual": 2.0336982493283685e-16
+    },
+    {
+      "case": "integer_topology_mutual_and_implicit_front",
+      "integer_boundary_zero": true,
+      "dropped_mutual_defect": 0.013170985732824263,
+      "old_front_defect": 0.13397982126953337
+    },
+    {
+      "case": "independent_all_vector_load_and_material_integrals",
+      "force_error": 4.1509240458449365e-17,
+      "moment_error": 1.7639785089894283e-16,
+      "generalized_error": 2.2087146711744315e-16
+    },
+    {
+      "case": "repeat_from_same_parent",
+      "identical_state": true,
+      "parent_unchanged": true,
+      "cache_hits": 3
+    },
+    {
+      "case": "all_source_free_convection_and_material_transport",
+      "independent_node_velocity_errors": [
+        1.8222798409221323e-16,
+        2.363970996911466e-16,
+        2.0781845013122857e-16,
+        1.3876475389663826e-16
+      ],
+      "omitted_induction_defect": 0.03605658563738214,
+      "old_mu_exactly_transported": true,
+      "detached_ids_distinct": true
+    },
+    {
+      "case": "full_implicit_circulation_and_load_directional_tangent",
+      "relative_error": 1.4918007223984154e-12,
+      "includes_normals_velocity_inflow_and_old_time_convection": true
+    },
+    {
+      "case": "free_convection_full_state_directional_tangent",
+      "relative_error": 1.7282651566394233e-11
+    },
+    {
+      "case": "adopted_PG_material_work_force_and_moment",
+      "work_error": 1.3844277053802225e-16,
+      "force_error": 8.512481214426131e-16,
+      "moment_error": 1.0008305157612975e-16,
+      "full_PG_load_tangent_error": 7.407730664915105e-11,
+      "all_load_points_derived_from_same_material_map": true
+    },
+    {
+      "case": "explicit_finite_tail_and_retirement",
+      "retired_rows": 4,
+      "circulation_difference_from_growing": 0.0804436373052667,
+      "tail_error_not_assumed_zero": true,
+      "closure_and_convection_policy_restored": true
+    },
+    {
+      "case": "restart_and_current_load_history",
+      "bitwise_state_and_next_load_match": true,
+      "both_bound_circulation_levels_retained": true
+    },
+    {
+      "case": "trial_atomic_failure_and_epoch",
+      "negative_controls": [
+        "post_solve_change",
+        "wrong_input",
+        "missing_input",
+        "bad_dt",
+        "fractional_tail",
+        "stale_acceptance"
+      ],
+      "state_unchanged_on_failure": true
+    },
+    {
+      "case": "whole_facet_geometry_guards",
+      "cases": [
+        "shared_vertex",
+        "shared_edge",
+        "coplanar_overlap",
+        "crossing",
+        "beyond_vertex",
+        "beyond_edge"
+      ]
+    }
+  ],
+  "failures": [],
+  "artifact": {
+    "artifact": "build/analysis/uvlm-wake-assembly-snapshot.npz",
+    "artifact_sha256": "f4d0ac25504a5212e0ff16eaf4f90ba8152de73a907c7c865302475782e0a776"
+  },
+  "seconds": 50.40599999995902,
+  "sources": {
+    "tools/design-experiments/check_uvlm_wake_assembly.py": "9b2a46fdd2d9a86371ac4171fbe64d9ce42a97f24b7fbb596317186ead0eac1f",
+    "tools/design-experiments/uvlm_wake_assembly.py": "053d4caaa78b28e927c22b7c5ddf81f494cb9e8ebe8066af720ed00430dbbb6f",
+    "tools/design-experiments/uvlm_surface_bindings.py": "41a257ae546181723687a047cbcfbd5eaed8f3a5ddc1c66e79addf5af238d093",
+    "tools/design-experiments/uvlm_geometry_guard.py": "f79080669248b9200a0cc2f386d88a3aec9f09f95c9fbeeb179160da370ae8f2",
+    "tools/design-experiments/uvlm_induction_reference.py": "3aa9882f79e11fcc132fa0a1fec01b0ba047cda53ee6e3daa62444b71bd40e51",
+    "tools/design-experiments/check_uvlm_wp1_three_dimensional.py": "c6d48be5c7b2a53584beadde7731fe5bcd59e7eeb147af6692e5ee127dbbabf3",
+    "tools/design-experiments/connection_shell.py": "55a37a5f7e0ddbc02c5ec3a1fd7c27835f2642d90f08f3413865d24207097654",
+    "docs/verification/uvlm-assembly-adoption-protocol.md": "33edc1ef6afeb9a0282ed556c9de2c684ff5fe4b79e59adf52491b513fbd82a2",
+    "docs/verification/uvlm-induction-adoption-audit.json": "b76dc45f36dd4f46199e993d60924acd479bba2d7fa9cd078315a2f1def15b15"
+  }
+}

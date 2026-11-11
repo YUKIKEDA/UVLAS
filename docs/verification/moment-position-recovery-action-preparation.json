@@ -1,0 +1,9 @@
+{
+  "mathematical_recovery_unchanged": true,
+  "global_identity_allocated": false,
+  "sources": {
+    "tools/design-experiments/moment_position_recovery_action.py": "ea2e019b13805ab7b6d9adaa5f8ddc7b1c5040ab8057281842ac3889577e9159",
+    "tools/design-experiments/moment_position_recovery.py": "b9e6912fb85889b9439fbd4a8517fe484ad237c57b92270c5a0d113b7572d734",
+    "docs/verification/mixed-mean-stress-finite-pair-protocol.md": "244942e80e260a59695a7c8d7b945e323ec2cee4f46e22744a8f7b6ba05967de"
+  }
+}

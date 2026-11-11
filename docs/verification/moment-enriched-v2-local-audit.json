@@ -1,0 +1,61 @@
+{
+  "records": [],
+  "stops": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    }
+  ],
+  "parent_stops_rechecked": [],
+  "all_reproduction_checks": false,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/audit_moment_enriched_local_v2.py": "b12295938df83249866582ae11055588086513ed5f3f087a54638331bd36f075",
+    "tools/design-experiments/moment_enriched_ancf.py": "7cd471191740fd624eab4ca1481c2d35444c49e9a4ae691e4f0fb893588aac24",
+    "docs/verification/moment-enriched-local-v2-result.json": "beff673720a17b3672a4f2236595c61c13d8f04693085b0abcc4abd310aff6b7",
+    "docs/verification/moment-enriched-protocol.md": "84ec6760b9806cde4fcb26ff0186d36b3d0f000d49f668a3518cddb5febecfc9"
+  },
+  "seconds": 6.342999999993481
+}

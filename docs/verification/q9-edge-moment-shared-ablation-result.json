@@ -1,0 +1,111 @@
+{
+  "source_sha256": "f606c798051ecc92af47c8abd0c0b996601e7d0a9af2e42beda397439a2d0b71",
+  "parent_sha256": "8ef739c16f56463120689aab32c12c017fb49483e94379b965d7bdaa89808e42",
+  "protocol_sha256": "c7134dd78f80c9c91db88c076a9acc869dfa9517dca617b4636022c6bc611007",
+  "dependencies": {
+    "check_q9_edge_moment_shared_space_v2.py": "7ab03aadc263757fc3f1280e5ca57c2b7b96d39d3d0df5c7a704fab02b6a7d88",
+    "q9_edge_moment.py": "8d2a8fcc0acbfcd08ff4ea1c0aae26a6e88ce0981f98b59902129d3f76232668"
+  },
+  "cases": [
+    {
+      "h": 0.1,
+      "n": 2,
+      "R1": {
+        "w_dofs": 9,
+        "compatible_w": 9,
+        "projected_w": 9,
+        "best_fit_norm": 3.644493866179388e-15
+      },
+      "R": {
+        "w_dofs": 9,
+        "compatible_w": 4,
+        "projected_w": 4,
+        "best_fit_norm": 0.0006248310526251631
+      }
+    },
+    {
+      "h": 0.1,
+      "n": 4,
+      "R1": {
+        "w_dofs": 49,
+        "compatible_w": 49,
+        "projected_w": 49,
+        "best_fit_norm": 4.8568602944539905e-15
+      },
+      "R": {
+        "w_dofs": 49,
+        "compatible_w": 22,
+        "projected_w": 22,
+        "best_fit_norm": 0.00011710903574114506
+      }
+    },
+    {
+      "h": 0.01,
+      "n": 2,
+      "R1": {
+        "w_dofs": 9,
+        "compatible_w": 9,
+        "projected_w": 9,
+        "best_fit_norm": 3.5239486955577174e-15
+      },
+      "R": {
+        "w_dofs": 9,
+        "compatible_w": 4,
+        "projected_w": 4,
+        "best_fit_norm": 0.0006248310526251245
+      }
+    },
+    {
+      "h": 0.01,
+      "n": 4,
+      "R1": {
+        "w_dofs": 49,
+        "compatible_w": 49,
+        "projected_w": 49,
+        "best_fit_norm": 4.156253905693982e-15
+      },
+      "R": {
+        "w_dofs": 49,
+        "compatible_w": 22,
+        "projected_w": 22,
+        "best_fit_norm": 0.0001171090357412183
+      }
+    },
+    {
+      "h": 0.001,
+      "n": 2,
+      "R1": {
+        "w_dofs": 9,
+        "compatible_w": 9,
+        "projected_w": 9,
+        "best_fit_norm": 2.902700959602078e-15
+      },
+      "R": {
+        "w_dofs": 9,
+        "compatible_w": 4,
+        "projected_w": 4,
+        "best_fit_norm": 0.0006248310526251861
+      }
+    },
+    {
+      "h": 0.001,
+      "n": 4,
+      "R1": {
+        "w_dofs": 49,
+        "compatible_w": 49,
+        "projected_w": 49,
+        "best_fit_norm": 4.2644883130562076e-15
+      },
+      "R": {
+        "w_dofs": 49,
+        "compatible_w": 22,
+        "projected_w": 22,
+        "best_fit_norm": 0.000117109035741084
+      }
+    }
+  ],
+  "seconds": 8.311999999976251,
+  "peak_bytes": 76353536,
+  "completed": true,
+  "product_shell_adopted": false
+}

@@ -1,0 +1,16 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "tools/design-experiments/mq3_interior_stationarity_v2.py": "b898743843570b9662df3526c8002271cdc830653b341a3a92bbd7bf13071760",
+    "tools/design-experiments/check_mq3_interior_v2.py": "8233ac1a22f3e5688877d46b87aa753ca2967799689c56f05e083864cd8434ae",
+    "tools/design-experiments/audit_mq3_interior_v2.py": "6fd14865b4a3f12a5eaa1bbb98a794a35e1364a7e295c2170faedabe3af3f09b",
+    "tools/design-experiments/mq3_interior_stationarity.py": "a1c347d32c529f74c753cdef64beedb6345942599ca3535713de25955e3d1dd9",
+    "tools/design-experiments/mq3_necessary_constraints.py": "8219e59189dff53fcd04e350000809d9d1249316bc22ce20d0e70374ff47954b",
+    "tools/design-experiments/mq3_factor_space.py": "869367789e4ae5de95d51957f508ffbd6d61d4691bb460b2c7aabfcc37c83fd2",
+    "tools/design-experiments/mq3_factor_family.py": "e995b30cbb7439aeb60cb9c1765185b2918998648541e6db173f01627fbd670a",
+    "docs/mq3-interior-stationarity-diagnostic.md": "333ffde8ff4a2675b079ddab7b635a532028f26cc77607560c4d8b3641f9c115",
+    "docs/verification/mq3-interior-audit-protocol.md": "497d303be229c8cf2a6151dcc3089aead9248ba5f5a56e15e70c5fa8fd4f41cf",
+    "docs/verification/mq3-interior-v2-fixed-operator-protocol.md": "7b382ff3f309346ef58c65bc77c34eb47ae15f253cb674e4441dcb1a50f7768a",
+    "docs/verification/mq3-interior-result.json": "aa9ae6538311537dd359195c80e02d846bf6ca5e4ef5f5537dcc0e5dc16971c7"
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "dihedral": 0,
+      "eps": 0.0,
+      "k": 0.05,
+      "matrix_error": 1.708067113833499e-16,
+      "wake_error": 1.8051503241704954e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 0.0,
+      "k": 0.2,
+      "matrix_error": 1.708067113833499e-16,
+      "wake_error": 2.1385882635968692e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 0.0,
+      "k": 0.8,
+      "matrix_error": 1.708067113833499e-16,
+      "wake_error": 2.206452932372338e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 1e-05,
+      "k": 0.05,
+      "matrix_error": 1.565964708171945e-16,
+      "wake_error": 1.8051452551514281e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 1e-05,
+      "k": 0.2,
+      "matrix_error": 1.565964708171945e-16,
+      "wake_error": 2.138583590986999e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 1e-05,
+      "k": 0.8,
+      "matrix_error": 1.565964708171945e-16,
+      "wake_error": 2.206458786836066e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 0.03,
+      "k": 0.05,
+      "matrix_error": 1.4245026015201153e-16,
+      "wake_error": 1.357623223125768e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 0.03,
+      "k": 0.2,
+      "matrix_error": 1.4245026015201153e-16,
+      "wake_error": 1.5738131145558862e-12
+    },
+    {
+      "dihedral": 0,
+      "eps": 0.03,
+      "k": 0.8,
+      "matrix_error": 1.4245026015201153e-16,
+      "wake_error": 1.90641276785565e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 0.0,
+      "k": 0.05,
+      "matrix_error": 1.3967153271299082e-16,
+      "wake_error": 1.7065338731135397e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 0.0,
+      "k": 0.2,
+      "matrix_error": 1.3967153271299082e-16,
+      "wake_error": 1.492003808055123e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 0.0,
+      "k": 0.8,
+      "matrix_error": 1.3967153271299082e-16,
+      "wake_error": 2.992646026639226e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 1e-05,
+      "k": 0.05,
+      "matrix_error": 1.5826351016095956e-16,
+      "wake_error": 1.7065380244143735e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 1e-05,
+      "k": 0.2,
+      "matrix_error": 1.5826351016095956e-16,
+      "wake_error": 1.4920157454141284e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 1e-05,
+      "k": 0.8,
+      "matrix_error": 1.5826351016095956e-16,
+      "wake_error": 2.99266307070818e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 0.03,
+      "k": 0.05,
+      "matrix_error": 1.736091631970418e-16,
+      "wake_error": 1.2969631543445436e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 0.03,
+      "k": 0.2,
+      "matrix_error": 1.736091631970418e-16,
+      "wake_error": 1.298799044204957e-12
+    },
+    {
+      "dihedral": 5,
+      "eps": 0.03,
+      "k": 0.8,
+      "matrix_error": 1.736091631970418e-16,
+      "wake_error": 2.3711634327656723e-12
+    }
+  ],
+  "seconds": 9.577999999979511,
+  "sources": {
+    "tools/design-experiments/check_ptera_scalar_reference.py": "f021f3c354d0caa6f6211730b654c6885f30d8a251d14e6e26a9f1be780c8d5d",
+    "tools/design-experiments/ptera_scalar_reference.py": "91c25012f0f46279356c2645024eecaf0bf94d88b7d92b767d4ecf5dabe88db6",
+    "build/reference-ptera/env/Lib/site-packages/pterasoftware/_aerodynamics_functions.py": "4a25d676287b1b693c360a5d25060fa08ea9fb63e78f7adb4e253d95c4191a6b",
+    "docs/verification/ptera-scalar-reference-protocol.md": "301c593a6420d546ada0ef19eb31b5033997e6ed271575ab5920f9e83cd794d9"
+  }
+}

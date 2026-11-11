@@ -1,0 +1,58 @@
+{
+  "candidate": "MMS-1 current finite-thickness specification",
+  "disposition": "not_adopted",
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "planned_primary_conditions": 8,
+  "executed_primary_conditions": 7,
+  "all_checks_primary_conditions": 6,
+  "coarse_numerical_conditions": 4,
+  "regular_n4_numerical_conditions": 2,
+  "distorted_n4_thick_resource_failure": true,
+  "distorted_n4_thin_executed": false,
+  "regular_finest_accuracy_pass": true,
+  "regular_finest_convergence_pass": true,
+  "regular_finest_thin_uniformity_pass": false,
+  "regular_finest_thin_amplifications": [
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": "quintic",
+      "thin_amplification": 34.557929206822465
+    },
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": "exponential",
+      "thin_amplification": 29.953307410834203
+    },
+    {
+      "amplitude": 0.0,
+      "field": "recovered_position_error",
+      "target": "quintic",
+      "thin_amplification": 38.990365420149764
+    },
+    {
+      "amplitude": 0.0,
+      "field": "recovered_position_error",
+      "target": "exponential",
+      "thin_amplification": 26.996650726311714
+    }
+  ],
+  "independent_n2_conditions": 2,
+  "independent_n2_all_passed": true,
+  "independent_n4_global_resolve": false,
+  "adoption_date": null,
+  "next": "Decompose saved n4 regular two thicknesses and distorted thick case into thickness variation, projected mean stress and six-face stabilization; no unmotivated candidate or threshold changes.",
+  "sources": {
+    "docs/verification/mixed-mean-stress-finite-curved-result.json": "3427e7457cf567b6e341eed599e32ff2c1802ae5a068b5eb385137b420a69810",
+    "docs/verification/mixed-mean-stress-curved-full-result.json": "8202e4e0abc9f293032bf02cdb43795b7162b6c121891fd168e14d6bc8ab18f7",
+    "docs/verification/mixed-mean-stress-finite-curved-preparation.json": "7d5bcf3cdd24aa69a067f1bd7f72893af5d24decb09f796d9f342714aa968eca",
+    "docs/verification/mixed-mean-stress-curved-full-preparation.json": "79ee8b285b0016f23f06fe6178066d7295bf987decb6782f8a2391850b041d3f",
+    "docs/verification/mixed-mean-stress-finite-curved-protocol.md": "89ba9292e31e889d43cabfd88be5ee290d2d670aaf83729bba16e22983cf9cfc",
+    "docs/verification/mixed-mean-stress-curved-full-protocol.md": "c847b959822ddf33edc957d46e8527dbe2b0cc36a8f8dc47a3b4362b1169eab5",
+    "docs/verification/mixed-mean-stress-finite-curved-results.md": "1c2bf11552dc4d5e4d0297de215d57dd4bd003616007c1c40b437b0ba8a5b1fd",
+    "docs/main-shell-completion-outlook-v10.md": "3d5b8f5acbf934f8a8cf9b024eecd54c79ad9944c1ddd71b92d0d1d277bcb440",
+    "docs/main-shell-adoption-exit-plan.md": "2e0e825cac7b258eba5619b9f5a55c17f53dcb8ac05fbe42dfedabe340834482"
+  }
+}

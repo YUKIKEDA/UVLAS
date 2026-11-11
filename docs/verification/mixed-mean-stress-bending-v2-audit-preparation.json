@@ -1,0 +1,7 @@
+{
+  "sources": {
+    "tools/design-experiments/audit_mixed_mean_stress_bending_v2.py": "b09955546bcd5bf763211b5097ce0c0bb5b3dedf41d6699914b5356e34eaffc3",
+    "docs/verification/mixed-mean-stress-bending-v2-result.json": "1fd3bdd1f855a2f0b1a71692c7a3ec86b992363626b16edb87ef58bdcfeef89e",
+    "docs/verification/mixed-mean-stress-bending-v2-run-preparation.json": "819c7ef243d74a59d9ec204387f70ab4e42808ba1ed8e225208087fd8674db95"
+  }
+}

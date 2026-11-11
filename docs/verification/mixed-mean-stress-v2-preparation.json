@@ -1,0 +1,13 @@
+{
+  "reason": "Same exact rational polynomial column span. Replace full Gauss-Jordan updates of all prior columns by sparse forward column elimination; coefficient conversion condition gate unchanged. Initial standalone preprocessing diagnostic was interrupted during the curved case; no primary adoption run was made.",
+  "sources": {
+    "tools/design-experiments/mixed_mean_stress_space_v2.py": "bd635f2169deebe80dfa89d9a0b12038f360f6c49e7e9cc0a4f819971a688e75",
+    "tools/design-experiments/mixed_mean_stress_thin_v2.py": "21eaf08300666a5df6ea0e20b0bb6852b11600a8bb72e9193a4c262bbb137024",
+    "tools/design-experiments/check_mixed_mean_stress_thin_v2.py": "2b4aa0260a507ef65cda4343995ec925fbd7a22a836615b4e3037076784366be",
+    "tools/design-experiments/mixed_mean_stress_space.py": "286fe9d9804f5cf559516597135aa59477a589380124e583d9db91a1d241b461",
+    "tools/design-experiments/mixed_mean_stress_thin.py": "0dbddd2f0cbbb34306fa06f054577c0acb0a476f2d1b88461fe5b3414d51ad03",
+    "tools/design-experiments/check_mixed_mean_stress_thin.py": "aaa962e1cd45e7001f47cfb45fffc2cccb28faccbfb9ec8ab900c7e8f846d2f6",
+    "docs/mixed-mean-stress-formulation.md": "b631e4888ec3e4a48bb69f65d4cd24237dee4c2214122c03763b401161e2e877",
+    "docs/verification/mixed-mean-stress-protocol.md": "1efb045fc1e82946fe630e12d24c239826f2b18ae13142e84e81a2fa46219b7f"
+  }
+}

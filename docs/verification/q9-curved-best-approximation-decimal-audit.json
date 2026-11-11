@@ -1,0 +1,25 @@
+{
+  "source_sha256": "0a2054d468dc0f016c210d37bdc3aaf20e71568e012524b27302553d1de60f67",
+  "parent_sha256": "94593641f336c35a6c3989476edd91dfe01a36c6de39ba469a50364139ba379e",
+  "artifact_sha256": "e8601b45225ff29362fceb5390e0c1c7eb18a8fe68124fafb8ad98e64354990c",
+  "protocol_sha256": "4ee7815e6e54f135635c6f1e8bb4515f2fd17afe3be30154b80d6eb552e2ea96",
+  "dependency_sha256": "96f43444a9548093ebb6163ba6588a502272aebea6370a146f57563a141db6ce",
+  "precision": 80,
+  "forward_interval_maximum_ratio": 0.17377085654644184,
+  "gradient_interval_maximum_ratio": 0.004258716807913265,
+  "decimal_lower_expression": "0.10667310293775096491943748758629809919407349663226407066982807589476914460897084",
+  "reported_lower_objective": 0.10629859249400711,
+  "decimal_feasible_objective": "0.10667366205211637671261778341623773428461599715503942078370055484271641519386700",
+  "reported_upper_objective": 0.10667366205211674,
+  "checks": {
+    "forward_interval": true,
+    "gradient_interval": true,
+    "positive_gram": true,
+    "lower": true,
+    "feasible": true,
+    "upper": true
+  },
+  "seconds": 2.0619999999762513,
+  "peak_bytes": 290140160,
+  "all_criteria_pass": true
+}

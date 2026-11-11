@@ -1,0 +1,902 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "h": 0.01,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 3.891110429060739e-15,
+      "constant_error": 5.773159728050814e-15,
+      "work_error": 7.955172945961382e-15,
+      "boundary_error": 9.558940423612767e-15,
+      "moment_error": 1.803974202738574e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n1-h0.01-c0.npz",
+      "artifact_sha256": "d8dc62233da9a3636937811f8e30978d2981cc75efe3f00dffad62f3e604e9c9"
+    },
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "h": 0.0001,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.148731734058659e-15,
+      "constant_error": 5.773159728050814e-15,
+      "work_error": 1.2168255123177923e-14,
+      "boundary_error": 1.2712240274118237e-14,
+      "moment_error": 1.5087740498739384e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n1-h0.0001-c0.npz",
+      "artifact_sha256": "96fe3c1ab490ddd11da47c1e168f32884fa7075bec2e2c995d9e9336ae12ffe9"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 7.108893109684446e-15,
+      "constant_error": 5.773159728050814e-15,
+      "work_error": 7.577420370961981e-15,
+      "boundary_error": 6.963725741210351e-15,
+      "moment_error": 2.1824873458345294e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.01-c0.npz",
+      "artifact_sha256": "6ec8989fa284e8c160de647077935e33dca20db6060ebf0f0c671ec65744c4f0"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "cell": 1,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 8.486305911505432e-15,
+      "constant_error": 1.116422879302717e-14,
+      "work_error": 1.4352345774877466e-14,
+      "boundary_error": 1.2653868296459366e-14,
+      "moment_error": 2.3715774185452473e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.01-c1.npz",
+      "artifact_sha256": "e17f7aa1aeec2728a3c16667dc342008e850ed67e1dcc86cfc2ebad671a34f7a"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "cell": 2,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.5633081298184515e-15,
+      "constant_error": 6.719554693371473e-15,
+      "work_error": 1.051645475152838e-14,
+      "boundary_error": 9.972403538174115e-15,
+      "moment_error": 1.977303239455433e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.01-c2.npz",
+      "artifact_sha256": "8f971759177d56a7dc8d22d9e1cb3ce08b808e0ac815670dc0afb305196b129e"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "cell": 3,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 7.922692311518881e-15,
+      "constant_error": 1.4876988529977098e-14,
+      "work_error": 1.2058506884299647e-14,
+      "boundary_error": 1.053485155980848e-14,
+      "moment_error": 2.1078938384174185e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.01-c3.npz",
+      "artifact_sha256": "f1f1ed154a9319437be1f84a50fcea11526b825160b919e2c109108614ba6d53"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.5469018551183736e-15,
+      "constant_error": 8.881784197001252e-15,
+      "work_error": 7.124444423227787e-15,
+      "boundary_error": 7.425861191641304e-15,
+      "moment_error": 1.9835800143706134e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.0001-c0.npz",
+      "artifact_sha256": "bdf915d5240bdeadbda1ef291e3dd92f63e5f5630033713dee4a8c6c3242c80b"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 1,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 6.526933239718186e-15,
+      "constant_error": 1.0550462141702924e-14,
+      "work_error": 1.3143508469622288e-14,
+      "boundary_error": 1.2223977891436297e-14,
+      "moment_error": 2.417080486814131e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.0001-c1.npz",
+      "artifact_sha256": "dd75d556a7b77c96366afae5259335666f5b6fc2aecc1cb7fe9a73edaeed728c"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 2,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.458858671847175e-15,
+      "constant_error": 6.661338147750939e-15,
+      "work_error": 9.120401827556658e-15,
+      "boundary_error": 9.505003933825963e-15,
+      "moment_error": 2.0535431994532828e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.0001-c2.npz",
+      "artifact_sha256": "cdeb3ff9f656413434f8c55fe3d3bf18581d81806218ca408172224828d8d9c0"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 3,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        53,
+        53,
+        53
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 7.535617751237723e-15,
+      "constant_error": 9.103828801926284e-15,
+      "work_error": 1.2177458988676048e-14,
+      "boundary_error": 1.1455041837197156e-14,
+      "moment_error": 2.352820461749372e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0-n2-h0.0001-c3.npz",
+      "artifact_sha256": "7495169dfac6373f7106da380bd2dd6ad69d93649c94d302e001dc7bbd2dccdc"
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "h": 0.01,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 5.059405654707117e-15,
+      "constant_error": 8.141989580224472e-15,
+      "work_error": 8.491724852375939e-15,
+      "boundary_error": 1.893835174213739e-14,
+      "moment_error": 2.0002590396379693e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n1-h0.01-c0.npz",
+      "artifact_sha256": "61ca5f28d9e517f570713b05a89122cb9fec8b182b6db2b993a565a3226f8663"
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "h": 0.0001,
+      "cell": 0,
+      "basis_ranks": [
+        105,
+        105,
+        105
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 5.536573835429992e-15,
+      "constant_error": 1.6431300764452317e-14,
+      "work_error": 6.406127819683452e-15,
+      "boundary_error": 1.5033904143777492e-12,
+      "moment_error": 1.7801929545033767e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n1-h0.0001-c0.npz",
+      "artifact_sha256": "45f50050bd483352f791c0e80cf4c1f6962e4d62ff12bf6a23034a75b7400fdb"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.01,
+      "cell": 0,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 9.777359709349038e-14,
+      "constant_error": 7.549516567451064e-15,
+      "work_error": 8.257509845639994e-15,
+      "boundary_error": 9.302294197216251e-15,
+      "moment_error": 2.724597221156114e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.01-c0.npz",
+      "artifact_sha256": "0d4820bd959abc7c2b70da715422bc033c75da205906397128cb8ca15e581bb2"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.01,
+      "cell": 1,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 6.156383017623019e-13,
+      "constant_error": 1.5679079994967106e-14,
+      "work_error": 1.1502589145697365e-13,
+      "boundary_error": 1.156071580392412e-13,
+      "moment_error": 1.457374823007304e-14,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.01-c1.npz",
+      "artifact_sha256": "0d73c5b2d93341b141dd63e3df8687d8261cb0b503eb48f356ef19c4f1dc5974"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.01,
+      "cell": 2,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 8.70184889580897e-14,
+      "constant_error": 7.549516567451064e-15,
+      "work_error": 1.4153031349982595e-14,
+      "boundary_error": 1.503501025015252e-14,
+      "moment_error": 3.150008828228148e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.01-c2.npz",
+      "artifact_sha256": "9baf34ef2772f0ad9621d679d2f22075b2660e934b08e5f2207ba6a461b17cd7"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.01,
+      "cell": 3,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.5033862343900405e-13,
+      "constant_error": 2.7977620220553945e-14,
+      "work_error": 1.2909455043071453e-13,
+      "boundary_error": 1.3020127688489424e-13,
+      "moment_error": 1.3769298328987621e-14,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.01-c3.npz",
+      "artifact_sha256": "0598edec8b381f3eab2f5ac79b369bcb7c9acec1cc0b5432fc8e1d007da83d16"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 0,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 3.939357030327841e-14,
+      "constant_error": 8.881784197001252e-15,
+      "work_error": 9.590200773976085e-15,
+      "boundary_error": 5.791618418334454e-13,
+      "moment_error": 2.7126094611856065e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.0001-c0.npz",
+      "artifact_sha256": "111912205820fcccebf708f133e28c4e3a0bda9049a2a0de6ecfbbfc5a9ddade"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 1,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.1416542595141237e-13,
+      "constant_error": 9.159339953157541e-15,
+      "work_error": 1.774543338467098e-13,
+      "boundary_error": 6.775286650693977e-13,
+      "moment_error": 5.976180188535614e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.0001-c1.npz",
+      "artifact_sha256": "9d544cf071c1cc8abb2d3321a6bc7675bea0c6bf5e8a2e6310f74145e1fdae26"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 2,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.047707012780542e-14,
+      "constant_error": 8.104628079763643e-15,
+      "work_error": 8.689973113016377e-15,
+      "boundary_error": 6.079611830111841e-13,
+      "moment_error": 2.6377572357689593e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.0001-c2.npz",
+      "artifact_sha256": "82b3f0fe522ba21fa367106ac18b31130ac4003582303be8fb56fd76c15b7f1f"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "h": 0.0001,
+      "cell": 3,
+      "basis_ranks": [
+        106,
+        106,
+        106
+      ],
+      "constraint_ranks": [
+        54,
+        54,
+        54
+      ],
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "field_difference": 4.88130216049954e-13,
+      "constant_error": 9.103828801926284e-15,
+      "work_error": 7.242013968959001e-14,
+      "boundary_error": 4.4160398388834344e-13,
+      "moment_error": 5.544676350904268e-15,
+      "checks": {
+        "basis_rank": true,
+        "constraint_rank": true,
+        "constraint_residual": true,
+        "zero_rhs": true,
+        "field": true,
+        "constant": true,
+        "work": true,
+        "boundary": true,
+        "moments": true,
+        "local_rank": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mq3-independent-20261103-101450/k0.4-n2-h0.0001-c3.npz",
+      "artifact_sha256": "92d18dce8ae360a0ff9f1a05697ee0a88476238f3f4675a0387e4913aa63a330"
+    }
+  ],
+  "shared": [
+    {
+      "kappa": 0.0,
+      "h": 0.01,
+      "internal_edges": 4,
+      "raw_moment_difference": 3.862379964327959e-16,
+      "modified_moment_difference": 1.3160535777741288e-14,
+      "global_work_difference": 1.3806653417676935e-14,
+      "constant_patch_error": 2.7755575615628914e-14,
+      "checks": {
+        "raw_moments": true,
+        "modified_moments": true,
+        "global_work": true,
+        "constant_patch": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.0001,
+      "internal_edges": 4,
+      "raw_moment_difference": 9.647508146835557e-16,
+      "modified_moment_difference": 7.875400934515424e-15,
+      "global_work_difference": 1.3891653420800197e-14,
+      "constant_patch_error": 2.6645352591003757e-14,
+      "checks": {
+        "raw_moments": true,
+        "modified_moments": true,
+        "global_work": true,
+        "constant_patch": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.01,
+      "internal_edges": 4,
+      "raw_moment_difference": 2.745907433875992e-16,
+      "modified_moment_difference": 1.5003343160843245e-14,
+      "global_work_difference": 1.2452735168905415e-13,
+      "constant_patch_error": 1.2145839889399213e-13,
+      "checks": {
+        "raw_moments": true,
+        "modified_moments": true,
+        "global_work": true,
+        "constant_patch": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.0001,
+      "internal_edges": 4,
+      "raw_moment_difference": 3.907716146142043e-16,
+      "modified_moment_difference": 1.030186162410401e-14,
+      "global_work_difference": 8.057182611608426e-13,
+      "constant_patch_error": 2.8632651805082787e-13,
+      "checks": {
+        "raw_moments": true,
+        "modified_moments": true,
+        "global_work": true,
+        "constant_patch": true
+      }
+    }
+  ],
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "independent_coefficient_construction": true,
+  "independent_mesh_generation": false,
+  "global_equilibrium_solved": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/audit_mq3_independent.py": "0b19ac7ef254f89f64382bee2a222f428bc4fe8f97d63995628ad58d5aa52377",
+    "tools/design-experiments/mq3_independent.py": "d4737fd1437b911dea242a959286fce5324c233826729e9d43b8c88c6ca91b29",
+    "tools/design-experiments/q3_curved_independent.py": "d62458b053fd7bd1dd8606d8747b0b8f640fc1294ac0559f88a5730f840138e4",
+    "tools/design-experiments/mq3_joint_moments.py": "8679b63ce11be12253215713d42f088b1a88358f432111354f1ca02c1898182c",
+    "docs/verification/mq3-local-feasibility-result.json": "940154b1d76809d2b2b221f8255da50c476e651830a91cf8dc59c4058da0a6b4",
+    "docs/verification/mq3-independent-audit-protocol.md": "b8f54268f5aeaf837954ec19b7e68cb93c48c1a6d0d258cfebf11ef94794739b"
+  },
+  "seconds": 18.82900000002701,
+  "peak_bytes": 358092800
+}

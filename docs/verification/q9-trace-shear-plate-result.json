@@ -1,0 +1,1812 @@
+{
+  "source_sha256": "1d523ac78046301be128e12c6d324123e30664e7366f97f030c3f58da76cdce6",
+  "protocol_sha256": "2f3caabdecbbaf20fcbe3d4f51af6d7d96747ce079113238b022a300fa3f56f4",
+  "protocol": "docs/verification/q9-trace-shear-plate-experiment.md",
+  "candidate_sha256": "164cebc47ad3df149a1c9bb6c6ac98fb25a21ef69d517182dab7838145815b34",
+  "gate_sha256": {
+    "q9-trace-shear-local-result.json": "c229af9c7e79a04958581c48346aa8e7073be687729ce7f4a0ee422755ddf874",
+    "q9-trace-shear-shared-result.json": "505f64d4472c6a5b7aeab0efb606ce814421a5cbc004385d0560e47edf488daa",
+    "q9-trace-shear-gates-audit.json": "324f9451a9c482108c030c5b77a9bbaf2721e74f950f5954e8f4088cf22bfe87",
+    "plate-modal-exact-reference-result.json": "879ea1f6966b24680e880ea9e2b2c6e9f7fe51f5b86af3d1ef4545be92677ff7"
+  },
+  "dependency_sha256": {
+    "check_q9_distorted_plate.py": "2193febfa3c254217f4a33644a061736f9b5835af8395ece0a4b9b8c8804393a",
+    "q9_trace_shear.py": "92db045fa88677ae8fbdad39ed6b7e616c95ea2df76caee21214b90dc1a8bb71",
+    "check_q9_precision_diagnostic.py": "5d339d42d180575a6f158107e493607d98298c5ec5c1491649e837d51ef767be",
+    "check_q9_plate_convergence.py": "909db42a881612996ce1381432bc03153c18f7b0107876a56a986f84316ffd9d"
+  },
+  "cases": [
+    {
+      "n": 2,
+      "h": 0.01,
+      "reference": {
+        "coefficients": [
+          -3.141364538609428e-05,
+          -3.141364538609428e-05,
+          1.0004326045609153e-05,
+          -8.45631657493582e-05
+        ],
+        "center": 1.0004326045609153e-05,
+        "pressure": 3.5680985726740826e-10,
+        "compliance": 8.923162465629133e-16
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.7999999999999997,
+        "area": 0.9999999999999999,
+        "area_error": 1.1102230246251565e-16,
+        "polynomial_error": 2.6645352591003757e-15,
+        "wrong_jacobian_error": 0.37399855263086734
+      },
+      "stiffness_7_vs_9": 3.3831183417972095e-14,
+      "load_7_vs_9": 9.845162824269553e-14,
+      "symmetry": 3.604359505737453e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.5675583597753645e-12,
+                "backward_normwise": 4.5408687616163796e-17,
+                "backward_componentwise": 8.460644468118823e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 1.6288375394369195e-12,
+            "float64_projected_standard_residual": 1.887403937852627e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.60009352885655e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.216115997188658e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.118071699756956e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "be1d1dd8e16f079f182d9a91b2c2ed776ef342b0924095c7fb23ca44afd07c50",
+            "observables": {
+              "center": 9.753789318604102e-06,
+              "compliance": 8.704938172360549e-16,
+              "center_relative": 0.025042839054111976,
+              "l2_relative": 0.03692353175969612,
+              "compliance_relative": 0.024455936346464147
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.5675583597753645e-12,
+                "backward_normwise": 4.5408687616163796e-17,
+                "backward_componentwise": 8.460644468118823e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 1.6288375394369195e-12,
+            "float64_projected_standard_residual": 1.887403937852627e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.60009352885655e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.216115997188658e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.118071699756956e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "be1d1dd8e16f079f182d9a91b2c2ed776ef342b0924095c7fb23ca44afd07c50",
+            "observables": {
+              "center": 9.753789318604102e-06,
+              "compliance": 8.704938172360549e-16,
+              "center_relative": 0.025042839054111976,
+              "l2_relative": 0.03692353175969612,
+              "compliance_relative": 0.024455936346464147
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.0112517465679535e-12,
+                "backward_normwise": 4.219915009418046e-17,
+                "backward_componentwise": 1.862603162562334e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.009366391080886e-12,
+            "float64_projected_standard_residual": 1.2253386248772163e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.600093528855774e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.2161159971905e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.118071699755e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "1b811939d72613106ac763d167152fe0b2bfb0106d9a39a759aa499a1efbeb69",
+            "observables": {
+              "center": 9.753789318604656e-06,
+              "compliance": 8.704938172360484e-16,
+              "center_relative": 0.025042839054056576,
+              "l2_relative": 0.03692353175967904,
+              "compliance_relative": 0.024455936346471363
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.0112517465679535e-12,
+                "backward_normwise": 4.219915009418046e-17,
+                "backward_componentwise": 1.862603162562334e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.009366391080886e-12,
+            "float64_projected_standard_residual": 1.2253386248772163e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.600093528855774e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.2161159971905e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.118071699755e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "1b811939d72613106ac763d167152fe0b2bfb0106d9a39a759aa499a1efbeb69",
+            "observables": {
+              "center": 9.753789318604656e-06,
+              "compliance": 8.704938172360484e-16,
+              "center_relative": 0.025042839054056576,
+              "l2_relative": 0.03692353175967904,
+              "compliance_relative": 0.024455936346471363
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 3.801026571962346e-12,
+        "center_relative": 5.684341886080802e-14,
+        "compliance_relative": 7.549516567451064e-15,
+        "position_relative": 1.8475726160575323e-13,
+        "first_thickness_derivative_relative": 5.726747549275836e-13,
+        "second_thickness_derivative_relative": 3.801026571962346e-12
+      },
+      "eligible": true,
+      "observables": {
+        "center": 9.753789318604656e-06,
+        "compliance": 8.704938172360484e-16,
+        "center_relative": 0.025042839054056576,
+        "l2_relative": 0.03692353175967904,
+        "compliance_relative": 0.024455936346471363
+      },
+      "seconds": 0.23399999999674037,
+      "peak_bytes": 68165632,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n2-h0.01.npz",
+      "artifact_sha256": "1abeff801fa4e036b3ab3fa49770aa5075d4a5fe4d028f6ab1e11a15dffaabec"
+    },
+    {
+      "n": 4,
+      "h": 0.01,
+      "reference": {
+        "coefficients": [
+          -3.141364538609428e-05,
+          -3.141364538609428e-05,
+          1.0004326045609153e-05,
+          -8.45631657493582e-05
+        ],
+        "center": 1.0004326045609153e-05,
+        "pressure": 3.5680985726740826e-10,
+        "compliance": 8.923162465629133e-16
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.6585786437626895,
+        "area": 0.9999999999999997,
+        "area_error": 3.3306690738754696e-16,
+        "polynomial_error": 7.105427357601002e-15,
+        "wrong_jacobian_error": 0.44563690382234533
+      },
+      "stiffness_7_vs_9": 4.4238952342358634e-10,
+      "load_7_vs_9": 1.0220030659175035e-15,
+      "symmetry": 3.7571922384890217e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 6.193671523631377e-12,
+                "backward_normwise": 4.0057707760038936e-17,
+                "backward_componentwise": 3.6537243584256223e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 6.394105933382323e-12,
+            "float64_projected_standard_residual": 7.497056547406372e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.888839284398913e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.146720207055759e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.841676314016715e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "876ec89d1ee938bea83d8896f0df6ee1ab1d7520f81185d3791267de48195188",
+            "observables": {
+              "center": 9.978961735808516e-06,
+              "compliance": 8.908497353586837e-16,
+              "center_relative": 0.0025353341829327247,
+              "l2_relative": 0.004500713659202041,
+              "compliance_relative": 0.001643488180203323
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 6.193671523631377e-12,
+                "backward_normwise": 4.0057707760038936e-17,
+                "backward_componentwise": 3.6537243584256223e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 6.394105933382323e-12,
+            "float64_projected_standard_residual": 7.497056547406372e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.888839284398913e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.146720207055759e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.841676314016715e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "876ec89d1ee938bea83d8896f0df6ee1ab1d7520f81185d3791267de48195188",
+            "observables": {
+              "center": 9.978961735808516e-06,
+              "compliance": 8.908497353586837e-16,
+              "center_relative": 0.0025353341829327247,
+              "l2_relative": 0.004500713659202041,
+              "compliance_relative": 0.001643488180203323
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 6.742125233402701e-12,
+                "backward_normwise": 6.817824216799607e-17,
+                "backward_componentwise": 8.94829110454796e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 6.917189504356497e-12,
+            "float64_projected_standard_residual": 7.918761106505471e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.888839284374259e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1467202070620655e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.841676313839872e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "bc7416e7d85bb28dec1d71e08435a0ab7d64d41bd0676069dac5b05f5c2753e9",
+            "observables": {
+              "center": 9.97896173578165e-06,
+              "compliance": 8.90849735356782e-16,
+              "center_relative": 0.002535334185618132,
+              "l2_relative": 0.004500713660006416,
+              "compliance_relative": 0.0016434881823346181
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 6.742125233402701e-12,
+                "backward_normwise": 6.817824216799607e-17,
+                "backward_componentwise": 8.94829110454796e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 6.917189504356497e-12,
+            "float64_projected_standard_residual": 7.918761106505471e-12,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.888839284374259e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1467202070620655e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.841676313839872e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "bc7416e7d85bb28dec1d71e08435a0ab7d64d41bd0676069dac5b05f5c2753e9",
+            "observables": {
+              "center": 9.97896173578165e-06,
+              "compliance": 8.90849735356782e-16,
+              "center_relative": 0.002535334185618132,
+              "l2_relative": 0.004500713660006416,
+              "compliance_relative": 0.0016434881823346181
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 2.723802074037562e-11,
+        "center_relative": 2.6922908347160046e-12,
+        "compliance_relative": 2.134736831749251e-12,
+        "position_relative": 2.5744601090749952e-12,
+        "first_thickness_derivative_relative": 9.976146623275752e-12,
+        "second_thickness_derivative_relative": 2.723802074037562e-11
+      },
+      "eligible": true,
+      "observables": {
+        "center": 9.97896173578165e-06,
+        "compliance": 8.90849735356782e-16,
+        "center_relative": 0.002535334185618132,
+        "l2_relative": 0.004500713660006416,
+        "compliance_relative": 0.0016434881823346181
+      },
+      "seconds": 0.9529999999795109,
+      "peak_bytes": 80855040,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n4-h0.01.npz",
+      "artifact_sha256": "c206f33909cf16b73bac794e48ecba7506047255d64abfcb02dc93368360e0da"
+    },
+    {
+      "n": 8,
+      "h": 0.01,
+      "reference": {
+        "coefficients": [
+          -3.141364538609428e-05,
+          -3.141364538609428e-05,
+          1.0004326045609153e-05,
+          -8.45631657493582e-05
+        ],
+        "center": 1.0004326045609153e-05,
+        "pressure": 3.5680985726740826e-10,
+        "compliance": 8.923162465629133e-16
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.6152240934977409,
+        "area": 0.9999999999999997,
+        "area_error": 3.3306690738754696e-16,
+        "polynomial_error": 1.509903313490213e-14,
+        "wrong_jacobian_error": 0.45016932911806684
+      },
+      "stiffness_7_vs_9": 2.523191012495874e-09,
+      "load_7_vs_9": 1.1155295517356875e-15,
+      "symmetry": 3.032439636494495e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 3.306798120414765e-11,
+                "backward_normwise": 1.0592308354726363e-16,
+                "backward_componentwise": 1.7309951740781446e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 3.3770108984130496e-11,
+            "float64_projected_standard_residual": 3.6741124795915134e-11,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.9739955865374e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.14167318160433e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.577066048125061e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "6df38b5a17ed058d29a7a9d3b315083f200a2af0f2b5cc8bdc895b6d9186b0fe",
+            "observables": {
+              "center": 1.0002480469894007e-05,
+              "compliance": 8.922229604677584e-16,
+              "center_relative": 0.00018447776559171736,
+              "l2_relative": 0.00055862139117574,
+              "compliance_relative": 0.00010454375958546258
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 3.306798120414765e-11,
+                "backward_normwise": 1.0592308354726363e-16,
+                "backward_componentwise": 1.7309951740781446e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 3.3770108984130496e-11,
+            "float64_projected_standard_residual": 3.6741124795915134e-11,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.9739955865374e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.14167318160433e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.577066048125061e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "6df38b5a17ed058d29a7a9d3b315083f200a2af0f2b5cc8bdc895b6d9186b0fe",
+            "observables": {
+              "center": 1.0002480469894007e-05,
+              "compliance": 8.922229604677584e-16,
+              "center_relative": 0.00018447776559171736,
+              "l2_relative": 0.00055862139117574,
+              "compliance_relative": 0.00010454375958546258
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 3.52618633841802e-11,
+                "backward_normwise": 8.785066590010893e-17,
+                "backward_componentwise": 1.3735725205927216e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 3.5631148545866956e-11,
+            "float64_projected_standard_residual": 4.0193912010756135e-11,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.973995586567586e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1416731816184195e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.577066047767365e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "4606d2038d789f3a49987eafbb0a039a4e6073ca5fc1870d3d16517ce1a2632e",
+            "observables": {
+              "center": 1.0002480469921599e-05,
+              "compliance": 8.922229604704867e-16,
+              "center_relative": 0.00018447776283381234,
+              "l2_relative": 0.0005586213906098464,
+              "compliance_relative": 0.00010454375652790837
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 3.52618633841802e-11,
+                "backward_normwise": 8.785066590010893e-17,
+                "backward_componentwise": 1.3735725205927216e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 3.5631148545866956e-11,
+            "float64_projected_standard_residual": 4.0193912010756135e-11,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.973995586567586e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1416731816184195e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.577066047767365e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "4606d2038d789f3a49987eafbb0a039a4e6073ca5fc1870d3d16517ce1a2632e",
+            "observables": {
+              "center": 1.0002480469921599e-05,
+              "compliance": 8.922229604704867e-16,
+              "center_relative": 0.00018447776283381234,
+              "l2_relative": 0.0005586213906098464,
+              "compliance_relative": 0.00010454375652790837
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 9.584124240032238e-11,
+        "center_relative": 2.758460126983664e-12,
+        "compliance_relative": 3.0578872767250687e-12,
+        "position_relative": 3.5727583576414635e-12,
+        "first_thickness_derivative_relative": 1.3127734254045613e-11,
+        "second_thickness_derivative_relative": 9.584124240032238e-11
+      },
+      "eligible": true,
+      "observables": {
+        "center": 1.0002480469921599e-05,
+        "compliance": 8.922229604704867e-16,
+        "center_relative": 0.00018447776283381234,
+        "l2_relative": 0.0005586213906098464,
+        "compliance_relative": 0.00010454375652790837
+      },
+      "seconds": 8.125,
+      "peak_bytes": 139616256,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n8-h0.01.npz",
+      "artifact_sha256": "5878cc090a36bac3644aa68bc76293d625606d6f1683382754bc8ddad1bba14e"
+    },
+    {
+      "n": 16,
+      "h": 0.01,
+      "reference": {
+        "coefficients": [
+          -3.141364538609428e-05,
+          -3.141364538609428e-05,
+          1.0004326045609153e-05,
+          -8.45631657493582e-05
+        ],
+        "center": 1.0004326045609153e-05,
+        "pressure": 3.5680985726740826e-10,
+        "compliance": 8.923162465629133e-16
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.6038429439193536,
+        "area": 0.9999999999999993,
+        "area_error": 6.661338147750939e-16,
+        "polynomial_error": 4.263256414560601e-14,
+        "wrong_jacobian_error": 0.4364344547372079
+      },
+      "stiffness_7_vs_9": 3.589218603291769e-09,
+      "load_7_vs_9": 1.1560200546206423e-15,
+      "symmetry": 3.0237980004677914e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.633224631094963e-10,
+                "backward_normwise": 1.6078318092988475e-16,
+                "backward_componentwise": 2.5555509799364522e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.6424709149809726e-10,
+            "float64_projected_standard_residual": 1.7657751910437408e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.996646540231926e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.141376503972205e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.488599549066101e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "66b97ff6397fbfed4ae5085663836f7f5e6b8128f56adeba48ef3004f9fff109",
+            "observables": {
+              "center": 1.0004206518526341e-05,
+              "compliance": 8.923103959433266e-16,
+              "center_relative": 1.1947539721002265e-05,
+              "l2_relative": 6.967691971819715e-05,
+              "compliance_relative": 6.556665990586907e-06
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.633224631094963e-10,
+                "backward_normwise": 1.6078318092988475e-16,
+                "backward_componentwise": 2.5555509799364522e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.6424709149809726e-10,
+            "float64_projected_standard_residual": 1.7657751910437408e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.996646540231926e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.141376503972205e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.488599549066101e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "66b97ff6397fbfed4ae5085663836f7f5e6b8128f56adeba48ef3004f9fff109",
+            "observables": {
+              "center": 1.0004206518526341e-05,
+              "compliance": 8.923103959433266e-16,
+              "center_relative": 1.1947539721002265e-05,
+              "l2_relative": 6.967691971819715e-05,
+              "compliance_relative": 6.556665990586907e-06
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.5956795169901157e-10,
+                "backward_normwise": 1.2851908135520879e-16,
+                "backward_componentwise": 8.614871716639949e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 1.6061786847751484e-10,
+            "float64_projected_standard_residual": 1.7054040948037696e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.996646540235905e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.141376503968893e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.488599548955555e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "8671185c190faef224c803255c86e192489a294a4eb5d45f7be84548876cf435",
+            "observables": {
+              "center": 1.000420651852877e-05,
+              "compliance": 8.923103959438583e-16,
+              "center_relative": 1.194753947819649e-05,
+              "l2_relative": 6.967691966518166e-05,
+              "compliance_relative": 6.55666539473021e-06
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.5956795169901157e-10,
+                "backward_normwise": 1.2851908135520879e-16,
+                "backward_componentwise": 8.614871716639949e-16
+              }
+            ],
+            "float64_projected_fsum_residual": 1.6061786847751484e-10,
+            "float64_projected_standard_residual": 1.7054040948037696e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.996646540235905e-06,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.141376503968893e-05,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.488599548955555e-05,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "8671185c190faef224c803255c86e192489a294a4eb5d45f7be84548876cf435",
+            "observables": {
+              "center": 1.000420651852877e-05,
+              "compliance": 8.923103959438583e-16,
+              "center_relative": 1.194753947819649e-05,
+              "l2_relative": 6.967691966518166e-05,
+              "compliance_relative": 6.55666539473021e-06
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 4.621647338179452e-11,
+        "center_relative": 2.4280577548552174e-13,
+        "compliance_relative": 5.958566973163215e-13,
+        "position_relative": 1.5645710096979746e-12,
+        "first_thickness_derivative_relative": 5.405389514130235e-12,
+        "second_thickness_derivative_relative": 4.621647338179452e-11
+      },
+      "eligible": true,
+      "observables": {
+        "center": 1.000420651852877e-05,
+        "compliance": 8.923103959438583e-16,
+        "center_relative": 1.194753947819649e-05,
+        "l2_relative": 6.967691966518166e-05,
+        "compliance_relative": 6.55666539473021e-06
+      },
+      "seconds": 38.46799999999348,
+      "peak_bytes": 404688896,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n16-h0.01.npz",
+      "artifact_sha256": "e1a64c38d88cfa0b01dffeac0b618961029b9bb4265f7fae4dec23d2cb552966"
+    },
+    {
+      "n": 2,
+      "h": 0.001,
+      "reference": {
+        "coefficients": [
+          -3.1415903724139864e-06,
+          -3.1415903724139864e-06,
+          1.0000043261752862e-06,
+          -8.45962747143538e-06
+        ],
+        "center": 1.0000043261752862e-06,
+        "pressure": 3.568098572674082e-14,
+        "compliance": 8.920275589489644e-21
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.7999999999999997,
+        "area": 0.9999999999999999,
+        "area_error": 1.1102230246251565e-16,
+        "polynomial_error": 2.6645352591003757e-15,
+        "wrong_jacobian_error": 0.37399855263086734
+      },
+      "stiffness_7_vs_9": 3.3967609955851646e-14,
+      "load_7_vs_9": 9.843386754990991e-14,
+      "symmetry": 3.8749207455281e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.7156659769918522e-10,
+                "backward_normwise": 5.000640263215743e-17,
+                "backward_componentwise": 4.296739873552393e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.7784167388320225e-10,
+            "float64_projected_standard_residual": 1.8463804648344805e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.595954736117025e-07,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.2163559671953816e-06,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.121699634119408e-06,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "09547513f1e6f217c2adf870b59f414e72ecd32946ad78a4688673f5d915e9bd",
+            "observables": {
+              "center": 9.749553437571355e-07,
+              "compliance": 8.702060182723722e-21,
+              "center_relative": 0.025048874052330805,
+              "l2_relative": 0.036928290357274546,
+              "compliance_relative": 0.02446285482738164
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.7156659769918522e-10,
+                "backward_normwise": 5.000640263215743e-17,
+                "backward_componentwise": 4.296739873552393e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.7784167388320225e-10,
+            "float64_projected_standard_residual": 1.8463804648344805e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.595954736117025e-07,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.2163559671953816e-06,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.121699634119408e-06,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "09547513f1e6f217c2adf870b59f414e72ecd32946ad78a4688673f5d915e9bd",
+            "observables": {
+              "center": 9.749553437571355e-07,
+              "compliance": 8.702060182723722e-21,
+              "center_relative": 0.025048874052330805,
+              "l2_relative": 0.036928290357274546,
+              "compliance_relative": 0.02446285482738164
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.528378646054588e-10,
+                "backward_normwise": 4.6733942209445305e-17,
+                "backward_componentwise": 1.582744831213533e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.5304326891844955e-10,
+            "float64_projected_standard_residual": 1.6688000592518915e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.59595473507732e-07,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.2163559667966154e-06,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.121699633145017e-06,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "9ca0c6466f0b197b903f548dc7d6bf5ed4ed892460c2d7d7950d1b36de0fa816",
+            "observables": {
+              "center": 9.749553436471271e-07,
+              "compliance": 8.702060181753675e-21,
+              "center_relative": 0.025048874162338808,
+              "l2_relative": 0.036928290427685063,
+              "compliance_relative": 0.024462854936127987
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 1.528378646054588e-10,
+                "backward_normwise": 4.6733942209445305e-17,
+                "backward_componentwise": 1.582744831213533e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 1.5304326891844955e-10,
+            "float64_projected_standard_residual": 1.6688000592518915e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.59595473507732e-07,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.2163559667966154e-06,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 9.121699633145017e-06,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "9ca0c6466f0b197b903f548dc7d6bf5ed4ed892460c2d7d7950d1b36de0fa816",
+            "observables": {
+              "center": 9.749553436471271e-07,
+              "compliance": 8.702060181753675e-21,
+              "center_relative": 0.025048874162338808,
+              "l2_relative": 0.036928290427685063,
+              "compliance_relative": 0.024462854936127987
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 6.4360499208793596e-09,
+        "center_relative": 1.1283440848330883e-10,
+        "compliance_relative": 1.1147327505511839e-10,
+        "position_relative": 1.0834830330986242e-10,
+        "first_thickness_derivative_relative": 1.2398073317287002e-10,
+        "second_thickness_derivative_relative": 6.4360499208793596e-09
+      },
+      "eligible": true,
+      "observables": {
+        "center": 9.749553436471271e-07,
+        "compliance": 8.702060181753675e-21,
+        "center_relative": 0.025048874162338808,
+        "l2_relative": 0.036928290427685063,
+        "compliance_relative": 0.024462854936127987
+      },
+      "seconds": 0.5150000000139698,
+      "peak_bytes": 404688896,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n2-h0.001.npz",
+      "artifact_sha256": "7a7f8b7787e046221978ee1a09211c3fef77eb9cd10715b8599ffb0d374feed8"
+    },
+    {
+      "n": 4,
+      "h": 0.001,
+      "reference": {
+        "coefficients": [
+          -3.1415903724139864e-06,
+          -3.1415903724139864e-06,
+          1.0000043261752862e-06,
+          -8.45962747143538e-06
+        ],
+        "center": 1.0000043261752862e-06,
+        "pressure": 3.568098572674082e-14,
+        "compliance": 8.920275589489644e-21
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.6585786437626895,
+        "area": 0.9999999999999997,
+        "area_error": 3.3306690738754696e-16,
+        "polynomial_error": 7.105427357601002e-15,
+        "wrong_jacobian_error": 0.44563690382234533
+      },
+      "stiffness_7_vs_9": 4.429393245636528e-10,
+      "load_7_vs_9": 9.455338897093169e-16,
+      "symmetry": 3.072564358590025e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 8.573790442811761e-10,
+                "backward_normwise": 6.804648018331212e-17,
+                "backward_componentwise": 1.1640263471679732e-14
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 2.2962174697876354e-20,
+                "backward_normwise": 1.7636153636363502e-27,
+                "backward_componentwise": 2.0562127075915945e-25
+              }
+            ],
+            "float64_projected_fsum_residual": 2.961638308164639e-10,
+            "float64_projected_standard_residual": 5.778281682254156e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.884588938837277e-07,
+                "max_abs_correction": 3.8073919220843987e-17
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1470564989921003e-06,
+                "max_abs_correction": 1.7047978019503127e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.845416232982362e-06,
+                "max_abs_correction": 6.953860976085212e-16
+              }
+            },
+            "retained_scaled_solution_sha256": "7397054ab5b28c40246578c128196cef25bc56648287bf68ccc385457b6c8545",
+            "observables": {
+              "center": 9.974671314181345e-07,
+              "compliance": 8.905610235147993e-21,
+              "center_relative": 0.002537183780849994,
+              "l2_relative": 0.004501115342005815,
+              "compliance_relative": 0.0016440472264029893
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 8.573790442811761e-10,
+                "backward_normwise": 6.804648018331212e-17,
+                "backward_componentwise": 1.1640263471679732e-14
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 2.2962174697876354e-20,
+                "backward_normwise": 1.7636153636363502e-27,
+                "backward_componentwise": 2.0562127075915945e-25
+              }
+            ],
+            "float64_projected_fsum_residual": 2.961638308164714e-10,
+            "float64_projected_standard_residual": 5.778281682254156e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.884588938837277e-07,
+                "max_abs_correction": 3.8073919220843987e-17
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1470564989921003e-06,
+                "max_abs_correction": 1.7047978019503127e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.845416232982362e-06,
+                "max_abs_correction": 6.953860976085212e-16
+              }
+            },
+            "retained_scaled_solution_sha256": "578703f5ab071453b6242a3398e75d58d9db3875b3b793f4725c34b7e207676f",
+            "observables": {
+              "center": 9.974671314181345e-07,
+              "compliance": 8.905610235147993e-21,
+              "center_relative": 0.002537183780849994,
+              "l2_relative": 0.004501115342005815,
+              "compliance_relative": 0.0016440472264029893
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 7.910745368193573e-10,
+                "backward_normwise": 5.281296044773768e-17,
+                "backward_componentwise": 6.051339787253729e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 8.236406165332957e-10,
+            "float64_projected_standard_residual": 9.601038230075374e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.884588940555384e-07,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.147056499690273e-06,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.845416233415291e-06,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "540ef0ca664f816fa4c10f675d94579510c52a22347b86637e65e39feeefe394",
+            "observables": {
+              "center": 9.974671315616359e-07,
+              "compliance": 8.905610236562286e-21,
+              "center_relative": 0.0025371836373492274,
+              "l2_relative": 0.004501115284729082,
+              "compliance_relative": 0.0016440470678548147
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 7.910745368193573e-10,
+                "backward_normwise": 5.281296044773768e-17,
+                "backward_componentwise": 6.051339787253729e-15
+              }
+            ],
+            "float64_projected_fsum_residual": 8.236406165332957e-10,
+            "float64_projected_standard_residual": 9.601038230075374e-10,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.884588940555384e-07,
+                "max_abs_correction": 0.0
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.147056499690273e-06,
+                "max_abs_correction": 0.0
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.845416233415291e-06,
+                "max_abs_correction": 0.0
+              }
+            },
+            "retained_scaled_solution_sha256": "540ef0ca664f816fa4c10f675d94579510c52a22347b86637e65e39feeefe394",
+            "observables": {
+              "center": 9.974671315616359e-07,
+              "compliance": 8.905610236562286e-21,
+              "center_relative": 0.0025371836373492274,
+              "l2_relative": 0.004501115284729082,
+              "compliance_relative": 0.0016440470678548147
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 3.648946835575676e-09,
+        "center_relative": 1.4386569713309427e-10,
+        "compliance_relative": 1.5880918802224642e-10,
+        "position_relative": 1.4431715103385996e-10,
+        "first_thickness_derivative_relative": 1.8986924076640717e-10,
+        "second_thickness_derivative_relative": 3.648946835575676e-09
+      },
+      "eligible": true,
+      "observables": {
+        "center": 9.974671315616359e-07,
+        "compliance": 8.905610236562286e-21,
+        "center_relative": 0.0025371836373492274,
+        "l2_relative": 0.004501115284729082,
+        "compliance_relative": 0.0016440470678548147
+      },
+      "seconds": 2.6410000000032596,
+      "peak_bytes": 404688896,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n4-h0.001.npz",
+      "artifact_sha256": "6c9c998862072f46c2b1ed1a68b27a7fb512a936658b9eb5d2695732a60aa8f8"
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "reference": {
+        "coefficients": [
+          -3.1415903724139864e-06,
+          -3.1415903724139864e-06,
+          1.0000043261752862e-06,
+          -8.45962747143538e-06
+        ],
+        "center": 1.0000043261752862e-06,
+        "pressure": 3.568098572674082e-14,
+        "compliance": 8.920275589489644e-21
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.6152240934977409,
+        "area": 0.9999999999999997,
+        "area_error": 3.3306690738754696e-16,
+        "polynomial_error": 1.509903313490213e-14,
+        "wrong_jacobian_error": 0.45016932911806684
+      },
+      "stiffness_7_vs_9": 2.5336214253720607e-09,
+      "load_7_vs_9": 1.0353221319914378e-15,
+      "symmetry": 3.149347482520907e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 5.223471690387964e-09,
+                "backward_normwise": 1.169219476196823e-16,
+                "backward_componentwise": 4.5770670399109e-14
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 4.007622124534321e-19,
+                "backward_normwise": 9.867818574412384e-27,
+                "backward_componentwise": 7.386072790429026e-24
+              }
+            ],
+            "float64_projected_fsum_residual": 9.899814556148186e-10,
+            "float64_projected_standard_residual": 1.9874656918094506e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.969720133910899e-07,
+                "max_abs_correction": 1.176183597810217e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1419522882140743e-06,
+                "max_abs_correction": 4.96161407315468e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.580933783144752e-06,
+                "max_abs_correction": 2.4395141803986928e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "d3aee8d22d587642d45e74427f41349bdd52777373e4c6069037fd7bf1a7aa4c",
+            "observables": {
+              "center": 9.998194687665183e-07,
+              "compliance": 8.919342628799864e-21,
+              "center_relative": 0.0001848566090458803,
+              "l2_relative": 0.0005586691748042303,
+              "compliance_relative": 0.00010458877423913382
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 5.223471690387964e-09,
+                "backward_normwise": 1.169219476196823e-16,
+                "backward_componentwise": 4.5770670399109e-14
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 4.007622124534321e-19,
+                "backward_normwise": 9.867818574412384e-27,
+                "backward_componentwise": 7.386072790429026e-24
+              }
+            ],
+            "float64_projected_fsum_residual": 9.899814556148186e-10,
+            "float64_projected_standard_residual": 1.9874656918094506e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.969720133910899e-07,
+                "max_abs_correction": 1.176183597810217e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1419522882140743e-06,
+                "max_abs_correction": 4.96161407315468e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.580933783144752e-06,
+                "max_abs_correction": 2.4395141803986928e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "5f370badc36b4729242d0ba8789cd2ef31c19f575f8113c8eda1f85a1c0e6d8c",
+            "observables": {
+              "center": 9.998194687665183e-07,
+              "compliance": 8.919342628799864e-21,
+              "center_relative": 0.0001848566090458803,
+              "l2_relative": 0.0005586691748042303,
+              "compliance_relative": 0.00010458877423913382
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 4.745890715925589e-09,
+                "backward_normwise": 1.0526483392865368e-16,
+                "backward_componentwise": 5.01011333017345e-14
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 7.43622981231317e-19,
+                "backward_normwise": 2.3894312305008592e-26,
+                "backward_componentwise": 3.840219376810171e-24
+              }
+            ],
+            "float64_projected_fsum_residual": 1.0283617120245867e-09,
+            "float64_projected_standard_residual": 1.8917097177041336e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.969720137062745e-07,
+                "max_abs_correction": 1.5320507263137184e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1419522896855243e-06,
+                "max_abs_correction": 6.921809249361109e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.580933784559454e-06,
+                "max_abs_correction": 2.577415379376429e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "2f009941c31ab7d2a26cb3187737b1eb8076e09029774e6829290ecc2b21084c",
+            "observables": {
+              "center": 9.99819468878587e-07,
+              "compliance": 8.919342629763855e-21,
+              "center_relative": 0.0001848564969775257,
+              "l2_relative": 0.0005586691545485234,
+              "compliance_relative": 0.00010458866617168994
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 4.745890715925589e-09,
+                "backward_normwise": 1.0526483392865368e-16,
+                "backward_componentwise": 5.01011333017345e-14
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 7.43622981231317e-19,
+                "backward_normwise": 2.3894312305008592e-26,
+                "backward_componentwise": 3.840219376810171e-24
+              }
+            ],
+            "float64_projected_fsum_residual": 1.0283617120245867e-09,
+            "float64_projected_standard_residual": 1.8917097177041336e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.969720137062745e-07,
+                "max_abs_correction": 1.5320507263137184e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1419522896855243e-06,
+                "max_abs_correction": 6.921809249361109e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.580933784559454e-06,
+                "max_abs_correction": 2.577415379376429e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "dcbce0215fd021c5c5434d4b7d9b510093990ce51976d78146aa19d9c9ee55aa",
+            "observables": {
+              "center": 9.99819468878587e-07,
+              "compliance": 8.919342629763855e-21,
+              "center_relative": 0.0001848564969775257,
+              "l2_relative": 0.0005586691545485234,
+              "compliance_relative": 0.00010458866617168994
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 1.0443382113040128e-09,
+        "center_relative": 1.120890047445755e-10,
+        "compliance_relative": 1.0807876815732698e-10,
+        "position_relative": 1.4460626155335153e-10,
+        "first_thickness_derivative_relative": 1.950269058739607e-10,
+        "second_thickness_derivative_relative": 1.0443382113040128e-09
+      },
+      "eligible": true,
+      "observables": {
+        "center": 9.99819468878587e-07,
+        "compliance": 8.919342629763855e-21,
+        "center_relative": 0.0001848564969775257,
+        "l2_relative": 0.0005586691545485234,
+        "compliance_relative": 0.00010458866617168994
+      },
+      "seconds": 11.25,
+      "peak_bytes": 404688896,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n8-h0.001.npz",
+      "artifact_sha256": "49849235902fec7a08204833a01260ee075b2311b236da7116320e4037cbbd6c"
+    },
+    {
+      "n": 16,
+      "h": 0.001,
+      "reference": {
+        "coefficients": [
+          -3.1415903724139864e-06,
+          -3.1415903724139864e-06,
+          1.0000043261752862e-06,
+          -8.45962747143538e-06
+        ],
+        "center": 1.0000043261752862e-06,
+        "pressure": 3.568098572674082e-14,
+        "compliance": 8.920275589489644e-21
+      },
+      "geometry": {
+        "minimum_scaled_determinant": 0.6038429439193536,
+        "area": 0.9999999999999993,
+        "area_error": 6.661338147750939e-16,
+        "polynomial_error": 4.263256414560601e-14,
+        "wrong_jacobian_error": 0.4364344547372079
+      },
+      "stiffness_7_vs_9": 3.628255163376608e-09,
+      "load_7_vs_9": 1.1471888495212447e-15,
+      "symmetry": 3.124186888756773e-17,
+      "assembly_pass": true,
+      "solves": {
+        "7": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 2.709129836690604e-08,
+                "backward_normwise": 1.908595634399773e-16,
+                "backward_componentwise": 1.3190611487259313e-12
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 1.0264396743546881e-17,
+                "backward_normwise": 7.369586547579718e-26,
+                "backward_componentwise": 3.115212635272041e-22
+              }
+            ],
+            "float64_projected_fsum_residual": 3.956948651383839e-09,
+            "float64_projected_standard_residual": 7.572495269940497e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.992365430847863e-07,
+                "max_abs_correction": 3.4372215834753243e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.141612523143479e-06,
+                "max_abs_correction": 1.2758247420769503e-15
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.492317301026653e-06,
+                "max_abs_correction": 4.94550435353085e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "6764450335307a252b2451c308b241d6cf62858ec8b37c084b54e9e5833a4e61",
+            "observables": {
+              "center": 9.999922970992492e-07,
+              "compliance": 8.920217066194738e-21,
+              "center_relative": 1.2029023997328636e-05,
+              "l2_relative": 6.968175039440521e-05,
+              "compliance_relative": 6.560704803204587e-06
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 2.709129836690604e-08,
+                "backward_normwise": 1.908595634399773e-16,
+                "backward_componentwise": 1.3190611487259313e-12
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 1.0264396743546881e-17,
+                "backward_normwise": 7.369586547579718e-26,
+                "backward_componentwise": 3.115212635272041e-22
+              }
+            ],
+            "float64_projected_fsum_residual": 3.9569486513838314e-09,
+            "float64_projected_standard_residual": 7.572495269940497e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.992365430847863e-07,
+                "max_abs_correction": 3.4372215834753243e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.141612523143479e-06,
+                "max_abs_correction": 1.2758247420769503e-15
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.492317301026653e-06,
+                "max_abs_correction": 4.94550435353085e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "c79a4edbd48772be41bd5f2fbee73c21790b53ee00a198dd603227050ef8145e",
+            "observables": {
+              "center": 9.999922970992492e-07,
+              "compliance": 8.920217066194738e-21,
+              "center_relative": 1.2029023997328636e-05,
+              "l2_relative": 6.968175039440521e-05,
+              "compliance_relative": 6.560704803204587e-06
+            }
+          }
+        },
+        "9": {
+          "70": {
+            "decimal_digits": 70,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 3.110204841135657e-08,
+                "backward_normwise": 1.94009410872093e-16,
+                "backward_componentwise": 5.308688715384599e-13
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 3.0559250690619305e-18,
+                "backward_normwise": 2.517670487978774e-26,
+                "backward_componentwise": 5.802418114084378e-23
+              }
+            ],
+            "float64_projected_fsum_residual": 3.948044628687697e-09,
+            "float64_projected_standard_residual": 7.186521263008614e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.99236543868579e-07,
+                "max_abs_correction": 1.1228438155392456e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1416125257498877e-06,
+                "max_abs_correction": 6.547433392168917e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.492317304054196e-06,
+                "max_abs_correction": 3.07716058309173e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "2c97de69ff0d35b8201b1ec1bd86ae432571be95e4eedb7431c8ef2c29b995a4",
+            "observables": {
+              "center": 9.999922974802834e-07,
+              "compliance": 8.920217069861002e-21,
+              "center_relative": 1.2028642964789782e-05,
+              "l2_relative": 6.968171196066767e-05,
+              "compliance_relative": 6.5602937997510935e-06
+            }
+          },
+          "90": {
+            "decimal_digits": 90,
+            "eligible": true,
+            "history": [
+              {
+                "corrections": 0,
+                "relative_residual": 3.110204841135657e-08,
+                "backward_normwise": 1.94009410872093e-16,
+                "backward_componentwise": 5.308688715384599e-13
+              },
+              {
+                "corrections": 1,
+                "relative_residual": 3.0559250690619305e-18,
+                "backward_normwise": 2.517670487978774e-26,
+                "backward_componentwise": 5.802418114084378e-23
+              }
+            ],
+            "float64_projected_fsum_residual": 3.948044628687704e-09,
+            "float64_projected_standard_residual": 7.186521263008614e-09,
+            "physical_correction_groups": {
+              "position": {
+                "max_abs_initial": 9.99236543868579e-07,
+                "max_abs_correction": 1.1228438155392456e-16
+              },
+              "first_thickness_derivative": {
+                "max_abs_initial": 3.1416125257498877e-06,
+                "max_abs_correction": 6.547433392168917e-16
+              },
+              "second_thickness_derivative": {
+                "max_abs_initial": 8.492317304054196e-06,
+                "max_abs_correction": 3.07716058309173e-15
+              }
+            },
+            "retained_scaled_solution_sha256": "239585585f100af2b5a5650230724948cc3e0fc79c0bfb36c83cd83355155418",
+            "observables": {
+              "center": 9.999922974802834e-07,
+              "compliance": 8.920217069861002e-21,
+              "center_relative": 1.2028642964789782e-05,
+              "l2_relative": 6.968171196066767e-05,
+              "compliance_relative": 6.5602937997510935e-06
+            }
+          }
+        }
+      },
+      "precision_comparisons": {
+        "7": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        },
+        "9": {
+          "physical_solution_relative": 0.0,
+          "center_relative": 0.0,
+          "compliance_relative": 0.0,
+          "position_relative": 0.0,
+          "first_thickness_derivative_relative": 0.0,
+          "second_thickness_derivative_relative": 0.0
+        }
+      },
+      "quadrature_response": {
+        "physical_solution_relative": 7.025339167798029e-10,
+        "center_relative": 3.8103709076864334e-10,
+        "compliance_relative": 4.1100611802846743e-10,
+        "position_relative": 4.2165653893432695e-10,
+        "first_thickness_derivative_relative": 5.38498725660343e-10,
+        "second_thickness_derivative_relative": 7.025339167798029e-10
+      },
+      "eligible": true,
+      "observables": {
+        "center": 9.999922974802834e-07,
+        "compliance": 8.920217069861002e-21,
+        "center_relative": 1.2028642964789782e-05,
+        "l2_relative": 6.968171196066767e-05,
+        "compliance_relative": 6.5602937997510935e-06
+      },
+      "seconds": 45.71899999998277,
+      "peak_bytes": 466305024,
+      "artifact": "build/analysis/q9-trace-shear-plate-20261101-214511/n16-h0.001.npz",
+      "artifact_sha256": "70ef254f4cd7180f51ac405dee3e75101e1c8f0ae3364c07769b32c286a97692"
+    }
+  ],
+  "thickness_checks": [
+    {
+      "h": 0.01,
+      "accuracy_pass": true,
+      "last_l2_order": 3.003118067437881,
+      "order_pass": true
+    },
+    {
+      "h": 0.001,
+      "accuracy_pass": true,
+      "last_l2_order": 3.0031421938313274,
+      "order_pass": true
+    }
+  ],
+  "thin_uniformity_pass": true,
+  "stop_reason": null,
+  "seconds": 108.04700000002049,
+  "peak_bytes": 466305024,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

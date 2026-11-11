@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "scope": "continuation control on a known static fold; not a physical wing branch test",
+  "steps": 40,
+  "max_equilibrium_residual": 6.938893903907228e-17,
+  "known_fold_U": 0.3849001794597505,
+  "direction_continued_through_fold": true,
+  "static_not_flutter": true,
+  "restart_bitwise": true,
+  "singular_fixed_speed_Newton_rejected": true,
+  "sources": {
+    "tools/design-experiments/check_static_branch_continuation.py": "748a868780fd084224342cfed1e2686acb8ba41242a8e7fe8048f16ec4ac9716",
+    "docs/j1-static-continuation-error-contract.md": "8f1b4764534a838a2726fbd722db2276e62f27b4bea357e045889979e064a91f"
+  }
+}

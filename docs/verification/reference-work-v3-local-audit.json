@@ -1,0 +1,247 @@
+{
+  "records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 6.824210844241686e-13,
+        "force": 7.850579563894711e-12,
+        "tangent": 1.0936627189519144e-12,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.145370481167263e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5708706193998368e-15,
+        "vertical_error_work": 9.265006796365527e-16,
+        "top_bottom_error_work": 3.6994984546989516e-16,
+        "weak_commutation": 1.9277521388388755e-15,
+        "body_work": 1.9006621665368833e-15,
+        "decomposition": 1.2191043079581705e-15
+      },
+      "polynomial": {
+        "fields": 46,
+        "gradient_error": 3.834456975403667e-15,
+        "stabilization_residual": 8.802356345285118e-15,
+        "passed": true
+      },
+      "reference_gradient": 4.021173411605005e-14,
+      "gram": 0.0,
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 6.846904406113988e-12,
+        "force": 7.836265928107558e-11,
+        "tangent": 1.0096764349964285e-11,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.132002298106654e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5708706193998368e-15,
+        "vertical_error_work": 9.265006796365527e-16,
+        "top_bottom_error_work": 3.6994984546989516e-16,
+        "weak_commutation": 1.9277521388388755e-15,
+        "body_work": 1.9006621665368833e-15,
+        "decomposition": 1.2191043079581705e-15
+      },
+      "polynomial": {
+        "fields": 46,
+        "gradient_error": 3.861269158426729e-15,
+        "stabilization_residual": 8.802356345285118e-15,
+        "passed": true
+      },
+      "reference_gradient": 4.905675102628976e-13,
+      "gram": 0.0,
+      "passed": true
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 6.849028384944757e-11,
+        "force": 7.834821741510067e-10,
+        "tangent": 1.0025679479180406e-10,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.1614127365818035e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5708706193998368e-15,
+        "vertical_error_work": 9.265006796365527e-16,
+        "top_bottom_error_work": 3.6994984546989516e-16,
+        "weak_commutation": 1.9277521388388755e-15,
+        "body_work": 1.9006621665368833e-15,
+        "decomposition": 1.2191043079581705e-15
+      },
+      "polynomial": {
+        "fields": 46,
+        "gradient_error": 3.826019878217046e-15,
+        "stabilization_residual": 8.802356345285118e-15,
+        "passed": true
+      },
+      "reference_gradient": 4.506570010745782e-12,
+      "gram": 0.0,
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.046856857090507e-12,
+        "force": 6.787689598128691e-12,
+        "tangent": 5.060049653319762e-12,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.153383672920974e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5708706193998368e-15,
+        "vertical_error_work": 9.265006796365527e-16,
+        "top_bottom_error_work": 3.6994984546989516e-16,
+        "weak_commutation": 1.9277521388388755e-15,
+        "body_work": 1.9006621665368833e-15,
+        "decomposition": 1.2191043079581705e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 3.57572071769763e-14,
+      "gram": 0.0,
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 9.983987274056655e-13,
+        "force": 4.9910365205260936e-11,
+        "tangent": 5.958908674646464e-12,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.138305503690766e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5708706193998368e-15,
+        "vertical_error_work": 9.265006796365527e-16,
+        "top_bottom_error_work": 3.6994984546989516e-16,
+        "weak_commutation": 1.9277521388388755e-15,
+        "body_work": 1.9006621665368833e-15,
+        "decomposition": 1.2191043079581705e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 4.1438857474070685e-13,
+      "gram": 0.0,
+      "passed": true
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 9.94037703765095e-12,
+        "force": 4.99074301165916e-10,
+        "tangent": 5.924999783532088e-11,
+        "face_transform": 1.9873038824421222e-14,
+        "gradient": 4.152785565145499e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5708706193998368e-15,
+        "vertical_error_work": 9.265006796365527e-16,
+        "top_bottom_error_work": 3.6994984546989516e-16,
+        "weak_commutation": 1.9277521388388755e-15,
+        "body_work": 1.9006621665368833e-15,
+        "decomposition": 1.2191043079581705e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 3.9613177711402556e-12,
+      "gram": 0.0,
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.5512573209046032e-10,
+        "force": 2.2023659814120374e-09,
+        "tangent": 2.340262368429068e-09,
+        "face_transform": 2.856518274316219e-14,
+        "gradient": 4.647136528972072e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5709955330493897e-15,
+        "vertical_error_work": 9.424547422372374e-16,
+        "top_bottom_error_work": 3.7444689438089054e-16,
+        "weak_commutation": 1.930521664015102e-15,
+        "body_work": 1.9057450848228305e-15,
+        "decomposition": 1.2332643497281862e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 8.957229658061762e-14,
+      "gram": 1.0053497077208614e-15,
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.4657821230832005e-10,
+        "force": 2.2149717746607435e-09,
+        "tangent": 2.329795321832188e-09,
+        "face_transform": 2.856518274316219e-14,
+        "gradient": 4.616795611009087e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5709955330493897e-15,
+        "vertical_error_work": 9.424547422372374e-16,
+        "top_bottom_error_work": 3.7444689438089054e-16,
+        "weak_commutation": 1.930521664015102e-15,
+        "body_work": 1.9057450848228305e-15,
+        "decomposition": 1.2332643497281862e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 8.387947226400052e-13,
+      "gram": 1.0053497077208614e-15,
+      "passed": true
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.1342237636144475e-10,
+        "force": 2.428613188928715e-09,
+        "tangent": 2.382065782613404e-09,
+        "face_transform": 2.856518274316219e-14,
+        "gradient": 4.6357084773959895e-16
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.5709955330493897e-15,
+        "vertical_error_work": 9.424547422372374e-16,
+        "top_bottom_error_work": 3.7444689438089054e-16,
+        "weak_commutation": 1.930521664015102e-15,
+        "body_work": 1.9057450848228305e-15,
+        "decomposition": 1.2332643497281862e-15
+      },
+      "polynomial": null,
+      "reference_gradient": 8.724138929385819e-12,
+      "gram": 1.0053497077208614e-15,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "parent_stops_rechecked": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/audit_reference_work_v3_local.py": "bf0d4ef73e5f762dc6b27308007ed41ff4a21c00df49b603847814411ca94c3d",
+    "tools/design-experiments/reference_work_ancf_v3.py": "5894f38dc299953f0cbb581f9a4f5f9cd3aba0f0cd2f75588f180a1fb271d3e4",
+    "docs/verification/reference-work-v3-local-result.json": "2bd4fa41ec89fd0755a9891072376642891fb1ecf4c872c6c66ad23d25344d40",
+    "docs/verification/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8"
+  },
+  "seconds": 9.391000000061467
+}

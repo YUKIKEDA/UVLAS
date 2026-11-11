@@ -1,0 +1,49 @@
+{
+  "status": "interrupted_for_coefficient_cache",
+  "all_criteria_pass": false,
+  "stage": "external_24_not_completed",
+  "source_sha256": "06489dbf691eda83a20121e0aecc23d6ee071856ee3f1aabda6d7550d42d9c73",
+  "record_kind": "summaries_from_completed_tool_output_only; no full state/eigenvectors retained",
+  "completed_internal": [
+    {
+      "n": 2,
+      "eligible": true,
+      "seconds": 0.9529999999940628,
+      "displacement_l2": 0.058435888958219565,
+      "green_l2": 0.038947820493753664,
+      "energy_relative": 0.0002456331764328912
+    },
+    {
+      "n": 4,
+      "eligible": true,
+      "seconds": 0.6720000000059372,
+      "displacement_l2": 0.006387738495959995,
+      "green_l2": 0.01036931545602869,
+      "energy_relative": 4.107490207183595e-05
+    },
+    {
+      "n": 8,
+      "eligible": true,
+      "seconds": 2.389999999999418,
+      "displacement_l2": 0.0005126077962767371,
+      "green_l2": 0.002667058415647437,
+      "energy_relative": 4.685705942808482e-06
+    },
+    {
+      "n": 16,
+      "eligible": true,
+      "seconds": 10.156000000002678,
+      "displacement_l2": 3.910417522405506e-05,
+      "green_l2": 0.000662057716943343,
+      "energy_relative": 4.083821740774596e-07
+    }
+  ],
+  "completed_external": [
+    {
+      "n": 12,
+      "eligible": true,
+      "seconds": 136.18799999999464
+    }
+  ],
+  "reason": "F and S recomputed for each basis pair; stopped by Ctrl-C before external_24 completion; same-coefficient caching will be implemented; inputs and thresholds unchanged"
+}

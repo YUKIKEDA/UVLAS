@@ -1,0 +1,178 @@
+{
+  "source_sha256": "8278043ee37d37b5add5da85ac5a5b365d277e5b0eefff63ea83a8523caa68e5",
+  "parent_sha256": "3535b2ced3f61e016a08ca7c9146fd8a8aa07608d9804ccc3bd93d388b29cc17",
+  "dependency_sha256": {
+    "audit_q9_curved_strain_screen.py": "2a092c9ae927b8676ce989a2d92d8eff0d9f9b93fae0b9e9bd27890a2b9245ec",
+    "check_q9_curved_strain_boundary.py": "e14a524c368b3111f7017029c9fff32703554cb2767e3da0852cb6a818335024",
+    "check_q9_independent_load.py": "1c541fade6d865aecaf7fbfa99fa8dbbf0f68f44a0ba0f51da36004e3ff4003d",
+    "check_q9_plate_convergence.py": "909db42a881612996ce1381432bc03153c18f7b0107876a56a986f84316ffd9d"
+  },
+  "cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "coefficient_difference": 3.6501637216583564e-16,
+      "mean_difference": 2.450212068622264e-16,
+      "moment_difference": 9.034713300318002e-16,
+      "stiffness_difference": 9.182426929991565e-16,
+      "work11_difference": 1.1871451563467905e-15,
+      "boundary_traction_difference": 1.7610940717471688e-15,
+      "value_difference": 7.076374510655719e-16
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "coefficient_difference": 3.7731370115482707e-16,
+      "mean_difference": 1.0152002139560949e-16,
+      "moment_difference": 9.453913389483054e-16,
+      "stiffness_difference": 8.587781383167739e-16,
+      "work11_difference": 8.905275008333134e-16,
+      "boundary_traction_difference": 4.306613316612461e-15,
+      "value_difference": 7.076374510655721e-16
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "coefficient_difference": 2.095166214054801e-15,
+      "mean_difference": 3.652298427277478e-16,
+      "moment_difference": 9.387433096807955e-16,
+      "stiffness_difference": 8.347886407036599e-16,
+      "work11_difference": 1.3535611179202972e-15,
+      "boundary_traction_difference": 1.593272229016261e-15,
+      "value_difference": 8.32664448874434e-16
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "coefficient_difference": 2.348440518119323e-15,
+      "mean_difference": 1.0739319426300777e-16,
+      "moment_difference": 9.93208733365376e-16,
+      "stiffness_difference": 9.183619499780332e-16,
+      "work11_difference": 1.2913658149735024e-15,
+      "boundary_traction_difference": 4.82483271722333e-15,
+      "value_difference": 7.821025041177688e-16
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "coefficient_difference": 7.983193317101947e-16,
+      "mean_difference": 8.348088528557522e-17,
+      "moment_difference": 8.595083433385564e-16,
+      "stiffness_difference": 8.412270439333928e-16,
+      "work11_difference": 1.7547859057782521e-15,
+      "boundary_traction_difference": 1.8067388630012936e-15,
+      "value_difference": 9.524526194398812e-16
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "coefficient_difference": 2.4421732084111452e-15,
+      "mean_difference": 3.033469342110748e-16,
+      "moment_difference": 9.304258058204394e-16,
+      "stiffness_difference": 8.986852825204864e-16,
+      "work11_difference": 8.567231668216697e-16,
+      "boundary_traction_difference": 4.428524969862909e-15,
+      "value_difference": 9.57188083638736e-16
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "coefficient_difference": 6.43489989377128e-15,
+      "mean_difference": 1.584253205931428e-16,
+      "moment_difference": 8.488235857449794e-16,
+      "stiffness_difference": 8.038043798977006e-16,
+      "work11_difference": 3.68947542182085e-15,
+      "boundary_traction_difference": 2.6796923841574716e-15,
+      "value_difference": 9.013803948171341e-16
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "coefficient_difference": 2.5315155310618866e-15,
+      "mean_difference": 3.138990218891015e-16,
+      "moment_difference": 8.860114570281315e-16,
+      "stiffness_difference": 7.494563893484174e-16,
+      "work11_difference": 5.4170888855546205e-15,
+      "boundary_traction_difference": 7.841779480816136e-15,
+      "value_difference": 8.902886234372501e-16
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "coefficient_difference": 5.0900051264417294e-15,
+      "mean_difference": 1.518517138488382e-16,
+      "moment_difference": 7.942844874236149e-16,
+      "stiffness_difference": 6.890291495046977e-16,
+      "work11_difference": 2.8330721891249987e-15,
+      "boundary_traction_difference": 1.8196519929394392e-15,
+      "value_difference": 9.143434841727148e-16
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "coefficient_difference": 4.8509176536525064e-15,
+      "mean_difference": 2.268323172452644e-16,
+      "moment_difference": 8.146777257183466e-16,
+      "stiffness_difference": 7.0773382066012e-16,
+      "work11_difference": 3.1329996049277367e-15,
+      "boundary_traction_difference": 1.8238069705930464e-14,
+      "value_difference": 7.939955861493078e-16
+    }
+  ],
+  "shared_pairs": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "trace_error": 1.2976308108376864e-35
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "trace_error": 4.2255398007551637e-38
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "trace_error": 5.135309767971845e-16
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "trace_error": 5.920213598614712e-16
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "trace_error": 1.2976308108376864e-35
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "trace_error": 2.987907847287629e-38
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "trace_error": 1.8069235809485277e-16
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "trace_error": 1.9789133343093762e-16
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "trace_error": 2.8749741919707943e-16
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "trace_error": 3.7244469336545603e-16
+    }
+  ],
+  "seconds": 31.094000000040978,
+  "peak_bytes": 100573184,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

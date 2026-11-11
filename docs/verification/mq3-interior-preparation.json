@@ -1,0 +1,16 @@
+{
+  "status": "frozen_before_execution",
+  "maximum_problems": 16,
+  "sources": {
+    "tools/design-experiments/mq3_interior_stationarity.py": "a1c347d32c529f74c753cdef64beedb6345942599ca3535713de25955e3d1dd9",
+    "tools/design-experiments/check_mq3_interior.py": "e04d7d3257a9f21eba6a432d99e295683df2a2189ad738551d231959cc964fe5",
+    "tools/design-experiments/audit_mq3_interior.py": "d81cec617e637029c82a891eabe70dddd7f2ae4f0adf0cde87c2126485551862",
+    "tools/design-experiments/mq3_necessary_constraints.py": "8219e59189dff53fcd04e350000809d9d1249316bc22ce20d0e70374ff47954b",
+    "tools/design-experiments/mq3_factor_space.py": "869367789e4ae5de95d51957f508ffbd6d61d4691bb460b2c7aabfcc37c83fd2",
+    "tools/design-experiments/mq3_factor_family.py": "e995b30cbb7439aeb60cb9c1765185b2918998648541e6db173f01627fbd670a",
+    "docs/mq3-interior-stationarity-diagnostic.md": "333ffde8ff4a2675b079ddab7b635a532028f26cc77607560c4d8b3641f9c115",
+    "docs/verification/mq3-interior-audit-protocol.md": "497d303be229c8cf2a6151dcc3089aead9248ba5f5a56e15e70c5fa8fd4f41cf",
+    "docs/verification/mq3-factor-v2-result.json": "cad5d2d28b7e700b835a657f11e9c95bdcf231bb7dcd06518b1496410b3d213c",
+    "docs/verification/mq3-necessary-result.json": "3981a43b27e3c69f52642c55cf0e224debc68a6525bc6f48864460a2f4cbd42f"
+  }
+}

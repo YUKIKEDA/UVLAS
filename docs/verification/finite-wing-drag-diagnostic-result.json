@@ -1,0 +1,306 @@
+{
+  "passed": false,
+  "operator_log_integral_verified": true,
+  "near_force_independent_comparison_passed": true,
+  "finite_grid_near_far_identity_passed": false,
+  "physical_drag_continuum_qualified": false,
+  "failures": [
+    "near midpoint force and exact regularized far-energy functional differ at finite grid; no common continuum error budget qualified"
+  ],
+  "records": [
+    {
+      "case": "exact_log_Trefftz_vs_independent_line_integral",
+      "relative_error": 1.1102230246251565e-16
+    },
+    {
+      "case": "drag-d0-m16-n192",
+      "result": {
+        "dihedral": 0,
+        "m": 16,
+        "n": 192,
+        "near_drag": 1592.102230913381,
+        "independent_near_drag": 1592.1089364401823,
+        "near_difference": 4.2117261249696725e-06,
+        "regularized_far_drag": 1608.2276067317596,
+        "far_near_difference": 0.010128354514727045,
+        "eps": 1.114285714285714e-05,
+        "seconds": 5.827999999979511
+      }
+    },
+    {
+      "case": "drag-d0-m16-n96",
+      "result": {
+        "dihedral": 0,
+        "m": 16,
+        "n": 96,
+        "near_drag": 1573.8703956671563,
+        "independent_near_drag": 1573.8671165413762,
+        "near_difference": 2.0834832532568015e-06,
+        "regularized_far_drag": 1696.4153368652676,
+        "far_near_difference": 0.07786215531817353,
+        "eps": 1.114285714285714e-05,
+        "seconds": 4.234000000054948
+      }
+    },
+    {
+      "case": "drag-d0-span384",
+      "result": {
+        "dihedral": 0,
+        "m": 16,
+        "n": 384,
+        "near_drag": 1609.7096057880221,
+        "independent_near_drag": 1609.5831331045642,
+        "near_difference": 7.857480664208438e-05,
+        "regularized_far_drag": 1566.7555569449319,
+        "far_near_difference": -0.026684346473824005,
+        "eps": 1.114285714285714e-05,
+        "seconds": 24.32799999997951
+      }
+    },
+    {
+      "case": "drag-d5-m16-n192",
+      "result": {
+        "dihedral": 5,
+        "m": 16,
+        "n": 192,
+        "near_drag": 1585.3485003679857,
+        "independent_near_drag": 1585.3551628861178,
+        "near_difference": 4.202539776620995e-06,
+        "regularized_far_drag": 1601.215703786026,
+        "far_near_difference": 0.010008653248391397,
+        "eps": 1.114285714285714e-05,
+        "seconds": 6.563000000081956
+      }
+    },
+    {
+      "case": "drag-d5-m16-n96",
+      "result": {
+        "dihedral": 5,
+        "m": 16,
+        "n": 96,
+        "near_drag": 1567.164460633279,
+        "independent_near_drag": 1567.1611876921975,
+        "near_difference": 2.0884521052533245e-06,
+        "regularized_far_drag": 1689.0646439403192,
+        "far_near_difference": 0.07778391251788674,
+        "eps": 1.114285714285714e-05,
+        "seconds": 1.625
+      }
+    },
+    {
+      "case": "drag-d5-span384",
+      "result": {
+        "dihedral": 5,
+        "m": 16,
+        "n": 384,
+        "near_drag": 1602.9204604986703,
+        "independent_near_drag": 1602.7938573684874,
+        "near_difference": 7.898902881420256e-05,
+        "regularized_far_drag": 1559.9030635065672,
+        "far_near_difference": -0.026836888075357446,
+        "eps": 1.114285714285714e-05,
+        "seconds": 25.843999999924563
+      }
+    },
+    {
+      "case": "drag-elliptic-operator",
+      "result": {
+        "records": [
+          {
+            "eps": 0.01,
+            "n": 256,
+            "drag": 0.4541806294462823,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.03619877022714313
+          },
+          {
+            "eps": 0.01,
+            "n": 512,
+            "drag": 0.4541836126362308,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.03619243970145669
+          },
+          {
+            "eps": 0.01,
+            "n": 1024,
+            "drag": 0.4541846018550437,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.036190340513938324
+          },
+          {
+            "eps": 0.01,
+            "n": 2048,
+            "drag": 0.45418485309407125,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.03618980736816324
+          },
+          {
+            "eps": 0.01,
+            "n": 4096,
+            "drag": 0.4541849163501258,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.03618967313464638
+          },
+          {
+            "eps": 0.005,
+            "n": 256,
+            "drag": 0.461689319906846,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.02026483418786751
+          },
+          {
+            "eps": 0.005,
+            "n": 512,
+            "drag": 0.46167131078133444,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.02030305073914651
+          },
+          {
+            "eps": 0.005,
+            "n": 1024,
+            "drag": 0.46167189647041745,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.020301807868310817
+          },
+          {
+            "eps": 0.005,
+            "n": 2048,
+            "drag": 0.4616721549877885,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.02030125927741111
+          },
+          {
+            "eps": 0.005,
+            "n": 4096,
+            "drag": 0.4616722204398443,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.020301120383834914
+          },
+          {
+            "eps": 0.0025,
+            "n": 256,
+            "drag": 0.4660791733285745,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.010949275900974609
+          },
+          {
+            "eps": 0.0025,
+            "n": 512,
+            "drag": 0.465945503993846,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.011232931039132588
+          },
+          {
+            "eps": 0.0025,
+            "n": 1024,
+            "drag": 0.46593557959832327,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.01125399126052784
+          },
+          {
+            "eps": 0.0025,
+            "n": 2048,
+            "drag": 0.46593562749715156,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.011253889616057333
+          },
+          {
+            "eps": 0.0025,
+            "n": 4096,
+            "drag": 0.46593569374086874,
+            "ideal_drag": 0.47123889803846897,
+            "relative_difference": -0.011253749042523409
+          }
+        ]
+      }
+    },
+    {
+      "case": "drag-quadrature-m16-n96",
+      "result": {
+        "m": 16,
+        "n": 96,
+        "records": [
+          {
+            "order": 1,
+            "near_drag": 1573.8703956671563,
+            "seconds": 1.437000000034459
+          },
+          {
+            "order": 2,
+            "near_drag": 1602.9568866157192,
+            "seconds": 2.952999999979511
+          },
+          {
+            "order": 4,
+            "near_drag": 1629.7441277454705,
+            "seconds": 5.859000000054948
+          },
+          {
+            "order": 8,
+            "near_drag": 1658.4092859372058,
+            "seconds": 11.547000000020489
+          },
+          {
+            "order": 16,
+            "near_drag": 1682.3785198185333,
+            "seconds": 34.95299999997951
+          }
+        ],
+        "regularized_far_drag": 1696.4153368652676
+      }
+    },
+    {
+      "case": "drag-quadrature-m4-n24",
+      "result": {
+        "m": 4,
+        "n": 24,
+        "records": [
+          {
+            "order": 1,
+            "near_drag": 1561.8756438632163,
+            "seconds": 2.672000000020489
+          },
+          {
+            "order": 2,
+            "near_drag": 1684.256971294688,
+            "seconds": 0.015000000013969839
+          },
+          {
+            "order": 4,
+            "near_drag": 1792.6395655484373,
+            "seconds": 0.030999999959021807
+          },
+          {
+            "order": 8,
+            "near_drag": 1903.3482627108392,
+            "seconds": 0.0470000000204891
+          },
+          {
+            "order": 16,
+            "near_drag": 2018.9474444990346,
+            "seconds": 0.15700000000651926
+          }
+        ],
+        "regularized_far_drag": 2255.7477438907554
+      }
+    }
+  ],
+  "sources": {
+    "tools/design-experiments/assess_drag_diagnostic.py": "83a320eb418538b929859c2fcc4a909e07801c26549f3cfcb5a883cdd73da507",
+    "tools/design-experiments/probe_finite_wing_drag.py": "9e281ecf070f4f9b8b34b9ce57c467dd8427e4abcd157aeb199d3eda1d93c678",
+    "tools/design-experiments/check_drag_quadrature.py": "f678423c4d1f19497b98ad42467b06e52ce588cb105a7e9c15f39c1459306148",
+    "docs/verification/finite-wing-drag-diagnostic-protocol.md": "835f5c644acc94533e628edfb8d43a5fe58a0dc09bb45d10d09a6c9d7ca2f4cd",
+    "docs/verification/edge-load-integral-result.json": "1eb6c663dd72df4d6275a963971461f5f62a2e89fa8b48039711b21b9ab8f6ed"
+  },
+  "artifacts": {
+    "build/analysis/finite-wing-2-3/drag-d0-m16-n192.json": "1480daef1edea6fab8bdce3920a808814896fc3ac6c6679cd9352ff004c2f64d",
+    "build/analysis/finite-wing-2-3/drag-d0-m16-n96.json": "2f83b5a3fb446932d4e1cd54ab1c36d7c43ccdd588d5526c9a32f0d87e459b53",
+    "build/analysis/finite-wing-2-3/drag-d0-span384.json": "61c1ad8153042b854988d6199a374d527d0b3692e4e113d720c49c72e963a4eb",
+    "build/analysis/finite-wing-2-3/drag-d5-m16-n192.json": "2381cd36e0593d436dd407fedeb8e4eb35b4b2b1f8f76109c9fe2f7a35966db0",
+    "build/analysis/finite-wing-2-3/drag-d5-m16-n96.json": "07de2a71bf19147de2449b247675491f542b37d17522c19b6ab32eeccede85a5",
+    "build/analysis/finite-wing-2-3/drag-d5-span384.json": "99d0afd5d21b4712327956efd7c654ecc9197aeab2bfdc2dba434aa0e2ee1cac",
+    "build/analysis/finite-wing-2-3/drag-elliptic-operator.json": "f767395b7caf07d5fc3013c065995b4a4c6bf2738ac55db98b3d22fa1ae5d4f1",
+    "build/analysis/finite-wing-2-3/drag-quadrature-m16-n96.json": "184b8ac5603fea50719b26621140be29c16f96d5a7303630ca50da1ae09d738d",
+    "build/analysis/finite-wing-2-3/drag-quadrature-m4-n24.json": "982114e95a7b604db424c897e9581817abd1dba1678b4e96d9bb1c7c6479b5ed"
+  }
+}

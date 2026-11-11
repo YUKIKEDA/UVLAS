@@ -1,0 +1,18 @@
+{
+  "source_sha256": "6928c3afe02694caaa8a9e1fa1ec632b8254d11733a28783877351f2d4edc2dc",
+  "evidence_sha256": {
+    "q9-trace-shear-local-result.json": "c229af9c7e79a04958581c48346aa8e7073be687729ce7f4a0ee422755ddf874",
+    "q9-trace-shear-shared-result.json": "505f64d4472c6a5b7aeab0efb606ce814421a5cbc004385d0560e47edf488daa",
+    "q9-trace-shear-gates-audit.json": "324f9451a9c482108c030c5b77a9bbaf2721e74f950f5954e8f4088cf22bfe87",
+    "q9-trace-shear-plate-result.json": "c437b4c0879f9efd4e9ca1a6cadb652b7173a670aa92527d284d1dc3fad1eac2",
+    "q9-trace-shear-plate-audit.json": "1d328e8f6e0efe2bbd57392d35d8abcdcd269b151bfaf86a2b2df3bce3fb3ceb",
+    "q9-trace-shear-results.md": "4822b5f34b7adb2323711a1bed166cb4a1a1854dee7f6d31b4729a8bfd2dc4b5"
+  },
+  "candidate": "T-S36-v1",
+  "local_and_shared_gates_pass": true,
+  "limited_plate_comparison_pass": true,
+  "independent_audits_pass": true,
+  "verification_scope": "flat constant-thickness bilinear distorted mesh, isotropic linear, defined loads and supports",
+  "decision": "retain frozen candidate for general-curved and constitutive review",
+  "product_shell_adopted": false
+}

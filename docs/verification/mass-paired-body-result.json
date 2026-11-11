@@ -1,0 +1,247 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "n": 1,
+      "h": 0.01,
+      "observation": {
+        "error": [
+          7.361892000131993e-05,
+          7.361892000131993e-05,
+          7.361892000131992e-05
+        ],
+        "position": [
+          0.000991845419570842,
+          0.000991845419570842,
+          0.000991845419570842
+        ],
+        "stationarity": [
+          6.313360725955736e-16,
+          6.313360725955736e-16,
+          6.313367004144435e-16
+        ]
+      },
+      "projection": {
+        "error": [
+          7.361892000131981e-05,
+          7.361892000131963e-05,
+          7.361892000131909e-05
+        ],
+        "position": [
+          0.0009918454020400634,
+          0.0009918454020400324,
+          0.000991845402040687
+        ],
+        "stationarity": [
+          2.6654029922454745e-16,
+          2.6708003148611256e-16,
+          2.570223756766447e-16
+        ]
+      },
+      "physical_vs_projection": 3.167563635281721e-13,
+      "external_work_error": 5.419746296203226e-09,
+      "loads": {
+        "resultant": [
+          -2.3107058801097313e-18,
+          -2.532628512290358e-19,
+          2.0328790734103208e-20
+        ],
+        "exact_external_work": 2.128311317687322e-06
+      },
+      "checks": {
+        "energy": true,
+        "position": true,
+        "stationary": true,
+        "physical_vs_projection": true,
+        "external_work": true,
+        "force_balance": true
+      },
+      "artifact": "build/analysis/mass-paired-body-20261105-121145/n1-h0.01.npz",
+      "artifact_sha256": "7e4e419c721e720607bba249c84e6315f74dd857619e0f34dbd9b87faf51e1bf"
+    },
+    {
+      "n": 1,
+      "h": 0.0001,
+      "observation": {
+        "error": [
+          7.544519608011938e-07,
+          7.544519608011938e-07,
+          7.544519608011932e-07
+        ],
+        "position": [
+          6.974497592644049e-05,
+          6.974497592644049e-05,
+          6.974497592644049e-05
+        ],
+        "stationarity": [
+          3.341398485153549e-14,
+          3.341398485153549e-14,
+          3.3413985152232865e-14
+        ]
+      },
+      "projection": {
+        "error": [
+          7.544518617880619e-07,
+          7.544518617860807e-07,
+          7.544518617874303e-07
+        ],
+        "position": [
+          7.102410627207217e-05,
+          7.102410627184842e-05,
+          7.102410626961643e-05
+        ],
+        "stationarity": [
+          6.070588940268039e-16,
+          6.6982919862623e-16,
+          6.693358235715788e-16
+        ]
+      },
+      "physical_vs_projection": 3.865371981806807e-10,
+      "external_work_error": 1.0153330755310405e-12,
+      "loads": {
+        "resultant": [
+          -2.6156377411212794e-18,
+          3.8031779331718085e-19,
+          -1.2468324983583301e-18
+        ],
+        "exact_external_work": 2.128293349552628e-08
+      },
+      "checks": {
+        "energy": true,
+        "position": true,
+        "stationary": true,
+        "physical_vs_projection": true,
+        "external_work": true,
+        "force_balance": true
+      },
+      "artifact": "build/analysis/mass-paired-body-20261105-121145/n1-h0.0001.npz",
+      "artifact_sha256": "0c18998956ac743594cc476bac54c2998914c462f0bdc18de6e30b8ab3502ce8"
+    },
+    {
+      "n": 2,
+      "h": 0.01,
+      "observation": {
+        "error": [
+          1.4423694423663308e-05,
+          1.4423694423663308e-05,
+          1.4423694423663306e-05
+        ],
+        "position": [
+          4.927876383170233e-05,
+          4.927876383170233e-05,
+          4.927876383170233e-05
+        ],
+        "stationarity": [
+          7.0106512452719105e-16,
+          7.0106512452719105e-16,
+          7.010651315626893e-16
+        ]
+      },
+      "projection": {
+        "error": [
+          1.4423694423664829e-05,
+          1.4423694423664734e-05,
+          1.4423694423664515e-05
+        ],
+        "position": [
+          4.927871861204708e-05,
+          4.9278718612047816e-05,
+          4.927871861495226e-05
+        ],
+        "stationarity": [
+          3.0402186051307604e-16,
+          3.027522535471677e-16,
+          2.9731439213005795e-16
+        ]
+      },
+      "physical_vs_projection": 6.410953366781318e-13,
+      "external_work_error": 2.0804869979687326e-10,
+      "loads": {
+        "resultant": [
+          2.1955093992831465e-18,
+          3.9810548520952116e-20,
+          1.0299920638612292e-18
+        ],
+        "exact_external_work": 2.1283113176873167e-06
+      },
+      "checks": {
+        "energy": true,
+        "position": true,
+        "stationary": true,
+        "physical_vs_projection": true,
+        "external_work": true,
+        "force_balance": true
+      },
+      "artifact": "build/analysis/mass-paired-body-20261105-121145/n2-h0.01.npz",
+      "artifact_sha256": "81718a862bf287398e8b410ffac4cae96a1eace9c32381080321283fc557e4b8"
+    },
+    {
+      "n": 2,
+      "h": 0.0001,
+      "observation": {
+        "error": [
+          1.4784199027234814e-07,
+          1.4784199027234814e-07,
+          1.4784199027234822e-07
+        ],
+        "position": [
+          1.0726003330632022e-05,
+          1.0726003330632022e-05,
+          1.0726003330632022e-05
+        ],
+        "stationarity": [
+          3.550570676505079e-14,
+          3.550570676505079e-14,
+          3.5505706778756545e-14
+        ]
+      },
+      "projection": {
+        "error": [
+          1.4783289412903002e-07,
+          1.4783289412881985e-07,
+          1.478328941289624e-07
+        ],
+        "position": [
+          6.991924906542102e-06,
+          6.9919249066392814e-06,
+          6.99192490463366e-06
+        ],
+        "stationarity": [
+          5.660012920981933e-16,
+          5.437208223579594e-16,
+          5.400672421142209e-16
+        ]
+      },
+      "physical_vs_projection": 1.639969983759569e-09,
+      "external_work_error": 2.4159050671798356e-13,
+      "loads": {
+        "resultant": [
+          2.913793338554793e-18,
+          -2.0921713797181218e-19,
+          1.3755815063409838e-18
+        ],
+        "exact_external_work": 2.1282933495527444e-08
+      },
+      "checks": {
+        "energy": true,
+        "position": true,
+        "stationary": true,
+        "physical_vs_projection": true,
+        "external_work": true,
+        "force_balance": true
+      },
+      "artifact": "build/analysis/mass-paired-body-20261105-121145/n2-h0.0001.npz",
+      "artifact_sha256": "a60038e24d7daaea65e8b85a179ca33a5474c7b764f4b5318a78ef6e13dcd6ec"
+    }
+  ],
+  "stops": [],
+  "independent_load_definition": "u_x=a X^2; sigma=diag(2aX(lambda+2mu),2aXlambda,2aXlambda); b=-div(sigma); t=sigma*n",
+  "seconds": 144.68799999996554,
+  "R4_complete": false,
+  "sources": {
+    "tools/design-experiments/check_mass_paired_body.py": "008432b408d049b23752df8000d02b5c3d688637118b58222caeb8557cfd4071",
+    "tools/design-experiments/mass_paired_ancf.py": "45e85b54665ad1555aa85e4a24c9901d824427748205f66e49102a046257e62b",
+    "tools/design-experiments/exact_paired_finite.py": "2d92c260516962da34fd84d0590ed3559549ccbbc46fa2fc22e50b7228d43720",
+    "tools/design-experiments/general_paired_fields.py": "8f5e27f18520d2137bd8ce2cb0f341c4298a483932595543b527267c61675b4e"
+  }
+}

@@ -1,0 +1,423 @@
+{
+  "passed": true,
+  "scope": "setting sensitivities measured separately; native pitch input/axis/sign and continuous-time frequency provenance",
+  "settings_records": [
+    {
+      "side": "candidate",
+      "k": 0.05,
+      "relative_changes": {
+        "tail64": [
+          [
+            4.428092890169424e-05,
+            4.488997605432155e-05
+          ],
+          [
+            4.4224527399922713e-05,
+            4.469040458205979e-05
+          ]
+        ],
+        "tail256": [
+          [
+            6.605941514245097e-06,
+            6.652872739741667e-06
+          ],
+          [
+            6.597296434069271e-06,
+            6.623061854669781e-06
+          ]
+        ],
+        "core1e-4": [
+          [
+            4.734413614254659e-07,
+            4.944325716224637e-07
+          ],
+          [
+            4.7583848808221056e-07,
+            4.983958635292576e-07
+          ]
+        ],
+        "core1e-6": [
+          [
+            4.734418739036687e-09,
+            4.944331702245723e-09
+          ],
+          [
+            4.758390079310928e-09,
+            4.9839649203526166e-09
+          ]
+        ],
+        "q24": [
+          [
+            0.0,
+            1.6029135053414928e-17
+          ],
+          [
+            2.1087080717814652e-16,
+            0.0
+          ]
+        ]
+      }
+    },
+    {
+      "side": "candidate",
+      "k": 0.2,
+      "relative_changes": {
+        "tail64": [
+          [
+            1.3836381310383973e-05,
+            1.4037914345682685e-05
+          ],
+          [
+            1.3585629846444254e-05,
+            1.3120399452137833e-05
+          ]
+        ],
+        "tail256": [
+          [
+            1.7440468513359294e-06,
+            1.757388272939286e-06
+          ],
+          [
+            1.712900167116996e-06,
+            1.6429708925043728e-06
+          ]
+        ],
+        "core1e-4": [
+          [
+            4.5834544916190027e-07,
+            4.846783989755618e-07
+          ],
+          [
+            4.918080616289334e-07,
+            5.406435201379997e-07
+          ]
+        ],
+        "core1e-6": [
+          [
+            4.58346225836256e-09,
+            4.846794584106245e-09
+          ],
+          [
+            4.9180876697148014e-09,
+            5.406446610014164e-09
+          ]
+        ],
+        "q24": [
+          [
+            8.153340994917308e-17,
+            3.533495230235499e-17
+          ],
+          [
+            0.0,
+            8.234783372140701e-17
+          ]
+        ]
+      }
+    },
+    {
+      "side": "candidate",
+      "k": 0.8,
+      "relative_changes": {
+        "tail64": [
+          [
+            2.420074716640974e-06,
+            2.4562255045617854e-06
+          ],
+          [
+            2.4502502375216112e-06,
+            2.1038410925659655e-06
+          ]
+        ],
+        "tail256": [
+          [
+            2.831247213709752e-07,
+            2.853486327282251e-07
+          ],
+          [
+            2.874184728273563e-07,
+            2.4506774887247363e-07
+          ]
+        ],
+        "core1e-4": [
+          [
+            6.365789092441406e-07,
+            7.595471516459128e-07
+          ],
+          [
+            6.981814279043438e-07,
+            8.267319158144911e-07
+          ]
+        ],
+        "core1e-6": [
+          [
+            6.365807417553571e-09,
+            7.595499609795544e-09
+          ],
+          [
+            6.981834600247561e-09,
+            8.267349022415055e-09
+          ]
+        ],
+        "q24": [
+          [
+            3.3235266928200245e-16,
+            0.0
+          ],
+          [
+            1.3881761350566472e-16,
+            1.303733497138101e-16
+          ]
+        ]
+      }
+    },
+    {
+      "side": "reference",
+      "k": 0.05,
+      "relative_changes": {
+        "tail64": [
+          [
+            4.4280720460773386e-05,
+            4.4890319710010885e-05
+          ],
+          [
+            4.422407226838537e-05,
+            4.467681982318074e-05
+          ]
+        ],
+        "tail256": [
+          [
+            6.605925542313729e-06,
+            6.652895528951234e-06
+          ],
+          [
+            6.597243644473778e-06,
+            6.621020782399583e-06
+          ]
+        ],
+        "core1e-4": [
+          [
+            4.656486350702296e-07,
+            4.865805643093008e-07
+          ],
+          [
+            4.679597871665751e-07,
+            4.90480573215788e-07
+          ]
+        ],
+        "core1e-6": [
+          [
+            4.656457264896468e-09,
+            4.8657956892421875e-09
+          ],
+          [
+            4.679545334650645e-09,
+            4.9047759077278576e-09
+          ]
+        ],
+        "q24": [
+          [
+            5.592480731802493e-12,
+            1.302780365147397e-12
+          ],
+          [
+            5.5695872594357275e-12,
+            1.2896730263839548e-12
+          ]
+        ]
+      }
+    },
+    {
+      "side": "reference",
+      "k": 0.2,
+      "relative_changes": {
+        "tail64": [
+          [
+            1.3835242921012641e-05,
+            1.4034540350548082e-05
+          ],
+          [
+            1.358946937043061e-05,
+            1.3089225918372867e-05
+          ]
+        ],
+        "tail256": [
+          [
+            1.7439737927727032e-06,
+            1.75710508069593e-06
+          ],
+          [
+            1.7134534048757837e-06,
+            1.6391977490959016e-06
+          ]
+        ],
+        "core1e-4": [
+          [
+            4.4920074679241577e-07,
+            4.7541988445343744e-07
+          ],
+          [
+            4.814583440606439e-07,
+            5.295617137299574e-07
+          ]
+        ],
+        "core1e-6": [
+          [
+            4.491576568290528e-09,
+            4.754044198187876e-09
+          ],
+          [
+            4.813955298053886e-09,
+            5.295317966983382e-09
+          ]
+        ],
+        "q24": [
+          [
+            2.116304003555139e-11,
+            7.042015522288746e-12
+          ],
+          [
+            1.9844353530623485e-11,
+            6.252234067146762e-12
+          ]
+        ]
+      }
+    },
+    {
+      "side": "reference",
+      "k": 0.8,
+      "relative_changes": {
+        "tail64": [
+          [
+            2.419877360537844e-06,
+            2.4527028821719154e-06
+          ],
+          [
+            2.4640992176887867e-06,
+            2.137655204691341e-06
+          ]
+        ],
+        "tail256": [
+          [
+            2.8312612234700635e-07,
+            2.851405607050385e-07
+          ],
+          [
+            2.8906772851775905e-07,
+            2.491817154897106e-07
+          ]
+        ],
+        "core1e-4": [
+          [
+            5.943086570555383e-07,
+            6.971560557071375e-07
+          ],
+          [
+            6.575658424930477e-07,
+            7.700759294021921e-07
+          ]
+        ],
+        "core1e-6": [
+          [
+            5.939511473997015e-09,
+            6.968978664497014e-09
+          ],
+          [
+            6.572826727637146e-09,
+            7.698973451841942e-09
+          ]
+        ],
+        "q24": [
+          [
+            9.018592447205883e-11,
+            5.7622297607005786e-11
+          ],
+          [
+            7.073747161469155e-11,
+            3.953505569245674e-11
+          ]
+        ]
+      }
+    }
+  ],
+  "pitch_time_finite_errors": [
+    [
+      0.03717515710429937,
+      0.052827273861185964
+    ],
+    [
+      0.018740680038155884,
+      0.02653200908839316
+    ],
+    [
+      0.009393826881503876,
+      0.013278711538048013
+    ]
+  ],
+  "pitch_time_extrapolated_errors": [
+    [
+      0.0004939420415544257,
+      0.000694144010093369
+    ],
+    [
+      0.00011364436370127298,
+      0.0001710298073391052
+    ]
+  ],
+  "period_3_to_6": [
+    1.598714420474027e-05,
+    1.5151630490699057e-05
+  ],
+  "coarse_sensitivity_is_not_fine_grid_error_bound": true,
+  "sources": {
+    "build/analysis/frequency-settings/candidate-base-k0.05.npz": "5d2ef0f0d3b50dc2115deebc5be15ac786b846fc0e6d32c06a16f9e9a5513e9a",
+    "build/analysis/frequency-settings/candidate-base-k0.2.npz": "68752b5340e85142e1ac898e0709c2537d1baf2d519b3eb717eb0a54f1d1254e",
+    "build/analysis/frequency-settings/candidate-base-k0.8.npz": "78e9d3bc30bb648a48966a41b0efb735683da5c2e6a9907d5f3e9a1351b0ba48",
+    "build/analysis/frequency-settings/candidate-core1e-4-k0.05.npz": "cc1a59feac6b80d33f77b18628e5928e49055795a64b391be7a2089f1efdda6d",
+    "build/analysis/frequency-settings/candidate-core1e-4-k0.2.npz": "2d1037a4891b1883a3ab6a525358dfebbe3ba8713967feea780dc1ec71892615",
+    "build/analysis/frequency-settings/candidate-core1e-4-k0.8.npz": "1ee28adedbf7cb226922c063816152d164b08f69f48202625aebaf3a8ce43f42",
+    "build/analysis/frequency-settings/candidate-core1e-6-k0.05.npz": "caae1bb29103a688b3bb2539b3273aabe3ef13c194f9cd7401fdf32fe4a1cfdc",
+    "build/analysis/frequency-settings/candidate-core1e-6-k0.2.npz": "98c4c4157feec5b29be88cb8e558d8c0c598f758a24167dd0db2746436baf104",
+    "build/analysis/frequency-settings/candidate-core1e-6-k0.8.npz": "7b583641aadb24b59341f65e7068394617ee030d52d95197886b878f7944fccf",
+    "build/analysis/frequency-settings/candidate-q24-k0.05.npz": "e8c388c1d601c5ee1a71e4c497407cdd3eca9f04c6ffb19295d94bdb6b9ed35d",
+    "build/analysis/frequency-settings/candidate-q24-k0.2.npz": "8293286b68789ffc4271986cb8483fb90a33fbcb7ceeb9e7f0b84c690a35c9c3",
+    "build/analysis/frequency-settings/candidate-q24-k0.8.npz": "bb18bc377feb23313f566b9cd0046bd149fde74def67fb137268e503dfedb532",
+    "build/analysis/frequency-settings/candidate-tail256-k0.05.npz": "df950979487f2289e5296b1c12b0f69061e34ae0f475c945cf8601e63844c093",
+    "build/analysis/frequency-settings/candidate-tail256-k0.2.npz": "4efae0d7faa493d08285e56efa283510117d2f2f446fe7bdd824bbf49f21fade",
+    "build/analysis/frequency-settings/candidate-tail256-k0.8.npz": "31aa937ce69fdd56e99f917fcea4e5105aa894bbdebd3f3d73f40a12985de448",
+    "build/analysis/frequency-settings/candidate-tail64-k0.05.npz": "3b288a9c20bedebfc01c203d75c445414f246ef605c1dd767f7d72f049880a52",
+    "build/analysis/frequency-settings/candidate-tail64-k0.2.npz": "24778c0156f55c70fe103267f63af7e5d4d6169e1bfcbbd799a36e1258eaa29f",
+    "build/analysis/frequency-settings/candidate-tail64-k0.8.npz": "1d241e1b693f7a786d25601cfed726a978add037b21f45bd0ad32117a534cdb8",
+    "build/analysis/frequency-settings/reference-base-k0.05.npz": "c11a6c87355c55255fde4e289c9d7fd29e9f2099243586de2270a73e05a09a23",
+    "build/analysis/frequency-settings/reference-base-k0.2.npz": "0ba38ea4acdbd1d35c624f68d34af2b041790821de6df1b369ddbc359b0d4af1",
+    "build/analysis/frequency-settings/reference-base-k0.8.npz": "7b1aa3d3953a9448b4f4decef399bb967295d9e328d0ea9fc7c901a08fc62f19",
+    "build/analysis/frequency-settings/reference-core1e-4-k0.05.npz": "74f1aeb87b67056de44ad8cb85fa9fb0d1df51cdca2a856e40431ebc5e3c66b0",
+    "build/analysis/frequency-settings/reference-core1e-4-k0.2.npz": "64698607c1cf87f22854c76ed6f7b0b19a7ddf99dcf89fa6ed509fdf83682967",
+    "build/analysis/frequency-settings/reference-core1e-4-k0.8.npz": "f130791142de0c984081d36772eef7f568c121e4d4802694fe0d7e4684e08b9d",
+    "build/analysis/frequency-settings/reference-core1e-6-k0.05.npz": "cb8cf20c0121e2610ac5e86eaadc1bac5fdef3810f13db6467494aa114e7a96e",
+    "build/analysis/frequency-settings/reference-core1e-6-k0.2.npz": "e9a1cfc61b6c0ff2aa070a3a7c7a2bc482c7f1cba309c43ed20ba95c0391f9e2",
+    "build/analysis/frequency-settings/reference-core1e-6-k0.8.npz": "f07e5086403760be4c5fe72a4a22a5bc1112fa7d057f6305abf43209c72d7ef6",
+    "build/analysis/frequency-settings/reference-q24-k0.05.npz": "514799c1adcc5c548e62219c06f9d4227a4beb0974db0ec989dd67944f2487e5",
+    "build/analysis/frequency-settings/reference-q24-k0.2.npz": "57ea70ae52a202d160b7a7cc8cb7e950253190439be0971cb598464d60e07e52",
+    "build/analysis/frequency-settings/reference-q24-k0.8.npz": "fbd099decd31d1304f5539524ed23148ff45227288ad6bbf9d3cd98c491b202c",
+    "build/analysis/frequency-settings/reference-tail256-k0.05.npz": "854f84b36504959f85f04224298b432b50299ac85814cb360fb8562ac4e6554b",
+    "build/analysis/frequency-settings/reference-tail256-k0.2.npz": "773f2530ae468db33c8ccd01ecbc4a9dc5bc0b31f0bc2f14c9b7263e2b8a13d6",
+    "build/analysis/frequency-settings/reference-tail256-k0.8.npz": "87fdb23a41d2e60de5d8038a63b57332e1a8ede1fa822ad8bf6f3c203fc30c9e",
+    "build/analysis/frequency-settings/reference-tail64-k0.05.npz": "14f72c4d59e12de82eb8a47165ac3c596352c616e856dcc66838eccd47df6945",
+    "build/analysis/frequency-settings/reference-tail64-k0.2.npz": "c5405b46dda47b6cbe5eb5c1e28be589acdaae744b05c8744977839087d0747c",
+    "build/analysis/frequency-settings/reference-tail64-k0.8.npz": "86f988fb209c0c08dda987050254d29a788fefd86259b6b26a62f773b6ba1ff8",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s1024-c3.json": "c836028b2b480b5bad46dde1d533c4ed1b4c4e7c30a9d3b97e64fb190b482f3e",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s1024-c3.npz": "675fbd425344df80d0f1d6f9a879da82238eb3fc737a50563aee16e6d670496b",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s256-c3.json": "40a5a6cefc6f64cfa1e3201dd4f2ac26e4a60d67f1b42eccfb35eb48527ca94c",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s256-c3.npz": "c0e0236525cbdd18265980e1f79bc5c6dc14a2b23aa02e9bf121914ea5ea52df",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s512-c3.json": "c238c7c8b169102110bb0e3acf1cd19b35d8ff68cdf3b64e09059b2815adca10",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s512-c3.npz": "eef477711af17cbd5157967da748d63ed7bb81c83ee502d9b64d8c6a142a4ebc",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s512-c6.json": "279c3ccf9710695c004ee7b40110354ef738dbc08f1f03036340ad39355df228",
+    "build/analysis/pitch-frequency-2-3/pitch-time-s512-c6.npz": "1f4620089bfdd63b4c56eb17bef77e1bacf98b8c1789be9fa1aa3661c9554e80",
+    "build/analysis/pitch-frequency-2-3/reference-m2-n8-k0.2.npz": "35cc82af3d322755b6e85137efe3f4b2c6d026a5a94ebde612ca93f018095c2d",
+    "docs/verification/frequency-setting-controls-protocol.md": "d3db7160fcce30d4b51de9282e1748a9225a96fc0992bd711d443533884c95a5",
+    "docs/verification/uvlm-pitch-frequency-extension-protocol.md": "c6d170dcf2082e69b39379eee77f95d2981857eb847e6d6de844cf77e7e169db",
+    "tools/design-experiments/assess_frequency_settings_and_pitch_time.py": "764803126af32fe67a8041429ef67ce5b67a0bccf7782b2ec863298abf261251",
+    "tools/design-experiments/probe_ptera_pitch_time.py": "48b4ba0a6c315eee86e36b4c7a44b4eb55d7b9e0d8b29273b75785ea4a8cb2dc",
+    "tools/design-experiments/run_frequency_setting_controls.py": "93d3449d3a2788ddd5d6fc87a04ec67a051fc6fb9e655213f707c3e58e014547"
+  }
+}

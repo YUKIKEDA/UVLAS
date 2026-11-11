@@ -1,0 +1,32 @@
+{
+  "R4_complete": true,
+  "selected_for_R5": "reference-coefficient PG-ANCF with exact integral paired lifting",
+  "rejected_membrane_Ritz_binding_remains_rejected": true,
+  "main_shell_adopted": false,
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "metrics": {
+    "quality_configurations": 28,
+    "quality_rhs": 84,
+    "primary_configurations": 16,
+    "nonquadratic_configurations": 12,
+    "finest_energy_error": 9.563214875446522e-06,
+    "finest_position_error": 5.4666867965311195e-08,
+    "max_thin_amplification": 1.360525455967972,
+    "max_original_stationarity": 7.449074316872561e-12,
+    "max_cold_quality_case_seconds": 154.31299999996554,
+    "actual_capacity_dofs": 100800,
+    "capacity_peak_rss": 919117824
+  },
+  "remaining_milestone": "R5: integrate applicability/rejection conditions and freeze main-shell adoption specification",
+  "limitations": [
+    "representative R4 evidence, not all practical application acceptance",
+    "100800-coordinate capacity measured on independent supported two-curved-patch blocks; globally connected product performance not measured",
+    "exact modal restart oracle is not product time integrator adoption",
+    "prototype coefficient adapter is not product parallel runtime"
+  ],
+  "sources": {
+    "docs/verification/paired-reference-r4-audit.json": "345e3f15dcebb79f2aea865c1dc77be72c8fec7c87f2cabf40bc75db0b07aed9",
+    "tools/design-experiments/close_paired_reference_r4.py": "9a568facee2cbc0c90e908e49736437c26ee49e77369979de67b7833d825e627"
+  }
+}

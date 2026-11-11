@@ -1,0 +1,240 @@
+{
+  "records": [
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "error": [
+          2.7640336570188685e-07,
+          8.252950135016391e-06
+        ],
+        "kkt": [
+          3.1145742771084947e-15,
+          7.0112975161337176e-15
+        ],
+        "linear_residual": [
+          4.0939606815803454e-14,
+          8.641868750096023e-14
+        ],
+        "local_rcond": 0.003084239238547549,
+        "global_rcond": 1.886530883344621e-05
+      },
+      "observed": {
+        "error": [
+          2.7640336544083696e-07,
+          8.25295013974938e-06
+        ],
+        "elastic_error": [
+          1.4524302678214373e-07,
+          8.134905628920148e-06
+        ],
+        "stabilization_error": [
+          2.3516650186236636e-07,
+          1.3908617536450551e-06
+        ],
+        "h1": [
+          0.49043488048108924,
+          2.1284356305903294
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 20.5,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105716/potential-k0.4-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "3d496a9194dfca4e7ce5c339610b4beebaaa8fe85a45c1b379a8749e70c70862"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          2.3120341747888356e-05,
+          5.270361111560939e-05
+        ],
+        "kkt": [
+          2.070645154846033e-13,
+          4.5175586957733013e-13
+        ],
+        "linear_residual": [
+          1.8998227322113212e-12,
+          4.9615775647383044e-12
+        ],
+        "local_rcond": 9.824628636338616e-05,
+        "global_rcond": 2.069392361381779e-07
+      },
+      "observed": {
+        "error": [
+          2.31203416112287e-05,
+          5.270361152386991e-05
+        ],
+        "elastic_error": [
+          2.8543422667779372e-06,
+          5.237453052540489e-05
+        ],
+        "stabilization_error": [
+          2.2943472414697788e-05,
+          5.88040984136529e-06
+        ],
+        "h1": [
+          0.49043488084401454,
+          2.128436310214022
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 21.625,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105716/potential-k0.4-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "0bfe3acbbc1969c4c65a756999fdf44efbfed90798d4ca8145e66cdcab17e956"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 8,
+      "h": 0.001,
+      "fit": {
+        "error": [
+          3.289523526195105e-08,
+          2.4462970788971307e-06
+        ],
+        "kkt": [
+          3.0138055162830744e-14,
+          7.363021735080464e-14
+        ],
+        "linear_residual": [
+          4.611160075025075e-13,
+          1.513668411113319e-12
+        ],
+        "local_rcond": 0.0005812365149932174,
+        "global_rcond": 3.752133685508352e-07
+      },
+      "observed": {
+        "error": [
+          3.289523060904521e-08,
+          2.4462971535964488e-06
+        ],
+        "elastic_error": [
+          9.277118573253632e-09,
+          2.4369094763128004e-06
+        ],
+        "stabilization_error": [
+          3.155996305131008e-08,
+          2.141073748168443e-07
+        ],
+        "h1": [
+          0.49043487638027317,
+          2.12843606910204
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 103.64100000006147,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105716/potential-k0.4-a0.2-n8-h0.001.npz",
+      "artifact_sha256": "ee8c8760522647d520aab6c48fd33a62d1444dce8a5f6d4063b64b5910afda10"
+    },
+    {
+      "kind": "potential",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 8,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          3.181972541899065e-07,
+          6.297247935179568e-06
+        ],
+        "kkt": [
+          2.594842092466503e-13,
+          6.334862199349982e-13
+        ],
+        "linear_residual": [
+          3.622679158358592e-12,
+          1.1350759345296592e-11
+        ],
+        "local_rcond": 0.00013303340099700745,
+        "global_rcond": 4.185752903899288e-08
+      },
+      "observed": {
+        "error": [
+          3.181972133566538e-07,
+          6.297248164107685e-06
+        ],
+        "elastic_error": [
+          7.416313915593932e-08,
+          6.292447447865009e-06
+        ],
+        "stabilization_error": [
+          3.0943383037165895e-07,
+          2.4584457735476415e-07
+        ],
+        "h1": [
+          0.4904348767790402,
+          2.128436136057483
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 96.78099999995902,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105716/potential-k0.4-a0.2-n8-h0.0001.npz",
+      "artifact_sha256": "fcd7d5684ba2a4164d257f1bfb260157d8128b6d98c4a358c20c72223ef71f29"
+    }
+  ],
+  "stop_reason": null,
+  "all_numerical_checks": true,
+  "quartic_accuracy_gate_pass": false,
+  "thin_amplification": [
+    83.6471060124538,
+    6.386032949602963
+  ],
+  "exponential_additional_observation_only": true,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_polynomial_trace_refinement_potential.py": "fe9dbefd6dab06c495d45e5bd6a3aed3c253c0cb95a1ee574cbf59dec6882b28",
+    "tools/design-experiments/polynomial_trace_fit_v2.py": "71a69113e1b36d2a717a30288ee63d7367c6d189bf0ba5c01c6cc996ec41450f",
+    "tools/design-experiments/hybrid_gradient_fit.py": "cc503556db3eefc1e855ecd4599882ec8e927b91f7a33e2ea3ec4205d5b6936c",
+    "tools/design-experiments/hybrid_gradient_ancf.py": "86a7696aeb78c09f5e86d9077df8ecadd1896d79015dbabf34f7ed38c15c9d4b",
+    "docs/verification/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604",
+    "docs/verification/polynomial-trace-potential-refinement-preparation.json": "cc0944d6cc32d0780e343c4c459335ac1591284aa4fde710d41e6ea1045302c0",
+    "docs/verification/polynomial-trace-shared-result.json": "a7bb8a6643c066fe93554d2b66c91c1ea7054bec70e145c1ba5e989724792b07"
+  },
+  "seconds": 242.59400000004098,
+  "peak_bytes": 1626406912
+}

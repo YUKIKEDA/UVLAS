@@ -1,0 +1,240 @@
+{
+  "records": [
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "error": [
+          9.100620615570946e-07,
+          9.800045247639873e-07
+        ],
+        "kkt": [
+          2.4622040517892317e-15,
+          5.447042688796787e-15
+        ],
+        "linear_residual": [
+          3.343030078073877e-14,
+          9.421318502408844e-14
+        ],
+        "local_rcond": 0.002220599110378449,
+        "global_rcond": 3.0383337912515057e-05
+      },
+      "observed": {
+        "error": [
+          9.100620615033307e-07,
+          9.80004526524031e-07
+        ],
+        "elastic_error": [
+          8.795611217045261e-07,
+          9.475080695971623e-07
+        ],
+        "stabilization_error": [
+          2.336347340905624e-07,
+          2.50274509400876e-07
+        ],
+        "h1": [
+          0.49043487732683644,
+          2.1284353449570728
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 20.188000000081956,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105311/weak-k0.4-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "90a611b242e5ea3e9968af3a4a4ec0e4e47afcc03694551e4422eb4743b56112"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          2.397220446827821e-05,
+          1.3371958183219217e-05
+        ],
+        "kkt": [
+          1.5528720470983253e-13,
+          3.7246740611157285e-13
+        ],
+        "linear_residual": [
+          1.840091903199855e-12,
+          4.430937957279629e-12
+        ],
+        "local_rcond": 0.0001014421532730989,
+        "global_rcond": 3.9320310258372114e-07
+      },
+      "observed": {
+        "error": [
+          2.3972204304220335e-05,
+          1.3371957186068094e-05
+        ],
+        "elastic_error": [
+          6.269729382670238e-06,
+          9.285804759788587e-06
+        ],
+        "stabilization_error": [
+          2.3137784523833767e-05,
+          9.62200961073755e-06
+        ],
+        "h1": [
+          0.49043478300864196,
+          2.1284330689080515
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 21.20299999997951,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105311/weak-k0.4-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "4b0d6224531f79d2d909b5dc2fc00ae06f729c1d2d38ef82018627cb00c9a23d"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 8,
+      "h": 0.001,
+      "fit": {
+        "error": [
+          3.9146577899776525e-08,
+          1.1132537530586486e-07
+        ],
+        "kkt": [
+          2.1865719236830417e-14,
+          5.272090553269615e-14
+        ],
+        "linear_residual": [
+          4.736580795441821e-13,
+          1.2634722272579154e-12
+        ],
+        "local_rcond": 0.0003527928928487625,
+        "global_rcond": 7.668786403301626e-07
+      },
+      "observed": {
+        "error": [
+          3.914657268342183e-08,
+          1.1132536102779783e-07
+        ],
+        "elastic_error": [
+          2.2154863248289436e-08,
+          9.062934869924463e-08
+        ],
+        "stabilization_error": [
+          3.227407918605924e-08,
+          6.465026807616697e-08
+        ],
+        "h1": [
+          0.49043487648797507,
+          2.128436102829036
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 95.48499999998603,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105311/weak-k0.4-a0.2-n8-h0.001.npz",
+      "artifact_sha256": "2c025f72ba8ee35eebf10ba08582af93f5909bb9b58d1c1b657ddd57c038a553"
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 8,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          3.603490791164717e-07,
+          8.173028741021394e-07
+        ],
+        "kkt": [
+          2.433580956815547e-13,
+          5.821753840927403e-13
+        ],
+        "linear_residual": [
+          3.2470049358973386e-12,
+          9.997673188219906e-12
+        ],
+        "local_rcond": 7.717330864002937e-05,
+        "global_rcond": 9.274148777846015e-08
+      },
+      "observed": {
+        "error": [
+          3.6034907727562215e-07,
+          8.173030106517691e-07
+        ],
+        "elastic_error": [
+          1.6621049970896116e-07,
+          6.791949589208624e-07
+        ],
+        "stabilization_error": [
+          3.197272701536259e-07,
+          4.5461898222240347e-07
+        ],
+        "h1": [
+          0.4904348765394769,
+          2.128436050747852
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 93.46900000004098,
+      "artifact": "build/analysis/polynomial-trace-refinement-20261104-105311/weak-k0.4-a0.2-n8-h0.0001.npz",
+      "artifact_sha256": "9135cda6680df1170a2fe4510af7f7fa5802ef885620c54ef83d9aecfc7624b1"
+    }
+  ],
+  "stop_reason": null,
+  "all_numerical_checks": true,
+  "quartic_accuracy_gate_pass": false,
+  "thin_amplification": [
+    26.341285191716125,
+    13.644791247543484
+  ],
+  "exponential_additional_observation_only": true,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_polynomial_trace_refinement_weak.py": "659ab91790c3b351c477b5c376594cfced200d30e56e004795c778d3a0aa6990",
+    "tools/design-experiments/polynomial_trace_fit_v2.py": "71a69113e1b36d2a717a30288ee63d7367c6d189bf0ba5c01c6cc996ec41450f",
+    "tools/design-experiments/hybrid_gradient_fit.py": "cc503556db3eefc1e855ecd4599882ec8e927b91f7a33e2ea3ec4205d5b6936c",
+    "tools/design-experiments/hybrid_gradient_ancf.py": "86a7696aeb78c09f5e86d9077df8ecadd1896d79015dbabf34f7ed38c15c9d4b",
+    "docs/verification/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604",
+    "docs/verification/polynomial-trace-weak-refinement-preparation.json": "794cad0bce4eefcacdc452b9c2a9ec60b82298b02c9fad11acb0c5b91db52b6e",
+    "docs/verification/polynomial-trace-shared-result.json": "a7bb8a6643c066fe93554d2b66c91c1ea7054bec70e145c1ba5e989724792b07"
+  },
+  "seconds": 230.40700000000652,
+  "peak_bytes": 1626329088
+}

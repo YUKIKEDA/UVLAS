@@ -1,0 +1,1320 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1147773454050829e-15,
+        "constant": 1.4155343563970746e-14,
+        "work": 1.0592166331478622e-15,
+        "surface_work": 4.0021458917392664e-17,
+        "patch": 1.5768109254969568e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "material_tangent": 1.5266210753119508e-16,
+        "geometric_tangent": 7.632783294297951e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1147864161895507e-15,
+        "constant": 1.4155343563970746e-14,
+        "work": 1.0591329563633764e-15,
+        "surface_work": 3.875935472230572e-18,
+        "patch": 1.5768109254969568e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "material_tangent": 6.105913248447633e-16,
+        "geometric_tangent": 1.4224732503009818e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1147871218773632e-15,
+        "constant": 1.4155343563970746e-14,
+        "work": 1.0591346812661299e-15,
+        "surface_work": 4.0581762931527075e-19,
+        "patch": 1.5768109254969568e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "material_tangent": 6.105907538467834e-16,
+        "geometric_tangent": 9.020562075079397e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1864495089516089e-15,
+        "constant": 3.2679317151645957e-15,
+        "work": 1.227946178850924e-15,
+        "surface_work": 1.7786777584180225e-17,
+        "patch": 1.8191442656556584e-15,
+        "patch_energy": 3.219646771412954e-15,
+        "material_tangent": 1.2940412071114546e-15,
+        "geometric_tangent": 4.163336342344337e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1864572785654644e-15,
+        "constant": 3.2679317151645957e-15,
+        "work": 1.227941996556522e-15,
+        "surface_work": 1.8035010091636355e-18,
+        "patch": 1.8191442656556584e-15,
+        "patch_energy": 3.219646771412954e-15,
+        "material_tangent": 9.7047944673443e-16,
+        "geometric_tangent": 1.5265566588595902e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.18645684818524e-15,
+        "constant": 3.2679317151645957e-15,
+        "work": 1.2279487032258495e-15,
+        "surface_work": 1.8192994385720693e-19,
+        "patch": 1.8191442656556584e-15,
+        "patch_energy": 3.219646771412954e-15,
+        "material_tangent": 1.6174648869211056e-15,
+        "geometric_tangent": 0.0
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1161526024345373e-15,
+        "constant": 3.635980405647388e-15,
+        "work": 1.3842642040613815e-15,
+        "surface_work": 2.053830555362063e-17,
+        "patch": 2.822842224700565e-15,
+        "patch_energy": 1.5543122344752192e-15,
+        "material_tangent": 1.8864053812586645e-15,
+        "geometric_tangent": 1.5265566588595902e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1161537442652186e-15,
+        "constant": 3.635980405647388e-15,
+        "work": 1.3842435244098677e-15,
+        "surface_work": 2.1356445769756403e-18,
+        "patch": 2.822842224700565e-15,
+        "patch_energy": 1.5543122344752192e-15,
+        "material_tangent": 2.321501487008665e-15,
+        "geometric_tangent": 4.163336342344337e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.116153626825175e-15,
+        "constant": 3.635980405647388e-15,
+        "work": 1.384242148356648e-15,
+        "surface_work": 2.02774922804557e-19,
+        "patch": 2.822842224700565e-15,
+        "patch_energy": 1.5543122344752192e-15,
+        "material_tangent": 7.254685015771516e-16,
+        "geometric_tangent": 9.71445146547012e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0058343018463818e-15,
+        "constant": 4.3486528343187836e-15,
+        "work": 1.0088922246986014e-15,
+        "surface_work": 1.783823723909115e-17,
+        "patch": 1.6669688770025318e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "material_tangent": 1.0244466439738173e-15,
+        "geometric_tangent": 4.163336342344337e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0058333112374224e-15,
+        "constant": 4.3486528343187836e-15,
+        "work": 1.0089109299238803e-15,
+        "surface_work": 1.7537170399148653e-18,
+        "patch": 1.6669688770025318e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "material_tangent": 1.0243828380842296e-15,
+        "geometric_tangent": 6.938893903907228e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0058333389645676e-15,
+        "constant": 4.3486528343187836e-15,
+        "work": 1.008910450699155e-15,
+        "surface_work": 1.7305541071495308e-19,
+        "patch": 1.6669688770025318e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "material_tangent": 0.0,
+        "geometric_tangent": 6.938893903907228e-18
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.048519423553247e-15,
+        "constant": 2.9976021664879227e-15,
+        "work": 1.2603333055910756e-15,
+        "surface_work": 2.2321233286810112e-17,
+        "patch": 3.236011033149387e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "material_tangent": 0.0,
+        "geometric_tangent": 5.551115123125783e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0485182234431669e-15,
+        "constant": 2.9976021664879227e-15,
+        "work": 1.2603204260130042e-15,
+        "surface_work": 2.251349624578873e-18,
+        "patch": 3.236011033149387e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "material_tangent": 6.468174614626537e-16,
+        "geometric_tangent": 2.7755575615628914e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0485183087240376e-15,
+        "constant": 2.9976021664879227e-15,
+        "work": 1.2603204427751445e-15,
+        "surface_work": 2.2091903332242385e-19,
+        "patch": 3.236011033149387e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "material_tangent": 3.2340850298603257e-16,
+        "geometric_tangent": 1.3877787807814457e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 9.859150757463456e-16,
+        "constant": 2.914335439641036e-15,
+        "work": 6.869537764867579e-16,
+        "surface_work": 2.9615331141414966e-16,
+        "patch": 1.652099216788565e-15,
+        "patch_energy": 3.4416913763379853e-15,
+        "material_tangent": 8.343444307744537e-16,
+        "geometric_tangent": 1.249000902703301e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1679643264483884e-15,
+        "constant": 2.9976021664879227e-15,
+        "work": 7.79373662306508e-16,
+        "surface_work": 1.4179871890656102e-16,
+        "patch": 1.5884089479133468e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "material_tangent": 1.8776277750899776e-15,
+        "geometric_tangent": 2.7755575615628914e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0111478980911702e-15,
+        "constant": 6.966649479522857e-15,
+        "work": 9.457392492697225e-16,
+        "surface_work": 2.579696885743112e-16,
+        "patch": 1.5203035601048724e-15,
+        "patch_energy": 1.5543122344752192e-15,
+        "material_tangent": 2.0862570042495053e-16,
+        "geometric_tangent": 9.71445146547012e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1768045359681675e-15,
+        "constant": 5.4162837409554855e-15,
+        "work": 9.709040877615789e-16,
+        "surface_work": 4.858782457956733e-17,
+        "patch": 2.1824686403520382e-15,
+        "patch_energy": 1.3322676295501878e-15,
+        "material_tangent": 4.852877891000077e-16,
+        "geometric_tangent": 1.1796119636642288e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.013571181537773e-15,
+        "constant": 3.0884149404553087e-15,
+        "work": 1.1096936859970113e-15,
+        "surface_work": 4.352213088228561e-17,
+        "patch": 2.3668336313383522e-15,
+        "patch_energy": 3.552713678800501e-15,
+        "material_tangent": 1.2940766195815021e-15,
+        "geometric_tangent": 8.326672684688674e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0827627235768697e-15,
+        "constant": 3.3306690738754696e-15,
+        "work": 8.455922526965277e-16,
+        "surface_work": 4.963751024864624e-17,
+        "patch": 2.143844949328399e-15,
+        "patch_energy": 1.2212453270876722e-15,
+        "material_tangent": 6.470381890661385e-16,
+        "geometric_tangent": 1.457167719820518e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 9.680900835919437e-16,
+        "constant": 6.601365031780668e-15,
+        "work": 1.2796143490865092e-15,
+        "surface_work": 5.4487633333434696e-17,
+        "patch": 4.112291276559603e-15,
+        "patch_energy": 3.3306690738754696e-15,
+        "material_tangent": 1.6312577288142563e-15,
+        "geometric_tangent": 1.6653345369377348e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1155343206005212e-15,
+        "constant": 9.927918759328418e-15,
+        "work": 1.2711646064794586e-15,
+        "surface_work": 6.847476642620119e-17,
+        "patch": 4.586277361548325e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "material_tangent": 3.625354502078672e-16,
+        "geometric_tangent": 6.938893903907228e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0335030640056343e-15,
+        "constant": 8.471757760619713e-15,
+        "work": 1.344623286241009e-15,
+        "surface_work": 5.3534147242525677e-17,
+        "patch": 4.076713277379033e-15,
+        "patch_energy": 1.9984014443252818e-15,
+        "material_tangent": 2.3564826194776852e-15,
+        "geometric_tangent": 1.1796119636642288e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.1474336424243227e-15,
+        "constant": 2.886579864025407e-15,
+        "work": 8.763305115119949e-16,
+        "surface_work": 5.075429292477039e-17,
+        "patch": 2.116692375544401e-15,
+        "patch_energy": 1.2212453270876722e-15,
+        "material_tangent": 1.5207532338321422e-16,
+        "geometric_tangent": 1.0408340855860843e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 9.925331289066755e-16,
+        "constant": 3.708182018890422e-15,
+        "work": 6.933158549169593e-16,
+        "surface_work": 5.708337588732946e-17,
+        "patch": 2.11282674388008e-15,
+        "patch_energy": 1.5543122344752192e-15,
+        "material_tangent": 9.12454951350009e-16,
+        "geometric_tangent": 1.4051260155412137e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0693255986685282e-15,
+        "constant": 3.9968028886505635e-15,
+        "work": 1.2006668016868986e-15,
+        "surface_work": 5.2112359539052165e-17,
+        "patch": 2.347873875427923e-15,
+        "patch_energy": 2.886579864025407e-15,
+        "material_tangent": 6.083033210027842e-16,
+        "geometric_tangent": 1.3877787807814457e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "h": 0.01,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.0894519138997396e-15,
+        "constant": 6.953434380115291e-15,
+        "work": 9.718302292845044e-16,
+        "surface_work": 7.188299257519997e-17,
+        "patch": 4.1373143940543666e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "material_tangent": 8.717704806371705e-16,
+        "geometric_tangent": 7.632783294297951e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "h": 0.001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.23101541931447e-15,
+        "constant": 8.313331143991438e-15,
+        "work": 1.2675310612210878e-15,
+        "surface_work": 5.0922281449514305e-17,
+        "patch": 4.129388855683215e-15,
+        "patch_energy": 2.55351295663786e-15,
+        "material_tangent": 4.359186806139594e-16,
+        "geometric_tangent": 1.1449174941446927e-16
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "h": 0.0001,
+      "primary_passed": true,
+      "metrics": {
+        "field_difference": 1.165919709267658e-15,
+        "constant": 5.063330572643342e-15,
+        "work": 1.0753432310558103e-15,
+        "surface_work": 3.602838131137095e-17,
+        "patch": 4.34006787933126e-15,
+        "patch_energy": 6.661338147750939e-16,
+        "material_tangent": 6.538785226565524e-16,
+        "geometric_tangent": 2.0816681711721685e-17
+      },
+      "checks": {
+        "field_difference": true,
+        "constant": true,
+        "work": true,
+        "surface_work": true,
+        "patch": true,
+        "patch_energy": true,
+        "material_tangent": true,
+        "geometric_tangent": true
+      }
+    }
+  ],
+  "states": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            203,
+            203,
+            203
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            203,
+            203,
+            203
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            210,
+            210,
+            210
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            211,
+            211,
+            211
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            211,
+            211,
+            211
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        }
+      ],
+      "reproduced": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "primary_passed": true,
+      "field_reports": [
+        {
+          "order": 9,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        },
+        {
+          "order": 11,
+          "ranks": [
+            226,
+            226,
+            226
+          ]
+        }
+      ],
+      "reproduced": true
+    }
+  ],
+  "shared_edge_checks": [
+    {
+      "kappa": 0.0,
+      "h": 0.01,
+      "cells": [
+        0,
+        1
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.01,
+      "cells": [
+        0,
+        2
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.01,
+      "cells": [
+        1,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.01,
+      "cells": [
+        2,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.001,
+      "cells": [
+        0,
+        1
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.001,
+      "cells": [
+        0,
+        2
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.001,
+      "cells": [
+        1,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.001,
+      "cells": [
+        2,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.0001,
+      "cells": [
+        0,
+        1
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.0001,
+      "cells": [
+        0,
+        2
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.0001,
+      "cells": [
+        1,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.0001,
+      "cells": [
+        2,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.01,
+      "cells": [
+        0,
+        1
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.01,
+      "cells": [
+        0,
+        2
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.01,
+      "cells": [
+        1,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.01,
+      "cells": [
+        2,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.001,
+      "cells": [
+        0,
+        1
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.001,
+      "cells": [
+        0,
+        2
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.001,
+      "cells": [
+        1,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.001,
+      "cells": [
+        2,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.0001,
+      "cells": [
+        0,
+        1
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.0001,
+      "cells": [
+        0,
+        2
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.0001,
+      "cells": [
+        1,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.0001,
+      "cells": [
+        2,
+        3
+      ],
+      "error": 0.0,
+      "passed": true
+    }
+  ],
+  "preparation_failure_audit": null,
+  "all_reproduction_checks": true,
+  "primary_complete": true,
+  "physical_adoption": false,
+  "stop_reason": null,
+  "sources": {
+    "tools/design-experiments/audit_gsp_q3_local_v2.py": "8d0c1dfdb377b9d07a8dfd9cf29bcb9a2d07147609eee63271b38f631c3689a1",
+    "tools/design-experiments/gsp_q3_v2.py": "82135b41ad8c32e88a61e63bf8a9874983d4e5ac1670712ef213daaf64f9faed",
+    "docs/verification/gsp-q3-local-v2-result.json": "0453c840cb51be43540abe47a05d038f9a85192ae11199d8521f1f708a7435cc",
+    "docs/verification/gsp-q3-local-v2-protocol.md": "7b90202c4e29ca6ac38d0ac2fac14513594b098e9502c7fd50e5dcb31594376e"
+  },
+  "seconds": 10.672000000020489
+}

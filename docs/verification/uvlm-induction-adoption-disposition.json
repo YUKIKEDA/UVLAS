@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "uvlm_2_1_complete": true,
+  "uvlm_review_complete": false,
+  "structural_review_complete": true,
+  "product_implementation_start": false,
+  "decisions": [
+    "UI-D01",
+    "UI-D02",
+    "UI-D03",
+    "UI-D04",
+    "UI-D05",
+    "UI-D06"
+  ],
+  "metrics": {
+    "verification_groups": 10,
+    "individually_qualified_velocity_columns": 81,
+    "individually_qualified_geometric_columns": 117,
+    "max_individual_velocity_relative": 1.0997730716015846e-11,
+    "max_individual_geometry_relative": 2.6660258031529957e-12,
+    "max_near_relative": 1.0997730673680264e-11,
+    "shared_vertex_chain_rule_error": 1.10108278552966e-14,
+    "trace_averaging_defect": 0.6299164116588432,
+    "incident_mesh_node_error": 6.0405169871783435e-15,
+    "negative_controls": 10
+  },
+  "legacy_recorded_status": {
+    "uvlm-column-update": true,
+    "uvlm-adaptive-quadrature": true,
+    "uvlm-wp1-three-dimensional": false
+  },
+  "next_work": "2.2 wake assembly state topology and loads",
+  "specification": "docs/uvlm-induction-adopted-specification.md",
+  "default_core_radius_selected": false,
+  "finite_wing_reference_qualified": false,
+  "free_wake_time_update_adopted": false
+}

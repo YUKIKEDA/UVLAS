@@ -1,0 +1,17 @@
+{
+  "accepted": false,
+  "R4_complete": false,
+  "issue": "recursive interval Cholesky enclosure growth",
+  "n4_cylinder": {
+    "h": 0.0001,
+    "coefficient_radius": 2295185505517568.0
+  },
+  "n2_nonquadratic": {
+    "h": 0.0001,
+    "reason": "uncertified_positive_mass_pivot"
+  },
+  "next": "midpoint factorization followed by verified congruence enclosure",
+  "sources": {
+    "tools/design-experiments/mass_paired_ancf_v1.py": "1fadbdad9f408ae48a95f175274ef0bb4f0c25678879a0b1db0fa84c64e0fe19"
+  }
+}

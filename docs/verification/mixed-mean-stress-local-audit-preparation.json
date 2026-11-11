@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "tools/design-experiments/mixed_mean_stress_element.py": "f3db9d2c7c7d49fe5e58efed880ce8d2b59b2873be193c6b8fdfde39ef87149d",
+    "tools/design-experiments/check_mixed_mean_stress_local.py": "ade858496842b8ec0f3cfbd1079f4a4e3ceac107971e6eb7c9bd770195c0313c",
+    "tools/design-experiments/audit_mixed_mean_stress_thin.py": "7e886a83a7bdf95960211652ac694cbea771bad0e6bdd77f74811339f0077ff7",
+    "tools/design-experiments/mixed_mean_stress_space_v4.py": "327a5dd769db68e17795b01fa2e6411f00821eb1856a6fc206774aa42cfd14c8",
+    "tools/design-experiments/mixed_mean_stress_basis.py": "e4d229e54b8e400e86e2a387f9fa836e4cb60850e30a51bed8b74dab0010e5a4",
+    "tools/design-experiments/mixed_mean_stress_thin_v6.py": "b1bb040c7daf93cceefd29acd2da410536ef0cc898efaf6679bc05b04266359c",
+    "docs/verification/mixed-mean-stress-thin-v6-result.json": "5575b0464d2e2b2657b764dc9f71019c8148401daa92f67ccc895589bf89e340",
+    "docs/verification/mixed-mean-stress-local-protocol.md": "0aadc2609dc75d1456dbe5f970b6c198e89e007948b603a191f7fd56839e3d78",
+    "docs/verification/mixed-mean-stress-gauge-v6.md": "8b918b575573e058d4c624ac6a44b00c3e580e073fd615db1871cd5a2a93f531"
+  }
+}

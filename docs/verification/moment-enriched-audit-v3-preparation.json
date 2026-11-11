@@ -1,0 +1,8 @@
+{
+  "reason": "Use existing coefficient face evaluator from the imported old module; missing export in auditor v2, no operator/threshold change.",
+  "sources": {
+    "tools/design-experiments/audit_moment_enriched_local_v3.py": "be067e8887902dc5474b339c8e7b49460931f46cc22a2bcee6c2b5b7fdd11c73",
+    "tools/design-experiments/moment_enriched_ancf.py": "7cd471191740fd624eab4ca1481c2d35444c49e9a4ae691e4f0fb893588aac24",
+    "docs/verification/moment-enriched-v2-local-audit.json": "5482483d9512184d57ab7a06fe459253cce9d86a79384f4cbffaf6bc36f7b2cb"
+  }
+}

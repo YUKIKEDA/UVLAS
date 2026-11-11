@@ -1,0 +1,101 @@
+{
+  "passed": false,
+  "scope": "harmonic independent operators and common load observable on two wings; native observation differences retained; not continuum accuracy",
+  "records": [
+    {
+      "dihedral": 0,
+      "m": 2,
+      "n": 8,
+      "errors": {
+        "A": 1.0568472205866286e-09,
+        "gamma": 1.1921230574555707e-09,
+        "dual": 9.301534145585444e-10
+      },
+      "native_observation_raw_difference": 0.04687741843025045,
+      "observation_identity_error": 0.0,
+      "passed": false
+    },
+    {
+      "dihedral": 0,
+      "m": 4,
+      "n": 16,
+      "errors": {
+        "A": 6.578969274384449e-09,
+        "gamma": 2.3701906474828487e-09,
+        "dual": 1.6411597105028422e-09
+      },
+      "native_observation_raw_difference": 0.025807052816903812,
+      "observation_identity_error": 3.707333507552051e-19,
+      "passed": false
+    },
+    {
+      "dihedral": 0,
+      "m": 8,
+      "n": 32,
+      "errors": {
+        "A": 6.849209972607634e-08,
+        "gamma": 1.3418476935058199e-08,
+        "dual": 2.6945254714133895e-09
+      },
+      "native_observation_raw_difference": 0.013011603187071175,
+      "observation_identity_error": 1.3593610495845642e-19,
+      "passed": false
+    },
+    {
+      "dihedral": 5,
+      "m": 2,
+      "n": 8,
+      "errors": {
+        "A": 2.2306901938366433e-09,
+        "gamma": 3.553344771792909e-09,
+        "dual": 3.733152914570227e-09
+      },
+      "native_observation_raw_difference": 0.0466858081972146,
+      "observation_identity_error": 4.956866714013907e-19,
+      "passed": false
+    },
+    {
+      "dihedral": 5,
+      "m": 4,
+      "n": 16,
+      "errors": {
+        "A": 6.76986727103937e-09,
+        "gamma": 2.8544128500599085e-09,
+        "dual": 3.978449306169592e-10
+      },
+      "native_observation_raw_difference": 0.025706528873323805,
+      "observation_identity_error": 2.563540175684355e-19,
+      "passed": false
+    },
+    {
+      "dihedral": 5,
+      "m": 8,
+      "n": 32,
+      "errors": {
+        "A": 6.855070061668175e-08,
+        "gamma": 1.4141274093708978e-08,
+        "dual": 3.0409824112114446e-09
+      },
+      "native_observation_raw_difference": 0.012960751780908455,
+      "observation_identity_error": 1.464132771684005e-19,
+      "passed": false
+    }
+  ],
+  "sources": {
+    "build/analysis/multiple-surface-harmonic/candidate-d0-m2-n8.npz": "9bd486be7b4a06f88ccedfa5fafc431be5e0e66743d19afd980d9c63b8dc50b6",
+    "build/analysis/multiple-surface-harmonic/reference-d0-m2-n8.npz": "a58c6da10f220b7dc15b88ab45a4574c8eaee356531b7fab13bd81beb6a8b6ff",
+    "build/analysis/multiple-surface-harmonic/candidate-d0-m4-n16.npz": "b59c8ce906de302da9fe5fe12ec36d5918dc528965764e59638b2214a60dc514",
+    "build/analysis/multiple-surface-harmonic/reference-d0-m4-n16.npz": "d74cd5b8f02a31e46df58cbc310a3137a768e54f3115af6621dca1b939392b8c",
+    "build/analysis/multiple-surface-harmonic/candidate-d0-m8-n32.npz": "4acc3c66b5d6d13671505c8b990be5c0e9c08222bf550490ef67a85f3a75cf6a",
+    "build/analysis/multiple-surface-harmonic/reference-d0-m8-n32.npz": "7128966faf008443eff5382e09bed8d8d99641618d206d02ae4190e472108688",
+    "build/analysis/multiple-surface-harmonic/candidate-d5-m2-n8.npz": "49ae77893a5c487c35e316a98fb6a5fb3a534cbc3630c725e6e59db98da2cf0e",
+    "build/analysis/multiple-surface-harmonic/reference-d5-m2-n8.npz": "417b0b1ddbdccb6c75d785ce3949b3deccbb67d4cfe852f868007bea753b3360",
+    "build/analysis/multiple-surface-harmonic/candidate-d5-m4-n16.npz": "67cfb9d11b199e4ffdab39eddedfc6ba11186ed7bc559e220bfc0d9f7f5614f2",
+    "build/analysis/multiple-surface-harmonic/reference-d5-m4-n16.npz": "88453a56c1db441334ebfad11880e011440a6ca0c918581b72e683fc17250203",
+    "build/analysis/multiple-surface-harmonic/candidate-d5-m8-n32.npz": "912a4cc24416ce774e0caa538952c2e79c8a76c5edb2a25be18b83da27db0fde",
+    "build/analysis/multiple-surface-harmonic/reference-d5-m8-n32.npz": "71e8f884d2b3d99d1d3ba47b0751d51d4af025c8283c7b80242a7915f0fa0c9c",
+    "tools/design-experiments/assess_multiple_surface_harmonic.py": "8e7d6ea66b4184c02c10155b57ec94256d0313390668a7e70d53631a0274b0c3",
+    "tools/design-experiments/run_multiple_surface_harmonic.py": "3ecbc3dc4e1bf02b4b47744652905184dc1b4a76b12cfa1a90fc8beac59bdd60",
+    "docs/verification/multiple-surface-harmonic-protocol.md": "e50d31db6dca90d30b11df6014fd3e53674073557138f93b55187dd3723285df"
+  }
+}

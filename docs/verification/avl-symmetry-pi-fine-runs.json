@@ -1,0 +1,1760 @@
+{
+  "protocol": "docs/verification/avl-symmetry-fine-observation-addendum.md",
+  "protocol_sha256": "25a20c842127de1abfd2f6edd169797d8fb7615e1c55caccd013c49606cccd60",
+  "source_sha256": "c4dc067e7abb7a5e1ea2dd7c5be3ffebc3b7097ad1f3fd53bfc46c829e17bf29",
+  "resource_runner_sha256": "772ee3f888faf887526c0884671718cecf66bc88a28d24b92e5dcf3b3fa5e334",
+  "preparation_sha256": "9168f66d6a61cfb514ccfbb20a551e8972612c92779983afc1d59c84174d087e",
+  "spacing_result_sha256": "8bfef85655889d3f9c21ba71c445068931ee3d9a83536218a2cbb5054da819db",
+  "gate_sha256": "49fa2ad4f4641f4a8f612fb094b073ebd7f1b10b582fa54350efb2f2e5342f61",
+  "stage": "fine",
+  "runs": [
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 80,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N80/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N80",
+      "native_unknowns": 960,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 1.0602850870000005,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73076736,
+      "maximum_group_live_bytes": 74756096,
+      "available_memory_before": 24194514944,
+      "files": {
+        "console.txt": {
+          "sha256": "a38912b4812636c118f861d3474e581227ae1217c71e7cbb57a1743b4c58e53c",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "bcfd58c9934452163ee1f2698b532b2257b8d1633f4c2441acee5fe95259e3c8",
+          "bytes": 819
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "6fa23259992e1d9f2f08004d3f780fd2cef314f09b69ff6c30d0e21ed480cb68",
+          "bytes": 881
+        },
+        "after/elements.txt": {
+          "sha256": "f69654dade40e2504e131c102862cfc908bbb30eb7450eada91b0b366a757fdd",
+          "bytes": 190734
+        },
+        "after/strips.txt": {
+          "sha256": "e1d080d1edb42eaacc40dc6d35b929ddcc61c25d5ba58e34379796cb1c513b73",
+          "bytes": 14194
+        },
+        "after/total.txt": {
+          "sha256": "06ba9b293dafc7b81e8f6d8cf05e0f8587f87a2b5d1b2f10bf0a1a3cf5de64ac",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "835468096ae4b8511304abb1bc7fdef766479c39b92456fc1799b658c97d3c4b",
+          "bytes": 544380
+        },
+        "after/uv-rows.txt": {
+          "sha256": "bbf7a17dadfd667c7c451c7c3f496a4dfa23655ed7210a0bc64af164f803edca",
+          "bytes": 527104
+        },
+        "after/uv-strips.txt": {
+          "sha256": "c6b638eabb64251b02c3aca3fcd80aa62df931dbbee03dde1920375388371428",
+          "bytes": 3310
+        },
+        "out/elements.txt": {
+          "sha256": "f69654dade40e2504e131c102862cfc908bbb30eb7450eada91b0b366a757fdd",
+          "bytes": 190734
+        },
+        "out/strips.txt": {
+          "sha256": "e1d080d1edb42eaacc40dc6d35b929ddcc61c25d5ba58e34379796cb1c513b73",
+          "bytes": 14194
+        },
+        "out/total.txt": {
+          "sha256": "06ba9b293dafc7b81e8f6d8cf05e0f8587f87a2b5d1b2f10bf0a1a3cf5de64ac",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "835468096ae4b8511304abb1bc7fdef766479c39b92456fc1799b658c97d3c4b",
+          "bytes": 544380
+        },
+        "out/uv-rows.txt": {
+          "sha256": "bbf7a17dadfd667c7c451c7c3f496a4dfa23655ed7210a0bc64af164f803edca",
+          "bytes": 527104
+        },
+        "out/uv-strips.txt": {
+          "sha256": "c6b638eabb64251b02c3aca3fcd80aa62df931dbbee03dde1920375388371428",
+          "bytes": 3310
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 80,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N80/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N80",
+      "native_unknowns": 960,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 1.2216929050000003,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73302016,
+      "maximum_group_live_bytes": 74731520,
+      "available_memory_before": 24144134144,
+      "files": {
+        "console.txt": {
+          "sha256": "4c18f18d9dcc9a8025712f0e160a50ba2269ce3313cc0a9f69100b332bb0e21e",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "6894852860ba6f7962f29e94ddbf1a81f8d8e00b4c627a83b4ac464080335488",
+          "bytes": 819
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "27a575969403e2a5d2cc65e551e6dbf5b373aa54c0e2d136ee112bf88ceb2884",
+          "bytes": 1063
+        },
+        "after/elements.txt": {
+          "sha256": "6aa1f7b01ac28cd6d07e74d7f387a3e4b8409347230888b23880f99649cb6325",
+          "bytes": 190734
+        },
+        "after/strips.txt": {
+          "sha256": "4f3663aed659ffe50425ca23bf7042c3156282ecdfc7ce785ded09fc0a7bfb48",
+          "bytes": 14194
+        },
+        "after/total.txt": {
+          "sha256": "f3e7958536decef9d31eded6a74778cd418ee8aeaca0ed896405d7230b2cca97",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "2078c762fa88d5e1b680742898b935d4868cf13b19c298af16638c475f4a9fbe",
+          "bytes": 544380
+        },
+        "after/uv-rows.txt": {
+          "sha256": "34a20e1f2ef1ea735ed012c122d8c3ec26db50e57cb5dbc0ca9594ede1e0840b",
+          "bytes": 527104
+        },
+        "after/uv-strips.txt": {
+          "sha256": "1db82db5c8b18d274caa6373caf4cb0600c0c35331a2a32f8f5be60e56b45931",
+          "bytes": 3310
+        },
+        "out/elements.txt": {
+          "sha256": "6aa1f7b01ac28cd6d07e74d7f387a3e4b8409347230888b23880f99649cb6325",
+          "bytes": 190734
+        },
+        "out/strips.txt": {
+          "sha256": "4f3663aed659ffe50425ca23bf7042c3156282ecdfc7ce785ded09fc0a7bfb48",
+          "bytes": 14194
+        },
+        "out/total.txt": {
+          "sha256": "f3e7958536decef9d31eded6a74778cd418ee8aeaca0ed896405d7230b2cca97",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "2078c762fa88d5e1b680742898b935d4868cf13b19c298af16638c475f4a9fbe",
+          "bytes": 544380
+        },
+        "out/uv-rows.txt": {
+          "sha256": "34a20e1f2ef1ea735ed012c122d8c3ec26db50e57cb5dbc0ca9594ede1e0840b",
+          "bytes": 527104
+        },
+        "out/uv-strips.txt": {
+          "sha256": "1db82db5c8b18d274caa6373caf4cb0600c0c35331a2a32f8f5be60e56b45931",
+          "bytes": 3310
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "physical_n": 160,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M3-N160/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160",
+      "native_unknowns": 240,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.41782721799999933,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 13328384,
+      "maximum_group_live_bytes": 14561280,
+      "available_memory_before": 24110116864,
+      "files": {
+        "console.txt": {
+          "sha256": "d86880351f3f17fe9be083441df095a99db76c1c569a9629c1d0dd882d953fc8",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "69a666bfd793aeb6002c540d0540afe08dfe6cfb1338b97a45ecca12fa9d9a1b",
+          "bytes": 818
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "9c184ad1e3dbb5ab7fe5a472f64b01bbf8ed1cd3fa6ee3f314cbe5152a29e5cd",
+          "bytes": 880
+        },
+        "after/elements.txt": {
+          "sha256": "69b424b5be2317afdb33cedc007c1db5783797fd353b8bd95226b4d719b65f0b",
+          "bytes": 89934
+        },
+        "after/strips.txt": {
+          "sha256": "1034532038ecf72ea2bcaea4968539c46d2f41a01ae3d09c439dcb635096d530",
+          "bytes": 27274
+        },
+        "after/total.txt": {
+          "sha256": "42617a3a4bf0392556287686373d6660693cd0999ec40df67966c821f85f5717",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-matrix.bin": {
+          "sha256": "efa08212623bd907169b90476917bf06d89236840ae056922b77bb3774b6c585",
+          "bytes": 460800
+        },
+        "after/uh-meta.txt": {
+          "sha256": "57b8619195c620d1e57f77bbeea36792dfe1a12c51ebfee41ce67269a5773256",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "1979d3b6168f2b1a5a226bb7e972f6511e193fc4f787a923f6fc1ee88b3af4a8",
+          "bytes": 136140
+        },
+        "after/uv-rows.txt": {
+          "sha256": "f64031e91beebf5e314dd38a701b9b0eecf1a1cb4b7e29472a3e7f549c9f838c",
+          "bytes": 131824
+        },
+        "after/uv-strips.txt": {
+          "sha256": "374c7050f6a2b2ce995f5c39b3f38d8168f97ea3b389608bf2050933b5e276bd",
+          "bytes": 6550
+        },
+        "out/elements.txt": {
+          "sha256": "69b424b5be2317afdb33cedc007c1db5783797fd353b8bd95226b4d719b65f0b",
+          "bytes": 89934
+        },
+        "out/strips.txt": {
+          "sha256": "1034532038ecf72ea2bcaea4968539c46d2f41a01ae3d09c439dcb635096d530",
+          "bytes": 27274
+        },
+        "out/total.txt": {
+          "sha256": "42617a3a4bf0392556287686373d6660693cd0999ec40df67966c821f85f5717",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-matrix.bin": {
+          "sha256": "efa08212623bd907169b90476917bf06d89236840ae056922b77bb3774b6c585",
+          "bytes": 460800
+        },
+        "out/uh-meta.txt": {
+          "sha256": "57b8619195c620d1e57f77bbeea36792dfe1a12c51ebfee41ce67269a5773256",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "1979d3b6168f2b1a5a226bb7e972f6511e193fc4f787a923f6fc1ee88b3af4a8",
+          "bytes": 136140
+        },
+        "out/uv-rows.txt": {
+          "sha256": "f64031e91beebf5e314dd38a701b9b0eecf1a1cb4b7e29472a3e7f549c9f838c",
+          "bytes": 131824
+        },
+        "out/uv-strips.txt": {
+          "sha256": "374c7050f6a2b2ce995f5c39b3f38d8168f97ea3b389608bf2050933b5e276bd",
+          "bytes": 6550
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "physical_n": 160,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N160/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160",
+      "native_unknowns": 480,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.42162935900000065,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 26353664,
+      "maximum_group_live_bytes": 28028928,
+      "available_memory_before": 24090624000,
+      "files": {
+        "console.txt": {
+          "sha256": "978c1219ced27bea91e77f709e9207dbd459c2dccc4e6a06ab6f7755f79d7827",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "70400aed3101150887c6de3b59db67ab3b7b3de391a54b4aa82a865679e2a981",
+          "bytes": 818
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "fab01ab4914f3ab1d423fce40a894aa4d39b88521d7148a4cb9e17485d1866e0",
+          "bytes": 880
+        },
+        "after/elements.txt": {
+          "sha256": "66c715e3dad0fa3b1620dcffe94d966befb9f11b7907efe20ddbaa6f3e8474bb",
+          "bytes": 131454
+        },
+        "after/strips.txt": {
+          "sha256": "7dc04da0ac94b1e056e542b7659b72f7826886bb401c29b5cbd9cb9e062a5ae2",
+          "bytes": 27274
+        },
+        "after/total.txt": {
+          "sha256": "a9291af4a3f34572407209de22ebe2f861e03eb56ab4c3f2a467b787b8ba1f1c",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "393ad82ebf6d07c01d12d6e425f0d2cced93da4eb505b0650f4554805dad1b68",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "e52528b916fb775a66d76803a15a306fd2533150ef0c6d762b5a3c4b67303aca",
+          "bytes": 272220
+        },
+        "after/uv-rows.txt": {
+          "sha256": "e8c7fb38b58bc0fd3f64c919be675b27ac12c1bb2a464993c2ad07d62b5d87a4",
+          "bytes": 263584
+        },
+        "after/uv-strips.txt": {
+          "sha256": "80dfc12818101825011af1908108f3c123cedcc2990ac9b6033b2b1c5aa0c81d",
+          "bytes": 6550
+        },
+        "out/elements.txt": {
+          "sha256": "66c715e3dad0fa3b1620dcffe94d966befb9f11b7907efe20ddbaa6f3e8474bb",
+          "bytes": 131454
+        },
+        "out/strips.txt": {
+          "sha256": "7dc04da0ac94b1e056e542b7659b72f7826886bb401c29b5cbd9cb9e062a5ae2",
+          "bytes": 27274
+        },
+        "out/total.txt": {
+          "sha256": "a9291af4a3f34572407209de22ebe2f861e03eb56ab4c3f2a467b787b8ba1f1c",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "393ad82ebf6d07c01d12d6e425f0d2cced93da4eb505b0650f4554805dad1b68",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "e52528b916fb775a66d76803a15a306fd2533150ef0c6d762b5a3c4b67303aca",
+          "bytes": 272220
+        },
+        "out/uv-rows.txt": {
+          "sha256": "e8c7fb38b58bc0fd3f64c919be675b27ac12c1bb2a464993c2ad07d62b5d87a4",
+          "bytes": 263584
+        },
+        "out/uv-strips.txt": {
+          "sha256": "80dfc12818101825011af1908108f3c123cedcc2990ac9b6033b2b1c5aa0c81d",
+          "bytes": 6550
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "physical_n": 160,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160",
+      "native_unknowns": 960,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 1.0227756779999986,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73338880,
+      "maximum_group_live_bytes": 74833920,
+      "available_memory_before": 24116142080,
+      "files": {
+        "console.txt": {
+          "sha256": "7c5e04f8165ef8d2b8063a8f89de54ed96da5680bb8ccff514087e66d42279fa",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "27c8e748e398e8425c157b30ede064fade06f9e3e4349403cc9e728213bd52d4",
+          "bytes": 819
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "55d5bda3ffe6c4a611b4d5feee663ad9517840eba166ee906283b0c5acd7c971",
+          "bytes": 881
+        },
+        "after/elements.txt": {
+          "sha256": "e5f6430cb77fec72a40e56bdc0afd9baccaa4bd4a762f6caaec9c630b41d86dd",
+          "bytes": 214494
+        },
+        "after/strips.txt": {
+          "sha256": "551a93ea9abc8ccdc3e7fe8373955878638b1362d614cd0d36343c368c45663c",
+          "bytes": 27274
+        },
+        "after/total.txt": {
+          "sha256": "0ca45553b14209ba817833e955435efa1c03d120c76f074dff2f923b01856141",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "dcb34f4e50db696113fc92339338c26388c1d18609232908efdda01439a04112",
+          "bytes": 544380
+        },
+        "after/uv-rows.txt": {
+          "sha256": "98c05343f1809a7113aeec87c6300d44c723b26891fddbca77cc03787b1cca68",
+          "bytes": 527104
+        },
+        "after/uv-strips.txt": {
+          "sha256": "fdf1e356715657ee27b562e1364d64b27216460fe30d1911f1ab03460ff8dba7",
+          "bytes": 6550
+        },
+        "out/elements.txt": {
+          "sha256": "e5f6430cb77fec72a40e56bdc0afd9baccaa4bd4a762f6caaec9c630b41d86dd",
+          "bytes": 214494
+        },
+        "out/strips.txt": {
+          "sha256": "551a93ea9abc8ccdc3e7fe8373955878638b1362d614cd0d36343c368c45663c",
+          "bytes": 27274
+        },
+        "out/total.txt": {
+          "sha256": "0ca45553b14209ba817833e955435efa1c03d120c76f074dff2f923b01856141",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "dcb34f4e50db696113fc92339338c26388c1d18609232908efdda01439a04112",
+          "bytes": 544380
+        },
+        "out/uv-rows.txt": {
+          "sha256": "98c05343f1809a7113aeec87c6300d44c723b26891fddbca77cc03787b1cca68",
+          "bytes": 527104
+        },
+        "out/uv-strips.txt": {
+          "sha256": "fdf1e356715657ee27b562e1364d64b27216460fe30d1911f1ab03460ff8dba7",
+          "bytes": 6550
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "physical_n": 160,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M3-N160/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N160",
+      "native_unknowns": 240,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.21584151499999926,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 13578240,
+      "maximum_group_live_bytes": 192512,
+      "available_memory_before": 24119730176,
+      "files": {
+        "console.txt": {
+          "sha256": "5d1ea6cc2d37deedceda0e639bb0939ecb206d32b4d747a3756a2f8657fa2d7c",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "da8a197b1b50149c10220e71372ab90637f0863a74ab0e8a387d9fc1760d744e",
+          "bytes": 818
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "b1e2985c3affa0930143d4d3b2a8185cf7e3a64b3cd6e4675d7bd6ff647d4824",
+          "bytes": 1062
+        },
+        "after/elements.txt": {
+          "sha256": "a7ef69b79a79fe65cf8914df87bd98d011ac58bc3a7cdd5e0043c4e1bd328eee",
+          "bytes": 89934
+        },
+        "after/strips.txt": {
+          "sha256": "9e025513ad143a92d98163d25a458e39e11a4eb3cc1b190694e987d9347a694d",
+          "bytes": 27274
+        },
+        "after/total.txt": {
+          "sha256": "7d49c74f79929d653a1dfba00cbb12bbd89da167e17db25843ab4b22124f858c",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-matrix.bin": {
+          "sha256": "787903e5ee1d90839f32e544a39782effba208c7fe95e618432151591feb430c",
+          "bytes": 460800
+        },
+        "after/uh-meta.txt": {
+          "sha256": "57b8619195c620d1e57f77bbeea36792dfe1a12c51ebfee41ce67269a5773256",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "5e6363030523b95c980164e987f581630007c548912c5d8db29078aad48f9b49",
+          "bytes": 136140
+        },
+        "after/uv-rows.txt": {
+          "sha256": "e2562f526106676ab01904b90af40db37479a7241b7cc9631e3cae2293522ac5",
+          "bytes": 131824
+        },
+        "after/uv-strips.txt": {
+          "sha256": "1766ac3817da67edeaf6f4b99de43084e3697975443e1b6dc7f08f5578bb3f99",
+          "bytes": 6550
+        },
+        "out/elements.txt": {
+          "sha256": "a7ef69b79a79fe65cf8914df87bd98d011ac58bc3a7cdd5e0043c4e1bd328eee",
+          "bytes": 89934
+        },
+        "out/strips.txt": {
+          "sha256": "9e025513ad143a92d98163d25a458e39e11a4eb3cc1b190694e987d9347a694d",
+          "bytes": 27274
+        },
+        "out/total.txt": {
+          "sha256": "7d49c74f79929d653a1dfba00cbb12bbd89da167e17db25843ab4b22124f858c",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-matrix.bin": {
+          "sha256": "787903e5ee1d90839f32e544a39782effba208c7fe95e618432151591feb430c",
+          "bytes": 460800
+        },
+        "out/uh-meta.txt": {
+          "sha256": "57b8619195c620d1e57f77bbeea36792dfe1a12c51ebfee41ce67269a5773256",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "5e6363030523b95c980164e987f581630007c548912c5d8db29078aad48f9b49",
+          "bytes": 136140
+        },
+        "out/uv-rows.txt": {
+          "sha256": "e2562f526106676ab01904b90af40db37479a7241b7cc9631e3cae2293522ac5",
+          "bytes": 131824
+        },
+        "out/uv-strips.txt": {
+          "sha256": "1766ac3817da67edeaf6f4b99de43084e3697975443e1b6dc7f08f5578bb3f99",
+          "bytes": 6550
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "physical_n": 160,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N160/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N160",
+      "native_unknowns": 480,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.4141794919999988,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 26402816,
+      "maximum_group_live_bytes": 27983872,
+      "available_memory_before": 24127307776,
+      "files": {
+        "console.txt": {
+          "sha256": "07e7e83c57576a1d90b6a6327f13af2ce9dfb4f6a6a28f10dad289f6ea89368a",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "78d1df8601d0fe9f753755b1445698488ffc19c2540bac65c19de3ce90cd5896",
+          "bytes": 818
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "c9aaa69f4a062e8ebaecc005b8e6b84e6ff65d676b5c15171c2854c9ceb4656c",
+          "bytes": 1062
+        },
+        "after/elements.txt": {
+          "sha256": "535d944b7a7464f740355a7552e402ab493541460fcdcb4c81a55fd07d570b7c",
+          "bytes": 131454
+        },
+        "after/strips.txt": {
+          "sha256": "30dfbb2c9b1c48f6506447f1a02261695dcc1068e5fc7d7f653c8df34ab2b85e",
+          "bytes": 27274
+        },
+        "after/total.txt": {
+          "sha256": "a4cdb79fb7467b3f705d9ba7329273ec01f898398711136013f9cbf1e1fa736c",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "393ad82ebf6d07c01d12d6e425f0d2cced93da4eb505b0650f4554805dad1b68",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "eb34c242613e2a2dbeedc12ea6a2b67522035197ec8c6867f8976921f6c57c69",
+          "bytes": 272220
+        },
+        "after/uv-rows.txt": {
+          "sha256": "cddac8bf5dcce3f4a5993078768cfdb96794e7104f04809441e9c1ddc949a224",
+          "bytes": 263584
+        },
+        "after/uv-strips.txt": {
+          "sha256": "2a7dea1851c422dc1e44f612111d9bc641449321aae38e112aa0ff1140aa34b4",
+          "bytes": 6550
+        },
+        "out/elements.txt": {
+          "sha256": "535d944b7a7464f740355a7552e402ab493541460fcdcb4c81a55fd07d570b7c",
+          "bytes": 131454
+        },
+        "out/strips.txt": {
+          "sha256": "30dfbb2c9b1c48f6506447f1a02261695dcc1068e5fc7d7f653c8df34ab2b85e",
+          "bytes": 27274
+        },
+        "out/total.txt": {
+          "sha256": "a4cdb79fb7467b3f705d9ba7329273ec01f898398711136013f9cbf1e1fa736c",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "393ad82ebf6d07c01d12d6e425f0d2cced93da4eb505b0650f4554805dad1b68",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "eb34c242613e2a2dbeedc12ea6a2b67522035197ec8c6867f8976921f6c57c69",
+          "bytes": 272220
+        },
+        "out/uv-rows.txt": {
+          "sha256": "cddac8bf5dcce3f4a5993078768cfdb96794e7104f04809441e9c1ddc949a224",
+          "bytes": 263584
+        },
+        "out/uv-strips.txt": {
+          "sha256": "2a7dea1851c422dc1e44f612111d9bc641449321aae38e112aa0ff1140aa34b4",
+          "bytes": 6550
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "physical_n": 160,
+      "kind": "half_fine",
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a1",
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N160",
+      "native_unknowns": 960,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.8228461300000003,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73093120,
+      "maximum_group_live_bytes": 74686464,
+      "available_memory_before": 24152481792,
+      "files": {
+        "console.txt": {
+          "sha256": "361a9a49caea82b09e932f2aa0b5dd29fdbfaf1bb6053c10908157eb2a6fbe97",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "3416f3ac3123404cc165b6daf8ccb3d084e6eb19c5c0d31abcd8a6a03221c970",
+          "bytes": 819
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "a0f433ac20a3b79b6487015b5b87eea620b13bd339574e72338cadc20fc09620",
+          "bytes": 1063
+        },
+        "after/elements.txt": {
+          "sha256": "320978265bf88a443d1b633d98f795c1c50ef04bac46a7a0c7ab7f8fe0f2453b",
+          "bytes": 214494
+        },
+        "after/strips.txt": {
+          "sha256": "664142de25f1abe7e38bc2770aa12e4034ed9ea2b9da61296884a51c120e6dd9",
+          "bytes": 27274
+        },
+        "after/total.txt": {
+          "sha256": "a99b254edd0655e90d7c6a7b3e96453d4c8afd8df850e4669e248411a419256a",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "5e4d5a0fd72677972be9130a4dd311d19001a36330ac0ebb2005d5dfa3fa2101",
+          "bytes": 544380
+        },
+        "after/uv-rows.txt": {
+          "sha256": "5e6fd86971834660065e862a1a6420ce4caac5e7f03b4fe38a66035d259f02be",
+          "bytes": 527104
+        },
+        "after/uv-strips.txt": {
+          "sha256": "510c9b161ad3fbc1a29a8672a410f247e31cad8d8656060f3cf95df84935688b",
+          "bytes": 6550
+        },
+        "out/elements.txt": {
+          "sha256": "320978265bf88a443d1b633d98f795c1c50ef04bac46a7a0c7ab7f8fe0f2453b",
+          "bytes": 214494
+        },
+        "out/strips.txt": {
+          "sha256": "664142de25f1abe7e38bc2770aa12e4034ed9ea2b9da61296884a51c120e6dd9",
+          "bytes": 27274
+        },
+        "out/total.txt": {
+          "sha256": "a99b254edd0655e90d7c6a7b3e96453d4c8afd8df850e4669e248411a419256a",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "5e4d5a0fd72677972be9130a4dd311d19001a36330ac0ebb2005d5dfa3fa2101",
+          "bytes": 544380
+        },
+        "out/uv-rows.txt": {
+          "sha256": "5e6fd86971834660065e862a1a6420ce4caac5e7f03b4fe38a66035d259f02be",
+          "bytes": 527104
+        },
+        "out/uv-strips.txt": {
+          "sha256": "510c9b161ad3fbc1a29a8672a410f247e31cad8d8656060f3cf95df84935688b",
+          "bytes": 6550
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N640",
+      "native_unknowns": 7680,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 90.714755378,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 3421233152,
+      "maximum_group_live_bytes": 3422867456,
+      "available_memory_before": 24135315456,
+      "files": {
+        "console.txt": {
+          "sha256": "a54a112f0fad1ea44237bf495576df438784df8ab7b3d4c0d88bb9d2b0aa9eae",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "6842dd187593b61c737a9589f852200da5dfe1d5412586106432113b4eb2151c",
+          "bytes": 826
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815",
+          "bytes": 892
+        },
+        "after/elements.txt": {
+          "sha256": "96a8a27dfe1f4b839108e3ae5343f9a33a626197e29eaa365628a0c47ac6f8d2",
+          "bytes": 1519614
+        },
+        "after/strips.txt": {
+          "sha256": "a523b597aef0cb33269d26dd52607ff0dfa91e8a39c19793fd7aa3f658ba1718",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "dcabafa9ccd5155283fb88a663fdb0ef21e7161f4e4f4dc79cd6fffda39ba535",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "e06d76748acd6eb0b16b7f9833032de53c049b691c6643e42298692c812e271c",
+          "bytes": 4354620
+        },
+        "after/uv-rows.txt": {
+          "sha256": "e34ff19971d028313794d70060e8bc98f0a777d11c98b4062e1fed0e47694a88",
+          "bytes": 4216384
+        },
+        "after/uv-strips.txt": {
+          "sha256": "0e456241e31ff69a5cf15476662c442ef464b19639f6a5f5fb6a7ed48c316be1",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "96a8a27dfe1f4b839108e3ae5343f9a33a626197e29eaa365628a0c47ac6f8d2",
+          "bytes": 1519614
+        },
+        "out/strips.txt": {
+          "sha256": "a523b597aef0cb33269d26dd52607ff0dfa91e8a39c19793fd7aa3f658ba1718",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "dcabafa9ccd5155283fb88a663fdb0ef21e7161f4e4f4dc79cd6fffda39ba535",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "e06d76748acd6eb0b16b7f9833032de53c049b691c6643e42298692c812e271c",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "e34ff19971d028313794d70060e8bc98f0a777d11c98b4062e1fed0e47694a88",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "0e456241e31ff69a5cf15476662c442ef464b19639f6a5f5fb6a7ed48c316be1",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N640",
+      "native_unknowns": 7680,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 93.350420885,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 3421478912,
+      "maximum_group_live_bytes": 3422978048,
+      "available_memory_before": 24284844032,
+      "files": {
+        "console.txt": {
+          "sha256": "f8d4aba5495e8911dc12a1e9d557734a6e782a6d25f05365296bdc66356a7c42",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "282512f6f6034fbeb1199d25939f3eeafbce071b1279e68b5f743c4f6a78f39d",
+          "bytes": 826
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb",
+          "bytes": 1074
+        },
+        "after/elements.txt": {
+          "sha256": "c93a4759e50f2fd1fa252673c72c04b1b76c005397104b37ff709e7bf7fcdd73",
+          "bytes": 1519614
+        },
+        "after/strips.txt": {
+          "sha256": "3a6fffeba6753f6563e821454529bb9fc37032fce324cb877e1985d10d82852e",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "1bdeaa1b854e034c41c07ac5610e7f65eddc6d5f781b7cd52bcfce8b3b89d768",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "b84bb4cb0a9559d32c36bf9ad4ac656a2062f8b27cf7a6aa5e788a1f96b527c7",
+          "bytes": 4354620
+        },
+        "after/uv-rows.txt": {
+          "sha256": "3c4654d293f6b9130e187d212a817e174b6ff742de5a510975f97f8c8cb87bdf",
+          "bytes": 4216384
+        },
+        "after/uv-strips.txt": {
+          "sha256": "c93a108acf5a922cc132312f86f7a359ee2903401023ac0a937a2c55c8fe5705",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "c93a4759e50f2fd1fa252673c72c04b1b76c005397104b37ff709e7bf7fcdd73",
+          "bytes": 1519614
+        },
+        "out/strips.txt": {
+          "sha256": "3a6fffeba6753f6563e821454529bb9fc37032fce324cb877e1985d10d82852e",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "1bdeaa1b854e034c41c07ac5610e7f65eddc6d5f781b7cd52bcfce8b3b89d768",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "b84bb4cb0a9559d32c36bf9ad4ac656a2062f8b27cf7a6aa5e788a1f96b527c7",
+          "bytes": 4354620
+        },
+        "out/uv-rows.txt": {
+          "sha256": "3c4654d293f6b9130e187d212a817e174b6ff742de5a510975f97f8c8cb87bdf",
+          "bytes": 4216384
+        },
+        "out/uv-strips.txt": {
+          "sha256": "c93a108acf5a922cc132312f86f7a359ee2903401023ac0a937a2c55c8fe5705",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N640",
+      "native_unknowns": 960,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.8174882240000159,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73109504,
+      "maximum_group_live_bytes": 74866688,
+      "available_memory_before": 24281702400,
+      "files": {
+        "console.txt": {
+          "sha256": "763c92ab9b815ae7dd0b8c8f4c8e0eb78519a0c7b5ed423bd6d514dab8d59593",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "9cb608f2b1fd469563ea96f23db224ecdb9af3f2b84b4ff310bffa7a0fecb3c2",
+          "bytes": 819
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "460a8b0886f2b00ffc8f0d8392555fdaf79a6c80a57ffefbd67573ea84675947",
+          "bytes": 891
+        },
+        "after/elements.txt": {
+          "sha256": "db0763e35873a0a3b149e0265b291ab55c833c525a21a3d785dfffd25188f9e0",
+          "bytes": 357054
+        },
+        "after/strips.txt": {
+          "sha256": "f37cffd03e535c1840dbefe849998dba02db27b2c38dcf6dcf4d619b53936152",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "d951412c4a070ae5ada319be5da05d4a8242ee09d61499d249dc52fdbd7833b8",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "70981dd5671c837b4b124cbafe15bfbfa45ac7383bc453da1c8b2699a1da0931",
+          "bytes": 544380
+        },
+        "after/uv-rows.txt": {
+          "sha256": "eee418976ce6e204acfc2a1171cb1612c5aa464bc4cefc3d7bfad5cb9bd08929",
+          "bytes": 527104
+        },
+        "after/uv-strips.txt": {
+          "sha256": "706a11e13429771c69ea3e9a1d53f4073109ec1164e77d89766e4f9b4c886631",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "db0763e35873a0a3b149e0265b291ab55c833c525a21a3d785dfffd25188f9e0",
+          "bytes": 357054
+        },
+        "out/strips.txt": {
+          "sha256": "f37cffd03e535c1840dbefe849998dba02db27b2c38dcf6dcf4d619b53936152",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "d951412c4a070ae5ada319be5da05d4a8242ee09d61499d249dc52fdbd7833b8",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "70981dd5671c837b4b124cbafe15bfbfa45ac7383bc453da1c8b2699a1da0931",
+          "bytes": 544380
+        },
+        "out/uv-rows.txt": {
+          "sha256": "eee418976ce6e204acfc2a1171cb1612c5aa464bc4cefc3d7bfad5cb9bd08929",
+          "bytes": 527104
+        },
+        "out/uv-strips.txt": {
+          "sha256": "706a11e13429771c69ea3e9a1d53f4073109ec1164e77d89766e4f9b4c886631",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N640",
+      "native_unknowns": 1920,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 3.8382717700000057,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 243466240,
+      "maximum_group_live_bytes": 245182464,
+      "available_memory_before": 24234901504,
+      "files": {
+        "console.txt": {
+          "sha256": "73fea27a7f248d8f859c2ffffb7a010810e6b6b504d93e19954b8ff6d3093b88",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "5e23e97b29d14403e9007b1e7cbc6605901b1a347f288751517f48e34c72e3c5",
+          "bytes": 820
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "d02e3fbad6586737c53e49b5866a5b2031fc87c159e3476b13a54a8f7e2beedd",
+          "bytes": 891
+        },
+        "after/elements.txt": {
+          "sha256": "94ef7d1d4ec791b0840ea6b93cb894f133c377fa65ea6f7ed625eeeb05488048",
+          "bytes": 523134
+        },
+        "after/strips.txt": {
+          "sha256": "95cb95873945d91280e6d4590fe15abe5b122f0e485859d3bd99ef16d73d3482",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "69f9dcac78f9319d22487984d4bf6b10f2664cdb4cb6a761bb5546958bfedbbc",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "5e49a556a9c037119542871f97c6ecfc518d587392b992c86da9c9d413cd9dc0",
+          "bytes": 1088700
+        },
+        "after/uv-rows.txt": {
+          "sha256": "7d85ccce33142a1d88d2a46da5b597a8359cae1c4f073f92f3e09bd854f1832b",
+          "bytes": 1054144
+        },
+        "after/uv-strips.txt": {
+          "sha256": "dfa5b9c256d45cc32c51cf0cd1cb0165e82d88f6972381b761eb012f8f5af816",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "94ef7d1d4ec791b0840ea6b93cb894f133c377fa65ea6f7ed625eeeb05488048",
+          "bytes": 523134
+        },
+        "out/strips.txt": {
+          "sha256": "95cb95873945d91280e6d4590fe15abe5b122f0e485859d3bd99ef16d73d3482",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "69f9dcac78f9319d22487984d4bf6b10f2664cdb4cb6a761bb5546958bfedbbc",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "5e49a556a9c037119542871f97c6ecfc518d587392b992c86da9c9d413cd9dc0",
+          "bytes": 1088700
+        },
+        "out/uv-rows.txt": {
+          "sha256": "7d85ccce33142a1d88d2a46da5b597a8359cae1c4f073f92f3e09bd854f1832b",
+          "bytes": 1054144
+        },
+        "out/uv-strips.txt": {
+          "sha256": "dfa5b9c256d45cc32c51cf0cd1cb0165e82d88f6972381b761eb012f8f5af816",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N640",
+      "native_unknowns": 3840,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 16.12252854799999,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 893669376,
+      "maximum_group_live_bytes": 895483904,
+      "available_memory_before": 24202858496,
+      "files": {
+        "console.txt": {
+          "sha256": "92a39367e8a545f85d8b83edbc7b5cc807726d0edc434b0bbdad8f3690ded04f",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "cd626e589a807b36f80a816944a515500307af176a3f864f72e2e755663deb2a",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "9fef690119f4e9199a7f8946a2f8d7eaba7f6f1d755f58df6417aa2344c7a76c",
+          "bytes": 892
+        },
+        "after/elements.txt": {
+          "sha256": "9b9ff43662cbc622c8f57bd0b127bec5891c40e71a09f4f7fca4f38c7dd0fe66",
+          "bytes": 855294
+        },
+        "after/strips.txt": {
+          "sha256": "6b9754cb37c1493d3d3393a4ccfc11f8a52a253bf8206e20f6c8d2646ac29144",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "983f4bb9f70c40f8e61adac0dfe6e4aa86b0f72460e3c873e80b40c3e70e4e43",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "bcf6061780d75886fdb02cb36dcd81ffca2773cdf6ce648bfb5def3b0b85d63d",
+          "bytes": 2177340
+        },
+        "after/uv-rows.txt": {
+          "sha256": "fa528003b8e11da47a182a8b8c0868e2548844ae86b8f723d1909f691d1d9ce8",
+          "bytes": 2108224
+        },
+        "after/uv-strips.txt": {
+          "sha256": "0690f4a2de57ff6c608c0f543f647b34ca5c63ebb6da7d9229e9849516f48205",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "9b9ff43662cbc622c8f57bd0b127bec5891c40e71a09f4f7fca4f38c7dd0fe66",
+          "bytes": 855294
+        },
+        "out/strips.txt": {
+          "sha256": "6b9754cb37c1493d3d3393a4ccfc11f8a52a253bf8206e20f6c8d2646ac29144",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "983f4bb9f70c40f8e61adac0dfe6e4aa86b0f72460e3c873e80b40c3e70e4e43",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "bcf6061780d75886fdb02cb36dcd81ffca2773cdf6ce648bfb5def3b0b85d63d",
+          "bytes": 2177340
+        },
+        "out/uv-rows.txt": {
+          "sha256": "fa528003b8e11da47a182a8b8c0868e2548844ae86b8f723d1909f691d1d9ce8",
+          "bytes": 2108224
+        },
+        "out/uv-strips.txt": {
+          "sha256": "0690f4a2de57ff6c608c0f543f647b34ca5c63ebb6da7d9229e9849516f48205",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N640",
+      "native_unknowns": 960,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 0.8195856520000007,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 73355264,
+      "maximum_group_live_bytes": 74956800,
+      "available_memory_before": 24236396544,
+      "files": {
+        "console.txt": {
+          "sha256": "c3b18dcb01e85728e4823a1169fd479518645acb94d9685d6451cc8f2c167a1b",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "939085c45adfcbeea7e21b63e495418c53525dee008a5d22a902462f3c0c8f65",
+          "bytes": 819
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "bc33bb9bd7351ee1722de91f30cba997e9d7ed6267eefd3e6d73dc8071e4728f",
+          "bytes": 1073
+        },
+        "after/elements.txt": {
+          "sha256": "d98e1248da4aab6fd8b526a70406dfc5d6b6c29c150e6237c533ec57cbca9f41",
+          "bytes": 357054
+        },
+        "after/strips.txt": {
+          "sha256": "233b973a8a00c53e53409eaecdc306675ff2d2b233039a389508034269316b39",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "a9d8ba3a13534d60d70c01d42f689a51982baf5441b293ee209fa4b4dc6a3849",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "50f369b3eacfbaff323a1428930e1342b4f592a873766a60c5777b6a21f52633",
+          "bytes": 544380
+        },
+        "after/uv-rows.txt": {
+          "sha256": "a762721d4f965534e87382a486c7cceca8669e4288658753c890df0f32857b3a",
+          "bytes": 527104
+        },
+        "after/uv-strips.txt": {
+          "sha256": "9ade4ca317ded9d35d495b3a67f41db61083aeb8c1371758eee47b01764d7827",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "d98e1248da4aab6fd8b526a70406dfc5d6b6c29c150e6237c533ec57cbca9f41",
+          "bytes": 357054
+        },
+        "out/strips.txt": {
+          "sha256": "233b973a8a00c53e53409eaecdc306675ff2d2b233039a389508034269316b39",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "a9d8ba3a13534d60d70c01d42f689a51982baf5441b293ee209fa4b4dc6a3849",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "50f369b3eacfbaff323a1428930e1342b4f592a873766a60c5777b6a21f52633",
+          "bytes": 544380
+        },
+        "out/uv-rows.txt": {
+          "sha256": "a762721d4f965534e87382a486c7cceca8669e4288658753c890df0f32857b3a",
+          "bytes": 527104
+        },
+        "out/uv-strips.txt": {
+          "sha256": "9ade4ca317ded9d35d495b3a67f41db61083aeb8c1371758eee47b01764d7827",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N640",
+      "native_unknowns": 1920,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 3.428770143999998,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 243585024,
+      "maximum_group_live_bytes": 245256192,
+      "available_memory_before": 24200200192,
+      "files": {
+        "console.txt": {
+          "sha256": "91e5d0bef73f1fb2609d9dfe97a6b2f3d988e07bc1814079123e653268720be0",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "64d698ffb08ed72aad6c317711c6ee6731c6c5269b52e28cb09b0c20d52d7c58",
+          "bytes": 821
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "29efa1987a2263eb5aaa151a6d556e2197a6bdb41824cd94ad6be13bd039c343",
+          "bytes": 1073
+        },
+        "after/elements.txt": {
+          "sha256": "027921e7cddec28caaa4e5d47f1a6c995c7e764188172fb1b1925559dba7a1da",
+          "bytes": 523134
+        },
+        "after/strips.txt": {
+          "sha256": "a111bc07c2207248d1bc4a6fefac96c9827b5f56f578e3f24e75fc88a93ddb2b",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "2a2cbd56627cb6f3d2486fb0feb855ff909d0687a31df04dce7e7e3af728f712",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "46a83c1657f475097af5be3f2b09834d0e4c9850e796a9aceb1c1d5c808be3d0",
+          "bytes": 1088700
+        },
+        "after/uv-rows.txt": {
+          "sha256": "1aa30ed7563c961088ac66f1936cb930d9a7d1499c41d971fbe5691052f0da12",
+          "bytes": 1054144
+        },
+        "after/uv-strips.txt": {
+          "sha256": "4fe128c7ec52aa89acfac29ecb4b3bfcf196bae118502e301b376934ab53c153",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "027921e7cddec28caaa4e5d47f1a6c995c7e764188172fb1b1925559dba7a1da",
+          "bytes": 523134
+        },
+        "out/strips.txt": {
+          "sha256": "a111bc07c2207248d1bc4a6fefac96c9827b5f56f578e3f24e75fc88a93ddb2b",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "2a2cbd56627cb6f3d2486fb0feb855ff909d0687a31df04dce7e7e3af728f712",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "46a83c1657f475097af5be3f2b09834d0e4c9850e796a9aceb1c1d5c808be3d0",
+          "bytes": 1088700
+        },
+        "out/uv-rows.txt": {
+          "sha256": "1aa30ed7563c961088ac66f1936cb930d9a7d1499c41d971fbe5691052f0da12",
+          "bytes": 1054144
+        },
+        "out/uv-strips.txt": {
+          "sha256": "4fe128c7ec52aa89acfac29ecb4b3bfcf196bae118502e301b376934ab53c153",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "physical_n": 640,
+      "kind": "half_fine",
+      "comparison_directory": null,
+      "directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N640",
+      "native_unknowns": 3840,
+      "executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+      "seconds": 16.130548922000003,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 894038016,
+      "maximum_group_live_bytes": 895483904,
+      "available_memory_before": 24216330240,
+      "files": {
+        "console.txt": {
+          "sha256": "ad090182ef50d197e836d61cf9c2b004e8cf0729b9a2cd2d6e0a3e513b84e61e",
+          "bytes": 32254
+        },
+        "resource.txt": {
+          "sha256": "3d0b83e2392ef33fe1c58d432dc5c09c1d56be74c2a860f85d8cf5de2c8b0d0d",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "7e71dcb9187d712b07b0a0587c026ef46d31e993e451a578bd2dabc8ea21f84d",
+          "bytes": 201
+        },
+        "wing.avl": {
+          "sha256": "6e4799be9d14d4998d7ee54a7ab01abee68d5c3cd7a5262227c165474b7a101f",
+          "bytes": 1074
+        },
+        "after/elements.txt": {
+          "sha256": "7a95cf6cf8a47066bb32d8eb6246b23f2363db48c5511d936cea49c249ae3197",
+          "bytes": 855294
+        },
+        "after/strips.txt": {
+          "sha256": "74f7630ec37ae9edfad33e24d9e378d279c832429c2fe1a38f235b8eec896307",
+          "bytes": 105754
+        },
+        "after/total.txt": {
+          "sha256": "408baf732eaab6aacf7d5e038c44ae4acf8b739093a70744960110e0fdb0b8ec",
+          "bytes": 1351
+        },
+        "after/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "after/uh-meta.txt": {
+          "sha256": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff",
+          "bytes": 92
+        },
+        "after/uv-forces.txt": {
+          "sha256": "b00a3c58484a189e2610ddf64a05a6f159e45b11d37847b02a63d0998dccab86",
+          "bytes": 2177340
+        },
+        "after/uv-rows.txt": {
+          "sha256": "1cc5bfa4cf8a9a548e0c724edab59bbfc6af9aa76e0ce954eec1955bd5d2c8a9",
+          "bytes": 2108224
+        },
+        "after/uv-strips.txt": {
+          "sha256": "e1df3056c4991c4afc2f4d7435493a1d1ad995347dd8a9e6a151ca6da9d9b20b",
+          "bytes": 25990
+        },
+        "out/elements.txt": {
+          "sha256": "7a95cf6cf8a47066bb32d8eb6246b23f2363db48c5511d936cea49c249ae3197",
+          "bytes": 855294
+        },
+        "out/strips.txt": {
+          "sha256": "74f7630ec37ae9edfad33e24d9e378d279c832429c2fe1a38f235b8eec896307",
+          "bytes": 105754
+        },
+        "out/total.txt": {
+          "sha256": "408baf732eaab6aacf7d5e038c44ae4acf8b739093a70744960110e0fdb0b8ec",
+          "bytes": 1351
+        },
+        "out/uh-guard-tests.txt": {
+          "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+          "bytes": 409
+        },
+        "out/uh-meta.txt": {
+          "sha256": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff",
+          "bytes": 92
+        },
+        "out/uv-forces.txt": {
+          "sha256": "b00a3c58484a189e2610ddf64a05a6f159e45b11d37847b02a63d0998dccab86",
+          "bytes": 2177340
+        },
+        "out/uv-rows.txt": {
+          "sha256": "1cc5bfa4cf8a9a548e0c724edab59bbfc6af9aa76e0ce954eec1955bd5d2c8a9",
+          "bytes": 2108224
+        },
+        "out/uv-strips.txt": {
+          "sha256": "e1df3056c4991c4afc2f4d7435493a1d1ad995347dd8a9e6a151ca6da9d9b20b",
+          "bytes": 25990
+        }
+      },
+      "before_after_equal": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true,
+        "uh-meta.txt": true,
+        "uh-guard-tests.txt": true
+      }
+    }
+  ],
+  "completed": true,
+  "stop_reason": null,
+  "seconds": 246.470977547,
+  "total_bytes": 96631685
+}

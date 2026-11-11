@@ -1,0 +1,1744 @@
+{
+  "local_records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 4.594189959076172e-16,
+        "rigid": 1.3762730186216782e-16,
+        "constant_stress_work": 2.144817423230545e-15,
+        "energy_force": 9.321893324436126e-16,
+        "force_tangent": 2.6200277764355203e-15,
+        "rotation_energy": 1.2744325944936345e-14,
+        "rotation_force": 4.0730525302886906e-14,
+        "min_J": 0.24999999999999972,
+        "min_F": 0.9535710420121443
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-flat-0.01.npz",
+      "artifact_sha256": "7aed0b401544ea5a9d2fc60127362eb73b2f2bcd4f2ca028fc02bf4c483a184e"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 4.594156433393825e-16,
+        "rigid": 1.3762779868269868e-16,
+        "constant_stress_work": 2.0036665113058246e-15,
+        "energy_force": 6.991360503446932e-16,
+        "force_tangent": 1.0916690417400617e-15,
+        "rotation_energy": 9.068131214200967e-15,
+        "rotation_force": 3.980338890996655e-14,
+        "min_J": 0.24999999999999972,
+        "min_F": 0.9536797522583463
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-flat-0.001.npz",
+      "artifact_sha256": "f0a4e56bc0aa16268eb83f3dedd3228feb6d6a76b625b57d8235461c3d64ff34"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 4.594156021713342e-16,
+        "rigid": 1.376278026025812e-16,
+        "constant_stress_work": 2.2301482360532702e-15,
+        "energy_force": 4.369599942846404e-16,
+        "force_tangent": 2.8428878899915634e-15,
+        "rotation_energy": 1.2713765791947522e-14,
+        "rotation_force": 4.0985654263213315e-14,
+        "min_J": 0.24999999999999972,
+        "min_F": 0.953690605172045
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-flat-0.0001.npz",
+      "artifact_sha256": "07c9a13693567aa8b99467f00cb0a03cbd0e33e07945e9ec6bae4a698bb7d4c1"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 6.180577560004912e-16,
+        "rigid": 1.3019367667130771e-16,
+        "constant_stress_work": 4.979645670161191e-15,
+        "energy_force": 1.3596747543329465e-15,
+        "force_tangent": 2.8585902535798347e-15,
+        "rotation_energy": 1.722020663647035e-14,
+        "rotation_force": 2.43125826106736e-14,
+        "min_J": 0.06258600504339068,
+        "min_F": 0.9082238762760388
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-curved-distorted-0.01.npz",
+      "artifact_sha256": "f01e9fc31320b12a14741fef28cff42dff0d63d8082aa1ef11e54c4ae1ee0d1e"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 6.2073377703832245e-16,
+        "rigid": 1.2941962003268377e-16,
+        "constant_stress_work": 5.538295315196959e-14,
+        "energy_force": 1.6995754950886028e-15,
+        "force_tangent": 5.583140311543879e-16,
+        "rotation_energy": 1.3302226915016329e-14,
+        "rotation_force": 2.38580920955246e-14,
+        "min_J": 0.06268827486723791,
+        "min_F": 0.9083512195289671
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-curved-distorted-0.001.npz",
+      "artifact_sha256": "79bb95d5fe850ab6e23ff594444fb49cf36e3b3c75b426add086bc892a78e197"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 6.074292583430768e-16,
+        "rigid": 1.306651878086629e-16,
+        "constant_stress_work": 4.840689888535924e-13,
+        "energy_force": 9.104867762209858e-16,
+        "force_tangent": 2.5124129431987257e-15,
+        "rotation_energy": 1.466268305373716e-14,
+        "rotation_force": 2.391779837432963e-14,
+        "min_J": 0.06269850184962268,
+        "min_F": 0.9083639259104506
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-curved-distorted-0.0001.npz",
+      "artifact_sha256": "d7017920f912b7f93538869cf79082866f2f3f8384070353944d9047ab397b2f"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 4.972514504433867e-16,
+        "rigid": 1.4415734155089588e-16,
+        "constant_stress_work": 1.1957881594540352e-14,
+        "energy_force": 4.437984149058806e-16,
+        "force_tangent": 1.1245592634141543e-15,
+        "rotation_energy": 7.967350857403728e-15,
+        "rotation_force": 4.234749212287534e-14,
+        "min_J": 0.24955703285624634,
+        "min_F": 0.9535241813454876
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-quartic-reference-0.01.npz",
+      "artifact_sha256": "b1c0728a36153d4ef10bb4848dfc01d87d3997486b5659703f2a9f24f19869d1"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 5.052476255390948e-16,
+        "rigid": 1.419467214800027e-16,
+        "constant_stress_work": 1.2644851374903983e-13,
+        "energy_force": 1.525541536881057e-15,
+        "force_tangent": 5.221120977963714e-15,
+        "rotation_energy": 8.062260882943293e-15,
+        "rotation_force": 4.3130603371351065e-14,
+        "min_J": 0.2499648274219226,
+        "min_F": 0.9535881484810187
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-quartic-reference-0.001.npz",
+      "artifact_sha256": "4f48d71612ff5489e496d95e491bde894a64e55b3db297eb6d08d0dfdb40d151"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "ranks": [
+        219,
+        219,
+        219
+      ],
+      "metrics": {
+        "affine": 5.240395998903266e-16,
+        "rigid": 1.5118994094488914e-16,
+        "constant_stress_work": 1.5124297071280368e-12,
+        "energy_force": 2.0802837023718003e-15,
+        "force_tangent": 1.7571078631559132e-15,
+        "rotation_energy": 1.2152673568054946e-14,
+        "rotation_force": 4.254345024886081e-14,
+        "min_J": 0.2500056068042526,
+        "min_F": 0.9535945311412938
+      },
+      "checks": {
+        "rank": true,
+        "orientation": true,
+        "identities": true
+      },
+      "artifact": "build/analysis/mortar-q4-20261104-010027/local-quartic-reference-0.0001.npz",
+      "artifact_sha256": "d54865f19f000353849d304764e45b4234afe10e6773a0983f7fe087bbac1abe"
+    }
+  ],
+  "interfaces": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "degree": 0,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 0,
+          "ranks": [
+            17,
+            17,
+            17
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 1,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 12,
+            "ranks": [
+              12,
+              12,
+              12
+            ],
+            "discarded": 8,
+            "span": 6.3720889108987845e-16
+          },
+          "passed": false
+        },
+        {
+          "h": 0.0001,
+          "degree": 0,
+          "ranks": [
+            17,
+            17,
+            17
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 1,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 12,
+            "ranks": [
+              12,
+              12,
+              12
+            ],
+            "discarded": 8,
+            "span": 3.2671508266141106e-16
+          },
+          "passed": false
+        }
+      ],
+      "metrics": {
+        "integral": 7.977881073806795e-16,
+        "dual": 0.0,
+        "rotation": 7.23705358139418e-16,
+        "reaction_rotation": 8.965081485499458e-16
+      },
+      "patches": [
+        {
+          "residual": 4.170998310873551e-14,
+          "gap": 2.1495685822296594e-17,
+          "force_norm": 0.00034285944515818185,
+          "reaction_norm": 0.0002418153449331367
+        },
+        {
+          "residual": 1.7714089245324426e-14,
+          "gap": 2.031018712600023e-17,
+          "force_norm": 0.00034285944515818114,
+          "reaction_norm": 0.00024181534493313665
+        },
+        {
+          "residual": 3.3564854391797845e-15,
+          "gap": 2.7404515891161385e-17,
+          "force_norm": 0.0001949440135403654,
+          "reaction_norm": 0.0001313747188513003
+        },
+        {
+          "residual": 3.360350142224493e-15,
+          "gap": 2.028941141247083e-17,
+          "force_norm": 0.00012437144301138698,
+          "reaction_norm": 8.644643013186343e-05
+        },
+        {
+          "residual": 5.017633034224254e-15,
+          "gap": 2.0292154817137496e-17,
+          "force_norm": 0.00012437144301138695,
+          "reaction_norm": 8.644643013186345e-05
+        },
+        {
+          "residual": 8.969426260898081e-14,
+          "gap": 2.6347110628352543e-17,
+          "force_norm": 0.00017287143793539298,
+          "reaction_norm": 0.00012223829657437865
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": false,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "degree": 0,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 0,
+          "ranks": [
+            17,
+            17,
+            17
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 1,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 12,
+            "ranks": [
+              12,
+              12,
+              12
+            ],
+            "discarded": 6,
+            "span": 2.2342805094824224e-15
+          },
+          "passed": false
+        },
+        {
+          "h": 0.0001,
+          "degree": 0,
+          "ranks": [
+            17,
+            17,
+            17
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 1,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 12,
+            "ranks": [
+              12,
+              12,
+              12
+            ],
+            "discarded": 6,
+            "span": 3.249930331271065e-16
+          },
+          "passed": false
+        }
+      ],
+      "metrics": {
+        "integral": 8.013644480738528e-16,
+        "dual": 1.0813752038936686e-15,
+        "rotation": 7.104167516867642e-16,
+        "reaction_rotation": 8.694527428884991e-16
+      },
+      "patches": [
+        {
+          "residual": 5.560723504717342e-14,
+          "gap": 2.0539777097040858e-17,
+          "force_norm": 0.0003438667046942337,
+          "reaction_norm": 0.0002432259474424367
+        },
+        {
+          "residual": 1.891166709782687e-14,
+          "gap": 2.4881684525006507e-17,
+          "force_norm": 0.00034858579950455246,
+          "reaction_norm": 0.00024985317794302053
+        },
+        {
+          "residual": 3.766905077750939e-15,
+          "gap": 3.0845243516421976e-17,
+          "force_norm": 0.0001968013020607287,
+          "reaction_norm": 0.00013395341435513055
+        },
+        {
+          "residual": 4.1274412536367344e-15,
+          "gap": 2.4863566094099133e-17,
+          "force_norm": 0.00012675607653545482,
+          "reaction_norm": 8.980718100406231e-05
+        },
+        {
+          "residual": 4.043914479460325e-15,
+          "gap": 2.4869821085827836e-17,
+          "force_norm": 0.0001243981828240795,
+          "reaction_norm": 8.644729441207176e-05
+        },
+        {
+          "residual": 1.0363687264751564e-13,
+          "gap": 2.5274201951185595e-17,
+          "force_norm": 0.0001745762875409986,
+          "reaction_norm": 0.0001246376573382179
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": false,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "degree": 0,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 0,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 14,
+            "ranks": [
+              14,
+              14,
+              14
+            ],
+            "discarded": 6,
+            "span": 3.0011542715439794e-16
+          },
+          "passed": true
+        },
+        {
+          "h": 0.0001,
+          "degree": 0,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 14,
+            "ranks": [
+              14,
+              14,
+              14
+            ],
+            "discarded": 6,
+            "span": 2.6783270895009867e-16
+          },
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "integral": 8.017495253986282e-16,
+        "dual": 5.367666372323087e-16,
+        "rotation": 7.347482494501217e-16,
+        "reaction_rotation": 9.253687500791706e-16
+      },
+      "patches": [
+        {
+          "residual": 4.177179117334877e-14,
+          "gap": 2.231371972215029e-17,
+          "force_norm": 0.0003474580435009423,
+          "reaction_norm": 0.0002444727570826762
+        },
+        {
+          "residual": 1.8628715176454452e-14,
+          "gap": 2.2261244256097764e-17,
+          "force_norm": 0.0003600312671407735,
+          "reaction_norm": 0.00025355512434751404
+        },
+        {
+          "residual": 1.6740244974785973e-14,
+          "gap": 2.86381324563633e-17,
+          "force_norm": 0.00021510118442671678,
+          "reaction_norm": 0.0001421274021271285
+        },
+        {
+          "residual": 6.950965980672928e-14,
+          "gap": 2.2634130773970708e-17,
+          "force_norm": 0.00013438133078015372,
+          "reaction_norm": 9.269175965488053e-05
+        },
+        {
+          "residual": 9.5538792827209e-14,
+          "gap": 2.18976329759792e-17,
+          "force_norm": 0.00013036611763071794,
+          "reaction_norm": 8.975802585100758e-05
+        },
+        {
+          "residual": 8.48907486181582e-14,
+          "gap": 2.7655234335057948e-17,
+          "force_norm": 0.00017762892163434405,
+          "reaction_norm": 0.00012554763852859295
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "degree": 0,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 0,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 18,
+            "ranks": [
+              18,
+              18,
+              18
+            ],
+            "discarded": 4,
+            "span": 2.5690478621882626e-16
+          },
+          "passed": true
+        },
+        {
+          "h": 0.0001,
+          "degree": 0,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 18,
+            "ranks": [
+              18,
+              18,
+              18
+            ],
+            "discarded": 4,
+            "span": 2.27039596316913e-16
+          },
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "integral": 8.022697076893197e-16,
+        "dual": 1.5964552563059004e-15,
+        "rotation": 7.4366383771409e-16,
+        "reaction_rotation": 9.2702815733286e-16
+      },
+      "patches": [
+        {
+          "residual": 5.272124302790763e-14,
+          "gap": 2.1307698017884522e-17,
+          "force_norm": 0.00034842385893778943,
+          "reaction_norm": 0.00024585141657876817
+        },
+        {
+          "residual": 1.8196019247087307e-14,
+          "gap": 2.462444149837369e-17,
+          "force_norm": 0.0003649424137044138,
+          "reaction_norm": 0.00026046972711578446
+        },
+        {
+          "residual": 1.6815278121039516e-14,
+          "gap": 3.0134525423549356e-17,
+          "force_norm": 0.00021757870336094662,
+          "reaction_norm": 0.00014569295472080735
+        },
+        {
+          "residual": 6.4303068999665e-14,
+          "gap": 2.4767317895916712e-17,
+          "force_norm": 0.00013656774485992188,
+          "reaction_norm": 9.579665269999e-05
+        },
+        {
+          "residual": 1.6051906384706769e-13,
+          "gap": 2.1997004751698545e-17,
+          "force_norm": 0.0001307419877198188,
+          "reaction_norm": 9.02694358090206e-05
+        },
+        {
+          "residual": 1.00195763997799e-13,
+          "gap": 2.4974807304403552e-17,
+          "force_norm": 0.0001790864956326979,
+          "reaction_norm": 0.00012760866900545588
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "degree": 1,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 24,
+            "ranks": [
+              24,
+              24,
+              24
+            ],
+            "discarded": 8,
+            "span": 2.6110640927363726e-16
+          },
+          "passed": true
+        },
+        {
+          "h": 0.0001,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 24,
+            "ranks": [
+              24,
+              24,
+              24
+            ],
+            "discarded": 8,
+            "span": 2.761852010240027e-16
+          },
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "integral": 8.490846730089936e-16,
+        "dual": 9.758615370693722e-16,
+        "rotation": 8.416245551893755e-16,
+        "reaction_rotation": 9.22340086075015e-16
+      },
+      "patches": [
+        {
+          "residual": 4.170998310873551e-14,
+          "gap": 2.2107305421618286e-17,
+          "force_norm": 0.00034285944515818185,
+          "reaction_norm": 0.0002418153449331367
+        },
+        {
+          "residual": 1.7714089245324426e-14,
+          "gap": 2.0967668427173166e-17,
+          "force_norm": 0.00034285944515818114,
+          "reaction_norm": 0.00024181534493313665
+        },
+        {
+          "residual": 3.3564854391797845e-15,
+          "gap": 2.7600339614666126e-17,
+          "force_norm": 0.0001949440135403654,
+          "reaction_norm": 0.0001313747188513003
+        },
+        {
+          "residual": 3.360350142224493e-15,
+          "gap": 2.0888448676213154e-17,
+          "force_norm": 0.00012437144301138698,
+          "reaction_norm": 8.644643013186343e-05
+        },
+        {
+          "residual": 5.017633034224254e-15,
+          "gap": 2.08911711906621e-17,
+          "force_norm": 0.00012437144301138695,
+          "reaction_norm": 8.644643013186345e-05
+        },
+        {
+          "residual": 8.969426260898081e-14,
+          "gap": 2.6888358581124488e-17,
+          "force_norm": 0.00017287143793539298,
+          "reaction_norm": 0.00012223829657437865
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "degree": 1,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 24,
+            "ranks": [
+              24,
+              24,
+              24
+            ],
+            "discarded": 6,
+            "span": 4.3173117706971395e-16
+          },
+          "passed": true
+        },
+        {
+          "h": 0.0001,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 24,
+            "ranks": [
+              24,
+              24,
+              24
+            ],
+            "discarded": 6,
+            "span": 3.224449775186948e-16
+          },
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "integral": 8.517640528985452e-16,
+        "dual": 2.7570189810934738e-15,
+        "rotation": 8.282500567278001e-16,
+        "reaction_rotation": 9.289723416198649e-16
+      },
+      "patches": [
+        {
+          "residual": 5.560723504717342e-14,
+          "gap": 2.175856372299889e-17,
+          "force_norm": 0.0003438667046942337,
+          "reaction_norm": 0.0002432259474424367
+        },
+        {
+          "residual": 1.891166709782687e-14,
+          "gap": 2.5406931823948195e-17,
+          "force_norm": 0.00034858579950455246,
+          "reaction_norm": 0.00024985317794302053
+        },
+        {
+          "residual": 3.766905077750939e-15,
+          "gap": 3.101241370497187e-17,
+          "force_norm": 0.0001968013020607287,
+          "reaction_norm": 0.00013395341435513055
+        },
+        {
+          "residual": 4.1274412536367344e-15,
+          "gap": 2.534133156793339e-17,
+          "force_norm": 0.00012675607653545482,
+          "reaction_norm": 8.980718100406231e-05
+        },
+        {
+          "residual": 4.043914479460325e-15,
+          "gap": 2.5347433254767374e-17,
+          "force_norm": 0.0001243981828240795,
+          "reaction_norm": 8.644729441207176e-05
+        },
+        {
+          "residual": 1.0363687264751564e-13,
+          "gap": 2.5800888076605348e-17,
+          "force_norm": 0.0001745762875409986,
+          "reaction_norm": 0.0001246376573382179
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "degree": 1,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 26,
+            "ranks": [
+              26,
+              26,
+              26
+            ],
+            "discarded": 6,
+            "span": 6.62783851859179e-16
+          },
+          "passed": true
+        },
+        {
+          "h": 0.0001,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 26,
+            "ranks": [
+              26,
+              26,
+              26
+            ],
+            "discarded": 6,
+            "span": 2.6539166070219315e-16
+          },
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "integral": 8.52028295626838e-16,
+        "dual": 2.8410015810474163e-15,
+        "rotation": 8.07250100263108e-16,
+        "reaction_rotation": 9.144822987142735e-16
+      },
+      "patches": [
+        {
+          "residual": 4.177179117334877e-14,
+          "gap": 2.2888185943520202e-17,
+          "force_norm": 0.0003474580435009423,
+          "reaction_norm": 0.0002444727570826762
+        },
+        {
+          "residual": 1.8628715176454452e-14,
+          "gap": 2.2848848860097593e-17,
+          "force_norm": 0.0003600312671407735,
+          "reaction_norm": 0.00025355512434751404
+        },
+        {
+          "residual": 1.6740244974785973e-14,
+          "gap": 2.8829031793677833e-17,
+          "force_norm": 0.00021510118442671678,
+          "reaction_norm": 0.0001421274021271285
+        },
+        {
+          "residual": 6.950965980672928e-14,
+          "gap": 2.315616687542115e-17,
+          "force_norm": 0.00013438133078015372,
+          "reaction_norm": 9.269175965488053e-05
+        },
+        {
+          "residual": 9.5538792827209e-14,
+          "gap": 2.2184281930535567e-17,
+          "force_norm": 0.00013036611763071794,
+          "reaction_norm": 8.975802585100758e-05
+        },
+        {
+          "residual": 8.48907486181582e-14,
+          "gap": 2.81588688073936e-17,
+          "force_norm": 0.00017762892163434405,
+          "reaction_norm": 0.00012554763852859295
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "degree": 1,
+      "scans": [
+        {
+          "h": 0.01,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 28,
+            "ranks": [
+              28,
+              28,
+              28
+            ],
+            "discarded": 4,
+            "span": 2.8716254283928617e-16
+          },
+          "passed": true
+        },
+        {
+          "h": 0.0001,
+          "degree": 1,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "supported_ranks": [
+            24,
+            24,
+            24
+          ],
+          "expected_rank": 18,
+          "expected_supported_rank": 24,
+          "spurious_free_modes": 0,
+          "spurious_supported_modes": 0,
+          "constraint_metadata": {
+            "rank": 28,
+            "ranks": [
+              28,
+              28,
+              28
+            ],
+            "discarded": 4,
+            "span": 2.645947439905733e-16
+          },
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "integral": 8.523915461239623e-16,
+        "dual": 2.0572629601541593e-15,
+        "rotation": 8.408430687821917e-16,
+        "reaction_rotation": 9.270460870409067e-16
+      },
+      "patches": [
+        {
+          "residual": 5.272124302790763e-14,
+          "gap": 2.2460871792445977e-17,
+          "force_norm": 0.00034842385893778943,
+          "reaction_norm": 0.00024585141657876817
+        },
+        {
+          "residual": 1.8196019247087307e-14,
+          "gap": 2.5148403033594894e-17,
+          "force_norm": 0.0003649424137044138,
+          "reaction_norm": 0.00026046972711578446
+        },
+        {
+          "residual": 1.6815278121039516e-14,
+          "gap": 3.03161034466394e-17,
+          "force_norm": 0.00021757870336094662,
+          "reaction_norm": 0.00014569295472080735
+        },
+        {
+          "residual": 6.4303068999665e-14,
+          "gap": 2.525850156717197e-17,
+          "force_norm": 0.00013656774485992188,
+          "reaction_norm": 9.579665269999e-05
+        },
+        {
+          "residual": 1.6051906384706769e-13,
+          "gap": 2.2256033064953994e-17,
+          "force_norm": 0.0001307419877198188,
+          "reaction_norm": 9.02694358090206e-05
+        },
+        {
+          "residual": 1.00195763997799e-13,
+          "gap": 2.550068522138796e-17,
+          "force_norm": 0.0001790864956326979,
+          "reaction_norm": 0.00012760866900545588
+        }
+      ],
+      "checks": {
+        "interface": true,
+        "patch": true,
+        "rigid": true,
+        "resources": true
+      }
+    }
+  ],
+  "records": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "degree": 1,
+      "nullity": 58,
+      "ranks": [
+        434,
+        434,
+        434
+      ],
+      "ranks11": [
+        434,
+        434,
+        434
+      ],
+      "constraint_metadata": {
+        "rd": {
+          "rank": 16,
+          "ranks": [
+            16,
+            16,
+            16
+          ],
+          "discarded": 16,
+          "span": 2.839162764305997e-16
+        },
+        "c": {
+          "rank": 8,
+          "ranks": [
+            8,
+            8,
+            8
+          ],
+          "discarded": 28,
+          "span": 1.733176299378915e-16
+        }
+      },
+      "metrics": {
+        "anchor": 2.4169344908783538e-14,
+        "orthogonal": 1.0269696318335938e-14,
+        "projector": 1.726619014872489e-13,
+        "kernel": 4.348124695049597e-18,
+        "rd_constraint": 9.334796433490809e-18,
+        "c_constraint": 4.294902371036278e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.99237582371742e-15,
+          "h1": 1.1547005383792366,
+          "fit": {
+            "error": 2.337746163292375e-15,
+            "h1": 1.1547005383792577,
+            "multiplier": 0.0,
+            "kkt": 2.0719805610119505e-16,
+            "H1_ranks": [
+              304,
+              304,
+              304
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.250453878721739e-15,
+          "h1": 0.6191391873668869,
+          "fit": {
+            "error": 2.40157445424759e-15,
+            "h1": 0.6191391873668919,
+            "multiplier": 0.0,
+            "kkt": 2.149883084178846e-16,
+            "H1_ranks": [
+              304,
+              304,
+              304
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 3.90420835512078e-15,
+          "h1": 0.46462136829144507,
+          "fit": {
+            "error": 3.2333161593442256e-15,
+            "h1": 0.46462136829144685,
+            "multiplier": 0.0,
+            "kkt": 1.9171946771354305e-16,
+            "H1_ranks": [
+              304,
+              304,
+              304
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0003613224054944522,
+          "h1": 1.9880909220120437,
+          "fit": {
+            "error": 0.0003613224054939692,
+            "h1": 1.98809092201207,
+            "multiplier": 0.0,
+            "kkt": 2.0346277369386153e-16,
+            "H1_ranks": [
+              304,
+              304,
+              304
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "constraints": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/mortar-q4-20261104-010027/joint-p1-k0-a0-n2.npz",
+      "artifact_sha256": "562e3327f7d8c9465c734696835b7498b505fab325d67d159de9e0efbbaa3a68"
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "degree": 1,
+      "nullity": 44,
+      "ranks": [
+        448,
+        448,
+        448
+      ],
+      "ranks11": [
+        448,
+        448,
+        448
+      ],
+      "constraint_metadata": {
+        "rd": {
+          "rank": 16,
+          "ranks": [
+            16,
+            16,
+            16
+          ],
+          "discarded": 14,
+          "span": 4.464231811121435e-16
+        },
+        "c": {
+          "rank": 8,
+          "ranks": [
+            8,
+            8,
+            8
+          ],
+          "discarded": 28,
+          "span": 1.733176299378915e-16
+        }
+      },
+      "metrics": {
+        "anchor": 2.7447052008916516e-13,
+        "orthogonal": 7.165416376117333e-15,
+        "projector": 1.6329794392094213e-12,
+        "kernel": 4.768447003737833e-18,
+        "rd_constraint": 1.0882536371206691e-17,
+        "c_constraint": 4.293489378703168e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.9921085318928227e-15,
+          "h1": 1.1547005383792561,
+          "fit": {
+            "error": 2.468786204626454e-15,
+            "h1": 1.1547005383792421,
+            "multiplier": 0.0,
+            "kkt": 2.685979764611561e-16,
+            "H1_ranks": [
+              290,
+              290,
+              290
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.086550254280716e-15,
+          "h1": 0.6191391873668922,
+          "fit": {
+            "error": 2.3331420284902136e-15,
+            "h1": 0.6191391873668881,
+            "multiplier": 0.0,
+            "kkt": 2.5067121198645157e-16,
+            "H1_ranks": [
+              290,
+              290,
+              290
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 6.276306778086991e-14,
+          "h1": 0.4646213682914475,
+          "fit": {
+            "error": 6.27455743567117e-14,
+            "h1": 0.4646213682914457,
+            "multiplier": 0.0,
+            "kkt": 2.5712194574096095e-16,
+            "H1_ranks": [
+              290,
+              290,
+              290
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.00036961565032843575,
+          "h1": 1.9880895369419238,
+          "fit": {
+            "error": 0.00036961565032831773,
+            "h1": 1.9880895369419045,
+            "multiplier": 0.0,
+            "kkt": 2.346659475248673e-16,
+            "H1_ranks": [
+              290,
+              290,
+              290
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "constraints": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/mortar-q4-20261104-010027/joint-p1-k0-a0.2-n2.npz",
+      "artifact_sha256": "4e5aa1c615d4a9c3db8d2e56461680601cc627cc608f3638587baa838196c2bd"
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "degree": 1,
+      "nullity": 6,
+      "ranks": [
+        480,
+        480,
+        480
+      ],
+      "ranks11": [
+        480,
+        480,
+        480
+      ],
+      "constraint_metadata": {
+        "rd": {
+          "rank": 18,
+          "ranks": [
+            18,
+            18,
+            18
+          ],
+          "discarded": 14,
+          "span": 2.113459492937114e-15
+        },
+        "c": {
+          "rank": 8,
+          "ranks": [
+            8,
+            8,
+            8
+          ],
+          "discarded": 28,
+          "span": 1.733176299378915e-16
+        }
+      },
+      "metrics": {
+        "anchor": 1.2197676622214373e-12,
+        "orthogonal": 1.591952624366044e-15,
+        "projector": 2.0388422207633743e-12,
+        "kernel": 2.3433320449602635e-17,
+        "rd_constraint": 6.770135342499331e-18,
+        "c_constraint": 4.292258611253661e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 4.185573919939046e-15,
+          "h1": 1.2336900743609216,
+          "fit": {
+            "error": 4.022612657694636e-15,
+            "h1": 1.2336900743609078,
+            "multiplier": 0.0,
+            "kkt": 1.4015632680700467e-15,
+            "H1_ranks": [
+              252,
+              252,
+              252
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.2796894947146137e-15,
+          "h1": 0.6590319606013839,
+          "fit": {
+            "error": 2.833799539545314e-15,
+            "h1": 0.659031960601379,
+            "multiplier": 0.0,
+            "kkt": 8.706245574734276e-16,
+            "H1_ranks": [
+              252,
+              252,
+              252
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.03701379256300159,
+          "h1": 0.5030521062660542,
+          "fit": {
+            "error": 0.03701379256300105,
+            "h1": 0.5030521062660518,
+            "multiplier": 0.0,
+            "kkt": 6.97918402682623e-16,
+            "H1_ranks": [
+              252,
+              252,
+              252
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.008324743462206522,
+          "h1": 2.1311347214735537,
+          "fit": {
+            "error": 0.00832474346220619,
+            "h1": 2.1311347214735332,
+            "multiplier": 0.0,
+            "kkt": 1.2263230359972811e-15,
+            "H1_ranks": [
+              252,
+              252,
+              252
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "constraints": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/mortar-q4-20261104-010027/joint-p1-k0.4-a0-n2.npz",
+      "artifact_sha256": "1a5e393d91ca93d89efb4d1f6abfba57499404f7aa47e925ee7378f799476a67"
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "degree": 1,
+      "nullity": 3,
+      "ranks": [
+        477,
+        477,
+        477
+      ],
+      "ranks11": [
+        477,
+        477,
+        477
+      ],
+      "constraint_metadata": {
+        "rd": {
+          "rank": 20,
+          "ranks": [
+            20,
+            20,
+            20
+          ],
+          "discarded": 12,
+          "span": 2.684185687011729e-16
+        },
+        "c": {
+          "rank": 8,
+          "ranks": [
+            8,
+            8,
+            8
+          ],
+          "discarded": 28,
+          "span": 1.733176299378915e-16
+        }
+      },
+      "metrics": {
+        "anchor": 1.791190749449835e-10,
+        "orthogonal": 1.2080552510062331e-15,
+        "projector": 1.799856106771113e-10,
+        "kernel": 6.154837838106567e-16,
+        "rd_constraint": 1.505387159739136e-17,
+        "c_constraint": 4.290863497178351e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 6.626307498409339e-15,
+          "h1": 1.2336900743609205,
+          "fit": {
+            "error": 6.708670067082021e-15,
+            "h1": 1.2336900743609078,
+            "multiplier": 0.0,
+            "kkt": 9.824396176959843e-16,
+            "H1_ranks": [
+              249,
+              249,
+              249
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.2835481649650994e-15,
+          "h1": 0.659031960601382,
+          "fit": {
+            "error": 2.863700231109864e-15,
+            "h1": 0.659031960601379,
+            "multiplier": 0.0,
+            "kkt": 8.562900970389273e-16,
+            "H1_ranks": [
+              249,
+              249,
+              249
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860310079001846,
+          "h1": 0.5730146813965864,
+          "fit": {
+            "error": 0.14860310079001823,
+            "h1": 0.5730146813965855,
+            "multiplier": 0.0,
+            "kkt": 7.892055724534595e-16,
+            "H1_ranks": [
+              249,
+              249,
+              249
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.03184017659590753,
+          "h1": 2.1460121605843723,
+          "fit": {
+            "error": 0.031840176595907634,
+            "h1": 2.1460121605843585,
+            "multiplier": 0.0,
+            "kkt": 8.440300820438477e-16,
+            "H1_ranks": [
+              249,
+              249,
+              249
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "constraints": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/mortar-q4-20261104-010027/joint-p1-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "fe36c88d36c9fa9d30093d144de08b6c16303d39cfe36440fc6973bff0823ab7"
+    }
+  ],
+  "dispositions": [
+    {
+      "degree": 0,
+      "algebra_pass": false,
+      "both_curved_improved": false,
+      "main_shell_adopted": false,
+      "status": "rejected_necessary_gate"
+    },
+    {
+      "degree": 1,
+      "algebra_pass": true,
+      "both_curved_improved": false,
+      "main_shell_adopted": false,
+      "status": "rejected_necessary_gate"
+    }
+  ],
+  "stop_reason": null,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_mortar_q4.py": "d1e7a2d9f4c08338c2790e6767dd0426c4cdbf85db1f114a138244c7926961fc",
+    "tools/design-experiments/mortar_q4.py": "805a8e889c2a3e3e249a048830eb6a0b626470c57cc2a8043fb8290a673df523",
+    "tools/design-experiments/qem_el2_q4.py": "4e9f6a0ee21f98354dc4cae32a33358a4a2ca49ae223e68629290b05e22ec780",
+    "docs/mortar-q4-formulation.md": "c987122f52f5fa197da79839ee3eb61e051545d97bef23be9ac307bdf45c4d10",
+    "docs/verification/mortar-q4-protocol.md": "81af22d1d6e7d8b3084ff033ef7fb15749fb6ae316389370dc1564d020423f4f",
+    "docs/verification/mortar-q4-preparation.json": "ba1c84fd47c54846ef2122140810c02d07a342de2c7bcddabd693dc0d98a31e2",
+    "docs/verification/tying-projection-v2-result.json": "317c59bae61c3d677d3769d87cbee1d82012c349d1a6977670262d2e32ee2492"
+  },
+  "seconds": 28.39100000000326,
+  "peak_bytes": 198479872
+}

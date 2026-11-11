@@ -1,0 +1,104 @@
+{
+  "rejection_reproduced": true,
+  "accepted": false,
+  "R4_complete": false,
+  "records": [
+    {
+      "case": "protected_reference_lift",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "error": [
+        2.4033495266499913e-06,
+        4.8550302868547e-06,
+        1.013399503382112e-05
+      ],
+      "position": [
+        1.5982435116766458e-07,
+        3.8898875600883157e-07,
+        6.219190295887961e-07
+      ]
+    },
+    {
+      "case": "protected_reference_lift",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "error": [
+        2.3195590591494336e-06,
+        4.765494639536867e-06,
+        9.990024199918353e-06
+      ],
+      "position": [
+        5.499499217314613e-06,
+        1.1898033635291037e-05,
+        2.3512574535926837e-05
+      ]
+    },
+    {
+      "case": "independent_full_trace_lift_mass_root",
+      "n": 2,
+      "h": 0.01,
+      "dofs": 159,
+      "rank": [
+        159,
+        159,
+        159
+      ],
+      "rcond": 2.895210347575207e-06,
+      "trace": 0.0
+    },
+    {
+      "case": "independent_full_trace_lift_mass_root",
+      "n": 2,
+      "h": 0.0001,
+      "dofs": 159,
+      "rank": [
+        153,
+        159,
+        159
+      ],
+      "rcond": 2.89468067130848e-10,
+      "trace": 0.0
+    }
+  ],
+  "position_thin_ratio": [
+    34.409645195714475,
+    30.58708883354177,
+    37.80648833252942
+  ],
+  "sources": {
+    "build/analysis/pg-ritz-protected-elliptic-n4-h0.01.npz": "15ad06dea618d140a5aaee4ec9bd31bd4dfeae3486f809f11552e4353c396213",
+    "build/analysis/pg-ritz-protected-elliptic-n4-h0.0001.npz": "35001b1de4b945a09aafccca9c1608abbb08c9d45456da6ad4002c4fdd487e5d",
+    "tools/design-experiments/check_pg_ritz_r4_followup.py": "160439b4fdb9f879047be23455d40b2f488555d03ead18f66d3d682e2a668624",
+    "tools/design-experiments/pg_ritz_clamped_kernel.py": "bfb5ab7d4028d836b7cc804c484cc09b7ea5c0ffb0009de72670c51d1daf6d87",
+    "tools/design-experiments/pg_ritz_trace_prelift.py": "7646436ad16bdfbd2f5c15656fb2ed37fcaa8165dde43f7ea3e739ae080d1160",
+    "tools/design-experiments/pg_trace_nullspace.py": "4ee491796ace22370eefeb1d46e00f3bd008b66c0a540d1ec4cdc7d2ae894d53",
+    "tools/design-experiments/pg_ritz_shell_nested.py": "821750f93f6b28299c5753e813e3d8a805a70e10abefead184687e267bc312ca",
+    "tools/design-experiments/pg_ritz_lift_v9.py": "a1fd4cb2b2dc46503b999e9db9cc515d37100435fa16e892b23567d13865b057",
+    "tools/design-experiments/pg_ritz_coarse.py": "f719a97cb232b3a17394b1e4609a8c44d6c7b1081660d1ad3ab653f62867def4",
+    "tools/design-experiments/pg_ritz_lift_exact.py": "5e392273f3178e869aebb3d3da449e8cca65e551c7496be1bc88ba26514b7737",
+    "tools/design-experiments/pg_ritz_clamp.py": "419553e3d5169c4ca86b56a7fb65bf88f8d46da691e54fee6d302e419214b9f6",
+    "tools/design-experiments/pg_ritz_particular_v2.py": "d2225da4a86e6bced19886ef13779dd318c6af7207c9aab9b4d75eecd3df434f",
+    "tools/design-experiments/pg_polynomial_curvature_exact.py": "de76c7c4133bb5eb2bae0cbb84f360167063ddcb56b812e727ff2058f2804ee7",
+    "tools/design-experiments/pg_ritz_geometry.py": "1b59c9f87fb99b58a6dd9bbfdeccba38d25302718d3bc6ed8709c3567152bc1d",
+    "tools/design-experiments/stable_curvature_profiles.py": "06d02f7499f7665a322cc38827e174325590fdd445b9c15f6d4abde038ea5619",
+    "tools/design-experiments/pg_ritz_shell_v3.py": "a50b76970ec3b628dc4dcfa0ed4217524854ea2503bf9bbac0f14e8faa78006b",
+    "tools/design-experiments/pg_ritz_lift_v4.py": "f37423aa3d17dd4b8930e8be678d71dacf5aad58985514f8875f155059f0942b",
+    "tools/design-experiments/pg_ritz_particular.py": "c21e709c8b73cb8647febe26c6868846dca29e59f3cd590e9314a68d15c1722d",
+    "tools/design-experiments/curvature_work_profiles.py": "ab205e22635e8f6b89148cc38768095773ad39580bb5b8073a47aa5f447a657b",
+    "tools/design-experiments/check_pg_ritz_finite_v3.py": "55d7b324163a5f990d803a12e6cbb233e7944cbab29c6d1ebddeb36098be0886",
+    "tools/design-experiments/pg_ritz_trace.py": "70179425bca21a67a0b3870b0baadd8af93f5e41c9e0b5b8cfeedd2b8b33d20d",
+    "tools/design-experiments/pg_ritz_targets.py": "d30ce350038b5766c6457b2a451c27f9f8b86a9adad0451fc3f46b645ff4fa97",
+    "tools/design-experiments/pg_ritz_shell_v2.py": "3f644d5166b8c9364e0bff19ce52aefe13778467f6d685f2e35e3ba9bdeea65c",
+    "tools/design-experiments/pg_ritz_lift_v3.py": "9bfdbe65ca4f93724311915823cd5fdd15171a3ce9eae2b5fc446793ff7cedef"
+  }
+}

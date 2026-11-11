@@ -1,0 +1,876 @@
+{
+  "protocol": "docs/verification/avl-solve-sensitivity-experiment.md",
+  "source_sha256": "07cfcf75e00909352b05ed260bbdbfc0a2057225db7a5439c110e6d7b8a52777",
+  "preparation_sha256": "e12594dbbcdbcff2cbfac3aeffd0f82afe2bf94f407967a04e91ad9aefc03075",
+  "parents": {
+    "original": {
+      "path": "docs/verification/avl-fixed-band-grid-runs.json",
+      "sha256": "9833795f2d4d46c642a9e0713b18d0f42e4eceaeb39f1e91024b7d6e87362ea7"
+    },
+    "aligned": {
+      "path": "docs/verification/avl-band-aligned-grid-runs.json",
+      "sha256": "021c73350678aa538ce19c216c602777a7dbf6debd2cedc07fe0728b3eadf409"
+    }
+  },
+  "executable_sha256": "b9a16fb17636f643d938b18e8014c873e66f3f8d423416535df4478704e11b72",
+  "runs": [
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "m": 4,
+      "n": 12,
+      "original_directory": "build/analysis/avl-stable-reference-20261031-001225/core0-FW-V01-M4-N12-a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V01-M4-N12",
+      "seconds": 0.21145136099999995,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 7938048,
+      "files": {
+        "console.txt": {
+          "sha256": "057d18c2321dacfd301df2323ccd6c423240080ab4fa6e12be08853cdeebe355",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "37303bfcf225693d4a7f2968620bb88739e7476fb611354d43da642afe276c2b",
+          "bytes": 818
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+          "bytes": 285
+        },
+        "after/elements.txt": {
+          "sha256": "82c5da12cd7d835e6579b7630c110763f3931dd686867065fedeaa20be896176",
+          "bytes": 16326
+        },
+        "after/strips.txt": {
+          "sha256": "f9f325fb27732543d41eca61e23b478612ae27f36dd133fe4878cbdb63e0ab5c",
+          "bytes": 5038
+        },
+        "after/total.txt": {
+          "sha256": "7e3d981301056e7338c8a41fddf9939932bcfc465965e5365da28e3a5b08119e",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "4c622175aaaace70bd7eabd93197e011a424ea5570a10771db24e8b965c0d68a",
+          "bytes": 27276
+        },
+        "after/uv-rows.txt": {
+          "sha256": "039a75a0eed9019bfda91d36120b2087a98692a954e2e8c39d4deab34818c42a",
+          "bytes": 26416
+        },
+        "after/uv-strips.txt": {
+          "sha256": "f12278b0f93b19c59046a81b5b6b7131a386c6d7c584197571daa1268fd51a86",
+          "bytes": 1042
+        },
+        "out/elements.txt": {
+          "sha256": "82c5da12cd7d835e6579b7630c110763f3931dd686867065fedeaa20be896176",
+          "bytes": 16326
+        },
+        "out/strips.txt": {
+          "sha256": "f9f325fb27732543d41eca61e23b478612ae27f36dd133fe4878cbdb63e0ab5c",
+          "bytes": 5038
+        },
+        "out/total.txt": {
+          "sha256": "7e3d981301056e7338c8a41fddf9939932bcfc465965e5365da28e3a5b08119e",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "c292203bd6ec047c2713785b79d9cf2d840c0c2b6419e2c939931c00321027f7",
+          "bytes": 104577
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "4f6b0a1beaa87863d6a795d32557d816dedbbf462aa8d76c6e642443d92e34bd",
+          "bytes": 31723
+        },
+        "out/us-matrix.bin": {
+          "sha256": "7e91347c4250bc8653275e8794ed243931abb032155af9c544da468a95a12688",
+          "bytes": 18432
+        },
+        "out/us-responses.txt": {
+          "sha256": "eeb1548e2e253f7fa3dbd00153f6bb2a320b956a91d7382dfaa937368863204f",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "269be3cb1796bab3aa77fff233ddc1d1c76685930c196587c2dcff6602218a91",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "d9a9f639a092f89a10d6539246317bbd4b40cc31d239fb2d58c0dd27f375d5fd",
+          "bytes": 10850
+        },
+        "out/uv-forces.txt": {
+          "sha256": "4c622175aaaace70bd7eabd93197e011a424ea5570a10771db24e8b965c0d68a",
+          "bytes": 27276
+        },
+        "out/uv-rows.txt": {
+          "sha256": "039a75a0eed9019bfda91d36120b2087a98692a954e2e8c39d4deab34818c42a",
+          "bytes": 26416
+        },
+        "out/uv-strips.txt": {
+          "sha256": "f12278b0f93b19c59046a81b5b6b7131a386c6d7c584197571daa1268fd51a86",
+          "bytes": 1042
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true
+      }
+    },
+    {
+      "family": "original",
+      "case": "FW-V02",
+      "m": 8,
+      "n": 24,
+      "original_directory": "build/analysis/avl-stable-reference-20261031-001225/core0-FW-V02-M8-N24-a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V02-M8-N24",
+      "seconds": 0.411786296999999,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 12615680,
+      "files": {
+        "console.txt": {
+          "sha256": "9bcb99cb6a5529a356768285b640ddf4a44704bed223a3a02d959d3252e12595",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "edca8ec92feb0458bf29753d1382deba51a856136844a68001f955bb25687221",
+          "bytes": 820
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "2eb8aaf2c4bd01dc9b1ed87e904951f186a54bfe83aabb83592cb08b4fdc01e6",
+          "bytes": 324
+        },
+        "after/elements.txt": {
+          "sha256": "3ed950ebebb562fa8e99257b3b619e6398e04e8bc65420fc8defce280f7199ef",
+          "bytes": 48366
+        },
+        "after/strips.txt": {
+          "sha256": "1a538b189060328844353a36de99dc7cbcd01bff57e6c63f36890c07233c4267",
+          "bytes": 8962
+        },
+        "after/total.txt": {
+          "sha256": "5cdb4024b9dab1bd6ed7707c335fb9112be509c7f5ac8faa528a7cbd2011d62f",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "c85bfda648a5853b8d57270d886f0f62fa9dd0b1016e90e4d7d96fd600b9ab45",
+          "bytes": 108924
+        },
+        "after/uv-rows.txt": {
+          "sha256": "afb70fbff8c2f4dee0d170c1580392fc3e70f53d6ace95287e3b7909ad34f689",
+          "bytes": 105472
+        },
+        "after/uv-strips.txt": {
+          "sha256": "3d03f4f4316dddd57980dadc956f33274c39d774ad50d0afbd9fdd814448bd0e",
+          "bytes": 2014
+        },
+        "out/elements.txt": {
+          "sha256": "3ed950ebebb562fa8e99257b3b619e6398e04e8bc65420fc8defce280f7199ef",
+          "bytes": 48366
+        },
+        "out/strips.txt": {
+          "sha256": "1a538b189060328844353a36de99dc7cbcd01bff57e6c63f36890c07233c4267",
+          "bytes": 8962
+        },
+        "out/total.txt": {
+          "sha256": "5cdb4024b9dab1bd6ed7707c335fb9112be509c7f5ac8faa528a7cbd2011d62f",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "ee76a2d69cff38355dc04e4f46ec14a7412ba473ffdf12909c3bcbbfc6b1a382",
+          "bytes": 418209
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "41c7ac4d5985297600b91e9baa9b6b104758f876dabb529dfb9c76220a12cf31",
+          "bytes": 135403
+        },
+        "out/us-matrix.bin": {
+          "sha256": "828228e2770c45aff492760030fd8f7ee6ace32a2bbcc81234b217e9972d95a8",
+          "bytes": 294912
+        },
+        "out/us-responses.txt": {
+          "sha256": "8180ee246a43729a58599798d63ebea889d7a69662ff4469c043d9e981b9db14",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "1d5171c3ce491cd49cdc1541b912022a6351e411494238942ba210b547b1010a",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "b2fdfafde8ec95be51c2d1627b4937563d762f9f0a5a4cb3fe72a2af720dcc93",
+          "bytes": 43250
+        },
+        "out/uv-forces.txt": {
+          "sha256": "c85bfda648a5853b8d57270d886f0f62fa9dd0b1016e90e4d7d96fd600b9ab45",
+          "bytes": 108924
+        },
+        "out/uv-rows.txt": {
+          "sha256": "afb70fbff8c2f4dee0d170c1580392fc3e70f53d6ace95287e3b7909ad34f689",
+          "bytes": 105472
+        },
+        "out/uv-strips.txt": {
+          "sha256": "3d03f4f4316dddd57980dadc956f33274c39d774ad50d0afbd9fdd814448bd0e",
+          "bytes": 2014
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true
+      }
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "m": 16,
+      "n": 96,
+      "original_directory": "build/analysis/avl-fixed-bands-20261031-003234/FW-V01-M16-N96/a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V01-M16-N96",
+      "seconds": 2.933443016,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 182980608,
+      "files": {
+        "console.txt": {
+          "sha256": "f96e3c9a7b191d578696c1208fd9ccb6948f000cb1ae6598ad58fa08cceb017d",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "15c27787465ff1d77ef07bd90929f3985bced0c79416051e071a4b9be9c8050b",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "2ba834643e7c3e23de1511adc7b6f530ee6ab2bee3aec36ed46172db645f5c8a",
+          "bytes": 289
+        },
+        "after/elements.txt": {
+          "sha256": "3fdd7dc47f99786c9ea217653dd7a6fafbe90be8a0afb4fcad5ef632bf644150",
+          "bytes": 323646
+        },
+        "after/strips.txt": {
+          "sha256": "c0b7d1aa0b276a7d6baa57f2a847c011dbf0f5a4f90674a0c47504f342d719ee",
+          "bytes": 32506
+        },
+        "after/total.txt": {
+          "sha256": "05484a7bc92a06f12769dfa669ae42bb7643227035de6e677783f763ec2b84ae",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "aab1a9f572fee7bd5dbe817ae599e7e293798fe3a4968cea251b62cdd4c4d15d",
+          "bytes": 870972
+        },
+        "after/uv-rows.txt": {
+          "sha256": "dbb3c32968c6ac78cd12efa773804280c5036a6323ba490ce8f22b998c68ff3e",
+          "bytes": 843328
+        },
+        "after/uv-strips.txt": {
+          "sha256": "e08b0a20857dba1a89e5a968c5ad301f681a99a28128f4065ce8bae37598ca4e",
+          "bytes": 7846
+        },
+        "out/elements.txt": {
+          "sha256": "3fdd7dc47f99786c9ea217653dd7a6fafbe90be8a0afb4fcad5ef632bf644150",
+          "bytes": 323646
+        },
+        "out/strips.txt": {
+          "sha256": "c0b7d1aa0b276a7d6baa57f2a847c011dbf0f5a4f90674a0c47504f342d719ee",
+          "bytes": 32506
+        },
+        "out/total.txt": {
+          "sha256": "05484a7bc92a06f12769dfa669ae42bb7643227035de6e677783f763ec2b84ae",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "965a2950149e8feb258851522dbab195ee5cb8e236067a0d868f72ec9c7ca6a6",
+          "bytes": 3345441
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "214471a7386bb3def60670bf1388e3d5285d0d64d245c58d68a7da4bdaeb8695",
+          "bytes": 1103083
+        },
+        "out/us-responses.txt": {
+          "sha256": "a6b70e7f4a844d02bfd570442877b9dde248bd1088aa8af2e983a8f0e9baf449",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "430f8b7e7b37ca8b03ba9933854e53634563c162ac7810d85b03d75804fd7c60",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "95500f22d464e0d844ee70bc05975858f2b177a48405afeb396e3fca566ab669",
+          "bytes": 345650
+        },
+        "out/uv-forces.txt": {
+          "sha256": "aab1a9f572fee7bd5dbe817ae599e7e293798fe3a4968cea251b62cdd4c4d15d",
+          "bytes": 870972
+        },
+        "out/uv-rows.txt": {
+          "sha256": "dbb3c32968c6ac78cd12efa773804280c5036a6323ba490ce8f22b998c68ff3e",
+          "bytes": 843328
+        },
+        "out/uv-strips.txt": {
+          "sha256": "e08b0a20857dba1a89e5a968c5ad301f681a99a28128f4065ce8bae37598ca4e",
+          "bytes": 7846
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true
+      }
+    },
+    {
+      "family": "original",
+      "case": "FW-V01",
+      "m": 32,
+      "n": 96,
+      "original_directory": "build/analysis/avl-fixed-bands-20261031-003234/FW-V01-M32-N96/a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/original-FW-V01-M32-N96",
+      "seconds": 12.126797673000002,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 661241856,
+      "files": {
+        "console.txt": {
+          "sha256": "101ac69d12f60f5a4ec4d2181f579a886493f0ae8207c51e0b0fa3f6f7b584ba",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "cf796a2cfcbff93d20cf82fb7734da07916f4bc0995842e60696f86246924508",
+          "bytes": 825
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "594be0e5c1a6b537352444837dcc942823529121e32532f131c7f3e436c3f211",
+          "bytes": 289
+        },
+        "after/elements.txt": {
+          "sha256": "7155f7b8a050be75410a093e79473fed3afb34e4c810d4072442993a863e689d",
+          "bytes": 589374
+        },
+        "after/strips.txt": {
+          "sha256": "7849c50e416af434b53544e786b9d893a36c1b03294dbd5a3a23c6ae837366a2",
+          "bytes": 32506
+        },
+        "after/total.txt": {
+          "sha256": "c431fe924813f2c72bcd877143c0874de675d61430011ae050305d405c1b3338",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "339b839c0c85e5f2b215b0e4c30f340c9e51fab537e6b98c3c25206d2efaa90b",
+          "bytes": 1741884
+        },
+        "after/uv-rows.txt": {
+          "sha256": "72300e645ff386eb2de91ed1371d416d5cfb753067273e5a6d69519c3b3aa826",
+          "bytes": 1686592
+        },
+        "after/uv-strips.txt": {
+          "sha256": "9a754b8d1e9f71ac427397191555b4965fdae6107781731b9b485db9d4c06667",
+          "bytes": 7846
+        },
+        "out/elements.txt": {
+          "sha256": "7155f7b8a050be75410a093e79473fed3afb34e4c810d4072442993a863e689d",
+          "bytes": 589374
+        },
+        "out/strips.txt": {
+          "sha256": "7849c50e416af434b53544e786b9d893a36c1b03294dbd5a3a23c6ae837366a2",
+          "bytes": 32506
+        },
+        "out/total.txt": {
+          "sha256": "c431fe924813f2c72bcd877143c0874de675d61430011ae050305d405c1b3338",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "3da3dbc0e76e6db4ffd9c33275f49ec45cfb2540a6ca57522c06db6c6e0f9ee3",
+          "bytes": 6690849
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "9985a6e4709aee76043762902e0cce555818942d28137754ade6c5a2a9e7dca5",
+          "bytes": 2209003
+        },
+        "out/us-responses.txt": {
+          "sha256": "4c19dd0076a1c12536cc8af353229095d65fe950091cea7755b41bbf562b4393",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "1ba6aa2e95ae0648fbb6f8e8bdf2efc9b3c1677f12a8e72a3fa6a13295fb7c83",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "b565d320a8b00633e1ce210026efa62c845e18762827bfcc072b6dcf5611d405",
+          "bytes": 691250
+        },
+        "out/uv-forces.txt": {
+          "sha256": "339b839c0c85e5f2b215b0e4c30f340c9e51fab537e6b98c3c25206d2efaa90b",
+          "bytes": 1741884
+        },
+        "out/uv-rows.txt": {
+          "sha256": "72300e645ff386eb2de91ed1371d416d5cfb753067273e5a6d69519c3b3aa826",
+          "bytes": 1686592
+        },
+        "out/uv-strips.txt": {
+          "sha256": "9a754b8d1e9f71ac427397191555b4965fdae6107781731b9b485db9d4c06667",
+          "bytes": 7846
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true
+      }
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "original_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M12-N160/a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V01-M12-N160",
+      "seconds": 4.643742198999998,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 274427904,
+      "files": {
+        "console.txt": {
+          "sha256": "9fe14790bdb9d666dcbf39b63bec5a7ad9ab5b88cd0ac36b9ddf6ff2f17d67c8",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "242f437cece921a4cc196ca79a07705d1b5156cfac7494e5d82c1d9bd4794909",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "4a28485c9257b78b89fae3821500cce83682179890ef93e3467714d63d9e1af0",
+          "bytes": 1591
+        },
+        "after/elements.txt": {
+          "sha256": "6924b0cf07cf51782242c43db4eece016beca63ba46d50844759d3fa1a4d1c31",
+          "bytes": 428094
+        },
+        "after/strips.txt": {
+          "sha256": "2b54faa4cceba341101335b88feafd67e3eb57e5758253c1b64321e734e89ab7",
+          "bytes": 53434
+        },
+        "after/total.txt": {
+          "sha256": "aeb4d7cd1b9dd787e9891c321288fe461a413df6b0778520d341ac184fe9b701",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "270820589a55d1598f64227de2c95eb70113a31b84aeb1eaa895fb21eee92921",
+          "bytes": 1088700
+        },
+        "after/uv-rows.txt": {
+          "sha256": "f886920a47bd6dc8866ac6b7ad577e0655bb851b71d94c47eb1245a2a43bb054",
+          "bytes": 1054144
+        },
+        "after/uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        },
+        "out/elements.txt": {
+          "sha256": "6924b0cf07cf51782242c43db4eece016beca63ba46d50844759d3fa1a4d1c31",
+          "bytes": 428094
+        },
+        "out/strips.txt": {
+          "sha256": "2b54faa4cceba341101335b88feafd67e3eb57e5758253c1b64321e734e89ab7",
+          "bytes": 53434
+        },
+        "out/total.txt": {
+          "sha256": "aeb4d7cd1b9dd787e9891c321288fe461a413df6b0778520d341ac184fe9b701",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "8e60192ec9ef3f727dae1eb193fee90f788654672eda08fe610f6d0ca6348c4b",
+          "bytes": 4181793
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "a2364877440debd906a9b56265ea42b6adcb34c41f4f6853107365799fee342b",
+          "bytes": 1379563
+        },
+        "out/us-responses.txt": {
+          "sha256": "8e85d81a1e16fa72bd1db4b4c05176f6a233a69f0b67c6dae043da7c81ab74ff",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "d012e9aaf56933bd8e9940f0706403b5e4ea3d7c1ecc41af87e819dbcf06fc89",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "4305d7aef22f703850a3d55b32d22eb4ea29db9ccec4528c996453bb9e70ba02",
+          "bytes": 432050
+        },
+        "out/uv-forces.txt": {
+          "sha256": "270820589a55d1598f64227de2c95eb70113a31b84aeb1eaa895fb21eee92921",
+          "bytes": 1088700
+        },
+        "out/uv-rows.txt": {
+          "sha256": "f886920a47bd6dc8866ac6b7ad577e0655bb851b71d94c47eb1245a2a43bb054",
+          "bytes": 1054144
+        },
+        "out/uv-strips.txt": {
+          "sha256": "dc4ec1ad7822670f80ebd29ed65904c8ae499d2de2ff2059b489fcb472de218f",
+          "bytes": 13030
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true
+      }
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "original_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V01-M24-N160",
+      "seconds": 18.336619867,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 1013940224,
+      "files": {
+        "console.txt": {
+          "sha256": "87330856387bfaa45e8e0b820f58da178ce429787e82dfd5838d8c971027603d",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "d9dd8d99c7b27d438a35681eba22b29e8d1cdba6f5436e3b08ff930ac6fd045e",
+          "bytes": 826
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "6875a852b03cc6481a299526bb81535fd11966f6fc83e61a1d598ba306b567ef",
+          "bytes": 1591
+        },
+        "after/elements.txt": {
+          "sha256": "193aca89fa33d419433a6c71dc1b12270c3d6d633651fc0e1f2e9089812e4e47",
+          "bytes": 760254
+        },
+        "after/strips.txt": {
+          "sha256": "66406e1a5525a55f05fd4438a5836f77ff43262c95fe4aaad44e4ee3d316e008",
+          "bytes": 53434
+        },
+        "after/total.txt": {
+          "sha256": "abbc3e79a73fe372f80a7fac32681c30328be261ba01ed8e866b12e4ece3fd19",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "02f55ba48ff6f7ec55bbab95a3e5c9fd2f5b6ffb1ca3e69bbee96d02c93b1bba",
+          "bytes": 2177340
+        },
+        "after/uv-rows.txt": {
+          "sha256": "0838b07df83c945b64f8a1614500b99d6cfcac58e9f6abe74d1cfe921f6adf9c",
+          "bytes": 2108224
+        },
+        "after/uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        },
+        "out/elements.txt": {
+          "sha256": "193aca89fa33d419433a6c71dc1b12270c3d6d633651fc0e1f2e9089812e4e47",
+          "bytes": 760254
+        },
+        "out/strips.txt": {
+          "sha256": "66406e1a5525a55f05fd4438a5836f77ff43262c95fe4aaad44e4ee3d316e008",
+          "bytes": 53434
+        },
+        "out/total.txt": {
+          "sha256": "abbc3e79a73fe372f80a7fac32681c30328be261ba01ed8e866b12e4ece3fd19",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "890cc7f9301d122254e504ee6ffbe1539175c190d54553ffdf90462dd847b6bd",
+          "bytes": 8363553
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "b8b1feb8fe495a7292093ecb5655b50cef501517e99b0de14ae35d5af7f2fab2",
+          "bytes": 2761963
+        },
+        "out/us-responses.txt": {
+          "sha256": "27ff6aef8bcfc5980d63ae257c610b1cd882071a22460a28b46174aed528dad5",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "4e8047dbeadcea5dfc966c2906797726c5689cdc950e2f48677bbef9c888dbe0",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "65bf530517edbe2fadcf0691b939687bdac70a16c13b19403c3da6bc936944a9",
+          "bytes": 864050
+        },
+        "out/uv-forces.txt": {
+          "sha256": "02f55ba48ff6f7ec55bbab95a3e5c9fd2f5b6ffb1ca3e69bbee96d02c93b1bba",
+          "bytes": 2177340
+        },
+        "out/uv-rows.txt": {
+          "sha256": "0838b07df83c945b64f8a1614500b99d6cfcac58e9f6abe74d1cfe921f6adf9c",
+          "bytes": 2108224
+        },
+        "out/uv-strips.txt": {
+          "sha256": "2ff870aaa10f11d0d0927769caad6c8dd93e46ac4a9d89f030e5e018a6c01b98",
+          "bytes": 13030
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true
+      }
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "original_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M12-N160/a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V02-M12-N160",
+      "seconds": 4.339001717000002,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 274624512,
+      "files": {
+        "console.txt": {
+          "sha256": "dda4352b0a9d73495612fb7b47043d0dad8818ac6d60afa611af1e8eddf182dd",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "3ba5a95c281c96c1a16ed757175e5827b2f072dc607bd91ec6a25e6df565a190",
+          "bytes": 823
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "e9804f4855983395acd3f33453b38e7a081cbd64c128eb8afa56f470fb9bd7b8",
+          "bytes": 1955
+        },
+        "after/elements.txt": {
+          "sha256": "3b21a3737014ce64be9ade937b1b08bf642613955e20dac68bee27e210a16ce4",
+          "bytes": 428094
+        },
+        "after/strips.txt": {
+          "sha256": "dd3f8ea21af921bb17bd157cd36435cf9e2d1421507ba9b5faba85c1fc16e1d4",
+          "bytes": 53434
+        },
+        "after/total.txt": {
+          "sha256": "41f9701401ca2c9326a76815178a7376954690d499604835860dd1204d88e866",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "f83c9e7bb71d2475388feddfa8d5df04fe4441b4d58d471ada58559bc2a20734",
+          "bytes": 1088700
+        },
+        "after/uv-rows.txt": {
+          "sha256": "7c158237fe7228bd9ac3356bc4d3d8f0aa4bdfaba679090d6cd8db0f591dec40",
+          "bytes": 1054144
+        },
+        "after/uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        },
+        "out/elements.txt": {
+          "sha256": "3b21a3737014ce64be9ade937b1b08bf642613955e20dac68bee27e210a16ce4",
+          "bytes": 428094
+        },
+        "out/strips.txt": {
+          "sha256": "dd3f8ea21af921bb17bd157cd36435cf9e2d1421507ba9b5faba85c1fc16e1d4",
+          "bytes": 53434
+        },
+        "out/total.txt": {
+          "sha256": "41f9701401ca2c9326a76815178a7376954690d499604835860dd1204d88e866",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "510340930a4b7071b484c5afd338c9b62861ceaa785bc87f7e7f675be866e7e0",
+          "bytes": 4181793
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "907ad6e49093fd273cc7b40d5ea0233efc8ef538e94bd3219dfcf48a8e1c0c2a",
+          "bytes": 1379563
+        },
+        "out/us-responses.txt": {
+          "sha256": "a3593c1aa6c7c57c9455ceeb849518ef60c174428ce3a26cb45328d4dc1d652f",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "172bcf99319ab0a90e0e48c17b2cceb39edcdc6ff86c7849273680a8b8323f88",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "cd7464adaa51a5218296d0a220592ca00318327189c36d55b311fa7f15c87ebe",
+          "bytes": 432050
+        },
+        "out/uv-forces.txt": {
+          "sha256": "f83c9e7bb71d2475388feddfa8d5df04fe4441b4d58d471ada58559bc2a20734",
+          "bytes": 1088700
+        },
+        "out/uv-rows.txt": {
+          "sha256": "7c158237fe7228bd9ac3356bc4d3d8f0aa4bdfaba679090d6cd8db0f591dec40",
+          "bytes": 1054144
+        },
+        "out/uv-strips.txt": {
+          "sha256": "a9cd5608c270610cb2bb4f40e86ce62ec048328d6791e7e9dd57b9fcc1e269df",
+          "bytes": 13030
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true
+      }
+    },
+    {
+      "family": "aligned",
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "original_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a1",
+      "directory": "build/analysis/avl-sensitivity-20261031-014242/aligned-FW-V02-M24-N160",
+      "seconds": 18.089032211000003,
+      "exit_code": 0,
+      "stopped": null,
+      "peak_resident_bytes": 1013567488,
+      "files": {
+        "console.txt": {
+          "sha256": "27d38042217b1f62c3812ffa0f851e34a4d16d1b5deb3c4d2c921e0690bcd931",
+          "bytes": 33779
+        },
+        "resource.txt": {
+          "sha256": "c6b24cf8240ee9850ffb9d7015fdb691a04377ccaa9fab4092d83d318dc9eeb1",
+          "bytes": 826
+        },
+        "session.txt": {
+          "sha256": "fec17e12d87d7b042396547a760898b4c23fab3b3f9236f53d2000b3d4dd97c8",
+          "bytes": 209
+        },
+        "wing.avl": {
+          "sha256": "2f7f84fb11f1b65003c97740b560fae47d56f03f374e971007970331a7ac331b",
+          "bytes": 1955
+        },
+        "after/elements.txt": {
+          "sha256": "3ffde7caa2dcd6dd96b7bd55b5ce73f933ff58b03a73ae8df8b162ecea99996c",
+          "bytes": 760254
+        },
+        "after/strips.txt": {
+          "sha256": "9bb1f4710617af6dc40e52b5a600794a909a19e4b476d598dea8ff7f5d5222f1",
+          "bytes": 53434
+        },
+        "after/total.txt": {
+          "sha256": "1c96900b08df4959ef81f82617a73b4e19ed48b95a83864e71d0a97d1098dc59",
+          "bytes": 1297
+        },
+        "after/uv-forces.txt": {
+          "sha256": "649ee253005de50716e16015f663ea8564102142cf38ecc0409de46ec3f5217c",
+          "bytes": 2177340
+        },
+        "after/uv-rows.txt": {
+          "sha256": "95752ba8561212d512371bd0dc842d7a74ec7d4e1f5faa186763fdd257bc733b",
+          "bytes": 2108224
+        },
+        "after/uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        },
+        "out/elements.txt": {
+          "sha256": "3ffde7caa2dcd6dd96b7bd55b5ce73f933ff58b03a73ae8df8b162ecea99996c",
+          "bytes": 760254
+        },
+        "out/strips.txt": {
+          "sha256": "9bb1f4710617af6dc40e52b5a600794a909a19e4b476d598dea8ff7f5d5222f1",
+          "bytes": 53434
+        },
+        "out/total.txt": {
+          "sha256": "1c96900b08df4959ef81f82617a73b4e19ed48b95a83864e71d0a97d1098dc59",
+          "bytes": 1297
+        },
+        "out/us-adjoints.txt": {
+          "sha256": "8481dff48c6079d0085672e26e825f843f92d54046809f2ce5bca10322924aae",
+          "bytes": 8363553
+        },
+        "out/us-matrix-cross.txt": {
+          "sha256": "4c88f542eca8455199df8e8433188f3b369347a3c9cfc45899572649b1858eb7",
+          "bytes": 2761963
+        },
+        "out/us-responses.txt": {
+          "sha256": "97ac8142cccac1c928c107db678dbff52073086db2bb3f5323c6444cd6c20a9b",
+          "bytes": 5593
+        },
+        "out/us-summary.txt": {
+          "sha256": "b28543f38e0cc8d4579e2d973e2ee02d3fdffab2f6366be92bddd3526094e583",
+          "bytes": 300
+        },
+        "out/us-vectors.txt": {
+          "sha256": "b0706e05f46e1d37405584f3f2714d2b9678888d520ec23def4c668fccb1338a",
+          "bytes": 864050
+        },
+        "out/uv-forces.txt": {
+          "sha256": "649ee253005de50716e16015f663ea8564102142cf38ecc0409de46ec3f5217c",
+          "bytes": 2177340
+        },
+        "out/uv-rows.txt": {
+          "sha256": "95752ba8561212d512371bd0dc842d7a74ec7d4e1f5faa186763fdd257bc733b",
+          "bytes": 2108224
+        },
+        "out/uv-strips.txt": {
+          "sha256": "14cbe46c64004f186426880327537ae091e820ce8c127e4d4a374536cbad3278",
+          "bytes": 13030
+        }
+      },
+      "unchanged": {
+        "total.txt": true,
+        "strips.txt": true,
+        "elements.txt": true,
+        "uv-rows.txt": true,
+        "uv-forces.txt": true,
+        "uv-strips.txt": true
+      }
+    }
+  ],
+  "completed": true,
+  "stop_reason": null,
+  "seconds": 67.591872943,
+  "total_bytes": 95734647
+}

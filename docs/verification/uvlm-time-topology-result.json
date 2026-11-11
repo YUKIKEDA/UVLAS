@@ -1,0 +1,476 @@
+{
+  "protocol": "docs/verification/uvlm-time-topology-experiment.md",
+  "source_sha256": "35cf26ff4ba49b15c310a55d2c92045fadf9e3bb6e2d139f66f24666e7bef8fc",
+  "numpy": "2.3.5",
+  "memory_helper_sha256": "909db42a881612996ce1381432bc03153c18f7b0107876a56a986f84316ffd9d",
+  "kernel_reference_error": 0.0,
+  "kernel_quadrature_error": 6.071532165918825e-18,
+  "cases": [
+    {
+      "boundary_squared_zero": true,
+      "force_error": 3.552740783751416e-15,
+      "moment_error": 1.0695084443661336e-14,
+      "virtual_work_error": 3.552713678800501e-15,
+      "omitted_trailing_vertices_force_difference": 0.35370000000009066,
+      "reversed_unsteady_normal_difference": 1.7966400000004255,
+      "aic_quadrature_error": 3.1086244689504383e-15,
+      "omitted_inter_surface_gamma_error": 0.015912934288090375,
+      "circulation_error": 1.9984014443252818e-15,
+      "nonpenetration_relative": 2.266687422931946e-16,
+      "bdf2_error": 1.6220358389773537e-13,
+      "bdf1_known_error": 1.0326895588663731e-13,
+      "fixed_step_bdf2_mismatch": 1.695310558602614e-13,
+      "newest_wrong_time_mismatch": 0.008504000000002065,
+      "trailing_induction_error": 0.0,
+      "material_geometry_error": 2.220446049250313e-16,
+      "material_circulation_error": 0.0,
+      "steady_trailing_induction_error": 0.0
+    },
+    {
+      "boundary_squared_zero": true,
+      "force_error": 6.938893903907228e-18,
+      "moment_error": 3.552822097363439e-15,
+      "virtual_work_error": 0.0,
+      "omitted_trailing_vertices_force_difference": 0.35935499999989323,
+      "reversed_unsteady_normal_difference": 1.8256559999994877,
+      "aic_quadrature_error": 1.7763568394002505e-15,
+      "omitted_inter_surface_gamma_error": 0.016802465722025817,
+      "circulation_error": 8.881784197001252e-16,
+      "nonpenetration_relative": 1.3929393557661078e-16,
+      "bdf2_error": 1.7896795156957523e-13,
+      "bdf1_known_error": 8.636971346454025e-14,
+      "fixed_step_bdf2_mismatch": 0.11356692307714067,
+      "newest_wrong_time_mismatch": 0.005639139999998877,
+      "trailing_induction_error": 0.0,
+      "material_geometry_error": 2.220446049250313e-16,
+      "material_circulation_error": 1.9984014443252818e-15,
+      "steady_trailing_induction_error": 0.0
+    },
+    {
+      "boundary_squared_zero": true,
+      "force_error": 3.552740783751416e-15,
+      "moment_error": 3.662079734488538e-15,
+      "virtual_work_error": 0.0,
+      "omitted_trailing_vertices_force_difference": 0.3711000000000517,
+      "reversed_unsteady_normal_difference": 1.885920000000226,
+      "aic_quadrature_error": 3.1086244689504383e-15,
+      "omitted_inter_surface_gamma_error": 0.018486079482999074,
+      "circulation_error": 1.9984014443252818e-15,
+      "nonpenetration_relative": 1.274259275242661e-16,
+      "bdf2_error": 1.137423488728473e-13,
+      "bdf1_known_error": 3.677787241418429e-14,
+      "fixed_step_bdf2_mismatch": 0.11064148148154923,
+      "newest_wrong_time_mismatch": 0.011992860000000993,
+      "trailing_induction_error": 0.0,
+      "material_geometry_error": 2.220446049250313e-16,
+      "material_circulation_error": 1.9984014443252818e-15,
+      "steady_trailing_induction_error": 0.0
+    }
+  ],
+  "cold_start_linear_error": 1.7763568394002505e-15,
+  "repeated_convection_drift_m": 0.8640000000000008,
+  "checks": {
+    "kernel_reference": true,
+    "kernel_quadrature": true,
+    "topology": true,
+    "material_transport": true,
+    "circulation": true,
+    "aic_quadrature": true,
+    "negative_omitted_inter_surface": true,
+    "derivatives": true,
+    "force_work": true,
+    "parent_unchanged": true,
+    "repeat_trial_identical": true,
+    "double_commit_refused": true,
+    "checkpoint_equal": true,
+    "final_rows": true,
+    "negative_time_transfer": true,
+    "negative_fixed_step_coefficients": true,
+    "negative_normal": true,
+    "negative_omitted_vertices": true,
+    "negative_repeated_convection": true,
+    "missing_history_refused": true
+  },
+  "all_criteria_pass": true,
+  "final_state": {
+    "t": 0.06,
+    "generation": 3,
+    "gamma": [
+      1.0187200000000003,
+      1.1199560000000006,
+      1.2211920000000005,
+      1.3224280000000008,
+      1.423664000000001,
+      1.524900000000001,
+      1.626136000000002
+    ],
+    "gamma_previous": [
+      1.0101178000000002,
+      1.1107886900000006,
+      1.2114595800000003,
+      1.3121304700000003,
+      1.4128013600000005,
+      1.5134722500000009,
+      1.614143140000001
+    ],
+    "h_previous": 0.027,
+    "wake": [
+      {
+        "nodes": [
+          [
+            [
+              0.999995500003375,
+              -0.5,
+              -0.0017999955000020252
+            ],
+            [
+              0.999995500003375,
+              0.0,
+              -0.0017999955000020252
+            ],
+            [
+              0.999995500003375,
+              0.5,
+              -0.0017999955000020252
+            ]
+          ],
+          [
+            [
+              1.2159986387503088,
+              -0.5,
+              -0.0009899992513126021
+            ],
+            [
+              1.2159986387503088,
+              0.0,
+              -0.0009899992513126021
+            ],
+            [
+              1.2159986387503088,
+              0.5,
+              -0.0009899992513126021
+            ]
+          ],
+          [
+            [
+              1.3199995000000417,
+              -0.5,
+              -0.0005999998333333417
+            ],
+            [
+              1.3199995000000417,
+              0.0,
+              -0.0005999998333333417
+            ],
+            [
+              1.3199995000000417,
+              0.5,
+              -0.0005999998333333417
+            ]
+          ],
+          [
+            [
+              1.48,
+              -0.5,
+              0.0
+            ],
+            [
+              1.48,
+              0.0,
+              0.0
+            ],
+            [
+              1.48,
+              0.5,
+              0.0
+            ]
+          ],
+          [
+            [
+              1.6399995000000416,
+              -0.5,
+              0.0005999998333333417
+            ],
+            [
+              1.6399995000000416,
+              0.0,
+              0.0005999998333333417
+            ],
+            [
+              1.6399995000000416,
+              0.5,
+              0.0005999998333333417
+            ]
+          ],
+          [
+            [
+              1.7999980000006666,
+              -0.5,
+              0.0011999986666669333
+            ],
+            [
+              1.7999980000006666,
+              0.0,
+              0.0011999986666669333
+            ],
+            [
+              1.7999980000006666,
+              0.5,
+              0.0011999986666669333
+            ]
+          ]
+        ],
+        "circulation": [
+          [
+            1.2114595800000003,
+            1.3121304700000003
+          ],
+          [
+            1.2068880000000006,
+            1.307292000000001
+          ],
+          [
+            1.2,
+            1.3
+          ],
+          [
+            1.1932880000000001,
+            1.292892
+          ],
+          [
+            1.1867519999999998,
+            1.285968
+          ]
+        ],
+        "births": [
+          2,
+          1,
+          0,
+          -1,
+          -2
+        ],
+        "intervals": [
+          [
+            0.033,
+            0.06
+          ],
+          [
+            0.02,
+            0.033
+          ],
+          [
+            0.0,
+            0.02
+          ],
+          [
+            -0.02,
+            0.0
+          ],
+          [
+            -0.04,
+            -0.02
+          ]
+        ]
+      },
+      {
+        "nodes": [
+          [
+            [
+              1.201494597754051,
+              1.5,
+              0.49759775540168505
+            ],
+            [
+              1.201494597754051,
+              1.8333333333333333,
+              0.49759775540168505
+            ],
+            [
+              1.201494597754051,
+              2.1666666666666665,
+              0.49759775540168505
+            ],
+            [
+              1.201494597754051,
+              2.5,
+              0.49759775540168505
+            ]
+          ],
+          [
+            [
+              1.416823366126027,
+              1.5,
+              0.49867932027357925
+            ],
+            [
+              1.416823366126027,
+              1.8333333333333333,
+              0.49867932027357925
+            ],
+            [
+              1.416823366126027,
+              2.1666666666666665,
+              0.49867932027357925
+            ],
+            [
+              1.416823366126027,
+              2.5,
+              0.49867932027357925
+            ]
+          ],
+          [
+            [
+              1.5204993999167167,
+              1.5,
+              0.49919975020002083
+            ],
+            [
+              1.5204993999167167,
+              1.8333333333333333,
+              0.49919975020002083
+            ],
+            [
+              1.5204993999167167,
+              2.1666666666666665,
+              0.49919975020002083
+            ],
+            [
+              1.5204993999167167,
+              2.5,
+              0.49919975020002083
+            ]
+          ],
+          [
+            [
+              1.68,
+              1.5,
+              0.5
+            ],
+            [
+              1.68,
+              1.8333333333333333,
+              0.5
+            ],
+            [
+              1.68,
+              2.1666666666666665,
+              0.5
+            ],
+            [
+              1.68,
+              2.5,
+              0.5
+            ]
+          ],
+          [
+            [
+              1.8394994000833833,
+              1.5,
+              0.5007997498000208
+            ],
+            [
+              1.8394994000833833,
+              1.8333333333333333,
+              0.5007997498000208
+            ],
+            [
+              1.8394994000833833,
+              2.1666666666666665,
+              0.5007997498000208
+            ],
+            [
+              1.8394994000833833,
+              2.5,
+              0.5007997498000208
+            ]
+          ],
+          [
+            [
+              1.9989976006674666,
+              1.5,
+              0.5015989984003336
+            ],
+            [
+              1.9989976006674666,
+              1.8333333333333333,
+              0.5015989984003336
+            ],
+            [
+              1.9989976006674666,
+              2.1666666666666665,
+              0.5015989984003336
+            ],
+            [
+              1.9989976006674666,
+              2.5,
+              0.5015989984003336
+            ]
+          ]
+        ],
+        "circulation": [
+          [
+            1.4128013600000005,
+            1.5134722500000009,
+            1.614143140000001
+          ],
+          [
+            1.4076960000000012,
+            1.5081000000000013,
+            1.6085040000000022
+          ],
+          [
+            1.4,
+            1.5,
+            1.6
+          ],
+          [
+            1.392496,
+            1.4921,
+            1.5917040000000002
+          ],
+          [
+            1.3851839999999997,
+            1.4844,
+            1.5836160000000001
+          ]
+        ],
+        "births": [
+          2,
+          1,
+          0,
+          -1,
+          -2
+        ],
+        "intervals": [
+          [
+            0.033,
+            0.06
+          ],
+          [
+            0.02,
+            0.033
+          ],
+          [
+            0.0,
+            0.02
+          ],
+          [
+            -0.02,
+            0.0
+          ],
+          [
+            -0.04,
+            -0.02
+          ]
+        ]
+      }
+    ]
+  },
+  "seconds": 0.7969999999913853,
+  "peak_process_working_bytes": 64262144,
+  "sources": [
+    "https://spiral.imperial.ac.uk/bitstreams/68d9db23-1616-4cc0-ab88-4f24970aff85/download",
+    "https://orbi.uliege.be/bitstream/2268/200767/1/AIAAjournal_InducedDrag_accepted.pdf"
+  ],
+  "limitations": "prescribed planar motion, manufactured normal RHS, uniform wake convection, prescribed edge load velocity; no physical aero-load or ANCF coupled solve, no core/near-field adoption"
+}

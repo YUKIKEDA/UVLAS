@@ -1,0 +1,67 @@
+{
+  "history": [
+    {
+      "iteration": 0,
+      "residual": 1.4945648877350146,
+      "min_F": 0.9954826466864634,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 1,
+      "residual": 0.05821103173973253,
+      "min_F": 1.0088017071801747,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 2,
+      "residual": 0.0009550879612718469,
+      "min_F": 1.0090221961601664,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 3,
+      "residual": 6.013535698722428e-07,
+      "min_F": 1.009026961752728,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 4,
+      "residual": 8.744411512993844e-13,
+      "min_F": 1.0090269668239908
+    }
+  ],
+  "metrics": {
+    "displacement": 4.111686827102422e-10,
+    "equilibrium": 8.744411512993844e-13,
+    "support_reaction": 5.395054915647302e-13,
+    "independent_equilibrium": 8.778068335747871e-13,
+    "internal_pointwise_flux": 6.145756635650169e-13,
+    "flux_dual": 1.2547016333715808e-15,
+    "tangent": 7.730811284862401e-15,
+    "min_F": 1.0090269668239908
+  },
+  "checks": {
+    "newton": true,
+    "displacement": true,
+    "identities": true,
+    "orientation": true,
+    "resources": true
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "artifact": {
+    "path": "build/analysis/hybrid-gradient-equilibrium-20261104-102515.npz",
+    "sha256": "353ac1303929e55ab55a235b1b4b9ccf0ef0897e8bd13f4298dc38866b5846c3"
+  },
+  "manufactured_Ku_load": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_hybrid_gradient_equilibrium.py": "20aa408cbddb0e0509d4e6f24813e346cf97e7c9bb2bd6c415abe3e2d24eb57c",
+    "tools/design-experiments/hybrid_gradient_ancf.py": "86a7696aeb78c09f5e86d9077df8ecadd1896d79015dbabf34f7ed38c15c9d4b",
+    "docs/verification/hybrid-gradient-equilibrium-protocol.md": "a48cf32e358a545237afea460df4d51ee1d26699ae17bc29029e32bf0addf6e4",
+    "docs/verification/hybrid-gradient-equilibrium-preparation.json": "d7f5daf3a5c30b899f1cfddf9ec4451be8366078cc1d5d80507479da9e65bc81",
+    "docs/verification/hybrid-gradient-local-result.json": "92587816fa5aa04678acf0dfe37e22768e8385de8cef02c38e1be2835515b5ff"
+  },
+  "seconds": 6.592999999993481,
+  "peak_bytes": 893386752
+}

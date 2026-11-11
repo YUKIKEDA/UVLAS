@@ -1,0 +1,110 @@
+{
+  "source_sha256": "15180e1fd6bed2712b3ff1b981c6d29091f9aec6aa0ea20c11bbc18e0ce4bee2",
+  "protocol": "docs/verification/avl-allocation-factorial-experiment.md",
+  "protocol_sha256": "e2d11e91dcdf95ef0de15894d29cfea36091c18073e63d6ef5cf1d0726332407",
+  "solve_audit_sha256": "d52fd5afcc47fc45e24ec09619bae3725392a90665c1d7ec1a9f0e42a2c7795b",
+  "parent_sha256": "43277cb97895b3eee390b463b01310f02f9a0677969632b82e2c06d0af4500f3",
+  "tip_parent_sha256": "c9df031d5c3910e1741a002ec691d032aef7f9f79c86afe80d5b0d6a8868cc46",
+  "executable_sha256": "7f5b321f308be5d737b6999ba143fc239a8bc7056e281a889e68603fa20bf740",
+  "decks": [
+    {
+      "case": "FW-V01",
+      "allocation": "inner-only",
+      "m": 12,
+      "physical_n": 1024,
+      "native_strips": 512,
+      "native_unknowns": 6144,
+      "interval_counts": [
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        64,
+        64
+      ],
+      "path": "docs/verification/fixtures/avl-fw-allocation-factorial/FW-V01-M12-N1024-inner-only.avl",
+      "sha256": "d5aad10ca15859782877059ab6c1cb98687da9beee8b08f711c9d31a8d8602ce",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/wing.avl",
+      "donor_sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50"
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "tip-only",
+      "m": 12,
+      "physical_n": 1536,
+      "native_strips": 768,
+      "native_unknowns": 9216,
+      "interval_counts": [
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        128,
+        128
+      ],
+      "path": "docs/verification/fixtures/avl-fw-allocation-factorial/FW-V01-M12-N1536-tip-only.avl",
+      "sha256": "543a16ef6412bd04a7b5b42ef9855ab85c219bc8a95a9f113cfed05fe79eb45b",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/wing.avl",
+      "donor_sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "inner-only",
+      "m": 12,
+      "physical_n": 1024,
+      "native_strips": 512,
+      "native_unknowns": 6144,
+      "interval_counts": [
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        64,
+        64
+      ],
+      "path": "docs/verification/fixtures/avl-fw-allocation-factorial/FW-V02-M12-N1024-inner-only.avl",
+      "sha256": "864d31febbb4d850e670c7afcdfa534c394adcf38c2f474bc331580c79e32ae0",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/wing.avl",
+      "donor_sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "tip-only",
+      "m": 12,
+      "physical_n": 1536,
+      "native_strips": 768,
+      "native_unknowns": 9216,
+      "interval_counts": [
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        128,
+        128
+      ],
+      "path": "docs/verification/fixtures/avl-fw-allocation-factorial/FW-V02-M12-N1536-tip-only.avl",
+      "sha256": "fcf9595820a4eb3186b593e6b80035ccd950c385f04b03819d38cd2ee7d6e5a5",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/wing.avl",
+      "donor_sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa"
+    }
+  ],
+  "new_runs": 0,
+  "all_criteria_pass": true,
+  "reference_acceptance": false
+}

@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-03",
+  "local_full_archives": false,
+  "sources": [
+    {
+      "title": "Finite Element Analysis of Shell Structures",
+      "authors": "M. L. Bucalem; K. J. Bathe",
+      "year": 1997,
+      "url": "https://web.mit.edu/kjb/www/Publications_Prior_to_1998/Finite_Element_Analysis_of_Shell_Structures.pdf",
+      "checked_scope": "Introduction requirements and section 3.3, PDF pages 4 and 13-14: restricted zero-strain spaces, distortion and spurious zero-energy modes",
+      "role": "general locking mechanism and reliability requirements; not proof of UVLAS candidate"
+    },
+    {
+      "title": "Weak form quadrature shell elements based on absolute nodal coordinate formulation",
+      "authors": "Zixuan He; Huayi Li; Hongzhi Zhong",
+      "version": "Research Square v1, posted 2024-02-28",
+      "doi": "10.21203/rs.3.rs-3945984/v1",
+      "url": "https://assets-eu.researchsquare.com/files/rs-3945984/v1_covered_f1a02851-92be-4fd3-82c2-fe14d02ae7e0.pdf?c=1714982132",
+      "checked_scope": "Section 3.1 Lobatto in-plane/Gauss thickness integration, discussion of EL2 before section 4, example 4.1 and portions of 4.4; full derivation and all examples not yet audited",
+      "related_published_article_doi": "10.1016/j.tws.2024.112670",
+      "published_and_preprint_equivalence_verified": false,
+      "role": "source for formulation review only; UVLAS distorted thin-shell suitability not established"
+    }
+  ]
+}

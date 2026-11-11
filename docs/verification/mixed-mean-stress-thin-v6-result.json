@@ -1,0 +1,2803 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "global_q0_ranks": [
+        114,
+        114,
+        114
+      ],
+      "q01_dimension": 144,
+      "local": [
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.0993988724817045,
+            "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.2908952333944339e-16,
+            "seconds": 0.030999999959021807
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 3.0215180161315297e-16,
+            "smallest_nonzero": 0.6940383829638791,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.409584874809271e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.250000000000007,
+          "fluctuation": 7.068047992855194e-12,
+          "constant_stress": 3.2644836561307764e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.0993988724817045,
+            "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.2908952333944339e-16,
+            "seconds": 0.015999999945051968
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 3.0215180161315297e-16,
+            "smallest_nonzero": 0.6940383829638791,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.9595278569095296e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.250000000000007,
+          "fluctuation": 7.138572420678601e-12,
+          "constant_stress": 3.2644836561307764e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.0993988724817045,
+            "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.2908952333944339e-16,
+            "seconds": 0.030999999959021807
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 3.0215180161315297e-16,
+            "smallest_nonzero": 0.6940383829638791,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.409584874809271e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.250000000000007,
+          "fluctuation": 7.068047992855197e-12,
+          "constant_stress": 3.2644836561307764e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.0993988724817045,
+            "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.2908952333944339e-16,
+            "seconds": 0.015999999945051968
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 3.0215180161315297e-16,
+            "smallest_nonzero": 0.6940383829638791,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.9595278569095296e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.250000000000007,
+          "fluctuation": 7.138572420678603e-12,
+          "constant_stress": 3.2644836561307764e-15
+        }
+      ],
+      "error": [
+        2.7467950062716853e-15,
+        2.881541402011019e-15,
+        3.972417512209677e-08
+      ],
+      "independent": [
+        2.765050565276053e-15,
+        2.876465340970791e-15,
+        3.972417521710131e-08
+      ],
+      "kkt": [
+        2.1739693440518325e-16,
+        2.2324573762976625e-16,
+        2.310723170852094e-16
+      ],
+      "checks": {
+        "rank": true,
+        "work": true,
+        "fluctuation": true,
+        "constant_stress": true,
+        "kkt": true,
+        "quadrature": true,
+        "resources": true
+      },
+      "seconds": 2.719000000040978,
+      "artifact": "build/analysis/mixed-mean-stress-20261104-160200/k0-n2-a0.npz",
+      "artifact_sha256": "7a3a41e41171e09be2b01fec056cf8776112923ff8e818cbb5da2118baa310ef"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "global_q0_ranks": [
+        114,
+        114,
+        114
+      ],
+      "q01_dimension": 144,
+      "local": [
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.18665795725535,
+            "coefficient_basis_sha256": "e7e413609ab0c0efda95fa975e9d0b2c8cce7fefb60c268e6e10bb8dff8568ba",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "9349891b939d45d158ed11c985bd9ef91ed605925720df40eca48dc99caab4d8",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 2.7797500817321286e-16,
+            "seconds": 0.045999999972991645
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 3.0224690423301263e-16,
+            "smallest_nonzero": 0.6122896694119491,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.5032089688532804e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.8309368178300316,
+          "fluctuation": 5.137091779135532e-14,
+          "constant_stress": 3.3256107999700776e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.1669569721455684,
+            "coefficient_basis_sha256": "b7329b326273f8444f60ea86a3e6fd11eb633a4e3e11ec0d6f36051a2c4d0020",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "14f69f30836f0162e8f5e1ec04166069df6b20827319e1dcc5240c587b55f94c",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 2.5085930933413175e-16,
+            "seconds": 0.06300000008195639
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 2.8616940411142617e-16,
+            "smallest_nonzero": 0.6142491242625054,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.456199350031647e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.978666475440735,
+          "fluctuation": 3.963321709765345e-14,
+          "constant_stress": 5.495225382003484e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.1866579572553495,
+            "coefficient_basis_sha256": "394b9f2bb1955d71ae52557020417d48c594ce40d38fca29501ab6416aaecf6a",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "5def0d3bd79e8af3a3c4ff086e2312560e3b357f6c0d167cb2c0b0cb401fcd8b",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 2.726289964816196e-16,
+            "seconds": 0.0470000000204891
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 2.856250837294591e-16,
+            "smallest_nonzero": 0.6122896694119483,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.541697898348516e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.83093681783004,
+          "fluctuation": 5.156195638620919e-14,
+          "constant_stress": 2.5095221864403987e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 174,
+            "constant_completion": 0,
+            "coefficient_condition": 3.1669569721455675,
+            "coefficient_basis_sha256": "a71985663e28a7c91ad75f044c1d608f66feaa9577457c7dced19fd7f1ca8487",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 174,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 174,
+              "rational_space_sha256": "930577b6c44635e6e530d7884b238f6f5913fbd324fb62f50c925b1cfa324325",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 2.746719945995073e-16,
+            "seconds": 0.062000000034458935
+          },
+          "q01": {
+            "ranks": [
+              174,
+              174,
+              174
+            ],
+            "columns": 108,
+            "nullity": 39,
+            "residual": 2.9671849526697e-16,
+            "smallest_nonzero": 0.6142491242625058,
+            "raw_ranks": [
+              69,
+              69,
+              69
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              69,
+              69,
+              69
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 39,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.4761702290523594e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.9786664754407335,
+          "fluctuation": 3.889056535907912e-14,
+          "constant_stress": 7.06669981835276e-15
+        }
+      ],
+      "error": [
+        3.419172726469261e-15,
+        3.6967908401536375e-15,
+        5.395626176421579e-08
+      ],
+      "independent": [
+        3.4482542249263322e-15,
+        3.782801396263008e-15,
+        5.395626176871738e-08
+      ],
+      "kkt": [
+        2.9816326540098135e-16,
+        3.206813836664089e-16,
+        2.9240383709273476e-16
+      ],
+      "checks": {
+        "rank": true,
+        "work": true,
+        "fluctuation": true,
+        "constant_stress": true,
+        "kkt": true,
+        "quadrature": true,
+        "resources": true
+      },
+      "seconds": 2.76500000001397,
+      "artifact": "build/analysis/mixed-mean-stress-20261104-160200/k0-n2-a0.2.npz",
+      "artifact_sha256": "66a4ff9b02c26bdded93c9b7bc7471d3a37c3f05dc3f63e740dd0b3af2f87940"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "global_q0_ranks": [
+        62,
+        62,
+        62
+      ],
+      "q01_dimension": 92,
+      "local": [
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.2167818994583435,
+            "coefficient_basis_sha256": "9893086c11a7cc0dbedaf082c63079f5dbc9273984a5bd41461b62607e71ecc4",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "6496cbc343eac64b2100d35e62e65a10d510abe7a0df69d8475a62a88979bd94",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 3.640137480372215e-16,
+            "seconds": 0.20400000002700835
+          },
+          "q01": {
+            "ranks": [
+              175,
+              175,
+              175
+            ],
+            "columns": 108,
+            "nullity": 38,
+            "residual": 3.074671113382762e-16,
+            "smallest_nonzero": 0.5630202196589364,
+            "raw_ranks": [
+              70,
+              70,
+              70
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              70,
+              70,
+              70
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 38,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.5239069913696932e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.6039402555036624,
+          "fluctuation": 3.127047770345641e-14,
+          "constant_stress": 2.550853101536877e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.4634035399847445,
+            "coefficient_basis_sha256": "73b7b18566ba637fbeca0a75e086f0c022682ae8ce9cc1d0683ceddba2fc6fdf",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "8e23c60ede3103fd429ef4eb0c6cf5d65d0db2d6d44fdd57fb2d7a638b57792b",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 4.0290697201084843e-16,
+            "seconds": 0.21799999999348074
+          },
+          "q01": {
+            "ranks": [
+              175,
+              175,
+              175
+            ],
+            "columns": 108,
+            "nullity": 38,
+            "residual": 3.562132755984693e-16,
+            "smallest_nonzero": 0.5228930858401475,
+            "raw_ranks": [
+              70,
+              70,
+              70
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              70,
+              70,
+              70
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 38,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 3.424599701009517e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.375206258653359,
+          "fluctuation": 3.294705540701789e-14,
+          "constant_stress": 4.032866349343947e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.2167818994583435,
+            "coefficient_basis_sha256": "9893086c11a7cc0dbedaf082c63079f5dbc9273984a5bd41461b62607e71ecc4",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "6496cbc343eac64b2100d35e62e65a10d510abe7a0df69d8475a62a88979bd94",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 3.640137480372215e-16,
+            "seconds": 0.2029999999795109
+          },
+          "q01": {
+            "ranks": [
+              175,
+              175,
+              175
+            ],
+            "columns": 108,
+            "nullity": 38,
+            "residual": 3.074671113382762e-16,
+            "smallest_nonzero": 0.5630202196589364,
+            "raw_ranks": [
+              70,
+              70,
+              70
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              70,
+              70,
+              70
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 38,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.524052168774838e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.6039402555036624,
+          "fluctuation": 3.127053921342877e-14,
+          "constant_stress": 2.550853101536877e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.4634035399847445,
+            "coefficient_basis_sha256": "73b7b18566ba637fbeca0a75e086f0c022682ae8ce9cc1d0683ceddba2fc6fdf",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "8e23c60ede3103fd429ef4eb0c6cf5d65d0db2d6d44fdd57fb2d7a638b57792b",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 4.0290697201084843e-16,
+            "seconds": 0.18799999996554106
+          },
+          "q01": {
+            "ranks": [
+              175,
+              175,
+              175
+            ],
+            "columns": 108,
+            "nullity": 38,
+            "residual": 3.562132755984693e-16,
+            "smallest_nonzero": 0.5228930858401475,
+            "raw_ranks": [
+              70,
+              70,
+              70
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              70,
+              70,
+              70
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 38,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 3.423492671166191e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.375206258653359,
+          "fluctuation": 3.29184050846996e-14,
+          "constant_stress": 4.032866349343947e-15
+        }
+      ],
+      "error": [
+        5.0771936810577715e-14,
+        0.00015819720254279084,
+        2.2717774141892505e-06
+      ],
+      "independent": [
+        5.0804661728370195e-14,
+        0.000158197202542776,
+        2.271777414102377e-06
+      ],
+      "kkt": [
+        2.9033076772723285e-16,
+        3.018226767061483e-16,
+        2.494694496229773e-16
+      ],
+      "checks": {
+        "rank": true,
+        "work": true,
+        "fluctuation": true,
+        "constant_stress": true,
+        "kkt": true,
+        "quadrature": true,
+        "resources": true
+      },
+      "seconds": 3.422000000020489,
+      "artifact": "build/analysis/mixed-mean-stress-20261104-160200/k0.4-n2-a0.npz",
+      "artifact_sha256": "ec5e7ef54209c341e9a5115c50dfc1f0007b31067ea045389d511e139c9e6a6f"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "global_q0_ranks": [
+        54,
+        54,
+        54
+      ],
+      "q01_dimension": 84,
+      "local": [
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.612559529802254,
+            "coefficient_basis_sha256": "62e4937370135d0a76319d4942f7d8e3026d062d6b48ac01fced2c3fd72815c9",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "86da8342c55fc45504e6181b5184c04fee2193f2cb43dbfe3622d48e17950bca",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 4.3002033933012577e-16,
+            "seconds": 3.6410000000614673
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.826736189798021e-16,
+            "smallest_nonzero": 2.5663307171523258e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 3.0812463784790784e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.413104896465879,
+          "fluctuation": 2.600943725012661e-14,
+          "constant_stress": 3.820203450603209e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.081304517813473,
+            "coefficient_basis_sha256": "e5a45419dad409b137cd8aef093beb6bd6251adfa6a743af169eed546c5ef659",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "55886db29297b9cdac4b17c966913dd4f466938f4175a8bc2b6da1868d31741a",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 4.1762072519704196e-16,
+            "seconds": 3.702999999979511
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.1816040188682207e-16,
+            "smallest_nonzero": 3.8815099070622996e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.9423273622029515e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 5.0453524053070495,
+          "fluctuation": 3.571148803043671e-14,
+          "constant_stress": 2.8810466373332446e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.6125595298022546,
+            "coefficient_basis_sha256": "3e00caccd3381da8c345281467e09c31cad3079e5fa3d36a8e38778546572597",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "7b5a1e2cc17e0c92420919e536966e8b112b871c76d42ba5ad1e48e2e3626965",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 4.39422364393662e-16,
+            "seconds": 3.64000000001397
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.3450069570128993e-16,
+            "smallest_nonzero": 2.5663307171581683e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 3.0794430829967273e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.413104896465875,
+          "fluctuation": 2.562504333169892e-14,
+          "constant_stress": 3.628710146020951e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.081304517813472,
+            "coefficient_basis_sha256": "5f9fa51a0d397014efba8c5ed59d98511fc9124714a01c8bac74fe097f1a4aac",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "ca9ea6df6565c20e9d90475e9812aefc8e40b1f741db57a115cb5af1efa05cf5",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 3.832060765815014e-16,
+            "seconds": 3.625
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.7516418018967697e-16,
+            "smallest_nonzero": 3.881509907068159e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 3.1267031339076394e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 5.045352405307051,
+          "fluctuation": 3.631300085682568e-14,
+          "constant_stress": 2.8467852683473643e-15
+        }
+      ],
+      "error": [
+        3.0234659438391256e-12,
+        0.00022017447423098267,
+        2.683320946906756e-06
+      ],
+      "independent": [
+        3.023484680992961e-12,
+        0.00022017447423097243,
+        2.683320946896495e-06
+      ],
+      "kkt": [
+        2.7999893721131966e-16,
+        3.218236074976508e-16,
+        2.9084727910396414e-16
+      ],
+      "checks": {
+        "rank": true,
+        "work": true,
+        "fluctuation": true,
+        "constant_stress": true,
+        "kkt": true,
+        "quadrature": true,
+        "resources": true
+      },
+      "seconds": 17.218999999924563,
+      "artifact": "build/analysis/mixed-mean-stress-20261104-160200/k0.4-n2-a0.2.npz",
+      "artifact_sha256": "734d47815d5ce6de5aed2ab1ef327d79f26ac8b49dcffa40425e5258836cb643"
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "global_q0_ranks": [
+        156,
+        156,
+        156
+      ],
+      "q01_dimension": 216,
+      "local": [
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.1608797220870053,
+            "coefficient_basis_sha256": "05618a4d1ba24c29abace41c56f8ef0c6f0f01b07df3d5cfac863e11ca972064",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "80aad2396e46deb43fbf10b8d472b19f7ce644bbc7451b66c6bb465308f77501",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 9.93241008432298e-17,
+            "seconds": 3.672000000020489
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.1758967720511976e-16,
+            "smallest_nonzero": 8.529907517009402e-07,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.5369192657881215e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.64313145271115,
+          "fluctuation": 5.02357339738286e-14,
+          "constant_stress": 3.036930679426761e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.101702088362079,
+            "coefficient_basis_sha256": "db5a3a03625d7b0518672ea367a96bff44b79beb51513ef2dabb7a55ca163ceb",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "24a248a879582218d6eac2992b211dd23ffcd66c0ab542b7f3e254f25234695d",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 8.79071087490059e-17,
+            "seconds": 3.672000000020489
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.534365836515786e-16,
+            "smallest_nonzero": 1.0621947787400231e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.64383959998051e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.467910421054093,
+          "fluctuation": 6.608684518942622e-14,
+          "constant_stress": 3.9672934013407906e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.786531679886911,
+            "coefficient_basis_sha256": "03453dfca4da0e140db6d80c769361d13f3d4178073ca5f20662e17649b52fe6",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "5f9c2aa454bfc79900c96cb5f97ec30a5111c86a658706caada9f7ff5bfeee41",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.187399426914166e-16,
+            "seconds": 3.672000000020489
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.386060067866208e-16,
+            "smallest_nonzero": 1.2154992846464354e-06,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.0164573126360007e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.5192531594338945,
+          "fluctuation": 3.821897217551659e-14,
+          "constant_stress": 2.8395239154045517e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.360067437954027,
+            "coefficient_basis_sha256": "96cb2f07bc020054bfce9403e907a28a6471b52adc255e7391a86925ec610281",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "3ac6be4594b1f614c3af6b779c8556cde282d79a6a92a8cd98a4436f4d6f7729",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.1733548736325513e-16,
+            "seconds": 3.6719999999040738
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.360688956006517e-16,
+            "smallest_nonzero": 8.496344550541413e-07,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.0299750610857013e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.13824550753036,
+          "fluctuation": 5.574213517705693e-14,
+          "constant_stress": 5.737524132525338e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.223021896681204,
+            "coefficient_basis_sha256": "422ac28061951070e4a0ce489d5a06995a370e3c94c057573c497927be535403",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "98a349cb5de761f403922995abe16b5f67b9ffbb2f56aff0764cc7d33fa78796",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 9.61618598636508e-17,
+            "seconds": 3.6880000000819564
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.0423466055177228e-16,
+            "smallest_nonzero": 3.2039539295660534e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.370577814732091e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.186547852368754,
+          "fluctuation": 6.914340202669556e-14,
+          "constant_stress": 3.0593023716079555e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.3720469877789885,
+            "coefficient_basis_sha256": "c1abd3439528322570a3592f83ec72e6dbc097a16aaccf4a29d459bcf389a5ce",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "6efd35e658899d67ae70ea709961332183755ed8804970aed7e75d7a232c4fb2",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.283019613230827e-16,
+            "seconds": 3.6869999999180436
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 4.2069206903059305e-16,
+            "smallest_nonzero": 0.0001876394329646505,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.8849078730445165e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 5.9595589560073225,
+          "fluctuation": 3.997754762927386e-14,
+          "constant_stress": 2.869978093714157e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.9155925397930695,
+            "coefficient_basis_sha256": "7c6ce1a44a6a4b4e76b230ab58662bdf29bca0b0439b15bfffd40934fd0b45da",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "d786c3b65678a91dd797c0ed08b7c140db64bf5015d25110b664feabd52196b1",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.0757718805245518e-16,
+            "seconds": 3.655999999959022
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.3364540079558994e-16,
+            "smallest_nonzero": 1.7280084874780097e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.6752005900845985e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 6.463461086441301,
+          "fluctuation": 2.6348608714165674e-14,
+          "constant_stress": 5.448089861290659e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.467596188768625,
+            "coefficient_basis_sha256": "19e7a95afae2f177e02fe9d4614075127c396f0dbb3fd7821b3f0863ab15ffdb",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "d3ab3525f47c7b5b2c9c492182b3c3c1cc8a74f1436e192d27e0aa5c8f7fd89d",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.3416222732332515e-16,
+            "seconds": 3.655999999959022
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.2656153984028465e-16,
+            "smallest_nonzero": 1.3644730820035497e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.818832975262841e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.651122036119401,
+          "fluctuation": 5.6600846105343815e-14,
+          "constant_stress": 3.3542991482720127e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.223021896681206,
+            "coefficient_basis_sha256": "aa653c9995574b60d4d5e729530efb58180743b76831894a37d69b49410cd07e",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "723c316d1c7d497f5ce914762cf462d9e356e1edf17a3cb9a08ded2b267ccd63",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 9.888898663305436e-17,
+            "seconds": 3.719000000040978
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 4.0553590927139587e-16,
+            "smallest_nonzero": 3.2039539295632446e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.580943523847288e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.186547852368761,
+          "fluctuation": 6.979382853165233e-14,
+          "constant_stress": 3.0349153264476446e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.372046987778989,
+            "coefficient_basis_sha256": "2c9b7208cd305d273c4c211763d42262fe1e62a064960b379936a3a1107fb3b8",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "30dc48f18ce7af2bfd34e52f693d941aac8996bccab63fffe9cdcf8b9b890514",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 9.27885540576516e-17,
+            "seconds": 3.702999999979511
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.9824753149600624e-16,
+            "smallest_nonzero": 0.00018763943296499903,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.673590652152168e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 5.959558956007326,
+          "fluctuation": 3.9058536080256574e-14,
+          "constant_stress": 3.90649655661972e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.9155925397930713,
+            "coefficient_basis_sha256": "17ea35021ce6888dc8cf7d6096fc156d1df45c3f03acdbfbf09bb9943539c849",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "5bc0035780d467e8bd6aedc64ec4b78a8b62ef5b8f813a0df5cb722627e68de8",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.0420071931713561e-16,
+            "seconds": 3.7660000000614673
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.971882848863463e-16,
+            "smallest_nonzero": 1.728008487489866e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.9943180799893607e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 6.46346108644131,
+          "fluctuation": 2.6179028083168182e-14,
+          "constant_stress": 3.0499249007592447e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.467596188768631,
+            "coefficient_basis_sha256": "a9816d0f58dcab8c0924eb19e18fa5e69f9d9c8253682e0a69b671e7ccbf9934",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "58aa040c367112a459881fcadb647cb53633406146404476059eaa2bbf237580",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.3071564028339883e-16,
+            "seconds": 3.797000000020489
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.266615312035072e-16,
+            "smallest_nonzero": 1.364473081997118e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.8081944809803782e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.651122036119399,
+          "fluctuation": 5.6517062459717604e-14,
+          "constant_stress": 3.101500153592919e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.160879722087005,
+            "coefficient_basis_sha256": "3f11fc0e5050fbad441453dc7cfd94f7b0363eea495f55382b3b3013bd3406d1",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "d8bf5501164136e32fea269d95e3d875c3bc697564ef29e30d56bd7949746cba",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.119279756539448e-16,
+            "seconds": 3.687999999965541
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.3678447982276564e-16,
+            "smallest_nonzero": 8.529907517236948e-07,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.5998983128722454e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 3.6431314527111467,
+          "fluctuation": 4.9938301184038166e-14,
+          "constant_stress": 3.630188454199398e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.101702088362075,
+            "coefficient_basis_sha256": "3e70ebe26856f70b0d7eedf78e9e7af4fea7558c1cd3a8da5f17ae6e46d4661f",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "b2e028ed67b7a33d13adf60473c10f667a1ac89e0f0b8489935f55a12955a1ae",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 8.230733408979106e-17,
+            "seconds": 3.655999999959022
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 5.020952868101069e-16,
+            "smallest_nonzero": 1.0621947787440577e-05,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.948591495259153e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.467910421054094,
+          "fluctuation": 6.860560151934376e-14,
+          "constant_stress": 3.420375787547035e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 3.7865316798869046,
+            "coefficient_basis_sha256": "426d841cdc5d69dc2aa96428370d928a7a7958e5c54a5764a1c63b41bf96eed9",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "073f3fcc566cbb752b570212fedec7c479ab41f3b26f01dab3f287979eb9a538",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.1995123236697747e-16,
+            "seconds": 3.672000000020489
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.227988327889666e-16,
+            "smallest_nonzero": 1.2154992845680302e-06,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 1.8580180197198596e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.519253159433887,
+          "fluctuation": 3.756974709667029e-14,
+          "constant_stress": 2.7369905332807035e-15
+        },
+        {
+          "stress": {
+            "mem_rank": 69,
+            "normal_shear_rank": 105,
+            "combined_rank": 174,
+            "stress_rank": 177,
+            "constant_completion": 3,
+            "coefficient_condition": 4.3600674379540285,
+            "coefficient_basis_sha256": "9a5c24352629b618ec21c66d2e11fe5bd6bdb1981d543ed651bc7bae7ea4915c",
+            "exact_space_certificate": {
+              "mem_upper_rank": 69,
+              "joint_upper_rank": 174,
+              "upper_rank": 177,
+              "three_rigid_identities": [
+                true,
+                true,
+                true
+              ],
+              "constant_stress_identities": [
+                true,
+                true,
+                true
+              ],
+              "pointwise_membrane_director_orthogonality": true,
+              "modular_primes": [
+                1000000007,
+                1000000009
+              ],
+              "exact_lower_rank": 177,
+              "rational_space_sha256": "9b20993e8372501039149fd4bcb215ab24853e57dcbebe610927f6a02d721a6b",
+              "basis_preprocessing_decimal_digits": 80
+            },
+            "coefficient_projection_error": 1.2688142346306054e-16,
+            "seconds": 3.702999999979511
+          },
+          "q01": {
+            "ranks": [
+              177,
+              177,
+              177
+            ],
+            "columns": 108,
+            "nullity": 36,
+            "residual": 3.127540474358844e-16,
+            "smallest_nonzero": 8.49634454950809e-07,
+            "raw_ranks": [
+              72,
+              72,
+              72
+            ],
+            "block_equilibrated": false,
+            "q0_ranks": [
+              72,
+              72,
+              72
+            ],
+            "director_ranks": [
+              105,
+              105,
+              105
+            ],
+            "q0_dimension": 36,
+            "q1_homogeneous_dimension": 30,
+            "original_work_residual": 2.105401642933738e-16
+          },
+          "odd": {
+            "ranks": [
+              25,
+              25,
+              25
+            ],
+            "columns": 70,
+            "nullity": 45,
+            "residual": 4.552673028314405e-16,
+            "smallest_nonzero": 2.6457513110645836
+          },
+          "gram_condition": 4.138245507530362,
+          "fluctuation": 5.5384466646006466e-14,
+          "constant_stress": 2.855978555128432e-15
+        }
+      ],
+      "error": [
+        3.4093367514646174e-11,
+        7.051800335316355e-06,
+        1.0214407811964115e-07
+      ],
+      "independent": [
+        3.4093358420677385e-11,
+        7.05180033532494e-06,
+        1.0214407812610657e-07
+      ],
+      "kkt": [
+        2.296879546433811e-16,
+        2.234952293547374e-16,
+        2.207991224099187e-16
+      ],
+      "checks": {
+        "rank": true,
+        "work": true,
+        "fluctuation": true,
+        "constant_stress": true,
+        "kkt": true,
+        "quadrature": true,
+        "resources": true
+      },
+      "seconds": 69.84400000004098,
+      "artifact": "build/analysis/mixed-mean-stress-20261104-160200/k0.4-n4-a0.2.npz",
+      "artifact_sha256": "dc1fb1d2b765711ce8e93134f309c40a2ee39b436c8adcfba7cc2175bdec350e"
+    }
+  ],
+  "stops": [],
+  "all_numeric_checks": true,
+  "necessary_approximation_gate": true,
+  "main_shell_adopted": false,
+  "finite_h_checks_executed": false,
+  "geometry_conditional": true,
+  "seconds": 96.0,
+  "peak_bytes": 395247616,
+  "sources": {
+    "tools/design-experiments/check_mixed_mean_stress_thin_v6.py": "570823b19e882405afd13965ffb4bcb49fa202fa8efadb91b267463c676a5c33",
+    "tools/design-experiments/mixed_mean_stress_thin_v6.py": "b1bb040c7daf93cceefd29acd2da410536ef0cc898efaf6679bc05b04266359c",
+    "tools/design-experiments/mixed_mean_stress_space_v4.py": "327a5dd769db68e17795b01fa2e6411f00821eb1856a6fc206774aa42cfd14c8",
+    "docs/mixed-mean-stress-formulation.md": "b631e4888ec3e4a48bb69f65d4cd24237dee4c2214122c03763b401161e2e877",
+    "docs/verification/mixed-mean-stress-protocol.md": "1efb045fc1e82946fe630e12d24c239826f2b18ae13142e84e81a2fa46219b7f"
+  }
+}

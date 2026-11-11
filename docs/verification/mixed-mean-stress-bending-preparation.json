@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "tools/design-experiments/mixed_mean_stress_bending.py": "194cfea40e0702cc185db71873f9cfd6d1838ac21c8ba0b325518333c45c81e2",
+    "tools/design-experiments/check_mixed_mean_stress_bending.py": "91d06aed0abecb7d229ded69665fb5815fa26aee478eaa40ee3a60be64fb02f1",
+    "tools/design-experiments/check_mixed_mean_stress_bending_coefficient.py": "5c32d0a385a19c2e7dd29f433fe8d978f4d8aa6e354eb4fc7d54efe280a1c817",
+    "tools/design-experiments/mixed_mean_stress_thin_v6.py": "b1bb040c7daf93cceefd29acd2da410536ef0cc898efaf6679bc05b04266359c",
+    "docs/verification/mixed-mean-stress-bending-protocol.md": "097272e75288d49c7a86b4f2788380e63960986b70bb2ce4dacaf637c40de2cb",
+    "docs/verification/mixed-mean-stress-bending-coefficient-result.json": "729d5e2820d0658754b345f9a25edf37969623e819e74550fdbf8e158862dd85",
+    "docs/verification/mixed-mean-stress-disposition.json": "2df785e469419245438847f760d4015e52dd39f7e4636675f096a7ad89204e5a"
+  }
+}

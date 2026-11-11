@@ -1,0 +1,13 @@
+{
+  "adoption_candidate_qualified": false,
+  "main_shell_adopted": false,
+  "reason": "Stable anchor removed polynomial numerical floor, but true exponential thin amplification still exceeds 2. Curvature closure must also include the geometry-weighted work of membrane/normal modes.",
+  "sources": {
+    "tools/design-experiments/geometry_compatible_ancf_v3.py": "67feb044e1fc6b17b2c14e84db070b7896d4d55cd3dd64cf3f54d8575a1b2695",
+    "tools/design-experiments/geometry_compatible_ancf_coarse.py": "706c9fdc2fbdebc4e6a8ca7afc8283415f898ae60b915f3496ad727401978a29",
+    "docs/verification/geometry-compatible-ancf-v3-protocol.md": "e3cbcb8b759629c5b2d6787487b656ae84e6ea011ffae4058b59deec84892e0e",
+    "docs/verification/geometry-compatible-ancf-coarse-protocol.md": "9f871db939f9073b320af2faf38ffa369f4f7f84aa8162a7b9b1a72fdc31a9a0",
+    "build/analysis/geometry-compatible-ancf-screen-v3.json": "b1c5cdaaa2258b73a6b8f3e0a47d2e135fc603820ef8fed3ca2bf354a0068a63",
+    "build/analysis/geometry-compatible-ancf-coarse-screen.json": "3439c67e8738759d45dff4106ac582ffd9f6f7958e946bf60455c0abed6526b9"
+  }
+}

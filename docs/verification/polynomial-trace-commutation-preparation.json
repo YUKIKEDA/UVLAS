@@ -1,0 +1,7 @@
+{
+  "sources": {
+    "tools/design-experiments/diagnose_polynomial_trace_commutation.py": "63d9cae23a90220f944aa9757f1306097e4fcb89fd7190772a2f4d1ab020318d",
+    "tools/design-experiments/polynomial_trace_ancf.py": "cc8e33bdc4c32d9b91d694a78ddff30b1316a766d5ee3e8f59fa9a87e9aae2c6",
+    "docs/verification/polynomial-trace-commutation-protocol.md": "97f4ba1a52e5e866ebc54b30a9d1ef2b72d299e8a74f37fcecc7448faf56e591"
+  }
+}

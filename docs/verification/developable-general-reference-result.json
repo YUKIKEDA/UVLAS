@@ -1,0 +1,122 @@
+{
+  "records": [
+    {
+      "kind": "quadratic",
+      "kappa": 0.0,
+      "h": 0.01,
+      "field_error": 0.0,
+      "covariant_shear": 0.0,
+      "thickness_strain": 0.0,
+      "midstrain": 0.0,
+      "clamp": 0.0,
+      "body_difference": 0.0,
+      "energy": 5.608974358974361e-08,
+      "decimal_energy": "5.6089743589743589743589743589743589743589743589743589743589743589743589743589739E-8",
+      "energy_difference": 3.23812467415e-16,
+      "series_terms": 1,
+      "weak": {
+        "relative": 1.268536711574297e-10,
+        "cauchy": 2.0878544200886254e-13,
+        "allowed_reaction": 0.0,
+        "reference": 1.1217948717948706e-07
+      },
+      "quadrature": 2.416418498667518e-15,
+      "checks": {
+        "field": true,
+        "kinematic": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true,
+        "body": true,
+        "weak": true,
+        "cauchy": true,
+        "quadrature": true,
+        "reaction": true,
+        "resources": true
+      }
+    },
+    {
+      "kind": "quadratic",
+      "kappa": 0.0,
+      "h": 0.001,
+      "field_error": 0.0,
+      "covariant_shear": 0.0,
+      "thickness_strain": 0.0,
+      "midstrain": 0.0,
+      "clamp": 0.0,
+      "body_difference": 0.0,
+      "energy": 5.60897435897436e-11,
+      "decimal_energy": "5.6089743589743589743589743589743589743589743589743589743589743589743589743589739E-11",
+      "energy_difference": 1.44999652713e-16,
+      "series_terms": 1,
+      "weak": {
+        "relative": 6.840818570500492e-09,
+        "cauchy": 1.0698839273928565e-12,
+        "allowed_reaction": 0.0,
+        "reference": 1.1217948717948761e-10
+      },
+      "quadrature": 1.570452998819534e-14,
+      "checks": {
+        "field": true,
+        "kinematic": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true,
+        "body": true,
+        "weak": true,
+        "cauchy": true,
+        "quadrature": true,
+        "reaction": true,
+        "resources": true
+      }
+    },
+    {
+      "kind": "quadratic",
+      "kappa": 0.0,
+      "h": 0.0001,
+      "field_error": 0.0,
+      "covariant_shear": 0.0,
+      "thickness_strain": 0.0,
+      "midstrain": 0.0,
+      "clamp": 0.0,
+      "body_difference": 0.0,
+      "energy": 5.608974358974361e-14,
+      "decimal_energy": "5.6089743589743589743589743589743589743589743589743589743589743589743589743589739E-14",
+      "energy_difference": 3.37623798705e-16,
+      "series_terms": 1,
+      "weak": {
+        "relative": 6.571477148334211e-07,
+        "cauchy": 1.9452435043506558e-11,
+        "allowed_reaction": 0.0,
+        "reference": 1.1217948717948698e-13
+      },
+      "quadrature": 1.7696529793745563e-13,
+      "checks": {
+        "field": true,
+        "kinematic": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true,
+        "body": true,
+        "weak": false,
+        "cauchy": true,
+        "quadrature": true,
+        "reaction": true,
+        "resources": true
+      }
+    }
+  ],
+  "all_checks_pass": false,
+  "stop_reason": "required_gate_failed",
+  "longdouble_mantissa_bits": 53,
+  "physical_adoption": false,
+  "discrete_equilibrium_solved": false,
+  "sources": {
+    "tools/design-experiments/check_developable_general_reference.py": "6d628c071e2fc5f4dd4b7e60a5397705da48acd5c6cc594cbdd23ae40e2d25bb",
+    "tools/design-experiments/developable_general_reference.py": "487156acafec9acdf35afdf790783bd1b67f3cc1c1dd090a72af9f6594b51ec7",
+    "docs/developable-general-bending-reference-contract.md": "6fde694981b581a33825270b6d2182216c6fc27e0d2c1aae67a3174d3eb76a3c",
+    "docs/verification/developable-general-reference-experiment.md": "0a0ee1d03abb03329a6fa16c4e468a6d862c0bdc71cc320233584de95aefd610"
+  },
+  "seconds": 0.14100000000325963,
+  "peak_bytes": 74702848
+}

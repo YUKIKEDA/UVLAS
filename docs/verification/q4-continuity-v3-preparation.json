@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "tools/design-experiments/diagnose_q4_continuity_v3.py": "f66a20b4b296cd2cba9a335de51fc7faaf65b26e885913b3ff9f7702d806f5d2",
+    "tools/design-experiments/check_q4_continuity_v3.py": "6fd019b9014c1973cf1bc242dede53259f204dec2317f94340de6b485e056744",
+    "tools/design-experiments/tying_mid_projection_q4_v2.py": "30e333c486415cf2af9ac7b98ae2c918f03f5e63bea0c6f37516b5297bc2fc26",
+    "tools/design-experiments/tying_projection_operator_v2.py": "8ea702d6c668d5dc56308fb338b591e217b22d8994ccf892b501f7b272d441e1",
+    "tools/design-experiments/tying_projection_basis.py": "305abfff0b05c8c83fdc9da22a828d8845478ab92deef9ba172d05df7ff3ff22",
+    "docs/verification/q4-continuity-v3-protocol.md": "f13ef80d3311ebc68c6be1175fc42c358d40ae8aeb4c225b2f59adc7057f0adb",
+    "docs/verification/q4-continuity-v2-result.json": "8ec7695b3536fb2975b3bc52ef6632b3e213d970ccc98f3355191ac1eede09fa"
+  }
+}

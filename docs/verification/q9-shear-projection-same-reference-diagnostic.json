@@ -1,0 +1,56 @@
+{
+  "purpose": "Post-audit diagnostic only; does not override the failed independent-reference audit",
+  "source_helper_sha256": "c3e399ae9c75e8b94c3ec2aa6df49ec5201dbe2c1db3146d5103389e3ca8bf8b",
+  "parent_sha256": "9d4c7b3641cb7148250276596b3b61ba9b38e697116bff0f593dd3efba8def73",
+  "cases": [
+    {
+      "n": 2,
+      "h": 0.01,
+      "same_reference_l2_difference": 1.3877787807814457e-17,
+      "same_reference_relative_difference": 1.367278923268203e-16
+    },
+    {
+      "n": 4,
+      "h": 0.01,
+      "same_reference_l2_difference": 3.469446951953614e-18,
+      "same_reference_relative_difference": 3.3130431019369266e-16
+    },
+    {
+      "n": 8,
+      "h": 0.01,
+      "same_reference_l2_difference": 6.505213034913027e-19,
+      "same_reference_relative_difference": 7.780888417363794e-16
+    },
+    {
+      "n": 16,
+      "h": 0.01,
+      "same_reference_l2_difference": 3.984442983884229e-18,
+      "same_reference_relative_difference": 4.9484327566945836e-14
+    },
+    {
+      "n": 2,
+      "h": 0.001,
+      "same_reference_l2_difference": 2.220446049250313e-16,
+      "same_reference_relative_difference": 3.8857768475150356e-16
+    },
+    {
+      "n": 4,
+      "h": 0.001,
+      "same_reference_l2_difference": 6.938893903907228e-17,
+      "same_reference_relative_difference": 1.3616702116187635e-15
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "same_reference_l2_difference": 3.903127820947816e-17,
+      "same_reference_relative_difference": 5.805168229588069e-15
+    },
+    {
+      "n": 16,
+      "h": 0.001,
+      "same_reference_l2_difference": 1.0299920638612292e-17,
+      "same_reference_relative_difference": 1.3835548626820093e-14
+    }
+  ],
+  "acceptance_override": false
+}

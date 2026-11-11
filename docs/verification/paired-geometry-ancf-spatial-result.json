@@ -1,0 +1,449 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "primary": {
+        "error": [
+          2.0869032485016846e-08,
+          4.536061860793152e-06,
+          2.4616359613373957e-05
+        ],
+        "position": [
+          9.982015513015504e-12,
+          2.1150352436774805e-09,
+          1.2446539919963143e-08
+        ],
+        "original_kkt": [
+          5.984581509419881e-25,
+          1.1441409568430315e-22,
+          5.759336431637201e-22
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0869032476727117e-08,
+          4.536058106110995e-06,
+          2.4618155234921465e-05
+        ],
+        "position": [
+          9.982008696632037e-12,
+          2.1150536157453337e-09,
+          1.2445687443555188e-08
+        ],
+        "original_kkt": [
+          3.483533372837371e-18,
+          2.313299717411221e-16,
+          7.920939615932212e-14
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 3.7703764737219303e-25,
+        "boundary_constraint": 7.001859529437754e-16
+      },
+      "rcond": 4.209880687034448e-07,
+      "checks": {
+        "rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "independent": true,
+        "trace": true,
+        "resources": true
+      },
+      "seconds": 13.75,
+      "artifact": "build/analysis/paired-geometry-ancf-spatial-20261104-224658/rational-a0-n2-h0.01.npz",
+      "artifact_sha256": "5a7fd71486b1b9597acbe4e140a85fcd683965875a8519984c707ef50a703667"
+    },
+    {
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "primary": {
+        "error": [
+          2.0871123013267208e-08,
+          4.536527287583943e-06,
+          2.461830465410415e-05
+        ],
+        "position": [
+          9.749634200989031e-12,
+          2.0653946707040274e-09,
+          1.2145927489539284e-08
+        ],
+        "original_kkt": [
+          5.994420635541976e-26,
+          1.1146522973985736e-23,
+          5.582077328120805e-23
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0871122983649744e-08,
+          4.536523533159089e-06,
+          2.4620100149771012e-05
+        ],
+        "position": [
+          9.749627791301427e-12,
+          2.0654134589311452e-09,
+          1.2145110606670819e-08
+        ],
+        "original_kkt": [
+          5.717371224826811e-18,
+          4.031521223148068e-18,
+          6.97608048892974e-16
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 6.351293252001339e-29,
+        "boundary_constraint": 7.288356244588009e-16
+      },
+      "rcond": 5.400282525698025e-09,
+      "checks": {
+        "rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "independent": true,
+        "trace": true,
+        "resources": true
+      },
+      "seconds": 14.515999999945052,
+      "artifact": "build/analysis/paired-geometry-ancf-spatial-20261104-224658/rational-a0-n2-h0.0001.npz",
+      "artifact_sha256": "f15e85ed6a6c76223e1dd2e8056a7744bbc8cbca0a68f3bbda452e305f3cd8f7"
+    },
+    {
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "primary": {
+        "error": [
+          2.0869032460409867e-08,
+          4.536061860762606e-06,
+          2.4616359613369356e-05
+        ],
+        "position": [
+          9.982003489643027e-12,
+          2.115035043874624e-09,
+          1.2446539442008623e-08
+        ],
+        "original_kkt": [
+          6.454780176583669e-25,
+          8.29411125392936e-23,
+          4.016334974108646e-22
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0869032460322332e-08,
+          4.536058106068892e-06,
+          2.4618155234934947e-05
+        ],
+        "position": [
+          9.981994187869789e-12,
+          2.115053416083902e-09,
+          1.2445686966428707e-08
+        ],
+        "original_kkt": [
+          3.550164666842398e-18,
+          2.6220185961653285e-16,
+          6.556067861438676e-14
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 3.4008109168439907e-25,
+        "boundary_constraint": 1.5572787115619444e-15
+      },
+      "rcond": 3.91096913211806e-07,
+      "checks": {
+        "rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "independent": true,
+        "trace": true,
+        "resources": true
+      },
+      "seconds": 18.81299999996554,
+      "artifact": "build/analysis/paired-geometry-ancf-spatial-20261104-224658/rational-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "a260b669009e72bf74d9c2742e798f91a037ea9da2f5a68632688ca5676580e9"
+    },
+    {
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "primary": {
+        "error": [
+          2.0871123017909653e-08,
+          4.536527287590139e-06,
+          2.461830465410239e-05
+        ],
+        "position": [
+          9.7496405545012e-12,
+          2.0653946726217663e-09,
+          1.214592749272197e-08
+        ],
+        "original_kkt": [
+          7.363031866927977e-24,
+          7.896041487257014e-23,
+          1.513483951218251e-22
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0871122972040013e-08,
+          4.536523533162625e-06,
+          2.462010014978139e-05
+        ],
+        "position": [
+          9.749633110416335e-12,
+          2.0654134603678616e-09,
+          1.2145110610251401e-08
+        ],
+        "original_kkt": [
+          4.164727761565345e-18,
+          3.66380418601515e-18,
+          6.336116580598883e-16
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 8.967376340099852e-28,
+        "boundary_constraint": 1.5813620118571974e-15
+      },
+      "rcond": 3.6414062092503676e-09,
+      "checks": {
+        "rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "independent": true,
+        "trace": true,
+        "resources": true
+      },
+      "seconds": 18.60999999998603,
+      "artifact": "build/analysis/paired-geometry-ancf-spatial-20261104-224658/rational-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "9f803716cb033a235a44bcf8b6e8bc29abab1741555c59efff24d55404b219ff"
+    }
+  ],
+  "accuracy": [
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "n2": [
+        2.0869032476727117e-08,
+        2.0871122983649744e-08
+      ],
+      "n4": [
+        1.0223678851498765e-10,
+        1.0224599225789019e-10
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 1.0001001726804997,
+      "passed": true
+    },
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "n2": [
+        4.536058106110995e-06,
+        4.536523533159089e-06
+      ],
+      "n4": [
+        2.2080333721753638e-08,
+        2.2082396329431028e-08
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 1.000102606059536,
+      "passed": true
+    },
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "n2": [
+        2.4618155234921465e-05,
+        2.4620100149771012e-05
+      ],
+      "n4": [
+        8.09080652417413e-07,
+        8.091612137484621e-07
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 1.0000790032734372,
+      "passed": true
+    },
+    {
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "n2": [
+        9.982008696632037e-12,
+        9.749627791301427e-12
+      ],
+      "n4": [
+        1.2984583944122365e-14,
+        1.1883988544215796e-14
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 0.9767200257590423,
+      "passed": true
+    },
+    {
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "n2": [
+        2.1150536157453337e-09,
+        2.0654134589311452e-09
+      ],
+      "n4": [
+        2.7867530445971815e-12,
+        2.550062813522023e-12
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 0.9765300716517792,
+      "passed": true
+    },
+    {
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "n2": [
+        1.2445687443555188e-08,
+        1.2145110606670819e-08
+      ],
+      "n4": [
+        1.0783149335430125e-10,
+        9.869852721569515e-11
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 0.9758489164823099,
+      "passed": true
+    },
+    {
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "n2": [
+        2.0869032460322332e-08,
+        2.0871122972040013e-08
+      ],
+      "n4": [
+        1.0222887329248199e-10,
+        1.0224599658246608e-10
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 1.0001001729103471,
+      "passed": true
+    },
+    {
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "n2": [
+        4.536058106068892e-06,
+        4.536523533162625e-06
+      ],
+      "n4": [
+        2.208013257011505e-08,
+        2.208239630126522e-08
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 1.0001026060695983,
+      "passed": true
+    },
+    {
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "n2": [
+        2.4618155234934947e-05,
+        2.462010014978139e-05
+      ],
+      "n4": [
+        8.090806201210441e-07,
+        8.091612137369094e-07
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 1.0000790032733111,
+      "passed": true
+    },
+    {
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "n2": [
+        9.981994187869789e-12,
+        9.749633110416335e-12
+      ],
+      "n4": [
+        1.6070810202890065e-14,
+        1.1891255372737259e-14
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 0.9767219782860802,
+      "passed": true
+    },
+    {
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "n2": [
+        2.115053416083902e-09,
+        2.0654134603678616e-09
+      ],
+      "n4": [
+        2.909366363742021e-12,
+        2.550807527267957e-12
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 0.976530164515679,
+      "passed": true
+    },
+    {
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "n2": [
+        1.2445686966428707e-08,
+        1.2145110610251401e-08
+      ],
+      "n4": [
+        1.0785981066581826e-10,
+        9.869858586402226e-11
+      ],
+      "numerical_floor": false,
+      "spatial_decrease": true,
+      "thin_ratio_n2": 0.9758489541808268,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "seconds": 65.75,
+  "peak_bytes": 241020928,
+  "main_shell_adopted": false,
+  "sources": {
+    "docs/verification/paired-geometry-ancf-candidate-result.json": "7d0714df5d97152a86300c2c8193d551103878c5995fba1e4228662245e87823",
+    "tools/design-experiments/check_paired_gc_spatial.py": "3edee49f39f1992c26e459dff00f9500ab79dbc57e7d38bcfe9131e40a275c10",
+    "docs/verification/paired-geometry-ancf-spatial-protocol.md": "928f0afe8c4d998d6cefcfc237051f1158068e1ca8f4f49e4991efdfbfacab5d",
+    "tools/design-experiments/check_paired_gc_qualification.py": "3425469650dc1ecfc89867f9d71ae55f27654deac0ca52ccdd16f3136faca07e"
+  }
+}

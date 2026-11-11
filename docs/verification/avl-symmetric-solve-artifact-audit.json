@@ -1,0 +1,28 @@
+{
+  "source_sha256": "e9ef272157878a9dbe37fa10c0964ff2334280bbd512e10198b1e5e54b6114a8",
+  "sensitivity_sha256": "b95dea7605ed5076f623a9b062289a873e83ead7932a899b63def2df8dcd3c9d",
+  "weight_sha256": "856d52dd96db79945c4135ad800ccd47ba3f477d85c4c6af5c9bd0dfe6a5bcb4",
+  "small_check_sha256": "7734d192c6272cf3f0aadf18d939967f6b3b31be7c3fa069a925f0760b2247db",
+  "initial_manufacturing_failure_preserved": true,
+  "sampled_native_columns": 56,
+  "independent_decimal_column_error": 1.1102230246251565e-16,
+  "independent_decimal_observation_change_error": 1.262177448353619e-29,
+  "stages": [
+    {
+      "stage": "small",
+      "cases": 2,
+      "seconds": 4.815123582,
+      "peak_bytes": 8867840
+    },
+    {
+      "stage": "main",
+      "cases": 6,
+      "seconds": 637.838328447,
+      "peak_bytes": 4377976832
+    }
+  ],
+  "archive_members_verified": 66,
+  "raw_bytes": 87719706,
+  "all_criteria_pass": true,
+  "reference_acceptance": false
+}

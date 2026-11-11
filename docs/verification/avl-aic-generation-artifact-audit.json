@@ -1,0 +1,11 @@
+{
+  "source_sha256": "050409f62a3c7621088064f0ca96bf794ba1a8ee1ff2e261b5b73335253f2eed",
+  "result_sha256": "31386dff9fa691bddc6efbe8606752c6ce44ff838e57994820caf7bfa0754baf",
+  "coefficients": 296832,
+  "decimal160_cases": 251,
+  "line_integral_cases": 16,
+  "files_verified": 26,
+  "preserved_initial_files": 19,
+  "criteria": 7,
+  "all_criteria_pass": true
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "AttributeError in test-geometry import before the first case: generic belongs to the imported prior module.",
+  "evaluated_cases": 0,
+  "source": "tools/design-experiments/check_reference_work_thin_local.py",
+  "source_sha256": "7f69e46e67d544d83d48e8c0e3afa960dfd2b524486acedfbca2dc1e9334e172",
+  "model_or_threshold_changed": false
+}

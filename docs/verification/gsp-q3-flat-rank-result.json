@@ -1,0 +1,68 @@
+{
+  "records": [
+    {
+      "space": "selected_203",
+      "rows": 203,
+      "columns": 144,
+      "modular_ranks": {
+        "1000003": 138,
+        "1000033": 138,
+        "1000037": 138
+      },
+      "null_directions": 6,
+      "null_independence_ranks": {
+        "1000003": 6,
+        "1000033": 6,
+        "1000037": 6
+      },
+      "exact_kernel": true,
+      "proven_rational_rank": 138,
+      "checks": {
+        "exact_kernel": true,
+        "independent": true,
+        "rank_matches_upper": true
+      },
+      "artifact": "build/analysis/gsp-flat-certificate-20261103-140953/selected.npz",
+      "artifact_sha256": "fe886fc2d4c65c47a9d58816a59072c8292f79d8e387bad53ad75ae20a775224"
+    },
+    {
+      "space": "negative_control_Q222",
+      "rows": 162,
+      "columns": 144,
+      "modular_ranks": {
+        "1000003": 126,
+        "1000033": 126,
+        "1000037": 126
+      },
+      "null_directions": 15,
+      "null_independence_ranks": {
+        "1000003": 15,
+        "1000033": 15,
+        "1000037": 15
+      },
+      "exact_kernel": true,
+      "proven_rational_rank": null,
+      "checks": {
+        "exact_kernel": true,
+        "independent": true,
+        "rank_matches_upper": false
+      },
+      "artifact": "build/analysis/gsp-flat-certificate-20261103-140953/reduced.npz",
+      "artifact_sha256": "6a59d3d65b83bc50b23de18f3698bc071956a3dd07585194832720b7fe523e4b"
+    }
+  ],
+  "prime_checks": {
+    "1000003": true,
+    "1000033": true,
+    "1000037": true
+  },
+  "all_checks_pass": false,
+  "scope": "affine_positive_thickness_only",
+  "curved_uniform_accuracy_proven": false,
+  "sources": {
+    "tools/design-experiments/certify_gsp_q3_flat_rank.py": "c7fa93604ccdb6f0f4e7ea3d1f4ceda51bdcd68d9bb35b6da029b335e0648cd1",
+    "docs/verification/gsp-q3-flat-rank-protocol.md": "b10bf3080b25dc38548ca32869f1b7c12c56081731ab532f9c332a86b2e0e985",
+    "docs/verification/gsp-q3-flat-rank-preparation.json": "52744f774b4bf796e3bbd480f73bcbc6e26de98c6add8b4b437f9a9d70ca2f01"
+  },
+  "seconds": 0.5160000000032596
+}

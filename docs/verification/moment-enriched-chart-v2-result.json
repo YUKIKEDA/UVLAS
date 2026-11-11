@@ -1,0 +1,120 @@
+{
+  "records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.0000000000002744,
+        "force": 1.0000000000002125,
+        "tangent": 0.9999999999997552,
+        "reference": 0.9999999999999996,
+        "orthogonal": 1.0000000000000009
+      },
+      "passed": false
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.0000000000032208,
+        "force": 1.0000000000020097,
+        "tangent": 0.9999999999978021,
+        "reference": 0.9999999999999997,
+        "orthogonal": 1.0000000000000009
+      },
+      "passed": false
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.0000000000328002,
+        "force": 1.000000000020008,
+        "tangent": 0.9999999999782326,
+        "reference": 0.9999999999999996,
+        "orthogonal": 1.0000000000000009
+      },
+      "passed": false
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 0.9999999999998398,
+        "force": 0.9999999999998841,
+        "tangent": 0.9999999999995315,
+        "reference": 0.9999999999999997,
+        "orthogonal": 1.0000000000000009
+      },
+      "passed": false
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 0.9999999999991052,
+        "force": 0.9999999999986727,
+        "tangent": 0.999999999995658,
+        "reference": 0.9999999999999997,
+        "orthogonal": 1.0000000000000009
+      },
+      "passed": false
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 0.999999999991474,
+        "force": 0.9999999999865781,
+        "tangent": 0.9999999999569884,
+        "reference": 0.9999999999999997,
+        "orthogonal": 1.0000000000000009
+      },
+      "passed": false
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.000000000000176,
+        "force": 0.9999999999996901,
+        "tangent": 0.9999999999999272,
+        "reference": 0.9999999999999997,
+        "orthogonal": 1.000000000000001
+      },
+      "passed": false
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.000000000002255,
+        "force": 0.9999999999967164,
+        "tangent": 0.9999999999991193,
+        "reference": 0.9999999999999996,
+        "orthogonal": 1.000000000000001
+      },
+      "passed": false
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.0000000000230882,
+        "force": 0.999999999967034,
+        "tangent": 0.9999999999910277,
+        "reference": 0.9999999999999996,
+        "orthogonal": 1.000000000000001
+      },
+      "passed": false
+    }
+  ],
+  "stops": [],
+  "passed": false,
+  "physical_adoption": false,
+  "sources": {
+    "tools/design-experiments/check_moment_enriched_chart_v2.py": "614fe65de35f0d6c5463d1ba8aa461fdaa7bf05ee4239ab8718f9d97484f354b",
+    "tools/design-experiments/moment_enriched_ancf.py": "7cd471191740fd624eab4ca1481c2d35444c49e9a4ae691e4f0fb893588aac24",
+    "docs/verification/moment-enriched-local-v2-result.json": "beff673720a17b3672a4f2236595c61c13d8f04693085b0abcc4abd310aff6b7"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "accepted": false,
+  "reason": "general_PG_rank:[368,376,380]",
+  "parameters": [
+    0.4,
+    0.2,
+    0
+  ],
+  "n": 2,
+  "sources": {
+    "tools/design-experiments/pg_ritz_shell_v4.py": "96f4b05a5f339d0a3e405653abc76938930fba7212fec1c9e49f30b906faa70f",
+    "tools/design-experiments/pg_ritz_lift_v5.py": "5b17bf98c7071b8a749a5a63e64fc773ec1d12500f4b3f461261d2991c720850"
+  }
+}

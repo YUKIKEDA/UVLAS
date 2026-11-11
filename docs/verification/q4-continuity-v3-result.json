@@ -1,0 +1,934 @@
+{
+  "records": [
+    {
+      "method": "raw",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 3,
+      "ranks9": [
+        429,
+        429,
+        429
+      ],
+      "ranks11": [
+        429,
+        429,
+        429
+      ],
+      "metrics": {
+        "anchor": 1.2244918528119601e-12,
+        "orthogonal": 9.28429611709287e-16,
+        "projector": 2.045861539359329e-12,
+        "kernel": 8.536462305150262e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.55418917020409e-15,
+          "h1": 1.233690074360922,
+          "fit": {
+            "error": 2.1252210908461595e-15,
+            "h1": 1.2336900743609118,
+            "multiplier": 0.0,
+            "kkt": 2.337883599006017e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.5899893904464994e-15,
+          "h1": 0.6590319606013826,
+          "fit": {
+            "error": 2.0321578934382505e-15,
+            "h1": 0.6590319606013807,
+            "multiplier": 0.0,
+            "kkt": 4.3616543229192327e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860310107034683,
+          "h1": 0.5730145864589941,
+          "fit": {
+            "error": 0.1486031010703467,
+            "h1": 0.5730145864589934,
+            "multiplier": 0.0,
+            "kkt": 1.6296237986782927e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.03184017664503774,
+          "h1": 2.1460121419373226,
+          "fit": {
+            "error": 0.031840176645037827,
+            "h1": 2.14601214193731,
+            "multiplier": 0.0,
+            "kkt": 8.557219617665454e-17,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken--raw/raw-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "631e270ae3ba778dad02c21a40352ba0308e8c84eb9bbf8be6f371d4f0f3cac2",
+      "broken_fields": [],
+      "negative_control": false
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 11,
+      "ranks9": [
+        421,
+        421,
+        421
+      ],
+      "ranks11": [
+        421,
+        421,
+        421
+      ],
+      "metrics": {
+        "anchor": 3.0812122474548348e-12,
+        "orthogonal": 2.4069538062157123e-15,
+        "projector": 1.5983736699422077e-11,
+        "kernel": 6.100262641297736e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.572571178659428e-15,
+          "h1": 1.233690074360921,
+          "fit": {
+            "error": 1.9930295777771927e-15,
+            "h1": 1.23369007436091,
+            "multiplier": 0.0,
+            "kkt": 2.2466899110440605e-16,
+            "H1_ranks": [
+              227,
+              227,
+              227
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.6160295075695398e-15,
+          "h1": 0.6590319606013821,
+          "fit": {
+            "error": 1.8300643588916958e-15,
+            "h1": 0.6590319606013799,
+            "multiplier": 0.0,
+            "kkt": 7.115260545955041e-17,
+            "H1_ranks": [
+              227,
+              227,
+              227
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860310107034697,
+          "h1": 0.5730145864589944,
+          "fit": {
+            "error": 0.14860310107034685,
+            "h1": 0.5730145864589937,
+            "multiplier": 0.0,
+            "kkt": 1.3322374049028358e-16,
+            "H1_ranks": [
+              227,
+              227,
+              227
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.031840176645038076,
+          "h1": 2.1460121419373226,
+          "fit": {
+            "error": 0.031840176645037986,
+            "h1": 2.1460121419373097,
+            "multiplier": 0.0,
+            "kkt": 1.1802477609229642e-16,
+            "H1_ranks": [
+              227,
+              227,
+              227
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken--conservative/conservative-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "cb3a9a6974f26dd5c5390753655ad45190a670ab83f962a355f22504bfce4bb0",
+      "broken_fields": [],
+      "negative_control": false
+    },
+    {
+      "method": "raw",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 3,
+      "ranks9": [
+        477,
+        477,
+        477
+      ],
+      "ranks11": [
+        477,
+        477,
+        477
+      ],
+      "metrics": {
+        "anchor": 3.0165504815046216e-09,
+        "orthogonal": 7.507782174706492e-16,
+        "projector": 1.772991426808393e-09,
+        "kernel": 6.300512409248557e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.520885257704445e-15,
+          "h1": 1.2336900743609218,
+          "fit": {
+            "error": 2.0615018066761083e-15,
+            "h1": 1.2336900743609107,
+            "multiplier": 0.0,
+            "kkt": 2.8253413732026793e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.732769417922426e-15,
+          "h1": 0.6590319606013828,
+          "fit": {
+            "error": 2.1669367740838046e-15,
+            "h1": 0.6590319606013805,
+            "multiplier": 0.0,
+            "kkt": 5.698977932458497e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860310107034683,
+          "h1": 0.5730145864589938,
+          "fit": {
+            "error": 0.14860310107034672,
+            "h1": 0.5730145864589932,
+            "multiplier": 0.0,
+            "kkt": 6.362205394031508e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.03184017664503777,
+          "h1": 2.1460121419373235,
+          "fit": {
+            "error": 0.03184017664503787,
+            "h1": 2.14601214193731,
+            "multiplier": 0.0,
+            "kkt": 3.5415624255948184e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken-0-raw/raw-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "534c94329f284fa586f4bfe29401c6ba06ad57b5a65ca11537383ee3ffc5138e",
+      "broken_fields": [
+        0
+      ],
+      "negative_control": true
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 17,
+      "ranks9": [
+        463,
+        463,
+        463
+      ],
+      "ranks11": [
+        463,
+        463,
+        463
+      ],
+      "metrics": {
+        "anchor": 3.76744074968332e-09,
+        "orthogonal": 3.652111116246072e-15,
+        "projector": 1.3033502543050146e-08,
+        "kernel": 9.47712890904868e-16
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.680781412294667e-15,
+          "h1": 1.2336900743609207,
+          "fit": {
+            "error": 2.221816885643399e-15,
+            "h1": 1.2336900743609105,
+            "multiplier": 0.0,
+            "kkt": 3.335253444053706e-16,
+            "H1_ranks": [
+              233,
+              233,
+              233
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.2016738030024266e-15,
+          "h1": 0.6590319606013822,
+          "fit": {
+            "error": 2.8368888579541244e-15,
+            "h1": 0.65903196060138,
+            "multiplier": 0.0,
+            "kkt": 5.07902375939743e-16,
+            "H1_ranks": [
+              233,
+              233,
+              233
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.05712650008012482,
+          "h1": 0.5141084465122951,
+          "fit": {
+            "error": 0.05712650008012487,
+            "h1": 0.5141084465122946,
+            "multiplier": 0.0,
+            "kkt": 4.728957291267653e-16,
+            "H1_ranks": [
+              233,
+              233,
+              233
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.010747281964323105,
+          "h1": 2.1323473621736255,
+          "fit": {
+            "error": 0.010747281964323077,
+            "h1": 2.132347362173613,
+            "multiplier": 0.0,
+            "kkt": 4.627553043811237e-16,
+            "H1_ranks": [
+              233,
+              233,
+              233
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken-0-conservative/conservative-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "cf53c6fd2a88a824bc12952c2dcb39cced23dccd5aff618b9f2181336ecb1878",
+      "broken_fields": [
+        0
+      ],
+      "negative_control": true
+    },
+    {
+      "method": "raw",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 3,
+      "ranks9": [
+        483,
+        483,
+        483
+      ],
+      "ranks11": [
+        483,
+        483,
+        483
+      ],
+      "metrics": {
+        "anchor": 8.57992798663598e-12,
+        "orthogonal": 4.469817247255641e-16,
+        "projector": 6.6421155195188095e-12,
+        "kernel": 6.584729537732824e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.6837427750255193e-15,
+          "h1": 1.233690074360922,
+          "fit": {
+            "error": 2.399064872414674e-15,
+            "h1": 1.2336900743609083,
+            "multiplier": 0.0,
+            "kkt": 6.015605286755182e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.8990869219371486e-15,
+          "h1": 0.6590319606013817,
+          "fit": {
+            "error": 2.4280349857340213e-15,
+            "h1": 0.6590319606013784,
+            "multiplier": 0.0,
+            "kkt": 7.862944245253e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.148603101070347,
+          "h1": 0.5730145864589936,
+          "fit": {
+            "error": 0.14860310107034683,
+            "h1": 0.5730145864589925,
+            "multiplier": 0.0,
+            "kkt": 7.105446305163562e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.031840176645037986,
+          "h1": 2.1460121419373213,
+          "fit": {
+            "error": 0.03184017664503782,
+            "h1": 2.146012141937304,
+            "multiplier": 0.0,
+            "kkt": 7.66230873149491e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken-1-raw/raw-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "48a9ce006ab6e97939cb4afb5a75ea567ca4950acdb3cecfbbb39555bb4bb345",
+      "broken_fields": [
+        1
+      ],
+      "negative_control": true
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 21,
+      "ranks9": [
+        465,
+        465,
+        465
+      ],
+      "ranks11": [
+        465,
+        465,
+        465
+      ],
+      "metrics": {
+        "anchor": 3.620137334372968e-10,
+        "orthogonal": 5.48447654052767e-15,
+        "projector": 3.0932986273768754e-09,
+        "kernel": 5.893492845035017e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.433859617378457e-15,
+          "h1": 1.2336900743609216,
+          "fit": {
+            "error": 2.1283065862875116e-15,
+            "h1": 1.2336900743609072,
+            "multiplier": 0.0,
+            "kkt": 2.2580270399044115e-16,
+            "H1_ranks": [
+              237,
+              237,
+              237
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.6687560604989888e-15,
+          "h1": 0.6590319606013817,
+          "fit": {
+            "error": 2.0028862644046388e-15,
+            "h1": 0.6590319606013787,
+            "multiplier": 0.0,
+            "kkt": 1.738574351188528e-16,
+            "H1_ranks": [
+              237,
+              237,
+              237
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14858629475841903,
+          "h1": 0.5731264785047638,
+          "fit": {
+            "error": 0.14858629475841892,
+            "h1": 0.5731264785047626,
+            "multiplier": 0.0,
+            "kkt": 2.7953684528434105e-16,
+            "H1_ranks": [
+              237,
+              237,
+              237
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0318364836783153,
+          "h1": 2.1460413213405856,
+          "fit": {
+            "error": 0.03183648367831524,
+            "h1": 2.1460413213405687,
+            "multiplier": 0.0,
+            "kkt": 1.8025496354133923e-16,
+            "H1_ranks": [
+              237,
+              237,
+              237
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken-1-conservative/conservative-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "ba959f2525c5d00872f9537d4d059d293cde5ab4142eb0bce6dce22ae35dd57e",
+      "broken_fields": [
+        1
+      ],
+      "negative_control": true
+    },
+    {
+      "method": "raw",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 20,
+      "ranks9": [
+        514,
+        514,
+        514
+      ],
+      "ranks11": [
+        514,
+        514,
+        514
+      ],
+      "metrics": {
+        "anchor": 2.480359037078018e-13,
+        "orthogonal": 5.199540182499608e-15,
+        "projector": 8.972293516097443e-13,
+        "kernel": 7.862176778390642e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 6.183213734240091e-13,
+          "h1": 1.043812610190403,
+          "fit": {
+            "error": 6.183693668272075e-13,
+            "h1": 1.0438126101904013,
+            "multiplier": 0.0,
+            "kkt": 6.325505116183297e-16,
+            "H1_ranks": [
+              230,
+              230,
+              230
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 4.635369637659233e-13,
+          "h1": 0.5916183209285504,
+          "fit": {
+            "error": 4.635644115761314e-13,
+            "h1": 0.5916183209285486,
+            "multiplier": 0.0,
+            "kkt": 7.958218730321009e-16,
+            "H1_ranks": [
+              230,
+              230,
+              230
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.040509575337273965,
+          "h1": 0.4741163752379625,
+          "fit": {
+            "error": 0.0405095753372736,
+            "h1": 0.4741163752379614,
+            "multiplier": 0.0,
+            "kkt": 7.356935609287855e-16,
+            "H1_ranks": [
+              230,
+              230,
+              230
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.008294719251464893,
+          "h1": 1.8495059942715573,
+          "fit": {
+            "error": 0.008294719251464348,
+            "h1": 1.849505994271552,
+            "multiplier": 0.0,
+            "kkt": 8.04839830191142e-16,
+            "H1_ranks": [
+              230,
+              230,
+              230
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken-01-raw/raw-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "382349a1c8a0a35afc28e88275553c769ef4863068cd2b0a2cd139615415f65c",
+      "broken_fields": [
+        0,
+        1
+      ],
+      "negative_control": true
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 48,
+      "ranks9": [
+        486,
+        486,
+        486
+      ],
+      "ranks11": [
+        486,
+        486,
+        486
+      ],
+      "metrics": {
+        "anchor": 5.084761830588501e-12,
+        "orthogonal": 9.39464151273106e-15,
+        "projector": 9.881527495782234e-11,
+        "kernel": 2.201385322736828e-15
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 3.8928753487915113e-11,
+          "h1": 1.0438126101908085,
+          "fit": {
+            "error": 3.892669567510496e-11,
+            "h1": 1.0438126101908058,
+            "multiplier": 0.0,
+            "kkt": 3.7557474637346303e-16,
+            "H1_ranks": [
+              258,
+              258,
+              258
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.918663820849084e-11,
+          "h1": 0.5916183209286391,
+          "fit": {
+            "error": 2.9185721780540677e-11,
+            "h1": 0.5916183209286388,
+            "multiplier": 0.0,
+            "kkt": 2.792695568889932e-16,
+            "H1_ranks": [
+              258,
+              258,
+              258
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.034471802581572925,
+          "h1": 0.46819747548344903,
+          "fit": {
+            "error": 0.0344718025815727,
+            "h1": 0.4681974754834479,
+            "multiplier": 0.0,
+            "kkt": 3.5752520767302194e-16,
+            "H1_ranks": [
+              258,
+              258,
+              258
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.005849547124606459,
+          "h1": 1.8476719397605368,
+          "fit": {
+            "error": 0.005849547124606479,
+            "h1": 1.8476719397605268,
+            "multiplier": 0.0,
+            "kkt": 3.175581597030491e-16,
+            "H1_ranks": [
+              258,
+              258,
+              258
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/q4-continuity-v3-20261104-002636/broken-01-conservative/conservative-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "a7d591e52fab477c33b12d2c00eaaa27ee1f744bbbb274d2cca9f6fac21ab339",
+      "broken_fields": [
+        0,
+        1
+      ],
+      "negative_control": true
+    }
+  ],
+  "stop_reason": null,
+  "physical_adoption": false,
+  "all_numerical_checks": true,
+  "sources": {
+    "tools/design-experiments/diagnose_q4_continuity_v3.py": "f66a20b4b296cd2cba9a335de51fc7faaf65b26e885913b3ff9f7702d806f5d2",
+    "tools/design-experiments/tying_mid_projection_q4_v2.py": "30e333c486415cf2af9ac7b98ae2c918f03f5e63bea0c6f37516b5297bc2fc26",
+    "tools/design-experiments/check_q4_continuity_v3.py": "6fd019b9014c1973cf1bc242dede53259f204dec2317f94340de6b485e056744",
+    "docs/verification/q4-continuity-v3-protocol.md": "f13ef80d3311ebc68c6be1175fc42c358d40ae8aeb4c225b2f59adc7057f0adb",
+    "docs/verification/q4-continuity-v3-preparation.json": "13119d355f8b335e24e691239da3f0ef36a801038cf0a90955d2a9fa16651f54"
+  },
+  "seconds": 11.85999999998603,
+  "peak_bytes": 208130048
+}

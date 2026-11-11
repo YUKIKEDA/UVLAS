@@ -1,0 +1,390 @@
+{
+  "protocol": "docs/verification/q9-integrator-candidate-comparison.md",
+  "source_sha256": "5fe8e09f62802aa4a34918e438dd6c426eb90d435eabe39fa75d72f94f151775",
+  "dependency_sha256": {
+    "check_q9_transient_accuracy.py": "94cdc3420c2ecaad043bce2fb281b3b51ef64a77f352c7897f1f6ce5fe3ceac1",
+    "check_q9_material_tangent.py": "cd9d5c4b9973bb2b02b462cd1c60c98c1e0ee34fac218f00e27da9b2d78faf29"
+  },
+  "reference_result_sha256": "42ce0651bd704d79354449c64c4903049a5f4fc8e300c8d1e427c7fccf51f8c8",
+  "reference_trajectory_sha256": "4c5c5fb2c432859271b81a75385c145a2d85e05faf206a0c6af9f2f89c728e85",
+  "numpy": "2.3.5",
+  "short_window_seconds": 0.00010700656938608646,
+  "linear_cases": [
+    {
+      "rho": 1.0,
+      "coefficients": [
+        0.5,
+        0.5,
+        0.25,
+        0.5
+      ],
+      "matrix_scalar_error": 3.552713678800501e-15,
+      "spectral_max": 1.0000000000000002,
+      "high_frequency_radius": 1.0,
+      "one_period_phase_errors": [
+        0.012871587190299055,
+        0.0032268339019912344,
+        0.000807268371790702,
+        0.00020185210720697952
+      ],
+      "order": 1.9997497213145534,
+      "eligible": true
+    },
+    {
+      "rho": 0.8,
+      "coefficients": [
+        0.6666666666666666,
+        0.5555555555555556,
+        0.3086419753086419,
+        0.6111111111111109
+      ],
+      "matrix_scalar_error": 3.552713678800501e-15,
+      "spectral_max": 0.9999999999999997,
+      "high_frequency_radius": 0.8000167862062498,
+      "one_period_phase_errors": [
+        0.013579756212303808,
+        0.0034054234115320275,
+        0.000852043116158151,
+        0.00021305762861014398
+      ],
+      "order": 1.9996827286781171,
+      "eligible": true
+    },
+    {
+      "rho": 0.5,
+      "coefficients": [
+        1.0,
+        0.6666666666666666,
+        0.44444444444444453,
+        0.8333333333333334
+      ],
+      "matrix_scalar_error": 8.881784197001252e-16,
+      "spectral_max": 0.9999999999999815,
+      "high_frequency_radius": 0.5000168019470812,
+      "one_period_phase_errors": [
+        0.01913537482912136,
+        0.004822806477252683,
+        0.0012089730452108493,
+        0.00030255249843874713
+      ],
+      "order": 1.998524675762656,
+      "eligible": true
+    },
+    {
+      "rho": 0.0,
+      "coefficients": [
+        2.0,
+        1.0,
+        1.0,
+        1.5
+      ],
+      "matrix_scalar_error": 8.881784197001252e-16,
+      "spectral_max": 0.9999999999995,
+      "high_frequency_radius": 2.1538915728667627e-05,
+      "one_period_phase_errors": [
+        0.06512881048076737,
+        0.017199946588661176,
+        0.004382869575960567,
+        0.0011037770828909166
+      ],
+      "order": 1.989426911161724,
+      "eligible": true
+    }
+  ],
+  "nonlinear_cases": [
+    {
+      "rho": 1.0,
+      "n": 640,
+      "residual_max": 2.956498418880388e-20,
+      "sampled_det_f_min": 1.0007911634272546,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 1.8917889873432984e-06,
+        "velocity_scaled_mass_max": 0.006421142549964733,
+        "phase_space_max": 0.006421142568193088,
+        "low4_displacement_max": 3.741781072041832e-11,
+        "high65_displacement_max": 1.8917889869732539e-06,
+        "low4_velocity_max": 1.2717371287251865e-07,
+        "high65_velocity_max": 0.006421142548705366,
+        "physical_acceleration_relative": 0.25638777085899295,
+        "pk2_increment_relative": 0.008819094379047404,
+        "low4_phase_space_max": 1.271737132151853e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.8,
+      "n": 320,
+      "residual_max": 3.891307852915414e-18,
+      "sampled_det_f_min": 1.00079116382806,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 7.547329641991036e-06,
+        "velocity_scaled_mass_max": 0.026477800620211663,
+        "phase_space_max": 0.026477800622764835,
+        "low4_displacement_max": 1.4950936986125996e-10,
+        "high65_displacement_max": 7.547329640510179e-06,
+        "low4_velocity_max": 5.243160627650108e-07,
+        "high65_velocity_max": 0.026477800615020385,
+        "physical_acceleration_relative": 1.0221152474861581,
+        "pk2_increment_relative": 0.035209327381132416,
+        "low4_phase_space_max": 5.243160627731269e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.8,
+      "n": 640,
+      "residual_max": 3.580144968435076e-20,
+      "sampled_det_f_min": 1.0007911634113724,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 1.9992867679345086e-06,
+        "velocity_scaled_mass_max": 0.00675750933436127,
+        "phase_space_max": 0.006757509354872989,
+        "low4_displacement_max": 3.954347435652908e-11,
+        "high65_displacement_max": 1.9992867675434475e-06,
+        "low4_velocity_max": 1.3383924776617037e-07,
+        "high65_velocity_max": 0.006757509333035859,
+        "physical_acceleration_relative": 0.2709515010495105,
+        "pk2_increment_relative": 0.009320363586451878,
+        "low4_phase_space_max": 1.3383924815301066e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.8,
+      "n": 1280,
+      "residual_max": 8.038401367267256e-21,
+      "sampled_det_f_min": 1.0007911635735915,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 4.982518650809758e-07,
+        "velocity_scaled_mass_max": 0.0017381964920124753,
+        "phase_space_max": 0.001738196493992281,
+        "low4_displacement_max": 9.862922869077007e-12,
+        "high65_displacement_max": 4.982518649833573e-07,
+        "low4_velocity_max": 3.441373310956765e-08,
+        "high65_velocity_max": 0.0017381964916718046,
+        "physical_acceleration_relative": 0.06747510173114042,
+        "pk2_increment_relative": 0.002324517827603133,
+        "low4_phase_space_max": 3.4413733144632395e-08
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.5,
+      "n": 320,
+      "residual_max": 1.5963830458141752e-17,
+      "sampled_det_f_min": 1.0007911758459471,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 9.71141793051186e-06,
+        "velocity_scaled_mass_max": 0.033179396884729026,
+        "phase_space_max": 0.03317939696730805,
+        "low4_displacement_max": 1.9232855762470545e-10,
+        "high65_displacement_max": 9.711417928607388e-06,
+        "low4_velocity_max": 6.573966584497146e-07,
+        "high65_velocity_max": 0.033179396878216395,
+        "physical_acceleration_relative": 1.3151024652257277,
+        "pk2_increment_relative": 0.04532010718092657,
+        "low4_phase_space_max": 6.573966600174774e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.5,
+      "n": 640,
+      "residual_max": 7.832579232365264e-20,
+      "sampled_det_f_min": 1.000791165294277,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 2.8496274432971615e-06,
+        "velocity_scaled_mass_max": 0.009554244527519804,
+        "phase_space_max": 0.009554244530437355,
+        "low4_displacement_max": 5.638178649601824e-11,
+        "high65_displacement_max": 2.849627442739386e-06,
+        "low4_velocity_max": 1.8935883785156583e-07,
+        "high65_velocity_max": 0.00955424452564332,
+        "physical_acceleration_relative": 0.38612816582545856,
+        "pk2_increment_relative": 0.013286347965442457,
+        "low4_phase_space_max": 1.8935883789133784e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.5,
+      "n": 1280,
+      "residual_max": 1.297173536966502e-20,
+      "sampled_det_f_min": 1.0007911636727438,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 7.074387097947014e-07,
+        "velocity_scaled_mass_max": 0.00245400540683072,
+        "phase_space_max": 0.002454005410578155,
+        "low4_displacement_max": 1.400548485886559e-11,
+        "high65_displacement_max": 7.07438709656065e-07,
+        "low4_velocity_max": 4.8590101442838105e-08,
+        "high65_velocity_max": 0.00245400540634967,
+        "physical_acceleration_relative": 0.09580227061638857,
+        "pk2_increment_relative": 0.0033005621435771623,
+        "low4_phase_space_max": 4.859010151094972e-08
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.0,
+      "n": 320,
+      "residual_max": 3.231858749103968e-16,
+      "sampled_det_f_min": 1.0007912730822388,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 1.0304799055988521e-05,
+        "velocity_scaled_mass_max": 0.03583323192104578,
+        "phase_space_max": 0.03583323192141991,
+        "low4_displacement_max": 2.0883781732360032e-10,
+        "high65_displacement_max": 1.030479905387236e-05,
+        "low4_velocity_max": 7.102185854050335e-07,
+        "high65_velocity_max": 0.035833231914007474,
+        "physical_acceleration_relative": 1.3954524885732664,
+        "pk2_increment_relative": 0.048089786835722924,
+        "low4_phase_space_max": 7.102185854120259e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.0,
+      "n": 640,
+      "residual_max": 1.5629909721021936e-18,
+      "sampled_det_f_min": 1.0007911966260878,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 8.256456275343822e-06,
+        "velocity_scaled_mass_max": 0.02802775119187721,
+        "phase_space_max": 0.02802775122431289,
+        "low4_displacement_max": 1.634509713165851e-10,
+        "high65_displacement_max": 8.256456273725923e-06,
+        "low4_velocity_max": 5.555049614805593e-07,
+        "high65_velocity_max": 0.02802775118637221,
+        "physical_acceleration_relative": 1.118431639225569,
+        "pk2_increment_relative": 0.03850529421749335,
+        "low4_phase_space_max": 5.555049620872557e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    },
+    {
+      "rho": 0.0,
+      "n": 1280,
+      "residual_max": 3.125569420009887e-20,
+      "sampled_det_f_min": 1.0007911683878385,
+      "max_iterations": 1,
+      "errors": {
+        "displacement_mass_max": 2.585393755232652e-06,
+        "velocity_scaled_mass_max": 0.008641555980859243,
+        "phase_space_max": 0.008641555981868417,
+        "low4_displacement_max": 5.115715312083944e-11,
+        "high65_displacement_max": 2.5853937547265292e-06,
+        "low4_velocity_max": 1.7127926212275104e-07,
+        "high65_velocity_max": 0.00864155597916183,
+        "physical_acceleration_relative": 0.3503008987115953,
+        "pk2_increment_relative": 0.012055053749266848,
+        "low4_phase_space_max": 1.7127926212662243e-07
+      },
+      "observable_eligible": {
+        "displacement_mass_max": true,
+        "velocity_scaled_mass_max": false,
+        "physical_acceleration_relative": false,
+        "pk2_increment_relative": false,
+        "low4_phase_space_max": true
+      }
+    }
+  ],
+  "rho1_midpoint_difference": {
+    "displacement_mass_max": 1.974585567984076e-15,
+    "velocity_scaled_mass_max": 2.6283895996575036e-13,
+    "phase_space_max": 2.628416595566169e-13,
+    "low4_displacement_max": 1.844121949231849e-15,
+    "high65_displacement_max": 1.194170233685603e-15,
+    "low4_velocity_max": 4.0332163489509106e-17,
+    "high65_velocity_max": 2.628389591655827e-13
+  },
+  "restart": {
+    "checkpoint_step": 237,
+    "all_endpoint_states_bit_equal": true,
+    "reset_algorithmic_to_physical_difference": {
+      "displacement_mass_max": 3.3387178346359994e-09,
+      "velocity_scaled_mass_max": 1.8042063773013184e-05,
+      "phase_space_max": 1.8042064081931186e-05,
+      "low4_displacement_max": 2.3603118493485566e-14,
+      "high65_displacement_max": 3.3387178345525675e-09,
+      "low4_velocity_max": 3.5157782398378506e-10,
+      "high65_velocity_max": 1.804206376958766e-05
+    },
+    "next_algorithmic_acceleration_scaled_difference": 0.0028549359801392673,
+    "negative_detected": true
+  },
+  "verification_checks": {
+    "linear_cases": true,
+    "rho1_midpoint": true,
+    "algorithmic_history_restart": true,
+    "incorrect_history_detected": true
+  },
+  "all_verification_checks_pass": true,
+  "seconds": 45.51600000000326,
+  "peak_process_working_bytes": 161546240,
+  "limitations": "same isotropic fixed-support short IVP, all 69 coordinates; candidate observable failures are retained; no full-wing, aero, damping identification or product method adoption"
+}

@@ -1,0 +1,113 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        2.38063228601271e-14,
+        1.0989488030585287e-05
+      ],
+      "error_difference": 1.7568361367195332e-16,
+      "shared": 1.0024659301630191e-15,
+      "support": 7.031486399650845e-16,
+      "constraint": 9.647016656090892e-15,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        3.149279455492993e-14,
+        1.1651950375851508e-05
+      ],
+      "error_difference": 3.6603851189236786e-16,
+      "shared": 8.2134107000026945e-16,
+      "support": 8.880582848605618e-16,
+      "constraint": 1.3715280967591915e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        3.89333890769802e-13,
+        0.00027573603475557863
+      ],
+      "error_difference": 7.956417642784874e-16,
+      "shared": 1.2234174010843459e-15,
+      "support": 8.278373972123163e-16,
+      "constraint": 3.2898587233928156e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        0.14681502287457382,
+        0.0315223359231846
+      ],
+      "error_difference": 2.498001805406602e-16,
+      "shared": 1.1990183648737967e-15,
+      "support": 9.258819096545342e-16,
+      "constraint": 6.183259048275704e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "error": [
+        0.1468179164935135,
+        0.03152569150625514
+      ],
+      "error_difference": 2.7755575615628914e-16,
+      "shared": 1.7614470096795602e-15,
+      "support": 1.6912765448711435e-15,
+      "constraint": 2.4907115261658123e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "geometry_conditional": true,
+  "independent_global_resolve": false,
+  "sources": {
+    "tools/design-experiments/audit_reference_work_thin_global.py": "057d1723a18fa77f89a391d3029363a918b22be9e4499d8683cd27c7a6ad86ad",
+    "docs/verification/reference-work-thin-global-v4-result.json": "b037674b6140b3eef4906b06df1e989ef3e960215788bf70a4dc1885610fe1f9",
+    "tools/design-experiments/reference_work_thin_limit_v3.py": "db50d41d11cd1ec1648d80469677da7303266aec6535d3cf0c3e4248b58d1606"
+  }
+}

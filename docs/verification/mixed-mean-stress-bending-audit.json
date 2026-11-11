@@ -1,0 +1,185 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        1.4086653419218877e-13,
+        9.34156297743644e-14,
+        1.0989454860269266e-05
+      ],
+      "position_error": [
+        1.5324643889618e-14,
+        1.7059087627431835e-14,
+        1.5707532071331756e-07
+      ],
+      "energy_difference": 2.9471833773355577e-16,
+      "position_difference": 5.040068920041459e-16,
+      "shared": 1.5335305594034928e-14,
+      "support": 8.730300320495061e-15,
+      "work": 2.334732421581335e-15,
+      "zero": 1.3779977395990188e-15,
+      "jump": 4.151858068364245e-15,
+      "position_reconstruction": 1.11492047057685e-15,
+      "checks": {
+        "energy": true,
+        "position": true,
+        "shared": true,
+        "support": true,
+        "work": true,
+        "zero": true,
+        "stabilization": true,
+        "position_reconstruction": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        9.910903541399217e-14,
+        7.198204146235148e-14,
+        1.1638389206249153e-05
+      ],
+      "position_error": [
+        2.838559497151839e-14,
+        3.092003112647294e-14,
+        1.9151990358322787e-07
+      ],
+      "energy_difference": 5.518639879928053e-16,
+      "position_difference": 5.0926389823876e-16,
+      "shared": 2.1741179725830808e-14,
+      "support": 1.3986400961920763e-14,
+      "work": 2.8380137504816665e-15,
+      "zero": 1.6853543194871235e-15,
+      "jump": 8.696116192566179e-15,
+      "position_reconstruction": 1.1019363959013027e-15,
+      "checks": {
+        "energy": true,
+        "position": true,
+        "shared": true,
+        "support": true,
+        "work": true,
+        "zero": true,
+        "stabilization": true,
+        "position_reconstruction": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        1.3309244596465815e-11,
+        0.004313124880873265,
+        0.0002750271820894673
+      ],
+      "position_error": [
+        5.399255529639697e-13,
+        0.00043833267040946247,
+        6.631712367099687e-06
+      ],
+      "energy_difference": 6.463471251272335e-16,
+      "position_difference": 5.3890268983392e-16,
+      "shared": 1.6150014345286816e-14,
+      "support": 9.042599898054321e-15,
+      "work": 2.811073760913862e-15,
+      "zero": 1.821561911241295e-15,
+      "jump": 9.700102770848566e-15,
+      "position_reconstruction": 1.1467982375721689e-15,
+      "checks": {
+        "energy": true,
+        "position": true,
+        "shared": true,
+        "support": true,
+        "work": true,
+        "zero": true,
+        "stabilization": true,
+        "position_reconstruction": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        3.4248310628874757e-10,
+        0.005949631817684024,
+        0.0003252569165693417
+      ],
+      "position_error": [
+        2.8715871590808405e-11,
+        0.0010959313784596036,
+        1.3575500431576227e-05
+      ],
+      "energy_difference": 5.003593026020603e-16,
+      "position_difference": 3.715942315183121e-16,
+      "shared": 1.4942170669006603e-14,
+      "support": 6.288833489019053e-15,
+      "work": 2.4285638457426596e-15,
+      "zero": 1.4784184678545781e-15,
+      "jump": 7.974761044531115e-15,
+      "position_reconstruction": 1.0908489211279837e-15,
+      "checks": {
+        "energy": true,
+        "position": true,
+        "shared": true,
+        "support": true,
+        "work": true,
+        "zero": true,
+        "stabilization": true,
+        "position_reconstruction": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "error": [
+        1.0083289089167077e-08,
+        0.0007902862252096549,
+        4.828573640402354e-05
+      ],
+      "position_error": [
+        2.16613783852042e-10,
+        2.742832660980886e-05,
+        3.7862684613577646e-07
+      ],
+      "energy_difference": 9.396847991567647e-16,
+      "position_difference": 8.079471412988427e-17,
+      "shared": 3.947220344633042e-14,
+      "support": 2.3330951476120444e-14,
+      "work": 5.775781463978975e-15,
+      "zero": 5.066449158656958e-16,
+      "jump": 1.8008507083761987e-14,
+      "position_reconstruction": 8.141086902302617e-16,
+      "checks": {
+        "energy": true,
+        "position": true,
+        "shared": true,
+        "support": true,
+        "work": true,
+        "zero": true,
+        "stabilization": true,
+        "position_reconstruction": true
+      },
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_audit_checks": true,
+  "independent_global_resolve": false,
+  "geometry_conditional": true,
+  "seconds": 115.56300000008196,
+  "sources": {
+    "tools/design-experiments/audit_mixed_mean_stress_bending.py": "098b728f5d6af9a2c1a0c9bf0975f34cd9e16e62fdedcc47f78b498a850690f3",
+    "docs/verification/mixed-mean-stress-bending-result.json": "7394f2a0e44014fffa4846fd9fcb0d0a6dc8e583f0946a64f70cdfe973a83c66",
+    "tools/design-experiments/mixed_mean_stress_bending.py": "194cfea40e0702cc185db71873f9cfd6d1838ac21c8ba0b325518333c45c81e2",
+    "docs/verification/mixed-mean-stress-bending-protocol.md": "097272e75288d49c7a86b4f2788380e63960986b70bb2ce4dacaf637c40de2cb"
+  }
+}

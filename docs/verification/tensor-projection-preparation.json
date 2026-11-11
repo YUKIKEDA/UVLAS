@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "tools/design-experiments/tensor_projection_basis.py": "35d21f0f9ab1390e18c0783861e8ecb29c3f5f3a5158540dd5e0e0538bbfa45d",
+    "tools/design-experiments/tensor_mid_projection_q4.py": "f390228f54f1d2a66dc6d21e69c3f293359091fc7f26e20f34d0da30ee9c13e0",
+    "tools/design-experiments/check_tensor_projection.py": "1d55604a018cbc9ed1cac8c5a6f2f560fb4cd2818d51adaa2da02685ceb647d3",
+    "tools/design-experiments/audit_tensor_projection.py": "735627652633aae779ffd40cd5c83853c0caa335ed035d3b55a1d1563f22a7e3",
+    "docs/tensor-projection-formulation.md": "cacddaedcef2e06f945d360792eda873366120ad11d19748b5dea614a6f90331",
+    "docs/verification/tensor-projection-protocol.md": "f1c91eec05da16a5eedb67193aa7dedab938509c5984157664789070d7be2599"
+  }
+}

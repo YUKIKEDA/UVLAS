@@ -1,0 +1,888 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        204,
+        204,
+        204
+      ],
+      "full_ranks11": [
+        204,
+        204,
+        204
+      ],
+      "nullity": 48,
+      "anchor_shifts": [
+        4.361841720381527e-15,
+        4.5470132923921575e-15
+      ],
+      "anchor_orthogonality": [
+        9.643074211304038e-15,
+        9.976939605870437e-15
+      ],
+      "kernel_residual": 7.241088091925936e-17,
+      "projector_difference": 2.60160799396731e-14,
+      "control0": 1.5796742543942947e-16,
+      "control1": 2.9660184949252226e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 2.6490598939921554e-15,
+            "h1": 1.1547005383792603,
+            "unconstrained_h1": 1.1547005383792575,
+            "multiplier": 0.0,
+            "kkt": 2.3101346267622536e-16,
+            "H1_ranks": [
+              174,
+              174,
+              174
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 168,
+            "positive_metric_dimension": 174
+          },
+          "observed_error": 3.0369129940477003e-15,
+          "observed_h1": 1.1547005383792432,
+          "reference_h1": 1.1547005383792517,
+          "h1_bound": 2.3094010767585034,
+          "zero_constraint": 8.578806333859926e-18,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 2.9132208004183e-15,
+            "h1": 0.46462136829144685,
+            "unconstrained_h1": 0.46462136829144646,
+            "multiplier": 0.0,
+            "kkt": 2.0763376029929158e-16,
+            "H1_ranks": [
+              174,
+              174,
+              174
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 168,
+            "positive_metric_dimension": 174
+          },
+          "observed_error": 2.955744956458146e-15,
+          "observed_h1": 0.4646213682914455,
+          "reference_h1": 0.4646213682914477,
+          "h1_bound": 0.9292427365828954,
+          "zero_constraint": 5.199348610420131e-18,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "baseline_quartic_error": 2.800261857699284e-15,
+      "relative_reduction": -0.0555244854445891,
+      "progress_gate_passed": null,
+      "checks": {
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "anchor": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 2.0,
+      "map_keys": [
+        "c40aa5c2f42ca138702ba9e7fb0c74253a153604e65a93cbfc7bd52c758cd300",
+        "694189d4efebb69d96dd7b938f595e9e593b16a96e0e400b6aa04e3bc555e636",
+        "f1522bd96b167a80c8770cf8bf5d80cb56672ec4ef8cc74e09dc2fb83319fd38",
+        "8bfc7f6c7df84019afda74507d5e35d23ca149cccc08f3d1fee0f656fbe4d03e"
+      ],
+      "artifact": "build/analysis/gsp-q3-shared-20261103-213540/k0-a0-n2.npz",
+      "artifact_sha256": "2cdfa267b254f4cf1a06a0e674c9f841a5592b73df3a5094b66556014004095f"
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        220,
+        220,
+        220
+      ],
+      "full_ranks11": [
+        220,
+        220,
+        220
+      ],
+      "nullity": 32,
+      "anchor_shifts": [
+        1.3252847702499932e-13,
+        5.638557396374831e-14
+      ],
+      "anchor_orthogonality": [
+        7.186141332165042e-15,
+        6.266464947181671e-15
+      ],
+      "kernel_residual": 7.268108060003329e-17,
+      "projector_difference": 5.521941354310378e-13,
+      "control0": 1.9280813672035557e-16,
+      "control1": 3.8032682914594734e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 3.67119684117529e-15,
+            "h1": 1.1547005383792512,
+            "unconstrained_h1": 1.15470053837925,
+            "multiplier": 0.0,
+            "kkt": 3.368475409541093e-16,
+            "H1_ranks": [
+              158,
+              158,
+              158
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 152,
+            "positive_metric_dimension": 158
+          },
+          "observed_error": 3.887016332804467e-15,
+          "observed_h1": 1.1547005383792506,
+          "reference_h1": 1.1547005383792517,
+          "h1_bound": 2.3094010767585034,
+          "zero_constraint": 9.402539440368606e-18,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 0.0417880734623578,
+            "h1": 0.4813768117195991,
+            "unconstrained_h1": 0.48137681171959906,
+            "multiplier": 0.0,
+            "kkt": 1.9417468774991417e-16,
+            "H1_ranks": [
+              158,
+              158,
+              158
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 152,
+            "positive_metric_dimension": 158
+          },
+          "observed_error": 0.0417880734623579,
+          "observed_h1": 0.4813768117195995,
+          "reference_h1": 0.4646213682914477,
+          "h1_bound": 0.9292427365828954,
+          "zero_constraint": 6.704279587988295e-18,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "baseline_quartic_error": 9.531946667949078e-06,
+      "relative_reduction": -4383.002021629979,
+      "progress_gate_passed": null,
+      "checks": {
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "anchor": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 2.0310000000172295,
+      "map_keys": [
+        "82ada028337dbf3a5818d6cd241bc0a7296de1ac3232d2bd650f9e602beb2f89",
+        "d47e59d0e22006a23123dd48665133ebe294b731ba9035360663a6934bc01b27",
+        "b0115da88974798ee14b6d8eb4f37b4250a20c9d1208f3560a04545fda570ce8",
+        "1b8750bc3ed3f258214f36cf6830eb0c3efa613428ebfdd9a766bfd1c7260a60"
+      ],
+      "artifact": "build/analysis/gsp-q3-shared-20261103-213540/k0-a0.2-n2.npz",
+      "artifact_sha256": "6d9b67d20f74f7a76316bf423692ed710df63eb8d7e6a34f57e462c5f5fa2173"
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        244,
+        244,
+        244
+      ],
+      "full_ranks11": [
+        244,
+        244,
+        244
+      ],
+      "nullity": 8,
+      "anchor_shifts": [
+        1.3377119970862503e-13,
+        2.920560977271416e-13
+      ],
+      "anchor_orthogonality": [
+        2.1681420858766593e-15,
+        1.3483601409272394e-15
+      ],
+      "kernel_residual": 2.125789666601712e-15,
+      "projector_difference": 5.037599259452258e-13,
+      "control0": 1.8540613788948557e-16,
+      "control1": 3.4875066258904425e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 3.796614882388199e-15,
+            "h1": 1.2336900743609167,
+            "unconstrained_h1": 1.2336900743609167,
+            "multiplier": 0.0,
+            "kkt": 6.251617299773311e-16,
+            "H1_ranks": [
+              134,
+              134,
+              134
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 128,
+            "positive_metric_dimension": 134
+          },
+          "observed_error": 3.6382354914684486e-15,
+          "observed_h1": 1.2336900743609147,
+          "reference_h1": 1.2336900743609103,
+          "h1_bound": 2.4673801487218205,
+          "zero_constraint": 9.070495513798503e-18,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 0.33003691715085154,
+            "h1": 0.7534792464663814,
+            "unconstrained_h1": 0.7534792464663814,
+            "multiplier": 0.0,
+            "kkt": 7.718585455855085e-16,
+            "H1_ranks": [
+              134,
+              134,
+              134
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 128,
+            "positive_metric_dimension": 134
+          },
+          "observed_error": 0.33003691715085176,
+          "observed_h1": 0.7534792464663809,
+          "reference_h1": 0.4904348764631308,
+          "h1_bound": 0.9808697529262616,
+          "zero_constraint": 7.306747789184189e-18,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "baseline_quartic_error": 0.32998292955713154,
+      "relative_reduction": -0.00016360723202457628,
+      "progress_gate_passed": false,
+      "checks": {
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "anchor": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 2.030999999959022,
+      "map_keys": [
+        "70f9940419722a29d290f96031e9153c6e7545935cf0d06b8fa3f0997a18e835",
+        "32a1f44d0bbddec16e8490b55867389d02308c1aeb454c20164170fd50855fd9",
+        "7ecc5614eb8ff3787e58302042ee0fd1375a08ac52a1a0db63694ae75b3a904c",
+        "e796ba7faedabdbe5148cd8c14bb7818f1e7f14e0c25f73f032b4f86a9383434"
+      ],
+      "artifact": "build/analysis/gsp-q3-shared-20261103-213540/k0.4-a0-n2.npz",
+      "artifact_sha256": "2240da161ecf62cdf3a9eaca87ac5b152d441b4b8efc05eec45cd662b2e89c5a"
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "free_nodes": 42,
+      "rd_columns": 252,
+      "full_ranks9": [
+        251,
+        251,
+        251
+      ],
+      "full_ranks11": [
+        251,
+        251,
+        251
+      ],
+      "nullity": 1,
+      "anchor_shifts": [
+        3.217299394897535e-13,
+        1.6784970028525386e-13
+      ],
+      "anchor_orthogonality": [
+        2.220446049250313e-16,
+        2.220446049250313e-16
+      ],
+      "kernel_residual": 3.074640901823786e-17,
+      "projector_difference": 0.0,
+      "control0": 2.37735597694075e-16,
+      "control1": 3.594330124184112e-15,
+      "solutions": {
+        "quadratic": {
+          "fit": {
+            "error": 3.286609659252646e-15,
+            "h1": 1.233690074360909,
+            "unconstrained_h1": 1.2336900743609087,
+            "multiplier": 0.0,
+            "kkt": 6.014821688547661e-16,
+            "H1_ranks": [
+              127,
+              127,
+              127
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 123,
+            "positive_metric_dimension": 127
+          },
+          "observed_error": 3.40275059021224e-15,
+          "observed_h1": 1.233690074360904,
+          "reference_h1": 1.2336900743609103,
+          "h1_bound": 2.4673801487218205,
+          "zero_constraint": 1.1283903301013965e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        },
+        "quartic": {
+          "fit": {
+            "error": 0.5963639300120865,
+            "h1": 0.8385473621054446,
+            "unconstrained_h1": 0.8385473621054446,
+            "multiplier": 0.0,
+            "kkt": 4.9301648251198714e-17,
+            "H1_ranks": [
+              127,
+              127,
+              127
+            ],
+            "H1_nullity": 0,
+            "unpenalized_objective_rank": 0,
+            "unpenalized_nonuniqueness": 0,
+            "positive_objective_rank": 123,
+            "positive_metric_dimension": 127
+          },
+          "observed_error": 0.5963639300120865,
+          "observed_h1": 0.8385473621054441,
+          "reference_h1": 0.4904348764631308,
+          "h1_bound": 0.9808697529262616,
+          "zero_constraint": 1.1583252241555148e-17,
+          "checks": {
+            "kkt": true,
+            "sphere": true,
+            "quadrature": true,
+            "H1": true,
+            "zero": true,
+            "reference": true,
+            "positive_fit": true
+          }
+        }
+      },
+      "stage_error": null,
+      "baseline_quartic_error": 0.5963330679529358,
+      "relative_reduction": -5.175305682225684e-05,
+      "progress_gate_passed": false,
+      "checks": {
+        "rank": true,
+        "kernel": true,
+        "projector": true,
+        "anchor": true,
+        "zero_c": true,
+        "positive_control": true,
+        "quadratic": true,
+        "quartic": true,
+        "resources": true
+      },
+      "seconds": 2.125,
+      "map_keys": [
+        "821157f3cfce0e18c1cb5f7aa1aa83610297a98d9cbc79aae02e4197e68fe1ed",
+        "920b7d6fdbf6214611987fd63862b84939f9bf034692ff57e92f2ce2b452c65d",
+        "7031061383e7759bbfa572f11216c92bf69d86094c98a7828ec7d3b103dffc92",
+        "26c6a6d352c97c93980b791d5714dc0d203db5ac07938c9dff753f04e0ea1e32"
+      ],
+      "artifact": "build/analysis/gsp-q3-shared-20261103-213540/k0.4-a0.2-n2.npz",
+      "artifact_sha256": "e3f4ba06ff412b52e39e45a6edeafd08d10cfec9c922e521b264a10e1fbc1d3a"
+    }
+  ],
+  "maps": {
+    "c40aa5c2f42ca138702ba9e7fb0c74253a153604e65a93cbfc7bd52c758cd300": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c0-state.npz",
+      "artifact_sha256": "a25db6075f66b531eed6df739f4b7965098c73cdee628a9be9f177f0fe3d5cea",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 2.738888288227738e-16,
+        "first_odd": 1.787920546584876e-16,
+        "first_zero": 2.4994429527883753e-17,
+        "work_zero": 8.879015927338698e-16,
+        "work_first": 2.760657495890269e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "694189d4efebb69d96dd7b938f595e9e593b16a96e0e400b6aa04e3bc555e636": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c1-state.npz",
+      "artifact_sha256": "dbb10b6c01e43ed27f7cdd293e2cd868c3470fa551b5170b64cad5296ea9cf4f",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 2.7744544042593577e-16,
+        "first_odd": 1.6945397259405544e-16,
+        "first_zero": 2.6871423538592065e-17,
+        "work_zero": 9.777782843995072e-16,
+        "work_first": 3.101312087186513e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "f1522bd96b167a80c8770cf8bf5d80cb56672ec4ef8cc74e09dc2fb83319fd38": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c2-state.npz",
+      "artifact_sha256": "da92c7ed6a74a2af169b920f78b73954a925027a7084c97742c52520102263b1",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 2.677613679574106e-16,
+        "first_odd": 1.7984734803277968e-16,
+        "first_zero": 2.760397404320764e-17,
+        "work_zero": 8.172074711364081e-16,
+        "work_first": 4.410547861219548e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "8bfc7f6c7df84019afda74507d5e35d23ca149cccc08f3d1fee0f656fbe4d03e": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0-n2-c3-state.npz",
+      "artifact_sha256": "c4b565879d829181b068c1a0a9a8ad0fd903e7cfc1902001d7a643991bada969",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 2.7689254967414486e-16,
+        "first_odd": 1.8034284587321308e-16,
+        "first_zero": 2.614713717992338e-17,
+        "work_zero": 9.655493337875111e-16,
+        "work_first": 2.9908984312492843e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "82ada028337dbf3a5818d6cd241bc0a7296de1ac3232d2bd650f9e602beb2f89": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0-n2-c0-state.npz",
+      "artifact_sha256": "20a174f397e1fe9af006e33106c74a785ce5dbc142eb84b20a88f3ec72c6a8a6",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.4305553870897047e-16,
+        "first_odd": 1.8183633804636896e-16,
+        "first_zero": 2.4659965843978145e-17,
+        "work_zero": 7.239861782631749e-16,
+        "work_first": 3.9317786249343996e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "d47e59d0e22006a23123dd48665133ebe294b731ba9035360663a6934bc01b27": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0-n2-c1-state.npz",
+      "artifact_sha256": "b992e57e3678c7b84d14a67531ce60aa0f0d228df4cee6799cee32794d406265",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.5374112692559453e-16,
+        "first_odd": 1.9009603022969904e-16,
+        "first_zero": 2.7020019903694584e-17,
+        "work_zero": 1.2738237995857155e-15,
+        "work_first": 3.073158495969817e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "b0115da88974798ee14b6d8eb4f37b4250a20c9d1208f3560a04545fda570ce8": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0-n2-c2-state.npz",
+      "artifact_sha256": "27c4e4136fbdb74c05ea69530be0bd9b50747cff6da817ed4638d1d054cdc82d",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.465811549791883e-16,
+        "first_odd": 1.8071023577807076e-16,
+        "first_zero": 2.5456440212200664e-17,
+        "work_zero": 6.009599302093993e-16,
+        "work_first": 4.084795076281725e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "1b8750bc3ed3f258214f36cf6830eb0c3efa613428ebfdd9a766bfd1c7260a60": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0-n2-c3-state.npz",
+      "artifact_sha256": "c669aa113033eeb992bd44a81fbd5b2ca852dbc18353710199b81c9d28a099b6",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.596826371917643e-16,
+        "first_odd": 1.960442678960113e-16,
+        "first_zero": 2.5668792371492295e-17,
+        "work_zero": 1.013412055299577e-15,
+        "work_first": 4.2970631482842104e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "70f9940419722a29d290f96031e9153c6e7545935cf0d06b8fa3f0997a18e835": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c0-state.npz",
+      "artifact_sha256": "2aedd561c5db4fa63dbe6a33f9f43f27470808fc1c6256c5c8785e5a7a7799c3",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.0350917778961054e-16,
+        "first_odd": 1.704031163881309e-16,
+        "first_zero": 2.559443592601116e-17,
+        "work_zero": 8.872579605136146e-16,
+        "work_first": 4.250228350623849e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "32a1f44d0bbddec16e8490b55867389d02308c1aeb454c20164170fd50855fd9": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c1-state.npz",
+      "artifact_sha256": "f7f0a9458c578129c0dade24f4ec81683fdac3def77d41c26644d9ebd196ca22",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.2481594335816836e-16,
+        "first_odd": 1.875005020168069e-16,
+        "first_zero": 2.5719265483003224e-17,
+        "work_zero": 1.1389784723380416e-15,
+        "work_first": 4.128633818464924e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "7ecc5614eb8ff3787e58302042ee0fd1375a08ac52a1a0db63694ae75b3a904c": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c2-state.npz",
+      "artifact_sha256": "62b18a3e0f40de589be621429101c69aa98bceb6e93197f1d34e6a9f27076f7f",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 2.9289346993197833e-16,
+        "first_odd": 1.739698012746278e-16,
+        "first_zero": 2.7078595445721062e-17,
+        "work_zero": 8.232691716159491e-16,
+        "work_first": 3.5022634948925497e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "e796ba7faedabdbe5148cd8c14bb7818f1e7f14e0c25f73f032b4f86a9383434": {
+      "artifact": "build/analysis/gsp-q3-additional-local-20261103-212811/k0.4-n2-c3-state.npz",
+      "artifact_sha256": "6d0f40b1e85385a48be50b7146dcc626a1413e0939c68d4620346c20bc366f09",
+      "local_result": "docs/verification/gsp-q3-additional-local-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.2257651226068686e-16,
+        "first_odd": 1.901529478247913e-16,
+        "first_zero": 2.7190574624779937e-17,
+        "work_zero": 9.372484598911586e-16,
+        "work_first": 4.109652032479144e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "821157f3cfce0e18c1cb5f7aa1aa83610297a98d9cbc79aae02e4197e68fe1ed": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0.4-n2-c0-state.npz",
+      "artifact_sha256": "135326f8463eb4e43b01d49986e249e029dc21a401d9197124a23a6ffa2f67b2",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.6302906469022934e-16,
+        "first_odd": 1.989028897685661e-16,
+        "first_zero": 2.953254033598771e-17,
+        "work_zero": 8.878538222439569e-16,
+        "work_first": 3.695743744401741e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "920b7d6fdbf6214611987fd63862b84939f9bf034692ff57e92f2ce2b452c65d": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0.4-n2-c1-state.npz",
+      "artifact_sha256": "9325c53e57743311e1bbcc0de2a6e376f41232b3c883b9cd6e751525e3e77edc",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.816764530362696e-16,
+        "first_odd": 2.29042857761114e-16,
+        "first_zero": 3.375440990406363e-17,
+        "work_zero": 1.2902919737666646e-15,
+        "work_first": 5.405696448660073e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "7031061383e7759bbfa572f11216c92bf69d86094c98a7828ec7d3b103dffc92": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0.4-n2-c2-state.npz",
+      "artifact_sha256": "2a247d06f1a73a46428a8ad5ae5c08ab79225d9757f1b627d6e63a2541f856eb",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.539603002244877e-16,
+        "first_odd": 2.036349695500628e-16,
+        "first_zero": 2.7504124891154812e-17,
+        "work_zero": 9.329496246796731e-16,
+        "work_first": 4.765196538031773e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    },
+    "26c6a6d352c97c93980b791d5714dc0d203db5ac07938c9dff753f04e0ea1e32": {
+      "artifact": "build/analysis/gsp-q3-local-v2-20261103-181355/k0.4-n2-c3-state.npz",
+      "artifact_sha256": "6ea8c9465b6fc3c221d5158093dbd5b4a4becddcd86ed9845e27bc4245310717",
+      "local_result": "docs/verification/gsp-q3-local-v2-result.json",
+      "metrics": {
+        "zero_coefficients": 0.0,
+        "first_coefficients": 0.0,
+        "zero_thickness_dependence": 3.813227021719119e-16,
+        "first_odd": 2.19204852316598e-16,
+        "first_zero": 3.105890244715446e-17,
+        "work_zero": 1.0970477610677334e-15,
+        "work_first": 6.19895601214284e-17
+      },
+      "checks": {
+        "zero_coefficients": true,
+        "first_coefficients": true,
+        "zero_thickness_dependence": true,
+        "first_odd": true,
+        "first_zero": true,
+        "work_zero": true,
+        "work_first": true
+      }
+    }
+  },
+  "all_checks_pass": true,
+  "both_curved_improved": false,
+  "stop_reason": null,
+  "physical_adoption": false,
+  "finite_thickness_lower_bound": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "sources": {
+    "tools/design-experiments/check_gsp_q3_shared.py": "a54a7dc9295046689c726641fb60ad879a5b06b41be320f39489790ee2460015",
+    "tools/design-experiments/gsp_q3_shared_space.py": "c84e319969daedfa232d2357e65e82a5837d6c87a586217261aa3e56b7511d9f",
+    "tools/design-experiments/gsp_q3_v2.py": "82135b41ad8c32e88a61e63bf8a9874983d4e5ac1670712ef213daaf64f9faed",
+    "tools/design-experiments/gsp_q3_basis_v2.py": "4826deee9dd17064f1650408d58d5699d2d87949f5d7eb3e8b5aa8c1018b7e0d",
+    "tools/design-experiments/q3_thin_expansion.py": "c645d0a7c0e893bce0d0d2ab9e26a849df6e36faa0ba54b3657a4f9cbabfec73",
+    "tools/design-experiments/q3_quartic_approximation.py": "dc4c23ca559cdd994de1b4a53bd45ce500088b4d39a209a5e0d0b79197454781",
+    "tools/design-experiments/check_q3_thin_limit.py": "a28f9307f9fa2c7fc175e8b267cc0373056f84f0e48ce4f0422c84c1fc29c52c",
+    "tools/design-experiments/mq3i1_shared_space.py": "a6b494a6b67716f32b5fd3ea329853f125d048c3efdca323eafdbeecd0653382",
+    "docs/gsp-q3-shared-and-membrane-contract.md": "c0e02b89bc5a635d3341fe82829dbd6642297477bc69c0a2d0257bb485f63d58",
+    "docs/verification/gsp-q3-shared-protocol.md": "dd38e4f43eba31c7a4a735543f2376ddb98f3cc6fed9e5c717c26409347907e8",
+    "docs/verification/gsp-q3-shared-preparation.json": "7e97f819c753f30a6b94c962fac14ef08ffe7c9d1ccfe24d25c703dd6fc3395d",
+    "docs/verification/gsp-q3-additional-local-result.json": "dd6b3f778278454ee0846bd8cac75750fc2d1472242e6268153fa1b3b54e17cc",
+    "docs/verification/gsp-q3-additional-local-audit.json": "edbb40dcca34c7accd8b41680cc404b7497ea5ce4fa2412b5e3422ffb01e9a79",
+    "docs/verification/gsp-q3-local-v2-result.json": "0453c840cb51be43540abe47a05d038f9a85192ae11199d8521f1f708a7435cc",
+    "docs/verification/gsp-q3-local-v2-audit.json": "e1f2fa339c95a3c06041db0393e5f53c176069f8281523772675ede03a98144b",
+    "docs/verification/mq3i1-shared-result.json": "0d55e0bbb0711a0772a88231eb163ab5a78762ac7b1598755c919e2d45e09b45"
+  },
+  "seconds": 8.562999999965541,
+  "peak_bytes": 376049664
+}

@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "eps": 0.0,
+      "relative_error": 1.5604198294340012e-15
+    },
+    {
+      "eps": 0.02,
+      "relative_error": 1.453595256177723e-15
+    }
+  ],
+  "false_self_rejected": true,
+  "sources": {
+    "tools/design-experiments/check_drag_material_self.py": "89c9a71b3ca9a3c2753a0094e5e68a91c4d3e0534b5a4ce0cfdcb2aef212fce3",
+    "tools/design-experiments/uvlm_drag_force_kernel.py": "dfe8f7bc931b48ae8e73179131feac8dbde2f6c2820d1042ca06bbc08cca2ced",
+    "tools/design-experiments/check_finite_wing_specialization.py": "c0a3f90d5ef59764945ca891298b0fdc98e61cd1ff065d59eb29ffb128859a50",
+    "tools/design-experiments/uvlm_wake_assembly_v2.py": "233b0219d6db9baf2cccc7dede170593503d7b7ca48c5c7ced93e944a47069d6"
+  },
+  "seconds": 3.375
+}

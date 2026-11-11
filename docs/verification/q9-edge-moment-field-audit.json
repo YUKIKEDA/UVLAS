@@ -1,0 +1,178 @@
+{
+  "source_sha256": "6a4c794189310868e75bddfbd1fc8bee6de6c62bb054741db559cba4bd6a5711",
+  "parent_sha256": "363cc288c41c795866aed1bdc6b06a30cd9d1c09b681afdcec628df38674f4d6",
+  "protocol_sha256": "3d4033d749c3885c633a061a4a936b02a8b5fed6f50bb77d61309046452ffc37",
+  "dependencies": {
+    "q9_edge_moment_fields.py": "0c51a1de8d1c3611c710422003ea25f52de7d76c7dc4823c0cd70e0764c9c5b9",
+    "audit_q9_curved_strain_screen.py": "2a092c9ae927b8676ce989a2d92d8eff0d9f9b93fae0b9e9bd27890a2b9245ec",
+    "check_q9_curved_load.py": "f018f5bc52d34249052f4163faef0b41814e45dc508581ec0ee351e0d5bac28c",
+    "check_q9_plate_convergence.py": "909db42a881612996ce1381432bc03153c18f7b0107876a56a986f84316ffd9d"
+  },
+  "cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "field": 2.5003416372402865e-15,
+      "force": 1.922932875143547e-15,
+      "tangent": 4.0989888967254415e-16,
+      "symmetry": 3.644117857307324e-16,
+      "minimum_sample_detF": 1.0226180511365803,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "field": 2.522249278405016e-15,
+      "force": 1.3130982188183677e-15,
+      "tangent": 3.5693935896669403e-16,
+      "symmetry": 2.8373092637961104e-16,
+      "minimum_sample_detF": 1.0251491068058767,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "field": 3.994911801881646e-15,
+      "force": 2.6133855110297854e-15,
+      "tangent": 5.496153957858163e-16,
+      "symmetry": 4.055826205777946e-16,
+      "minimum_sample_detF": 1.0222753264464568,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "field": 3.954810144170913e-15,
+      "force": 2.0355493690392367e-15,
+      "tangent": 4.999523745630519e-16,
+      "symmetry": 3.5781515708178997e-16,
+      "minimum_sample_detF": 1.0248338329237447,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "field": 3.0358140881846314e-15,
+      "force": 3.677298013017556e-15,
+      "tangent": 4.82632471316233e-16,
+      "symmetry": 3.186710154477661e-16,
+      "minimum_sample_detF": 1.0213075467354826,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "field": 3.366314917986442e-15,
+      "force": 1.8628170180451245e-15,
+      "tangent": 4.150642278958719e-16,
+      "symmetry": 3.605988036766863e-16,
+      "minimum_sample_detF": 1.0248956638323408,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "field": 5.721118104543993e-15,
+      "force": 2.544187589612146e-15,
+      "tangent": 4.836381302583149e-16,
+      "symmetry": 3.5514927467067537e-16,
+      "minimum_sample_detF": 0.9926875136872276,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "field": 6.054320253584396e-15,
+      "force": 1.574799271424565e-15,
+      "tangent": 4.586925847789689e-16,
+      "symmetry": 3.292248339585179e-16,
+      "minimum_sample_detF": 0.995905005877151,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "field": 6.1143551454141144e-15,
+      "force": 1.5204421914430496e-15,
+      "tangent": 5.235875284463441e-16,
+      "symmetry": 3.1176873351207863e-16,
+      "minimum_sample_detF": 0.9927552151071064,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "field": 6.2944766857827254e-15,
+      "force": 2.584261884824389e-15,
+      "tangent": 5.143828009284568e-16,
+      "symmetry": 4.143033653110586e-16,
+      "minimum_sample_detF": 0.9959767431858454,
+      "checks": {
+        "field": true,
+        "force": true,
+        "tangent": true,
+        "symmetry": true,
+        "orientation": true
+      }
+    }
+  ],
+  "stop_reason": null,
+  "seconds": 58.09399999998277,
+  "peak_bytes": 64843776,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

@@ -1,0 +1,6 @@
+{
+  "status": "serialization_failed",
+  "reason": "NumPy boolean was not converted to a JSON boolean",
+  "source_sha256": "3bcd5142f83f69f759a747e57994d6fe9aa862d435ee05d2f05564b587ef7b83",
+  "numerical_criteria_status": "not_recorded"
+}

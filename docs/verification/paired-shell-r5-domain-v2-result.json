@@ -1,0 +1,442 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "n": 1,
+      "h": 0.01,
+      "ns": 114,
+      "observation": {
+        "error": [
+          2.1584603774282437e-06,
+          6.603258589639952e-05,
+          0.00012273675760706367
+        ],
+        "position": [
+          5.2716013538625936e-08,
+          1.520298175982521e-06,
+          1.996982675845985e-06
+        ],
+        "stationarity": [
+          3.262217329518638e-17,
+          3.1260020746423847e-16,
+          6.462431390222248e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          7.62640535222633e-05,
+          7.62640535222633e-05,
+          7.626405352226331e-05
+        ],
+        "position": [
+          0.0009885156512809928,
+          0.0009885156512809928,
+          0.0009885156512809928
+        ],
+        "stationarity": [
+          5.814331057834295e-16,
+          5.814331057834295e-16,
+          5.814325594099801e-16
+        ]
+      },
+      "physical_vs_weak": 3.5280948310554165e-13,
+      "work_error": 5.816206959722642e-09,
+      "loads": {
+        "resultant": [
+          3.135014521575975e-22,
+          1.9815277009830289e-19,
+          6.67435492656787e-19
+        ],
+        "exact_external_work": 1.4885875544444301e-06
+      },
+      "stiffness_ranks": [
+        342,
+        342,
+        342
+      ],
+      "mass_root_ranks": [
+        114,
+        114,
+        114
+      ],
+      "rcond": 9.872525443244507e-05,
+      "mass_min": 7.688325146635346e-07,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": true,
+        "independent_physical_solution": true,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.7999999999999977,
+        0.3666666666666667,
+        0.4366666666666664
+      ],
+      "cold_quality_seconds": 8.109000000054948,
+      "artifact": "build/analysis/paired-shell-r5-domain-v2-20261105-123943/n1-h0.01.npz",
+      "artifact_sha256": "42fc2fb99bd2aa5cb2c77716c95f5d0fc9f5c3a9df36eb1f8ed2a74a1cdb6e37",
+      "parent_artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.01.npz",
+      "parent_artifact_sha256": "cbc1f5e2e45b8e6935fab4262d702f3389ed7df2a82bc5bc993397fe29747fe1"
+    },
+    {
+      "n": 1,
+      "h": 0.0001,
+      "ns": 114,
+      "observation": {
+        "error": [
+          4.405288939532224e-08,
+          1.2445594192017935e-06,
+          1.8603239911721096e-06
+        ],
+        "position": [
+          3.5983524380579255e-08,
+          1.0301854532120625e-06,
+          1.244130285810742e-06
+        ],
+        "stationarity": [
+          2.950423847101712e-17,
+          2.5252022682241337e-16,
+          5.753855259664837e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          7.781351203603755e-07,
+          7.781351203603755e-07,
+          7.781351203603735e-07
+        ],
+        "position": [
+          8.46233499229436e-05,
+          8.46233499229436e-05,
+          8.46233499229436e-05
+        ],
+        "stationarity": [
+          1.3921496643602538e-14,
+          1.3921496643602538e-14,
+          1.3921496827447693e-14
+        ]
+      },
+      "physical_vs_weak": 6.4904738406897e-10,
+      "work_error": 4.3432432284023135e-13,
+      "loads": {
+        "resultant": [
+          1.4776817535168994e-18,
+          -7.897920488656308e-20,
+          3.1013471332717244e-18
+        ],
+        "exact_external_work": 1.4885750872609408e-08
+      },
+      "stiffness_ranks": [
+        342,
+        342,
+        342
+      ],
+      "mass_root_ranks": [
+        114,
+        114,
+        114
+      ],
+      "rcond": 3.0144298894866326e-07,
+      "mass_min": 3.1964982117450294e-07,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": true,
+        "independent_physical_solution": true,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.7999999999999977,
+        0.3666666666666667,
+        0.4366666666666664
+      ],
+      "cold_quality_seconds": 8.031000000075437,
+      "artifact": "build/analysis/paired-shell-r5-domain-v2-20261105-123943/n1-h0.0001.npz",
+      "artifact_sha256": "eeaac3d61ef8e0870a7598411ba44af8408be0ff3fa8cd46be4ee65df2c803c1",
+      "parent_artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.0001.npz",
+      "parent_artifact_sha256": "87a5dbb1d3b693f4b22e76a7479ce59f494e821a5dcd58fc5b625c75c4299c51"
+    },
+    {
+      "n": 2,
+      "h": 0.01,
+      "ns": 236,
+      "observation": {
+        "error": [
+          7.188917950059358e-08,
+          7.107601063593183e-07,
+          1.0222855475767124e-05
+        ],
+        "position": [
+          4.444555261369104e-10,
+          3.703037983611588e-09,
+          6.513887354678677e-08
+        ],
+        "stationarity": [
+          2.6772570705677006e-17,
+          2.425811560816886e-16,
+          4.851070537367113e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          1.5825043617951426e-05,
+          1.5825043617951426e-05,
+          1.5825043617951422e-05
+        ],
+        "position": [
+          5.6505563321544314e-05,
+          5.6505563321544314e-05,
+          5.6505563321544314e-05
+        ],
+        "stationarity": [
+          6.323634829114615e-16,
+          6.323634829114615e-16,
+          6.323634565853726e-16
+        ]
+      },
+      "physical_vs_weak": 1.2452510470105587e-12,
+      "work_error": 2.5043529961210406e-10,
+      "loads": {
+        "resultant": [
+          2.701687685883946e-19,
+          3.5893021139900977e-20,
+          1.5899073117759234e-18
+        ],
+        "exact_external_work": 1.4885875544444367e-06
+      },
+      "stiffness_ranks": [
+        708,
+        708,
+        708
+      ],
+      "mass_root_ranks": [
+        236,
+        236,
+        236
+      ],
+      "rcond": 4.5629424019597896e-05,
+      "mass_min": 3.705167642665349e-08,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": true,
+        "independent_physical_solution": true,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.800000000000001,
+        0.3666666666666667,
+        0.43666666666666665
+      ],
+      "cold_quality_seconds": 48.67099999997299,
+      "artifact": "build/analysis/paired-shell-r5-domain-v2-20261105-123943/n2-h0.01.npz",
+      "artifact_sha256": "2d7868a010acfa11212047d0236b5c3da80e4d7b3b7bf63e8b11577acddde131",
+      "parent_artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.01.npz",
+      "parent_artifact_sha256": "f7e12b9b128d2015c4ba84ed8fb2181d5c08c7b249b032270b27b50de7067e89"
+    },
+    {
+      "n": 2,
+      "h": 0.0001,
+      "ns": 236,
+      "observation": {
+        "error": [
+          8.12948640594586e-10,
+          7.85712173665411e-09,
+          1.1683644914887806e-07
+        ],
+        "position": [
+          3.6035005595512926e-10,
+          3.004760085656163e-09,
+          5.341116506448618e-08
+        ],
+        "stationarity": [
+          3.74879287178736e-17,
+          2.7594187375581697e-16,
+          6.078385408171042e-16
+        ]
+      },
+      "physical": {
+        "error": [
+          1.601476364316399e-07,
+          1.601476364316399e-07,
+          1.6014763643163988e-07
+        ],
+        "position": [
+          1.4253455449706585e-05,
+          1.4253455449706585e-05,
+          1.4253455449706585e-05
+        ],
+        "stationarity": [
+          2.6908608495420865e-14,
+          2.6908608495420865e-14,
+          2.6908608506021413e-14
+        ]
+      },
+      "physical_vs_weak": 2.095004390264202e-09,
+      "work_error": 2.427237259679637e-13,
+      "loads": {
+        "resultant": [
+          -1.6330475724551312e-18,
+          1.780754422704158e-20,
+          -1.3502900455218687e-18
+        ],
+        "exact_external_work": 1.4885750872613537e-08
+      },
+      "stiffness_ranks": [
+        708,
+        708,
+        708
+      ],
+      "mass_root_ranks": [
+        236,
+        236,
+        236
+      ],
+      "rcond": 2.1166584322568954e-07,
+      "mass_min": 2.5204100393151326e-08,
+      "checks": {
+        "original_stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "resource": true,
+        "physical_energy": true,
+        "physical_position": true,
+        "physical_stationarity": true,
+        "independent_physical_solution": true,
+        "work": true,
+        "force_balance": true
+      },
+      "footprint_moments": [
+        0.800000000000001,
+        0.3666666666666667,
+        0.43666666666666665
+      ],
+      "cold_quality_seconds": 48.98300000000745,
+      "artifact": "build/analysis/paired-shell-r5-domain-v2-20261105-123943/n2-h0.0001.npz",
+      "artifact_sha256": "15e9d4f9de53f74e2387a51d1149895f622aae0cfe64272d78a2b1a359b68591",
+      "parent_artifact": "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.0001.npz",
+      "parent_artifact_sha256": "0e84d019459cc5a5e1c10731c747970ea738ae12ad8f0e37b8d3a611ae1fe282"
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "thin_amplification",
+      "n": 1,
+      "quantity": "error",
+      "values": [
+        0.020409403784289175,
+        0.01884765532512114,
+        0.015157024085057346
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "n": 1,
+      "quantity": "position",
+      "values": [
+        0.6825919102212368,
+        0.6776206598723872,
+        0.6230050469935545
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        0.011308358869054468,
+        0.011054533964912787,
+        0.011428944625680589
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.8107674103800585,
+        0.8114310733387639,
+        0.8199583774828862
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        7.188917950059358e-08,
+        7.107601063593183e-07,
+        1.0222855475767124e-05
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        4.444555261369104e-10,
+        3.703037983611588e-09,
+        6.513887354678677e-08
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        8.12948640594586e-10,
+        7.85712173665411e-09,
+        1.1683644914887806e-07
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        3.6035005595512926e-10,
+        3.004760085656163e-09,
+        5.341116506448618e-08
+      ],
+      "passed": true
+    }
+  ],
+  "seconds": 45.85999999998603,
+  "correction": "s=1 face split at actual native t knots; unchanged N, space, material, roots, and thresholds",
+  "sources": {
+    "tools/design-experiments/check_paired_shell_r5_domain_v2.py": "72515139d06ece3ac5b7c00c84125b3613a6d31b77f48a1131b934f3840eade4",
+    "tools/design-experiments/check_paired_shell_r5_domain.py": "8c2fc314073636ea02d280877cb3e47477a8b4934415e916e668b29392c13b51",
+    "docs/verification/paired-shell-r5-domain-result.json": "49169952a2ca2b22bd9adf941704a110814cc1408b30b6043d1af65b6e65f555",
+    "tools/design-experiments/swept_taper_domain.py": "c4047af9fa078f448bdead110d5da511927170ba6954cd588f0c2c381d5ef97f",
+    "tools/design-experiments/mass_paired_ancf.py": "45e85b54665ad1555aa85e4a24c9901d824427748205f66e49102a046257e62b",
+    "tools/design-experiments/check_mass_paired_body.py": "008432b408d049b23752df8000d02b5c3d688637118b58222caeb8557cfd4071",
+    "tools/design-experiments/exact_paired_finite.py": "2d92c260516962da34fd84d0590ed3559549ccbbc46fa2fc22e50b7228d43720",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.01.npz": "cbc1f5e2e45b8e6935fab4262d702f3389ed7df2a82bc5bc993397fe29747fe1",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.0001.npz": "87a5dbb1d3b693f4b22e76a7479ce59f494e821a5dcd58fc5b625c75c4299c51",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.01.npz": "f7e12b9b128d2015c4ba84ed8fb2181d5c08c7b249b032270b27b50de7067e89",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.0001.npz": "0e84d019459cc5a5e1c10731c747970ea738ae12ad8f0e37b8d3a611ae1fe282"
+  }
+}

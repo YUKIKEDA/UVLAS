@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "tools/design-experiments/hybrid_gradient_ancf.py": "86a7696aeb78c09f5e86d9077df8ecadd1896d79015dbabf34f7ed38c15c9d4b",
+    "tools/design-experiments/check_hybrid_gradient_local.py": "31ab5a7d93b86bbd5a18a5f5fd82f8ccc08107b063be82d93eb5e71efac98995",
+    "tools/design-experiments/audit_hybrid_gradient_local.py": "644b58922a6b83064c042ef4da3cbdb5da0bfd39ffda7d909e84d40c12417988",
+    "tools/design-experiments/qem_el2_q4.py": "4e9f6a0ee21f98354dc4cae32a33358a4a2ca49ae223e68629290b05e22ec780",
+    "docs/hybrid-gradient-ancf-formulation.md": "f63a2c5e559b91d12e2dcf1c69458afa0730df6b0e7f5e3bf72a67b85bef9c44",
+    "docs/verification/hybrid-gradient-ancf-protocol.md": "18a894ddb33c0e228fa7f66c9e4f49615a2172de625b0b724a611726f4dcdecc"
+  }
+}

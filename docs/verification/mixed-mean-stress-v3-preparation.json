@@ -1,0 +1,14 @@
+{
+  "reason": "Same exact column space: replace repeated Fraction reduction by primitive integer fraction-free forward elimination. Gates and mathematical spaces unchanged.",
+  "sources": {
+    "tools/design-experiments/mixed_mean_stress_space_v3.py": "008f6b48c30a4f2f5750125533bf40d9525edd88bfa5d7c3d50bb11b4df79d12",
+    "tools/design-experiments/mixed_mean_stress_thin_v3.py": "52af99cd8137117629e3c5567652b3d321bed46ed2bffe1e70cd967562782c90",
+    "tools/design-experiments/check_mixed_mean_stress_thin_v3.py": "fe5b1cc8b65dc30da83605d6c9520f1e3d27d113c97d178e82e64c89775d0ca4",
+    "tools/design-experiments/mixed_mean_stress_space_v2.py": "bd635f2169deebe80dfa89d9a0b12038f360f6c49e7e9cc0a4f819971a688e75",
+    "tools/design-experiments/mixed_mean_stress_thin_v2.py": "21eaf08300666a5df6ea0e20b0bb6852b11600a8bb72e9193a4c262bbb137024",
+    "tools/design-experiments/check_mixed_mean_stress_thin_v2.py": "2b4aa0260a507ef65cda4343995ec925fbd7a22a836615b4e3037076784366be",
+    "docs/verification/mixed-mean-stress-v2-interrupted.json": "d7453fb09da26762d3a26c2e451e47617c5073842ad74ff10373ddad48a8c0d9",
+    "build/analysis/mixed-mean-stress-20261104-153634/checkpoint.json": "253d97eaa2c15ae7a8d312b0404334591286209b3e728d25bcf1e6d6ff858f0f",
+    "docs/verification/mixed-mean-stress-protocol.md": "1efb045fc1e82946fe630e12d24c239826f2b18ae13142e84e81a2fa46219b7f"
+  }
+}

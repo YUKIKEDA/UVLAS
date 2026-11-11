@@ -1,0 +1,51 @@
+{
+  "records": [
+    {
+      "n": 2,
+      "q0_ranks": [
+        5,
+        5,
+        5
+      ],
+      "q01_dimensions": 35,
+      "known_fields": [
+        "cylindrical quadratic",
+        "cylindrical cubic",
+        "y-dependent twisting"
+      ],
+      "span_difference": 1.414213562373095,
+      "all_three_positions_and_y_dependence_retained_before_rank": true,
+      "checks": {
+        "q0_dimension": false,
+        "span": false
+      }
+    },
+    {
+      "n": 4,
+      "q0_ranks": [
+        5,
+        5,
+        5
+      ],
+      "q01_dimensions": 65,
+      "known_fields": [
+        "cylindrical quadratic",
+        "cylindrical cubic",
+        "y-dependent twisting"
+      ],
+      "span_difference": 1.4142135623730954,
+      "all_three_positions_and_y_dependence_retained_before_rank": true,
+      "checks": {
+        "q0_dimension": false,
+        "span": false
+      }
+    }
+  ],
+  "geometry_conditional": true,
+  "all_checks_pass": false,
+  "sources": {
+    "tools/design-experiments/check_reference_work_thin_q0_space.py": "ae6d8fb1f89852ad0b6d5ea442899770c16df6c69910f4aec7c72a9bc008568b",
+    "tools/design-experiments/check_reference_work_thin_global_v4.py": "fc13ce2ebeb22fb23bcdf60b865226162bf0d9fe7a81720caf688d0de307fbb3",
+    "docs/verification/reference-work-thin-global-v4-result.json": "b037674b6140b3eef4906b06df1e989ef3e960215788bf70a4dc1885610fe1f9"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "scope": "flat n2 finite-thickness projection and independent uncondensed preconditioned reference; not physical PDE",
+  "initial_package_completed": true,
+  "recovery_configurations": 3,
+  "condensed_conditions": 2,
+  "uncondensed_preconditioned_conditions": 2,
+  "unpreconditioned_full_v1_passed": false,
+  "raw_basis_condition_failure_resolved": false,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "thin_accuracy_gate_evaluated": false,
+  "overall_completion_percentage": null,
+  "overall_percentage_reason": "Remaining adoption risks and work estimates are unresolved; test counts do not measure total work.",
+  "next": "Regular/distorted curved n2 x two thicknesses, then conditional n4 refinement; physical load adjoint and PDE remain.",
+  "sources": {
+    "docs/verification/moment-position-recovery-action-result.json": "567e82cf3cc985a296f5dbabade170aee53f3050a22f588a74a1cd13a875ba2b",
+    "docs/verification/mixed-mean-stress-finite-pair-result.json": "0a57646aa1cdc065c879bc9c7098f64c10e15278cbd8bbf0af34ee61d187571d",
+    "docs/verification/mixed-mean-stress-finite-full-v2-result.json": "e21bfe74ca14e9950516d3e1e8a4ca49da61132fd2c6fc359667d7638c4f40f1",
+    "docs/verification/mixed-mean-stress-finite-full-result.json": "7a4b6fc3a4cc7b566763860ffa7daeb8094c87cf85988358a0a6f122efc276c6",
+    "docs/verification/mixed-mean-stress-finite-pair-results.md": "96b3bb7b28550adf0add61af06e3fd0ae1b5b68e2ac689def1e171803b4ad367",
+    "docs/verification/mixed-mean-stress-finite-full-v2-protocol.md": "f0bf795078fc67b0072ea46b8c234f07fa8e9559d28a04e0eebfb42bd1effe12",
+    "docs/verification/mixed-mean-stress-finite-full-v2-preparation.json": "f6c09c6205da48ee55f7d1689248b116c7d038504c7f130640ab3316c2c07223",
+    "docs/verification/mixed-mean-stress-finite-pair-preparation.json": "aabe67b5ddc2bfa0dbff0a08054850649a72fe5d3f5d7ea55e6bc5409c40537e",
+    "docs/verification/mixed-mean-stress-finite-pair-protocol.md": "244942e80e260a59695a7c8d7b945e323ec2cee4f46e22744a8f7b6ba05967de",
+    "docs/mixed-mean-stress-finite-formulation.md": "a2e2cadd0d01243128b875bbece384b88c82a3a6955d6aa1beac0057ad70532d",
+    "docs/main-shell-completion-outlook-v9.md": "66b9cee8beef07f42a0e193ebc26831aa7373bb91f8771bd6f88f48a3b809868"
+  }
+}

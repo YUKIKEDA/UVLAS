@@ -1,0 +1,51 @@
+{
+  "audit_passed": true,
+  "solver_candidate_adopted": false,
+  "numerical_experiment_all_passed": false,
+  "independent_n2_all_passed": true,
+  "checked_source_files": 118,
+  "checked_artifacts": 65,
+  "checked_document_links": 423,
+  "recomputed_field_differences": [
+    [
+      3.0586974081091455e-10,
+      7.945231464998796e-11,
+      7.530445634538754e-10
+    ],
+    [
+      5.092895199744452e-10,
+      6.062529913746292e-10,
+      1.0132654207366445e-09
+    ]
+  ],
+  "recomputed_finest_thin_amplifications": [
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": "quintic",
+      "thin_amplification": 34.557929206822465
+    },
+    {
+      "amplitude": 0.0,
+      "field": "error",
+      "target": "exponential",
+      "thin_amplification": 29.953307410834203
+    },
+    {
+      "amplitude": 0.0,
+      "field": "recovered_position_error",
+      "target": "quintic",
+      "thin_amplification": 38.990365420149764
+    },
+    {
+      "amplitude": 0.0,
+      "field": "recovered_position_error",
+      "target": "exponential",
+      "thin_amplification": 26.996650726311714
+    }
+  ],
+  "sources": {
+    "docs/verification/mixed-mean-stress-finite-curved-disposition.json": "333c42f09e293c12359019d2f50b735bd4600bf3cbd0fadb86c43622854056d7",
+    "tools/design-experiments/audit_mixed_mean_stress_finite_curved.py": "13247973ac6a370c941a530ea52d36fa5ff3baccf25fd7e1ecad7ced414d3deb"
+  }
+}

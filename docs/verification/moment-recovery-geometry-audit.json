@@ -1,0 +1,48 @@
+{
+  "records": [
+    {
+      "cell": 0,
+      "reference_gradient": 1.3455187197886607e-14,
+      "surface_normal_differential": 1.4913976992643458e-13,
+      "panel_normal_differential": 3.0709094935142155e-14,
+      "reversed_connectivity": 0.0
+    },
+    {
+      "cell": 1,
+      "reference_gradient": 3.6402644419933744e-14,
+      "surface_normal_differential": 6.719191059679569e-13,
+      "panel_normal_differential": 4.085805576735074e-14,
+      "reversed_connectivity": 0.0
+    },
+    {
+      "cell": 2,
+      "reference_gradient": 1.82998110189265e-14,
+      "surface_normal_differential": 1.5891558206421476e-13,
+      "panel_normal_differential": 3.490579716733589e-14,
+      "reversed_connectivity": 0.0
+    },
+    {
+      "cell": 3,
+      "reference_gradient": 3.7505524846071825e-14,
+      "surface_normal_differential": 2.0323427973623082e-12,
+      "panel_normal_differential": 5.029304356359437e-14,
+      "reversed_connectivity": 0.0
+    }
+  ],
+  "degenerate_rejected": true,
+  "native_map_injective": true,
+  "native_singular_bounds": [
+    0.9999999999999974,
+    1.4142135623730965
+  ],
+  "internal_neighbor_leakage": 0.0,
+  "passed": true,
+  "physical_adoption": false,
+  "seconds": 11.922000000020489,
+  "sources": {
+    "tools/design-experiments/audit_moment_recovery_geometry.py": "f42694ed858ccd590cef2a4c385b4259916d00c465b3498ee68a2a78628c2b74",
+    "tools/design-experiments/moment_position_recovery.py": "b9e6912fb85889b9439fbd4a8517fe484ad237c57b92270c5a0d113b7572d734",
+    "tools/design-experiments/moment_recovery_normals.py": "9e5708145b1c4ec5617c8b84fb27149d83405e685bb1a1aceff19baa38bb2520",
+    "docs/verification/moment-position-recovery-result.json": "e462c876ac1416dda1648dcb1fad92b20a911581bb2284ee76ece1be45da5050"
+  }
+}

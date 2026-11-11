@@ -1,0 +1,386 @@
+{
+  "source_sha256": "1f3f4095405c96837503e87f55cb8e5bc2601c79ffae6dfd0a2e1aaaf965ab15",
+  "parent_sha256": "b79b98c1b416fc46231568649a5d69a543f9381c087b884cdf0d1d19b1d8f507",
+  "protocol_sha256": "ae62fc8887dbe04d27427bfb0f44ac5fd4ef07aa478a60a107a50ad2e975e740",
+  "dependency_sha256": "934f31ce0db31d5310b535185fbd41eb09f00d27ae4d5a170de2ff30ef9f0ddf",
+  "cases": [
+    {
+      "geometry": "SADDLE",
+      "n": 2,
+      "h": 0.1,
+      "maximum": {
+        "residual": 3.65991318539e-17,
+        "h1": 3.4902859778452337e-16,
+        "kkt": 4.157304000557382e-15,
+        "constraint": 4.440892098500626e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "n": 2,
+      "h": 0.01,
+      "maximum": {
+        "residual": 3.3689250926291616e-17,
+        "h1": 1.5555934531496029e-16,
+        "kkt": 5.604230101359405e-15,
+        "constraint": 2.220446049250313e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "n": 2,
+      "h": 0.001,
+      "maximum": {
+        "residual": 3.250534450041176e-17,
+        "h1": 1.5555934531496036e-16,
+        "kkt": 3.2388524599490898e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "n": 4,
+      "h": 0.1,
+      "maximum": {
+        "residual": 4.016977379220283e-17,
+        "h1": 3.4590891373810534e-16,
+        "kkt": 2.1605596608212675e-15,
+        "constraint": 4.440892098500626e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "n": 4,
+      "h": 0.01,
+      "maximum": {
+        "residual": 3.961695886725623e-17,
+        "h1": 1.4199137952169508e-16,
+        "kkt": 4.231157924083632e-15,
+        "constraint": 4.440892098500626e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "n": 4,
+      "h": 0.001,
+      "maximum": {
+        "residual": 4.74753390440084e-17,
+        "h1": 0.0,
+        "kkt": 3.556961299456408e-15,
+        "constraint": 6.661338147750939e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 2,
+      "h": 0.1,
+      "maximum": {
+        "residual": 4.46068871651803e-17,
+        "h1": 1.7349333510219471e-16,
+        "kkt": 3.974997118769489e-15,
+        "constraint": 6.661338147750939e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 2,
+      "h": 0.01,
+      "maximum": {
+        "residual": 2.4846019195791656e-17,
+        "h1": 6.187680451403243e-16,
+        "kkt": 3.0600360342047026e-15,
+        "constraint": 2.220446049250313e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 2,
+      "h": 0.001,
+      "maximum": {
+        "residual": 2.649665232003845e-17,
+        "h1": 1.7349333510219474e-16,
+        "kkt": 3.7946421863450055e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 4,
+      "h": 0.1,
+      "maximum": {
+        "residual": 2.118409842332388e-17,
+        "h1": 1.7188292940154365e-16,
+        "kkt": 2.3598859848970313e-15,
+        "constraint": 2.220446049250313e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 4,
+      "h": 0.01,
+      "maximum": {
+        "residual": 6.213056445502913e-17,
+        "h1": 1.4083997397994126e-16,
+        "kkt": 5.09718099599581e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 4,
+      "h": 0.001,
+      "maximum": {
+        "residual": 4.845757140890222e-17,
+        "h1": 1.4083997397994124e-16,
+        "kkt": 2.951934956776763e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "SADDLE",
+      "n": 8,
+      "h": 0.001,
+      "maximum": {
+        "residual": 4.117621729012286e-17,
+        "h1": 1.4152204301518515e-16,
+        "kkt": 9.368978582658944e-15,
+        "constraint": 4.440892098500626e-16
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "NORMAL-C",
+      "n": 8,
+      "h": 0.001,
+      "maximum": {
+        "residual": 1.517114121923728e-17,
+        "h1": 3.435583100992776e-16,
+        "kkt": 6.359983120817891e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "n": 2,
+      "h": 0.01,
+      "maximum": {
+        "residual": 4.405228924953668e-17,
+        "h1": 1.7551021129803535e-16,
+        "kkt": 7.769161356423337e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "n": 2,
+      "h": 0.001,
+      "maximum": {
+        "residual": 5.4692669720675066e-17,
+        "h1": 1.3343172850498995e-16,
+        "kkt": 8.189218116998482e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "n": 4,
+      "h": 0.01,
+      "maximum": {
+        "residual": 7.443259259735278e-17,
+        "h1": 1.4196927224471569e-16,
+        "kkt": 4.0115762800853456e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "n": 4,
+      "h": 0.001,
+      "maximum": {
+        "residual": 2.990471392751529e-17,
+        "h1": 1.4196927221580253e-16,
+        "kkt": 2.1226913154993647e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.01,
+      "maximum": {
+        "residual": 3.3892788127277797e-17,
+        "h1": 1.2864480314002344e-16,
+        "kkt": 8.747312171645889e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "n": 2,
+      "h": 0.001,
+      "maximum": {
+        "residual": 3.2466103895268384e-17,
+        "h1": 1.6802269179484683e-16,
+        "kkt": 8.853214538714064e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.01,
+      "maximum": {
+        "residual": 6.418306115441065e-17,
+        "h1": 1.6757492930760806e-16,
+        "kkt": 3.253367341419636e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "n": 4,
+      "h": 0.001,
+      "maximum": {
+        "residual": 5.874546407550457e-17,
+        "h1": 1.339546899311574e-16,
+        "kkt": 3.1709237748616957e-15,
+        "constraint": 0.0
+      },
+      "checks": {
+        "residual": true,
+        "h1": true,
+        "kkt": true,
+        "constraint": true
+      }
+    }
+  ],
+  "seconds": 0.28100000001722947,
+  "all_criteria_pass": true,
+  "coarse_observation_accepted": false,
+  "product_shell_adopted": false
+}

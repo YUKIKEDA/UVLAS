@@ -1,0 +1,117 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "factor_comparison_complete_current_MQ3_not_adopted",
+  "v1": {
+    "stopped": true,
+    "records": 9,
+    "passed": 8,
+    "failed": "quadratic_reproduction",
+    "threshold": 1e-08
+  },
+  "v2": {
+    "conditions": 20,
+    "unique_maps": 52,
+    "all_primary_checks": true,
+    "all_alternate_evaluation_checks": true,
+    "maximum_anchor_projector_change": 4.559226767410718e-09,
+    "maximum_quadratic_error": 3.2405569499766502e-15
+  },
+  "effects": [
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 1,
+      "error_physical_work": 0.5944911331920547,
+      "error_physical_no_work": 0.5944911331920547,
+      "error_covariant_work": 0.594496929760757,
+      "error_covariant_no_work": 0.1510960937548201,
+      "work_removal_effect_at_physical": 0.0,
+      "metric_change_effect_with_work": 5.796568702254312e-06,
+      "interaction": -0.4434008360059368,
+      "combined_relative_reduction": 0.7458396175843258
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "error_physical_work": 0.3299799645604337,
+      "error_physical_no_work": 0.32997996456038237,
+      "error_covariant_work": 0.32998292727154477,
+      "error_covariant_no_work": 0.03722665666722867,
+      "work_removal_effect_at_physical": -5.134781488891349e-14,
+      "metric_change_effect_with_work": 2.9627111110541726e-06,
+      "interaction": -0.29275627060426473,
+      "combined_relative_reduction": 0.8871851001110982
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 1,
+      "error_physical_work": 0.5944911331920547,
+      "error_physical_no_work": 0.5944911331920547,
+      "error_covariant_work": 0.594496929760757,
+      "error_covariant_no_work": 0.1510960937548201,
+      "work_removal_effect_at_physical": 0.0,
+      "metric_change_effect_with_work": 5.796568702254312e-06,
+      "interaction": -0.4434008360059368,
+      "combined_relative_reduction": 0.7458396175843258
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "error_physical_work": 0.5963329459652817,
+      "error_physical_no_work": 0.5963329459652811,
+      "error_covariant_work": 0.5963330679529363,
+      "error_covariant_no_work": 0.596333067952935,
+      "work_removal_effect_at_physical": -6.661338147750939e-16,
+      "metric_change_effect_with_work": 1.219876545333065e-07,
+      "interaction": -6.661338147750939e-16,
+      "combined_relative_reduction": -2.0456299459285777e-07
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "error_physical_work": 0.0008206389175604892,
+      "error_physical_no_work": 0.0008002093989074459,
+      "error_covariant_work": 9.53194666795918e-06,
+      "error_covariant_no_work": 0.00019645851749275852,
+      "work_removal_effect_at_physical": -2.042951865304334e-05,
+      "metric_change_effect_with_work": -0.00081110697089253,
+      "interaction": 0.00020735608947784268,
+      "combined_relative_reduction": 0.7606029725268573
+    }
+  ],
+  "physical_adoption": false,
+  "work_preservation_requirement_maintained": true,
+  "finite_thickness_accuracy_evaluated": false,
+  "finite_thickness_lower_bound": false,
+  "next": "docs/mq3-necessary-constraint-diagnostic.md",
+  "next_executed": false,
+  "verification": {
+    "mq3-factor-preparation_hashes": 6,
+    "mq3-factor-result_hashes": 9,
+    "mq3-factor-audit_hashes": 5,
+    "mq3-factor-v2-preparation_hashes": 8,
+    "mq3-factor-v2-result_hashes": 10,
+    "mq3-factor-v2-audit_hashes": 5,
+    "mq3-factor-result_artifacts": 31,
+    "mq3-factor-v2-result_artifacts": 72,
+    "python_syntax": 6,
+    "local_markdown_links": 384
+  },
+  "documents": {
+    "README.md": "77a2602e2bf70795d7642d2fa9cba068397d54f5a4c94c5e7d47814f30fd8ed5",
+    "docs/roadmap.md": "144f422a23a81642a4adf224a139a8d66b666eebf9ea20adbd7af479f00bba19",
+    "docs/preimplementation-plan.md": "9917de69aebb7775073cdd82de41dc63a5b9581bff587a3bc0a0ffb2f4b94edb",
+    "docs/structural-model-adoption-review.md": "f9aac9dc0e5fc7b0d26651b2c3ded4e39d1f3610a914a1bea67a9ef494888275",
+    "docs/requirements-evidence-map.md": "5fdd99dfa2d64ad904c37d073275c61f24b401307782b4e66078580e0fd4e0e7",
+    "docs/design-decisions.md": "fed8c9b6ed369c677da7fcafae9f19d6203c69748cdcebe06a1cec2c6e69cc80",
+    "docs/verification/mq3-factor-results.md": "703795c605b04aaa41e3b1c8ed4879e73f20b879bca08c4fc2bcb015573567ae",
+    "docs/mq3-necessary-constraint-diagnostic.md": "905b2ff5eece914a1f69b91b0dc1bc1f940a09f02366dfc07e0ed5b9f66841fb",
+    "docs/verification/mq3-factor-v2-kernel-protocol.md": "582f390fb4ed8f3855721a82fa55e4f0a405c85a78adc5aa55d7b45508012314",
+    "docs/verification/mq3-factor-audit-protocol.md": "61b203e4ed66974f3a5ff29087bf5367266720ccf90c92649fcb36456fbfe701"
+  }
+}

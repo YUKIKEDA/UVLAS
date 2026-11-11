@@ -1,0 +1,365 @@
+{
+  "records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "coordinate_count": 558,
+      "coefficient_identity": 1.3993024615902008e-15,
+      "independent_identity": 1.5549722925843908e-15,
+      "J_ranks": [
+        80,
+        80,
+        80
+      ],
+      "TB_ranks": [
+        50,
+        50,
+        50
+      ],
+      "leading_kernel": {
+        "ranks": [
+          150,
+          150,
+          150
+        ],
+        "columns": 186,
+        "nullity": 36,
+        "residual": 3.5274524879842648e-16,
+        "smallest_nonzero": 0.9960206950865083
+      },
+      "polynomial_span_difference": 1.8308764322232194e-14,
+      "rigid_constraint": 2.306294020059703e-18,
+      "rigid_bending": 1.3204544950605225e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "coordinate_count": 558,
+      "coefficient_identity": 1.3598924026108135e-15,
+      "independent_identity": 1.6773941282474296e-15,
+      "J_ranks": [
+        80,
+        80,
+        80
+      ],
+      "TB_ranks": [
+        50,
+        50,
+        50
+      ],
+      "leading_kernel": {
+        "ranks": [
+          150,
+          150,
+          150
+        ],
+        "columns": 186,
+        "nullity": 36,
+        "residual": 3.5274524879842648e-16,
+        "smallest_nonzero": 0.9960206950865083
+      },
+      "polynomial_span_difference": 1.8308764322232194e-14,
+      "rigid_constraint": 2.306294020059703e-18,
+      "rigid_bending": 1.3204544950605225e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "coordinate_count": 558,
+      "coefficient_identity": 1.5357779544927585e-15,
+      "independent_identity": 1.5281419791691712e-15,
+      "J_ranks": [
+        80,
+        80,
+        80
+      ],
+      "TB_ranks": [
+        50,
+        50,
+        50
+      ],
+      "leading_kernel": {
+        "ranks": [
+          150,
+          150,
+          150
+        ],
+        "columns": 186,
+        "nullity": 36,
+        "residual": 3.5274524879842648e-16,
+        "smallest_nonzero": 0.9960206950865083
+      },
+      "polynomial_span_difference": 1.8308764322232194e-14,
+      "rigid_constraint": 2.306294020059703e-18,
+      "rigid_bending": 1.3204544950605225e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "coordinate_count": 558,
+      "coefficient_identity": 1.5903047891542231e-15,
+      "independent_identity": 1.761334880400053e-15,
+      "J_ranks": [
+        80,
+        80,
+        80
+      ],
+      "TB_ranks": [
+        50,
+        50,
+        50
+      ],
+      "leading_kernel": {
+        "ranks": [
+          150,
+          150,
+          150
+        ],
+        "columns": 186,
+        "nullity": 36,
+        "residual": 3.5274524879842648e-16,
+        "smallest_nonzero": 0.9960206950865083
+      },
+      "polynomial_span_difference": 1.8308764322232194e-14,
+      "rigid_constraint": 2.3702923830653687e-18,
+      "rigid_bending": 1.6345470113576634e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "coordinate_count": 558,
+      "coefficient_identity": 1.741648347050076e-15,
+      "independent_identity": 1.7437608097730808e-15,
+      "J_ranks": [
+        80,
+        80,
+        80
+      ],
+      "TB_ranks": [
+        50,
+        50,
+        50
+      ],
+      "leading_kernel": {
+        "ranks": [
+          150,
+          150,
+          150
+        ],
+        "columns": 186,
+        "nullity": 36,
+        "residual": 3.5274524879842648e-16,
+        "smallest_nonzero": 0.9960206950865083
+      },
+      "polynomial_span_difference": 1.8308764322232194e-14,
+      "rigid_constraint": 2.3702923830653687e-18,
+      "rigid_bending": 1.6345470113576634e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "coordinate_count": 558,
+      "coefficient_identity": 1.6813887162823113e-15,
+      "independent_identity": 1.8752761695542177e-15,
+      "J_ranks": [
+        80,
+        80,
+        80
+      ],
+      "TB_ranks": [
+        50,
+        50,
+        50
+      ],
+      "leading_kernel": {
+        "ranks": [
+          150,
+          150,
+          150
+        ],
+        "columns": 186,
+        "nullity": 36,
+        "residual": 3.5274524879842648e-16,
+        "smallest_nonzero": 0.9960206950865083
+      },
+      "polynomial_span_difference": 1.8308764322232194e-14,
+      "rigid_constraint": 2.3702923830653687e-18,
+      "rigid_bending": 1.6345470113576634e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "coordinate_count": 603,
+      "coefficient_identity": 1.3723987670764304e-15,
+      "independent_identity": 1.6880221931352915e-15,
+      "J_ranks": [
+        95,
+        95,
+        95
+      ],
+      "TB_ranks": [
+        56,
+        56,
+        56
+      ],
+      "leading_kernel": {
+        "ranks": [
+          165,
+          165,
+          165
+        ],
+        "columns": 201,
+        "nullity": 36,
+        "residual": 4.1502881680373655e-16,
+        "smallest_nonzero": 0.9960198947566354
+      },
+      "polynomial_span_difference": 1.7504242221567392e-14,
+      "rigid_constraint": 2.833151052404673e-18,
+      "rigid_bending": 2.030213882137197e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "coordinate_count": 603,
+      "coefficient_identity": 1.3617143776134238e-15,
+      "independent_identity": 1.6415558955432364e-15,
+      "J_ranks": [
+        95,
+        95,
+        95
+      ],
+      "TB_ranks": [
+        56,
+        56,
+        56
+      ],
+      "leading_kernel": {
+        "ranks": [
+          165,
+          165,
+          165
+        ],
+        "columns": 201,
+        "nullity": 36,
+        "residual": 4.1502881680373655e-16,
+        "smallest_nonzero": 0.9960198947566354
+      },
+      "polynomial_span_difference": 1.7504242221567392e-14,
+      "rigid_constraint": 2.833151052404673e-18,
+      "rigid_bending": 2.030213882137197e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "coordinate_count": 603,
+      "coefficient_identity": 1.4248456568726705e-15,
+      "independent_identity": 1.724051681644023e-15,
+      "J_ranks": [
+        95,
+        95,
+        95
+      ],
+      "TB_ranks": [
+        56,
+        56,
+        56
+      ],
+      "leading_kernel": {
+        "ranks": [
+          165,
+          165,
+          165
+        ],
+        "columns": 201,
+        "nullity": 36,
+        "residual": 4.1502881680373655e-16,
+        "smallest_nonzero": 0.9960198947566354
+      },
+      "polynomial_span_difference": 1.7504242221567392e-14,
+      "rigid_constraint": 2.833151052404673e-18,
+      "rigid_bending": 2.030213882137197e-18,
+      "checks": {
+        "coefficient_identity": true,
+        "independent_identity": true,
+        "stabilization_kernel": true,
+        "leading_kernel": true,
+        "rigid": true,
+        "resources": true
+      }
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "main_shell_adopted": false,
+  "sources": {
+    "tools/design-experiments/check_moment_enriched_thin_local.py": "daac9a69e1662106162a04e7963a930e2e4576d199084f67b6223c2bdb6ce750",
+    "tools/design-experiments/moment_enriched_thin.py": "2cba4e8b15acc9b00af75cf50e368d12affcf1c05d3a145fb713d8e3361b3683",
+    "docs/verification/moment-enriched-thin-protocol.md": "7d730a1dd32a21ded8133fd7610891297cb4f09955b273fdb402b2fd8ece17cf",
+    "docs/verification/moment-enriched-thin-preparation.json": "8708969042051478a2393144281f6a6c6080f48eea0fd360da0721f439fc6e51"
+  },
+  "seconds": 21.79700000002049
+}

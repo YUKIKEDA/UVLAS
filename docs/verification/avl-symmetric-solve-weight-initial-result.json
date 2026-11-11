@@ -1,0 +1,9 @@
+{
+  "reason": "Manufactured force point was moved in x only and violated point_on_support; no reference run or weight result was produced",
+  "sources": {
+    "build/analysis/avl_symmetric_observation_weights_initial.py": "25f49d3fe54e8881b0b5cad1baca61cac5c8b7d16309fc214204074ff992ce17",
+    "build/analysis/prepare_avl_symmetric_solve_weights_initial.py": "e8377c6c36a5aab24b874da2ac4fe82390aed2a54f1e8ebd8509cd4ce69d71b1"
+  },
+  "manufacturing_error": true,
+  "reference_unchanged": true
+}

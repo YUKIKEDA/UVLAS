@@ -1,0 +1,100 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "cell": 0,
+      "original_sha256": "71e58542eba9e1e2b7cf152b4962a0ee645815901d3405813aa45ad711a19d27",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0-n1-c0.npz",
+      "artifact_sha256": "368958e0ed69e2a51ca0674722049077240c8bec7b22967687a6ea42ce4c1526"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 0,
+      "original_sha256": "c35a0991dc21983b7c09edba07d76ed28b36057eedb6214de6c70970a80960b5",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0-n2-c0.npz",
+      "artifact_sha256": "9f81637c20a670a3a9a17ad1ca2fc417c4b174121ce634ea802dd9f61ac4b07c"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 1,
+      "original_sha256": "7f43cea4bc1dbb23e887cb2eda0056d428bdbd1a784401efdb03a2e811098976",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0-n2-c1.npz",
+      "artifact_sha256": "828746ae1dd5c378fd4203cfb619270aa8ccd90fa9946e9a439668f47ff6cc4e"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 2,
+      "original_sha256": "43b18bce49dd767637db7d36a90ffe4a420485b9e583557e19666bcfafe5a862",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0-n2-c2.npz",
+      "artifact_sha256": "0532d847e18540c38f9b34f77d9fdbb85095e22f66a4434fa1451f512dd3221b"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "cell": 3,
+      "original_sha256": "d43f24cb21dc195614ecdbb153f0e68ff0da8c8c10b22e06b5e074090e8bba66",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0-n2-c3.npz",
+      "artifact_sha256": "ccaadd130af38d34880a92b36df2eb759e8226d59d903231cae481f77e673d82"
+    },
+    {
+      "kappa": 0.4,
+      "n": 1,
+      "cell": 0,
+      "original_sha256": "07e4fc90078a5a7d9f5cd95dcfc161a15a36b87c06a9be1545d6f711ae43c9e6",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0.4-n1-c0.npz",
+      "artifact_sha256": "974ed3f3641458bdf9fc3c6707cf0ae1fcd53a03461f1e4975328454f2a7e411"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 0,
+      "original_sha256": "c8d35b877e0f301a8cd76d2116760ab7a6866e13d2abe1040224d4a1f36ee157",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0.4-n2-c0.npz",
+      "artifact_sha256": "fbc88277f474742d5541a9020c201f50ac091af015d3177e1b1c35f5bc1086b7"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 1,
+      "original_sha256": "8e36f1f18d06f3f8964e6892af703c4a22904fbe7769f549bd1caffaae14461f",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0.4-n2-c1.npz",
+      "artifact_sha256": "89f6e39c211b31f02ec2af0227ae652dd4fab8490188a3eebad32cd6a3b68bcd"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 2,
+      "original_sha256": "d5bc5159e0737d027fb1daad6e31045a6d14a855b5a103bcfe999a3eef4686c4",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0.4-n2-c2.npz",
+      "artifact_sha256": "cc4b9651aae57b217d2b2db9aeab2baca65500e50a025c5f8b0d06fa0c28626c"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "cell": 3,
+      "original_sha256": "671b684e512748176974288abf60d5194266dabcf1784c10ca0b6268c78032e4",
+      "artifact": "build/analysis/mq3-zero-first-export-20261103-103815/k0.4-n2-c3.npz",
+      "artifact_sha256": "d43671c5a3f126475028b88fde5bbd78fb4f10a334618ed292a288498e8d81d4"
+    }
+  ],
+  "all_checks_pass": true,
+  "displacement_shape": [
+    121,
+    6,
+    144
+  ],
+  "constant_shape": [
+    121,
+    6,
+    6
+  ],
+  "meaning": "11x11 observation witnesses, not interpolation tables for arbitrary points",
+  "sources": {
+    "tools/design-experiments/export_mq3_zero_first_maps.py": "f573d01b038798304ede6ea82baec0309cd3da703f682b2734d41c2be8d38f1e",
+    "docs/verification/mq3-zero-first-map-result.json": "282a0f896b5dce788f1f724da2c0fadd92fc0a612ad294166c1dcdd63e743958"
+  }
+}

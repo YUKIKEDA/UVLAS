@@ -1,0 +1,47 @@
+{
+  "R5_complete": true,
+  "main_shell_adopted": true,
+  "adopted_model": "reference-coefficient PG-ANCF",
+  "specification": "docs/main-shell-adopted-specification.md",
+  "decisions": [
+    "SH-D01",
+    "SH-D02",
+    "SH-D03",
+    "SH-D04",
+    "SH-D05",
+    "SH-D06",
+    "SH-D07",
+    "SH-D08"
+  ],
+  "scope": "main-shell numerical formulation and internal contracts; product acceptance remains required",
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "next_work": "1.2 material/layer/equivalent-input integration",
+  "metrics": {
+    "additional_quality_configurations": 4,
+    "additional_quality_rhs": 12,
+    "additional_physical_problems": 4,
+    "finest_quality_energy": 1.0222855475767124e-05,
+    "finest_quality_position": 6.513887354678677e-08,
+    "max_thin_amplification": 0.8199583774828862,
+    "max_physical_vs_weak": 2.095004390264202e-09,
+    "max_physical_stationarity": 2.6908608506021413e-14
+  },
+  "evidence": [
+    "docs/verification/paired-reference-r4-audit.json",
+    "docs/verification/paired-reference-r4-closure.json",
+    "docs/verification/paired-shell-r5-domain-v2-result.json"
+  ],
+  "required_downstream": {
+    "1.2": "material and equivalent input",
+    "1.3": "beam adoption",
+    "1.4": "connections supports and eccentric inertia",
+    "1.5": "loads damping recovery and structural integration",
+    "2": "UVLM adoption",
+    "3": "J1 time and stability",
+    "4": "sparse numerical dependencies precision and concrete types",
+    "5": "practical acceptance cases geometry error material validity and connected performance",
+    "6": "implementation start review"
+  },
+  "unchanged_product_requirements": "8b73b30e3022f8b36601acb96df1fe4d15b00bc585e498f8c9799344756809ad"
+}

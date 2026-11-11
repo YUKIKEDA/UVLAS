@@ -1,0 +1,35 @@
+{
+  "records": [
+    {
+      "space": "selected_203",
+      "rational_rank": 138,
+      "nullity": 6,
+      "exact_zero": true,
+      "independent": true,
+      "matches_modular_lower_bound": true,
+      "passed": true,
+      "witness": "build/analysis/gsp-flat-certificate-20261103-140953/selected-complete-rational-kernel.json",
+      "witness_sha256": "f8c116a2847f6c1d7c7d2d1e274dee2be7b609e60bda745743eff896a7766728"
+    },
+    {
+      "space": "negative_control_Q222",
+      "rational_rank": 126,
+      "nullity": 18,
+      "exact_zero": true,
+      "independent": true,
+      "matches_modular_lower_bound": true,
+      "passed": true,
+      "witness": "build/analysis/gsp-flat-certificate-20261103-140953/reduced-complete-rational-kernel.json",
+      "witness_sha256": "2acc325dd627913b4175649700cc49b956d617894dbaa5f319e60a2ecf65f595"
+    }
+  ],
+  "all_checks_pass": true,
+  "scope": "affine_positive_thickness_only",
+  "sources": {
+    "tools/design-experiments/audit_gsp_q3_flat_rank.py": "19809c95d0006cf30bb8d2172c8b1b5fcdd4ed8fdcc4ae0fc005c1a3f41c9548",
+    "docs/verification/gsp-q3-flat-rank-result.json": "0830bf715144fc8c2bfe5fc5b0e2f0f60e0a85f85adc111d9ee3e90d5a1020a5",
+    "docs/verification/gsp-q3-flat-rank-audit-protocol.md": "af76bd9d2fb312c79a1c55fa5beb5fc82b69ddaf6903381f58aa70b30a29ac21",
+    "docs/verification/gsp-q3-flat-rank-audit-preparation.json": "a4044438127697b9004df63654d6d2df00455569206563d625e6c1e727aa6ed7"
+  },
+  "seconds": 0.5310000000172295
+}

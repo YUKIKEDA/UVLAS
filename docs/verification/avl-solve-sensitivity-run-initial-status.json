@@ -1,0 +1,21 @@
+{
+  "protocol": "docs/verification/avl-solve-sensitivity-experiment.md",
+  "source_sha256": "85a105471b09a0e11370ba8526744474ebb6ee4300cd463f728d6182bc0292aa",
+  "preparation_sha256": "9b576126d534fb956f80065235e02adf8d81ad4fa536e66423f1abb8ce339fa5",
+  "parents": {
+    "original": {
+      "path": "docs/verification/avl-fixed-band-grid-runs.json",
+      "sha256": "9833795f2d4d46c642a9e0713b18d0f42e4eceaeb39f1e91024b7d6e87362ea7"
+    },
+    "aligned": {
+      "path": "docs/verification/avl-band-aligned-grid-runs.json",
+      "sha256": "021c73350678aa538ce19c216c602777a7dbf6debd2cedc07fe0728b3eadf409"
+    }
+  },
+  "executable_sha256": "a12b9e758853f094d322c3e7321ff327910ccce3fe7364a73c03a9056d6e836a",
+  "runs": [],
+  "completed": false,
+  "stop_reason": "FileNotFoundError(2, 'No such file or directory')",
+  "seconds": 0.03277201000000218,
+  "total_bytes": 0
+}

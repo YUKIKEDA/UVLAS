@@ -1,0 +1,2132 @@
+{
+  "protocol": "docs/verification/q9-curved-load-experiment.md",
+  "cases": [
+    {
+      "shape": "RECT",
+      "h": 0.1,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          0,
+          0,
+          0
+        ],
+        "coefficient_count": 1,
+        "exact_positive": true,
+        "lower": 0.012499999999999999,
+        "upper": 0.012500000000000002,
+        "lower_exact_fraction": "3602879701896397/288230376151711744",
+        "upper_exact_fraction": "3602879701896397/288230376151711744",
+        "volume": 0.1,
+        "centroid": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "physical_z_second_moment": 8.333333333333334e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 2.0933844396970578e-15,
+          "maximum": 4.2313974664473765e-15
+        },
+        "mass": {
+          "relative": 2.765870093488968e-15,
+          "maximum": 5.211237859084063e-15
+        },
+        "force": 1.37454930947415e-15
+      },
+      "sampled_det_min": 0.012499999999999994,
+      "sampled_jac_condition_max": 10.000000000000009,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 7.459310995817327e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "0f921281ac8119962e23593c572574a89c2afe0a5ee710aeedd222b487b362af",
+        "projected_residual": 9.8658280260496e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.4827856947431877e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 2.5746930693292974e-17,
+      "full_projected_residual": 2.28435602371892e-14,
+      "reference_reproduction": {
+        "displacement": 4.612908555665261e-16,
+        "strain": 4.479432756035894e-15
+      },
+      "displacement_relative": 2.1966289726434406e-14,
+      "strain_relative": 3.471560385927818e-14,
+      "energy_relative": 3.774758283725532e-15,
+      "energy": 4.1666666666666827e-11,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 2.1141942363467336e-18,
+          "reference_max": 9.570833333333332e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 9.432558900623889e-18,
+          "reference_max": 0.0005
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 8.239936510889834e-18,
+          "reference_max": 0.0003
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.1094237467877974e-15,
+        "green_error": 1.7763568394002505e-15
+      },
+      "seconds": 0.14100000000325963,
+      "peak_process_working_bytes": 82997248,
+      "eligible": true
+    },
+    {
+      "shape": "RECT",
+      "h": 0.1,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          3,
+          3,
+          0
+        ],
+        "coefficient_count": 16,
+        "exact_positive": true,
+        "lower": 0.012499999999999995,
+        "upper": 0.01250000000000001,
+        "lower_exact_fraction": "5265614583427858471403024548499466918967325178725754659968475153/421249166674228746791672110734681729275580381602196445017243910144",
+        "upper_exact_fraction": "21062458333711451650872773704619279569406025500811978247094268603/1684996666696914987166688442938726917102321526408785780068975640576",
+        "volume": 0.10000000000000002,
+        "centroid": [
+          0.3,
+          -0.4,
+          0.5
+        ],
+        "physical_z_second_moment": 8.333333333333334e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 1.9133686374406725e-15,
+          "maximum": 4.055609138463531e-15
+        },
+        "mass": {
+          "relative": 2.647075047330419e-15,
+          "maximum": 4.8390065834352024e-15
+        },
+        "force": 3.884889252179366e-15
+      },
+      "sampled_det_min": 0.012499999999999983,
+      "sampled_jac_condition_max": 10.000000000000014,
+      "volume_relative": 0.0,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.0821456216838794e-14
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "767ed4a95ce97b5c3fb99b87a7a7e085bea3e29e3d745f9471c013553c82b5e2",
+        "projected_residual": 1.3186662983068393e-14
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.5270894722972207e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 2.0441138349099118e-15,
+      "full_projected_residual": 3.697834181152432e-14,
+      "reference_reproduction": {
+        "displacement": 1.419894151966018e-15,
+        "strain": 1.0079384448350629e-14
+      },
+      "displacement_relative": 3.932621007916249e-14,
+      "strain_relative": 4.6828444517802925e-14,
+      "energy_relative": 3.3084646133829665e-14,
+      "energy": 4.166666666666805e-11,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 3.618524750670371e-18,
+          "reference_max": 8.767027536000699e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 1.474514954580286e-17,
+          "reference_max": 0.0004632589795856444
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 1.8350121769317163e-17,
+          "reference_max": 0.0002748045200661951
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.9984014443252818e-15,
+        "green_error": 2.1649348980190553e-15
+      },
+      "seconds": 0.09399999999732245,
+      "peak_process_working_bytes": 82997248,
+      "eligible": true
+    },
+    {
+      "shape": "RECT",
+      "h": 0.01,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          0,
+          0,
+          0
+        ],
+        "coefficient_count": 1,
+        "exact_positive": true,
+        "lower": 0.0012499999999999998,
+        "upper": 0.0012500000000000002,
+        "lower_exact_fraction": "5764607523034235/4611686018427387904",
+        "upper_exact_fraction": "5764607523034235/4611686018427387904",
+        "volume": 0.01,
+        "centroid": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "physical_z_second_moment": 8.333333333333334e-08
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 2.0529568999376996e-15,
+          "maximum": 3.991001838603582e-15
+        },
+        "mass": {
+          "relative": 2.5792738777694697e-15,
+          "maximum": 4.5438388140730225e-15
+        },
+        "force": 1.3505426792263844e-15
+      },
+      "sampled_det_min": 0.0012499999999999992,
+      "sampled_jac_condition_max": 100.00000000000006,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 4.635251231391289e-13
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "2db7b7f5af641bca719756712986757618db7633d9dd8f626a4c41c2c91c9c15",
+        "projected_residual": 7.119473558341058e-13
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 5.992757691174433e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.1014305038904966e-16,
+      "full_projected_residual": 2.5923895294024993e-12,
+      "reference_reproduction": {
+        "displacement": 3.469956362308323e-16,
+        "strain": 5.599290945044867e-14
+      },
+      "displacement_relative": 1.3432039283160425e-12,
+      "strain_relative": 2.2899350186813177e-12,
+      "energy_relative": 9.65227897609111e-13,
+      "energy": 4.166666666662645e-14,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 1.3154760484038186e-16,
+          "reference_max": 9.583208333333333e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 4.955888130431241e-16,
+          "reference_max": 0.0005
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 5.007387733624302e-16,
+          "reference_max": 0.0003
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.5543122344752192e-15,
+        "green_error": 1.3322676295501878e-15
+      },
+      "seconds": 0.13999999999941792,
+      "peak_process_working_bytes": 84344832,
+      "eligible": true
+    },
+    {
+      "shape": "RECT",
+      "h": 0.01,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          3,
+          3,
+          0
+        ],
+        "coefficient_count": 16,
+        "exact_positive": true,
+        "lower": 0.0012499999999999996,
+        "upper": 0.0012500000000000011,
+        "lower_exact_fraction": "8424983333484573261944511811418627589022109803583474985027661015/6739986666787659948666753771754907668409286105635143120275902562304",
+        "upper_exact_fraction": "33699933333938321472195128062667783215675177884155395857584040765/26959946667150639794667015087019630673637144422540572481103610249216",
+        "volume": 0.01,
+        "centroid": [
+          0.3,
+          -0.4,
+          0.5
+        ],
+        "physical_z_second_moment": 8.333333333333333e-08
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 1.862051767689282e-15,
+          "maximum": 4.217492227318886e-15
+        },
+        "mass": {
+          "relative": 2.3678876919809795e-15,
+          "maximum": 4.5438388140730185e-15
+        },
+        "force": 3.754694026739644e-13
+      },
+      "sampled_det_min": 0.0012499999999999992,
+      "sampled_jac_condition_max": 100.00000000000017,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 9.450792666809257e-13
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "727111b4e6fa04a424b2cfb6aaa3fc1d58762622c8167a21fdb4017c7df84610",
+        "projected_residual": 1.4484396069368572e-12
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 9.921577470299918e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 2.188452045304657e-13,
+      "full_projected_residual": 3.8214711718895745e-12,
+      "reference_reproduction": {
+        "displacement": 1.75650658818985e-15,
+        "strain": 1.0032430794087635e-13
+      },
+      "displacement_relative": 7.106461446014707e-12,
+      "strain_relative": 6.244679504731709e-12,
+      "energy_relative": 3.0322411248562275e-12,
+      "energy": 4.1666666666793006e-14,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 6.219186949284194e-16,
+          "reference_max": 8.77836322245343e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 1.9037505946672972e-15,
+          "reference_max": 0.0004632589795856444
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 7.488042304271136e-16,
+          "reference_max": 0.0002748045200661951
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.4424906541753444e-15,
+        "green_error": 2.4424906541753444e-15
+      },
+      "seconds": 0.125,
+      "peak_process_working_bytes": 85692416,
+      "eligible": true
+    },
+    {
+      "shape": "SKEW",
+      "h": 0.1,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          1,
+          2,
+          0
+        ],
+        "coefficient_count": 6,
+        "exact_positive": true,
+        "lower": 0.012499999999999997,
+        "upper": 0.012500000000000002,
+        "lower_exact_fraction": "64903710731685338150871800322457/5192296858534827628530496329220096",
+        "upper_exact_fraction": "64903710731685352562390607908045/5192296858534827628530496329220096",
+        "volume": 0.1,
+        "centroid": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "physical_z_second_moment": 8.333333333333334e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 2.0503371250267178e-15,
+          "maximum": 4.8588201527927004e-15
+        },
+        "mass": {
+          "relative": 2.7412576554537145e-15,
+          "maximum": 5.025122221259632e-15
+        },
+        "force": 1.3727223149831877e-15
+      },
+      "sampled_det_min": 0.012499999999999983,
+      "sampled_jac_condition_max": 12.198039027185573,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 7.902777434694781e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "f8dc8be4d8d636d64cc57aa8fbfde48ffc96688b6935444a692bc19aaf71cf0a",
+        "projected_residual": 9.301744930887712e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.2989429926652994e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 2.4397878412068264e-17,
+      "full_projected_residual": 2.515203279853174e-14,
+      "reference_reproduction": {
+        "displacement": 8.346507422728059e-16,
+        "strain": 1.1198581890089735e-14
+      },
+      "displacement_relative": 1.432956272797576e-14,
+      "strain_relative": 2.9676242008737797e-14,
+      "energy_relative": 2.220446049250313e-16,
+      "energy": 4.166666666666668e-11,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 2.520770051028798e-18,
+          "reference_max": 0.00017154166666666663
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 9.784924606681678e-18,
+          "reference_max": 0.0007
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 1.0408340855860843e-17,
+          "reference_max": 0.0003
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.5543122344752192e-15,
+        "green_error": 1.3322676295501878e-15
+      },
+      "seconds": 0.09399999999732245,
+      "peak_process_working_bytes": 85692416,
+      "eligible": true
+    },
+    {
+      "shape": "SKEW",
+      "h": 0.1,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          3,
+          3,
+          0
+        ],
+        "coefficient_count": 16,
+        "exact_positive": true,
+        "lower": 0.012499999999999997,
+        "upper": 0.012500000000000006,
+        "lower_exact_fraction": "1316403645856964748313986403766020305546274101964621207379311083/105312291668557186697918027683670432318895095400549111254310977536",
+        "upper_exact_fraction": "189562125003402989699077774264791491240458205134696588819482212753/15164970000272234884500195986448542253920893737679072020620780765184",
+        "volume": 0.10000000000000002,
+        "centroid": [
+          0.3,
+          -0.4,
+          0.5
+        ],
+        "physical_z_second_moment": 8.333333333333334e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 1.9727379242228704e-15,
+          "maximum": 4.165128298597246e-15
+        },
+        "mass": {
+          "relative": 2.6154122797860495e-15,
+          "maximum": 5.211237859084063e-15
+        },
+        "force": 4.312296537083726e-15
+      },
+      "sampled_det_min": 0.012499999999999983,
+      "sampled_jac_condition_max": 12.198039027185583,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.077146228746395e-14
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "28b4fb9aea57a73daa47c9835773d4b8a9b40c0804cba94ebc3def5e68358086",
+        "projected_residual": 1.644253500360521e-14
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 2.5086174975148444e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.5644226040432865e-15,
+      "full_projected_residual": 3.5749575138607695e-14,
+      "reference_reproduction": {
+        "displacement": 1.1409849825440598e-15,
+        "strain": 1.3084418321150807e-14
+      },
+      "displacement_relative": 2.0012855687713578e-14,
+      "strain_relative": 3.718729417590229e-14,
+      "energy_relative": 3.519406988061746e-14,
+      "energy": 4.1666666666665204e-11,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 3.0357660829594124e-18,
+          "reference_max": 0.0001571347512656285
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 1.7889335846010823e-17,
+          "reference_max": 0.0006195868143670494
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 5.421010862427522e-18,
+          "reference_max": 0.0002748045200661951
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.3314683517128287e-15,
+        "green_error": 2.220446049250313e-15
+      },
+      "seconds": 0.10900000000401633,
+      "peak_process_working_bytes": 85921792,
+      "eligible": true
+    },
+    {
+      "shape": "SKEW",
+      "h": 0.01,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          1,
+          2,
+          0
+        ],
+        "coefficient_count": 6,
+        "exact_positive": true,
+        "lower": 0.0012499999999999996,
+        "upper": 0.0012500000000000002,
+        "lower_exact_fraction": "103845937170696537438515178619535/83076749736557242056487941267521536",
+        "upper_exact_fraction": "103845937170696560496945270756475/83076749736557242056487941267521536",
+        "volume": 0.01,
+        "centroid": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "physical_z_second_moment": 8.333333333333334e-08
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 2.0264543771545764e-15,
+          "maximum": 4.354302964410652e-15
+        },
+        "mass": {
+          "relative": 2.62496201509605e-15,
+          "maximum": 4.5438388140730225e-15
+        },
+        "force": 1.3545199513731433e-15
+      },
+      "sampled_det_min": 0.0012499999999999992,
+      "sampled_jac_condition_max": 121.98039027185574,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 7.309909507353244e-13
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "90136fc78d66ea9dd3434778171acd683d3c34f0bfa26c440de94f3dc47e8bc9",
+        "projected_residual": 8.672868417896298e-13
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.2578148013046916e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.0823692899015062e-16,
+      "full_projected_residual": 3.1869054604597776e-12,
+      "reference_reproduction": {
+        "displacement": 8.36144036191922e-16,
+        "strain": 6.71914913405384e-14
+      },
+      "displacement_relative": 1.0603487607390968e-12,
+      "strain_relative": 4.176196155793307e-12,
+      "energy_relative": 4.585221091701897e-13,
+      "energy": 4.166666666668577e-14,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 1.8854275779522922e-16,
+          "reference_max": 0.00017166541666666663
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 7.575320579156219e-16,
+          "reference_max": 0.0007
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 1.2160411566597418e-15,
+          "reference_max": 0.0003
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.5543122344752192e-15,
+        "green_error": 1.3322676295501878e-15
+      },
+      "seconds": 0.09399999999732245,
+      "peak_process_working_bytes": 85921792,
+      "eligible": true
+    },
+    {
+      "shape": "SKEW",
+      "h": 0.01,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          3,
+          3,
+          0
+        ],
+        "coefficient_count": 16,
+        "exact_positive": true,
+        "lower": 0.0012499999999999996,
+        "upper": 0.0012500000000000005,
+        "lower_exact_fraction": "2106245833371143524227296379480495376378530492618886246791393165/1684996666696914987166688442938726917102321526408785780068975640576",
+        "upper_exact_fraction": "303299400005444772995712650041162981276609861213280909686973149015/242639520004355758152003135783176676062734299802865152329932492242944",
+        "volume": 0.010000000000000002,
+        "centroid": [
+          0.3,
+          -0.4,
+          0.5
+        ],
+        "physical_z_second_moment": 8.333333333333334e-08
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 1.8470291026661303e-15,
+          "maximum": 4.299170358949184e-15
+        },
+        "mass": {
+          "relative": 2.327642411715891e-15,
+          "maximum": 4.259848888193458e-15
+        },
+        "force": 4.410924501131689e-13
+      },
+      "sampled_det_min": 0.0012499999999999992,
+      "sampled_jac_condition_max": 121.98039027185582,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 8.286117339623519e-13
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "e2e8894582618ce9111b6492203c51d2499696fef0009890a42c94712d4629d5",
+        "projected_residual": 1.0892790970280556e-12
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.2877746578225206e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.691769658094021e-13,
+      "full_projected_residual": 4.225336235314513e-12,
+      "reference_reproduction": {
+        "displacement": 1.2092269371086736e-15,
+        "strain": 1.1417563594831267e-13
+      },
+      "displacement_relative": 3.327432601347847e-12,
+      "strain_relative": 2.2184427797674724e-12,
+      "energy_relative": 1.712296970879379e-12,
+      "energy": 4.1666666666595323e-14,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 5.287653995211805e-16,
+          "reference_max": 0.0001572481081301558
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 1.8210259689066532e-15,
+          "reference_max": 0.0006195868143670494
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 1.066800727617112e-15,
+          "reference_max": 0.0002748045200661951
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.7755575615628914e-15,
+        "green_error": 2.4424906541753444e-15
+      },
+      "seconds": 0.10900000000401633,
+      "peak_process_working_bytes": 85962752,
+      "eligible": true
+    },
+    {
+      "shape": "TRAP",
+      "h": 0.1,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          0,
+          1,
+          0
+        ],
+        "coefficient_count": 2,
+        "exact_positive": true,
+        "lower": 0.008749999999999997,
+        "upper": 0.016250000000000004,
+        "lower_exact_fraction": "11358149378044935347338468172759/1298074214633706907132624082305024",
+        "upper_exact_fraction": "21093705987797739132416984833065/1298074214633706907132624082305024",
+        "volume": 0.1,
+        "centroid": [
+          0.0,
+          0.05000000000000001,
+          0.0
+        ],
+        "physical_z_second_moment": 8.333333333333334e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 7.658227950037433e-10,
+          "maximum": 1.500849355787987e-09
+        },
+        "mass": {
+          "relative": 2.7923605263763353e-15,
+          "maximum": 4.861796253372889e-15
+        },
+        "force": 1.4011289104318e-15
+      },
+      "sampled_det_min": 0.008869399101846403,
+      "sampled_jac_condition_max": 13.59772929849183,
+      "volume_relative": 1.1102230246251565e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 5.947965646169466e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "7ada2d1a78f660605413027160a61ab5bc141da055edf31a5c4760253b6dc60f",
+        "projected_residual": 7.323009059068483e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 8.030114503098417e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 2.5333028504392373e-17,
+      "full_projected_residual": 2.6115313435072745e-14,
+      "reference_reproduction": {
+        "displacement": 6.762983705705718e-16,
+        "strain": 6.7191491340538415e-15
+      },
+      "displacement_relative": 2.4875765729890605e-14,
+      "strain_relative": 5.1513476694412784e-14,
+      "energy_relative": 5.551115123125783e-15,
+      "energy": 4.1666666666666904e-11,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 2.8358663074073975e-18,
+          "reference_max": 0.00012098639455782314
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 9.86623976961809e-18,
+          "reference_max": 0.0006500000000000001
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 5.7462715141731735e-18,
+          "reference_max": 0.0003
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.6653345369377348e-15,
+        "green_error": 1.5543122344752192e-15
+      },
+      "seconds": 0.09399999999732245,
+      "peak_process_working_bytes": 85962752,
+      "eligible": true
+    },
+    {
+      "shape": "TRAP",
+      "h": 0.1,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          3,
+          3,
+          0
+        ],
+        "coefficient_count": 16,
+        "exact_positive": true,
+        "lower": 0.008749999999999997,
+        "upper": 0.01625000000000001,
+        "lower_exact_fraction": "1842965104199750648064995097826951203872084705466336759200550853/210624583337114373395836055367340864637790190801098222508621955072",
+        "upper_exact_fraction": "27381195833824878783396127645492340638103004144080298405997377653/1684996666696914987166688442938726917102321526408785780068975640576",
+        "volume": 0.10000000000000002,
+        "centroid": [
+          0.2758535357892894,
+          -0.3583984933112683,
+          0.5136478169444157
+        ],
+        "physical_z_second_moment": 8.333333333333334e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 8.257073237960019e-10,
+          "maximum": 1.6835083772198932e-09
+        },
+        "mass": {
+          "relative": 2.7772622917606173e-15,
+          "maximum": 4.861796253372887e-15
+        },
+        "force": 5.307868391919744e-15
+      },
+      "sampled_det_min": 0.008869399101846387,
+      "sampled_jac_condition_max": 13.597729298491833,
+      "volume_relative": 1.1102230246251565e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.11558278645941e-14
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "9dc38833ac245e22f872b4d2ac694ef2fe6f148c87ca6edbec4ff9d11ab72451",
+        "projected_residual": 1.7090039495301862e-14
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.2717241384752933e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.7165370003564575e-15,
+      "full_projected_residual": 5.632434871054412e-14,
+      "reference_reproduction": {
+        "displacement": 1.891151433455715e-15,
+        "strain": 1.0642828299500663e-14
+      },
+      "displacement_relative": 3.248854462546213e-14,
+      "strain_relative": 7.800567094810487e-14,
+      "energy_relative": 5.3179682879545e-14,
+      "energy": 4.1666666666664455e-11,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 3.604972223514302e-18,
+          "reference_max": 0.00011082536030333983
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 2.47198095326695e-17,
+          "reference_max": 0.0006016699707298619
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 7.643625316022806e-18,
+          "reference_max": 0.0002748045200661951
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.55351295663786e-15,
+        "green_error": 2.3314683517128287e-15
+      },
+      "seconds": 0.09399999999732245,
+      "peak_process_working_bytes": 85962752,
+      "eligible": true
+    },
+    {
+      "shape": "TRAP",
+      "h": 0.01,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          0,
+          1,
+          0
+        ],
+        "coefficient_count": 2,
+        "exact_positive": true,
+        "lower": 0.0008749999999999998,
+        "upper": 0.0016250000000000004,
+        "lower_exact_fraction": "18173039004871895925237601244545/20769187434139310514121985316880384",
+        "upper_exact_fraction": "33749929580476381440931272616575/20769187434139310514121985316880384",
+        "volume": 0.01,
+        "centroid": [
+          0.0,
+          0.05000000000000001,
+          0.0
+        ],
+        "physical_z_second_moment": 8.333333333333334e-08
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 7.522014154500441e-10,
+          "maximum": 1.5008488807181102e-09
+        },
+        "mass": {
+          "relative": 2.4086687528807752e-15,
+          "maximum": 4.397263368457762e-15
+        },
+        "force": 1.3645856947098376e-15
+      },
+      "sampled_det_min": 0.0008869399101846392,
+      "sampled_jac_condition_max": 135.9772929849183,
+      "volume_relative": 0.0,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 6.32740851383252e-13
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "ff8e73e8a731965840ddb8e5f8a5bc25a7bc4265f5fe7bb1e9841b3de2f6131c",
+        "projected_residual": 9.240046558462651e-13
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 7.8254085591347e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.073601145128077e-16,
+      "full_projected_residual": 2.619450023107273e-12,
+      "reference_reproduction": {
+        "displacement": 5.083271763154575e-16,
+        "strain": 5.6692820818579277e-14
+      },
+      "displacement_relative": 7.962943889127668e-13,
+      "strain_relative": 5.868756821775151e-13,
+      "energy_relative": 4.71511718558304e-13,
+      "energy": 4.166666666664702e-14,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 9.634491555249314e-17,
+          "reference_max": 0.00012083999488884307
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 3.961674738262033e-16,
+          "reference_max": 0.0006500000000000001
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 2.693700297540236e-16,
+          "reference_max": 0.0003
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.3322676295501878e-15,
+        "green_error": 1.1102230246251565e-15
+      },
+      "seconds": 0.0930000000007567,
+      "peak_process_working_bytes": 85962752,
+      "eligible": true
+    },
+    {
+      "shape": "TRAP",
+      "h": 0.01,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          3,
+          3,
+          0
+        ],
+        "coefficient_count": 16,
+        "exact_positive": true,
+        "lower": 0.0008749999999999998,
+        "upper": 0.0016250000000000008,
+        "lower_exact_fraction": "2948744166719600934598877543359929945086395981863351930516264515/3369993333393829974333376885877453834204643052817571560137951281152",
+        "upper_exact_fraction": "43809913334119804533472101408648225922218374020479718658620298515/26959946667150639794667015087019630673637144422540572481103610249216",
+        "volume": 0.01,
+        "centroid": [
+          0.2758535357892894,
+          -0.3583984933112683,
+          0.5136478169444157
+        ],
+        "physical_z_second_moment": 8.333333333333333e-08
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 8.147453305230383e-10,
+          "maximum": 1.6835093391745096e-09
+        },
+        "mass": {
+          "relative": 2.256872845315966e-15,
+          "maximum": 4.580482675476835e-15
+        },
+        "force": 4.468547059819834e-13
+      },
+      "sampled_det_min": 0.0008869399101846392,
+      "sampled_jac_condition_max": 135.9772929849183,
+      "volume_relative": 0.0,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.1844070468701226e-12
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "c41a1d334bea06483f836de1f35854039989c06b80046a39dd76460f1f0b3f81",
+        "projected_residual": 1.8169535739621865e-12
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 7.361282279565262e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.9020578077662014e-13,
+      "full_projected_residual": 3.6292654783661454e-12,
+      "reference_reproduction": {
+        "displacement": 1.6526101034909188e-15,
+        "strain": 1.252097447000006e-13
+      },
+      "displacement_relative": 1.9229897973452446e-12,
+      "strain_relative": 1.0913105271848569e-12,
+      "energy_relative": 1.9858559241470175e-12,
+      "energy": 4.166666666658392e-14,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 2.089664162194249e-16,
+          "reference_max": 0.00011069125600076677
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 7.765055959341183e-16,
+          "reference_max": 0.0006019598889215758
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 7.193681414441322e-17,
+          "reference_max": 0.0002748045200661951
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 3.552713678800501e-15,
+        "green_error": 3.219646771412954e-15
+      },
+      "seconds": 0.11000000000058208,
+      "peak_process_working_bytes": 86167552,
+      "eligible": true
+    },
+    {
+      "shape": "SADDLE",
+      "h": 0.1,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          2,
+          2,
+          2
+        ],
+        "coefficient_count": 27,
+        "exact_positive": true,
+        "lower": 0.011494999999999998,
+        "upper": 0.013515000000000003,
+        "lower_exact_fraction": "1395686182258422293250074581496598736967917722840251304393411597864924713541966307/121416805764108066932466369176469931665150427440758720078238275608681517825325531136",
+        "upper_exact_fraction": "1640948129901920629567575314637796005494118365584678161349019752736489571646419543/121416805764108066932466369176469931665150427440758720078238275608681517825325531136",
+        "volume": 0.10265333333333333,
+        "centroid": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "physical_z_second_moment": 0.00020202444444444447
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 4.556924974590346e-11,
+          "maximum": 3.884874405315736e-11
+        },
+        "mass": {
+          "relative": 2.5578381280288667e-15,
+          "maximum": 4.603567013325149e-15
+        },
+        "force": 6.645963902698254e-16
+      },
+      "sampled_det_min": 0.012495313328753184,
+      "sampled_jac_condition_max": 10.193632047901524,
+      "volume_relative": 0.0,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.6675025739328835e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "f42fe8d8aca99c4efc3defcdfb97e61ab3f48c31d29098b8b26f0780ec5a1660",
+        "projected_residual": 1.7675624085529209e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.0353839942426409e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.1744758003367744e-16,
+      "full_projected_residual": 4.758449275059838e-15,
+      "reference_reproduction": {
+        "displacement": 5.766782402775563e-16,
+        "strain": 3.8138145921474414e-15
+      },
+      "displacement_relative": 2.7727119424817933e-14,
+      "strain_relative": 1.0011263304387033e-14,
+      "energy_relative": 6.439293542825908e-15,
+      "energy": 1.0101222222222158e-10,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 2.507217523872729e-18,
+          "reference_max": 9.523133290037668e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 6.1257422745431e-18,
+          "reference_max": 0.0005042923417413407
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 6.993104012531504e-18,
+          "reference_max": 0.0004
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.4432899320127035e-15,
+        "green_error": 1.1102230246251565e-15
+      },
+      "seconds": 0.0930000000007567,
+      "peak_process_working_bytes": 86167552,
+      "eligible": true
+    },
+    {
+      "shape": "SADDLE",
+      "h": 0.1,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          5,
+          5,
+          2
+        ],
+        "coefficient_count": 108,
+        "exact_positive": true,
+        "lower": 0.0122942,
+        "upper": 0.013515000000000004,
+        "lower_exact_fraction": "2689049786062730823484869115010539492568511633618308085478553850371698593991168906020266505958532203/218725072478301192437250222711762136535316943089321243642577060640995299919937592322351317702305382400",
+        "upper_exact_fraction": "7390173386360603286134101690650560720530364271659022534748598094246233704967015826066211833490293/546812681195752981093125556779405341338292357723303109106442651602488249799843980805878294255763456",
+        "volume": 0.10265333333333335,
+        "centroid": [
+          0.3,
+          -0.4,
+          0.5
+        ],
+        "physical_z_second_moment": 0.00020202444444444447
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 4.006950223627797e-11,
+          "maximum": 3.779788988271313e-11
+        },
+        "mass": {
+          "relative": 2.6314103167406837e-15,
+          "maximum": 4.957687552811696e-15
+        },
+        "force": 9.768370328423878e-16
+      },
+      "sampled_det_min": 0.012495313328753184,
+      "sampled_jac_condition_max": 10.193632047901525,
+      "volume_relative": 1.1102230246251565e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.9790523482795875e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "9bf1959ce84add5c68431f0f7518e11cc06dae7e436a0659a22b279d80bd7313",
+        "projected_residual": 2.400090732013549e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 3.5868151167516233e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.4887606992240622e-16,
+      "full_projected_residual": 4.567238741573138e-15,
+      "reference_reproduction": {
+        "displacement": 1.2863945710695458e-15,
+        "strain": 3.368695584147535e-15
+      },
+      "displacement_relative": 5.454767217137647e-14,
+      "strain_relative": 1.5351017851811553e-14,
+      "energy_relative": 9.992007221626409e-16,
+      "energy": 1.0101222222222212e-10,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 5.1906179007743525e-18,
+          "reference_max": 9.016239049394146e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 1.5124620306172787e-17,
+          "reference_max": 0.0004659461723067472
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 8.51098705401121e-18,
+          "reference_max": 0.0005000818374695218
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.3314683517128287e-15,
+        "green_error": 2.3314683517128287e-15
+      },
+      "seconds": 0.20399999999790452,
+      "peak_process_working_bytes": 86175744,
+      "eligible": true
+    },
+    {
+      "shape": "SADDLE",
+      "h": 0.01,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          2,
+          2,
+          2
+        ],
+        "coefficient_count": 27,
+        "exact_positive": true,
+        "lower": 0.0011499949999999998,
+        "upper": 0.0013501950000000002,
+        "lower_exact_fraction": "571919235255072595929162820092200056936903259649914035767757203726938592312071783045/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+        "upper_exact_fraction": "671483347184311894822693644113637014639016045009865778420946426683073164793376044485/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+        "volume": 0.010266653333333334,
+        "centroid": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "physical_z_second_moment": 1.1730044244444445e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 4.645358547071659e-11,
+          "maximum": 3.964278947705035e-11
+        },
+        "mass": {
+          "relative": 2.377409219864011e-15,
+          "maximum": 4.186547647946419e-15
+        },
+        "force": 1.2690038649186623e-15
+      },
+      "sampled_det_min": 0.0012499953133287543,
+      "sampled_jac_condition_max": 100.19363204790154,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.6323205985828946e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "dcc1f5e60db7bcc48488a1677a472ff68a67aadf8681ba4a07f94e644222d7d1",
+        "projected_residual": 1.9453213276784257e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.241489031412844e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.6884010685883982e-16,
+      "full_projected_residual": 4.271143846994355e-15,
+      "reference_reproduction": {
+        "displacement": 5.783267108677262e-16,
+        "strain": 3.2996520946954112e-15
+      },
+      "displacement_relative": 9.630713444814571e-14,
+      "strain_relative": 2.062282559184632e-14,
+      "energy_relative": 4.9960036108132044e-15,
+      "energy": 5.865022122222193e-12,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 8.971772977317549e-18,
+          "reference_max": 9.535888462494107e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 3.073713158996405e-17,
+          "reference_max": 0.000504377036328552
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 2.1033522146218786e-17,
+          "reference_max": 0.0004
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.3877787807814457e-15,
+        "green_error": 1.1102230246251565e-15
+      },
+      "seconds": 0.0930000000007567,
+      "peak_process_working_bytes": 86175744,
+      "eligible": true
+    },
+    {
+      "shape": "SADDLE",
+      "h": 0.01,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          5,
+          5,
+          2
+        ],
+        "coefficient_count": 108,
+        "exact_positive": true,
+        "lower": 0.0012299869999999999,
+        "upper": 0.0013501950000000004,
+        "lower_exact_fraction": "220388553295764086309620516984583592156045574798603066748057036987346638825695152958774104975502138969/179179579374224336844595382445475542249731639778771962791999128077103349694412875630470199461728569262080",
+        "upper_exact_fraction": "3024092152164760991996233233566668726751063856927751732970379677526570541748833772556241437522299235/2239744742177804210557442280568444278121645497234649534899989100963791871180160945380877493271607115776",
+        "volume": 0.010266653333333334,
+        "centroid": [
+          0.3,
+          -0.4,
+          0.5
+        ],
+        "physical_z_second_moment": 1.1730044244444445e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 4.06988576196586e-11,
+          "maximum": 3.8560129560908864e-11
+        },
+        "mass": {
+          "relative": 2.370644702691428e-15,
+          "maximum": 4.321597572073721e-15
+        },
+        "force": 2.383536614916368e-15
+      },
+      "sampled_det_min": 0.0012499953133287532,
+      "sampled_jac_condition_max": 100.19363204790154,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 1.2736867893908994e-15
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "5e61876ab02c3ba307fcf20bd935f82db36cd213760bd61d3cf9d42fcf300878",
+        "projected_residual": 1.6120568006360735e-15
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.9078570429258358e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 3.5245651128462705e-16,
+      "full_projected_residual": 5.0148947510100406e-15,
+      "reference_reproduction": {
+        "displacement": 1.5171377695105328e-15,
+        "strain": 4.488640887961204e-15
+      },
+      "displacement_relative": 1.4221551602179147e-13,
+      "strain_relative": 2.4226363148722113e-14,
+      "energy_relative": 1.1546319456101628e-14,
+      "energy": 5.865022122222154e-12,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 1.2996873542669984e-17,
+          "reference_max": 9.033702460657216e-05
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 4.775910569798647e-17,
+          "reference_max": 0.0004660532744103084
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 7.356311740314148e-17,
+          "reference_max": 0.0005000818374695218
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.3314683517128287e-15,
+        "green_error": 2.220446049250313e-15
+      },
+      "seconds": 0.18800000000192085,
+      "peak_process_working_bytes": 86282240,
+      "eligible": true
+    },
+    {
+      "shape": "NORMAL-C",
+      "h": 0.1,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          4,
+          4,
+          5
+        ],
+        "coefficient_count": 150,
+        "exact_positive": true,
+        "lower": 0.012206393624898573,
+        "upper": 0.013134900843596026,
+        "lower_exact_fraction": "11507412743431585055966579833580433701567008688605526562523259984277465446408495782729042547798622604758564414267543733437764818026985283284921156502005/942736495074088858563798632686348555838392909260402659371187914011686533364546271806381786589860397259455365028737300450654569885214993199358615945740288",
+        "upper_exact_fraction": "1375861153826378833717282890928091516171129742473960916122053627159967784749851786913257216806734344613010000025775974830359236169035538843353573144147/104748499452676539840422070298483172870932545473378073263465323779076281484949585756264642954428933028828373892081922272294952209468332577706512882860032",
+        "volume": 0.10130324497604028,
+        "centroid": [
+          0.0,
+          0.0,
+          0.00024679788372411856
+        ],
+        "physical_z_second_moment": 0.0001960373419552957
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 3.1329447043480265e-12,
+          "maximum": 3.3872055830572977e-12
+        },
+        "mass": {
+          "relative": 2.591769635487234e-15,
+          "maximum": 4.902363457979819e-15
+        },
+        "force": 1.3743411469801789e-15
+      },
+      "sampled_det_min": 0.012374560287051367,
+      "sampled_jac_condition_max": 10.657036063468354,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 4.617723211819271e-16
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "fbe988eda59f60426a6f0d74d34ff76ad205f0b938f8869e242f4ad9bfee9bea",
+        "projected_residual": 4.753644148115258e-16
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 4.9989150814444803e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 4.998500821177408e-16,
+      "full_projected_residual": 8.883262127279468e-16,
+      "reference_reproduction": {
+        "displacement": 7.271562032238288e-16,
+        "strain": 1.2468324983583301e-15
+      },
+      "displacement_relative": 2.8246729275935074e-14,
+      "strain_relative": 1.349831704744453e-14,
+      "energy_relative": 0.0,
+      "energy": 7.802298002481565e-08,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 1.773686991550505e-17,
+          "reference_max": 0.0006195676554504991
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 7.266865061084093e-17,
+          "reference_max": 0.00041907235475830237
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 8.183015896834345e-17,
+          "reference_max": 8.381447095166048e-05
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.6653345369377348e-15,
+        "green_error": 1.3322676295501878e-15
+      },
+      "seconds": 0.2809999999954016,
+      "peak_process_working_bytes": 86310912,
+      "eligible": true
+    },
+    {
+      "shape": "NORMAL-C",
+      "h": 0.1,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          5,
+          5,
+          5
+        ],
+        "coefficient_count": 216,
+        "exact_positive": true,
+        "lower": 0.01227137286141921,
+        "upper": 0.01313490084359603,
+        "lower_exact_fraction": "2056652629532735987253817825288135373384138401889565442599782072088747358005222420712716283405954062395086333023952619695496511546048133649882137305454111/167597599124282463744675312477573076593492072757404917221544518046522050375919337210023428727086292846125398227331075635671923535149332124330420612576051200",
+        "upper_exact_fraction": "88055113844888260875028360508661111933788319778456058842241061290023006706256651093550039403700257012663792685935112573044260549980890861921568636019125/6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048",
+        "volume": 0.10130324497604029,
+        "centroid": [
+          0.30009742094681097,
+          -0.40001761951777015,
+          0.5002260705799672
+        ],
+        "physical_z_second_moment": 0.0001960373419552957
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 2.79807288129101e-12,
+          "maximum": 3.3219128810971103e-12
+        },
+        "mass": {
+          "relative": 2.571376402648673e-15,
+          "maximum": 4.902363457979819e-15
+        },
+        "force": 1.4274675312891018e-15
+      },
+      "sampled_det_min": 0.012374560287051367,
+      "sampled_jac_condition_max": 10.657036063468361,
+      "volume_relative": 1.1102230246251565e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 3.694521880601995e-16
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "6e7a6f26a164bf6fefde64025373537331919efbde052070b4505abb27515d5c",
+        "projected_residual": 4.0229493937444506e-16
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 1.670898668793665e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 2.6871168163471575e-16,
+      "full_projected_residual": 7.801043036698909e-16,
+      "reference_reproduction": {
+        "displacement": 7.278529915922807e-16,
+        "strain": 1.0880861850144941e-15
+      },
+      "displacement_relative": 1.9771101307262232e-14,
+      "strain_relative": 8.121786166715331e-15,
+      "energy_relative": 8.881784197001252e-16,
+      "energy": 7.802298002481573e-08,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 1.0408340855860843e-17,
+          "reference_max": 0.0005353623852440858
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 5.4206720492486204e-17,
+          "reference_max": 0.0004747524252489431
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 6.680845316526206e-17,
+          "reference_max": 9.495048504978861e-05
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 2.886579864025407e-15,
+        "green_error": 2.886579864025407e-15
+      },
+      "seconds": 0.9530000000013388,
+      "peak_process_working_bytes": 86384640,
+      "eligible": true
+    },
+    {
+      "shape": "NORMAL-C",
+      "h": 0.01,
+      "transformed": false,
+      "geometry_certificate": {
+        "degree": [
+          4,
+          4,
+          5
+        ],
+        "coefficient_count": 150,
+        "exact_positive": true,
+        "lower": 0.0012322061065299604,
+        "upper": 0.0013005248623463922,
+        "lower_exact_fraction": "6496393418423441240404751831834234199813735505566164639855690265785729579974910232711668914997885116858999206849536414954240910998313750093051293944814178775/5272164602980308261106099813694509990862926310510058554414947936654497164849399848030125804027997098222563567148657298972509686783782382448056853727576363892736",
+        "upper_exact_fraction": "2285527048186161886514746746105536630224262052125454350282370939523058502374549279158410705043830519555644658469438304691198550315920780672133126713904116035/1757388200993436087035366604564836663620975436836686184804982645551499054949799949343375268009332366074187855716219099657503228927927460816018951242525454630912",
+        "volume": 0.010131593950885167,
+        "centroid": [
+          0.0,
+          0.0,
+          2.4685972338469415e-06
+        ],
+        "physical_z_second_moment": 1.1455967116373031e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 3.2147073769850136e-12,
+          "maximum": 3.4652091991411206e-12
+        },
+        "mass": {
+          "relative": 2.3786228330639195e-15,
+          "maximum": 4.4317009486871805e-15
+        },
+        "force": 1.1536513987903079e-14
+      },
+      "sampled_det_min": 0.0012487853020065394,
+      "sampled_jac_condition_max": 103.97067075498707,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 2.8786439654482065e-16
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "8475d8e435b577213d724954fc9e9e12a368a2b26497d4f34754a468dc8cc038",
+        "projected_residual": 2.8748146408436444e-16
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 2.0632779747847311e-16,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 6.978350336711746e-16,
+      "full_projected_residual": 1.2900965785450015e-15,
+      "reference_reproduction": {
+        "displacement": 6.422064913823253e-16,
+        "strain": 1.2468324983583301e-15
+      },
+      "displacement_relative": 7.880011854163722e-13,
+      "strain_relative": 1.7770073607037418e-13,
+      "energy_relative": 2.220446049250313e-16,
+      "energy": 7.803275725633671e-09,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 5.090183086636042e-16,
+          "reference_max": 0.000619733809281568
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 2.404001477052109e-15,
+          "reference_max": 0.000420827242737459
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 1.0597805185502684e-15,
+          "reference_max": 8.41654485474918e-05
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 1.4432899320127035e-15,
+        "green_error": 1.3322676295501878e-15
+      },
+      "seconds": 0.3280000000013388,
+      "peak_process_working_bytes": 86384640,
+      "eligible": true
+    },
+    {
+      "shape": "NORMAL-C",
+      "h": 0.01,
+      "transformed": true,
+      "geometry_certificate": {
+        "degree": [
+          5,
+          5,
+          5
+        ],
+        "coefficient_count": 216,
+        "exact_positive": true,
+        "lower": 0.0012388271984720568,
+        "upper": 0.0013005248623463924,
+        "lower_exact_fraction": "696672096532654957492349482239915729522255688777915480137655822243005530365034233910278520582152084397047988699761953406812420415303605844013675295340560698819/562364224317899547851317313460747732358712139787739579137594446576479697583935983789880085762986357143740113829190111890401033256936787461126064397608145481891840",
+        "upper_exact_fraction": "146273731083914386245936066412926439654066827627950197961000313320289016879989190434609673292993579304385343034223407711783365679944421507206973179628014960965/112472844863579909570263462692149546471742427957547915827518889315295939516787196757976017152597271428748022765838022378080206651387357492225212879521629096378368",
+        "volume": 0.010131593950885169,
+        "centroid": [
+          0.3000009744535739,
+          -0.4000001762393266,
+          0.5000022612722603
+        ],
+        "physical_z_second_moment": 1.145596711637303e-05
+      },
+      "quadrature_difference": {
+        "stiffness": {
+          "relative": 2.852653526475149e-12,
+          "maximum": 3.397805104056178e-12
+        },
+        "mass": {
+          "relative": 2.345381635693747e-15,
+          "maximum": 4.293211062171927e-15
+        },
+        "force": 1.070235738669147e-14
+      },
+      "sampled_det_min": 0.0012487853020065384,
+      "sampled_jac_condition_max": 103.9706707549871,
+      "volume_relative": 2.220446049250313e-16,
+      "status": "evaluated",
+      "solve": {
+        "history": [
+          {
+            "corrections": 0,
+            "relative_residual": 3.4194564346447693e-16
+          }
+        ],
+        "eligible": true,
+        "retained_scaled_solution_sha256": "5671eefbae1d2a205b6996f35cc038eddc7a72738908de8881c25fb992e6b42f",
+        "projected_residual": 3.9917561882620447e-16
+      },
+      "constraint_rank": 6,
+      "constraint_relative": 7.699983443078245e-17,
+      "ranks": {
+        "mass": {
+          "1e-11": 81,
+          "1e-10": 81,
+          "1e-09": 81
+        },
+        "stiffness": {
+          "1e-11": 75,
+          "1e-10": 75,
+          "1e-09": 75
+        }
+      },
+      "rigid_load_work": 1.6535417124763607e-15,
+      "full_projected_residual": 2.9147717084230425e-15,
+      "reference_reproduction": {
+        "displacement": 1.054304967719486e-15,
+        "strain": 1.0880861850144941e-15
+      },
+      "displacement_relative": 7.067528026839495e-13,
+      "strain_relative": 8.533704508185103e-14,
+      "energy_relative": 1.887379141862766e-15,
+      "energy": 7.80327572563366e-09,
+      "unit_separated_dof_errors": {
+        "position": {
+          "max_abs_error": 3.998266561583419e-16,
+          "reference_max": 0.0005354170134695236
+        },
+        "first_thickness_derivative": {
+          "max_abs_error": 2.1120258320017626e-15,
+          "reference_max": 0.00047615386395135386
+        },
+        "second_thickness_derivative": {
+          "max_abs_error": 1.8837064070034715e-15,
+          "reference_max": 9.523077279027078e-05
+        }
+      },
+      "finite_rigid_kinematics": {
+        "f_error": 3.9968028886505635e-15,
+        "green_error": 3.552713678800501e-15
+      },
+      "seconds": 1.0319999999992433,
+      "peak_process_working_bytes": 86446080,
+      "eligible": true
+    }
+  ],
+  "coordinate_comparisons": [
+    {
+      "shape": "RECT",
+      "h": 0.1,
+      "errors": {
+        "stiffness": {
+          "relative": 4.381398869496575e-16,
+          "maximum": 1.1597865525102072e-15
+        },
+        "mass": {
+          "relative": 2.726850004775189e-16,
+          "maximum": 5.583469134732926e-16
+        },
+        "force": 4.451794899012529e-15,
+        "displacement": 6.182819311111759e-14,
+        "energy": 2.930988785010413e-14
+      },
+      "eligible": true
+    },
+    {
+      "shape": "RECT",
+      "h": 0.01,
+      "errors": {
+        "stiffness": {
+          "relative": 4.692085096567768e-16,
+          "maximum": 8.295128789987877e-16
+        },
+        "mass": {
+          "relative": 3.481138955078519e-16,
+          "maximum": 7.623296525288698e-16
+        },
+        "force": 4.109769437235231e-13,
+        "displacement": 6.7293407995472646e-12,
+        "energy": 3.997469022465339e-12
+      },
+      "eligible": true
+    },
+    {
+      "shape": "SKEW",
+      "h": 0.1,
+      "errors": {
+        "stiffness": {
+          "relative": 3.8555954536693286e-16,
+          "maximum": 7.616125893938237e-16
+        },
+        "mass": {
+          "relative": 1.921720959325998e-16,
+          "maximum": 4.288104295474888e-16
+        },
+        "force": 3.8291302790526e-15,
+        "displacement": 1.6803118198876096e-14,
+        "energy": 3.5416114485542494e-14
+      },
+      "eligible": true
+    },
+    {
+      "shape": "SKEW",
+      "h": 0.01,
+      "errors": {
+        "stiffness": {
+          "relative": 4.570458800597804e-16,
+          "maximum": 1.0466308100726403e-15
+        },
+        "mass": {
+          "relative": 2.501958999017486e-16,
+          "maximum": 5.58346913473293e-16
+        },
+        "force": 4.422180910277563e-13,
+        "displacement": 4.409663695983696e-12,
+        "energy": 2.170708057747106e-12
+      },
+      "eligible": true
+    },
+    {
+      "shape": "TRAP",
+      "h": 0.1,
+      "errors": {
+        "stiffness": {
+          "relative": 4.0410044314446196e-16,
+          "maximum": 1.0609324374130991e-15
+        },
+        "mass": {
+          "relative": 2.958819700390647e-16,
+          "maximum": 6.295367453141631e-16
+        },
+        "force": 5.0574738960194455e-15,
+        "displacement": 4.6872826494812324e-14,
+        "energy": 5.873079800267078e-14
+      },
+      "eligible": true
+    },
+    {
+      "shape": "TRAP",
+      "h": 0.01,
+      "errors": {
+        "stiffness": {
+          "relative": 4.654448247126895e-16,
+          "maximum": 1.1320906200201608e-15
+        },
+        "mass": {
+          "relative": 3.0556595780109834e-16,
+          "maximum": 6.098637220230962e-16
+        },
+        "force": 4.583738788584823e-13,
+        "displacement": 2.5873283750845185e-12,
+        "energy": 1.514455227891176e-12
+      },
+      "eligible": true
+    },
+    {
+      "shape": "SADDLE",
+      "h": 0.1,
+      "errors": {
+        "stiffness": {
+          "relative": 4.332902618971038e-16,
+          "maximum": 9.185855806704768e-16
+        },
+        "mass": {
+          "relative": 2.4358521620777026e-16,
+          "maximum": 7.082410789730997e-16
+        },
+        "force": 7.634997208566166e-16,
+        "displacement": 8.511221617311796e-14,
+        "energy": 5.329070518200751e-15
+      },
+      "eligible": true
+    },
+    {
+      "shape": "SADDLE",
+      "h": 0.01,
+      "errors": {
+        "stiffness": {
+          "relative": 4.3376330083432554e-16,
+          "maximum": 8.594279372839196e-16
+        },
+        "mass": {
+          "relative": 2.945682999709846e-16,
+          "maximum": 6.752496206365194e-16
+        },
+        "force": 1.2114411829946783e-15,
+        "displacement": 2.322519319489093e-13,
+        "energy": 6.661338147750939e-15
+      },
+      "eligible": true
+    },
+    {
+      "shape": "NORMAL-C",
+      "h": 0.1,
+      "errors": {
+        "stiffness": {
+          "relative": 4.1332307178235057e-16,
+          "maximum": 8.960387236276653e-16
+        },
+        "mass": {
+          "relative": 2.2994801716391467e-16,
+          "maximum": 5.686652229530226e-16
+        },
+        "force": 1.118183413286852e-15,
+        "displacement": 3.2809337193410305e-14,
+        "energy": 1.1102230246251565e-15
+      },
+      "eligible": true
+    },
+    {
+      "shape": "NORMAL-C",
+      "h": 0.01,
+      "errors": {
+        "stiffness": {
+          "relative": 4.139153589479901e-16,
+          "maximum": 9.619343723287512e-16
+        },
+        "mass": {
+          "relative": 2.608540338723802e-16,
+          "maximum": 5.948120111336477e-16
+        },
+        "force": 6.497549233550724e-15,
+        "displacement": 1.2859734013171397e-12,
+        "energy": 1.4432899320127035e-15
+      },
+      "eligible": true
+    }
+  ],
+  "rotation": [
+    [
+      0.7816391739070251,
+      -0.4829292842142122,
+      0.3947397981737998
+    ],
+    [
+      0.5501172307043584,
+      0.8320301337746346,
+      -0.07139249941787586
+    ],
+    [
+      -0.29395787843858057,
+      0.27295633888831433,
+      0.9160150668873173
+    ]
+  ],
+  "translation": [
+    0.3,
+    -0.4,
+    0.5
+  ],
+  "all_criteria_pass": true,
+  "stopped": null,
+  "limitation": "Single element manufactured linear fields; no generic curved bending convergence or nonlinear tangent evidence"
+}

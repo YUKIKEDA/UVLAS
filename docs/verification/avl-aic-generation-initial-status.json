@@ -1,0 +1,87 @@
+{
+  "status": "postprocessing_serialization_failed",
+  "error": "NumPy boolean from a quadrature comparison was not JSON serializable.",
+  "source_sha256": "37477d2294363fc6a3a8ceb7b82113868c0db06b3f682952cadd83e6a1c027ac",
+  "directory": "build/analysis/avl-aic-generation-20261031-021110",
+  "progress": {
+    "completed": 8
+  },
+  "files": {
+    "progress.json": {
+      "sha256": "7e3efa98fb50b3098076c827e56b08cbc917efe0531b98103808cb61e28affe5",
+      "bytes": 18
+    },
+    "aligned-FW-V01-M12-N160/coefficient-diagnostics.npz": {
+      "sha256": "c7147cf2061e69f0c9add22541667860bd606277dc845a553aca74227f810191",
+      "bytes": 1126938
+    },
+    "aligned-FW-V01-M12-N160/coefficients.tsv.gz": {
+      "sha256": "d7fec687de71e355fcaa62f1e40c01115e11b351eb517864e111cef490022267",
+      "bytes": 2460912
+    },
+    "aligned-FW-V01-M24-N160/coefficient-diagnostics.npz": {
+      "sha256": "b67e9fe59e4af81331e5e8c32f01c42825ee59e7ff166a516e7d650e5d67646e",
+      "bytes": 2245823
+    },
+    "aligned-FW-V01-M24-N160/coefficients.tsv.gz": {
+      "sha256": "8a1d9f0b9e26fca39cf86fa4cfdf5cb605ca5ad675194a5b438bb1aeb02a427c",
+      "bytes": 4920114
+    },
+    "aligned-FW-V02-M12-N160/coefficient-diagnostics.npz": {
+      "sha256": "0ab09e343c07c3d43888438bbe88ff281df62c9dda1d7e033f82c5c9738204f4",
+      "bytes": 1127571
+    },
+    "aligned-FW-V02-M12-N160/coefficients.tsv.gz": {
+      "sha256": "c23af4e82366c4d1116b5b9d3035fef66154d211a020c83930ecf9d35111a2ce",
+      "bytes": 2462212
+    },
+    "aligned-FW-V02-M24-N160/coefficient-diagnostics.npz": {
+      "sha256": "2f526bc82a4d094116f8ed06431a6690d34deb6e9ced4969fe7246fce85ea189",
+      "bytes": 2246111
+    },
+    "aligned-FW-V02-M24-N160/coefficients.tsv.gz": {
+      "sha256": "720dd6ede919b6dc677cf72813987f3047396c7a5ee4e2bec06d02f063782bb5",
+      "bytes": 4925612
+    },
+    "original-FW-V01-M16-N96/coefficient-diagnostics.npz": {
+      "sha256": "2652a31d577aba4864aaba17e750997745259a6ccc1e177ccd6b10383968ac19",
+      "bytes": 899282
+    },
+    "original-FW-V01-M16-N96/coefficients.tsv.gz": {
+      "sha256": "052104cd727bad4097a1df926a409f481cc2087f3aa794d744a5d5167ab77c49",
+      "bytes": 1965689
+    },
+    "original-FW-V01-M32-N96/coefficient-diagnostics.npz": {
+      "sha256": "07b5cce14b4fba78236618efa6a30f378bd871ef20a8c68606fadfca8046231f",
+      "bytes": 1792315
+    },
+    "original-FW-V01-M32-N96/coefficients.tsv.gz": {
+      "sha256": "5cd4cd00229c6930ecc61115b71005e5be87f93e86a55d7cf3d1c801f6b4db46",
+      "bytes": 3930849
+    },
+    "original-FW-V01-M4-N12/coefficient-diagnostics.npz": {
+      "sha256": "2cb8af4620ecd62456fcb62a996f080a47865334f92700131b6431b27f0bdbdf",
+      "bytes": 74720
+    },
+    "original-FW-V01-M4-N12/coefficients.tsv.gz": {
+      "sha256": "589b25f3c7941e42b601dfd401a4aa6d70eaa4c4928afa2934929e0ce0690cc4",
+      "bytes": 181248
+    },
+    "original-FW-V01-M4-N12/projected-small-matrix.npz": {
+      "sha256": "bf672f9d68d35dea292b809425ee376374d47500b507a46fca0912a10219b35f",
+      "bytes": 15428
+    },
+    "original-FW-V02-M8-N24/coefficient-diagnostics.npz": {
+      "sha256": "8076f2842cecb5b07355b271387db1a1f6c210de0d44dd6520789d3c5d600d9f",
+      "bytes": 1274762
+    },
+    "original-FW-V02-M8-N24/coefficients.tsv.gz": {
+      "sha256": "a115cb9a250ba82a349d2f97c69c2cab7d402e7a77f533f3bd17ccf7ee4da50b",
+      "bytes": 2894704
+    },
+    "original-FW-V02-M8-N24/projected-small-matrix.npz": {
+      "sha256": "4c332acd25022cd76e9023545d9c1c993be4655e4c96d5a479868ae5709d4267",
+      "bytes": 276962
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "identities": {
+    "membrane_ss": "0",
+    "membrane_st": "0",
+    "membrane_tt_retained": "0",
+    "director_tangent_1": "0",
+    "director_tangent_2": "0",
+    "director_normal": "0"
+  },
+  "zero_director_negative_control": "1/4",
+  "scope": "independent symbolic differential/algebraic identities; not uniform convergence or novelty"
+}

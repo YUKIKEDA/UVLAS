@@ -1,0 +1,964 @@
+{
+  "protocol": "docs/verification/avl-symmetry-reduction-experiment.md",
+  "source_sha256": "ee892e96e7ff484d6818b6753b05772d7c7db8f79fd09bcd5243ac123eefe48b",
+  "parent_input_sha256": "541f14d5904eaec01715da706fb935517b101a64e52ba183e18ea9acdd58fb1f",
+  "parent_executable_sha256": "18dcac60c910299747714795ab6666d6db6546038ddb9a1d7ddfddb4b78c10c9",
+  "source_hashes": {
+    "ADIMEN.INC": {
+      "parent": "35d0d0d65f4a70690a32f367d71935bc9d41eab12448c8f203d936e78d5ca00c",
+      "measured": "35d0d0d65f4a70690a32f367d71935bc9d41eab12448c8f203d936e78d5ca00c"
+    },
+    "aero.f": {
+      "parent": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6",
+      "measured": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6"
+    },
+    "aic.f": {
+      "parent": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f",
+      "measured": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f"
+    },
+    "AINDEX.INC": {
+      "parent": "6283370c4341161d4f974d7d11cc961dd820305c1d5f000f42f472fa877feff7",
+      "measured": "6283370c4341161d4f974d7d11cc961dd820305c1d5f000f42f472fa877feff7"
+    },
+    "ainput.f": {
+      "parent": "c4408d58c3217be4abfa482c51146be8355ed3220020d6f86e00aba994651bd3",
+      "measured": "c4408d58c3217be4abfa482c51146be8355ed3220020d6f86e00aba994651bd3"
+    },
+    "airutil.f": {
+      "parent": "d81ce8cc13ed092f0038eade905bcbf6f436a1690ac44fb3c6e13368fe8e5ed1",
+      "measured": "d81ce8cc13ed092f0038eade905bcbf6f436a1690ac44fb3c6e13368fe8e5ed1"
+    },
+    "amake.f": {
+      "parent": "e572097d8f65e0bf9cb6134a181d54612c64758b24c31c7095a644b57dc471d7",
+      "measured": "e572097d8f65e0bf9cb6134a181d54612c64758b24c31c7095a644b57dc471d7"
+    },
+    "amass.f": {
+      "parent": "54f4e1d27ce919c26dcf6ade95cae828b076661c36e6518d6192c39eb4e06d3e",
+      "measured": "54f4e1d27ce919c26dcf6ade95cae828b076661c36e6518d6192c39eb4e06d3e"
+    },
+    "amode.f": {
+      "parent": "f3aecac48f154860e636e3235ab2cc57c80b369b39cbac2b55f8a60b8378ea4b",
+      "measured": "f3aecac48f154860e636e3235ab2cc57c80b369b39cbac2b55f8a60b8378ea4b"
+    },
+    "aoml.f": {
+      "parent": "d30d6c9e3bafde44cbf785a4dbf718185bb15ce94065ccc700797a4397765aae",
+      "measured": "d30d6c9e3bafde44cbf785a4dbf718185bb15ce94065ccc700797a4397765aae"
+    },
+    "aoper.f": {
+      "parent": "5d187735eec5cb7f92df0f18808e1e54e5fb4001c1a51dffd9d7529a68c089fc",
+      "measured": "4280580c4c0a6160d82320f59ca4c72afa3620c1b9e3d5724a019a1468f9135a"
+    },
+    "aoutmrf.f": {
+      "parent": "82384d13a4c6ef3a04ec7647a7dcca2be519b449013675adf209f23bf7234003",
+      "measured": "82384d13a4c6ef3a04ec7647a7dcca2be519b449013675adf209f23bf7234003"
+    },
+    "aoutput.f": {
+      "parent": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9",
+      "measured": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9"
+    },
+    "aoutput_bug.f": {
+      "parent": "cddaaa0f48695474f86ccd35b4283b358f3ef4f59c75a73f1e4b7ffddf3716a8",
+      "measured": "cddaaa0f48695474f86ccd35b4283b358f3ef4f59c75a73f1e4b7ffddf3716a8"
+    },
+    "aplotmd.f": {
+      "parent": "edd810b6e4fcd1a25f712ceecdb7ea0dac9fc530139fd7bdc880f89006e150dc",
+      "measured": "edd810b6e4fcd1a25f712ceecdb7ea0dac9fc530139fd7bdc880f89006e150dc"
+    },
+    "aplottp.f": {
+      "parent": "f8ead0c48d2e40bf4003413dbea88a7b5b858eb042503083a0f42029e4268ad6",
+      "measured": "f8ead0c48d2e40bf4003413dbea88a7b5b858eb042503083a0f42029e4268ad6"
+    },
+    "aplotvl.f": {
+      "parent": "83ecf66d2f936505b3d8b6a90109b57fef598c70a35e48b670e9c4bb5ad5cfce",
+      "measured": "83ecf66d2f936505b3d8b6a90109b57fef598c70a35e48b670e9c4bb5ad5cfce"
+    },
+    "arrow3d.f": {
+      "parent": "efbc406db10a0bfa64d27ebe6b7f62b4a1c8868f49e791eb6edae88c5a93483c",
+      "measured": "efbc406db10a0bfa64d27ebe6b7f62b4a1c8868f49e791eb6edae88c5a93483c"
+    },
+    "asetup.f": {
+      "parent": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf",
+      "measured": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf"
+    },
+    "atime.f": {
+      "parent": "e6117e27365e43431d784def548fe3330454265a140722a4adfbffe034e3645e",
+      "measured": "e6117e27365e43431d784def548fe3330454265a140722a4adfbffe034e3645e"
+    },
+    "atpforc.f": {
+      "parent": "21153c1a3623177d4bfcbcd799f0bdedade0081a4955b6e1f4e7c649a9dbf65a",
+      "measured": "21153c1a3623177d4bfcbcd799f0bdedade0081a4955b6e1f4e7c649a9dbf65a"
+    },
+    "atrim.f": {
+      "parent": "8476c4231d429cb0259bc6ecf87bd9086cb5050b2ba9c5b5e1a69e9474589f6b",
+      "measured": "8476c4231d429cb0259bc6ecf87bd9086cb5050b2ba9c5b5e1a69e9474589f6b"
+    },
+    "autil.f": {
+      "parent": "e88ec69b68a92c4480d13a20d16e53517e51a02fd435d34b44d43294e005865a",
+      "measured": "e88ec69b68a92c4480d13a20d16e53517e51a02fd435d34b44d43294e005865a"
+    },
+    "avl.f": {
+      "parent": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a",
+      "measured": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a"
+    },
+    "AVL.INC": {
+      "parent": "95b675cca17eeba2740435e94a8c7202b09b19bc121f5730cfb9404db5f5962b",
+      "measured": "95b675cca17eeba2740435e94a8c7202b09b19bc121f5730cfb9404db5f5962b"
+    },
+    "AVLPLT.INC": {
+      "parent": "986c02a734d845176c658f2a9f42f205ce1775802eacf2d5066103a6c67d4234",
+      "measured": "986c02a734d845176c658f2a9f42f205ce1775802eacf2d5066103a6c67d4234"
+    },
+    "avl_heap.f90": {
+      "parent": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966",
+      "measured": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966"
+    },
+    "avl_heap_inc.f90": {
+      "parent": "9a32d3ba657fb70919aefc3bc01ff2998ac144acf1585bb761abd56bc57e3897",
+      "measured": "9a32d3ba657fb70919aefc3bc01ff2998ac144acf1585bb761abd56bc57e3897"
+    },
+    "ba_trans.f": {
+      "parent": "1d96c668c1ed80edc7d1519739d7ab64c86ca2d5235acbf4edca8952d03c6e49",
+      "measured": "1d96c668c1ed80edc7d1519739d7ab64c86ca2d5235acbf4edca8952d03c6e49"
+    },
+    "cdcl.f": {
+      "parent": "ce2711def9b2ead1a4782a0a4285fa2a9422ac7a23778334a8e6332048fba133",
+      "measured": "ce2711def9b2ead1a4782a0a4285fa2a9422ac7a23778334a8e6332048fba133"
+    },
+    "dtest.f": {
+      "parent": "b3797686b5e6bea6606310ab034c92ae779f78a5689fe6490e457be8257a53c5",
+      "measured": "b3797686b5e6bea6606310ab034c92ae779f78a5689fe6490e457be8257a53c5"
+    },
+    "getvm.f": {
+      "parent": "0b96359c604864a4887d47ce34cdb0688dbed48944db611b39800abf36942561",
+      "measured": "0b96359c604864a4887d47ce34cdb0688dbed48944db611b39800abf36942561"
+    },
+    "hidden.f": {
+      "parent": "7e2067ec26f7dddcdb4335d1791822cbea005bf712afa272717e888a6f019ee9",
+      "measured": "7e2067ec26f7dddcdb4335d1791822cbea005bf712afa272717e888a6f019ee9"
+    },
+    "limits.f": {
+      "parent": "ee5be7c8c366b134e7b6c91370f21830241fedb936484f9bfde76dbddb049ae0",
+      "measured": "ee5be7c8c366b134e7b6c91370f21830241fedb936484f9bfde76dbddb049ae0"
+    },
+    "limits2.f": {
+      "parent": "e54047eb86e957391354d9a7cddc2f87c84bf1ea0a4a31ba76f4d761cdbb68fd",
+      "measured": "e54047eb86e957391354d9a7cddc2f87c84bf1ea0a4a31ba76f4d761cdbb68fd"
+    },
+    "MASKS.INC": {
+      "parent": "b5ce0ae28ab0f41f8cf9fde42ff24490f537d5c6bc865c63cd2d30c881f390d9",
+      "measured": "b5ce0ae28ab0f41f8cf9fde42ff24490f537d5c6bc865c63cd2d30c881f390d9"
+    },
+    "matrix-lapackdp.f": {
+      "parent": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259",
+      "measured": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259"
+    },
+    "matrix-lapacksp.f": {
+      "parent": "a6007b27c936363d7782dea3c00ec8f769b4478bde3e8d2316b724fca300fa2e",
+      "measured": "a6007b27c936363d7782dea3c00ec8f769b4478bde3e8d2316b724fca300fa2e"
+    },
+    "matrix-lapacksubs.f": {
+      "parent": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564",
+      "measured": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564"
+    },
+    "matrix-linpack.f": {
+      "parent": "781cd5fcf42276f01647c52402a1a8a4f51bd90c248a2dd2f913e49b534577e2",
+      "measured": "781cd5fcf42276f01647c52402a1a8a4f51bd90c248a2dd2f913e49b534577e2"
+    },
+    "matrix.f": {
+      "parent": "8fb855c52b8e650827e1b348ffa0e18420a7af173a90287b410e4daee772b335",
+      "measured": "8fb855c52b8e650827e1b348ffa0e18420a7af173a90287b410e4daee772b335"
+    },
+    "movie.f": {
+      "parent": "5bd5c43b0001d05bef589a1fbe1ebf33de4185f6f755ffc736594a98e61428cf",
+      "measured": "5bd5c43b0001d05bef589a1fbe1ebf33de4185f6f755ffc736594a98e61428cf"
+    },
+    "obsetup.f": {
+      "parent": "618705cae4b701fff26086d7343dc541d0255c955d1d91b9daa209ee1ec37474",
+      "measured": "618705cae4b701fff26086d7343dc541d0255c955d1d91b9daa209ee1ec37474"
+    },
+    "plsubs.f": {
+      "parent": "d07878f8ee8dacfa9987d6b27eda8ae4275cb115571842ca2507d27a6071a03b",
+      "measured": "d07878f8ee8dacfa9987d6b27eda8ae4275cb115571842ca2507d27a6071a03b"
+    },
+    "pltops.f": {
+      "parent": "c2ef34b204be3581c9d9ec6e77b10525c5b71e68e3ca8a0e6b1eb5cddffc09e7",
+      "measured": "c2ef34b204be3581c9d9ec6e77b10525c5b71e68e3ca8a0e6b1eb5cddffc09e7"
+    },
+    "plutil.f": {
+      "parent": "e9b3a8f7e1024fa6592518205c35f100792afe0c2e546dd3f3a7a017becd4944",
+      "measured": "e9b3a8f7e1024fa6592518205c35f100792afe0c2e546dd3f3a7a017becd4944"
+    },
+    "second.f": {
+      "parent": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c",
+      "measured": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c"
+    },
+    "second_g77.f": {
+      "parent": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c",
+      "measured": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c"
+    },
+    "second_ifc.f": {
+      "parent": "d5a18e587d53dbe039318d67e38eacf901ce30961ee77c8c1a1fafd3020214a8",
+      "measured": "d5a18e587d53dbe039318d67e38eacf901ce30961ee77c8c1a1fafd3020214a8"
+    },
+    "sgutil.f": {
+      "parent": "6203d18f18b4428c48f5a86ad61de4c77bc56d9d72994364d2680cf17f5c9058",
+      "measured": "6203d18f18b4428c48f5a86ad61de4c77bc56d9d72994364d2680cf17f5c9058"
+    },
+    "spline.f": {
+      "parent": "5ef039d273e75115b158fcd769ce638744ec37185de1e9663d2238dc758eba2f",
+      "measured": "5ef039d273e75115b158fcd769ce638744ec37185de1e9663d2238dc758eba2f"
+    },
+    "unitset.f": {
+      "parent": "e6aef6bab251b730843f33188a9b75ca2329a3bc4c2bd50e9ff5426410b0fc79",
+      "measured": "e6aef6bab251b730843f33188a9b75ca2329a3bc4c2bd50e9ff5426410b0fc79"
+    },
+    "userio.f": {
+      "parent": "9ed3f0a93f49e0ac01864589ad2578569746a15e7a6ba97a5d8c3fa95303d93b",
+      "measured": "9ed3f0a93f49e0ac01864589ad2578569746a15e7a6ba97a5d8c3fa95303d93b"
+    },
+    "uvl_grid_export.f": {
+      "parent": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b",
+      "measured": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b"
+    },
+    "uvl_measurement.f": {
+      "parent": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29",
+      "measured": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29"
+    },
+    "uvl_pair_probe.f": {
+      "parent": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16",
+      "measured": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16"
+    },
+    "vorvel.f": {
+      "parent": "d47173a6be368e7ecdada2ad9539d28de5fc8eca14a3c2a29572b3b7a1208676",
+      "measured": "d47173a6be368e7ecdada2ad9539d28de5fc8eca14a3c2a29572b3b7a1208676"
+    },
+    "vorvelc.f": {
+      "parent": "646747bac2b52e2f2ccec4713a98d5bc76ef42ab98827baf870b8849246df2bd",
+      "measured": "646747bac2b52e2f2ccec4713a98d5bc76ef42ab98827baf870b8849246df2bd"
+    }
+  },
+  "adapter_sha256": {
+    "reference_avl_symmetry_export.f": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468",
+    "reference_avl_symmetry_guard.f": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80"
+  },
+  "patch_sha256": "e22bcec12797d3a3c80353c0e1e971707588596281a35293cba0094305dbbb1b",
+  "build_script_sha256": "118e3655ded29e1cd24b6b7f49f5c16e5a4046fa9db2bfd09020d0a6fae301d7",
+  "decks": [
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "physical_n": 40,
+      "native_n": 20,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V01-M6-N40-half.avl",
+      "sha256": "b0f07124d3ee358dd345327fc4406e03c1d503a92a445f5c276012cd7adaa93d",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.0,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.0,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.0,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.0,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.0,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.0,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.0,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.0,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.0,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.0,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2,
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/a1",
+      "full_input": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M6-N40/wing.avl"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 160,
+      "native_n": 80,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V01-M24-N160-half.avl",
+      "sha256": "9ba633af9e56016a2346ae9971e4d0fd763312b43e5192be8421381712aa663a",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.0,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.0,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.0,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.0,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.0,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.0,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.0,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.0,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.0,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.0,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2,
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/a1",
+      "full_input": "build/analysis/avl-band-aligned-20261031-011125/FW-V01-M24-N160/wing.avl"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 320,
+      "native_n": 160,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V01-M24-N320-half.avl",
+      "sha256": "1b1438c30863b7cb9ccb8ab53c209e1b2afa00f558d114de9b55a9907f0271fb",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.0,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.0,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.0,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.0,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.0,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.0,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.0,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.0,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.0,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.0,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2,
+      "comparison_directory": "build/analysis/avl-span320-20261031-123619/new-FW-V01-M24-N320/out",
+      "full_input": "build/analysis/avl-span320-20261031-123619/new-FW-V01-M24-N320/wing.avl"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 640,
+      "native_n": 320,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V01-M24-N640-half.avl",
+      "sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.0,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.0,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.0,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.0,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.0,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.0,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.0,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.0,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.0,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.0,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "physical_n": 40,
+      "native_n": 20,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V02-M6-N40-half.avl",
+      "sha256": "2d7b28f152342ba9d820d793bc4bd37a14f18f3416d9e96b2daa3c1f06bd0b77",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.03499546541036963,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.06999093082073926,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.10498639623110882,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.13998186164147847,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.17497732705184801,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.20997279246221764,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.24496825787258728,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.2799637232829568,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.31495918869332645,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.34995465410369603,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2,
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/a1",
+      "full_input": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M6-N40/wing.avl"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 160,
+      "native_n": 80,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V02-M24-N160-half.avl",
+      "sha256": "0d98d2cf23301af743a0115abbf3137715a68d18d0b2ea762af7dc047d75068e",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.03499546541036963,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.06999093082073926,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.10498639623110882,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.13998186164147847,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.17497732705184801,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.20997279246221764,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.24496825787258728,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.2799637232829568,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.31495918869332645,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.34995465410369603,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2,
+      "comparison_directory": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/a1",
+      "full_input": "build/analysis/avl-band-aligned-20261031-011125/FW-V02-M24-N160/wing.avl"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 320,
+      "native_n": 160,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V02-M24-N320-half.avl",
+      "sha256": "1e8fd8ae2406784994de72ee09b8d792853b6e6d48e1da65f436fa26e1a144eb",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.03499546541036963,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.06999093082073926,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.10498639623110882,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.13998186164147847,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.17497732705184801,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.20997279246221764,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.24496825787258728,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.2799637232829568,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.31495918869332645,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.34995465410369603,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2,
+      "comparison_directory": "build/analysis/avl-span320-20261031-123619/new-FW-V02-M24-N320/out",
+      "full_input": "build/analysis/avl-span320-20261031-123619/new-FW-V02-M24-N320/wing.avl"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 640,
+      "native_n": 320,
+      "path": "docs/verification/fixtures/avl-fw-symmetric/FW-V02-M24-N640-half.avl",
+      "sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb",
+      "sections": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 1.5,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.28008301528388413,
+          "y": 0.40000000000000036,
+          "z": 0.03499546541036963,
+          "chord": 1.41,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.5601660305677683,
+          "y": 0.8000000000000007,
+          "z": 0.06999093082073926,
+          "chord": 1.3199999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 0.8402490458516518,
+          "y": 1.2000000000000002,
+          "z": 0.10498639623110882,
+          "chord": 1.23,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.1203320611355359,
+          "y": 1.6000000000000005,
+          "z": 0.13998186164147847,
+          "chord": 1.14,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.4004150764194194,
+          "y": 2.0,
+          "z": 0.17497732705184801,
+          "chord": 1.05,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.6804980917033037,
+          "y": 2.4000000000000004,
+          "z": 0.20997279246221764,
+          "chord": 0.9599999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 1.9605811069871877,
+          "y": 2.8000000000000007,
+          "z": 0.24496825787258728,
+          "chord": 0.8699999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.2406641222710713,
+          "y": 3.2,
+          "z": 0.2799637232829568,
+          "chord": 0.7799999999999999,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.5207471375549555,
+          "y": 3.6000000000000005,
+          "z": 0.31495918869332645,
+          "chord": 0.6899999999999998,
+          "incidence_deg": 0.0
+        },
+        {
+          "x_le": 2.800830152838839,
+          "y": 4.0,
+          "z": 0.34995465410369603,
+          "chord": 0.6,
+          "incidence_deg": 0.0
+        }
+      ],
+      "half_area": 4.2
+    }
+  ]
+}
