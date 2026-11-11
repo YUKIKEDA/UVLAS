@@ -1,6 +1,6 @@
 """Where every file of the R&D baseline goes.
 
-The baseline (tag ``rd-baseline-2026-11-06``) kept 165 design notes in ``docs/``,
+The baseline (the commit ``BASELINE`` below) kept 165 design notes in ``docs/``,
 1,174 verification records in ``docs/verification/`` and 861 experiment files in
 ``tools/design-experiments/``, each in one flat directory. This module maps each
 baseline path to its place in the organized tree. It holds data and pure
@@ -25,7 +25,9 @@ from __future__ import annotations
 import re
 from pathlib import PurePosixPath
 
-BASELINE_TAG = "rd-baseline-2026-11-06"
+# The commit that holds the R&D state before reorganization. It is named by its
+# hash, not by a tag: the commit is in the history of main, and a hash cannot be moved.
+BASELINE = "51bd5b544e7b821cdbbbb01ad8be4f53ca0e6a5b"
 # Written when the baseline was redacted; it travels with the baseline.
 REDACTION_RECORD = "redaction-record.json"
 OLD_RECORDS = "docs/verification"

@@ -354,7 +354,7 @@ class Transform:
         tree = {self.moves[old]: self.settle(old) for old in sorted(self.baseline)}
         registry = {
             "schema": "uvlas.rd-registry/1",
-            "baseline": plan.BASELINE_TAG,
+            "baseline": plan.BASELINE,
             "note": "Baseline path -> current path. Regenerate with tools/rd/reorganize.py; "
             "sha256 is the content at reorganization, baseline_sha256 the content at the tag.",
             "files": {
@@ -397,7 +397,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--report", type=Path, help="Write the full report to this file")
     args = parser.parse_args(argv)
-    transform = Transform(read_rev(plan.BASELINE_TAG))
+    transform = Transform(read_rev(plan.BASELINE))
     tree = transform.run()
     report = summary(transform, tree)
     if args.report:
@@ -460,7 +460,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  removed by plan but present: {path}")
         print(
             f"verify {args.rev}: {len(scope) - len(wrong)}/{len(scope)} files equal "
-            f"transform({plan.BASELINE_TAG}), {len(stale)} stale, "
+            f"transform({plan.BASELINE[:7]}), {len(stale)} stale, "
             f"{len(plan.MAINTAINED)} maintained by hand, {len(plan.REMOVED)} removed by plan"
         )
         return 1 if wrong or stale or present else 0

@@ -1,6 +1,6 @@
 {
  "schema": "uvlas.rd-registry/1",
- "baseline": "rd-baseline-2026-11-06",
+ "baseline": "51bd5b544e7b821cdbbbb01ad8be4f53ca0e6a5b",
  "note": "Baseline path -> current path. Regenerate with tools/rd/reorganize.py; sha256 is the content at reorganization, baseline_sha256 the content at the tag.",
  "files": {
   ".gitattributes": {

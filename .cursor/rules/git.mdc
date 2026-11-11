@@ -14,7 +14,7 @@ alwaysApply: true
 - 試験に続くcommitとpushは、終了コードを通してだけ続ける。`&&` でつなぐか、`$LASTEXITCODE` を確かめる。`;` でつながない。ビルドの出力を別のコマンドへパイプした後ろに `git commit` を置かない。
 - hookと署名を飛ばさない（`--no-verify` を使わない）。
 - 仕様や記録がハッシュで引く commit は、PRのブランチ上に置く。squash mergeの後も辿れるようにする。
-- タグ `rd-baseline-2026-11-06` は証拠の基準点。動かさない、消さない。
+- ベースラインのcommit（`tools/rd/relocation_plan.py` の `BASELINE`）は証拠の基準点。`main` の履歴に置き、履歴を書き換えない。基準点を持つPRは、squashやrebaseでなく、merge commitでmergeする。SHAが変わると基準点を失う。
 - gitignoreに足すのは、消してよいものだけである。
 - 公開リポジトリへ出す前に、第三者ライセンスのファイルと、個人を特定できる情報の有無を確かめる。
 

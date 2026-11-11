@@ -7,7 +7,7 @@ alwaysApply: true
 
 - 採否に使ったsource／input／result／reportは書き換えない。訂正は新しい版、追加規約、新しい結果で行う（SE-11）。
 - `rd/` はR&Dの記録。内容を直さない。置き場所を変えるとき、ファイルを削除するときは、[relocation_plan.py](../../tools/rd/relocation_plan.py) を直して `python tools/rd/reorganize.py reissue` を実行する。手で `git mv` や削除をしない。リンクとハッシュの再発行が抜ける。
-- R&D時点の状態は、タグ `rd-baseline-2026-11-06` に元のパスとバイトのまま残っている。旧マニフェストはこのタグで検証できる。
+- R&D時点の状態は、ベースラインのcommit（`tools/rd/relocation_plan.py` の `BASELINE`）に、元のパスのまま残っている。内容は、伏せ字にした箇所とリポジトリに入れなかったファイルを除き、当時のバイトのままである（`rd/redaction-record.json`）。
 - 現在のツリーは「ベースライン＋再配置ツール」とバイト一致する。確かめるコマンド：`python tools/rd/reorganize.py verify --rev HEAD`。手で維持するページは `relocation_plan.py` の `MAINTAINED` に挙げ、比較から外す。
 - ツリーの整合は `python tools/rd/check_tree.py`（Python 3.11以上）で確かめる。
 

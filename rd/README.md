@@ -80,7 +80,7 @@ R&Dの時点では、全てが三つの平坦なディレクトリにあった�
 
 | 基準点 | 意味 |
 |---|---|
-| タグ `rd-baseline-2026-11-06` | 並べ直す前の状態。元のパスとバイトのまま。旧マニフェストはここで検証できる |
+| ベースラインのcommit `51bd5b5`（`relocation_plan.py` の `BASELINE`） | 並べ直す前の状態。元のパスのまま。伏せ字にした箇所と、リポジトリに入れなかったファイルを除き、当時のバイトのまま |
 | [tools/rd/relocation_plan.py](../tools/rd/relocation_plan.py) | 各ファイルの行き先を決める規則。手で維持するページ（`MAINTAINED`）と、後から削除したファイル（`REMOVED`）もここに書く |
 | [registry.json](registry.json) | ファイルごとの旧パス、新パス、両時点のSHA-256 |
 
