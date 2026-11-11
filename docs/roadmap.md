@@ -34,7 +34,7 @@ flowchart LR
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
 | F-1 | Task | リポジトリ基盤：R&D成果の整理、Rules／Skills、開発環境、ロードマップ | #1 | In progress |
-| F-2 | Task | Linux（GCC 14）とCIでビルド・試験を確認する | #2 | Todo |
+| F-2 | Task | Linux（GCC 14）とCIでビルド・試験を確認する | #2 | Done |
 | F-3 | Task | 証拠の束をリリースのアセットへ置き、取得して照合する | #3 | In progress |
 | F-4 | Design | 公開前の判断：AVL由来のGPLファイルと絶対パスの扱い、初回push | #4 | Done |
 

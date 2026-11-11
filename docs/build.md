@@ -10,7 +10,7 @@
 | Ninja | Windows、Linuxとも |
 | vcpkg | manifestの `builtin-baseline` のコミットを持つ版。環境変数 `VCPKG_ROOT` を設定する |
 | Windows | Visual StudioのC++ツール（MSVC 19.44以上）。2026-11-11の確認はVisual Studio 2026（MSVC 19.51） |
-| Linux | GCC 14またはClangと、対応する標準ライブラリ |
+| Linux | GCC 14と、対応する標準ライブラリ。認定済みは GCC 14.2（`linux-x64-gnu14.2-sse2`）。認定していないコンパイラの版では、基準結果の試験が落ちる |
 | just | 任意。レシピは [justfile](../justfile) |
 | Python | 3.10以上。試験（基準結果の照合）が使う。R&Dツリーの検査と追跡の道具は、`uv` が用意する3.12で走る |
 | uv | `just` のレシピが、clang-format、clang-tidy、Python 3.12を呼ぶのに使う |
@@ -104,6 +104,7 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | 日付 | 環境 | 確認したこと |
 |---|---|---|
 | 2026-10-29 | Windows／MSVC 14.44、Ubuntu 22.04／GCC 14.4 | 依存なしの構成で、Debug・ReleaseのビルドとCLI試験5件。[記録](../rd/foundation/build/records/cpp23-2026-10-29.md) |
-| 2026-11-11 | Windows／MSVC 19.51（Visual Studio 2026）、CMake 3.30.4、vcpkg 2026-10-29（baseline `2ec0f174`） | vcpkg manifestでの構成、Debug・Releaseのビルド、試験6件（CLI 5件、`toolchain.pinned_dependencies`）、clang-format 21.1.2とclang-tidy 21.1.1の検査 |
+| 2026-11-11 | Windows／MSVC 19.51（Visual Studio 2026）、CMake 3.30.4、vcpkg 2026-10-29（baseline `2ec0f174`） | vcpkg manifestでの構成、Debug・Releaseのビルド、試験8件、clang-format 21.1.2とclang-tidy 21.1.1の検査 |
+| 2026-11-12 | GitHub Actions：ubuntu-24.04／GCC 14.2.0、windows-2025／MSVC | PR #28のCI。Linuxは `linux-debug`、`linux-release`、`linux-sanitize` のビルドと試験8件、Windowsは同じ8件、フォーマット、Skillの複製、追跡、R&Dツリーの検査 |
 
-Linux（GCC 14）での確認と、CIのワークフローの初回実行は、まだ行っていない。ロードマップの行F-2で行う。
+開発機にLinux（GCC 14）の環境は無い。Linuxの確認は、CIの実行による。
