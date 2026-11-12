@@ -29,7 +29,7 @@
 | `.cursor/rules/` | 規則 |
 | `ruff.toml`、`pyrightconfig.json`、`.clang-format`、`.clang-tidy` | 静的検査の設定。どれもゲートが使う |
 | `out/` | ビルド生成物、vcpkgの導入物。git対象外 |
-| `build/` | R&Dのスクリプトを走らせるための一時領域。git対象外。消してよい |
+| `build/` | R&Dのスクリプトを走らせるための一時領域。git対象外。索引にまだ無い証拠が残っているので、#3 が閉じるまで消さない（[rd/README.md](../rd/README.md)） |
 | `.dev/` | 一時置き場。git対象外 |
 
 ## 製品モジュール

@@ -245,6 +245,42 @@ REMOVED: dict[str, str] = {
     "tools/toolchains/linux-gcc14.packages.json": "same",
 }
 
+# (record, cited path) pairs whose file is, by its nature, neither in the
+# repository nor in the evidence index, with the reason. check_tree.py counts
+# these and fails on every other cited path that it cannot find.
+_AVL_LINK_INPUT = (
+    "Static library that the AVL build makes from the AVL source; "
+    "an intermediate of the link, not kept after the executables were built"
+)
+_CHRONO_SOURCE = (
+    "File of Project Chrono at the revision the record names, with its URL; "
+    "the path is relative to that repository"
+)
+HASH_EXTERNAL: dict[tuple[str, str], str] = {
+    **{
+        (f"{OLD_RECORDS}/{record}.json", f"build/reference-avl/source-baseline/{library}"): (
+            _AVL_LINK_INPUT
+        )
+        for record in (
+            "avl-span1280-capacity-ks-preparation",
+            "avl-span1280-capacity-preparation",
+            "avl-symmetric-solve-preparation",
+        )
+        for library in ("plotlib/libPlt_gDP.a", "eispack/libeispack.a")
+    },
+    **{
+        (f"{OLD_RECORDS}/chrono-shell-source-manifest.json", name): _CHRONO_SOURCE
+        for name in (
+            "LICENSE",
+            "src/chrono/fea/ChElementShellANCF_3423.cpp",
+            "src/chrono/fea/ChElementShellANCF_3423.h",
+            "src/chrono/fea/ChElementShellANCF_3833.cpp",
+            "src/chrono/fea/ChElementShellANCF_3833.h",
+            "src/chrono/fea/ChNodeFEAxyzDD.h",
+        )
+    },
+}
+
 # Files outside the R&D material keep their place.
 UNMOVED_PREFIXES = (
     ".gitattributes",
