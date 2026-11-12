@@ -30,24 +30,27 @@ jobs:
         with:
           path: out/vcpkg-cache
           key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'cmake/vcpkg-ports/**') }}
+      # A PowerShell step fails only on the exit code of its last native command.
+      # Every command whose failure has to stop the job is therefore a step of its own.
       - name: Bootstrap vcpkg
+        run: ./out/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+      - name: vcpkg environment
         run: |
           New-Item -ItemType Directory -Force out/vcpkg-cache | Out-Null
-          ./out/vcpkg/bootstrap-vcpkg.bat -disableMetrics
           echo "VCPKG_ROOT=$env:GITHUB_WORKSPACE/out/vcpkg" >> $env:GITHUB_ENV
           echo "VCPKG_DEFAULT_BINARY_CACHE=$env:GITHUB_WORKSPACE/out/vcpkg-cache" >> $env:GITHUB_ENV
       - name: Compiler version
         run: pwsh -NoProfile -File tools/dev/msvc.ps1 cl
       - name: Configure
         run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --preset windows-msvc
-      - name: Build and test Debug
-        run: |
-          pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-debug
-          pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-debug
-      - name: Build and test Release
-        run: |
-          pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-release
-          pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-release
+      - name: Build Debug
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-debug
+      - name: Test Debug
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-debug
+      - name: Build Release
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-release
+      - name: Test Release
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-release
 
   linux:
     name: build and test (linux, gcc 14, ${{ matrix.preset }})
