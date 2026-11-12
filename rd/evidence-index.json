@@ -17,6 +17,11 @@
    "sha256": "cc63849b8a304386f2cd72ec2292bef4717be12d8fe47a4c39f914e05b7be117",
    "bytes": 468387840,
    "files": 151
+  },
+  "uvlas-rd-evidence-2026-11-part04.tar": {
+   "sha256": "95ddf99ed3d35b49801a12937b4f07063f8ad500b71375fa3449a4170b48fc03",
+   "bytes": 136007680,
+   "files": 179
   }
  },
  "files": {
@@ -36,6 +41,11 @@
    "bytes": 586,
    "pristine_sha256": "b39ef5e4e39989978a4bc7deaa32d0c50d9ed2699ffafcb9780e741870905732",
    "bundle": "uvlas-rd-evidence-2026-11-part01.tar"
+  },
+  "build/analysis/avl-allocation-factorial-20261031-183217/FW-V01-inner-only/out/uh-guard-tests.txt": {
+   "sha256": "1c2c296bb5399d38dd9a03f1400453d09317c4f5c51779225733f39ec4eada88",
+   "bytes": 409,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-allocation-factorial-20261031-183217/FW-V01-inner-only/physical-fullwing/uv-forces.txt": {
    "sha256": "7cdd2b9b43090e4482eeb2d33d0e26e8886b99135952576ab7a423852ddbfb7c",
@@ -277,40 +287,310 @@
    "bytes": 131824,
    "bundle": "uvlas-rd-evidence-2026-11-part01.tar"
   },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/elements.txt": {
+   "sha256": "7e6a9830569673fb85501d3ce211b2e192561b35d787614e5426d312461e5d7f",
+   "bytes": 380574,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/strips.txt": {
+   "sha256": "347880a17e1c67bfa8c9e601b76754d03e2a709245b092ab080c2f80722dad66",
+   "bytes": 27274,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/total.txt": {
+   "sha256": "d281afbdecf365cee714437381f72e0838863b78279b2469cb9245d5ee3b632e",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/uh-meta.txt": {
+   "sha256": "4930497810cf7a03e298b3858f0635dc863f042127e11e944a63aae0a427b05a",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/uv-forces.txt": {
+   "sha256": "a2df7d10db78d24ab3a7299aea4d9eddde0a3ff8eb9b3f820cf4fe175cdee2ac",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/uv-rows.txt": {
+   "sha256": "70ba9f7ab7e58fcd7ae7ef364ba1fdd9d7247eb19b26f700cdaea4e6acba22aa",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/after/uv-strips.txt": {
+   "sha256": "f545b33161f5f5174d061f78ec3804f71ca2ff50698cfa0bc53e7cce2e21162b",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N160/wing.avl": {
    "sha256": "9ba633af9e56016a2346ae9971e4d0fd763312b43e5192be8421381712aa663a",
    "bytes": 881,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/elements.txt": {
+   "sha256": "b235a0b605423263b806ed4f73b70ec3889105a46132249b4aa38562a5c990c3",
+   "bytes": 760254,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/strips.txt": {
+   "sha256": "c4ecda0b4ae3a70552db628b89db0e69caa01f6499584f7b94fd6040bb8080a0",
+   "bytes": 53434,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/total.txt": {
+   "sha256": "029aa4ee6d333413a4aa238012d7c906bc3491da7472acf9f5793fd611f7e108",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/uh-meta.txt": {
+   "sha256": "f5a264bb1a1fcbc187e3b1fba1281aa39d28975d2901f009131921195dd4eeff",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/uv-forces.txt": {
+   "sha256": "f9d26ea98aadfad8e99985e7613ebe422954f12653309677e1d7185aeace5bf4",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/uv-rows.txt": {
+   "sha256": "f372b0fce087ba8f979f4959681e05bcf22314308d677444368ca58b8ed89b77",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/after/uv-strips.txt": {
+   "sha256": "11df5915eebf8422ea4716ff56f57710be50a53cbe5f34704f60c15252c7b1aa",
+   "bytes": 13030,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N320/wing.avl": {
    "sha256": "1b1438c30863b7cb9ccb8ab53c209e1b2afa00f558d114de9b55a9907f0271fb",
    "bytes": 892,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/elements.txt": {
+   "sha256": "96a8a27dfe1f4b839108e3ae5343f9a33a626197e29eaa365628a0c47ac6f8d2",
+   "bytes": 1519614,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/strips.txt": {
+   "sha256": "a523b597aef0cb33269d26dd52607ff0dfa91e8a39c19793fd7aa3f658ba1718",
+   "bytes": 105754,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/total.txt": {
+   "sha256": "dcabafa9ccd5155283fb88a663fdb0ef21e7161f4e4f4dc79cd6fffda39ba535",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/uh-meta.txt": {
+   "sha256": "e5c31bdd7faafa951cfd102ffe105a3a0c621681dfead046e328d0633f1b7731",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/uv-forces.txt": {
+   "sha256": "e06d76748acd6eb0b16b7f9833032de53c049b691c6643e42298692c812e271c",
+   "bytes": 4354620,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/uv-rows.txt": {
+   "sha256": "e34ff19971d028313794d70060e8bc98f0a777d11c98b4062e1fed0e47694a88",
+   "bytes": 4216384,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/after/uv-strips.txt": {
+   "sha256": "0e456241e31ff69a5cf15476662c442ef464b19639f6a5f5fb6a7ed48c316be1",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M24-N640/wing.avl": {
    "sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815",
    "bytes": 892,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/elements.txt": {
+   "sha256": "802a2c51f336e55c2152f5ef55fb218a7ac45af924ac2f92327296687c4ff110",
+   "bytes": 33534,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/strips.txt": {
+   "sha256": "ce391fe79d8637f12b610fb71241c4faac40fc6b2fece6e872137b0712f501d0",
+   "bytes": 7654,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/total.txt": {
+   "sha256": "468b86c4f9e1673a08f84b0c0523ca40fef3cfcde19220ee01d241d011e845dd",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/uh-matrix.bin": {
+   "sha256": "1e390a9e3f4b42f07da503a4c66c4eedf62e80c7b4358ef333d1b72cdb6e9dac",
+   "bytes": 115200,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/uh-meta.txt": {
+   "sha256": "8839418b20392892502404c937cc8472716e463b0a11782ca17c2e30d7fa07a7",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/uv-forces.txt": {
+   "sha256": "f22957bc8471c24bb41a0f120fb917c02fff7c7bcbcb5545a6972a78bcbf9b8d",
+   "bytes": 68100,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/uv-rows.txt": {
+   "sha256": "693c83fba07f9692cebfdf07d2de2989d807abcc791785fca3e58191ec9bd8ce",
+   "bytes": 65944,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/after/uv-strips.txt": {
+   "sha256": "7b4baa8d3d5fd1c09abbe9d6bd9649af3ec76428c099be4afe7eded8053e0f7a",
+   "bytes": 1690,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V01-M6-N40/wing.avl": {
    "sha256": "b0f07124d3ee358dd345327fc4406e03c1d503a92a445f5c276012cd7adaa93d",
    "bytes": 880,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/after/elements.txt": {
+   "sha256": "116b50907330c1ceb5281d90328939846ddbb058132f9bf4b6007e904cb7b3bb",
+   "bytes": 380574,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/after/strips.txt": {
+   "sha256": "e779bf03c45062283a772e455fffaa33862bfed15b71c860794eb6c1c795b964",
+   "bytes": 27274,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/after/total.txt": {
+   "sha256": "ad5cc33cd73a7d974dc96e59f83a5578c470ea14533b9490d7e7e8fdb9b9a16a",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/after/uv-forces.txt": {
+   "sha256": "18ad93857a58caa143a20f791d802d69efe4feb0883d50c1c8cb4aaa6a3feb62",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/after/uv-rows.txt": {
+   "sha256": "f176d5cf168d4da9ada554ccf9fcbd5843ad43d9863fcd731736a1925b2112fc",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/after/uv-strips.txt": {
+   "sha256": "63a05ca2f84a4ad0db2facac54a51f46e0375e2dc982ecb1372c7b345ad7b3ca",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N160/wing.avl": {
    "sha256": "0d98d2cf23301af743a0115abbf3137715a68d18d0b2ea762af7dc047d75068e",
    "bytes": 1063,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/after/elements.txt": {
+   "sha256": "70df6e2e7906284f374755329b790d8130c7c5532eda25c16410cf90e106d6cb",
+   "bytes": 760254,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/after/strips.txt": {
+   "sha256": "97b28c60e352d6aff8256d5bd7c2c10c2dace351d2e4800097e6bce6ff49abeb",
+   "bytes": 53434,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/after/total.txt": {
+   "sha256": "3cfba68da9c2b57dc1004f5ae412eff8ac38eb8dca3da25f42b0458535f56525",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/after/uv-forces.txt": {
+   "sha256": "40d9953629ae1283e3ca7d9a460ae90e8808d619671622fe77d4d3195a4c078c",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/after/uv-rows.txt": {
+   "sha256": "e9798d67746409dbfcaae6f245b3bec0b559fe851777e3a7657eb6d5143720a4",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/after/uv-strips.txt": {
+   "sha256": "c45b57d161f9d92953b9158e7567d9b8954be6a4eb9115e14c980a09307e5bd0",
+   "bytes": 13030,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N320/wing.avl": {
    "sha256": "1e8fd8ae2406784994de72ee09b8d792853b6e6d48e1da65f436fa26e1a144eb",
    "bytes": 1074,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/after/elements.txt": {
+   "sha256": "c93a4759e50f2fd1fa252673c72c04b1b76c005397104b37ff709e7bf7fcdd73",
+   "bytes": 1519614,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/after/strips.txt": {
+   "sha256": "3a6fffeba6753f6563e821454529bb9fc37032fce324cb877e1985d10d82852e",
+   "bytes": 105754,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/after/total.txt": {
+   "sha256": "1bdeaa1b854e034c41c07ac5610e7f65eddc6d5f781b7cd52bcfce8b3b89d768",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/after/uv-forces.txt": {
+   "sha256": "b84bb4cb0a9559d32c36bf9ad4ac656a2062f8b27cf7a6aa5e788a1f96b527c7",
+   "bytes": 4354620,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/after/uv-rows.txt": {
+   "sha256": "3c4654d293f6b9130e187d212a817e174b6ff742de5a510975f97f8c8cb87bdf",
+   "bytes": 4216384,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/after/uv-strips.txt": {
+   "sha256": "c93a108acf5a922cc132312f86f7a359ee2903401023ac0a937a2c55c8fe5705",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M24-N640/wing.avl": {
    "sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb",
    "bytes": 1074,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/elements.txt": {
+   "sha256": "f80581de8391e9e4d41e90026654996cedba42fb79f2c971202026508fd86fe3",
+   "bytes": 33534,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/strips.txt": {
+   "sha256": "2abc53f3ae06653179a338312bd267f1039ed4150cdb8710684586299517b722",
+   "bytes": 7654,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/total.txt": {
+   "sha256": "4f3f399223c378241f01abcdd9f27714766f481f6dc9aff4482d563d3e9bdd3d",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/uh-matrix.bin": {
+   "sha256": "f0c7cdb1178727dd736032d283c62c140ba6623c8b1d17d33c6277e5301efc72",
+   "bytes": 115200,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/uv-forces.txt": {
+   "sha256": "1f9efd4dc0cd5547811ac134317a663ba446136b345e69b3401c1d083d45bbf6",
+   "bytes": 68100,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/uv-rows.txt": {
+   "sha256": "66396c4a483eb81db9eeac9c128e9da59406445d0e2ed3e7693a366669058b8d",
+   "bytes": 65944,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/after/uv-strips.txt": {
+   "sha256": "4c467f324eb514851b3b9db2f6f53d5922be778d1c79d6331bb64f2d60498d8d",
+   "bytes": 1690,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-capacity16000-20261031-142340/FW-V02-M6-N40/wing.avl": {
    "sha256": "2d7b28f152342ba9d820d793bc4bd37a14f18f3416d9e96b2daa3c1f06bd0b77",
@@ -547,6 +827,26 @@
    "bytes": 421696,
    "bundle": "uvlas-rd-evidence-2026-11-part01.tar"
   },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/after/total.txt": {
+   "sha256": "f759a9fa12838e69d144d0b9bf0fb5e4d4a7508ae5f09713891f01d4495f19bc",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/after/uv-forces.txt": {
+   "sha256": "476fdae3d8e799d264a5aed336c05693297677599aee1bdfdc813b1162392ab0",
+   "bytes": 4354620,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/after/uv-rows.txt": {
+   "sha256": "cf485716dc896c7b23ef4cc0c9f02ac28ea366f80486ca2e0abfbc1c5a0402c1",
+   "bytes": 4216384,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/after/uv-strips.txt": {
+   "sha256": "3f40cdc8d4437650290a656670b15a6411af0adcc021066eb024e900618f95e1",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "4fa0d4e06d88bf9333409a6973c8b27d470a7ea0662bbded02e3c093d0c648d2",
    "bytes": 7268766,
@@ -562,6 +862,31 @@
    "bytes": 892,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M24-N1280/after/total.txt": {
+   "sha256": "36d1374695e7cc7299214befc5adbf7cc84dc76a0142141ecd272a62a3c71715",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M24-N1280/after/uh-meta.txt": {
+   "sha256": "5ec518eb0d069f1b7f5e3db5579247085153ffbbed7ed8d42f86c673c0d2b98a",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M24-N1280/after/uv-forces.txt": {
+   "sha256": "954b8bec4b8903b6e7bf5864084c0ae7452ac732b58f3cd242a013f1c926a28e",
+   "bytes": 8709180,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M24-N1280/after/uv-rows.txt": {
+   "sha256": "0b709ea171671ce68f3ecf9a913314c2abf87fb7d79ca703bea7b377437a41b3",
+   "bytes": 8432704,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M24-N1280/after/uv-strips.txt": {
+   "sha256": "869ebe1a4e5cfc8d435655a600bb8889e5ad518163bca1d6145d13bb8e174d34",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-span1280-20261031-152720/FW-V01-M24-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "6ce2b3753ed5e6d590d32cae60fc874bc11d09e2874c84eb5339c44864a3c314",
    "bytes": 14570872,
@@ -571,6 +896,26 @@
    "sha256": "08e3a4d0f645816692f2d256dc4ed941160056c9a7c68231a477da30388ad74c",
    "bytes": 15086310,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M3-N1280/after/total.txt": {
+   "sha256": "13d8e565c3ef954049296559f19cddb45851bac1091bb5dc16fa83e344f8e1f1",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M3-N1280/after/uv-forces.txt": {
+   "sha256": "1bd406e48f4c1a1498f8ad56f10f76984af83d638121f9c61ee4a2755111ffa6",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M3-N1280/after/uv-rows.txt": {
+   "sha256": "e151ba54aee7a4c68d86e31ed1b456f03ad12df7af0f3bb824c3175bf1f82821",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M3-N1280/after/uv-strips.txt": {
+   "sha256": "8148b415339aee16f1fb564b8d643e66d0c5e50a4dad971c83af601bc071a881",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-span1280-20261031-152720/FW-V01-M3-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "c0e5adc255a8dccc627548b6267e8711798b9dc4f92038b0364c2bebfe9dcb7b",
@@ -582,6 +927,26 @@
    "bytes": 1882513,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M6-N1280/after/total.txt": {
+   "sha256": "d2fab97f1fc01e2bb25d610b88d55ecac1ba823a1030c1ba736b5a3b5985ab53",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M6-N1280/after/uv-forces.txt": {
+   "sha256": "bfec882dcf14ff0312f6c4f43fb91b1205cd1fe43e66cec3c48ba5ac6f484add",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M6-N1280/after/uv-rows.txt": {
+   "sha256": "56ab435fc36a4f0472997f7c0217934d2107cce1564fa1ea0a2ce40539866aec",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V01-M6-N1280/after/uv-strips.txt": {
+   "sha256": "2d3497d9c85ddf69e2e4b217d319b2570338cf75225a01b89631d90c597f62f9",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-span1280-20261031-152720/FW-V01-M6-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "ee884913adf0fbf0fd1f3cac0dea9384d6857663ddeb4c4ff1a3a53a400485a0",
    "bytes": 3624693,
@@ -591,6 +956,26 @@
    "sha256": "7d82402789dcb7c8c1cc312f6474f6c5bc9035fa664b9ec48415a40e593f3543",
    "bytes": 3765929,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/after/total.txt": {
+   "sha256": "8b2c66a8d9ac5f513e250fa29fa9d8d65e92d7d8e77a299ccec558f52a2ec61f",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/after/uv-forces.txt": {
+   "sha256": "64d370b1754a3dd81b340250437b02d5fb666c3f1db40b75fa6cae9f2f020f59",
+   "bytes": 4354620,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/after/uv-rows.txt": {
+   "sha256": "69ef2408f9173089a3ced4aa0ebb1ddcd99ce4a4a0fbedd2ff04a5593db6d48b",
+   "bytes": 4216384,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/after/uv-strips.txt": {
+   "sha256": "178bc7807ba69a3db1404c9d486c4b92acc8cafac0d0514c821aad0106d566f2",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "6191e9a83e312a3d5045316f416d9de2f6c4a50d978f9ae4bf44383d8c23030f",
@@ -607,6 +992,26 @@
    "bytes": 1074,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M24-N1280/after/total.txt": {
+   "sha256": "a987d3ca715f3f98762a4479b67dc5e1c0b62eef897dae835ee37d94aeaf4099",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M24-N1280/after/uv-forces.txt": {
+   "sha256": "e9775b321d8f0c55cac3af680c9aef2c9cf2a2b9c5147a7ec927d1c79d46ea2b",
+   "bytes": 8709180,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M24-N1280/after/uv-rows.txt": {
+   "sha256": "979893274d1066254843112580d6cf6955331eae983a63c6412d4010ec2d05da",
+   "bytes": 8432704,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M24-N1280/after/uv-strips.txt": {
+   "sha256": "3f01f55bc5f81f091278006d882b27bdaf131cbc38e481447c32f6c8605a21d0",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-span1280-20261031-152720/FW-V02-M24-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "38307855983cf153eebd8ff31fe8b21e8fba2128342a08e9977a387c6109e054",
    "bytes": 14570872,
@@ -617,6 +1022,26 @@
    "bytes": 15086130,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M3-N1280/after/total.txt": {
+   "sha256": "4ffd75415591d9a53358b338d04c989b2879cbdea70319e1b60e7407b8a870ad",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M3-N1280/after/uv-forces.txt": {
+   "sha256": "e8fe2e7842502b5a06784318605e8792ac92c717b242fca7279eec448f8b2f06",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M3-N1280/after/uv-rows.txt": {
+   "sha256": "db42d9b90f6f4b039149bd7364008b0a58df3c427ac3d3531e7f830711eee018",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M3-N1280/after/uv-strips.txt": {
+   "sha256": "d87536bc3405da970cd2a5462756e015215e750046fdce579f97492b0217b467",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-span1280-20261031-152720/FW-V02-M3-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "ed600c51968aedc811ac0a2f0adc3bab45e0c1f5dfacbd6322a0335ca43956bd",
    "bytes": 1810706,
@@ -626,6 +1051,26 @@
    "sha256": "a9ff1b70b606cc80529f13011ddcaeecc3b1e7a8855d75cb815aadfd0ad2d091",
    "bytes": 1882475,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M6-N1280/after/total.txt": {
+   "sha256": "f7840c480a7fa85736fe617a0b65dc3ea57448abf7618ec13ab933fc678d4f94",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M6-N1280/after/uv-forces.txt": {
+   "sha256": "4b198951bb429517d22b867e4d57300343549f773ea861ae94ec2af0d2bc2b30",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M6-N1280/after/uv-rows.txt": {
+   "sha256": "ccfb5f9f9a9a345e68b1711404665292c44e5184d05c5cdb7148e6f47457db5d",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-span1280-20261031-152720/FW-V02-M6-N1280/after/uv-strips.txt": {
+   "sha256": "a95883083b194a779d83ee03d95c877ca6267321e58b91a71f0baaec9ed167ed",
+   "bytes": 51910,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-span1280-20261031-152720/FW-V02-M6-N1280/physical-fullwing/uv-forces.txt": {
    "sha256": "9adaf109c450408fead3bb29d65fafbd875dae3a2bf5e72c535534417c7e9483",
@@ -767,6 +1212,51 @@
    "bytes": 105472,
    "bundle": "uvlas-rd-evidence-2026-11-part01.tar"
   },
+  "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-small-geometry/uv-forces.txt": {
+   "sha256": "0d56af930e2be9f0ace431ef64fa4675e5bbb5ea3fa800e85a2c7a68eb92ac1c",
+   "bytes": 111432,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetric-solve-weights-v2/FW-V01-small-geometry/uv-rows.txt": {
+   "sha256": "b2e52aa1c37dbaeab7fb8dfcb926d1e036fb21dbd234caa4daf9e5e6bbcbd847",
+   "bytes": 117454,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-small-geometry/uv-forces.txt": {
+   "sha256": "1c40b88310564f8fee1516c99e9deab21d68e9b82c6d83795a2764f51b670133",
+   "bytes": 111432,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetric-solve-weights-v2/FW-V02-small-geometry/uv-rows.txt": {
+   "sha256": "7bf1bc73f1eeb7a6a685c41e812ca32edc0e30667742e036dbe4957eeb21b95e",
+   "bytes": 117448,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160/after/total.txt": {
+   "sha256": "0ca45553b14209ba817833e955435efa1c03d120c76f074dff2f923b01856141",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160/after/uh-meta.txt": {
+   "sha256": "424ffbe40dcf8a6b675fe9595088a16593f90c1e30162b3e7348bf3cd8e65c32",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160/after/uv-forces.txt": {
+   "sha256": "dcb34f4e50db696113fc92339338c26388c1d18609232908efdda01439a04112",
+   "bytes": 544380,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160/after/uv-rows.txt": {
+   "sha256": "98c05343f1809a7113aeec87c6300d44c723b26891fddbca77cc03787b1cca68",
+   "bytes": 527104,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160/after/uv-strips.txt": {
+   "sha256": "fdf1e356715657ee27b562e1364d64b27216460fe30d1911f1ab03460ff8dba7",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N160/physical-fullwing/uv-forces.txt": {
    "sha256": "9dbcf0386e52ba5d4b1992ae6b26abe910b2743519841861cccc2970e18107c7",
    "bytes": 899081,
@@ -776,6 +1266,26 @@
    "sha256": "2fda300f76cf35bb155eb3dc5496834f3a7b4347f791823342b12aa726537a9e",
    "bytes": 940723,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N640/after/total.txt": {
+   "sha256": "983f4bb9f70c40f8e61adac0dfe6e4aa86b0f72460e3c873e80b40c3e70e4e43",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N640/after/uv-forces.txt": {
+   "sha256": "bcf6061780d75886fdb02cb36dcd81ffca2773cdf6ce648bfb5def3b0b85d63d",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N640/after/uv-rows.txt": {
+   "sha256": "fa528003b8e11da47a182a8b8c0868e2548844ae86b8f723d1909f691d1d9ce8",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N640/after/uv-strips.txt": {
+   "sha256": "0690f4a2de57ff6c608c0f543f647b34ca5c63ebb6da7d9229e9849516f48205",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M12-N640/physical-fullwing/uv-forces.txt": {
    "sha256": "d4bb3f4c29fefcaf832af5537643f98f1649741eb8fad78183ac256f6a3c3fa6",
@@ -802,6 +1312,26 @@
    "bytes": 892,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N80/after/total.txt": {
+   "sha256": "06ba9b293dafc7b81e8f6d8cf05e0f8587f87a2b5d1b2f10bf0a1a3cf5de64ac",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N80/after/uv-forces.txt": {
+   "sha256": "835468096ae4b8511304abb1bc7fdef766479c39b92456fc1799b658c97d3c4b",
+   "bytes": 544380,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N80/after/uv-rows.txt": {
+   "sha256": "bbf7a17dadfd667c7c451c7c3f496a4dfa23655ed7210a0bc64af164f803edca",
+   "bytes": 527104,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N80/after/uv-strips.txt": {
+   "sha256": "c6b638eabb64251b02c3aca3fcd80aa62df931dbbee03dde1920375388371428",
+   "bytes": 3310,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N80/physical-fullwing/uv-forces.txt": {
    "sha256": "ba80845c8782f682ac858df6d9ecc72e2951560ddfd198fd563883595d2b8551",
    "bytes": 896563,
@@ -811,6 +1341,31 @@
    "sha256": "7726284d7108cf166aa832ba9506d1317a30f2a710588e47129c273773f3a5bb",
    "bytes": 940689,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160/after/total.txt": {
+   "sha256": "42617a3a4bf0392556287686373d6660693cd0999ec40df67966c821f85f5717",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160/after/uh-meta.txt": {
+   "sha256": "57b8619195c620d1e57f77bbeea36792dfe1a12c51ebfee41ce67269a5773256",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160/after/uv-forces.txt": {
+   "sha256": "1979d3b6168f2b1a5a226bb7e972f6511e193fc4f787a923f6fc1ee88b3af4a8",
+   "bytes": 136140,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160/after/uv-rows.txt": {
+   "sha256": "f64031e91beebf5e314dd38a701b9b0eecf1a1cb4b7e29472a3e7f549c9f838c",
+   "bytes": 131824,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160/after/uv-strips.txt": {
+   "sha256": "374c7050f6a2b2ce995f5c39b3f38d8168f97ea3b389608bf2050933b5e276bd",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N160/physical-fullwing/uv-forces.txt": {
    "sha256": "1057b54618558f4f4ceac17501c2655f302c7142faaa60579d290a25ac8dada9",
@@ -822,6 +1377,26 @@
    "bytes": 234956,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N640/after/total.txt": {
+   "sha256": "d951412c4a070ae5ada319be5da05d4a8242ee09d61499d249dc52fdbd7833b8",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N640/after/uv-forces.txt": {
+   "sha256": "70981dd5671c837b4b124cbafe15bfbfa45ac7383bc453da1c8b2699a1da0931",
+   "bytes": 544380,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N640/after/uv-rows.txt": {
+   "sha256": "eee418976ce6e204acfc2a1171cb1612c5aa464bc4cefc3d7bfad5cb9bd08929",
+   "bytes": 527104,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N640/after/uv-strips.txt": {
+   "sha256": "706a11e13429771c69ea3e9a1d53f4073109ec1164e77d89766e4f9b4c886631",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M3-N640/physical-fullwing/uv-forces.txt": {
    "sha256": "23722528f85eabc7e2443709c32597dff760802e519c9fa494ebcbf2c7a93e00",
    "bytes": 901981,
@@ -831,6 +1406,31 @@
    "sha256": "1cb260e9d67238c93c579c7f1f44fc58f1260e965841a51e7acbb684ca538d6d",
    "bytes": 940721,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160/after/total.txt": {
+   "sha256": "a9291af4a3f34572407209de22ebe2f861e03eb56ab4c3f2a467b787b8ba1f1c",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160/after/uh-meta.txt": {
+   "sha256": "393ad82ebf6d07c01d12d6e425f0d2cced93da4eb505b0650f4554805dad1b68",
+   "bytes": 92,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160/after/uv-forces.txt": {
+   "sha256": "e52528b916fb775a66d76803a15a306fd2533150ef0c6d762b5a3c4b67303aca",
+   "bytes": 272220,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160/after/uv-rows.txt": {
+   "sha256": "e8c7fb38b58bc0fd3f64c919be675b27ac12c1bb2a464993c2ad07d62b5d87a4",
+   "bytes": 263584,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160/after/uv-strips.txt": {
+   "sha256": "80dfc12818101825011af1908108f3c123cedcc2990ac9b6033b2b1c5aa0c81d",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N160/physical-fullwing/uv-forces.txt": {
    "sha256": "1a589a73912c6b10942584c5efa349350fd46e2c3b12acc4085a1249a4700d08",
@@ -842,6 +1442,26 @@
    "bytes": 469886,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N640/after/total.txt": {
+   "sha256": "69f9dcac78f9319d22487984d4bf6b10f2664cdb4cb6a761bb5546958bfedbbc",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N640/after/uv-forces.txt": {
+   "sha256": "5e49a556a9c037119542871f97c6ecfc518d587392b992c86da9c9d413cd9dc0",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N640/after/uv-rows.txt": {
+   "sha256": "7d85ccce33142a1d88d2a46da5b597a8359cae1c4f073f92f3e09bd854f1832b",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N640/after/uv-strips.txt": {
+   "sha256": "dfa5b9c256d45cc32c51cf0cd1cb0165e82d88f6972381b761eb012f8f5af816",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M6-N640/physical-fullwing/uv-forces.txt": {
    "sha256": "f366399329443ce63438dc58488c4ac31dfed8e5eac39c9df154cd17be9cc474",
    "bytes": 1807223,
@@ -852,6 +1472,26 @@
    "bytes": 1882525,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N160/after/total.txt": {
+   "sha256": "a99b254edd0655e90d7c6a7b3e96453d4c8afd8df850e4669e248411a419256a",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N160/after/uv-forces.txt": {
+   "sha256": "5e4d5a0fd72677972be9130a4dd311d19001a36330ac0ebb2005d5dfa3fa2101",
+   "bytes": 544380,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N160/after/uv-rows.txt": {
+   "sha256": "5e6fd86971834660065e862a1a6420ce4caac5e7f03b4fe38a66035d259f02be",
+   "bytes": 527104,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N160/after/uv-strips.txt": {
+   "sha256": "510c9b161ad3fbc1a29a8672a410f247e31cad8d8656060f3cf95df84935688b",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N160/physical-fullwing/uv-forces.txt": {
    "sha256": "3c8e8e6745973ae78b37949f8d930089c2fad5ef0844a5128c9685eb092f5bbc",
    "bytes": 899081,
@@ -861,6 +1501,26 @@
    "sha256": "be5962dbed3a86565136840072230d02d62308996eb541c34a7159ef5e8307ce",
    "bytes": 940743,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N640/after/total.txt": {
+   "sha256": "408baf732eaab6aacf7d5e038c44ae4acf8b739093a70744960110e0fdb0b8ec",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N640/after/uv-forces.txt": {
+   "sha256": "b00a3c58484a189e2610ddf64a05a6f159e45b11d37847b02a63d0998dccab86",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N640/after/uv-rows.txt": {
+   "sha256": "1cc5bfa4cf8a9a548e0c724edab59bbfc6af9aa76e0ce954eec1955bd5d2c8a9",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N640/after/uv-strips.txt": {
+   "sha256": "e1df3056c4991c4afc2f4d7435493a1d1ad995347dd8a9e6a151ca6da9d9b20b",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M12-N640/physical-fullwing/uv-forces.txt": {
    "sha256": "b0f2d315d043aa395f0df47f36c2651ce2a9ddb7781125ab8cfbf3bbd312c53b",
@@ -887,6 +1547,26 @@
    "bytes": 1074,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N80/after/total.txt": {
+   "sha256": "f3e7958536decef9d31eded6a74778cd418ee8aeaca0ed896405d7230b2cca97",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N80/after/uv-forces.txt": {
+   "sha256": "2078c762fa88d5e1b680742898b935d4868cf13b19c298af16638c475f4a9fbe",
+   "bytes": 544380,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N80/after/uv-rows.txt": {
+   "sha256": "34a20e1f2ef1ea735ed012c122d8c3ec26db50e57cb5dbc0ca9594ede1e0840b",
+   "bytes": 527104,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N80/after/uv-strips.txt": {
+   "sha256": "1db82db5c8b18d274caa6373caf4cb0600c0c35331a2a32f8f5be60e56b45931",
+   "bytes": 3310,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N80/physical-fullwing/uv-forces.txt": {
    "sha256": "7b0c42f2c013b793f8b361df409b994286d8f3f7751bcb19e51ec88fbca1b9c0",
    "bytes": 896563,
@@ -896,6 +1576,26 @@
    "sha256": "a197fbda28cfc9a7a776c6e1479c2e463e5504b65cd4e6c0df772261343561cf",
    "bytes": 940755,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N160/after/total.txt": {
+   "sha256": "7d49c74f79929d653a1dfba00cbb12bbd89da167e17db25843ab4b22124f858c",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N160/after/uv-forces.txt": {
+   "sha256": "5e6363030523b95c980164e987f581630007c548912c5d8db29078aad48f9b49",
+   "bytes": 136140,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N160/after/uv-rows.txt": {
+   "sha256": "e2562f526106676ab01904b90af40db37479a7241b7cc9631e3cae2293522ac5",
+   "bytes": 131824,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N160/after/uv-strips.txt": {
+   "sha256": "1766ac3817da67edeaf6f4b99de43084e3697975443e1b6dc7f08f5578bb3f99",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N160/physical-fullwing/uv-forces.txt": {
    "sha256": "cd22b79c4de5ff9f9a7d8cee14f8d4fdf875d297d6c618804a33eea2067acb02",
@@ -907,6 +1607,26 @@
    "bytes": 234918,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N640/after/total.txt": {
+   "sha256": "a9d8ba3a13534d60d70c01d42f689a51982baf5441b293ee209fa4b4dc6a3849",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N640/after/uv-forces.txt": {
+   "sha256": "50f369b3eacfbaff323a1428930e1342b4f592a873766a60c5777b6a21f52633",
+   "bytes": 544380,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N640/after/uv-rows.txt": {
+   "sha256": "a762721d4f965534e87382a486c7cceca8669e4288658753c890df0f32857b3a",
+   "bytes": 527104,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N640/after/uv-strips.txt": {
+   "sha256": "9ade4ca317ded9d35d495b3a67f41db61083aeb8c1371758eee47b01764d7827",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M3-N640/physical-fullwing/uv-forces.txt": {
    "sha256": "ba7cb268ad46c9e65d4e8319569c35dcc421731c30f3ddbe5f2402b8ce0fc3a2",
    "bytes": 901981,
@@ -917,6 +1637,26 @@
    "bytes": 940735,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
   },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N160/after/total.txt": {
+   "sha256": "a4cdb79fb7467b3f705d9ba7329273ec01f898398711136013f9cbf1e1fa736c",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N160/after/uv-forces.txt": {
+   "sha256": "eb34c242613e2a2dbeedc12ea6a2b67522035197ec8c6867f8976921f6c57c69",
+   "bytes": 272220,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N160/after/uv-rows.txt": {
+   "sha256": "cddac8bf5dcce3f4a5993078768cfdb96794e7104f04809441e9c1ddc949a224",
+   "bytes": 263584,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N160/after/uv-strips.txt": {
+   "sha256": "2a7dea1851c422dc1e44f612111d9bc641449321aae38e112aa0ff1140aa34b4",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N160/physical-fullwing/uv-forces.txt": {
    "sha256": "bb5629954e74f49d81608b3ae9cba078e4c401f2eaafcdb7deb6ed69b2176f73",
    "bytes": 448032,
@@ -926,6 +1666,26 @@
    "sha256": "844a3b16186dc4a81c1db80f1848cf15ae04d3d0e9cec6d52651c0b8ea130f77",
    "bytes": 469896,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N640/after/total.txt": {
+   "sha256": "2a2cbd56627cb6f3d2486fb0feb855ff909d0687a31df04dce7e7e3af728f712",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N640/after/uv-forces.txt": {
+   "sha256": "46a83c1657f475097af5be3f2b09834d0e4c9850e796a9aceb1c1d5c808be3d0",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N640/after/uv-rows.txt": {
+   "sha256": "1aa30ed7563c961088ac66f1936cb930d9a7d1499c41d971fbe5691052f0da12",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N640/after/uv-strips.txt": {
+   "sha256": "4fe128c7ec52aa89acfac29ecb4b3bfcf196bae118502e301b376934ab53c153",
+   "bytes": 25990,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M6-N640/physical-fullwing/uv-forces.txt": {
    "sha256": "35aebdd016d0f136417399c30622a5617de7b474aa8982d9768265abe89fc106",
@@ -1006,6 +1766,126 @@
    "sha256": "2d7b28f152342ba9d820d793bc4bd37a14f18f3416d9e96b2daa3c1f06bd0b77",
    "bytes": 1062,
    "bundle": "uvlas-rd-evidence-2026-11-part03.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_baseline-FW-V01-M24-N160/after/total.txt": {
+   "sha256": "5023548d542ba80f1922d0fa167fc191c0e6df806b8e94dcc07fb47ef0cd3fae",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_baseline-FW-V01-M24-N320/after/total.txt": {
+   "sha256": "86a51c9cc9234760e7be7f09a9148e04c87d75a4c10c007c08faa880441f0356",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_baseline-FW-V01-M6-N40/after/total.txt": {
+   "sha256": "35f210d5c1ab679db442b9f1c2b9509ce1818d93370bf32b7605589a23b7b4c6",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_baseline-FW-V02-M24-N160/after/total.txt": {
+   "sha256": "a66bcd322f34948b960d11a43a53e4ad8aaff862fafbf7a29ea110f32b04f5af",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_baseline-FW-V02-M24-N320/after/total.txt": {
+   "sha256": "cdd7296739967f5ea2200ba8363684d7713246489a13ae007a1158483d519129",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_baseline-FW-V02-M6-N40/after/total.txt": {
+   "sha256": "a44c0f28ca2300823bb8eb421918d176723fee3a4db63b601d6e07760d2ca2ca",
+   "bytes": 1351,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N160/after/uv-forces.txt": {
+   "sha256": "487071ae0ef4c28adbcfb58f437ab6e08310a80baa6243138d8ae38e0a8ad412",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N160/after/uv-rows.txt": {
+   "sha256": "12cebeeb026ce87227a74e7dc0bffcd6d27b8a360962e009d0dc3a3c93efd031",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N160/after/uv-strips.txt": {
+   "sha256": "c3065a02bbb4f0bb6eb42220e840cc895d37892c6339288a5e6d4e853f096017",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N320/after/uv-forces.txt": {
+   "sha256": "b57d52d475764b2c63d780616b7ae2b4ae5610f09c66761984f66195dd6f191d",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N320/after/uv-rows.txt": {
+   "sha256": "587be19172354fc159db04bd06df22380ee442eb608caedecf82954ff02d0fab",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M24-N320/after/uv-strips.txt": {
+   "sha256": "7f3b93f693a00d29578e68a3267c267e4e8228e0afabfaff715cd404c01495fe",
+   "bytes": 13030,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M6-N40/after/uv-forces.txt": {
+   "sha256": "29c4b53a8de35b32010ea69035cae90d23dd5c59f77edda8d2ff0e73b1f80406",
+   "bytes": 68100,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M6-N40/after/uv-rows.txt": {
+   "sha256": "fe9ff4955e40a7b01391cccef85dfda0bf4341105a5fbcd9fd782a001ce4eeb1",
+   "bytes": 65944,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V01-M6-N40/after/uv-strips.txt": {
+   "sha256": "a8b5ae6a7111303922856a306792eaa968ddc78eb8c47b3ca61765a318a91cda",
+   "bytes": 1690,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N160/after/uv-forces.txt": {
+   "sha256": "040dc03816e9c5ac024c4b2becb449a0bf7b3e00857e18eeed25939c0c42054f",
+   "bytes": 1088700,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N160/after/uv-rows.txt": {
+   "sha256": "d9567f732f0068cc346ab87e0e181998bd03aedd4f1b99baac70d08c69e7dd53",
+   "bytes": 1054144,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N160/after/uv-strips.txt": {
+   "sha256": "ba789ce4da9747ce220a34b7c625d056ae6897c5b9718b6041655a5cf8a3503a",
+   "bytes": 6550,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N320/after/uv-forces.txt": {
+   "sha256": "4ed786873ab09a501dd76ec2b1aa835a7cc78656072343172c4d27ac5059622c",
+   "bytes": 2177340,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N320/after/uv-rows.txt": {
+   "sha256": "e3cab957eac7691b631153e38df108b76115ddc7c24a0d964257257454125254",
+   "bytes": 2108224,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M24-N320/after/uv-strips.txt": {
+   "sha256": "dab67a631484964082ababf9f7ad5264b8a6d81e5b3ba11a81986ea03346bdc0",
+   "bytes": 13030,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M6-N40/after/uv-forces.txt": {
+   "sha256": "d5ae4d0bd175809df5c67d12db4c1fba3bc9216089d569ae81fa3c1219d88f6d",
+   "bytes": 68100,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M6-N40/after/uv-rows.txt": {
+   "sha256": "a673337c553ac6cc950741bc58b902671567509a8ee0fcd5a73bf82776c5b91c",
+   "bytes": 65944,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/analysis/avl-symmetry-regression-20261031-133414/half_measured-FW-V02-M6-N40/after/uv-strips.txt": {
+   "sha256": "15346a806315f4e75c76e96f86d367b2f7cd085f83764b04b8dc730761f27cc0",
+   "bytes": 1690,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/analysis/avl-tip-redistribution-20261031-171922/FW-V01-tip-poor/physical-fullwing/uv-forces.txt": {
    "sha256": "d0251363c9b89831a44a389713f1291369c423270c7ab9ffe2a18fda7be6b3b5",
@@ -14330,6 +15210,256 @@
    "sha256": "500ebb17d51a76fe3b6fc31fea86ba5203806a08b9c85bd4d2399a70a2a7363e",
    "bytes": 3935,
    "bundle": "uvlas-rd-evidence-2026-11-part02.tar"
+  },
+  "build/reference-avl/source-baseline/bin/arrow3d.o": {
+   "sha256": "bac3c624aac4738a79cedce6865415db5f1c4c17ab82e459b3de563a0e3284a3",
+   "bytes": 4832,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-baseline/bin/autil.o": {
+   "sha256": "6fd194edbde8cc7094c031a11b1d5f3321d6a43adc4e5461ffab3ca9b3298af6",
+   "bytes": 4104,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-baseline/bin/avl_heap_inc.o": {
+   "sha256": "ba90e7e6aa5ecef9ff7f2cb06f26e57a91a9424efb823298f1aacb9694759aa4",
+   "bytes": 1096,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-baseline/bin/matrix-lapackdp.o": {
+   "sha256": "213f64f764c8b1ae8d22f76fc93b97d4c3668ece18dc2cf978af868c1998927e",
+   "bytes": 1728,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-baseline/bin/plsubs.o": {
+   "sha256": "00abb89b443d20f369758d6924183d0e8d0951d1de7a6297bbc58f363851958c",
+   "bytes": 27408,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-baseline/bin/second.o": {
+   "sha256": "e44261b2aa47f722b9959f1a427480510ed6f237a2a838f433214bfe882ecef9",
+   "bytes": 1400,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-baseline/src/asetup.f": {
+   "sha256": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf",
+   "bytes": 15863,
+   "source": "file src/asetup.f of the AVL 3.52 source archive, unchanged, not stored: https://web.mit.edu/drela/Public/web/avl/"
+  },
+  "build/reference-avl/source-baseline/src/avl_heap.f90": {
+   "sha256": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966",
+   "bytes": 867,
+   "source": "file src/avl_heap.f90 of the AVL 3.52 source archive, unchanged, not stored: https://web.mit.edu/drela/Public/web/avl/"
+  },
+  "build/reference-avl/source-baseline/src/matrix-lapackdp.f": {
+   "sha256": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259",
+   "bytes": 1048,
+   "source": "file src/matrix-lapackdp.f of the AVL 3.52 source archive, unchanged, not stored: https://web.mit.edu/drela/Public/web/avl/"
+  },
+  "build/reference-avl/source-baseline/src/matrix-lapacksubs.f": {
+   "sha256": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564",
+   "bytes": 165139,
+   "source": "file src/matrix-lapacksubs.f of the AVL 3.52 source archive, unchanged, not stored: https://web.mit.edu/drela/Public/web/avl/"
+  },
+  "build/reference-avl/source-core0-grid/bin/aic.o": {
+   "sha256": "8bc1d5eeff8acab009aba94d05bb532951c4e65142fd25c0773c48592eb75643",
+   "bytes": 12976,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-core0-grid8000-spacing-pi64/bin/sgutil.o": {
+   "sha256": "cf8cf977edaa05a3e7692d5672c619145fa8cd38788dc313a310d0debcf8c85d",
+   "bytes": 6568,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-core0-grid8000/src/ADIMEN.INC": {
+   "sha256": "35d0d0d65f4a70690a32f367d71935bc9d41eab12448c8f203d936e78d5ca00c",
+   "bytes": 1015,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/reference-avl/source-core0-grid8000/src/avl_heap_inc.f90": {
+   "sha256": "9a32d3ba657fb70919aefc3bc01ff2998ac144acf1585bb761abd56bc57e3897",
+   "bytes": 580,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aero.o": {
+   "sha256": "ee4104d6b3f823ccab8d70e4f47095cba110bdf0b66728721a363db37ad972d9",
+   "bytes": 37480,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/ainput.o": {
+   "sha256": "d3e5abe42263f0f5552d0f80c25b928972ae28ab344b1c2d4f41f3b935685968",
+   "bytes": 63544,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/airutil.o": {
+   "sha256": "a0e44a7a6d70c4b335ce52528bfe2f66bdf63dcfc58fcfc919ce11bb62a1cae2",
+   "bytes": 10968,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/amake.o": {
+   "sha256": "9b48aaa667573336895e2c4c627d05d03d39b3af4fab912adae087ea4a25fd42",
+   "bytes": 35344,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/amass.o": {
+   "sha256": "88461890c4d3454b91ef0678f9188337bb7bb612af2846a4dcb7990fc7bbbcc9",
+   "bytes": 35488,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/amode.o": {
+   "sha256": "b38ee733d1390ba6e1755947019cc17727bdce5a93accd6043d0ec28248201ba",
+   "bytes": 92880,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aoml.o": {
+   "sha256": "21db40669a1d78d50cb324815cba2bfc5498a2b5107bf1a8eac0175f3c666613",
+   "bytes": 22728,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aoper.o": {
+   "sha256": "3e4abdcf9094faba2ce86442464630427ad81e373b9ba9a1820575dbb593b29f",
+   "bytes": 92680,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aoutmrf.o": {
+   "sha256": "605cecb9e8a7b844dca9463db7026ccb37ffdfd723f4ab31a69618cefb2f4c5c",
+   "bytes": 51104,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aoutput.o": {
+   "sha256": "76c3f67b2ec88bcb524c39aa702cb15c2dae11db4b84e70bb9793e98b0f01a09",
+   "bytes": 175152,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aplotmd.o": {
+   "sha256": "ec0b21fc6e92141c26658373d109865b5704243eb8a875bf0f22532dfd42192e",
+   "bytes": 41472,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aplottp.o": {
+   "sha256": "54e165f783da85e663da991c5a8eab3353b67b6397234cd46e25cf21a317f413",
+   "bytes": 50560,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/aplotvl.o": {
+   "sha256": "60a59468cd0d7d142c20f4c804f1e507200267ac6051818a106e688352f8093b",
+   "bytes": 72112,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/asetup.o": {
+   "sha256": "f9ebc634af2f79b5aa0f4e35af65e273dc10970103d03043ec2484557f335ed0",
+   "bytes": 18456,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/atpforc.o": {
+   "sha256": "b87c321c222ef9e74dddbbe09a1cf0312e7a04498bcbc8193533ec5c849fadb1",
+   "bytes": 12072,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/atrim.o": {
+   "sha256": "d042346eaa74a980fc9badd49a2660e923640e91f294553d23cd440ab222e86a",
+   "bytes": 33256,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/avl.o": {
+   "sha256": "ffceebd440bebc1dfbab0d888ccd240778e1798ab9c9eb02d32e829577850238",
+   "bytes": 54576,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/avl_heap.o": {
+   "sha256": "e68625e19348d8daa160966ebc9ced4f825d11b155d61aa5dcb08b19f69556dd",
+   "bytes": 6224,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/cdcl.o": {
+   "sha256": "ef41ecb35fcf4ee5a0c84a8719e70339a7374e5336eae3c923f2548b32ed4b24",
+   "bytes": 2616,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/getvm.o": {
+   "sha256": "4b472f819fe4a63862622eebc6243b4e381b4d4318e125915b5f0b833653998a",
+   "bytes": 8264,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/hidden.o": {
+   "sha256": "d4ae2ebcbd69b2c74101db30a2b1520c4b490199bfe5f930f7d5ec4802ef77cb",
+   "bytes": 8920,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/limits.o": {
+   "sha256": "97408a29621a3801629400631be14520209991128bd16c13ce52c1c8cb661417",
+   "bytes": 9104,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/matrix-lapacksubs.o": {
+   "sha256": "737122752b863f5caf65024de5cf8afeb395e3ce6e3c19070891345a5ee81cbf",
+   "bytes": 52120,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/obsetup.o": {
+   "sha256": "284ba2c6e2c85ed7676b70e46ad25b06626a0a6865a0b99681ff56f8ae623387",
+   "bytes": 26056,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/pltops.o": {
+   "sha256": "c8c03a3d644a60d6b4a86b9e654e024c22e9af6ade8b16f4080fb6c23eaeb0d5",
+   "bytes": 14376,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/plutil.o": {
+   "sha256": "fc194e180e92fac22d4a8216e7365a596fd215b65c62597a13cf1f58b041a7f5",
+   "bytes": 14536,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/spline.o": {
+   "sha256": "c6d040b6e586e1d77453e73cb6a722be216504092ebb52dd38baf12e59f8d30c",
+   "bytes": 14576,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/userio.o": {
+   "sha256": "4f9520bb5ec29ade2797bf8db2151befd07f6e34eb9715eb1b0f73f3413e9c9a",
+   "bytes": 16472,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/uvl_grid_export.o": {
+   "sha256": "d0876c9d1c747727265a7b77541317982733e1ee50d81eba2858ecdee093a45f",
+   "bytes": 9856,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/uvl_measurement.o": {
+   "sha256": "7e2d29c3addf1683d7a883b689bb68c9e95518c90183127f3b250bc04f8574f7",
+   "bytes": 10304,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/uvl_pair_probe.o": {
+   "sha256": "ea37ebef39075f3406673a1d7ba88076e13d2bc81319d2c728748fdc096cc4bf",
+   "bytes": 6368,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/uvl_symmetry_export.o": {
+   "sha256": "bd74b4ac6c27f0c1df25bab31d3021adbfc41d84a94f69f7543401ff8e154c83",
+   "bytes": 16128,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-ks1000-spacing-pi64/bin/uvl_symmetry_guard.o": {
+   "sha256": "06f332eedace92aafea281ff06b99cdb9b54ef2a392b9e71f7b4a00f78a9ad19",
+   "bytes": 6952,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/source-symmetry16000-spacing-pi64/bin/amake.o": {
+   "sha256": "b80903146550ecfd46a630fdc72eb9e6283a9e2847e7db21f681150a4e0cc4f4",
+   "bytes": 35344,
+   "not_published": "object file of an AVL build; made again from the AVL 3.52 source archive and the patches in build/third-party-gpl/avl"
+  },
+  "build/reference-avl/spacing-old.txt": {
+   "sha256": "2340554ef2f7faeb96090080d6345785308fdd176ddaa1ac47ebee8d177fe9aa",
+   "bytes": 5154,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
+  },
+  "build/reference-avl/spacing-pi64.txt": {
+   "sha256": "19db5f50c9637fb4a330611dea8992d7b0a4ab118ea0ee99d58350c33a79edbe",
+   "bytes": 5154,
+   "bundle": "uvlas-rd-evidence-2026-11-part04.tar"
   },
   "build/reference-ptera/env/Lib/site-packages/pterasoftware-5.1.0.dist-info/METADATA": {
    "sha256": "537c6390f7b6572744840c0289d015af99789dc52e6d43ed8f03dbe2df5a1462",

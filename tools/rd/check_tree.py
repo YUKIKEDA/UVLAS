@@ -25,9 +25,11 @@ A record cites a file in one of two forms, and both are checked:
 
 A path that is not a repository path is resolved as the one repository file
 whose path ends with it: records name fixtures relative to their family. A
-bare name is checked when the registry or the tree knows a file of that name.
-The rest are counted under what they are: a field name such as "result_sha256"
-with no path beside it, or a file that was never in the repository.
+bare name is checked against the repository files of that name, then against
+the hashes the evidence index holds for files of that name; a bare name that
+matches neither is an error. Only a hash under a field name such as
+"result_sha256", with no path beside it, is counted and not checked: the record
+does not say which file it is.
 """
 
 from __future__ import annotations
@@ -254,7 +256,10 @@ def check_hashes(files: list[Path]) -> tuple[list[str], Counter[str], dict[str, 
             elif value in evidence_by_name.get(key, ()):
                 counts["large evidence file by name, matches the index"] += 1
             else:
-                counts["file that was never in the repository, not checked"] += 1
+                errors.append(
+                    f"{label}: {key} is cited by hash; no repository file has that name "
+                    "and no file of that name in rd/evidence-index.json has that hash"
+                )
 
         walk(data, visit)
     return errors, counts, cited
