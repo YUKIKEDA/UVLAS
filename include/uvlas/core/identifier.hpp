@@ -5,14 +5,20 @@
 
 namespace uvlas::core {
 
-// All uint64 values are legal. Absence is an optional, never a reserved ID.
+/// Strongly typed physical/file identity, not an array index (N4-08).
+/// @tparam Tag Distinguishes identity domains even when their numbers coincide.
+/// All uint64 values, including zero, are legal; represent absence with optional.
+/// Construction does not verify membership in a model or a generation.
 template <class Tag>
 class Identifier {
 public:
+    /// Preserve the full identity value without interpreting it as an array offset.
     explicit constexpr Identifier(std::uint64_t value) noexcept : value_(value) {}
+    /// Return the stored number by value; no model-membership check is implied.
     [[nodiscard]] constexpr std::uint64_t value() const noexcept {
         return value_;
     }
+    /// Compare numbers within this identity domain only.
     auto operator<=>(const Identifier&) const = default;
 
 private:
@@ -34,17 +40,29 @@ struct ScopeTag;
 struct ComponentTag;
 } // namespace detail
 
+/// Identity of a structural degree of freedom.
 using DofId = Identifier<detail::DofTag>;
+/// Identity of an aerodynamic panel.
 using PanelId = Identifier<detail::PanelTag>;
+/// Identity of a wake vertex.
 using WakeVertexId = Identifier<detail::WakeVertexTag>;
+/// Identity of a wake face.
 using WakeFaceId = Identifier<detail::WakeFaceTag>;
+/// Identity of a material layer.
 using LayerId = Identifier<detail::LayerTag>;
+/// Identity of a trial state; distinct from an accepted state.
 using TrialId = Identifier<detail::TrialTag>;
+/// Generation of the model definition.
 using ModelGeneration = Identifier<detail::ModelGenerationTag>;
+/// Generation of the numerical state used for evaluation.
 using NumericalGeneration = Identifier<detail::NumericalGenerationTag>;
+/// Identity of an accepted state, used for both parent and last-accepted context.
 using AcceptedStateId = Identifier<detail::AcceptedStateTag>;
+/// Identity of an observable in the observation plan.
 using ObservationId = Identifier<detail::ObservationTag>;
+/// Identity of an evaluation scope defined by the observation plan.
 using ScopeId = Identifier<detail::ScopeTag>;
+/// Identity of the component associated with a diagnostic.
 using ComponentId = Identifier<detail::ComponentTag>;
 
 } // namespace uvlas::core

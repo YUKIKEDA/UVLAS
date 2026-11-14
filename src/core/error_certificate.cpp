@@ -9,6 +9,8 @@ namespace {
     FailureDetails details;
     details.numerical_generation = context.numerical_generation;
     details.problem = context.observation;
+    // The internal contract fixes diagnostic precedence even when several inputs
+    // are invalid: nonfinite, negative, then unsupported representation.
     if (!std::isfinite(budget) || !std::isfinite(upper_bound)) {
         return Failure{FailureCode::Nonfinite, Operation::CertifyError, details};
     }
@@ -25,6 +27,7 @@ namespace {
 
 Result<ErrorCertificate> ErrorCertificate::unevaluated(CertificateContext context,
                                                        double budget) noexcept {
+    // Zero is only a validation placeholder: no evaluated bound is stored or implied.
     if (const auto failure = validate(context, budget, 0)) {
         return std::unexpected(*failure);
     }
@@ -38,6 +41,8 @@ Result<ErrorCertificate> ErrorCertificate::assess(CertificateContext context, do
     }
     // Bounds and budgets refer to the same observation/scope and scale. This
     // records an evaluator's bound; it does not generate or round a solution.
+    // Equality meets the budget, including a zero budget. Adding an epsilon would
+    // change the acceptance contract and could certify an excessive bound (N4-02).
     if (upper_bound <= budget) {
         return ErrorCertificate{context, budget, Achieved{upper_bound}};
     }
