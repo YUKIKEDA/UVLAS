@@ -12,11 +12,11 @@
 
 namespace uvlas::core {
 
-/// Failure categories from N4-08; ordinal values are not a serialization format.
+/// Reason an operation failed. Inspect named values; do not persist their ordinals.
 enum class FailureCode : std::uint8_t {
     InvalidInput,            ///< Input violates the operation's contract.
     Unsupported,             ///< Requested capability is unsupported.
-    GeometryInvalid,         ///< Geometry violates the adopted geometric conditions.
+    GeometryInvalid,         ///< Geometry is invalid for the requested operation.
     RankUnresolved,          ///< Required rank could not be established.
     ChartSingular,           ///< Coordinate chart is singular.
     Nonfinite,               ///< A required finite value is NaN or infinity.
@@ -42,7 +42,7 @@ enum class Operation : std::uint8_t {
     EvaluateStep,         ///< Time-step evaluation.
     SolveLinear,          ///< Linear-system solve.
     AdvanceTrial,         ///< Trial-state advancement.
-    Commit,               ///< Acceptance of a qualified trial.
+    Commit,               ///< Acceptance of a trial state that passed the required checks.
     LinearizeEquilibrium, ///< Equilibrium linearization.
     SearchFlutter,        ///< Flutter search.
     Recover,              ///< Checkpoint recovery.
@@ -77,7 +77,7 @@ struct ResourceUsage {
 using ProblemId =
     std::variant<DofId, PanelId, WakeVertexId, WakeFaceId, LayerId, ObservationId, ScopeId>;
 
-/// Owned, allocation-free context (N4-08). A missing field is unknown, never ID zero.
+/// Owned, allocation-free diagnostic context. A missing field is unknown, never ID zero.
 /// The reporting operation supplies these identities; this value does not validate them.
 struct FailureDetails {
     /// Model generation involved in the operation, when available.
@@ -101,7 +101,7 @@ struct FailureDetails {
 };
 
 /// Owned diagnostic safe to construct and copy while handling allocation failure.
-/// No field borrows exception text or workspace storage (N4-08).
+/// No field borrows exception text or temporary calculation storage.
 struct Failure {
     /// Failure category, distinct from the operation where it occurred.
     FailureCode code;
@@ -132,7 +132,7 @@ inline constexpr bool is_result<Result<T>> = true;
 // No allocating diagnostic is constructed while translating an allocation failure.
 static_assert(std::is_nothrow_copy_constructible_v<Failure>);
 
-/// Invoke an entry action once and translate escaping exceptions to Failure (N4-08).
+/// Invoke an action once and return exceptions as Failure values without throwing.
 /// @param operation Entry operation used only for translated exceptions.
 /// @param exception_code Caller-selected category for exceptions other than bad_alloc.
 /// @param details Context copied into translated failures; borrowed only during this call.
@@ -140,8 +140,9 @@ static_assert(std::is_nothrow_copy_constructible_v<Failure>);
 /// @return The action's result unchanged, or ResourceExceeded for bad_alloc, or
 /// exception_code for any other exception. Existing returned failures keep their context.
 /// @note Diagnostic construction does not allocate. The action may allocate or throw.
-/// This guard does not validate inputs or roll back action side effects; callers must
-/// enforce the read-only parent and accepted-state contract (IM00-9).
+/// This guard does not validate inputs or undo changes made by action. An action
+/// must leave any previously accepted state unchanged on failure; compute changes
+/// in a separate candidate and publish them only after success.
 template <class F>
     requires detail::is_result<std::invoke_result_t<F>>
 [[nodiscard]] auto guard_entry(Operation operation, FailureCode exception_code,
@@ -150,7 +151,7 @@ template <class F>
     try {
         return std::invoke(std::forward<F>(action));
     } catch (const std::bad_alloc&) {
-        // Allocation failure has a fixed category regardless of the entry's fallback.
+        // N4-08: allocation failure has a fixed category regardless of the entry's fallback.
         // Copy only pre-existing value context; allocating exception text could fail again.
         return std::unexpected(Failure{FailureCode::ResourceExceeded, operation, details});
     } catch (...) {

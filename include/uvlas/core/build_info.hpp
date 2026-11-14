@@ -5,7 +5,7 @@
 
 namespace uvlas {
 
-/// Binary provenance (QA-06); an internal API whose compatibility is not yet fixed.
+/// Version, source revision and build settings compiled into the running binary.
 /// All string views borrow static storage and outlive the returned BuildInfo value.
 struct BuildInfo {
     /// Project version compiled into this binary.
@@ -24,7 +24,8 @@ struct BuildInfo {
     std::string_view floating_point;
     /// Target instruction-set level.
     std::string_view instruction_set;
-    /// OS, architecture, compiler major.minor and instruction-set qualification key (QA-07).
+    /// Key combining OS, architecture, compiler major.minor and instruction set.
+    /// Use it to distinguish environments when comparing numerical results.
     std::string_view platform_key;
 };
 
@@ -33,7 +34,8 @@ struct BuildInfo {
 
 /// Return owned JSON containing provenance and numerical dependency versions.
 /// @throws std::bad_alloc If serialization cannot allocate memory.
-/// This diagnostic helper is not a solver entry; it does not return Result<T>.
+/// Allocation exceptions propagate to the caller; catch them if invoking this
+/// diagnostic function from an exception-free application boundary.
 [[nodiscard]] std::string build_info_json();
 
 } // namespace uvlas

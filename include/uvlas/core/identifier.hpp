@@ -5,7 +5,7 @@
 
 namespace uvlas::core {
 
-/// Strongly typed physical/file identity, not an array index (N4-08).
+/// Strongly typed identity for a model object or state, not an array index.
 /// @tparam Tag Distinguishes identity domains even when their numbers coincide.
 /// All uint64 values, including zero, are legal; represent absence with optional.
 /// Construction does not verify membership in a model or a generation.
@@ -58,9 +58,9 @@ using ModelGeneration = Identifier<detail::ModelGenerationTag>;
 using NumericalGeneration = Identifier<detail::NumericalGenerationTag>;
 /// Identity of an accepted state, used for both parent and last-accepted context.
 using AcceptedStateId = Identifier<detail::AcceptedStateTag>;
-/// Identity of an observable in the observation plan.
+/// Identity of the measured quantity whose error is being assessed.
 using ObservationId = Identifier<detail::ObservationTag>;
-/// Identity of an evaluation scope defined by the observation plan.
+/// Identity of the domain or subset over which an error bound was evaluated.
 using ScopeId = Identifier<detail::ScopeTag>;
 /// Identity of the component associated with a diagnostic.
 using ComponentId = Identifier<detail::ComponentTag>;

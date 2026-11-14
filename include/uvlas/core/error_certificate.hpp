@@ -6,20 +6,22 @@
 
 namespace uvlas::core {
 
-/// Representation of the evaluated field; a tag alone does not qualify its consumer (N4-06).
+/// Arithmetic representation used to evaluate the field associated with an error bound.
+/// Selecting a tag does not perform a conversion or change the arithmetic of a calculation.
 enum class Precision : std::uint8_t {
     Binary64, ///< Field evaluated in binary64.
-    TwoWord   ///< Field evaluated in the two-word representation.
+    TwoWord   ///< Field evaluated using values represented by two floating-point words.
 };
 
-/// Identity of the observation, scope and numerical state being certified (N4-02).
-/// The evaluator is responsible for their correspondence to the supplied error bound.
+/// Identifies the measured quantity, evaluation domain and state to which a bound applies.
+/// Supply identities that refer to the calculation that produced the bound. These
+/// values are stored without checking them against a model or a registry.
 struct CertificateContext {
-    /// Observable defined by the observation plan.
+    /// Measured quantity, such as displacement or force, whose error was bounded.
     ObservationId observation;
-    /// Evaluation scope defined by that plan; a narrower scope cannot certify a wider one.
+    /// Domain or subset covered by the bound; a subset's bound does not cover a larger domain.
     ScopeId scope;
-    /// Numerical generation actually evaluated.
+    /// Version of the numerical state evaluated; change it when that state changes.
     NumericalGeneration numerical_generation;
     /// Representation of the evaluated field, not of the stored double budget.
     Precision representation;
@@ -52,19 +54,35 @@ struct Exceeded {
 /// Explicit assessment state; inspect the alternative instead of testing a success flag.
 using ErrorAssessment = std::variant<Unevaluated, Achieved, Exceeded>;
 
-/// Owned, validated record of a supplied error bound against its budget (N4-02).
-/// Does not compute or establish conservatism of a bound, verify scope membership,
-/// convert a solution, or qualify TwoWord consumers. Those are evaluator responsibilities.
-/// Construction is restricted to factories so unevaluated cannot masquerade as achieved.
+/// Records whether a supplied error upper bound meets a permitted error budget.
+/// Both values must describe the same measured quantity, domain, state and scale.
+/// For an absolute error use the quantity's physical units for both; for a relative
+/// error use the same normalization for both. This class does not choose the scale.
+/// The caller must compute a conservative bound: this class checks its numeric
+/// validity and compares it to the budget, without recomputing or verifying the bound.
+/// Use unevaluated() when no bound is available, and inspect assessment() explicitly.
+/// A successful factory call means the record is valid, not that its budget was met.
+/// @code{.cpp}
+/// using namespace uvlas::core;
+/// const CertificateContext context{ObservationId{1}, ScopeId{2},
+///                                  NumericalGeneration{3}, Precision::Binary64};
+/// const auto record = ErrorCertificate::assess(context, 1e-6, 5e-7);
+/// if (record) {
+///     if (std::holds_alternative<Achieved>(record->assessment())) {
+///         // The reported bound is no larger than the budget.
+///     }
+/// }
+/// @endcode
 class ErrorCertificate {
 public:
     /// Create a record with no evaluated bound; no achievement is implied.
     /// @param context Observation, scope, numerical generation and field representation.
-    /// @param budget Nonnegative finite budget in the observation's prescribed scale.
-    /// Zero is allowed and requires exact agreement when later assessed.
-    /// @return Owned Unevaluated record, or Nonfinite, InvalidInput,
-    /// then PrecisionUnsupported in that validation order. Failures identify the
-    /// observation and numerical generation with Operation::CertifyError.
+    /// @param budget Nonnegative finite permitted error, in the scale used for this quantity.
+    /// Zero is allowed; only a zero upper bound can meet a zero budget.
+    /// @return Owned Unevaluated record. Invalid inputs return Failure: Nonfinite for
+    /// a nonfinite budget, InvalidInput for a negative budget, or PrecisionUnsupported
+    /// for an unknown representation tag, checked in that order. The failure identifies
+    /// the supplied observation and numerical generation with Operation::CertifyError.
     [[nodiscard]] static Result<ErrorCertificate> unevaluated(CertificateContext context,
                                                               double budget) noexcept;
     /// Classify a supplied conservative bound without an added numerical tolerance.
@@ -73,8 +91,10 @@ public:
     /// @param upper_bound Nonnegative finite conservative bound in the same scale as budget.
     /// @return Owned Achieved record when upper_bound <= budget, otherwise an Exceeded
     /// record. Exceeded is a valid record, not a failed factory or a successful analysis.
-    /// Invalid inputs return Nonfinite, InvalidInput, then PrecisionUnsupported in that
-    /// order, with observation and numerical generation under Operation::CertifyError.
+    /// Invalid inputs return Failure: Nonfinite if either number is nonfinite,
+    /// InvalidInput if either is negative, or PrecisionUnsupported if the representation
+    /// tag is unknown, checked in that order. The failure identifies the supplied
+    /// observation and numerical generation with Operation::CertifyError.
     [[nodiscard]] static Result<ErrorCertificate> assess(CertificateContext context, double budget,
                                                          double upper_bound) noexcept;
 
