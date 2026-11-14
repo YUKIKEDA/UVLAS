@@ -32,7 +32,8 @@ add_custom_target(uvlas_git_revision ALL
     BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/generated/uvlas/git_revision.hpp"
     VERBATIM)
 
-add_library(uvlas_core STATIC src/core/build_info.cpp src/core/error_certificate.cpp)
+add_library(uvlas_core STATIC src/core/build_info.cpp src/core/error_certificate.cpp
+    src/core/checked_dimensions.cpp)
 uvlas_configure_target(uvlas_core)
 target_include_directories(uvlas_core
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

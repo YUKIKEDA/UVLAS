@@ -38,7 +38,7 @@
 
 | モジュール | 責任 | 導入するパッケージ |
 |---|---|---|
-| `core` | ビルド情報。強いID、checked寸法、`Failure`、`ErrorCertificate` | IM00-3の[失敗・認定の型](specs/foundation/failure-certificate-contract.md)。checked寸法・資源計画はIM00-2 |
+| `core` | ビルド情報。強いID、checked寸法、ResourcePlan、`Failure`、`ErrorCertificate` | IM00-3の[失敗・認定の型](specs/foundation/failure-certificate-contract.md)、IM00-2の[寸法・資源契約](specs/foundation/dimensions-resource-contract.md) |
 | `numerics` | 密・疎の保持、基準解法、精度保持、世代とWorkspace | IM-00 |
 | `structure` | PG参照係数、材料、梁、接続、荷重、回復 | IM-01、IM-02 |
 | `aero` | 渦核、後流、荷重、TE所有 | IM-03 |

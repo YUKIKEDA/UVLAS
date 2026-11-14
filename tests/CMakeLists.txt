@@ -88,3 +88,20 @@ uvlas_add_test(core.error_certificate
     LABELS unit negative
     SOURCES core/error_certificate_test.cpp
     LIBS uvlas_core)
+
+uvlas_add_test(core.checked_dimensions
+    LABELS unit negative
+    SOURCES core/checked_dimensions_test.cpp
+    LIBS uvlas_core)
+uvlas_add_test(core.resource_plan
+    LABELS unit negative
+    SOURCES core/resource_plan_test.cpp
+    LIBS uvlas_core)
+
+add_test(NAME core.identifier_compilation
+    COMMAND "${CMAKE_COMMAND}"
+        -S "${CMAKE_CURRENT_SOURCE_DIR}/core/identifier_compile"
+        -B "${CMAKE_CURRENT_BINARY_DIR}/identifier-compile-$<CONFIG>"
+        "-DPROJECT_INCLUDE=${PROJECT_SOURCE_DIR}/include"
+        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+set_tests_properties(core.identifier_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
