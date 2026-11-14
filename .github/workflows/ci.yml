@@ -1,8 +1,6 @@
 name: ci
 
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -14,9 +12,42 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: select affected checks
+    runs-on: ubuntu-24.04
+    outputs:
+      build: ${{ steps.scope.outputs.build }}
+      format: ${{ steps.scope.outputs.format }}
+      python: ${{ steps.scope.outputs.python }}
+      skills: ${{ steps.scope.outputs.skills }}
+      rd: ${{ steps.scope.outputs.rd }}
+      trace: ${{ steps.scope.outputs.trace }}
+      checks: ${{ steps.scope.outputs.checks }}
+      test_regex: ${{ steps.scope.outputs.test_regex }}
+      build_targets: ${{ steps.scope.outputs.build_targets }}
+      cpp_files: ${{ steps.scope.outputs.cpp_files }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Check selection and aggregation
+        run: python3 tools/dev/ci_scope_test.py
+      - name: Select affected checks
+        id: scope
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_FORCE_FULL: ${{ github.event_name == 'workflow_dispatch' }}
+        run: python3 tools/dev/ci_scope.py
+
   windows:
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     name: build and test (windows, msvc)
     runs-on: windows-2025
+    env:
+      CI_TEST_REGEX: ${{ needs.changes.outputs.test_regex }}
+      CI_BUILD_TARGETS: ${{ needs.changes.outputs.build_targets }}
     steps:
       - uses: actions/checkout@v7
       - name: vcpkg at a commit that holds the manifest baseline
@@ -44,15 +75,27 @@ jobs:
       - name: Configure
         run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --preset windows-msvc
       - name: Build Debug
-        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-debug
+        run: |
+          if ($env:CI_BUILD_TARGETS) {
+            pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-debug --target ($env:CI_BUILD_TARGETS -split ' ')
+          } else {
+            pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-debug
+          }
       - name: Test Debug
-        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-debug
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-debug -R $env:CI_TEST_REGEX
       - name: Build Release
-        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-release
+        run: |
+          if ($env:CI_BUILD_TARGETS) {
+            pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-release --target ($env:CI_BUILD_TARGETS -split ' ')
+          } else {
+            pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-release
+          }
       - name: Test Release
-        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-release
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-release -R $env:CI_TEST_REGEX
 
   linux:
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     name: build and test (linux, gcc 14, ${{ matrix.preset }})
     runs-on: ubuntu-24.04
     strategy:
@@ -61,6 +104,9 @@ jobs:
         preset: [linux-debug, linux-release, linux-sanitize]
     env:
       CXX: g++-14
+      CI_TEST_REGEX: ${{ needs.changes.outputs.test_regex }}
+      CI_BUILD_TARGETS: ${{ needs.changes.outputs.build_targets }}
+      CI_CPP_FILES: ${{ needs.changes.outputs.cpp_files }}
     steps:
       - uses: actions/checkout@v7
       - name: vcpkg at a commit that holds the manifest baseline
@@ -96,46 +142,65 @@ jobs:
       - name: Configure, build, test
         run: |
           cmake --preset ${{ matrix.preset }}
-          cmake --build --preset ${{ matrix.preset }}
-          ctest --preset ${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }} ${CI_BUILD_TARGETS:+--target $CI_BUILD_TARGETS}
+          ctest --preset ${{ matrix.preset }} -R "$CI_TEST_REGEX"
       - name: clang-tidy
-        if: matrix.preset == 'linux-debug'
+        if: matrix.preset == 'linux-debug' && needs.changes.outputs.format == 'true'
         run: |
           pipx install clang-tidy==21.1.1
-          clang-tidy -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp')
+          if [ -n "$CI_CPP_FILES" ]; then
+            clang-tidy -p out/build/linux-debug --quiet $CI_CPP_FILES
+          else
+            clang-tidy -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp')
+          fi
 
   checks:
+    needs: changes
+    if: needs.changes.outputs.checks == 'true'
     name: format, skills, R&D tree
     runs-on: ubuntu-24.04
+    env:
+      CI_CPP_FILES: ${{ needs.changes.outputs.cpp_files }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Formatting
+        if: needs.changes.outputs.format == 'true'
         run: |
           pip install clang-format==21.1.2
-          clang-format --dry-run --Werror $(git ls-files 'src/*.cpp' 'include/*.hpp' 'tests/*.cpp' 'qa/*.cpp')
+          if [ -n "$CI_CPP_FILES" ]; then
+            clang-format --dry-run --Werror $CI_CPP_FILES
+          else
+            clang-format --dry-run --Werror $(git ls-files 'src/*.cpp' 'include/*.hpp' 'tests/*.cpp' 'qa/*.cpp')
+          fi
       - name: Python tools
+        if: needs.changes.outputs.python == 'true'
         run: |
           pip install ruff==0.17.4 pyright==1.1.408
           ruff check .
           ruff format --check .
           pyright
       - name: Traceability
+        if: needs.changes.outputs.trace == 'true'
         run: python -X utf8 tools/qa/trace.py check
       - name: Skill copies
+        if: needs.changes.outputs.skills == 'true'
         run: python tools/dev/sync_skills.py --check
       - name: R&D tree
+        if: needs.changes.outputs.rd == 'true'
         run: python -X utf8 tools/rd/check_tree.py
 
   # The single required check on main. A job added above is added to `needs` in the same PR.
   ci:
     name: ci
     if: always()
-    needs: [windows, linux, checks]
+    needs: [changes, windows, linux, checks]
     runs-on: ubuntu-24.04
     steps:
-      - name: Every job passed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
-        run: exit 1
+      - uses: actions/checkout@v7
+      - name: Every required job passed
+        env:
+          CI_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 tools/dev/ci_scope.py --verify-needs

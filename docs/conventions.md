@@ -24,7 +24,7 @@
 | `rd/evidence-index.json` | 記録がハッシュで引用する大きい証拠ファイルの索引。実体はGitHubのリリースのアセット |
 | `tools/rd/` | R&Dツリーの再配置と検査 |
 | `tools/qa/` | 追跡（`trace.py`）、基準結果と結果の変更管理（`results.py`） |
-| `tools/dev/` | 開発用の補助（MSVC環境の起動、Skillの複製） |
+| `tools/dev/` | 開発用の補助（MSVC環境の起動、Skillの複製、CIの変更範囲判定と集約の検査） |
 | `.agents/skills/`、`.claude/skills/` | Skillの正本と、その複製 |
 | `.cursor/rules/` | 規則 |
 | `ruff.toml`、`pyrightconfig.json`、`.clang-format`、`.clang-tidy` | 静的検査の設定。どれもゲートが使う |
