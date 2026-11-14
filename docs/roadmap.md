@@ -2,9 +2,9 @@
 
 作業の順序と状態の正本。行が持つのはID、種類、題、Issue、状態だけで、完了条件はIssueに書く。行の追加と削除はGrillの後に行う。「今」を書き換えるのは、その行を終えるPRだけ。
 
-**今**：IM00-3
+**今**：IM00-2
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用（構造、空力、連成、数値基盤、入出力）と受入計画を終え、IM00-1の依存機能・通知検査を実装した。次は共通の失敗型と誤差認定の型。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、IM00-1の依存検査、IM00-3の共通失敗型・誤差認定の型を実装した。次はID・寸法・ResourcePlanで、IM00-12の計測基盤と並行して進められる。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -55,7 +55,7 @@ flowchart LR
 |---|---|---|---|---|
 | IM00-1 | Feat | 固定した数値依存の機能とライセンス通知を検査する | #5 | Done |
 | IM00-2 | Feat | 強いID、checked 64bit寸法、ResourcePlan | #6 | Todo |
-| IM00-3 | Feat | Failure／expected と ErrorCertificate | #7 | Todo |
+| IM00-3 | Feat | Failure／expected と ErrorCertificate | #7 | Done |
 | IM00-4 | Feat | 密・CSC疎の保持、DofLayout、PointSoA | #8 | Todo |
 | IM00-5 | Feat | PrecisionBuffer、two-product・補償残差、TwoWordの保持と明示投影 | #9 | Todo |
 | IM00-6 | Feat | 密基準解法：pivot付きLU、実LU＋複素後縁更新、反復改良 | #10 | Todo |
