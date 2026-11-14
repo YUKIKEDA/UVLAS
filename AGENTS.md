@@ -30,7 +30,7 @@
 |---|---|
 | `workflow` | Grill、Issue、ブランチ、PR、人のmerge、振り返り。ゲート。commit前にブランチを確かめる |
 | `consent` | 質問は決定ではない。何を利用者が決め、何を自分で決めるか |
-| `git` | 破壊的な操作は名指しの指示で。commitとpushは頼まれたときだけ。ステージを読む |
+| `git` | 通常のcommit・pushは確認なしでPRまで進める。破壊的な操作は名指しの指示で。ステージを読む |
 | `conventional-commits` | `type(scope): subject`。`perf` は使わない |
 | `pull-requests` | テンプレートの見出し。Verificationは完了条件の各行から書く |
 | `github-closing` | 番号の前の閉じる動詞は、否定文でもIssueを閉じる |

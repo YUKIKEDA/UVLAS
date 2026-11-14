@@ -9,6 +9,7 @@ Grill（設計が分岐するとき）→ Issue → ブランチ → 作業 → 
 - Issueはテンプレートから作る。白紙のIssueは作れない。Issueには [docs/roadmap.md](docs/roadmap.md) の行IDを書く。
 - ブランチ名は `type/<Issue番号>-<slug>`。`main` へ直接commitしない。
 - 1 Issueは1 PR。mergeは人が行い、mergeしたブランチは消す。
+- エージェントへ実行を依頼したタスクは、検査・commit・通常のpush・PR作成まで進める。commit・pushごとの確認は不要で、変更内容は原則PRレビューで確認する。設計や範囲の判断が分かれる場合は、PR前に確認する。
 - commitの件名は `type(scope): subject`（英語）。
 
 | テンプレート | ラベル | commitのtype |
