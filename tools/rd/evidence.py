@@ -6,18 +6,20 @@
     python tools/rd/evidence.py check-bundles DIR  # check bundle files in DIR against the index
     python tools/rd/evidence.py pack BUNDLE LIST   # add cited files to the index, in a new bundle
     python tools/rd/evidence.py source NAME WHERE  # add a third-party file to the index
+    python tools/rd/evidence.py not-published NAME HOW  # add a build product to the index
 
 `fetch` uses the GitHub CLI (`gh release download`). Every bundle is compared
 with its SHA-256 before it is unpacked, and every unpacked file with its own.
 
-`pack` and `source` are for a cited file that tools/rd/check_tree.py reports as
-missing from the index. Both read the file from the working tree (build/...).
+`pack`, `source` and `not-published` are for a cited file that tools/rd/check_tree.py reports as
+missing from the index. They read the file from the working tree (build/...).
 `pack` takes a JSON list of cited names, writes the bundle BUNDLE into
 out/rd-evidence-bundles/ and adds the files and the bundle to the index. It
 refuses a file that holds a user name or a machine path (tools/rd/redact.py).
 The bundle is evidence only after its owner has uploaded it to the release and
 `fetch` has passed. `source` records a third-party file that is not stored:
-WHERE says where it is obtained from. Standard library only.
+WHERE says where it is obtained from. `not-published` records a build product
+that is not stored: HOW says what it is made from. Standard library only.
 """
 
 from __future__ import annotations
@@ -166,30 +168,33 @@ def pack(index: dict[str, Any], bundle: str, names: list[str]) -> int:
     return 0
 
 
-def add_source(index: dict[str, Any], name: str, where: str) -> int:
+def add_unstored(index: dict[str, Any], kind: str, name: str, text: str) -> int:
+    """Record a file that is not stored: kind is `source` or `not_published`."""
     path = local_file(index, name)
-    index["files"][name] = {"sha256": sha256(path), "bytes": path.stat().st_size, "source": where}
+    index["files"][name] = {"sha256": sha256(path), "bytes": path.stat().st_size, kind: text}
     write_index(index)
-    print(f"added {name} as third-party material")
+    print(f"added {name} as {kind}")
     return 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument(
-        "mode", choices=("summary", "fetch", "check", "check-bundles", "pack", "source")
+        "mode",
+        choices=("summary", "fetch", "check", "check-bundles", "pack", "source", "not-published"),
     )
     parser.add_argument(
         "directory", nargs="?", help="check-bundles: DIR. pack: BUNDLE. source: NAME"
     )
-    parser.add_argument("argument", nargs="?", help="pack: LIST. source: WHERE")
+    parser.add_argument("argument", nargs="?", help="pack: LIST. source: WHERE. not-published: HOW")
     args = parser.parse_args()
     index = data_store.load_index()
-    if args.mode in ("pack", "source"):
+    if args.mode in ("pack", "source", "not-published"):
         if args.directory is None or args.argument is None:
             parser.error(f"{args.mode} needs two arguments")
-        if args.mode == "source":
-            return add_source(index, args.directory, args.argument)
+        if args.mode != "pack":
+            kind = args.mode.replace("-", "_")
+            return add_unstored(index, kind, args.directory, args.argument)
         names = json.loads(Path(args.argument).read_text(encoding="utf-8"))
         return pack(index, args.directory, cast("list[str]", names))
     if args.mode == "summary":
