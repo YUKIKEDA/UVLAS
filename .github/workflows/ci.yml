@@ -18,9 +18,9 @@ jobs:
     name: build and test (windows, msvc)
     runs-on: windows-2025
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: vcpkg at a commit that holds the manifest baseline
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: microsoft/vcpkg
           path: out/vcpkg
@@ -62,9 +62,9 @@ jobs:
     env:
       CXX: g++-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: vcpkg at a commit that holds the manifest baseline
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: microsoft/vcpkg
           path: out/vcpkg
@@ -108,7 +108,7 @@ jobs:
     name: format, skills, R&D tree
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
