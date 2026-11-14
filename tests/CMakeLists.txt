@@ -79,3 +79,12 @@ add_test(NAME toolchain.notice_configuration
         "-DPYTHON_EXECUTABLE=${Python3_EXECUTABLE}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notice_configuration.cmake")
 set_tests_properties(toolchain.notice_configuration PROPERTIES TIMEOUT 180 LABELS "integration;negative")
+
+uvlas_add_test(core.failure
+    LABELS unit negative
+    SOURCES core/failure_test.cpp
+    LIBS uvlas_core)
+uvlas_add_test(core.error_certificate
+    LABELS unit negative
+    SOURCES core/error_certificate_test.cpp
+    LIBS uvlas_core)

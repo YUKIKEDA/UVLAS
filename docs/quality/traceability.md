@@ -87,13 +87,13 @@
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 6 | 0 | 0 |
-| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 1 | 0 | 0 |
+| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 4 | 1 | 1 |
 | N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 1 | 0 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
-| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
+| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 3 | 1 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | QA-01 | [quality-plan.md:13](../quality/quality-plan.md) | 0 | 0 | 0 |
@@ -101,8 +101,8 @@
 | QA-03 | [quality-plan.md:31](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-04 | [quality-plan.md:39](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-05 | [quality-plan.md:51](../quality/quality-plan.md) | 0 | 0 | 0 |
-| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 0 | 0 | 1 |
-| QA-07 | [quality-plan.md:71](../quality/quality-plan.md) | 0 | 0 | 2 |
+| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 0 | 0 | 0 |
+| QA-07 | [quality-plan.md:71](../quality/quality-plan.md) | 0 | 0 | 1 |
 | QA-08 | [quality-plan.md:82](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-10 | [quality-plan.md:100](../quality/quality-plan.md) | 0 | 0 | 0 |

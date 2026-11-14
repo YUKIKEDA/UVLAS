@@ -13,6 +13,14 @@ alwaysApply: true
 - 「この仕様はどこで検証されているか」には、`python tools/qa/trace.py show <ID>` の出力で答える。記憶で答えない。
 - 文書に新しいIDを書くなら、正本の文書（`docs/requirements/`、`docs/specs/`、`docs/quality/`）のどこかに定義がある。見出し、表の行の最初の欄、または `ID：` の形で定義する。
 - ゲート `just trace-check` を通す。`docs/quality/traceability.md` は道具が書く。手で直さない。
+- コメントだけの変更でも、`include/`・`src/` 内の仕様IDの追加・削除は追跡表に影響する。`just trace-matrix` で再生成し、`just trace-check` で照合する。C++のトークンが不変という検査で代用しない。
+
+2026-11-15、PR #40でAPIコメントに仕様IDを追加した後、追跡表の再生成を省き、CIのTraceabilityが失敗した。
+
+```text
+BAD   コメントだけなので、整形とコードの不変性だけを確認する
+GOOD  仕様IDの参照も変わったので、追跡表を再生成して照合する。数値試験は再実行しない
+```
 
 ## 結果を変える変更
 

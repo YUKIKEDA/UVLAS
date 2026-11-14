@@ -25,8 +25,31 @@ globs: "**/*.cpp,**/*.hpp"
 - 型は `PascalCase`、関数と変数は `snake_case`、定数は `snake_case`、マクロは `UVLAS_` で始める。名前空間は `uvlas::<module>`。
 - マクロは、条件付きコンパイルとビルド情報にだけ使う。
 - ヘッダは自分で完結する（単独でincludeしてコンパイルできる）。includeの順は `.clang-format` が決める。
-- コメントは英語。何をするかではなく、なぜそうするか、どの仕様の条に基づくかを書く。測ったことは測ったと書き、確かめていない原因は確かめていないと書く（`open-ends`）。
+- コメントは英語。APIには利用側が守る契約を、実装中には理由と根拠を書く。測ったことは測ったと書き、確かめていない原因は確かめていないと書く（`open-ends`）。
 - 使われなくなったコードは、その経路を外したPRで消す（`no-dead-code`）。
+
+## APIと実装のコメント
+
+- `include/` の公開ヘッダにある型、関数、型別名、公開フィールドには、宣言のそばにDoxygen形式（`///`、`/** ... */`、`///<`）のドキュメンテーションコメントを付ける。互換性未固定のAPIも対象にする。`detail` 名前空間など非公開の実装補助は除く。
+- 型には役割と不変条件を、関数には入力条件、単位・尺度、戻り値、失敗・例外、所有権・借用期間、状態への作用を、該当する範囲で書く。名前を言い直すだけにせず、宣言とコメントで利用側が呼出し方を判断できるようにする。
+- APIのドキュメンテーションコメントは利用者に向けて書く。内部の仕様ID、Issue、実装工程の番号で説明せず、引数の意味・制約と結果の扱いをその場で理解できるようにする。開発上の根拠や追跡情報は、Doxygenの対象にならない実装コメントか開発文書へ置く。
+- 数値境界、失敗分類、検査順、確保・寿命、元の式からの変形など、誤読すると契約を壊す箇所にはインラインコメントで「なぜ」を残す。自明な代入やループを逐語的に説明しない。
+- 契約文書へのリンクだけで済ませない。仕様を変えるときは、宣言のコメントと実装の理由も同じ変更で照合する。レビューではドキュメンテーションコメントの有無と契約との一致を確認する。
+
+2026-11-15、PR #40で共通の失敗・誤差認定型に利用側の契約を説明するコメントが不足していた。別文書を用意しても、宣言の説明を省いてよいことにはならない。
+
+同PRの訂正では、APIコメントに内部の仕様IDや工程名を混ぜてしまった。利用者がそれらを調べなくても呼び出せる説明に改めた。
+
+```cpp
+/// BAD: Classify the bound according to N4-02; state ownership follows IM00-9.
+static Result<ErrorCertificate> assess(CertificateContext context, double budget, double upper_bound);
+
+// GOOD: the declaration states the classification contract
+/// Classify a nonnegative finite bound in the same scale as budget.
+/// Return an Exceeded record, not a failed factory, when the bound exceeds budget.
+/// Invalid inputs return a Failure; no hidden tolerance is added.
+static Result<ErrorCertificate> assess(CertificateContext context, double budget, double upper_bound);
+```
 
 ## ライブラリの版についての思い込み
 

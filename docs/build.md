@@ -1,6 +1,6 @@
 # 構成、ビルド、試験
 
-現在の製品コードはビルド情報とCLIの骨組みだけで、解析コマンドは無い。公開APIの互換性保証は始めていない。
+現在の製品コードはビルド情報、共通の失敗・誤差認定の型とCLIの骨組みで、解析コマンドは無い。公開APIの互換性保証は始めていない。
 
 ## 必要なもの
 
@@ -86,6 +86,8 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | `toolchain.precise_arithmetic` | Multiprecisionの精度、有理数の厳密算術、Hash2のSHA-256既知値を照合する |
 | `toolchain.third_party_notices` | vcpkgの著作権・ライセンス通知が構成先へバイト一致で複製されていること。扱いは[第三者通知](../THIRD_PARTY_NOTICES.md) |
 | `toolchain.notice_configuration` | 実ソースの複製を使った新規構成6通り。試験の既定ON・明示ON・OFFと、Catch2通知あり／なしを照合する。依存原本の変更・C++ビルドは行わない |
+| `core.failure` | 17種類の失敗、所有する診断、識別子の混用拒否、例外をResultへ変換する入口の契約 |
+| `core.error_certificate` | 未評価・達成・未達の区別、予算境界、負値・非有限・未対応表現の拒否 |
 | `qa.numeric_canary` | 基準ケースの結果が、このプラットフォームの基準結果とビット一致すること（QA-04）。認定していないプラットフォームでは落ちる |
 | `cli.build_info` | `uvlas --build-info` が来歴を返すこと |
 
