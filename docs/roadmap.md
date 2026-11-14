@@ -2,9 +2,9 @@
 
 作業の順序と状態の正本。行が持つのはID、種類、題、Issue、状態だけで、完了条件はIssueに書く。行の追加と削除はGrillの後に行う。「今」を書き換えるのは、その行を終えるPRだけ。
 
-**今**：F-1
+**今**：IM00-3
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用（構造、空力、連成、数値基盤、入出力）と受入計画は終わっており、製品本体は未着手。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用（構造、空力、連成、数値基盤、入出力）と受入計画を終え、IM00-1の依存機能・通知検査を実装した。次は共通の失敗型と誤差認定の型。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -33,7 +33,7 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
-| F-1 | Task | リポジトリ基盤：R&D成果の整理、Rules／Skills、開発環境、ロードマップ | #1 | In progress |
+| F-1 | Task | リポジトリ基盤：R&D成果の整理、Rules／Skills、開発環境、ロードマップ | #1 | Done |
 | F-2 | Task | Linux（GCC 14）とCIでビルド・試験を確認する | #2 | Done |
 | F-3 | Task | 証拠の束をリリースのアセットへ置き、取得して照合する | #3 | Done |
 | F-4 | Design | 公開前の判断：AVL由来のGPLファイルと絶対パスの扱い、初回push | #4 | Done |
@@ -53,7 +53,7 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
-| IM00-1 | Feat | 固定した数値依存の機能とライセンス通知を検査する | #5 | Todo |
+| IM00-1 | Feat | 固定した数値依存の機能とライセンス通知を検査する | #5 | Done |
 | IM00-2 | Feat | 強いID、checked 64bit寸法、ResourcePlan | #6 | Todo |
 | IM00-3 | Feat | Failure／expected と ErrorCertificate | #7 | Todo |
 | IM00-4 | Feat | 密・CSC疎の保持、DofLayout、PointSoA | #8 | Todo |
