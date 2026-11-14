@@ -68,3 +68,14 @@ add_test(NAME toolchain.third_party_notices
         "-DNOTICES_DIR=${UVLAS_THIRD_PARTY_NOTICES}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notices.cmake")
 set_tests_properties(toolchain.third_party_notices PROPERTIES TIMEOUT 10 LABELS "integration")
+
+add_test(NAME toolchain.notice_configuration
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSOURCE_ROOT=${PROJECT_SOURCE_DIR}"
+        "-DBINARY_ROOT=${CMAKE_CURRENT_BINARY_DIR}"
+        "-DDEPENDENCY_PREFIX=${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
+        "-DTRIPLET=${VCPKG_TARGET_TRIPLET}"
+        "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+        "-DPYTHON_EXECUTABLE=${Python3_EXECUTABLE}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notice_configuration.cmake")
+set_tests_properties(toolchain.notice_configuration PROPERTIES TIMEOUT 180 LABELS "integration;negative")
