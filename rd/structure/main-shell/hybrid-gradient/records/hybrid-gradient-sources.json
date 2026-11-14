@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-04",
+  "primary_source": {
+    "title": "A hybridizable discontinuous Galerkin method for both thin and 3D nonlinear elastic structures",
+    "authors": "S. Terrana; N. C. Nguyen; J. Bonet; J. Peraire",
+    "year": 2019,
+    "doi": "10.1016/j.cma.2019.04.029",
+    "url": "https://www.mit.edu/~cuongng/project/csm3/csm3.pdf",
+    "author_repository": "https://gala.gre.ac.uk/id/eprint/23898/",
+    "checked_scope": "Published author PDF: sections 2.2 through 3.3, equations 3-18, approximation spaces, four-field variational principle, common volume/trace traction, and stabilization discussion.",
+    "publisher_access": "Publisher open attempt returned 403; author-hosted PDF and university repository were available.",
+    "independent_extension": "ANCF Q4 x thickness-P2 volume, independent vertical-face position traces with top/bottom trace tied to volume position, S4 or S3+ mixed gradient spaces, fixed reference linear-limit tau=2.5 and Lc=.5. Original adaptive stabilization and full 3D equal-order method are not reproduced.",
+    "source_locking_claim_transferred": false
+  },
+  "method_scope": "New mixed volume/trace verification candidate; not product adoption or a general HDG rejection"
+}

@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "scope": "actual free PG/UVLM physical IDs/time plus BDF2 stencil/load envelope and atomic commit",
+  "next_state_and_packet_bitwise": true,
+  "BDF1_would_change_current_derivative": 0.003149231536633476,
+  "rejected": [
+    "missing_history",
+    "BDF1_substitution",
+    "wrong_policy",
+    "wrong_model",
+    "changed_load",
+    "changed_qualified_trial",
+    "double_commit"
+  ],
+  "seconds": 16.936999999918044,
+  "sources": {
+    "rd/coupled/j1/experiments/check_coupled_checkpoint.py": "b4ef4bed0a73cf100ae2c8ac8f7d98e9ad7a950d360bf420eda98fc4c0bc4ab3",
+    "rd/coupled/j1/experiments/coupled_checkpoint_witness.py": "6b5b7f18973c43811cae6018ca13ba8ca000bb7b92134f2f7993d1a70fd92b5b",
+    "docs/specs/coupled/coupled-state-search-contract.md": "1f624248e72e2d040ef025a2f901617bd3ae5c150ad4b805cbb01224ebe765ce",
+    "rd/coupled/j1/records/pg-uvlm-free-step-result.json": "69d3666642c2b490dab99424568cf8eb5084f2778aff6854ca7bd4197f7c305d"
+  }
+}

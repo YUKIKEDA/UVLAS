@@ -1,0 +1,8 @@
+{
+  "sources": {
+    "rd/structure/main-shell/hybrid-gradient/experiments/check_hybrid_gradient_equilibrium.py": "d0475466a72aa8ca13a47cafef2768a266d3a4b21bd7d9ba04b8cc6d11f0299c",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-equilibrium-protocol.md": "a48cf32e358a545237afea460df4d51ee1d26699ae17bc29029e32bf0addf6e4",
+    "rd/structure/main-shell/hybrid-gradient/records/hybrid-gradient-local-result.json": "f46312f6e03e3f7dcac25104540981b9b4d4f26a488a2e681ce034bca598861d"
+  }
+}

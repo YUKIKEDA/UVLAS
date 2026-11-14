@@ -1,0 +1,314 @@
+{
+  "records": [
+    {
+      "kind": "weak",
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.741939108585526e-15,
+        "force": 7.561691588343027e-15,
+        "tangent": 2.8836824211382396e-14,
+        "weak_gradient": 2.882382384870138e-15,
+        "flux_dual": 1.4438583494718884e-15,
+        "stabilization_operator": 5.845040852016447e-15
+      },
+      "polynomial": {
+        "polynomials": 46,
+        "gradient_error": 1.0940735590957318e-12,
+        "stabilization_residual": 2.0907367974589465e-14,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 6.532313906746618e-16,
+        "force": 9.473859472558458e-15,
+        "tangent": 7.429181507361236e-14,
+        "weak_gradient": 3.058488210319776e-15,
+        "flux_dual": 1.1836364878072764e-15,
+        "stabilization_operator": 6.5683725022265664e-15
+      },
+      "polynomial": {
+        "polynomials": 46,
+        "gradient_error": 9.545129556006913e-12,
+        "stabilization_residual": 2.0944550415594938e-13,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.4969887005224213e-15,
+        "force": 9.4098379944005e-15,
+        "tangent": 3.5851321984323606e-14,
+        "weak_gradient": 2.858755696399995e-15,
+        "flux_dual": 1.274493038144823e-15,
+        "stabilization_operator": 5.030372153548702e-15
+      },
+      "polynomial": {
+        "polynomials": 46,
+        "gradient_error": 9.860563646019343e-11,
+        "stabilization_residual": 1.3094295879017674e-12,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 1.7401727534500113e-15,
+        "force": 6.5635317816958814e-15,
+        "tangent": 8.495578176927388e-15,
+        "weak_gradient": 4.026455563930764e-15,
+        "flux_dual": 1.2520162369323888e-15,
+        "stabilization_operator": 6.035681914416287e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 1.740186013674811e-15,
+        "force": 5.380350070228467e-15,
+        "tangent": 2.860143658017762e-14,
+        "weak_gradient": 3.911483504087608e-15,
+        "flux_dual": 1.4406729909194261e-15,
+        "stabilization_operator": 6.650962034954384e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 1.3595204271422033e-16,
+        "force": 6.725708540681433e-15,
+        "tangent": 1.206812202063563e-15,
+        "weak_gradient": 3.81557362341628e-15,
+        "flux_dual": 1.2402798858339111e-15,
+        "stabilization_operator": 4.1115574789438026e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 3.986133512809516e-15,
+        "force": 1.053589127575625e-14,
+        "tangent": 6.16644597572865e-14,
+        "weak_gradient": 3.9767233590798275e-15,
+        "flux_dual": 2.5814009465789815e-15,
+        "stabilization_operator": 5.186329384393294e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 4.332791595536272e-16,
+        "force": 8.768183943454915e-15,
+        "tangent": 8.083290676506654e-14,
+        "weak_gradient": 3.805605473300674e-15,
+        "flux_dual": 1.866123982636947e-15,
+        "stabilization_operator": 6.140769744894614e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 2.0309962377911717e-15,
+        "force": 1.312212912860301e-14,
+        "tangent": 6.932504176704454e-16,
+        "weak_gradient": 3.912244332919921e-15,
+        "flux_dual": 2.6968887800912418e-15,
+        "stabilization_operator": 5.780258731866565e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "energy": 3.916949631186048e-15,
+        "force": 9.710073526048728e-15,
+        "tangent": 2.304153059468872e-14,
+        "weak_gradient": 3.0955563463633276e-15,
+        "flux_dual": 2.0900868485499626e-15,
+        "stabilization_operator": 5.845040852016447e-15
+      },
+      "polynomial": {
+        "polynomials": 46,
+        "gradient_error": 1.0900886730435142e-12,
+        "stabilization_residual": 2.0907367974589465e-14,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "energy": 6.994706868053175e-16,
+        "force": 8.590484563221373e-15,
+        "tangent": 6.615322933480729e-14,
+        "weak_gradient": 3.3309969078788335e-15,
+        "flux_dual": 2.1146477319640327e-15,
+        "stabilization_operator": 6.5683725022265664e-15
+      },
+      "polynomial": {
+        "polynomials": 46,
+        "gradient_error": 9.54280172111938e-12,
+        "stabilization_residual": 2.0944550415594938e-13,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 2.040123287840354e-15,
+        "force": 1.004072579111967e-14,
+        "tangent": 5.625273625187397e-15,
+        "weak_gradient": 3.2027411840033707e-15,
+        "flux_dual": 2.413384285287277e-15,
+        "stabilization_operator": 5.030372153548702e-15
+      },
+      "polynomial": {
+        "polynomials": 46,
+        "gradient_error": 9.860546191792163e-11,
+        "stabilization_residual": 1.3094295879017674e-12,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "energy": 9.30989573072527e-16,
+        "force": 5.102115060507492e-15,
+        "tangent": 1.1867531516613637e-14,
+        "weak_gradient": 3.745188587671057e-15,
+        "flux_dual": 3.022978114228251e-15,
+        "stabilization_operator": 6.035681914416287e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "energy": 3.4913941931374835e-16,
+        "force": 6.990467235047204e-15,
+        "tangent": 2.1699720439519277e-15,
+        "weak_gradient": 4.426835988195002e-15,
+        "flux_dual": 2.017946573389584e-15,
+        "stabilization_operator": 6.650962034954384e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 4.364245075651107e-16,
+        "force": 5.493224675924338e-15,
+        "tangent": 1.0278905367922935e-14,
+        "weak_gradient": 3.667774990107305e-15,
+        "flux_dual": 1.6629091982312145e-15,
+        "stabilization_operator": 4.1115574789438026e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "energy": 3.879435210665731e-15,
+        "force": 1.6524476253113052e-14,
+        "tangent": 1.4310758426999863e-13,
+        "weak_gradient": 4.116166451886003e-15,
+        "flux_dual": 1.7878369318372224e-15,
+        "stabilization_operator": 5.186329384393294e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "energy": 4.733900952489115e-15,
+        "force": 1.2406222114577103e-14,
+        "tangent": 2.2210705947842557e-13,
+        "weak_gradient": 3.559047310070926e-15,
+        "flux_dual": 2.1977774293013336e-15,
+        "stabilization_operator": 6.140769744894614e-15
+      },
+      "polynomial": null,
+      "passed": true
+    },
+    {
+      "kind": "potential",
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "energy": 3.4638304524617856e-15,
+        "force": 1.3577633110194335e-14,
+        "tangent": 2.4267841202398293e-13,
+        "weak_gradient": 3.3993784469095695e-15,
+        "flux_dual": 3.755655922155338e-15,
+        "stabilization_operator": 5.780258731866565e-15
+      },
+      "polynomial": null,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/audit_polynomial_trace_local.py": "e2eae79a5b7953cc52da70a32a0448fecf8b9617fd4579b131fa7d4805e24314",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-result.json": "748bcc3774681d7ef363656479c8dd3e52bb962d58688cf16b49d547ac57e6d1",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604"
+  },
+  "seconds": 22.641000000061467
+}

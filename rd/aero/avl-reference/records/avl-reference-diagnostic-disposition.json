@@ -1,0 +1,26 @@
+{
+  "source_sha256": "7f36155ab07eecb9d2793c2f5286fd4e14d08401656ea03af0d53da86b9e8dfd",
+  "evidence_sha256": {
+    "avl-allocation-factorial-runs.json": "1fda4bc132205e28060d1c9ce20f639898aaf759ed9664d8143cd851303b442a",
+    "avl-allocation-factorial-result.json": "41b93706b67110c97b62a757de18a29921c532728a885ace10639c036f92a24e",
+    "avl-allocation-factorial-artifact-audit.json": "d54d76ea25d90eb7c111a497418564347d8f704537cdbe56816c65b069e6f2c3",
+    "avl-span1280-observation-result.json": "e3c99d520f4f9b65fe3a28cc00a0609b894a8e53d6fcf4af8de2ca15e46ea397",
+    "avl-span1280-results.md": "47953541567155502e158f0aacfd42d24d53103a17d33992e66176112fa0ae86",
+    "avl-symmetric-solve-sensitivity-results.md": "bda67732d7d5d2f5dd0d1336b0de49d968f05778bc5674bd03f2b5ecf036caf0",
+    "avl-allocation-factorial-results.md": "c873e877b4c4cbe6f030bf23ada3c047eedbd443014986e4d3dceb7bca26a8a3",
+    "avl-reference-diagnostic-disposition.md": "cf5637f8fcb9cc7fa8d9c992ebd0e4c10fc6bf147ce906dab8ffa35b25edacdf"
+  },
+  "current_diagnostic_completed": true,
+  "disposition": "not-adopted-as-accuracy-acceptance-reference",
+  "allowed_use": [
+    "fixed-artifact-regression",
+    "finite-grid-diagnostics"
+  ],
+  "reference_accuracy_accepted": false,
+  "m24_combined_error_budget": null,
+  "root_cause_fully_resolved": false,
+  "e_aero_closed": false,
+  "j1_closed": false,
+  "production_core_start_authorized": false,
+  "next_work": "structural-model-adoption-review"
+}

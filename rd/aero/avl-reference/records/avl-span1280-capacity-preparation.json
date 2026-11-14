@@ -1,0 +1,383 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-span1280-capacity-experiment.md",
+  "protocol_sha256": "d41158d8c3b771e736e4731d47f65db4f08ed2e3c0455914ff051123a0a21b15",
+  "source_sha256": "cdb4ad062ad66fa8693dfbc6b132ee2637947af735f0e854e89eb6a565b7254a",
+  "parent": "build/reference-avl/source-symmetry8000-spacing-pi64",
+  "target": "build/reference-avl/source-symmetry16000-spacing-pi64",
+  "parent_executable_sha256": "321d2bd14e3f9795471e18b504b51b12f46af8159718b7f4b00e6cbfbc7df59b",
+  "source_files": {
+    "ADIMEN.INC": {
+      "parent": "35d0d0d65f4a70690a32f367d71935bc9d41eab12448c8f203d936e78d5ca00c",
+      "capacity": "a5219cf37211f1bc466deff3c51be66e7e59e3300a4966d3314b4e365c7ed69e"
+    },
+    "aero.f": {
+      "parent": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6",
+      "capacity": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6"
+    },
+    "aic.f": {
+      "parent": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f",
+      "capacity": "51725b7b3eeb31641795781dd030c7b60fb67ecefeb8ac566b4bcc398783b43f"
+    },
+    "AINDEX.INC": {
+      "parent": "6283370c4341161d4f974d7d11cc961dd820305c1d5f000f42f472fa877feff7",
+      "capacity": "6283370c4341161d4f974d7d11cc961dd820305c1d5f000f42f472fa877feff7"
+    },
+    "ainput.f": {
+      "parent": "c4408d58c3217be4abfa482c51146be8355ed3220020d6f86e00aba994651bd3",
+      "capacity": "c4408d58c3217be4abfa482c51146be8355ed3220020d6f86e00aba994651bd3"
+    },
+    "airutil.f": {
+      "parent": "d81ce8cc13ed092f0038eade905bcbf6f436a1690ac44fb3c6e13368fe8e5ed1",
+      "capacity": "d81ce8cc13ed092f0038eade905bcbf6f436a1690ac44fb3c6e13368fe8e5ed1"
+    },
+    "amake.f": {
+      "parent": "e572097d8f65e0bf9cb6134a181d54612c64758b24c31c7095a644b57dc471d7",
+      "capacity": "e572097d8f65e0bf9cb6134a181d54612c64758b24c31c7095a644b57dc471d7"
+    },
+    "amass.f": {
+      "parent": "54f4e1d27ce919c26dcf6ade95cae828b076661c36e6518d6192c39eb4e06d3e",
+      "capacity": "54f4e1d27ce919c26dcf6ade95cae828b076661c36e6518d6192c39eb4e06d3e"
+    },
+    "amode.f": {
+      "parent": "f3aecac48f154860e636e3235ab2cc57c80b369b39cbac2b55f8a60b8378ea4b",
+      "capacity": "f3aecac48f154860e636e3235ab2cc57c80b369b39cbac2b55f8a60b8378ea4b"
+    },
+    "aoml.f": {
+      "parent": "d30d6c9e3bafde44cbf785a4dbf718185bb15ce94065ccc700797a4397765aae",
+      "capacity": "d30d6c9e3bafde44cbf785a4dbf718185bb15ce94065ccc700797a4397765aae"
+    },
+    "aoper.f": {
+      "parent": "4280580c4c0a6160d82320f59ca4c72afa3620c1b9e3d5724a019a1468f9135a",
+      "capacity": "4280580c4c0a6160d82320f59ca4c72afa3620c1b9e3d5724a019a1468f9135a"
+    },
+    "aoutmrf.f": {
+      "parent": "82384d13a4c6ef3a04ec7647a7dcca2be519b449013675adf209f23bf7234003",
+      "capacity": "82384d13a4c6ef3a04ec7647a7dcca2be519b449013675adf209f23bf7234003"
+    },
+    "aoutput.f": {
+      "parent": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9",
+      "capacity": "7a3255c44f6a7c5db5c1de040a5fa454ed4a23c40d26346bc7a788e98499a9a9"
+    },
+    "aoutput_bug.f": {
+      "parent": "cddaaa0f48695474f86ccd35b4283b358f3ef4f59c75a73f1e4b7ffddf3716a8",
+      "capacity": "cddaaa0f48695474f86ccd35b4283b358f3ef4f59c75a73f1e4b7ffddf3716a8"
+    },
+    "aplotmd.f": {
+      "parent": "edd810b6e4fcd1a25f712ceecdb7ea0dac9fc530139fd7bdc880f89006e150dc",
+      "capacity": "edd810b6e4fcd1a25f712ceecdb7ea0dac9fc530139fd7bdc880f89006e150dc"
+    },
+    "aplottp.f": {
+      "parent": "f8ead0c48d2e40bf4003413dbea88a7b5b858eb042503083a0f42029e4268ad6",
+      "capacity": "f8ead0c48d2e40bf4003413dbea88a7b5b858eb042503083a0f42029e4268ad6"
+    },
+    "aplotvl.f": {
+      "parent": "83ecf66d2f936505b3d8b6a90109b57fef598c70a35e48b670e9c4bb5ad5cfce",
+      "capacity": "83ecf66d2f936505b3d8b6a90109b57fef598c70a35e48b670e9c4bb5ad5cfce"
+    },
+    "arrow3d.f": {
+      "parent": "efbc406db10a0bfa64d27ebe6b7f62b4a1c8868f49e791eb6edae88c5a93483c",
+      "capacity": "efbc406db10a0bfa64d27ebe6b7f62b4a1c8868f49e791eb6edae88c5a93483c"
+    },
+    "asetup.f": {
+      "parent": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf",
+      "capacity": "88b7caee259879b034a4043e53a56130c987715e40288013d418e572a364d1bf"
+    },
+    "atime.f": {
+      "parent": "e6117e27365e43431d784def548fe3330454265a140722a4adfbffe034e3645e",
+      "capacity": "e6117e27365e43431d784def548fe3330454265a140722a4adfbffe034e3645e"
+    },
+    "atpforc.f": {
+      "parent": "21153c1a3623177d4bfcbcd799f0bdedade0081a4955b6e1f4e7c649a9dbf65a",
+      "capacity": "21153c1a3623177d4bfcbcd799f0bdedade0081a4955b6e1f4e7c649a9dbf65a"
+    },
+    "atrim.f": {
+      "parent": "8476c4231d429cb0259bc6ecf87bd9086cb5050b2ba9c5b5e1a69e9474589f6b",
+      "capacity": "8476c4231d429cb0259bc6ecf87bd9086cb5050b2ba9c5b5e1a69e9474589f6b"
+    },
+    "autil.f": {
+      "parent": "e88ec69b68a92c4480d13a20d16e53517e51a02fd435d34b44d43294e005865a",
+      "capacity": "e88ec69b68a92c4480d13a20d16e53517e51a02fd435d34b44d43294e005865a"
+    },
+    "avl.f": {
+      "parent": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a",
+      "capacity": "acbce56d83c28d189ca0338f3e03d5bae138503089cf6f21e5af35b05ba1335a"
+    },
+    "AVL.INC": {
+      "parent": "95b675cca17eeba2740435e94a8c7202b09b19bc121f5730cfb9404db5f5962b",
+      "capacity": "95b675cca17eeba2740435e94a8c7202b09b19bc121f5730cfb9404db5f5962b"
+    },
+    "AVLPLT.INC": {
+      "parent": "986c02a734d845176c658f2a9f42f205ce1775802eacf2d5066103a6c67d4234",
+      "capacity": "986c02a734d845176c658f2a9f42f205ce1775802eacf2d5066103a6c67d4234"
+    },
+    "avl_heap.f90": {
+      "parent": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966",
+      "capacity": "010bbfb00a6fae198e538e6d520b84bb44243318da15f7f28a4f39fef7833966"
+    },
+    "avl_heap_inc.f90": {
+      "parent": "9a32d3ba657fb70919aefc3bc01ff2998ac144acf1585bb761abd56bc57e3897",
+      "capacity": "61b72cebd61aaca40ce24502d433e2297139d394d4a6dec1e0963d99be0a3f86"
+    },
+    "ba_trans.f": {
+      "parent": "1d96c668c1ed80edc7d1519739d7ab64c86ca2d5235acbf4edca8952d03c6e49",
+      "capacity": "1d96c668c1ed80edc7d1519739d7ab64c86ca2d5235acbf4edca8952d03c6e49"
+    },
+    "cdcl.f": {
+      "parent": "ce2711def9b2ead1a4782a0a4285fa2a9422ac7a23778334a8e6332048fba133",
+      "capacity": "ce2711def9b2ead1a4782a0a4285fa2a9422ac7a23778334a8e6332048fba133"
+    },
+    "dtest.f": {
+      "parent": "b3797686b5e6bea6606310ab034c92ae779f78a5689fe6490e457be8257a53c5",
+      "capacity": "b3797686b5e6bea6606310ab034c92ae779f78a5689fe6490e457be8257a53c5"
+    },
+    "getvm.f": {
+      "parent": "0b96359c604864a4887d47ce34cdb0688dbed48944db611b39800abf36942561",
+      "capacity": "0b96359c604864a4887d47ce34cdb0688dbed48944db611b39800abf36942561"
+    },
+    "hidden.f": {
+      "parent": "7e2067ec26f7dddcdb4335d1791822cbea005bf712afa272717e888a6f019ee9",
+      "capacity": "7e2067ec26f7dddcdb4335d1791822cbea005bf712afa272717e888a6f019ee9"
+    },
+    "limits.f": {
+      "parent": "ee5be7c8c366b134e7b6c91370f21830241fedb936484f9bfde76dbddb049ae0",
+      "capacity": "ee5be7c8c366b134e7b6c91370f21830241fedb936484f9bfde76dbddb049ae0"
+    },
+    "limits2.f": {
+      "parent": "e54047eb86e957391354d9a7cddc2f87c84bf1ea0a4a31ba76f4d761cdbb68fd",
+      "capacity": "e54047eb86e957391354d9a7cddc2f87c84bf1ea0a4a31ba76f4d761cdbb68fd"
+    },
+    "MASKS.INC": {
+      "parent": "b5ce0ae28ab0f41f8cf9fde42ff24490f537d5c6bc865c63cd2d30c881f390d9",
+      "capacity": "b5ce0ae28ab0f41f8cf9fde42ff24490f537d5c6bc865c63cd2d30c881f390d9"
+    },
+    "matrix-lapackdp.f": {
+      "parent": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259",
+      "capacity": "9e54a239019de9cfd2f6fdb9b119bd8eaaf8e832761460d7fd5653eeb002e259"
+    },
+    "matrix-lapacksp.f": {
+      "parent": "a6007b27c936363d7782dea3c00ec8f769b4478bde3e8d2316b724fca300fa2e",
+      "capacity": "a6007b27c936363d7782dea3c00ec8f769b4478bde3e8d2316b724fca300fa2e"
+    },
+    "matrix-lapacksubs.f": {
+      "parent": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564",
+      "capacity": "3137b3e864c83ad1965ce9988b01611aefa7818f7171c331211520c18fc17564"
+    },
+    "matrix-linpack.f": {
+      "parent": "781cd5fcf42276f01647c52402a1a8a4f51bd90c248a2dd2f913e49b534577e2",
+      "capacity": "781cd5fcf42276f01647c52402a1a8a4f51bd90c248a2dd2f913e49b534577e2"
+    },
+    "matrix.f": {
+      "parent": "8fb855c52b8e650827e1b348ffa0e18420a7af173a90287b410e4daee772b335",
+      "capacity": "8fb855c52b8e650827e1b348ffa0e18420a7af173a90287b410e4daee772b335"
+    },
+    "movie.f": {
+      "parent": "5bd5c43b0001d05bef589a1fbe1ebf33de4185f6f755ffc736594a98e61428cf",
+      "capacity": "5bd5c43b0001d05bef589a1fbe1ebf33de4185f6f755ffc736594a98e61428cf"
+    },
+    "obsetup.f": {
+      "parent": "618705cae4b701fff26086d7343dc541d0255c955d1d91b9daa209ee1ec37474",
+      "capacity": "618705cae4b701fff26086d7343dc541d0255c955d1d91b9daa209ee1ec37474"
+    },
+    "plsubs.f": {
+      "parent": "d07878f8ee8dacfa9987d6b27eda8ae4275cb115571842ca2507d27a6071a03b",
+      "capacity": "d07878f8ee8dacfa9987d6b27eda8ae4275cb115571842ca2507d27a6071a03b"
+    },
+    "pltops.f": {
+      "parent": "c2ef34b204be3581c9d9ec6e77b10525c5b71e68e3ca8a0e6b1eb5cddffc09e7",
+      "capacity": "c2ef34b204be3581c9d9ec6e77b10525c5b71e68e3ca8a0e6b1eb5cddffc09e7"
+    },
+    "plutil.f": {
+      "parent": "e9b3a8f7e1024fa6592518205c35f100792afe0c2e546dd3f3a7a017becd4944",
+      "capacity": "e9b3a8f7e1024fa6592518205c35f100792afe0c2e546dd3f3a7a017becd4944"
+    },
+    "second.f": {
+      "parent": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c",
+      "capacity": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c"
+    },
+    "second_g77.f": {
+      "parent": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c",
+      "capacity": "56869d6d5b85c6ec967dec488f70315245266eba409d6ff7424edc6bc620239c"
+    },
+    "second_ifc.f": {
+      "parent": "d5a18e587d53dbe039318d67e38eacf901ce30961ee77c8c1a1fafd3020214a8",
+      "capacity": "d5a18e587d53dbe039318d67e38eacf901ce30961ee77c8c1a1fafd3020214a8"
+    },
+    "sgutil.f": {
+      "parent": "db0680f8cc84efc14a6b885effdef2c882ac11e3610c41d6bce96c183f6fde33",
+      "capacity": "db0680f8cc84efc14a6b885effdef2c882ac11e3610c41d6bce96c183f6fde33"
+    },
+    "spline.f": {
+      "parent": "5ef039d273e75115b158fcd769ce638744ec37185de1e9663d2238dc758eba2f",
+      "capacity": "5ef039d273e75115b158fcd769ce638744ec37185de1e9663d2238dc758eba2f"
+    },
+    "unitset.f": {
+      "parent": "e6aef6bab251b730843f33188a9b75ca2329a3bc4c2bd50e9ff5426410b0fc79",
+      "capacity": "e6aef6bab251b730843f33188a9b75ca2329a3bc4c2bd50e9ff5426410b0fc79"
+    },
+    "userio.f": {
+      "parent": "9ed3f0a93f49e0ac01864589ad2578569746a15e7a6ba97a5d8c3fa95303d93b",
+      "capacity": "9ed3f0a93f49e0ac01864589ad2578569746a15e7a6ba97a5d8c3fa95303d93b"
+    },
+    "uvl_grid_export.f": {
+      "parent": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b",
+      "capacity": "54ec19ec1c04925d12beda4eee0a1f280d41cd54fed8a021c328988b88f9438b"
+    },
+    "uvl_measurement.f": {
+      "parent": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29",
+      "capacity": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29"
+    },
+    "uvl_pair_probe.f": {
+      "parent": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16",
+      "capacity": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16"
+    },
+    "uvl_symmetry_export.f": {
+      "parent": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468",
+      "capacity": "7d57597a7c71d398ff567bc4071e6272ea18a5eb943fb0a7de432baecff64468"
+    },
+    "uvl_symmetry_guard.f": {
+      "parent": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80",
+      "capacity": "400ca7281f0043a5ebe0c1a729f9e078c23f5d63b18f65281dc1cf18b1b0ff80"
+    },
+    "vorvel.f": {
+      "parent": "d47173a6be368e7ecdada2ad9539d28de5fc8eca14a3c2a29572b3b7a1208676",
+      "capacity": "d47173a6be368e7ecdada2ad9539d28de5fc8eca14a3c2a29572b3b7a1208676"
+    },
+    "vorvelc.f": {
+      "parent": "646747bac2b52e2f2ccec4713a98d5bc76ef42ab98827baf870b8849246df2bd",
+      "capacity": "646747bac2b52e2f2ccec4713a98d5bc76ef42ab98827baf870b8849246df2bd"
+    }
+  },
+  "changed_source_files": [
+    "ADIMEN.INC",
+    "avl_heap_inc.f90"
+  ],
+  "changed_constants": 3,
+  "build_script_sha256": "0d3884c24c36eeda77c536750f8b5ac92ab0b338a3a4f5c1be295666a6591519",
+  "patch_sha256": "e06627b059e855ea75df6a1294fa19d99587a1411c6d7f6a8de1a9d249f7e587",
+  "compiler_sha256": "7564cac4a7d02785e005665954fc981338b200686ab9b8bfe6df15da0f2cc1f3",
+  "objects": [
+    "avl_heap_inc.o",
+    "avl_heap.o",
+    "avl.o",
+    "aoper.o",
+    "amode.o",
+    "amass.o",
+    "asetup.o",
+    "amake.o",
+    "ainput.o",
+    "aoutput.o",
+    "aoutmrf.o",
+    "aero.o",
+    "atrim.o",
+    "atpforc.o",
+    "aic.o",
+    "cdcl.o",
+    "airutil.o",
+    "autil.o",
+    "aoml.o",
+    "aplotvl.o",
+    "aplottp.o",
+    "aplotmd.o",
+    "limits.o",
+    "pltops.o",
+    "hidden.o",
+    "plsubs.o",
+    "obsetup.o",
+    "userio.o",
+    "plutil.o",
+    "arrow3d.o",
+    "getvm.o",
+    "spline.o",
+    "sgutil.o",
+    "second.o",
+    "matrix-lapackdp.o",
+    "matrix-lapacksubs.o",
+    "uvl_measurement.o",
+    "uvl_pair_probe.o",
+    "uvl_grid_export.o",
+    "uvl_symmetry_export.o",
+    "uvl_symmetry_guard.o"
+  ],
+  "link_inputs": {
+    "<repo>/build/reference-avl/source-baseline/plotlib/libPlt_gDP.a": "1e4e52ffe866d2b3455e59c32e82df27e6e9140cba9aac79ec36a8b957f96911",
+    "<repo>/build/reference-avl/source-baseline/eispack/libeispack.a": "b73f95dc39ef0cb03cb722c084be6ef54a41b20fe6046dfad9f7ddb86e4f0b1a"
+  },
+  "gate_sha256": "9b72b4453aa1adce4a8655403b444ff1d7698f7954891691e64ee362659c96de",
+  "parent_runs_sha256": "4e205ad04ae30ee87545de75f7b973d62fe13dd54a58b48c4057bddf64db2142",
+  "inputs": [
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "physical_n": 40,
+      "native_unknowns": 120,
+      "input": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V01-M6-N40/wing.avl",
+      "input_sha256": "b0f07124d3ee358dd345327fc4406e03c1d503a92a445f5c276012cd7adaa93d",
+      "parent_directory": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V01-M6-N40/out"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 160,
+      "native_unknowns": 1920,
+      "input": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V01-M24-N160/wing.avl",
+      "input_sha256": "9ba633af9e56016a2346ae9971e4d0fd763312b43e5192be8421381712aa663a",
+      "parent_directory": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V01-M24-N160/out"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 320,
+      "native_unknowns": 3840,
+      "input": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V01-M24-N320/wing.avl",
+      "input_sha256": "1b1438c30863b7cb9ccb8ab53c209e1b2afa00f558d114de9b55a9907f0271fb",
+      "parent_directory": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V01-M24-N320/out"
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "physical_n": 640,
+      "native_unknowns": 7680,
+      "input": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N640/wing.avl",
+      "input_sha256": "67abf8a316534a3e05b2cc6aec6bf9456928c9d86b8d3499e8503a3fd89f2815",
+      "parent_directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V01-M24-N640/out"
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "physical_n": 40,
+      "native_unknowns": 120,
+      "input": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V02-M6-N40/wing.avl",
+      "input_sha256": "2d7b28f152342ba9d820d793bc4bd37a14f18f3416d9e96b2daa3c1f06bd0b77",
+      "parent_directory": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V02-M6-N40/out"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 160,
+      "native_unknowns": 1920,
+      "input": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V02-M24-N160/wing.avl",
+      "input_sha256": "0d98d2cf23301af743a0115abbf3137715a68d18d0b2ea762af7dc047d75068e",
+      "parent_directory": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V02-M24-N160/out"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 320,
+      "native_unknowns": 3840,
+      "input": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V02-M24-N320/wing.avl",
+      "input_sha256": "1e8fd8ae2406784994de72ee09b8d792853b6e6d48e1da65f436fa26e1a144eb",
+      "parent_directory": "build/analysis/avl-symmetry-pi-regression-20261031-134613/half_measured-FW-V02-M24-N320/out"
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "physical_n": 640,
+      "native_unknowns": 7680,
+      "input": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N640/wing.avl",
+      "input_sha256": "ab88a0f075e531cf5b2e41979e36219b8667fe87edcba32c67405baf9e0dcecb",
+      "parent_directory": "build/analysis/avl-symmetry-pi-fine-20261031-135433/half_fine-FW-V02-M24-N640/out"
+    }
+  ],
+  "capacity": 16000,
+  "strips": 1000
+}

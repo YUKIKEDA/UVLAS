@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/diagnose_q4_continuity_v3.py": "20a225dc42c59570f43084a7c22edc869b3ccd4e393901c15037d5335c3dae8f",
+    "rd/structure/main-shell/q4-projection/experiments/check_q4_continuity_v3.py": "7a572b9e0fe918183161b488f877858499d2b84ec704227c8bf63b83ea6bcb82",
+    "rd/structure/main-shell/q4-projection/experiments/tying_mid_projection_q4_v2.py": "f7841db7c24669543229ddd1af4792a0362986bce630a1feb7e38bbf125f34d3",
+    "rd/structure/main-shell/q4-projection/experiments/tying_projection_operator_v2.py": "8f4c34cd7394c34c4e85d9d671f8449b73981ddc10814150cfc5e70a5f356dec",
+    "rd/structure/main-shell/q4-projection/experiments/tying_projection_basis.py": "cfc7a3ee9b1f593d56b9f17a4bf3e0c92af9763a18826bafe2452498f74a478c",
+    "rd/structure/main-shell/q4-projection/records/q4-continuity-v3-protocol.md": "f13ef80d3311ebc68c6be1175fc42c358d40ae8aeb4c225b2f59adc7057f0adb",
+    "rd/structure/main-shell/q4-projection/records/q4-continuity-v2-result.json": "5b01a172a7e43b118c33ef155b49c34b6cb6358a53199bf8531524eb75a83ff1"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "source_sha256": "a33cd241cc1803c3e8214c6f8bb21ea19fc8ce442e216c9852c2b2d3c12af610",
+  "result_sha256": "cbcaa82789086cfa89b6c0feebba426a586f786faf603a6903415bbb81a57c69",
+  "runs_sha256": "06ae155609511b0c4c17a39b638cfac9f41874a87b4e224922870ebec7cde814",
+  "regression_cases": 4,
+  "new_cases": 2,
+  "raw_files": 96,
+  "changed_source_parameters": 2,
+  "method_checks": 5,
+  "all_criteria_pass": true
+}

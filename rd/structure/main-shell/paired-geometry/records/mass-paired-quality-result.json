@@ -1,0 +1,3696 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 195,
+      "observation": {
+        "error": [
+          1.866281867440003e-08,
+          3.7563822603449374e-06,
+          2.1435073990830194e-05
+        ],
+        "position": [
+          8.502070455379153e-12,
+          1.5966811830569258e-09,
+          1.0195134160561492e-08
+        ],
+        "stationarity": [
+          1.426143048494438e-17,
+          6.138365677157882e-17,
+          1.1277069258323807e-15
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1349422640096915e-13,
+          "d": 6.408856916436305e-14
+        },
+        {
+          "r": 6.675631666622254e-14,
+          "d": 2.973181488842781e-14
+        },
+        {
+          "r": 9.075650908057034e-14,
+          "d": 3.5704089908000706e-13
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.186109741108619e-16,
+        "mass_4_versus_7": 8.18747354652446e-16
+      },
+      "trace": 2.674326450358818e-14,
+      "rcond": 0.0003119997110913952,
+      "mass_min": 0.9999999999999951,
+      "stiffness_ranks": [
+        585,
+        585,
+        585
+      ],
+      "mass_root_ranks": [
+        195,
+        195,
+        195
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 5.48499999998603,
+      "cold_preparation": 5.48499999998603,
+      "cold_case_seconds": 12.125,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.0,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 189,
+        "coarse_rank": 21,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 189,
+        "selected_rows": 237,
+        "all_coefficient_rows": 1376,
+        "source_seconds": 0.7970000000204891,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.177675513675981e-118,
+        "quadrature": 15,
+        "seconds": 5.48499999998603,
+        "verified_positive_pivots": 195,
+        "verified_congruence_bound": 5.825970764519336e-103,
+        "locality": {
+          "max_active": 99,
+          "mean_active": 87.5,
+          "total_columns": 195
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-00.npz",
+      "artifact_sha256": "e5bdffe00a9562d3642d3518996398e3e71b3f9df169263063964fcbd7fc2d25"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 195,
+      "observation": {
+        "error": [
+          2.313137469604741e-08,
+          4.667477858231404e-06,
+          2.506079919651893e-05
+        ],
+        "position": [
+          1.0970979077781266e-11,
+          2.172325394614005e-09,
+          1.2671335810330206e-08
+        ],
+        "stationarity": [
+          1.9581470957616977e-13,
+          6.309470302117496e-13,
+          7.449074316872561e-12
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1349420848683243e-13,
+          "d": 6.4459579099296e-14
+        },
+        {
+          "r": 6.675304412037104e-14,
+          "d": 1.5424569339546156e-13
+        },
+        {
+          "r": 8.541611971969584e-14,
+          "d": 1.6762331118013416e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.355736351122107e-16,
+        "mass_4_versus_7": 8.283367916212953e-16
+      },
+      "trace": 4.111220777112651e-13,
+      "rcond": 2.1199524463903546e-07,
+      "mass_min": 0.999999999999996,
+      "stiffness_ranks": [
+        585,
+        585,
+        585
+      ],
+      "mass_root_ranks": [
+        195,
+        195,
+        195
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 4.625,
+      "cold_preparation": 5.422000000020489,
+      "cold_case_seconds": 12.062000000034459,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.0,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 189,
+        "coarse_rank": 21,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 189,
+        "selected_rows": 237,
+        "all_coefficient_rows": 1376,
+        "source_seconds": 0.7970000000204891,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.595659940079818e-111,
+        "quadrature": 15,
+        "seconds": 4.625,
+        "verified_positive_pivots": 195,
+        "verified_congruence_bound": 4.3643646039665364e-95,
+        "locality": {
+          "max_active": 99,
+          "mean_active": 87.5,
+          "total_columns": 195
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-01.npz",
+      "artifact_sha256": "5dca7be5d03cac5d3236b82b956a1f8f025186873122d5e3e69f209510f83d3e"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 435,
+      "observation": {
+        "error": [
+          1.0871759416237495e-10,
+          2.0103614531882645e-08,
+          6.321568379901704e-07
+        ],
+        "position": [
+          1.3959638701603975e-14,
+          2.544286597682791e-12,
+          8.226068644654765e-11
+        ],
+        "stationarity": [
+          1.0361002362243476e-17,
+          3.11221197712031e-17,
+          3.977106449140268e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1349760829633314e-13,
+          "d": 6.409739604603112e-14
+        },
+        {
+          "r": 7.300654555526463e-14,
+          "d": 5.289700791898198e-14
+        },
+        {
+          "r": 1.7667459845032311e-13,
+          "d": 4.59139105960306e-13
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.005250321939266e-16,
+        "mass_4_versus_7": 8.317804413355667e-16
+      },
+      "trace": 5.1012981497892225e-14,
+      "rcond": 0.00028985631812058186,
+      "mass_min": 0.9999999999999754,
+      "stiffness_ranks": [
+        1305,
+        1305,
+        1305
+      ],
+      "mass_root_ranks": [
+        435,
+        435,
+        435
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 38.90599999995902,
+      "cold_preparation": 38.90599999995902,
+      "cold_case_seconds": 99.76599999994505,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.0,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 415,
+        "coarse_rank": 21,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 415,
+        "selected_rows": 505,
+        "all_coefficient_rows": 5504,
+        "source_seconds": 4.577999999979511,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.244975778296927e-106,
+        "quadrature": 15,
+        "seconds": 38.90599999995902,
+        "verified_positive_pivots": 435,
+        "verified_congruence_bound": 7.327453186456757e-88,
+        "locality": {
+          "max_active": 133,
+          "mean_active": 111.5,
+          "total_columns": 435
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-02.npz",
+      "artifact_sha256": "99603a7a4684bdc1d98e8e8f5d00eabc65919f8cfc222ae4c99c82ab5e5c2f4a"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 435,
+      "observation": {
+        "error": [
+          1.1313624466230008e-10,
+          2.268905477558277e-08,
+          8.193648573931124e-07
+        ],
+        "position": [
+          5.391775164602224e-14,
+          2.730113611019918e-12,
+          1.0225004954495281e-10
+        ],
+        "stationarity": [
+          1.333964083337448e-13,
+          4.930755304352718e-13,
+          5.0254849974951426e-12
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.134968389616618e-13,
+          "d": 6.441923762293151e-14
+        },
+        {
+          "r": 7.101294508831129e-14,
+          "d": 2.687401217179601e-13
+        },
+        {
+          "r": 1.8124871995679126e-13,
+          "d": 1.415454338937357e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.932616531902505e-16,
+        "mass_4_versus_7": 8.460042369964076e-16
+      },
+      "trace": 5.81184552614146e-13,
+      "rcond": 1.9223022679931103e-07,
+      "mass_min": 0.9999999999999944,
+      "stiffness_ranks": [
+        1305,
+        1305,
+        1305
+      ],
+      "mass_root_ranks": [
+        435,
+        435,
+        435
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 36.39000000001397,
+      "cold_preparation": 40.96799999999348,
+      "cold_case_seconds": 106.46799999999348,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.0,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 415,
+        "coarse_rank": 21,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 415,
+        "selected_rows": 505,
+        "all_coefficient_rows": 5504,
+        "source_seconds": 4.577999999979511,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.593393043680176e-101,
+        "quadrature": 15,
+        "seconds": 36.39000000001397,
+        "verified_positive_pivots": 435,
+        "verified_congruence_bound": 5.500742048750552e-82,
+        "locality": {
+          "max_active": 133,
+          "mean_active": 111.5,
+          "total_columns": 435
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-03.npz",
+      "artifact_sha256": "b52910b987be095759a1b1379888ede577ee2dfce070de720d1f6e9e920a9722"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 232,
+      "observation": {
+        "error": [
+          1.1886649497890295e-09,
+          2.387656325486377e-07,
+          1.3488264744841249e-06
+        ],
+        "position": [
+          1.123679158658795e-11,
+          2.2254875063815946e-09,
+          1.2989828306179791e-08
+        ],
+        "stationarity": [
+          1.3932478831754653e-17,
+          1.2307422584522406e-16,
+          4.214697023781845e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1373839933443656e-13,
+          "d": 6.417054192866843e-14
+        },
+        {
+          "r": 6.650182176032324e-14,
+          "d": 4.895807599330551e-14
+        },
+        {
+          "r": 1.356071237687029e-13,
+          "d": 1.2234000036913387e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.879698451021545e-16,
+        "mass_4_versus_7": 7.934826316909589e-16
+      },
+      "trace": 5.5117572536335206e-14,
+      "rcond": 0.00021209485756632795,
+      "mass_min": 0.9999999999999958,
+      "stiffness_ranks": [
+        696,
+        696,
+        696
+      ],
+      "mass_root_ranks": [
+        232,
+        232,
+        232
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 9.0,
+      "cold_preparation": 9.0,
+      "cold_case_seconds": 17.10999999998603,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 226,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 226,
+        "selected_rows": 237,
+        "all_coefficient_rows": 1968,
+        "source_seconds": 1.7190000000409782,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 9.367701186530126e-127,
+        "quadrature": 15,
+        "seconds": 9.0,
+        "verified_positive_pivots": 232,
+        "verified_congruence_bound": 1.7885693193089054e-115,
+        "locality": {
+          "max_active": 129,
+          "mean_active": 110.75,
+          "total_columns": 232
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-04.npz",
+      "artifact_sha256": "e429fd24dbc9334816966aa00d394bbefb9abb3e81d944ee3da4ebd495650ed6"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 232,
+      "observation": {
+        "error": [
+          1.4567945898615656e-11,
+          2.9113946256554294e-09,
+          1.687213737863335e-08
+        ],
+        "position": [
+          8.461507819424749e-12,
+          1.6657364595381617e-09,
+          1.0106290993315836e-08
+        ],
+        "stationarity": [
+          1.5829001211318468e-17,
+          1.230983356077139e-16,
+          4.267139829508612e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1373913788883723e-13,
+          "d": 6.426680347472277e-14
+        },
+        {
+          "r": 6.689082590347609e-14,
+          "d": 8.117723660043916e-14
+        },
+        {
+          "r": 1.34290357954729e-13,
+          "d": 1.288898676765736e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.10880040731654e-16,
+        "mass_4_versus_7": 8.982695700197294e-16
+      },
+      "trace": 5.461081437798193e-13,
+      "rcond": 2.3192636248434696e-06,
+      "mass_min": 0.9999999999999938,
+      "stiffness_ranks": [
+        696,
+        696,
+        696
+      ],
+      "mass_root_ranks": [
+        232,
+        232,
+        232
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 6.640999999945052,
+      "cold_preparation": 8.35999999998603,
+      "cold_case_seconds": 16.04700000002049,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 226,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 226,
+        "selected_rows": 237,
+        "all_coefficient_rows": 1968,
+        "source_seconds": 1.7190000000409782,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.849218786233158e-123,
+        "quadrature": 15,
+        "seconds": 6.640999999945052,
+        "verified_positive_pivots": 232,
+        "verified_congruence_bound": 3.7738055090669464e-111,
+        "locality": {
+          "max_active": 129,
+          "mean_active": 110.75,
+          "total_columns": 232
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-05.npz",
+      "artifact_sha256": "04529b75b869b9e224364ac354130c487a514ab75fb0b5f26c31c8ff9ed3c3e4"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 510,
+      "observation": {
+        "error": [
+          5.812251020974918e-12,
+          1.1606593618617146e-09,
+          4.410056390888216e-08
+        ],
+        "position": [
+          1.4594811533881376e-14,
+          2.9253523707266234e-12,
+          1.117757912561768e-10
+        ],
+        "stationarity": [
+          9.669123054541294e-18,
+          8.046218831010513e-17,
+          2.8098981660066227e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1374056093655655e-13,
+          "d": 6.41651207859268e-14
+        },
+        {
+          "r": 7.243599851651244e-14,
+          "d": 8.375493712342545e-14
+        },
+        {
+          "r": 2.05072028871867e-13,
+          "d": 1.735545707559097e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.725160751822911e-16,
+        "mass_4_versus_7": 7.975622984153283e-16
+      },
+      "trace": 7.763508793963126e-14,
+      "rcond": 0.0001658043935788658,
+      "mass_min": 0.9999999999999889,
+      "stiffness_ranks": [
+        1530,
+        1530,
+        1530
+      ],
+      "mass_root_ranks": [
+        510,
+        510,
+        510
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 65.46900000004098,
+      "cold_preparation": 65.46900000004098,
+      "cold_case_seconds": 147.28200000000652,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 490,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 490,
+        "selected_rows": 505,
+        "all_coefficient_rows": 7872,
+        "source_seconds": 9.0,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 5.9443674415845626e-120,
+        "quadrature": 15,
+        "seconds": 65.46900000004098,
+        "verified_positive_pivots": 510,
+        "verified_congruence_bound": 7.050278953192288e-106,
+        "locality": {
+          "max_active": 183,
+          "mean_active": 145.8125,
+          "total_columns": 510
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-06.npz",
+      "artifact_sha256": "5ff56bbe7a90de8e74ba7303d18fd2c90773a0c7bdf5577e07a7b2b3ebc9bab9"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 510,
+      "observation": {
+        "error": [
+          5.937635580701783e-14,
+          1.1857558941939137e-11,
+          4.506560798474373e-10
+        ],
+        "position": [
+          1.2767566207092865e-14,
+          2.559247381465373e-12,
+          9.781468250189457e-11
+        ],
+        "stationarity": [
+          1.1424978513659585e-17,
+          1.3420143679414874e-16,
+          3.506101517825746e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1374092173432473e-13,
+          "d": 6.416000406669618e-14
+        },
+        {
+          "r": 7.278123333375325e-14,
+          "d": 1.3518436449146447e-13
+        },
+        {
+          "r": 2.0609749686409544e-13,
+          "d": 2.2536337235452903e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.221038143533087e-16,
+        "mass_4_versus_7": 9.056717158126303e-16
+      },
+      "trace": 8.145271023809904e-13,
+      "rcond": 2.1672051874138646e-06,
+      "mass_min": 0.999999999999986,
+      "stiffness_ranks": [
+        1530,
+        1530,
+        1530
+      ],
+      "mass_root_ranks": [
+        510,
+        510,
+        510
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 58.95299999997951,
+      "cold_preparation": 67.95299999997951,
+      "cold_case_seconds": 148.795999999973,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.2,
+          0.0
+        ],
+        "boundary": "clamped",
+        "exact_rank": 490,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 490,
+        "selected_rows": 505,
+        "all_coefficient_rows": 7872,
+        "source_seconds": 9.0,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 3.129426446350417e-116,
+        "quadrature": 15,
+        "seconds": 58.95299999997951,
+        "verified_positive_pivots": 510,
+        "verified_congruence_bound": 1.7746296144572518e-102,
+        "locality": {
+          "max_active": 183,
+          "mean_active": 145.8125,
+          "total_columns": 510
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-07.npz",
+      "artifact_sha256": "5dd33fbcd5c25c5c7cd00a1d02d0847c45b746dfa20bef70a175720b505e5906"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 205,
+      "observation": {
+        "error": [
+          2.311921910521916e-08,
+          4.6663591405399584e-06,
+          2.5036644046796975e-05
+        ],
+        "position": [
+          1.1092166219747077e-11,
+          2.1993510975795225e-09,
+          1.283619811674935e-08
+        ],
+        "stationarity": [
+          5.139322747890993e-18,
+          2.2741902909502066e-17,
+          9.842831560654412e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1347442555558191e-13,
+          "d": 6.399705169526289e-14
+        },
+        {
+          "r": 6.684795130373586e-14,
+          "d": 3.6440941219923e-14
+        },
+        {
+          "r": 9.344594296201761e-14,
+          "d": 4.40509456109069e-13
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.989033527090198e-16,
+        "mass_4_versus_7": 8.60177966535496e-16
+      },
+      "trace": 3.26778005730851e-14,
+      "rcond": 0.0001565476323192426,
+      "mass_min": 0.9999999999999936,
+      "stiffness_ranks": [
+        615,
+        615,
+        615
+      ],
+      "mass_root_ranks": [
+        205,
+        205,
+        205
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 7.905999999959022,
+      "cold_preparation": 7.905999999959022,
+      "cold_case_seconds": 15.140999999945052,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.0,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 199,
+        "coarse_rank": 23,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 199,
+        "selected_rows": 237,
+        "all_coefficient_rows": 1952,
+        "source_seconds": 2.218999999924563,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.977125717232544e-121,
+        "quadrature": 15,
+        "seconds": 7.905999999959022,
+        "verified_positive_pivots": 205,
+        "verified_congruence_bound": 5.430103416795621e-108,
+        "locality": {
+          "max_active": 116,
+          "mean_active": 98.75,
+          "total_columns": 205
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-08.npz",
+      "artifact_sha256": "97a24d7fe7ff77fa8dcd2b8cd5f6ffb3a24696b4edfa2cb8f33f1355a359e601"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 205,
+      "observation": {
+        "error": [
+          2.3139916112760954e-08,
+          4.66881280270155e-06,
+          2.505198822403424e-05
+        ],
+        "position": [
+          1.0867014914905022e-11,
+          2.15175539727734e-09,
+          1.2556363064308692e-08
+        ],
+        "stationarity": [
+          1.275095319091225e-14,
+          3.3350231321393874e-14,
+          5.418893587499667e-13
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.134747854685001e-13,
+          "d": 6.404116296549699e-14
+        },
+        {
+          "r": 6.70157715073816e-14,
+          "d": 6.516937536108006e-14
+        },
+        {
+          "r": 8.967892193186777e-14,
+          "d": 1.0828760000185817e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.154435349088298e-16,
+        "mass_4_versus_7": 8.505392400357155e-16
+      },
+      "trace": 5.945657197880005e-13,
+      "rcond": 7.716034421989792e-07,
+      "mass_min": 0.999999999999994,
+      "stiffness_ranks": [
+        615,
+        615,
+        615
+      ],
+      "mass_root_ranks": [
+        205,
+        205,
+        205
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 5.797000000020489,
+      "cold_preparation": 8.015999999945052,
+      "cold_case_seconds": 15.577999999863096,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.0,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 199,
+        "coarse_rank": 23,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 199,
+        "selected_rows": 237,
+        "all_coefficient_rows": 1952,
+        "source_seconds": 2.218999999924563,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 1.6920361224057065e-117,
+        "quadrature": 15,
+        "seconds": 5.797000000020489,
+        "verified_positive_pivots": 205,
+        "verified_congruence_bound": 1.6560304602495104e-103,
+        "locality": {
+          "max_active": 116,
+          "mean_active": 98.75,
+          "total_columns": 205
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-09.npz",
+      "artifact_sha256": "83483bbdacd08337d6207b9ed938d4f2f7224d2e58f04af48575686820ac359b"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 455,
+      "observation": {
+        "error": [
+          1.1281735046631378e-10,
+          2.2663160400774834e-08,
+          8.186796607123503e-07
+        ],
+        "position": [
+          1.4318406871757725e-14,
+          2.878787260347075e-12,
+          1.1011948125876737e-10
+        ],
+        "stationarity": [
+          8.019798290388946e-18,
+          2.450706073403415e-17,
+          3.019033813813797e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1347722298438724e-13,
+          "d": 6.398859918569736e-14
+        },
+        {
+          "r": 7.17678328076761e-14,
+          "d": 6.135470410696176e-14
+        },
+        {
+          "r": 1.8831709079233947e-13,
+          "d": 6.393895913028384e-13
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.683937160378085e-16,
+        "mass_4_versus_7": 8.644994930278291e-16
+      },
+      "trace": 5.0431575793382044e-14,
+      "rcond": 0.00011815462031382962,
+      "mass_min": 0.9999999999999847,
+      "stiffness_ranks": [
+        1365,
+        1365,
+        1365
+      ],
+      "mass_root_ranks": [
+        455,
+        455,
+        455
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 58.76500000001397,
+      "cold_preparation": 58.76500000001397,
+      "cold_case_seconds": 121.98400000005495,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.0,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 435,
+        "coarse_rank": 23,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 435,
+        "selected_rows": 505,
+        "all_coefficient_rows": 7808,
+        "source_seconds": 12.187000000034459,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 4.463226828432387e-115,
+        "quadrature": 15,
+        "seconds": 58.76500000001397,
+        "verified_positive_pivots": 455,
+        "verified_congruence_bound": 2.61009989251248e-99,
+        "locality": {
+          "max_active": 170,
+          "mean_active": 132.875,
+          "total_columns": 455
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-10.npz",
+      "artifact_sha256": "75fb93c72d47e70f5e98cab75c4e0bac8581a33207c26c677d5c8862b104fae7"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": false,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 455,
+      "observation": {
+        "error": [
+          1.1315997321242337e-10,
+          2.2697682935231964e-08,
+          8.196357253796662e-07
+        ],
+        "position": [
+          1.3230745148043569e-14,
+          2.6473899577107507e-12,
+          1.0118793284803078e-10
+        ],
+        "stationarity": [
+          9.609898713486272e-15,
+          3.9362961687581766e-14,
+          4.0142732538859415e-13
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1347890370423748e-13,
+          "d": 6.41030708742845e-14
+        },
+        {
+          "r": 7.333234087488077e-14,
+          "d": 1.2338171303710344e-13
+        },
+        {
+          "r": 1.801902844970122e-13,
+          "d": 1.6574688097319458e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.958835316441823e-16,
+        "mass_4_versus_7": 8.637014550416462e-16
+      },
+      "trace": 6.714123703095624e-13,
+      "rcond": 3.727677416084228e-07,
+      "mass_min": 0.9999999999999825,
+      "stiffness_ranks": [
+        1365,
+        1365,
+        1365
+      ],
+      "mass_root_ranks": [
+        455,
+        455,
+        455
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 44.56299999996554,
+      "cold_preparation": 56.75,
+      "cold_case_seconds": 122.23400000005495,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          0.0,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 435,
+        "coarse_rank": 23,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 435,
+        "selected_rows": 505,
+        "all_coefficient_rows": 7808,
+        "source_seconds": 12.187000000034459,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 9.651128280220306e-113,
+        "quadrature": 15,
+        "seconds": 44.56299999996554,
+        "verified_positive_pivots": 455,
+        "verified_congruence_bound": 1.3850912417531954e-97,
+        "locality": {
+          "max_active": 170,
+          "mean_active": 132.875,
+          "total_columns": 455
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-11.npz",
+      "artifact_sha256": "fd34555626b1270cec2452ea98ac3fa70d8c2cddb72330494b50e449fa9a35b1"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": true,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 235,
+      "observation": {
+        "error": [
+          1.184391668694281e-09,
+          2.3609634625140804e-07,
+          1.34575751708727e-06
+        ],
+        "position": [
+          1.0849245288602699e-11,
+          2.137356704452269e-09,
+          1.257992232214315e-08
+        ],
+        "stationarity": [
+          1.313677623524006e-17,
+          1.1402670470835448e-16,
+          3.8768298447451074e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1441597613884263e-13,
+          "d": 6.438652608617913e-14
+        },
+        {
+          "r": 6.730256002519509e-14,
+          "d": 3.8272692252111936e-14
+        },
+        {
+          "r": 1.4189637043720478e-13,
+          "d": 6.870026936990937e-13
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.158808007707226e-16,
+        "mass_4_versus_7": 9.640312997070427e-16
+      },
+      "trace": 5.488759870014138e-14,
+      "rcond": 0.00021339400665597072,
+      "mass_min": 0.9999999999999944,
+      "stiffness_ranks": [
+        705,
+        705,
+        705
+      ],
+      "mass_root_ranks": [
+        235,
+        235,
+        235
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 10.0,
+      "cold_preparation": 10.0,
+      "cold_case_seconds": 18.28200000000652,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          -0.2,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 229,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 229,
+        "selected_rows": 237,
+        "all_coefficient_rows": 2016,
+        "source_seconds": 2.60999999998603,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 2.619241630039698e-127,
+        "quadrature": 15,
+        "seconds": 10.0,
+        "verified_positive_pivots": 235,
+        "verified_congruence_bound": 7.826806034033701e-116,
+        "locality": {
+          "max_active": 137,
+          "mean_active": 115.0,
+          "total_columns": 235
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-12.npz",
+      "artifact_sha256": "14d9cd12467602369582eef02e709e48f65a59e63552b65d293f1caa23296f4a"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": true,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 235,
+      "observation": {
+        "error": [
+          1.4380264955018037e-11,
+          2.8545948378071374e-09,
+          1.666504188620145e-08
+        ],
+        "position": [
+          8.213360537215206e-12,
+          1.6096531428813675e-09,
+          9.82785567994948e-09
+        ],
+        "stationarity": [
+          1.4624687179942443e-17,
+          1.1828341341362152e-16,
+          4.125679568479222e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1441590184351128e-13,
+          "d": 6.446910372802565e-14
+        },
+        {
+          "r": 6.687604574325558e-14,
+          "d": 7.428826889517742e-14
+        },
+        {
+          "r": 1.4035711506625784e-13,
+          "d": 1.2967708688694844e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.292631898675659e-16,
+        "mass_4_versus_7": 1.0958135991710339e-15
+      },
+      "trace": 5.547953425337283e-13,
+      "rcond": 2.2624607910239635e-06,
+      "mass_min": 0.9999999999999931,
+      "stiffness_ranks": [
+        705,
+        705,
+        705
+      ],
+      "mass_root_ranks": [
+        235,
+        235,
+        235
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 7.375,
+      "cold_preparation": 9.98499999998603,
+      "cold_case_seconds": 17.750999999931082,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          -0.2,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 229,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 229,
+        "selected_rows": 237,
+        "all_coefficient_rows": 2016,
+        "source_seconds": 2.60999999998603,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 2.4541803390532167e-122,
+        "quadrature": 15,
+        "seconds": 7.375,
+        "verified_positive_pivots": 235,
+        "verified_congruence_bound": 5.529548416535823e-110,
+        "locality": {
+          "max_active": 137,
+          "mean_active": 115.0,
+          "total_columns": 235
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-13.npz",
+      "artifact_sha256": "43f171e2a00123e1527fad6afb99f5653eb53c0cea4b7d46f134d4bca5577d86"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.01,
+      "variable": true,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 515,
+      "observation": {
+        "error": [
+          5.778496497391261e-12,
+          1.1455871281569678e-09,
+          4.343268345404781e-08
+        ],
+        "position": [
+          1.412800446221257e-14,
+          2.821761842645219e-12,
+          1.0766311589485795e-10
+        ],
+        "stationarity": [
+          8.777431536954645e-18,
+          7.639632148591904e-17,
+          2.5756554629873275e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1442014498322132e-13,
+          "d": 6.43829154090815e-14
+        },
+        {
+          "r": 7.346531158117735e-14,
+          "d": 7.851181877166764e-14
+        },
+        {
+          "r": 2.0835320416138061e-13,
+          "d": 1.4789820815991997e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.932760105853587e-16,
+        "mass_4_versus_7": 9.933071953248654e-16
+      },
+      "trace": 7.5915409979381e-14,
+      "rcond": 0.00017166791744821584,
+      "mass_min": 0.9999999999999762,
+      "stiffness_ranks": [
+        1545,
+        1545,
+        1545
+      ],
+      "mass_root_ranks": [
+        515,
+        515,
+        515
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 73.375,
+      "cold_preparation": 73.375,
+      "cold_case_seconds": 154.31299999996554,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          -0.2,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 495,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 495,
+        "selected_rows": 505,
+        "all_coefficient_rows": 8064,
+        "source_seconds": 13.797000000020489,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 2.3899355880907393e-120,
+        "quadrature": 15,
+        "seconds": 73.375,
+        "verified_positive_pivots": 515,
+        "verified_congruence_bound": 2.019432789758785e-106,
+        "locality": {
+          "max_active": 201,
+          "mean_active": 154.9375,
+          "total_columns": 515
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-14.npz",
+      "artifact_sha256": "b37a600c10861242c2d13a4d2515be06b0690ba25666261ed963b6a0057df651"
+    },
+    {
+      "family": "primary",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 4,
+      "h": 0.0001,
+      "variable": true,
+      "rates": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "ns": 515,
+      "observation": {
+        "error": [
+          5.896322396119511e-14,
+          1.1691110785351976e-11,
+          4.433582461643313e-10
+        ],
+        "position": [
+          1.2327193136851382e-14,
+          2.461619867922983e-12,
+          9.396477792060569e-11
+        ],
+        "stationarity": [
+          1.153039650908856e-17,
+          1.0436847197405667e-16,
+          3.208149173298771e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1441936139743862e-13,
+          "d": 6.43903166697255e-14
+        },
+        {
+          "r": 7.432643756249968e-14,
+          "d": 1.4208906937711978e-13
+        },
+        {
+          "r": 2.0726370098936585e-13,
+          "d": 2.472551623074058e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.838070083378214e-16,
+        "mass_4_versus_7": 1.1500645959379544e-15
+      },
+      "trace": 8.00742434504218e-13,
+      "rcond": 1.1226582485525287e-06,
+      "mass_min": 0.9999999999999736,
+      "stiffness_ranks": [
+        1545,
+        1545,
+        1545
+      ],
+      "mass_root_ranks": [
+        515,
+        515,
+        515
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 58.65700000000652,
+      "cold_preparation": 72.45400000002701,
+      "cold_case_seconds": 146.454000000027,
+      "exact_source": {
+        "n": 4,
+        "parameters": [
+          0.4,
+          -0.2,
+          0.07
+        ],
+        "boundary": "clamped",
+        "exact_rank": 495,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 495,
+        "selected_rows": 505,
+        "all_coefficient_rows": 8064,
+        "source_seconds": 13.797000000020489,
+        "r_degree": 10,
+        "d_degree": 13
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 7.909206474613146e-117,
+        "quadrature": 15,
+        "seconds": 58.65700000000652,
+        "verified_positive_pivots": 515,
+        "verified_congruence_bound": 5.292005657426967e-103,
+        "locality": {
+          "max_active": 201,
+          "mean_active": 154.9375,
+          "total_columns": 515
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-15.npz",
+      "artifact_sha256": "7d050b3628233cf792fe267737189144a356e7c0e97b24d921038bfe64b82850"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 1,
+      "h": 0.01,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 114,
+      "observation": {
+        "error": [
+          1.757441659425466e-06,
+          5.219027128010187e-05,
+          9.521060687134673e-05
+        ],
+        "position": [
+          4.6230535190728705e-08,
+          1.2885701775779286e-06,
+          1.6474798019863538e-06
+        ],
+        "stationarity": [
+          3.234254391840586e-17,
+          3.0199462332535697e-16,
+          6.206116975841888e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1180803095422442e-13,
+          "d": 6.368156612846206e-14
+        },
+        {
+          "r": 6.760082181594458e-14,
+          "d": 5.198255252966611e-14
+        },
+        {
+          "r": 1.135495611564735e-13,
+          "d": 6.059497949528856e-13
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.238347117483239e-16,
+        "mass_4_versus_7": 7.615326172785032e-16
+      },
+      "trace": 1.5775125098581335e-14,
+      "rcond": 0.00017268753143227298,
+      "mass_min": 0.9999999999999567,
+      "stiffness_ranks": [
+        342,
+        342,
+        342
+      ],
+      "mass_root_ranks": [
+        114,
+        114,
+        114
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 5.60999999998603,
+      "cold_preparation": 5.60999999998603,
+      "cold_case_seconds": 7.969000000040978,
+      "exact_source": {
+        "n": 1,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025
+        ],
+        "boundary": "clamped",
+        "exact_rank": 112,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 112,
+        "selected_rows": 118,
+        "all_coefficient_rows": 1080,
+        "source_seconds": 2.265999999945052,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 1.7829809682258335e-134,
+        "quadrature": 23,
+        "seconds": 5.60999999998603,
+        "verified_positive_pivots": 114,
+        "verified_congruence_bound": 1.1835647926999756e-126,
+        "locality": {
+          "max_active": 102,
+          "mean_active": 90.0,
+          "total_columns": 114
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-16.npz",
+      "artifact_sha256": "147e11deef64852e62a16b3845b50f348d508df2947a91bc4a917d98f214addb"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 1,
+      "h": 0.0001,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 114,
+      "observation": {
+        "error": [
+          3.655237822343195e-08,
+          9.958310968309808e-07,
+          1.4496609341119994e-06
+        ],
+        "position": [
+          3.4190846324179966e-08,
+          1.0435962506426714e-06,
+          1.1788580569538473e-06
+        ],
+        "stationarity": [
+          3.2480964010909864e-17,
+          3.284276131078532e-16,
+          6.959429346810467e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1181034615683573e-13,
+          "d": 6.377966306116117e-14
+        },
+        {
+          "r": 6.774292096784539e-14,
+          "d": 1.1264667429290163e-13
+        },
+        {
+          "r": 1.1374522658437123e-13,
+          "d": 1.5127357002243586e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.523596851608432e-16,
+        "mass_4_versus_7": 9.0435944250165e-16
+      },
+      "trace": 2.0555517533677467e-13,
+      "rcond": 4.5637983270972254e-07,
+      "mass_min": 0.9999999999999558,
+      "stiffness_ranks": [
+        342,
+        342,
+        342
+      ],
+      "mass_root_ranks": [
+        114,
+        114,
+        114
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 3.5160000000614673,
+      "cold_preparation": 5.782000000006519,
+      "cold_case_seconds": 8.187999999965541,
+      "exact_source": {
+        "n": 1,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025
+        ],
+        "boundary": "clamped",
+        "exact_rank": 112,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 112,
+        "selected_rows": 118,
+        "all_coefficient_rows": 1080,
+        "source_seconds": 2.265999999945052,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 6.259331760313014e-132,
+        "quadrature": 23,
+        "seconds": 3.5160000000614673,
+        "verified_positive_pivots": 114,
+        "verified_congruence_bound": 9.010371829321255e-124,
+        "locality": {
+          "max_active": 102,
+          "mean_active": 90.0,
+          "total_columns": 114
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-17.npz",
+      "artifact_sha256": "ec6a6aca1d4bc97a2c5e01af9c94c9fcd71cc67b9bf72fb390476f85ace4296b"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 236,
+      "observation": {
+        "error": [
+          5.598710806831239e-08,
+          5.48205232587493e-07,
+          8.035147436213315e-06
+        ],
+        "position": [
+          3.6993001889388113e-10,
+          3.0426057252810317e-09,
+          5.4666867965311195e-08
+        ],
+        "stationarity": [
+          5.90507681418121e-17,
+          3.411245920740647e-16,
+          5.343449113945724e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1180375847165457e-13,
+          "d": 6.368140003288021e-14
+        },
+        {
+          "r": 6.996450452276358e-14,
+          "d": 8.263725344185106e-14
+        },
+        {
+          "r": 1.767764292223793e-13,
+          "d": 1.3775090870571172e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 4.943849824810773e-16,
+        "mass_4_versus_7": 7.93826920194364e-16
+      },
+      "trace": 3.0165652863914374e-14,
+      "rcond": 0.00016676167704026852,
+      "mass_min": 0.999999999999958,
+      "stiffness_ranks": [
+        708,
+        708,
+        708
+      ],
+      "mass_root_ranks": [
+        236,
+        236,
+        236
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 29.734000000054948,
+      "cold_preparation": 29.734000000054948,
+      "cold_case_seconds": 46.67099999997299,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025
+        ],
+        "boundary": "clamped",
+        "exact_rank": 230,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 230,
+        "selected_rows": 237,
+        "all_coefficient_rows": 4320,
+        "source_seconds": 11.437000000034459,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 2.230332791082411e-128,
+        "quadrature": 23,
+        "seconds": 29.734000000054948,
+        "verified_positive_pivots": 236,
+        "verified_congruence_bound": 2.553554194007945e-117,
+        "locality": {
+          "max_active": 158,
+          "mean_active": 127.25,
+          "total_columns": 236
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-18.npz",
+      "artifact_sha256": "529a35e8f9466292899a742f72c0e6f58aac58865d452667d3ec209fefff94f7"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 236,
+      "observation": {
+        "error": [
+          6.338866623602117e-10,
+          6.0586164660230055e-09,
+          9.192384313978343e-08
+        ],
+        "position": [
+          3.033729269571258e-10,
+          2.5238295824105157e-09,
+          4.520008673805866e-08
+        ],
+        "stationarity": [
+          6.09807998620287e-17,
+          3.6297954698894836e-16,
+          5.741903638575259e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1180349510662673e-13,
+          "d": 6.376031743253782e-14
+        },
+        {
+          "r": 7.047878957243423e-14,
+          "d": 1.9181606566283176e-13
+        },
+        {
+          "r": 1.782155312370343e-13,
+          "d": 3.5105077835046236e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.440900357160055e-16,
+        "mass_4_versus_7": 9.566737999470478e-16
+      },
+      "trace": 2.875166946684113e-13,
+      "rcond": 3.3077487064907555e-07,
+      "mass_min": 0.9999999999999571,
+      "stiffness_ranks": [
+        708,
+        708,
+        708
+      ],
+      "mass_root_ranks": [
+        236,
+        236,
+        236
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 18.359000000054948,
+      "cold_preparation": 29.796000000089407,
+      "cold_case_seconds": 46.92100000008941,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025
+        ],
+        "boundary": "clamped",
+        "exact_rank": 230,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 230,
+        "selected_rows": 237,
+        "all_coefficient_rows": 4320,
+        "source_seconds": 11.437000000034459,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 8.51793998851668e-124,
+        "quadrature": 23,
+        "seconds": 18.359000000054948,
+        "verified_positive_pivots": 236,
+        "verified_congruence_bound": 2.1362593197675676e-113,
+        "locality": {
+          "max_active": 158,
+          "mean_active": 127.25,
+          "total_columns": 236
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-19.npz",
+      "artifact_sha256": "142385186141a5fab96e3d5cbca9ea3d4d72c908095f9031d3d2c5c6e23748d9"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 1,
+      "h": 0.01,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 115,
+      "observation": {
+        "error": [
+          1.3410980754152582e-06,
+          3.989615923742264e-05,
+          7.288594728733663e-05
+        ],
+        "position": [
+          4.579305869179641e-08,
+          1.2715342819870593e-06,
+          1.6207192175922305e-06
+        ],
+        "stationarity": [
+          2.973838268272532e-17,
+          2.535565871594279e-16,
+          5.17962057365259e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.11414178574201e-13,
+          "d": 6.251236893563792e-14
+        },
+        {
+          "r": 6.882587904035887e-14,
+          "d": 5.3840127007735214e-14
+        },
+        {
+          "r": 1.5215609320533933e-13,
+          "d": 1.4422338463168846e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.128628518323705e-16,
+        "mass_4_versus_7": 7.264560811622847e-16
+      },
+      "trace": 1.55414971234317e-14,
+      "rcond": 0.00014270080947079841,
+      "mass_min": 0.9999999999999569,
+      "stiffness_ranks": [
+        345,
+        345,
+        345
+      ],
+      "mass_root_ranks": [
+        115,
+        115,
+        115
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 6.156000000075437,
+      "cold_preparation": 6.156000000075437,
+      "cold_case_seconds": 8.625,
+      "exact_source": {
+        "n": 1,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025,
+          0.0,
+          1.0,
+          0.2
+        ],
+        "boundary": "clamped",
+        "exact_rank": 113,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 113,
+        "selected_rows": 118,
+        "all_coefficient_rows": 1180,
+        "source_seconds": 3.3280000000959262,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 1.6786390387110336e-134,
+        "quadrature": 23,
+        "seconds": 6.156000000075437,
+        "verified_positive_pivots": 115,
+        "verified_congruence_bound": 3.6735370655239626e-127,
+        "locality": {
+          "max_active": 105,
+          "mean_active": 92.0,
+          "total_columns": 115
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-20.npz",
+      "artifact_sha256": "e60f6139b83474b0330a07c4604b6de4c7a5369a9ae9f5fb6d5e12795ac1488b"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 1,
+      "h": 0.0001,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 115,
+      "observation": {
+        "error": [
+          3.31438940242791e-08,
+          8.942477737057748e-07,
+          1.2591406820860123e-06
+        ],
+        "position": [
+          3.0059030602739706e-08,
+          8.871610883709468e-07,
+          1.058446185811409e-06
+        ],
+        "stationarity": [
+          2.2358860096587692e-17,
+          2.7205827199699373e-16,
+          5.308694726456349e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.114179224723921e-13,
+          "d": 6.272508095486371e-14
+        },
+        {
+          "r": 6.885849080560829e-14,
+          "d": 1.811107100662395e-13
+        },
+        {
+          "r": 1.5336988913948709e-13,
+          "d": 2.8238824124350502e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.312362143985676e-16,
+        "mass_4_versus_7": 7.760347048055103e-16
+      },
+      "trace": 1.9525449787562997e-13,
+      "rcond": 3.8960210645994123e-07,
+      "mass_min": 0.9999999999999565,
+      "stiffness_ranks": [
+        345,
+        345,
+        345
+      ],
+      "mass_root_ranks": [
+        115,
+        115,
+        115
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 2.797000000020489,
+      "cold_preparation": 6.125000000116415,
+      "cold_case_seconds": 8.578000000095926,
+      "exact_source": {
+        "n": 1,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025,
+          0.0,
+          1.0,
+          0.2
+        ],
+        "boundary": "clamped",
+        "exact_rank": 113,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 113,
+        "selected_rows": 118,
+        "all_coefficient_rows": 1180,
+        "source_seconds": 3.3280000000959262,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 7.911426292297645e-132,
+        "quadrature": 23,
+        "seconds": 2.797000000020489,
+        "verified_positive_pivots": 115,
+        "verified_congruence_bound": 9.642193567132996e-125,
+        "locality": {
+          "max_active": 105,
+          "mean_active": 92.0,
+          "total_columns": 115
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-21.npz",
+      "artifact_sha256": "769de4232c17b0de59ee11bc46d1be9e5ad78a554f93ba480fab42b9af695913"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 2,
+      "h": 0.01,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 237,
+      "observation": {
+        "error": [
+          4.250345700557517e-08,
+          4.1796824574175143e-07,
+          6.156902699359686e-06
+        ],
+        "position": [
+          3.6389346561819514e-10,
+          2.9906395047996e-09,
+          5.386093567765432e-08
+        ],
+        "stationarity": [
+          5.720298198465677e-17,
+          3.156791299206862e-16,
+          5.10956098677871e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.114124647487743e-13,
+          "d": 6.251064535413621e-14
+        },
+        {
+          "r": 7.21265942458994e-14,
+          "d": 1.1542745687368728e-13
+        },
+        {
+          "r": 2.1147836505680643e-13,
+          "d": 1.7251851781557133e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.091956505291623e-16,
+        "mass_4_versus_7": 7.673322427642017e-16
+      },
+      "trace": 2.923725007034365e-14,
+      "rcond": 0.0001381285165126593,
+      "mass_min": 0.9999999999999585,
+      "stiffness_ranks": [
+        711,
+        711,
+        711
+      ],
+      "mass_root_ranks": [
+        237,
+        237,
+        237
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 33.29599999997299,
+      "cold_preparation": 33.29599999997299,
+      "cold_case_seconds": 50.59299999999348,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025,
+          0.0,
+          1.0,
+          0.2
+        ],
+        "boundary": "clamped",
+        "exact_rank": 231,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 231,
+        "selected_rows": 237,
+        "all_coefficient_rows": 4720,
+        "source_seconds": 16.42099999997299,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 3.9401256099149056e-128,
+        "quadrature": 23,
+        "seconds": 33.29599999997299,
+        "verified_positive_pivots": 237,
+        "verified_congruence_bound": 2.2761680158110437e-117,
+        "locality": {
+          "max_active": 165,
+          "mean_active": 130.75,
+          "total_columns": 237
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-22.npz",
+      "artifact_sha256": "4bdebaf4bb6b8d1de555be05e3eec1ff49fa535f5ac3b780999f36505ac89bca"
+    },
+    {
+      "family": "nonquadratic",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 2,
+      "h": 0.0001,
+      "variable": true,
+      "rates": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "ns": 237,
+      "observation": {
+        "error": [
+          5.047967004856774e-10,
+          4.815934134435476e-09,
+          7.4210244190402e-08
+        ],
+        "position": [
+          2.8094179518413206e-10,
+          2.2945576444241497e-09,
+          4.2191048656475276e-08
+        ],
+        "stationarity": [
+          7.118942976003535e-17,
+          3.328678677660609e-16,
+          5.091752965930013e-16
+        ]
+      },
+      "inclusion": [
+        {
+          "r": 2.1140922749071697e-13,
+          "d": 6.280176478604244e-14
+        },
+        {
+          "r": 7.180294838270197e-14,
+          "d": 3.058892381501608e-13
+        },
+        {
+          "r": 2.1617932578342878e-13,
+          "d": 4.6757618458175645e-12
+        }
+      ],
+      "equivalence": {
+        "full_3d_operator": 5.35740833614585e-16,
+        "mass_4_versus_7": 8.137484238174411e-16
+      },
+      "trace": 3.023172414075933e-13,
+      "rcond": 2.0399744491818858e-07,
+      "mass_min": 0.9999999999999585,
+      "stiffness_ranks": [
+        711,
+        711,
+        711
+      ],
+      "mass_root_ranks": [
+        237,
+        237,
+        237
+      ],
+      "checks": {
+        "inclusion": true,
+        "equivalence": true,
+        "stationarity": true,
+        "rcond": true,
+        "mass": true,
+        "trace": true,
+        "resource": true
+      },
+      "preparation": 16.85999999998603,
+      "cold_preparation": 33.28099999995902,
+      "cold_case_seconds": 50.79599999997299,
+      "exact_source": {
+        "n": 2,
+        "parameters": [
+          0.4,
+          0.2,
+          0.07,
+          0.1,
+          -0.06,
+          0.025,
+          0.0,
+          1.0,
+          0.2
+        ],
+        "boundary": "clamped",
+        "exact_rank": 231,
+        "coarse_rank": 30,
+        "exact_coarse_inclusion": true,
+        "exact_selected_rank": 231,
+        "selected_rows": 237,
+        "all_coefficient_rows": 4720,
+        "source_seconds": 16.42099999997299,
+        "r_degree": 12,
+        "d_degree": 21
+      },
+      "normalization": {
+        "precision_bits": 512,
+        "max_radius": 8.211407070783218e-125,
+        "quadrature": 23,
+        "seconds": 16.85999999998603,
+        "verified_positive_pivots": 237,
+        "verified_congruence_bound": 1.5671046879613841e-114,
+        "locality": {
+          "max_active": 165,
+          "mean_active": 130.75,
+          "total_columns": 237
+        },
+        "attempted_precisions": [
+          512
+        ]
+      },
+      "artifact": "build/analysis/mass-paired-quality-20261105-120334/case-23.npz",
+      "artifact_sha256": "f56d150870c2967b378bd1a8b9b73df1388a1d565d53206d2da56992b21bd932"
+    }
+  ],
+  "failures": [],
+  "comparisons": [
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        1.2394362877123668,
+        1.2425460282635887,
+        1.16914918078845
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        1.2903891040846487,
+        1.360525455967972,
+        1.24288073219748
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 4,
+      "quantity": "error",
+      "values": [
+        1.0406433800708068,
+        1.1286057410024368,
+        1.2961417296349058
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "n": 4,
+      "quantity": "position",
+      "values": [
+        1.0,
+        1.0730369815673944,
+        1.2430001980520073
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        1.0871759416237495e-10,
+        2.0103614531882645e-08,
+        6.321568379901704e-07
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        1.3959638701603975e-14,
+        2.544286597682791e-12,
+        8.226068644654765e-11
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        1.1313624466230008e-10,
+        2.268905477558277e-08,
+        8.193648573931124e-07
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        5.391775164602224e-14,
+        2.730113611019918e-12,
+        1.0225004954495281e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        0.012255720925565487,
+        0.012193524648327956,
+        0.012508753125628191
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.7530181328204276,
+        0.7484816044851547,
+        0.7780157485613464
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "quantity": "error",
+      "values": [
+        0.1720503805481314,
+        0.010216226510179042,
+        0.010218828058039232
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "n": 4,
+      "quantity": "position",
+      "values": [
+        1.0,
+        0.8748509776378447,
+        0.8750972048832558
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        5.812251020974918e-12,
+        1.1606593618617146e-09,
+        4.410056390888216e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        1.4594811533881376e-14,
+        2.9253523707266234e-12,
+        1.117757912561768e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        5.937635580701783e-14,
+        1.1857558941939137e-11,
+        4.506560798474373e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        1.2767566207092865e-14,
+        2.559247381465373e-12,
+        9.781468250189457e-11
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        1.0008952295251667,
+        1.0005258193995987,
+        1.0006128687698153
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.9797017732711917,
+        0.978359207697869,
+        0.9781995377528869
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 4,
+      "quantity": "error",
+      "values": [
+        1.003036968557526,
+        1.001523288625533,
+        1.0011678128982513
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "n": 4,
+      "quantity": "position",
+      "values": [
+        1.0,
+        0.9196198670795749,
+        0.9188922040983054
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        1.1281735046631378e-10,
+        2.2663160400774834e-08,
+        8.186796607123503e-07
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        1.4318406871757725e-14,
+        2.878787260347075e-12,
+        1.1011948125876737e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        1.1315997321242337e-10,
+        2.2697682935231964e-08,
+        8.196357253796662e-07
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        1.3230745148043569e-14,
+        2.6473899577107507e-12,
+        1.0118793284803078e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        0.012141477633721786,
+        0.012090804805456039,
+        0.012383391268191407
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.7570444135725707,
+        0.7531045892004565,
+        0.7812334153010239
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 4,
+      "quantity": "error",
+      "values": [
+        0.17305539606218612,
+        0.010205344052844548,
+        0.010207940447276498
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "n": 4,
+      "quantity": "position",
+      "values": [
+        1.0,
+        0.8723698189976846,
+        0.872766658661172
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        5.778496497391261e-12,
+        1.1455871281569678e-09,
+        4.343268345404781e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        1.412800446221257e-14,
+        2.821761842645219e-12,
+        1.0766311589485795e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        5.896322396119511e-14,
+        1.1691110785351976e-11,
+        4.433582461643313e-10
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        1.2327193136851382e-14,
+        2.461619867922983e-12,
+        9.396477792060569e-11
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 1,
+      "quantity": "error",
+      "values": [
+        0.02079862965999194,
+        0.01908078023749711,
+        0.015225834408038725
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 1,
+      "quantity": "position",
+      "values": [
+        0.7395727993007696,
+        0.8098870118228838,
+        0.7155523579302807
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        0.01132201115990449,
+        0.011051730457636697,
+        0.0114402185982917
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.8200819383737332,
+        0.8294960998199663,
+        0.8268278103428265
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        5.598710806831239e-08,
+        5.48205232587493e-07,
+        8.035147436213315e-06
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        3.6993001889388113e-10,
+        3.0426057252810317e-09,
+        5.4666867965311195e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        6.338866623602117e-10,
+        6.0586164660230055e-09,
+        9.192384313978343e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025
+      ],
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        3.033729269571258e-10,
+        2.5238295824105157e-09,
+        4.520008673805866e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 1,
+      "quantity": "error",
+      "values": [
+        0.024713997157900933,
+        0.02241438250694993,
+        0.017275493136175213
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 1,
+      "quantity": "position",
+      "values": [
+        0.6564101953758469,
+        0.6977091384312166,
+        0.6530719043264357
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 2,
+      "quantity": "error",
+      "values": [
+        0.011876603364744269,
+        0.011522248839475429,
+        0.012053178004277998
+      ],
+      "passed": true
+    },
+    {
+      "kind": "thin_amplification",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "n": 2,
+      "quantity": "position",
+      "values": [
+        0.772044078084387,
+        0.7672464838178168,
+        0.7833330061137312
+      ],
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.01,
+      "quantity": "error",
+      "values": [
+        4.250345700557517e-08,
+        4.1796824574175143e-07,
+        6.156902699359686e-06
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.01,
+      "quantity": "position",
+      "values": [
+        3.6389346561819514e-10,
+        2.9906395047996e-09,
+        5.386093567765432e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.0001,
+      "quantity": "error",
+      "values": [
+        5.047967004856774e-10,
+        4.815934134435476e-09,
+        7.4210244190402e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    },
+    {
+      "kind": "finest_quality",
+      "parameters": [
+        0.4,
+        0.2,
+        0.07,
+        0.1,
+        -0.06,
+        0.025,
+        0.0,
+        1.0,
+        0.2
+      ],
+      "h": 0.0001,
+      "quantity": "position",
+      "values": [
+        2.8094179518413206e-10,
+        2.2945576444241497e-09,
+        4.2191048656475276e-08
+      ],
+      "accuracy": true,
+      "decrease": true,
+      "passed": true
+    }
+  ],
+  "seconds": 1344.438000000082,
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_quality.py": "2c34de18e55eba8d6aab71bd196ef31999d9d27cade7531ca5a480487c309c4b",
+    "rd/structure/main-shell/paired-geometry/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_polynomials.py": "dd82587536402eae97cdf69b1dc8c3520322a2e612bbea1e210e5d6d9673d03c",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_ancf.py": "c1e7db587b7bef6cec5918be65f9548042a722dde27e4cb0353c93deeadd9045",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py": "793e5aafa760bcec8deae2b4eca8ac0e13eea36e59530a325a18184b833735fb",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_fields.py": "1b5eb312a92cb61274d952a42dc4aecdeb0229bbbf5031f5deb1ca13becf8a7f",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_exact_polynomials.py": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+    "rd/structure/main-shell/geometry-compatible/experiments/coefficient_compatible_ancf.py": "cc32052397e89ca163455c34a227eb17fc1b25932e3a6ee87dfde8f38e9953d9",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_ancf.py": "93f39b311ae1940900d47975361eb1db8f79c5229b5d2a848ba116be75ed98bd",
+    "rd/structure/main-shell/paired-geometry/experiments/check_exact_paired_primary.py": "4a57a1dc08e81c2c33057b581b611cf60a8bf25a1a2a5b20eb41cebb1842663a"
+  }
+}

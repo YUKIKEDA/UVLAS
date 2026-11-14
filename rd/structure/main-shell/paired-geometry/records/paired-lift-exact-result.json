@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "width": "1",
+      "skew": "0",
+      "fields": 128,
+      "identities_per_field": 8,
+      "coefficient_residual_exactly_zero": true,
+      "zero_director_negative_controls": 80
+    },
+    {
+      "width": "4/5",
+      "skew": "3/20",
+      "fields": 128,
+      "identities_per_field": 8,
+      "coefficient_residual_exactly_zero": true,
+      "zero_director_negative_controls": 80
+    }
+  ],
+  "stops": [],
+  "seconds": 6.562999999965541,
+  "arbitrary_degree_derivation": "linearity and integration by parts; numeric identities above cover every monomial through total degree four",
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_lift_exact.py": "e559ad8e1efc37c4b3054b5be08575415a47cf8abdf88025441942a88d09dcec",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_polynomials.py": "dd82587536402eae97cdf69b1dc8c3520322a2e612bbea1e210e5d6d9673d03c",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_exact_polynomials.py": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_reference_admissibility.py": "0c14ec76b1fa1905c31358e27c8536026de26a15829511f76b2f5f5a08079af5"
+  }
+}

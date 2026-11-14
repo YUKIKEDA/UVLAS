@@ -1,0 +1,161 @@
+{
+  "source_sha256": "f2fa0e80f8408f58a2f37cc492118aaabc460b0de2c077122fb507e8d2bcaab1",
+  "definition_sha256": "6a74b4d60e7ba36177e1248270664a698ba220959a6c787a16d4505c16b4a280",
+  "protocol_sha256": "93cd74fdd49f5aeab0f5cd880d748476de6151c42ffd69d763a9ae7060dad297",
+  "dependencies": {
+    "q9_curved_energy_scaling.py": "e1e4be2b1a4e48be7c98fa5a6664e071a66ad2984d92090291c6b7f795ce926a",
+    "check_q9_curved_bounded_lift.py": "a0e22c04272c78f7bde2e9f7a448618fecdacf4ef55b9005d4d926f25c046d37",
+    "check_q9_independent_load.py": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96"
+  },
+  "cases": [
+    {
+      "kappa": 0.0,
+      "h": 0.01,
+      "field_error": 0.0,
+      "covariant_shear": 0.0,
+      "midstrain": 0.0,
+      "direction_variation": 0.0,
+      "jacobian_lower": 1.0,
+      "energy": 5.6089743589743535e-08,
+      "decimal_energy": "5.6089743589743593956688185645594405918695539357268311448184815153488535855409041E-8",
+      "energy_relative_difference": 1.0490765389948744e-15,
+      "series_terms": 1,
+      "energy_over_h3": 0.05608974358974352,
+      "checks": {
+        "field": true,
+        "shear": true,
+        "membrane": true,
+        "direction": true,
+        "clamp": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.001,
+      "field_error": 0.0,
+      "covariant_shear": 0.0,
+      "midstrain": 0.0,
+      "direction_variation": 0.0,
+      "jacobian_lower": 1.0,
+      "energy": 5.608974358974366e-11,
+      "decimal_energy": "5.6089743589743593956688185645594405918695539357268311448184815153488535855409041E-11",
+      "energy_relative_difference": 1.2220305508307182e-15,
+      "series_terms": 1,
+      "energy_over_h3": 0.05608974358974366,
+      "checks": {
+        "field": true,
+        "shear": true,
+        "membrane": true,
+        "direction": true,
+        "clamp": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.0,
+      "h": 0.0001,
+      "field_error": 0.0,
+      "covariant_shear": 0.0,
+      "midstrain": 0.0,
+      "direction_variation": 0.0,
+      "jacobian_lower": 1.0,
+      "energy": 5.6089743589743634e-14,
+      "decimal_energy": "5.6089743589743598517634824707211987556304087585010077007184719410387055707070132E-14",
+      "energy_relative_difference": 6.31251525129363e-16,
+      "series_terms": 1,
+      "energy_over_h3": 0.056089743589743626,
+      "checks": {
+        "field": true,
+        "shear": true,
+        "membrane": true,
+        "direction": true,
+        "clamp": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.01,
+      "field_error": 1.9975982957003602e-16,
+      "covariant_shear": 1.4268100589909238e-16,
+      "midstrain": 2.5267144698365633e-17,
+      "direction_variation": 0.0,
+      "jacobian_lower": 0.998,
+      "energy": 5.908132463656028e-08,
+      "decimal_energy": "5.9081324636560344649884528227537068521187549338086689027437658737683635646664078E-8",
+      "energy_relative_difference": 1.145268053883631e-15,
+      "series_terms": 16,
+      "energy_over_h3": 0.05908132463656027,
+      "checks": {
+        "field": true,
+        "shear": true,
+        "membrane": true,
+        "direction": true,
+        "clamp": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.001,
+      "field_error": 1.1017285701565049e-16,
+      "covariant_shear": 8.337514706413529e-17,
+      "midstrain": 2.5267144698365633e-17,
+      "direction_variation": 0.0,
+      "jacobian_lower": 0.9998,
+      "energy": 5.908119786174548e-11,
+      "decimal_energy": "5.9081197861746928960472722962392710506115458515480757457361368068877789339090247E-11",
+      "energy_relative_difference": 2.4478501106806414e-14,
+      "series_terms": 12,
+      "energy_over_h3": 0.05908119786174548,
+      "checks": {
+        "field": true,
+        "shear": true,
+        "membrane": true,
+        "direction": true,
+        "clamp": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "h": 0.0001,
+      "field_error": 8.630406369412472e-17,
+      "covariant_shear": 6.339872203608987e-17,
+      "midstrain": 2.5267144698365633e-17,
+      "direction_variation": 0.0,
+      "jacobian_lower": 0.99998,
+      "energy": 5.908119659401516e-14,
+      "decimal_energy": "5.9081196594002095954540000190732720632261258687236854713402408426555815753391614E-14",
+      "energy_relative_difference": 2.2117197761966034e-13,
+      "series_terms": 10,
+      "energy_over_h3": 0.05908119659401515,
+      "checks": {
+        "field": true,
+        "shear": true,
+        "membrane": true,
+        "direction": true,
+        "clamp": true,
+        "geometry": true,
+        "energy": true,
+        "flat": true
+      }
+    }
+  ],
+  "seconds": 0.061999999976251274,
+  "peak_bytes": 76767232,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false,
+  "load_equilibrium_reference_adopted": false
+}

@@ -1,0 +1,61 @@
+{
+  "records": [],
+  "stops": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "reason": "AttributeError(\"module 'moment_enriched_ancf' has no attribute 'face_values'\")"
+    }
+  ],
+  "parent_stops_rechecked": [],
+  "all_reproduction_checks": false,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/audit_moment_enriched_local_v2.py": "160786074a94b4c84c978ca20f65415aa7e63a5a7014f09dad1fe22bf97f541c",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-local-v2-result.json": "76dc00cb91c414fe2f6d3da60c63175e944641afaa5bda40766a181d80c944f6",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-protocol.md": "84ec6760b9806cde4fcb26ff0186d36b3d0f000d49f668a3518cddb5febecfc9"
+  },
+  "seconds": 6.342999999993481
+}

@@ -1,0 +1,20 @@
+{
+  "document_checks_passed": true,
+  "meaning": "document integrity and layout, not scientific peer review",
+  "pages": 12,
+  "equations": 32,
+  "table_rows_matched": 19,
+  "figures": 3,
+  "out_of_page_blocks": [],
+  "replacement_characters": 0,
+  "browser": {
+    "passed": true,
+    "math": {
+      "equations": 32,
+      "typeset": 32,
+      "errors": []
+    },
+    "remote_fetch_allowed": false
+  },
+  "visual_inspection": "All 12 pages inspected in contact sheets; pages 3,4,8,11 inspected at larger size. Final command-only change on page 11 re-inspected."
+}

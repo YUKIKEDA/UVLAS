@@ -1,0 +1,5 @@
+{
+  "error": "numpy boolean could not be serialized; no numeric result written",
+  "source_sha256": "41d1e60bc006f4341e6bee8750c7c200423bdc7a765cab623768a5d60d33db8e",
+  "source_archive": "build/analysis/analyze_avl_source_measurement_corrected_initial.py"
+}

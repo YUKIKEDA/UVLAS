@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "error": [
+        2.744555443257274e-11,
+        9.660692343401938e-06
+      ],
+      "h1": [
+        0.4646213682914774,
+        1.988086128078057
+      ],
+      "error_difference": 1.862763710948559e-13,
+      "h1_difference": 1.1102230246251565e-16,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "error": [
+        3.1592958233205493e-07,
+        1.1033926367712075e-05
+      ],
+      "h1": [
+        0.464621367041009,
+        1.988087608159614
+      ],
+      "error_difference": 1.966636283500905e-09,
+      "h1_difference": 0.0,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/audit_reference_work_v3_shared.py": "c2041807ae67238443ed676ad59cba3e19bea0435b80dfdfc5bd00765e7bf7fd",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-shared-result.json": "f196a795ca4bf3a4dc4fab5d8033cc083cc8272bd32a320788281978d235f22d",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8"
+  },
+  "seconds": 3.1410000000614673
+}

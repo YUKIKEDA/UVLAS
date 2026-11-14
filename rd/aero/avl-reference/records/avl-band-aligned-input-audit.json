@@ -1,0 +1,11 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-band-aligned-grid-experiment.md",
+  "source_sha256": "e96e9f41040b4b284ca26344367e97d60796809f620663ffe98d0b8c6a00ce12",
+  "fixture_sha256": "b03ef526cc2aa044e0f3277d74a7690c6efda35a7e96ba511150b2a803123ebd",
+  "parent_fixture_sha256": "774fad1dd61d1ce4fc2b10059adf6fc2bcc0f3c3c7ac22bf9979035ade0806ab",
+  "physical_shape_unchanged": true,
+  "cases": 2,
+  "decks": 20,
+  "sections_per_deck": 21,
+  "max_unknowns": 3840
+}

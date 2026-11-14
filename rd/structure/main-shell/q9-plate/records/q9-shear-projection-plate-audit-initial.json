@@ -1,0 +1,6 @@
+{
+  "source_sha256": "db69704946ef76d6a84a1edf69a262374ed2f90586ebb3c9f67b3176e1961802",
+  "status": "failed_audit_source_check",
+  "reason": "Copied source check still named the baseline experiment instead of the candidate experiment",
+  "primary_result_changed": false
+}

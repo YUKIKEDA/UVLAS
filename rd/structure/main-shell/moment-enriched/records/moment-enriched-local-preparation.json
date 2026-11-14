@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_local.py": "3778c4c5705c9756534a3188627cb6112a25607f6643fb4af53345a246213958",
+    "rd/structure/main-shell/moment-enriched/experiments/audit_moment_enriched_local.py": "9c2faf0c92dc992fe2b0ac28792a3ef2278c83ed4ac5c538052003ba4b599d21",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_coefficients.py": "1f4591a1b0f832ae065b94f64d6a7892a788bf13d25574b9d1493b52786d3420",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-protocol.md": "84ec6760b9806cde4fcb26ff0186d36b3d0f000d49f668a3518cddb5febecfc9",
+    "rd/structure/main-shell/moment-enriched/moment-enriched-formulation.md": "d941bf2ff4abe7cb023f040d4f2f5cfe03d46c49b26b985b5a8c241053c5639e"
+  }
+}

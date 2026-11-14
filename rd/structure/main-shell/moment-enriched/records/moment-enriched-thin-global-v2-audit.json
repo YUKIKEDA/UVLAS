@@ -1,0 +1,113 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        1.9486288853094532e-14,
+        1.0989454862051856e-05
+      ],
+      "error_difference": 2.680706812129355e-16,
+      "shared": 7.731247582545141e-16,
+      "support": 8.247998184856678e-16,
+      "constraint": 1.1268756807290367e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        5.3839345424841405e-14,
+        1.165188319913211e-05
+      ],
+      "error_difference": 4.748077067151871e-16,
+      "shared": 1.0240557806670847e-15,
+      "support": 7.132456588406586e-16,
+      "constraint": 1.349841015187209e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "error": [
+        7.658594640200533e-13,
+        0.0002757360347555168
+      ],
+      "error_difference": 7.076587579812887e-16,
+      "shared": 5.6167051073611686e-15,
+      "support": 1.3412757993220825e-15,
+      "constraint": 1.2145276394342863e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "error": [
+        2.7371617461101547e-12,
+        0.0025369797602205536
+      ],
+      "error_difference": 1.299264341351686e-16,
+      "shared": 1.0350254191582194e-15,
+      "support": 9.97604225332806e-16,
+      "constraint": 1.3543302121829984e-14,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "amplitude": 0.2,
+      "error": [
+        4.59690701127485e-12,
+        0.0026207250274053843
+      ],
+      "error_difference": 1.8986385111647286e-16,
+      "shared": 1.5728845632921785e-15,
+      "support": 1.1352763427962727e-15,
+      "constraint": 9.848798996509007e-15,
+      "checks": {
+        "energy": true,
+        "shared": true,
+        "support": true,
+        "constraints": true
+      },
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "geometry_conditional": true,
+  "independent_global_resolve": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/audit_moment_enriched_thin_global_v2.py": "758369bc6285fd5e3b58e65b97fec9977fa1efdcfd1340947edec71d47f9547a",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-global-v2-result.json": "8db54f8bdd7728caa4665dca9672b4a5beb38a89ee482e0bfe9006a0af4ac27a",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_thin_v2.py": "84da596899451fb467465a5ac0baa9c9c5ac79b976b1ca8a639cb0d2fa8406ca"
+  }
+}

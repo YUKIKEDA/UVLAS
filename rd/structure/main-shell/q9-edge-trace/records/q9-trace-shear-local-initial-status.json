@@ -1,0 +1,9 @@
+{
+  "source_sha256": "63698cb79ac0969cccd89041f8ad820a7a0cc9b0edf3db02a886a6ca36ba4b7c",
+  "stage": "result serialization",
+  "error": "NumPy boolean in checks was not converted to Python bool",
+  "numerical_criteria_changed": false,
+  "retained_directories": [
+    "build\\analysis\\q9-trace-shear-local-20261101-214129"
+  ]
+}

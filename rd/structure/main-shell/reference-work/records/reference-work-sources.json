@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-04",
+  "references": [
+    {
+      "title": "Raviart–Thomas — DefElement",
+      "url": "https://defelement.org/elements/raviart-thomas.html",
+      "read_scope": "Finite dimensional space, facet normal moments, contravariant Piola mapping",
+      "used_for": "Tensor-product reference flux space and matching facet moments",
+      "not_transferred": "No theorem for the anisotropic geometry-enriched nonlinear ANCF modification."
+    },
+    {
+      "title": "deal.II FE_RaviartThomas detailed description",
+      "url": "https://dealii.org/9.8.0/doxygen/deal.II/classFE__RaviartThomas.html",
+      "read_scope": "Detailed Description and Interpolation sections",
+      "used_for": "Divergence commuting interpolation and face normal trace moments",
+      "not_transferred": "The documented library element is not the RW-1 or RW-2 solver kernel."
+    }
+  ],
+  "public_element_reproduced": false
+}

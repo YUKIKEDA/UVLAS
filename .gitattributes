@@ -1,0 +1,28 @@
+# New source and configuration: normalized, LF in the working tree on every OS.
+* text=auto eol=lf
+
+# Byte-exact areas. Records in rd/ cite files by SHA-256, and those files mix
+# CRLF and LF. An end-of-line conversion on commit or checkout would change
+# their bytes and break the recorded hashes (.cursor/rules/evidence.mdc).
+# docs/ holds specifications that the records cite the same way.
+rd/** -text
+docs/** -text
+README.md -text
+AGENTS.md -text
+.agents/skills/solver-rd/** -text
+.agents/skills/solver-design-contracts/** -text
+.agents/skills/solver-implementation-review/** -text
+.claude/skills/solver-rd/** -text
+.claude/skills/solver-design-contracts/** -text
+.claude/skills/solver-implementation-review/** -text
+
+# Skills that come from outside (skills-lock.json) are kept as received.
+.agents/skills/grilling/** -text
+.agents/skills/natural-japanese/** -text
+.claude/skills/grilling/** -text
+.claude/skills/natural-japanese/** -text
+
+*.png binary
+*.pdf binary
+*.npz binary
+*.mat binary

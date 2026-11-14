@@ -1,0 +1,15 @@
+{
+  "status": "frozen_before_execution",
+  "maximum_quartic_problems": 14,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/mq3_necessary_constraints.py": "5a19a9e820d0bef1c741e87b8b7424fc0fbace7a6b3e46e1d2479eead7513e05",
+    "rd/structure/main-shell/mq3/experiments/check_mq3_necessary_constraints.py": "c943bcc834ab5d35a4a2295dddba07f44ada967149a39c4e1025a0d89d1f1d1f",
+    "rd/structure/main-shell/mq3/experiments/audit_mq3_necessary_constraints.py": "fa4337610617bc1b751202db326666b237ded1b7d78beb3cafff9bf5c375b357",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_space.py": "981e2d7a0eb6df9f6919233267b0a8aa44196d4a0170f325e81732c079b982a5",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/mq3/experiments/check_mq3_factor_v2.py": "d9da8a173317b4d1b7627139e61495d41923079b6adcadaff29a35f7182cca61",
+    "rd/structure/main-shell/mq3/mq3-necessary-constraint-diagnostic.md": "3913161fc2e6138a2a4492f5f61d276be500a54c7721470a61715785dc7164f9",
+    "rd/structure/main-shell/mq3/records/mq3-necessary-audit-protocol.md": "11c81a89c6a28d6083113bd253b61abbfdbd49e4846a2bb60d86a76f3878e67e",
+    "rd/structure/main-shell/mq3/records/mq3-factor-v2-result.json": "845e5bee9529fdec3ab272a854815a2d4bd93af67d3139025f554ad6980d8b20"
+  }
+}

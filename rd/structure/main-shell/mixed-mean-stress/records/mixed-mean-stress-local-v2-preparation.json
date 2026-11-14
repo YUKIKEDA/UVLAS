@@ -1,0 +1,14 @@
+{
+  "reason": "Preserve increments in affine state evaluation; same mathematical ANCF position coordinates and same energy/forces/tangent. Keep failed full-position patch result. Separately convert numpy bool to Python bool in audit result serialization only.",
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element_v2.py": "aa9322d39d8528455c2f5acb9a9f3195ad42d9542d47222736e58de2b6563d9a",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_local_v2.py": "0dd383ee6f8a4be80049050b6ec8890c4acd821ce700cc094d9557e1e584287e",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/audit_mixed_mean_stress_thin_v2.py": "5289b2a9b11eede303703ee555cf4b6ac9ef6db917e4b27477a1a0c41f21db13",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element.py": "fbeef50d24c6120e58f42cfa7009295688f55a56eb7226805a24d95d1a135ea1",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_local.py": "1dd7eef60b96b39da8e45d4a248790f49c3cefb550a21b30a479f8cd8543740e",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/audit_mixed_mean_stress_thin.py": "c74900eb1cfa226179b855a02ae091ddd8ccceeec2ac91397e3c8a250d9fefa7",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-local-result.json": "5738794df57758b9149f81d5f35b697c39a70a57c4a6273f4763da16bb8cfcb3",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-increment-contract.md": "5f3325d611d667c440a01299f2761edb365fdd4c5802bd734541e4135af18daa",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-local-audit-preparation.json": "fae14f6e6651200c21d68febc14550a70086722dbf9df8f7f6f781c601a7aaad"
+  }
+}

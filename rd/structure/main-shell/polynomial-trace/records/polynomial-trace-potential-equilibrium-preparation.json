@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/hybrid-gradient/experiments/hybrid_gradient_ancf.py": "e2e2b8d276baa02c6081b61e1987f3cbb265cb05ec6804190cb4fdbfc593374f",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-equilibrium-protocol.md": "0e916cf5b5962839cb286fc6800a39d2a7808ce0f800e05bf7f54bab5fa970bc",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-result.json": "748bcc3774681d7ef363656479c8dd3e52bb962d58688cf16b49d547ac57e6d1",
+    "rd/structure/main-shell/polynomial-trace/experiments/check_polynomial_trace_equilibrium_weak.py": "8b7197bccc9456a5bd6eb6c49fbbc52488532dea165b0b70c033017fcf1860ef",
+    "rd/structure/main-shell/polynomial-trace/experiments/check_polynomial_trace_equilibrium_potential.py": "3e4ab368e4fd1fd6ccde5357bbfcb48044bb04510fec2f3848eae17aeb9c7c53"
+  }
+}

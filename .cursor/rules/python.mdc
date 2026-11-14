@@ -1,0 +1,23 @@
+---
+description: 開発と品質の道具（Python）の書き方と検査
+alwaysApply: false
+globs: "tools/**/*.py"
+---
+
+# Pythonの道具
+
+`tools/` の下のPythonは、ゲートが頼る製品の一部である。追跡、基準結果の照合、R&Dツリーの再配置がこれで動く。C++と同じ厳しさで書く。
+
+- 検査はゲートである：`just lint-python`（`ruff check`、`ruff format --check`、`pyright` のstrict）。警告を残したままcommitしない。エディタに警告が出ているなら、それは未完了の作業である。
+- 設定はリポジトリにある：[ruff.toml](../../ruff.toml)、[pyrightconfig.json](../../pyrightconfig.json)。エディタの既定の設定に頼らない。
+- 型を書く。JSONを読んだ値は `object` として受け、`isinstance` と `cast` で絞ってから使う。型の分からない値を、そのまま流さない。
+- 標準ライブラリだけを使う。道具のために依存を足さない。
+- `rd/` のスクリプトは記録であり、直さない。検査と索引の対象から外してある。`.agents/` と `.claude/` のコードも、外から来たものを含むので対象外である。
+- 除外のパターンは、リポジトリの根に固定する（`./rd`）。裸の名前（`rd`）は、同じ名前のディレクトリを全て外す。
+
+2026-11-11、道具を検査なしで書き足し、所有者のエディタに359件の警告が出た。検査の設定を置いた後も、除外に `rd` と書いたために `tools/rd` が外れ、「警告0」と読み違えるところだった。検査を入れたら、対象のファイルの一覧（`ruff check --show-files`）を読む。
+
+```text
+BAD   extend-exclude = ["rd"]      tools/rd も検査から外れる
+GOOD  extend-exclude = ["./rd"]    根の rd だけが外れる
+```

@@ -1,0 +1,30 @@
+# Python in this repository: the development and quality tools under tools/.
+# `just lint` and CI run `ruff check` and `ruff format --check`; both are gates.
+#
+# The R&D scripts under rd/ are records and are not edited, so they are not
+# linted. The skills under .agents/ and .claude/ include code that comes from
+# outside (skills-lock.json) and is kept as received.
+target-version = "py310"
+line-length = 100
+# Patterns are anchored at the repository root: a bare "rd" would also exclude tools/rd.
+extend-exclude = ["./rd", "./out", "./build", "./.agents", "./.claude"]
+
+[lint]
+select = [
+    "E", "W", "F",  # pycodestyle, pyflakes
+    "I",            # import order
+    "B",            # likely bugs
+    "C4",           # comprehensions and collection calls
+    "UP",           # syntax of the target version
+    "SIM",          # simplifications
+    "PL",           # pylint
+    "FURB",         # refurb
+    "ISC",          # implicit string concatenation
+    "PTH",          # pathlib
+    "RUF",          # ruff's own
+]
+ignore = [
+    "PLR0911", "PLR0912", "PLR0913", "PLR0915",  # counts of returns, branches, arguments, statements
+    "PLR2004",                                    # a number compared in place, in small scripts
+    "RUF001", "RUF002", "RUF003",                 # Japanese punctuation in strings and comments
+]

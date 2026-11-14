@@ -1,0 +1,92 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "curved_face_pressure",
+      "tangent_error": 4.670526433581199e-16,
+      "work_error": 1.1233827392056924e-16,
+      "wrench_error": 1.3956801454593999e-15,
+      "tangent_asymmetry": 1.2563536927375338,
+      "symmetrization_negative_control": 0.5894815633968952
+    },
+    {
+      "case": "curved_face_traction_current",
+      "tangent_error": 5.421046965414311e-16,
+      "work_error": 0.0,
+      "wrench_error": 6.670265469147309e-16,
+      "tangent_asymmetry": 1.455601281750299,
+      "symmetrization_negative_control": 0.0
+    },
+    {
+      "case": "curved_face_traction_reference",
+      "tangent_error": 0.0,
+      "work_error": 0.0,
+      "wrench_error": 2.5042964475225874e-15,
+      "tangent_asymmetry": 0.0,
+      "symmetrization_negative_control": 0.0
+    },
+    {
+      "case": "closed_pressure_volume_potential",
+      "volume": 0.10917312351606609,
+      "volume_work_error": 9.281765080284421e-14,
+      "closed_tangent_asymmetry": 7.006795234898267e-14
+    },
+    {
+      "case": "eccentric_beam_wrench_world",
+      "tangent_error": 5.6326954705422005e-11,
+      "work_error": 4.90973631473272e-16,
+      "tangent_asymmetry": 0.22477343293160174
+    },
+    {
+      "case": "eccentric_beam_wrench_body",
+      "tangent_error": 4.431250501322756e-11,
+      "work_error": 5.4933921974747185e-15,
+      "tangent_asymmetry": 1.2363457945101726
+    },
+    {
+      "case": "objective_shell_viscosity",
+      "state_tangent_error": 2.1112244045198444e-15,
+      "velocity_tangent_error": 1.957537021136723e-15,
+      "power_error": 0.0,
+      "rigid_motion_strain_rate": 1.0526008601695701e-13,
+      "dissipation": 0.05489572159147656,
+      "velocity_tangent_min": -2.9515185764848727e-12,
+      "superposed_observer_force_error": 8.538917717623577e-15
+    },
+    {
+      "case": "objective_beam_viscosity",
+      "state_tangent_error": 8.139369807567527e-12,
+      "velocity_tangent_error": 1.897670017578936e-13,
+      "power_error": 0.0,
+      "rigid_motion_strain_rate": 1.3423666429918866e-16,
+      "compressed_elastic_minimum": -0.5226423488301108,
+      "compressed_viscous_power": 0.002632924959928681
+    },
+    {
+      "case": "moving_elastic_viscous_frame_support",
+      "state_tangent_error": 3.8322382504234785e-12,
+      "velocity_tangent_error": 1.1397950787394357e-10,
+      "power_balance_error": 1.3877787807814457e-16,
+      "moving_base_power": -0.1968930727541377
+    },
+    {
+      "case": "viscosity_admissibility",
+      "negative_controls": 3,
+      "semidefinite_rank": 1,
+      "no_stiffness_based_artificial_viscosity": true
+    }
+  ],
+  "failures": [],
+  "seconds": 7.531000000075437,
+  "sources": {
+    "rd/structure/integration/experiments/check_structural_load_damping.py": "c8b8d01ccdd091aed47e9ca44e7a7da8d1e0c8505003fc84ccbf20389e3d65ae",
+    "rd/structure/integration/experiments/structural_load_damping.py": "2a0547bf6f8bb1d601cf080894734ac1aa358134dd52eb5bf636847bbfc10a09",
+    "rd/structure/connection/experiments/connection_shell.py": "f78d9f16b871e263e1b525721d4f8c1442ef7d09838ca993bbf83d26f3c44727",
+    "rd/structure/connection/experiments/connection_kinematics.py": "bce97cffc9b538e313e859f9d0337ed7cd84a7a29d16d405e7dac96faf02c685",
+    "rd/structure/beam/experiments/beam_se3_v2.py": "3c71924e347b844353523727510041f529a8b62cd3c31fec6f7b3f70120ada48",
+    "rd/structure/beam/experiments/beam_jet2.py": "0a352d90bb2ad09a27765bfda31a09f2295686ba61f9f742b383600369c81295",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e",
+    "rd/structure/integration/records/structural-final-integration-protocol.md": "866eaeb93cd31d5f2927a9c3f8a72f2b7c64cf25def7485c0005ed300819527f"
+  }
+}

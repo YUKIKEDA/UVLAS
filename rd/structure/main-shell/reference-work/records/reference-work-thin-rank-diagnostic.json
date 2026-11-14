@@ -1,0 +1,30 @@
+{
+  "monolithic_cutoff_ranks": [
+    903,
+    904,
+    905
+  ],
+  "relative_cutoffs": [
+    1e-09,
+    1e-10,
+    1e-11
+  ],
+  "singular_values_900_to_908": [
+    8.538417980151604e-05,
+    7.09966138674367e-05,
+    4.5972834623029204e-05,
+    3.134728889462311e-10,
+    6.296752316068638e-11,
+    1.4843591881273918e-15,
+    1.1836063339311934e-15,
+    8.8294294737953e-16,
+    8.431305383727326e-16
+  ],
+  "largest_singular_value": 2.6186969652143213,
+  "chosen_adoption_rank": null,
+  "exact_rank_of_rounded_geometry_certified": false,
+  "analytic_geometry_certificate_is_a_different_statement": true,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/diagnose_reference_work_thin_rank.py": "f2ddd8596703e07fe564f4c65dd36efcfda5d03d4d082807b34656afe002f3fd"
+  }
+}

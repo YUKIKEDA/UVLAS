@@ -1,0 +1,4 @@
+interface:
+  display_name: "ソルバー仕様・契約設計"
+  short_description: "Turn solver requirements into implementable numerical contracts"
+  default_prompt: "$solver-design-contracts を使い、採用式から主要I/F・不変条件・検証ケースを導出し、実装開始に残る穴を審査してください。"

@@ -1,0 +1,14 @@
+{
+  "purpose": "Freeze paired candidate and its numerical gates before qualification finishes",
+  "main_shell_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-qualification-protocol.md": "2af71c9d4e3546a20e79100b1362868daeb332045eaa8d110d7f64e02b173194",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-protocol.md": "98c305ea826b9d5c1827dbda91986c3bdde5c703d6270766b7aaf160b5b13ee9",
+    "rd/structure/main-shell/paired-geometry/paired-geometry-ancf-definition.md": "fe6778c4b9379d46d94db790742f057800ecda50976db32d0d6c2b45b928ed9d",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-basis-audit.json": "58af353d1bec173d09a54482f4e5cfcb678ee207c1ee070dfe03751dd6a8065c",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-screen.json": "144915ee16b5566e3695403950c945fb9e1a17633f7f8ea6cb86631b0c832b99",
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_gc_qualification.py": "4a119012dab4c2071d1737185bbe8503b187f16e89437ab60edaada54ac2f2b5",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_geometry_ancf.py": "a4fa7105f896ddc825f0cc482e6ef0949f8e2c0dc0768d9f997ad761592d1c95",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_curvature_profiles.py": "1ae53ab1ab525c93ccb97b6aaf84ba130b85f57ae753385226e55df9d2ab2e98"
+  }
+}

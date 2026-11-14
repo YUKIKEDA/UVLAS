@@ -1,0 +1,61 @@
+{
+  "records": [],
+  "stops": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "reason": "KeyError('ranks')"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "reason": "KeyError('ranks')"
+    }
+  ],
+  "all_local_checks": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_local.py": "3778c4c5705c9756534a3188627cb6112a25607f6643fb4af53345a246213958",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/moment-enriched-formulation.md": "d941bf2ff4abe7cb023f040d4f2f5cfe03d46c49b26b985b5a8c241053c5639e",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-protocol.md": "84ec6760b9806cde4fcb26ff0186d36b3d0f000d49f668a3518cddb5febecfc9",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-local-preparation.json": "a3860d4877c42f8ad7854539c35de97862995eef53368e7671d421d8c74fa905"
+  },
+  "seconds": 11.14000000001397,
+  "peak_bytes": 358629376
+}

@@ -1,0 +1,110 @@
+{
+  "source_sha256": "b422409afacb6fef196c58266529efe4da08f543398cc23f2ec081330da5d8a5",
+  "protocol": "rd/aero/avl-reference/records/avl-allocation-factorial-experiment.md",
+  "protocol_sha256": "e2d11e91dcdf95ef0de15894d29cfea36091c18073e63d6ef5cf1d0726332407",
+  "solve_audit_sha256": "143eca892695fb9939720ae036f464a362e0fd86a0457f11c2911c6d0e702221",
+  "parent_sha256": "7ef4bab10c3401ec917e9012b78a7ab58e82dc6c175790cf0a75ca23aa47314e",
+  "tip_parent_sha256": "41cb0109245c0e63f973eceddecbb4b0f0c6d19dbf282d57b5d0aa64ab44d5e4",
+  "executable_sha256": "7f5b321f308be5d737b6999ba143fc239a8bc7056e281a889e68603fa20bf740",
+  "decks": [
+    {
+      "case": "FW-V01",
+      "allocation": "inner-only",
+      "m": 12,
+      "physical_n": 1024,
+      "native_strips": 512,
+      "native_unknowns": 6144,
+      "interval_counts": [
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        64,
+        64
+      ],
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-allocation-factorial/FW-V01-M12-N1024-inner-only.avl",
+      "sha256": "d5aad10ca15859782877059ab6c1cb98687da9beee8b08f711c9d31a8d8602ce",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/wing.avl",
+      "donor_sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50"
+    },
+    {
+      "case": "FW-V01",
+      "allocation": "tip-only",
+      "m": 12,
+      "physical_n": 1536,
+      "native_strips": 768,
+      "native_unknowns": 9216,
+      "interval_counts": [
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        128,
+        128
+      ],
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-allocation-factorial/FW-V01-M12-N1536-tip-only.avl",
+      "sha256": "543a16ef6412bd04a7b5b42ef9855ab85c219bc8a95a9f113cfed05fe79eb45b",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V01-M12-N1280/wing.avl",
+      "donor_sha256": "e7427fac1cba0c2461aaa17e0e248f2c8e932c8cd563f218b191d9337129dc50"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "inner-only",
+      "m": 12,
+      "physical_n": 1024,
+      "native_strips": 512,
+      "native_unknowns": 6144,
+      "interval_counts": [
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        48,
+        64,
+        64
+      ],
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-allocation-factorial/FW-V02-M12-N1024-inner-only.avl",
+      "sha256": "864d31febbb4d850e670c7afcdfa534c394adcf38c2f474bc331580c79e32ae0",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/wing.avl",
+      "donor_sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa"
+    },
+    {
+      "case": "FW-V02",
+      "allocation": "tip-only",
+      "m": 12,
+      "physical_n": 1536,
+      "native_strips": 768,
+      "native_unknowns": 9216,
+      "interval_counts": [
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        128,
+        128
+      ],
+      "path": "rd/aero/avl-reference/fixtures/avl-fw-allocation-factorial/FW-V02-M12-N1536-tip-only.avl",
+      "sha256": "fcf9595820a4eb3186b593e6b80035ccd950c385f04b03819d38cd2ee7d6e5a5",
+      "donor": "build/analysis/avl-span1280-20261031-152720/FW-V02-M12-N1280/wing.avl",
+      "donor_sha256": "57531fac992e8c39535e0a24a3e9588a1eb4c4ebb981d2f3c7ae26201b5a02aa"
+    }
+  ],
+  "new_runs": 0,
+  "all_criteria_pass": true,
+  "reference_acceptance": false
+}

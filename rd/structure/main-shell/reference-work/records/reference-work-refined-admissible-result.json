@@ -1,0 +1,44 @@
+{
+  "records": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "initial_shared_mismatch": 0.0,
+      "initial_support_projection_norm": 0.0,
+      "final_shared_mismatch": 0.0,
+      "final_support_norm": 0.0,
+      "admissible_primary_error": 1.0934170392670417e-07,
+      "admissible_independent_error": 1.0934170869975004e-07,
+      "solver_primary_error": 8.140971813919056e-08,
+      "solver_independent_error": 8.14097192366702e-08,
+      "admissible_to_solver_ratio": 1.343103866773909,
+      "better_admissible_field": false,
+      "is_minimum": false
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "initial_shared_mismatch": 0.0,
+      "initial_support_projection_norm": 0.0,
+      "final_shared_mismatch": 0.0,
+      "final_support_norm": 0.0,
+      "admissible_primary_error": 1.0934894741663337e-05,
+      "admissible_independent_error": 1.0934804908309738e-05,
+      "solver_primary_error": 6.190721561116734e-06,
+      "solver_independent_error": 6.190701465993948e-06,
+      "admissible_to_solver_ratio": 1.7663272842949311,
+      "better_admissible_field": false,
+      "is_minimum": false
+    }
+  ],
+  "new_solve": false,
+  "solution_modified": false,
+  "acceptance_thresholds_changed": false,
+  "finite_h_lower_bound": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/diagnose_reference_work_refined_admissible.py": "dc234468fd564c80df3ab046f054fe00783675997e583027a61be3dd6e9fb944",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_refined_fit_v2.py": "d59549b988766f6df636b2c2135844abe30fa2f5e7c047a7cfbcddcc6b80c950",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-finite-result.json": "d0cdd11c4abb8ee211272d44cd284f2d117e6b8951056da40786decc8732f6a2",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-admissible-protocol.md": "b14220b5613ce323dfda226486b04e6bf22363131c807200d809c86d6355cdde"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "history": [
+    {
+      "iteration": 0,
+      "residual": 1.0992431070253545,
+      "min_F": 0.9991219774602873,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 1,
+      "residual": 0.011734352049656699,
+      "min_F": 1.0090325330684404,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 2,
+      "residual": 7.175908633148972e-05,
+      "min_F": 1.0090266626180076,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 3,
+      "residual": 2.018768045333446e-09,
+      "min_F": 1.0090269667981706,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 4,
+      "residual": 2.4696086517868975e-13,
+      "min_F": 1.0090269668239813
+    }
+  ],
+  "metrics": {
+    "displacement": 5.411449132679873e-09,
+    "constraint": 6.795549824675165e-17,
+    "free_equilibrium": 2.469955833409698e-13,
+    "support_reaction": 1.2099128217838408e-13,
+    "interface_reaction": 8.19542780260666e-13,
+    "independent_equilibrium": 2.4706367365161185e-13,
+    "tangent": 4.03930550277971e-15,
+    "min_F": 1.0090269668239813
+  },
+  "checks": {
+    "newton": true,
+    "displacement": true,
+    "identities": true,
+    "orientation": true,
+    "resources": true
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "artifact": {
+    "path": "build/analysis/mortar-equilibrium-20261104-010706.npz",
+    "sha256": "a4e9a104b4ddd001f0716f01b489def6c5964de29ff04dde1a9fc72fc1243b29"
+  },
+  "manufactured_Ku_load": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/check_mortar_equilibrium.py": "ca179d243c453435ecf1c150284921611e61f4b7387e6ec4efbd6f01cf36451c",
+    "rd/structure/main-shell/mortar/experiments/mortar_q4.py": "e836a825f48dbab5065be822e5c71096741368f2c48842124dd91052d5d249cd",
+    "rd/structure/main-shell/mortar/records/mortar-q4-equilibrium-protocol.md": "158ce030b93e92bc363c1c3fc41888ba306029af9abcc6424a0c5c254e983919",
+    "rd/structure/main-shell/mortar/records/mortar-q4-equilibrium-preparation.json": "29b0c0cb1a8329a18d13976c5a088498a7e60086391ac87bad588a5c396853f7",
+    "rd/structure/main-shell/mortar/records/mortar-q4-result.json": "8df6126cbe758482246aa6691759192fea73aef92ad1f9a86755bdb598d95302"
+  },
+  "seconds": 1.577999999979511,
+  "peak_bytes": 126058496
+}

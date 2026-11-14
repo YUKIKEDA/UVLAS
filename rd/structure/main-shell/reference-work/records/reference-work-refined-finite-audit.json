@@ -1,0 +1,83 @@
+{
+  "records": [
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        8.140971896699472e-08,
+        1.6534037885674406e-06
+      ],
+      "h1": [
+        0.49043487645653056,
+        2.12843558541814
+      ],
+      "error_difference": 1.0699909501580033e-14,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        6.1907255027555215e-06,
+        4.1862168123484054e-05
+      ],
+      "h1": [
+        0.49043489205775204,
+        2.1284352957784836
+      ],
+      "error_difference": 3.5278339915957493e-10,
+      "h1_difference": 0.0,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.001,
+      "error": [
+        1.00177387674058e-07,
+        3.6104828946351756e-07
+      ],
+      "h1": [
+        0.49043487646462647,
+        2.1284361399719365
+      ],
+      "error_difference": 5.290659873604872e-13,
+      "h1_difference": 4.440892098500626e-16,
+      "passed": true
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        9.737262803497642e-07,
+        2.9209930099279458e-06
+      ],
+      "h1": [
+        0.49043487649161943,
+        2.128436128683537
+      ],
+      "error_difference": 8.016786625864468e-10,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/audit_reference_work_refined_finite.py": "e2861534271ede535005c08da84bf8eac913885f88f04895c04adbe00b21b660",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-finite-result.json": "d0cdd11c4abb8ee211272d44cd284f2d117e6b8951056da40786decc8732f6a2",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8"
+  },
+  "seconds": 65.60899999993853
+}

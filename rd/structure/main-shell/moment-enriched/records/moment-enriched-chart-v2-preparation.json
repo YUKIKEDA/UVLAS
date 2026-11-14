@@ -1,0 +1,7 @@
+{
+  "reason": "Correct chart transform of the reference nodal geometry: all three fields have 25 nodes; previous transform incorrectly used the abandoned mixed-order 25/16/9 geometry. No operator or threshold change.",
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_chart_v2.py": "d1a5b74907b24fc4c66240a7f9d4bd95177c58379b907ac5aba4d700d8414a91",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-chart-result.json": "28007ae42dfad12467995771a0d6d95b060c65663a283d9606981d18eb1563f7"
+  }
+}

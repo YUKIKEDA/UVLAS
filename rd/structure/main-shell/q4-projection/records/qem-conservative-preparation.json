@@ -1,0 +1,10 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/q4-projection/experiments/check_qem_conservative.py": "2b185bc762cd94676ccfa03990f75ca0d41fc4d284560aee14cfa31d6d3cef81",
+    "rd/structure/main-shell/q4-projection/experiments/audit_qem_conservative.py": "c78c759a16ff4e33166f3f9d83e7be2539439b936d7c352f7129a64db51ab152",
+    "rd/structure/main-shell/q4-projection/qem-conservative-formulation.md": "d40f6bae9af7c533451dec65a20a02283c928981dbe7d1aa069abc67b462d72f",
+    "rd/structure/main-shell/q4-projection/records/qem-conservative-protocol.md": "fc3d9601bbb34d035e38bd646ce88c36eb6f033eeab5ad230d9e8204404f2d56"
+  }
+}

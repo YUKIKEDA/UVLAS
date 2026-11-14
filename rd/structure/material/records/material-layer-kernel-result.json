@@ -1,0 +1,71 @@
+{
+  "records": [
+    {
+      "case": "Mandel_engineering_bridge",
+      "metrics": {
+        "energy": 0.0,
+        "compliance": 1.0404786006524282e-16
+      },
+      "passed": true
+    },
+    {
+      "case": "curved_reference_fiber_axis",
+      "metrics": {
+        "orthogonal": 2.795076269212341e-16,
+        "determinant": 4.440892098500626e-16,
+        "objective": 2.485118780863752e-16,
+        "Mandel_orthogonal": 7.536377538859932e-16,
+        "material_tensor": 7.410741937918042e-18
+      },
+      "passed": true
+    },
+    {
+      "case": "parallel_fiber_negative_control",
+      "metrics": {
+        "rejection_failure": 0.0
+      },
+      "passed": true
+    },
+    {
+      "case": "normal_stress_Schur_and_recovery",
+      "metrics": {
+        "stress_normal": 0.0,
+        "stress": 0.0,
+        "compliance_route": 2.1568913141074446e-16,
+        "recovery": 0.0,
+        "energy": 0.0
+      },
+      "omitting_Schur_detected": true,
+      "passed": true
+    },
+    {
+      "case": "layer_moments_vs_tensor_quadrature",
+      "metrics": {
+        "energy": 8.470329472543003e-22,
+        "force": 2.7107509376408435e-19
+      },
+      "passed": true
+    },
+    {
+      "case": "homogeneous_layer_subdivision",
+      "metrics": {
+        "matrix": 1.7699948607126696e-16,
+        "initial_load": 1.0842050159151315e-19,
+        "constant": 5.293955920339377e-23,
+        "energy": 8.470329472543003e-22,
+        "force": 2.235548765782621e-19
+      },
+      "passed": true
+    }
+  ],
+  "all_checks_pass": true,
+  "material_point_contract_only": true,
+  "element_plane_stress_adopted": false,
+  "real_material_validation": false,
+  "sources": {
+    "rd/structure/material/experiments/check_material_layer_kernel.py": "1dddae8e58c83c3263fc7195ee2a83dcc13ebb9f968938012bd986b923ac2f86",
+    "docs/specs/structure/material-layer-adoption-contract.md": "cafea600ef53cb76426b6b980c9cac463eb73c96eb3223cd9a2950c33a2b8155",
+    "rd/structure/material/records/material-layer-kernel-protocol.md": "a5d5768d261b5a242aeff4b94ae324fc978fd10e4c7c2d0718290b9c10781912",
+    "rd/structure/material/records/material-layer-kernel-preparation.json": "fcc2ecc50290ecaf755531b84190dad568e36b87a9f3ae4dd2e171ee75711948"
+  }
+}

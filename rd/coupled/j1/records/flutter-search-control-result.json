@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "scope": "search control and mode identities on a fully known two-mode spectrum; not physical flutter validation",
+  "records": [
+    {
+      "case": "error_aware_critical_interval",
+      "mode": 0,
+      "truth": 10.0,
+      "interval": [
+        9.984375,
+        10.0078125
+      ],
+      "estimate": 9.99609375,
+      "frequency": 1.2998828124999984
+    },
+    {
+      "case": "error_aware_critical_interval",
+      "mode": 1,
+      "truth": 14.0,
+      "interval": [
+        13.9921875,
+        14.015625
+      ],
+      "estimate": 14.00390625,
+      "frequency": 1.0197265624999972
+    },
+    {
+      "case": "search_restart_queue_modes_and_points_bitwise",
+      "restart_actions": [
+        3,
+        8,
+        12,
+        34
+      ],
+      "evaluations": 21,
+      "unique_points": 21
+    },
+    {
+      "case": "frequency_order_crossing_keeps_physical_mode",
+      "MAC": [
+        [
+          0.9919218463940789,
+          0.008078153605931797
+        ],
+        [
+          0.008078153605933927,
+          0.9919218463940555
+        ]
+      ]
+    },
+    {
+      "case": "cluster_subspace_independent_of_internal_basis",
+      "max_angle": 0.0,
+      "missing_cluster_dimension_rejected": true
+    },
+    {
+      "case": "uncertain_growth_not_forced_to_stable_or_unstable"
+    },
+    {
+      "case": "invalid_search_state_rejections",
+      "rejected": [
+        "policy",
+        "missing_queue",
+        "point_identity",
+        "premature_complete"
+      ]
+    }
+  ],
+  "sources": {
+    "rd/coupled/j1/experiments/check_flutter_search.py": "e5e8944ae81b35bad395f8a5945b5e82150e4bda5bdcf837823ed573c2a847be",
+    "rd/coupled/j1/experiments/flutter_search_witness.py": "318089f8eb18aa7f94eab28784a9d24804c3e67f6deebb097b9bfcc8b140181f",
+    "docs/specs/coupled/coupled-state-search-contract.md": "1f624248e72e2d040ef025a2f901617bd3ae5c150ad4b805cbb01224ebe765ce"
+  }
+}

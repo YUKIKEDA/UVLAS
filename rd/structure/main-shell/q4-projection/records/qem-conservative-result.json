@@ -1,0 +1,1658 @@
+{
+  "local_records": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "metrics": {
+        "constant": 1.0416318146148073e-14,
+        "rigid": 2.0010848873339903e-16,
+        "conservative_work": 2.5112423204180227e-15,
+        "native_work": 1.4772708729751298e-15,
+        "min_det": 0.24999999999999956,
+        "energy_force": 1.3877787807814457e-17,
+        "force_tangent": 2.4690399875386873e-15,
+        "general_dual_work": 1.0572591233068092e-15,
+        "idempotence": 5.798935222332042e-17
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": true
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-flat-h0.01.npz",
+      "artifact_sha256": "e9511e345b868759374f3edc3fad035970e543ee161d7afc92fbba6d783e94c8"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "metrics": {
+        "constant": 1.0416230926309884e-14,
+        "rigid": 2.0010933638875993e-16,
+        "conservative_work": 2.277642129320409e-15,
+        "native_work": 1.2980750932641911e-15,
+        "min_det": 0.24999999999999956,
+        "energy_force": 2.7755575615628914e-17,
+        "force_tangent": 1.6834847200987183e-15,
+        "general_dual_work": 1.0531230822479285e-15,
+        "idempotence": 5.798967116434078e-17
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": true
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-flat-h0.001.npz",
+      "artifact_sha256": "3aa77a2d5c98bdcf3b091f2ca2b3b2cc47d1197c913482e34f5a7ec4796d4682"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "metrics": {
+        "constant": 1.041622998365048e-14,
+        "rigid": 2.001093440987301e-16,
+        "conservative_work": 2.462094636288953e-15,
+        "native_work": 1.5635086411733303e-15,
+        "min_det": 0.24999999999999956,
+        "energy_force": 3.191891195797325e-16,
+        "force_tangent": 7.856264284232004e-16,
+        "general_dual_work": 1.0635115263690566e-15,
+        "idempotence": 5.798967435377273e-17
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": true
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-flat-h0.0001.npz",
+      "artifact_sha256": "42270c8af0809cc40ff5ed54aebfabe8a7690622872a4c33f761e21fa2f74720"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "metrics": {
+        "constant": 1.489903756037701e-14,
+        "rigid": 2.0409215310236276e-16,
+        "conservative_work": 5.026964485570384e-15,
+        "native_work": 4.786257138257234e-15,
+        "min_det": 0.06238672751925743,
+        "energy_force": 8.326672684688674e-17,
+        "force_tangent": 2.779598386864386e-15,
+        "general_dual_work": 1.0253232333168415e-15,
+        "idempotence": 6.41805336823113e-17
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": true
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-curved-distorted-h0.01.npz",
+      "artifact_sha256": "dd48524a7f9c466c88a1250d9b8e73ca29f9edbf6a5f893082d3b8cd4e3a443d"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "metrics": {
+        "constant": 1.5175828241818534e-14,
+        "rigid": 2.0334390050912753e-16,
+        "conservative_work": 5.5379766526286184e-14,
+        "native_work": 5.542371384296886e-14,
+        "min_det": 0.06248867275192552,
+        "energy_force": 0.0,
+        "force_tangent": 1.0691950509068248e-15,
+        "general_dual_work": 1.0848923624031065e-15,
+        "idempotence": 6.483276059372065e-17
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": true
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-curved-distorted-h0.001.npz",
+      "artifact_sha256": "d728d3ee653963438f538a0dc7cdfcd0c9d13390066ae6f19b82382de4ed59c8"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "metrics": {
+        "constant": 1.4676361516066458e-14,
+        "rigid": 2.0719706120739654e-16,
+        "conservative_work": 4.840710171774923e-13,
+        "native_work": 4.841086041841186e-13,
+        "min_det": 0.062498867275192334,
+        "energy_force": 5.551115123125783e-17,
+        "force_tangent": 2.1383924771110915e-15,
+        "general_dual_work": 9.013916440242084e-16,
+        "idempotence": 6.462268134598035e-17
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": true
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-curved-distorted-h0.0001.npz",
+      "artifact_sha256": "0d6cbd7b8a5fbf4a9ec013a84f416ef67b5c9018b9fb76d091a969ac154d6cad"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "metrics": {
+        "constant": 1.3105028646269997e-14,
+        "rigid": 2.3071856337193337e-16,
+        "conservative_work": 1.200210066593849e-14,
+        "native_work": 0.0005602238422880871,
+        "min_det": 0.24954691007703034,
+        "energy_force": 1.3877787807814457e-16,
+        "force_tangent": 3.3572724660837333e-16,
+        "general_dual_work": 1.4109527871133707e-15,
+        "idempotence": 1.9750059031844944e-16
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": false
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-quartic-reference-h0.01.npz",
+      "artifact_sha256": "90ece566ee565c4293031ccf929574e8a473301202a7752cc2af2c22ebf269a9"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "metrics": {
+        "constant": 1.2958417094631556e-14,
+        "rigid": 2.2667207597566575e-16,
+        "conservative_work": 1.2631330367343913e-13,
+        "native_work": 0.0005602238453508437,
+        "min_det": 0.24995469100770276,
+        "energy_force": 8.326672684688674e-17,
+        "force_tangent": 3.357371854383411e-16,
+        "general_dual_work": 1.0123475180823166e-15,
+        "idempotence": 2.1128302018942565e-16
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": false
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-quartic-reference-h0.001.npz",
+      "artifact_sha256": "91bf63321cb222bdba287d8359d64d2377644ca71b34123c8e17dfd11abb6919"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "metrics": {
+        "constant": 1.2481488648935825e-14,
+        "rigid": 2.2649861567446605e-16,
+        "conservative_work": 1.512461896381509e-12,
+        "native_work": 0.0005602238453506035,
+        "min_det": 0.24999546910076997,
+        "energy_force": 1.3877787807814457e-17,
+        "force_tangent": 1.5667739958767034e-15,
+        "general_dual_work": 1.0945383721512978e-15,
+        "idempotence": 2.0034510963854143e-16
+      },
+      "native_ranks": [
+        219,
+        219,
+        219
+      ],
+      "conservative_ranks": [
+        219,
+        219,
+        219
+      ],
+      "checks": {
+        "native_rank": true,
+        "conservative_rank": true,
+        "orientation": true,
+        "conservative_fields": true,
+        "native_work": false
+      },
+      "artifact": "build/analysis/qem-conservative-20261103-230113/local-quartic-reference-h0.0001.npz",
+      "artifact_sha256": "01e7009e1173c11b7b13e1844bc2fb531675597a86863830cfa63303224982c0"
+    }
+  ],
+  "records": [
+    {
+      "method": "raw",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "nullity": 48,
+      "ranks9": [
+        384,
+        384,
+        384
+      ],
+      "ranks11": [
+        384,
+        384,
+        384
+      ],
+      "metrics": {
+        "anchor": 7.911264593239704e-15,
+        "orthogonal": 9.107503542401286e-15,
+        "projector": 3.7192280279640074e-14,
+        "kernel": 9.483456949711459e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 4.0254867243467234e-15,
+          "h1": 1.1547005383792366,
+          "fit": {
+            "error": 3.5436024389064733e-15,
+            "h1": 1.1547005383792575,
+            "multiplier": 0.0,
+            "kkt": 4.746896614688799e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.1742728537294946e-15,
+          "h1": 0.619139187366887,
+          "fit": {
+            "error": 2.236843283655019e-15,
+            "h1": 0.6191391873668914,
+            "multiplier": 0.0,
+            "kkt": 2.1514968353044213e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 3.3483309820848157e-15,
+          "h1": 0.4646213682914448,
+          "fit": {
+            "error": 2.7261303519298834e-15,
+            "h1": 0.4646213682914466,
+            "multiplier": 0.0,
+            "kkt": 2.3178455886793836e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0003627132338411609,
+          "h1": 1.9880911872414686,
+          "fit": {
+            "error": 0.000362713233840373,
+            "h1": 1.9880911872414933,
+            "multiplier": 0.0,
+            "kkt": 3.138774087323372e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/raw-k0-a0-n2.npz",
+      "artifact_sha256": "d0739ab3ff278620bdc2df9c6188b67f013d86bdba97290e43a999e65442146d"
+    },
+    {
+      "method": "nodal",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "nullity": 48,
+      "ranks9": [
+        384,
+        384,
+        384
+      ],
+      "ranks11": [
+        384,
+        384,
+        384
+      ],
+      "metrics": {
+        "anchor": 7.695307789327975e-15,
+        "orthogonal": 9.03782896556121e-15,
+        "projector": 3.6214410119130504e-14,
+        "kernel": 9.551381707492405e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.3435042536547894e-15,
+          "h1": 1.154700538379236,
+          "fit": {
+            "error": 1.8510972515804206e-15,
+            "h1": 1.1547005383792557,
+            "multiplier": 0.0,
+            "kkt": 1.7772861560521622e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.2452717434871462e-15,
+          "h1": 0.6191391873668866,
+          "fit": {
+            "error": 1.7654698308443572e-15,
+            "h1": 0.6191391873668913,
+            "multiplier": 0.0,
+            "kkt": 1.8399290283999826e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 2.425441506253441e-15,
+          "h1": 0.4646213682914452,
+          "fit": {
+            "error": 2.3587045754824817e-15,
+            "h1": 0.4646213682914468,
+            "multiplier": 0.0,
+            "kkt": 1.8475824625283101e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0003627132338411448,
+          "h1": 1.988091187241467,
+          "fit": {
+            "error": 0.00036271323384062484,
+            "h1": 1.9880911872414924,
+            "multiplier": 0.0,
+            "kkt": 1.9124411025539732e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/nodal-k0-a0-n2.npz",
+      "artifact_sha256": "d6fb11771b79117d678e6d615fb7d6365957edcd1bbefd7e8ef141c61ab20499"
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "nullity": 48,
+      "ranks9": [
+        384,
+        384,
+        384
+      ],
+      "ranks11": [
+        384,
+        384,
+        384
+      ],
+      "metrics": {
+        "anchor": 7.888593272264006e-15,
+        "orthogonal": 9.069286298883603e-15,
+        "projector": 3.6654494372147365e-14,
+        "kernel": 8.522482760020249e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 3.11442673981925e-15,
+          "h1": 1.1547005383792366,
+          "fit": {
+            "error": 2.5238105149099845e-15,
+            "h1": 1.1547005383792566,
+            "multiplier": 0.0,
+            "kkt": 3.085162670497638e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.336712686710901e-15,
+          "h1": 0.6191391873668869,
+          "fit": {
+            "error": 2.1948273531278034e-15,
+            "h1": 0.6191391873668913,
+            "multiplier": 0.0,
+            "kkt": 2.844745064433147e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 2.448230033216519e-15,
+          "h1": 0.4646213682914453,
+          "fit": {
+            "error": 2.585056501664684e-15,
+            "h1": 0.4646213682914468,
+            "multiplier": 0.0,
+            "kkt": 2.5171354099552275e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0003627132338405331,
+          "h1": 1.988091187241468,
+          "fit": {
+            "error": 0.00036271323384063264,
+            "h1": 1.9880911872414926,
+            "multiplier": 0.0,
+            "kkt": 2.801832613391977e-16,
+            "H1_ranks": [
+              264,
+              264,
+              264
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/conservative-k0-a0-n2.npz",
+      "artifact_sha256": "665362d989403b8d7c08dce73066d4982c5f06c88d3197a082b5e2f1527cdd8a"
+    },
+    {
+      "method": "raw",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 35,
+      "ranks9": [
+        397,
+        397,
+        397
+      ],
+      "ranks11": [
+        397,
+        397,
+        397
+      ],
+      "metrics": {
+        "anchor": 1.3662950477964227e-13,
+        "orthogonal": 8.490994338056622e-15,
+        "projector": 5.603530921571679e-13,
+        "kernel": 9.843125142284533e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 3.035676593499798e-15,
+          "h1": 1.1547005383792561,
+          "fit": {
+            "error": 2.1284917992882846e-15,
+            "h1": 1.1547005383792392,
+            "multiplier": 0.0,
+            "kkt": 2.3146379886036433e-16,
+            "H1_ranks": [
+              251,
+              251,
+              251
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.9561681516254333e-15,
+          "h1": 0.619139187366892,
+          "fit": {
+            "error": 2.0458908446805528e-15,
+            "h1": 0.6191391873668869,
+            "multiplier": 0.0,
+            "kkt": 1.9828723204262194e-16,
+            "H1_ranks": [
+              251,
+              251,
+              251
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 1.1452321536884766e-14,
+          "h1": 0.4646213682914472,
+          "fit": {
+            "error": 1.1154324514130492e-14,
+            "h1": 0.46462136829144496,
+            "multiplier": 0.0,
+            "kkt": 2.1497450784833713e-16,
+            "H1_ranks": [
+              251,
+              251,
+              251
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0004150452672539946,
+          "h1": 1.9880905420522352,
+          "fit": {
+            "error": 0.00041504526725384303,
+            "h1": 1.988090542052213,
+            "multiplier": 0.0,
+            "kkt": 1.8395396254761492e-16,
+            "H1_ranks": [
+              251,
+              251,
+              251
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/raw-k0-a0.2-n2.npz",
+      "artifact_sha256": "e11c6672dc9632a2946f5912a3fef8c2e505bf1fdb3166769484344d661c27b0"
+    },
+    {
+      "method": "nodal",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 47,
+      "ranks9": [
+        385,
+        385,
+        385
+      ],
+      "ranks11": [
+        385,
+        385,
+        385
+      ],
+      "metrics": {
+        "anchor": 1.540809715551008e-14,
+        "orthogonal": 8.726154513058175e-15,
+        "projector": 4.869490266526742e-14,
+        "kernel": 7.655345171634193e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 3.1938945716237454e-15,
+          "h1": 1.1547005383792572,
+          "fit": {
+            "error": 2.5758640922387325e-15,
+            "h1": 1.1547005383792401,
+            "multiplier": 0.0,
+            "kkt": 3.2615441790401465e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.5632357619234927e-15,
+          "h1": 0.619139187366893,
+          "fit": {
+            "error": 2.3936785591955166e-15,
+            "h1": 0.619139187366888,
+            "multiplier": 0.0,
+            "kkt": 3.2828130120091687e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 3.946234410557722e-15,
+          "h1": 0.46462136829144796,
+          "fit": {
+            "error": 3.876054073306078e-15,
+            "h1": 0.46462136829144596,
+            "multiplier": 0.0,
+            "kkt": 4.331625974094715e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0004097158505183912,
+          "h1": 1.9880909968967464,
+          "fit": {
+            "error": 0.00040971585051821483,
+            "h1": 1.9880909968967235,
+            "multiplier": 0.0,
+            "kkt": 3.701901537912365e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/nodal-k0-a0.2-n2.npz",
+      "artifact_sha256": "2cff093d596ad899dcfc2f3a50580518f3adcf2639205364e06aee9a93f28ee9"
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 47,
+      "ranks9": [
+        385,
+        385,
+        385
+      ],
+      "ranks11": [
+        385,
+        385,
+        385
+      ],
+      "metrics": {
+        "anchor": 8.116469318033257e-15,
+        "orthogonal": 8.563071014019585e-15,
+        "projector": 4.8017220085488486e-14,
+        "kernel": 7.778422636917544e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.740326381724506e-15,
+          "h1": 1.1547005383792555,
+          "fit": {
+            "error": 2.256557636901975e-15,
+            "h1": 1.1547005383792392,
+            "multiplier": 0.0,
+            "kkt": 2.291367659081928e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.336378988757344e-15,
+          "h1": 0.6191391873668922,
+          "fit": {
+            "error": 1.9650306602419947e-15,
+            "h1": 0.6191391873668874,
+            "multiplier": 0.0,
+            "kkt": 2.0322316190610668e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 2.7892143517725892e-15,
+          "h1": 0.46462136829144746,
+          "fit": {
+            "error": 2.631934671604257e-15,
+            "h1": 0.4646213682914453,
+            "multiplier": 0.0,
+            "kkt": 2.1030481860375653e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.0004097158505180629,
+          "h1": 1.9880909968967442,
+          "fit": {
+            "error": 0.0004097158505181299,
+            "h1": 1.9880909968967215,
+            "multiplier": 0.0,
+            "kkt": 2.098156351524472e-16,
+            "H1_ranks": [
+              263,
+              263,
+              263
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/conservative-k0-a0.2-n2.npz",
+      "artifact_sha256": "1297116cddc4e5b9db7391c1af6b544c387bc0b4a7d98cdb43c65a258d54579d"
+    },
+    {
+      "method": "raw",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "nullity": 6,
+      "ranks9": [
+        426,
+        426,
+        426
+      ],
+      "ranks11": [
+        426,
+        426,
+        426
+      ],
+      "metrics": {
+        "anchor": 2.24719676337524e-13,
+        "orthogonal": 2.8171690272218845e-15,
+        "projector": 9.920947506866528e-13,
+        "kernel": 1.0105777077117509e-16
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.685119886943577e-15,
+          "h1": 1.2336900743609196,
+          "fit": {
+            "error": 2.223777880988561e-15,
+            "h1": 1.233690074360908,
+            "multiplier": 0.0,
+            "kkt": 4.398349341534517e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.7083778640525327e-15,
+          "h1": 0.6590319606013838,
+          "fit": {
+            "error": 2.073279003232509e-15,
+            "h1": 0.6590319606013791,
+            "multiplier": 0.0,
+            "kkt": 4.682948085718339e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.03701379256300405,
+          "h1": 0.5030521062660633,
+          "fit": {
+            "error": 0.03701379256300342,
+            "h1": 0.5030521062660611,
+            "multiplier": 0.0,
+            "kkt": 4.566726006111418e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.008324743462207598,
+          "h1": 2.1311347214735545,
+          "fit": {
+            "error": 0.008324743462207056,
+            "h1": 2.1311347214735346,
+            "multiplier": 0.0,
+            "kkt": 4.835796702823669e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/raw-k0.4-a0-n2.npz",
+      "artifact_sha256": "491dd4b47e778b57aebb9ce1c12643f5a3c5382251bdf6a8912fa9c12d1b3a70"
+    },
+    {
+      "method": "nodal",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "nullity": 6,
+      "ranks9": [
+        426,
+        426,
+        426
+      ],
+      "ranks11": [
+        426,
+        426,
+        426
+      ],
+      "metrics": {
+        "anchor": 7.24118898687229e-13,
+        "orthogonal": 1.5794426236402379e-15,
+        "projector": 1.0726273372436137e-12,
+        "kernel": 7.514209111135166e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 4.933093739138531e-07,
+          "h1": 1.2336900808448275,
+          "fit": {
+            "error": 4.933093737590291e-07,
+            "h1": 1.2336900808448152,
+            "multiplier": 0.0,
+            "kkt": 4.3544692917377757e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.112941864903675e-06,
+          "h1": 0.6590319543420837,
+          "fit": {
+            "error": 2.1129418647778756e-06,
+            "h1": 0.6590319543420792,
+            "multiplier": 0.0,
+            "kkt": 4.918621495994238e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.03700914043040953,
+          "h1": 0.5029475074896688,
+          "fit": {
+            "error": 0.03700914043040942,
+            "h1": 0.5029475074896664,
+            "multiplier": 0.0,
+            "kkt": 3.8112358467882856e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.008323720564081372,
+          "h1": 2.1311256322787524,
+          "fit": {
+            "error": 0.008323720564081318,
+            "h1": 2.131125632278734,
+            "multiplier": 0.0,
+            "kkt": 3.431179677868266e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": false,
+        "cubic": false,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/nodal-k0.4-a0-n2.npz",
+      "artifact_sha256": "3bcb8c791e959f6bc78f5f5d4797d62aec50251f93d523acc05ba99f46181b6b"
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "nullity": 6,
+      "ranks9": [
+        426,
+        426,
+        426
+      ],
+      "ranks11": [
+        426,
+        426,
+        426
+      ],
+      "metrics": {
+        "anchor": 3.1267990870617776e-13,
+        "orthogonal": 1.3594278699989937e-15,
+        "projector": 1.1312412518675437e-12,
+        "kernel": 7.513281130157332e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 4.933093736214077e-07,
+          "h1": 1.2336900808448275,
+          "fit": {
+            "error": 4.93309373759431e-07,
+            "h1": 1.2336900808448144,
+            "multiplier": 0.0,
+            "kkt": 2.678465779089885e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.1129418648416297e-06,
+          "h1": 0.6590319543420832,
+          "fit": {
+            "error": 2.1129418647952114e-06,
+            "h1": 0.6590319543420787,
+            "multiplier": 0.0,
+            "kkt": 2.7087600039692227e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.03700914043040989,
+          "h1": 0.5029475074896703,
+          "fit": {
+            "error": 0.03700914043040982,
+            "h1": 0.5029475074896678,
+            "multiplier": 0.0,
+            "kkt": 5.158885105777429e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.008323720564081455,
+          "h1": 2.1311256322787497,
+          "fit": {
+            "error": 0.008323720564081441,
+            "h1": 2.131125632278732,
+            "multiplier": 0.0,
+            "kkt": 3.7893399658797887e-16,
+            "H1_ranks": [
+              222,
+              222,
+              222
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": false,
+        "cubic": false,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/conservative-k0.4-a0-n2.npz",
+      "artifact_sha256": "2f2f60141071199e3d2f98f8fdf5402c2d4910c33de1b11e086bf68e3e26e04d"
+    },
+    {
+      "method": "raw",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 3,
+      "ranks9": [
+        429,
+        429,
+        429
+      ],
+      "ranks11": [
+        429,
+        429,
+        429
+      ],
+      "metrics": {
+        "anchor": 1.2244918528119601e-12,
+        "orthogonal": 9.28429611709287e-16,
+        "projector": 2.045861539359329e-12,
+        "kernel": 8.536462305150262e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 2.55418917020409e-15,
+          "h1": 1.233690074360922,
+          "fit": {
+            "error": 2.1252210908461595e-15,
+            "h1": 1.2336900743609118,
+            "multiplier": 0.0,
+            "kkt": 2.337883599006017e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 2.5899893904464994e-15,
+          "h1": 0.6590319606013826,
+          "fit": {
+            "error": 2.0321578934382505e-15,
+            "h1": 0.6590319606013807,
+            "multiplier": 0.0,
+            "kkt": 4.3616543229192327e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860310107034683,
+          "h1": 0.5730145864589941,
+          "fit": {
+            "error": 0.1486031010703467,
+            "h1": 0.5730145864589934,
+            "multiplier": 0.0,
+            "kkt": 1.6296237986782927e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.03184017664503774,
+          "h1": 2.1460121419373226,
+          "fit": {
+            "error": 0.031840176645037827,
+            "h1": 2.14601214193731,
+            "multiplier": 0.0,
+            "kkt": 8.557219617665454e-17,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/raw-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "631e270ae3ba778dad02c21a40352ba0308e8c84eb9bbf8be6f371d4f0f3cac2"
+    },
+    {
+      "method": "nodal",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 3,
+      "ranks9": [
+        429,
+        429,
+        429
+      ],
+      "ranks11": [
+        429,
+        429,
+        429
+      ],
+      "metrics": {
+        "anchor": 1.9604978605115026e-12,
+        "orthogonal": 5.755780078234276e-16,
+        "projector": 3.3672659811060826e-12,
+        "kernel": 6.209858134287262e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 6.895059233444384e-07,
+          "h1": 1.233690087145882,
+          "fit": {
+            "error": 6.895059234005991e-07,
+            "h1": 1.2336900871458707,
+            "multiplier": 0.0,
+            "kkt": 5.61010607979149e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.201935695764395e-06,
+          "h1": 0.6590319470729123,
+          "fit": {
+            "error": 3.20193569577458e-06,
+            "h1": 0.6590319470729101,
+            "multiplier": 0.0,
+            "kkt": 3.957439472163633e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860324829845772,
+          "h1": 0.5725116266973318,
+          "fit": {
+            "error": 0.1486032482984577,
+            "h1": 0.572511626697331,
+            "multiplier": 0.0,
+            "kkt": 4.4404294943349317e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.031840068084313916,
+          "h1": 2.14597048091399,
+          "fit": {
+            "error": 0.03184006808431393,
+            "h1": 2.1459704809139772,
+            "multiplier": 0.0,
+            "kkt": 7.265098731106114e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": false,
+        "cubic": false,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/nodal-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "e5bd6550829249f15a5425028fd1386ac7327211b9b1111a1795210561fb5f2c"
+    },
+    {
+      "method": "conservative",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "nullity": 3,
+      "ranks9": [
+        429,
+        429,
+        429
+      ],
+      "ranks11": [
+        429,
+        429,
+        429
+      ],
+      "metrics": {
+        "anchor": 8.445745185229015e-13,
+        "orthogonal": 3.5493646260595723e-16,
+        "projector": 2.9138336736449392e-12,
+        "kernel": 6.374717693905099e-17
+      },
+      "solutions": {
+        "quadratic": {
+          "error": 6.895059233553128e-07,
+          "h1": 1.2336900871458782,
+          "fit": {
+            "error": 6.895059233975436e-07,
+            "h1": 1.2336900871458678,
+            "multiplier": 0.0,
+            "kkt": 6.515586912842915e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "cubic": {
+          "error": 3.201935695706425e-06,
+          "h1": 0.6590319470729112,
+          "fit": {
+            "error": 3.2019356957621054e-06,
+            "h1": 0.6590319470729089,
+            "multiplier": 0.0,
+            "kkt": 4.782107748826759e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "quartic": {
+          "error": 0.14860324829845784,
+          "h1": 0.5725116266973316,
+          "fit": {
+            "error": 0.14860324829845772,
+            "h1": 0.5725116266973309,
+            "multiplier": 0.0,
+            "kkt": 2.757749999007867e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        },
+        "exponential": {
+          "error": 0.031840068084313874,
+          "h1": 2.145970480913986,
+          "fit": {
+            "error": 0.03184006808431392,
+            "h1": 2.1459704809139724,
+            "multiplier": 0.0,
+            "kkt": 6.586400370492038e-16,
+            "H1_ranks": [
+              219,
+              219,
+              219
+            ],
+            "H1_nullity": 0,
+            "unpenalized_rank": 0,
+            "unpenalized_nonuniqueness": 0
+          }
+        }
+      },
+      "checks": {
+        "rank": true,
+        "anchor": true,
+        "projector": true,
+        "kernel": true,
+        "quadratic": false,
+        "cubic": false,
+        "quartic": true,
+        "exponential": true,
+        "resources": true
+      },
+      "error": null,
+      "artifact": "build/analysis/qem-conservative-20261103-230113/conservative-k0.4-a0.2-n2.npz",
+      "artifact_sha256": "f8d32cc06a241a1e85a5bf82fade3f21bd46604db978a613ad1dbe78669e6063"
+    }
+  ],
+  "conservative_local_pass": true,
+  "native_work_pass": false,
+  "all_shared_numerical_checks": false,
+  "stop_reason": null,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/check_qem_conservative.py": "2b185bc762cd94676ccfa03990f75ca0d41fc4d284560aee14cfa31d6d3cef81",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/q4-projection/qem-conservative-formulation.md": "d40f6bae9af7c533451dec65a20a02283c928981dbe7d1aa069abc67b462d72f",
+    "rd/structure/main-shell/q4-projection/records/qem-conservative-protocol.md": "fc3d9601bbb34d035e38bd646ce88c36eb6f033eeab5ad230d9e8204404f2d56",
+    "rd/structure/main-shell/q4-projection/records/qem-conservative-preparation.json": "715b015c26413e05d1847692bf0774bf445df677f9881b49013d323c9783337b"
+  },
+  "seconds": 23.48399999999674,
+  "peak_bytes": 170434560
+}

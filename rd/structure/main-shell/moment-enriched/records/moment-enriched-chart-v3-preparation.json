@@ -1,0 +1,7 @@
+{
+  "reason": "Correct relative error helper: its callers already pass the difference. v2 subtracted the reference twice. Geometry/chart/operator and thresholds unchanged.",
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_chart_v3.py": "8b5f87c94f8ed44a05469d87399a868c62c565323990d8b832a9dc9666e2abae",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-chart-v2-result.json": "a9b159b1a001b9e5b31ffc62f13f6af4f22df0797e3371fa79848c93422190ca"
+  }
+}

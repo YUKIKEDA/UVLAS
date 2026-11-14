@@ -1,0 +1,1392 @@
+{
+  "records": [
+    {
+      "geometry": "k0-a0",
+      "h": 0.01,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 2.779569467182001e-14,
+        "constant_P_work": 1.0470395190312295e-15,
+        "rigid": 2.0647337572211607e-18,
+        "energy_force": 3.360576147219115e-16,
+        "force_tangent": 8.056945341316559e-16,
+        "rotation_energy": 3.40414094261185e-13,
+        "rotation_force": 1.7445604353794056e-12,
+        "flux_dual": 2.803507318189099e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.6904632876143988e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0-a0-0.01.npz",
+      "artifact_sha256": "bde0dbd7ea1243d6be97a1455fa69f478bb27eb5a7d86e7a3b65dd750956e1fb",
+      "kappa": 0.0,
+      "independent": {
+        "energy": 6.587597373220803e-16,
+        "force": 4.5502439393301826e-15,
+        "tangent": 3.0884957141713477e-15
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 4.51326399817731e-14,
+        "constant_P_force": 3.2577063067831195e-12,
+        "self_adjoint": 2.549569171235444e-19,
+        "idempotence": 2.4117818789708466e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 174,
+        "constant_completion": 0,
+        "coefficient_condition": 3.0993988724817045,
+        "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 174,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 174,
+          "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 1.2908952333944339e-16,
+        "seconds": 0.015999999945051968
+      },
+      "stress_gram_condition": 3.250000000000005
+    },
+    {
+      "geometry": "k0-a0",
+      "h": 0.001,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 2.923583550813352e-13,
+        "constant_P_work": 1.050335106541408e-15,
+        "rigid": 2.739528397830544e-18,
+        "energy_force": 4.090870300385664e-15,
+        "force_tangent": 5.136469305096457e-15,
+        "rotation_energy": 7.664830915082801e-12,
+        "rotation_force": 3.5103904051979466e-11,
+        "flux_dual": 2.2430663012535484e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.693699900385856e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0-a0-0.001.npz",
+      "artifact_sha256": "b9b56fe44526211017e93d9d0b29c7c95b9856406dc204480a47a84e6a9d95d3",
+      "kappa": 0.0,
+      "independent": {
+        "energy": 2.484011315247748e-15,
+        "force": 3.024425907402577e-14,
+        "tangent": 2.0973916329143866e-14
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 3.4989193117182673e-13,
+        "constant_P_force": 2.0440366643891177e-11,
+        "self_adjoint": 1.9905274260476058e-20,
+        "idempotence": 2.334370318469677e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 174,
+        "constant_completion": 0,
+        "coefficient_condition": 3.0993988724817045,
+        "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 174,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 174,
+          "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 1.2908952333944339e-16,
+        "seconds": 0.015999999945051968
+      },
+      "stress_gram_condition": 3.250000000000008
+    },
+    {
+      "geometry": "k0-a0",
+      "h": 0.0001,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 2.673960628884783e-12,
+        "constant_P_work": 9.916534985920937e-16,
+        "rigid": 2.325344886218331e-18,
+        "energy_force": 4.933465431373148e-15,
+        "force_tangent": 1.5731344480662416e-14,
+        "rotation_energy": 3.3498183132671174e-11,
+        "rotation_force": 2.3495126694873955e-10,
+        "flux_dual": 2.8285128425032124e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.6725125657303373e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0-a0-0.0001.npz",
+      "artifact_sha256": "3eccc8c00afc2c9f221e577f101dac0f8e503c5ec04edb8c69d2e631c488495a",
+      "kappa": 0.0,
+      "independent": {
+        "energy": 8.788403209722858e-14,
+        "force": 2.607982420946747e-13,
+        "tangent": 1.5389358731082799e-15
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 5.93446252832726e-12,
+        "constant_P_force": 3.750133017912472e-10,
+        "self_adjoint": 8.999725064576941e-22,
+        "idempotence": 2.332130967978502e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 174,
+        "constant_completion": 0,
+        "coefficient_condition": 3.0993988724817045,
+        "coefficient_basis_sha256": "61408dd9d23d1c0d6bc6e9cfb4a4a235a8d045fa614d99c720d7fb7932cc5c12",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 174,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 174,
+          "rational_space_sha256": "f8a5d5e19ed3a5fc11fc53144288b7ea64ed31180329d3e74dd81cfe2c006385",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 1.2908952333944339e-16,
+        "seconds": 0.015999999945051968
+      },
+      "stress_gram_condition": 3.250000000000004
+    },
+    {
+      "geometry": "k0-a0.2",
+      "h": 0.01,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 3.476564052341475e-14,
+        "constant_P_work": 1.1538149940038087e-15,
+        "rigid": 2.1485400584638694e-18,
+        "energy_force": 2.265165014012168e-15,
+        "force_tangent": 5.1763992733800706e-15,
+        "rotation_energy": 2.3718583270629664e-13,
+        "rotation_force": 1.5991869479778472e-12,
+        "flux_dual": 3.118011113113011e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.689515030086377e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0-a0.2-0.01.npz",
+      "artifact_sha256": "d6d518ce8fa92c35f8b81418aabf1e8afb587d053f8ed62d0eac7a262b11af7b",
+      "kappa": 0.0,
+      "independent": {
+        "energy": 1.2093605236777395e-15,
+        "force": 4.803645917997567e-15,
+        "tangent": 1.1764543803136525e-14
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 4.4207054772474436e-14,
+        "constant_P_force": 3.257411754234226e-12,
+        "self_adjoint": 7.792703114739563e-20,
+        "idempotence": 2.1992363277898982e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 174,
+        "constant_completion": 0,
+        "coefficient_condition": 3.18665795725535,
+        "coefficient_basis_sha256": "e7e413609ab0c0efda95fa975e9d0b2c8cce7fefb60c268e6e10bb8dff8568ba",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 174,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 174,
+          "rational_space_sha256": "9349891b939d45d158ed11c985bd9ef91ed605925720df40eca48dc99caab4d8",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 2.7797500817321286e-16,
+        "seconds": 0.0470000000204891
+      },
+      "stress_gram_condition": 3.830936817830044
+    },
+    {
+      "geometry": "k0-a0.2",
+      "h": 0.001,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 3.6166997456316316e-13,
+        "constant_P_work": 1.1539497779130612e-15,
+        "rigid": 2.6915852676874778e-18,
+        "energy_force": 2.609338445084872e-15,
+        "force_tangent": 3.377853002637695e-15,
+        "rotation_energy": 5.441105690709262e-12,
+        "rotation_force": 2.869190808667258e-11,
+        "flux_dual": 3.0259706735445848e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.6936899703303014e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0-a0.2-0.001.npz",
+      "artifact_sha256": "860e6d2bb87467966ec953b4e815e434e7ebb355d13263bc7369353ae3f876e5",
+      "kappa": 0.0,
+      "independent": {
+        "energy": 4.36960303373998e-15,
+        "force": 3.037764594876286e-14,
+        "tangent": 3.5655115027842333e-14
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 3.521022839104509e-13,
+        "constant_P_force": 2.044100915209372e-11,
+        "self_adjoint": 2.117582368135751e-22,
+        "idempotence": 2.2092318689505752e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 174,
+        "constant_completion": 0,
+        "coefficient_condition": 3.18665795725535,
+        "coefficient_basis_sha256": "e7e413609ab0c0efda95fa975e9d0b2c8cce7fefb60c268e6e10bb8dff8568ba",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 174,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 174,
+          "rational_space_sha256": "9349891b939d45d158ed11c985bd9ef91ed605925720df40eca48dc99caab4d8",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 2.7797500817321286e-16,
+        "seconds": 0.0470000000204891
+      },
+      "stress_gram_condition": 3.83093681783005
+    },
+    {
+      "geometry": "k0-a0.2",
+      "h": 0.0001,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 3.518929149516305e-12,
+        "constant_P_work": 1.1141576712523204e-15,
+        "rigid": 2.32698260422311e-18,
+        "energy_force": 2.599253058355465e-15,
+        "force_tangent": 7.497893400242904e-16,
+        "rotation_energy": 5.808264115497368e-11,
+        "rotation_force": 2.2952832744766048e-10,
+        "flux_dual": 2.3326800736526037e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.6725124666882425e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0-a0.2-0.0001.npz",
+      "artifact_sha256": "b7a1fc1bf7543c36c3a95339ec337f4487f29c57c601e4e3f5a2bbf99be4fbfd",
+      "kappa": 0.0,
+      "independent": {
+        "energy": 6.699759815156734e-14,
+        "force": 2.752461584778815e-13,
+        "tangent": 3.8689129945253384e-14
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 5.9323363589448925e-12,
+        "constant_P_force": 3.750174081996088e-10,
+        "self_adjoint": 1.5881867761018131e-21,
+        "idempotence": 2.193870202187114e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 174,
+        "constant_completion": 0,
+        "coefficient_condition": 3.18665795725535,
+        "coefficient_basis_sha256": "e7e413609ab0c0efda95fa975e9d0b2c8cce7fefb60c268e6e10bb8dff8568ba",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 174,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 174,
+          "rational_space_sha256": "9349891b939d45d158ed11c985bd9ef91ed605925720df40eca48dc99caab4d8",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 2.7797500817321286e-16,
+        "seconds": 0.0470000000204891
+      },
+      "stress_gram_condition": 3.830936817830044
+    },
+    {
+      "geometry": "k0.4-a0",
+      "h": 0.01,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 3.527039434377878e-14,
+        "constant_P_work": 1.2492958672988227e-15,
+        "rigid": 3.092310991386721e-18,
+        "energy_force": 1.5828639851707128e-16,
+        "force_tangent": 3.22090572663444e-15,
+        "rotation_energy": 4.458937208710522e-13,
+        "rotation_force": 1.8387142511719158e-12,
+        "flux_dual": 2.6094813163170243e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.7005183197053067e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0.4-a0-0.01.npz",
+      "artifact_sha256": "6f446c30b54b1d5ce37cf4a74d72f548d1d5b0d7639e4a68107de1f0b0575dc8",
+      "kappa": 0.4,
+      "independent": {
+        "energy": 1.0978393692174347e-12,
+        "force": 7.215459218283574e-12,
+        "tangent": 4.796432768724589e-11
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 2.2944224871116727e-14,
+        "constant_P_force": 5.8126520208318925e-12,
+        "self_adjoint": 1.3552527156068805e-20,
+        "idempotence": 2.262657397913346e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 177,
+        "constant_completion": 3,
+        "coefficient_condition": 3.2167818994583435,
+        "coefficient_basis_sha256": "9893086c11a7cc0dbedaf082c63079f5dbc9273984a5bd41461b62607e71ecc4",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 177,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 177,
+          "rational_space_sha256": "6496cbc343eac64b2100d35e62e65a10d510abe7a0df69d8475a62a88979bd94",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 3.640137480372215e-16,
+        "seconds": 0.2190000000409782
+      },
+      "stress_gram_condition": 3.6039399318837617
+    },
+    {
+      "geometry": "k0.4-a0",
+      "h": 0.001,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 3.431889230724018e-13,
+        "constant_P_work": 1.0904597978850306e-15,
+        "rigid": 3.516018534974827e-18,
+        "energy_force": 6.773840217537325e-15,
+        "force_tangent": 3.664601441897239e-15,
+        "rotation_energy": 3.2278776160675387e-14,
+        "rotation_force": 1.6442199324419658e-11,
+        "flux_dual": 3.2372883687308345e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.6801622371260225e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": true,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0.4-a0-0.001.npz",
+      "artifact_sha256": "6c26c69fdb3c65fb8b856f3b768c951ff9c1c67d2b575e11bf1fb854d35e3a85",
+      "kappa": 0.4,
+      "independent": {
+        "energy": 3.332002700456814e-15,
+        "force": 7.45262704801497e-14,
+        "tangent": 4.85171021201486e-13
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 8.855271102218577e-13,
+        "constant_P_force": 6.108889426371945e-11,
+        "self_adjoint": 1.9164120431628545e-20,
+        "idempotence": 2.251720047181519e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 177,
+        "constant_completion": 3,
+        "coefficient_condition": 3.2167818994583435,
+        "coefficient_basis_sha256": "9893086c11a7cc0dbedaf082c63079f5dbc9273984a5bd41461b62607e71ecc4",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 177,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 177,
+          "rational_space_sha256": "6496cbc343eac64b2100d35e62e65a10d510abe7a0df69d8475a62a88979bd94",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 3.640137480372215e-16,
+        "seconds": 0.2190000000409782
+      },
+      "stress_gram_condition": 3.603940252267474
+    },
+    {
+      "geometry": "k0.4-a0",
+      "h": 0.0001,
+      "nscalar": 186,
+      "ni": 126,
+      "mixed_dimension": 282,
+      "mixed_completion_ranks": [
+        0,
+        0,
+        0
+      ],
+      "bubble_ranks": [
+        2,
+        2,
+        2
+      ],
+      "face_dimensions": [
+        25,
+        25,
+        15,
+        15,
+        15,
+        15
+      ],
+      "face_completion_ranks": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "ranks": [
+        552,
+        552,
+        552
+      ],
+      "gram_error": 1.1102230246251565e-16,
+      "metrics": {
+        "reference_gradient": 3.7598006159328215e-12,
+        "constant_P_work": 1.2507438989913334e-15,
+        "rigid": 3.4003749914858072e-18,
+        "energy_force": 1.0487458792802016e-15,
+        "force_tangent": 1.773517684529784e-16,
+        "rotation_energy": 3.046776996821316e-11,
+        "rotation_force": 2.228096377229097e-10,
+        "flux_dual": 2.8411445649594457e-15
+      },
+      "work": {
+        "fields": 49,
+        "volume_error_work": 2.9952552932512683e-15,
+        "vertical_error_work": 8.862707531464729e-16,
+        "top_bottom_error_work": 5.289945843715251e-16,
+        "weak_commutation": 5.181677497792184e-15,
+        "body_work": 3.625403772784678e-15,
+        "decomposition": 2.72706308357054e-15
+      },
+      "polynomial": {
+        "fields": 47,
+        "gradient_error": 2.672897286429443e-15,
+        "stabilization_residual": 9.514034843674168e-15,
+        "passed": true
+      },
+      "checks": {
+        "rank": true,
+        "identities": true,
+        "work": true,
+        "polynomial": true,
+        "potential_rank": true,
+        "gram": true,
+        "orientation": true,
+        "independent": true,
+        "mixed": false,
+        "stress_gram": true,
+        "resources": true
+      },
+      "artifact": "build/analysis/mixed-mean-stress-local-20261104-160439/k0.4-a0-0.0001.npz",
+      "artifact_sha256": "544393dc21a16e2fe2ddd193931707c4384f19cf620f58010b1d2509926fe6b2",
+      "kappa": 0.4,
+      "independent": {
+        "energy": 2.122527119993651e-14,
+        "force": 2.694005776551505e-13,
+        "tangent": 3.2810077163801e-14
+      },
+      "mixed_metrics": {
+        "constant_F_energy": 3.983138057435793e-12,
+        "constant_P_force": 1.0533932401819849e-09,
+        "self_adjoint": 4.1028158382630173e-22,
+        "idempotence": 2.2833124174578466e-16
+      },
+      "stress_space": {
+        "mem_rank": 69,
+        "normal_shear_rank": 105,
+        "combined_rank": 174,
+        "stress_rank": 177,
+        "constant_completion": 3,
+        "coefficient_condition": 3.2167818994583435,
+        "coefficient_basis_sha256": "9893086c11a7cc0dbedaf082c63079f5dbc9273984a5bd41461b62607e71ecc4",
+        "exact_space_certificate": {
+          "mem_upper_rank": 69,
+          "joint_upper_rank": 174,
+          "upper_rank": 177,
+          "three_rigid_identities": [
+            true,
+            true,
+            true
+          ],
+          "constant_stress_identities": [
+            true,
+            true,
+            true
+          ],
+          "pointwise_membrane_director_orthogonality": true,
+          "modular_primes": [
+            1000000007,
+            1000000009
+          ],
+          "exact_lower_rank": 177,
+          "rational_space_sha256": "6496cbc343eac64b2100d35e62e65a10d510abe7a0df69d8475a62a88979bd94",
+          "basis_preprocessing_decimal_digits": 80
+        },
+        "coefficient_projection_error": 3.640137480372215e-16,
+        "seconds": 0.2190000000409782
+      },
+      "stress_gram_condition": 3.603940255471296
+    }
+  ],
+  "stops": [
+    {
+      "geometry": "k0.4-a0",
+      "h": 0.0001,
+      "reason": "RuntimeError('MMS1_local_gate')"
+    }
+  ],
+  "all_local_checks": false,
+  "main_shell_adopted": false,
+  "conditional_benchmark_only": true,
+  "seconds": 24.0,
+  "peak_bytes": 659501056,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_local.py": "1dd7eef60b96b39da8e45d4a248790f49c3cefb550a21b30a479f8cd8543740e",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element.py": "fbeef50d24c6120e58f42cfa7009295688f55a56eb7226805a24d95d1a135ea1",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_space_v4.py": "168a19b51c050e2c76f6b9e2886c28f1964d11da611831690d6c8c51d7b30852",
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_local_v2.py": "730203f470bafa22da5354b3d8aa0247d47c8bd6d03627edf0847cfb71d04521",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-local-protocol.md": "0aadc2609dc75d1456dbe5f970b6c198e89e007948b603a191f7fd56839e3d78",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-thin-v6-result.json": "072e0b3e278633404f5c5cfecf9bc160534dc1c800455ff12d65faa1d1fb5678"
+  }
+}

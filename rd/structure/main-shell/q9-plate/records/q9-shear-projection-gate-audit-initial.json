@@ -1,0 +1,9 @@
+{
+  "source_sha256": "7ff2b4541225fc441309cb380a30c2724aeaea51d6f7cfeeb7bda705145951d2",
+  "status": "failed_audit_comparison",
+  "reason": "TRAP compared order9 primary against order7 independent full matrix at a same-order tolerance",
+  "measured_relative_difference": 7.658228485403218e-10,
+  "threshold": 1e-10,
+  "primary_candidate_changed": false,
+  "correction": "Compare independent order9 to stored primary order9; retain original 7/9 primary gate separately"
+}

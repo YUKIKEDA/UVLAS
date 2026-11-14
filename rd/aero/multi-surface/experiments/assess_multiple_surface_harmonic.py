@@ -1,0 +1,11 @@
+import sys,pathlib;sys.path.insert(0,str(next(p for p in pathlib.Path(__file__).resolve().parents if (p/'rd_paths.py').is_file())));import rd_paths
+from pathlib import Path
+import json,hashlib,numpy as np
+ROOT=rd_paths.ROOT;OUT=ROOT/'build/analysis/multiple-surface-harmonic'
+def main():
+    paths=[];records=[]
+    for d in [0,5]:
+        for m,n in [(2,8),(4,16),(8,32)]:
+            p=[OUT/f'{side}-d{d}-m{m}-n{n}.npz' for side in ['candidate','reference']];paths+=p;a,b=[np.load(q) for q in p];errors={key:float(np.linalg.norm(a[key]-b[key])/np.linalg.norm(b[key])) for key in ['A','gamma','dual']};raw=float(np.linalg.norm(a['dual']-b['native'])/np.linalg.norm(b['native']));closure=float(np.linalg.norm(b['native']+b['observation_difference']-b['dual'])/np.linalg.norm(b['dual']));passed=max(errors.values())<1e-9 and closure<1e-14;records.append(dict(dihedral=d,m=m,n=n,errors=errors,native_observation_raw_difference=raw,observation_identity_error=closure,passed=bool(passed)))
+    paths+=[Path(__file__),ROOT/'rd/aero/multi-surface/experiments/run_multiple_surface_harmonic.py',ROOT/'rd/aero/multi-surface/records/multiple-surface-harmonic-protocol.md'];result=dict(passed=all(r['passed'] for r in records),scope='harmonic independent operators and common load observable on two wings; native observation differences retained; not continuum accuracy',records=records,sources={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in paths});dest=ROOT/'rd/aero/multi-surface/records/multiple-surface-harmonic-result.json';assert not dest.exists();dest.write_text(json.dumps(result,indent=2),encoding='utf-8');print(json.dumps(result,indent=2))
+if __name__=='__main__':main()

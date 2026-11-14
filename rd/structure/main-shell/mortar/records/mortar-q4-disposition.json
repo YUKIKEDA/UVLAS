@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-04",
+  "status": "three_joint_trace_bulk_configurations_closed_rejected",
+  "main_shell_adopted": false,
+  "roadmap_1_1_complete": false,
+  "waiting_for_user_confirmation": false,
+  "configurations": [
+    {
+      "name": "raw_bulk_mortar_p0",
+      "adopted": false,
+      "reason": "extra_free_flat_zero_mode"
+    },
+    {
+      "name": "raw_bulk_mortar_p1",
+      "adopted": false,
+      "reason": "curved_approximation_not_improved_and_general_nonlinear_quadrature_not_converged"
+    },
+    {
+      "name": "tying_bulk_mortar_p1",
+      "adopted": false,
+      "reason": "distorted_curved_approximation_improvement_below_predeclared_gate",
+      "all_numerical_audits_pass": true
+    }
+  ],
+  "local_evaluations": 18,
+  "interface_configurations": 12,
+  "shared_thin_problems": 8,
+  "constant_F_patch_evaluations": 72,
+  "nonlinear_equilibrium_solves": 2,
+  "nonlinear_equilibrium_checks_pass": true,
+  "general_nonlinear_raw_quadrature_audit_pass": false,
+  "joint_tying_all_audits_pass": true,
+  "finite_thickness_new_cases": 0,
+  "membrane_convergence_cases": 0,
+  "thresholds_relaxed": false,
+  "internal_full_Q4_membrane_identity_replaced_before_joint_run": true,
+  "raw_sector_proof_applies_to_joint_assumed_strain_full_kernel": false,
+  "source_hash_checks": 75,
+  "artifact_hash_checks": 28,
+  "python_ast_files": 14,
+  "closure_failures": [],
+  "closure_pass": true,
+  "sources": {
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-audit.json": "8a4f4d0ecb2d500902f94b42c88e9f372958837be1d51c4ebfb41bb17db9ae12",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-equilibrium-preparation.json": "f0da612aafaeba547160ae536a44ad1d7ad98aabac55b07980f7d3aab73c48df",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-equilibrium-result.json": "edd08ec874c6374b5c33ed27adf33df4857540054bfa83bdea960d41f7606128",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-preparation.json": "3099b274b8ad5b75c8d6c605b0ffaaf06cd6e7f491ca036110107533b7b9c240",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-result.json": "aa95ec2435542f69952b228aebbb49d3f115be487259dbbdf0960c2aa1356873",
+    "rd/structure/main-shell/mortar/records/mortar-q4-audit-v2-preparation.json": "ff117f5f65ffc80b3e2f33477b8b0a18c0fbda00965dfa70abe3ce11109fa1a1",
+    "rd/structure/main-shell/mortar/records/mortar-q4-audit-v2.json": "87ef5474111139ddf0a350d2b92dfb943d13de09cc8a76a42bbd4696ab24d6d0",
+    "rd/structure/main-shell/mortar/records/mortar-q4-audit.json": "520e32eb734f58fd1a3bf6b5e3909a57038ce1b1d8fa2222b58b97e26169e6be",
+    "rd/structure/main-shell/mortar/records/mortar-q4-equilibrium-preparation.json": "29b0c0cb1a8329a18d13976c5a088498a7e60086391ac87bad588a5c396853f7",
+    "rd/structure/main-shell/mortar/records/mortar-q4-equilibrium-result.json": "1330f6369684f6901671194319acfd2b6dc576f4e77c6b24e8541b0a29ecbf3c",
+    "rd/structure/main-shell/mortar/records/mortar-q4-preparation.json": "38c334dff9bdaefdaddb84cade0fcbbdaec9e2395605325c99e4ef5f97945e7e",
+    "rd/structure/main-shell/mortar/records/mortar-q4-result.json": "8df6126cbe758482246aa6691759192fea73aef92ad1f9a86755bdb598d95302",
+    "rd/structure/main-shell/mortar/records/mortar-q4-sector-audit.json": "bd940a432f3e3c1aed9c2d7f774075eb17fc76e7a05e35b922690b2516daf8a6",
+    "rd/structure/main-shell/mortar/records/mortar-q4-sources.json": "cc0f6f6751aac7aee6623d29eb02c2c99ef9233f6aa411445cad6aa4b6e9f37e",
+    "rd/structure/main-shell/mortar/records/mortar-q4-results.md": "8f55bddcf94b5f04524e2487e4212bfdec27f19edd2ac2423ff90763ea5657de",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-results.md": "221d79e3451d5fb719756b40581278bd98cdef67a237f1f768a74796ca71826e"
+  }
+}

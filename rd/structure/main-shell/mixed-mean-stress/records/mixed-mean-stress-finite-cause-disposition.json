@@ -1,0 +1,24 @@
+{
+  "R1_completed": true,
+  "scope": "three saved n4 fields, original-point component energies and virtual work; not a new global solve",
+  "numerical_checks_passed": true,
+  "new_candidate_tested": false,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "single_cause_uniquely_identified": false,
+  "redesign_target": "Joint projected-mean stress and vertical-face trace compatibility for a common thickness-uniform bending lift; preserve all moment work and stability.",
+  "excluded_shortcuts": [
+    "delete projected mean work",
+    "delete face work",
+    "change thickness variation stiffness based only on energy fractions",
+    "claim a thickness-uniform bound proves the two-thickness error-ratio gate"
+  ],
+  "next": "R2: concrete common bending lift, mean projection, trace and weak-gradient spaces with general-reference geometry definition; no candidate code before definition.",
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-cause-result.json": "2a9f011520a971c70625ee2fa3ecfc5751a7deac48936a2d14c5d6f08ceb5de6",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-cause-protocol.md": "2ce3314da5bd5b4c355288487c907f1336b6af25070b71ffb6cdfbe7d75b275c",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-cause-preparation.json": "e44c5cb3b9c46075f6f8a4ab4cb2ed2306111be9dd297b2a7c37540132f5d9ff",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-cause-results.md": "18148527c0bfa247b071c429e4be4bca649de809bbb488f39570ad4fb6993c29",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-curved-disposition.json": "8c70b6a5b718248fc095e0ce94db21bb01d813ecb8e1d28fd0b064421b033392"
+  }
+}

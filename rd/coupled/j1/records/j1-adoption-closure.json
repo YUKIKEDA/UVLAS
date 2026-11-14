@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "structural_review_complete": true,
+  "uvlm_review_complete": true,
+  "j1_review_complete": true,
+  "product_implementation_start": false,
+  "current_work": "4 numerical foundations, concrete C++23 types and I/F, linear/eigen solvers, memory/performance and file formats",
+  "immutable": {
+    "rd/coupled/j1/records/j1-adoption-audit.json": "3c3044f80dbd0aabfe84a858980f4187d524e06f93518fcfcbec0d9d2d4b0603",
+    "rd/coupled/j1/records/j1-adoption-disposition.json": "d3886363b7daa68973a990522d7616302ada44496e815ad408a0b79516c49918",
+    "rd/coupled/j1/records/j1-adoption-completion.md": "950ef1d70812524ba36a216f7bf92cad748e17badabdeadb9aa44c098261d1fc",
+    "docs/specs/coupled/coupled-adopted-specification.md": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d"
+  },
+  "status_sync_source": {
+    "rd/coupled/j1/experiments/close_j1_adoption.py": "5e89328ec539d9c1ee1c6b5f53db09b3f6610f74cdf101d265a26f262d5fe3c5"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

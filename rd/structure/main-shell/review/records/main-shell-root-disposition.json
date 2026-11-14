@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-03",
+  "status": "deferral_proposal_A_withdrawn_main_shell_root_problem_remains_primary",
+  "user_direction": "Skipping is only postponement and does not solve the root problem",
+  "priority_answer_pending": false,
+  "proposal_A_adopted": false,
+  "material_point_contract_preserved": true,
+  "main_shell_adopted": false,
+  "root_countermeasure_validated": false,
+  "distorted_2x2_kernel_dimension": 2,
+  "known_bending_mode_dimension": 2,
+  "kernel_projector_difference": 1.1412141851928672e-16,
+  "reproduced_error": 0.1517194896744288,
+  "exact_sector_dimensions": [
+    4,
+    2
+  ],
+  "restricted_sector_lower_bound": 0.14681884647009852,
+  "finite_h_lower_bound": false,
+  "full_kernel_exactly_certified": false,
+  "new_candidate_selected": false,
+  "source_hash_closure_pass": true,
+  "artifact_hash_closure_pass": true,
+  "python_ast_pass": true,
+  "new_links_pass": true,
+  "supersedes_priority_only": "rd/structure/main-shell/mixed-order-150/records/mixed-order-150-and-material-disposition.json",
+  "sources": {
+    "rd/structure/main-shell/mixed-order-150/records/mixed-150-root-preparation.json": "5fb76672a7153f9f5727ac9da2089dc7f1f34159e94db24d85013de3ba33aa66",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-150-root-diagnostic.json": "d198eeb8ed5e20c7165af5fa4ddefb15cb3910cdc5a756548433b87a8b1e1bb5",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-150-root-audit.json": "9f978210b950ed56663457fa969b9b614752db93558590eb9249ed82085d9be8",
+    "rd/structure/main-shell/review/main-shell-root-cause.md": "732fe4980b0cf9837059d01367ff8f6b556175716df0bcdddae0d39ff8c4fa3c",
+    "rd/structure/main-shell/review/structural-progress-control-v2.md": "538d2e6e6031f505860e19fa21bed885a65790475dc7015f50ca021078a96bbc",
+    "rd/structure/main-shell/review/records/main-shell-root-sources.json": "762221282bac2140268a106f5ffe100082e76c52ae6dd4459a97dcd8bc756f47",
+    "rd/structure/main-shell/mixed-order-150/records/mixed-150-root-audit-v1-failure.json": "d5c5f75839b11a1dacfedeea4804a1e4efc29a4d70e5a759e4e7b021e0a9f8ea"
+  }
+}

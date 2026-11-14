@@ -1,0 +1,5 @@
+{
+  "reason": "Primary diagnostic interrupted during distorted curved exact Fraction basis preprocessing; completed first three configurations retained. No numerical acceptance failure or parameter change. Next version uses primitive integer fraction-free elimination of exactly the same rational space.",
+  "checkpoint": "build/analysis/mixed-mean-stress-20261104-153634/checkpoint.json",
+  "checkpoint_sha256": "253d97eaa2c15ae7a8d312b0404334591286209b3e728d25bcf1e6d6ff858f0f"
+}

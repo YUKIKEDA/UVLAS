@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "beam_1_3_complete": true,
+  "material_1_2_complete": true,
+  "main_shell_adopted": true,
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "1.4 connections supports mass and eccentric inertia",
+  "immutable": {
+    "docs/specs/structure/beam-adopted-specification.md": "a192a38dfcc81725af727b8637a51bcfa20f808202fe2cdf99bc99fc2bd11e8c",
+    "rd/structure/beam/records/beam-adoption-disposition.json": "3dd94749a5bf49d8ebdae9a46aa265c393164e3124d1d74dc7e4201ed8a63f36",
+    "rd/structure/beam/records/beam-adoption-results.md": "5200aa244fbccf50fba40461c29cf801891034835b90e27d1172fa342e2e9513",
+    "rd/structure/beam/records/beam-adoption-audit.json": "c75a496a55f56e4ac01a0f8a8a8144a18d12859ac291b634057749b189aae72c"
+  },
+  "status_sync_source": {
+    "rd/structure/beam/experiments/sync_beam_adoption_status.py": "55eae5bea7a5dcdcdbbe6eb2f05cf035b69d4fb2dc3c2ac8c3a01ec8ccf58e3a"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ],
+  "checked_status_links": 22
+}

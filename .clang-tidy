@@ -1,0 +1,37 @@
+# Static checks for product code, run by `just lint` and by CI.
+# Each group names the rule it serves (.cursor/rules/*.mdc). A check is added
+# together with the rule or the defect that motivates it; style is left to
+# clang-format.
+#
+#   bugprone-*                       cpp: silent narrowing, use after move, unchecked results
+#   cert-err33-c, cert-err58-cpp     cpp: failures are returned, never dropped or thrown at start-up
+#   cppcoreguidelines-init/member    numerics: no uninitialized value reaches a residual
+#   cppcoreguidelines-slicing        cpp: owned results are returned whole
+#   concurrency-mt-unsafe            performance: assembly tasks run in parallel
+#   misc-const-correctness           cpp: parents are read-only; a failed trial changes nothing
+#   modernize-use-nodiscard          cpp: an expected<> result is never ignored
+#   performance-*                    performance: no copies or conversions hidden in hot paths
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  cert-err33-c,
+  cert-err58-cpp,
+  concurrency-mt-unsafe,
+  cppcoreguidelines-init-variables,
+  cppcoreguidelines-pro-type-member-init,
+  cppcoreguidelines-slicing,
+  misc-const-correctness,
+  misc-unused-parameters,
+  modernize-use-nodiscard,
+  modernize-use-override,
+  performance-*
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*[/\\](include[/\\]uvlas|src|tests)[/\\].*'
+CheckOptions:
+  - key: bugprone-narrowing-conversions.WarnOnFloatingPointNarrowingConversion
+    value: true
+  - key: bugprone-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion
+    value: true
+  - key: bugprone-narrowing-conversions.PedanticMode
+    value: true

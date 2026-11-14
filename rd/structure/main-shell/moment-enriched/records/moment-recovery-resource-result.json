@@ -1,0 +1,33 @@
+{
+  "records": [
+    {
+      "name": "flat",
+      "seconds": 45.26500000001397,
+      "peak_bytes": 732594176,
+      "checks_reproduced": true,
+      "passed": true
+    },
+    {
+      "name": "curved-distorted",
+      "seconds": 45.85999999998603,
+      "peak_bytes": 1270087680,
+      "checks_reproduced": true,
+      "passed": true
+    },
+    {
+      "name": "quartic-reference",
+      "seconds": 7.217999999993481,
+      "peak_bytes": 1345310720,
+      "checks_reproduced": true,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "passed": true,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_recovery_resources.py": "b950d25bf28618b8ec9b76bf07c97776ce2b624e972ca51af0b6b50f611fefdf",
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_position_recovery.py": "200ff2c0473da5352a53ec3c71713b3f3d0db704be165074a3e0afb9712963fa",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_position_recovery.py": "be421f4139fd15940e34a8f8524c119bfcdf238c6088170490c0eb95379dc0c1",
+    "rd/structure/main-shell/moment-enriched/records/moment-position-recovery-result.json": "835d9326b3e5efc15ff297f2ac1085a7a822c89e2c9e4d9a77187b93db18c77c"
+  }
+}

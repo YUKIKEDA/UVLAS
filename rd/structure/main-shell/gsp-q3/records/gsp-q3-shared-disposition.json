@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "GSP_Q3_current_form_not_adopted_shared_progress_gate_failed",
+  "additional_local_conditions": 24,
+  "additional_shared_edge_checks": 24,
+  "shared_configurations": 4,
+  "shared_maps": 16,
+  "all_numerical_checks": true,
+  "all_alternate_evaluation_checks": true,
+  "both_curved_improved": false,
+  "physical_adoption": false,
+  "membrane_convergence_executed": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "finite_thickness_lower_bound": false,
+  "summary": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "nullity": 48,
+      "old_quartic_error": 2.800261857699284e-15,
+      "new_quartic_error": 2.955744956458146e-15,
+      "relative_reduction": -0.0555244854445891,
+      "progress_gate": null
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "nullity": 32,
+      "old_quartic_error": 9.531946667949078e-06,
+      "new_quartic_error": 0.0417880734623579,
+      "relative_reduction": -4383.002021629979,
+      "progress_gate": null
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "nullity": 8,
+      "old_quartic_error": 0.32998292955713154,
+      "new_quartic_error": 0.33003691715085176,
+      "relative_reduction": -0.00016360723202457628,
+      "progress_gate": false
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "nullity": 1,
+      "old_quartic_error": 0.5963330679529358,
+      "new_quartic_error": 0.5963639300120865,
+      "relative_reduction": -5.175305682225684e-05,
+      "progress_gate": false
+    }
+  ],
+  "next": "mixed_order_150_kinematic_screening_contract_only_not_executed",
+  "source_hash_closure_pass": true,
+  "artifact_hash_closure_pass": true,
+  "python_ast_pass": true,
+  "new_links_pass": true,
+  "verified_source_count": 25,
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-preparation.json": "bc3db539b0ab08ae21d9384bd79af0665e550e19a5a35dac1345482ae916e2be",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-result.json": "fb00fad52fd3f8ce9d8438bce6ac7f87f145ab2e4e14cb213dd00863dd288452",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-audit.json": "551a5683412ac7cbc33aa1d716d3adfd3d74bad4c4c81a2f40b452a38216fc00",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-shared-preparation.json": "784e4ad1c92288c57b8264856fd7bea58f9246f28f803aa6f5b9916650385971",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-shared-result.json": "5b445439f942a88c3c774d24756d7e81d3f958cc25f911d336286a3017d6187b",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-shared-audit.json": "4be697b6112143037d4808ff2c32095982db755873ed02dbee1927fc779f09c7",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-additional-local-results.md": "1973151d65bb09e226ca5eb5eaf766f6f022e25e5c6ab41c25b11c6540b70c99",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-shared-results.md": "cc328657859e286c25811c25a1ef230ddb28da5bedc73a39717f8c10510e2b8f",
+    "rd/structure/main-shell/mixed-order-150/mixed-order-150-screening-contract.md": "9c5b0bb5819901a0d411db5f9eb761121d46c140a6b5eca8ec64df16dea5a903"
+  }
+}

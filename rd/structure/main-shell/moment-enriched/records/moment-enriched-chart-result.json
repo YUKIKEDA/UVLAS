@@ -1,0 +1,57 @@
+{
+  "records": [],
+  "stops": [
+    {
+      "geometry": "flat",
+      "h": 0.01,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.001,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "flat",
+      "h": 0.0001,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.01,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.001,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "curved-distorted",
+      "h": 0.0001,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.01,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.001,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    },
+    {
+      "geometry": "quartic-reference",
+      "h": 0.0001,
+      "reason": "ValueError('cannot reshape array of size 150 into shape (75,3)')"
+    }
+  ],
+  "passed": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_chart.py": "8433d5bb1891e06c75e8b4e5ad7dd2a38ede4ae517505a7c6c337ca07efa5a97",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-local-v2-result.json": "76dc00cb91c414fe2f6d3da60c63175e944641afaa5bda40766a181d80c944f6"
+  }
+}

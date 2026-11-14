@@ -1,0 +1,12 @@
+{
+  "source_sha256": "a33cd241cc1803c3e8214c6f8bb21ea19fc8ce442e216c9852c2b2d3c12af610",
+  "result_sha256": "17f12dd85c182ae85f962d0ef6f3deb2d5a10b1ee63101032018d28645effb31",
+  "method_checks": 9,
+  "manufactured_cases": 4,
+  "rejected_cases": 7,
+  "meshes": 40,
+  "pair_bounds": 36,
+  "bounds_per_pair": 8,
+  "initial_failure_preserved": true,
+  "all_criteria_pass": true
+}

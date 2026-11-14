@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "uvlm_2_2_complete": true,
+  "uvlm_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "2.3 independent finite-wing and unsteady references and error budgets",
+  "immutable": {
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "rd/aero/wake-loads/records/uvlm-wake-adoption-disposition.json": "1eec6876b57712c3faf5b87763f7393a7b000daf8a449b9a66d7350721ff876b",
+    "rd/aero/wake-loads/records/uvlm-wake-adoption-results.md": "83e4e1a23edb107187b3ee1d8a6186c3b1160a4af728933d638085cabce1a0f9",
+    "rd/aero/wake-loads/records/uvlm-wake-adoption-audit.json": "9f606f8c02546e88117d7c45fc1493199b75d2e739c76128ed034a09b21d5b53"
+  },
+  "status_sync_source": {
+    "rd/aero/wake-loads/experiments/close_uvlm_wake_adoption.py": "ac19c2eb11c3a1aed0ff4ce134523cfbda05fd8d19eb6a72639c2a6d90f8e10d"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

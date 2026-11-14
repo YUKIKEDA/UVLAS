@@ -1,0 +1,47 @@
+"""Independent global QR without internal condensation for the first pair."""
+import sys,pathlib;sys.path.insert(0,str(next(p for p in pathlib.Path(__file__).resolve().parents if (p/'rd_paths.py').is_file())));import rd_paths
+from pathlib import Path
+import hashlib,json,time
+import numpy as np
+from scipy.linalg import solve_triangular
+import mixed_mean_stress_finite as fit
+import check_q9_plate_convergence as memory
+ROOT=rd_paths.ROOT
+def solve_full(a):
+    total=sum(c['ni'] for c in a['local']);lookup={int(v):i for i,v in enumerate(a['free'])};n=total+3*len(a['free']);maps=[];offset=0;counts=[]
+    for index,cell in enumerate(a['local']):
+        indices=list(range(offset,offset+cell['ni']));offset+=cell['ni'];indices.extend(total+3*lookup[int(node)]+cart if int(node) in lookup else -1 for node in cell['trace_ids'] for cart in range(3));maps.append(np.array(indices));counts.append(len(fit.get_state(a,index)['root']))
+    A=np.zeros((sum(counts),n+fit.NT),order='F');offset=0
+    for index,(cell,indices,count) in enumerate(zip(a['local'],maps,counts)):
+        s=fit.get_state(a,index);W=s['root']/a['h']**1.5;ni=cell['ni'];Wc=np.column_stack((W[:,:ni],W[:,ni:]@cell['trace_transform']));valid=indices>=0;rows=slice(offset,offset+count);offset+=count;A[rows,indices[valid]]=Wc[:,valid];A[rows,n:]=fit.rhs(s,cell['q'],a['h'],a['grid']['kappa'])
+    scale=1/np.linalg.norm(A[:,:n],axis=0);np.multiply(A[:,:n],scale[None,:],out=A[:,:n]);R=fit.qrtools.rfactor(A);del A;T=R[:n,:n];rhs=R[:n,n:n+fit.NT];y=solve_triangular(T,rhs,check_finite=False);value=scale[:,None]*y;linear=np.linalg.norm(T@y-rhs,axis=0)/np.maximum(1e-30,np.linalg.norm(rhs,axis=0))
+    def unpack(x):
+        local=[]
+        for cell,indices in zip(a['local'],maps):
+            u=np.zeros((len(indices),fit.NT));valid=indices>=0;u[valid]=x[indices[valid]];u[cell['ni']:]=cell['trace_transform']@u[cell['ni']:];local.append(u)
+        trace=np.zeros((len(a['grid']['trace_ref']),3,fit.NT));trace[a['free']]=x[total:].reshape(-1,3,fit.NT);return dict(local=np.array(local),trace=trace)
+    sol=unpack(value);metrics,grad=fit.evaluate(a,sol);history=[dict(iteration=0,**metrics)];reason=None
+    for iteration in range(1,5):
+        if max(metrics['direct_kkt'])<=1e-8:break
+        g=np.zeros((n,fit.NT))
+        for cell,indices,gi in zip(a['local'],maps,grad):
+            valid=indices>=0;canonical=np.vstack((gi[:cell['ni']],cell['trace_transform'].T@gi[cell['ni']:])) ;np.add.at(g,indices[valid],canonical[valid])
+        b=scale[:,None]*g;z=solve_triangular(T.T,b,lower=True,check_finite=False);dy=solve_triangular(T,z,check_finite=False);linear=np.maximum(linear,np.linalg.norm(T.T@z-b,axis=0)/np.maximum(1e-30,np.linalg.norm(b,axis=0)));linear=np.maximum(linear,np.linalg.norm(T@dy-z,axis=0)/np.maximum(1e-30,np.linalg.norm(z,axis=0)));delta=scale[:,None]*dy;accepted=False
+        for bt in range(4):
+            alpha=2.**(-bt);trial_value=value-alpha*delta;trial=unpack(trial_value);tm,tg=fit.evaluate(a,trial)
+            if max(tm['direct_kkt'])<max(metrics['direct_kkt']):value=trial_value;sol=trial;metrics,grad=tm,tg;history.append(dict(iteration=iteration,alpha=alpha,**metrics));accepted=True;break
+        if not accepted:reason='original_stationarity_not_decreasing';break
+    if max(metrics['direct_kkt'])>1e-8 and reason is None:reason='correction_iteration_limit'
+    return sol,dict(**metrics,full_rcond=fit.qrtools.rcond(T),linear_residual=linear.tolist(),history=history,stop_reason=reason,global_coordinates=n,local_condensation_factors_used=False)
+def main():
+    source=ROOT/'rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-pair-result.json';parent=json.loads(source.read_text());assert parent['all_checks_pass'];dest=ROOT/'rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-full-result.json';assert not dest.exists();start=time.monotonic();records=[];stops=[];out=ROOT/'build/analysis'/('mixed-mean-stress-finite-full-'+time.strftime('%Y%m%d-%H%M%S'));out.mkdir()
+    for r in parent['records']:
+        try:
+            tick=time.monotonic();a=fit.assemble(r['kappa'],r['n'],r['amplitude'],r['h']);sol,metrics=solve_full(a);obs=fit.observe(a,sol);old=np.load(ROOT/r['artifact']);field=np.linalg.norm(sol['local']-old['local'],axis=(0,1))/np.linalg.norm(old['local'],axis=(0,1));error=max(abs(x-y) for x,y in zip(obs['error'],r['observed']['error']));position=max(abs(x-y) for x,y in zip(obs['recovered_position_error'],r['observed']['recovered_position_error']));checks=dict(original_stationarity=max(metrics['direct_kkt'])<=1e-8,linear=max(metrics['linear_residual'])<=1e-8,condition=metrics['full_rcond']>=1e-10,fields=max(field)<=1e-8,error=error<=1e-8,position=position<=1e-8,resources=time.monotonic()-tick<=180 and memory.memory_bytes()<=2*1024**3)
+            path=out/f"h{r['h']:g}.npz";np.savez_compressed(path,local=sol['local'],trace=sol['trace']);records.append(dict(h=r['h'],metrics=metrics,observed=obs,field_difference=field.tolist(),error_difference=error,position_difference=position,checks={k:bool(v) for k,v in checks.items()},seconds=time.monotonic()-tick,artifact=path.relative_to(ROOT).as_posix(),artifact_sha256=hashlib.sha256(path.read_bytes()).hexdigest()));print('FULL',r['h'],records[-1],flush=True)
+            if not all(checks.values()):raise RuntimeError('MMS1_full_reference_gate')
+            if time.monotonic()-start>900:raise RuntimeError('MMS1_full_reference_series_resources')
+        except Exception as exc:stops.append(dict(h=r['h'],reason=repr(exc)));print('STOP',repr(exc),flush=True);break
+    paths=[Path(__file__),Path(fit.__file__),source,ROOT/'rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-pair-protocol.md']
+    dest.write_text(json.dumps(dict(records=records,stops=stops,all_checks_pass=len(records)==2 and not stops,independent_global_resolve=True,main_shell_adopted=False,physical_PDE_acceptance=False,seconds=time.monotonic()-start,peak_bytes=memory.memory_bytes(),sources={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}),indent=2),encoding='utf-8')
+if __name__=='__main__':main()

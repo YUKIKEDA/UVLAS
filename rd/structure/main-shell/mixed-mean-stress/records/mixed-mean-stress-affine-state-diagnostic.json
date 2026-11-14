@@ -1,0 +1,37 @@
+{
+  "records": [
+    {
+      "h": 0.01,
+      "position_roundtrip_increment_defect": 7.347287664350094e-17,
+      "direct_position_force_error": 5.8126520208318925e-12,
+      "preserved_increment_force_error": 2.303862220715715e-14,
+      "force_change_prediction_relative_residual": 0.004833186606564041,
+      "wrapper_increment_difference": 0.0
+    },
+    {
+      "h": 0.001,
+      "position_roundtrip_increment_defect": 7.395644414857282e-17,
+      "direct_position_force_error": 6.108889426371945e-11,
+      "preserved_increment_force_error": 2.2052935521937943e-13,
+      "force_change_prediction_relative_residual": 0.0020858169854875435,
+      "wrapper_increment_difference": 0.0
+    },
+    {
+      "h": 0.0001,
+      "position_roundtrip_increment_defect": 7.686939532202404e-17,
+      "direct_position_force_error": 1.0533932401819849e-09,
+      "preserved_increment_force_error": 2.758836491380601e-12,
+      "force_change_prediction_relative_residual": 0.0011404210940059612,
+      "wrapper_increment_difference": 0.0
+    }
+  ],
+  "diagnostic_only": true,
+  "original_absolute_state_failure_retained": true,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/diagnose_mixed_mean_stress_affine_state.py": "2e8c9ed8b4127c9c1842ba4c3c90a88af3cc72aeefd7f7f469f522bf1d1c016b",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element_v2.py": "aa9322d39d8528455c2f5acb9a9f3195ad42d9542d47222736e58de2b6563d9a",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-increment-contract.md": "5f3325d611d667c440a01299f2761edb365fdd4c5802bd734541e4135af18daa",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-local-result.json": "5738794df57758b9149f81d5f35b697c39a70a57c4a6273f4763da16bb8cfcb3",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-local-v2-result.json": "d2aaebc0c430b904e9d8e78027a516f3fd441db0d4aa26ff9efabedcfb9deec0"
+  }
+}

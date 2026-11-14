@@ -1,0 +1,9 @@
+{
+  "accepted": false,
+  "reason": "Nine Gauss nodes per seed interval underresolve the degree-10 primitive trial space. Sampled rank144 aliases true modes; cylinder exact bending membrane residual .853 instead of zero. Earlier local numerical checks alone are insufficient.",
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-reference-result.json": "ee21ddd89f68bae3cfb3a8d6db8fce13618359ec0a3fee9d8cd18298db8cff5a",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift.py": "683bca4b39d6f0960cffaa923bdfdec5e640388d7d00ce7cb3248fbf48e48192"
+  }
+}

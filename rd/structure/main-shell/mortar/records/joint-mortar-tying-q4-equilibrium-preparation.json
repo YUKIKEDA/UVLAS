@@ -1,0 +1,9 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/check_joint_mortar_tying_equilibrium.py": "6789817927d8789cb21e8a47b610a0de72f59e36de2336312c92e7b611aa33ea",
+    "rd/structure/main-shell/mortar/experiments/joint_mortar_tying_q4.py": "a39064297019a3ba57d0395033ba5a00fdf52f9361be228d7e6ea077193ea1c3",
+    "rd/structure/main-shell/q4-projection/experiments/tying_mid_projection_q4_v2.py": "f7841db7c24669543229ddd1af4792a0362986bce630a1feb7e38bbf125f34d3",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-equilibrium-protocol.md": "06080ea7a15947dbd8a44bebff145fcd9bdd70d563b765747e2efe2157b640e0",
+    "rd/structure/main-shell/mortar/records/joint-mortar-tying-q4-result.json": "aa95ec2435542f69952b228aebbb49d3f115be487259dbbdf0960c2aa1356873"
+  }
+}

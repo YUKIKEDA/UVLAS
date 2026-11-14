@@ -1,0 +1,132 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "relative_errors": [
+        [
+          2.292099690860526e-15,
+          2.708470253895857e-15
+        ],
+        [
+          1.069646522401579e-15,
+          2.3473408867097426e-15
+        ],
+        [
+          4.431392735663684e-15,
+          6.319763925757e-15
+        ],
+        [
+          1.069646522401579e-14,
+          2.8529220007703026e-14
+        ]
+      ],
+      "observed_orders": [
+        [
+          1.0995356735509143,
+          0.20645087746742652
+        ],
+        [
+          -2.050626073069968,
+          -1.4288432988038742
+        ],
+        [
+          -1.2713020218173943,
+          -2.1744977312321363
+        ]
+      ],
+      "roundoff_identity": true,
+      "independent_difference": 1.3752598145163157e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "relative_errors": [
+        [
+          1.6195575887638046e-05,
+          1.5775575216368356e-05
+        ],
+        [
+          4.048759823982333e-06,
+          3.943763180749384e-06
+        ],
+        [
+          1.0121815683764052e-06,
+          9.859326329749857e-07
+        ],
+        [
+          2.5304485774417465e-07,
+          2.4648263122457944e-07
+        ]
+      ],
+      "observed_orders": [
+        [
+          2.0000478001540154,
+          2.000047783429002
+        ],
+        [
+          2.000011955094653,
+          2.000011943548837
+        ],
+        [
+          2.000003046507968,
+          2.000003084708736
+        ]
+      ],
+      "roundoff_identity": false,
+      "independent_difference": 5.4605063774814455e-15,
+      "passed": true
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "relative_errors": [
+        [
+          8.002242887124124e-06,
+          7.555174012550641e-06
+        ],
+        [
+          2.0004954391349775e-06,
+          1.8887303719628325e-06
+        ],
+        [
+          5.001197693246432e-07,
+          4.721786489202666e-07
+        ],
+        [
+          1.2502963765856103e-07,
+          1.1804439824708679e-07
+        ]
+      ],
+      "observed_orders": [
+        [
+          2.0000470790441014,
+          2.0000482215524613
+        ],
+        [
+          2.0000117996953715,
+          2.0000120506658137
+        ],
+        [
+          2.0000035155593623,
+          2.0000032262988823
+        ]
+      ],
+      "roundoff_identity": false,
+      "independent_difference": 7.295653983256053e-15,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "seconds": 16.125,
+  "main_shell_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_bending_coefficient.py": "332ce6bf79911d20405a7b857edd57c776db73f85bfed39802df315ce1c3ca52",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_bending.py": "f85f96c544fe5f689b62722f28c80052f5c3086e675a2374e24d7d45c5b80813",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element_v2.py": "aa9322d39d8528455c2f5acb9a9f3195ad42d9542d47222736e58de2b6563d9a",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-bending-protocol.md": "097272e75288d49c7a86b4f2788380e63960986b70bb2ce4dacaf637c40de2cb",
+    "rd/structure/main-shell/mixed-mean-stress/mixed-mean-stress-leading-energy.md": "6987d213e3eb54a9a4a9d900b7d4113fddb01537021a5d3f1727f2dd69f4ee3d"
+  }
+}

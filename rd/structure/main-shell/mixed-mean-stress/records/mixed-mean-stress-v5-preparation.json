@@ -1,0 +1,12 @@
+{
+  "reason": "Same complete 177 equations; equilibrate independently scaled 174 basic and up to 3 completion conditions only when the original global rank classification disagrees. No rank cutoff relaxation.",
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_thin_v5.py": "5b2766953981fd275502c3b187ff30c2625b2045afe4e9820226c7da4f422c65",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_thin_v5.py": "b542a374568e6ced9583ea279e00c23bc79e014b433258242d5b4df04c13ffdd",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_constraints.py": "ca4f11ce5ce7e93af27a20ad51ed494c0aec1a3c77cabe60de3e78fd427ecb79",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_space_v4.py": "168a19b51c050e2c76f6b9e2886c28f1964d11da611831690d6c8c51d7b30852",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-thin-v4-result.json": "f7c418d94aabeda846c2e959c605aeaaccf60a73dc9d16d783ab913a3f4f259c",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-constraints-v5.md": "cbf4b1794accf0f7f7c9103f0aaf4c88e5962fac5427ed0e0b4f5039e7b15476",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-protocol.md": "1efb045fc1e82946fe630e12d24c239826f2b18ae13142e84e81a2fa46219b7f"
+  }
+}

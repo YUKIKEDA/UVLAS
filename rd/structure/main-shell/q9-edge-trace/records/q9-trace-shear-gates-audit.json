@@ -1,0 +1,131 @@
+{
+  "source_sha256": "8fc184ff5698a76788d70118325a5897a788e1b4ff6057e4acf0cced66af887d",
+  "local_result_sha256": "e495a7a4c01f344f57822e82b8a714d899313b0b35c585d25d009da189b593e5",
+  "shared_result_sha256": "536dc66c54775fef05e4aaa3e9f47b6f73385c733e52fe177ac4f0da42da1e43",
+  "dependency_sha256": {
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1"
+  },
+  "local_cases": [
+    {
+      "case": "RECT",
+      "metric_difference": 5.78531491432552e-16,
+      "sampling_difference": 3.890862970453093e-18,
+      "stiffness_difference": 1.3035783678374158e-15
+    },
+    {
+      "case": "SKEW",
+      "metric_difference": 1.2731333972319972e-15,
+      "sampling_difference": 7.768951288779928e-17,
+      "stiffness_difference": 1.2658678227534977e-15
+    },
+    {
+      "case": "TRAP",
+      "metric_difference": 5.485268503659627e-16,
+      "sampling_difference": 1.2655525636184612e-16,
+      "stiffness_difference": 1.1427366070646286e-15
+    }
+  ],
+  "shared_cases": [
+    {
+      "n": 1,
+      "amplitude": 0.0,
+      "D_difference": 1.1969540444188854e-16,
+      "W_difference": 1.1881893758638406e-16,
+      "tie_difference": 0.0,
+      "compatible_w_dimensions": {
+        "1e-09": 1,
+        "1e-10": 1,
+        "1e-11": 1
+      }
+    },
+    {
+      "n": 2,
+      "amplitude": 0.0,
+      "D_difference": 1.1119073210574692e-16,
+      "W_difference": 1.071331607893523e-16,
+      "tie_difference": 0.0,
+      "compatible_w_dimensions": {
+        "1e-09": 9,
+        "1e-10": 9,
+        "1e-11": 9
+      }
+    },
+    {
+      "n": 4,
+      "amplitude": 0.0,
+      "D_difference": 1.9488040763815368e-16,
+      "W_difference": 2.102648317622788e-16,
+      "tie_difference": 0.0,
+      "compatible_w_dimensions": {
+        "1e-09": 49,
+        "1e-10": 49,
+        "1e-11": 49
+      }
+    },
+    {
+      "n": 8,
+      "amplitude": 0.0,
+      "D_difference": 3.995083387777428e-16,
+      "W_difference": 4.16884522382634e-16,
+      "tie_difference": 0.0,
+      "compatible_w_dimensions": {
+        "1e-09": 225,
+        "1e-10": 225,
+        "1e-11": 225
+      }
+    },
+    {
+      "n": 1,
+      "amplitude": 0.2,
+      "D_difference": 1.1969540444188854e-16,
+      "W_difference": 1.1881893758638406e-16,
+      "tie_difference": 0.0,
+      "compatible_w_dimensions": {
+        "1e-09": 1,
+        "1e-10": 1,
+        "1e-11": 1
+      }
+    },
+    {
+      "n": 2,
+      "amplitude": 0.2,
+      "D_difference": 3.0014058602187037e-16,
+      "W_difference": 3.3750546464550264e-16,
+      "tie_difference": 4.1242314010145775e-17,
+      "compatible_w_dimensions": {
+        "1e-09": 9,
+        "1e-10": 9,
+        "1e-11": 9
+      }
+    },
+    {
+      "n": 4,
+      "amplitude": 0.2,
+      "D_difference": 2.8375709213741096e-16,
+      "W_difference": 2.8978631467458777e-16,
+      "tie_difference": 9.593824953364005e-17,
+      "compatible_w_dimensions": {
+        "1e-09": 49,
+        "1e-10": 49,
+        "1e-11": 49
+      }
+    },
+    {
+      "n": 8,
+      "amplitude": 0.2,
+      "D_difference": 4.556654687843864e-16,
+      "W_difference": 4.689598886565863e-16,
+      "tie_difference": 1.0854900599636332e-16,
+      "compatible_w_dimensions": {
+        "1e-09": 225,
+        "1e-10": 225,
+        "1e-11": 225
+      }
+    }
+  ],
+  "seconds": 1.1570000000065193,
+  "peak_bytes": 102498304,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

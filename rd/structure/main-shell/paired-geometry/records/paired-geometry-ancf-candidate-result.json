@@ -1,0 +1,1707 @@
+{
+  "records": [
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.0223677733551421e-10,
+          2.2080333867887544e-08,
+          8.090805979184266e-07
+        ],
+        "kkt": [
+          2.2358023393830928e-17,
+          2.0972618878411103e-17,
+          1.9239615630023495e-17
+        ],
+        "linear": [
+          1.9898466452881055e-14,
+          1.6286784461732904e-14,
+          1.4317662925390482e-14
+        ],
+        "rcond": 1.926421214905692e-07,
+        "ranks": [
+          714,
+          714,
+          714
+        ],
+        "columns": 714
+      },
+      "primary": {
+        "error": [
+          1.02236777335514e-10,
+          2.2080333867887663e-08,
+          8.090805979184411e-07
+        ],
+        "position": [
+          1.2985137080632545e-14,
+          2.7867541558716927e-12,
+          1.0783142340652593e-10
+        ],
+        "original_kkt": [
+          3.1246028920927006e-27,
+          5.118701104197905e-25,
+          2.2880437694608203e-23
+        ]
+      },
+      "independent": {
+        "error": [
+          1.0223678851498765e-10,
+          2.2080333721753638e-08,
+          8.09080652417413e-07
+        ],
+        "position": [
+          1.2984583944122365e-14,
+          2.7867530445971815e-12,
+          1.0783149335430125e-10
+        ],
+        "original_kkt": [
+          3.0919493386340824e-18,
+          2.6615570650999766e-18,
+          7.99922123624429e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.9588993998448165e-26,
+        "boundary_constraint": 9.51740675750718e-16
+      },
+      "anchor_consistency": [
+        1.5585854357429745e-13,
+        1.3688844411627336e-13,
+        1.2085549126304537e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.1143265577032215e-05,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        36,
+        81,
+        25,
+        232
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 127.73399999993853,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/rational-a0-n4-h0.01.npz",
+      "artifact_sha256": "24a35350c0331016c0a252fd5bd65be59e4f49d758c654f7089c389d4a6b9a5d"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.022459833299896e-10,
+          2.208239647124296e-08,
+          8.091611592480289e-07
+        ],
+        "kkt": [
+          1.1321337342500343e-15,
+          4.684319655459166e-18,
+          2.509209623779151e-18
+        ],
+        "linear": [
+          8.40658847699442e-11,
+          3.268601374540846e-13,
+          1.8713830062639148e-14
+        ],
+        "rcond": 4.163478881644398e-09,
+        "ranks": [
+          714,
+          714,
+          714
+        ],
+        "columns": 714
+      },
+      "primary": {
+        "error": [
+          1.0224598332998958e-10,
+          2.2082396471243166e-08,
+          8.091611592480403e-07
+        ],
+        "position": [
+          1.188515913123714e-14,
+          2.550063535547757e-12,
+          9.869844302924853e-11
+        ],
+        "original_kkt": [
+          1.1538385648788284e-25,
+          1.0112620037293093e-25,
+          2.0630222888932523e-24
+        ]
+      },
+      "independent": {
+        "error": [
+          1.0224599225789019e-10,
+          2.2082396329431028e-08,
+          8.091612137484621e-07
+        ],
+        "position": [
+          1.1883988544215796e-14,
+          2.550062813522023e-12,
+          9.869852721569515e-11
+        ],
+        "original_kkt": [
+          3.0189433853141252e-18,
+          2.7522941521214392e-18,
+          2.9577811245185394e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 6.902532920683853e-30,
+        "boundary_constraint": 1.3152872276011797e-15
+      },
+      "anchor_consistency": [
+        1.5604909657123917e-11,
+        1.3704935820585947e-11,
+        1.2098493461620311e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.2185685582030652e-09,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        36,
+        81,
+        25,
+        232
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 128.14000000001397,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/rational-a0-n4-h0.0001.npz",
+      "artifact_sha256": "f87c33ae308ad06c683c752667191a874f0df5f36aa22f6e7b8521ab8877fa04"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.0222884485617797e-10,
+          2.2080132710788216e-08,
+          8.090805656281449e-07
+        ],
+        "kkt": [
+          2.0719681649392602e-16,
+          6.406761301478563e-17,
+          1.4343809076335493e-17
+        ],
+        "linear": [
+          7.42375330621139e-14,
+          4.468625383301633e-14,
+          1.177518273008616e-14
+        ],
+        "rcond": 1.6540057344780644e-07,
+        "ranks": [
+          747,
+          747,
+          747
+        ],
+        "columns": 747
+      },
+      "primary": {
+        "error": [
+          1.0222884485617801e-10,
+          2.2080132710788434e-08,
+          8.09080565628161e-07
+        ],
+        "position": [
+          1.6066815477697684e-14,
+          2.9093601490778795e-12,
+          1.0785974146675491e-10
+        ],
+        "original_kkt": [
+          2.1868269907534935e-26,
+          1.4142223740807773e-24,
+          1.4218785455586363e-23
+        ]
+      },
+      "independent": {
+        "error": [
+          1.0222887329248199e-10,
+          2.208013257011505e-08,
+          8.090806201210441e-07
+        ],
+        "position": [
+          1.6070810202890065e-14,
+          2.909366363742021e-12,
+          1.0785981066581826e-10
+        ],
+        "original_kkt": [
+          1.4031412272152973e-18,
+          2.450875641154459e-18,
+          7.833788014204282e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.0093864977789613e-26,
+        "boundary_constraint": 2.6035498079649033e-15
+      },
+      "anchor_consistency": [
+        1.656621763809467e-13,
+        1.4481635702880438e-13,
+        1.2764253730345168e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.3446701070431283e-05,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        38,
+        81,
+        25,
+        241
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 241.07800000009593,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/rational-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "404211a5ee879735aea9be38a4254e8f0f34b454e792d14c850ba35b45585bc5"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.0224597867894634e-10,
+          2.2082396436599413e-08,
+          8.091611592479877e-07
+        ],
+        "kkt": [
+          9.671724463973425e-16,
+          1.867812714806953e-16,
+          2.363971705267841e-17
+        ],
+        "linear": [
+          2.1130552284032708e-11,
+          9.261968044195233e-12,
+          1.8834688753781742e-12
+        ],
+        "rcond": 4.113515234652174e-09,
+        "ranks": [
+          747,
+          747,
+          747
+        ],
+        "columns": 747
+      },
+      "primary": {
+        "error": [
+          1.0224597867894645e-10,
+          2.2082396436599625e-08,
+          8.09161159247995e-07
+        ],
+        "position": [
+          1.1893745206719081e-14,
+          2.550809752861785e-12,
+          9.869850219408071e-11
+        ],
+        "original_kkt": [
+          9.904575025128433e-26,
+          4.141488897392666e-24,
+          1.91243245213173e-23
+        ]
+      },
+      "independent": {
+        "error": [
+          1.0224599658246608e-10,
+          2.208239630126522e-08,
+          8.091612137369094e-07
+        ],
+        "position": [
+          1.1891255372737259e-14,
+          2.550807527267957e-12,
+          9.869858586402226e-11
+        ],
+        "original_kkt": [
+          1.6970716767875334e-18,
+          2.0283762087947e-18,
+          2.511329107007707e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 5.354393394187618e-29,
+        "boundary_constraint": 2.587057798767392e-15
+      },
+      "anchor_consistency": [
+        1.6566430677874223e-11,
+        1.4478525963633333e-11,
+        1.2759353395202708e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.3582092537011164e-09,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        38,
+        81,
+        25,
+        241
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 239.5779999999795,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/rational-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "71b5d280764b80b7e95c7ff1fd73b57e50ddcf9b228c6c2f91a1f5d48d0d5a58"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.7822785145891646e-16,
+          1.867211226940631e-16,
+          5.606548418181428e-13
+        ],
+        "kkt": [
+          1.9101300384017996e-13,
+          1.87833552843231e-13,
+          1.1516653167090816e-15
+        ],
+        "linear": [
+          1.0870741303708438e-12,
+          8.330749164925632e-13,
+          3.647584736809354e-13
+        ],
+        "rcond": 4.209880687034448e-07,
+        "ranks": [
+          288,
+          288,
+          288
+        ],
+        "columns": 288,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.7822785145891702e-16,
+          1.8672112269406343e-16,
+          5.606548418181412e-13
+        ],
+        "position": [
+          7.514713578056286e-16,
+          8.487019144836524e-16,
+          6.792339486248954e-16
+        ],
+        "original_kkt": [
+          2.107193425295686e-28,
+          7.341364560550804e-28,
+          6.277907919900823e-28
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0924756290665205e-16,
+          2.0826554352789202e-16,
+          5.606389273864194e-13
+        ],
+        "position": [
+          7.789006744409967e-16,
+          9.256703717327293e-16,
+          7.143210620503151e-16
+        ],
+        "original_kkt": [
+          3.989164065981364e-18,
+          5.252551270152862e-18,
+          3.672030537861252e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.8649164837490482e-29,
+        "boundary_constraint": 7.001859529437754e-16
+      },
+      "anchor_consistency": [
+        4.930675385253554e-14,
+        4.0361719798918513e-14,
+        7.683247983974373e-14
+      ],
+      "mechanics": {
+        "reference_geometry": 1.9632732939367514e-15,
+        "affine_gradient": 6.661338147750939e-16,
+        "rigid_strain": 9.325873406851315e-15,
+        "constant_stress_work": 1.1945840879393972e-14,
+        "nonlinear_tangent": 4.770351598236475e-16
+      },
+      "svd": null,
+      "mass_scaled_min": 1.738828447804105e-05,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        70,
+        70,
+        70
+      ],
+      "sizes": [
+        16,
+        25,
+        9,
+        116
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 16.061999999918044,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0-n2-h0.01.npz",
+      "artifact_sha256": "4cf47bc911c1a887f726ddf80077afaf55d8392948ad9ed057e20b23475ae3ce"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.8268620320536132e-16,
+          1.8820554161934608e-16,
+          5.60731198036326e-13
+        ],
+        "kkt": [
+          3.573233917930784e-11,
+          9.421806088888806e-12,
+          5.859681677443502e-14
+        ],
+        "linear": [
+          1.0919089048920018e-10,
+          5.325892453724757e-11,
+          6.426755054664317e-11
+        ],
+        "rcond": 5.400282525698025e-09,
+        "ranks": [
+          288,
+          288,
+          288
+        ],
+        "columns": 288
+      },
+      "primary": {
+        "error": [
+          1.8268620320567425e-16,
+          1.8820554161922974e-16,
+          5.607311980363244e-13
+        ],
+        "position": [
+          7.130278376545262e-16,
+          8.400216846818694e-16,
+          6.651282385107647e-16
+        ],
+        "original_kkt": [
+          9.395618535628924e-26,
+          1.7487624529172936e-26,
+          3.239689961205521e-26
+        ]
+      },
+      "independent": {
+        "error": [
+          2.1509831299945312e-16,
+          2.2101598139255764e-16,
+          5.607026694143803e-13
+        ],
+        "position": [
+          7.953458706524076e-16,
+          9.103790397445156e-16,
+          6.754140092213336e-16
+        ],
+        "original_kkt": [
+          3.1712572129224897e-18,
+          2.5681949665433417e-18,
+          4.7637353397207935e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.6500796034768365e-30,
+        "boundary_constraint": 7.288356244588009e-16
+      },
+      "anchor_consistency": [
+        4.963737865516068e-12,
+        4.059486998279488e-12,
+        7.735489102054566e-12
+      ],
+      "mechanics": null,
+      "svd": {
+        "rank": 288,
+        "columns": 288,
+        "error_difference": 2.0489503373661238e-26,
+        "position_error_difference": 0.0,
+        "original_kkt": [
+          3.171257206022179e-18,
+          2.5681949675112925e-18,
+          4.763735349707e-18
+        ]
+      },
+      "mass_scaled_min": 1.816605185304388e-09,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        70,
+        70,
+        70
+      ],
+      "sizes": [
+        16,
+        25,
+        9,
+        116
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 17.265999999945052,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0-n2-h0.0001.npz",
+      "artifact_sha256": "81e7951e9d839164a300033859e4434e6a96806f46a61a4f3ec55bb794f912ef"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.9478466357624878e-16,
+          2.1746398909564474e-16,
+          2.212769854308624e-15
+        ],
+        "kkt": [
+          2.0125193853569064e-13,
+          1.0523277869182771e-13,
+          1.3618954577894206e-13
+        ],
+        "linear": [
+          1.7685447813579442e-12,
+          9.659192065523841e-13,
+          1.5656675818103169e-12
+        ],
+        "rcond": 1.926421214905692e-07,
+        "ranks": [
+          714,
+          714,
+          714
+        ],
+        "columns": 714,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.947846635762491e-16,
+          2.174639890956435e-16,
+          2.2127698543086244e-15
+        ],
+        "position": [
+          3.915869331907996e-16,
+          5.4714815441566525e-16,
+          4.0413194028259854e-16
+        ],
+        "original_kkt": [
+          4.169985152188113e-28,
+          2.672098531284368e-28,
+          4.4212965059870085e-28
+        ]
+      },
+      "independent": {
+        "error": [
+          2.290618678690739e-16,
+          2.3753505033013875e-16,
+          2.218113825693811e-15
+        ],
+        "position": [
+          3.856139553728213e-16,
+          5.268609597812222e-16,
+          4.0290600032353336e-16
+        ],
+        "original_kkt": [
+          3.0782103333391213e-18,
+          2.0261902438783383e-18,
+          2.505883025659417e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.0987821568959903e-30,
+        "boundary_constraint": 9.51740675750718e-16
+      },
+      "anchor_consistency": [
+        8.397989841683845e-14,
+        6.751466864880188e-14,
+        1.330565348251584e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.1143265577032215e-05,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        36,
+        81,
+        25,
+        232
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 128.46900000004098,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0-n4-h0.01.npz",
+      "artifact_sha256": "80b0b1da985589024a3e3d8198db42c223a6443c7a736bec88003913704cb57e"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.9959987299850978e-16,
+          2.2093120029130938e-16,
+          2.2051521787280505e-15
+        ],
+        "kkt": [
+          4.705896402596285e-12,
+          1.8113764797736137e-11,
+          2.019873822528894e-11
+        ],
+        "linear": [
+          5.429771188516583e-11,
+          1.4943665847831207e-10,
+          1.989605846759037e-10
+        ],
+        "rcond": 4.163478881644399e-09,
+        "ranks": [
+          714,
+          714,
+          714
+        ],
+        "columns": 714
+      },
+      "primary": {
+        "error": [
+          1.9959987299869038e-16,
+          2.2093120029135508e-16,
+          2.2051521787279586e-15
+        ],
+        "position": [
+          3.932726733407582e-16,
+          5.522297719381063e-16,
+          4.2198399264808263e-16
+        ],
+        "original_kkt": [
+          1.2526023018765415e-26,
+          2.2936606051190846e-26,
+          6.913373047491109e-26
+        ]
+      },
+      "independent": {
+        "error": [
+          2.1264913610860563e-16,
+          2.269496800208474e-16,
+          2.2174502104807466e-15
+        ],
+        "position": [
+          3.731986062198036e-16,
+          5.640833522513378e-16,
+          4.113432534849526e-16
+        ],
+        "original_kkt": [
+          1.6075830246611915e-18,
+          1.5951816660615341e-18,
+          2.4124747467132246e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 5.1522477872247334e-30,
+        "boundary_constraint": 1.3152872276011797e-15
+      },
+      "anchor_consistency": [
+        8.39707749623572e-12,
+        6.747455801821244e-12,
+        1.3315418250949195e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.2185685582030652e-09,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        36,
+        81,
+        25,
+        232
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 126.53100000007544,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0-n4-h0.0001.npz",
+      "artifact_sha256": "2c39421b813973ee943836286c0dbc794945b7e76900cf4a0f0603ebf9dee2c1"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.8702122751698605e-16,
+          1.7969530669279578e-16,
+          5.606417660943853e-13
+        ],
+        "kkt": [
+          3.979009431266492e-13,
+          3.019024606244265e-13,
+          7.369239238443134e-16
+        ],
+        "linear": [
+          1.7608455894463715e-12,
+          1.1122679415962568e-12,
+          2.1052142437629641e-13
+        ],
+        "rcond": 3.91096913211806e-07,
+        "ranks": [
+          303,
+          303,
+          303
+        ],
+        "columns": 303,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.870212275169861e-16,
+          1.7969530669279855e-16,
+          5.606417660943851e-13
+        ],
+        "position": [
+          7.830374081067525e-16,
+          8.825079397120438e-16,
+          6.571604393531679e-16
+        ],
+        "original_kkt": [
+          7.110200420769695e-28,
+          1.3471533174985799e-27,
+          3.9542015835393475e-28
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0689554217980092e-16,
+          2.1473960804302287e-16,
+          5.606406728185542e-13
+        ],
+        "position": [
+          7.724758769957163e-16,
+          9.69545527001071e-16,
+          6.906251305446312e-16
+        ],
+        "original_kkt": [
+          2.921432052887645e-18,
+          6.222863981362425e-18,
+          4.0675654612052256e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.7730881440006648e-29,
+        "boundary_constraint": 1.5572787115619444e-15
+      },
+      "anchor_consistency": [
+        5.4125889381149563e-14,
+        4.472626707243581e-14,
+        8.236673047149897e-14
+      ],
+      "mechanics": {
+        "reference_geometry": 1.3322676295501878e-15,
+        "affine_gradient": 2.5673907444456745e-16,
+        "rigid_strain": 6.217248937900877e-15,
+        "constant_stress_work": 2.203180914014852e-14,
+        "nonlinear_tangent": 3.720436794207434e-15
+      },
+      "svd": null,
+      "mass_scaled_min": 1.4384689607078066e-05,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        70,
+        70,
+        70
+      ],
+      "sizes": [
+        18,
+        25,
+        9,
+        119
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 21.015999999945052,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "0c7692516fd1d963810689b2a0dd1902b79708ebbcb3718ec64d89405700c9f0"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.9398048528244234e-16,
+          1.981561773547422e-16,
+          5.607165883781438e-13
+        ],
+        "kkt": [
+          2.6470721302340287e-11,
+          1.9870709928419872e-11,
+          8.939228026806266e-14
+        ],
+        "linear": [
+          2.963957669854787e-10,
+          7.921274537134056e-11,
+          8.486651926937681e-11
+        ],
+        "rcond": 3.6414062092503676e-09,
+        "ranks": [
+          303,
+          303,
+          303
+        ],
+        "columns": 303
+      },
+      "primary": {
+        "error": [
+          1.9398048528247722e-16,
+          1.981561773547404e-16,
+          5.607165883781439e-13
+        ],
+        "position": [
+          7.643048335518806e-16,
+          8.86886911741766e-16,
+          6.643116601586029e-16
+        ],
+        "original_kkt": [
+          6.552378398919564e-26,
+          3.1473623410130717e-26,
+          5.268946741873825e-26
+        ]
+      },
+      "independent": {
+        "error": [
+          2.0760512382848145e-16,
+          2.2177736427596675e-16,
+          5.607152778766061e-13
+        ],
+        "position": [
+          7.880138686809829e-16,
+          9.55387772812013e-16,
+          6.740557387933129e-16
+        ],
+        "original_kkt": [
+          2.9648155014576535e-18,
+          2.593247956550527e-18,
+          2.9473181219000527e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 3.27870313732483e-30,
+        "boundary_constraint": 1.5813620118571974e-15
+      },
+      "anchor_consistency": [
+        5.410943997401003e-12,
+        4.469669082281213e-12,
+        8.226009027526813e-12
+      ],
+      "mechanics": null,
+      "svd": {
+        "rank": 303,
+        "columns": 303,
+        "error_difference": 9.188134134045294e-27,
+        "position_error_difference": 0.0,
+        "original_kkt": [
+          2.9648154914199655e-18,
+          2.5932479465809263e-18,
+          2.9473180825423008e-18
+        ]
+      },
+      "mass_scaled_min": 1.4914884174665745e-09,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        70,
+        70,
+        70
+      ],
+      "sizes": [
+        18,
+        25,
+        9,
+        119
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 22.438000000081956,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "0d084f26f40f2fbe810061890e6817afc37fd3a7ab79a32186adf5b1dd82a115"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.980829962980392e-16,
+          2.1730686880338584e-16,
+          2.2217619183281482e-15
+        ],
+        "kkt": [
+          2.530965670115473e-13,
+          2.0052079859011477e-13,
+          1.0551981926856112e-13
+        ],
+        "linear": [
+          1.410795463648703e-12,
+          1.2166438274786983e-12,
+          8.904249711443098e-13
+        ],
+        "rcond": 1.6540057344780644e-07,
+        "ranks": [
+          747,
+          747,
+          747
+        ],
+        "columns": 747,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.9808299629803814e-16,
+          2.1730686880338498e-16,
+          2.2217619183281427e-15
+        ],
+        "position": [
+          4.0378463927761446e-16,
+          5.327607525334657e-16,
+          4.0927091273527084e-16
+        ],
+        "original_kkt": [
+          2.9155352653913937e-28,
+          2.1729158786146107e-28,
+          5.009966362365026e-28
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2149853348105505e-16,
+          2.2606881125241116e-16,
+          2.2135329580217922e-15
+        ],
+        "position": [
+          3.6978014385697007e-16,
+          5.188133798985076e-16,
+          4.008107388772465e-16
+        ],
+        "original_kkt": [
+          2.9390123460975488e-18,
+          1.7944729888535538e-18,
+          1.8790609290724295e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.431014096928326e-30,
+        "boundary_constraint": 2.6035498079649033e-15
+      },
+      "anchor_consistency": [
+        9.427479721306401e-14,
+        7.697370418232295e-14,
+        1.4491481785314852e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.3446701070431283e-05,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        38,
+        81,
+        25,
+        241
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 240.85999999998603,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "32276ea8e967a4aa2b5768f4f3677c27935311d0fd514119ac7283f37200bd41"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          2.087701878702091e-16,
+          2.1185410695942124e-16,
+          2.2131306140763386e-15
+        ],
+        "kkt": [
+          3.907608460661267e-12,
+          4.035058587820626e-12,
+          1.2522342287118931e-11
+        ],
+        "linear": [
+          3.810983040979959e-11,
+          5.208418122491136e-11,
+          1.284777594953256e-10
+        ],
+        "rcond": 4.113515234652174e-09,
+        "ranks": [
+          747,
+          747,
+          747
+        ],
+        "columns": 747
+      },
+      "primary": {
+        "error": [
+          2.0877018787049415e-16,
+          2.118541069597287e-16,
+          2.213130614076327e-15
+        ],
+        "position": [
+          3.814608784875219e-16,
+          5.471110345691563e-16,
+          4.201877481480316e-16
+        ],
+        "original_kkt": [
+          1.4749636997149393e-26,
+          1.2292450317489439e-26,
+          6.50742497406151e-26
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2061323227006688e-16,
+          2.2522168125283964e-16,
+          2.2136221452739563e-15
+        ],
+        "position": [
+          3.586830147066368e-16,
+          5.436213606485622e-16,
+          4.0049331022317607e-16
+        ],
+        "original_kkt": [
+          1.773927565951749e-18,
+          2.1278024826919787e-18,
+          2.0602828986682714e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.018374581717823e-30,
+        "boundary_constraint": 2.587057798767392e-15
+      },
+      "anchor_consistency": [
+        9.428966447339071e-12,
+        7.697575056671993e-12,
+        1.4494686978047237e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 1.3582092537011164e-09,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        136,
+        136,
+        136
+      ],
+      "sizes": [
+        38,
+        81,
+        25,
+        241
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 240.6720000000205,
+      "artifact": "build/analysis/paired-geometry-ancf-qualified-20261104-222016/standard-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "f4c775363ca56f26cdea26faa6288e1c0b7d343d0b0e2e15fa84d51e9dc055f8"
+    }
+  ],
+  "stops": [],
+  "all_numerical_checks": true,
+  "accuracy": [
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.3753505033013875e-16,
+      "thin_error": 2.269496800208474e-16,
+      "ratio": 0.9554365964324876,
+      "finest": true,
+      "uniform": true,
+      "convergence": false,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 2.218113825693811e-15,
+      "thin_error": 2.2174502104807466e-15,
+      "ratio": 0.9997008200366558,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 5.268609597812222e-16,
+      "thin_error": 5.640833522513378e-16,
+      "ratio": 1.070649365414306,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 4.0290600032353336e-16,
+      "thin_error": 4.113432534849526e-16,
+      "ratio": 1.0209409965466985,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.2606881125241116e-16,
+      "thin_error": 2.2522168125283964e-16,
+      "ratio": 0.9962527781038062,
+      "finest": true,
+      "uniform": true,
+      "convergence": false,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 2.2135329580217922e-15,
+      "thin_error": 2.2136221452739563e-15,
+      "ratio": 1.0000402918112608,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 5.188133798985076e-16,
+      "thin_error": 5.436213606485622e-16,
+      "ratio": 1.0478167713309698,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 4.008107388772465e-16,
+      "thin_error": 4.0049331022317607e-16,
+      "ratio": 0.9992080335597804,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "coarse_thickness_error": 1.0223678851498765e-10,
+      "thin_error": 1.0224599225789019e-10,
+      "ratio": 1.0000900237872905,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.2080333721753638e-08,
+      "thin_error": 2.2082396329431028e-08,
+      "ratio": 1.0000934137909048,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 8.09080652417413e-07,
+      "thin_error": 8.091612137484621e-07,
+      "ratio": 1.0000995714466887,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "coarse_thickness_error": 1.2984583944122365e-14,
+      "thin_error": 1.1883988544215796e-14,
+      "ratio": 0.9152383006923555,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 2.7867530445971815e-12,
+      "thin_error": 2.550062813522023e-12,
+      "ratio": 0.9150659468968584,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 1.0783149335430125e-10,
+      "thin_error": 9.869852721569515e-11,
+      "ratio": 0.9153033510479358,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "coarse_thickness_error": 1.0222887329248199e-10,
+      "thin_error": 1.0224599658246608e-10,
+      "ratio": 1.000167499547169,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.208013257011505e-08,
+      "thin_error": 2.208239630126522e-08,
+      "ratio": 1.0001025234401553,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 8.090806201210441e-07,
+      "thin_error": 8.091612137369094e-07,
+      "ratio": 1.0000996113537526,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "coarse_thickness_error": 1.6070810202890065e-14,
+      "thin_error": 1.1891255372737259e-14,
+      "ratio": 0.739928804000113,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 2.909366363742021e-12,
+      "thin_error": 2.550807527267957e-12,
+      "ratio": 0.8767570695314953,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 1.0785981066581826e-10,
+      "thin_error": 9.869858586402226e-11,
+      "ratio": 0.9150635927761807,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": false
+    }
+  ],
+  "adoption_candidate_qualified": true,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "human_independent_review": false,
+  "seconds": 1550.125,
+  "peak_bytes": 775569408,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-qualification-protocol.md": "2af71c9d4e3546a20e79100b1362868daeb332045eaa8d110d7f64e02b173194",
+    "rd/structure/main-shell/paired-geometry/records/paired-geometry-ancf-protocol.md": "98c305ea826b9d5c1827dbda91986c3bdde5c703d6270766b7aaf160b5b13ee9",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_geometry_ancf.py": "a4fa7105f896ddc825f0cc482e6ef0949f8e2c0dc0768d9f997ad761592d1c95",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_curvature_profiles.py": "1ae53ab1ab525c93ccb97b6aaf84ba130b85f57ae753385226e55df9d2ab2e98",
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_gc_qualification.py": "4a119012dab4c2071d1737185bbe8503b187f16e89437ab60edaada54ac2f2b5",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_validation_stream.py": "d8fb5d010237c89021977628d17ddf70ac5e46ef9eac46a6f7ef289ed21714e2",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_stream.py": "b52857769f4d02117374842c4cbb65b13506c51548d1a2e5bbd7c2141ff8af50",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v6.py": "9a6e07f4bf4920ce0adb17438e06f0298efaba6dfcccf096f7c69629a12d2c90",
+    "rd/structure/main-shell/reference-work/experiments/stable_curvature_profiles.py": "2738c0ab7129b2f5252962b25f7129431b3217043ba7afb7665cd12a3ea15fac",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-qualification-protocol.md": "0e63131c954eb5b99b51d8218367a5aa4419681fa53b93cb9284ea6ddc513c4d"
+  }
+}

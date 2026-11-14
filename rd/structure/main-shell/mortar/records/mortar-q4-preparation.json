@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-04",
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/mortar_q4.py": "e836a825f48dbab5065be822e5c71096741368f2c48842124dd91052d5d249cd",
+    "rd/structure/main-shell/mortar/experiments/check_mortar_q4.py": "02ec6d0dfc2c08fb934ba03b2a0dc92218c71452bc22ee391f3d0a490fbdd705",
+    "rd/structure/main-shell/mortar/experiments/audit_mortar_q4.py": "db9fe4b431d405b7a0c86da8c61363055d9847fbde8b0a15174d64fa718c7a73",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/mortar/mortar-q4-formulation.md": "e13c762aabfc0990e60afaf3b06798aa1cb32aaa50978cac44eb54e55412b864",
+    "rd/structure/main-shell/mortar/records/mortar-q4-protocol.md": "81af22d1d6e7d8b3084ff033ef7fb15749fb6ae316389370dc1564d020423f4f",
+    "rd/structure/main-shell/q4-projection/records/tying-projection-v2-result.json": "5b7dd19b929a45b782a9eece9823afa4c50d43d157093ceeb2e38874ea62a4be"
+  }
+}

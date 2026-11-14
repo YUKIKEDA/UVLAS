@@ -1,0 +1,19 @@
+{
+  "source_sha256": "1cf4a945a54940ff747bc1a1528d25cd45b185c664e2ae6e5f04aaeef8081aa2",
+  "preparation_sha256": "b91f7f8bcf2f3c5f89c18609ce8a042fb6fc70e75f3187804348237fc502da54",
+  "runs_sha256": "879b4a2b72f4f5b8cc64aa016552eb27a5305c04fc2fe2d767521f1105fade3f",
+  "load_sha256": "d3b3d3fdb109452c202c6bd492135e692a5d1bab0e192b20c499cfe5a33f0522",
+  "failed_runs_sha256": "6102612a1f13adb2176caf440b0e8b4aebd494c34ba0a21fa881caae4866768a",
+  "recompiled_objects": 1,
+  "reused_objects": 40,
+  "changed_constants": 1,
+  "load_cases": 8,
+  "regression_cases": 8,
+  "compared_outputs": 66,
+  "regression_seconds": 268.916210306,
+  "peak_resident_bytes": 3433349120,
+  "runner_recorded_parent_build_resource": true,
+  "corrected_build_resource_sha256": "78dbf9906a080f074831826da37703e950baf26c088e3950b54c3f21ef93c4a0",
+  "all_criteria_pass": true,
+  "reference_acceptance": false
+}

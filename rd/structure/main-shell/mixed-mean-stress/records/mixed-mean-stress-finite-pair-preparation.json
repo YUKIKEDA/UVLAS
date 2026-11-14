@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_finite.py": "8eaf11dc5a49ae05531f96ff74e60822f2402d4a80ef3f2502413d69a3788828",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_finite_pair.py": "1077e7351a225ce25dbfdd89ea07d9d2730db4d855535febd7d44cc27ac5a5f2",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_finite_full.py": "a94bf8275597c447dce7838c21f16806af0a44491f529870de4a46743ce391c3",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_position_recovery_action.py": "b1c2246a964b89eaaca7888c49e310bac962467c26c866d98f97ec25f74ecde4",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element_v2.py": "aa9322d39d8528455c2f5acb9a9f3195ad42d9542d47222736e58de2b6563d9a",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-pair-protocol.md": "244942e80e260a59695a7c8d7b945e323ec2cee4f46e22744a8f7b6ba05967de",
+    "rd/structure/main-shell/moment-enriched/records/moment-position-recovery-action-result.json": "8cb282de5b23f204b88192d6adeaf6a6abc669ea992fde1eef89b25bc1e44b93",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-bending-disposition.json": "a3636c4ffa2f4151ba81ad3bcf24a1cdb5b78a6f15556979a486731bf94c72a8",
+    "rd/structure/main-shell/mixed-mean-stress/mixed-mean-stress-finite-formulation.md": "ba8a93217eab8af173ac05e6d63805308bd9d698c2b8934077f291b973572a3c"
+  }
+}

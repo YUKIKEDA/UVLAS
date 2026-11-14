@@ -1,0 +1,24 @@
+{
+  "source_sha256": "4b810acf62db981b6a2440bb038ec7e705c97bf66b08890185fe323f6a6ff259",
+  "diagnostic_sha256": "a7f00adf710e629b869f854668ca8202378d8ec5fb4a8c10fd5037aa18d55c3d",
+  "figures_sha256": "45c6426317adadb23905c290d755158a7306f11fcf00f18238f050b0f2e203e9",
+  "preparation_sha256": "1f410cc62e5d2d3af29e0e9a226606a6a6b25aa43b60927dd7560efbf0984f6b",
+  "channels": 10,
+  "scalar_series": 6,
+  "manufactured_cases": 9,
+  "refusals": 4,
+  "independent_decimal_maximum_difference": 8.673617379884035e-19,
+  "tip_energy_range": [
+    0.6855704023721028,
+    0.7961737371320556
+  ],
+  "scalar_spatial_cancellation_range": [
+    1.0,
+    1.0
+  ],
+  "next_inputs": 4,
+  "new_avl_runs": 0,
+  "output_bytes": 642112,
+  "reference_acceptance": false,
+  "all_criteria_pass": true
+}

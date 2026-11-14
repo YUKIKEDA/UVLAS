@@ -1,0 +1,5 @@
+{
+  "reason": "Interrupted during exact integer basis preprocessing for the first distorted curved cell; first three completed configurations preserved. Arithmetic cost, not a physical or numerical gate failure.",
+  "checkpoint": "build/analysis/mixed-mean-stress-20261104-154026/checkpoint.json",
+  "checkpoint_sha256": "367f96cc9fd6ed5d03a1f2368a7c1cd249dc267c0c909b788be26996e0cab7e2"
+}

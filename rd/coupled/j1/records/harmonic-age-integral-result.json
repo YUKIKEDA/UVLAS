@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "WP1_triangle_vs_age_derivative",
+      "relative_error": 1.65110486012353e-11
+    },
+    {
+      "case": "complex_capable_finite_segment",
+      "relative_error": 0.0
+    }
+  ],
+  "sources": {
+    "rd/coupled/j1/experiments/check_harmonic_age_integral.py": "606e88b4751423880208551a218760297f61653d54a2202e69a93c4c8162cffa",
+    "rd/aero/unsteady-reference/experiments/uvlm_harmonic_reference.py": "d64fad7a87174e2249408780a09a64cb35a9c82554c6cfafb8fe7e70b86c5ba9",
+    "rd/aero/unsteady-reference/experiments/uvlm_analytic_induction_v2.py": "a2fae675ff931fbd6db4eff89209dfe2436eea3da5a321180749b0974d630f63"
+  },
+  "seconds": 1.0309999999590218
+}

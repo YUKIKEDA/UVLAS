@@ -1,0 +1,12 @@
+{
+  "source_sha256": "9f573453a3f838b1662c835ec148eb0896f288a51ce6bfe7b1acd9ca7906439d",
+  "preparation_sha256": "19ee9303dacd7933faa67d0ac2ece350d38ac4077a7d2e5f02e4894fbb4ae5f2",
+  "cases": 4,
+  "unknowns": [
+    6144,
+    9216
+  ],
+  "within_current_capacity": true,
+  "new_runs": 0,
+  "all_criteria_pass": true
+}

@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "structural_review_complete": true,
+  "uvlm_2_1_complete": true,
+  "uvlm_2_2_complete": true,
+  "uvlm_2_3_complete": true,
+  "uvlm_2_4_complete": true,
+  "uvlm_review_complete": true,
+  "j1_review_complete": false,
+  "product_implementation_start": false,
+  "independent_harmonic_observations": 12,
+  "max_combined_relative_indicator": 0.008899798277495905,
+  "current_work": "3 joint coupling, time, initialization, constrained nonlinear mechanics, full wake state and stability",
+  "default_universal_core_selected": false,
+  "physical_product_acceptance_complete": false
+}

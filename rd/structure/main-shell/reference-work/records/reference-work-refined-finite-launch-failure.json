@@ -1,0 +1,106 @@
+{
+  "reason": "Preparation script referenced an absent equilibrium_v2 helper; finite process had been launched before the preparation failure was checked. Interrupted with Ctrl-C after first checkpoint. No adoption uses this unregistered run.",
+  "interrupted": true,
+  "model_or_threshold_changed": false,
+  "checkpoints": [
+    {
+      "path": "build/analysis/reference-work-refined-finite-20261104-122746/checkpoint.json",
+      "sha256": "0bc8c2f81ca1737e56e50e69f738dc0920228854e636a8b3be5ef83618fc0798",
+      "data": {
+        "records": [
+          {
+            "kind": "RW3",
+            "kappa": 0.4,
+            "n": 4,
+            "amplitude": 0.2,
+            "h": 0.01,
+            "fit": {
+              "compressed_error": [
+                8.140973002961823e-08,
+                1.653403835683306e-06
+              ],
+              "kkt": [
+                5.369810979687116e-15,
+                9.912693060067211e-15
+              ],
+              "linear_residual": [
+                4.8824121978579975e-14,
+                1.4102238389804483e-13
+              ],
+              "local_rcond": 0.00018071006104783437,
+              "global_rcond": 3.317504038170845e-05,
+              "initial_compressed_kkt": [
+                5.369810979687116e-15,
+                9.912693060067211e-15
+              ],
+              "initial_linear_residual": [
+                4.8824121978579975e-14,
+                1.4102238389804483e-13
+              ],
+              "pre_correction_system_residual_at_final_solution": [
+                4.872899391357551e-14,
+                1.38299288681519e-13
+              ],
+              "error": [
+                8.140971813919056e-08,
+                1.6534037752900389e-06
+              ],
+              "direct_kkt": [
+                1.5862313838204997e-13,
+                5.43074425195283e-13
+              ],
+              "correction_history": [
+                {
+                  "iteration": 0,
+                  "error": [
+                    8.140971813919056e-08,
+                    1.6534037752900389e-06
+                  ],
+                  "direct_kkt": [
+                    1.5862313838204997e-13,
+                    5.43074425195283e-13
+                  ]
+                }
+              ],
+              "correction_stop_reason": null,
+              "objective_evaluation": "original_primary_physical_strain_and_stabilization",
+              "FE_operator_changed": false
+            },
+            "observed": {
+              "error": [
+                8.14097192366702e-08,
+                1.653403777867531e-06
+              ],
+              "elastic_error": [
+                8.094330708766812e-08,
+                7.965181663639786e-07
+              ],
+              "stabilization_error": [
+                8.701920702059154e-09,
+                1.4488971196461085e-06
+              ],
+              "h1": [
+                0.4904348764565305,
+                2.12843558541814
+              ]
+            },
+            "checks": {
+              "local_condition": true,
+              "global_condition": true,
+              "local_ranks": true,
+              "linear": true,
+              "kkt": true,
+              "direct_kkt": true,
+              "quadrature": true,
+              "H1": true,
+              "resources": true
+            },
+            "seconds": 25.0,
+            "artifact": "build/analysis/reference-work-refined-finite-20261104-122746/k0.4-a0.2-n4-h0.01.npz",
+            "artifact_sha256": "fdfcb3e20cd16babdcccc477bb464a2d00cb76750041d16042aaa6c7985c5ac8"
+          }
+        ]
+      }
+    }
+  ]
+}

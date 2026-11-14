@@ -1,0 +1,61 @@
+{
+  "source_sha256": "a5011e86b6727e08dfb4716510eed0a55ee5eaeb9d13e4e984132c0bab463e1d",
+  "watchdog_sha256": "17da4a651d4bb81ff73308d25f1c1214b0da10e02eddd340e9e3685aa699ee90",
+  "termination_source_sha256": "cff867c82faad9ce7677ba3b44e097337a9b18c1c80d6e4e3f4fb1f62e7d1495",
+  "cases": [
+    {
+      "name": "normal",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "name": "boundary",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "name": "time",
+      "reason": "per_process_time_limit",
+      "passed": true
+    },
+    {
+      "name": "stage",
+      "reason": "stage_time_limit",
+      "passed": true
+    },
+    {
+      "name": "rss",
+      "reason": "process_group_rss_limit",
+      "passed": true
+    },
+    {
+      "name": "console",
+      "reason": "console_limit",
+      "passed": true
+    },
+    {
+      "name": "disk",
+      "reason": "disk_limit",
+      "passed": true
+    },
+    {
+      "name": "available",
+      "reason": "available_floor",
+      "passed": true
+    },
+    {
+      "name": "swap",
+      "reason": "swap_increase_limit",
+      "passed": true
+    },
+    {
+      "name": "cgroup",
+      "reason": "unknown_cgroup",
+      "passed": true
+    }
+  ],
+  "start_cases": 3,
+  "real_termination": true,
+  "child_return_code": -9,
+  "all_criteria_pass": true
+}

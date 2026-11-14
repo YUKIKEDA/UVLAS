@@ -1,0 +1,28 @@
+# Matches the style of the existing sources in src/ and include/.
+# The formatter version is pinned in the justfile (clang-format recipe).
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: Latest
+IndentWidth: 4
+ColumnLimit: 100
+AccessModifierOffset: -4
+PointerAlignment: Left
+ReferenceAlignment: Left
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: NextLine
+SpacesBeforeTrailingComments: 1
+InsertNewlineAtEOF: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"uvlas/'
+    Priority: 1
+  - Regex: '^<(Eigen|Spectra|boost|nlohmann|pybind11|catch2)[/.]|^<unsupported/'
+    Priority: 2
+  - Regex: '^<'
+    Priority: 3
+  - Regex: '.*'
+    Priority: 1

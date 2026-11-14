@@ -1,0 +1,9 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mortar/experiments/audit_mortar_q4_v2.py": "5cb4addf7f36bcc1fdf474010907faba5c9c6dc4b13550b5d5fdff5b34ecf035",
+    "rd/structure/main-shell/mortar/experiments/mortar_q4.py": "e836a825f48dbab5065be822e5c71096741368f2c48842124dd91052d5d249cd",
+    "rd/structure/main-shell/mortar/records/mortar-q4-result.json": "8df6126cbe758482246aa6691759192fea73aef92ad1f9a86755bdb598d95302",
+    "rd/structure/main-shell/mortar/records/mortar-q4-audit.json": "520e32eb734f58fd1a3bf6b5e3909a57038ce1b1d8fa2222b58b97e26169e6be",
+    "rd/structure/main-shell/mortar/records/mortar-q4-audit-v2-protocol.md": "53f9abe6fb044e52777461e07344daa2697b223e86c60fe5f7bf2f727256a709"
+  }
+}

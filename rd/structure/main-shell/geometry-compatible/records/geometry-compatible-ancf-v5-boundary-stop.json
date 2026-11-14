@@ -1,0 +1,10 @@
+{
+  "all_checks_pass": false,
+  "stage": "boundary_sampling_preflight",
+  "reason": "The stabilized trace space is larger than the old 13-samples-per-edge constraint can identify; stopped before acceptance and increased exact-trace sampling.",
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v5.py": "eb395c00f96b90e1d485314f15d08cf8ee9ea8c5a418194d301bcb829fad537b",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_stable_solve.py": "967d5be5461e4475495617ac38055e9bd0ae481fe51dc3cddf338aba9c132f93",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-v5-protocol.md": "e82948a6018c0d04843832e6db08665ff00f32f5d13c146cf41ac861d82307a7"
+  }
+}

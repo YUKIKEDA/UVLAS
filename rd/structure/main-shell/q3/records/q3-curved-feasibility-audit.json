@@ -1,0 +1,695 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 1,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 6.084662100691496e-14,
+          "primary_difference": 2.6224744480557925e-16,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.6350604767188685e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 2.6410946353938617e-15,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 1,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 6.151965062646801e-12,
+          "primary_difference": 3.3551240451075545e-13,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.8754619158831673e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 2.8754619158831673e-15,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 3.062684484086575e-14,
+          "primary_difference": 1.6465142660564489e-16,
+          "displacement": 9.71445146547012e-17,
+          "work_difference": 2.536256263395973e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 1.463844735170405e-13,
+          "primary_difference": 3.721759465824675e-14,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.6027346949806957e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 2.8909343424707204e-14,
+          "primary_difference": 2.7273532432774724e-15,
+          "displacement": 9.71445146547012e-17,
+          "work_difference": 2.4301371837999885e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 1.3688745163327458e-13,
+          "primary_difference": 5.1476810393660126e-14,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.521642679509451e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 3.4019776416099576e-15,
+      "actual_thickness_trace": 5.329070518200751e-15
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 3.1298582884936252e-12,
+          "primary_difference": 7.544344960703741e-14,
+          "displacement": 9.71445146547012e-17,
+          "work_difference": 2.652444425995626e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 1.4892012568553606e-11,
+          "primary_difference": 3.949772790955188e-12,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.8845884221329332e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 2.99447762227364e-12,
+          "primary_difference": 1.486834388506794e-13,
+          "displacement": 9.71445146547012e-17,
+          "work_difference": 2.6904367473035486e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 1.3960188499059281e-11,
+          "primary_difference": 4.773370903887821e-12,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.5272013477721273e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 3.3257723937047566e-15,
+      "actual_thickness_trace": 2.6645352591003757e-15
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 1,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 6.084662100691496e-14,
+          "primary_difference": 2.6224744480557925e-16,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.6350604767188685e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 2.6410946353938617e-15,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 1,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 6.151965062646801e-12,
+          "primary_difference": 3.3551240451075545e-13,
+          "displacement": 3.885780586188048e-16,
+          "work_difference": 2.8754619158831673e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 2.8754619158831673e-15,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 3.7289034851215685e-14,
+          "primary_difference": 1.0203187190738051e-14,
+          "displacement": 1.3877787807814457e-16,
+          "work_difference": 2.5869819815757415e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 1.7032127073519858e-13,
+          "primary_difference": 3.3489394133294736e-14,
+          "displacement": 5.551115123125783e-16,
+          "work_difference": 2.627307584685409e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 3.512206148721244e-14,
+          "primary_difference": 1.9593759896593058e-16,
+          "displacement": 1.3877787807814457e-16,
+          "work_difference": 2.5706859074566773e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 1.6584224530754907e-13,
+          "primary_difference": 6.325734059563729e-14,
+          "displacement": 5.551115123125783e-16,
+          "work_difference": 2.6485408043901163e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 3.463800153361443e-15,
+      "actual_thickness_trace": 1.0658141036401503e-14
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 3.775589435388261e-12,
+          "primary_difference": 1.0363816808671055e-12,
+          "displacement": 1.3877787807814457e-16,
+          "work_difference": 2.540017477661276e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 1.6841486287481648e-11,
+          "primary_difference": 2.9151418425320744e-12,
+          "displacement": 5.551115123125783e-16,
+          "work_difference": 2.5518031203339343e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 3.5212603795130866e-12,
+          "primary_difference": 2.0241650920449373e-13,
+          "displacement": 1.3877787807814457e-16,
+          "work_difference": 2.3945006873242004e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 1.6912070507184916e-11,
+          "primary_difference": 5.9808155253305425e-12,
+          "displacement": 5.551115123125783e-16,
+          "work_difference": 2.414569348961421e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 3.093043390005897e-15,
+      "actual_thickness_trace": 1.4210854715202004e-14
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 1,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 7.695623869616291e-14,
+          "primary_difference": 2.412707856968465e-16,
+          "displacement": 8.326672684688674e-16,
+          "work_difference": 1.7398134396369314e-14,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 1.7395561000826425e-14,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 1,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 7.988547041351233e-12,
+          "primary_difference": 1.3562366963267732e-13,
+          "displacement": 7.771561172376096e-16,
+          "work_difference": 1.5035167194545555e-12,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 1.503941693306856e-12,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 3.688793822754018e-14,
+          "primary_difference": 8.653012213287485e-16,
+          "displacement": 2.0816681711721685e-16,
+          "work_difference": 9.745756511148411e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 1.8198003194443107e-13,
+          "primary_difference": 5.228351181596845e-14,
+          "displacement": 7.216449660063518e-16,
+          "work_difference": 7.411020029011675e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 3.774227589913364e-14,
+          "primary_difference": 1.0153728060250152e-15,
+          "displacement": 2.0816681711721685e-16,
+          "work_difference": 7.0649101144289915e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 1.7783219192775498e-13,
+          "primary_difference": 5.836314385860243e-14,
+          "displacement": 7.216449660063518e-16,
+          "work_difference": 7.225733794907634e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 1.0864939375933087e-14,
+      "actual_thickness_trace": 5.329070518200751e-15
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 3.621541908437481e-12,
+          "primary_difference": 8.462750091409595e-14,
+          "displacement": 1.942890293094024e-16,
+          "work_difference": 6.580805643064455e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 1.8738555902888432e-11,
+          "primary_difference": 4.441239264852877e-12,
+          "displacement": 6.661338147750939e-16,
+          "work_difference": 5.981981374992836e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 3.6684940436608975e-12,
+          "primary_difference": 1.209415211042e-13,
+          "displacement": 1.942890293094024e-16,
+          "work_difference": 6.596074205955849e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 1.8623235139917597e-11,
+          "primary_difference": 4.62880179421839e-12,
+          "displacement": 6.661338147750939e-16,
+          "work_difference": 4.892570257239991e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 8.25845063223178e-13,
+      "actual_thickness_trace": 5.329070518200751e-15
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 1,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 7.695623869616291e-14,
+          "primary_difference": 2.412707856968465e-16,
+          "displacement": 8.326672684688674e-16,
+          "work_difference": 1.7398134396369314e-14,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 1.7395561000826425e-14,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 1,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 7.988547041351233e-12,
+          "primary_difference": 1.3562366963267732e-13,
+          "displacement": 7.771561172376096e-16,
+          "work_difference": 1.5035167194545555e-12,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 1.503941693306856e-12,
+      "actual_thickness_trace": 0.0
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 4.322741967392307e-14,
+          "primary_difference": 4.7760623650297914e-15,
+          "displacement": 2.220446049250313e-16,
+          "work_difference": 5.792599203710335e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 2.094742369819257e-13,
+          "primary_difference": 4.131710831423118e-14,
+          "displacement": 7.771561172376096e-16,
+          "work_difference": 6.757872004794634e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 4.6352804728269666e-14,
+          "primary_difference": 4.254431949722592e-16,
+          "displacement": 2.7755575615628914e-16,
+          "work_difference": 6.07857815533509e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 2.1071070520301075e-13,
+          "primary_difference": 5.5073772138488976e-14,
+          "displacement": 8.881784197001252e-16,
+          "work_difference": 8.668693534044167e-15,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 9.612613640135062e-15,
+      "actual_thickness_trace": 1.0658141036401503e-14
+    },
+    {
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "local": [
+        {
+          "cell": 0,
+          "energy_error": 4.4661577726289526e-12,
+          "primary_difference": 4.850221108696794e-13,
+          "displacement": 1.942890293094024e-16,
+          "work_difference": 5.789061109381616e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 1,
+          "energy_error": 2.0844339111646095e-11,
+          "primary_difference": 4.642223490845971e-12,
+          "displacement": 6.106226635438361e-16,
+          "work_difference": 6.536019849086612e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 2,
+          "energy_error": 4.653419543164238e-12,
+          "primary_difference": 3.48712516751665e-14,
+          "displacement": 2.220446049250313e-16,
+          "work_difference": 6.078062267486789e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        },
+        {
+          "cell": 3,
+          "energy_error": 2.1392801449253318e-11,
+          "primary_difference": 4.726407313937205e-12,
+          "displacement": 8.326672684688674e-16,
+          "work_difference": 4.4003387748062525e-13,
+          "checks": {
+            "strain": true,
+            "primary_difference": true,
+            "displacement": true,
+            "work": true
+          }
+        }
+      ],
+      "shared_work": 7.950140253056807e-13,
+      "actual_thickness_trace": 1.0658141036401503e-14
+    }
+  ],
+  "all_checks_pass": true,
+  "physical_adoption": false,
+  "independent_mesh_generation": false,
+  "independent_resolve": false,
+  "sources": {
+    "rd/structure/main-shell/q3/experiments/audit_q3_curved_feasibility.py": "af77409875a618a77386e71f8f763b7db2c2937dd687abf67616ecf11e286c7f",
+    "rd/structure/main-shell/q3/experiments/q3_curved_independent.py": "0a716302cc4360b2012d56f7b34c3aff2a2622ddcad3d34a4b53c40b2ffbc113",
+    "rd/structure/main-shell/q3/records/q3-curved-feasibility-result.json": "8a8cb00ac1d0ca46957612d6177c1569cb631dac7e463f4ef6430879f9cdd042",
+    "rd/structure/main-shell/q3/records/q3-curved-feasibility-experiment.md": "0799b683bc00324382b88c5cbb579d2c158980ef246d186a69746da60ad85792"
+  },
+  "seconds": 0.9839999999967404
+}

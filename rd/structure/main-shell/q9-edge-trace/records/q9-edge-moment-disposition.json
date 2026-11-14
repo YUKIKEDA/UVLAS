@@ -1,0 +1,17 @@
+{
+  "source_sha256": "5455fcbe2cd808e7885ebbb932b073a436621c5c27b9e8641c417a5201c5c669",
+  "evidence_sha256": {
+    "q9-edge-moment-feasibility-result.json": "212e7aae317e16f5ecb2d3ee29513381ae4c8150879f92ec000edd15f3db89cf",
+    "q9-edge-moment-feasibility-audit.json": "46b4e574dd991dea603a8bd389be843c72a05803c3666a29a138b1a19554a7a2",
+    "q9-edge-moment-results.md": "b87ac1540dfd40e2004c702e0f2fb44bc9a10eed7867f40f8afa957bdeffcf1d"
+  },
+  "candidate": "G-EM1",
+  "linear_value_work_trace_feasible": true,
+  "local_rank_gates_pass": true,
+  "flat_T_S36_inheritance_pass": true,
+  "independent_reconstruction_pass": true,
+  "curved_shared_shear_space_closed": false,
+  "nonlinear_material_initial_strain_closed": false,
+  "decision": "retain candidate for general-field adjoint and nonlinear review",
+  "product_shell_adopted": false
+}

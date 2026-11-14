@@ -1,0 +1,19 @@
+{
+  "source_sha256": "f0571e631e2d192dd69259da5c711f1d51587b9883e089f83bd1d9a18e5e2717",
+  "evidence_sha256": {
+    "q9-distorted-energy-result.json": "17109150822020e8ee0b4faf0b5dd947ed38acb7e7d6992441e1f4b79ae56895",
+    "q9-distorted-energy-artifact-audit.json": "b2f2ad0cb529331cea38bcc0c731ae48d02f6b6641390a49b3dce28907fde46d",
+    "q9-shear-projection-gate-result.json": "b2dfadc4149c2ecb8eb8e084f0ec78db175e7bb7e7c0a990f24bc5b6c65831f8",
+    "q9-shear-projection-gate-audit.json": "d8bd6c9afe0cb1b90a15acb303171d46ec83a79a0d4a4097ce2cad42920f7e2f",
+    "q9-shear-projection-plate-result.json": "1c4328f5bcb310c476a048c24049e4d9ecb8e7f9f42e7ca236e83f7356e17a02",
+    "q9-shear-projection-plate-artifact-audit.json": "5fc65b118c8828bc3293e720b383c051aafe0153f7fcb63c7192e4468648111e",
+    "q9-shear-projection-same-reference-diagnostic.json": "8512e93eff6a5a2baf00cd6c653e445b60e1e19822d6b8be72408dabb5344186",
+    "q9-shear-projection-results.md": "1dead563f19532ea8a1cea8082f336fc95e29c33f97578a9bdb3fe5bc29b449c"
+  },
+  "energy_diagnostic_pass": true,
+  "local_gate_pass": true,
+  "global_experiment_pass": false,
+  "global_observation_audit_pass": false,
+  "product_shell_adopted": false,
+  "decision": "P-S36 alone not adopted; thin-uniformity and reference-metric audit remain unmet"
+}

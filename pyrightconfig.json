@@ -1,0 +1,6 @@
+{
+  "include": ["tools"],
+  "exclude": ["rd", "out", "build", ".agents", ".claude", "docs"],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "strict"
+}

@@ -1,0 +1,20 @@
+---
+description: 数値設計・実装・レビューで常に守る境界（SE-01〜14）への入口
+alwaysApply: true
+---
+
+# ソルバー開発の共通Rules
+
+数値設計、R&D、実装、レビューでは次を読む。
+
+- [共通Rules SE-01〜14](../../docs/engineering/solver-engineering-rules.md)
+- [UVLASレビュー・プロファイル](../../docs/engineering/uvlas-review-profile.md)：採用仕様の正本と優先関係、優先的に探す回帰
+- [知見と根拠](../../docs/engineering/lessons-and-evidence.md)：P-01〜07、N-01〜22
+
+要点：
+
+- 元系と消費表現の精度、全必要微分、時刻・履歴・輸送政策、仕事・トレース、失敗時の親状態不変を守る。
+- 局所成立から共有後の空間・全体系の成立を推論しない（SE-05）。
+- rank方向の削除、人工支持、接線の対称化、未認定の縮約を、実装最適化と呼ばない。
+- レビューでは仕様自身も審査する（SE-14）。
+- 古い候補、Euler／BDF1試作を、現在の採用仕様と取り違えない。採用仕様は `docs/specs/`、経緯は `rd/` にある。

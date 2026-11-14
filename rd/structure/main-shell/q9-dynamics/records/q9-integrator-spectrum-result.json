@@ -1,0 +1,376 @@
+{
+  "protocol": "rd/structure/main-shell/q9-dynamics/records/q9-integrator-candidate-comparison.md#6",
+  "source_sha256": "fe0e2b38148c7778a92311e98c46ddbd03494b23bb668e9b3a53483ba27b0210",
+  "dependency_sha256": "ad5a2f9e8f4e5c9672bcd1e72e160c444f8772daac68a7c5eb6e9c0c031a1629",
+  "nonlinear_result_sha256": "1caa7680de03cfbd90bb428047116e11c8b7b3e8f6551541f52500f3df820e32",
+  "finite_frequency_cases": [
+    {
+      "rho": 1.0,
+      "h_omega": 0.01,
+      "spectral_radius": 1.0,
+      "eigenvalues": [
+        [
+          -1.0,
+          0.0
+        ],
+        [
+          0.9999500012499688,
+          0.009999750006249844
+        ],
+        [
+          0.9999500012499688,
+          -0.009999750006249844
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 1.0,
+      "frequency_ratio": 0.9999916667916645
+    },
+    {
+      "rho": 1.0,
+      "h_omega": 0.1,
+      "spectral_radius": 1.0,
+      "eigenvalues": [
+        [
+          -1.0,
+          0.0
+        ],
+        [
+          0.9950124688279302,
+          0.09975062344139651
+        ],
+        [
+          0.9950124688279302,
+          -0.09975062344139651
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999999999999999,
+      "frequency_ratio": 0.9991679144388552
+    },
+    {
+      "rho": 1.0,
+      "h_omega": 1.0,
+      "spectral_radius": 1.0,
+      "eigenvalues": [
+        [
+          -1.0,
+          0.0
+        ],
+        [
+          0.6,
+          0.7999999999999999
+        ],
+        [
+          0.6,
+          -0.7999999999999999
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999999999999999,
+      "frequency_ratio": 0.9272952180016122
+    },
+    {
+      "rho": 1.0,
+      "h_omega": 10.0,
+      "spectral_radius": 1.0,
+      "eigenvalues": [
+        [
+          -1.0,
+          0.0
+        ],
+        [
+          -0.9230769230769231,
+          0.38461538461538447
+        ],
+        [
+          -0.9230769230769231,
+          -0.38461538461538447
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 1.0,
+      "frequency_ratio": 0.2746801533890032
+    },
+    {
+      "rho": 0.8,
+      "h_omega": 0.01,
+      "spectral_radius": 0.9999999999931417,
+      "eigenvalues": [
+        [
+          -0.5000003086408956,
+          0.0
+        ],
+        [
+          0.9999500012894047,
+          0.009999745376916972
+        ],
+        [
+          0.9999500012894047,
+          -0.009999745376916972
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999999999931418,
+      "frequency_ratio": 0.9999912038420884
+    },
+    {
+      "rho": 0.8,
+      "h_omega": 0.1,
+      "spectral_radius": 0.9999999316155782,
+      "eigenvalues": [
+        [
+          -0.5000308534065978,
+          0.0
+        ],
+        [
+          0.9950128612851354,
+          0.09974602302011348
+        ],
+        [
+          0.9950128612851354,
+          -0.09974602302011348
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999999316155782,
+      "frequency_ratio": 0.9991217481918042
+    },
+    {
+      "rho": 0.8,
+      "h_omega": 1.0,
+      "spectral_radius": 0.9994746140137885,
+      "eigenvalues": [
+        [
+          0.6025555166921184,
+          0.7974185559428033
+        ],
+        [
+          0.6025555166921184,
+          -0.7974185559428033
+        ],
+        [
+          -0.5029833738097688,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9994746140137885,
+      "frequency_ratio": 0.9237000416175986
+    },
+    {
+      "rho": 0.8,
+      "h_omega": 10.0,
+      "spectral_radius": 0.9297917671531133,
+      "eigenvalues": [
+        [
+          -0.8311605816452641,
+          0.4167551052894439
+        ],
+        [
+          -0.8311605816452641,
+          -0.4167551052894439
+        ],
+        [
+          -0.5917216520490673,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9297917671531133,
+      "frequency_ratio": 0.26768149138819897
+    },
+    {
+      "rho": 0.5,
+      "h_omega": 0.01,
+      "spectral_radius": 0.9999999998148272,
+      "eigenvalues": [
+        [
+          -3.7035939689480888e-06,
+          0.0
+        ],
+        [
+          0.9999500014814384,
+          0.009999708342040683
+        ],
+        [
+          0.9999500014814384,
+          -0.009999708342040683
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999999998148272,
+      "frequency_ratio": 0.9999875003475995
+    },
+    {
+      "rho": 0.5,
+      "h_omega": 0.1,
+      "spectral_radius": 0.9999981604239171,
+      "eigenvalues": [
+        [
+          -0.00036927757723867005,
+          0.0
+        ],
+        [
+          0.9950147717280582,
+          0.0997092016524964
+        ],
+        [
+          0.9950147717280582,
+          -0.0997092016524964
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.999998160423917,
+      "frequency_ratio": 0.9987534645547219
+    },
+    {
+      "rho": 0.5,
+      "h_omega": 1.0,
+      "spectral_radius": 0.9893127860157759,
+      "eigenvalues": [
+        [
+          0.6145960289471059,
+          0.7752493210424273
+        ],
+        [
+          0.6145960289471059,
+          -0.7752493210424273
+        ],
+        [
+          -0.029192057894210935,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9893127860157758,
+      "frequency_ratio": 0.9004782085658819
+    },
+    {
+      "rho": 0.5,
+      "h_omega": 10.0,
+      "spectral_radius": 0.6825284214864481,
+      "eigenvalues": [
+        [
+          -0.5630812246517148,
+          0.38572604343174394
+        ],
+        [
+          -0.5630812246517148,
+          -0.38572604343174394
+        ],
+        [
+          -0.25956911055146786,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.6825284214864481,
+      "frequency_ratio": 0.2540986281979324
+    },
+    {
+      "rho": 0.0,
+      "h_omega": 0.01,
+      "spectral_radius": 0.9999999950019987,
+      "eigenvalues": [
+        [
+          0.9999500000009991,
+          0.009999375080443781
+        ],
+        [
+          0.9999500000009991,
+          -0.009999375080443781
+        ],
+        [
+          0.4999750062476885,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999999950019987,
+      "frequency_ratio": 0.9999541773343914
+    },
+    {
+      "rho": 0.0,
+      "h_omega": 0.1,
+      "spectral_radius": 0.9999519176521883,
+      "eigenvalues": [
+        [
+          0.9950009523303965,
+          0.09938280775814506
+        ],
+        [
+          0.9950009523303965,
+          -0.09938280775814506
+        ],
+        [
+          0.4975602843939323,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9999519176521882,
+      "frequency_ratio": 0.9955194147969169
+    },
+    {
+      "rho": 0.0,
+      "h_omega": 1.0,
+      "spectral_radius": 0.9065633333045505,
+      "eigenvalues": [
+        [
+          0.6305405713414586,
+          0.6513644641709005
+        ],
+        [
+          0.6305405713414586,
+          -0.6513644641709005
+        ],
+        [
+          0.4055855239837504,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.9065633333045504,
+      "frequency_ratio": 0.8016412241929795
+    },
+    {
+      "rho": 0.0,
+      "h_omega": 10.0,
+      "spectral_radius": 0.24253562503633327,
+      "eigenvalues": [
+        [
+          -0.05882352941176466,
+          0.23529411764705915
+        ],
+        [
+          -0.05882352941176466,
+          -0.23529411764705915
+        ],
+        [
+          0.1666666666666665,
+          0.0
+        ]
+      ],
+      "oscillatory_amplitude_per_step": 0.24253562503633327,
+      "frequency_ratio": 0.18157749899217604
+    }
+  ],
+  "nonlinear_observed_orders": [
+    {
+      "rho": 0.8,
+      "observed_orders_640_1280": {
+        "displacement_mass_max": 2.0045383095045044,
+        "velocity_scaled_mass_max": 1.9589004207699707,
+        "physical_acceleration_relative": 2.005607487625674,
+        "pk2_increment_relative": 2.0034547448954454,
+        "low4_phase_space_max": 1.959444939278956
+      }
+    },
+    {
+      "rho": 0.5,
+      "observed_orders_640_1280": {
+        "displacement_mass_max": 2.010096247441694,
+        "velocity_scaled_mass_max": 1.961003373394929,
+        "physical_acceleration_relative": 2.0109480395144694,
+        "pk2_increment_relative": 2.009160937011199,
+        "low4_phase_space_max": 1.9623884057443801
+      }
+    },
+    {
+      "rho": 0.0,
+      "observed_orders_640_1280": {
+        "displacement_mass_max": 1.6751386808140734,
+        "velocity_scaled_mass_max": 1.6974929846966382,
+        "physical_acceleration_relative": 1.6748104841391782,
+        "pk2_increment_relative": 1.6754187368275202,
+        "low4_phase_space_max": 1.6974493129474353
+      }
+    }
+  ]
+}

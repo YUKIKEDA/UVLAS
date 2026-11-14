@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "explicit_linear_and_C1_Hermite_histories",
+      "polynomial_errors": [
+        4.440892098500626e-16,
+        9.992007221626409e-16,
+        7.549516567451064e-15
+      ],
+      "all_internal_knots_registered_as_events": true,
+      "no_implicit_extrapolation": true
+    },
+    {
+      "case": "history_negative_controls",
+      "rejected": 6
+    },
+    {
+      "case": "finite_elastic_viscous_support_vs_harmonic_ODE",
+      "response_error": 8.90538034933604e-13,
+      "cycle_power_error": 2.9238208446870603e-16,
+      "not_product_time_integrator_adoption": true
+    },
+    {
+      "case": "actual_supported_beam_shell_vs_independent_series",
+      "tip_error": 6.110667527536862e-13,
+      "original_residual": 4.483085079273225e-14,
+      "finite_spring": 5.0
+    },
+    {
+      "case": "actual_state_atomic_failure_and_restart",
+      "operator_difference": 0.0,
+      "bitwise_identity": true,
+      "negative_controls": 5,
+      "scope": "binary64-qualified structural physical state; coupled integrator/wake format is work 3/4"
+    }
+  ],
+  "failures": [],
+  "seconds": 5.937000000034459,
+  "sources": {
+    "rd/structure/integration/experiments/check_structural_history_state.py": "1a5763226c74ddc528e1c0f82715684b262538930c55fdb267a397a57a4f295a",
+    "rd/structure/integration/experiments/structural_history_state.py": "a0da3b26f3ab7d6f08028be0c6f9e673b8208e8626087292a699446cc9f1f2f7",
+    "rd/structure/integration/experiments/structural_load_damping.py": "2a0547bf6f8bb1d601cf080894734ac1aa358134dd52eb5bf636847bbfc10a09",
+    "rd/structure/integration/experiments/check_structural_combined.py": "db79dee63cbe426da1275348048a1f7f26996b8776daa83db056b17132ea130c",
+    "rd/structure/integration/records/structural-combined-result.json": "a68d7332fcc145f83efa4ba6a91b1b0ba19b280fed4facd9fe0aaed0c5ff7a07",
+    "rd/structure/integration/records/structural-final-integration-protocol.md": "866eaeb93cd31d5f2927a9c3f8a72f2b7c64cf25def7485c0005ed300819527f"
+  }
+}

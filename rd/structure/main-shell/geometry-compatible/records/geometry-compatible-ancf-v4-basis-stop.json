@@ -1,0 +1,12 @@
+{
+  "all_checks_pass": false,
+  "stage": "fine13_geometry_basis",
+  "reason": "GC_enrichment_rank_ambiguous:[128, 135, 136]",
+  "new_field_space_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v4.py": "5622def39843d3b79dc511b767889894f0cb50dbcaf1930f879b52a795dd352f",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_worksolve_v2.py": "adf4685d800c1ef9a2b961fcd8fde9d33262472b8948e6240d3d7eace3014557",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-v4-protocol.md": "11b0f8becfddc8365a36dbecfc3bd358204ba79672d4fe31f91a5f8f0cf39853"
+  }
+}

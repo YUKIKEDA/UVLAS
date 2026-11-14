@@ -1,0 +1,28 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-conservative-observation-experiment.md",
+  "protocol_sha256": "c45a7eff075d35f8398b233647fcdd6f28b8edc7ad644f3df4959d63d33e5b0d",
+  "source_sha256": "61ac4b9803519264986e9d0e556ba6855433a7fd664eb4713f74e7a0403e36a3",
+  "dependency_sha256": {
+    "avl_field_overlay_exact.py": "21911c0541fa7f8390621156b189419de20e3f013707e17faeb9e3e2c1d757f0",
+    "check_avl_field_overlay.py": "69e4a51657f3ca1f5c16f9fc1df92d4e9159aad04efdd59f8c13927f0af0e177",
+    "check_avl_linear_load_wrench.py": "083d8b5af7a4ba456386e9ec0f42283fd0b129077ba034398d69ecc83b10a340",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1"
+  },
+  "parent_sha256": {
+    "avl-field-overlay-result.json": "68bf0d1f38fc775bd36d9a7791a8d2b73101bdc1e6a9a0ee78545405bd06a7fb",
+    "avl-fixed-band-grid-runs.json": "2fdfaff2fbe04aa34e882a7fc084541f9e936ea469772a777751307c5a67f763",
+    "avl-band-aligned-grid-runs.json": "3aa03a7d754efcc55018f5cd194396ba0bcb4ef39b7d34780ea7a03cdd936251"
+  },
+  "manufactured": null,
+  "meshes": [],
+  "pairs": [],
+  "series": [],
+  "budgets": [],
+  "checks": {},
+  "methods_criteria_pass": false,
+  "stop_reason": "ValueError('outside_wing')",
+  "reference_convergence_accepted": false,
+  "continuum_error_bound_available": false,
+  "seconds": 0.031000000017229468,
+  "peak_process_working_bytes": 85393408
+}

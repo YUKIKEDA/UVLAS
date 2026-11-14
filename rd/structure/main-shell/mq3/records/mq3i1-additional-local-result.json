@@ -1,0 +1,2256 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891022,
+        "solve": 1.5001791915543334e-16,
+        "all_moments": 2.1306290857951294e-15,
+        "constant": 5.773159728050814e-15,
+        "work": 7.14490515622275e-15,
+        "rigid": 1.202194901793826e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.1245766332402275e-19,
+        "raw_patch": 6.568405480919725e-16,
+        "patch": 2.4375695368945828e-15,
+        "patch_energy": 2.1094237467877974e-15,
+        "patch_target_span": 5.695021540847852e-16,
+        "axes": 1.8877120829380088e-15,
+        "test_basis": 2.5562104637152926e-16,
+        "work11": 7.850771058928419e-15
+      },
+      "axis_metrics": {
+        "swap": 1.7411989751858761e-15,
+        "s": 1.72579139266391e-15,
+        "t": 1.8877120829380088e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-state.npz",
+      "state_sha256": "561e65ab072dd9e4f79654c9539c1525f3203c377dd4468a26758a9f4ec3e992",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-h0.01.npz",
+      "artifact_sha256": "ccfc4bff3781f0d27cf9850ba63ac03a7119963f56baf382fbbe1da0b915e46f",
+      "seconds": 2.39000000001397
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891028,
+        "solve": 1.5001796081559069e-16,
+        "all_moments": 2.1306298708371894e-15,
+        "constant": 5.773159728050814e-15,
+        "work": 7.144905133086158e-15,
+        "rigid": 1.2022000056055961e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.0361917338830633e-20,
+        "raw_patch": 6.568405480919725e-16,
+        "patch": 2.4375695368945828e-15,
+        "patch_energy": 2.1094237467877974e-15,
+        "patch_target_span": 5.661216734794472e-16,
+        "axes": 1.8877200288994233e-15,
+        "test_basis": 2.556214790362023e-16,
+        "work11": 7.850771036728222e-15
+      },
+      "axis_metrics": {
+        "swap": 1.7412071066306994e-15,
+        "s": 1.7257988513237305e-15,
+        "t": 1.8877200288994233e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-state.npz",
+      "state_sha256": "561e65ab072dd9e4f79654c9539c1525f3203c377dd4468a26758a9f4ec3e992",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-h0.001.npz",
+      "artifact_sha256": "7158cf979fc8c1959320580f5d7b771508e31b4b8e03bd9ced15e76380a69eb7",
+      "seconds": 2.4070000000065193
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891022,
+        "solve": 1.5001796081014086e-16,
+        "all_moments": 2.1306298738165557e-15,
+        "constant": 5.773159728050814e-15,
+        "work": 7.144905132877715e-15,
+        "rigid": 1.2022000566438532e-16,
+        "zz": 0.0,
+        "thickness_difference": 9.67122736866691e-22,
+        "raw_patch": 6.568405480919725e-16,
+        "patch": 2.4375695368945828e-15,
+        "patch_energy": 2.1094237467877974e-15,
+        "patch_target_span": 5.703304509642317e-16,
+        "axes": 1.8877201072442282e-15,
+        "test_basis": 2.5562148336284406e-16,
+        "work11": 7.850771036532852e-15
+      },
+      "axis_metrics": {
+        "swap": 1.7412071843438991e-15,
+        "s": 1.7257989241376176e-15,
+        "t": 1.8877201072442282e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-state.npz",
+      "state_sha256": "561e65ab072dd9e4f79654c9539c1525f3203c377dd4468a26758a9f4ec3e992",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-h0.0001.npz",
+      "artifact_sha256": "4e83d1137c011153749cdd9e8910157b7df0a1e048dd6501e000855459b1725d",
+      "seconds": 2.375
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891023,
+        "solve": 1.4933469310393204e-16,
+        "all_moments": 1.905003413827594e-15,
+        "constant": 5.551115123125783e-15,
+        "work": 9.022214189751731e-15,
+        "rigid": 1.1105525711065954e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.1504124810366943e-19,
+        "raw_patch": 1.219871476016225e-15,
+        "patch": 4.025993643366055e-15,
+        "patch_energy": 4.440892098500626e-15,
+        "patch_target_span": 1.4411407624604864e-15,
+        "axes": 2.5146699539859176e-15,
+        "test_basis": 2.806072007413994e-16,
+        "work11": 9.923687863015866e-15
+      },
+      "axis_metrics": {
+        "swap": 2.4153079067092677e-15,
+        "s": 2.5146699539859176e-15,
+        "t": 2.152628525465386e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-state.npz",
+      "state_sha256": "d0259bc8e53e1ab3055b8b9785d2112624f155d3e61ec692f4451eb07e085ad0",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-h0.01.npz",
+      "artifact_sha256": "25ecec205b8d7369bd1a085bda58b59d8cb2cb56d525e8b96994eb84b374a078",
+      "seconds": 2.4369999999762513
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891026,
+        "solve": 1.4933469030264421e-16,
+        "all_moments": 1.9050029794139085e-15,
+        "constant": 5.551115123125783e-15,
+        "work": 9.022214172276731e-15,
+        "rigid": 1.1105572858589832e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.0158398173005932e-20,
+        "raw_patch": 1.219871476016225e-15,
+        "patch": 4.025993643366055e-15,
+        "patch_energy": 4.440892098500626e-15,
+        "patch_target_span": 1.450074789834802e-15,
+        "axes": 2.514679830866077e-15,
+        "test_basis": 2.8060767569768516e-16,
+        "work11": 9.923687846088495e-15
+      },
+      "axis_metrics": {
+        "swap": 2.4153185876707e-15,
+        "s": 2.514679830866077e-15,
+        "t": 2.152637024565448e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-state.npz",
+      "state_sha256": "d0259bc8e53e1ab3055b8b9785d2112624f155d3e61ec692f4451eb07e085ad0",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-h0.001.npz",
+      "artifact_sha256": "d6063001c2b2f361f67aa57ac31ff27354d01b7becff319e820d0e391391a28e",
+      "seconds": 2.422000000020489
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891026,
+        "solve": 1.4933469004919033e-16,
+        "all_moments": 1.905002982022778e-15,
+        "constant": 5.551115123125783e-15,
+        "work": 9.022214172191966e-15,
+        "rigid": 1.1105573330066357e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.0566877824807269e-21,
+        "raw_patch": 1.219871476016225e-15,
+        "patch": 4.025993643366055e-15,
+        "patch_energy": 4.440892098500626e-15,
+        "patch_target_span": 1.4382647181291649e-15,
+        "axes": 2.5146799310632714e-15,
+        "test_basis": 2.806076804472425e-16,
+        "work11": 9.923687846006233e-15
+      },
+      "axis_metrics": {
+        "swap": 2.4153186952593915e-15,
+        "s": 2.5146799310632714e-15,
+        "t": 2.1526371116312373e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-state.npz",
+      "state_sha256": "d0259bc8e53e1ab3055b8b9785d2112624f155d3e61ec692f4451eb07e085ad0",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-h0.0001.npz",
+      "artifact_sha256": "4b073fccc605b7f4c0443c98231385ee731db2eb319b258aaef2f0a02c2d5678",
+      "seconds": 2.452999999979511
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891023,
+        "solve": 1.488996380574322e-16,
+        "all_moments": 2.0836545128047427e-15,
+        "constant": 3.1086244689504383e-15,
+        "work": 6.2391415761138104e-15,
+        "rigid": 9.375322906048027e-17,
+        "zz": 0.0,
+        "thickness_difference": 1.0945462634082367e-19,
+        "raw_patch": 6.602933814898368e-16,
+        "patch": 1.8220912487903466e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "patch_target_span": 7.776937987494178e-16,
+        "axes": 1.8241829716624966e-15,
+        "test_basis": 2.7397696647945575e-16,
+        "work11": 6.702868415230934e-15
+      },
+      "axis_metrics": {
+        "swap": 1.5337446039420363e-15,
+        "s": 1.592774707229805e-15,
+        "t": 1.8241829716624966e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-state.npz",
+      "state_sha256": "c18956b65b0b76de54f1243f395e1a3b57ba1628ec5583487c3d10191b77ffbb",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-h0.01.npz",
+      "artifact_sha256": "fff41d7f344629298157da3f386992289b80d497b3d165143ebbe7b93c5ff2e2",
+      "seconds": 2.5
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891026,
+        "solve": 1.4889966173082684e-16,
+        "all_moments": 2.083654001244895e-15,
+        "constant": 3.1086244689504383e-15,
+        "work": 6.239141549450386e-15,
+        "rigid": 9.375362708149438e-17,
+        "zz": 0.0,
+        "thickness_difference": 1.0935314430626e-20,
+        "raw_patch": 6.602933814898368e-16,
+        "patch": 1.8220912487903466e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "patch_target_span": 7.784744388335487e-16,
+        "axes": 1.824190483428782e-15,
+        "test_basis": 2.7397743021339436e-16,
+        "work11": 6.702868390250084e-15
+      },
+      "axis_metrics": {
+        "swap": 1.5337516526692697e-15,
+        "s": 1.5927809773724191e-15,
+        "t": 1.824190483428782e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-state.npz",
+      "state_sha256": "c18956b65b0b76de54f1243f395e1a3b57ba1628ec5583487c3d10191b77ffbb",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-h0.001.npz",
+      "artifact_sha256": "10cb4d0a39612bb3044e052d7ab990b639181f03656f7f4db2b525a4a125155f",
+      "seconds": 2.5
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891026,
+        "solve": 1.488996615333674e-16,
+        "all_moments": 2.083653998022127e-15,
+        "constant": 3.1086244689504383e-15,
+        "work": 6.239141548881638e-15,
+        "rigid": 9.37536310617154e-17,
+        "zz": 0.0,
+        "thickness_difference": 9.91595836456029e-22,
+        "raw_patch": 6.602933814898368e-16,
+        "patch": 1.8220912487903466e-15,
+        "patch_energy": 1.1102230246251565e-15,
+        "patch_target_span": 7.770676966238105e-16,
+        "axes": 1.8241905576694024e-15,
+        "test_basis": 2.739774348507283e-16,
+        "work11": 6.702868389748042e-15
+      },
+      "axis_metrics": {
+        "swap": 1.5337517216957388e-15,
+        "s": 1.592781041401687e-15,
+        "t": 1.8241905576694024e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-state.npz",
+      "state_sha256": "c18956b65b0b76de54f1243f395e1a3b57ba1628ec5583487c3d10191b77ffbb",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-h0.0001.npz",
+      "artifact_sha256": "87fcafb070f192ca6f61a9968fbc0b6c716131c48e43dd0f51e09fbeb6b6b20b",
+      "seconds": 2.5
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891019,
+        "solve": 1.6261031667156654e-16,
+        "all_moments": 2.4186057356674683e-15,
+        "constant": 4.776726822332889e-15,
+        "work": 9.477766304182278e-15,
+        "rigid": 1.6303205423363382e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.1095098892068578e-19,
+        "raw_patch": 1.254788077253679e-15,
+        "patch": 3.819051827003144e-15,
+        "patch_energy": 2.886579864025407e-15,
+        "patch_target_span": 1.7593901882714972e-15,
+        "axes": 2.5547144604064306e-15,
+        "test_basis": 2.6401066677493295e-16,
+        "work11": 9.842365462036653e-15
+      },
+      "axis_metrics": {
+        "swap": 2.1464405705348466e-15,
+        "s": 2.5547144604064306e-15,
+        "t": 2.141332890339839e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-state.npz",
+      "state_sha256": "630da41cbfb1e841e0c74e430e834e1b838ccd5f98b6ab47545880a6e6a070eb",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-h0.01.npz",
+      "artifact_sha256": "2f8c1a36fd82f4d0184ad474751cd37c31950d5c2838a7ffc9d0521c07c6d9d9",
+      "seconds": 2.530999999959022
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891023,
+        "solve": 1.626103039886068e-16,
+        "all_moments": 2.4186065430113435e-15,
+        "constant": 4.776726822332889e-15,
+        "work": 9.477766277070578e-15,
+        "rigid": 1.6303274637175226e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.1044090662724223e-20,
+        "raw_patch": 1.254788077253679e-15,
+        "patch": 3.819051827003144e-15,
+        "patch_energy": 2.886579864025407e-15,
+        "patch_target_span": 1.7670536779660165e-15,
+        "axes": 2.5547247682158445e-15,
+        "test_basis": 2.640111136398936e-16,
+        "work11": 9.842365435298076e-15
+      },
+      "axis_metrics": {
+        "swap": 2.1464496517318176e-15,
+        "s": 2.5547247682158445e-15,
+        "t": 2.141341480332175e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-state.npz",
+      "state_sha256": "630da41cbfb1e841e0c74e430e834e1b838ccd5f98b6ab47545880a6e6a070eb",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-h0.001.npz",
+      "artifact_sha256": "4b7488e74af8957175ec5a8d12a4c2527f2c7f0736883b608aee272ac319933b",
+      "seconds": 2.5320000000065193
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        87,
+        87,
+        87
+      ],
+      "A_kernel_ranks": [
+        18,
+        18,
+        18
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.5785658300891023,
+        "solve": 1.626103045783332e-16,
+        "all_moments": 2.4186065499749524e-15,
+        "constant": 4.776726822332889e-15,
+        "work": 9.477766276705775e-15,
+        "rigid": 1.6303275329315234e-16,
+        "zz": 0.0,
+        "thickness_difference": 1.0453491773479339e-21,
+        "raw_patch": 1.254788077253679e-15,
+        "patch": 3.819051827003144e-15,
+        "patch_energy": 2.886579864025407e-15,
+        "patch_target_span": 1.7683478372057995e-15,
+        "axes": 2.554724871003258e-15,
+        "test_basis": 2.6401111810853797e-16,
+        "work11": 9.842365434961857e-15
+      },
+      "axis_metrics": {
+        "swap": 2.146449742098901e-15,
+        "s": 2.554724871003258e-15,
+        "t": 2.1413415652611014e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-state.npz",
+      "state_sha256": "630da41cbfb1e841e0c74e430e834e1b838ccd5f98b6ab47545880a6e6a070eb",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-h0.0001.npz",
+      "artifact_sha256": "4a77ddc8a845e24d9d57feb4333f7465d0d396586bfc21880dca17d4ff51b95b",
+      "seconds": 2.5310000000172295
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3698758320200786,
+        "solve": 2.404931329000058e-16,
+        "all_moments": 2.8553314599863305e-15,
+        "constant": 4.204872127572257e-14,
+        "work": 5.4916638409535e-15,
+        "rigid": 2.7286851032121554e-16,
+        "zz": 7.862525567740023e-16,
+        "thickness_difference": 4.4076110427726007e-16,
+        "raw_patch": 6.999461633836737e-16,
+        "patch": 4.441303387633135e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "patch_target_span": 6.027575529660327e-16,
+        "axes": 5.536092193360879e-15,
+        "test_basis": 2.6887473453795116e-16,
+        "work11": 5.926536878831904e-15
+      },
+      "axis_metrics": {
+        "swap": 5.536092193360879e-15,
+        "s": 4.533081742423732e-15,
+        "t": 2.8885246639823357e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-state.npz",
+      "state_sha256": "4d1726c5ea87ed6465a6d63e5802da8c0c63b70b88502ca8f076a6fb537d1f8e",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-h0.01.npz",
+      "artifact_sha256": "b3fd870de4e66f55c718877bcbc1b678de623b2a433d3f78d2fe27b38f2c1df5",
+      "seconds": 2.530999999959022
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3698758382034066,
+        "solve": 2.7511636946423445e-16,
+        "all_moments": 2.30196216195168e-15,
+        "constant": 3.7549034926287125e-14,
+        "work": 6.04227386994218e-15,
+        "rigid": 3.2381351440636465e-16,
+        "zz": 7.894528687683915e-16,
+        "thickness_difference": 4.2749680211603475e-16,
+        "raw_patch": 7.194841676163569e-16,
+        "patch": 6.78872550163081e-15,
+        "patch_energy": 2.220446049250313e-15,
+        "patch_target_span": 6.484825694874282e-16,
+        "axes": 6.444069432197299e-15,
+        "test_basis": 2.669714385921511e-16,
+        "work11": 6.301762628742902e-15
+      },
+      "axis_metrics": {
+        "swap": 6.444069432197299e-15,
+        "s": 4.795012343222998e-15,
+        "t": 3.951182531296482e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-state.npz",
+      "state_sha256": "4d1726c5ea87ed6465a6d63e5802da8c0c63b70b88502ca8f076a6fb537d1f8e",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-h0.001.npz",
+      "artifact_sha256": "30d99de4ffb57359e56c13c14e85a70e42c02c8bcc7d2d72606e8a0bc76cb00c",
+      "seconds": 2.5320000000065193
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3698758382652393,
+        "solve": 2.70010605057528e-16,
+        "all_moments": 2.694478499087037e-15,
+        "constant": 3.847334448926445e-14,
+        "work": 5.9461068997365714e-15,
+        "rigid": 3.121224121143802e-16,
+        "zz": 7.763728543556467e-16,
+        "thickness_difference": 4.3661074479327306e-16,
+        "raw_patch": 7.19603117122874e-16,
+        "patch": 4.541403671884886e-15,
+        "patch_energy": 1.7763568394002505e-15,
+        "patch_target_span": 6.545606143074471e-16,
+        "axes": 6.22573328078089e-15,
+        "test_basis": 2.530202147982606e-16,
+        "work11": 6.173737979545422e-15
+      },
+      "axis_metrics": {
+        "swap": 6.22573328078089e-15,
+        "s": 4.637491770532601e-15,
+        "t": 3.5415386113957886e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-state.npz",
+      "state_sha256": "4d1726c5ea87ed6465a6d63e5802da8c0c63b70b88502ca8f076a6fb537d1f8e",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-h0.0001.npz",
+      "artifact_sha256": "d1687ec3cdbe827bd2a71de78508c3b3b6ff005b27b918a87291f823e91360e3",
+      "seconds": 2.51500000001397
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3697916811126193,
+        "solve": 2.455480833065164e-16,
+        "all_moments": 3.4940967180353426e-15,
+        "constant": 9.769713250201706e-14,
+        "work": 7.701154730663427e-15,
+        "rigid": 4.799461791905991e-16,
+        "zz": 1.7521202225677777e-15,
+        "thickness_difference": 4.358585658779601e-16,
+        "raw_patch": 1.3192604997174543e-15,
+        "patch": 2.0785013498225556e-14,
+        "patch_energy": 6.106226635438361e-15,
+        "patch_target_span": 1.8749532634834627e-15,
+        "axes": 2.4577032901740235e-14,
+        "test_basis": 2.4837701500330543e-16,
+        "work11": 8.442046704925634e-15
+      },
+      "axis_metrics": {
+        "swap": 2.1257301735526517e-14,
+        "s": 2.4577032901740235e-14,
+        "t": 4.110486255387197e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-state.npz",
+      "state_sha256": "ced1d047c8bda9b1d11f19bb1ae8d47d52e6f56b642b913169ac50fbfe751cf2",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-h0.01.npz",
+      "artifact_sha256": "cf7553ed9277037a642dfb885a1d31a520bdfc39543c1b1e11a2e1844b730a5d",
+      "seconds": 2.5619999999762513
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3697917116755655,
+        "solve": 2.6198379535871677e-16,
+        "all_moments": 3.4041273769247812e-15,
+        "constant": 9.581729872964843e-14,
+        "work": 7.41713649569506e-15,
+        "rigid": 4.633487506208122e-16,
+        "zz": 1.7995325750298783e-15,
+        "thickness_difference": 4.3964998507133034e-16,
+        "raw_patch": 1.3198138187099601e-15,
+        "patch": 2.6185122735646577e-14,
+        "patch_energy": 8.992806499463768e-15,
+        "patch_target_span": 1.5987654734505673e-15,
+        "axes": 2.5748441903228177e-14,
+        "test_basis": 2.7103126538503986e-16,
+        "work11": 7.55213976291901e-15
+      },
+      "axis_metrics": {
+        "swap": 2.3241233686091567e-14,
+        "s": 2.5748441903228177e-14,
+        "t": 4.3491301181650895e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-state.npz",
+      "state_sha256": "ced1d047c8bda9b1d11f19bb1ae8d47d52e6f56b642b913169ac50fbfe751cf2",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-h0.001.npz",
+      "artifact_sha256": "cae69fac8c45e0f904f62502d8025a3db5e20bdedff3136b5e4fc3977ccb5818",
+      "seconds": 2.547000000020489
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3697917119811703,
+        "solve": 2.895370394226315e-16,
+        "all_moments": 3.3695136428696187e-15,
+        "constant": 1.0056716049522017e-13,
+        "work": 7.386396439712196e-15,
+        "rigid": 4.007879715155222e-16,
+        "zz": 1.704304725016324e-15,
+        "thickness_difference": 4.340101356423157e-16,
+        "raw_patch": 1.2784712618766084e-15,
+        "patch": 2.5783631315000652e-14,
+        "patch_energy": 6.328271240363392e-15,
+        "patch_target_span": 1.8319789407996916e-15,
+        "axes": 2.7583849662334506e-14,
+        "test_basis": 2.6200794980894106e-16,
+        "work11": 7.979299738414196e-15
+      },
+      "axis_metrics": {
+        "swap": 2.294184923747218e-14,
+        "s": 2.7583849662334506e-14,
+        "t": 4.2398206427119044e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-state.npz",
+      "state_sha256": "ced1d047c8bda9b1d11f19bb1ae8d47d52e6f56b642b913169ac50fbfe751cf2",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-h0.0001.npz",
+      "artifact_sha256": "02d78983b7c21ac42374267afcf2610f9a9da317c07f56e9acadd79e270ec9d7",
+      "seconds": 2.530999999959022
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.36987583202007734,
+        "solve": 2.943044967544087e-16,
+        "all_moments": 2.4641867535433657e-15,
+        "constant": 4.059840654969694e-14,
+        "work": 6.132678314627388e-15,
+        "rigid": 4.010850158955042e-16,
+        "zz": 8.437702874255935e-16,
+        "thickness_difference": 4.50972326446184e-16,
+        "raw_patch": 6.965485422041932e-16,
+        "patch": 3.413792993502975e-15,
+        "patch_energy": 8.881784197001252e-16,
+        "patch_target_span": 5.86059820857045e-16,
+        "axes": 5.520265021690851e-15,
+        "test_basis": 2.7671540283065112e-16,
+        "work11": 6.16446356865448e-15
+      },
+      "axis_metrics": {
+        "swap": 5.520265021690851e-15,
+        "s": 4.6706968744025914e-15,
+        "t": 5.2999970196226514e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-state.npz",
+      "state_sha256": "fb1abdac39745ad268889d00658a89a688632f355bf5c15d9f55932e58c73086",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-h0.01.npz",
+      "artifact_sha256": "6ac6362ecb7a3c65bd708c4a924bf97dca0811d6b2d4030234b5a24bd87eafac",
+      "seconds": 2.375
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3698758382034051,
+        "solve": 2.3068468409219384e-16,
+        "all_moments": 2.5490612805011888e-15,
+        "constant": 3.3979488889114443e-14,
+        "work": 6.969066070847028e-15,
+        "rigid": 2.8465235798505614e-16,
+        "zz": 8.190944772518844e-16,
+        "thickness_difference": 4.542933417677645e-16,
+        "raw_patch": 7.202800355844486e-16,
+        "patch": 5.10201188571889e-15,
+        "patch_energy": 2.4424906541753444e-15,
+        "patch_target_span": 6.215682720441703e-16,
+        "axes": 6.148495901658816e-15,
+        "test_basis": 2.597446406360546e-16,
+        "work11": 7.106111340577058e-15
+      },
+      "axis_metrics": {
+        "swap": 6.148495901658816e-15,
+        "s": 5.523920158402656e-15,
+        "t": 5.280730084393387e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-state.npz",
+      "state_sha256": "fb1abdac39745ad268889d00658a89a688632f355bf5c15d9f55932e58c73086",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-h0.001.npz",
+      "artifact_sha256": "61c5f81bda63e89480d8fcde7ef0c7559ccc241db0b0945859ad9599c0096654",
+      "seconds": 2.422000000020489
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.36987583826523907,
+        "solve": 2.5464770068104583e-16,
+        "all_moments": 2.561954816830696e-15,
+        "constant": 3.0967718941860024e-14,
+        "work": 6.091369848476214e-15,
+        "rigid": 3.2226523625781577e-16,
+        "zz": 7.815723470780606e-16,
+        "thickness_difference": 4.3199266226398737e-16,
+        "raw_patch": 7.149697526867281e-16,
+        "patch": 6.020551145663e-15,
+        "patch_energy": 3.1086244689504383e-15,
+        "patch_target_span": 5.373194069844003e-16,
+        "axes": 6.4560684218151905e-15,
+        "test_basis": 2.8600563099823493e-16,
+        "work11": 6.085770202074324e-15
+      },
+      "axis_metrics": {
+        "swap": 6.4560684218151905e-15,
+        "s": 5.4504684797567885e-15,
+        "t": 6.1625331902910745e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-state.npz",
+      "state_sha256": "fb1abdac39745ad268889d00658a89a688632f355bf5c15d9f55932e58c73086",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-h0.0001.npz",
+      "artifact_sha256": "2a1568955efe500b3790f9dc4d1faa2ee6e826af409df04b56b1bbecc23963eb",
+      "seconds": 2.4380000000237487
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.01,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3697916811126209,
+        "solve": 2.908085044913013e-16,
+        "all_moments": 3.3055535799745328e-15,
+        "constant": 1.1769288343378703e-13,
+        "work": 8.249159285401665e-15,
+        "rigid": 4.744406086759645e-16,
+        "zz": 1.7725499687153088e-15,
+        "thickness_difference": 4.3870291903514223e-16,
+        "raw_patch": 1.344519869236704e-15,
+        "patch": 3.136761041242298e-14,
+        "patch_energy": 6.5503158452884236e-15,
+        "patch_target_span": 1.5932149797583902e-15,
+        "axes": 4.0328469346951844e-14,
+        "test_basis": 2.7277589903837714e-16,
+        "work11": 8.409369399265669e-15
+      },
+      "axis_metrics": {
+        "swap": 2.31021685633771e-14,
+        "s": 4.0328469346951844e-14,
+        "t": 5.945896889014181e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-state.npz",
+      "state_sha256": "e98a8a5c76662b6368df91e936127198231c52f4a9745a79bd5eb400cef17968",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-h0.01.npz",
+      "artifact_sha256": "9f01354ff2ffcb1d6d36713b47cea5243eeee3dac5b1c7eef98b10377a3be44c",
+      "seconds": 2.422000000020489
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.3697917116755686,
+        "solve": 2.320988508131933e-16,
+        "all_moments": 3.3522088459794366e-15,
+        "constant": 1.1709489680775034e-13,
+        "work": 7.54963708620094e-15,
+        "rigid": 3.859551265274691e-16,
+        "zz": 1.7766138900088924e-15,
+        "thickness_difference": 4.3668689442269287e-16,
+        "raw_patch": 1.3293456958714193e-15,
+        "patch": 3.046213521190245e-14,
+        "patch_energy": 8.326672684688674e-15,
+        "patch_target_span": 1.4441218016628493e-15,
+        "axes": 4.193322713579317e-14,
+        "test_basis": 2.5229169819853204e-16,
+        "work11": 7.51456044880792e-15
+      },
+      "axis_metrics": {
+        "swap": 2.4928314267149094e-14,
+        "s": 4.193322713579317e-14,
+        "t": 3.847036377084822e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-state.npz",
+      "state_sha256": "e98a8a5c76662b6368df91e936127198231c52f4a9745a79bd5eb400cef17968",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-h0.001.npz",
+      "artifact_sha256": "c0805eeb2a52fd7b9a3357237fbc8d4faba122736cfd6ea41b8ac4c46a182062",
+      "seconds": 2.4219999999622814
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "h": 0.0001,
+      "B_ranks": [
+        138,
+        138,
+        138
+      ],
+      "B_ranks11": [
+        138,
+        138,
+        138
+      ],
+      "C_ranks": [
+        86,
+        86,
+        86
+      ],
+      "A_kernel_ranks": [
+        19,
+        19,
+        19
+      ],
+      "target_ranks": [
+        105,
+        105,
+        105
+      ],
+      "metrics": {
+        "rcond": 0.36979171198117067,
+        "solve": 2.4777117426582083e-16,
+        "all_moments": 3.430214709247766e-15,
+        "constant": 1.173634488238187e-13,
+        "work": 7.971217865344566e-15,
+        "rigid": 3.079777663729081e-16,
+        "zz": 1.7123536620185137e-15,
+        "thickness_difference": 4.3947125668790595e-16,
+        "raw_patch": 1.3046915208368552e-15,
+        "patch": 3.3000334987774235e-14,
+        "patch_energy": 7.66053886991358e-15,
+        "patch_target_span": 1.462031328462873e-15,
+        "axes": 4.11539962337397e-14,
+        "test_basis": 2.486158003652875e-16,
+        "work11": 7.840043617981645e-15
+      },
+      "axis_metrics": {
+        "swap": 2.5100266454950654e-14,
+        "s": 4.11539962337397e-14,
+        "t": 5.875683730818637e-15
+      },
+      "checks": {
+        "condition": true,
+        "solve": true,
+        "moments": true,
+        "local_rank": true,
+        "coefficient_ranks": true,
+        "fields": true,
+        "separate_points": true,
+        "resources": true
+      },
+      "state_artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-state.npz",
+      "state_sha256": "e98a8a5c76662b6368df91e936127198231c52f4a9745a79bd5eb400cef17968",
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-h0.0001.npz",
+      "artifact_sha256": "1e4678d1bc7b748c75c9d63cd77dc8fa3ecfdfffa53a2ec34293f32e6cd6bb32",
+      "seconds": 2.4380000000237487
+    }
+  ],
+  "states": [
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          53,
+          53,
+          53
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          87,
+          87,
+          87
+        ],
+        "A_kernel_ranks": [
+          18,
+          18,
+          18
+        ],
+        "kernel_dimension": 18,
+        "pure_shear_directions": 34,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            38,
+            38,
+            38
+          ],
+          "directions": 34,
+          "basis_closure": true,
+          "constraint_residual": 2.3752475782334407e-16,
+          "orthogonality": 1.4694181538345787e-14,
+          "field_purity": 4.3202473402859483e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 3.38692735633473e-16,
+        "solve": 1.5001796080514807e-16,
+        "derivative_solve": 1.440309362253665e-16,
+        "zero_moments": 2.130629873857404e-15,
+        "zero_c": 0.0,
+        "constant": 5.773159728050814e-15,
+        "zero_dependence": 3.885425270612775e-16,
+        "first_linearity": 3.3838505024311497e-16,
+        "near_-0.0001": 2.1306298738165557e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 2.1306298738165557e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c0-state.npz",
+      "artifact_sha256": "561e65ab072dd9e4f79654c9539c1525f3203c377dd4468a26758a9f4ec3e992"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          53,
+          53,
+          53
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          87,
+          87,
+          87
+        ],
+        "A_kernel_ranks": [
+          18,
+          18,
+          18
+        ],
+        "kernel_dimension": 18,
+        "pure_shear_directions": 34,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            38,
+            38,
+            38
+          ],
+          "directions": 34,
+          "basis_closure": true,
+          "constraint_residual": 1.764851264688098e-16,
+          "orthogonality": 1.3130418399966087e-14,
+          "field_purity": 4.990893604264705e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 3.3100721359723717e-16,
+        "solve": 1.4926153979697134e-16,
+        "derivative_solve": 1.533372906286348e-16,
+        "zero_moments": 1.9050029820350184e-15,
+        "zero_c": 0.0,
+        "constant": 5.551115123125783e-15,
+        "zero_dependence": 4.509808994456363e-16,
+        "first_linearity": 3.226468486483722e-16,
+        "near_-0.0001": 1.905002982022778e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 1.905002982022778e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c1-state.npz",
+      "artifact_sha256": "d0259bc8e53e1ab3055b8b9785d2112624f155d3e61ec692f4451eb07e085ad0"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          53,
+          53,
+          53
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          87,
+          87,
+          87
+        ],
+        "A_kernel_ranks": [
+          18,
+          18,
+          18
+        ],
+        "kernel_dimension": 18,
+        "pure_shear_directions": 34,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            38,
+            38,
+            38
+          ],
+          "directions": 34,
+          "basis_closure": true,
+          "constraint_residual": 2.116358360410157e-16,
+          "orthogonality": 1.3393534923512385e-14,
+          "field_purity": 3.1113347595107055e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 3.643333355036306e-16,
+        "solve": 1.4889966153054744e-16,
+        "derivative_solve": 1.5701250444851558e-16,
+        "zero_moments": 2.083653997941464e-15,
+        "zero_c": 0.0,
+        "constant": 3.849182965108643e-15,
+        "zero_dependence": 3.9387680807976064e-16,
+        "first_linearity": 3.226584867122025e-16,
+        "near_-0.0001": 2.083653998022127e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 2.083653998022127e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c2-state.npz",
+      "artifact_sha256": "c18956b65b0b76de54f1243f395e1a3b57ba1628ec5583487c3d10191b77ffbb"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          53,
+          53,
+          53
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          87,
+          87,
+          87
+        ],
+        "A_kernel_ranks": [
+          18,
+          18,
+          18
+        ],
+        "kernel_dimension": 18,
+        "pure_shear_directions": 34,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            38,
+            38,
+            38
+          ],
+          "directions": 34,
+          "basis_closure": true,
+          "constraint_residual": 2.257808714543369e-16,
+          "orthogonality": 2.3136432571891054e-14,
+          "field_purity": 2.9984116726794646e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 3.39927515170403e-16,
+        "solve": 1.626103045824642e-16,
+        "derivative_solve": 1.3613188711850133e-16,
+        "zero_moments": 2.4186065500086746e-15,
+        "zero_c": 0.0,
+        "constant": 4.776726822332889e-15,
+        "zero_dependence": 3.7150458330570864e-16,
+        "first_linearity": 3.650371259662681e-16,
+        "near_-0.0001": 2.4186065499749524e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 2.4186065499749524e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0-n2-c3-state.npz",
+      "artifact_sha256": "630da41cbfb1e841e0c74e430e834e1b838ccd5f98b6ab47545880a6e6a070eb"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 0,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          54,
+          54,
+          54
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          86,
+          86,
+          86
+        ],
+        "A_kernel_ranks": [
+          19,
+          19,
+          19
+        ],
+        "kernel_dimension": 19,
+        "pure_shear_directions": 32,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            40,
+            40,
+            40
+          ],
+          "directions": 32,
+          "basis_closure": true,
+          "constraint_residual": 3.215764957836377e-16,
+          "orthogonality": 1.9208227380710876e-14,
+          "field_purity": 4.089284868108887e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 4.924107426536533e-16,
+        "solve": 1.6780398763564025e-16,
+        "derivative_solve": 1.3756765644243918e-16,
+        "zero_moments": 2.557228981427016e-15,
+        "zero_c": 0.0,
+        "constant": 5.493686019870721e-14,
+        "zero_dependence": 6.85744800291672e-16,
+        "first_linearity": 4.3886971212471123e-16,
+        "near_-0.0001": 2.5757826354155583e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 2.694478499087037e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c0-state.npz",
+      "artifact_sha256": "4d1726c5ea87ed6465a6d63e5802da8c0c63b70b88502ca8f076a6fb537d1f8e"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 1,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          54,
+          54,
+          54
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          86,
+          86,
+          86
+        ],
+        "A_kernel_ranks": [
+          19,
+          19,
+          19
+        ],
+        "kernel_dimension": 19,
+        "pure_shear_directions": 32,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            40,
+            40,
+            40
+          ],
+          "directions": 32,
+          "basis_closure": true,
+          "constraint_residual": 2.9494744612315586e-16,
+          "orthogonality": 2.1128207947432368e-14,
+          "field_purity": 4.725634357179826e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 1.0725429479366167e-15,
+        "solve": 1.7327109054323218e-16,
+        "derivative_solve": 1.5666340783637233e-16,
+        "zero_moments": 3.696278637423728e-15,
+        "zero_c": 0.0,
+        "constant": 7.71686202851181e-14,
+        "zero_dependence": 1.8370735304838564e-15,
+        "first_linearity": 6.2939676194822e-16,
+        "near_-0.0001": 4.087367333735294e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 3.3695136428696187e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c1-state.npz",
+      "artifact_sha256": "ced1d047c8bda9b1d11f19bb1ae8d47d52e6f56b642b913169ac50fbfe751cf2"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 2,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          54,
+          54,
+          54
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          86,
+          86,
+          86
+        ],
+        "A_kernel_ranks": [
+          19,
+          19,
+          19
+        ],
+        "kernel_dimension": 19,
+        "pure_shear_directions": 32,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            40,
+            40,
+            40
+          ],
+          "directions": 32,
+          "basis_closure": true,
+          "constraint_residual": 3.574317610713469e-16,
+          "orthogonality": 1.795750433076145e-14,
+          "field_purity": 3.99068879489379e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 5.130116117597831e-16,
+        "solve": 1.7164603224363775e-16,
+        "derivative_solve": 1.5148896160355694e-16,
+        "zero_moments": 2.218204776051154e-15,
+        "zero_c": 0.0,
+        "constant": 3.067601611872e-14,
+        "zero_dependence": 5.599705256670991e-16,
+        "first_linearity": 4.597745307012851e-16,
+        "near_-0.0001": 2.318493811727327e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 2.561954816830696e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c2-state.npz",
+      "artifact_sha256": "fb1abdac39745ad268889d00658a89a688632f355bf5c15d9f55932e58c73086"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "cell": 3,
+      "preparation": {
+        "space_ranks": [
+          105,
+          105,
+          105
+        ],
+        "base_constraint_ranks": [
+          54,
+          54,
+          54
+        ],
+        "geometry_ranks": [
+          0,
+          0,
+          0
+        ],
+        "C_ranks": [
+          86,
+          86,
+          86
+        ],
+        "A_kernel_ranks": [
+          19,
+          19,
+          19
+        ],
+        "kernel_dimension": 19,
+        "pure_shear_directions": 32,
+        "pure_shear_metrics": {
+          "pure_target_dimension": 72,
+          "constraint_ranks": [
+            40,
+            40,
+            40
+          ],
+          "directions": 32,
+          "basis_closure": true,
+          "constraint_residual": 3.9124700208812305e-16,
+          "orthogonality": 1.899147737500027e-14,
+          "field_purity": 5.199983262170854e-32
+        },
+        "moment_count": 21,
+        "checks": {
+          "interior": true,
+          "space": true,
+          "geometry": true,
+          "C": true,
+          "A_kernel": true
+        }
+      },
+      "differential": {
+        "derivative": 5.669880286285149e-16,
+        "solve": 1.71501635537984e-16,
+        "derivative_solve": 1.385461557231897e-16,
+        "zero_moments": 2.8858295697989003e-15,
+        "zero_c": 0.0,
+        "constant": 1.0964371120460281e-13,
+        "zero_dependence": 6.698826299251115e-16,
+        "first_linearity": 5.315004413379607e-16,
+        "near_-0.0001": 3.2714838133610564e-15,
+        "near_rank_-0.0001": 0.0,
+        "near_0.0001": 3.430214709247766e-15,
+        "near_rank_0.0001": 0.0
+      },
+      "artifact": "build/analysis/mq3i1-additional-local-20261103-124847/k0.4-n2-c3-state.npz",
+      "artifact_sha256": "e98a8a5c76662b6368df91e936127198231c52f4a9745a79bd5eb400cef17968"
+    }
+  ],
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "preparation_failure": null,
+  "physical_adoption": false,
+  "shared_bending_evaluated": false,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/check_mq3i1_additional_local.py": "b089140f801d53000a170299aba7bfb7db46897f9bb135a4010d8ee941848fbc",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_moments_v2.py": "544096d7d9456e192522dd6d303b9fdad117586abc871ba5504b0eab470aceeb",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/mq3/experiments/mq3_interior_stationarity.py": "722fd820d288a85858813a41798b1d3996b7db1ccc8dcbbc78bdbd73fd74068e",
+    "rd/structure/main-shell/mq3/experiments/mq3i1_pure_shear.py": "bb1eff85a7891017ecf4e26bcf4b0a70d65632bcb34228a1c51019ddf0b2a6dd",
+    "rd/structure/main-shell/q3/experiments/q3_thin_expansion.py": "8120d2378e3f873f32d5b68c6ca99ffc11135ae7d274891245c4c26e8d66b513",
+    "rd/structure/main-shell/mq3/records/mq3i1-v2-pure-shear-protocol.md": "754fd2373bf43adb9330ca98424b86d10311a95bcb5aec42c74da7044a810135",
+    "rd/structure/main-shell/mq3/mq3-interior-moment-alternative.md": "9fd4c84ebd04452f29c62d019d5355264e6d2f9fc1eea7108ed4c5b9640cb79c",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-preparation.json": "6581e24a60e7285e7d1f391a639df913a209a2e4b097c2d1bd1b545c0d720287"
+  },
+  "seconds": 97.04700000002049,
+  "peak_bytes": 385818624
+}

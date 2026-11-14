@@ -1,0 +1,8 @@
+{
+  "status": "frozen_before_followup",
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/compare_mq3i1_shared_operators.py": "5db045612656d95dd49de576d53170cb32bda1c8a64a29a081e294f7a844aec7",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-followup-protocol.md": "8e00d53455a6ed550eb6d8454f4f8247386c7a6a2b46dcb7a51c2c8f22de39fe",
+    "rd/structure/main-shell/mq3/records/mq3i1-shared-result.json": "0b0c16862845be93148c5a842c89dc109737b4a3b2b68c600afeed38aef7418e"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "MQ3I1_local_feasibility_and_membrane_patches_passed",
+  "v1": {
+    "completed_conditions": 18,
+    "all_30_complete": false,
+    "stop": "auxiliary_pure_shear_rank_uncertain_on_axis_change",
+    "ranks": [
+      40,
+      40,
+      41
+    ],
+    "unisolvence_failure": false,
+    "partial_field_audit_passed": 18,
+    "full_v1_audit_flag": false,
+    "failure_preserved": true
+  },
+  "v2": {
+    "unique_reference_cells": 10,
+    "thicknesses": [
+      0.01,
+      0.001,
+      0.0001
+    ],
+    "conditions": 30,
+    "membrane_patch_checks": 120,
+    "coordinate_change_checks": 90,
+    "all_primary_checks": true,
+    "all_alternate_evaluation_checks": true,
+    "local_strain_rank": 138,
+    "minimum_whitened_KKT_rcond": 0.3697280805130538,
+    "maxima": {
+      "solve": 3.4497969081826165e-16,
+      "all_moments": 8.771766865163046e-15,
+      "constant": 1.0340352716507741e-13,
+      "work": 1.2416691403225613e-13,
+      "rigid": 9.433311373716796e-16,
+      "zz": 9.731346849517999e-15,
+      "thickness_difference": 2.7114435925990958e-15,
+      "raw_patch": 1.5256463286029866e-15,
+      "patch": 2.843936370982173e-14,
+      "patch_energy": 4.263256414560601e-14,
+      "patch_target_span": 2.17493757688334e-15,
+      "axes": 2.2383560523116266e-13,
+      "test_basis": 3.114273468029127e-16,
+      "work11": 1.5160971328275962e-13,
+      "old_field_regression": 1.5056539044138316e-15
+    },
+    "audit_maxima": {
+      "field_difference": 3.798915421537246e-15,
+      "constraints": 5.772801465372191e-16,
+      "Qs_full_constraints": 2.1185017346796078e-15,
+      "Qs_membrane": 8.967381794480509e-18,
+      "surface_work": 1.0498179109222387e-15,
+      "patch_error": 3.2008329624524453e-14,
+      "constant": 1.0007836149828224e-13,
+      "patch_energy": 3.930189507173054e-14,
+      "LU_vs_QR": 5.566744534518515e-16
+    }
+  },
+  "physical_adoption": false,
+  "shared_bending_evaluated": false,
+  "membrane_global_convergence_evaluated": false,
+  "finite_thickness_bending_accuracy_evaluated": false,
+  "next": "rd/structure/main-shell/mq3/mq3i1-shared-and-membrane-contract.md",
+  "next_executed": false,
+  "work_preservation_requirement_maintained": true,
+  "verification": {
+    "mq3i1-local-preparation_source_hashes": 9,
+    "mq3i1-local-result_source_hashes": 7,
+    "mq3i1-local-audit_source_hashes": 4,
+    "mq3i1-local-v2-preparation_source_hashes": 10,
+    "mq3i1-local-v2-result_source_hashes": 9,
+    "mq3i1-local-v2-audit_source_hashes": 5,
+    "mq3i1-local-result_artifact_hashes": 26,
+    "mq3i1-local-v2-result_artifact_hashes": 40,
+    "python_syntax": 7,
+    "local_markdown_links": 387
+  },
+  "documents": {
+    "README.md": "416b8c5b08b3e8013c195d5429193f2cc5761adcfd4c98f31382715e13c75ac1",
+    "rd/planning/preimplementation-history.md": "a5e3ef804cd3cedaf671e2bcb0c0954a33bf6cac7f7667f677a5c85074bdae76",
+    "rd/planning/preimplementation-plan.md": "df9532538a1a3c9f0f4affcf96bac6a589eb64050079a18710b864538d813435",
+    "rd/planning/structural-model-adoption-review.md": "ad4f21ff3d1f50a2f30de11eb798c735a1864b891f47bd379a6b8690ae37f5d5",
+    "rd/planning/requirements-evidence-map.md": "3e619d0640477f50806d5f1891dc899be6a82655d0626e1b27798c4318280a06",
+    "docs/specs/design-decisions.md": "da7634dfc765f73616dd37866812a6a623d9c3c0153f590072e9bce3d5f4f948",
+    "rd/structure/main-shell/mq3/records/mq3i1-local-results.md": "2db7f089a189df3c4c03150782f268c2a00ff482d8e66864521a868e2dbf7351",
+    "rd/structure/main-shell/mq3/mq3i1-shared-and-membrane-contract.md": "311d10fe261cc56bd1194872da9d182a5ab537c99d8f48f28f99a0bcd738305d",
+    "rd/structure/main-shell/mq3/records/mq3i1-local-execution-protocol.md": "e09676ce1fce4bd8e40520003696238d620792625f73af704d52bc0cb07d7a5c",
+    "rd/structure/main-shell/mq3/records/mq3i1-v2-pure-shear-protocol.md": "754fd2373bf43adb9330ca98424b86d10311a95bcb5aec42c74da7044a810135"
+  }
+}

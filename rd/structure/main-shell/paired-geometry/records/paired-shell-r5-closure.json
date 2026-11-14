@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "R5_complete": true,
+  "main_shell_adopted": true,
+  "structural_review_complete": false,
+  "product_implementation_start": false,
+  "current_work": "1.2 material/layer/equivalent-input integration",
+  "checked_status_links": 22,
+  "immutable": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "rd/planning/structural-integration-after-shell.md": "b3d9c118b339e7d12984be9f856e59662f68334f36b7e992511cb0063dd4dde7",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-disposition.json": "10f02dbf8f4e1f6b647bbaf100ca2d6f68e2b06c418807cb97debcbb16e6a321",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-results.md": "1f5499ea95d0dbb9fe71b412efba86c8a73e61a748b53b2ed8813945a223cb0f",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-audit.json": "48e4a9ecbcb3ea0ee6cff0269f71c0567032d9b0ddf6040421aba51f8e222167"
+  },
+  "status_sync_source": {
+    "rd/structure/main-shell/paired-geometry/experiments/sync_paired_shell_r5_status.py": "1fa14870bd98f1dce389952e63e5244a90609137bc5e259227ad0f5a84432eac"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

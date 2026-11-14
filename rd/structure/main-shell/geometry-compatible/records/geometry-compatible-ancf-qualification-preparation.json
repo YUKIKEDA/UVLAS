@@ -1,0 +1,12 @@
+{
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/check_geometry_compatible_ancf_candidate.py": "0fb8913c6b43a9740a1fa82bff502ab19d9e3c294c6d3870f5243d19439ae566",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_validation.py": "694fc643a20bfdc19b572bbb707708e886fcf01376da9c7668cc63da6fc1f063",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_trial.py": "4624c6e1520a93dbe989f61d931a563ba5b380eaae94030ea88811b05655bbe9",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v6.py": "9a6e07f4bf4920ce0adb17438e06f0298efaba6dfcccf096f7c69629a12d2c90",
+    "rd/structure/main-shell/reference-work/experiments/stable_curvature_profiles.py": "2738c0ab7129b2f5252962b25f7129431b3217043ba7afb7665cd12a3ea15fac",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-qualification-protocol.md": "0e63131c954eb5b99b51d8218367a5aa4419681fa53b93cb9284ea6ddc513c4d",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-v6-protocol.md": "9bcc2544c84a35c5caae2704cecc104d6e5d4fb4594efe81378ec5f8c8b086c6"
+  }
+}

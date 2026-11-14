@@ -1,0 +1,16 @@
+{
+  "accepted": false,
+  "parameters": [
+    0.4,
+    0,
+    0.07
+  ],
+  "n": 2,
+  "reason": "Normalized component-space rank ambiguous [164,164,165]; singular values 2.72e-7 then 2.41e-10. Reference Ritz roundoff is amplified when normalizing nearly dependent scalar components. Preserve exact particular membrane lift separately rather than changing rank tolerance.",
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell.py": "13ccfb1482c1aaa1431830e0e1fc3eef5f0170af5b85d894fac13316f6ba44e3",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_lift_v2.py": "4b2435b5ceb5d3886fc6954c0aee74bb69bd5b9bafcb924b743ef402f9cbb52d",
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-reference-v2-result.json": "8c24be306dafd1f05d81596df7584ac0701553b45bdddae7bb20dfa55773ba51"
+  }
+}

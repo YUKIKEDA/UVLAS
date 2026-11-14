@@ -1,0 +1,86 @@
+---
+description: 作業の順序、Issue、ブランチ、PR、ゲート、誰がmergeするか
+alwaysApply: true
+---
+
+# 作業の流れ
+
+```
+Grill（設計が分岐するとき）→ Issue → ブランチ → 作業 → PR → 人のレビュー → squash merge → 振り返り
+```
+
+1. API、意味、パッケージの境界が分岐するときはGrillする。手順は `.agents/skills/grilling/SKILL.md`。Issueに完了条件があり、採用仕様が答えを決めているなら省く。
+2. 1 Issueは1 PR。Issueは `.github/ISSUE_TEMPLATE/` から作る。白紙のIssueは作れない。
+3. 採用仕様の意味を変える変更は `design` のIssueで、実装のIssueより先に仕様を直す（`design-docs`）。
+4. 完了条件はIssueに書く。ロードマップが持つのはID、題、Issue、状態だけ。
+5. ブランチは `main` から、起点を名指しして作る：`git fetch` の後に `git switch -c <branch> origin/main`。名前は `type/<Issue番号>-<slug>`（例：`feat/6-strong-ids`）。
+6. ブランチをpushしたターンのうちにPRを開く。本文は `.github/pull_request_template.md` から書く（`pull-requests`）。
+7. 人がレビューし、squash mergeする。エージェントはmergeしない。
+8. mergeの後、ローカルとリモートのブランチを消す。
+9. 次の機能ブランチの前に、振り返りをする。
+
+## ゲート
+
+PRを開く前に全て通す。CIは同じ内容を実行し、集約ジョブ `ci` が `main` の必須チェックになる。
+
+| コマンド | 内容 |
+|---|---|
+| `just gate` | 構成、ビルド、試験。WindowsはDebugとRelease、LinuxはDebug、Release、sanitizer |
+| `just format-check` | clang-format |
+| `just lint` | clang-tidy。先に構成が要る |
+| `just skills-check` | `.claude/skills` が `.agents/skills` の複製であること |
+| `just rd-check`、`just rd-verify` | R&Dツリーのリンク、ハッシュ対、ベースラインの変換との一致 |
+
+- 試験の件数は、CTestの「N tests passed … out of M」の行から読む。0件の実行は合格ではない。
+- 通ったと書くのは、そのコマンドを実際に走らせた環境だけ。Windowsで通したものを「両OSで通過」と書かない。
+- `main` のCIを、mergeのたびに読む。赤い `main` は、次のmergeの前に専用のIssueとPRで直す。
+
+## してはいけないこと
+
+- Issue番号とブランチなしに実装を始める。
+- 完了条件をロードマップへ写す。
+- 状態が `Grill後に分解` の行に着手する。
+- Grillなしにロードマップの行を足す、消す、「範囲に入れないもの」を触る。
+- mergeする。名指しの指示なしにIssueやPRを閉じる。
+- IssueもPRも無いブランチを残してターンを終える。要らなくなったファイルを残す（`scratch`）。
+
+## 番号を書く前に作る
+
+Issueの番号は、作ってから書く。IssueとPRは同じ連番を使い、次の番号は予測できない。PRの本文は `gh issue create` が番号を返してから書く。
+
+```text
+BAD   本文に Closes #26 と書いてからIssueを作り、#27 が振られる
+GOOD  Issueを作り、返ってきた番号を読んでから本文を書く
+```
+
+## commitの前にブランチを確かめる
+
+`git branch --show-current` を、commitするコマンドの一部にする。ブランチを作る一連のコマンドは途中で失敗し得る。そのときcommitは `main` に載る。
+
+2026-11-11、`git switch -c` の直後に作業ツリーが `main` へ戻っていたのを確かめずにcommitし、利用者に「ブランチで作業している」と誤って報告した。利用者の指摘で分かった。
+
+```text
+BAD   git switch -c chore/1-x ; （別の操作）; git commit
+GOOD  if ((git branch --show-current) -ne 'chore/1-x') { throw } ; git commit
+```
+
+## 長いコマンドと並行するPR
+
+1〜2分を超えそうなコマンドは、始める前に見込み時間を言うか、バックグラウンドで走らせる（`pace`）。
+
+ロードマップの「今」を書き換えるのは、その行を終えるPRだけ。規則のPRや横のPRは触らない。別のPRの上に積むIssueは、自分のブランチとPRを持ち、下のPRがmergeされてから `main` へ向け直す。積んだPRがmergeされた後、`main` と最後のブランチのheadを比べる。
+
+## 振り返り
+
+squash mergeを知ったターンに、mergeされたPRへ3点をコメントする。無ければ「なし」と書く。
+
+1. 規則、Skill、採用仕様、ADRに書くべき教訓。作業が頼ったのにどこにも書かれていない知識（測り方、この環境での道具の壊れ方、レビューや利用者に指摘された誤り）は教訓である。
+2. それを運ぶIssue。
+3. リファクタリングの要否。要るなら `refactor` のIssueを次に置く。先送りには、いつ行うかを名指しするロードマップの行が要る（`defer`）。
+
+続けて、頼まれるのを待たずに、`chore` のIssueと、各教訓を該当のファイルへ書くPRを作る。次の機能ブランチは、そのPRが開くまで待つ。振り返りの記録簿は作らない。PRのコメントと規則が記録である。
+
+```text
+BAD   PRがmergeされ、次の行を始める。その行が教えたことは会話の中に残る
+GOOD  PRがmergeされ、3点を書き、教訓のchore PRを開き、それから次の行
+```

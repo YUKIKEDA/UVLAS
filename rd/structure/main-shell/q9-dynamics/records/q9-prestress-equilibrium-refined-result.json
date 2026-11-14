@@ -1,0 +1,300 @@
+{
+  "protocol": "rd/structure/main-shell/q9-dynamics/records/q9-prestress-equilibrium-experiment.md",
+  "stable_increment": true,
+  "scipy": "1.16.3",
+  "numpy": "2.3.5",
+  "equilibrium": {
+    "newton": {
+      "eligible": true,
+      "history": [
+        {
+          "iteration": 0,
+          "residual": 0.6681757227532935,
+          "candidate_physical_step": 0.024749167667145546,
+          "potential": 5962.910423259729,
+          "x": [
+            1.0,
+            1.0,
+            1.0,
+            0.05
+          ],
+          "accepted_step": 1.0,
+          "potential_change": -8076.80711096133,
+          "total_value_difference": -8076.807110961389
+        },
+        {
+          "iteration": 1,
+          "residual": 0.0036475981874750374,
+          "candidate_physical_step": 6.884528687143764e-05,
+          "potential": -2113.89668770166,
+          "x": [
+            1.0020097732722062,
+            0.9993970680183382,
+            0.9993970680183382,
+            -0.0001422808635212769
+          ],
+          "accepted_step": 1.0,
+          "potential_change": -0.11171229827385787,
+          "total_value_difference": -0.11171229836872953
+        },
+        {
+          "iteration": 2,
+          "residual": 6.855364157390679e-08,
+          "candidate_physical_step": 7.111250631900043e-10,
+          "potential": -2114.008400000029,
+          "x": [
+            1.0020000001835598,
+            0.9993992194911578,
+            0.9993992194911577,
+            -1.3867743774338432e-09
+          ],
+          "accepted_step": 1.0,
+          "potential_change": -2.841006954430042e-11,
+          "total_value_difference": 1.0913936421275139e-11
+        },
+        {
+          "iteration": 3,
+          "residual": 1.8517886017148702e-14,
+          "candidate_physical_step": 9.313872891497781e-17,
+          "potential": -2114.008400000018,
+          "x": [
+            1.002,
+            0.9993992195314143,
+            0.9993992195314142,
+            -1.2116308616577709e-16
+          ]
+        }
+      ]
+    },
+    "x": [
+      1.002,
+      0.9993992195314143,
+      0.9993992195314142,
+      -1.2116308616577709e-16
+    ],
+    "expected": [
+      1.002,
+      0.9993992195314143,
+      0.9993992195314143,
+      0.0
+    ],
+    "coordinate_error": 1.2116308616577709e-16,
+    "full_residual": 2.7609489084663597e-13,
+    "eligible": true
+  },
+  "modes": {
+    "eligible": true,
+    "squared_frequencies": [
+      468191.4333252227,
+      240109979.83960283,
+      445477226.13868403,
+      1045905007751.2864
+    ],
+    "frequencies_hz": [
+      108.90099884265781,
+      2466.182645389754,
+      3359.1769765106465,
+      162766.96022443313
+    ],
+    "reference_frequencies_hz": [
+      108.90099884267028,
+      2466.182645390224,
+      3359.176976510957,
+      162766.96022443316
+    ],
+    "reference_frequency_relative": 1.9062529332813938e-13,
+    "eigenpair_residuals": [
+      4.417350988874102e-17,
+      7.67654764089348e-14,
+      4.76319562739608e-14,
+      1.221894763696591e-18
+    ],
+    "mass_orthogonality": 6.661338147750939e-16,
+    "theta_mode_index": 0,
+    "theta_mac": 1.0000000000000004,
+    "theta_squared_frequency_relative": 2.290390099801698e-13,
+    "matrix_comparison": {
+      "stiffness": {
+        "relative": 1.0130057527883125e-13,
+        "maximum": 2.2865764108605934e-13
+      },
+      "mass": {
+        "relative": 2.2937218708918936e-16,
+        "maximum": 3.9474596431116685e-16
+      }
+    }
+  },
+  "linear_response": {
+    "eligible": true,
+    "cases": [
+      {
+        "steps_per_period": 40,
+        "step": 0.00022956630577941349,
+        "max_theta_relative": 0.04825004398676795,
+        "max_energy_relative": 3.808064974464287e-14,
+        "discrete_eigenvalue_distance": 1.376229702781989e-13,
+        "unit_circle_error": 4.440892098500626e-16,
+        "theta_phase_error": 1.6903145549918008e-14,
+        "continuous_discrete_phase_difference": 0.0003217919011902215
+      },
+      {
+        "steps_per_period": 80,
+        "step": 0.00011478315288970674,
+        "max_theta_relative": 0.012109026412028925,
+        "max_energy_relative": 6.461498003318411e-14,
+        "discrete_eigenvalue_distance": 1.5958794236141773e-13,
+        "unit_circle_error": 8.881784197001252e-16,
+        "theta_phase_error": 3.4555691641457997e-15,
+        "continuous_discrete_phase_difference": 4.033544127451938e-05
+      },
+      {
+        "steps_per_period": 160,
+        "step": 5.739157644485337e-05,
+        "max_theta_relative": 0.003030139960350428,
+        "max_energy_relative": 1.7108536809473662e-13,
+        "discrete_eigenvalue_distance": 1.1945303255758082e-13,
+        "unit_circle_error": 8.881784197001252e-16,
+        "theta_phase_error": 6.1825544683813405e-15,
+        "continuous_discrete_phase_difference": 5.045427460687035e-06
+      },
+      {
+        "steps_per_period": 320,
+        "step": 2.8695788222426686e-05,
+        "max_theta_relative": 0.0007576336535557189,
+        "max_energy_relative": 8.064660050877137e-13,
+        "discrete_eigenvalue_distance": 6.82725102175538e-14,
+        "unit_circle_error": 1.3322676295501878e-15,
+        "theta_phase_error": 1.3378187446733136e-14,
+        "continuous_discrete_phase_difference": 6.307878360929664e-07
+      }
+    ],
+    "last_order": 1.999812111612842
+  },
+  "nonequilibrium_initialization": {
+    "x": [
+      1.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "unchanged": true,
+    "acceleration": [
+      624712.3555555226,
+      -1.6492059288157163e-08,
+      -4.212215736628692e-05,
+      1.4242909277202476e-11
+    ],
+    "equilibrium_residual": 0.6675536335722719,
+    "acceleration_residual": 0.0,
+    "eligible": true
+  },
+  "nonlinear_reference": {
+    "eligible": true,
+    "cases": [
+      {
+        "amplitude": 0.01,
+        "linear_limit_relative": 3.0278064884719895e-05,
+        "nfev": 235601,
+        "projected_ode_residual": 1.944472773219955e-13,
+        "mass_reference_relative": 4.901913076822143e-16,
+        "gradient_reference_scaled": 1.9444731499669623e-13,
+        "convective_reference_scaled": 2.440548804400479e-20,
+        "eligible": true
+      },
+      {
+        "amplitude": 0.005,
+        "linear_limit_relative": 7.569497902809065e-06,
+        "nfev": 220925,
+        "projected_ode_residual": 1.3545830331671566e-13,
+        "mass_reference_relative": 3.321651311003876e-16,
+        "gradient_reference_scaled": 1.354583077157066e-13,
+        "convective_reference_scaled": 5.5267511702145246e-21,
+        "eligible": true
+      },
+      {
+        "amplitude": 0.0025,
+        "linear_limit_relative": 1.8923733355281566e-06,
+        "nfev": 202805,
+        "projected_ode_residual": 2.4882658199398556e-13,
+        "mass_reference_relative": 3.6029111472556543e-16,
+        "gradient_reference_scaled": 2.488266091672263e-13,
+        "convective_reference_scaled": 2.113046043907618e-21,
+        "eligible": true
+      }
+    ],
+    "amplitude_orders": [
+      2.0000034913532216,
+      2.000000869238119
+    ]
+  },
+  "negative_controls": [
+    {
+      "name": "omitted_geometric_tangent",
+      "mismatch": 1.0000000000002558,
+      "detected": true
+    },
+    {
+      "name": "reset_initial_strain",
+      "mismatch": 0.33311125916055606,
+      "detected": true
+    },
+    {
+      "name": "omitted_constraint_curvature",
+      "mismatch": 0.6607920584742257,
+      "detected": true
+    },
+    {
+      "name": "unbalanced_reference_as_equilibrium",
+      "mismatch": 0.6675536335722719,
+      "detected": true
+    },
+    {
+      "name": "continuous_discrete_frequency_confusion",
+      "mismatch": 0.0003217919011902215,
+      "detected": true
+    },
+    {
+      "name": "omitted_velocity_inertia",
+      "mismatch": 3.780638820941594e-05,
+      "detected": true
+    }
+  ],
+  "unchanged_model": true,
+  "model_fingerprint": "cab7455c57ed1ca5de2c4a6919c167736887d692f0ef4e799b2fa18b445e645e",
+  "fingerprint_fields": [
+    "reference_geometry",
+    "elasticity",
+    "material_axes",
+    "initial_strain",
+    "mass",
+    "nominal_load",
+    "kinematic_map_id"
+  ],
+  "seconds": 12.781000000002678,
+  "peak_process_working_bytes": 87175168,
+  "all_criteria_pass": true,
+  "source_sha256": "24b579aa07245fcc16587dc12f1d87ee7161070e47fe136e7cd5caf47a9b0444",
+  "dependencies": [
+    {
+      "path": "check_q9_material_tangent.py",
+      "sha256": "33a07c38bfaa7c83c8dda86285839b69c2f9fa9fad64a73b7bba7511c1ceb8e9"
+    },
+    {
+      "path": "check_q9_curved_load.py",
+      "sha256": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b"
+    },
+    {
+      "path": "check_q9_interface_reparameterization.py",
+      "sha256": "becc74504f8d45f769a0a4e66c6f9cca28360ee97fcc7662e14bdd4a5fa9088c"
+    },
+    {
+      "path": "check_q9_independent_load.py",
+      "sha256": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96"
+    },
+    {
+      "path": "check_q9_plate_convergence.py",
+      "sha256": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1"
+    }
+  ],
+  "limitation": "4-coordinate affine kinematic fixture embedded in Q9; nonlinear orbit is an independent analytic reduced model; not full-DOF equilibrium/transient, wing modes, aeroelasticity or restart"
+}

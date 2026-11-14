@@ -1,0 +1,4 @@
+interface:
+  display_name: "ソルバーの性能"
+  short_description: "Budget, measure, attribute and improve solver time and memory without changing results"
+  default_prompt: "$solver-performance を使い、性能要求から予算を作り、計測と内訳に基づいて改善し、結果の同一性を確かめてください。"

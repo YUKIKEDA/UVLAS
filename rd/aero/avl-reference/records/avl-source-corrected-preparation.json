@@ -1,0 +1,50 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-source-measurement-experiment.md",
+  "source_sha256": "96625fd587ccfc700b92164d5f4f904e935956db929d5bd2bb88bf8c1f6c546c",
+  "adapter_sha256": "cbc18aad57c9eb993666417ac9409bf44740e9d7f958576345f3a040f996488d",
+  "archive_sha256": "0b588ecea9222f5b625d0af0c87ae31daf3cdba1532cf0bbb36f93d6e854849b",
+  "variants": [
+    {
+      "name": "measured",
+      "path": "build/reference-avl/source-measured-corrected",
+      "patch": "build/third-party-gpl/avl/measured-corrected.patch",
+      "patch_sha256": "4f945945d98fc957e4dabc621a769fd54274d5e68ed46e96e310b4d6421d0ddb",
+      "changes": [
+        {
+          "path": "src/aero.f",
+          "original_sha256": "11b732770f883cc5e51482cd40528d3283ac44eb50c2cd63629bae720b1ff226",
+          "modified_sha256": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6"
+        },
+        {
+          "path": "src/aoper.f",
+          "original_sha256": "cc7fb951d748cbfa7e1e4a737dda283ac6752d301a68c11cdbdc01c39efc68af",
+          "modified_sha256": "5cd5f64fb529e1cb3c6aef6080ccfe141b258c7be017e844e3c06b9bcbe2d6c5"
+        }
+      ]
+    },
+    {
+      "name": "core0",
+      "path": "build/reference-avl/source-core0-corrected",
+      "patch": "build/third-party-gpl/avl/core0-corrected.patch",
+      "patch_sha256": "24290c4c614f4cc4a823940af38df3ab4cd09304bc8f1c7101b6d0b87ca681d5",
+      "changes": [
+        {
+          "path": "src/aero.f",
+          "original_sha256": "11b732770f883cc5e51482cd40528d3283ac44eb50c2cd63629bae720b1ff226",
+          "modified_sha256": "1ac3205ef348f48ae252d83b19c445a67244e2b55a4eb9c5ca21031f8d716ad6"
+        },
+        {
+          "path": "src/aoper.f",
+          "original_sha256": "cc7fb951d748cbfa7e1e4a737dda283ac6752d301a68c11cdbdc01c39efc68af",
+          "modified_sha256": "5cd5f64fb529e1cb3c6aef6080ccfe141b258c7be017e844e3c06b9bcbe2d6c5"
+        },
+        {
+          "path": "src/aic.f",
+          "original_sha256": "ccbb18836d7fda5d1c9558564b881cebee87c9e38e7bf90e8f13ca6d2a0b8228",
+          "modified_sha256": "159d5087a40d9db52ff478c5df25f019bd98717bcc976726febede2b2d9bd0d7"
+        }
+      ]
+    }
+  ],
+  "license": "External AVL and measurement adapter: GPL-2.0-or-later; not linked into UVLAS"
+}

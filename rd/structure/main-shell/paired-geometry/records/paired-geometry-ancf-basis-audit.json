@@ -1,0 +1,153 @@
+{
+  "passed": true,
+  "representation": [
+    {
+      "n": 2,
+      "k": 0.0,
+      "rank": 64,
+      "value": 1.4260560390200057e-15,
+      "derivative": 2.286358530337145e-14,
+      "jump": 1.3322676295501878e-15,
+      "slope": 1.7053025658242404e-13,
+      "orthogonality": 3.3306690738754696e-16,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true
+      }
+    },
+    {
+      "n": 2,
+      "k": 0.4,
+      "rank": 64,
+      "value": 1.4489233747545533e-15,
+      "derivative": 2.569888570773272e-14,
+      "jump": 1.5543122344752192e-15,
+      "slope": 2.2737367544323206e-13,
+      "orthogonality": 3.3306690738754696e-16,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true
+      }
+    },
+    {
+      "n": 4,
+      "k": 0.0,
+      "rank": 128,
+      "value": 1.3877568173781094e-15,
+      "derivative": 3.134402576661074e-14,
+      "jump": 1.3322676295501878e-15,
+      "slope": 9.094947017729282e-13,
+      "orthogonality": 4.440892098500626e-16,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true
+      }
+    },
+    {
+      "n": 4,
+      "k": 0.4,
+      "rank": 128,
+      "value": 1.5567821099804239e-15,
+      "derivative": 2.9836425403953975e-14,
+      "jump": 1.9984014443252818e-15,
+      "slope": 3.410605131648481e-13,
+      "orthogonality": 4.440892098500626e-16,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true
+      }
+    }
+  ],
+  "native_inclusion": [
+    {
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "position": 2.971623546594683e-15,
+      "strain": 2.5361920030658967e-12,
+      "passed": true
+    },
+    {
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "position": 2.993199110910108e-15,
+      "strain": 2.532640484110184e-10,
+      "passed": true
+    },
+    {
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "position": 2.6504453185028137e-15,
+      "strain": 1.242929052130864e-12,
+      "passed": true
+    },
+    {
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "position": 2.6361671773787617e-15,
+      "strain": 1.2425034025832442e-10,
+      "passed": true
+    },
+    {
+      "n": 4,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "position": 4.140619912903264e-15,
+      "strain": 3.0938304815347945e-12,
+      "passed": true
+    },
+    {
+      "n": 4,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "position": 4.148157702324107e-15,
+      "strain": 3.0925703200375314e-10,
+      "passed": true
+    },
+    {
+      "n": 4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "position": 3.698787991607702e-15,
+      "strain": 2.3584536569316027e-12,
+      "passed": true
+    },
+    {
+      "n": 4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "position": 3.6996711193328684e-15,
+      "strain": 2.359597795423047e-10,
+      "passed": true
+    }
+  ],
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_gc_basis.py": "ece07cf414ff53dbb8766457ba4969b23f849fa288404a9905f54837bc9b92d3",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_geometry_ancf.py": "a4fa7105f896ddc825f0cc482e6ef0949f8e2c0dc0768d9f997ad761592d1c95",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_curvature_profiles.py": "1ae53ab1ab525c93ccb97b6aaf84ba130b85f57ae753385226e55df9d2ab2e98",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "build/analysis/paired-curvature-profiles/n2-k0-f0-d40-p100.npz": "c385a763e3154ed2347997bae8fe20b6c01ec748d7e2b96a9f64a1c384866e4b",
+    "build/analysis/paired-curvature-profiles/n2-k0-f0-d40-p100.json": "c401f212f361c8e8d701954e3eaac1b082391b5d7a865e79833f546c451a18e1",
+    "build/analysis/paired-curvature-profiles/n2-k0.4-f0-d40-p100.npz": "4b2d3ec68f852a64b1214e06567e4da601dbb4ee5e465fd9c567499589a59435",
+    "build/analysis/paired-curvature-profiles/n2-k0.4-f0-d40-p100.json": "98ed9bdc2b0362bb504dd2f35f4368707dc6f300256ead438b0fab8ce05fc310",
+    "build/analysis/paired-curvature-profiles/n4-k0-f0-d40-p100.npz": "f42deda9e051a626d1c6c6a092e4d3c422c4faca0bbaa17f44af0c7756759037",
+    "build/analysis/paired-curvature-profiles/n4-k0-f0-d40-p100.json": "58467ce755ff2f7d3a8041f6543241513d38dd3e6ed708c4423d425432ef1b3f",
+    "build/analysis/paired-curvature-profiles/n4-k0.4-f0-d40-p100.npz": "e7329c0054652e8a82371602d9bdd0e74e88f938e74d76f9bebab382aa86c172",
+    "build/analysis/paired-curvature-profiles/n4-k0.4-f0-d40-p100.json": "f96e76e00060b78b01ea5f36b5f5d4b293de9a17ec861bc8053cd67d69ab9123"
+  }
+}

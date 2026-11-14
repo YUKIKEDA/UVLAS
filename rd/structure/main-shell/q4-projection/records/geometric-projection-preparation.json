@@ -1,0 +1,13 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/geometric_mid_projection_q4.py": "236c5850d0a7ee4d5b141905fbedfc3ca35d2b11815ea42f7f1c7a509eac0830",
+    "rd/structure/main-shell/q4-projection/experiments/check_geometric_projection.py": "93d2fa07a8661623df32fe9845bbec7891a56b12e2a288e72e1c82e472d33f9a",
+    "rd/structure/main-shell/q4-projection/experiments/audit_geometric_projection.py": "f68de074430c76e98fc340ec27d132736303e2a573ecef0e43dfc661370dca0c",
+    "rd/structure/main-shell/q4-projection/experiments/qem_el2_q4.py": "d4982a12ed8e964e425064f13c29a234c44dc52a00356dcb570d286740afc3ee",
+    "rd/structure/main-shell/q4-projection/geometric-projection-formulation.md": "66870bf7598586329ab2e06663595bf08bfa21e3f233eaf90b0e0836767f2bd9",
+    "rd/structure/main-shell/q4-projection/records/geometric-projection-protocol.md": "7372a9131c360a17608128afe7b8205388fbb677f730129fb127e64641a11f29",
+    "rd/structure/main-shell/q4-projection/records/mid-projection-result.json": "4208badfb8441d6f57756e772c259b2acddaec6924f45eaa30da56cea51cccee",
+    "rd/structure/main-shell/q4-projection/records/mid-projection-audit.json": "755b0d5e77b4917766b358b6881da08086a1edcfdaac749da303e094de5f84fc"
+  }
+}

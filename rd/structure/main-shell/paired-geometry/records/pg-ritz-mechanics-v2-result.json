@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "nonlinear_layered_material_tangent_objectivity",
+      "metrics": {
+        "energy_derivative": 1.9989465827543603e-16,
+        "force_derivative": 1.2997607881412235e-15,
+        "symmetric": 2.292994076255834e-16,
+        "objective_energy": 1.4169151698371385e-13,
+        "objective_force": 1.93577929778522e-13
+      }
+    },
+    {
+      "case": "homogeneous_layer_split_same_S",
+      "metrics": {
+        "energy": 4.577113610428959e-15,
+        "force": 1.0598526056697704e-14,
+        "tangent": 2.957262835424572e-16,
+        "mass": 4.1429270128902567e-16
+      }
+    },
+    {
+      "case": "nonlinear_physical_traction_equilibrium",
+      "metrics": {
+        "free_residual": 1.446183600257542e-10,
+        "physical_displacement_error": 5.894602770420974e-13,
+        "reference_affine_work": 1.4854316712553778e-12
+      },
+      "history": [
+        {
+          "iteration": 0,
+          "residual": 32.96877895978312,
+          "min_det": 1.0195405630418226
+        },
+        {
+          "iteration": 1,
+          "residual": 0.07380980155311151,
+          "min_det": 1.019944783182891
+        },
+        {
+          "iteration": 2,
+          "residual": 0.00022810315664343751,
+          "min_det": 1.019948373616279
+        },
+        {
+          "iteration": 3,
+          "residual": 1.446183600257542e-10,
+          "min_det": 1.0199483759999723
+        }
+      ]
+    },
+    {
+      "case": "consistent_mass_modes_and_eccentric_inertia",
+      "metrics": {
+        "eigen_backward": 2.6495914803686392e-14,
+        "mass_orthogonality": 1.128195781655868e-11,
+        "spatial_inertia": 2.6767629932341435e-15
+      },
+      "free_nullities": [
+        6,
+        6,
+        6
+      ],
+      "eigen_min": 0.10559482343450927,
+      "eigen_max": 983256.2164765755,
+      "mass_min": 4.102542044115875e-11
+    }
+  ],
+  "stops": [],
+  "state_artifact": {
+    "artifact": "build/analysis/pg-ritz-mechanics-20261105-011852.npz",
+    "artifact_sha256": "83fd55f6731bf7ea8a0672162574333876b79d9b4ee7581a4be00100778952fa"
+  },
+  "seconds": 8.687000000034459,
+  "R4_complete": false,
+  "main_shell_adopted": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_mechanics_v2.py": "60853423914f69567b6b3f9ab650fd2f33d699666eeaa166473ec675438eb28d",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_trace_v3.py": "480e40577fbbee1515e1fba35f552f1b6bc92d5f29e3a371fa38b510677e75fc",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e",
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-mechanics-protocol.md": "cac70368df0cf3556f77388b2288e1af63390ea8b51d1a2b5d21ba57d0abe341",
+    "docs/specs/structure/material-layer-adoption-contract.md": "cafea600ef53cb76426b6b980c9cac463eb73c96eb3223cd9a2950c33a2b8155",
+    "rd/structure/main-shell/q9-dynamics/nonlinear-step-restart-contract.md": "68e816acfaf069d46666e29cfec3305815af10e92cb2b1480fdceca3af3a5cba"
+  }
+}

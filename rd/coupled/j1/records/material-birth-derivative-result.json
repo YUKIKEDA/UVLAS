@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "scope": "actual weak right derivative of newborn strip; old material coefficients preserved",
+  "analytic_derivative": -0.16424261482767616,
+  "finite_right_derivative_errors": [
+    6.899763391743363e-07,
+    1.734768154681987e-07,
+    4.328914926521321e-08,
+    1.053518305926815e-08
+  ],
+  "final_order": 2.0387900658064155,
+  "wrong_Aeff_and_omitted_flux_error": 0.5900405268589173,
+  "sources": {
+    "rd/coupled/j1/experiments/check_material_birth_derivative.py": "058bd2d6756c1518a6cd0d71c3250c9f6957f59741dffd6031c7090fa48aa826",
+    "docs/specs/coupled/j1-initialization-output-derivative-addendum.md": "6b2159b633a0412b5221546b075eb9938718c69d306a63602b638ce73c16f05f",
+    "rd/aero/wake-loads/records/uvlm-wake-adoption-closure.json": "c562eac4d5d054bb50f86f000627026a42d4cafa5969420b6068f870013a457e"
+  }
+}

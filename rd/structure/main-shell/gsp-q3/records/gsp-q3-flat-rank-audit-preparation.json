@@ -1,0 +1,8 @@
+{
+  "status": "frozen_before_rational_audit",
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/audit_gsp_q3_flat_rank.py": "859e7db9cacc51d50ea2f96519c2d3a3d2eef493e93169e728da3c1eb91fac32",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-audit-protocol.md": "af76bd9d2fb312c79a1c55fa5beb5fc82b69ddaf6903381f58aa70b30a29ac21",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-flat-rank-result.json": "08242c53d69064e2df2b4ca9d78473c5c2bf657a95220f99207b78681f2d00cc"
+  }
+}

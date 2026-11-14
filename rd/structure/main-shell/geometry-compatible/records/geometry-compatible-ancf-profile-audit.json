@@ -1,0 +1,186 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "n": 2,
+      "k": 0.0,
+      "kind": 0,
+      "value": 7.919510909323122e-16,
+      "derivative": 2.2782950749118535e-14,
+      "jump": 6.661338147750939e-16,
+      "slope": 3.410605131648481e-13,
+      "orthogonality": 2.220446049250313e-16,
+      "rank": 36,
+      "tail": 1.1754973555104663e-86,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 2,
+      "k": 0.0,
+      "kind": 1,
+      "value": 1.412095232468394e-15,
+      "derivative": 3.3559712735875964e-14,
+      "jump": 1.5543122344752192e-15,
+      "slope": 0.0,
+      "orthogonality": 2.220446049250313e-16,
+      "rank": 36,
+      "tail": 6.4746898679186916e-90,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 2,
+      "k": 0.4,
+      "kind": 0,
+      "value": 7.023024583602823e-16,
+      "derivative": 2.3211865556610146e-14,
+      "jump": 1.3322676295501878e-15,
+      "slope": 6.821210263296962e-13,
+      "orthogonality": 2.220446049250313e-16,
+      "rank": 44,
+      "tail": 3.966821788006266e-39,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 2,
+      "k": 0.4,
+      "kind": 1,
+      "value": 1.695437814368964e-15,
+      "derivative": 4.507346711941747e-14,
+      "jump": 2.220446049250313e-15,
+      "slope": 0.0,
+      "orthogonality": 4.440892098500626e-16,
+      "rank": 44,
+      "tail": 6.686598379710045e-40,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 4,
+      "k": 0.0,
+      "kind": 0,
+      "value": 1.1309409224743094e-15,
+      "derivative": 6.23320519466373e-14,
+      "jump": 8.881784197001252e-16,
+      "slope": 9.094947017729282e-13,
+      "orthogonality": 4.440892098500626e-16,
+      "rank": 72,
+      "tail": 2.4524625261085113e-83,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 4,
+      "k": 0.0,
+      "kind": 1,
+      "value": 1.451296683306011e-15,
+      "derivative": 3.705067219079602e-14,
+      "jump": 1.5543122344752192e-15,
+      "slope": 0.0,
+      "orthogonality": 4.440892098500626e-16,
+      "rank": 72,
+      "tail": 2.9831340336471406e-87,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 4,
+      "k": 0.4,
+      "kind": 0,
+      "value": 2.091179101168945e-15,
+      "derivative": 8.369127665259934e-14,
+      "jump": 1.3322676295501878e-15,
+      "slope": 2.2737367544323206e-12,
+      "orthogonality": 4.440892098500626e-16,
+      "rank": 88,
+      "tail": 3.839727876606086e-46,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    },
+    {
+      "n": 4,
+      "k": 0.4,
+      "kind": 1,
+      "value": 2.6415879763132956e-15,
+      "derivative": 8.332312145000238e-14,
+      "jump": 2.4424906541753444e-15,
+      "slope": 0.0,
+      "orthogonality": 4.440892098500626e-16,
+      "rank": 88,
+      "tail": 1.761635640008432e-47,
+      "checks": {
+        "span": true,
+        "value": true,
+        "derivative": true,
+        "continuity": true,
+        "orthogonality": true,
+        "hash": true
+      }
+    }
+  ],
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/experiments/check_gc_profile_representation.py": "8d08006ab3a14f9e993d824bf32e5723176b7780fbfb03eeda3b59fb5aeb8d3d",
+    "rd/structure/main-shell/reference-work/experiments/stable_curvature_profiles.py": "2738c0ab7129b2f5252962b25f7129431b3217043ba7afb7665cd12a3ea15fac",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "build/analysis/stable-curvature-profiles/n2-k0-f0-d40-p100.json": "616bff8b2097ccbfa41b9ebc0df941d24a3b4fe0e99cf2731bd570a5dcda17ef",
+    "build/analysis/stable-curvature-profiles/n2-k0-f0-d40-p100.npz": "0b3622d6835c8bdcbfa4a7e6ef22845f47ba85e72832f66690ffcd28f1224676",
+    "build/analysis/stable-curvature-profiles/n2-k0-f1-d40-p100.json": "e5c3a88f1584fe8163004e0feefdde971570c18fdeaa8ea1e3b607c4c165914e",
+    "build/analysis/stable-curvature-profiles/n2-k0-f1-d40-p100.npz": "06dad7df8d601323be80c6cc63a5fa545ea9112d6e06b2681420f5398ee814d8",
+    "build/analysis/stable-curvature-profiles/n2-k0.4-f0-d40-p100.json": "ea82ca7c67b4322e0b7b20cbac868626f977ebabf7824ecf4a0a923e311f8b87",
+    "build/analysis/stable-curvature-profiles/n2-k0.4-f0-d40-p100.npz": "5ea7cab5147b1f029f9ff194ae385f203b78377296b3192c997e78489a26d304",
+    "build/analysis/stable-curvature-profiles/n2-k0.4-f1-d40-p100.json": "3b4ccd3545a7bdf8def12ec51f72e7f65648937f4938c5c45c39d721a59e5c35",
+    "build/analysis/stable-curvature-profiles/n2-k0.4-f1-d40-p100.npz": "55447c7ee94e5638b35e6f6db144a82c07fb96274cf830a9226db16c20c80efa",
+    "build/analysis/stable-curvature-profiles/n4-k0-f0-d40-p100.json": "66a0c4788722d203664c1a8679fa6bfdf19b8e5ee4de7704d6bc8f570da7ac50",
+    "build/analysis/stable-curvature-profiles/n4-k0-f0-d40-p100.npz": "e5a7749016cdbeb43e10bcef06508ec7196bd7bade7c87d0a709151b861e52cd",
+    "build/analysis/stable-curvature-profiles/n4-k0-f1-d40-p100.json": "2b98d6d439cf0165123e30e088c62407315567a496096267a3d8a8f007208251",
+    "build/analysis/stable-curvature-profiles/n4-k0-f1-d40-p100.npz": "5ca20d9fbf529c7b852c84a98cce6429c2dc80e77fe6a535e1b8263dd235471d",
+    "build/analysis/stable-curvature-profiles/n4-k0.4-f0-d40-p100.json": "1a87769fdb73066f5be019af80631d2bad770e8cedb6344d0e3e790a80a60037",
+    "build/analysis/stable-curvature-profiles/n4-k0.4-f0-d40-p100.npz": "bc95cabdcb56058cb5faf03ffba426b80240f81bd87255418ce9fc1b8e3600eb",
+    "build/analysis/stable-curvature-profiles/n4-k0.4-f1-d40-p100.json": "e3bf147858a4994df9902b9ea77cecf1d4eb3be157855450058fc2a1500c96d6",
+    "build/analysis/stable-curvature-profiles/n4-k0.4-f1-d40-p100.npz": "a6dfaa19abbb74947517239530dadc6f352c8dc367f86a784db55d3009e7cfe0"
+  }
+}

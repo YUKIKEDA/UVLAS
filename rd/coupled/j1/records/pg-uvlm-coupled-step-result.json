@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "scope": "two actual PG Ritz directions, nonlinear deformed equilibrium, prescribed finite wake, full step history; not full-shell accuracy/free-wake adoption",
+  "records": [
+    {
+      "case": "deformed_PG_finite_wake_fixed_point",
+      "residual": 2.408705867777664e-16,
+      "step_difference": 3.1401849173675503e-16,
+      "polynomial_projection_error": 1.883601352802158e-15
+    },
+    {
+      "case": "actual_PG_UVLM_strong_step_and_JVP",
+      "relative_JVP_error": 1.4030214211125536e-13,
+      "iterations": 3,
+      "residual": 7.0959991294709e-16
+    },
+    {
+      "case": "full_history_implicit_step_linearization",
+      "dimension": 24,
+      "relative_directional_error": 3.7697893727943373e-10
+    },
+    {
+      "case": "deformed_PG_mode_and_nonlinear_time_response",
+      "eigenvalue": [
+        0.8358222082281983,
+        0.5102476909964647
+      ],
+      "relative_time_mode_error": 5.630400531884871e-10,
+      "spectral_radius": 0.9792606751701436
+    }
+  ],
+  "failures": [],
+  "seconds": 18.10999999998603,
+  "peak_bytes": 150024192,
+  "sources": {
+    "rd/coupled/j1/experiments/check_pg_uvlm_coupled_step.py": "02e159fbb5b058d9d28577e11655be2d68aa2fc331e4f53dfc07dd7173e46e94",
+    "rd/coupled/j1/experiments/pg_uvlm_coupled_step.py": "35035d7323f4f8e3b8ef70665ee35f961a27ee31b1082955528c58cab7cf0836",
+    "rd/coupled/j1/records/pg-uvlm-coupled-step-protocol.md": "892ab95bf44cd0818be6b1f9a95b40b0625b15cd3f3724f3cd774f496d2de482",
+    "docs/specs/coupled/coupled-time-stability-specification.md": "5bcff38bf8d02628569e831e53e3d42cb01df770d88b659e9c896e66c6277ecb"
+  }
+}

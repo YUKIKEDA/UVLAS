@@ -1,0 +1,141 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: build and test (windows, msvc)
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - name: vcpkg at a commit that holds the manifest baseline
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          path: out/vcpkg
+          fetch-depth: 0
+      - name: vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: out/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'cmake/vcpkg-ports/**') }}
+      # A PowerShell step fails only on the exit code of its last native command.
+      # Every command whose failure has to stop the job is therefore a step of its own.
+      - name: Bootstrap vcpkg
+        run: ./out/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+      - name: vcpkg environment
+        run: |
+          New-Item -ItemType Directory -Force out/vcpkg-cache | Out-Null
+          echo "VCPKG_ROOT=$env:GITHUB_WORKSPACE/out/vcpkg" >> $env:GITHUB_ENV
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$env:GITHUB_WORKSPACE/out/vcpkg-cache" >> $env:GITHUB_ENV
+      - name: Compiler version
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cl
+      - name: Configure
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --preset windows-msvc
+      - name: Build Debug
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-debug
+      - name: Test Debug
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-debug
+      - name: Build Release
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build --preset windows-release
+      - name: Test Release
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-release
+
+  linux:
+    name: build and test (linux, gcc 14, ${{ matrix.preset }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [linux-debug, linux-release, linux-sanitize]
+    env:
+      CXX: g++-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: vcpkg at a commit that holds the manifest baseline
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          path: out/vcpkg
+          fetch-depth: 0
+      - name: vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: out/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'cmake/vcpkg-ports/**') }}
+      - name: Bootstrap vcpkg
+        run: |
+          mkdir -p out/vcpkg-cache
+          ./out/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/out/vcpkg" >> "$GITHUB_ENV"
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$GITHUB_WORKSPACE/out/vcpkg-cache" >> "$GITHUB_ENV"
+      # The runner image ships GCC 14 and Ninja. Install only what is missing, so a
+      # package mirror that cannot be reached does not fail the job.
+      - name: Tools
+        run: |
+          missing=""
+          command -v ninja >/dev/null || missing="$missing ninja-build"
+          command -v g++-14 >/dev/null || missing="$missing g++-14"
+          if [ -n "$missing" ]; then
+            sudo apt-get update && sudo apt-get install -y $missing
+          fi
+          ninja --version
+      - name: Compiler version
+        run: g++-14 --version
+      - name: Configure, build, test
+        run: |
+          cmake --preset ${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }}
+          ctest --preset ${{ matrix.preset }}
+      - name: clang-tidy
+        if: matrix.preset == 'linux-debug'
+        run: |
+          pipx install clang-tidy==21.1.1
+          clang-tidy -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp')
+
+  checks:
+    name: format, skills, R&D tree
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Formatting
+        run: |
+          pip install clang-format==21.1.2
+          clang-format --dry-run --Werror $(git ls-files 'src/*.cpp' 'include/*.hpp' 'tests/*.cpp' 'qa/*.cpp')
+      - name: Python tools
+        run: |
+          pip install ruff==0.17.4 pyright==1.1.408
+          ruff check .
+          ruff format --check .
+          pyright
+      - name: Traceability
+        run: python -X utf8 tools/qa/trace.py check
+      - name: Skill copies
+        run: python tools/dev/sync_skills.py --check
+      - name: R&D tree
+        run: python -X utf8 tools/rd/check_tree.py
+
+  # The single required check on main. A job added above is added to `needs` in the same PR.
+  ci:
+    name: ci
+    if: always()
+    needs: [windows, linux, checks]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Every job passed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1

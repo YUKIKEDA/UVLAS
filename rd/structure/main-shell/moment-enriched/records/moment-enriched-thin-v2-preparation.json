@@ -1,0 +1,15 @@
+{
+  "reason": "Same complete exact polynomial nullspace, spaces, FE operators, ranks and thresholds. Exact rational L2 orthogonalization precedes float64 conversion; avoids ~6.10e8 condition amplification of raw RREF columns.",
+  "previous_stop": "analytic_isometry_lift_residual 2.25707882562521e-9 >1e-9",
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_thin_v2.py": "84da596899451fb467465a5ac0baa9c9c5ac79b976b1ca8a639cb0d2fa8406ca",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_exact_isometry_v2.py": "4c28775b12b2bcb62d04081916c28c88ff47af8d4863035a464734df0a3443df",
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_thin_global_v2.py": "0a00fc0f2588c91f3347135297da1716d44ec6551f822ce001aec2dbbbb01e5d",
+    "rd/structure/main-shell/moment-enriched/experiments/audit_moment_enriched_thin_global_v2.py": "758369bc6285fd5e3b58e65b97fec9977fa1efdcfd1340947edec71d47f9547a",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_exact_basis.py": "7f29c8d608f407b07a2fce8ad447b9fc03421ac9d5dd2aa43256d292159ddc6d",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-global-result.json": "1f263d34bbfeeeab418d2fef5e4be554f698c9038db8a96be91dad7036419e2a",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-preparation.json": "19a0b9edcbfd8ba6f8f4de8b6e81fb1849ce81a7e4b7faf841b747e380b80b7a",
+    "rd/structure/main-shell/moment-enriched/moment-enriched-thin-formulation.md": "a5793357a8c35bfa4d5b43805df8cc72b734b4a96c2182eaad354001d3589f1a",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-protocol.md": "7d730a1dd32a21ded8133fd7610891297cb4f09955b273fdb402b2fd8ece17cf"
+  }
+}

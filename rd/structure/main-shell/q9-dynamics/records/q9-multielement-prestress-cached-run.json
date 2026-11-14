@@ -1,0 +1,357 @@
+{
+  "status": "interrupted_for_componentwise_contraction",
+  "stage": "external_24_not_completed",
+  "internal": [
+    {
+      "n": 2,
+      "elements": 4,
+      "total_coordinates": 225,
+      "free_coordinates": 180,
+      "newton": [
+        {
+          "iteration": 0,
+          "residual": 0.8286266134667155,
+          "candidate_physical_step": 0.0006433542089987387,
+          "step": 1.0,
+          "potential_change": -2734.0168630071857
+        },
+        {
+          "iteration": 1,
+          "residual": 0.002135845525276969,
+          "candidate_physical_step": 0.00015488549651200418,
+          "step": 1.0,
+          "potential_change": -0.6199811686434096
+        },
+        {
+          "iteration": 2,
+          "residual": 6.041107887579181e-05,
+          "candidate_physical_step": 1.194611384147011e-07,
+          "step": 1.0,
+          "potential_change": -6.877041135413403e-06
+        },
+        {
+          "iteration": 3,
+          "residual": 4.0735797082398443e-11,
+          "candidate_physical_step": 2.6386611295103827e-12
+        }
+      ],
+      "converged": true,
+      "geometry": {
+        "eligible": true,
+        "maximum_radius": 0.0020765768737277404,
+        "minimum_parent_det_lower": 0.0031055724904337453,
+        "det_polynomial_crosscheck": true
+      },
+      "static_errors": {
+        "displacement_l2": 0.058435888958219565,
+        "green_l2": 0.038947820493753664,
+        "energy_relative": 0.0002456331764328912,
+        "reference_energy": 9733.6574579329
+      },
+      "reaction": {
+        "force": [
+          -7000000.000000409,
+          -5.002038960810751e-08,
+          9.072380606767183e-07
+        ],
+        "moment": [
+          -1.445954467271804e-10,
+          -252.30244531675555,
+          -3.277091309428215e-08
+        ],
+        "force_reference_error": 1.4233775293537227e-13,
+        "balance": 1.1541962067400652e-11
+      },
+      "modes": {
+        "eligible": true,
+        "eigenpair_residual_max": 2.1958425146123978e-13,
+        "mass_orthogonality": 7.216449660063518e-16
+      },
+      "frequencies_hz": [
+        122.43460537549143,
+        240.6338444403563,
+        549.1328075655211,
+        681.1253588488624,
+        790.656455012738,
+        923.4164293532993
+      ],
+      "right_center_displacement": [
+        0.0005009749952551434,
+        3.8218076363470094e-17,
+        0.000521048587530832
+      ],
+      "seconds": 0.8910000000032596,
+      "peak_process_working_bytes": 98078720,
+      "eligible": true
+    },
+    {
+      "n": 4,
+      "elements": 16,
+      "total_coordinates": 729,
+      "free_coordinates": 648,
+      "newton": [
+        {
+          "iteration": 0,
+          "residual": 0.7842597849319725,
+          "candidate_physical_step": 0.0006435843091263845,
+          "step": 1.0,
+          "potential_change": -2737.340053259591
+        },
+        {
+          "iteration": 1,
+          "residual": 0.0022929306432441267,
+          "candidate_physical_step": 0.00015821433594039144,
+          "step": 1.0,
+          "potential_change": -0.620385629612322
+        },
+        {
+          "iteration": 2,
+          "residual": 5.229487465846912e-05,
+          "candidate_physical_step": 1.2406924595565435e-07,
+          "step": 1.0,
+          "potential_change": -7.1647233230442975e-06
+        },
+        {
+          "iteration": 3,
+          "residual": 3.70541959897187e-11,
+          "candidate_physical_step": 2.8646903092066646e-12
+        }
+      ],
+      "converged": true,
+      "geometry": {
+        "eligible": true,
+        "maximum_radius": 0.0021086424607301714,
+        "minimum_parent_det_lower": 0.0007763182830945938
+      },
+      "static_errors": {
+        "displacement_l2": 0.006387738495959995,
+        "green_l2": 0.01036931545602869,
+        "energy_relative": 4.107490207183595e-05,
+        "reference_energy": 9733.657457932572
+      },
+      "reaction": {
+        "force": [
+          -7000000.000001397,
+          -6.108598427090328e-08,
+          7.200214469094135e-08
+        ],
+        "moment": [
+          3.2798119775634405e-09,
+          -28.612752431250257,
+          -1.3067619875073433e-08
+        ],
+        "force_reference_error": 2.000244738489211e-13,
+        "balance": 1.2047224039538587e-11
+      },
+      "modes": {
+        "eligible": true,
+        "eigenpair_residual_max": 9.286438329186438e-13,
+        "mass_orthogonality": 6.661338147750939e-16
+      },
+      "frequencies_hz": [
+        117.84485721672566,
+        230.17741956628277,
+        541.5700806982717,
+        564.1816209203305,
+        667.5919587120167,
+        759.6576889873031
+      ],
+      "right_center_displacement": [
+        0.000500172866234605,
+        -6.260685728995489e-18,
+        0.0005023485006557363
+      ],
+      "seconds": 0.6089999999967404,
+      "peak_process_working_bytes": 105082880,
+      "eligible": true
+    },
+    {
+      "n": 8,
+      "elements": 64,
+      "total_coordinates": 2601,
+      "free_coordinates": 2448,
+      "newton": [
+        {
+          "iteration": 0,
+          "residual": 0.7483024584753267,
+          "candidate_physical_step": 0.0006521120903929174,
+          "step": 1.0,
+          "potential_change": -2737.566337720273
+        },
+        {
+          "iteration": 1,
+          "residual": 0.0023533514993314135,
+          "candidate_physical_step": 0.00016051153976723027,
+          "step": 1.0,
+          "potential_change": -0.6229206434744228
+        },
+        {
+          "iteration": 2,
+          "residual": 4.441323315558952e-05,
+          "candidate_physical_step": 1.2647331261647854e-07,
+          "step": 1.0,
+          "potential_change": -7.289322829028e-06
+        },
+        {
+          "iteration": 3,
+          "residual": 3.1852348404164554e-11,
+          "candidate_physical_step": 2.9592243384946953e-12
+        }
+      ],
+      "converged": true,
+      "geometry": {
+        "eligible": true,
+        "maximum_radius": 0.0021188226547989154,
+        "minimum_parent_det_lower": 0.0001940736310061852
+      },
+      "static_errors": {
+        "displacement_l2": 0.0005126077962767371,
+        "green_l2": 0.002667058415647437,
+        "energy_relative": 4.685705942808482e-06,
+        "reference_energy": 9733.657457932784
+      },
+      "reaction": {
+        "force": [
+          -7000000.000001555,
+          -3.8140314018164645e-08,
+          1.0223454138813537e-08
+        ],
+        "moment": [
+          -4.141495812959306e-09,
+          -2.2454045533817855,
+          -3.784953150898218e-08
+        ],
+        "force_reference_error": 2.2225855295146095e-13,
+        "balance": 1.2256731917316096e-11
+      },
+      "modes": {
+        "eligible": true,
+        "eigenpair_residual_max": 2.7654783069942587e-12,
+        "mass_orthogonality": 6.661338147750939e-16
+      },
+      "frequencies_hz": [
+        116.84889029993151,
+        227.67452767982746,
+        539.1328604664658,
+        550.899384244309,
+        657.4856447407575,
+        741.6457245716492
+      ],
+      "right_center_displacement": [
+        0.0005000267972521399,
+        -1.1138816253477748e-18,
+        0.0005001836288628075
+      ],
+      "seconds": 4.1560000000026776,
+      "peak_process_working_bytes": 131788800,
+      "eligible": true
+    },
+    {
+      "n": 16,
+      "elements": 256,
+      "total_coordinates": 9801,
+      "free_coordinates": 9504,
+      "newton": [
+        {
+          "iteration": 0,
+          "residual": 0.7247324375577634,
+          "candidate_physical_step": 0.0006574514957085621,
+          "step": 1.0,
+          "potential_change": -2737.5810183794756
+        },
+        {
+          "iteration": 1,
+          "residual": 0.002378860092767339,
+          "candidate_physical_step": 0.00016169684086129665,
+          "step": 1.0,
+          "potential_change": -0.6238874025066963
+        },
+        {
+          "iteration": 2,
+          "residual": 3.844594174592681e-05,
+          "candidate_physical_step": 1.2755100952075586e-07,
+          "step": 1.0,
+          "potential_change": -7.3270512555428935e-06
+        },
+        {
+          "iteration": 3,
+          "residual": 2.8968531073873797e-11,
+          "candidate_physical_step": 2.9948697715183936e-12
+        }
+      ],
+      "converged": true,
+      "geometry": {
+        "eligible": true,
+        "maximum_radius": 0.0021205655719842304,
+        "minimum_parent_det_lower": 4.851815352262338e-05
+      },
+      "static_errors": {
+        "displacement_l2": 3.910417522405506e-05,
+        "green_l2": 0.000662057716943343,
+        "energy_relative": 4.083821740774596e-07,
+        "reference_energy": 9733.657457932544
+      },
+      "reaction": {
+        "force": [
+          -7000000.000001816,
+          4.459913327536924e-08,
+          -4.698462098551293e-09
+        ],
+        "moment": [
+          2.307320182137751e-09,
+          -0.1495483015643371,
+          -2.0173320081084967e-07
+        ],
+        "force_reference_error": 2.595189492879246e-13,
+        "balance": 1.2319055630759091e-11
+      },
+      "modes": {
+        "eligible": true,
+        "eigenpair_residual_max": 1.4929672070410216e-11,
+        "mass_orthogonality": 5.551115123125783e-16
+      },
+      "frequencies_hz": [
+        116.55813007256916,
+        226.98301593852034,
+        538.3133825432034,
+        548.783368538409,
+        655.998346497412,
+        738.2697846673994
+      ],
+      "right_center_displacement": [
+        0.0005000030023014634,
+        -2.0467888213589802e-17,
+        0.000500012364997222
+      ],
+      "seconds": 19.0,
+      "peak_process_working_bytes": 264974336,
+      "eligible": true
+    }
+  ],
+  "external": [
+    {
+      "n": 12,
+      "elements": 144,
+      "total_coordinates": 5625,
+      "free_coordinates": 5400,
+      "modes": {
+        "eligible": true,
+        "eigenpair_residual_max": 1.2120032278236164e-11,
+        "mass_orthogonality": 6.661338147750939e-16
+      },
+      "frequencies_hz": [
+        116.64212417415344,
+        227.16426275497628,
+        538.5431637841348,
+        549.2989034279843,
+        656.3205396098923,
+        739.086239668323
+      ],
+      "seconds": 112.38999999999942,
+      "peak_process_working_bytes": 342241280,
+      "eligible": true
+    }
+  ],
+  "source_sha256": "56c334a1da3af194714b702f398efe023dfe2b621db882ca978d778fbd30b895",
+  "reason": "Cached coefficients alone left external_12 at about 112 seconds; stopped before external_24 completion to use an equivalent component-block contraction with a full-matrix crosscheck."
+}

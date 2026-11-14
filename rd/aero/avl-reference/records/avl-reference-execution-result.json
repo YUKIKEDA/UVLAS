@@ -1,0 +1,139 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-reference-execution-protocol.md",
+  "source_sha256": "e82b0eac497122785d1db11ea830968eec4cd3b31b615b3e1f8017eb23f014f6",
+  "input_manifest_sha256": "774fad1dd61d1ce4fc2b10059adf6fc2bcc0f3c3c7ac22bf9979035ade0806ab",
+  "executable": {
+    "url": "https://web.mit.edu/drela/Public/web/avl/avl352.exe",
+    "sha256": "443520d255408491222a8df9060bd000f78da95a68845a2f6efdbc67e203f07a",
+    "bytes": 1793164
+  },
+  "runs": [
+    {
+      "label": "planar",
+      "case": "FW-V01",
+      "directory": "build/analysis/avl-smoke-20261030-210330-816448/planar",
+      "seconds": 0.17199999999138527,
+      "exit_code": 0,
+      "stopped": null,
+      "input_sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+      "session_sha256": "6273f5edfed0332de7d7d5c3a72546270b2f2cf2335407dedd6bf2f5b6467844",
+      "console_sha256": "3caa5c6adc1757b03091747eb1fe20ffcb46c9b5ae75f6cb5cbe0e63f37e9d19",
+      "outputs": {
+        "total.txt": {
+          "exists": true,
+          "bytes": 1322,
+          "sha256": "ba40c6240b878644adb978384783fb552a95ad4a57da8369dce4c9c88a458890"
+        },
+        "strips.txt": {
+          "exists": true,
+          "bytes": 5065,
+          "sha256": "78c4202978765da5584344b537c80c6b56320f930d8c5fc9f77de3df7d843a98"
+        },
+        "strips-body.txt": {
+          "exists": true,
+          "bytes": 3362,
+          "sha256": "f7ed8ecd0912b1f126b75bc3c6570c6f68529f17ef95c3edeebd7db18f5891cf"
+        },
+        "elements.txt": {
+          "exists": true,
+          "bytes": 16435,
+          "sha256": "c6e0d371fbe6ac23a9e074c541c958787ef7e6cb24786b4ec9709dbeb30854bf"
+        }
+      },
+      "checks": {
+        "normal_exit": true,
+        "version": true,
+        "all_outputs": true,
+        "mrf": true,
+        "no_command_failure": true
+      }
+    },
+    {
+      "label": "dihedral",
+      "case": "FW-V02",
+      "directory": "build/analysis/avl-smoke-20261030-210330-816448/dihedral",
+      "seconds": 0.062000000005355105,
+      "exit_code": 0,
+      "stopped": null,
+      "input_sha256": "74c7dfe03d913cc0b2b08ee0a91062c07bbf6c99d40ab237e02f48dd03b315ea",
+      "session_sha256": "6273f5edfed0332de7d7d5c3a72546270b2f2cf2335407dedd6bf2f5b6467844",
+      "console_sha256": "4451f5bff6af1c4bd8c4bf3b407a215d116c4f53688c34a7ac80840ec0f387cf",
+      "outputs": {
+        "total.txt": {
+          "exists": true,
+          "bytes": 1322,
+          "sha256": "1ee6188c329e04404ce032e6ad5fc1dc0d2dce3d62e814f66b2f177b5ae5bc87"
+        },
+        "strips.txt": {
+          "exists": true,
+          "bytes": 5065,
+          "sha256": "3da70b7c10281ccb676ca3339ff883123c648d69cb524834609eef386cbc658a"
+        },
+        "strips-body.txt": {
+          "exists": true,
+          "bytes": 3362,
+          "sha256": "105c4a5a9f53850b3542d248829d2b5153c28ec68feb6bf6a847540cae5a0bb7"
+        },
+        "elements.txt": {
+          "exists": true,
+          "bytes": 16435,
+          "sha256": "4059b741d525a222769611d3312400b6783c921c3340b4bf75901acf9519009d"
+        }
+      },
+      "checks": {
+        "normal_exit": true,
+        "version": true,
+        "all_outputs": true,
+        "mrf": true,
+        "no_command_failure": true
+      }
+    },
+    {
+      "label": "repeat",
+      "case": "FW-V01",
+      "directory": "build/analysis/avl-smoke-20261030-210330-816448/repeat",
+      "seconds": 0.0629999999946449,
+      "exit_code": 0,
+      "stopped": null,
+      "input_sha256": "01e93de42755f3206fa385f373e54c784680b23827c0d1044e95d1c4de6f37fd",
+      "session_sha256": "6273f5edfed0332de7d7d5c3a72546270b2f2cf2335407dedd6bf2f5b6467844",
+      "console_sha256": "3caa5c6adc1757b03091747eb1fe20ffcb46c9b5ae75f6cb5cbe0e63f37e9d19",
+      "outputs": {
+        "total.txt": {
+          "exists": true,
+          "bytes": 1322,
+          "sha256": "ba40c6240b878644adb978384783fb552a95ad4a57da8369dce4c9c88a458890"
+        },
+        "strips.txt": {
+          "exists": true,
+          "bytes": 5065,
+          "sha256": "78c4202978765da5584344b537c80c6b56320f930d8c5fc9f77de3df7d843a98"
+        },
+        "strips-body.txt": {
+          "exists": true,
+          "bytes": 3362,
+          "sha256": "f7ed8ecd0912b1f126b75bc3c6570c6f68529f17ef95c3edeebd7db18f5891cf"
+        },
+        "elements.txt": {
+          "exists": true,
+          "bytes": 16435,
+          "sha256": "c6e0d371fbe6ac23a9e074c541c958787ef7e6cb24786b4ec9709dbeb30854bf"
+        }
+      },
+      "checks": {
+        "normal_exit": true,
+        "version": true,
+        "all_outputs": true,
+        "mrf": true,
+        "no_command_failure": true
+      }
+    }
+  ],
+  "repeat_outputs_equal": true,
+  "transport_checks_pass": true,
+  "limitations": [
+    "transport checks only; semantic parsing and option audit follow",
+    "no core-zero source build",
+    "no quantitative residual or conservative element force reconstruction yet"
+  ]
+}

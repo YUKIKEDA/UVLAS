@@ -1,0 +1,167 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "fixed_operator_interior_diagnostic_complete",
+  "v1": {
+    "stopped": true,
+    "passed_problems": 12,
+    "failed": "quadrature_changed_operator_component_projector",
+    "threshold": 1e-10,
+    "failure_preserved": true
+  },
+  "v2": {
+    "quartic_problems": 16,
+    "quadratic_controls": 16,
+    "equivalences": 4,
+    "all_primary_checks": true,
+    "all_alternate_evaluation_checks": true,
+    "fixed_9_cubed_operator": true,
+    "changed_quadrature_subspace_uniformity_proven": false
+  },
+  "summary": [
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "added_interior": "m",
+      "nullity": 54,
+      "quartic_error": 0.037065052808892496
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "added_interior": "s",
+      "nullity": 88,
+      "quartic_error": 0.021495940664955887
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "added_interior": "ms",
+      "nullity": 14,
+      "quartic_error": 0.037226656667127746
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "added_interior": "msx",
+      "nullity": 14,
+      "quartic_error": 0.037226656667127746
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "added_interior": "m",
+      "nullity": 52,
+      "quartic_error": 0.03713707622652458
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "added_interior": "s",
+      "nullity": 80,
+      "quartic_error": 0.016673826410600785
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "added_interior": "ms",
+      "nullity": 24,
+      "quartic_error": 0.037213346093048515
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "added_interior": "msx",
+      "nullity": 10,
+      "quartic_error": 0.32998292713714794
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "added_interior": "m",
+      "nullity": 41,
+      "quartic_error": 0.3688582962959956
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "added_interior": "s",
+      "nullity": 80,
+      "quartic_error": 0.02692000905393477
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "added_interior": "ms",
+      "nullity": 7,
+      "quartic_error": 0.5963330679529347
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "added_interior": "msx",
+      "nullity": 7,
+      "quartic_error": 0.5963330679529347
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "added_interior": "m",
+      "nullity": 40,
+      "quartic_error": 0.18448323962857993
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "added_interior": "s",
+      "nullity": 72,
+      "quartic_error": 0.01891249516428065
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "added_interior": "ms",
+      "nullity": 9,
+      "quartic_error": 0.5963330679529365
+    },
+    {
+      "amplitude": 0.2,
+      "work": true,
+      "added_interior": "msx",
+      "nullity": 7,
+      "quartic_error": 0.5963330679529365
+    }
+  ],
+  "physical_adoption": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "finite_thickness_lower_bound": false,
+  "work_preservation_requirement_maintained": true,
+  "next": "rd/structure/main-shell/mq3/mq3-interior-moment-alternative.md",
+  "next_candidate": "M-Q3I1",
+  "next_candidate_formulated": true,
+  "next_executed": false,
+  "verification": {
+    "mq3-interior-preparation_source_hashes": 10,
+    "mq3-interior-result_source_hashes": 8,
+    "mq3-interior-audit_source_hashes": 4,
+    "mq3-interior-v2-preparation_source_hashes": 11,
+    "mq3-interior-v2-result_source_hashes": 10,
+    "mq3-interior-v2-audit_source_hashes": 4,
+    "mq3-interior-result_artifact_hashes": 42,
+    "mq3-interior-v2-result_artifact_hashes": 48,
+    "python_syntax": 6,
+    "local_markdown_links": 387
+  },
+  "documents": {
+    "README.md": "3e3811ceacf23f56852e9df766ead6ee31cf656af04dde2ffc50022b4fb5bc7c",
+    "rd/planning/preimplementation-history.md": "d5753d4495b7692644da73ab25a4b98bf5efe6052c4965b2bb55b8aa8a2f9263",
+    "rd/planning/preimplementation-plan.md": "2cd72f7ced9b57007f8773c155c66be7e98910a58da64540c6e896ad2c4e09eb",
+    "rd/planning/structural-model-adoption-review.md": "bbcf26a57cfb576d510643c26f336a52f93c41afe3bb11b1828751de57c76ef3",
+    "rd/planning/requirements-evidence-map.md": "69f608dfb91236661ae90aec49975e5cfcd3ae1c291972dfe0dfc1c4f69212e6",
+    "docs/specs/design-decisions.md": "fb10c63957c40a2e262685118eee57ed0bdafd94ab7eaef98e44d209006ecd35",
+    "rd/structure/main-shell/mq3/records/mq3-interior-results.md": "2a6bfed7e3795acf9d8c1598f54d6e90628967b56281c7ccf2e3c38e689e4982",
+    "rd/structure/main-shell/mq3/mq3-interior-moment-alternative.md": "9fd4c84ebd04452f29c62d019d5355264e6d2f9fc1eea7108ed4c5b9640cb79c",
+    "rd/structure/main-shell/mq3/records/mq3-interior-audit-protocol.md": "497d303be229c8cf2a6151dcc3089aead9248ba5f5a56e15e70c5fa8fd4f41cf",
+    "rd/structure/main-shell/mq3/records/mq3-interior-v2-fixed-operator-protocol.md": "7b382ff3f309346ef58c65bc77c34eb47ae15f253cb674e4441dcb1a50f7768a"
+  }
+}

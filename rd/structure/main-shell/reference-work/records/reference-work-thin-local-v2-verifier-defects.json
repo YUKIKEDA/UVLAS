@@ -1,0 +1,12 @@
+{
+  "defects": [
+    "The span helper was passed a residual as the first field and subtracted the reference a second time.",
+    "Independent geometric face coordinates were compared without the required orthogonal coordinate transformation."
+  ],
+  "model_changed": false,
+  "thresholds_changed": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_local_v2.py": "eaf1095df822e08ddd1837a44a6ee6a92872e988440f73e2c4063da29a25ea0d",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-local-result.json": "e980691792447a155dd72a0c3228a53154f55ea6dd3a294dfb1ecfe6004fe117"
+  }
+}

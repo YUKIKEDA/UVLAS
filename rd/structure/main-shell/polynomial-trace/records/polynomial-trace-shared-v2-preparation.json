@@ -1,0 +1,15 @@
+{
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/check_polynomial_trace_shared_v2.py": "100f19e99e6a0faa40ead6bed6c6d03a75ad2ade0c86cb79c5b6af259ac6670d",
+    "rd/structure/main-shell/polynomial-trace/experiments/audit_polynomial_trace_shared_v2.py": "f8e1acaed5efabf3ef559e420e48ee2c21f163a30d30bdbafcf7b8e90c409afc",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_fit.py": "f6dff8ed8117bd6b2d518af8f63df766cc82ef5de0cf14aebed78f8088086917",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_fit_v2.py": "98aca3bff2f4a850dcc584c855b84191a284a57505b3baa192b7c5f5c2b1e18b",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-v2-protocol.md": "1f1eef28275b8701b73a51dd4329034ffd1089f5df42f8f5383415cea3c8b6b0",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-v1-failure.json": "6519c6434c93c3bf7c41fe08fc4222f340cd901e188887a4a92bf3860217051c",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-shared-preparation.json": "0b355df2b11510e973c1030e80409c767d9be67e898a9141ffae85111931f9c0",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-result.json": "748bcc3774681d7ef363656479c8dd3e52bb962d58688cf16b49d547ac57e6d1",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-local-audit.json": "b6e8a64ecf58cadea0ef33033e016a3f44731d5b97ad1d07d1b5656ecf42912f"
+  }
+}

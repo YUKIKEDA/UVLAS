@@ -1,0 +1,219 @@
+{
+  "identities": [
+    {
+      "family": "a",
+      "degree": 0,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "b",
+      "degree": 0,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "a",
+      "degree": 1,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "b",
+      "degree": 1,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "a",
+      "degree": 2,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "b",
+      "degree": 2,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "a",
+      "degree": 3,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "b",
+      "degree": 3,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "a",
+      "degree": 4,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "b",
+      "degree": 4,
+      "all_six_identities_zero": true
+    },
+    {
+      "family": "c",
+      "degree": 0,
+      "all_six_identities_zero": true
+    }
+  ],
+  "graphs": [
+    {
+      "n": 2,
+      "edges": 4,
+      "all_edges_x_nonconstant": true,
+      "reached": 4,
+      "connected": true
+    },
+    {
+      "n": 4,
+      "edges": 24,
+      "all_edges_x_nonconstant": true,
+      "reached": 16,
+      "connected": true
+    }
+  ],
+  "spaces": [
+    {
+      "n": 2,
+      "cells": [
+        {
+          "cell": 0,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 1,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 2,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 3,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "cells": [
+        {
+          "cell": 0,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 1,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 2,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 3,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 4,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 5,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 6,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 7,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 8,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 9,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 10,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 11,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 12,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 13,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 14,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        },
+        {
+          "cell": 15,
+          "bilinear_cross_nonzero": true,
+          "eleven_fields_in_spaces": true,
+          "a5_director_corner_matches": true
+        }
+      ]
+    }
+  ],
+  "xy_L2_w5_gap_squared": "1/485100",
+  "xy_L2_w5_relative_gap_squared": "1/44100",
+  "xy_L2_w5_relative_gap": 0.004761904761904762,
+  "passed": true,
+  "geometry_conditional": true,
+  "finite_h_lower_bound": false,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_collapse.py": "4d8e0cb3fbe9b8f347b212b254c346f007ed0ecf52ef58c1b669030173c002f7",
+    "rd/structure/main-shell/moment-enriched/moment-enriched-thin-collapse.md": "9d4cf4caf3a56b5316565252e04ae8cc7281ca538b600d1052ebfb8559a5b113",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_exact_isometry.py": "691ee2247b78458b5211c64d666bbd2e93fa20fc248ed0168fa761726cbd40f3",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-q0-space-v2-result.json": "d61317631fa3a3b1563d8eeb0fa0dfe0fccc6b2fe83363a7b16f61658f7db055"
+  }
+}

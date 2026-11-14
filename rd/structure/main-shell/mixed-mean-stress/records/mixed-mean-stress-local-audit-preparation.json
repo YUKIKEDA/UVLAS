@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_element.py": "fbeef50d24c6120e58f42cfa7009295688f55a56eb7226805a24d95d1a135ea1",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_local.py": "1dd7eef60b96b39da8e45d4a248790f49c3cefb550a21b30a479f8cd8543740e",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/audit_mixed_mean_stress_thin.py": "c74900eb1cfa226179b855a02ae091ddd8ccceeec2ac91397e3c8a250d9fefa7",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_space_v4.py": "168a19b51c050e2c76f6b9e2886c28f1964d11da611831690d6c8c51d7b30852",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_basis.py": "b50c24e2cffa87fee00c70427dffba07f67417898ad140c17b939d505be155aa",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_thin_v6.py": "da7fe98b0c143174cc9f6ef01df5cb77def56e49edd0d30e6b0e402ab2f07783",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-thin-v6-result.json": "072e0b3e278633404f5c5cfecf9bc160534dc1c800455ff12d65faa1d1fb5678",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-local-protocol.md": "0aadc2609dc75d1456dbe5f970b6c198e89e007948b603a191f7fd56839e3d78",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-gauge-v6.md": "8b918b575573e058d4c624ac6a44b00c3e580e073fd615db1871cd5a2a93f531"
+  }
+}

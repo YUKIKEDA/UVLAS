@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "peak_bytes": 218386432,
+  "scope": "linear heave/pitch with prescribed material wake, fixed physical tail; not general J1 adoption",
+  "quadrature_difference": 2.338022352721116e-16,
+  "records": [
+    {
+      "intervals": 32,
+      "relative_errors": [
+        0.07384248888976977,
+        0.08414590975623906,
+        0.09423769901010279,
+        0.1125459680341013,
+        0.09751601783495219,
+        0.09910274707455219
+      ],
+      "time_frequency_difference": 4.003919304477873e-15,
+      "restart_bitwise": true,
+      "full_step_dimension": 152,
+      "step_JVP_difference": 9.570318134689583e-12,
+      "eigenmode_time_difference": 5.851826129243878e-12,
+      "spectral_radius": 0.9074638719229352
+    },
+    {
+      "intervals": 64,
+      "relative_errors": [
+        0.018332515600817775,
+        0.02055936926504069,
+        0.023428496500512746,
+        0.02750031051267982,
+        0.023963640746104263,
+        0.0242221212301511
+      ],
+      "time_frequency_difference": 1.2954239564212835e-15,
+      "restart_bitwise": true,
+      "full_step_dimension": 280,
+      "step_JVP_difference": 3.835944052116335e-12,
+      "eigenmode_time_difference": 9.012783769340401e-12,
+      "spectral_radius": 0.9497533240166234
+    },
+    {
+      "intervals": 128,
+      "relative_errors": [
+        0.0045800006481497785,
+        0.005087991403844505,
+        0.005850240547064795,
+        0.006812980451515517,
+        0.005949550653790569,
+        0.005994171809570322
+      ],
+      "time_frequency_difference": 4.006719738326154e-14,
+      "restart_bitwise": true
+    },
+    {
+      "intervals": 256,
+      "relative_errors": [
+        0.0011460938527584007,
+        0.001267949335367615,
+        0.0014631367550228798,
+        0.0016987655800470428,
+        0.0014847966027045063,
+        0.001493702531763785
+      ],
+      "time_frequency_difference": 4.2999092376300503e-14,
+      "restart_bitwise": true
+    }
+  ],
+  "final_orders": [
+    1.9986226123510835,
+    2.004599133673007,
+    1.9994313257039678,
+    2.003799284670293,
+    2.0025153968240135,
+    2.0046675695328067
+  ],
+  "seconds": 5.077999999979511,
+  "sources": {
+    "rd/coupled/j1/experiments/check_coupled_bdf2_resource.py": "9e032d54d22fe59484b8ab877a59fa643f840bf7f5f74dad7484c6aa85e57212",
+    "rd/coupled/j1/experiments/check_coupled_bdf2_prescribed.py": "a64759085298dfe90e48749302e98ee26762488b6cbdd705b01c30dcf861374e",
+    "rd/coupled/j1/records/coupled-bdf2-prescribed-result.json": "c003d8d6c455764a15c2750d078c39409dbdb6db2afd6577a10dd42d05ce4a01",
+    "rd/coupled/j1/records/coupled-bdf2-prescribed-protocol.md": "80217a81d5b011ce32754435b02651ae215ab0ef6c244df2b6b6538bde140129",
+    "rd/coupled/j1/experiments/uvlm_age_scalar.py": "9d45edf27d0e719410da4434ab6dd730863ff31a802131726302c91e247ec7af",
+    "rd/aero/unsteady-reference/experiments/uvlm_frequency_fast.py": "cf882a9dcdb7de4789b2c6d5d53ac4ccb382ddd346de6cab6489892aaa7ba304"
+  }
+}

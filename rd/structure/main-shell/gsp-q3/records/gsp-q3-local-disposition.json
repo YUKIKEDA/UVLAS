@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-03",
+  "roadmap": "1.1 main shell selection",
+  "status": "GSP_Q3_v1_stopped_at_distorted_basis_Gram_gate",
+  "planned_local_conditions": 30,
+  "completed_local_conditions": 3,
+  "completed_conditions_passed": true,
+  "primary_complete": false,
+  "saved_evidence_reproduced": true,
+  "shared_edge_checks_executed": 0,
+  "curved_local_conditions_executed": 0,
+  "physical_adoption": false,
+  "shared_bending_evaluated": false,
+  "product_implementation_authorized": false,
+  "next": "same_stress_space_direct_polynomial_basis_v2_contract_only_not_executed",
+  "source_hash_closure_pass": true,
+  "artifact_hash_closure_pass": true,
+  "python_ast_pass": true,
+  "new_gsp_links_pass": true,
+  "verified_source_count": 12,
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-preparation.json": "fcb849dfd4518e49501e38606a361c9a3114e4a64c76cc783e9b485c3cad3ae7",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-result.json": "4596c48e114a4eb7b3d2fc4a514503d282d920c9bae254752cf5b00ec88d3116",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-audit.json": "0c5b85fc0fd863da96794b2491581ba13ede105b046a9fd1a36608b9fb7cf597",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-basis-diagnostic.json": "beb453e3d370806b77fae3b05540c00cc24336b559882094b45ab18b583c5736",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-results.md": "9992426914e7bab72a0b5a92ea60b9dfe135eb534588fc6708bf759ebb471ba3",
+    "rd/structure/main-shell/gsp-q3/gsp-q3-basis-v2-contract.md": "2e4582e10fa78bae79194be3f467f525e7fc9f46d500ba1cfbadd1854b150a47"
+  }
+}

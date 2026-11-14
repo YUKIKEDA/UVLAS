@@ -1,0 +1,78 @@
+{
+  "audit_source_sha256": "72f54ca8b681d6cc37661741ac301928a8c4841a99dd4e6a1b534a3d9f1222f9",
+  "parent_sha256": "1c4328f5bcb310c476a048c24049e4d9ecb8e7f9f42e7ca236e83f7356e17a02",
+  "cases": [
+    {
+      "n": 2,
+      "h": 0.01,
+      "primary": 0.10149931789076672,
+      "independent": 0.10149931789115607,
+      "difference": 3.893552147360424e-13,
+      "relative_difference": 3.83603774712127e-12,
+      "audit_pass": true
+    },
+    {
+      "n": 4,
+      "h": 0.01,
+      "primary": 0.010472085165222415,
+      "independent": 0.01047208516563454,
+      "difference": 4.1212519508171397e-13,
+      "relative_difference": 3.935464509497817e-11,
+      "audit_pass": true
+    },
+    {
+      "n": 8,
+      "h": 0.01,
+      "primary": 0.0008360501636800271,
+      "independent": 0.0008360501639945846,
+      "difference": 3.145575163190917e-13,
+      "relative_difference": 3.7624239547362744e-10,
+      "audit_pass": true
+    },
+    {
+      "n": 16,
+      "h": 0.01,
+      "primary": 8.051929125426222e-05,
+      "independent": 8.051929147663435e-05,
+      "difference": 2.2237212884881202e-13,
+      "relative_difference": 2.7617248659903092e-09,
+      "audit_pass": true
+    },
+    {
+      "n": 2,
+      "h": 0.001,
+      "primary": 0.5714291212245742,
+      "independent": 0.5714291212346453,
+      "difference": 1.007105510097972e-11,
+      "relative_difference": 1.7624329469589194e-11,
+      "audit_pass": true
+    },
+    {
+      "n": 4,
+      "h": 0.001,
+      "primary": 0.05095869649419899,
+      "independent": 0.050958696515915974,
+      "difference": 2.1716982379071936e-11,
+      "relative_difference": 4.26168325980319e-10,
+      "audit_pass": true
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "primary": 0.006723539554037661,
+      "independent": 0.006723539576973094,
+      "difference": 2.293543306663981e-11,
+      "relative_difference": 3.411214120524729e-09,
+      "audit_pass": true
+    },
+    {
+      "n": 16,
+      "h": 0.001,
+      "primary": 0.0007444533582604729,
+      "independent": 0.0007444533792718244,
+      "difference": 2.1011351512834064e-11,
+      "relative_difference": 2.8223865578268386e-08,
+      "audit_pass": false
+    }
+  ]
+}

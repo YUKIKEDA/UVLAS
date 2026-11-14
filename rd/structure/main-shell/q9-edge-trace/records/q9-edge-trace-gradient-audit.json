@@ -1,0 +1,124 @@
+{
+  "source_sha256": "973e27040610870894a1108bcedb4a30ef18858a2866cc7a33dec3053a56c202",
+  "parent_sha256": "5fee91c0bbbaf1076387aab4152bc2c360a1bac5f16a7bc0bdece8c2f7d8dee0",
+  "protocol_sha256": "f0af8c61a06fe13b246e3d32daf92878e54f7de74012e1385c18a56caa4477f0",
+  "dependencies": {
+    "q9_edge_trace_gradient.py": "3f851f3b85f902e7b6d3377fe4be909c3a259309042c983363d6ae30ba42c058",
+    "q9_edge_trace_moment.py": "03871a53c40353ec117aa1a0c841d944a8c9c40fc5977a08f610f6e092db1c77",
+    "audit_q9_curved_strain_screen.py": "b2c7c704dc6d59fd101ccb5b720eb33e4476596a4309885011355074d1585b31",
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_edge_moment_shared_space_v2.py": "d5690f8eb082135fca177f50965e58d53b88614f4022edf0decc48a7aa2a1151"
+  },
+  "cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "independent": 0.0,
+      "mean": 2.298779087959428e-17,
+      "trace": 0.0,
+      "restore": 1.0446585177268775e-15,
+      "work7": 3.018670826792339e-16,
+      "checks": {
+        "independent": true,
+        "mean": true,
+        "trace": true,
+        "restore": true,
+        "work7": true
+      }
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "independent": 0.0,
+      "mean": 2.136430008231649e-17,
+      "trace": 0.0,
+      "restore": 1.4243099181118505e-15,
+      "work7": 3.2084941715778276e-16,
+      "checks": {
+        "independent": true,
+        "mean": true,
+        "trace": true,
+        "restore": true,
+        "work7": true
+      }
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "independent": 2.6172136954994686e-17,
+      "mean": 4.689031043926437e-17,
+      "trace": 4.344182166915177e-18,
+      "restore": 7.386356495459552e-16,
+      "work7": 2.7122126929605816e-16,
+      "checks": {
+        "independent": true,
+        "mean": true,
+        "trace": true,
+        "restore": true,
+        "work7": true
+      }
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "independent": 2.6172136954994686e-17,
+      "mean": 3.610681735314959e-17,
+      "trace": 4.344182166915177e-18,
+      "restore": 6.708667645168409e-16,
+      "work7": 2.5630340346214517e-16,
+      "checks": {
+        "independent": true,
+        "mean": true,
+        "trace": true,
+        "restore": true,
+        "work7": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "independent": 3.1242214062257e-17,
+      "mean": 2.081265663194584e-17,
+      "trace": 1.4827576413533702e-33,
+      "restore": 6.866820786794142e-07,
+      "work7": 2.472023088679638e-16,
+      "checks": {
+        "independent": true,
+        "mean": true,
+        "trace": true,
+        "restore": false,
+        "work7": true
+      }
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "independent": 3.1242214062257e-17,
+      "mean": 4.891905342870489e-17,
+      "trace": 1.4827576413533702e-33,
+      "restore": 7.10827872917954e-07,
+      "work7": 2.4592370958771376e-16,
+      "checks": {
+        "independent": true,
+        "mean": true,
+        "trace": true,
+        "restore": false,
+        "work7": true
+      }
+    }
+  ],
+  "curve_rejections": [
+    "SADDLE",
+    "NORMAL-C"
+  ],
+  "shared_trace_errors": [
+    1.7177374998690024e-16,
+    1.1520951112520055e-17,
+    1.0516118241050202e-16,
+    1.8288273504597745e-16
+  ],
+  "seconds": 1.672000000020489,
+  "peak_bytes": 76886016,
+  "all_criteria_pass": false,
+  "product_shell_adopted": false
+}

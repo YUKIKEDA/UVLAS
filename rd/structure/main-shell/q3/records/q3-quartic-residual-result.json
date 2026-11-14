@@ -1,0 +1,128 @@
+{
+  "records": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "error": 0.049785034519292726,
+      "normalized_parts": {
+        "membrane": 0.0020046284786205213,
+        "bending": 0.0002857707939405313,
+        "higher_thickness": 5.163907235043067e-09,
+        "transverse_normal": 0.00016976141867934222,
+        "transverse_shear": 1.8383806939538057e-05
+      },
+      "fractions": {
+        "membrane": 0.8087909269215282,
+        "bending": 0.11529758645218584,
+        "higher_thickness": 2.083439082957321e-06,
+        "transverse_normal": 0.0684922401499865,
+        "transverse_shear": 0.007417163037216366
+      },
+      "element_mean_fraction": 0.002425945198769093,
+      "membrane_internal_variation_fraction": 0.9990766424611134,
+      "reconstruction": 3.92576436732619e-16,
+      "audit_difference": 6.46233603226792e-20,
+      "checks": {
+        "reconstruction": true,
+        "partition_audit": true,
+        "parent": true
+      }
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "error": 0.5705412295617845,
+      "normalized_parts": {
+        "membrane": 0.00982688180888133,
+        "bending": 0.29860706441874896,
+        "higher_thickness": 4.1594200746401853e-11,
+        "transverse_normal": 0.0018844095645490018,
+        "transverse_shear": 0.01519893879609946
+      },
+      "fractions": {
+        "membrane": 0.030188509093057297,
+        "bending": 0.9173308741038719,
+        "higher_thickness": 1.277787737628387e-10,
+        "transverse_normal": 0.0057889691135816785,
+        "transverse_shear": 0.046691647561710355
+      },
+      "element_mean_fraction": 0.0011699785735756816,
+      "membrane_internal_variation_fraction": 0.9628653572101763,
+      "reconstruction": 3.442126852116477e-16,
+      "audit_difference": 6.310887240547068e-17,
+      "checks": {
+        "reconstruction": true,
+        "partition_audit": true,
+        "parent": true
+      }
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "error": 0.05528516139738261,
+      "normalized_parts": {
+        "membrane": 0.002118032070250967,
+        "bending": 0.0005506285374196505,
+        "higher_thickness": 2.2044815406562418e-11,
+        "transverse_normal": 0.0002169433105355075,
+        "transverse_shear": 0.00017084513048370523
+      },
+      "fractions": {
+        "membrane": 0.6929714911761574,
+        "bending": 0.18015302224136262,
+        "higher_thickness": 7.212557741478661e-09,
+        "transverse_normal": 0.07097887303692689,
+        "transverse_shear": 0.05589660633299579
+      },
+      "element_mean_fraction": 0.0013135516780405489,
+      "membrane_internal_variation_fraction": 0.9991577216949465,
+      "reconstruction": 5.34938875799768e-16,
+      "audit_difference": 1.8932661358996715e-19,
+      "checks": {
+        "reconstruction": true,
+        "partition_audit": true,
+        "parent": true
+      }
+    },
+    {
+      "n": 8,
+      "h": 0.0001,
+      "error": 0.3275383095274533,
+      "normalized_parts": {
+        "membrane": 0.0391694659944694,
+        "bending": 0.03730295267603699,
+        "higher_thickness": 5.215802395070159e-12,
+        "transverse_normal": 0.0034010990402338695,
+        "transverse_shear": 0.027407826492145775
+      },
+      "fractions": {
+        "membrane": 0.365109761474366,
+        "bending": 0.3477114586081026,
+        "higher_thickness": 4.861798137943415e-11,
+        "transverse_normal": 0.03170261395715269,
+        "transverse_shear": 0.2554761659117612
+      },
+      "element_mean_fraction": 0.0072857008969769484,
+      "membrane_internal_variation_fraction": 0.9808269240685253,
+      "reconstruction": 4.537298986369951e-16,
+      "audit_difference": 1.5777218101367662e-17,
+      "checks": {
+        "reconstruction": true,
+        "partition_audit": true,
+        "parent": true
+      }
+    }
+  ],
+  "all_checks_pass": true,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/q3/experiments/check_q3_quartic_residual.py": "9f22ca635f9feb29cc92980c50ec72d8ab6a7ca350f524bfee6139bcb20a0857",
+    "rd/structure/main-shell/q3/experiments/q3_curved_element.py": "82e0f5d765fd99a1cdf24da33d331e2e901627223503c17dcad7f312a5c43ba5",
+    "rd/structure/main-shell/q3/experiments/developable_general_reference.py": "565f402b7838be9f41ede07bec3c00dbeff7d2e5289203ae2391cacb18ca9d6e",
+    "rd/structure/main-shell/q9-curved/experiments/check_q9_eas21_residual.py": "0f43592b005dcd4fa44d610e53ef97cf2497723b1d737d643eba066d5afc226c",
+    "rd/structure/main-shell/q9-curved/experiments/audit_q9_eas21_residual_v2.py": "bde424393e61fe4b99117f72b71cf95cdc7b6aba92273dca0ba967e76540ab0d",
+    "rd/structure/main-shell/q3/records/q3-quartic-shared-approximation-result.json": "e8a15f841932764deac778138713e018ce37fd5443b9cf15e0e9ed7901d32ed2",
+    "rd/structure/main-shell/q3/records/q3-quartic-residual-experiment.md": "f228f76f80ebae587d5f4e7fa7b390dd614408f79cb178dad8248666fb968207"
+  },
+  "seconds": 5.297000000020489
+}

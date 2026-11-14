@@ -1,0 +1,234 @@
+{
+  "records": [
+    {
+      "metric": "physical",
+      "work": true,
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 1,
+      "kernel_residual": 1.6260290469526678e-17,
+      "observations": {
+        "quadratic": {
+          "error": 1.6729863767152413e-13,
+          "error_difference": 2.0591552928723737e-17,
+          "h1_difference": 2.4424906541753444e-15,
+          "zero_residual": 5.215028474195064e-17
+        },
+        "quartic": {
+          "error": 0.5944911331920475,
+          "error_difference": 1.1102230246251565e-16,
+          "h1_difference": 8.881784197001252e-16,
+          "zero_residual": 5.302336282402523e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": true,
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "kernel_residual": 6.462114826199852e-18,
+      "observations": {
+        "quadratic": {
+          "error": 1.457004727645442e-11,
+          "error_difference": 6.1695129470154755e-18,
+          "h1_difference": 5.440092820663267e-15,
+          "zero_residual": 3.713755126102624e-17
+        },
+        "quartic": {
+          "error": 0.32997996456042755,
+          "error_difference": 1.6653345369377348e-16,
+          "h1_difference": 2.220446049250313e-16,
+          "zero_residual": 2.3736121204689925e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": true,
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 1,
+      "kernel_residual": 1.6260290469526678e-17,
+      "observations": {
+        "quadratic": {
+          "error": 1.6729863767152413e-13,
+          "error_difference": 2.0591552928723737e-17,
+          "h1_difference": 2.4424906541753444e-15,
+          "zero_residual": 5.215028474195064e-17
+        },
+        "quartic": {
+          "error": 0.5944911331920475,
+          "error_difference": 1.1102230246251565e-16,
+          "h1_difference": 8.881784197001252e-16,
+          "zero_residual": 5.302336282402523e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": true,
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 2,
+      "kernel_residual": 2.338782094068903e-14,
+      "observations": {
+        "quadratic": {
+          "error": 2.9373727762648366e-11,
+          "error_difference": 3.9807243979641406e-17,
+          "h1_difference": 6.439293542825908e-15,
+          "zero_residual": 6.079982373280153e-17
+        },
+        "quartic": {
+          "error": 0.5963329459622286,
+          "error_difference": 6.661338147750939e-16,
+          "h1_difference": 1.7763568394002505e-15,
+          "zero_residual": 6.088018807769559e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": true,
+      "kappa": 0.0,
+      "amplitude": 0.2,
+      "n": 2,
+      "kernel_residual": 5.774718417144381e-18,
+      "observations": {
+        "quadratic": {
+          "error": 2.7504159405264455e-14,
+          "error_difference": 1.5784872261878335e-17,
+          "h1_difference": 7.771561172376096e-16,
+          "zero_residual": 3.482446371463922e-17
+        },
+        "quartic": {
+          "error": 0.0008206389175591174,
+          "error_difference": 7.589415207398531e-18,
+          "h1_difference": 2.220446049250313e-16,
+          "zero_residual": 1.8298636313321035e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": false,
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 1,
+      "kernel_residual": 1.4106664617358823e-17,
+      "observations": {
+        "quadratic": {
+          "error": 1.3307788960791476e-13,
+          "error_difference": 5.629154125101713e-17,
+          "h1_difference": 2.4424906541753444e-15,
+          "zero_residual": 5.903159504610414e-17
+        },
+        "quartic": {
+          "error": 0.5944911331920576,
+          "error_difference": 0.0,
+          "h1_difference": 1.1102230246251565e-15,
+          "zero_residual": 5.903714691868395e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": false,
+      "kappa": 0.4,
+      "amplitude": 0.0,
+      "n": 2,
+      "kernel_residual": 6.3842336230380854e-18,
+      "observations": {
+        "quadratic": {
+          "error": 2.0983447322117143e-11,
+          "error_difference": 5.3385002655015485e-17,
+          "h1_difference": 4.9960036108132044e-15,
+          "zero_residual": 3.9545225782456914e-17
+        },
+        "quartic": {
+          "error": 0.3299799645599651,
+          "error_difference": 5.551115123125783e-17,
+          "h1_difference": 4.440892098500626e-16,
+          "zero_residual": 2.487340516884378e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "metric": "physical",
+      "work": false,
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "n": 1,
+      "kernel_residual": 1.4106664617358823e-17,
+      "observations": {
+        "quadratic": {
+          "error": 1.3307788960791476e-13,
+          "error_difference": 5.629154125101713e-17,
+          "h1_difference": 2.4424906541753444e-15,
+          "zero_residual": 5.903159504610414e-17
+        },
+        "quartic": {
+          "error": 0.5944911331920576,
+          "error_difference": 0.0,
+          "h1_difference": 1.1102230246251565e-15,
+          "zero_residual": 5.903714691868395e-17
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    }
+  ],
+  "validated_primary_configurations": 8,
+  "all_checks_pass": true,
+  "primary_all_configurations_complete": false,
+  "stop_reason": null,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/audit_mq3_factor.py": "cd161b09c1439fb287fe081aac1a6c0ca7c341b3814704452d8dd3cd1e53c103",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/q3/experiments/q3_curved_independent.py": "0a716302cc4360b2012d56f7b34c3aff2a2622ddcad3d34a4b53c40b2ffbc113",
+    "rd/structure/main-shell/mq3/records/mq3-factor-result.json": "501731a805da8bb32ed0ccce4cfb03b1d6a2355cca92216af48dae6cf1e27d40",
+    "rd/structure/main-shell/mq3/records/mq3-factor-audit-protocol.md": "61b203e4ed66974f3a5ff29087bf5367266720ccf90c92649fcb36456fbfe701"
+  },
+  "seconds": 9.51600000000326
+}

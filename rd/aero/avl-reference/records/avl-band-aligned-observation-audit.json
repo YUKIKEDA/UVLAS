@@ -1,0 +1,913 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-band-aligned-grid-experiment.md",
+  "source_sha256": "f4ff121f3c5278351d2cf75d79b5f367ddaf4c9fc2e4951e092ecfe00a89dd45",
+  "dependency_sha256": "083d8b5af7a4ba456386e9ec0f42283fd0b129077ba034398d69ecc83b10a340",
+  "parent_result_sha256": "3aa03a7d754efcc55018f5cd194396ba0bcb4ef39b7d34780ea7a03cdd936251",
+  "cases": [
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 20,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 3,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 40,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 6,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 2.5814337440131057e-20
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 80,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 2.5814337440131057e-20
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 12,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 20,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 40,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 6.453584360032764e-21,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 80,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 2.5814337440131057e-20
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.2907168720065528e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V01",
+      "m": 24,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.5814337440131057e-20,
+      "point_vs_reconstruction_moment": 2.5814337440131057e-20
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.0651469952104845e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 20,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.0651469952104845e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 3,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 40,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.0651469952104845e-19,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 6,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 80,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 12,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 2.0651469952104845e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 20,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 40,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 80,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 1.4826696375870144e-18
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": -2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 1.0325734976052423e-19,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": -1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 2.0651469952104845e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": 0,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 0.0,
+      "point_vs_reconstruction_moment": 0.0
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": 1,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 7.413348187935072e-19
+    },
+    {
+      "case": "FW-V02",
+      "m": 24,
+      "n": 160,
+      "alpha": 2,
+      "crossing_source_count": 0,
+      "point_vs_reconstruction_force": 5.1628674880262113e-20,
+      "point_vs_reconstruction_moment": 4.130293990420969e-19
+    }
+  ],
+  "checks": {
+    "supports_do_not_cross": true,
+    "point_reconstruction_equivalence": true
+  },
+  "all_criteria_pass": true
+}

@@ -1,0 +1,20 @@
+{
+  "records": [],
+  "all_checks_pass": false,
+  "stop_reason": "InvalidOperation([<class 'decimal.InvalidOperation'>])",
+  "longdouble_mantissa_bits": 53,
+  "weak_work_decimal_digits": 80,
+  "physical_adoption": false,
+  "discrete_equilibrium_solved": false,
+  "sources": {
+    "rd/structure/main-shell/q3/experiments/check_developable_general_reference_v2.py": "1b2da562e2885bed12b01468defa5cdc8f167f3288befba6a5fc37a923e1e88a",
+    "rd/structure/main-shell/q3/experiments/developable_general_reference.py": "565f402b7838be9f41ede07bec3c00dbeff7d2e5289203ae2391cacb18ca9d6e",
+    "rd/structure/main-shell/q3/experiments/developable_general_decimal_work.py": "18a2ff7f87173ece87c27921f013eddaded3a47d8ac7b403ed151abf15cfeb13",
+    "rd/structure/main-shell/q3/records/developable-general-reference-decimal-work-protocol.md": "9ab83a91b934bc5c81f7de0163f8b15b5484ac046a01bf98fc1a4f1c2cc31481",
+    "rd/structure/main-shell/q3/records/developable-general-reference-result.json": "42fbec6f76164746d69ccd7375019a323c5961b8202c9686e9dd623b30851ee2",
+    "rd/structure/main-shell/q3/developable-general-bending-reference-contract.md": "6fde694981b581a33825270b6d2182216c6fc27e0d2c1aae67a3174d3eb76a3c",
+    "rd/structure/main-shell/q3/records/developable-general-reference-experiment.md": "0a0ee1d03abb03329a6fa16c4e468a6d862c0bdc71cc320233584de95aefd610"
+  },
+  "seconds": 0.1720000000204891,
+  "peak_bytes": 61063168
+}

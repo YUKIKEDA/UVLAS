@@ -1,0 +1,17 @@
+{
+  "passed": false,
+  "records": [],
+  "failures": [
+    {
+      "reason": "AssertionError()",
+      "traceback": "Traceback (most recent call last):\n  File \"<repo>\\tools\\design-experiments\\check_beam_se3_physical.py\", line 105, in main\n    exact_error=float(np.max(abs(e['strain']-strain)));assert max(dual,exact_error)<=1e-8\n                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+    }
+  ],
+  "seconds": 0.0470000000204891,
+  "sources": {
+    "rd/structure/beam/experiments/check_beam_se3_physical.py": "4ae420e42ef8f73b91712ce2e283454c199311faadf7fa16fe1f56a562bc645e",
+    "rd/structure/beam/experiments/beam_se3.py": "0852afd7ff7419729505518cb1b67d7f4cb3e9b80b45a96932246132e050b36c",
+    "rd/structure/beam/experiments/beam_jet2.py": "0a352d90bb2ad09a27765bfda31a09f2295686ba61f9f742b383600369c81295",
+    "rd/structure/beam/records/beam-se3-adoption-protocol.md": "ad7c1923c65d018f55114c5a5ec8db575fee6e0d14088f69a63cd167163d5c1b"
+  }
+}

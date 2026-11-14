@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "structural_review_complete": true,
+  "uvlm_review_complete": true,
+  "j1_review_complete": true,
+  "numerical_foundation_review_complete": true,
+  "product_implementation_start": false,
+  "practical_acceptance_complete": false,
+  "current_work": "5 practical cases, public references, acceptance/performance plan",
+  "immutable": {
+    "rd/foundation/numerics/records/numerical-foundation-adoption-audit.json": "e1c9ca1f6103e0651c416bc77eea6280d434a1934970f4779e93c26124ff3ad8",
+    "rd/foundation/numerics/records/numerical-foundation-adoption-disposition.json": "98adae655cd55dd90182908d5177b3c347a8ce10dba50dd2e9e7972f4dc19aa3",
+    "rd/foundation/numerics/records/numerical-foundation-adoption-completion.md": "e6a8d1ce6b86161dabf3dbf9e070d557d745c558e2d4ea3123383f6ff2001b03"
+  },
+  "status_sync_source": {
+    "rd/foundation/numerics/experiments/close_numerical_foundation_adoption.py": "81fdb2bfd2fcbee5ed7f1f9734f82b1b4d3e983af63a1d7859f834e7867fdbc8"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ]
+}

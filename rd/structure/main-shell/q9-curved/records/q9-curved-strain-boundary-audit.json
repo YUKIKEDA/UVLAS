@@ -1,0 +1,156 @@
+{
+  "source_sha256": "04311fc8a816513954de35c2913d8f3221ac5bc0b76e4e1a6f6a8164407bb75f",
+  "parent_sha256": "5be03399529ef4233bf3bbcd483585a6a0b471c28ebb6c547adfbc264c0d680e",
+  "dependency_sha256": {
+    "audit_q9_curved_strain_screen.py": "b2c7c704dc6d59fd101ccb5b720eb33e4476596a4309885011355074d1585b31",
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_curved_strain_boundary.py": "9993c9f2fa2966d3365f105230d59e2414690bce98e4e5977b016cc67811207e",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1"
+  },
+  "cases": [
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "scheme": "G-COV",
+      "value_difference": 0.0,
+      "trace_difference": 0.0
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.1,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 7.06650079976992e-18
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "scheme": "G-COV",
+      "value_difference": 0.0,
+      "trace_difference": 3.5275023321697973e-17
+    },
+    {
+      "geometry": "RECT",
+      "h": 0.01,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 3.527527772845605e-17
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "scheme": "G-COV",
+      "value_difference": 6.911998562236691e-18,
+      "trace_difference": 5.321167661072383e-17
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.1,
+      "scheme": "C-COV",
+      "value_difference": 1.5710179489075627e-17,
+      "trace_difference": 8.900859463234447e-17
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "scheme": "G-COV",
+      "value_difference": 5.450533223506898e-17,
+      "trace_difference": 1.878810708960263e-16
+    },
+    {
+      "geometry": "SKEW",
+      "h": 0.01,
+      "scheme": "C-COV",
+      "value_difference": 2.820469004341406e-17,
+      "trace_difference": 1.2085996791330919e-16
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "scheme": "G-COV",
+      "value_difference": 9.865930687655449e-17,
+      "trace_difference": 0.0
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.1,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 0.0
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "scheme": "G-COV",
+      "value_difference": 9.66854845077447e-17,
+      "trace_difference": 3.5275023321697973e-17
+    },
+    {
+      "geometry": "TRAP",
+      "h": 0.01,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 0.0
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "scheme": "G-COV",
+      "value_difference": 8.917127903639693e-17,
+      "trace_difference": 4.641992823229165e-17
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.1,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 2.7755575615628914e-17
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "scheme": "G-COV",
+      "value_difference": 8.182800408806925e-17,
+      "trace_difference": 6.684909493449401e-17
+    },
+    {
+      "geometry": "SADDLE",
+      "h": 0.01,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 2.7755575615628914e-17
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "scheme": "G-COV",
+      "value_difference": 2.203098814490545e-16,
+      "trace_difference": 1.728966233854028e-16
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.1,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 2.7755575615628914e-17
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "scheme": "G-COV",
+      "value_difference": 2.237793284010081e-16,
+      "trace_difference": 5.774226746698249e-17
+    },
+    {
+      "geometry": "NORMAL-C",
+      "h": 0.01,
+      "scheme": "C-COV",
+      "value_difference": 0.0,
+      "trace_difference": 2.7755575615628914e-17
+    }
+  ],
+  "seconds": 0.3279999999795109,
+  "peak_bytes": 61517824,
+  "all_criteria_pass": true,
+  "operators_accepted": false
+}

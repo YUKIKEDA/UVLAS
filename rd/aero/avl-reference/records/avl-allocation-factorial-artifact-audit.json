@@ -1,0 +1,11 @@
+{
+  "source_sha256": "fed97935a8f0a3fdfb9f89065d2edd1047bcd885357775ad3fa0e59c1bb58f83",
+  "runs_sha256": "1fda4bc132205e28060d1c9ce20f639898aaf759ed9664d8143cd851303b442a",
+  "result_sha256": "41b93706b67110c97b62a757de18a29921c532728a885ace10639c036f92a24e",
+  "archive_members": 32,
+  "raw_bytes": 49784142,
+  "decimal_effect_maximum_difference": 6.3909718758127455e-16,
+  "decimal_norm_maximum_difference": 6.229107359457767e-16,
+  "all_criteria_pass": true,
+  "reference_acceptance": false
+}

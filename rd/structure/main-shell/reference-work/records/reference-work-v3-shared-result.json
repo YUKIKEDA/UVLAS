@@ -1,0 +1,145 @@
+{
+  "records": [
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "fit": {
+        "error": [
+          2.463013633729768e-11,
+          9.660692777199088e-06
+        ],
+        "kkt": [
+          2.9392175188671943e-15,
+          3.468101701561847e-15
+        ],
+        "linear_residual": [
+          2.7406854227367303e-14,
+          3.8125307385886695e-14
+        ],
+        "local_rcond": 6.399645205840792e-05,
+        "global_rcond": 0.0001858181446026448
+      },
+      "observed": {
+        "error": [
+          2.7259278061477884e-11,
+          9.660692338950724e-06
+        ],
+        "elastic_error": [
+          2.7237199414204804e-11,
+          8.6551116802976e-06
+        ],
+        "stabilization_error": [
+          1.0969086123332955e-12,
+          4.291621869344651e-06
+        ],
+        "h1": [
+          0.4646213682914774,
+          1.9880861280780573
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": true,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 4.89000000001397,
+      "artifact": "build/analysis/reference-work-v3-shared-20261104-114610/k0-a0-n2-h0.01.npz",
+      "artifact_sha256": "9e78e39036abba7625455c00a81d8894da844c4aead597f56ce54b19d39fbd96"
+    },
+    {
+      "kind": "RW3",
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "fit": {
+        "error": [
+          2.9305886967059136e-07,
+          1.1016241200437964e-05
+        ],
+        "kkt": [
+          2.1789771979032147e-13,
+          6.762192644193391e-13
+        ],
+        "linear_residual": [
+          1.0420350350599142e-12,
+          2.602038487820173e-12
+        ],
+        "local_rcond": 6.563665834107789e-09,
+        "global_rcond": 2.257017580011046e-06
+      },
+      "observed": {
+        "error": [
+          3.166473724586711e-07,
+          1.1035893003995576e-05
+        ],
+        "elastic_error": [
+          3.1660058808278596e-07,
+          1.1035016413420428e-05
+        ],
+        "stabilization_error": [
+          5.442987287737488e-09,
+          1.3909403718446053e-07
+        ],
+        "h1": [
+          0.464621367041009,
+          1.988087608159614
+        ]
+      },
+      "checks": {
+        "local_condition": true,
+        "global_condition": true,
+        "local_ranks": true,
+        "linear": true,
+        "kkt": true,
+        "quadrature": false,
+        "H1": true,
+        "resources": true
+      },
+      "seconds": 4.765999999945052,
+      "artifact": "build/analysis/reference-work-v3-shared-20261104-114610/k0-a0-n2-h0.0001.npz",
+      "artifact_sha256": "44c315034782adbcc6967b2c22298264026e2802b8e7449fbd3d32605cc6cc62"
+    }
+  ],
+  "stop_reason": "RuntimeError('shared_necessary_gate')",
+  "all_global_checks": false,
+  "all_curved_improved": false,
+  "comparisons": [
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.01,
+      "ratios": [
+        155.49831536044465,
+        0.02697812958246794
+      ]
+    },
+    {
+      "kappa": 0.0,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "ratios": [
+        18514.972994858326,
+        0.03042598479567077
+      ]
+    }
+  ],
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_v3_shared.py": "ed3aed73a641a44b3482ed6f06fbaa944a3cbb5cbc9f69127d467964fd8f4ce9",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit.py": "52d144a37ec016c468cd84c67709d55997d72e49c610cda01d1113fd19161a25",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-shared-preparation.json": "3a0411b83e7fbeb1de2b827697b147358e7c192e078dbf02cf45f79a7f377082"
+  },
+  "seconds": 9.670999999972992,
+  "peak_bytes": 698208256
+}

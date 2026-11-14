@@ -1,0 +1,155 @@
+{
+  "protocol": "rd/aero/wake-loads/records/uvlm-wp1-three-dimensional-experiment.md#8",
+  "source_sha256": "d646f4adef33f6d9e3febe4738cc356e7f299417cc0912ac6bb5737fb82d8a56",
+  "dependency_sha256": {
+    "check_uvlm_wp1_three_dimensional.py": "86372369e6d9cc0148d3d4cfe87a59ca77754aeaa17e6be850594c58576bbb08",
+    "check_aerogrid_geometry.py": "260436bdca8d1e5ddacbd772a171f98290b07be7f58a649eb7dc06522f408617",
+    "check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "check_q9_independent_load.py": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96",
+    "check_q9_interface_reparameterization.py": "becc74504f8d45f769a0a4e66c6f9cca28360ee97fcc7662e14bdd4a5fa9088c",
+    "check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1",
+    "check_uvlm_harmonic_heave.py": "1f2b41839d49d15d00156083d89c085e37fa90703034b7eedaf825a29ccc3714",
+    "check_uvlm_trailing_edge.py": "9a7d1faf4a9345402f3df11ba34929b82f68ff73ae2abe6d56ae9f19b4f4f9c9",
+    "check_vortex_core_load.py": "7c139bfb2e239132eb02fa43979b312f4126f44c88bb93a4d32860b5c7b2d616"
+  },
+  "parent_result_sha256": "643c0a8f27a4b05b586ca553db54ed11bfd4a0d923f9dd8afcfb36597fb89a3b",
+  "cases": [
+    {
+      "coefficients": [
+        1.0,
+        0.0
+      ],
+      "cases": [
+        {
+          "surface_order": 24,
+          "velocity": [
+            [
+              0.0,
+              0.0,
+              0.02068881644333051
+            ],
+            [
+              0.0,
+              0.0,
+              0.2223527232148228
+            ]
+          ],
+          "analytic_difference": 8.147344263318338e-10,
+          "area_reference_difference": 8.147396465089115e-10,
+          "reference_eligible": true
+        },
+        {
+          "surface_order": 48,
+          "velocity": [
+            [
+              0.0,
+              0.0,
+              0.020688816443330482
+            ],
+            [
+              0.0,
+              0.0,
+              0.22235272303287956
+            ]
+          ],
+          "analytic_difference": 1.051044824807078e-14,
+          "area_reference_difference": 5.3452799675394016e-15,
+          "reference_eligible": true
+        },
+        {
+          "surface_order": 96,
+          "velocity": [
+            [
+              0.0,
+              0.0,
+              0.020688816443330545
+            ],
+            [
+              0.0,
+              0.0,
+              0.2223527230328793
+            ]
+          ],
+          "analytic_difference": 1.1596490463526418e-14,
+          "area_reference_difference": 6.3982158631571444e-15,
+          "reference_eligible": true
+        }
+      ],
+      "change_48_96": 1.1530361673954568e-15
+    },
+    {
+      "coefficients": [
+        0.0,
+        1.0
+      ],
+      "cases": [
+        {
+          "surface_order": 24,
+          "velocity": [
+            [
+              0.0,
+              0.0,
+              0.014316255240960842
+            ],
+            [
+              0.0,
+              0.0,
+              0.10632659695459777
+            ]
+          ],
+          "analytic_difference": 1.6958663776738096e-09,
+          "area_reference_difference": 1.6958712930923322e-09,
+          "reference_eligible": true
+        },
+        {
+          "surface_order": 48,
+          "velocity": [
+            [
+              0.0,
+              0.0,
+              0.01431625524096087
+            ],
+            [
+              0.0,
+              0.0,
+              0.10632659713654101
+            ]
+          ],
+          "analytic_difference": 3.909054755170256e-15,
+          "area_reference_difference": 1.474852502615926e-15,
+          "reference_eligible": true
+        },
+        {
+          "surface_order": 96,
+          "velocity": [
+            [
+              0.0,
+              0.0,
+              0.014316255240960807
+            ],
+            [
+              0.0,
+              0.0,
+              0.10632659713654127
+            ]
+          ],
+          "analytic_difference": 6.230471385041151e-15,
+          "area_reference_difference": 1.3333414570751846e-15,
+          "reference_eligible": true
+        }
+      ],
+      "change_48_96": 2.525700437624449e-15
+    }
+  ],
+  "checks": {
+    "planar_analytic": true,
+    "quadrature_change": true,
+    "independent_area": true
+  },
+  "all_criteria_pass": true,
+  "numpy": "2.3.5",
+  "scipy": "1.16.3",
+  "seconds": 0.030999999988125637,
+  "peak_process_working_bytes": 83853312,
+  "limits": "quadrature-only comparison at fixed planar observations; not a general near/self evaluator"
+}

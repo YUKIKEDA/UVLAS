@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "anisotropic_layerwise_viscosity_in_reference_material_axes",
+      "state_tangent_error": 2.4978418466145076e-15,
+      "velocity_tangent_error": 2.0215876311245782e-15,
+      "independent_material_power_error": 0.0,
+      "two_distinct_layers": true,
+      "varying_reference_axes": true
+    },
+    {
+      "case": "layer_partition_additivity",
+      "force_error": 1.8664469843261313e-15
+    }
+  ],
+  "failures": [],
+  "seconds": 5.797000000020489,
+  "sources": {
+    "rd/structure/integration/experiments/check_structural_layer_damping.py": "ab0aacae1ca2ad0af3b954f8d967a62fec8b19eaf8fa93ac99868a1f5eeed242",
+    "rd/structure/integration/experiments/structural_layer_damping.py": "60290302633ea2b648556d5a52b4de6329c219e00b964aaf1e449b6c6f9050eb",
+    "rd/structure/material/experiments/material_equivalent_input.py": "b91632492915899230505b43a7e34232484c6ba28e0e79b38cdfa88ca6226bd4",
+    "rd/structure/integration/experiments/structural_load_damping.py": "2a0547bf6f8bb1d601cf080894734ac1aa358134dd52eb5bf636847bbfc10a09",
+    "rd/structure/integration/records/structural-final-integration-protocol.md": "866eaeb93cd31d5f2927a9c3f8a72f2b7c64cf25def7485c0005ed300819527f"
+  }
+}

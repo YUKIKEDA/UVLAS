@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "layerwise_stress_measure_axes_and_sides",
+      "max_independent_stress_error": 4.022977699687849e-16,
+      "interface_stresses_not_averaged": true
+    },
+    {
+      "case": "physical_cut_traction_and_wrench_transport",
+      "max_error": 4.617114188702307e-16
+    },
+    {
+      "case": "nonlinear_beam_cut_wrench_vs_boundary_balance",
+      "cases": [
+        {
+          "n": 8,
+          "force_error": 0.01212389982189554,
+          "moment_error": 0.03655609159252806,
+          "original_residual": 1.0731325789124102e-12
+        },
+        {
+          "n": 16,
+          "force_error": 0.006265646356077899,
+          "moment_error": 0.01827995572487808,
+          "original_residual": 5.0920734859609825e-12
+        },
+        {
+          "n": 32,
+          "force_error": 0.0031837781202339937,
+          "moment_error": 0.009140220538233478,
+          "original_residual": 1.27838951871682e-11
+        }
+      ],
+      "no_equilibrium_correction": true
+    },
+    {
+      "case": "recovery_admissibility",
+      "inverted_state_rejected": true
+    }
+  ],
+  "failures": [],
+  "seconds": 8.297000000020489,
+  "sources": {
+    "rd/structure/integration/experiments/check_structural_recovery.py": "e1e0a60aaa9def30347f96e917567d10a0119cfc5643c88dab4b758a841ad614",
+    "rd/structure/integration/experiments/structural_recovery.py": "b24257c399252c980992c4158bc55f7e79b91062a533a70608ef42cfb72eb2b7",
+    "rd/structure/material/experiments/material_equivalent_input.py": "b91632492915899230505b43a7e34232484c6ba28e0e79b38cdfa88ca6226bd4",
+    "rd/structure/beam/experiments/check_beam_se3_physical_v4.py": "a24423ab75e512c7db1ed24426e13c0e65ac94b83505d9061364e247a6d14cef",
+    "rd/structure/connection/experiments/connection_shell.py": "f78d9f16b871e263e1b525721d4f8c1442ef7d09838ca993bbf83d26f3c44727",
+    "rd/structure/material/experiments/check_material_shell_integration.py": "f6d1313342aa133548a2abbc06e942b875ea554fcf21db6afe547a32268f6cf2",
+    "rd/structure/integration/records/structural-final-integration-protocol.md": "866eaeb93cd31d5f2927a9c3f8a72f2b7c64cf25def7485c0005ed300819527f"
+  }
+}

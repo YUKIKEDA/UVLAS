@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.01,
+      "error": 2.002198192776362e-14
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "h": 0.0001,
+      "error": 2.6358440812291346e-12
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.01,
+      "error": 1.879277617638985e-15
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        0.2,
+        0.0
+      ],
+      "h": 0.0001,
+      "error": 1.8627725494939517e-15
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.01,
+      "error": 2.939391666349728e-14
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        0.0,
+        0.07
+      ],
+      "h": 0.0001,
+      "error": 2.046246401395137e-12
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.01,
+      "error": 1.272192987306884e-15
+    },
+    {
+      "case": "independent_target_complex_jets",
+      "parameters": [
+        0.4,
+        -0.2,
+        0.07
+      ],
+      "h": 0.0001,
+      "error": 1.364877541114838e-15
+    },
+    {
+      "case": "inertia_from_analytic_physical_X",
+      "error": 3.0906433909852485e-15
+    },
+    {
+      "case": "full_DOF_exact_modal_restart_reference",
+      "dofs": 207,
+      "all_modes_excited": true,
+      "bitwise_replay": true,
+      "energy_error": 2.3747391426984294e-12,
+      "negative_controls": 16,
+      "product_integrator_adopted": false
+    }
+  ],
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_state_and_independent.py": "01925c0838b569ad9af522572e21aca9986a41b4c1a69ed967828f95f5c08bd5",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_state_reference.py": "ca66c8afaeeda0fe1fa62eb30d1ed0b9d89af5fc01c3d794cb4e27cc8cc31e6c",
+    "rd/structure/main-shell/paired-geometry/records/pg-ritz-mechanics-v2-result.json": "87c1f0a8a8795cd791ef6eb34616c88ab49ad8a4481e41e81c448014c85f3f7e",
+    "build/analysis/pg-ritz-mechanics-20261105-011852.npz": "83fd55f6731bf7ea8a0672162574333876b79d9b4ee7581a4be00100778952fa",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_targets.py": "8bd0544ced200ae0e014d42436f6c39c116d261f94cbd19eb6b1be32ae8755a4",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e"
+  }
+}

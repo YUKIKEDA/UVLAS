@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "full_WP1_constant_wake_specialization",
+      "dihedral": 0.0,
+      "matrix_error": 1.2819767100585636e-15
+    },
+    {
+      "case": "full_WP1_constant_wake_specialization",
+      "dihedral": 5.0,
+      "matrix_error": 1.0791656612400883e-15
+    }
+  ],
+  "failures": [],
+  "sources": {
+    "rd/aero/finite-wing/experiments/check_finite_wing_specialization.py": "8f829e811063f75605b60a61b647401426b30bf52d55d27a5cd42bb49812c214",
+    "rd/aero/finite-wing/experiments/uvlm_steady_reference.py": "36c6c6d03b6ef00bfff11697b9036c0130c364b8f9ac4a48534646d3d71e8ad1",
+    "rd/aero/wake-loads/experiments/uvlm_wake_assembly_v2.py": "4263e6d56c8317b294c1459b8ca8ef509741abe9e2fbcdaf02aa75be5bc6a7cf",
+    "rd/aero/unsteady-reference/records/uvlm-independent-reference-protocol.md": "8f2917f6c1bbd7f0c8a0e5d57c515eb9aa99162355cfeb0552499e4676f3e00b"
+  },
+  "seconds": 0.4220000000204891
+}

@@ -1,0 +1,12 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_v3_shared_v2.py": "b9bae21df31ecc7aa62101a8643e61432d02008aad900f12612e9f78d7d545bc",
+    "rd/structure/main-shell/reference-work/experiments/audit_reference_work_v3_shared_v2.py": "ffc0f73f7212a161c1414d32bfb799b321b891dc97ac827e437ac8f8b7dd94d9",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit_v2.py": "9828829ef8ad9a9502c456c4adeb45e2648c8aa98fd18fdbe03b5a452c1a6d03",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit.py": "52d144a37ec016c468cd84c67709d55997d72e49c610cda01d1113fd19161a25",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-shared-v2-protocol.md": "a279c8bb14494c59f04828d72edd6910d30da4e3b313f56bcc5520147d0325d7",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-shared-result.json": "f196a795ca4bf3a4dc4fab5d8033cc083cc8272bd32a320788281978d235f22d",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-residual-diagnostic.json": "b589c3aa0a7de47ed194122d121f047ab949032db937bc5c77db382a9bc9fddd"
+  }
+}

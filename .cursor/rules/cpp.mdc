@@ -1,0 +1,41 @@
+---
+description: C++23の製品コードの書き方
+alwaysApply: false
+globs: "**/*.cpp,**/*.hpp"
+---
+
+# C++
+
+型は `types`、I/Fの約束は `api-contract`、数値は `numerics`、速さは `performance` に従う。ここは書き方である。
+
+## 安全
+
+- 未定義動作を書かない：範囲外の添字、符号付き整数のオーバーフロー、未初期化の読み、寿命の切れた参照。Linuxのsanitizerのビルドが、試験の全てで通る。
+- 寸法の積と、確保するバイト数は、検査付きの演算で計算する。`size_t` と `int64_t` を黙って混ぜない。32bitの外部APIへ渡す前に、乗算を含む範囲検査をする。
+- 縮小変換を黙って行わない。必要なら、範囲を検査する名前の付いた関数を通す。
+- `reinterpret_cast`、Cスタイルのキャスト、`const_cast` を使わない。構造体のpaddingやポインタを、そのまま書き出さない（IO4-06）。
+- 生の `new` と `delete` を書かない。所有は値か、標準の所有型で表す。
+- グローバルな可変状態を持たない。差し替えて条件を切り替えるグローバル変数を、R&Dの試作から持ち込まない。
+- 戻り値を捨ててはならない関数に `[[nodiscard]]` を付ける。`expected` を捨てない。
+
+## 書き方
+
+- 整形は `.clang-format`（`just format-check`）、静的検査は `.clang-tidy`（`just lint`）。どちらもゲート。検査を黙らせる `NOLINT` には、理由を同じ行に書く。整形の差分だけのcommitを、他の変更に混ぜない。
+- 警告はエラー。`#pragma warning(disable)` や `-Wno-…` を、ビルドを通すために足さない。原因を直すか、その警告がこのリポジトリに合わないなら、理由をコメントに書いて `cmake/ProjectOptions.cmake` を変えるPRにする。
+- 型は `PascalCase`、関数と変数は `snake_case`、定数は `snake_case`、マクロは `UVLAS_` で始める。名前空間は `uvlas::<module>`。
+- マクロは、条件付きコンパイルとビルド情報にだけ使う。
+- ヘッダは自分で完結する（単独でincludeしてコンパイルできる）。includeの順は `.clang-format` が決める。
+- コメントは英語。何をするかではなく、なぜそうするか、どの仕様の条に基づくかを書く。測ったことは測ったと書き、確かめていない原因は確かめていないと書く（`open-ends`）。
+- 使われなくなったコードは、その経路を外したPRで消す（`no-dead-code`）。
+
+## ライブラリの版についての思い込み
+
+依存の版や機能を、記憶から書かない。ヘッダを読む。2026-11-11、Eigen 5.0.1の版マクロを `WORLD=5, MAJOR=0, MINOR=1` と思い込んで試験を書き、試験が落ちた。実際は `WORLD=3, MAJOR=5, MINOR=0, PATCH=1` だった。
+
+```cpp
+// BAD: written from memory
+CHECK(EIGEN_WORLD_VERSION == 5);
+
+// GOOD: read from Eigen/Version in the installed tree, then written
+CHECK(EIGEN_MAJOR_VERSION == 5);
+```

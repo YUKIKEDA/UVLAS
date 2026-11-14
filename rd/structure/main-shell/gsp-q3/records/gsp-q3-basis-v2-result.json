@@ -1,0 +1,143 @@
+{
+  "records": [
+    {
+      "kappa": 0.0,
+      "n": 1,
+      "amplitude": 0.0,
+      "cell": 0,
+      "preparations": [
+        {
+          "digits": 80,
+          "seconds": 10.125,
+          "coefficient_bytes": 4210056,
+          "coefficient_max": 13.228756555322967
+        },
+        {
+          "digits": 120,
+          "seconds": 8.35899999999674,
+          "coefficient_bytes": 4210056,
+          "coefficient_max": 13.228756555322967
+        }
+      ],
+      "precision_agreement": 2.8363668030890935e-35,
+      "gates": [
+        {
+          "order": 9,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 9.436937143396326e-16,
+          "gram_identity": 3.0581690290559774e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.2446309771100983e-15,
+          "gram_identity": 2.971214022202179e-15
+        },
+        {
+          "order": 13,
+          "ranks": [
+            203,
+            203,
+            203
+          ],
+          "span": 1.1855954015121896e-15,
+          "gram_identity": 1.6519272389116405e-15
+        }
+      ],
+      "checks": {
+        "precision_agreement": true,
+        "original_gates": true,
+        "resources": true
+      },
+      "source_artifact": "build/analysis/gsp-q3-local-20261103-143628/k0-n1-c0-state.npz",
+      "source_sha256": "cf36e07fade78a6f47991c96775c31172ba37e6856bb66154d6e3f6577d90c6f",
+      "artifact": "build/analysis/gsp-q3-basis-v2-20261103-181154/state-0.npz",
+      "artifact_sha256": "cb8e9e7dca1eadf2c11bcac4cdd26a384f14da8a334907c0683bdde320dbd2c4"
+    },
+    {
+      "kappa": 0.0,
+      "n": 2,
+      "amplitude": 0.2,
+      "cell": 0,
+      "preparations": [
+        {
+          "digits": 80,
+          "seconds": 10.436999999976251,
+          "coefficient_bytes": 4355208,
+          "coefficient_max": 13.136819301837066
+        },
+        {
+          "digits": 120,
+          "seconds": 7.077999999979511,
+          "coefficient_bytes": 4355208,
+          "coefficient_max": 13.136819301837066
+        }
+      ],
+      "precision_agreement": 4.078689865916012e-51,
+      "gates": [
+        {
+          "order": 9,
+          "ranks": [
+            210,
+            210,
+            210
+          ],
+          "span": 9.534236574857018e-16,
+          "gram_identity": 3.443603709367442e-16
+        },
+        {
+          "order": 11,
+          "ranks": [
+            210,
+            210,
+            210
+          ],
+          "span": 1.102531230962528e-15,
+          "gram_identity": 3.3721633913910723e-15
+        },
+        {
+          "order": 13,
+          "ranks": [
+            210,
+            210,
+            210
+          ],
+          "span": 1.3128877821009187e-15,
+          "gram_identity": 1.7430302185620837e-15
+        }
+      ],
+      "checks": {
+        "precision_agreement": true,
+        "original_gates": true,
+        "resources": true
+      },
+      "source_artifact": "build/analysis/gsp-q3-local-20261103-143628/k0-n2-c0-state.npz",
+      "source_sha256": "48675d55ce534eba6552fb5a9c1fa941e9b007474417b7e8a29677789cc8fafa",
+      "artifact": "build/analysis/gsp-q3-basis-v2-20261103-181154/state-1.npz",
+      "artifact_sha256": "ed52a50ed281110a1f7f2deb41645ab762ab525393f4aeb9cff3f6ea3d3fe50a"
+    }
+  ],
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "local_30_executed": false,
+  "physical_adoption": false,
+  "seconds": 38.65600000001723,
+  "peak_bytes": 419454976,
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/check_gsp_q3_basis_v2.py": "d2934a9a942e563c2b5490b1e0d053ed1c7b69e22b298d6c0bdc15905d97b9c4",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_basis_v2.py": "83c84a0c661f0a63e37744a1a3ee5d4b0bfc298308a699046f3356c3adcdb68b",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3.py": "f1f8b51106db7e2627acf12a5da45f2cb407fde868d6c93c1b65436db415b733",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-result.json": "4596c48e114a4eb7b3d2fc4a514503d282d920c9bae254752cf5b00ec88d3116",
+    "rd/structure/main-shell/gsp-q3/gsp-q3-basis-v2-contract.md": "2e4582e10fa78bae79194be3f467f525e7fc9f46d500ba1cfbadd1854b150a47",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-basis-v2-protocol.md": "b6e993271d1d0d5109eb8b1a910568e7cd82119c643382f1fc3a5c209562e93c",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-basis-v2-preparation.json": "05d4577c0e29d8f90de9118b2d363ff1f9356773cc19e72ab3c33ccc4f863285"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "access_date": "2026-11-03",
+  "primary_sources": [
+    {
+      "id": "SRC-MITC4P-2017",
+      "title": "A new MITC4+ shell element",
+      "authors": [
+        "Yeongbin Ko",
+        "Phill-Seung Lee",
+        "Klaus-Juergen Bathe"
+      ],
+      "url": "https://web.mit.edu/kjb/www/Principal_Publications/A_new_MITC4%2B_shell_element.pdf",
+      "doi": "10.1016/j.compstruc.2016.11.004",
+      "checked": [
+        "section 3",
+        "equations 7-27"
+      ],
+      "use": "four-node geometry/strain construction and limitations; no transfer of validation"
+    },
+    {
+      "id": "SRC-REGGE-V3",
+      "title": "Avoiding Membrane Locking with Regge Interpolation",
+      "authors": [
+        "Michael Neunteufel",
+        "Joachim Schoeberl"
+      ],
+      "url": "https://arxiv.org/html/1907.06232v3",
+      "doi": "10.1016/j.cma.2020.113524",
+      "checked": [
+        "sections 2.2-3.2",
+        "equations 2.14-2.21",
+        "equations 3.6-3.8"
+      ],
+      "use": "geometry/dual-work and mixed formulation; GSP-Q3 is not the published Regge element"
+    },
+    {
+      "id": "SRC-CAS-V1",
+      "title": "Overcoming membrane locking in quadratic NURBS-based discretizations of linear Kirchhoff-Love shells: CAS elements",
+      "authors": [
+        "Hugo Casquero",
+        "Kyle Dakota Mathews"
+      ],
+      "url": "https://arxiv.org/html/2311.00101v1",
+      "access_url": "https://arxiv.org/html/2311.00101",
+      "checked": [
+        "sections 3-4",
+        "equations 27-32",
+        "continuity assumptions"
+      ],
+      "use": "C1 displacement and geometry prerequisites; not a full-3D ANCF validation"
+    },
+    {
+      "id": "SRC-HYLDAHL-2015",
+      "title": "Rectangular shell elements based on the absolute nodal coordinate formulation",
+      "authors": [
+        "Per Hyldahl"
+      ],
+      "url": "https://openbooks.kb.dk/au/catalog/download/97/90/303?inline=1",
+      "doi": "10.7146/aul.97.90",
+      "checked": [
+        "section 16.2 equations 16.44-16.48, PDF pages 99-101",
+        "section 18",
+        "section 19.3",
+        "section 21"
+      ],
+      "use": "48-coordinate kinematics and remaining curved/thickness/distortion limitations",
+      "old_url": "https://ebooks.au.dk/aul/catalog/download/97/90/303?inline=1",
+      "old_url_status": "timeout; official migrated PDF checked"
+    }
+  ],
+  "source_count": 4,
+  "access_method": "web original full text; selected sections checked",
+  "local_full_source_archives_created": false,
+  "published_performance_or_proofs_transferred_to_GSP_Q3": false,
+  "candidate_space_and_derivations": "original UVLAS design"
+}

@@ -1,0 +1,86 @@
+{
+  "source_sha256": "01d3ebf76f89be6edb89e997bacb1e38b9b5dcf6475e26bf8964d52f5eb1d8db",
+  "parent_sha256": "d1f2add37e413548c6ba5d277b8c123e580dea0315d74564980cbeb2f421edd8",
+  "protocol_sha256": "437be8c00196f2b9fd6d0bc0205f4403cb49461a8811e5dc8dbc7a27a5b20965",
+  "dependencies": {
+    "q9_developable_bending_approximation.py": "442be8ef780eed68fb8e41f6206826cb43784d204e457117df3be51091cacf15",
+    "check_q9_curved_bounded_lift.py": "a0e22c04272c78f7bde2e9f7a448618fecdacf4ef55b9005d4d926f25c046d37",
+    "q9_curved_constrained_gradient.py": "c0629577b7aa249f34e9cc7ee16d7aae5a738fa9979a67d6d36764e5d51235ac",
+    "audit_q9_curved_strain_screen.py": "b2c7c704dc6d59fd101ccb5b720eb33e4476596a4309885011355074d1585b31"
+  },
+  "cases": [
+    {
+      "kappa": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "membrane_scale": {
+        "raw": 0.0,
+        "cg": 1.7235602442943229e-77
+      },
+      "normalized_membrane_scale": {
+        "raw": 0.0,
+        "cg": 1.7529579837191574e-32
+      },
+      "full_interpolation_error": {
+        "raw": 1.2519176678954823e-11,
+        "cg": 2.868524056837016e-11
+      },
+      "interpolation_position_error": 1.8933563453659807e-16,
+      "checks": {
+        "metric": true,
+        "finite": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 4,
+      "h": 0.0001,
+      "membrane_scale": {
+        "raw": 2.1336134532178825e-10,
+        "cg": 2.1313014199823625e-10
+      },
+      "normalized_membrane_scale": {
+        "raw": 60.09429287184336,
+        "cg": 60.06172425866783
+      },
+      "full_interpolation_error": {
+        "raw": 66.87982009994563,
+        "cg": 66.35768305073664
+      },
+      "interpolation_position_error": 0.0003572512719311157,
+      "checks": {
+        "metric": true,
+        "finite": true,
+        "flat": true
+      }
+    },
+    {
+      "kappa": 0.4,
+      "n": 8,
+      "h": 0.0001,
+      "membrane_scale": {
+        "raw": 1.3296459061604321e-11,
+        "cg": 1.3293022758544513e-11
+      },
+      "normalized_membrane_scale": {
+        "raw": 15.001799577984423,
+        "cg": 14.999860939259483
+      },
+      "full_interpolation_error": {
+        "raw": 16.6893732885318,
+        "cg": 16.56345057206397
+      },
+      "interpolation_position_error": 4.440014954648219e-05,
+      "checks": {
+        "metric": true,
+        "finite": true,
+        "flat": true
+      }
+    }
+  ],
+  "seconds": 40.95299999997951,
+  "peak_bytes": 107397120,
+  "all_criteria_pass": true,
+  "product_shell_adopted": false
+}

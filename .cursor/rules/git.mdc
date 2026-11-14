@@ -1,0 +1,27 @@
+---
+description: 破壊的なgit操作とcommitには、明示の指示が要る
+alwaysApply: true
+---
+
+# git
+
+質問は許可ではない。`reset`、`rebase`、`push --force`、`push --force-with-lease`、`branch -D`、タグの削除と付け替え、`clean` は、操作と対象のSHAまたはrefを名指しした指示があるときだけ行う。
+
+そのような操作について問われたら、現在の `HEAD` のSHA、対象のSHA、何が消えるか、正確なコマンドを答える。それから待つ。
+
+- commitは、頼まれたときだけ。pushも、頼まれたときだけ。開いたPRは同意ではない。
+- 自分が直前に作った、未pushのcommitやタグの付け替えは例外とする。行ったら、付け替える前のSHAを報告の最初に書く。
+- 試験に続くcommitとpushは、終了コードを通してだけ続ける。`&&` でつなぐか、`$LASTEXITCODE` を確かめる。`;` でつながない。ビルドの出力を別のコマンドへパイプした後ろに `git commit` を置かない。
+- hookと署名を飛ばさない（`--no-verify` を使わない）。
+- 仕様や記録がハッシュで引く commit は、PRのブランチ上に置く。squash mergeの後も辿れるようにする。
+- ベースラインのcommit（`tools/rd/relocation_plan.py` の `BASELINE`）は証拠の基準点。`main` の履歴に置き、履歴を書き換えない。基準点を持つPRは、squashやrebaseでなく、merge commitでmergeする。SHAが変わると基準点を失う。
+- gitignoreに足すのは、消してよいものだけである。
+- 公開リポジトリへ出す前に、第三者ライセンスのファイルと、個人を特定できる情報の有無を確かめる。
+
+## 改行
+
+`core.autocrlf=true` の環境である。改行の扱いは `.gitattributes` が決める。`rd/` と `docs/` はバイト保持（`-text`）で、記録がSHA-256で引くファイルの改行は変換しない。2026-11-11の調査で、R&Dのファイルは改行が混在しており、既定の設定のままcommitすると別の環境のチェックアウトでハッシュが合わなくなることが分かった。
+
+## ステージの中身を読む
+
+commitの前に `git diff --cached --name-status` を読み、意図したファイルだけが入っていることを確かめる。2026-11-11、基準点のcommitに作業中の設定ファイルが混ざり、検証用のタグを付けたcommitに別の改名が混ざった。どちらも、ステージを読まずにcommitした。

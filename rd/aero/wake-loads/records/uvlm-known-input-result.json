@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "groups": 5,
+  "records": [
+    {
+      "case": "space_time_derivatives_and_divergence",
+      "spatial_relative": 3.5245170267701087e-11,
+      "temporal_relative": 3.712537366909786e-10
+    },
+    {
+      "case": "C1_knots_and_component_monotonicity"
+    },
+    {
+      "case": "coefficient_restart_bitwise"
+    },
+    {
+      "case": "invalid_input_rejections",
+      "rejected": [
+        "range",
+        "duplicate",
+        "missing",
+        "gust_divergence",
+        "nonfinite_time",
+        "saved_discontinuity",
+        "mutation"
+      ]
+    },
+    {
+      "case": "adopted_assembly_input_restart_and_identity",
+      "next_state_and_load_bitwise": true
+    }
+  ],
+  "sources": {
+    "rd/aero/wake-loads/experiments/check_uvlm_known_input.py": "2f170bfab306826022bc91a9b7ec88539b3e3b5737c9d3db41fc5ef2ed444270",
+    "rd/aero/wake-loads/experiments/uvlm_known_input.py": "58b9cd39e8d44555414ad85657d65d0a0b20944ce6c84d6d4c1848d871f0b9d1",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "rd/aero/wake-loads/records/uvlm-wake-policy-result.json": "7ba4006c5f234e03c48e5da2e4e200f505916322f42a6d326b48f2d7077db2cc"
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "quality_count": 28,
+  "quality_rhs_count": 84,
+  "quality_finest_max_energy": 9.563214875446522e-06,
+  "quality_finest_max_position": 5.4666867965311195e-08,
+  "quality_max_stationarity": 7.449074316872561e-12,
+  "quality_max_case_seconds": 154.31299999996554,
+  "groups": [
+    {
+      "group": "G1",
+      "n": 4,
+      "max_energy": 8.193648573931124e-07,
+      "max_position": 1.0225004954495281e-10,
+      "max_thin_amplification": 1.360525455967972,
+      "max_dofs": 1305
+    },
+    {
+      "group": "G2",
+      "n": 4,
+      "max_energy": 4.410056390888216e-08,
+      "max_position": 1.117757912561768e-10,
+      "max_thin_amplification": 1.0,
+      "max_dofs": 1530
+    },
+    {
+      "group": "G3",
+      "n": 4,
+      "max_energy": 8.196357253796662e-07,
+      "max_position": 1.1011948125876737e-10,
+      "max_thin_amplification": 1.003036968557526,
+      "max_dofs": 1365
+    },
+    {
+      "group": "G4",
+      "n": 4,
+      "max_energy": 4.343268345404781e-08,
+      "max_position": 1.0766311589485795e-10,
+      "max_thin_amplification": 1.0,
+      "max_dofs": 1545
+    },
+    {
+      "group": "G5",
+      "n": 2,
+      "max_energy": 8.035147436213315e-06,
+      "max_position": 5.4666867965311195e-08,
+      "max_thin_amplification": 0.8294960998199663,
+      "max_dofs": 708
+    },
+    {
+      "group": "G6",
+      "n": 2,
+      "max_energy": 6.156902699359686e-06,
+      "max_position": 5.386093567765432e-08,
+      "max_thin_amplification": 0.7833330061137312,
+      "max_dofs": 711
+    },
+    {
+      "group": "G7",
+      "n": 2,
+      "max_energy": 9.563214875446522e-06,
+      "max_position": 5.4120524940237534e-08,
+      "max_thin_amplification": 0.8534733044789157,
+      "max_dofs": 714
+    }
+  ],
+  "physical": [
+    {
+      "domain": "rectangle",
+      "n": 1,
+      "h": 0.01,
+      "energy": 7.361892000131993e-05,
+      "position": 0.000991845419570842,
+      "stationarity": 6.313367004144435e-16,
+      "discrete_load_agreement": 3.167563635281721e-13
+    },
+    {
+      "domain": "rectangle",
+      "n": 1,
+      "h": 0.0001,
+      "energy": 7.544519608011938e-07,
+      "position": 6.974497592644049e-05,
+      "stationarity": 3.3413985152232865e-14,
+      "discrete_load_agreement": 3.865371981806807e-10
+    },
+    {
+      "domain": "rectangle",
+      "n": 2,
+      "h": 0.01,
+      "energy": 1.4423694423663308e-05,
+      "position": 4.927876383170233e-05,
+      "stationarity": 7.010651315626893e-16,
+      "discrete_load_agreement": 6.410953366781318e-13
+    },
+    {
+      "domain": "rectangle",
+      "n": 2,
+      "h": 0.0001,
+      "energy": 1.4784199027234822e-07,
+      "position": 1.0726003330632022e-05,
+      "stationarity": 3.5505706778756545e-14,
+      "discrete_load_agreement": 1.639969983759569e-09
+    },
+    {
+      "domain": "taper",
+      "n": 1,
+      "h": 0.01,
+      "energy": 7.626405352226331e-05,
+      "position": 0.0009885156512809928,
+      "stationarity": 5.814331057834295e-16,
+      "discrete_load_agreement": 3.5280948310554165e-13
+    },
+    {
+      "domain": "taper",
+      "n": 1,
+      "h": 0.0001,
+      "energy": 7.781351203603755e-07,
+      "position": 8.46233499229436e-05,
+      "stationarity": 1.3921496827447693e-14,
+      "discrete_load_agreement": 6.4904738406897e-10
+    },
+    {
+      "domain": "taper",
+      "n": 2,
+      "h": 0.01,
+      "energy": 1.5825043617951426e-05,
+      "position": 5.6505563321544314e-05,
+      "stationarity": 6.323634829114615e-16,
+      "discrete_load_agreement": 1.2452510470105587e-12
+    },
+    {
+      "domain": "taper",
+      "n": 2,
+      "h": 0.0001,
+      "energy": 1.601476364316399e-07,
+      "position": 1.4253455449706585e-05,
+      "stationarity": 2.6908608506021413e-14,
+      "discrete_load_agreement": 2.095004390264202e-09
+    }
+  ],
+  "geometry_parameters": [
+    [
+      0.4,
+      0.0,
+      0.0
+    ],
+    [
+      0.4,
+      0.2,
+      0.0
+    ],
+    [
+      0.4,
+      0.0,
+      0.07
+    ],
+    [
+      0.4,
+      -0.2,
+      0.07
+    ],
+    [
+      0.4,
+      0.2,
+      0.07,
+      0.1,
+      -0.06,
+      0.025
+    ],
+    [
+      0.4,
+      0.2,
+      0.07,
+      0.1,
+      -0.06,
+      0.025,
+      0.0,
+      1.0,
+      0.2
+    ]
+  ],
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-quality-result.json": "f0345e55e920f4bb87d3b9abd4c6e1507b201f8ea4eb929a86417997cc224c9a",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_quality.py": "2c34de18e55eba8d6aab71bd196ef31999d9d27cade7531ca5a480487c309c4b",
+    "rd/structure/main-shell/paired-geometry/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_polynomials.py": "dd82587536402eae97cdf69b1dc8c3520322a2e612bbea1e210e5d6d9673d03c",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_ancf.py": "c1e7db587b7bef6cec5918be65f9548042a722dde27e4cb0353c93deeadd9045",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py": "793e5aafa760bcec8deae2b4eca8ac0e13eea36e59530a325a18184b833735fb",
+    "rd/structure/main-shell/paired-geometry/experiments/general_paired_fields.py": "1b5eb312a92cb61274d952a42dc4aecdeb0229bbbf5031f5deb1ca13becf8a7f",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_exact_polynomials.py": "f8321bb2188970885c5daddb7f119a80343ceb5cdc2926a0900a619be12a46e8",
+    "rd/structure/main-shell/geometry-compatible/experiments/coefficient_compatible_ancf.py": "cc32052397e89ca163455c34a227eb17fc1b25932e3a6ee87dfde8f38e9953d9",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_ancf.py": "93f39b311ae1940900d47975361eb1db8f79c5229b5d2a848ba116be75ed98bd",
+    "rd/structure/main-shell/paired-geometry/experiments/check_exact_paired_primary.py": "4a57a1dc08e81c2c33057b581b611cf60a8bf25a1a2a5b20eb41cebb1842663a",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-coefficient-input-result.json": "46d1111dc403182244d54091d2ef85051533d822468050b6d01e48615af204e8",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_coefficient_input.py": "68fe1c38ba8380a3bd72c9e12c3cba9bcaafd766cf2e1e4c24f7f652c7693ba2",
+    "rd/structure/main-shell/paired-geometry/experiments/paired_reference_admissibility.py": "0c14ec76b1fa1905c31358e27c8536026de26a15829511f76b2f5f5a08079af5",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-reference-result.json": "51ddf1467a311cd42d8960de64c2ca5b2dd9e79ee1f7c5237f246f80c60d64bf",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_reference.py": "32979ab95bfb0dfa9d21a1359da9637d7917301325f74e738111b53b5475cfe0",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_mechanics.py": "01e67324f576468ca22f6c7a6511f38fca17813344630c6090aad7f2fe1c1cff",
+    "rd/structure/main-shell/paired-geometry/records/paired-lift-exact-result.json": "92fb8778e93e52fca922f139300c8dbe23957a7b39f95619a7cfef01c1a18608",
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_lift_exact.py": "e559ad8e1efc37c4b3054b5be08575415a47cf8abdf88025441942a88d09dcec",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-body-result.json": "993027e24961090872beb7f5d25291899cdeae6969234b7682654cd7a97201a6",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_body.py": "b71226f1331cb03a2118d77ccd6befb3794ff48adf33609896baab8a557b75a5",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-interface-result.json": "3b93269d1a04e83dc992fc589d11fae8e8aa2bec0c78802aa39e5e0b4cdb2bb4",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_interface.py": "0eb764b84c8ab1e9c215538bbb570d39a8548170a57446c2cae752c81e42f453",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-mechanics-result.json": "7ce73f9ec309fdf492048b2ec4bf9e6ba5d6288629fa9df82b37e5e79af59f26",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_mechanics.py": "e86e875f403a29ad1f78daa6144030369a3e736ed18e4b9ffe7ad20b59327354",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_state_reference.py": "ca66c8afaeeda0fe1fa62eb30d1ed0b9d89af5fc01c3d794cb4e27cc8cc31e6c",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-orientation-result.json": "f1922d049e907f608707740c28e21933baffda1577384831aa7751e09d0d128e",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_orientation_quadrature.py": "1b55b0326d121ef114f11490f58ea77b9f1adc4d42313d0135a8e0051b4ea8c6",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-domain-v2-result.json": "7552eb6b9cb4f9cebb07b31eeeb61abd3c392620ed9f5e897f1ba5ffe2ce7e43",
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_shell_r5_domain_v2.py": "1e926f1d7bd0e0e34b4d8c8a8e52485ed5664f874e8b74eb38afab94c3e75e5a",
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_shell_r5_domain.py": "2e36fa6ef9c5d4d1a5c8da3b74c4b460d091e7d2f7550cb3100049d0b08799c1",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-domain-result.json": "d50d631251cc80de8b69f270187c5627081713e2a2d03f0e4083b4595622778d",
+    "rd/structure/main-shell/paired-geometry/experiments/swept_taper_domain.py": "e29bcfa5e20b638e5ee0e344627fb4b73763358c5b511d5a385832bb0321f2fc",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.01.npz": "cbc1f5e2e45b8e6935fab4262d702f3389ed7df2a82bc5bc993397fe29747fe1",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n1-h0.0001.npz": "87a5dbb1d3b693f4b22e76a7479ce59f494e821a5dcd58fc5b625c75c4299c51",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.01.npz": "f7e12b9b128d2015c4ba84ed8fb2181d5c08c7b249b032270b27b50de7067e89",
+    "build/analysis/paired-shell-r5-domain-20261105-123611/n2-h0.0001.npz": "0e84d019459cc5a5e1c10731c747970ea738ae12ad8f0e37b8d3a611ae1fe282"
+  }
+}

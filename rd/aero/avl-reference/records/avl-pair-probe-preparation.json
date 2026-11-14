@@ -1,0 +1,9 @@
+{
+  "protocol": "rd/aero/avl-reference/records/avl-collinear-kernel-experiment.md",
+  "source_sha256": "354901742875f1acf89675ecff19c7ce9cf64e469ad29dc7a905b2bb5184ff03",
+  "original_adapter_sha256": "cbc18aad57c9eb993666417ac9409bf44740e9d7f958576345f3a040f996488d",
+  "modified_adapter_sha256": "3f9ce27733e6a2de6d0e7d8170be65d96ed712e73f3fc85663e4b27353903f29",
+  "probe_sha256": "21e5b0847ac5bb02b4432dd81c25984a93e6549d8dac7cccd0371b89a30aac16",
+  "build_script_sha256": "3424e9ddc0a255824bc6444fa2bafe2f2c9da1d42861a22b5b80c5e2d4e327b6",
+  "original_executable_sha256": "d3039906a4e2e9b1a494e667c94b18d8f8a78d5d57671689b845163a09c9989e"
+}

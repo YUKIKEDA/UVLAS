@@ -1,0 +1,17 @@
+{
+  "source_sha256": "a64477aa49bdea76519a251793419455ded5c095736b3ffd1d5b2b942c7be37c",
+  "runs_sha256": "7ef4bab10c3401ec917e9012b78a7ab58e82dc6c175790cf0a75ca23aa47314e",
+  "observations_sha256": "e3c99d520f4f9b65fe3a28cc00a0609b894a8e53d6fcf4af8de2ca15e46ea397",
+  "completed_fine_cases": 8,
+  "physical_fields": 14,
+  "series": 4,
+  "stored_field_pairs": 12,
+  "raw_files": 160,
+  "seconds": 1655.5293620830003,
+  "peak_resident_bytes": 13466492928,
+  "raw_bytes": 159092311,
+  "initial_failure_preserved": true,
+  "separate_first_wing_checkpoint_preserved": true,
+  "reference_acceptance": false,
+  "all_criteria_pass": true
+}

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "structural_1_5_complete": true,
+  "structural_review_complete": true,
+  "product_implementation_start": false,
+  "current_work": "2 UVLM model adoption",
+  "immutable": {
+    "docs/specs/structure/structural-adopted-specification.md": "5e2e8ae0229fbdbf9cbb1a35dee1be9b5ea867611e3c9e1de42c5a554d00e325",
+    "rd/structure/integration/records/structural-adoption-disposition.json": "705065b46d2047b1b6fd1a5e26f0f76b3f37b142d72ee8950f4361e6e0827cbb",
+    "rd/structure/integration/records/structural-adoption-results.md": "f2a8b3fb07737194766fd567bac83e09674e803bc15b7b4d780e1afdf07a6245",
+    "rd/structure/integration/records/structural-adoption-audit.json": "c5eb3e1400a6663737889326729d9af8b288c8dd5caf20fbe15491e72c77c3fa"
+  },
+  "status_sync_source": {
+    "rd/structure/integration/experiments/sync_structural_adoption_status.py": "157be284e573f98cd9a38458137cf3f725225933d61c6162e4e32266a55bcb13"
+  },
+  "mutable_status_entries": [
+    "README.md",
+    "rd/planning/preimplementation-plan.md",
+    "rd/planning/structural-model-adoption-review.md",
+    "rd/planning/requirements-evidence-map.md",
+    "docs/specs/design-decisions.md",
+    "rd/planning/preimplementation-history.md"
+  ],
+  "checked_status_links": 42
+}

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "nonlinear_shoe_second_variation",
+      "relative_error": 1.3992620279776323e-09,
+      "omitted_multiplier_hessian_work": 0.0019307379298811123
+    },
+    {
+      "case": "retained_original_coupled_operators",
+      "equilibrium_residual": 1.224803033822114e-10,
+      "state_dofs": 333,
+      "constraint_dofs": 111
+    }
+  ],
+  "artifact": {
+    "artifact": "build/analysis/connection-coupled-snapshot.npz",
+    "artifact_sha256": "4487efb5c911f2f90e4da37def4bc5b3033a05db69cfe8444638018a385f3a83"
+  },
+  "sources": {
+    "rd/structure/connection/experiments/check_connection_snapshot.py": "fe3f6971179750623676cbf16db88ecf3ed185000d69d6d3fb54cf8365a4b69f",
+    "rd/structure/connection/experiments/check_connection_beam_shell.py": "2322329a578ad8bdebd02e55882a26397607fcc35c014b9cfb0ae02a6fdcbbd1",
+    "rd/structure/connection/records/connection-beam-shell-result.json": "d0c053a22f2cfd62a886a4e8f565b650095acdbfa0eed3122a0335982d9d047b"
+  },
+  "seconds": 8.98499999998603
+}

@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/reference_work_thin_limit_v2.py": "69e5f222152a7a6c1c3ac6c5fd25fbccf12a79555b0505865d5bbee25a22a07b",
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_thin_global_v3.py": "a9c45fbf790a7d5ec6606ccbbafeb0a8ca3824ed10f167a16e19482bbb62dfb7",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_exact_isometry_v2.py": "316ae19345984db7749967196b9906cc4e4aba37e4e18bd3fd8469298d64a9c2",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-v2-protocol.md": "96d0d86045212e07820e8cd993cb86faf31b444d3c47c6d6f625626e8fa9500f",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-preparation.json": "6d3c7f5fe03d2c4b948e62ac839c112bdb1d62aa100026ba9a645943fb06bc02",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-local-v3-result.json": "6fa4c239e982603aa0537e71962133e2e9eb615384dda27999367bff227c3410",
+    "rd/structure/main-shell/reference-work/records/reference-work-thin-global-result.json": "4873138811a522d7617aee00a321ec6e13989676c2388cd8bb5f1ec8dd58648e"
+  }
+}

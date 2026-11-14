@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-03",
+  "roadmap_location": "1.structural_adoption/1.1_primary_shell/joint_membrane_shear_redesign",
+  "candidate": "M-Q3_independent_quadrilateral_moment_extension",
+  "status": "local_feasibility_and_separate_quadrature_passed",
+  "conditions": 20,
+  "physical_adoption": false,
+  "independent_implementation_audit": false,
+  "shared_kernel_evaluated": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "published_MITC_or_Regge_implementation": false,
+  "next_action": "Independent monomial/Vandermonde implementation audit, shared work, and h=0/first-order operator derivation before shared kernel tests",
+  "next_contract": "rd/structure/main-shell/mq3/mq3-audit-and-shared-space-contract.md",
+  "evidence_sha256": {
+    "mq3-local-feasibility-result.json": "8f9594ba5d8d103b2c67000f7a50ada06cea7d107da9585dcbaeeb4ed1379a02",
+    "mq3-separate-quadrature-result.json": "d6854c4ab608fe39ccdeaa0fbed09786078fd9ddc100cc3b782606137aea285f"
+  }
+}

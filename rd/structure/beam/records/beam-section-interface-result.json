@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "explicit_section_mass_and_warping_controls",
+      "negative_controls": [
+        "units",
+        "order",
+        "warping",
+        "restrained_warping",
+        "source_id",
+        "mass_per_length",
+        "centroid_inertia_per_length",
+        "initial_generalized_strain",
+        "K"
+      ],
+      "prepared_immutable": true
+    },
+    {
+      "case": "precision_backend_general_coupled_section_derivatives",
+      "metrics": {
+        "force": 4.707087831915866e-16,
+        "tangent": 1.790988691207214e-16
+      }
+    },
+    {
+      "case": "shell_point_and_frame_dual_work",
+      "virtual_work_error": 5.551115123125783e-17,
+      "force_moment_wrench_error": 1.1062741570630339e-16,
+      "position_H_available": true,
+      "frame_H_available": true
+    }
+  ],
+  "failures": [],
+  "seconds": 0.0470000000204891,
+  "sources": {
+    "rd/structure/beam/experiments/check_beam_section_and_interface.py": "04b9dafc3775dc7dabcb00c3ad117bd8d84c8f75c0a068fd79fefac7cc647f1e",
+    "rd/structure/beam/experiments/beam_se3_v2.py": "3c71924e347b844353523727510041f529a8b62cd3c31fec6f7b3f70120ada48",
+    "rd/structure/beam/experiments/beam_se3_high_precision.py": "094efaf6b130b92de6fbdcc611ac0ff9bae27385f02ab42f297b8f28097a5782",
+    "rd/structure/beam/experiments/beam_jet2_decimal.py": "21a60956a1710c7fdb9e93d9f328bebb3bb942fafc89fab0f1a9fb389e184b2a",
+    "rd/structure/beam/experiments/beam_section_input.py": "a26932cb4d1027863ea84812956a511a005edf53665ffc6e3571f21ce3159609",
+    "rd/structure/beam/experiments/beam_decimal_reference.py": "1f3d19351dc89f9e7c5bb1bd2026bb9254a5068dab13c4b44b6c9fe357162457",
+    "rd/structure/beam/experiments/check_beam_se3_physical_v4.py": "a24423ab75e512c7db1ed24426e13c0e65ac94b83505d9061364e247a6d14cef"
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "records": [
+    {
+      "broken_fields": [],
+      "method": "raw",
+      "solution_status": "reproduced",
+      "observations": {
+        "quadratic": {
+          "error": 2.260816244538893e-15,
+          "error_difference": 2.9337292566519723e-16,
+          "h1_difference": 9.2148511043888e-15
+        },
+        "cubic": {
+          "error": 2.4012203654069887e-15,
+          "error_difference": 1.8876902503951078e-16,
+          "h1_difference": 3.3306690738754696e-15
+        },
+        "quartic": {
+          "error": 0.14860310107034652,
+          "error_difference": 3.0531133177191805e-16,
+          "h1_difference": 7.771561172376096e-16
+        },
+        "exponential": {
+          "error": 0.03184017664503765,
+          "error_difference": 9.020562075079397e-17,
+          "h1_difference": 6.217248937900877e-15
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "gauge": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true
+      }
+    },
+    {
+      "broken_fields": [],
+      "method": "conservative",
+      "solution_status": "reproduced",
+      "observations": {
+        "quadratic": {
+          "error": 2.1677765921912794e-15,
+          "error_difference": 4.047945864681486e-16,
+          "h1_difference": 9.547918011776346e-15
+        },
+        "cubic": {
+          "error": 2.0842135306153456e-15,
+          "error_difference": 5.318159769541942e-16,
+          "h1_difference": 3.3306690738754696e-15
+        },
+        "quartic": {
+          "error": 0.14860310107034666,
+          "error_difference": 3.0531133177191805e-16,
+          "h1_difference": 5.551115123125783e-16
+        },
+        "exponential": {
+          "error": 0.03184017664503788,
+          "error_difference": 1.942890293094024e-16,
+          "h1_difference": 6.439293542825908e-15
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "gauge": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true
+      }
+    },
+    {
+      "broken_fields": [
+        0
+      ],
+      "method": "raw",
+      "solution_status": "reproduced",
+      "observations": {
+        "quadratic": {
+          "error": 2.237280938856655e-15,
+          "error_difference": 2.836043188477899e-16,
+          "h1_difference": 9.769962616701378e-15
+        },
+        "cubic": {
+          "error": 2.584720464011818e-15,
+          "error_difference": 1.4804895391060824e-16,
+          "h1_difference": 3.885780586188048e-15
+        },
+        "quartic": {
+          "error": 0.14860310107034663,
+          "error_difference": 1.942890293094024e-16,
+          "h1_difference": 7.771561172376096e-16
+        },
+        "exponential": {
+          "error": 0.03184017664503767,
+          "error_difference": 1.0408340855860843e-16,
+          "h1_difference": 6.661338147750939e-15
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "gauge": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true
+      }
+    },
+    {
+      "broken_fields": [
+        0
+      ],
+      "method": "conservative",
+      "solution_status": "reproduced",
+      "observations": {
+        "quadratic": {
+          "error": 2.3269298716524464e-15,
+          "error_difference": 3.538515406422205e-16,
+          "h1_difference": 8.992806499463768e-15
+        },
+        "cubic": {
+          "error": 2.746261942658893e-15,
+          "error_difference": 4.554118603435336e-16,
+          "h1_difference": 3.6637359812630166e-15
+        },
+        "quartic": {
+          "error": 0.05712650008012493,
+          "error_difference": 1.1102230246251565e-16,
+          "h1_difference": 8.881784197001252e-16
+        },
+        "exponential": {
+          "error": 0.010747281964323062,
+          "error_difference": 4.336808689942018e-17,
+          "h1_difference": 6.439293542825908e-15
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "gauge": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true
+      }
+    },
+    {
+      "broken_fields": [
+        1
+      ],
+      "method": "raw",
+      "solution_status": "reproduced",
+      "observations": {
+        "quadratic": {
+          "error": 2.478224885727086e-15,
+          "error_difference": 2.0551788929843308e-16,
+          "h1_difference": 9.325873406851315e-15
+        },
+        "cubic": {
+          "error": 2.241992368379705e-15,
+          "error_difference": 6.5709455355744375e-16,
+          "h1_difference": 3.552713678800501e-15
+        },
+        "quartic": {
+          "error": 0.14860310107034666,
+          "error_difference": 3.3306690738754696e-16,
+          "h1_difference": 5.551115123125783e-16
+        },
+        "exponential": {
+          "error": 0.03184017664503792,
+          "error_difference": 6.938893903907228e-17,
+          "h1_difference": 6.661338147750939e-15
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "gauge": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true
+      }
+    },
+    {
+      "broken_fields": [
+        1
+      ],
+      "method": "conservative",
+      "solution_status": "reproduced",
+      "observations": {
+        "quadratic": {
+          "error": 2.0971857228242806e-15,
+          "error_difference": 3.3667389455417654e-16,
+          "h1_difference": 9.880984919163893e-15
+        },
+        "cubic": {
+          "error": 2.076142178156282e-15,
+          "error_difference": 5.926138823427067e-16,
+          "h1_difference": 2.9976021664879227e-15
+        },
+        "quartic": {
+          "error": 0.14858629475841878,
+          "error_difference": 2.498001805406602e-16,
+          "h1_difference": 9.992007221626409e-16
+        },
+        "exponential": {
+          "error": 0.03183648367831522,
+          "error_difference": 7.632783294297951e-17,
+          "h1_difference": 6.217248937900877e-15
+        }
+      },
+      "checks": {
+        "kernel": true,
+        "gauge": true,
+        "quadratic": true,
+        "cubic": true,
+        "quartic": true,
+        "exponential": true
+      }
+    },
+    {
+      "broken_fields": [
+        0,
+        1
+      ],
+      "method": "raw",
+      "solution_status": "not_solved_in_primary",
+      "observations": {},
+      "checks": {
+        "kernel": true,
+        "gauge": true
+      }
+    },
+    {
+      "broken_fields": [
+        0,
+        1
+      ],
+      "method": "conservative",
+      "solution_status": "not_solved_in_primary",
+      "observations": {},
+      "checks": {
+        "kernel": true,
+        "gauge": true
+      }
+    }
+  ],
+  "all_available_fields_reproduced": true,
+  "all_primary_solutions_available": false,
+  "stop_reason": null,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/q4-projection/experiments/audit_q4_continuity.py": "c3549389611ce392dd27507826484500fcc07eb3c2b0061b304cf1a9774f88a8",
+    "rd/structure/main-shell/q4-projection/records/q4-continuity-v2-result.json": "5b01a172a7e43b118c33ef155b49c34b6cb6358a53199bf8531524eb75a83ff1",
+    "rd/structure/main-shell/q4-projection/experiments/audit_tying_projection_v2.py": "7a81721f5f8b6a89a4ef5ef1a7becc365a0e952b41136448a3596a733934479f",
+    "rd/structure/main-shell/q4-projection/experiments/diagnose_q4_continuity_v2.py": "b19d39bfa6816c01174ed41be2981748639462e4d0ce8c291240d4c190a975e8"
+  },
+  "seconds": 3.6719999999622814
+}

@@ -1,0 +1,223 @@
+{
+  "passed": false,
+  "records": [
+    {
+      "case": "explicit_3d_input_and_engineering_bridge",
+      "canonical_effective_identity": true,
+      "bridge_error": 4.7804374665377785e-17
+    },
+    {
+      "case": "quadratic_strain_velocity_section_work",
+      "metrics": {
+        "energy": 1.55480001775685e-16,
+        "force": 2.1563761949222643e-16,
+        "mass": 1.9347486026080494e-16
+      }
+    },
+    {
+      "case": "reference_plane_shift",
+      "energy_error": 0.0
+    },
+    {
+      "case": "nonunique_ABD_and_areal_mass",
+      "same_ABD_shear": true,
+      "normal_energy_difference": 0.00135,
+      "second_mass_moment_difference": 2.314814814814816e-06
+    },
+    {
+      "case": "normal_and_material_basis_reversal",
+      "tensor_error": 1.8332288907564897e-16,
+      "forgotten_component_transform_defect": 0.09890115712775044
+    },
+    {
+      "case": "invalid_inputs",
+      "rejected": [
+        "units_mm_N",
+        "components_unknown",
+        "measure_small_strain",
+        "rho_0.0",
+        "rho_-1.0",
+        "e0_[0, 0, -1, 0, 0, 0]",
+        "e0_[nan, nan, nan, nan,",
+        "C_[[1.0, 0.0, 0.0, 0.0",
+        "nonsymmetric",
+        "indefinite",
+        "near_null",
+        "abd",
+        "abd_shear",
+        "missing_E3",
+        "incompressible_input",
+        "gap",
+        "overlap",
+        "reverse",
+        "incomplete",
+        "duplicate_id",
+        "zero_fiber",
+        "parallel_fiber",
+        "certificate_h",
+        "certificate_reference",
+        "certificate_units",
+        "certificate_moment",
+        "outside_layer",
+        "side_without_interface"
+      ],
+      "count": 28
+    }
+  ],
+  "failures": [
+    {
+      "reason": "ValueError('too many values to unpack (expected 3)')",
+      "traceback": "Traceback (most recent call last):\n  File \"<repo>\\tools\\design-experiments\\check_material_shell_integration.py\", line 134, in main\n    model=shell.prepare(1,(.4,.2,.07,.1,-.06,.025),h,True,'extended');q0=model['reference_coordinates'];data=data_for(model,stack)\n                                                                                                             ^^^^^^^^^^^^^^^^^^^^^\n  File \"<repo>\\tools\\design-experiments\\check_material_shell_integration.py\", line 55, in data_for\n    p,N,G,det,X=engine.kinematics_from_fields(model,xy,zz,model['h'],model['variable'],F)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<repo>\\tools\\design-experiments\\exact_paired_finite.py\", line 34, in kinematics_from_fields\n    p=points(plane,z);X,J,det,H,Ha=shell.geometry.reference(p[:,:2],p[:,2],h,model['parameters'],variable)\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<repo>\\tools\\design-experiments\\pg_ritz_geometry.py\", line 52, in reference\n    r,A,n,dn,g=graph(p,parameters);H=h*(1+.1*p[:,0]+.05*p[:,1]) if variable else np.full(len(p),h);Hz=np.tile([.1*h,.05*h],(len(p),1)) if variable else np.zeros((len(p),2));z=H*zeta/2;J=np.empty((len(p),3,3));J[:,:,:2]=A+z[:,None,None]*dn+n[:,:,None]*(zeta[:,None]*Hz/2)[:,None,:];J[:,:,2]=H[:,None]*n/2\n               ^^^^^^^^^^^^^^^^^^^\n  File \"<repo>\\tools\\design-experiments\\pg_ritz_geometry.py\", line 7, in graph\n    x,y=p.T;kx,ky,tau=parameters;fx=kx*x+tau*y;fy=ky*y+tau*x;g=1+fx*fx+fy*fy;v=np.column_stack((-fx,-fy,np.ones(len(p))));n=v/np.sqrt(g)[:,None]\n            ^^^^^^^^^\nValueError: too many values to unpack (expected 3)\n"
+    }
+  ],
+  "artifact": null,
+  "seconds": 8.421999999904074,
+  "material_input": [
+    {
+      "id": "L0",
+      "lower": "-1",
+      "upper": "-.37",
+      "fiber_global": [
+        0.9736663950053749,
+        0.2279775235351884,
+        0.1
+      ],
+      "material": {
+        "units": "SI",
+        "components": "mandel_xx_yy_zz_yz_xz_xy",
+        "measure": "green_second_pk",
+        "e0": [
+          0.001,
+          -0.0003,
+          0.0002,
+          0.0001,
+          -5e-05,
+          8e-05
+        ],
+        "kind": "isotropic",
+        "E": 12.0,
+        "nu": 0.29,
+        "rho": 1.2
+      }
+    },
+    {
+      "id": "L1",
+      "lower": "-.37",
+      "upper": ".22",
+      "fiber_global": [
+        0.9171208228166051,
+        -0.3986093279844229,
+        0.1
+      ],
+      "material": {
+        "units": "SI",
+        "components": "mandel_xx_yy_zz_yz_xz_xy",
+        "measure": "green_second_pk",
+        "e0": [
+          0.001,
+          -0.0003,
+          0.0002,
+          0.0001,
+          -5e-05,
+          8e-05
+        ],
+        "kind": "orthotropic",
+        "E1": 90.0,
+        "E2": 9.0,
+        "E3": 6.0,
+        "nu12": 0.27,
+        "nu13": 0.23,
+        "nu23": 0.29,
+        "G23": 2.5,
+        "G13": 3.5,
+        "G12": 4.0,
+        "rho": 0.8
+      }
+    },
+    {
+      "id": "L2",
+      "lower": ".22",
+      "upper": "1",
+      "fiber_global": [
+        0.7838216658808492,
+        0.6209859870365597,
+        0.1
+      ],
+      "material": {
+        "units": "SI",
+        "components": "mandel_xx_yy_zz_yz_xz_xy",
+        "measure": "green_second_pk",
+        "e0": [
+          -0.0004,
+          0.0006,
+          -0.0002,
+          3e-05,
+          0.0001,
+          -0.0002
+        ],
+        "kind": "effective_3d",
+        "C": [
+          [
+            33.0,
+            1.5,
+            -0.8999999999999999,
+            0.6000000000000001,
+            0.30000000000000004,
+            1.2000000000000002
+          ],
+          [
+            1.5,
+            18.75,
+            -0.44999999999999996,
+            0.30000000000000004,
+            0.15000000000000002,
+            0.6000000000000001
+          ],
+          [
+            -0.8999999999999999,
+            -0.44999999999999996,
+            11.27,
+            -0.18,
+            -0.09,
+            -0.36
+          ],
+          [
+            0.6000000000000001,
+            0.30000000000000004,
+            -0.18,
+            5.12,
+            0.06000000000000001,
+            0.24000000000000005
+          ],
+          [
+            0.30000000000000004,
+            0.15000000000000002,
+            -0.09,
+            0.06000000000000001,
+            7.03,
+            0.12000000000000002
+          ],
+          [
+            1.2000000000000002,
+            0.6000000000000001,
+            -0.36,
+            0.24000000000000005,
+            0.12000000000000002,
+            8.48
+          ]
+        ],
+        "rho": 1.6
+      }
+    }
+  ],
+  "real_material_validation": false,
+  "element_plane_stress_adopted": false,
+  "sources": {
+    "rd/structure/material/experiments/check_material_shell_integration.py": "f6d1313342aa133548a2abbc06e942b875ea554fcf21db6afe547a32268f6cf2",
+    "rd/structure/material/experiments/material_equivalent_input.py": "b91632492915899230505b43a7e34232484c6ba28e0e79b38cdfa88ca6226bd4",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e",
+    "rd/structure/material/records/material-shell-integration-protocol.md": "ea76361c36e694fc4bb41b39a7442baad3b6992164db2bb0518c53cc1c6582e7"
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "records": [
+    {
+      "n": 4,
+      "h": 0.01,
+      "free_dofs": 1404,
+      "condensed_dofs": 828,
+      "elements": 16,
+      "reference_h1": 0.4904348764631308,
+      "h1_bound": 0.9808697529262616,
+      "local_rcond": 0.03352927021576759,
+      "fit": {
+        "error": 0.049785034519263735,
+        "boundary_minimum_model": 0.04978503451926278,
+        "global_rcond": 3.7246617382623515e-05,
+        "linear_residual": 6.119399650196718e-14,
+        "kkt": 2.956967573467533e-15,
+        "h1": 0.4979012478900835
+      },
+      "observation": {
+        "error": 0.04978503451929313,
+        "upper": 0.049785034520959545,
+        "reference_norm": 2.5000048369902714e-08,
+        "h1": 0.49790124789008,
+        "position_error": 0.009390737123933962,
+        "area": 1.0260606304268443
+      },
+      "interpolation": 0.0775184716513225,
+      "reference_ratio9": 0.9999999999999988,
+      "checks": {
+        "ball": true,
+        "kkt": true,
+        "local_rank": true,
+        "global_rank": true,
+        "linear_solve": true,
+        "quadrature": true,
+        "reference": true,
+        "h1": true,
+        "resources": true
+      },
+      "seconds": 1.5939999999827705,
+      "peak_bytes": 122179584,
+      "artifact": "build/analysis/q3-quartic-shared-20261103-003355/n4-h0.01.npz",
+      "artifact_sha256": "bc0ce2b3da97848b5e0cd611f1448ebfd61dde7e1db066a21176bd905cdafc23",
+      "artifact_bytes": 3066248
+    },
+    {
+      "n": 4,
+      "h": 0.0001,
+      "free_dofs": 1404,
+      "condensed_dofs": 828,
+      "elements": 16,
+      "reference_h1": 0.4904348764631308,
+      "h1_bound": 0.9808697529262616,
+      "local_rcond": 0.032913695292423634,
+      "fit": {
+        "error": 0.5705412295582438,
+        "boundary_minimum_model": 0.5705412295578648,
+        "global_rcond": 2.2607151868359951e-07,
+        "linear_residual": 1.81692728359675e-11,
+        "kkt": 7.584167686158857e-13,
+        "h1": 0.9250427539946424
+      },
+      "observation": {
+        "error": 0.5705412295617686,
+        "upper": 0.570541229800909,
+        "reference_norm": 2.500000000483699e-14,
+        "h1": 0.9250427539946386,
+        "position_error": 1.6470534791744156,
+        "area": 1.0260606304268443
+      },
+      "interpolation": 7.751825493498298,
+      "reference_ratio9": 0.9999999999999987,
+      "checks": {
+        "ball": true,
+        "kkt": true,
+        "local_rank": true,
+        "global_rank": true,
+        "linear_solve": true,
+        "quadrature": true,
+        "reference": true,
+        "h1": true,
+        "resources": true
+      },
+      "seconds": 1.562000000034459,
+      "peak_bytes": 122249216,
+      "artifact": "build/analysis/q3-quartic-shared-20261103-003355/n4-h0.0001.npz",
+      "artifact_sha256": "f12d5b32af5d7bc701f56a8cfc367b9a9b8c544b3b35fce13e0640413458c5bf",
+      "artifact_bytes": 3075782
+    },
+    {
+      "n": 8,
+      "h": 0.001,
+      "free_dofs": 5400,
+      "condensed_dofs": 3096,
+      "elements": 64,
+      "reference_h1": 0.4904348764631308,
+      "h1_bound": 0.9808697529262616,
+      "local_rcond": 0.03261464083171859,
+      "fit": {
+        "error": 0.05528516139224259,
+        "boundary_minimum_model": 0.05528516139225292,
+        "global_rcond": 5.812051810954858e-07,
+        "linear_residual": 1.5868834139845874e-12,
+        "kkt": 3.767594096292576e-14,
+        "h1": 0.5305021193504574
+      },
+      "observation": {
+        "error": 0.05528516139738244,
+        "upper": 0.05528516141812685,
+        "reference_norm": 2.5000000483697922e-11,
+        "h1": 0.5305021193504547,
+        "position_error": 0.011350937977938048,
+        "area": 1.0260606304268447
+      },
+      "interpolation": 0.09720733745961928,
+      "reference_ratio9": 0.9999999999999983,
+      "checks": {
+        "ball": true,
+        "kkt": true,
+        "local_rank": true,
+        "global_rank": true,
+        "linear_solve": true,
+        "quadrature": true,
+        "reference": true,
+        "h1": true,
+        "resources": true
+      },
+      "seconds": 9.35899999999674,
+      "peak_bytes": 791244800,
+      "artifact": "build/analysis/q3-quartic-shared-20261103-003355/n8-h0.001.npz",
+      "artifact_sha256": "e20b521e088e3f5ecbce7100677e02091c7db821d2d0d637927eae88aedf6082",
+      "artifact_bytes": 12700524
+    },
+    {
+      "n": 8,
+      "h": 0.0001,
+      "free_dofs": 5400,
+      "condensed_dofs": 3096,
+      "elements": 64,
+      "reference_h1": 0.4904348764631308,
+      "h1_bound": 0.9808697529262616,
+      "local_rcond": 0.03261935766864151,
+      "fit": {
+        "error": 0.32753830939776685,
+        "boundary_minimum_model": 0.3275383093978638,
+        "global_rcond": 1.3285233320132517e-07,
+        "linear_residual": 2.1006479405772125e-11,
+        "kkt": 4.4507968538512407e-13,
+        "h1": 0.6712575089749148
+      },
+      "observation": {
+        "error": 0.327538309527359,
+        "upper": 0.3275383097958124,
+        "reference_norm": 2.500000000483699e-14,
+        "h1": 0.6712575089749161,
+        "position_error": 0.5113376225820417,
+        "area": 1.0260606304268447
+      },
+      "interpolation": 0.9720733474857296,
+      "reference_ratio9": 0.9999999999999982,
+      "checks": {
+        "ball": true,
+        "kkt": true,
+        "local_rank": true,
+        "global_rank": true,
+        "linear_solve": true,
+        "quadrature": true,
+        "reference": true,
+        "h1": true,
+        "resources": true
+      },
+      "seconds": 9.438000000023749,
+      "peak_bytes": 791732224,
+      "artifact": "build/analysis/q3-quartic-shared-20261103-003355/n8-h0.0001.npz",
+      "artifact_sha256": "f396290bb57822eb52491b90d213ac2563435a05246d696eacda40c6a1e29775",
+      "artifact_bytes": 12689879
+    }
+  ],
+  "all_numerical_checks_pass": true,
+  "stop_reason": null,
+  "gate": {
+    "absolute_1pct": false,
+    "thin_amplification": 11.460095088227115,
+    "thin_uniformity": false
+  },
+  "physical_adoption": false,
+  "rigorous_optimality_lower_bound": false,
+  "reference_h1_32_40_difference": 2.1094237467877974e-15,
+  "sources": {
+    "rd/structure/main-shell/q3/experiments/check_q3_quartic_shared_approximation.py": "fa14334197e6919b6263b7ece2605d6b0f8f6bdb92998c22f2312e246fbc5ea2",
+    "rd/structure/main-shell/q3/experiments/q3_quartic_approximation.py": "80ccd7a4f0a77dff997021002242a5cc399a8459f93cf5048bd89fedf95477b7",
+    "rd/structure/main-shell/q3/experiments/q3_curved_element.py": "82e0f5d765fd99a1cdf24da33d331e2e901627223503c17dcad7f312a5c43ba5",
+    "rd/structure/main-shell/q3/experiments/developable_general_reference.py": "565f402b7838be9f41ede07bec3c00dbeff7d2e5289203ae2391cacb18ca9d6e",
+    "rd/structure/main-shell/q9-curved/experiments/check_q9_curved_best_approximation_bounds.py": "315a27506e4e0e35e05b134d54f3ea73c957532ef0f690a6647c7d5eb40e0896",
+    "rd/structure/main-shell/q3/records/developable-general-reference-v3-result.json": "8689be771215cdff2974cbca10273f41d44c34544e72d0582767802603444d64",
+    "rd/structure/main-shell/q3/records/q3-quartic-shared-approximation-experiment.md": "8fe52b1589c869f1acb0571eb03e7c515d7c2d43206c5514438b0adc28ae9b28"
+  },
+  "seconds": 22.04700000002049,
+  "peak_bytes": 791732224
+}

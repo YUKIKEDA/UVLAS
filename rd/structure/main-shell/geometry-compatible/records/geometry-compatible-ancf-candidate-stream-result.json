@@ -1,0 +1,1693 @@
+{
+  "records": [
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.7547658745422303e-16,
+          1.762734968150183e-16,
+          1.8720723829135971e-16
+        ],
+        "kkt": [
+          2.364392358859832e-13,
+          6.124463637232065e-14,
+          1.5588103431375313e-15
+        ],
+        "linear": [
+          9.145668789873513e-13,
+          5.956999717551946e-13,
+          9.146384578233804e-15
+        ],
+        "rcond": 1.9398881081640986e-06,
+        "ranks": [
+          360,
+          360,
+          360
+        ],
+        "columns": 360,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.7547658745422405e-16,
+          1.7627349681501865e-16,
+          1.8720723829135444e-16
+        ],
+        "position": [
+          7.379366342128695e-16,
+          8.535778940423255e-16,
+          4.829150001489058e-16
+        ],
+        "original_kkt": [
+          2.8550768188815046e-28,
+          7.395390067391792e-29,
+          8.785643181502259e-28
+        ]
+      },
+      "independent": {
+        "error": [
+          2.1675662049270104e-16,
+          2.227180155944099e-16,
+          2.199734398706282e-16
+        ],
+        "position": [
+          7.772958786842259e-16,
+          9.251730522371121e-16,
+          5.556625684860673e-16
+        ],
+        "original_kkt": [
+          2.708433985121883e-18,
+          4.3140182763588514e-18,
+          3.503793750234446e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 3.9626320817066956e-30,
+        "boundary_constraint": 1.6302854220543322e-15
+      },
+      "anchor_consistency": [
+        4.9306753852535534e-14,
+        4.036171979891827e-14,
+        7.683247983974402e-14
+      ],
+      "mechanics": {
+        "reference_geometry": 1.9632732939367514e-15,
+        "affine_gradient": 6.661338147750939e-16,
+        "rigid_strain": 9.325873406851315e-15,
+        "constant_stress_work": 3.265187240093517e-14,
+        "nonlinear_tangent": 3.6818556103237204e-16
+      },
+      "svd": null,
+      "mass_scaled_min": 0.04433545175286001,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        78,
+        78,
+        78
+      ],
+      "sizes": [
+        92,
+        97,
+        9
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 19.281000000075437,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-213635/standard-a0-n2-h0.01.npz",
+      "artifact_sha256": "e03e0ffc4fa297c74adbe09efd77b28bd13f75ee08e645be5f4793acfabd2817",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 2,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.8781241878255483e-16,
+          1.8347249792434127e-16,
+          3.242192658181336e-16
+        ],
+        "kkt": [
+          5.454594959585468e-12,
+          8.82642506460052e-12,
+          3.679605889948725e-13
+        ],
+        "linear": [
+          4.6628843191525544e-11,
+          4.007079826274199e-11,
+          3.1637386879457426e-12
+        ],
+        "rcond": 1.9472778463431704e-08,
+        "ranks": [
+          360,
+          360,
+          360
+        ],
+        "columns": 360
+      },
+      "primary": {
+        "error": [
+          1.8781241878248514e-16,
+          1.8347249792432712e-16,
+          3.2421926581778785e-16
+        ],
+        "position": [
+          7.388832304043369e-16,
+          8.403320828833824e-16,
+          5.087113741962231e-16
+        ],
+        "original_kkt": [
+          4.477975509101947e-27,
+          6.200980634353958e-27,
+          2.065015177738381e-25
+        ]
+      },
+      "independent": {
+        "error": [
+          2.1620424028944302e-16,
+          2.214085021318241e-16,
+          3.55968672444252e-16
+        ],
+        "position": [
+          7.640376077554814e-16,
+          9.229480433198857e-16,
+          5.334197256310496e-16
+        ],
+        "original_kkt": [
+          4.243036712129744e-18,
+          3.897886361050636e-18,
+          4.214363632366881e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.324440772988316e-30,
+        "boundary_constraint": 1.5450385096805526e-15
+      },
+      "anchor_consistency": [
+        4.963737865516059e-12,
+        4.0594869982794615e-12,
+        7.735489102054545e-12
+      ],
+      "mechanics": null,
+      "svd": {
+        "rank": 360,
+        "columns": 360,
+        "error_difference": 7.726429110857993e-26,
+        "position_error_difference": 0.0,
+        "original_kkt": [
+          4.2430367163094046e-18,
+          3.897886358866419e-18,
+          4.214363557097801e-18
+        ]
+      },
+      "mass_scaled_min": 0.04433550961738879,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        78,
+        78,
+        78
+      ],
+      "sizes": [
+        92,
+        97,
+        9
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 15.984000000054948,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-213635/standard-a0-n2-h0.0001.npz",
+      "artifact_sha256": "2613f627f167935569afaf24548b2266a999c16334512cd7dd089f3c1b65b390",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.8783038901058434e-16,
+          2.0849983833103537e-16,
+          1.9341195156880807e-16
+        ],
+        "kkt": [
+          3.476521276770924e-14,
+          9.007884911321981e-15,
+          4.056077401953038e-14
+        ],
+        "linear": [
+          2.1536716760508616e-13,
+          6.963690314958696e-14,
+          1.7806459603605176e-13
+        ],
+        "rcond": 1.0041654876268593e-06,
+        "ranks": [
+          858,
+          858,
+          858
+        ],
+        "columns": 858,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.8783038901058392e-16,
+          2.0849983833103619e-16,
+          1.9341195156880765e-16
+        ],
+        "position": [
+          3.9720894843458826e-16,
+          5.438015636424622e-16,
+          4.057729528387864e-16
+        ],
+        "original_kkt": [
+          2.604246997355457e-29,
+          1.0009208709701406e-29,
+          9.566758011351934e-29
+        ]
+      },
+      "independent": {
+        "error": [
+          2.282988724746603e-16,
+          2.3647853173189237e-16,
+          2.3987442070450784e-16
+        ],
+        "position": [
+          3.7283376992140657e-16,
+          5.396930065422204e-16,
+          4.152704087323255e-16
+        ],
+        "original_kkt": [
+          2.5210509917657833e-18,
+          3.851219816336343e-18,
+          2.255642304727467e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 6.334301584603705e-30,
+        "boundary_constraint": 1.8490380541105228e-15
+      },
+      "anchor_consistency": [
+        8.397989841683852e-14,
+        6.751466864880206e-14,
+        1.33056534825158e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05141855455846392,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        188,
+        225,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 123.0,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-213635/standard-a0-n4-h0.01.npz",
+      "artifact_sha256": "dae343b4dfba5df2fffbd450a3de06743da6c3cac4249db1b74b6bdf5aa902e0",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.9514898416076514e-16,
+          2.1172908898970888e-16,
+          1.8471562471618825e-16
+        ],
+        "kkt": [
+          8.806511796774494e-12,
+          6.2752833396952014e-12,
+          2.8898033564413237e-12
+        ],
+        "linear": [
+          3.787772223417881e-11,
+          2.7852508118033267e-11,
+          1.1862393524680475e-11
+        ],
+        "rcond": 9.948735025012733e-09,
+        "ranks": [
+          858,
+          858,
+          858
+        ],
+        "columns": 858
+      },
+      "primary": {
+        "error": [
+          1.951489841607426e-16,
+          2.1172908898970957e-16,
+          1.8471562471620112e-16
+        ],
+        "position": [
+          3.7371406835520925e-16,
+          5.554870022983423e-16,
+          4.111762343088134e-16
+        ],
+        "original_kkt": [
+          8.547806329163922e-27,
+          4.922877746627396e-27,
+          7.036542313979358e-27
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2361338152245957e-16,
+          2.4614960278203275e-16,
+          2.3895965612332255e-16
+        ],
+        "position": [
+          3.6526539840648407e-16,
+          5.521501766961979e-16,
+          4.0282155217604704e-16
+        ],
+        "original_kkt": [
+          2.76912647860749e-18,
+          2.442676928473693e-18,
+          2.394338402100413e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.4916344581496664e-30,
+        "boundary_constraint": 1.6927070656633957e-15
+      },
+      "anchor_consistency": [
+        8.397077496235694e-12,
+        6.747455801821213e-12,
+        1.3315418250949179e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.051418621112005736,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        188,
+        225,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 120.93700000003446,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-213635/standard-a0-n4-h0.0001.npz",
+      "artifact_sha256": "10b785aa4d4a645947e0313d2c4b0a61e2b31298a5000a7afcd2d11a2bd49a63",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.860925239634118e-16,
+          1.8367239773825164e-16,
+          1.9105817371568347e-16
+        ],
+        "kkt": [
+          1.2052080894730207e-13,
+          8.755467158824344e-14,
+          4.967340400069378e-15
+        ],
+        "linear": [
+          8.112115335318065e-13,
+          5.443291208023203e-13,
+          2.740630070156508e-14
+        ],
+        "rcond": 1.8094602032283497e-06,
+        "ranks": [
+          375,
+          375,
+          375
+        ],
+        "columns": 375,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.8609252396341214e-16,
+          1.8367239773825164e-16,
+          1.9105817371567163e-16
+        ],
+        "position": [
+          7.604766730017616e-16,
+          8.97515972498528e-16,
+          4.750343010858236e-16
+        ],
+        "original_kkt": [
+          8.063057948355332e-29,
+          8.004636743678282e-29,
+          2.777209212801186e-27
+        ]
+      },
+      "independent": {
+        "error": [
+          2.1162622876368594e-16,
+          2.1526298516155724e-16,
+          2.235668365994098e-16
+        ],
+        "position": [
+          7.840770641099368e-16,
+          9.589849276284488e-16,
+          5.452993143459367e-16
+        ],
+        "original_kkt": [
+          3.121582737004033e-18,
+          4.624505570106155e-18,
+          3.3575776359102095e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 5.691377323972362e-30,
+        "boundary_constraint": 3.1257493887916245e-15
+      },
+      "anchor_consistency": [
+        5.41258893811496e-14,
+        4.47262670724356e-14,
+        8.236673047149939e-14
+      ],
+      "mechanics": {
+        "reference_geometry": 1.3322676295501878e-15,
+        "affine_gradient": 2.5673907444456745e-16,
+        "rigid_strain": 6.217248937900877e-15,
+        "constant_stress_work": 4.979456020036519e-14,
+        "nonlinear_tangent": 0.0
+      },
+      "svd": null,
+      "mass_scaled_min": 0.04419234709841288,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        78,
+        78,
+        78
+      ],
+      "sizes": [
+        95,
+        99,
+        9
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 20.07799999997951,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-213635/standard-a0.2-n2-h0.01.npz",
+      "artifact_sha256": "2e37acf1bd5c03c9ab6f70efe6343724ef4e80991924a0c965d6444c91c5f556",
+      "execution_route": "original_passed"
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 2,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.9519348870821612e-16,
+          1.9422418032365463e-16,
+          3.2442517071309926e-16
+        ],
+        "kkt": [
+          3.909375775221143e-12,
+          3.939142790383882e-12,
+          5.094585832926107e-13
+        ],
+        "linear": [
+          3.285783830205273e-11,
+          2.8741438448401752e-11,
+          2.881442286063152e-12
+        ],
+        "rcond": 2.0968541961197133e-08,
+        "ranks": [
+          375,
+          375,
+          375
+        ],
+        "columns": 375
+      },
+      "primary": {
+        "error": [
+          1.9519348870819415e-16,
+          1.9422418032363365e-16,
+          3.244251707135024e-16
+        ],
+        "position": [
+          7.46659989195589e-16,
+          8.949577920041534e-16,
+          4.984277976834837e-16
+        ],
+        "original_kkt": [
+          3.549602100551676e-27,
+          3.1705821714628383e-27,
+          2.855974044639361e-25
+        ]
+      },
+      "independent": {
+        "error": [
+          2.145635255299987e-16,
+          2.1624866865867816e-16,
+          3.6134489335828464e-16
+        ],
+        "position": [
+          7.695376234867499e-16,
+          9.444062052157465e-16,
+          5.373953263498054e-16
+        ],
+        "original_kkt": [
+          5.602420411943268e-18,
+          2.9320129094539957e-18,
+          3.3341554727728646e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.936934831631163e-30,
+        "boundary_constraint": 3.127127917776323e-15
+      },
+      "anchor_consistency": [
+        5.410943997401021e-12,
+        4.469669082281224e-12,
+        8.226009027526839e-12
+      ],
+      "mechanics": null,
+      "svd": {
+        "rank": 375,
+        "columns": 375,
+        "error_difference": 2.847353994349981e-26,
+        "position_error_difference": 0.0,
+        "original_kkt": [
+          5.602420409611819e-18,
+          2.932012909645142e-18,
+          3.3341553946418376e-18
+        ]
+      },
+      "mass_scaled_min": 0.044192404564879634,
+      "anchor_ranks": [
+        32,
+        32,
+        32
+      ],
+      "anchor_columns": 32,
+      "boundary_ranks": [
+        78,
+        78,
+        78
+      ],
+      "sizes": [
+        95,
+        99,
+        9
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 20.70299999997951,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-213635/standard-a0.2-n2-h0.0001.npz",
+      "artifact_sha256": "f9c320ed94962e08997b1052562b631b388b261f9debaedf2bda2c3d4932d2cc",
+      "execution_route": "original_passed"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          3.499643234377735e-14,
+          2.4670745952335577e-11,
+          3.3107294454744953e-09
+        ],
+        "kkt": [
+          1.977385393030254e-15,
+          1.745162171115473e-15,
+          2.038427886669266e-15
+        ],
+        "linear": [
+          2.7531365207816527e-14,
+          1.9359735491184965e-14,
+          2.0609592873146484e-14
+        ],
+        "rcond": 1.0041654876268509e-06,
+        "ranks": [
+          858,
+          858,
+          858
+        ],
+        "columns": 858
+      },
+      "primary": {
+        "error": [
+          3.499643234377689e-14,
+          2.4670745952335712e-11,
+          3.3107294454745416e-09
+        ],
+        "position": [
+          3.1087621661893055e-16,
+          1.5694546822440078e-15,
+          2.409989916311722e-13
+        ],
+        "original_kkt": [
+          2.0231742260810317e-25,
+          3.856349448759442e-23,
+          1.6504876471768314e-21
+        ]
+      },
+      "independent": {
+        "error": [
+          3.4971714548651424e-14,
+          2.4629023919667407e-11,
+          3.3161173338381935e-09
+        ],
+        "position": [
+          2.990482648824334e-16,
+          1.6084828006840479e-15,
+          2.5337034536419173e-13
+        ],
+        "original_kkt": [
+          2.162395897774252e-18,
+          1.0362237591842095e-17,
+          1.7253075818821492e-15
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.212100558090189e-25,
+        "boundary_constraint": 1.8490380541105228e-15
+      },
+      "anchor_consistency": [
+        1.5585854357429745e-13,
+        1.3688844411627336e-13,
+        1.2085549126304537e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05141855455846328,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        188,
+        225,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 130.25,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-215052/rational-a0-n4-h0.01.npz",
+      "artifact_sha256": "f8540d2ed1760e0f482b4bf47b90adfbe8cc500937ce1494fa50421cc5b95bcf"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.0,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          2.2279311215183217e-13,
+          4.4129250195947135e-10,
+          1.8425476655254908e-08
+        ],
+        "kkt": [
+          3.1128549639519774e-13,
+          4.652599290947882e-13,
+          3.251397336755867e-13
+        ],
+        "linear": [
+          3.905638282788432e-12,
+          3.687511065934584e-12,
+          3.196130991812156e-12
+        ],
+        "rcond": 9.948735025002312e-09,
+        "ranks": [
+          858,
+          858,
+          858
+        ],
+        "columns": 858
+      },
+      "primary": {
+        "error": [
+          2.2279311215184777e-13,
+          4.412925019594717e-10,
+          1.8425476655255004e-08
+        ],
+        "position": [
+          3.0611980423288954e-16,
+          3.0274796016527476e-14,
+          1.3158748259298668e-12
+        ],
+        "original_kkt": [
+          3.184559114986891e-23,
+          1.027800306733551e-20,
+          2.6309915812896436e-19
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2277229270136019e-13,
+          4.412637976076149e-10,
+          1.842584996165414e-08
+        ],
+        "position": [
+          3.077058658813725e-16,
+          3.0226491445010575e-14,
+          1.3172855519535871e-12
+        ],
+        "original_kkt": [
+          2.4644460426698893e-18,
+          1.4543499466536579e-16,
+          6.033727317078548e-15
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.6130706676049771e-25,
+        "boundary_constraint": 1.6927070656633957e-15
+      },
+      "anchor_consistency": [
+        1.5604909657123917e-11,
+        1.3704935820585947e-11,
+        1.2098493461620311e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05141862111200657,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        188,
+        225,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 129.454000000027,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-215052/rational-a0-n4-h0.0001.npz",
+      "artifact_sha256": "51acda9c00c609472b18ff4a1de7d35d5319b61a16f19a0d90e6f70e84b9eee2"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          3.497234143826268e-14,
+          2.467062397400677e-11,
+          3.3107294365440276e-09
+        ],
+        "kkt": [
+          7.683212361991474e-15,
+          6.150861706577713e-15,
+          5.5285518406667065e-15
+        ],
+        "linear": [
+          4.929175359276656e-14,
+          5.246279063154742e-14,
+          7.496651343976566e-14
+        ],
+        "rcond": 1.063326500671849e-06,
+        "ranks": [
+          891,
+          891,
+          891
+        ],
+        "columns": 891
+      },
+      "primary": {
+        "error": [
+          3.497234143825986e-14,
+          2.4670623974006782e-11,
+          3.310729436544093e-09
+        ],
+        "position": [
+          3.223980561754877e-16,
+          1.642814227164167e-15,
+          2.411088736251745e-13
+        ],
+        "original_kkt": [
+          7.856993951154736e-25,
+          1.3584149393143676e-22,
+          4.473224474425188e-21
+        ]
+      },
+      "independent": {
+        "error": [
+          3.4970639780386185e-14,
+          2.4628969857651215e-11,
+          3.3161173123112317e-09
+        ],
+        "position": [
+          3.048788916754125e-16,
+          1.6713599432819519e-15,
+          2.534744753594334e-13
+        ],
+        "original_kkt": [
+          1.3152680399907748e-18,
+          9.055916430174288e-18,
+          5.590229625279376e-16
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 1.796204726752035e-25,
+        "boundary_constraint": 3.0842987938202746e-15
+      },
+      "anchor_consistency": [
+        1.656621763809467e-13,
+        1.4481635702880438e-13,
+        1.2764253730345168e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05115967396047379,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        193,
+        231,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 244.60900000005495,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-215052/rational-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "90a498f9f3190b0a2edc659008f8f91cf72cee39f73641da5bcf070663b8d038"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "rational",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          2.2277369112934657e-13,
+          4.412924881697496e-10,
+          1.8425474014386094e-08
+        ],
+        "kkt": [
+          5.791552944203701e-13,
+          5.064114404178316e-13,
+          5.47972886733867e-13
+        ],
+        "linear": [
+          3.994381050719176e-12,
+          3.1410495000736045e-12,
+          6.130557372254554e-12
+        ],
+        "rcond": 7.070604034851352e-09,
+        "ranks": [
+          891,
+          891,
+          891
+        ],
+        "columns": 891
+      },
+      "primary": {
+        "error": [
+          2.227736911293745e-13,
+          4.4129248816975496e-10,
+          1.842547401438629e-08
+        ],
+        "position": [
+          3.1313398142984436e-16,
+          3.0285433885552935e-14,
+          1.3158889504054352e-12
+        ],
+        "original_kkt": [
+          5.922477434765369e-23,
+          1.1184468391403271e-20,
+          4.43578786344476e-19
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2276918596964817e-13,
+          4.4126380217614247e-10,
+          1.8425849818028462e-08
+        ],
+        "position": [
+          3.095221146615014e-16,
+          3.023603443421573e-14,
+          1.3172994830723297e-12
+        ],
+        "original_kkt": [
+          1.3201862343380882e-18,
+          1.4593682012157633e-16,
+          6.049754635587054e-15
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 3.3457139129949607e-25,
+        "boundary_constraint": 3.1555445309920734e-15
+      },
+      "anchor_consistency": [
+        1.6566430677874223e-11,
+        1.4478525963633333e-11,
+        1.2759353395202708e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05115974016197272,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        193,
+        231,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 243.43700000003446,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-215052/rational-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "51672bab111a9789e4e108c7a6d13079b483f4289bf607bbdf494c8043e7be61"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.01,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          1.9495558223396487e-16,
+          2.0827238940428633e-16,
+          2.0621268210386315e-16
+        ],
+        "kkt": [
+          8.064910276021167e-14,
+          5.2483333051429945e-14,
+          3.9534274620014547e-14
+        ],
+        "linear": [
+          5.682066129396691e-13,
+          3.5813681237610457e-13,
+          2.937842194120385e-13
+        ],
+        "rcond": 1.0633265006718492e-06,
+        "ranks": [
+          891,
+          891,
+          891
+        ],
+        "columns": 891,
+        "free_nullities": [
+          6,
+          6,
+          6
+        ]
+      },
+      "primary": {
+        "error": [
+          1.9495558223396543e-16,
+          2.0827238940428658e-16,
+          2.0621268210386296e-16
+        ],
+        "position": [
+          4.0378355553227253e-16,
+          5.327479465860522e-16,
+          4.0935056056711914e-16
+        ],
+        "original_kkt": [
+          9.515478067075012e-29,
+          5.662092368912704e-29,
+          1.8618545666936866e-28
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2453257270577427e-16,
+          2.328412725251205e-16,
+          2.294091826412322e-16
+        ],
+        "position": [
+          3.697411693113958e-16,
+          5.187832423817308e-16,
+          4.007940886677405e-16
+        ],
+        "original_kkt": [
+          2.3959112113872613e-18,
+          1.1973753655436445e-18,
+          1.5172418114704635e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 2.5239549277014044e-29,
+        "boundary_constraint": 3.0842987938202746e-15
+      },
+      "anchor_consistency": [
+        9.427479721306401e-14,
+        7.697370418232295e-14,
+        1.4491481785314852e-13
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05115967396047379,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        193,
+        231,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 247.25,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-215052/standard-a0.2-n4-h0.01.npz",
+      "artifact_sha256": "42fecb0a9ec992081393ee2df1a88c833bd688d78177b6e52ec45733ace9d3f8"
+    },
+    {
+      "execution_route": "streamed",
+      "mode": "standard",
+      "amplitude": 0.2,
+      "n": 4,
+      "h": 0.0001,
+      "fit": {
+        "passed_rank": true,
+        "error": [
+          2.0709896417037361e-16,
+          2.0674305438514793e-16,
+          2.039445288383974e-16
+        ],
+        "kkt": [
+          2.488805982219286e-12,
+          2.5439837554216814e-12,
+          3.285911806382635e-12
+        ],
+        "linear": [
+          1.4139975072555533e-11,
+          1.866635310614447e-11,
+          2.834212128524853e-11
+        ],
+        "rcond": 7.070604034851351e-09,
+        "ranks": [
+          891,
+          891,
+          891
+        ],
+        "columns": 891
+      },
+      "primary": {
+        "error": [
+          2.0709896417036166e-16,
+          2.0674305438517401e-16,
+          2.0394452883834142e-16
+        ],
+        "position": [
+          3.8146081124938547e-16,
+          5.471111998640908e-16,
+          4.20149745116617e-16
+        ],
+        "original_kkt": [
+          1.0398177916892545e-26,
+          7.486921535612974e-27,
+          1.6639854285112373e-26
+        ]
+      },
+      "independent": {
+        "error": [
+          2.2412460646753233e-16,
+          2.359828521071481e-16,
+          2.3308063152082736e-16
+        ],
+        "position": [
+          3.586830154748082e-16,
+          5.436187773695814e-16,
+          4.004883876526049e-16
+        ],
+        "original_kkt": [
+          1.8203375633732133e-18,
+          2.27693013838431e-18,
+          2.4567047275500326e-18
+        ]
+      },
+      "traces": {
+        "sharing": 0.0,
+        "fixed": 3.204946309349576e-30,
+        "boundary_constraint": 3.1555445309920734e-15
+      },
+      "anchor_consistency": [
+        9.428966447339071e-12,
+        7.697575056671993e-12,
+        1.4494686978047237e-11
+      ],
+      "mechanics": null,
+      "svd": null,
+      "mass_scaled_min": 0.05115974016197272,
+      "anchor_ranks": [
+        64,
+        64,
+        64
+      ],
+      "anchor_columns": 64,
+      "boundary_ranks": [
+        152,
+        152,
+        152
+      ],
+      "sizes": [
+        193,
+        231,
+        25
+      ],
+      "checks": {
+        "fixed_rank": true,
+        "condition": true,
+        "linear": true,
+        "original_stationarity": true,
+        "compression": true,
+        "independent": true,
+        "mass": true,
+        "trace": true,
+        "anchor": true,
+        "free_rigid": true,
+        "mechanics": true,
+        "svd": true,
+        "resources": true
+      },
+      "seconds": 250.85899999993853,
+      "artifact": "build/analysis/geometry-compatible-ancf-qualified-20261104-215052/standard-a0.2-n4-h0.0001.npz",
+      "artifact_sha256": "305cec47318b0f50641cb5de9dc099e9668a50bb9053b41b08d19908b51a6381"
+    }
+  ],
+  "stops": [],
+  "all_numerical_checks": true,
+  "accuracy": [
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.3647853173189237e-16,
+      "thin_error": 2.4614960278203275e-16,
+      "ratio": 1.0408961903616052,
+      "finest": true,
+      "uniform": true,
+      "convergence": false,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 2.3987442070450784e-16,
+      "thin_error": 2.3895965612332255e-16,
+      "ratio": 0.9961864855014609,
+      "finest": true,
+      "uniform": true,
+      "convergence": false,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 5.396930065422204e-16,
+      "thin_error": 5.521501766961979e-16,
+      "ratio": 1.023081955858183,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 4.152704087323255e-16,
+      "thin_error": 4.0282155217604704e-16,
+      "ratio": 0.9700222883824532,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.328412725251205e-16,
+      "thin_error": 2.359828521071481e-16,
+      "ratio": 1.0134923656272692,
+      "finest": true,
+      "uniform": true,
+      "convergence": false,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 2.294091826412322e-16,
+      "thin_error": 2.3308063152082736e-16,
+      "ratio": 1.0160039316531495,
+      "finest": true,
+      "uniform": true,
+      "convergence": false,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 5.187832423817308e-16,
+      "thin_error": 5.436187773695814e-16,
+      "ratio": 1.0478726623354888,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "standard",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 4.007940886677405e-16,
+      "thin_error": 4.004883876526049e-16,
+      "ratio": 0.9992372616668281,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 0,
+      "coarse_thickness_error": 3.4971714548651424e-14,
+      "thin_error": 2.2277229270136019e-13,
+      "ratio": 6.370070657858286,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.4629023919667407e-11,
+      "thin_error": 4.412637976076149e-10,
+      "ratio": 17.916414351087845,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 3.3161173338381935e-09,
+      "thin_error": 1.842584996165414e-08,
+      "ratio": 5.556452955881208,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 0,
+      "coarse_thickness_error": 2.990482648824334e-16,
+      "thin_error": 3.077058658813725e-16,
+      "ratio": 1.0289505140661581,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 1.6084828006840479e-15,
+      "thin_error": 3.0226491445010575e-14,
+      "ratio": 18.791927045881994,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.0,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 2.5337034536419173e-13,
+      "thin_error": 1.3172855519535871e-12,
+      "ratio": 5.199051807188152,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 0,
+      "coarse_thickness_error": 3.4970639780386185e-14,
+      "thin_error": 2.2276918596964817e-13,
+      "ratio": 6.370177593793741,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 1,
+      "coarse_thickness_error": 2.4628969857651215e-11,
+      "thin_error": 4.4126380217614247e-10,
+      "ratio": 17.916453864149734,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "error",
+      "target": 2,
+      "coarse_thickness_error": 3.3161173123112317e-09,
+      "thin_error": 1.8425849818028462e-08,
+      "ratio": 5.556452948640171,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": false
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 0,
+      "coarse_thickness_error": 3.048788916754125e-16,
+      "thin_error": 3.095221146615014e-16,
+      "ratio": 1.0152297292888097,
+      "finest": true,
+      "uniform": true,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 1,
+      "coarse_thickness_error": 1.6713599432819519e-15,
+      "thin_error": 3.023603443421573e-14,
+      "ratio": 18.090677927127413,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": true
+    },
+    {
+      "mode": "rational",
+      "amplitude": 0.2,
+      "field": "position",
+      "target": 2,
+      "coarse_thickness_error": 2.534744753594334e-13,
+      "thin_error": 1.3172994830723297e-12,
+      "ratio": 5.196970942357667,
+      "finest": true,
+      "uniform": false,
+      "convergence": true,
+      "numerical_floor": false
+    }
+  ],
+  "adoption_candidate_qualified": false,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "human_independent_review": false,
+  "seconds": 1246.0470000000205,
+  "peak_bytes": 1020612608,
+  "sources": {
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-candidate-result.json": "52d5ee89cbb1948f1c793c05dcff62d0c6500e8e6aa0998dfee91228a62605ad",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-stream-protocol.md": "38c15baf7f87e3643ee0f62f9a0848c0c2306a80137241025ee8418c0da2dce6",
+    "rd/structure/main-shell/geometry-compatible/experiments/check_geometry_compatible_ancf_stream.py": "d15ca78197924aaa2ad8845db830dd1128d8a40d2a3c52d2b811b408640a9f87",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_validation_stream.py": "d8fb5d010237c89021977628d17ddf70ac5e46ef9eac46a6f7ef289ed21714e2",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_stream.py": "b52857769f4d02117374842c4cbb65b13506c51548d1a2e5bbd7c2141ff8af50",
+    "rd/structure/main-shell/geometry-compatible/experiments/geometry_compatible_ancf_v6.py": "9a6e07f4bf4920ce0adb17438e06f0298efaba6dfcccf096f7c69629a12d2c90",
+    "rd/structure/main-shell/reference-work/experiments/stable_curvature_profiles.py": "2738c0ab7129b2f5252962b25f7129431b3217043ba7afb7665cd12a3ea15fac",
+    "rd/structure/main-shell/reference-work/experiments/curvature_work_profiles.py": "a34c90231e06a3ee31ed4a04d9aa6cddbe9a7596db6d8b0d9e810c9ce5dbf7f3",
+    "rd/structure/main-shell/geometry-compatible/records/geometry-compatible-ancf-qualification-protocol.md": "0e63131c954eb5b99b51d8218367a5aa4419681fa53b93cb9284ea6ddc513c4d"
+  }
+}

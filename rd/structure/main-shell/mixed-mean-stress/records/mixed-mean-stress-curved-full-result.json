@@ -1,0 +1,193 @@
+{
+  "records": [
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.0,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          6.043747824869127e-08,
+          0.004301178660687553,
+          0.0002743049299740712
+        ],
+        "direct_kkt": [
+          1.5510848332300212e-09,
+          8.407616625061261e-10,
+          2.4068294956531116e-09
+        ],
+        "raw_full_rcond": 2.5740180449333857e-11,
+        "preconditioned_full_rcond": 0.9999931389457195,
+        "linear_residual": [
+          3.7518211905997094e-16,
+          3.5128550859998326e-16,
+          2.596211563728352e-16
+        ],
+        "basis_map_rhs_relative_residual": [
+          2.7517046145961266e-08,
+          2.270730065293757e-08,
+          1.0833238595090833e-07
+        ],
+        "basis_map_backward_error": [
+          3.649807115442396e-18,
+          4.703973186296717e-18,
+          5.219790157811298e-18
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              6.043747824869127e-08,
+              0.004301178660687553,
+              0.0002743049299740712
+            ],
+            "direct_kkt": [
+              1.5510848332300212e-09,
+              8.407616625061261e-10,
+              2.4068294956531116e-09
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "global_coordinates": 1962,
+        "local_condensation_factors_used": false,
+        "rebuilt_original_operator": true
+      },
+      "observed": {
+        "error": [
+          5.77852164842495e-08,
+          0.004301178351489456,
+          0.00027430390816353417
+        ],
+        "recovered_position_error": [
+          1.97023862737807e-06,
+          0.0004293346328923338,
+          6.538433595654315e-06
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "field_difference": [
+        3.0586974081091455e-10,
+        7.945231464998796e-11,
+        7.530445634538754e-10
+      ],
+      "error_difference": 8.943784557901984e-09,
+      "position_difference": 2.376955077391406e-10,
+      "checks": {
+        "original_stationarity": true,
+        "linear": true,
+        "preconditioned_condition": true,
+        "basis_map_backward_error": true,
+        "fields": true,
+        "error": true,
+        "position": true,
+        "resources": true
+      },
+      "seconds": 29.984000000054948,
+      "artifact": "build/analysis/mixed-mean-stress-curved-full-20261104-191248/a0.npz",
+      "artifact_sha256": "4a2858541cdc34e6f9e4927f4cb06b3c80268f1606049cbc7ad2e2737e31d337"
+    },
+    {
+      "kappa": 0.4,
+      "n": 2,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "metrics": {
+        "error": [
+          5.109925999386279e-08,
+          0.0050920468745381895,
+          0.0002797985975480395
+        ],
+        "direct_kkt": [
+          1.1661109947705639e-09,
+          1.3472251868379553e-09,
+          2.3257977511636306e-09
+        ],
+        "raw_full_rcond": 2.336475189246664e-11,
+        "preconditioned_full_rcond": 0.9999960720684895,
+        "linear_residual": [
+          3.311657957198546e-16,
+          3.7323895770540234e-16,
+          2.6720172459147025e-16
+        ],
+        "basis_map_rhs_relative_residual": [
+          3.9372340925249617e-08,
+          1.6794783922169e-08,
+          1.5981187495467032e-07
+        ],
+        "basis_map_backward_error": [
+          5.219503824234053e-18,
+          3.477255016261786e-18,
+          7.698097643249915e-18
+        ],
+        "history": [
+          {
+            "iteration": 0,
+            "error": [
+              5.109925999386279e-08,
+              0.0050920468745381895,
+              0.0002797985975480395
+            ],
+            "direct_kkt": [
+              1.1661109947705639e-09,
+              1.3472251868379553e-09,
+              2.3257977511636306e-09
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "global_coordinates": 1962,
+        "local_condensation_factors_used": false,
+        "rebuilt_original_operator": true
+      },
+      "observed": {
+        "error": [
+          5.451814739411021e-08,
+          0.005092046710095962,
+          0.0002797996422683255
+        ],
+        "recovered_position_error": [
+          3.396838495413592e-06,
+          0.0006081444859575484,
+          7.48856805882537e-06
+        ],
+        "recovery_global_identity_allocated": false
+      },
+      "field_difference": [
+        5.092895199744452e-10,
+        6.062529913746292e-10,
+        1.0132654207366445e-09
+      ],
+      "error_difference": 7.211484899662611e-09,
+      "position_difference": 1.6699185476108848e-10,
+      "checks": {
+        "original_stationarity": true,
+        "linear": true,
+        "preconditioned_condition": true,
+        "basis_map_backward_error": true,
+        "fields": true,
+        "error": true,
+        "position": true,
+        "resources": true
+      },
+      "seconds": 59.375,
+      "artifact": "build/analysis/mixed-mean-stress-curved-full-20261104-191248/a0.2.npz",
+      "artifact_sha256": "4584364c0e0c23d3b3fedf5ba7a548b6cf5807a1aab4e8869eaa6038bf46bea4"
+    }
+  ],
+  "stops": [],
+  "all_checks_pass": true,
+  "independent_global_resolve": true,
+  "n4_independent_global_resolve": false,
+  "main_shell_adopted": false,
+  "physical_PDE_acceptance": false,
+  "seconds": 89.42200000002049,
+  "peak_bytes": 1928175616,
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_curved_full.py": "15a4cb808f9b44533de7d8b72320595231ebeaaf952045a933805661a103b6f5",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_finite_full_v2.py": "c8a27575c40d5b75231119be0b61ca7321d08c3c0be1d22ee947c86dad45e214",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_finite.py": "8eaf11dc5a49ae05531f96ff74e60822f2402d4a80ef3f2502413d69a3788828",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-finite-curved-result.json": "78cde9a227c7a28a752e7d08f21f36207cbcd2762cf5ad6efc14d42b25e58d97",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-curved-full-protocol.md": "c847b959822ddf33edc957d46e8527dbe2b0cc36a8f8dc47a3b4362b1169eab5"
+  }
+}

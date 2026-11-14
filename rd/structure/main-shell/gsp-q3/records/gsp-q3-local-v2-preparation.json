@@ -1,0 +1,14 @@
+{
+  "status": "frozen_before_execution",
+  "sources": {
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_v2.py": "28ab1a6d10f82cb136901670aaa567104b440a76a9f0e09b76b9539700d7fb6c",
+    "rd/structure/main-shell/gsp-q3/experiments/check_gsp_q3_local_v2.py": "bffdc7725a39ae7010c7031900cb216b45461d3ad0fc12c97373259ec45303d6",
+    "rd/structure/main-shell/gsp-q3/experiments/audit_gsp_q3_local_v2.py": "bff8a047bafdd7380080c9a1009dfb3501ca0a165c65bd83104a3eea9f9ae98f",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3_basis_v2.py": "83c84a0c661f0a63e37744a1a3ee5d4b0bfc298308a699046f3356c3adcdb68b",
+    "rd/structure/main-shell/gsp-q3/experiments/gsp_q3.py": "f1f8b51106db7e2627acf12a5da45f2cb407fde868d6c93c1b65436db415b733",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-v2-protocol.md": "7b90202c4e29ca6ac38d0ac2fac14513594b098e9502c7fd50e5dcb31594376e",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-local-protocol.md": "93d0b2f404a7748a4f14be9c398d01a6dfa0796fcb351d021ee4f781d8269419",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-basis-v2-result.json": "9b113d93bb3425eaa97b7930e3aceecbe328c55eb28fa728443fa25aba7549a5",
+    "rd/structure/main-shell/gsp-q3/records/gsp-q3-basis-v2-audit.json": "b5c3962138652ef6640ba32c3b7141391dfdcbd1e59298f767c9f7b561b6eb68"
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "records": [
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "m",
+      "constraint_matrix_difference": 4.0912640072929797e-16,
+      "kernel_residual": 4.569110652439745e-18,
+      "observations": {
+        "quadratic": {
+          "error": 2.8404531442231768e-15,
+          "error_difference": 8.542012672128985e-17,
+          "h1_difference": 5.218048215738236e-15,
+          "necessary_residual": 4.311090775128957e-18
+        },
+        "quartic": {
+          "error": 0.03706505280889241,
+          "error_difference": 8.326672684688674e-17,
+          "h1_difference": 2.220446049250313e-16,
+          "necessary_residual": 5.565283757587312e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "s",
+      "constraint_matrix_difference": 3.9377136508700055e-16,
+      "kernel_residual": 1.0887577470229037e-17,
+      "observations": {
+        "quadratic": {
+          "error": 2.932973554280481e-15,
+          "error_difference": 1.66925169678595e-17,
+          "h1_difference": 5.440092820663267e-15,
+          "necessary_residual": 1.6415485517854314e-17
+        },
+        "quartic": {
+          "error": 0.02149594066495584,
+          "error_difference": 4.85722573273506e-17,
+          "h1_difference": 3.3306690738754696e-16,
+          "necessary_residual": 5.316116573328476e-17
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "ms",
+      "constraint_matrix_difference": 4.063593809165926e-16,
+      "kernel_residual": 5.967635922059232e-18,
+      "observations": {
+        "quadratic": {
+          "error": 1.010961628201241e-14,
+          "error_difference": 4.719678108194664e-17,
+          "h1_difference": 5.440092820663267e-15,
+          "necessary_residual": 8.079210012281432e-18
+        },
+        "quartic": {
+          "error": 0.037226656667127676,
+          "error_difference": 6.938893903907228e-17,
+          "h1_difference": 4.440892098500626e-16,
+          "necessary_residual": 8.148070950137323e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": false,
+      "level": "msx",
+      "constraint_matrix_difference": 4.063593809165926e-16,
+      "kernel_residual": 5.967635922059232e-18,
+      "observations": {
+        "quadratic": {
+          "error": 1.010961628201241e-14,
+          "error_difference": 4.719678108194664e-17,
+          "h1_difference": 5.440092820663267e-15,
+          "necessary_residual": 8.079210012281432e-18
+        },
+        "quartic": {
+          "error": 0.037226656667127676,
+          "error_difference": 6.938893903907228e-17,
+          "h1_difference": 4.440892098500626e-16,
+          "necessary_residual": 8.148070950137323e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "m",
+      "constraint_matrix_difference": 3.705751418320003e-16,
+      "kernel_residual": 1.4269082208881149e-15,
+      "observations": {
+        "quadratic": {
+          "error": 2.6847041232098258e-15,
+          "error_difference": 1.4318604006910874e-16,
+          "h1_difference": 4.9960036108132044e-15,
+          "necessary_residual": 4.461455388267473e-18
+        },
+        "quartic": {
+          "error": 0.03713707622652454,
+          "error_difference": 4.163336342344337e-17,
+          "h1_difference": 4.440892098500626e-16,
+          "necessary_residual": 5.554689172296897e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "s",
+      "constraint_matrix_difference": 3.5790725521853595e-16,
+      "kernel_residual": 3.195320855090008e-16,
+      "observations": {
+        "quadratic": {
+          "error": 3.828530687343171e-15,
+          "error_difference": 1.705272854663396e-16,
+          "h1_difference": 5.440092820663267e-15,
+          "necessary_residual": 1.6962783064276233e-17
+        },
+        "quartic": {
+          "error": 0.01667382641060076,
+          "error_difference": 2.42861286636753e-17,
+          "h1_difference": 4.440892098500626e-16,
+          "necessary_residual": 2.902016459833796e-17
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "ms",
+      "constraint_matrix_difference": 3.687450204170751e-16,
+      "kernel_residual": 2.9369455520568573e-16,
+      "observations": {
+        "quadratic": {
+          "error": 2.7997424449867112e-15,
+          "error_difference": 4.5703136343707565e-17,
+          "h1_difference": 5.773159728050814e-15,
+          "necessary_residual": 9.158957939589822e-18
+        },
+        "quartic": {
+          "error": 0.037213346093048466,
+          "error_difference": 4.85722573273506e-17,
+          "h1_difference": 6.661338147750939e-16,
+          "necessary_residual": 8.096994499745783e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.0,
+      "work": true,
+      "level": "msx",
+      "constraint_matrix_difference": 3.7916720752965655e-16,
+      "kernel_residual": 5.248749550371802e-18,
+      "observations": {
+        "quadratic": {
+          "error": 1.969173677439976e-15,
+          "error_difference": 2.1517106447943257e-16,
+          "h1_difference": 5.218048215738236e-15,
+          "necessary_residual": 7.924913182519638e-18
+        },
+        "quartic": {
+          "error": 0.329982927137148,
+          "error_difference": 5.551115123125783e-17,
+          "h1_difference": 1.1102230246251565e-16,
+          "necessary_residual": 8.178292599979212e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "m",
+      "constraint_matrix_difference": 4.616576442708803e-16,
+      "kernel_residual": 5.4076637459086635e-18,
+      "observations": {
+        "quadratic": {
+          "error": 5.265619264307679e-15,
+          "error_difference": 8.930293561413914e-16,
+          "h1_difference": 6.439293542825908e-15,
+          "necessary_residual": 6.682296820003641e-18
+        },
+        "quartic": {
+          "error": 0.36885829629599615,
+          "error_difference": 5.551115123125783e-16,
+          "h1_difference": 6.661338147750939e-16,
+          "necessary_residual": 6.963435895509836e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "s",
+      "constraint_matrix_difference": 3.9892781167590675e-16,
+      "kernel_residual": 1.2955602718177429e-17,
+      "observations": {
+        "quadratic": {
+          "error": 5.259314220958996e-15,
+          "error_difference": 1.7693390709691758e-15,
+          "h1_difference": 6.439293542825908e-15,
+          "necessary_residual": 2.112781860280847e-17
+        },
+        "quartic": {
+          "error": 0.026920009053934785,
+          "error_difference": 1.3877787807814457e-17,
+          "h1_difference": 2.220446049250313e-16,
+          "necessary_residual": 5.085039373917461e-17
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "ms",
+      "constraint_matrix_difference": 4.472853716339913e-16,
+      "kernel_residual": 5.085773945113431e-18,
+      "observations": {
+        "quadratic": {
+          "error": 4.047066928666341e-15,
+          "error_difference": 9.350069959593802e-16,
+          "h1_difference": 6.439293542825908e-15,
+          "necessary_residual": 9.707351453117692e-18
+        },
+        "quartic": {
+          "error": 0.5963330679529358,
+          "error_difference": 1.1102230246251565e-15,
+          "h1_difference": 1.7763568394002505e-15,
+          "necessary_residual": 9.986764869948772e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    },
+    {
+      "amplitude": 0.2,
+      "work": false,
+      "level": "msx",
+      "constraint_matrix_difference": 4.472853716339913e-16,
+      "kernel_residual": 5.085773945113431e-18,
+      "observations": {
+        "quadratic": {
+          "error": 4.047066928666341e-15,
+          "error_difference": 9.350069959593802e-16,
+          "h1_difference": 6.439293542825908e-15,
+          "necessary_residual": 9.707351453117692e-18
+        },
+        "quartic": {
+          "error": 0.5963330679529358,
+          "error_difference": 1.1102230246251565e-15,
+          "h1_difference": 1.7763568394002505e-15,
+          "necessary_residual": 9.986764869948772e-18
+        }
+      },
+      "checks": {
+        "constraint_matrix": true,
+        "kernel": true,
+        "quadratic": true,
+        "quartic": true
+      }
+    }
+  ],
+  "validated_primary_problems": 12,
+  "primary_complete": false,
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "independent_global_resolve": false,
+  "sources": {
+    "rd/structure/main-shell/mq3/experiments/audit_mq3_interior.py": "0fdccc248291bf38eed5e4ac0960665375c80d7a3cff54af91244a48d58b6f94",
+    "rd/structure/main-shell/mq3/experiments/mq3_factor_family.py": "0eddb51ca6cafaafb7bcdaa4b297e3e154a14a939f3ebc5a0aa67a2612a196d2",
+    "rd/structure/main-shell/mq3/records/mq3-interior-result.json": "4a953ae059c0458e2e2c3510c6d2963ae5804248bb1ac2fad7888299ac9e9bd2",
+    "rd/structure/main-shell/mq3/records/mq3-interior-audit-protocol.md": "497d303be229c8cf2a6151dcc3089aead9248ba5f5a56e15e70c5fa8fd4f41cf"
+  },
+  "seconds": 15.03100000001723
+}

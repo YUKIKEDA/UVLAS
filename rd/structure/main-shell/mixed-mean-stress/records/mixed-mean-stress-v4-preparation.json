@@ -1,0 +1,14 @@
+{
+  "reason": "Same complete stress space, exact rank bounded by rational identities and attained by modular minors. Separate Decimal80/100 coefficient basis preprocessing from float64 FE operators.",
+  "sources": {
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_space_v4.py": "168a19b51c050e2c76f6b9e2886c28f1964d11da611831690d6c8c51d7b30852",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_thin_v4.py": "ead382e45b5815893a692d29bbc30f3dd1b9c2a607fe51f09b04eacb6a7eb1b6",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/check_mixed_mean_stress_thin_v4.py": "8b2b2fccc464bcbd2a220fa4e00ef8825111c10e37f215c33b487af9c70b2593",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_space_v3.py": "c5074eea3cd6ed569bba12c70be89b1d62536ae17a287261df81b26ea9a12dde",
+    "rd/structure/main-shell/mixed-mean-stress/experiments/mixed_mean_stress_basis.py": "b50c24e2cffa87fee00c70427dffba07f67417898ad140c17b939d505be155aa",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-v3-interrupted.json": "9fcdd2238c72f16299a6a43fbd8b8e54549e6920d60b01bc61ea15bc8197a2d8",
+    "build/analysis/mixed-mean-stress-20261104-154026/checkpoint.json": "367f96cc9fd6ed5d03a1f2368a7c1cd249dc267c0c909b788be26996e0cab7e2",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-protocol.md": "1efb045fc1e82946fe630e12d24c239826f2b18ae13142e84e81a2fa46219b7f",
+    "rd/structure/main-shell/mixed-mean-stress/records/mixed-mean-stress-basis-v4.md": "f3f053baa28af35d0b44c25fa9654ff579c1a00db7d6e878eb7ff588d4b8c983"
+  }
+}

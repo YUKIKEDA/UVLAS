@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "case": "six_outer_faces",
+      "n": 1,
+      "work": 6.245004513516506e-17,
+      "reference_map": 2.6645352591003757e-15,
+      "net_force": 2.264462072310114e-16,
+      "net_moment": 7.110250420355456e-17
+    },
+    {
+      "case": "six_outer_faces",
+      "n": 2,
+      "work": 5.898059818321144e-17,
+      "reference_map": 1.9984014443252818e-15,
+      "net_force": 1.3947004136484323e-16,
+      "net_moment": 2.2473876566261383e-16
+    },
+    {
+      "case": "unequal_basis_interface_operator",
+      "orders": [
+        1,
+        2
+      ],
+      "dual_work": 0.0,
+      "affine_shared_field": 7.632783294297951e-17,
+      "normal_coordinate_reversal": 4.216896677841884e-14,
+      "midplane_negative_controls": [
+        {
+          "midplane": 0.0,
+          "full_trace": 0.013362062673024538
+        },
+        {
+          "midplane": 0.0,
+          "full_trace": 1.3509664298582502e-05
+        }
+      ],
+      "multipatch_equilibrium_verified": false
+    }
+  ],
+  "R4_complete": false,
+  "sources": {
+    "rd/structure/main-shell/paired-geometry/experiments/check_pg_ritz_full_trace_work.py": "e3c4f4d2da4ddfaa689097848980f5a5458edf59f14836e86485b020ecd08547",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_shell_v3.py": "b157961e1555a04e87411ba9a10274291025eb4f7c83b76c5c74cc9582755849",
+    "rd/structure/main-shell/paired-geometry/experiments/pg_ritz_mechanics.py": "24890253bef6e2e1aa0f837382ddd47685c69ecf951183b87b88ecc6898a7d8e"
+  }
+}

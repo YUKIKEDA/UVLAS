@@ -1,0 +1,56 @@
+{
+  "source_sha256": "9949070af5e082cfc9b294f20a9903beb97ec8b9cfdba600f395715477fd315d",
+  "watchdog_sha256": "cff867c82faad9ce7677ba3b44e097337a9b18c1c80d6e4e3f4fb1f62e7d1495",
+  "cases": [
+    {
+      "name": "normal",
+      "reason": null,
+      "passed": true
+    },
+    {
+      "name": "case_time",
+      "reason": "per_process_time_limit",
+      "passed": true
+    },
+    {
+      "name": "stage_time",
+      "reason": "stage_time_limit",
+      "passed": true
+    },
+    {
+      "name": "rss",
+      "reason": "process_group_rss_limit",
+      "passed": true
+    },
+    {
+      "name": "console",
+      "reason": "console_limit",
+      "passed": true
+    },
+    {
+      "name": "disk",
+      "reason": "disk_limit",
+      "passed": true
+    },
+    {
+      "name": "free",
+      "reason": "available_floor",
+      "passed": true
+    },
+    {
+      "name": "swap",
+      "reason": "swap_increase_limit",
+      "passed": true
+    },
+    {
+      "name": "cgroup",
+      "reason": "unknown_cgroup",
+      "passed": true
+    }
+  ],
+  "start_cases": 3,
+  "actual_group_terminated": true,
+  "child_return_code": -9,
+  "seconds": 0.30599035500000005,
+  "all_criteria_pass": true
+}

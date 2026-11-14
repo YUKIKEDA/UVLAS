@@ -1,0 +1,73 @@
+{
+  "history": [
+    {
+      "iteration": 0,
+      "residual": 1.023353972908321,
+      "min_F": 0.9959784639979717,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 1,
+      "residual": 0.08657442554221358,
+      "min_F": 1.0086183451912376,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 2,
+      "residual": 0.06445357361811987,
+      "min_F": 1.0089513537438735,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 3,
+      "residual": 0.0005208043260087054,
+      "min_F": 1.009024723355125,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 4,
+      "residual": 2.551222029350931e-06,
+      "min_F": 1.0090269652267618,
+      "alpha": 1.0
+    },
+    {
+      "iteration": 5,
+      "residual": 1.6964648735932965e-11,
+      "min_F": 1.0090269668239462
+    }
+  ],
+  "metrics": {
+    "displacement": 5.215091517173739e-11,
+    "equilibrium": 1.6964648735932965e-11,
+    "support_reaction": 3.0051800806553143e-12,
+    "independent_equilibrium": 1.6931585137020805e-11,
+    "internal_pointwise_flux": 6.7805093565270106e-12,
+    "flux_dual": 1.832058057674648e-15,
+    "tangent": 1.8691008672291836e-16,
+    "min_F": 1.0090269668239462
+  },
+  "checks": {
+    "newton": true,
+    "displacement": true,
+    "identities": true,
+    "orientation": true,
+    "resources": true
+  },
+  "all_checks_pass": true,
+  "stop_reason": null,
+  "artifact": {
+    "path": "build/analysis/reference-work-refined-equilibrium-20261104-122905.npz",
+    "sha256": "5e1e7c45bd6c755d2ef08f096dcfd712c414e5ae3f2b11b60990925267eeebfa"
+  },
+  "manufactured_Ku_load": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/reference-work/experiments/check_reference_work_refined_equilibrium.py": "40b191202dcde94c7453a4ab0073e385bd43158a400f10a7e7cca2fe2a960dd1",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_ancf_v3.py": "6460c432a35f7e907b7cc4ed4c600070af82b64222f0881c675b53095608951b",
+    "rd/structure/main-shell/reference-work/experiments/reference_work_fit.py": "52d144a37ec016c468cd84c67709d55997d72e49c610cda01d1113fd19161a25",
+    "rd/structure/main-shell/reference-work/records/reference-work-v3-protocol.md": "8bbf3ef077bb0174190f06312f2b6a0ed1ef27a8b4f0c59bbc1baacaf257ccf8",
+    "rd/structure/main-shell/reference-work/records/reference-work-refined-equilibrium-preparation.json": "0300ffe7a72df0944ded01fffbc390e8369990fd9dd25f73835eb54b7a5dfd56"
+  },
+  "seconds": 11.702999999979511,
+  "peak_bytes": 1560113152
+}

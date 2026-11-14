@@ -1,0 +1,17 @@
+{
+  "source_sha256": "cd7d4dbd612ddb5b915e56ddd30de158bc5d2f80051e912af91ffdc0a8dac87c",
+  "runs_sha256": "41cb0109245c0e63f973eceddecbb4b0f0c6d19dbf282d57b5d0aa64ab44d5e4",
+  "observations_sha256": "815ccc6aea2868e516281d07a6d23741ed08ff9dab79c51fd73079ba987b3734",
+  "completed_runs": 4,
+  "fields": 6,
+  "stored_field_pairs": 6,
+  "archive_members_verified": 32,
+  "decimal_norm_maximum_difference": 1.6940658945086007e-21,
+  "run_seconds": 412.653283623,
+  "peak_resident_bytes": 3433582592,
+  "raw_archived_bytes": 49780296,
+  "combined_bytes": 109336508,
+  "couple_component_sha256": "800e9ac6c0f71febaf677b9fc0e7f29740168dd0019ce99663d30e4de9300e54",
+  "reference_acceptance": false,
+  "all_criteria_pass": true
+}

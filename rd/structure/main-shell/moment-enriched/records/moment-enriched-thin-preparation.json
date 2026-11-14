@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-04",
+  "primary_mid_dimension": 36,
+  "director_mid_dimension": 35,
+  "sources": {
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_thin.py": "7b7e35c7abe2e94af645c5f6331f134f0e2b523aa9e176c53c9961b3873b9db0",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_exact_isometry.py": "691ee2247b78458b5211c64d666bbd2e93fa20fc248ed0168fa761726cbd40f3",
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_thin_local.py": "9eddcc38f4b493f79888d4d39dcef7e7b27f31d3258d396c104338312bae0191",
+    "rd/structure/main-shell/moment-enriched/experiments/check_moment_enriched_thin_global.py": "4597179faa531a2726cf8cf9b45d6b660dc794eee22de8819bd8a8f95c1e75fb",
+    "rd/structure/main-shell/moment-enriched/experiments/audit_moment_enriched_thin_global.py": "92a4208fc35762586420d5886c19c43bd1cfd629f8fc4fac750ebe3f1dae829b",
+    "rd/structure/main-shell/moment-enriched/experiments/moment_enriched_ancf.py": "b59e67a1da9eb93ef3481110adaee9643b9f36c34b48d182ac003a0e80dd46c6",
+    "rd/structure/main-shell/moment-enriched/moment-enriched-thin-formulation.md": "a5793357a8c35bfa4d5b43805df8cc72b734b4a96c2182eaad354001d3589f1a",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-thin-protocol.md": "7d730a1dd32a21ded8133fd7610891297cb4f09955b273fdb402b2fd8ece17cf",
+    "rd/structure/main-shell/moment-enriched/records/moment-enriched-disposition.json": "fb81a2dd49424c8e34d56e46048e9dc8dba48f2db276e380cf96e3a431cb2e46"
+  }
+}

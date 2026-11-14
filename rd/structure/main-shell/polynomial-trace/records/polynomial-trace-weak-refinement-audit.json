@@ -1,0 +1,83 @@
+{
+  "records": [
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.01,
+      "error": [
+        9.100620618415946e-07,
+        9.800045249106227e-07
+      ],
+      "h1": [
+        0.49043487732683644,
+        2.128435344957073
+      ],
+      "error_difference": 1.613408240897494e-15,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        2.397220430309718e-05,
+        1.3371957278532931e-05
+      ],
+      "h1": [
+        0.4904347830086419,
+        2.128433068908051
+      ],
+      "error_difference": 9.2464837192106e-14,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.001,
+      "error": [
+        3.914657378554974e-08,
+        1.1132536573582931e-07
+      ],
+      "h1": [
+        0.4904348764879751,
+        2.1284361028290366
+      ],
+      "error_difference": 4.708031480222945e-15,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    },
+    {
+      "kind": "weak",
+      "kappa": 0.4,
+      "amplitude": 0.2,
+      "h": 0.0001,
+      "error": [
+        3.6034907555689637e-07,
+        8.173029492004026e-07
+      ],
+      "h1": [
+        0.49043487653947687,
+        2.1284360507478524
+      ],
+      "error_difference": 6.145136650293528e-14,
+      "h1_difference": 2.220446049250313e-16,
+      "passed": true
+    }
+  ],
+  "stops": [],
+  "all_reproduction_checks": true,
+  "independent_global_resolve": false,
+  "physical_adoption": false,
+  "sources": {
+    "rd/structure/main-shell/polynomial-trace/experiments/audit_polynomial_trace_refinement_weak.py": "8c6f4d11269f6dfad9a23a81926d798c567aa793f47172691bc108805dba9cfe",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_trace_ancf.py": "e2f3b5104976c1ff1757cfa8c06282099656a7458e810f5337e676fb9817c2e9",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-weak-refinement-result.json": "921b14c89e7ebb9b8d8b435784b45f508a498cc032ee5589f3491dc255527d3d",
+    "rd/structure/main-shell/polynomial-trace/records/polynomial-trace-protocol.md": "8decfd36a371f1860b8375dbfa0fd26437fba54d6fe8a26bd9897bd8f3e54604"
+  },
+  "seconds": 112.70299999997951
+}

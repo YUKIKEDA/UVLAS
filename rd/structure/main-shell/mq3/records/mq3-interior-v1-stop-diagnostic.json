@@ -1,0 +1,20 @@
+{
+  "failed_map": "5afcb18c0e2de1a75eaf59339399a45061aa8908d168f9e0aca761b9371c5ec7",
+  "D_relative_quadrature_change": 9.037947122294436e-13,
+  "whitened_H_change": 8.742778925357996e-13,
+  "component_projector_differences": {
+    "m": 2.9297813146967454e-10,
+    "s": 2.235615846876173e-12,
+    "x": 2.927477286335393e-10
+  },
+  "small_Dm9": [
+    7.896265681324191e-14,
+    5.765816124328716e-14,
+    4.4552606126337085e-14,
+    2.3716584414643983e-14,
+    1.8067772574511553e-14,
+    8.09534846226889e-15
+  ],
+  "threshold": 1e-10,
+  "status": "v1_stopped_preserved"
+}

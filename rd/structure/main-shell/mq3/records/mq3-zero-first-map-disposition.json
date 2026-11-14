@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-03",
+  "roadmap_location": "1.structural_adoption/1.1_primary_shell/MQ3_zero_first_maps",
+  "status": "10_reference_cell_validation_complete",
+  "physical_adoption": false,
+  "shared_thin_kernel_evaluated": false,
+  "finite_thickness_accuracy_evaluated": false,
+  "extra_thickness_dependence_detected": false,
+  "original_internal_map_columns": 150,
+  "exported_displacement_shape": [
+    121,
+    6,
+    144
+  ],
+  "exported_constant_shape": [
+    121,
+    6,
+    6
+  ],
+  "next_action": "Compare shared zero-order kernel and constrained first-order bending on previous 12 configurations; validate additional local maps before use",
+  "next_protocol": "rd/structure/main-shell/mq3/records/mq3-shared-thin-space-protocol.md",
+  "evidence_sha256": {
+    "mq3-zero-first-map-result.json": "fc6c1156ce2d140e67740ff07dbb778eab7774cfc6d13e46bd8ac91ab149e75a",
+    "mq3-zero-first-map-export.json": "13b15925773f2765e7e79e99b30314ac4edeaed30a046a02ffec67bf0a6adb79"
+  }
+}

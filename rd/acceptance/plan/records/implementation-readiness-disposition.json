@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "preimplementation_initial_package_ready": true,
+  "practical_acceptance_plan_complete": true,
+  "initial_implementation_review_complete": true,
+  "implementation_start_allowed_packages": [
+    "IM-00"
+  ],
+  "product_implementation_started": false,
+  "experimental_reference_qualified": false,
+  "product_performance_qualified": false,
+  "all_product_acceptance_complete": false,
+  "current_work": "IM-00 product numerical representations, solvers and state contracts; not started",
+  "risks": [
+    "R-01",
+    "R-02",
+    "R-03",
+    "R-04",
+    "R-05",
+    "R-06",
+    "R-07"
+  ]
+}

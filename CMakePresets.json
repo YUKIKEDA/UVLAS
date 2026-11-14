@@ -1,0 +1,69 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "BUILD_TESTING": true,
+        "UVLAS_WARNINGS_AS_ERRORS": true,
+        "VCPKG_MANIFEST_FEATURES": "tests",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/out/vcpkg_installed"
+      }
+    },
+    {
+      "name": "windows-msvc",
+      "inherits": "base",
+      "displayName": "Windows MSVC x64 (Ninja; run inside tools/dev/msvc.ps1)",
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": { "CMAKE_CXX_COMPILER": "cl", "VCPKG_TARGET_TRIPLET": "x64-windows" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Ninja",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    },
+    {
+      "name": "linux-debug",
+      "inherits": "linux-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "linux-release",
+      "inherits": "linux-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "linux-sanitize",
+      "inherits": "linux-base",
+      "displayName": "Linux Debug with AddressSanitizer and UndefinedBehaviorSanitizer",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "UVLAS_SANITIZERS": "address,undefined" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "windows-debug", "configurePreset": "windows-msvc", "configuration": "Debug" },
+    { "name": "windows-release", "configurePreset": "windows-msvc", "configuration": "Release" },
+    { "name": "linux-debug", "configurePreset": "linux-debug" },
+    { "name": "linux-release", "configurePreset": "linux-release" },
+    { "name": "linux-sanitize", "configurePreset": "linux-sanitize" }
+  ],
+  "testPresets": [
+    {
+      "name": "test-base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error" }
+    },
+    { "name": "windows-debug", "inherits": "test-base", "configurePreset": "windows-msvc", "configuration": "Debug" },
+    { "name": "windows-release", "inherits": "test-base", "configurePreset": "windows-msvc", "configuration": "Release" },
+    { "name": "linux-debug", "inherits": "test-base", "configurePreset": "linux-debug" },
+    { "name": "linux-release", "inherits": "test-base", "configurePreset": "linux-release" },
+    { "name": "linux-sanitize", "inherits": "test-base", "configurePreset": "linux-sanitize" }
+  ]
+}
