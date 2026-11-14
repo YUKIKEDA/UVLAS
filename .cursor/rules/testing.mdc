@@ -12,7 +12,7 @@ globs: "tests/**"
 
 - Catch2 v3（ADR 0004）。`uvlas_add_test()`（`tests/CMakeLists.txt`）で登録し、1実行ファイルが1つのCTestの試験になる。
 - 走らせるのは `ctest --preset <preset>`、一部だけなら `-R <名前>` か `-L <ラベル>`。終了コードと、走った件数を読む。0件の実行は合格ではない（Presetがエラーにする）。
-- 試験は、Debug、Release、Linuxのsanitizerのビルドで走る。
+- 影響する試験を選び、Debug、Release、Linuxのsanitizerのうち必要な構成で走らせる。検証範囲と最後の全体検証の扱いは `workflow` に従う。文書や独立した道具だけの変更でC++の全試験を走らせない。
 
 ## 層とラベル
 

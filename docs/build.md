@@ -81,6 +81,11 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 |---|---|
 | `cli.*`（5件） | CLIを別プロセスで起動し、ビルド情報、不正入力時の終了コード、標準出力と標準エラーの使い分けを確かめる |
 | `toolchain.pinned_dependencies` | コンパイラへ届く依存の版がmanifestと一致すること、数値のビルド方針が効いていること、`fma` が積の誤差を正確に返すこと |
+| `toolchain.linear_algebra` | 実・複素のpivot付きLU、64bit CSCのSparseLU＋COLAMD、密・疎LLT、固定前処理GMRESを既知解と原残差で照合する |
+| `toolchain.arnoldi` | 実数作用素の複素共役固有値と、複素非Hermitian作用素の固有値を、行列を渡さないArnoldiで求める |
+| `toolchain.precise_arithmetic` | Multiprecisionの精度、有理数の厳密算術、Hash2のSHA-256既知値を照合する |
+| `toolchain.third_party_notices` | vcpkgの著作権・ライセンス通知が構成先へバイト一致で複製されていること。扱いは[第三者通知](../THIRD_PARTY_NOTICES.md) |
+| `toolchain.notice_configuration` | 実ソースの複製を使った新規構成6通り。試験の既定ON・明示ON・OFFと、Catch2通知あり／なしを照合する。依存原本の変更・C++ビルドは行わない |
 | `qa.numeric_canary` | 基準ケースの結果が、このプラットフォームの基準結果とビット一致すること（QA-04）。認定していないプラットフォームでは落ちる |
 | `cli.build_info` | `uvlas --build-info` が来歴を返すこと |
 

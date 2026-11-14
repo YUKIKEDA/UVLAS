@@ -28,16 +28,16 @@
 
 | 規則 | 一行 |
 |---|---|
-| `workflow` | Grill、Issue、ブランチ、PR、人のmerge、振り返り。ゲート。commit前にブランチを確かめる |
+| `workflow` | Grill、Issue、ブランチ、PR、人のmerge。検証は影響範囲に絞り、全体検証は最後に1回。commit前にブランチを確かめる |
 | `consent` | 質問は決定ではない。何を利用者が決め、何を自分で決めるか |
-| `git` | 破壊的な操作は名指しの指示で。commitとpushは頼まれたときだけ。ステージを読む |
+| `git` | 通常のcommit・pushは確認なしでPRまで進める。破壊的な操作は名指しの指示で。ステージを読む |
 | `conventional-commits` | `type(scope): subject`。`perf` は使わない |
 | `pull-requests` | テンプレートの見出し。Verificationは完了条件の各行から書く |
 | `github-closing` | 番号の前の閉じる動詞は、否定文でもIssueを閉じる |
 | `review-comments` | 指摘は、それが書かれたheadについてのもの |
 | `scope` | 範囲は要求が決める。半端な能力を出さない。状態を分けて言う |
 | `defer` | 先送りは、名前の付いたロードマップの行だけ |
-| `pace` | 行の外のものは切り出す。調査の限り。次の作業を決める。長い実行は複製の上で |
+| `pace` | 依存関係を整理し独立作業は並列に進める。調査の限り。長い実行は複製の上で |
 | `open-ends` | 未了の作業や、説明できない数値を残したままPRを出さない |
 | `spec-checks` | 試験は、仕様の文の全体を実装する |
 | `similar-findings` | 同じ種類の問題を、全体を検索して直す |

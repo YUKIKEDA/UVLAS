@@ -9,6 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(cmake/CompilerPolicy.cmake)
 include(cmake/ProjectOptions.cmake)
+# Resolve CTest's default BUILD_TESTING=ON before selecting required notices.
+include(CTest)
 include(cmake/Dependencies.cmake)
 
 # The platform key under which numerical results are qualified (QA-07).
@@ -52,7 +54,6 @@ uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_link_libraries(uvlas_cli PRIVATE uvlas_core)
 
-include(CTest)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
