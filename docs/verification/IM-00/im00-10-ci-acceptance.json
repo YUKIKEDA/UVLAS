@@ -1,0 +1,151 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "IO4-02",
+    "N4-03",
+    "N4-08"
+  ],
+  "package": "IM-00",
+  "issue": 14,
+  "date": "2026-11-15",
+  "scope": "Complete Issue 14 ownership and failure-boundary acceptance for existing product storage/state Python bindings; no physical solver or distribution qualification",
+  "source_commit": "57425189f72fbbc9732167cd8088f1c05e538be4",
+  "adopted_merge_commit": "8143b5f45ba4c65e3bdb2ca445f2d57d7295c232",
+  "pull_request": "https://github.com/YUKIKEDA/UVLAS/pull/50",
+  "execution_provenance": "Completed GitHub Actions run on source_commit. Git tree comparison from source_commit to adopted_merge_commit returned no changed paths. This metadata-only follow-up does not rerun C++ or Python product tests.",
+  "ci": {
+    "run_id": 43692183668,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668",
+    "status": "completed",
+    "conclusion": "success",
+    "successful_jobs": 10,
+    "total_jobs": 10,
+    "jobs": [
+      {
+        "name": "select affected checks",
+        "id": 132744973603,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744973603"
+      },
+      {
+        "name": "Python ownership (ubuntu-24.04, CPython 3.12)",
+        "id": 132744999015,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999015"
+      },
+      {
+        "name": "build and test (linux, gcc 14, linux-release)",
+        "id": 132744999028,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999028"
+      },
+      {
+        "name": "build and test (windows, msvc)",
+        "id": 132744999029,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999029"
+      },
+      {
+        "name": "Python ownership (windows-2025, CPython 3.12)",
+        "id": 132744999032,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999032"
+      },
+      {
+        "name": "compile optional benchmark (linux, gcc 14)",
+        "id": 132744999040,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999040"
+      },
+      {
+        "name": "format, skills, R&D tree",
+        "id": 132744999042,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999042"
+      },
+      {
+        "name": "build and test (linux, gcc 14, linux-sanitize)",
+        "id": 132744999045,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999045"
+      },
+      {
+        "name": "build and test (linux, gcc 14, linux-debug)",
+        "id": 132744999073,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132744999073"
+      },
+      {
+        "name": "ci",
+        "id": 132746536959,
+        "conclusion": "success",
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43692183668/job/132746536959"
+      }
+    ]
+  },
+  "binding_matrix": {
+    "operating_systems": [
+      "windows-2025",
+      "ubuntu-24.04"
+    ],
+    "configuration": "Release with UVLAS_WARNINGS_AS_ERRORS=ON",
+    "cpython": "3.12 (setup-python selection and exact CMake major/minor requirement; patch not asserted here)",
+    "numpy": "2.3.5 (tests/python/requirements.txt)",
+    "pybind11": "3.1.0 (exact CMake discovery and fixed header-only vcpkg overlay)",
+    "ctest_test": "python.ownership",
+    "runtime_policy": "External CPython interpreter/development module; dedicated tests;python vcpkg prefix"
+  },
+  "definition_of_done": [
+    {
+      "requirement": "Owned Python results; NumPy views retain their owner and are read-only",
+      "evidence": "Both platform ownership jobs succeeded: DenseReal/DenseComplex, immutable Model/Accepted views, independently budgeted Trial snapshots, empty owners, WRITEABLE reenable refusal and derived/memoryview checks."
+    },
+    {
+      "requirement": "Noncontiguous arrays and dtype mismatch are copied explicitly or rejected; no implicit unit conversion",
+      "evidence": "Both platform ownership jobs succeeded with strict native dtype/rank/layout/alignment/endian admission and nonfinite/None/type negative controls. The binding does not perform unit conversion."
+    },
+    {
+      "requirement": "C++ processing exceptions do not cross into Python; Failure is distinguishable",
+      "evidence": "Native processing guard and preallocated mutation publication are retained; typed Result/Failure categories, operations, resource units and identity domains are covered by the ownership tests. Python calling-type errors and Python object allocation exceptions remain distinct by contract."
+    },
+    {
+      "requirement": "CPython 3.12, NumPy 2.x and pybind11 3.1.0 pass on both operating systems",
+      "evidence": "Completed successful Python ownership jobs 132744999032 (Windows) and 132744999015 (Linux), at the same immutable source_commit."
+    },
+    {
+      "requirement": "Views cannot outlive their underlying owner",
+      "evidence": "Both platform ownership jobs succeeded with base-owner retention, GC after dropping external owner references, independent snapshot lifetime and empty canonical payload views."
+    }
+  ],
+  "local_metadata_checks": [
+    "Completed run/job metadata read through gh run view; no CI waiting",
+    "git diff --name-only source_commit..adopted_merge_commit returned no paths",
+    "Traceability regeneration/check and current source hash integrity check; no product tests rerun"
+  ],
+  "historical_records": [
+    "docs/verification/IM-00/im00-10.json",
+    "docs/verification/IM-00/im00-10-integration.json",
+    "docs/verification/IM-00/im00-10-owner-locks-review.json"
+  ],
+  "historical_policy": "Earlier records remain unchanged and retain their original execution versions and then-unverified platform scope. This new record supplies the later both-platform CI acceptance.",
+  "sources": {
+    "src/python/module.cpp": "e83342e7a1b6a11068192ba4a3ddd869f0dbd7e2dcc1b1c8e26eeb05b631a075",
+    "src/python/CMakeLists.txt": "58a3ee3264552d7f908a59ba063da089c94a94559fcd338c03680fa8a1fff5ba",
+    "tests/python/test_ownership.py": "439a188ef6b22c0fa9e2254f9ee9211d0d521d0a6712bfad2938be5aae73bdd2",
+    "tests/python/requirements.txt": "7bd6b8946940b79948c548c8048e545684b91c8edc9444d8dfc0c8f76a97c0a7",
+    "cmake/vcpkg-ports/pybind11/portfile.cmake": "f30ed3f6016d3288f5de6a045efc1f622a348ee0c0ab956f00ef1fe409f9a83d",
+    "cmake/vcpkg-ports/pybind11/vcpkg.json": "ca4d4104c9c727da0948c98111f67cf747f35b0b18e26c659da1afa5b46c9892",
+    "CMakeLists.txt": "ca68aa119ecb9b0afc3242bc4899c86a417c7ebd36186fa0cda3ceea09ab99e9",
+    ".github/workflows/ci.yml": "dd64665b74a225991bb596194fa8c8f95366c6756bb499c0570541f3784039da",
+    "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "docs/specs/foundation/python-binding-contract.md": "f076da1115a2e53557e0e2f4953a54f1e1efa447e886a5b509f1797379f3e619"
+  },
+  "not_claimed": [
+    "Physical solver implementation or accuracy",
+    "Experimental validation",
+    "Product-scale performance",
+    "Wheel/runtime distribution acceptance",
+    "Overall IM-00 completion or practical solver acceptance"
+  ]
+}

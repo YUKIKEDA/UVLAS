@@ -1,0 +1,6 @@
+[1/3] Processing file <repo>\tests\numerics\dense_solve_test.cpp.
+63483 warnings generated.
+[2/3] Processing file <repo>\tests\numerics\dense_allocations_test.cpp.
+125145 warnings generated.
+[3/3] Processing file <repo>\benchmarks\dense_solve_bench.cpp.
+179814 warnings generated.

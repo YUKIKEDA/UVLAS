@@ -141,6 +141,12 @@ add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
 
+uvlas_add_test(numerics.linear_validation
+    LABELS unit negative verification
+    SOURCES numerics/linear_validation_test.cpp
+    LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_linear_validation PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
 uvlas_add_test(numerics.linear_result
     LABELS unit negative verification
     SOURCES numerics/linear_result_test.cpp
@@ -203,19 +209,22 @@ uvlas_add_test(numerics.sparse_capacity
     SOURCES numerics/sparse_capacity_test.cpp
     LIBS uvlas_numerics)
 
-# Recompile all participating product code under one Eigen allocation-audit policy.
-get_target_property(uvlas_sparse_audit_sources uvlas_numerics SOURCES)
-list(TRANSFORM uvlas_sparse_audit_sources PREPEND "${PROJECT_SOURCE_DIR}/")
-add_library(uvlas_sparse_kernel_audit STATIC ${uvlas_sparse_audit_sources})
-uvlas_configure_target(uvlas_sparse_kernel_audit)
-uvlas_enable_allocation_audit(uvlas_sparse_kernel_audit)
-target_include_directories(uvlas_sparse_kernel_audit PUBLIC "${PROJECT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_sparse_kernel_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen)
-uvlas_require_audited_dependencies(uvlas_sparse_kernel_audit)
 uvlas_add_test(numerics.sparse_allocation
     LABELS property verification
     SOURCES numerics/sparse_allocation_test.cpp support/allocation_audit.cpp
-    LIBS uvlas_sparse_kernel_audit uvlas::eigen)
+    LIBS uvlas_numerics_audit uvlas::eigen)
 target_include_directories(uvlas_test_numerics_sparse_allocation PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
 uvlas_enable_allocation_audit(uvlas_test_numerics_sparse_allocation)
 uvlas_require_audited_dependencies(uvlas_test_numerics_sparse_allocation)
+
+uvlas_add_test(numerics.dense_solve LABELS unit verification negative
+ SOURCES numerics/dense_solve_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+
+uvlas_add_test(numerics.dense_contract LABELS unit negative verification
+ SOURCES numerics/dense_contract_test.cpp LIBS uvlas_numerics)
+
+uvlas_add_test(numerics.dense_allocations LABELS property verification
+ SOURCES numerics/dense_allocations_test.cpp support/allocation_audit.cpp
+ LIBS uvlas_numerics_audit uvlas::eigen)
+uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
+uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)

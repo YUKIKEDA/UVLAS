@@ -1,0 +1,202 @@
+{
+  "schema": "uvlas.verification-redaction/1",
+  "policy": "tools/rd/redact.py; replace benchmark default host_name with declared non-personal machine label",
+  "files": [
+    {
+      "artifact": "common-mutations.zip!/CMakeLists.txt",
+      "pristine_sha256": "f20fd189413a2334dd62f59272fd7e2d53efd587ccf7ae94b18e04b45fa40256",
+      "sha256": "00f26912b7c46b95a5eaa66986bbb467ee138d8d9c00a1658b01d4c9397e9848",
+      "path_replacements": 1,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/disable_consumer_budget_only-run.log",
+      "pristine_sha256": "30c95c30c9953f36182742784048b8b95e287c74033d5681a2ad2c7ba806fe7d",
+      "sha256": "796f82d3f827f1902711c1cdede3b36d84c521b02cc0794cb5c8672622aa46c0",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/disable_consumer_context_only-run.log",
+      "pristine_sha256": "855b9f3b7c7968635a0c39036bc24e4da26ae364ec2c3c0cb3c7935decdb4492",
+      "sha256": "ee7df43272d31a9530ab484a4716720def385b8f37374903b58ec4d19116c4ff",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/disable_consumer_identity_budget-run.log",
+      "pristine_sha256": "66c08e5bf8bbb38ca4b05a2349395bb4763e3d40be33d8214e2fe53aa25e2584",
+      "sha256": "26c7cf12a646106c3b1fd7a2c88a693873d3947012adedf59f27bd5457ae8f47",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/drop_low-run.log",
+      "pristine_sha256": "a96faef52c5bbbb2d04c8e9384acb275d293cc5e06da0e0b0eb2328c507b5113",
+      "sha256": "de591c035cd85d8f8ee6029260054e729db0ed4cb5edd5b5b75b65fee5a28b47",
+      "path_replacements": 14,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/extra.py",
+      "pristine_sha256": "ed2a9d931c9478361e880737b9b3f1ffe3841543eb3c20238bdb3981a129e4da",
+      "sha256": "9fbe91cd320aea9240eadeeaefc3545d232071310787ccf7c3c3d6e622e7cd12",
+      "path_replacements": 1,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/gate_returned_as_retained-run.log",
+      "pristine_sha256": "1bfbabeadaabdf8e8f02f9eb90a40943e389bef65384ead0e6cca44b4d9a4c0a",
+      "sha256": "7afabf0a6f9d52735ce84a3d6c59f8eb8f57f08e60d47ad01855fe4edd14b3f0",
+      "path_replacements": 5,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/ignore_relative-run.log",
+      "pristine_sha256": "84fded64ed41cfc8fc14efd78b807dfd4adf41964b06b02706eef843cbd77935",
+      "sha256": "5ac80805ec8d0aeda76e410ab9f925be631d1e6e952085beb4384def54eb2a26",
+      "path_replacements": 4,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/only_first_consumer-run.log",
+      "pristine_sha256": "a244cdb7267e798a233da9d010aa10ea55f023bf341c1f0ca7f2e59b744412eb",
+      "sha256": "40cfd1199aa41198782ced4d0885338df5d7edf1e4e3ca540e38f40a95cfd20a",
+      "path_replacements": 6,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/run.py",
+      "pristine_sha256": "57a977a4b154b458ae0d18784d4b23e0cafb32ffa40fa9a4956ef633b531726d",
+      "sha256": "a59a8ce6a56ca0782f62f627681bd255feed7826eaf789f6a7a90d8b168bff75",
+      "path_replacements": 1,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/setup.py",
+      "pristine_sha256": "ebdb708e2bbd15d58092de3001231b46fb5e2e215032fdc2b42ab40fa32f8180",
+      "sha256": "7d6ed6679694cbc101e0fb3c8e6be58011b269c1edd2ed6a5e12f4b848ee661d",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/summarize.py",
+      "pristine_sha256": "610d0ca736e756476572f92b2f448dde625ed82d7e4fa4cf248a4aece7f3722b",
+      "sha256": "2c2dfd192c4c367d358e560cd8451c0ab6bf948efa49f59240818cc5680dcdf8",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "common-mutations.zip!/zero_positive_quotient_underflow-run.log",
+      "pristine_sha256": "62220ae73b3a3cd8ad83d7e607ed985c2927e0c51e5d23b4fb4f49ae6673ae6e",
+      "sha256": "a9297ea25128f3940d15acf95e64f20ee0fd05cf741f1e1a339deff71fbaab41",
+      "path_replacements": 4,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/allocate_inside_kernel-run.log",
+      "pristine_sha256": "3fbcd5e0322ccf9854b57bd7d6547bc05c17144cccc6fc2aaa4a1c2f2df3ace2",
+      "sha256": "1ec8a3c586eea5d5cd17e3dd2d78d01de08690269eab9211426259a946ad1f79",
+      "path_replacements": 9,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/configure.log",
+      "pristine_sha256": "237135540bace6b2487f222f1bf995380a2f36ffa2b6153d7de737cc51aa0cc5",
+      "sha256": "226edc752a7aa0af7a28c84f3ed3b7d617b1a1c3d912cf1ec5c37a31545ce50e",
+      "path_replacements": 1,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/conjugate_original_update-run.log",
+      "pristine_sha256": "2a34637b14f027e4b561be90172c41925a747f40e7741ace1b3d498ea4b437c3",
+      "sha256": "e2754113ad8948129307171edba7ef6a5277ae4aa1fad0777fc28e56d418c709",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/disable_progress_promotion-run.log",
+      "pristine_sha256": "2db71f7264b89f7ca0177015174e5b0da95c40d46b2bb78a1019f29ea6c0f415",
+      "sha256": "322da93e158514ec5cd77de7f4606580d492c455d4c1884250e9944f2cd3df48",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/discard_initial_low_rhs-run.log",
+      "pristine_sha256": "7eca9c20b66550628964c79af00f7f1516617348cb82c92773381c3c3f480b97",
+      "sha256": "6024e8006c423b382c526f37cdb4de415db4e4097eaf9728d6d01828a162ac5f",
+      "path_replacements": 3,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/erase_correction_diagnostic-run.log",
+      "pristine_sha256": "432691180bc0c582aebf1a18f2d2bc28f41b82416ee9716c23b721464ae26543",
+      "sha256": "21467378840ca5b1c1d7f3c3912dfa269022eb18aa11c2b0e5d40f6eee28f217",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/threshold_nonzero_pivot-run.log",
+      "pristine_sha256": "63273acd3e2c0153b3fb5b3eaa4108bbb3ffa5f8abe63e185b80b9960848ca75",
+      "sha256": "38be0c5e2f231d6f002863c69c47cfd9542380eb1c95d7b380ca421dea0b5290",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-mutations.zip!/run_dense_mutations.py",
+      "pristine_sha256": "d15b385156e0ec3deac2d745daea8a2fa38346603b1975677a3b0a26e9bb660c",
+      "sha256": "5662689980a19bf2d14db2755c0ea366898804ef8d177b85c2bb465f14ed692f",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "dense-baseline.json",
+      "pristine_sha256": "342972686ed9ce69d36effb7aa86ee9808ab7538967693106ad678bef610473a",
+      "sha256": "4888d4aaf1adb652c0fb36eb14daa843c9eed50385848a48df06d0fedd543684",
+      "path_replacements": 2,
+      "note": "Numerical values, assertions and source bytes are unchanged; machine paths/hostname redacted. JSON baseline also reserialized."
+    },
+    {
+      "artifact": "dense-baseline.stderr.log",
+      "pristine_sha256": "c0fa9e97ccdfefe1bed4818aabcb2bbd02d6a54cb2a4f20276716f05db750ac4",
+      "sha256": "599c135a82eadeb880370a45a04bd3b18a889a80f8648ae2eb20bbe16a3f4f05",
+      "path_replacements": 1,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "windows-debug.log",
+      "pristine_sha256": "f09ac419c494f84a7ef9e5af1706bb3a494045aac2979fb0da19e98ff9d7994a",
+      "sha256": "7ebcfb139a0a657489c149c301ddab56baf15ef138ef7c49f739d862c9c152cb",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "windows-release.log",
+      "pristine_sha256": "adeabfe65e21f575a728658d3d129e18c8987a2478c89b5ee523e3472e4ef92b",
+      "sha256": "0d4fd81512d2ae5af7cfc65ade2df118ee2e8942fac2807d918a6dffd867982c",
+      "path_replacements": 2,
+      "note": "Text path redaction only."
+    },
+    {
+      "artifact": "updated-baseline.json",
+      "pristine_sha256": "2393d131ebbae8d05b5fca7cff8bdd472e3fcbf045b36e31d8489f81b0198da2",
+      "sha256": "d0178fa0c8b3affb9a33638a18c8abf571bf941f84d85264f56215d32ab8bbd7",
+      "path_replacements": 2,
+      "note": "Machine metadata redaction only; numerical measurements and assertions unchanged."
+    },
+    {
+      "artifact": "updated-baseline.stderr.log",
+      "pristine_sha256": "c41c15247da6807b11db9852b8aeae66dd661872825805c43e5dcfcb334cc4be",
+      "sha256": "fd8a5609e14bb21e7421e559b4de49b8564d8f056eaaa41eb9d2cabbb6edf4e1",
+      "path_replacements": 1,
+      "note": "Machine metadata redaction only; numerical measurements and assertions unchanged."
+    },
+    {
+      "artifact": "lint/tests-final.log",
+      "pristine_sha256": "18eabe01db83121ccbf5762667ecd60693db75b96a71eba449dd186c5e895ee9",
+      "sha256": "18a9f84f32a66238d68c5a7e5748ac9026d7d80297ecd921991937652b3ad716",
+      "path_replacements": 3,
+      "note": "Machine metadata redaction only; numerical measurements and assertions unchanged."
+    }
+  ]
+}
