@@ -33,6 +33,17 @@ globs: "tests/**"
 - 各試験は自分の状態を持つ。試験は並列に走る。共有のファイルや一時ディレクトリを使うなら、試験ごとに固有の名前にする。
 - 試験は、試験用の経路を製品のコードに要求しない。
 
+## 監査用の構成もtarget全体へ適用する
+
+確保監査の実行ファイルは、試験本体だけでなくsupportの翻訳単位にも製品と同じ警告・浮動小数点設定を適用する。Eigenを含む全翻訳単位の監査defineとassert設定を揃え、通常の製品ライブラリを混在させず監査用ライブラリへリンクする。`uvlas_enable_allocation_audit`と`uvlas_require_audited_dependencies`を実行ファイルにも適用し、実際のコンパイル引数を確認する。
+
+2026-11-15、PR #53のbackend_memory試験はallocation_audit.cppを通常構成でコンパイルし、Linux GCC 14 ReleaseでEigenの監査用TLSがunused-variableとして拒否された。Windowsでの成功だけでは構成差を検出できなかった。対象targetのpolicyと依存を揃えて修正し、無関係な数値試験は繰り返さなかった。
+
+```text
+BAD   監査supportを追加し、通常ライブラリへリンクしたまま試験本体だけを監査する
+GOOD  supportを含むtarget全体の通常policy・監査設定・監査済み依存を揃える
+```
+
 ## 何を確かめるか
 
 - 人が書いた系列（解法ごと、失敗の種類ごと、精度の表現ごと）は、全ての成員を試す。一つ二つで代表させない。
