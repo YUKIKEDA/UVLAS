@@ -4,7 +4,7 @@
 
 **今**：IM00-6
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。密・疎の保持IM00-4、状態契約IM00-9、精度保持・明示投影IM00-5も実装した。次は密基準解法IM00-6と疎基準解法IM00-7を並行して進める。Python結合IM00-10は独立した別ブランチで進め、採用は未了である。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。密・疎の保持IM00-4、状態契約IM00-9、精度保持・明示投影IM00-5も実装した。Python結合IM00-10は、実装済みの保持・状態処理についてWindows/Linuxの所有権・失敗境界の検証を終え、採用した。次は密基準解法IM00-6と疎基準解法IM00-7を並行して進める。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -62,7 +62,7 @@ flowchart LR
 | IM00-7 | Feat | 疎基準解法：対称正定値を確かめたLLT、不定KKTのSparseLU | #11 | Todo |
 | IM00-8 | Feat | 固定前処理の再始動GMRESと線形精度の認定 | #12 | Todo |
 | IM00-9 | Feat | Model参照、AcceptedState／TrialState、Workspace、cache世代、資格と一回確定 | #13 | Done |
-| IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | In progress |
+| IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | Done |
 | IM00-11 | Test | IM-00の完了gate：設計試作の4数値群を製品経路で検証する | #15 | Todo |
 | IM00-12 | Feat | 計測基盤：工程別の時間、ピークメモリ、確保の検査、決定性の試験枠、kernelベンチ | #25 | Done |
 
