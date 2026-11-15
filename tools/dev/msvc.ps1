@@ -21,6 +21,8 @@ if (-not $env:VSCMD_VER) {
     if ($vcpkgRoot) { $env:VCPKG_ROOT = $vcpkgRoot }
 }
 if ($args.Count -eq 0) { throw "Usage: msvc.ps1 <command> [arguments...]" }
-$command, $rest = $args
+$command = $args[0]
+# Array subexpression keeps a single argument from becoming a scalar string.
+$rest = @($args | Select-Object -Skip 1)
 & $command @rest
 exit $LASTEXITCODE
