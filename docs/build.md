@@ -142,3 +142,14 @@ kernelの計測は [benchmarks/README.md](../benchmarks/README.md) の独立し�
 `numerics.sparse_spd` は外向きSPD bound、`numerics.sparse_triangular` は抽出・両置換・非重複span、`numerics.sparse_solve` は元CSCの求解と認定、`numerics.sparse_allocation` は準備済み三角kernelのC++/Eigen確保を検査する。`numerics.sparse_capacity` は10万未知数の合成三重対角で、準備・求解時間とprocess lifetime peak RSSを出す。容量試験を実務graphの性能やメモリprofileの認定に転用しない。
 
 確保監査は製品のnumerics全体を監査用policyで再compileし、依存するcoreも同じpolicyの版を使う。通常版のEigen inline定義と混ぜない。
+
+## 凍結参照fixtureの対象検証
+
+`numerics.foundation_reference` は、既存PG24状態行列の代数adapterを製品DensePreparedで処理し、独立なDecimal参照と比較する。`tools.foundation_reference` は取込み・来歴・上書き拒否・全複素成分の負対照、`tools.foundation_reference_verify` は凍結fixtureの検証である。Pythonはrepo rootからmoduleとして起動し、CTestも同じ作業directoryを明示する。
+
+```text
+python -m tools.qa.foundation_reference verify tests/numerics/fixtures/j1-pg-free-history-24-v1
+ctest --test-dir <configured-build> -C Debug -R "^(numerics.foundation_reference|tools.foundation_reference.*)$" --output-on-failure
+```
+
+この先行整備はIssue #15全体のgateではない。製品固有値・Arnoldi、GMRESを含む未達は [fixture契約](specs/foundation/reference-fixture-contract.md) に記す。取込み・別directoryでの再生成はreference-fixture Skillに従う。

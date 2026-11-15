@@ -244,3 +244,17 @@ uvlas_add_test(numerics.gmres_allocations LABELS unit negative verification
     LIBS uvlas_numerics_audit uvlas::eigen)
 uvlas_enable_allocation_audit(uvlas_test_numerics_gmres_allocations)
 uvlas_require_audited_dependencies(uvlas_test_numerics_gmres_allocations)
+uvlas_add_test(numerics.foundation_reference
+    LABELS integration verification negative
+    SOURCES numerics/foundation_reference_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision Boost::hash2 nlohmann_json::nlohmann_json)
+target_compile_definitions(uvlas_test_numerics_foundation_reference PRIVATE
+    UVLAS_FOUNDATION_REFERENCE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/j1-pg-free-history-24-v1")
+
+add_test(NAME tools.foundation_reference
+    COMMAND "${Python3_EXECUTABLE}" -m unittest tools.qa.foundation_reference_test)
+add_test(NAME tools.foundation_reference_verify
+    COMMAND "${Python3_EXECUTABLE}" -m tools.qa.foundation_reference verify
+        "${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/j1-pg-free-history-24-v1")
+set_tests_properties(tools.foundation_reference tools.foundation_reference_verify
+    PROPERTIES WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" TIMEOUT 30 LABELS "unit;verification;negative")

@@ -1,0 +1,14 @@
+....F.
+======================================================================
+FAIL: test_source_and_manifest_cannot_be_restamped_together (tools.qa.foundation_reference_test.ReferenceTest.test_source_and_manifest_cannot_be_restamped_together)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 123, in test_source_and_manifest_cannot_be_restamped_together
+    self.assertRaisesRegex(ValueError, "source provenance"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 6 tests in 6.993s
+
+FAILED (failures=1)

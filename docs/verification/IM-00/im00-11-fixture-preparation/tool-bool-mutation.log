@@ -1,0 +1,93 @@
+..FFFFFFFF...
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=12, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=13, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=14, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=19, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=20, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=21, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=22, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_metadata_and_all_spectral_components_rejected (tools.qa.foundation_reference_test.ReferenceTest.test_invalid_metadata_and_all_spectral_components_rejected) (row=23, component=1, invalid=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>\tools\qa\foundation_reference_test.py", line 93, in test_invalid_metadata_and_all_spectral_components_rejected
+    self.check_mutation(change)
+  File "<repo>\tools\qa\foundation_reference_test.py", line 67, in check_mutation
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 6 tests in 6.862s
+
+FAILED (failures=8)

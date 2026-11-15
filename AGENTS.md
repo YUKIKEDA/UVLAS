@@ -77,10 +77,11 @@
 - `solver-design-contracts`：要求を、式・離散残差・I/F・不変条件・検証計画へ落とす。開始判定。
 - `solver-package-implementation`：開始審査を通ったパッケージを、製品コードと独立試験へ移す。
 - `solver-performance`：要求から予算を作り、計測と内訳に基づいて改善し、結果の同一性を確かめる。
+- `reference-fixture`：凍結R&D参照を、元のhashと独立oracleを保って製品fixtureへ取り込み、別directoryで再生成・検証する。
 - `kernel-profile`：実装済みkernelのCPU profileをWindows WPR/WPA・Linux perfで採り、条件と支配する呼出しを読む。
 - `solver-implementation-review`：実装・変更・完了主張のレビュー。証拠ハッシュの整合検査ツールを含む。
 
-参照データを作り直す手順は、最初のfixtureを足すIM00-11でSkillにする。kernelのプロファイル手順は、IM00-12で最初の実kernelとともにkernel-profileへ記載した。手順を記載したことと、そのOSで実際に採取したことは区別する。
+参照の取込み・再生成の手順は、IM00-11の先行整備でreference-fixtureへ記載した。fixtureの整備とIM00-11全体の完了は区別する。kernelのプロファイル手順は、IM00-12で最初の実kernelとともにkernel-profileへ記載した。手順を記載したことと、そのOSで実際に採取したことは区別する。
 
 ## 環境
 
