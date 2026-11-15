@@ -1,0 +1,138 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-03"
+  ],
+  "package": "IM-00",
+  "issue": 13,
+  "date": "2026-11-15",
+  "scope": "Immutable model references, owned canonical state envelopes, evaluation-target binding, qualification and single-use commit, complete cache generations and exclusive workspace leases",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "fbf378aecb2aa512624b9b86612dd45f6fddb306",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "command": "ctest --preset windows-debug -R '^core\\.state$'",
+  "ctest": {
+    "passed": 1,
+    "total": 1,
+    "tests": [
+      "core.state"
+    ]
+  },
+  "reference": "Fixed SHA-256 answers independently calculated with Python hashlib for documented model encoding and bytes [1,2,3]; explicit metadata mutations; owning storage observed after workspace reuse/destruction; real concurrent lease acquisition",
+  "sources": [
+    {
+      "id": "im00-9-state-api",
+      "sha256": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+      "hint": "include/uvlas/core/state.hpp"
+    },
+    {
+      "id": "im00-9-state-implementation",
+      "sha256": "9902e1174ebeadef96a8def7a86736e37726d6725163b6dfab0379ab3367a3b3",
+      "hint": "src/core/state.cpp"
+    },
+    {
+      "id": "im00-9-state-tests",
+      "sha256": "3d10bd26b164fd12571cdfe05913300b2e16fa5c9de8f5f905fef9421242b3ec",
+      "hint": "tests/core/state_test.cpp"
+    },
+    {
+      "id": "im00-9-state-contract",
+      "sha256": "2013a2c5cb1584db5332ab78c324993ec46907827241edf9c0a11e811f750c46",
+      "hint": "docs/specs/foundation/state-contract.md"
+    },
+    {
+      "id": "im00-9-failure-api",
+      "sha256": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d",
+      "hint": "include/uvlas/core/failure.hpp"
+    },
+    {
+      "id": "im00-9-certificate-api",
+      "sha256": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+      "hint": "include/uvlas/core/error_certificate.hpp"
+    },
+    {
+      "id": "im00-9-certificate-implementation",
+      "sha256": "35aee573784a768b9d81579ae91501d309fdfce991e5c043f777951bed7d4d9a",
+      "hint": "src/core/error_certificate.cpp"
+    },
+    {
+      "id": "im00-9-identity-api",
+      "sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "hint": "include/uvlas/core/identifier.hpp"
+    },
+    {
+      "id": "im00-9-resource-plan-api",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "hint": "include/uvlas/core/resource_plan.hpp"
+    },
+    {
+      "id": "im00-9-dimensions-api",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "hint": "include/uvlas/core/checked_dimensions.hpp"
+    },
+    {
+      "id": "im00-9-dimensions-implementation",
+      "sha256": "5132c6d9de7be64d5d4d820f436333341baa6a98384bcb7510733066030d484c",
+      "hint": "src/core/checked_dimensions.cpp"
+    },
+    {
+      "id": "im00-9-product-targets",
+      "sha256": "cb856a141371f849d007a25cad92d1f380d42f3ade6e5577ad84e609f36c3aba",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im00-9-test-targets",
+      "sha256": "bf5322c2afccfe58d810a248706b65bd1d328c6a8bd3179423881d0a52b3c1ee",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im00-9-compiler-policy",
+      "sha256": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+      "hint": "cmake/CompilerPolicy.cmake"
+    },
+    {
+      "id": "im00-9-project-options",
+      "sha256": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a",
+      "hint": "cmake/ProjectOptions.cmake"
+    },
+    {
+      "id": "im00-9-manifest",
+      "sha256": "f42cc5536e8e9a91cfa2fe84e592e0fe3bbe011f4bd1d8ae02fcde0dca3e9887",
+      "hint": "vcpkg.json"
+    }
+  ],
+  "development_mutations": [
+    "accept corrupted payload digest",
+    "accept unachieved evidence",
+    "ignore matrix generation",
+    "permit overlapping workspace leases"
+  ],
+  "review_corrections": [
+    "Borrowed API access restricted to lvalues",
+    "Evaluation target captured before computation and carried with completed evidence instead of restamping current candidate"
+  ],
+  "not_claimed": [
+    "physical_state_payload_format",
+    "governing_equation_evaluation",
+    "physical_solver_accuracy",
+    "experiment_validation",
+    "product_scale_performance",
+    "practical_acceptance"
+  ],
+  "ci": "Other platforms/configurations delegated to PR CI; no CI completion wait"
+}
