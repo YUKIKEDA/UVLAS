@@ -10,8 +10,8 @@ import subprocess
 from pathlib import Path
 from typing import cast
 
-FLAGS = ("build", "format", "python", "skills", "rd", "trace")
-JOBS = {"changes", "windows", "linux", "checks"}
+FLAGS = ("build", "benchmark", "format", "python", "skills", "rd", "trace")
+JOBS = {"changes", "windows", "linux", "benchmark", "checks"}
 TOOLCHAIN_TESTS = {
     "tests/toolchain/pinned_dependencies_test.cpp": "toolchain.pinned_dependencies",
     "tests/toolchain/linear_algebra_test.cpp": "toolchain.linear_algebra",
@@ -53,6 +53,10 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
             selected["skills"] = True
         elif path.startswith(".cursor/") or path in {"LICENSE", "THIRD_PARTY_NOTICES.md"}:
             continue
+        elif path.startswith("benchmarks/"):
+            # Compile the optional feature without running a performance comparison.
+            selected["format"] |= path.endswith((".cpp", ".hpp"))
+            selected["benchmark"] |= not path.endswith(".md")
         elif path == "tests/toolchain/check_notices.cmake":
             selected["build"] = True
         elif path.startswith(("src/", "include/", "tests/", "qa/", "cmake/")) or path in {
@@ -65,6 +69,7 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
             ".clang-tidy",
         }:
             selected["build"] = selected["format"] = selected["trace"] = True
+            selected["benchmark"] |= not path.startswith(("tests/", "qa/"))
         elif path.startswith(("rd/", "tools/rd/")):
             selected["rd"] = True
             selected["python"] |= path.startswith("tools/")
@@ -86,7 +91,7 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
         else:
             # Unknown dependencies must not silently disable required checks.
             selected = dict.fromkeys(FLAGS, True)
-    selected["checks"] = any(selected[key] for key in FLAGS if key != "build")
+    selected["checks"] = any(selected[key] for key in FLAGS if key not in {"build", "benchmark"})
     return selected
 
 
@@ -122,10 +127,15 @@ def verify_needs(value: object) -> list[str]:
     if changes.get("result") != "success":
         return ["Change selection did not succeed"]
     outputs = object_map(changes.get("outputs"))
-    if any(outputs.get(flag) not in ("true", "false") for flag in ("build", "checks")):
+    if any(outputs.get(flag) not in ("true", "false") for flag in ("build", "benchmark", "checks")):
         return ["Missing or invalid selection outputs"]
     errors: list[str] = []
-    for job, flag in (("windows", "build"), ("linux", "build"), ("checks", "checks")):
+    for job, flag in (
+        ("windows", "build"),
+        ("linux", "build"),
+        ("benchmark", "benchmark"),
+        ("checks", "checks"),
+    ):
         expected = "success" if outputs[flag] == "true" else "skipped"
         actual = object_map(needs[job]).get("result")
         if actual != expected:

@@ -19,7 +19,7 @@ endfunction()
 
 file(COPY "${SOURCE_ROOT}/CMakeLists.txt" "${SOURCE_ROOT}/cmake"
     "${SOURCE_ROOT}/src" "${SOURCE_ROOT}/include" "${SOURCE_ROOT}/tests"
-    "${SOURCE_ROOT}/qa" DESTINATION "${work}/source")
+    "${SOURCE_ROOT}/qa" "${SOURCE_ROOT}/benchmarks" DESTINATION "${work}/source")
 set(installed "${work}/installed")
 foreach(package IN ITEMS eigen3 spectra boost-multiprecision boost-hash2 nlohmann-json catch2)
     configure_file("${DEPENDENCY_PREFIX}/share/${package}/copyright"
@@ -67,5 +67,79 @@ foreach(mode IN ITEMS default ON OFF)
         math(EXPR count "${count}+1")
     endforeach()
 endforeach()
+
+# Only package discovery and the actual registered notice CTest run here. This
+# interface fixture never supplies headers or libraries to a compiled target.
+set(benchmark_package "${work}/benchmark-package")
+file(MAKE_DIRECTORY "${benchmark_package}")
+file(WRITE "${benchmark_package}/benchmarkConfig.cmake"
+    "add_library(benchmark::benchmark INTERFACE IMPORTED)\n")
+set(benchmark_notice "${installed}/${TRIPLET}/share/benchmark/copyright")
+file(WRITE "${benchmark_notice}" "Benchmark upstream notice fixture\n")
+
+function(configure_benchmark name mode)
+    set(options)
+    if(NOT mode STREQUAL "default")
+        list(APPEND options "-DUVLAS_BUILD_BENCHMARKS:BOOL=${mode}")
+    endif()
+    execute_process(COMMAND "${CMAKE_COMMAND}" -S "${work}/source" -B "${work}/${name}" -G Ninja
+        "-DCMAKE_CXX_COMPILER=${CXX_COMPILER}"
+        "-DCMAKE_PREFIX_PATH=${DEPENDENCY_PREFIX};${benchmark_package}"
+        "-DVCPKG_INSTALLED_DIR=${installed}" "-DVCPKG_TARGET_TRIPLET=${TRIPLET}"
+        "-DVCPKG_MANIFEST_FEATURES=benchmarks" "-DBUILD_TESTING:BOOL=ON"
+        "-DPython3_EXECUTABLE=${PYTHON_EXECUTABLE}" ${options}
+        RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error TIMEOUT 60)
+    if(NOT result EQUAL 0)
+        fail_case("Benchmark ${name}/${mode} configure failed: ${result}\n${output}\n${error}")
+    endif()
+endfunction()
+
+function(check_registered_notices name expect_success)
+    execute_process(COMMAND "${CTEST_COMMAND}" --test-dir "${work}/${name}"
+        --output-on-failure -R "^toolchain.third_party_notices$"
+        RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error TIMEOUT 30)
+    if(expect_success)
+        if(NOT result EQUAL 0 OR NOT output MATCHES "1/1 Test")
+            fail_case("Benchmark ${name} registered CTest failed: ${result}\n${output}\n${error}")
+        endif()
+    elseif(result EQUAL 0 OR NOT "${output}\n${error}" MATCHES "Missing copied notice: benchmark")
+        fail_case("Benchmark ${name} missing copy was not rejected: ${result}\n${output}\n${error}")
+    endif()
+endfunction()
+
+foreach(mode IN ITEMS default OFF ON)
+    configure_benchmark("benchmark-${mode}" "${mode}")
+    set(copy "${work}/benchmark-${mode}/third-party-notices/benchmark.txt")
+    if(mode STREQUAL "ON")
+        if(NOT EXISTS "${copy}")
+            fail_case("Enabled Benchmark notice was not copied")
+        endif()
+    elseif(EXISTS "${copy}")
+        fail_case("Disabled Benchmark notice was copied for ${mode}")
+    endif()
+    check_registered_notices("benchmark-${mode}" ON)
+endforeach()
+# The ON path must reject a lost copy, rather than simply skipping Benchmark.
+file(REMOVE "${work}/benchmark-ON/third-party-notices/benchmark.txt")
+check_registered_notices("benchmark-ON" OFF)
+configure_benchmark("benchmark-ON" ON)
+configure_benchmark("benchmark-ON" OFF)
+if(EXISTS "${work}/benchmark-ON/third-party-notices/benchmark.txt")
+    fail_case("ON to OFF retained the Benchmark notice")
+endif()
+check_registered_notices("benchmark-ON" ON)
+
+# Required upstream notices must still be enforced when the feature is enabled.
+file(REMOVE "${benchmark_notice}")
+execute_process(COMMAND "${CMAKE_COMMAND}" -S "${work}/source"
+    -B "${work}/benchmark-missing" -G Ninja "-DCMAKE_CXX_COMPILER=${CXX_COMPILER}"
+    "-DCMAKE_PREFIX_PATH=${DEPENDENCY_PREFIX};${benchmark_package}"
+    "-DVCPKG_INSTALLED_DIR=${installed}" "-DVCPKG_TARGET_TRIPLET=${TRIPLET}"
+    "-DVCPKG_MANIFEST_FEATURES=benchmarks" "-DBUILD_TESTING:BOOL=ON"
+    "-DUVLAS_BUILD_BENCHMARKS:BOOL=ON" "-DPython3_EXECUTABLE=${PYTHON_EXECUTABLE}"
+    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error TIMEOUT 60)
+if(result EQUAL 0 OR NOT "${output}\n${error}" MATCHES "Missing third-party notice for benchmark")
+    fail_case("Enabled Benchmark accepted a missing upstream notice: ${result}\n${output}\n${error}")
+endif()
 file(REMOVE_RECURSE "${work}")
-message(STATUS "${count} fresh notice configurations passed (N4-01)")
+message(STATUS "${count} Catch2 configurations and Benchmark default/OFF/ON/toggle/negative registered CTest checks passed (N4-01)")

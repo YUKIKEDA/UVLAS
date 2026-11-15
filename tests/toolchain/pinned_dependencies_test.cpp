@@ -12,12 +12,76 @@
 #include <catch2/catch_version_macros.hpp>
 #include <nlohmann/json.hpp>
 
+#include <array>
+#include <bit>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <limits>
 #include <map>
+#include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
+
+namespace {
+// Override version schemes: https://learn.microsoft.com/en-us/vcpkg/reference/vcpkg-json#overrides
+// This reads an exact pin, not a version range or a full manifest schema.
+[[nodiscard]] std::optional<std::string> pinned_version(const nlohmann::json& item) {
+    if (!item.is_object()) {
+        return std::nullopt;
+    }
+    std::optional<std::string> result;
+    for (const auto* field : {"version", "version-semver", "version-date", "version-string"}) {
+        const auto value = item.find(field);
+        if (value == item.end()) {
+            continue;
+        }
+        if (result.has_value() || !value->is_string()) {
+            return std::nullopt;
+        }
+        result = value->get<std::string>();
+        if (result->empty()) {
+            return std::nullopt;
+        }
+    }
+    return result;
+}
+} // namespace
+
+TEST_CASE("Override pin fields are unique nonempty strings", "[toolchain][negative][N4-01]") {
+    constexpr std::array<std::pair<std::string_view, std::string_view>, 4> fields{
+        {{"version", "1.2.3"},
+         {"version-semver", "2.3.4"},
+         {"version-date", "2026-11-15"},
+         {"version-string", "release-tag"}}};
+    // All sixteen subsets cover missing, each valid field, and every ambiguity.
+    for (unsigned mask = 0; mask < 16; ++mask) {
+        nlohmann::json item = {{"name", "fixture"}};
+        std::string expected;
+        for (std::size_t i = 0; i < fields.size(); ++i) {
+            if ((mask & (1U << i)) != 0) {
+                item[fields[i].first] = fields[i].second;
+                expected = fields[i].second;
+            }
+        }
+        const auto actual = pinned_version(item);
+        REQUIRE(actual.has_value() == std::has_single_bit(mask));
+        if (actual) {
+            CHECK(*actual == expected);
+        }
+    }
+    for (const auto& [field, value] : fields) {
+        (void)value;
+        for (const auto& invalid : nlohmann::json::array(
+                 {nullptr, false, 1, 1.5, "", nlohmann::json::array(), nlohmann::json::object()})) {
+            CHECK_FALSE(pinned_version(nlohmann::json{{field, invalid}}));
+        }
+    }
+    CHECK_FALSE(pinned_version(nullptr));
+    CHECK_FALSE(pinned_version(nlohmann::json::array()));
+}
 
 TEST_CASE("pinned dependency versions reach the compiler", "[toolchain][N4-01]") {
     std::ifstream input(UVLAS_MANIFEST_PATH);
@@ -25,7 +89,9 @@ TEST_CASE("pinned dependency versions reach the compiler", "[toolchain][N4-01]")
     const auto manifest = nlohmann::json::parse(input);
     std::map<std::string, std::string> versions;
     for (const auto& item : manifest.at("overrides")) {
-        versions.emplace(item.at("name").get<std::string>(), item.at("version").get<std::string>());
+        const auto pin = pinned_version(item);
+        REQUIRE(pin.has_value());
+        versions.emplace(item.at("name").get<std::string>(), *pin);
     }
     const auto version = [](int major, int minor, int patch) {
         return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(patch);

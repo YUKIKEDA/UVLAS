@@ -30,20 +30,20 @@ gate:
 # gate: formatting of product sources and tests
 [windows]
 format-check:
-    {{clang_format}} --dry-run --Werror (git ls-files "src/*.cpp" "include/*.hpp" "tests/*.cpp" "qa/*.cpp")
+    {{clang_format}} --dry-run --Werror (git ls-files "src/*.cpp" "src/*.hpp" "include/*.hpp" "tests/*.cpp" "tests/*.hpp" "qa/*.cpp" "qa/*.hpp" "benchmarks/*.cpp" "benchmarks/*.hpp")
 
 [linux]
 format-check:
-    {{clang_format}} --dry-run --Werror $(git ls-files 'src/*.cpp' 'include/*.hpp' 'tests/*.cpp' 'qa/*.cpp')
+    {{clang_format}} --dry-run --Werror $(git ls-files 'src/*.cpp' 'src/*.hpp' 'include/*.hpp' 'tests/*.cpp' 'tests/*.hpp' 'qa/*.cpp' 'qa/*.hpp' 'benchmarks/*.cpp' 'benchmarks/*.hpp')
 
 # not a gate: rewrite product sources and tests in place
 [windows]
 format:
-    {{clang_format}} -i (git ls-files "src/*.cpp" "include/*.hpp" "tests/*.cpp" "qa/*.cpp")
+    {{clang_format}} -i (git ls-files "src/*.cpp" "src/*.hpp" "include/*.hpp" "tests/*.cpp" "tests/*.hpp" "qa/*.cpp" "qa/*.hpp" "benchmarks/*.cpp" "benchmarks/*.hpp")
 
 [linux]
 format:
-    {{clang_format}} -i $(git ls-files 'src/*.cpp' 'include/*.hpp' 'tests/*.cpp' 'qa/*.cpp')
+    {{clang_format}} -i $(git ls-files 'src/*.cpp' 'src/*.hpp' 'include/*.hpp' 'tests/*.cpp' 'tests/*.hpp' 'qa/*.cpp' 'qa/*.hpp' 'benchmarks/*.cpp' 'benchmarks/*.hpp')
 
 # gate: Python tools: ruff (lint and format) and pyright in strict mode
 lint-python:

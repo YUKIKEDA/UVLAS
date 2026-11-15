@@ -66,6 +66,7 @@ add_test(NAME toolchain.third_party_notices
     COMMAND "${CMAKE_COMMAND}"
         "-DSHARE_DIR=${UVLAS_THIRD_PARTY_SHARE}"
         "-DNOTICES_DIR=${UVLAS_THIRD_PARTY_NOTICES}"
+        "-DBUILD_BENCHMARKS=${UVLAS_BUILD_BENCHMARKS}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notices.cmake")
 set_tests_properties(toolchain.third_party_notices PROPERTIES TIMEOUT 10 LABELS "integration")
 
@@ -77,6 +78,7 @@ add_test(NAME toolchain.notice_configuration
         "-DTRIPLET=${VCPKG_TARGET_TRIPLET}"
         "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
         "-DPYTHON_EXECUTABLE=${Python3_EXECUTABLE}"
+        "-DCTEST_COMMAND=${CMAKE_CTEST_COMMAND}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notice_configuration.cmake")
 set_tests_properties(toolchain.notice_configuration PROPERTIES TIMEOUT 180 LABELS "integration;negative")
 
@@ -105,6 +107,29 @@ add_test(NAME core.identifier_compilation
         "-DPROJECT_INCLUDE=${PROJECT_SOURCE_DIR}/include"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set_tests_properties(core.identifier_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
+
+uvlas_add_test(core.instrumentation LABELS unit integration negative
+    SOURCES core/instrumentation_test.cpp LIBS uvlas_core nlohmann_json::nlohmann_json)
+uvlas_add_test(core.allocation_audit LABELS property negative
+    SOURCES core/allocation_audit_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_core_audit uvlas::eigen)
+uvlas_enable_allocation_audit(uvlas_test_core_allocation_audit)
+uvlas_require_audited_dependencies(uvlas_test_core_allocation_audit)
+add_executable(uvlas_eigen_allocation_probe core/eigen_allocation_probe.cpp support/allocation_audit.cpp)
+uvlas_configure_target(uvlas_eigen_allocation_probe)
+uvlas_enable_allocation_audit(uvlas_eigen_allocation_probe)
+target_link_libraries(uvlas_eigen_allocation_probe PRIVATE uvlas::eigen)
+add_test(NAME core.eigen_allocation_guard COMMAND "${CMAKE_COMMAND}"
+    "-DPROBE=$<TARGET_FILE:uvlas_eigen_allocation_probe>"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/core/check_eigen_allocation.cmake")
+set_tests_properties(core.eigen_allocation_guard PROPERTIES TIMEOUT 40 LABELS "negative")
+add_test(NAME core.audit_configuration COMMAND "${CMAKE_COMMAND}"
+    "-DSOURCE=${CMAKE_CURRENT_SOURCE_DIR}/core/audit_configuration"
+    "-DBINARY=${CMAKE_CURRENT_BINARY_DIR}/audit-configuration-$<CONFIG>"
+    "-DAUDIT_MODULE=${PROJECT_SOURCE_DIR}/cmake/AllocationAudit.cmake"
+    "-DCOMPILER=${CMAKE_CXX_COMPILER}"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/core/check_audit_configuration.cmake")
+set_tests_properties(core.audit_configuration PROPERTIES TIMEOUT 100 LABELS "negative")
 
 find_package(Threads REQUIRED)
 uvlas_add_test(core.state

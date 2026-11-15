@@ -21,6 +21,15 @@ alwaysApply: true
 
 ## 既に決めたこと
 
+feature集合が異なる構成には別の `VCPKG_INSTALLED_DIR` を使う。他のタスクが参照中の導入prefixは読み取り専用とし、借用する構成では `VCPKG_MANIFEST_INSTALL=OFF` にする。バイナリキャッシュは共有できるが、導入prefixの内容を別のfeature集合で入れ替えない。
+
+2026-11-15、IM00-12のBenchmark構成でfeatureの区切りを誤り、共有prefixからCatch2が一時的に除去された。通常のtests構成で復元し、Benchmark用のprefixを分離した。
+
+```text
+BAD   他タスクが参照する通常prefixで、Benchmark用にfeature集合を切り替える
+GOOD  Benchmarkは専用prefixへ導入し、既存prefixの借用はmanifest installを無効にする
+```
+
 - 線形代数はEigen、固有値はSpectra、精密参照と厳密な線形拘束とSHA-256はBoost（Multiprecision、Hash2）、JSONはnlohmann/json、Pythonの結合はpybind11。
 - 試験はCatch2、kernelの計測はGoogle Benchmark。
 - BLAS、別の疎直接法、高速多重極は採用していない。足すなら、同じ原作用素と誤差の予算を、独立に検査する。
@@ -39,3 +48,19 @@ GOOD  設計のIssueを開く：何のためか、利用者が何を払うか（
 ```
 
 2026-11-11、vcpkgのレジストリにSpectra 1.2.0が無く、1.0.1のportを写したoverlay portは、CMakeの設定ファイルの置き場所が版で変わっていたために失敗した。portは、写した後に実際にビルドして確かめる。
+
+通知を選ぶ処理と、複製を検査するCTestは、同じビルド機能の選択に従う。導入prefixに残っている任意依存を、その構成の配布対象と混同しない。構成の成功だけでなく、実際に登録されたCTestを、既定OFF・明示OFF・ON・同一ビルド先のON→OFFで走らせる。ONの通知欠落を拒否する負対照も残す。
+
+2026-11-15、PR #46ではBenchmark OFF時に通知を除外した一方、CTestがprefix内の全通知を要求し、構成が成功しても試験が失敗した。BUILD_TESTING=OFFの構成確認だけではこの不整合を検出できなかった。
+
+```text
+BAD   コピー側だけ任意依存を除外し、試験はprefix内の全依存を必須にする
+GOOD  コピーと登録CTestに機能の選択を渡し、OFFとON双方の正・負対照を走らせる
+```
+
+manifestのoverrideを変えたときは、追加した任意featureのビルドだけでなく、manifestを読む既存の試験も影響範囲へ含める。2026-11-15、PR #46でBenchmarkをversion-semverで固定したところ、全overrideをversionだけで読むtoolchain.pinned_dependenciesが、Benchmark OFFの通常構成でも失敗した。任意featureと通知の構成試験に絞り、この既存consumerを手元で確認しなかったためCIで発覚した。
+
+```text
+BAD   任意featureがOFFなので、manifestの変更は既存の試験へ影響しないと判断する
+GOOD  manifestのconsumerを検索し、変更に関係する版固定の既存試験を選んで走らせる
+```

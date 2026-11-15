@@ -1,6 +1,6 @@
 # 構成、ビルド、試験
 
-現在の製品コードはビルド情報、共通の失敗・誤差認定の型とCLIの骨組みで、解析コマンドは無い。公開APIの互換性保証は始めていない。
+現在の製品コードはビルド情報、共通の失敗・誤差認定、checked寸法・資源計画、工程時間・メモリ計測とCLIの骨組みで、解析コマンドは無い。公開APIの互換性保証は始めていない。
 
 ## 必要なもの
 
@@ -28,6 +28,7 @@
 | Boost Multiprecision、Hash2 | 1.92.0 | 精密参照、正確な線形拘束、SHA-256 |
 | nlohmann/json | 3.12.0 | ケースと状態のJSON |
 | Catch2 | 3.16.1 | 試験（feature `tests`） |
+| Google Benchmark | 1.9.5 | kernel計測専用（feature `benchmarks`、通常Presetは導入しない） |
 | pybind11 | 3.1.0 | Python結合（feature `python`。現在のPresetでは導入しない） |
 
 ## Windows
@@ -85,13 +86,18 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | `toolchain.arnoldi` | 実数作用素の複素共役固有値と、複素非Hermitian作用素の固有値を、行列を渡さないArnoldiで求める |
 | `toolchain.precise_arithmetic` | Multiprecisionの精度、有理数の厳密算術、Hash2のSHA-256既知値を照合する |
 | `toolchain.third_party_notices` | vcpkgの著作権・ライセンス通知が構成先へバイト一致で複製されていること。扱いは[第三者通知](../THIRD_PARTY_NOTICES.md) |
-| `toolchain.notice_configuration` | 実ソースの複製を使った新規構成6通り。試験の既定ON・明示ON・OFFと、Catch2通知あり／なしを照合する。依存原本の変更・C++ビルドは行わない |
+| `toolchain.notice_configuration` | 実ソースの複製でCatch2通知の6構成と、Benchmarkの既定OFF・明示OFF・ON・同一ビルド先のON→OFFを確認する。後者は登録済みの通知CTestも走らせ、ONの複製・上流通知欠落を拒否する。構成専用package fixtureを使い、依存原本の変更・C++ビルドは行わない |
 | `core.failure` | 17種類の失敗、所有する診断、識別子の混用拒否、例外をResultへ変換する入口の契約 |
 | `core.error_certificate` | 未評価・達成・未達の区別、予算境界、負値・非有限・未対応表現の拒否 |
 | `core.checked_dimensions` | 符号付き64bit寸法・バイト数の検査、ゼロ次元、32bit外部APIへの検査付き変換 |
-| `core.resource_plan` | 累積payloadの確保前照合、超過時の確保禁止、失敗時の計上値不変、所有配列の寿命 |
-| `core.state` | 不変Model、親・候補・資格の所有とhash照合、一回確定、未達・未評価・変更後の拒否、全cache世代、Workspaceの再入・並行排他 |
+| `core.resource_plan` | 累積payloadの確保前照合、超過時の確保禁止、失敗時の予約解放と内側成功の計上保持、所有配列の寿命 |
 | `core.identifier_compilation` | 正のコンパイル対照と、8種類のIDを異種IDから受け取るコンパイル失敗の確認 |
+| `core.instrumentation` | 工程集計、無効時の結果不変、OSメモリ、条件と結果のJSON、入力拒否 |
+| `core.allocation_audit` | C++の全new形式、workerでの確保、未対応監査の拒否、準備済みEigen演算とthread数別の結果比較 |
+| `core.eigen_allocation_guard` | 同じprobeの正常対照と、Eigenの動的確保・reallocの期待診断による拒否 |
+| `core.audit_configuration` | 未監査の製品ライブラリの直接・interface越しリンクを構成時に拒否 |
+
+| `core.state` | 不変Model、親・候補・資格の所有とhash照合、一回確定、未達・未評価・変更後の拒否、全cache世代、Workspaceの再入・並行排他 |
 | `numerics.storage` | 密・complex・CSC疎・PointSoA・DofLayoutの配置、所有、ID・写像・尺度・非有限の検査 |
 | `numerics.eigen_views` | 非公開Eigen境界のpointer一致、padding、scalar・配置・stride・shape・非有限の拒否 |
 | `numerics.storage_compilation` | 正のコンパイル対照、未対応scalarとtemporaryからの借用のコンパイル失敗 |
@@ -100,12 +106,16 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 
 ソルバーの精度を確かめる試験は、まだ無い。
 
+確保監査では通常版のuvlas_coreを混ぜず、同じ製品sourceを再コンパイルしたuvlas_core_auditを使う。Eigenのruntime確保検査とassertを全TUで揃え、Releaseでも監査用targetはNDEBUGを解除する。監視backendとthreadの範囲は [計測契約](specs/foundation/instrumentation-contract.md) に従い、未対応の経路を確保0として通さない。
+
+kernelの計測は [benchmarks/README.md](../benchmarks/README.md) の独立した構成で行う。Benchmarkと通常構成の導入prefixを分ける。CPUプロファイルの手順は [kernel-profile](../.agents/skills/kernel-profile/SKILL.md) を使う。
+
 ## 開発用CLIの終了規約
 
 | 入力 | 標準出力 | 標準エラー | 終了コード |
 |---|---|---|---|
 | `--help` | 利用方法と開発状態 | 空 | 0 |
-| `--version` | 開発版、コンパイラ、プラットフォーム、ビルド構成 | 空 | 0 |
+| `--version` | 開発版、コンパイラ、プラットフォーム、ビルド構成、命令セット | 空 | 0 |
 | `--build-info` | 来歴のJSON：版、commit、未commitの変更の有無、コンパイラ、浮動小数点の設定、命令セット、プラットフォームの鍵、依存の版 | 空 | 0 |
 | 引数なし・余分な引数 | 空 | 引数個数の診断と利用方法 | 2 |
 | 想定外の例外 | 不定 | 不定 | 1 |

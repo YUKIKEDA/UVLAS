@@ -2,9 +2,9 @@
 
 作業の順序と状態の正本。行が持つのはID、種類、題、Issue、状態だけで、完了条件はIssueに書く。行の追加と削除はGrillの後に行う。「今」を書き換えるのは、その行を終えるPRだけ。
 
-**今**：IM00-12
+**今**：IM00-5
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、IM00-1の依存検査、IM00-3の共通失敗型・誤差認定の型、IM00-2のchecked寸法・資源計画を実装した。次はIM00-12の計測基盤。密・疎の保持IM00-4と状態契約IM00-9は先行条件を満たしており、依存と編集箇所を分けて並行できる。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。密・疎の保持IM00-4と状態契約IM00-9も採用済みで、次のIM00-5とPython結合IM00-10を並行して進められる。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -64,9 +64,9 @@ flowchart LR
 | IM00-9 | Feat | Model参照、AcceptedState／TrialState、Workspace、cache世代、資格と一回確定 | #13 | Done |
 | IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | Todo |
 | IM00-11 | Test | IM-00の完了gate：設計試作の4数値群を製品経路で検証する | #15 | Todo |
-| IM00-12 | Feat | 計測基盤：工程別の時間、ピークメモリ、確保の検査、決定性の試験枠、kernelベンチ | #25 | Todo |
+| IM00-12 | Feat | 計測基盤：工程別の時間、ピークメモリ、確保の検査、決定性の試験枠、kernelベンチ | #25 | Done |
 
-着手の順：IM00-1 → IM00-3 → IM00-2、IM00-12 → IM00-4 → IM00-5 → IM00-6、IM00-7 → IM00-8。IM00-12は最初の解法（IM00-6）より前に終える。IM00-9はIM00-3の後、IM00-10はIM00-9の後に並行して進められる。IM00-11が最後。
+依存はIssueに従う。IM00-1 → IM00-3の後、IM00-2とIM00-12を並行できる。IM00-2・3の後はIM00-4とIM00-9、IM00-3・4の後はIM00-5へ進める。IM00-4・5の後のIM00-6とIM00-7は並行し、両方の後にIM00-8を置く。IM00-3・9の後はIM00-10へ進め、IM00-1〜10の後にIM00-11でパッケージを判定する。IM00-12は最初の解法IM00-6より前に終える。行順を全作業の直列依存と解釈しない。
 
 ## IM-01 〜 IM-08
 

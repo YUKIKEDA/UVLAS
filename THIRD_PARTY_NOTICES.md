@@ -9,6 +9,7 @@ UVLAS自身のソースのライセンスは、ルートの `LICENSE` にあるA
 | Boost Multiprecision／Hash2 | 1.92.0 | BSL-1.0 | 精密参照、有理数、SHA-256 |
 | nlohmann/json | 3.12.0 | MIT | JSON |
 | Catch2 | 3.16.1 | BSL-1.0 | 試験専用 |
+| Google Benchmark | 1.9.5 | Apache-2.0 | `benchmarks` feature、計測専用。製品へリンクしない |
 | pybind11 | 3.1.0 | BSD-3-Clause | Python結合のfeature。現在のPresetでは導入しない |
 
 上の表はライセンス全文や著作権表示の代わりではない。CMakeの構成時に、vcpkgが導入した各パッケージの `share/<package>/copyright` を、構成先の `third-party-notices/<package>.txt` へバイトを変えずに複製する。導入済みの推移的依存とビルド用パッケージの通知も含むため、この一覧は製品のリンク依存の一覧ではない。Eigenの通知には、同梱されたBSD等の全文も含まれる。
