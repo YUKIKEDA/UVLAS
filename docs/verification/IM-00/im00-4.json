@@ -1,0 +1,147 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02"
+  ],
+  "package": "IM-00",
+  "issue": 8,
+  "date": "2026-11-15",
+  "scope": "Owned real/complex dense, canonical int64 CSC, PointSoA, DofLayout index selection and metadata, checked private Eigen borrowing only",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "e6b1130d474dab7940d583aba884b29962ac817b",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "command": "ctest --preset windows-debug -R '^numerics\\.'",
+  "ctest": {
+    "passed": 3,
+    "total": 3,
+    "tests": [
+      "numerics.storage",
+      "numerics.eigen_views",
+      "numerics.storage_compilation"
+    ]
+  },
+  "reference": "Fixed component positions, exact integer duplicate sums and canonical offsets, fixed physical identities/units/scales/owner associations, independent coordinate inverse selection; positive compiler control plus four rejected usages; pointer equality proves zero-copy views",
+  "sources": [
+    {
+      "id": "im00-4-storage-api",
+      "hint": "include/uvlas/numerics/storage.hpp",
+      "sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339"
+    },
+    {
+      "id": "im00-4-storage-implementation",
+      "hint": "src/numerics/storage.cpp",
+      "sha256": "a8e6917f308f8d96ce04f93469a5801ff580df731f8744912a45b5f3d82e4d06"
+    },
+    {
+      "id": "im00-4-private-eigen-adapter",
+      "hint": "src/numerics/eigen_views.hpp",
+      "sha256": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87"
+    },
+    {
+      "id": "im00-4-storage-tests",
+      "hint": "tests/numerics/storage_test.cpp",
+      "sha256": "7522ae49169ad9476b2f93de9173f7ec27598d4ede94ddbcea5afb3b2d0ddb75"
+    },
+    {
+      "id": "im00-4-eigen-tests",
+      "hint": "tests/numerics/eigen_views_test.cpp",
+      "sha256": "5a6bcd1fa4af676c1d383d59493dabf510fd49b4efa5e5d858b8824942a246e4"
+    },
+    {
+      "id": "im00-4-compiler-controls",
+      "hint": "tests/numerics/borrow_compile/CMakeLists.txt",
+      "sha256": "80399acde198f94d120d3dd39361863060be72f8c6aa137d57f419b951babe39"
+    },
+    {
+      "id": "im00-4-storage-contract",
+      "hint": "docs/specs/foundation/numerical-storage-contract.md",
+      "sha256": "55045fa3a3abee9a6c323550291383a620bdec12593ec7848b8095e0ce8cbb12"
+    },
+    {
+      "id": "im00-4-resource-plan",
+      "hint": "include/uvlas/core/resource_plan.hpp",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a"
+    },
+    {
+      "id": "im00-4-dimension-api",
+      "hint": "include/uvlas/core/checked_dimensions.hpp",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa"
+    },
+    {
+      "id": "im00-4-dimension-implementation",
+      "hint": "src/core/checked_dimensions.cpp",
+      "sha256": "5132c6d9de7be64d5d4d820f436333341baa6a98384bcb7510733066030d484c"
+    },
+    {
+      "id": "im00-4-failure-api",
+      "hint": "include/uvlas/core/failure.hpp",
+      "sha256": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d"
+    },
+    {
+      "id": "im00-4-identity-api",
+      "hint": "include/uvlas/core/identifier.hpp",
+      "sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7"
+    },
+    {
+      "id": "im00-4-product-targets",
+      "hint": "CMakeLists.txt",
+      "sha256": "617e5272e67917d18c00955877a6b33abe2cbfd375867aa09b8fc4ed8a3dad33"
+    },
+    {
+      "id": "im00-4-test-targets",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "f75fbff542d83f9b38b42dc2696ab23fd75858501c1b41a6b2b9391cc3e6de05"
+    },
+    {
+      "id": "im00-4-compiler-policy",
+      "hint": "cmake/CompilerPolicy.cmake",
+      "sha256": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8"
+    },
+    {
+      "id": "im00-4-project-options",
+      "hint": "cmake/ProjectOptions.cmake",
+      "sha256": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a"
+    },
+    {
+      "id": "im00-4-dependency-policy",
+      "hint": "cmake/Dependencies.cmake",
+      "sha256": "8a5c69a5ff7e27d8e9469f6a1d0584f983646431a2efc2d244d766de469d875c"
+    },
+    {
+      "id": "im00-4-manifest",
+      "hint": "vcpkg.json",
+      "sha256": "f42cc5536e8e9a91cfa2fe84e592e0fe3bbe011f4bd1d8ae02fcde0dca3e9887"
+    }
+  ],
+  "development_mutations": [
+    "complex real-part check removed",
+    "duplicate compensation discarded",
+    "CSC duplicate rows accepted",
+    "independent inverse loses order",
+    "point identities discarded",
+    "Eigen row-major silently accepted"
+  ],
+  "not_claimed": [
+    "physical_solver_accuracy",
+    "precision_buffer_or_two_word_consumer_qualification",
+    "nonlinear_constraint_map_evaluation",
+    "product_scale_performance",
+    "practical_acceptance"
+  ],
+  "ci": "not awaited; Linux and remaining configurations are delegated to PR CI"
+}

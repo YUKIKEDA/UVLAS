@@ -34,7 +34,7 @@ add_custom_target(uvlas_git_revision ALL
     VERBATIM)
 
 set(UVLAS_CORE_SOURCES src/core/build_info.cpp src/core/error_certificate.cpp
-    src/core/checked_dimensions.cpp src/core/instrumentation.cpp)
+    src/core/checked_dimensions.cpp src/core/state.cpp src/core/instrumentation.cpp)
 add_library(uvlas_core STATIC ${UVLAS_CORE_SOURCES})
 uvlas_configure_target(uvlas_core)
 target_include_directories(uvlas_core
@@ -43,11 +43,16 @@ target_include_directories(uvlas_core
 target_compile_definitions(uvlas_core PRIVATE UVLAS_BUILD_CONFIGURATION="$<CONFIG>")
 # build_info reports the versions of the numerical dependencies.
 target_link_libraries(uvlas_core PRIVATE
-    uvlas::eigen Spectra::Spectra Boost::headers nlohmann_json::nlohmann_json)
+    uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 nlohmann_json::nlohmann_json)
 add_dependencies(uvlas_core uvlas_git_revision)
 if(WIN32)
     target_link_libraries(uvlas_core PRIVATE psapi)
 endif()
+
+add_library(uvlas_numerics STATIC src/numerics/storage.cpp)
+uvlas_configure_target(uvlas_numerics)
+target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(uvlas_numerics PUBLIC uvlas_core)
 
 # QA-03: the first baseline case. Built with the product flags, compared by CTest.
 add_executable(uvlas_numeric_canary qa/numeric_canary/main.cpp)
@@ -70,7 +75,7 @@ if(BUILD_TESTING)
         PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
     target_compile_definitions(uvlas_core_audit PRIVATE UVLAS_BUILD_CONFIGURATION="$<CONFIG>")
     target_link_libraries(uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra
-        Boost::headers nlohmann_json::nlohmann_json)
+        Boost::headers Boost::hash2 nlohmann_json::nlohmann_json)
     if(WIN32)
         target_link_libraries(uvlas_core_audit PRIVATE psapi)
     endif()

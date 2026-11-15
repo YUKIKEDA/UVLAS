@@ -56,12 +56,12 @@ flowchart LR
 | IM00-1 | Feat | 固定した数値依存の機能とライセンス通知を検査する | #5 | Done |
 | IM00-2 | Feat | 強いID、checked 64bit寸法、ResourcePlan | #6 | Done |
 | IM00-3 | Feat | Failure／expected と ErrorCertificate | #7 | Done |
-| IM00-4 | Feat | 密・CSC疎の保持、DofLayout、PointSoA | #8 | Todo |
+| IM00-4 | Feat | 密・CSC疎の保持、DofLayout、PointSoA | #8 | Done |
 | IM00-5 | Feat | PrecisionBuffer、two-product・補償残差、TwoWordの保持と明示投影 | #9 | Todo |
 | IM00-6 | Feat | 密基準解法：pivot付きLU、実LU＋複素後縁更新、反復改良 | #10 | Todo |
 | IM00-7 | Feat | 疎基準解法：対称正定値を確かめたLLT、不定KKTのSparseLU | #11 | Todo |
 | IM00-8 | Feat | 固定前処理の再始動GMRESと線形精度の認定 | #12 | Todo |
-| IM00-9 | Feat | Model参照、AcceptedState／TrialState、Workspace、cache世代、資格と一回確定 | #13 | Todo |
+| IM00-9 | Feat | Model参照、AcceptedState／TrialState、Workspace、cache世代、資格と一回確定 | #13 | Done |
 | IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | Todo |
 | IM00-11 | Test | IM-00の完了gate：設計試作の4数値群を製品経路で検証する | #15 | Todo |
 | IM00-12 | Feat | 計測基盤：工程別の時間、ピークメモリ、確保の検査、決定性の試験枠、kernelベンチ | #25 | Done |

@@ -96,6 +96,11 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | `core.allocation_audit` | C++の全new形式、workerでの確保、未対応監査の拒否、準備済みEigen演算とthread数別の結果比較 |
 | `core.eigen_allocation_guard` | 同じprobeの正常対照と、Eigenの動的確保・reallocの期待診断による拒否 |
 | `core.audit_configuration` | 未監査の製品ライブラリの直接・interface越しリンクを構成時に拒否 |
+
+| `core.state` | 不変Model、親・候補・資格の所有とhash照合、一回確定、未達・未評価・変更後の拒否、全cache世代、Workspaceの再入・並行排他 |
+| `numerics.storage` | 密・complex・CSC疎・PointSoA・DofLayoutの配置、所有、ID・写像・尺度・非有限の検査 |
+| `numerics.eigen_views` | 非公開Eigen境界のpointer一致、padding、scalar・配置・stride・shape・非有限の拒否 |
+| `numerics.storage_compilation` | 正のコンパイル対照、未対応scalarとtemporaryからの借用のコンパイル失敗 |
 | `qa.numeric_canary` | 基準ケースの結果が、このプラットフォームの基準結果とビット一致すること（QA-04）。認定していないプラットフォームでは落ちる |
 | `cli.build_info` | `uvlas --build-info` が来歴を返すこと |
 
