@@ -1,0 +1,23 @@
+2026-11-15T18:54:05+09:00
+Running <repo>\out\build\windows-bench\benchmarks\Release\uvlas_kernel_bench.exe
+Run on (16 X 2496 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x8)
+  L1 Instruction 32 KiB (x8)
+  L2 Unified 1280 KiB (x8)
+  L3 Unified 20480 KiB (x1)
+uvlas.commit: ec8c311a20179b2d9a64a425200b9ee534e2323f
+uvlas.compiler: MSVC 19.51.36260.0
+uvlas.configuration: Release
+uvlas.cpu: 13th Gen Intel(R) Core(TM) i5-13400F
+uvlas.dirty: false
+uvlas.floating_point: /fp:strict
+uvlas.instruction_set: sse2
+uvlas.logical_processors: 16
+uvlas.machine: windows-reference-a
+uvlas.physical_memory_bytes: 51343966208
+uvlas.platform: Windows AMD64
+uvlas.platform_key: windows-x64-msvc19.51-sse2
+uvlas.settings: {"checked_extents":[5000,64,3],"dense_orders":[16,64],"dense_rhs_columns":1,"dense_update_rank":0,"dense_refinements_max":5,"dense_owning_output_included":true}
+uvlas.threads: 1
+uvlas.version: 0.1.0-dev

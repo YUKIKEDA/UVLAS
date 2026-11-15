@@ -1,0 +1,302 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02",
+    "N4-03",
+    "N4-05",
+    "N4-06",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 10,
+  "date": "2026-11-15",
+  "source_commit": "aee4a63751bf4b1e9dadc0eafdf5114f45ab77ae",
+  "scope": "部分pivot付き実密LUと、実LU＋非共役の複素rank更新を実装・認定する。所有する共通の線形求解結果、元系に対する保守的な精度判定、明示的なbackend資源判定を含む。",
+  "provenance": {
+    "full_affected_tests_commit": "ec8c311a20179b2d9a64a425200b9ee534e2323f",
+    "full_affected_tests_clean": true,
+    "additive_refinement_limit_test_commit": "2a98ea81761dd5d31a5a7a6d5ac862363d33f028",
+    "final_product_source_equal_to_full_affected_test_commit": true,
+    "note": "影響範囲8CTestは、cleanなec8c311でDebug・Releaseとも成功した。その後の変更はbenchmark・文書、既存停滞試験への上限0/1の10行、合力と局所観測の独立認定1caseである。追加部分だけを両構成で確認し、通過済みの他の数値試験は繰り返していない。src/includeの全変更ファイルは、8CTest実行時のbyteと同一。変異のsource/test snapshotは、その時点の検証byteを別archiveで保持する。",
+    "additive_observation_test_commit": "aee4a63751bf4b1e9dadc0eafdf5114f45ab77ae"
+  },
+  "environment": {
+    "os": "Windows 11 AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict。最近接丸めと段階的アンダーフローを前提とする。",
+    "instruction_set": "sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "boost": "1.92.0",
+      "catch2": "3.16.1",
+      "benchmark": "1.9.5"
+    },
+    "dependency_prefix": "既存の試験用prefixとbenchmark用prefixを読取り専用で再利用した。manifestの自動導入は無効にし、featureや共有prefixを変更していない。"
+  },
+  "verification": [
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.(dense_solve|dense_contract|dense_allocations|linear_validation|linear_result|linear_metrics|backend_memory|precision)$ --output-on-failure",
+      "passed": 8,
+      "total": 8,
+      "log": "docs/verification/IM-00/im00-6/windows-debug.log"
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.(dense_solve|dense_contract|dense_allocations|linear_validation|linear_result|linear_metrics|backend_memory|precision)$ --output-on-failure",
+      "passed": 8,
+      "total": 8,
+      "log": "docs/verification/IM-00/im00-6/windows-release.log"
+    },
+    {
+      "command": "uvlas_test_numerics_dense_solve --reporter console *stagnation promotes and preserves*",
+      "configuration": "Debug",
+      "passed_cases": 1,
+      "assertions": 15,
+      "scope": "既存の停滞試験へ追加した、反復改善上限0/1の回帰だけを実行した。"
+    },
+    {
+      "command": "uvlas_test_numerics_dense_solve --reporter console *stagnation promotes and preserves*",
+      "configuration": "Release",
+      "passed_cases": 1,
+      "assertions": 15,
+      "scope": "既存の停滞試験へ追加した、反復改善上限0/1の回帰だけを実行した。"
+    },
+    {
+      "command": "uvlas_test_numerics_dense_contract --reporter console A qualified total*",
+      "configuration": "Debug",
+      "passed_cases": 1,
+      "assertions": 13,
+      "scope": "別担当が追加した合力・局所観測の独立認定caseだけを実行した。"
+    },
+    {
+      "command": "uvlas_test_numerics_dense_contract --reporter console A qualified total*",
+      "configuration": "Release",
+      "passed_cases": 1,
+      "assertions": 13,
+      "scope": "別担当が追加した合力・局所観測の独立認定caseだけを実行した。"
+    }
+  ],
+  "completion_evidence": [
+    {
+      "requirement": "型付きOperator/Rhs/Scales/Precision/Limitsから、所有するSolutionとCertificateまたは値としてのFailureを返す",
+      "tests": [
+        "linear_validation_test.cpp",
+        "linear_result_test.cpp",
+        "dense_contract_test.cpp"
+      ],
+      "evidence": "完全なcache identity、元係数の実内容、尺度・単位、外部から構築できない認定と独立した所有結果を確認した。"
+    },
+    {
+      "requirement": "非対称実行列の部分pivot付きLUと元残差",
+      "tests": [
+        "dense_solve_test.cpp"
+      ],
+      "evidence": "固定した3次系の係数・右辺を、Boost100桁の独立な直接消去と比較した。厳密にゼロのpivotは拒否し、極小pivotを閾値で落とさない。"
+    },
+    {
+      "requirement": "実LU＋複素Schur/Woodburyと、元の複素系の直接求解との一致",
+      "tests": [
+        "dense_solve_test.cpp"
+      ],
+      "evidence": "rank2・二右辺の固定二進有理数系を、独立な複素Boost100桁直接消去で確認した。元有効行列は固定の明示係数を使う。共役化の変異を検出し、小Schurの条件診断を別対象として確認した。"
+    },
+    {
+      "requirement": "合計5回以下の反復改善と停滞時のTwoWord昇格",
+      "tests": [
+        "dense_solve_test.cpp"
+      ],
+      "evidence": "1/3、13/5を含む成分微動の停滞反例、低位語保持、厳格投影の拒否、上限0/1を確認した。昇格しても補正回数をリセットしない。"
+    },
+    {
+      "requirement": "特異・非有限・空系・ゼロ右辺を区別し、正のモデル尺度を使う",
+      "tests": [
+        "dense_solve_test.cpp",
+        "dense_contract_test.cpp"
+      ],
+      "evidence": "特異なbase/Schur、rank0、0×2、ゼロ右辺と厳密な許容差、1e-300の非零pivot、実部・虚部の非有限、不正入力と予算0の組合せ、物理行に含まないpaddingを確認した。"
+    },
+    {
+      "requirement": "条件推定を保証として使わず、合力・局所量・拘束・反力の精度を混同しない",
+      "tests": [
+        "dense_solve_test.cpp",
+        "linear_result_test.cpp"
+      ],
+      "evidence": "逆κ1推定は未認定の診断に限る。有効更新行列の条件はNotEvaluatedとする。全ての必要消費者を別々に評価し、実候補・context・budgetを確認した。 A=Iと二進有理数の右辺を使い、実解の合計が基準2に一致しても、第一成分が基準1からずれる例を別担当が試験した。合力のみなら成功、局所観測も必要ならPrecisionUnresolvedになる。"
+    },
+    {
+      "requirement": "成功時も失敗時も親を変えない",
+      "tests": [
+        "dense_contract_test.cpp",
+        "dense_solve_test.cpp"
+      ],
+      "evidence": "同世代の係数変更とcache不整合の拒否、因子や入力の破棄後の結果所有、例外・再入失敗後の準備再利用、以前の結果の独立性を確認した。"
+    }
+  ],
+  "allocation_audit": {
+    "all_product_tus_recompiled_with_audit_policy": true,
+    "backends": [
+      "プロセス全体のC++確保試行",
+      "呼出しthreadのEigen runtime確保禁止"
+    ],
+    "real_paths": 8,
+    "complex_updated_paths": 2,
+    "conditions": "実数2RHSは、初期Binary64/TwoWord×通常/厳格精度×保持/投影の8経路。複素rank1・1RHSは保持/投影の2経路。required_checksは全て空。",
+    "expected_cpp_allocations": {
+      "retained": 8,
+      "projected": 9
+    },
+    "interpretation": "数値kernel前に、非空metadata配列6個と候補平面2個を確保し、投影時は平面1個を追加する。公開呼出し全体の回数とsource通読で予定外確保を検出する。kernel区間の0確保を直接測定した主張ではない。消費者checkが非空ならproof配列の予定確保が加わる。"
+  },
+  "mutations": {
+    "isolated": true,
+    "common": {
+      "control_cases": 16,
+      "control_assertions": 397,
+      "compiled_and_detected": 8,
+      "archive": "docs/verification/IM-00/im00-6/common-mutations-redacted.zip",
+      "scope": "固定したmetrics/resultを対象に、低位語・relative項の無視、正商のunderflowを0にする欠陥、返却候補の判定差替え、consumerのcontext/budget/全件被覆を確認した。正確なsnapshotはarchive内にある。通過済みの共通変異は繰り返していない。"
+    },
+    "dense": {
+      "control_cases": 12,
+      "control_assertions": 180,
+      "compiled_and_detected": 6,
+      "archive": "docs/verification/IM-00/im00-6/dense-mutations-redacted.zip",
+      "build_timeout_seconds": 120,
+      "run_timeout_seconds": 20,
+      "names": [
+        "conjugate_original_update",
+        "disable_progress_promotion",
+        "discard_initial_low_rhs",
+        "erase_correction_diagnostic",
+        "threshold_nonzero_pivot",
+        "allocate_inside_kernel"
+      ],
+      "scope": "全変異がcompileに成功した後、実行exit42で検出された。期限超過やcompile失敗を検出扱いにしていない。その後の追加は複素確保監査、上限0/1、合力・局所観測の独立認定caseだけで、製品実装のbyteは変わっていない。"
+    }
+  },
+  "measurements": [
+    {
+      "artifact": "docs/verification/IM-00/im00-6/dense-baseline.json",
+      "source_commit": "ec8c311a20179b2d9a64a425200b9ee534e2323f",
+      "uncommitted_changes": false,
+      "repetitions": 3,
+      "minimum_time_seconds": 0.1,
+      "application_threads": 1,
+      "processor_affinity_mask": 1,
+      "explicit_warmup": false,
+      "median_wall_nanoseconds": {
+        "DensePreparation/16": 5704.968749731572,
+        "DensePreparation/64": 58384.904090518605,
+        "DenseSolveBinary64/16": 140609.2633910053,
+        "DenseSolveBinary64/64": 2072391.0448436777,
+        "DenseSolvePromotedTwoWord/16": 390830.1339379249,
+        "DenseSolvePromotedTwoWord/64": 5435147.500247694
+      },
+      "scope": "合成小系の容量baseline。所有する出力と元系の精度認定を含む。製品全体の性能や、変更前後の高速化を主張しない。"
+    },
+    {
+      "artifact": "docs/verification/IM-00/im00-6/updated-baseline.json",
+      "source_commit": "9eaa996fe8d6ea4d9c3d4569b72b89496239c3c2",
+      "uncommitted_changes": false,
+      "repetitions": 3,
+      "minimum_time_seconds": 0.1,
+      "application_threads": 1,
+      "processor_affinity_mask": 1,
+      "explicit_warmup": false,
+      "median_wall_nanoseconds": {
+        "UpdatedPreparation/16": 5461.790178742376,
+        "UpdatedPreparation/64": 53736.023916876824,
+        "UpdatedSolve/16": 827890.594093945,
+        "UpdatedSolve/64": 11555710.00126656
+      },
+      "scope": "合成小系の容量baseline。所有する出力と元系の精度認定を含む。製品全体の性能や、変更前後の高速化を主張しない。"
+    }
+  ],
+  "resource_qualification": "非空系のEigen backend計画は予測に限る。証明済み上界がないRequireProvenBoundを拒否し、準備の再利用時も判定し直す。UVLAS所有配列のResourcePlanの意味は変えていない。実allocator/RSSの上限や48GiB profileの合格を主張しない。",
+  "checks": {
+    "format": "変更C++はclang-format21.1.2の検査に成功した。その後の上限0/1と合力・局所観測の追加caseも同じ版で整形した。",
+    "tidy": "clang-tidy21.1.1で構成を一つに絞り、対象コードの診断0で成功した。最終ログを保存した。大量に表示されるgenerated warningsは非表示のsystem/第三者診断であり、製品の警告を受容したものではない。",
+    "japanese": "新規の密契約とbenchmark説明のlintは0。rootが契約、追加した計測説明、停滞の教訓を独立に通読した。既存の教訓文書全体に対する段落構造のinfoは、参照表を主体とした文書なので保持した。",
+    "trace": "trace.py matrix/checkで153ID、問題0。追跡表を再生成した。",
+    "integrity": "既存のcheck_evidence_manifest.pyでintegrity_passed=true、55file、manifest1件、error0。byte整合の検査であり、科学的合否の判定ではない。"
+  },
+  "remaining_gates": [
+    "IM00-11：パッケージ全体と実4096系の製品認定",
+    "対応する物理kernel・UVLM・ANCF連成パッケージ：物理的な受入",
+    "IM-07：実務規模の48GiB・12時間の性能受入",
+    "Linux GCC14/ASan/UBSan：PR公開後のCI。手元では実行しておらず、完了を待たない。"
+  ],
+  "adoption_references": [
+    {
+      "id": "dense_sparse",
+      "sha256": "5c0a4458162638a58128757cfe78a6befbe445ac7e81dd80cd4820418b41f272",
+      "hint": "rd/foundation/numerics/experiments/cpp-numerics/dense_sparse.cpp",
+      "role": "採用方式の来歴に限る。独立な数値参照には使っていない。"
+    },
+    {
+      "id": "numerical-foundation-adoption-completion",
+      "sha256": "e6a8d1ce6b86161dabf3dbf9e070d557d745c558e2d4ea3123383f6ff2001b03",
+      "hint": "rd/foundation/numerics/records/numerical-foundation-adoption-completion.md",
+      "role": "採用方式の来歴に限る。独立な数値参照には使っていない。"
+    }
+  ],
+  "redaction": "tools/rd/redact.pyの既存規約で伏字にした。変更前後hashはredaction.jsonに保存し、benchmark既定のhost_nameは個人を識別しない宣言済みmachine labelへ置き換えた。benchmarkの数値配列は元データとの完全一致を確認し、archiveのsource snapshotも伏字後にhashを照合した。",
+  "sources": {
+    "CMakeLists.txt": "1c5169537919fc863f4b896a8b129bf59a4a14a7f3e43fc0852442e1b6e13e26",
+    "benchmarks/CMakeLists.txt": "7426dbc668442280c8ba7ef8799275d7174876604829b9b1ffa61c3562375214",
+    "benchmarks/dense_solve_bench.cpp": "e28cdf6e16f9c44d459406af324a1dea12a38faad43cfca2d22bd308a6b8e56a",
+    "benchmarks/main.cpp": "93b9e75d751f0ffa661f65d0feaa902cc29523a0f96cb27e320ce96e2762280a",
+    "benchmarks/updated_solve_bench.cpp": "ec600e7e6379c7b0136e7d8d9f467ea419279bf435aa0f1f5dca61504d21875e",
+    "docs/specs/foundation/backend-memory-contract.md": "f05af17f5fdd00a72dfe7c1d2d4d0fd220372dc8144de1c7e4eae6e8624e4b66",
+    "docs/specs/foundation/dense-solve-contract.md": "0cef925b0219242c05873e992720466329abe9cf47b143613fe7ff3d8d33907b",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "e8f57df001807507a3365d8abae748f19616bcd418d73c4eac2ae1da9d603ed9",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "include/uvlas/numerics/dense_solve.hpp": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "src/numerics/backend_memory.cpp": "d89105fbfda46249b2ef5d0355b5bcb73972dcd47607b8d15214997b7da7ce5a",
+    "src/numerics/backend_memory_detail.hpp": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+    "src/numerics/dense_solve.cpp": "74d43eadcd51ff23880fda775cd41897fa37a829dbe51b3bac373475e473190e",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/linear_result.cpp": "c2609291c7ff9b2a3b941918267d97f36bbfa5671969a57f89df82c657e28186",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "src/numerics/linear_validation.cpp": "4e6a50603eb991b45f22c2f0db7dca3c0ef002491560fda8f16b2b2dbc132de9",
+    "src/numerics/precision.cpp": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+    "tests/CMakeLists.txt": "ed0d2f6b5cab253d71c21ac112f795d30f585e6e5c981c674214c8cf50ffc15a",
+    "tests/numerics/backend_memory_test.cpp": "ad71c09764eefa401dfd25363bfc491754c375c42dbcb21042ce61e7905e1d95",
+    "tests/numerics/dense_allocations_test.cpp": "2f631a1b7ca2497e1b7cc1a4c8f891a81021a2f25e20554f4ea6f87aa6f8741b",
+    "tests/numerics/dense_contract_test.cpp": "f80a44de6f5daf67b0bbfe1f406ad266d1e112a3c2061e8da24e2c97348418d6",
+    "tests/numerics/dense_solve_test.cpp": "e504d9cbb6f8ec0de6775238198e1fffb18378841a1935a8dfa5fcd2c8b958db",
+    "tests/numerics/linear_metrics_test.cpp": "108d57d9e38e717f7d2710444529ec1101a4de787b71db5d5a0883f9ed3157e6",
+    "tests/numerics/linear_result_test.cpp": "0d7952089a6bfe3f0adf29633b0d947e59ef931344aced69fda506c718fe5e4a",
+    "tests/numerics/linear_validation_test.cpp": "c578ba8ae845eba85b247870ab39f251f1eaa4d4c92757625bd68849ef1ffb84"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-6/common-mutations-redacted.zip": "0eaa98a1324cde9320507d7ed406bb6b63b860ac1e52747885cad950abe65823",
+    "docs/verification/IM-00/im00-6/dense-baseline.json": "4888d4aaf1adb652c0fb36eb14daa843c9eed50385848a48df06d0fedd543684",
+    "docs/verification/IM-00/im00-6/dense-baseline.stderr.log": "599c135a82eadeb880370a45a04bd3b18a889a80f8648ae2eb20bbe16a3f4f05",
+    "docs/verification/IM-00/im00-6/dense-baseline.stdout.log": "de3d238184cfc13b54a6c66dbd37ec8f89ae17aadb062828441d000b86c9ecff",
+    "docs/verification/IM-00/im00-6/dense-mutations-redacted.zip": "c1746b5161fd07ff0d3a96efc044cac120cbe3aa2832345b98d0feebee4bc04e",
+    "docs/verification/IM-00/im00-6/redaction.json": "5b4056bf1a06973aa877d3ee261d4713e661bd86c012313b90cabf064438125c",
+    "docs/verification/IM-00/im00-6/refinement-limits-debug.log": "e84ec007fec1fa3650244a9efda0627fae94d4e8e8c8485e3932a052acec0525",
+    "docs/verification/IM-00/im00-6/refinement-limits-release.log": "16383a15398d6d9b584892ffa726f9630769e13c091471a043d6c8c60e9eeed0",
+    "docs/verification/IM-00/im00-6/updated-baseline.json": "d0178fa0c8b3affb9a33638a18c8abf571bf941f84d85264f56215d32ab8bbd7",
+    "docs/verification/IM-00/im00-6/updated-baseline.stderr.log": "fd8a5609e14bb21e7421e559b4de49b8564d8f056eaaa41eb9d2cabbb6edf4e1",
+    "docs/verification/IM-00/im00-6/updated-baseline.stdout.log": "a609d38b8c0fae7aa2293f23f3dc03abd515eb596bd1898b267297dafeb58eb4",
+    "docs/verification/IM-00/im00-6/windows-debug.log": "7ebcfb139a0a657489c149c301ddab56baf15ef138ef7c49f739d862c9c152cb",
+    "docs/verification/IM-00/im00-6/windows-release.log": "0d4fd81512d2ae5af7cfc65ade2df118ee2e8942fac2807d918a6dffd867982c",
+    "docs/verification/IM-00/im00-6/lint/allocations-final.log": "d370fc53fd1e3c735de3a5c7ad63b80934addc41e6a7fca07cc390357a248add",
+    "docs/verification/IM-00/im00-6/lint/dense-contract.log": "3f7ee9ebf6ad4d74db38a915d9df54bccbf9bee3cf57d354a6ee3b87184afa38",
+    "docs/verification/IM-00/im00-6/lint/dense.log": "7997e3bb513e6d868fba24b315215241bdd509dfc7a97298cce2c00ae700622c",
+    "docs/verification/IM-00/im00-6/lint/format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-6/lint/linear-validation.log": "d5cd4fe481711d092e14d4915dc301d1b047ce758762538b25daae8565051b03",
+    "docs/verification/IM-00/im00-6/lint/solve-limits-final.log": "f1390191962d06383c6de676e2561720c1db221b28c8218d6066f5b6e5114d6d",
+    "docs/verification/IM-00/im00-6/lint/tests-final.log": "18a9f84f32a66238d68c5a7e5748ac9026d7d80297ecd921991937652b3ad716",
+    "docs/verification/IM-00/im00-6/lint/updated-benchmark.log": "f58b55f5b8ba5923dd9ff2e760b3abbcd32086073b5ea5f78452dcf3d462ff49",
+    "rd/foundation/numerics/experiments/cpp-numerics/dense_sparse.cpp": "5c0a4458162638a58128757cfe78a6befbe445ac7e81dd80cd4820418b41f272",
+    "rd/foundation/numerics/records/numerical-foundation-adoption-completion.md": "e6a8d1ce6b86161dabf3dbf9e070d557d745c558e2d4ea3123383f6ff2001b03",
+    "docs/verification/IM-00/im00-6/observations-debug.log": "223665de0a87d1ada2cdd3a7072a4224e28d437cc732abce1c785544cb09510c",
+    "docs/verification/IM-00/im00-6/observations-release.log": "424e5c6d618c13d12506e07b9cb1aba527080cbd6db632cb7d3c8a2c66db969f",
+    "docs/verification/IM-00/im00-6/lint/dense-observations.log": "bf68188de2190406e07291ce9c7ecdc9c35fd832bf3416cb899fce05c3072beb"
+  }
+}

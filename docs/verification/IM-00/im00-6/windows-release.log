@@ -1,0 +1,28 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+    Start 25: numerics.linear_validation
+1/8 Test #25: numerics.linear_validation .......   Passed    0.04 sec
+    Start 26: numerics.linear_result
+2/8 Test #26: numerics.linear_result ...........   Passed    0.03 sec
+    Start 27: numerics.linear_metrics
+3/8 Test #27: numerics.linear_metrics ..........   Passed    0.03 sec
+    Start 28: numerics.backend_memory
+4/8 Test #28: numerics.backend_memory ..........   Passed    0.03 sec
+    Start 29: numerics.precision
+5/8 Test #29: numerics.precision ...............   Passed    0.11 sec
+    Start 33: numerics.dense_solve
+6/8 Test #33: numerics.dense_solve .............   Passed    0.03 sec
+    Start 34: numerics.dense_contract
+7/8 Test #34: numerics.dense_contract ..........   Passed    0.04 sec
+    Start 35: numerics.dense_allocations
+8/8 Test #35: numerics.dense_allocations .......   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+negative        =   0.31 sec*proc (7 tests)
+property        =   0.08 sec*proc (2 tests)
+unit            =   0.31 sec*proc (7 tests)
+verification    =   0.33 sec*proc (7 tests)
+
+Total Test time (real) =   0.37 sec
