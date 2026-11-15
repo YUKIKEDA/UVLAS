@@ -1,0 +1,53 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-01"
+  ],
+  "package": "IM-00",
+  "issue": 25,
+  "date": "2026-11-15",
+  "scope": "Test-only support for official vcpkg override version fields; existing compiler header pin comparisons retained; manifest and product code unchanged",
+  "source_commit": "cc152ae94721fad7ace01d4b53d60f389b0a0410",
+  "trigger": "CI run 43684727922: registered toolchain.pinned_dependencies reports missing version key for Benchmark version-semver; same failure reproduced locally",
+  "reference": "https://learn.microsoft.com/en-us/vcpkg/reference/vcpkg-json#overrides",
+  "installed_port_check": "Installed vcpkg Benchmark port declares version-semver 1.9.5; manifest pin preserved unchanged",
+  "similar_findings": "Search across tests, tools and cmake found one overrides version parser, in the changed test translation unit",
+  "reproduction": {
+    "test": "toolchain.pinned_dependencies",
+    "configuration": "Windows MSVC Debug",
+    "total": 1,
+    "exit_code": 8,
+    "diagnostic": "key 'version' not found"
+  },
+  "verification": {
+    "command": "cmake --build out/build/windows-msvc --config Debug --target uvlas_test_toolchain_pinned_dependencies; ctest --test-dir out/build/windows-msvc -C Debug --output-on-failure -R ^toolchain.pinned_dependencies$",
+    "passed": 1,
+    "total": 1,
+    "compiler": "MSVC 19.51.36260.0",
+    "provenance": "Final candidate bytes were tested before this source commit; no clean-build-info or whole-suite claim"
+  },
+  "controls": [
+    "All sixteen subsets of version/version-semver/version-date/version-string: only one present is accepted, with exact preserved value",
+    "Each field rejects null, boolean, integer, floating point, empty string, array and object",
+    "Non-object entries rejected",
+    "Existing Eigen, Spectra, Boost, nlohmann/json and Catch2 header version comparisons retained"
+  ],
+  "checks": [
+    "Changed translation unit clang-format 21.1.2 dry-run passed",
+    "Changed translation unit clang-tidy 21.1.1 passed",
+    "git diff --check passed",
+    "Traceability: 153 IDs, zero problems"
+  ],
+  "independent_review": "Root and im00_4 reviewed the test and lesson; no unresolved major findings",
+  "sources": {
+    "tests/toolchain/pinned_dependencies_test.cpp": "d948af53b4314169e4d30180a0447a274b3162b12b04a56f0ada1140b9206688",
+    ".cursor/rules/dependencies.mdc": "f08a43acfdd67cee19c02d3e4c04a6f33215dce12ce666e2062de1c2b63978c0"
+  },
+  "historical_records": "Earlier im00-12 records remain unchanged and refer to their own tested revisions",
+  "not_claimed": [
+    "Linux execution of the correction",
+    "Whole product suite rerun",
+    "Any product numerical behavior change"
+  ],
+  "ci": "Not awaited; parent publishes the fix and CI validates other platforms"
+}
