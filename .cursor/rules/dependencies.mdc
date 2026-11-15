@@ -57,3 +57,10 @@ GOOD  設計のIssueを開く：何のためか、利用者が何を払うか（
 BAD   コピー側だけ任意依存を除外し、試験はprefix内の全依存を必須にする
 GOOD  コピーと登録CTestに機能の選択を渡し、OFFとON双方の正・負対照を走らせる
 ```
+
+manifestのoverrideを変えたときは、追加した任意featureのビルドだけでなく、manifestを読む既存の試験も影響範囲へ含める。2026-11-15、PR #46でBenchmarkをversion-semverで固定したところ、全overrideをversionだけで読むtoolchain.pinned_dependenciesが、Benchmark OFFの通常構成でも失敗した。任意featureと通知の構成試験に絞り、この既存consumerを手元で確認しなかったためCIで発覚した。
+
+```text
+BAD   任意featureがOFFなので、manifestの変更は既存の試験へ影響しないと判断する
+GOOD  manifestのconsumerを検索し、変更に関係する版固定の既存試験を選んで走らせる
+```
