@@ -231,6 +231,19 @@ uvlas_add_test(numerics.dense_allocations LABELS property verification
 uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
 uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)
 
+uvlas_add_test(numerics.gmres_contract LABELS unit negative verification
+    SOURCES numerics/gmres_contract_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+uvlas_add_test(numerics.gmres_solve LABELS unit verification
+    SOURCES numerics/gmres_solve_test.cpp LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_gmres_solve PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_add_test(numerics.gmres_residual LABELS unit negative verification
+    SOURCES numerics/gmres_residual_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+target_include_directories(uvlas_test_numerics_gmres_residual PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_add_test(numerics.gmres_allocations LABELS unit negative verification
+    SOURCES numerics/gmres_allocations_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen)
+uvlas_enable_allocation_audit(uvlas_test_numerics_gmres_allocations)
+uvlas_require_audited_dependencies(uvlas_test_numerics_gmres_allocations)
 uvlas_add_test(numerics.foundation_reference
     LABELS integration verification negative
     SOURCES numerics/foundation_reference_test.cpp

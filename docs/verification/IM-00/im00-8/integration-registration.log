@@ -1,0 +1,8 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+  Test #41: numerics.gmres_contract
+  Test #42: numerics.gmres_solve
+  Test #43: numerics.gmres_residual
+  Test #44: numerics.gmres_allocations
+
+Total Tests: 4

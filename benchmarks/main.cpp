@@ -69,7 +69,7 @@ int run(int argc, char* argv[]) {
     benchmark::AddCustomContext("uvlas.threads", "1");
     benchmark::AddCustomContext(
         "uvlas.settings",
-        R"({"checked_extents":[5000,64,3],"dense_orders":[16,64],"dense_rhs_columns":1,"dense_update_rank":0,"dense_refinements_max":5,"dense_owning_output_included":true,"updated_orders":[16,64],"updated_rhs_columns":1,"updated_rank":1,"updated_owning_output_included":true})");
+        R"({"checked_extents":[5000,64,3],"dense_orders":[16,64],"dense_rhs_columns":1,"dense_update_rank":0,"dense_refinements_max":5,"dense_owning_output_included":true,"updated_orders":[16,64],"updated_rhs_columns":1,"updated_rank":1,"updated_owning_output_included":true,"gmres_orders":[96,1024],"gmres_rhs_columns":1,"gmres_restart":64,"gmres_operator_quota":512,"gmres_owning_output_included":true})");
     benchmark::RunSpecifiedBenchmarks();
     benchmark::Shutdown();
     return 0;

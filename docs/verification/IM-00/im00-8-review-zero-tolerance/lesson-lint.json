@@ -1,0 +1,59 @@
+Reading inline script metadata from `.agents\skills\natural-japanese\scripts\lint.py`
+{
+  "file": "docs\\engineering\\lessons-and-evidence.md",
+  "stats": {
+    "total_findings": 0,
+    "by_category": {},
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 26,
+    "nominal_ending_count": 2,
+    "nominal_ending_ratio": 0.07692307692307693,
+    "total_paragraphs": 8,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      4,
+      3,
+      3,
+      3,
+      4,
+      2,
+      4,
+      3
+    ],
+    "paragraph_sentence_count_cv": 0.20351933162035313,
+    "rhythm": {
+      "mora_mean": 80.26923076923077,
+      "mora_stdev": 52.75236610975393,
+      "burstiness": -0.20686012876924104,
+      "length_autocorrelation_lag1": -0.16254431117267662
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "����/����/����/����",
+      "lead_pos_4gram_ratio": 0.15384615384615385
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 352,
+      "doc_char_count": 1319,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 1,
+      "bold_per_1000_chars": 0.140607424071991,
+      "bullet_line_count": 4,
+      "non_blank_line_count": 52,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 8,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": []
+}

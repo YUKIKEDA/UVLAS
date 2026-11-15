@@ -1,0 +1,98 @@
+Reading inline script metadata from `.agents\skills\natural-japanese\scripts\lint.py`
+{
+  "file": "docs\\specs\\foundation\\gmres-solve-contract.md",
+  "stats": {
+    "total_findings": 1,
+    "by_category": {
+      "low_lexical_diversity_ttr": 1
+    },
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 119,
+    "nominal_ending_count": 6,
+    "nominal_ending_ratio": 0.05042016806722689,
+    "total_paragraphs": 36,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      4,
+      6,
+      3,
+      6,
+      4,
+      1,
+      1,
+      1,
+      6,
+      3,
+      4,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      3,
+      3,
+      5,
+      4,
+      6,
+      5,
+      5,
+      3,
+      2,
+      5,
+      5,
+      3,
+      4,
+      3,
+      4,
+      4,
+      6,
+      2
+    ],
+    "paragraph_sentence_count_cv": 0.523105025125577,
+    "rhythm": {
+      "mora_mean": 59.18487394957983,
+      "mora_stdev": 47.36412967221038,
+      "burstiness": -0.11094185656891496,
+      "length_autocorrelation_lag1": -0.11652931927291296
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "����/����/����/����",
+      "lead_pos_4gram_ratio": 0.17757009345794392
+    },
+    "lexical_diversity": {
+      "ttr": 0.3244274809160305,
+      "mtld": 59.845971128888806,
+      "content_token_count": 1310,
+      "doc_char_count": 4554,
+      "skipped_too_short": false
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 71,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 26,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 3,
+      "category": "low_lexical_diversity_ttr",
+      "excerpt": "TTR=0.324 (���e�� 1310 �ꒆ 425 ���)",
+      "severity": "info",
+      "detail": "TTR(Type-Token Ratio)��臒l0.45�����B������b�̎g���񂵂������^��",
+      "related_lines": null
+    }
+  ]
+}

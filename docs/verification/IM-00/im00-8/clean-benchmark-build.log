@@ -1,0 +1,15 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring done (0.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: <repo>/out/build/windows-bench
+[0/4] Re-checking globbed directories...
+[1/12] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\windows-bench && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/windows-bench/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/12] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\gmres_residual_detail.cpp.obj
+[3/12] Building CXX object benchmarks\CMakeFiles\uvlas_kernel_bench.dir\Release\gmres_solve_bench.cpp.obj
+[4/12] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\gmres_solve.cpp.obj
+[5/12] Building CXX object benchmarks\CMakeFiles\uvlas_kernel_bench.dir\Release\main.cpp.obj
+[6/12] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[7/12] Linking CXX static library Release\uvlas_core.lib
+[8/12] Linking CXX static library Release\uvlas_numerics.lib
+[9/12] Linking CXX executable benchmarks\Release\uvlas_kernel_bench.exe

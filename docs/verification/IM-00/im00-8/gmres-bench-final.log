@@ -1,0 +1,54 @@
+2026-11-15T21:58:41+09:00
+Running <repo>\out\build\windows-bench\benchmarks\Release\uvlas_kernel_bench.exe
+Run on (16 X 2496 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x8)
+  L1 Instruction 32 KiB (x8)
+  L2 Unified 1280 KiB (x8)
+  L3 Unified 20480 KiB (x1)
+uvlas.commit: 3978961c27c064e72056b3010a0870e0a3e206f0
+uvlas.compiler: MSVC 19.51.36260.0
+uvlas.configuration: Release
+uvlas.cpu: 13th Gen Intel(R) Core(TM) i5-13400F
+uvlas.dirty: false
+uvlas.floating_point: /fp:strict
+uvlas.instruction_set: sse2
+uvlas.logical_processors: 16
+uvlas.machine: windows-local-a
+uvlas.physical_memory_bytes: 51343966208
+uvlas.platform: Windows AMD64
+uvlas.platform_key: windows-x64-msvc19.51-sse2
+uvlas.settings: {"checked_extents":[5000,64,3],"dense_orders":[16,64],"dense_rhs_columns":1,"dense_update_rank":0,"dense_refinements_max":5,"dense_owning_output_included":true,"updated_orders":[16,64],"updated_rhs_columns":1,"updated_rank":1,"updated_owning_output_included":true,"gmres_orders":[96,1024],"gmres_rhs_columns":1,"gmres_restart":64,"gmres_operator_quota":512,"gmres_owning_output_included":true}
+uvlas.threads: 1
+uvlas.version: 0.1.0-dev
+----------------------------------------------------------------------------------------
+Benchmark                              Time             CPU   Iterations UserCounters...
+----------------------------------------------------------------------------------------
+gmres/Preparation/96               0.004 ms        0.004 ms        20051 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Preparation/96               0.004 ms        0.004 ms        20051 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Preparation/96               0.004 ms        0.004 ms        20051 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Preparation/96_mean          0.004 ms        0.004 ms            3 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Preparation/96_median        0.004 ms        0.004 ms            3 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Preparation/96_stddev        0.000 ms        0.000 ms            3 operator_quota=0 order=0 restart=0 rhs_columns=0
+gmres/Preparation/96_cv             0.51 %          0.00 %             3 operator_quota=0.00% order=0.00% restart=0.00% rhs_columns=0.00%
+gmres/Preparation/1024             0.017 ms        0.017 ms         4480 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Preparation/1024             0.017 ms        0.017 ms         4480 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Preparation/1024             0.017 ms        0.017 ms         4480 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Preparation/1024_mean        0.017 ms        0.017 ms            3 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Preparation/1024_median      0.017 ms        0.017 ms            3 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Preparation/1024_stddev      0.000 ms        0.000 ms            3 operator_quota=0 order=0 restart=0 rhs_columns=0
+gmres/Preparation/1024_cv           0.63 %          0.00 %             3 operator_quota=0.00% order=0.00% restart=0.00% rhs_columns=0.00%
+gmres/Solve/96                      64.0 ms         62.5 ms            1 operator_actions=66 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Solve/96                      64.0 ms         62.5 ms            1 operator_actions=66 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Solve/96                      64.7 ms         62.5 ms            1 operator_actions=66 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Solve/96_mean                 64.2 ms         62.5 ms            3 operator_actions=66 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Solve/96_median               64.0 ms         62.5 ms            3 operator_actions=66 operator_quota=512 order=96 restart=64 rhs_columns=1
+gmres/Solve/96_stddev              0.405 ms        0.000 ms            3 operator_actions=0 operator_quota=0 order=0 restart=0 rhs_columns=0
+gmres/Solve/96_cv                   0.63 %          0.00 %             3 operator_actions=0.00% operator_quota=0.00% order=0.00% restart=0.00% rhs_columns=0.00%
+gmres/Solve/1024                     678 ms          656 ms            1 operator_actions=66 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Solve/1024                     648 ms          656 ms            1 operator_actions=66 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Solve/1024                     678 ms          672 ms            1 operator_actions=66 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Solve/1024_mean                668 ms          661 ms            3 operator_actions=66 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Solve/1024_median              678 ms          656 ms            3 operator_actions=66 operator_quota=512 order=1.024k restart=64 rhs_columns=1
+gmres/Solve/1024_stddev             17.3 ms         9.02 ms            3 operator_actions=0 operator_quota=0 order=0 restart=0 rhs_columns=0
+gmres/Solve/1024_cv                 2.59 %          1.36 %             3 operator_actions=0.00% operator_quota=0.00% order=0.00% restart=0.00% rhs_columns=0.00%

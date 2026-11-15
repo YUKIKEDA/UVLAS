@@ -1,0 +1,18 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring done (0.8s)
+-- Generating done (0.3s)
+-- Build files have been written to: <repo>/out/build/windows-msvc
+[0/4] Re-checking globbed directories...
+[1/15] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\windows-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/windows-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/15] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Debug\src\numerics\gmres_solve.cpp.obj
+[3/15] Building CXX object tests\CMakeFiles\uvlas_test_numerics_gmres_contract.dir\Debug\numerics\gmres_contract_test.cpp.obj
+[4/15] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[5/15] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[6/15] Linking CXX static library Debug\uvlas_core.lib
+[7/15] Linking CXX static library Debug\uvlas_core_audit.lib
+[8/15] Linking CXX static library Debug\uvlas_numerics_audit.lib
+[9/15] Linking CXX executable tests\Debug\uvlas_test_numerics_gmres_solve.exe
+[10/15] Linking CXX executable tests\Debug\uvlas_test_numerics_gmres_residual.exe
+[11/15] Linking CXX executable tests\Debug\uvlas_test_numerics_gmres_contract.exe
+[12/15] Linking CXX executable tests\Debug\uvlas_test_numerics_gmres_allocations.exe
