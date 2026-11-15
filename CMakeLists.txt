@@ -33,7 +33,7 @@ add_custom_target(uvlas_git_revision ALL
     VERBATIM)
 
 add_library(uvlas_core STATIC src/core/build_info.cpp src/core/error_certificate.cpp
-    src/core/checked_dimensions.cpp)
+    src/core/checked_dimensions.cpp src/core/state.cpp)
 uvlas_configure_target(uvlas_core)
 target_include_directories(uvlas_core
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -41,7 +41,7 @@ target_include_directories(uvlas_core
 target_compile_definitions(uvlas_core PRIVATE UVLAS_BUILD_CONFIGURATION="$<CONFIG>")
 # build_info reports the versions of the numerical dependencies.
 target_link_libraries(uvlas_core PRIVATE
-    uvlas::eigen Spectra::Spectra Boost::headers nlohmann_json::nlohmann_json)
+    uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 nlohmann_json::nlohmann_json)
 add_dependencies(uvlas_core uvlas_git_revision)
 
 add_library(uvlas_numerics STATIC src/numerics/storage.cpp)
