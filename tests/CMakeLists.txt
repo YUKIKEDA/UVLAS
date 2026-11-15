@@ -105,3 +105,18 @@ add_test(NAME core.identifier_compilation
         "-DPROJECT_INCLUDE=${PROJECT_SOURCE_DIR}/include"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set_tests_properties(core.identifier_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
+
+uvlas_add_test(numerics.storage LABELS unit negative
+    SOURCES numerics/storage_test.cpp LIBS uvlas_numerics)
+uvlas_add_test(numerics.eigen_views LABELS integration negative
+    SOURCES numerics/eigen_views_test.cpp LIBS uvlas_numerics uvlas::eigen)
+target_include_directories(uvlas_test_numerics_eigen_views PRIVATE "${PROJECT_SOURCE_DIR}/src")
+
+add_test(NAME numerics.storage_compilation
+    COMMAND "${CMAKE_COMMAND}"
+        -S "${CMAKE_CURRENT_SOURCE_DIR}/numerics/borrow_compile"
+        -B "${CMAKE_CURRENT_BINARY_DIR}/storage-compile-$<CONFIG>"
+        "-DPROJECT_ROOT=${PROJECT_SOURCE_DIR}"
+        "-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
+        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+set_tests_properties(numerics.storage_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
