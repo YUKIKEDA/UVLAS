@@ -90,6 +90,7 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | `core.error_certificate` | 未評価・達成・未達の区別、予算境界、負値・非有限・未対応表現の拒否 |
 | `core.checked_dimensions` | 符号付き64bit寸法・バイト数の検査、ゼロ次元、32bit外部APIへの検査付き変換 |
 | `core.resource_plan` | 累積payloadの確保前照合、超過時の確保禁止、失敗時の計上値不変、所有配列の寿命 |
+| `core.state` | 不変Model、親・候補・資格の所有とhash照合、一回確定、未達・未評価・変更後の拒否、全cache世代、Workspaceの再入・並行排他 |
 | `core.identifier_compilation` | 正のコンパイル対照と、8種類のIDを異種IDから受け取るコンパイル失敗の確認 |
 | `qa.numeric_canary` | 基準ケースの結果が、このプラットフォームの基準結果とビット一致すること（QA-04）。認定していないプラットフォームでは落ちる |
 | `cli.build_info` | `uvlas --build-info` が来歴を返すこと |

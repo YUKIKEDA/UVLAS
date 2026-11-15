@@ -105,3 +105,9 @@ add_test(NAME core.identifier_compilation
         "-DPROJECT_INCLUDE=${PROJECT_SOURCE_DIR}/include"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set_tests_properties(core.identifier_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
+
+find_package(Threads REQUIRED)
+uvlas_add_test(core.state
+    LABELS unit negative
+    SOURCES core/state_test.cpp
+    LIBS uvlas_core Threads::Threads)

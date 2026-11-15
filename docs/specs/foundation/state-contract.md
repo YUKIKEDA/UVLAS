@@ -1,0 +1,45 @@
+# IM00-9の状態・資格・一回確定の内部契約
+
+対象はN4-03、N4-08、Issue #13。物理kernelを追加せず、親の不変性、所有権、資格と確定、cache、Workspaceの共通契約を実装する。実務の数値認定や全物理状態の保存形式を確定したという主張はしない。
+
+## 所有する状態エンベロープ
+
+Modelは準備側から受けたcanonical definitionと4カテゴリの受入要求をコピーして所有し、構築後は不変とする。Model値の複製は不変データを所有する参照の複製であり、可変aliasを返さない。定義payloadはResourcePlanへ計上する。所有参照の管理領域は通常のプロセスoverheadとして扱う。
+
+AcceptedStateとTrialStateは別の型で、どちらも自前の固定長payloadを所有する。payloadのbyte列は、将来の物理状態を包むための共通プロトコルである。q、後流、TwoWordやcheckpointの具体的なencodingは、それぞれのconsumerで定める。この型は低位を捨てる変換、物理時刻の変更、履歴の再計算をしない。
+
+TrialState::beginは親をconstで受け、入力payloadをコピーする。親の確定番号・数値世代・payload digestを一体のParentIdentityとして保持する。候補の数値世代は親より新しい値に限る。入力で借りた配列やWorkspaceの再利用・破棄は返却状態に影響しない。
+
+置換は別の所有配列の準備を成功させてから行い、数値世代とrevisionを1ずつ増やす。失敗時は候補を変更しない。元のbyte列へ戻してもrevisionが変わるため、古い資格は復活しない。数値世代・revision・次の確定番号のoverflowはResourceExceededで拒否する。移動元や確定・キャンセル後の候補は以後の更新・資格付与・確定をStaleGenerationで拒否する。
+
+## 内容と世代の同一性
+
+候補と親のpayload digestは実際に所有するbyte列のSHA-256である。モデルfingerprintは以下を順に連結したSHA-256とする。
+
+1. ASCIIの `UVLASM01`。
+2. 定義byte数のuint64 little endianと定義の実byte列。
+3. 残差・幾何・時間・精度の順に、観測ID、範囲ID、予算のbinary64 bit列を各uint64 little endian、表現タグを1 byte。
+
+ホストの構造体表現、padding、アドレス、現在時刻はハッシュへ入れない。モデル世代は内容fingerprintと別に照合する。同じ定義でも異なる世代の報告を流用しない。SHA-256計算にヒープ確保はない。
+
+## 数値評価と資格packet
+
+Modelの4受入要求は、残差・幾何・時間・精度について、それぞれ観測ID、範囲ID、予算、評価表現を必須とする。予算は非負有限、表現は対応済みで、4観測IDは別々とする。各カテゴリに複数の物理条件がある場合、評価器が全条件を含む保守的な観測・上界を定義する。幾何条件をこの共通型が代わりに評価するわけではない。
+
+評価器は計算を始める前にEvaluationTargetを取得し、結果とともに持ち回る。このstampは候補の実hash、TrialId、revision、数値世代、モデルfingerprintと世代、親stampを含む。EvaluationReportの構築にはその開始時のtargetを渡し、完成した証拠に現在候補のstampを付け直さない。4つのErrorCertificateについて、観測・範囲・数値世代・表現・予算bit列が開始時targetとモデル要求に一致することを確認する。未評価と未達を報告として保持できるが、資格には変換できない。数値評価器は対象の状態そのものから保守的上界を計算する責任を持つ。共通型は、その上界の数学的正しさや物理式を評価済みと保証しない。
+
+qualifyは実payloadを再度hashし、報告対象と一致し、4カテゴリ全てがAchievedの場合だけQualificationPacketを発行する。別候補・古い世代・変更後の候補の報告はStaleGeneration。未評価はPrecisionUnresolved、未達は残差ならNonlinearUnconverged、幾何ならGeometryInvalid、時間・精度ならPrecisionUnresolvedとする。
+
+commitは読み取り専用の親と、可変の候補・packetを受ける。親の番号・数値世代・実payload hash、モデル内容と世代、候補の実hashとrevision、packet未消費を照合してから、所有配列をAcceptedStateへ移す。成功時のみ候補とpacketを消費する。失敗時には親・候補・packetを変更しない。資格を複数発行しても、候補自身が消費されるので二重確定できない。親の確定番号の次を新しい番号とする。
+
+初期状態は親の無いTrialStateを同じ4カテゴリで評価してからcommit_initialで確定する。初期確定番号は呼出側が明示する。初期化を通常の親番号0の試行として偽装しない。
+
+## Workspaceとcache
+
+Workspaceは呼出側が所有し、atomicなexclusive leaseを一つだけ発行する。並行・再入したacquireはInvalidInputであり、leaseの移動・破棄で排他を解放する。Workspaceをleaseより先に破棄してはならない。scratchのviewはlease内の借用で、返却状態にはコピーする。借用を返す公開APIはlvalueに限定し、一時オブジェクトからの借用を拒否する。
+
+CacheKeyはモデル内容と世代、幾何、拘束chart、疎pattern、数値行列、尺度、精度政策と実表現、後流政策、時刻区間、backendの全世代を保持する。cacheの再利用は全欄一致で判定する。RHS世代は要求に別保持できるが、それが変わった場合も行列世代の比較を省かない。寸法やアドレスを同一性の代用にしない。
+
+## 対応する試験
+
+既知の独立SHA-256、定義の入力alias、全4カテゴリの未評価・未達、報告の観測・範囲・世代・表現・予算、別候補・別モデル世代、資格後変更と元への復元、異なる親のID・内容・世代・モデル、二重確定、キャンセル・資源不足・番号overflow、全cache成分、並行／再入Workspace、scratch再利用・破棄後の所有結果、空状態を確認する。物理式の精度・性能・実験受入はこの結果から主張しない。
