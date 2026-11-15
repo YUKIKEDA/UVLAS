@@ -156,6 +156,16 @@ TEST_CASE("Dense stagnation promotes and preserves the correction low word",
                                  projection, f.accuracy(1e-30), f.limits(1), *prepared, f.plan);
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == core::FailureCode::PrecisionUnresolved);
+    const Limits no_refinements{1, 1, 0, 0, EstimateAdmission{1 << 24}};
+    auto capped = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales, precision,
+                               f.accuracy(1e-30), no_refinements, *prepared, f.plan);
+    REQUIRE_FALSE(capped);
+    CHECK(capped.error().code == core::FailureCode::LinearUnconverged);
+    const Limits one_refinement{1, 1, 0, 1, EstimateAdmission{1 << 24}};
+    auto once = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales, precision,
+                             f.accuracy(1e-30), one_refinement, *prepared, f.plan);
+    REQUIRE(once);
+    CHECK(once->certificate().refinements() == 1);
 }
 TEST_CASE("A tiny nonzero pivot is not a rank or condition threshold",
           "[verification][negative][N4-05][N4-06]") {
