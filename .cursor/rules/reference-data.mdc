@@ -22,3 +22,5 @@ alwaysApply: true
 BAD   製品の解法で K q = f を解き、同じ K から作った f と比べて「検証した」と書く
 GOOD  独立な体積力と面力を与え、R&Dの凍結した参照（idとsha256を記録）と比べる
 ```
+
+新しいテキストfixtureを凍結するときは、生成時の改行を明示し、gitが保存する正規化後のバイト列でSHA-256を確認する。2026-11-15、Issue #9のJSONはWindowsの既定出力でCRLFになり、`text=auto`によるLFのcommitバイトとhashが異なった。数値を再計算せずJSON値の一致を確認してLFへ揃え、生成側にもLFを指定した。
