@@ -1,0 +1,171 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-03",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 25,
+  "date": "2026-11-15",
+  "scope": "Phase timing, memory accounting report, declared allocation coverage, worker determinism test support, opt-in benchmark and build metadata; no physical solver acceptance",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "ad7885f7496ddb8fc5f6013d3d52ae5f24339700",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "command": "ctest --test-dir out/build/windows-msvc -C <Debug|Release> --output-on-failure -R ^(core.instrumentation|core.allocation_audit|core.eigen_allocation_guard|core.audit_configuration|cli.version)$",
+  "ctest": {
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "passed": 10,
+    "total": 10,
+    "tests": [
+      "cli.version",
+      "core.instrumentation",
+      "core.allocation_audit",
+      "core.eigen_allocation_guard",
+      "core.audit_configuration"
+    ]
+  },
+  "checks": [
+    "Affected MSVC Debug and Release builds with warnings as errors",
+    "Dedicated benchmark Release build; one-kernel functional smoke at clean commit",
+    "Changed C++ formatting and dedicated clang-tidy translation-unit checks",
+    "ci_scope selector: 6 tests; ruff lint/format and pyright strict on changed Python files",
+    "Traceability: 153 IDs, zero problems; synchronized Skills: 52 files, zero differences",
+    "Japanese documentation independently read by root and im00_4; no unresolved major review findings",
+    "Automation follow-up is independently checked at its own commit; source hashes below use current automation bytes while historical hashes preserve the product-test revision"
+  ],
+  "allocation_coverage": {
+    "cpp": "Process-wide replaceable scalar/array/aligned/nothrow C++ new attempts",
+    "eigen": "Calling-thread RuntimeNoMalloc with assert enabled also in Release; allocate and conservativeResize rejected with expected diagnostic after clean positive control",
+    "unsupported": [
+      "CHeap",
+      "External",
+      "AllThreads with Eigen"
+    ],
+    "declaration": "Caller must declare every required backend; declaration completeness is not detected automatically",
+    "compilation": "Audit product translation units recompiled consistently; unaudited product dependencies and opaque compiled artifacts rejected"
+  },
+  "mutations": [
+    {
+      "change": "Replace elapsed accumulation with assignment",
+      "baseline": "104 assertions in 4 cases passed",
+      "detected": "Catch2 failure exit 42 with exact 42 expectation violated"
+    },
+    {
+      "change": "Swap time_step and flutter_search JSON names",
+      "baseline": "Same isolated normal implementation passed",
+      "detected": "Catch2 failure exit 42 with named phase mapping violated"
+    }
+  ],
+  "benchmark_smoke": {
+    "library": "Google Benchmark 1.9.5",
+    "kernel": "checked_extent_product",
+    "configuration": "Release",
+    "commit": "ad7885f7496ddb8fc5f6013d3d52ae5f24339700",
+    "dirty": "false",
+    "machine": {
+      "label": "validation-machine",
+      "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+      "logical_processors": 16,
+      "physical_memory_bytes": 51343966208
+    },
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "settings": "{\"extents\":[5000,64,3]}",
+    "purpose": "Functional JSON/context smoke only; timings are not performance qualification"
+  },
+  "profiling": "WPR/WPA presence and CPU profile listing checked; no trace capture or profile analysis executed",
+  "reference": "Independent fixed named-stage table, integer sample totals, initialized result bytes, known invalid inputs and explicit negative allocation probes",
+  "sources": {
+    ".agents/skills/kernel-profile/SKILL.md": "f4117353609a0bb2a63c5e16b77c804b3217eb6ae4f5ad2ddc8173dca4012977",
+    ".claude/skills/kernel-profile/SKILL.md": "f4117353609a0bb2a63c5e16b77c804b3217eb6ae4f5ad2ddc8173dca4012977",
+    ".cursor/rules/dependencies.mdc": "af2e4e390cfddfaabe5c398375893dbfbedcd1925c30551413192cf826a06549",
+    ".github/workflows/ci.yml": "e6867dec196b5b00a38763c0f54caa812b47cdff0bacc6d40aac9c39e222d95d",
+    "AGENTS.md": "a58dc9ec90fddf63727ad2b173d5cc92f3cbad9cc09c23ea6ea97f5b434f8e61",
+    "CMakeLists.txt": "b2a9bcd45ce062d4082b3c371ddfa8fbe49f361c56623fc954abd27ab0afe956",
+    "THIRD_PARTY_NOTICES.md": "aec26cb1340d34423922fdab125e248570eb9bc2a86be0aeaa2cbf7799b09689",
+    "benchmarks/CMakeLists.txt": "3db16e51432bd4e9fefca6d44c65aef3dfbe49e0b8639d558cc1642323b1e806",
+    "benchmarks/README.md": "8db2421bd6ae712e0fbe0a296011ede24504f42e8e7e2921a923dca662a54bad",
+    "benchmarks/dimensions_bench.cpp": "3761a69d75edd40a9189451fc452b8ff4c06cc5da69e3000d4810397321fee80",
+    "benchmarks/main.cpp": "8f6ec969501b073280a02c745faa1c51bc2018599bd3309bef7c5e3e561f396c",
+    "cmake/AllocationAudit.cmake": "96a568712a3be7f5e4be32ec1e9d23e4a7a39da6274520a77a9b8f1fbbaa57b0",
+    "cmake/Dependencies.cmake": "925c1403e57b34e45f386c68cc7c1fa4ccf09e981ff4a83898f8ffbae7a43386",
+    "docs/adr/0005-google-benchmark-for-kernel-measurement.md": "2708135edcc8cc30d5e6f143170c13e1e07a4b968c2919b1454952bf80957511",
+    "docs/build.md": "1053afa2c1b043e3239df279d6b3e17e987d87d033c1ce4f37bda52a8cfeab74",
+    "docs/conventions.md": "b9f0782a8175095897265a7ca82b7a0cd98a98ab57db0afbcc98c62ca86acdf2",
+    "docs/roadmap.md": "446569fae12eabc0e120c65306e947e276398dcc42d80bcf249a03cb04e3005c",
+    "docs/specs/foundation/instrumentation-contract.md": "4847251a8ed011c7682d3f5fe353f687c6be02af5f9090e8ac5a93b2fa78f901",
+    "include/uvlas/core/instrumentation.hpp": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+    "justfile": "f737b362f42c33f97e925bb5ce7a42bb99df78056d5767275188da45316ae5d8",
+    "src/app/main.cpp": "d9abac3fda7a6f4f03770f5c99ad5cb1440f3972f74eb0c3c8980cd02fe8f03f",
+    "src/core/instrumentation.cpp": "2e6a16c4c7234deb0e5c1f9b9ecb0ff6438c97b13145784ef9bc9c3cedfe879e",
+    "tests/CMakeLists.txt": "d337b5cdfab47ad89e87f3291b123b08f8afabf869b5aa852516bf55d429b705",
+    "tests/check_cli.cmake": "cdb4d7bce91a8326e88adc006c2eb4b8a360c4f26f364f5f07ba0581eaf25657",
+    "tests/core/allocation_audit_test.cpp": "7c1635ebb21792d3272be5758dda75f85db146993850abd1721e95d6a8933bf0",
+    "tests/core/audit_configuration/CMakeLists.txt": "1992e4ffd9ac501ded48a1e389ca5350144e7332e700cec9ed9af42fd3982671",
+    "tests/core/check_audit_configuration.cmake": "cd4855a167daf85087c10119fc403a3020648df12ca7b0126ef173dddcedf572",
+    "tests/core/check_eigen_allocation.cmake": "c4b40cf503b1c8409d9bf0ee68a57dc4390b1ee150c2da8df572c00df056329e",
+    "tests/core/eigen_allocation_probe.cpp": "e3f0de40c8a96b7c37370418fd270f0f112204b5adf9604a2caa201f22d093e1",
+    "tests/core/instrumentation_test.cpp": "636c56c93292f490ca94c2056fdb8daadc1bcf87a0d255c9ca1b9342f78a3459",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "tests/support/thread_determinism.hpp": "341fba9b7b1994d4df73f83eb5396a845b6d5538365f6af2d9f84d8fb5b8ebcf",
+    "tools/dev/ci_scope.py": "864c1ebd032a0c0b3fe8543bfd64eff738ad067ffa1450a534ae3664537871ef",
+    "tools/dev/ci_scope_test.py": "9633a1f80c8ddd9a9e31844aeb424ede693504531fd8b02317cc2739137679b6",
+    "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec"
+  },
+  "not_claimed": [
+    "Linux execution",
+    "WPR or perf capture",
+    "Performance improvement or product-scale performance",
+    "Physical solver accuracy",
+    "Practical acceptance"
+  ],
+  "ci": "Not awaited; Linux and other workflow checks remain CI validation",
+  "automation_followup": {
+    "commit": "fc85553c72d128d6d0753ace5cc57acc095f076f",
+    "changed_paths": [
+      ".github/workflows/ci.yml",
+      "benchmarks/README.md",
+      "cmake/Dependencies.cmake",
+      "tools/dev/ci_scope.py",
+      "tools/dev/ci_scope_test.py"
+    ],
+    "product_code_changed": false,
+    "product_tests_repeated": false,
+    "product_test_revision": "ad7885f7496ddb8fc5f6013d3d52ae5f24339700",
+    "historical_source_hashes": {
+      ".github/workflows/ci.yml": "808bbdcac1a68af0c52aed18747b76fb564aa0c23415034b33420af0c68ccd3a",
+      "benchmarks/README.md": "f084de683325a4a531edbd53280ee3394cae6846e7d25a932032f930cdbecd45",
+      "cmake/Dependencies.cmake": "cd2695bdaa639a112920ac652c750b4c8972de08ec6466eebecdae24cbc61f03",
+      "tools/dev/ci_scope.py": "6afdad4e3b5e7f48b29333f70cd6d7fcbc695fba3bf5809633d258f0bcac623b",
+      "tools/dev/ci_scope_test.py": "708ea0ef5f2066ba4e1932f04e41e1c3755179afeca7d10e50ff53f17c992835"
+    },
+    "verified": [
+      "Selector 6 tests including all eight build/benchmark/checks job combinations and failure/cancellation rejection",
+      "Ruff lint/format and pyright strict for the two selector Python files",
+      "Workflow YAML parsed; dedicated benchmark job included in aggregate needs",
+      "Fresh isolated Windows configurations sharing read-only benchmark prefix: default OFF, explicit OFF and ON notice presence",
+      "Same build ON to OFF removes stale Benchmark notice"
+    ],
+    "linux_job": "Added Linux vcpkg benchmarks feature configure, compile and list-tests smoke; not run locally and CI not awaited"
+  }
+}
