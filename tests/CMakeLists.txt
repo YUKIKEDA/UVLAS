@@ -258,3 +258,11 @@ add_test(NAME tools.foundation_reference_verify
         "${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/j1-pg-free-history-24-v1")
 set_tests_properties(tools.foundation_reference tools.foundation_reference_verify
     PROPERTIES WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" TIMEOUT 30 LABELS "unit;verification;negative")
+
+if(WIN32)
+    find_program(UVLAS_PWSH_EXECUTABLE NAMES pwsh REQUIRED)
+    add_test(NAME tools.msvc_arguments
+        COMMAND "${UVLAS_PWSH_EXECUTABLE}" -NoProfile -File
+            "${PROJECT_SOURCE_DIR}/tools/dev/msvc_test.ps1")
+    set_tests_properties(tools.msvc_arguments PROPERTIES TIMEOUT 75 LABELS "unit;negative")
+endif()
