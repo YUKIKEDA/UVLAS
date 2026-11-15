@@ -62,6 +62,26 @@ constexpr auto operation = core::Operation::SolveLinear;
 auto fail(core::FailureCode code) noexcept {
     return std::unexpected(core::Failure{code, operation});
 }
+// A failed necessary observation identifies the actual evaluated candidate. Keep any
+// more specific diagnostics supplied by the consumer instead of relabelling them.
+core::Failure consumer_failure(core::Failure failure, const ConsumerCheck& check,
+                               core::NumericalGeneration generation,
+                               const Context& context) noexcept {
+    auto& details = failure.details;
+    if (!details.model) {
+        details.model = context.cache.model;
+    }
+    if (!details.trial) {
+        details.trial = context.trial;
+    }
+    if (!details.numerical_generation) {
+        details.numerical_generation = generation;
+    }
+    if (!details.problem) {
+        details.problem = check.observation;
+    }
+    return failure;
+}
 bool valid_kind(CheckKind kind) noexcept {
     return kind == CheckKind::Observation || kind == CheckKind::Constraint ||
            kind == CheckKind::Reaction;
@@ -83,8 +103,8 @@ core::Result<void> check_consumer_inputs(std::span<const ConsumerCheck> checks) 
     return {};
 }
 core::Result<void> check_accuracy_inputs(const Accuracy& accuracy) noexcept {
-    for (double value : {accuracy.absolute_tolerance, accuracy.relative_tolerance,
-                         accuracy.componentwise_backward_tolerance}) {
+    for (const double value : {accuracy.absolute_tolerance, accuracy.relative_tolerance,
+                               accuracy.componentwise_backward_tolerance}) {
         if (!std::isfinite(value)) {
             return fail(core::FailureCode::Nonfinite);
         }
@@ -243,7 +263,10 @@ core::Result<Solution<Scalar>> SolutionFactory::finalize(
         std::ranges::copy(metadata.retained_columns.values(),
                           metadata.returned_columns.values().begin());
     } else {
-        const auto& projection_request = std::get<Binary64Projection>(precision.returned);
+        const auto* projection_request = std::get_if<Binary64Projection>(&precision.returned);
+        if (projection_request == nullptr) {
+            return fail(core::FailureCode::PrecisionUnsupported);
+        }
         if (!projected || projected->precision() != core::Precision::Binary64) {
             return fail(core::FailureCode::PrecisionUnsupported);
         }
@@ -252,9 +275,9 @@ core::Result<Solution<Scalar>> SolutionFactory::finalize(
             target_shape.leading_dimension != shape.leading_dimension) {
             return fail(core::FailureCode::InvalidInput);
         }
-        if (retained.generation() != projection_request.retained_generation ||
-            projected->generation() != projection_request.target_generation ||
-            projection_request.retained_generation == projection_request.target_generation) {
+        if (retained.generation() != projection_request->retained_generation ||
+            projected->generation() != projection_request->target_generation ||
+            projection_request->retained_generation == projection_request->target_generation) {
             return fail(core::FailureCode::StaleGeneration);
         }
     }
@@ -312,12 +335,14 @@ core::Result<Solution<Scalar>> SolutionFactory::finalize(
         auto supported =
             require_precision(retained.precision(), precision.evaluator.supported_precision());
         if (!supported) {
-            return std::unexpected(supported.error());
+            return std::unexpected(
+                consumer_failure(supported.error(), check, retained.generation(), context.context));
         }
         supported =
             require_precision(candidate.precision(), precision.evaluator.supported_precision());
         if (!supported) {
-            return std::unexpected(supported.error());
+            return std::unexpected(consumer_failure(supported.error(), check,
+                                                    candidate.generation(), context.context));
         }
         const core::CertificateContext expected{check.observation, check.scope,
                                                 candidate.generation(), candidate.precision()};
@@ -327,14 +352,19 @@ core::Result<Solution<Scalar>> SolutionFactory::finalize(
                                                   expected);
             });
         if (!proof) {
-            return std::unexpected(proof.error());
+            return std::unexpected(
+                consumer_failure(proof.error(), check, candidate.generation(), context.context));
         }
         if (proof->context() != expected || std::bit_cast<std::uint64_t>(proof->budget()) !=
                                                 std::bit_cast<std::uint64_t>(check.budget)) {
-            return fail(core::FailureCode::StaleGeneration);
+            return std::unexpected(
+                consumer_failure(core::Failure{core::FailureCode::StaleGeneration, operation},
+                                 check, candidate.generation(), context.context));
         }
         if (!std::holds_alternative<core::Achieved>(proof->assessment())) {
-            return fail(core::FailureCode::PrecisionUnresolved);
+            return std::unexpected(
+                consumer_failure(core::Failure{core::FailureCode::PrecisionUnresolved, operation},
+                                 check, candidate.generation(), context.context));
         }
         metadata.consumers.values()[i].emplace(ConsumerProof{check, *proof});
     }

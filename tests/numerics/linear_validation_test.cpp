@@ -6,6 +6,7 @@
 #include <cmath>
 #include <limits>
 #include <span>
+#include <stdexcept>
 #include <utility>
 
 namespace {
@@ -222,4 +223,35 @@ TEST_CASE("A projected TwoWord source still needs a consumer that can assess its
         projection, input.accuracy(), input.limits());
     REQUIRE_FALSE(result);
     CHECK(result.error().code == core::FailureCode::PrecisionUnsupported);
+}
+
+TEST_CASE("Failed policy emplacement is preserved or rejected before numerical work",
+          "[negative][N4-06][N4-08]") {
+    struct ThrowingGeneration {
+        operator core::NumericalGeneration() const {
+            throw std::runtime_error("policy construction failed");
+        }
+    };
+    Inputs input;
+    const auto rhs = input.buffer();
+    ReturnedPrecision returned{RetainedPrecision{core::NumericalGeneration{50}}};
+    bool threw = false;
+    try {
+        returned.emplace<Binary64Projection>(ThrowingGeneration{}, core::NumericalGeneration{51});
+    } catch (const std::runtime_error&) {
+        threw = true;
+    }
+    REQUIRE(threw);
+    const Precision<double> precision{returned, {}, input.consumer};
+    const auto result = checks::check_solve_inputs(
+        1, 0, context(), Rhs<double>{rhs, context(), core::RhsGeneration{1}}, input.scales(),
+        precision, input.accuracy(), input.limits());
+    if (returned.valueless_by_exception()) {
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == core::FailureCode::PrecisionUnsupported);
+    } else {
+        // The standard library may retain the old alternative as a stronger guarantee.
+        REQUIRE(std::holds_alternative<RetainedPrecision>(returned));
+        CHECK(result);
+    }
 }

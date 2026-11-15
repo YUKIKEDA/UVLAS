@@ -295,5 +295,121 @@ TEST_CASE("A qualified total does not qualify a distinct local load observation"
     REQUIRE_FALSE(local_required);
     CHECK(evaluator.calls == 2);
     CHECK(local_required.error().code == core::FailureCode::PrecisionUnresolved);
+    CHECK(local_required.error().details.problem == core::ProblemId{core::ObservationId{82}});
+    CHECK(local_required.error().details.numerical_generation == core::NumericalGeneration{40});
     CHECK(total_only->certificate().consumer_count() == 1);
+}
+namespace {
+template <class Value>
+void check_known_failure(const core::Result<Value>& result) {
+    REQUIRE_FALSE(result);
+    CHECK(result.error().details.model == core::ModelGeneration{1});
+    CHECK(result.error().details.trial == core::TrialId{11});
+    CHECK(result.error().details.numerical_generation == core::NumericalGeneration{5});
+}
+template <StorageScalar Scalar>
+class DiagnosticConsumer final : public ConsumerEvaluator<Scalar> {
+public:
+    core::FailureDetails supplied{};
+    [[nodiscard]] SupportedPrecision supported_precision() const noexcept override {
+        return SupportedPrecision::Binary64AndTwoWord;
+    }
+    [[nodiscard]] core::Result<core::ErrorCertificate>
+    assess(const PrecisionBuffer<Scalar>&, const PrecisionBuffer<Scalar>&, const Context&,
+           const ConsumerCheck&, core::CertificateContext) const override {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved,
+                                             core::Operation::SolveLinear, supplied});
+    }
+};
+} // namespace
+TEST_CASE("Every dense public boundary completes known failure identities and preserves resource "
+          "diagnostics",
+          "[negative][N4-05][N4-08]") {
+    Inputs input;
+    const auto a = input.matrix();
+    const auto b = input.rhs();
+    core::ResourcePlan none{0};
+    const DenseOperator real_op{a, context()};
+    const auto prepare_real = DensePrepared::prepare(real_op, input.scales(), input.limits(), none);
+    check_known_failure(prepare_real);
+    REQUIRE(prepare_real.error().details.resources);
+    CHECK(*prepare_real.error().details.resources ==
+          core::ResourceUsage{core::ResourceKind::Bytes, 4 * sizeof(double), 0});
+    auto real_prepared = input.prepare(a);
+    const auto solve_real = solve_linear(
+        real_op, Rhs{b, context(), core::RhsGeneration{1}}, input.scales(),
+        Precision<double>{RetainedPrecision{core::NumericalGeneration{40}}, {}, input.consumer},
+        input.accuracy(), input.limits(), real_prepared, none);
+    check_known_failure(solve_real);
+    REQUIRE(solve_real.error().details.resources);
+    CHECK(*solve_real.error().details.resources ==
+          core::ResourceUsage{core::ResourceKind::Bytes, sizeof(ColumnMetrics), 0});
+    using Complex = std::complex<double>;
+    const std::array<Complex, 2> zero{Complex{}, Complex{}}, load{Complex{4}, Complex{6}};
+    auto u = DenseComplex::copy({2, 1, 2}, zero, input.source_plan, core::Operation::SolveLinear);
+    auto v = DenseComplex::copy({2, 1, 2}, zero, input.source_plan, core::Operation::SolveLinear);
+    auto raw_rhs =
+        DenseComplex::copy({2, 1, 2}, load, input.source_plan, core::Operation::SolveLinear);
+    REQUIRE(u);
+    REQUIRE(v);
+    REQUIRE(raw_rhs);
+    auto complex_rhs =
+        PrecisionBuffer<Complex>::binary64(std::move(*raw_rhs), core::NumericalGeneration{30});
+    REQUIRE(complex_rhs);
+    const ColumnUpdatedOperator updated{a, *u, *v, context()};
+    const auto prepare_complex =
+        UpdatedPrepared::prepare(updated, input.scales(), input.limits(), none);
+    check_known_failure(prepare_complex);
+    REQUIRE(prepare_complex.error().details.resources);
+    CHECK(*prepare_complex.error().details.resources ==
+          core::ResourceUsage{core::ResourceKind::Bytes, 4 * sizeof(double), 0});
+    auto complex_prepared =
+        UpdatedPrepared::prepare(updated, input.scales(), input.limits(), input.workspace_plan);
+    REQUIRE(complex_prepared);
+    const DiagnosticConsumer<Complex> complex_consumer;
+    const auto solve_complex = solve_linear(
+        updated, Rhs{*complex_rhs, context(), core::RhsGeneration{1}}, input.scales(),
+        Precision<Complex>{RetainedPrecision{core::NumericalGeneration{40}}, {}, complex_consumer},
+        input.accuracy(), input.limits(), *complex_prepared, none);
+    check_known_failure(solve_complex);
+    REQUIRE(solve_complex.error().details.resources);
+    CHECK(*solve_complex.error().details.resources ==
+          core::ResourceUsage{core::ResourceKind::Bytes, sizeof(ColumnMetrics), 0});
+    CHECK(none.allocated_bytes() == 0);
+    // Consumer failures can identify a different numerical observation and explicit resource unit.
+    for (const bool all_known : {false, true}) {
+        core::FailureDetails supplied{};
+        supplied.numerical_generation = core::NumericalGeneration{333};
+        supplied.resources =
+            core::ResourceUsage{core::ResourceKind::OperatorApplications, 501, 101};
+        supplied.parent = core::AcceptedStateId{44};
+        supplied.problem = core::ScopeId{61};
+        if (all_known) {
+            supplied.model = core::ModelGeneration{77};
+            supplied.trial = core::TrialId{88};
+        }
+        auto expected = supplied;
+        if (!all_known) {
+            expected.model = context().cache.model;
+            expected.trial = context().trial;
+        }
+        DiagnosticConsumer<double> evaluator;
+        evaluator.supplied = supplied;
+        const auto real_failure =
+            solve_linear(real_op, Rhs{b, context(), core::RhsGeneration{1}}, input.scales(),
+                         Precision<double>{RetainedPrecision{core::NumericalGeneration{40}},
+                                           requirement, evaluator},
+                         input.accuracy(), input.limits(), real_prepared, input.result_plan);
+        REQUIRE_FALSE(real_failure);
+        CHECK(real_failure.error().details == expected);
+        DiagnosticConsumer<Complex> complex_evaluator;
+        complex_evaluator.supplied = supplied;
+        const auto complex_failure = solve_linear(
+            updated, Rhs{*complex_rhs, context(), core::RhsGeneration{1}}, input.scales(),
+            Precision<Complex>{RetainedPrecision{core::NumericalGeneration{40}}, requirement,
+                               complex_evaluator},
+            input.accuracy(), input.limits(), *complex_prepared, input.result_plan);
+        REQUIRE_FALSE(complex_failure);
+        CHECK(complex_failure.error().details == expected);
+    }
 }

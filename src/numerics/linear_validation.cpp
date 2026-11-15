@@ -115,6 +115,9 @@ core::Result<void> check_solve_inputs(core::Index rows, core::Index update_rank,
             return initial;
         }
     }
+    if (precision.returned.valueless_by_exception()) {
+        return fail(core::FailureCode::PrecisionUnsupported);
+    }
     if (const auto* projection = std::get_if<Binary64Projection>(&precision.returned)) {
         if (projection->retained_generation == projection->target_generation) {
             return fail(core::FailureCode::InvalidInput);
