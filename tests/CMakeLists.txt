@@ -180,3 +180,42 @@ add_test(NAME numerics.storage_compilation
         "-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set_tests_properties(numerics.storage_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
+
+uvlas_add_test(numerics.sparse_spd
+    LABELS unit verification negative
+    SOURCES numerics/sparse_spd_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+target_include_directories(uvlas_test_numerics_sparse_spd PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.sparse_triangular
+    LABELS unit verification negative
+    SOURCES numerics/sparse_triangular_test.cpp
+    LIBS uvlas_numerics uvlas::eigen)
+target_include_directories(uvlas_test_numerics_sparse_triangular PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.sparse_solve
+    LABELS unit integration verification negative
+    SOURCES numerics/sparse_solve_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+
+uvlas_add_test(numerics.sparse_capacity
+    LABELS capacity verification
+    SOURCES numerics/sparse_capacity_test.cpp
+    LIBS uvlas_numerics)
+
+# Recompile all participating product code under one Eigen allocation-audit policy.
+get_target_property(uvlas_sparse_audit_sources uvlas_numerics SOURCES)
+list(TRANSFORM uvlas_sparse_audit_sources PREPEND "${PROJECT_SOURCE_DIR}/")
+add_library(uvlas_sparse_kernel_audit STATIC ${uvlas_sparse_audit_sources})
+uvlas_configure_target(uvlas_sparse_kernel_audit)
+uvlas_enable_allocation_audit(uvlas_sparse_kernel_audit)
+target_include_directories(uvlas_sparse_kernel_audit PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_link_libraries(uvlas_sparse_kernel_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen)
+uvlas_require_audited_dependencies(uvlas_sparse_kernel_audit)
+uvlas_add_test(numerics.sparse_allocation
+    LABELS property verification
+    SOURCES numerics/sparse_allocation_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_sparse_kernel_audit uvlas::eigen)
+target_include_directories(uvlas_test_numerics_sparse_allocation PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_sparse_allocation)
+uvlas_require_audited_dependencies(uvlas_test_numerics_sparse_allocation)

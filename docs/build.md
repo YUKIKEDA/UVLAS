@@ -136,3 +136,9 @@ kernelの計測は [benchmarks/README.md](../benchmarks/README.md) の独立し�
 ## Python結合の任意構成
 
 `UVLAS_BUILD_PYTHON=ON` とvcpkgの `tests;python` featureを、通常構成とは別の導入prefixへ指定する。外部CPython 3.12のInterpreter・Development.ModuleとNumPy 2.xを使う。構築例とAPIの使い方は [Python拡張](../src/python/README.md)。通常の `just lint` は任意moduleを除き、その構成のcompile databaseを使う専用のclang-tidyと `python.ownership` をWindows/LinuxのCIで実行する。ケースのrun/resumeとwheel配布はIM-06。
+
+## 疎求解の対象検証
+
+`numerics.sparse_spd` は外向きSPD bound、`numerics.sparse_triangular` は抽出・両置換・非重複span、`numerics.sparse_solve` は元CSCの求解と認定、`numerics.sparse_allocation` は準備済み三角kernelのC++/Eigen確保を検査する。`numerics.sparse_capacity` は10万未知数の合成三重対角で、準備・求解時間とprocess lifetime peak RSSを出す。容量試験を実務graphの性能やメモリprofileの認定に転用しない。
+
+確保監査は製品のnumerics全体を監査用policyで再compileし、依存するcoreも同じpolicyの版を使う。通常版のEigen inline定義と混ぜない。

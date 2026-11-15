@@ -51,10 +51,11 @@ if(WIN32)
 endif()
 
 add_library(uvlas_numerics STATIC src/numerics/storage.cpp src/numerics/precision.cpp
-    src/numerics/backend_memory.cpp src/numerics/linear_metrics.cpp src/numerics/linear_result.cpp src/numerics/linear_validation.cpp)
+    src/numerics/backend_memory.cpp src/numerics/linear_metrics.cpp src/numerics/linear_result.cpp src/numerics/linear_validation.cpp
+    src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp)
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_numerics PUBLIC uvlas_core)
+target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen)
 
 if(UVLAS_BUILD_PYTHON)
     if(NOT "python" IN_LIST VCPKG_MANIFEST_FEATURES)
