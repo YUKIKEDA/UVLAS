@@ -41,6 +41,12 @@
 | N-21 | 単位の内部整合が確認できても較正は証明できない。10g／11g等は異なる物の重量かもしれない | [S10診断](../../rd/acceptance/s10/records/s10-reference-metadata-result.json)、[A5](../requirements/practical-acceptance-plan.md)。誤植と断定せず構成対応を確認。sensor xをyから創作しない |
 | N-22 | 計画被覆・hash・限定試作の成功は、製品の実装・物理・性能の合格とは別 | [5の終了](../../rd/acceptance/plan/records/practical-acceptance-plan-completion.md)、[開始判定](../plans/implementation-start-review.md)。今回追加したhashツールも科学的合否を判定しない |
 
+## 密反復改善で確認した停滞（IM00-6）
+
+座標の全成分が不変になることだけでは、元残差の停滞を検出できない。行列の行が [7,5,8]、[-2,-5,8]、[6,5,6]、右辺が [-8,-7,-5] の系は、厳密解が [-3,13/5,0] である。binary64では第三成分の微動が続く一方、原残差が丸め水準に留まる。
+
+[密解法の契約](../specs/foundation/dense-solve-contract.md)では、未達指標の半減を進展の固定条件にし、進展のない列をTwoWordへ昇格する。`dense_solve_test.cpp` の固定反例で確認する。これは一般の非線形停滞判定へそのまま流用する規約ではない。
+
 ## 再利用先
 
 - 原因診断・実験・採否：`solver-rd`。

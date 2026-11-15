@@ -141,6 +141,12 @@ add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
 
+uvlas_add_test(numerics.linear_validation
+    LABELS unit negative verification
+    SOURCES numerics/linear_validation_test.cpp
+    LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_linear_validation PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
 uvlas_add_test(numerics.linear_result
     LABELS unit negative verification
     SOURCES numerics/linear_result_test.cpp
@@ -180,3 +186,15 @@ add_test(NAME numerics.storage_compilation
         "-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set_tests_properties(numerics.storage_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
+
+uvlas_add_test(numerics.dense_solve LABELS unit verification negative
+ SOURCES numerics/dense_solve_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+
+uvlas_add_test(numerics.dense_contract LABELS unit negative verification
+ SOURCES numerics/dense_contract_test.cpp LIBS uvlas_numerics)
+
+uvlas_add_test(numerics.dense_allocations LABELS property verification
+ SOURCES numerics/dense_allocations_test.cpp support/allocation_audit.cpp
+ LIBS uvlas_numerics_audit uvlas::eigen)
+uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
+uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)
