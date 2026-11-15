@@ -76,3 +76,12 @@ if (!pin.has_value()) {
 }
 use(*pin);
 ```
+
+構造化束縛でコンテナの要素を読むrange-forは、コピーが必要でなければ`const auto& [a, b]`で受ける。2026-11-15、PR #49の試験がpairを値で束縛し、MSVCでは通ったがGCCの`-Werror=range-loop-construct`でLinuxのDebug・Release・sanitizer構成がコンパイルに失敗した。コピーを省く修正だけなら数値経路を再実行せず、影響する翻訳単位をコンパイルする。
+
+```cpp
+// BAD: copying every pair can be rejected by another supported compiler.
+for (const auto [a, b] : pairs) { use(a, b); }
+// GOOD: borrow read-only elements when no independent copy is needed.
+for (const auto& [a, b] : pairs) { use(a, b); }
+```
