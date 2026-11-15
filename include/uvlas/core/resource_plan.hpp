@@ -70,6 +70,8 @@ private:
 /// incomplete plan appear to fit. Create a new plan for a new preparation, not per array.
 /// Counts exclude allocator metadata, array cookies, process overhead and external-library
 /// allocations; include those separately when setting an overall process memory budget.
+/// Allocations made during element construction may use the same plan: in-progress
+/// requests reserve their payload so nested requests cannot reuse that capacity.
 /// Use from one thread at a time. This object cannot be copied or moved to duplicate credit.
 class ResourcePlan {
 public:
@@ -90,13 +92,14 @@ public:
     [[nodiscard]] std::uint64_t byte_limit() const noexcept {
         return byte_limit_;
     }
-    /// Cumulative payload bytes of successful allocations; failures never increase this.
+    /// Cumulative payload bytes of successful allocations, excluding in-progress requests.
+    /// A failed request is not charged, but successful nested allocations remain charged.
     [[nodiscard]] std::uint64_t allocated_bytes() const noexcept {
         return allocated_bytes_;
     }
-    /// Uncharged payload bytes available for further preparation.
+    /// Bytes available after successful allocations and in-progress reservations.
     [[nodiscard]] std::uint64_t remaining_bytes() const noexcept {
-        return byte_limit_ - allocated_bytes_;
+        return byte_limit_ - allocated_bytes_ - reserved_bytes_;
     }
 
     /// Check dimensions and budget before allocating a value-initialized owned array.
@@ -104,10 +107,12 @@ public:
     /// @param operation Operation to identify in any returned Failure.
     /// @return Owned buffer, InvalidInput for a negative count or an element-construction
     /// exception, or ResourceExceeded for overflow, insufficient budget or bad_alloc.
-    /// Budget rejection occurs before element construction. Failed allocations leave
-    /// accounting unchanged. No exception escapes; T must have a nonthrowing destructor.
-    /// Resource diagnostics report required cumulative payload and the previously
-    /// charged payload, when the required total is representable; byte_limit() is the cap.
+    /// Budget rejection occurs before allocation and element construction. Capacity is
+    /// reserved before either can reenter this plan, and that reservation is released
+    /// on failure. Successful nested allocations retain their cumulative charges even
+    /// if this request fails. No exception escapes; T needs a nonthrowing destructor.
+    /// Resource diagnostics capture the required total and already charged or reserved
+    /// payload at admission, when representable; byte_limit() is the configured cap.
     template <class T>
         requires std::default_initializable<T> && std::is_nothrow_destructible_v<T>
     [[nodiscard]] Result<PlannedBuffer<T>> allocate(Index count, Operation operation) noexcept {
@@ -117,31 +122,41 @@ public:
             return std::unexpected(bytes.error());
         }
         FailureDetails details;
-        if (*bytes <= std::numeric_limits<std::uint64_t>::max() - allocated_bytes_) {
-            details.resources =
-                ResourceUsage{ResourceKind::Bytes, allocated_bytes_ + *bytes, allocated_bytes_};
+        const auto committed_or_reserved = byte_limit_ - remaining_bytes();
+        if (*bytes <= std::numeric_limits<std::uint64_t>::max() - committed_or_reserved) {
+            details.resources = ResourceUsage{ResourceKind::Bytes, committed_or_reserved + *bytes,
+                                              committed_or_reserved};
         }
         // N4-02: compare by subtraction before allocating or adding to the ledger.
         // An unrepresentable requested total is rejected without inventing a saturated count.
         if (*bytes > remaining_bytes()) {
             return std::unexpected(Failure{FailureCode::ResourceExceeded, operation, details});
         }
-        return guard_entry(
+        // Allocators and element constructors can reenter this plan on the same thread.
+        // Reserve first, and release only this request's reservation after all exception
+        // unwinding; restoring an old ledger snapshot would erase nested successes.
+        reserved_bytes_ += *bytes;
+        auto result = guard_entry(
             operation, FailureCode::InvalidInput, details, [&]() -> Result<PlannedBuffer<T>> {
                 if (count == 0) {
                     return PlannedBuffer<T>{};
                 }
                 auto storage = std::make_unique<T[]>(static_cast<std::size_t>(count));
-                // Construction may throw. Charge only after it succeeds; all
-                // subsequent ownership transfers are nonthrowing.
-                allocated_bytes_ += *bytes;
                 return PlannedBuffer<T>{std::move(storage), static_cast<std::size_t>(count)};
             });
+        reserved_bytes_ -= *bytes;
+        if (result) {
+            // The reservation guaranteed room. No user code runs between releasing
+            // it and recording success; ownership transfers are nonthrowing.
+            allocated_bytes_ += *bytes;
+        }
+        return result;
     }
 
 private:
     std::uint64_t byte_limit_;
     std::uint64_t allocated_bytes_ = 0;
+    std::uint64_t reserved_bytes_ = 0;
 };
 
 } // namespace uvlas::core
