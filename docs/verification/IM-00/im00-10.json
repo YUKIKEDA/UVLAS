@@ -1,0 +1,155 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "IO4-02",
+    "N4-03",
+    "N4-08"
+  ],
+  "package": "IM-00",
+  "issue": 14,
+  "date": "2026-11-15",
+  "scope": "Low-level CPython owning DenseReal/DenseComplex storage and canonical model/state/qualification/commit product bindings; no physical solver or file schema",
+  "source_commit": "a668b53491ec36ec7b2103e4e413474b4823e195",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "a668b53491ec36ec7b2103e4e413474b4823e195",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Release",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "execution_provenance": "Final product CTest/build/lint were run from clean source_commit. The following record and derived trace table are metadata-only follow-up. Source files were explicitly normalized to repository LF where text attributes apply; every recorded worktree file was compared byte-for-byte with its Git blob before hashing. Historical docs/rd evidence was not rewritten.",
+  "environment": {
+    "cpython": "3.12.8",
+    "numpy": "2.3.5",
+    "pybind11": "3.1.0",
+    "pybind11_version_evidence": "Exact CMake discovery and installed detail/common.h MAJOR=3 MINOR=1 MICRO=0",
+    "vcpkg_prefix": "Dedicated Python tests;python feature prefix; shared normal prefix untouched",
+    "interpreter": "External CPython 3.12.8 interpreter/development module; no vcpkg Python runtime",
+    "os": "Windows 11 AMD64"
+  },
+  "checks": [
+    {
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build out/build/python-msvc --config Release --target uvlas_python uvlas_cli uvlas_test_toolchain_pinned_dependencies",
+      "result": "success",
+      "warnings_as_errors": true
+    },
+    {
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --test-dir out/build/python-msvc -C Release -R '^(python.ownership|toolchain.pinned_dependencies|toolchain.third_party_notices)$' --output-on-failure",
+      "passed": 3,
+      "total": 3,
+      "tests": [
+        "python.ownership",
+        "toolchain.pinned_dependencies",
+        "toolchain.third_party_notices"
+      ],
+      "python_unittest_methods": 10
+    },
+    {
+      "command": "uvx clang-tidy@21.1.1 -p out/tidy-python --quiet src/python/module.cpp",
+      "result": "success",
+      "configuration": "One Release TU copied unchanged from feature compile_commands.json; same flags/includes, no disabled checks"
+    },
+    {
+      "command": "uvx clang-format@21.1.2 --dry-run --Werror src/python/module.cpp",
+      "result": "success"
+    },
+    {
+      "command": "out/python-env/Scripts/python.exe tools/dev/ci_scope_test.py",
+      "passed": 7,
+      "total": 7
+    },
+    {
+      "command": "uvx ruff@0.17.4 check tests/python tools/dev/ci_scope.py tools/dev/ci_scope_test.py; uvx ruff@0.17.4 format --check tests/python tools/dev/ci_scope.py tools/dev/ci_scope_test.py",
+      "result": "success"
+    },
+    {
+      "command": "uvx pyright@1.1.408",
+      "result": "0 errors, 0 warnings; tools strict scope"
+    }
+  ],
+  "reference": "Fixed exact NumPy arrays and explicit integer/state transitions. All binary comparisons are exact. Ownership checked through GC, mutation of caller input, WRITEABLE reenable attempts, derived views and memoryview. A real native state hash overlaps Python execution to check GIL release and nonblocking owner rejection, without a performance threshold.",
+  "development_mutations": [
+    {
+      "change": "Omit Dense view readonly restriction in an isolated copied module",
+      "expected": "one selected unittest rejected in all 8 real/complex and empty/nonempty subcases",
+      "observed": "8 assertion failures: WRITEABLE was true",
+      "provenance": "Development candidate before final documentation/include-only edits; the mutated readonly path is unchanged at source_commit. Product source/build was never mutated."
+    }
+  ],
+  "review_corrections": [
+    "Explicitly reject None for every shared_ptr parameter and implicit self; separate-process negative test prevents silent access violations",
+    "Allocate Python result and Accepted owner before consuming trial/packet; prepare replacement/cancellation destination before mutation",
+    "Budget variable native payload snapshots with ResourcePlan, preserving cumulative no-refund semantics",
+    "Protect all mutable getters with the same nonblocking per-owner lock; preserve evaluation-start target and full uint64 identities",
+    "Separate optional feature clang-tidy from normal sources; retain all changed product-format files in mixed scopes; exclude R&D and deleted files"
+  ],
+  "independent_review": {
+    "implementation_and_japanese": "Parent root and im00_12 independently read implementation/contracts/README; no major unresolved findings reported",
+    "im00_12_execution": "Isolated header-only dependency consumer probe, None-self crash reproduction and TypeError recheck only; did not run full product suite or Linux CI"
+  },
+  "japanese_document_lint": {
+    "contract": 0,
+    "readme_final": 0,
+    "adr": "One informational uniform paragraph structure finding retained: each ADR section has a concrete separate purpose; independent readability review found no issue"
+  },
+  "sources": {
+    ".cursor/rules/api-contract.mdc": "3c6c3a884c9af1fdbf269f34771c7d6948c03c6d8e6c7bba3c9008c9914fc6bd",
+    ".github/workflows/ci.yml": "dd64665b74a225991bb596194fa8c8f95366c6756bb499c0570541f3784039da",
+    "CMakeLists.txt": "6d13267e3b6dd87246b402651fdc974b53fd9d8be718bca6066a4072f6e49e2b",
+    "cmake/Dependencies.cmake": "925c1403e57b34e45f386c68cc7c1fa4ccf09e981ff4a83898f8ffbae7a43386",
+    "cmake/vcpkg-ports/pybind11/portfile.cmake": "f30ed3f6016d3288f5de6a045efc1f622a348ee0c0ab956f00ef1fe409f9a83d",
+    "cmake/vcpkg-ports/pybind11/usage": "e2dc5424a5cb151bb6360e65a79dab7db014e97af62682b814dd20d9b4331d49",
+    "cmake/vcpkg-ports/pybind11/vcpkg.json": "ca4d4104c9c727da0948c98111f67cf747f35b0b18e26c659da1afa5b46c9892",
+    "docs/adr/0006-header-only-pybind11-with-external-python.md": "2358869af1858d109b60c1c88518892cf3391f0ea311b7040518b3d8b7a1f1b1",
+    "docs/build.md": "86290d193343bbc0abceff210f60988c69c01ce2807b9b4d5051b55d792fb4cc",
+    "docs/conventions.md": "fdf84b8427bcc67b9da14c5996ae0f35a21a6b6db5ae8e067206512dce975c7e",
+    "docs/roadmap.md": "b5963f7ccad11d2e11663ae01d90c4355402399bf1da93ee4d8051b8adeaba22",
+    "docs/specs/foundation/python-binding-contract.md": "e3c3fecec563fd75cb86dc25d291993a7d929b627f96da2e45a15874b9b54819",
+    "include/uvlas/core/failure.hpp": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/state.hpp": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "justfile": "83be43eba6c5ef226204c804d4939956d5fd5d278abc847028258d9e245e8820",
+    "src/core/state.cpp": "9902e1174ebeadef96a8def7a86736e37726d6725163b6dfab0379ab3367a3b3",
+    "src/numerics/storage.cpp": "a8e6917f308f8d96ce04f93469a5801ff580df731f8744912a45b5f3d82e4d06",
+    "src/python/CMakeLists.txt": "58a3ee3264552d7f908a59ba063da089c94a94559fcd338c03680fa8a1fff5ba",
+    "src/python/README.md": "da9deecf5d96071f100b65f84d096b4c3db5894ddd3985e336fc5ff3b8916979",
+    "src/python/module.cpp": "c47cd858e3535a0327977006c142407ed7c2c64e635ef1f08b0606c6c9fb6966",
+    "tests/python/requirements.txt": "7bd6b8946940b79948c548c8048e545684b91c8edc9444d8dfc0c8f76a97c0a7",
+    "tests/python/test_ownership.py": "49de5a4e154025c12ba160e064510e606dcdd64525ca8f551346fccea65451fe",
+    "tools/dev/ci_scope.py": "01b0c7bd080dd3c1ea414ad130182f91391bfafd77929d3e5dcf6bdcb0d3890b",
+    "tools/dev/ci_scope_test.py": "3a7387e341c65b56a4e2d76b7dfe75804efc2244e3584bce69ad28a8961aeda5",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec"
+  },
+  "artifacts": {},
+  "completion": {
+    "implementation_ready": true,
+    "issue_complete": false,
+    "roadmap_status": "In progress",
+    "remaining": "Issue14 requires Linux CPython3.12/NumPy2 product execution. Dedicated Windows/Linux CI jobs added; Linux not locally available and CI was not awaited."
+  },
+  "not_claimed": [
+    "Linux execution",
+    "Both-OS Issue14 acceptance",
+    "Physical governing-equation evaluation",
+    "Physical canonical field serialization",
+    "Case JSON schema/run/resume/wheel packaging",
+    "Solver accuracy",
+    "Experiment validation",
+    "Product-scale performance",
+    "Practical acceptance"
+  ],
+  "ci": "Not awaited. Both OS optional jobs are wired; Linux remains pending evidence."
+}
