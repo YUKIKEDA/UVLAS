@@ -1,0 +1,5 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+  Test #28: numerics.backend_memory
+
+Total Tests: 1

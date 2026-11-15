@@ -1,0 +1,89 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 10,
+  "date": "2026-11-15",
+  "source_commit": "88381335f85cf641d39e78f3deaaedc806654493",
+  "scope": "PR53のLinux Releaseで判明したbackend_memory試験targetの監査policy漏れを修正する。変更はtests/CMakeLists.txtの3追加・1削除だけで、C++ source・数値演算・試験内容は変更していない。",
+  "observed_failure": {
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43705522852/job/132785673278",
+    "head": "7c8d7a3a969ae6c12191d2e11dca0e1f9869e5ed",
+    "configuration": "Linux GCC14 Release",
+    "diagnostic": "tests/support/allocation_audit.cppのeigen_scopes/original_eigen_allowedが未使用となり、-Werror=unused-variableでcompile失敗した。完了済jobの実ログから該当行を保存した。",
+    "cause": "backend_memoryが監査supportを使いながら通常uvlas_numericsへリンクし、監査compile policyを設定していなかった。Cpp-onlyの計測でもsupport自身のpolicy設定が必要である。"
+  },
+  "correction": [
+    "backend_memoryをuvlas_numerics_auditへリンクした。",
+    "uvlas_enable_allocation_auditとuvlas_require_audited_dependenciesを適用し、test/supportと関連製品TUを同じ監査policyへ揃えた。",
+    "同じsupportを使う登録を全検索し、他の既存targetにも監査設定が適用されていることを確認した。support.cpp自体は変更していない。"
+  ],
+  "tested_candidate": {
+    "build_commit": "7c8d7a3a969ae6c12191d2e11dca0e1f9869e5ed",
+    "uncommitted_changes": true,
+    "final_source_bytes_equal_to_candidate": true,
+    "note": "commit前のCMake候補で対象を構成・build・実行し、その同じbyteをsource_commitに固定した。clean表示のための再実行は行っていない。"
+  },
+  "environment": {
+    "platform": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict",
+    "dependency_policy": "固定済みの共有prefixを読取り専用で利用し、自動導入・feature変更なし。"
+  },
+  "verification": [
+    {
+      "command": "pwsh tools/dev/msvc.ps1 cmake --build out/build/windows-msvc --config Debug --target uvlas_test_numerics_backend_memory -j 2",
+      "build_exit": 0,
+      "test_command": "pwsh tools/dev/msvc.ps1 ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.backend_memory$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "command": "pwsh tools/dev/msvc.ps1 cmake --build out/build/windows-msvc --config Release --target uvlas_test_numerics_backend_memory -j 2",
+      "build_exit": 0,
+      "test_command": "pwsh tools/dev/msvc.ps1 ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.backend_memory$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    }
+  ],
+  "configuration_checks": {
+    "registration": "ctest -Nでnumerics.backend_memoryの登録1件を確認した。",
+    "compile_policy": "実際のDebug/Release compile commandで、support.cppにEIGEN_RUNTIME_NO_MALLOCと/UNDEBUGがあることを確認した。",
+    "dependency_policy": "CMake再構成が監査依存の検査に成功した。",
+    "runtime_scope": "計測対象は従来どおりCpp backendのみであり、確保試行0を確認した。このcaseでEigen数値kernelを動的に監査した主張ではない。"
+  },
+  "review": "原因と最小修正は別担当が完了済CIログと登録を照合して特定した。CMake差分と検証範囲を共有し、他の数値・監査suiteは繰り返していない。",
+  "checks": {
+    "trace": "trace.py matrix/checkで153ID・問題0。",
+    "integrity": "既存manifest checkerで16file・error0。source/artifactの保存byte整合を確認した。"
+  },
+  "history": {
+    "id": "im00-6-diagnostic-context",
+    "hint": "docs/verification/IM-00/im00-6-diagnostic-context.json",
+    "sha256": "79095424e2fdb1eb04f7e61da64ccbaf3b5e6a1e2d380faf38fb48f7b1d426bb",
+    "role": "旧sourceに対する検証履歴として不変のまま保持した。"
+  },
+  "ci_state": "修正後headのLinux CIは未確認。完了を待たず同じPRへpushする。MSVCの成功をLinuxの実行成功へ読み替えない。",
+  "sources": {
+    "tests/CMakeLists.txt": "2df9cdabf5538053a385f534ab789df48f26ab2c2db87542ba15f867e49d1417",
+    "CMakeLists.txt": "1c5169537919fc863f4b896a8b129bf59a4a14a7f3e43fc0852442e1b6e13e26",
+    "cmake/AllocationAudit.cmake": "96a568712a3be7f5e4be32ec1e9d23e4a7a39da6274520a77a9b8f1fbbaa57b0",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "tests/numerics/backend_memory_test.cpp": "ad71c09764eefa401dfd25363bfc491754c375c42dbcb21042ce61e7905e1d95"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-6-ci-audit-policy/build-debug.log": "22a549c55b9010a381e69b7074c3866aaafeb4f6b69a9e00cb1393c2fea80369",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/build-release.log": "53812794d00a158401a6a2c16b3ac355cefe5fc90d28bed02769458bf340e193",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/compile-policy.json": "4e3a153576649941ee562c7dde57e15ae8e25ea3d2030ce00316a040cf753767",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/linux-failure-excerpt.log": "07b7cb16c05518e172177782f0564c33fe0f059d8e54855fb39fb48fa3b8d10a",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/redaction.json": "3d341a749d697bed3356d6e4cb61c7a563338518b23aea82d491d92a224509f2",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/registration.log": "49446f7bff6d7787d7c30c322add69ee11286410f22814771b327d9e5cf073c8",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/test-debug.log": "b462c06b2010997f792999f40940cc179ba585ad93f6c7d5cc702df0b85511d7",
+    "docs/verification/IM-00/im00-6-ci-audit-policy/test-release.log": "b462c06b2010997f792999f40940cc179ba585ad93f6c7d5cc702df0b85511d7",
+    "docs/verification/IM-00/im00-6-diagnostic-context.json": "79095424e2fdb1eb04f7e61da64ccbaf3b5e6a1e2d380faf38fb48f7b1d426bb"
+  }
+}

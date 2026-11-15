@@ -1,0 +1,11 @@
+{
+  "target": "uvlas_test_numerics_backend_memory",
+  "source": "tests/support/allocation_audit.cpp",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "EIGEN_RUNTIME_NO_MALLOC": true,
+  "assertions_enabled": true,
+  "dependency_audit": "CMake configure succeeded with uvlas_require_audited_dependencies and uvlas_numerics_audit"
+}
