@@ -90,7 +90,10 @@ TEST_CASE("pinned dependency versions reach the compiler", "[toolchain][N4-01]")
     std::map<std::string, std::string> versions;
     for (const auto& item : manifest.at("overrides")) {
         const auto pin = pinned_version(item);
-        REQUIRE(pin.has_value());
+        if (!pin.has_value()) {
+            FAIL("Override must contain one nonempty version pin");
+            return;
+        }
         versions.emplace(item.at("name").get<std::string>(), *pin);
     }
     const auto version = [](int major, int minor, int patch) {
