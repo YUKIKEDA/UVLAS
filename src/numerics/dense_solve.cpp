@@ -27,6 +27,21 @@ constexpr auto operation = core::Operation::SolveLinear;
 auto fail(FailureCode code) noexcept {
     return std::unexpected(core::Failure{code, operation});
 }
+template <class Value>
+Result<Value> with_context(Result<Value> result, const Context& context) noexcept {
+    if (!result) {
+        auto& details = result.error().details;
+        // An inner failure may identify a more specific evaluation or resource request.
+        // Complete only unknown identities at the public boundary; never relabel known ones.
+        if (!details.model)
+            details.model = context.cache.model;
+        if (!details.trial)
+            details.trial = context.trial;
+        if (!details.numerical_generation)
+            details.numerical_generation = context.cache.matrix;
+    }
+    return result;
+}
 bool finite(double value) noexcept {
     return std::isfinite(value);
 }
@@ -299,7 +314,7 @@ std::optional<BackendMemoryPlan> DensePrepared::memory_plan() const noexcept {
 Result<DensePrepared> DensePrepared::prepare(const DenseOperator& op, const Scales& scales,
                                              const Limits& limits,
                                              core::ResourcePlan& plan) noexcept {
-    return core::guard_entry(
+    auto result = core::guard_entry(
         operation, FailureCode::FactorizationFailed, {}, [&]() -> Result<DensePrepared> {
             const auto valid = prepare_input(op.values, op.context, scales, limits, 0);
             if (!valid) {
@@ -343,6 +358,7 @@ Result<DensePrepared> DensePrepared::prepare(const DenseOperator& op, const Scal
             }
             return DensePrepared{std::move(data)};
         });
+    return with_context(std::move(result), op.context);
 }
 UpdatedPrepared::UpdatedPrepared(std::unique_ptr<detail::UpdatedData> data) noexcept
     : data_(std::move(data)) {}
@@ -358,7 +374,7 @@ ConditionDiagnostic UpdatedPrepared::schur_condition() const noexcept {
 Result<UpdatedPrepared> UpdatedPrepared::prepare(const ColumnUpdatedOperator& op,
                                                  const Scales& scales, const Limits& limits,
                                                  core::ResourcePlan& plan) noexcept {
-    return core::guard_entry(
+    auto result = core::guard_entry(
         operation, FailureCode::FactorizationFailed, {}, [&]() -> Result<UpdatedPrepared> {
             const auto base =
                 prepare_input(op.base, op.context, scales, limits, op.u.shape().columns);
@@ -479,6 +495,7 @@ Result<UpdatedPrepared> UpdatedPrepared::prepare(const ColumnUpdatedOperator& op
             }
             return UpdatedPrepared{std::move(data)};
         });
+    return with_context(std::move(result), op.context);
 }
 } // namespace uvlas::numerics::linear
 
@@ -678,6 +695,9 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
     std::fill(lo->values().begin(), lo->values().end(), Scalar{});
     std::optional<DenseMatrix<Scalar>> projected;
     const auto* projection = std::get_if<Binary64Projection>(&precision.returned);
+    const auto* retained_request = std::get_if<RetainedPrecision>(&precision.returned);
+    if (!projection && !retained_request)
+        return fail(FailureCode::PrecisionUnsupported);
     if (projection) {
         auto p = DenseMatrix<Scalar>::copy(rhs.values().shape(), high(rhs.values()).values(), plan,
                                            operation);
@@ -833,8 +853,8 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
         if (!*checked)
             return fail(FailureCode::PrecisionUnresolved);
     }
-    const auto generation = projection ? projection->retained_generation
-                                       : std::get<RetainedPrecision>(precision.returned).generation;
+    const auto generation =
+        projection ? projection->retained_generation : retained_request->generation;
     auto retained =
         two ? PrecisionBuffer<Scalar>::two_word(std::move(*hi), std::move(*lo), generation)
             : PrecisionBuffer<Scalar>::binary64(std::move(*hi), generation);
@@ -858,7 +878,7 @@ Result<Solution<double>> solve_linear(const DenseOperator& op, const Rhs<double>
                                       const Scales& scales, const Precision<double>& precision,
                                       const Accuracy& accuracy, const Limits& limits,
                                       DensePrepared& prepared, core::ResourcePlan& plan) noexcept {
-    return core::guard_entry(
+    auto result = core::guard_entry(
         operation, FailureCode::FactorizationFailed, {}, [&]() -> Result<Solution<double>> {
             if (!prepared.data_)
                 return fail(FailureCode::InvalidInput);
@@ -871,13 +891,14 @@ Result<Solution<double>> solve_linear(const DenseOperator& op, const Rhs<double>
             return solve<double>(*prepared.data_, rhs, scales, precision, accuracy, limits, plan, 0,
                                  prepared.data_->condition);
         });
+    return with_context(std::move(result), op.context);
 }
 Result<Solution<Complex>> solve_linear(const ColumnUpdatedOperator& op, const Rhs<Complex>& rhs,
                                        const Scales& scales, const Precision<Complex>& precision,
                                        const Accuracy& accuracy, const Limits& limits,
                                        UpdatedPrepared& prepared,
                                        core::ResourcePlan& plan) noexcept {
-    return core::guard_entry(
+    auto result = core::guard_entry(
         operation, FailureCode::FactorizationFailed, {}, [&]() -> Result<Solution<Complex>> {
             if (!prepared.data_)
                 return fail(FailureCode::InvalidInput);
@@ -896,5 +917,6 @@ Result<Solution<Complex>> solve_linear(const ColumnUpdatedOperator& op, const Rh
             return solve<Complex>(*prepared.data_, rhs, scales, precision, accuracy, limits, plan,
                                   op.u.shape().columns, NotEvaluated{});
         });
+    return with_context(std::move(result), op.context);
 }
 } // namespace uvlas::numerics::linear
