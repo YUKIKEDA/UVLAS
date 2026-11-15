@@ -1,0 +1,24 @@
+Internal ctest changing into directory: <repo>/out/build/sparse-msvc
+Test project <repo>/out/build/sparse-msvc
+    Start 32: numerics.sparse_spd
+1/5 Test #32: numerics.sparse_spd ..............   Passed    0.04 sec
+    Start 33: numerics.sparse_triangular
+2/5 Test #33: numerics.sparse_triangular .......   Passed    0.04 sec
+    Start 34: numerics.sparse_solve
+3/5 Test #34: numerics.sparse_solve ............   Passed    0.05 sec
+    Start 35: numerics.sparse_capacity
+4/5 Test #35: numerics.sparse_capacity .........   Passed    2.96 sec
+    Start 36: numerics.sparse_allocation
+5/5 Test #36: numerics.sparse_allocation .......   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+capacity        =   2.96 sec*proc (1 test)
+integration     =   0.05 sec*proc (1 test)
+negative        =   0.12 sec*proc (3 tests)
+property        =   0.03 sec*proc (1 test)
+unit            =   0.12 sec*proc (3 tests)
+verification    =   3.11 sec*proc (5 tests)
+
+Total Test time (real) =   3.12 sec

@@ -1,0 +1,87 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-03",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-00",
+  "issue": 11,
+  "date": "2026-11-15",
+  "source_commit": "cf237d094ae9fe1af03d105e81b61eddd2c76ea0",
+  "scope": "公開前の証拠レビューに対する追加実行。前回の製品CTest対照と別に、同一の隔離runnerで非変異controlを最初に実行し、その後3つの変異を同じ条件で確認した。古い結果を置き換えない。",
+  "provenance": "controlは製品3cppの原文copy。全4targetは同じ2つの試験cpp、同じCMake設定・Release compiler flags・link librariesで構築。変異だけ元記録の置換を適用した。controlを新規compileし、変更していない3mutant実行ファイルは前の隔離buildを再利用。全実行は新しい固定seedで順次行った。",
+  "commands": {
+    "build": "pwsh tools/dev/msvc.ps1 cmake --build out/sparse-mutations/build --target control --parallel 2",
+    "execution": "out/sparse-mutations/build/<variant>.exe --reporter compact --rng-seed 424242",
+    "order": [
+      "control",
+      "content",
+      "low_word",
+      "permutation"
+    ]
+  },
+  "results": [
+    {
+      "variant": "control",
+      "exit": 0,
+      "test_cases": 16,
+      "passed_assertions": 152
+    },
+    {
+      "variant": "content",
+      "exit": 42,
+      "failed_cases": 1,
+      "failed_assertions": 1
+    },
+    {
+      "variant": "low_word",
+      "exit": 42,
+      "failed_cases": 3,
+      "failed_assertions": 3
+    },
+    {
+      "variant": "permutation",
+      "exit": 42,
+      "failed_cases": 1,
+      "failed_assertions": 12
+    }
+  ],
+  "compiler": "MSVC19.51.36260.0 /fp:strict warnings-as-errors",
+  "linux": "未実行、CI成功の主張なし。",
+  "sources": {
+    "CMakeLists.txt": "e0adfd2dc4764d20b956c664b1ec69c50acc07419701b2572848a32dd1cdaad2",
+    "tests/CMakeLists.txt": "e48d4a892bf8d01f3932748f57614d7439297c11afd5885da8cc93797bd0fc33",
+    "docs/build.md": "7f554990027bdc95e21ad979b82d4711bab2093d25bbf06b23b67c5d13e14a91",
+    "docs/conventions.md": "340984aa132f43a678d477c2216e068aa6c5f86f2694bbd487d747f93e791eab",
+    "docs/specs/foundation/sparse-solve-contract.md": "8f49845c0436ad38eca6403cd3c87e98bdc1ba8c592001a3d76e0341e433867c",
+    "include/uvlas/numerics/sparse_solve.hpp": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+    "src/numerics/sparse_solve.cpp": "2166a62684eecc45ec9d088d07c6df8b2ead6a4f7a2e367faebd964cb19a19c2",
+    "src/numerics/sparse_spd.cpp": "c33e0702216468eccf8df150b364be41be8e1a5aee6d1c0e0ac697d95653a2af",
+    "src/numerics/sparse_spd.hpp": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+    "src/numerics/sparse_triangular.cpp": "fa15d6fef00fbc1821f939099c976fc46f8121ee9a523cf1c7976338dbe6039d",
+    "src/numerics/sparse_triangular.hpp": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+    "tests/numerics/sparse_allocation_test.cpp": "7783160fa07cae58d14bfe6d0b1d9ee8b4e4fe8f63d8ed874e69dd0636e255dc",
+    "tests/numerics/sparse_capacity_test.cpp": "caa01066f735a8bcd810178b568b03f0152d86e28e9c61b699b8afb161fc8596",
+    "tests/numerics/sparse_solve_test.cpp": "107bded2c9f8992086523e6a83c4ff43213422ad2b3e3b60cddb7633900cc5d1",
+    "tests/numerics/sparse_spd_test.cpp": "3ca1075dd83f72c604cdc01ccf01709a9e8924c0c774bb3dc8c0b42eaf2fcce5",
+    "tests/numerics/sparse_test_support.hpp": "98653f3a90ab15ccf350f9aea32adfcf35911fdf909c6b3b03f3a5b05df8c27b",
+    "tests/numerics/sparse_triangular_test.cpp": "d0e53b85e3d76a1de0160ac170b080cb9f1d42fe0313453b98714295d87d334a",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/linear_result.cpp": "c2609291c7ff9b2a3b941918267d97f36bbfa5671969a57f89df82c657e28186",
+    "src/numerics/linear_validation.cpp": "4e6a50603eb991b45f22c2f0db7dca3c0ef002491560fda8f16b2b2dbc132de9",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "src/numerics/backend_memory.cpp": "d89105fbfda46249b2ef5d0355b5bcb73972dcd47607b8d15214997b7da7ce5a",
+    "src/numerics/backend_memory_detail.hpp": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-7-isolated-control.txt": "7170d863707852bb96ed96487607149d897af6bda52db0ca3347f9f63ed6f5b9",
+    "docs/verification/IM-00/im00-7-isolated-content.txt": "d22f71dba3bbfe4cadaa0f043c1dca94fa23c540a4f10c5a61239210df293a73",
+    "docs/verification/IM-00/im00-7-isolated-low_word.txt": "92697359b58141214298d223d66c9070c340abe5afe54e422d4baac5fb3d12aa",
+    "docs/verification/IM-00/im00-7-isolated-permutation.txt": "15cbf7bf9d075bb84e6751a6a5def5e471895cb65951927453b27200fffbe27a",
+    "docs/verification/IM-00/im00-7-isolated-runner.cmake.txt": "6741c00b69a4b4d7283ef2d0875bdb000a592b65df97e58273cc5c9424cfb7f4"
+  }
+}

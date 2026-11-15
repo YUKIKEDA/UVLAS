@@ -1,0 +1,6 @@
+RNG seed: 3764944247
+<repo>\tests\numerics\sparse_solve_test.cpp(110): failed: !(mismatch) for: !{?}
+test cases:  16 |  15 passed | 1 failed
+assertions: 148 | 147 passed | 1 failed
+
+
