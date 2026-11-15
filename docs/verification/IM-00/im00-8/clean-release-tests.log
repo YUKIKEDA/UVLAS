@@ -1,0 +1,19 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+    Start 41: numerics.gmres_contract
+1/4 Test #41: numerics.gmres_contract ..........   Passed    0.05 sec
+    Start 42: numerics.gmres_solve
+2/4 Test #42: numerics.gmres_solve .............   Passed    0.04 sec
+    Start 43: numerics.gmres_residual
+3/4 Test #43: numerics.gmres_residual ..........   Passed    0.04 sec
+    Start 44: numerics.gmres_allocations
+4/4 Test #44: numerics.gmres_allocations .......   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+negative        =   0.13 sec*proc (3 tests)
+unit            =   0.17 sec*proc (4 tests)
+verification    =   0.17 sec*proc (4 tests)
+
+Total Test time (real) =   0.18 sec

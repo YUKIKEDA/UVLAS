@@ -1,0 +1,202 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 12,
+  "date": "2026-11-15",
+  "source_commit": "3978961c27c064e72056b3010a0870e0a3e206f0",
+  "scope": "実数の固定左前処理・再始動GMRESを、所有する結果と診断、元系の保守的な認定、TwoWord保持と明示投影へ接続する。物理ブロック前処理そのものは含めない。",
+  "provenance": {
+    "clean": true,
+    "build_info_uncommitted_changes": false,
+    "note": "mainの参照fixture準備を通常mergeした後、固定source commitから影響する4CTestをDebug/Releaseで各1回確認した。先行の変異と同じ数値本体byteを再利用し、無変更のfixtureや密疎の既存試験は繰り返していない。benchmarkは作用誤差のunderflow包絡を補った最終commitから再計測した。"
+  },
+  "environment": {
+    "os": "Windows 11 AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict、最近接丸めと段階的アンダーフロー。",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "boost": "1.92.0",
+      "catch2": "3.16.1",
+      "benchmark": "1.9.5"
+    },
+    "prefix": "試験用とbenchmark用の既存prefixを、manifest install無効で読取り専用再利用した。"
+  },
+  "verification": [
+    {
+      "configuration": "Debug",
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.gmres_ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "log": "docs/verification/IM-00/im00-8/clean-debug-tests.log"
+    },
+    {
+      "configuration": "Release",
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.gmres_ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "log": "docs/verification/IM-00/im00-8/clean-release-tests.log"
+    }
+  ],
+  "completion_evidence": [
+    {
+      "requirement": "一つの線形求解の間、前処理を固定する",
+      "evidence": "完全Contextとfactor CacheKeyを準備へ保存し、全callback前後とconsumer認定後に照合。作用後のA/P変更と再入を拒否する独立contract試験。"
+    },
+    {
+      "requirement": "再始動幅64、最大512作用を初期の資源設定とし、物理受入精度の代用にしない",
+      "evidence": "既定64/512を固定値で確認。Aのhi/lo作用と絶対作用を全列共有で開始前課金し、Pは別に計数。0/1/複数列quotaの対照と各実callback数照合。"
+    },
+    {
+      "requirement": "残差が未達ならLinearUnconvergedとし、部分解を正常として返さない",
+      "evidence": "特異不整合のKrylov breakdown、零P、loose producer bound、作用上限を拒否。投影だけが未達の場合はPrecisionUnresolvedを区別する。"
+    },
+    {
+      "requirement": "成分別の物理尺度による原残差から線形精度を認定する",
+      "evidence": "Ahi/Aloの各signed tailとproducer誤差を補償して元残差を包絡し、actual値の絶対下界を標準後退誤差の分母下界へ使用。共通metric/certificateと全consumer要求へ接続。"
+    },
+    {
+      "requirement": "小さい全ブロックの明示系と照合する",
+      "evidence": "非対称4x4の全交差ブロックを保持し、厳密解[1,-2,3,-1]と独立に固定したb=[8,-7,17,-8]をrestart2・非単位尺度で照合、解の絶対誤差1e-12未満。"
+    }
+  ],
+  "allocation_audit": {
+    "paths": 8,
+    "scope": "実数1x1の初期Binary64/TwoWord、通常/strict、保持/投影の全8経路。公開solve全体の固定所有確保8回、投影9回とEigen禁止を検証。source通読による前置所有確保の配置と組み合わせ、追加の内側確保を検出する。内kernel区間の0確保だけを別途直接計測したとは主張しない。",
+    "resource_scope": "ResourcePlanはGMRES自身の配列payload。opaque A/Pの所有backendやworkspaceはadapter所有者の別計上であり、非空の未証明RequireProvenBoundは拒否する。実プロセスのhard cap/RSSを認定しない。"
+  },
+  "mutations": {
+    "kernel": {
+      "control_cases": 17,
+      "control_assertions": 338,
+      "compiled_detected": 5,
+      "timeouts": 0,
+      "changes": [
+        "元系精度gateを除去",
+        "保持低位作用を除去",
+        "固定P identity照合を除去",
+        "作用quotaを除去",
+        "開始済みforward counter更新を除去"
+      ],
+      "scope": "隔離したsourceとABI snapshotへ明示objectをlinkし、全control成功後、各変異のcompile成功と実行exit42を確認。controlのcontractは追加tail-only対照前の13casesで、数値本体は最終commitと同一byte。"
+    },
+    "residual_helper": {
+      "control_cases": 3,
+      "control_assertions": 105,
+      "compiled_detected": 3,
+      "changes": [
+        "Ahi signed tail減算を除去",
+        "Alo signed tail減算を除去",
+        "低位作用のproducer誤差上界を除去"
+      ],
+      "reviewer": "別担当が隔離実行。入力29件の前後hash一致、元worktree/buildは不変。"
+    }
+  },
+  "static_analysis": {
+    "clang_format": "21.1.2、全追加C++ TUと公開/private headerを整形。",
+    "clang_tidy": "21.1.1。新規source2、数値/contract/residual/audit各test4、benchmark/main2の変更TU全8件で対象診断0。外部system headerの集約警告は対象診断へ数えない。",
+    "documentation": "日本語文書を別担当が通読。benchmark READMEとroadmapはfinding0。契約/規則/教訓の構造・術語反復infoは意味を保つため明記して保持。"
+  },
+  "benchmark": {
+    "command": "uvlas_kernel_bench --benchmark_filter=gmres/ --benchmark_min_time=0.05s --benchmark_repetitions=3 --benchmark_out_format=json",
+    "settings": "三重対角(-1/4,1,-1/4)、P=I、1列、尺度1、restart64、operator quota512、許容差1e-11。準備と所有出力込みsolveを別々に計測。",
+    "medians": [
+      {
+        "name": "gmres/Preparation/96",
+        "wall_time": 0.003836636576629403,
+        "cpu_time": 0.0038963143982843743,
+        "unit": "ms",
+        "operator_actions": null
+      },
+      {
+        "name": "gmres/Preparation/1024",
+        "wall_time": 0.016959709819275304,
+        "cpu_time": 0.017438616071428572,
+        "unit": "ms",
+        "operator_actions": null
+      },
+      {
+        "name": "gmres/Solve/96",
+        "wall_time": 63.967699999921024,
+        "cpu_time": 62.5,
+        "unit": "ms",
+        "operator_actions": 66.0
+      },
+      {
+        "name": "gmres/Solve/1024",
+        "wall_time": 677.9838999937056,
+        "cpu_time": 656.25,
+        "unit": "ms",
+        "operator_actions": 66.0
+      }
+    ],
+    "role": "合成容量baselineのみ。64Arnoldi作用＋元認定2作用を含み、既存EFTの環境検査も費用へ含む。実翼・強連成実務系の時間や48GiB/12時間受入は未認定。",
+    "measured_source_commit": "3978961c27c064e72056b3010a0870e0a3e206f0",
+    "build_dirty": false
+  },
+  "remaining_gates": [
+    "IM00-11で設計試作の4数値群を製品経路へ接続してパッケージを判定する。",
+    "IM-04で実空力/構造の固定ブロック前処理を接続する。",
+    "IM-07/IM-08の実務数値・性能・実験受入は未認定。",
+    "Linuxの追加head CI結果はこの提出時点で未確認。待機しない。"
+  ],
+  "redaction": "公開用コピーだけを伏字化し、各ログの前後SHAと置換件数を保存。元ログや旧検証記録は変更しない。benchmarkのhost名も匿名化し、数値配列と時間値は保持。",
+  "sources": {
+    ".cursor/rules/api-contract.mdc": "a06a26e807b372fbe2310e3c3ad341e9ba33bde1a804ab6f5c883a7c23fc9b9a",
+    "CMakeLists.txt": "3b1e74586510cd020e22861c95a1aa18ec8d7675a88f63ea16026af6dc32208f",
+    "benchmarks/CMakeLists.txt": "d2886cb889fa8a70647a40ee79775ce998370a10aa78adccda80afdeec3d124e",
+    "benchmarks/README.md": "ab4b5a97edf96e402f02348e1bc6776bc2630849d8ec085d899788bb5d5902c6",
+    "benchmarks/gmres_solve_bench.cpp": "298e0114ba359a318b193cb94a66bc563437bf476adccfd3fb5b6f34d647967d",
+    "benchmarks/main.cpp": "bed826493f55e2b9fbca065560fbe40b69a9500736ce70a41ba3e6d21f494a6e",
+    "docs/engineering/lessons-and-evidence.md": "22d5fa5b7b8c7ece2240572c98d8db7dd1e1bb42a52660122a74ccf3b494357c",
+    "docs/roadmap.md": "92854d46a39adb2c1d763e283a7b4aa04b5dbc4808539c2ef12bcbf9da47d0cb",
+    "docs/specs/foundation/gmres-solve-contract.md": "6bc779012c3862880cc94934774df663983e1ee2e506f6fdaa053405f6a64a8b",
+    "include/uvlas/numerics/gmres_solve.hpp": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+    "src/numerics/gmres_residual_detail.cpp": "46230d8c26c249212facc401815346b90bfc00a37c68cbb9f3c02be4f95f4a16",
+    "src/numerics/gmres_residual_detail.hpp": "d1ca3a8b763439e66c7525bfe0c46e656f2f7ab9b2e5691ce0f1200ceef4b4e6",
+    "src/numerics/gmres_solve.cpp": "fe2eadb615ca751acdf2d965657bce08d790b54e72d0ea6d5ad7a597eecfbb98",
+    "tests/CMakeLists.txt": "50a6153e429d5d31684e814a51197be920a66c1ced001070d21fe286c8c2a810",
+    "tests/numerics/gmres_allocations_test.cpp": "538cab00286b45cafc3c3a6553e051d0256caf8b86dc1844524fc9f6185c8c00",
+    "tests/numerics/gmres_contract_test.cpp": "5ed2e09f54bf15126ff0f687362c8e49a298d5348f50a80b2cc6a69fb77f2a4e",
+    "tests/numerics/gmres_residual_test.cpp": "12d48b0972d77c89be402366147e63364c8f359e8456e6645be0908b2e3c7b74",
+    "tests/numerics/gmres_solve_test.cpp": "56c9ae35f41c85028b4f25a40625949fecd02a44162059989ae017af0b4e865f",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "e8f57df001807507a3365d8abae748f19616bcd418d73c4eac2ae1da9d603ed9",
+    "docs/specs/foundation/linear-solve-accuracy-contract.md": "b55514eec4e0915296a3d14a5b89170be398630ae898f62aff47561b7526feaa",
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-8/audit-tidy.log": "70993013643d71fe7d19bd26a99a8388630542c7beca864a8a1e06c8cdaa2254",
+    "docs/verification/IM-00/im00-8/bench-git-revision.hpp": "d092052f3e22bcbc8c428c1cf573d2e0049060164a8512f0cee56c4c31c43b34",
+    "docs/verification/IM-00/im00-8/bench-main-tidy.log": "760531462a5ef5cf2ef0d0807f5b4c229414b3b0fee70ee0b20db1c5851acb92",
+    "docs/verification/IM-00/im00-8/bench-tidy.log": "e4a3b3ab2223b5e6fd42e9d50eefc3c583cd8611da5a45098b0539a47730c9a5",
+    "docs/verification/IM-00/im00-8/clean-benchmark-build.log": "b2964258a8fcfa06d6f1a654af2236bcec9a9a59a0b85c918d3951d9d019e4c3",
+    "docs/verification/IM-00/im00-8/clean-debug-build.log": "f394201b235743b188c56bf79f141fdd94c373796fa060c7045a2836c0f62ff0",
+    "docs/verification/IM-00/im00-8/clean-debug-tests.log": "0b8b11b82b065721dc53695d0f99f8ffd7a6f46503fc4b44f2f9abe3cd25477f",
+    "docs/verification/IM-00/im00-8/clean-release-build.log": "471c9d1dc3318f16a711d8109f8b2a3f256a2c96ee5a4b69bb4215fa20c19d5c",
+    "docs/verification/IM-00/im00-8/clean-release-tests.log": "c9c7d1b733f3f0469d806ef937b515f5849ef87c1796fda486b3294900c663aa",
+    "docs/verification/IM-00/im00-8/contract-tidy.log": "c384c55c85c62458908dc75cd1ab69b08d6f6ce1061c0b84d3ec78e12c9538cb",
+    "docs/verification/IM-00/im00-8/git-revision.hpp": "d092052f3e22bcbc8c428c1cf573d2e0049060164a8512f0cee56c4c31c43b34",
+    "docs/verification/IM-00/im00-8/gmres-bench-final.json": "ae7df73e185e8547cc3db126d8577080cd2c135fc5f9255202bc0f297338614d",
+    "docs/verification/IM-00/im00-8/gmres-bench-final.log": "8857b90ed383c0f990c3135a03f8e9fdc200a170ba15ee80bec86c840ad10527",
+    "docs/verification/IM-00/im00-8/gmres-helper-signed-tail-mutations.zip": "7673ccd3baf2d968b39aca1b51414acfd58c9f313da70c448f9c6ad4a7ec275e",
+    "docs/verification/IM-00/im00-8/gmres-kernel-mutations.zip": "d77fe0859af63fdf15b3f27b2ffb853797c507b44111e3634f0b746df37e3a06",
+    "docs/verification/IM-00/im00-8/integration-registration.log": "647638bcb822c6c288d9ec9be2d26828d05d77d48ed8124b1bd82a3fd5065091",
+    "docs/verification/IM-00/im00-8/numerics-tidy.log": "1c7118d8dbbe10d9674ce8e6485daf81366ce577fc598fb64f3a983bf8110b9a",
+    "docs/verification/IM-00/im00-8/readme-lint.json": "bd9f3c757439e7e27c5f373d360252aeefd4c192d4e306d15584e61637bf088f",
+    "docs/verification/IM-00/im00-8/redaction.json": "21b305d6301a8bbc412fb1f527212571439d7aaa0e41b5a496ae35c829d61c1d",
+    "docs/verification/IM-00/im00-8/residual-test-tidy.log": "7896326e290fa010fcc378e558237a11720817e196b1da02f31273650cde0265",
+    "docs/verification/IM-00/im00-8/residual-tidy.log": "e039e77a33bbf6cc69f7d8873ab13d90de425406cd21d5728e717a82b5ed7240",
+    "docs/verification/IM-00/im00-8/roadmap-lint.json": "f7a8e19475c7c7f0bfc1b5c92d3ac6ca47ee9ee3a12c136f1849ccc7bd36c110",
+    "docs/verification/IM-00/im00-8/solver-tidy.log": "8ba1c529fd49740b56cfb322178d82894da25e9a948c56e95428edd506aae363"
+  }
+}

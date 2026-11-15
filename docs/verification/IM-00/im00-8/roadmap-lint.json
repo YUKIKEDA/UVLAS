@@ -1,0 +1,64 @@
+Reading inline script metadata from `.agents\skills\natural-japanese\scripts\lint.py`
+{
+  "file": "docs\\roadmap.md",
+  "stats": {
+    "total_findings": 0,
+    "by_category": {},
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 39,
+    "nominal_ending_count": 10,
+    "nominal_ending_ratio": 0.2564102564102564,
+    "total_paragraphs": 13,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      4,
+      1,
+      9,
+      1,
+      3,
+      2,
+      2,
+      2,
+      7,
+      2,
+      2,
+      3,
+      1
+    ],
+    "paragraph_sentence_count_cv": 0.7734924681537619,
+    "rhythm": {
+      "mora_mean": 84.87179487179488,
+      "mora_stdev": 98.37296363179017,
+      "burstiness": 0.07367833530546061,
+      "length_autocorrelation_lag1": 0.11897257979987952
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "����/����/����/����",
+      "lead_pos_4gram_ratio": 0.1282051282051282
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 452,
+      "doc_char_count": 1833,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 1,
+      "bold_per_1000_chars": 0.21781746896101067,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 79,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 9,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": []
+}

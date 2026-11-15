@@ -1,0 +1,24 @@
+[0/2] Re-checking globbed directories...
+[1/20] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\windows-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/windows-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/20] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\gmres_residual_detail.cpp.obj
+[3/20] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\gmres_solve.cpp.obj
+[4/20] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Release\src\numerics\gmres_residual_detail.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[5/20] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Release\src\numerics\gmres_solve.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[6/20] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[7/20] Linking CXX static library Release\uvlas_core.lib
+[8/20] Linking CXX static library Release\uvlas_numerics.lib
+[9/20] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[10/20] Linking CXX static library Release\uvlas_core_audit.lib
+[11/20] Linking CXX static library Release\uvlas_numerics_audit.lib
+[12/20] Building CXX object tests\CMakeFiles\uvlas_test_numerics_gmres_solve.dir\Release\numerics\gmres_solve_test.cpp.obj
+[13/20] Building CXX object tests\CMakeFiles\uvlas_test_numerics_gmres_contract.dir\Release\numerics\gmres_contract_test.cpp.obj
+[14/20] Linking CXX executable tests\Release\uvlas_test_numerics_gmres_solve.exe
+[15/20] Linking CXX executable tests\Release\uvlas_test_numerics_gmres_contract.exe
+[16/20] Building CXX object tests\CMakeFiles\uvlas_test_numerics_gmres_allocations.dir\Release\numerics\gmres_allocations_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[17/20] Linking CXX executable tests\Release\uvlas_test_numerics_gmres_allocations.exe
+[18/20] Building CXX object tests\CMakeFiles\uvlas_test_numerics_gmres_residual.dir\Release\numerics\gmres_residual_test.cpp.obj
+[19/20] Linking CXX executable tests\Release\uvlas_test_numerics_gmres_residual.exe
