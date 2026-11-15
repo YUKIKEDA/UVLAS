@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       build: ${{ steps.scope.outputs.build }}
+      benchmark: ${{ steps.scope.outputs.benchmark }}
       format: ${{ steps.scope.outputs.format }}
       python: ${{ steps.scope.outputs.python }}
       skills: ${{ steps.scope.outputs.skills }}
@@ -154,6 +155,45 @@ jobs:
             clang-tidy -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp')
           fi
 
+  benchmark:
+    needs: changes
+    if: needs.changes.outputs.benchmark == 'true'
+    name: compile optional benchmark (linux, gcc 14)
+    runs-on: ubuntu-24.04
+    env:
+      CXX: g++-14
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: microsoft/vcpkg
+          path: out/vcpkg
+          fetch-depth: 0
+      - uses: actions/cache@v6
+        with:
+          path: out/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'cmake/vcpkg-ports/**') }}
+      - name: Bootstrap vcpkg
+        run: |
+          mkdir -p out/vcpkg-cache
+          ./out/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$GITHUB_WORKSPACE/out/vcpkg-cache" >> "$GITHUB_ENV"
+      - name: Configure and compile optional feature
+        run: |
+          cmake -S . -B out/build/linux-bench -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DUVLAS_BUILD_BENCHMARKS=ON \
+            -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/out/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_MANIFEST_FEATURES=benchmarks \
+            -DVCPKG_INSTALLED_DIR="$GITHUB_WORKSPACE/out/vcpkg_bench_installed"
+          cmake --build out/build/linux-bench --target uvlas_kernel_bench
+      - name: List the product kernel without timing it
+        env:
+          UVLAS_BENCH_MACHINE: ci-linux
+        run: |
+          export UVLAS_BENCH_CPU="$(lscpu | sed -n 's/^Model name:[[:space:]]*//p' | head -n 1)"
+          export UVLAS_BENCH_MEMORY_BYTES="$(awk '/^MemTotal:/ {printf "%.0f", $2 * 1024}' /proc/meminfo)"
+          out/build/linux-bench/benchmarks/uvlas_kernel_bench --benchmark_list_tests=true | grep '^checked_extent_product$'
+
   checks:
     needs: changes
     if: needs.changes.outputs.checks == 'true'
@@ -196,7 +236,7 @@ jobs:
   ci:
     name: ci
     if: always()
-    needs: [changes, windows, linux, checks]
+    needs: [changes, windows, linux, benchmark, checks]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7

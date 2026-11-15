@@ -1,6 +1,6 @@
 # kernelの小規模計測
 
-最初の対象は製品のchecked_extent_productである。Google Benchmark 1.9.5を使い、結果はBenchmarkのJSONとして保存する。CIの合否や実務受入の時間制限には使わない。
+最初の対象は製品のchecked_extent_productである。Google Benchmark 1.9.5を使い、結果はBenchmarkのJSONとして保存する。時間値をCIの合否や実務受入の時間制限には使わない。CIは変更の影響があるときだけLinuxの専用featureを構成・コンパイルし、kernelの一覧を確認する。
 
 ## Windows
 

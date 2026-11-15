@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 import tempfile
 import unittest
+from itertools import product
 from pathlib import Path
 
 from ci_scope import changed_paths, select, test_scope, verify_needs
@@ -20,16 +21,16 @@ class ScopeTest(unittest.TestCase):
             "tools/dev/sync_skills.py": {"python", "skills", "checks"},
             "tools/rd/check_tree.py": {"python", "rd", "checks"},
             "tools/qa/trace.py": {"python", "trace", "checks"},
-            "src/core/build_info.cpp": {"build", "format", "trace", "checks"},
+            "src/core/build_info.cpp": {"build", "benchmark", "format", "trace", "checks"},
             "tests/toolchain/arnoldi_test.cpp": {"build", "format", "trace", "checks"},
             "tests/toolchain/check_notices.cmake": {"build"},
             "docs/specs/foundation/contract.md": {"trace", "rd", "checks"},
             "rd/foundation/input.json": {"rd", "checks"},
             "ruff.toml": {"python", "checks"},
-            "benchmarks/dimensions_bench.cpp": {"format", "checks"},
-            "benchmarks/private.hpp": {"format", "checks"},
+            "benchmarks/dimensions_bench.cpp": {"benchmark", "format", "checks"},
+            "benchmarks/private.hpp": {"benchmark", "format", "checks"},
             "benchmarks/README.md": set(),
-            "benchmarks/CMakeLists.txt": set(),
+            "benchmarks/CMakeLists.txt": {"benchmark"},
             "tests/support/allocation_audit.hpp": {"build", "format", "trace", "checks"},
         }
         for path, expected in cases.items():
@@ -45,6 +46,8 @@ class ScopeTest(unittest.TestCase):
         self.assertTrue(all(select([], full=True).values()))
         self.assertFalse(any(select([]).values()))
         self.assertFalse(select(["benchmarks/dimensions_bench.cpp"])["build"])
+        self.assertTrue(select(["benchmarks/dimensions_bench.cpp"])["benchmark"])
+        self.assertFalse(select(["tests/core/instrumentation_test.cpp"])["benchmark"])
         self.assertTrue(select(["benchmarks/dimensions_bench.cpp", "src/core/source.cpp"])["build"])
         self.assertTrue(select(["README.md", "vcpkg.json"])["build"])
 
@@ -63,22 +66,24 @@ class ScopeTest(unittest.TestCase):
         )
 
     def test_job_result_matrix(self) -> None:
-        for build in (False, True):
+        for build, benchmark in product((False, True), repeat=2):
             for checks in (False, True):
                 needs: dict[str, object] = {
                     "changes": {
                         "result": "success",
                         "outputs": {
                             "build": str(build).lower(),
+                            "benchmark": str(benchmark).lower(),
                             "checks": str(checks).lower(),
                         },
                     },
                     "windows": {"result": "success" if build else "skipped"},
                     "linux": {"result": "success" if build else "skipped"},
+                    "benchmark": {"result": "success" if benchmark else "skipped"},
                     "checks": {"result": "success" if checks else "skipped"},
                 }
                 self.assertEqual(verify_needs(needs), [])
-                for job in ("windows", "linux", "checks"):
+                for job in ("windows", "linux", "benchmark", "checks"):
                     original = needs[job]
                     for result in ("success", "skipped", "failure", "cancelled"):
                         if original == {"result": result}:
@@ -94,7 +99,7 @@ class ScopeTest(unittest.TestCase):
         self.assertTrue(verify_needs({}))
         for outputs in ({}, {"build": "unknown", "checks": "false"}):
             needs: dict[str, object] = {
-                job: {"result": "skipped"} for job in ("windows", "linux", "checks")
+                job: {"result": "skipped"} for job in ("windows", "linux", "benchmark", "checks")
             }
             needs["changes"] = {"result": "success", "outputs": outputs}
             self.assertTrue(verify_needs(needs))
