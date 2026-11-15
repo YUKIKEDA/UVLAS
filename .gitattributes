@@ -26,3 +26,6 @@ AGENTS.md -text
 *.pdf binary
 *.npz binary
 *.mat binary
+
+# The imported historical PG artifacts retain the bytes cited by the R&D evidence index.
+tests/numerics/fixtures/j1-pg-free-history-24-v1/source/** -text

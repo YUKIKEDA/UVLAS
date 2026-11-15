@@ -1,0 +1,177 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-10"
+  ],
+  "package": "IM-00",
+  "issue": 15,
+  "date": "2026-11-15",
+  "source_commit": "3ffcf862692a9d74d26e35f9c4c98d09872a23fa",
+  "scope": "IM00-11の先行整備だけ。凍結PG24参照の原本取込み、hash/id来歴、独立Decimal oracle、実製品DensePreparedによる(I-P)の代数replayとfixture再生成手順。IM00-11全体のgateは未達。",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "3ffcf862692a9d74d26e35f9c4c98d09872a23fa",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "provenance": "Debug3CTestとReleaseのC++1CTestはclean source_commitから実行。configuration非依存のPython工具試験はDebugで一度にまとめた。隔離変異のcontrolとmutantは最終候補とbyte同一のコピーを、同一runner/commandでcontrolから順に実行した。R&Dの物理モデルと数値原本を再生成・変更していない。",
+  "verification": [
+    {
+      "command": "ctest --test-dir out/build/sparse-msvc -C Debug -R '^(numerics.foundation_reference|tools.foundation_reference.*)$' --output-on-failure",
+      "passed": 3,
+      "total": 3
+    },
+    {
+      "command": "ctest --test-dir out/build/sparse-msvc -C Release -R '^numerics.foundation_reference$' --output-on-failure",
+      "passed": 1,
+      "total": 1
+    }
+  ],
+  "independent_reference": {
+    "id": "j1-pg-free-history-24-v1",
+    "source_record": {
+      "id": "numerical-foundation-adoption-audit",
+      "hint": "rd/foundation/numerics/records/numerical-foundation-adoption-audit.json",
+      "sha256": "e1c9ca1f6103e0651c416bc77eea6280d434a1934970f4779e93c26124ff3ad8"
+    },
+    "source": "元audit・evidence-index・正規cacheの3artifactと2直接sourceのhashを照合。3つの原本のバイト列は公開済みbundleから読み出したものをそのまま保持。",
+    "oracle": "保存されたbinary64 A/bをexactにDecimalへ変換、独立scalar partial-pivot消去120桁を160桁で1e-100まで照合。verifyは解を再生成せず、保存参照の原残差だけを160桁で検査。",
+    "comparison": "相対解差と元残差を固定1e-12級で比較。物理FD/格子誤差、未知の物理成分単位、製品固有値の認定へ読み替えない。"
+  },
+  "checks": {
+    "cpp": "変更1TUのclang-format21.1.1/clang-tidy21.1.1、単一Debug compile commandで0診断。直接includeと全返値関数nodiscardを確認。",
+    "python": "変更2toolのruff0.17.4 check/format、pyright1.1.408 strictで0診断。標準libraryのみ。6unitは全24complex pairの両成分へbool/finite/type負対照を展開した。",
+    "skill": "skill-creator quick_validate成功（ホスト工具だけPyYAML6.0.2を隔離利用）。鏡像53files一致。契約/Skillのnatural-japanese tech lint0、root独立通読で指摘を修正済み。",
+    "trace": "153定義ID、0問題。記録追加後にmatrix/checkを再実行する。",
+    "raw_bytes": "作業fileとgit blobから読んだ内容のSHA-256を一致確認。元3artifactの原hashを維持し、派生JSONだけcanonical LF。",
+    "linux": "ローカル未実行。CIの成功や両OSの完了は主張せず、待機しない。"
+  },
+  "mutations": {
+    "isolated_copy": true,
+    "controls_first": true,
+    "results": [
+      {
+        "name": "tool-control",
+        "exit": 0,
+        "unit_methods": 6
+      },
+      {
+        "name": "source+fixture hashの同時付替えを許可",
+        "exit": 1,
+        "failed_assertions": 1
+      },
+      {
+        "name": "boolを数値へ変換",
+        "exit": 1,
+        "failed_assertions": 8
+      },
+      {
+        "name": "cpp-control",
+        "exit": 0,
+        "test_cases": 3,
+        "passed_assertions": 78
+      },
+      {
+        "name": "row/column adapterを逆転",
+        "exit": 42,
+        "failed_cases": 1,
+        "failed_assertions": 48
+      }
+    ],
+    "note": "最初のeigenpairだけではbool変異を検出しなかった。全24pairへ拡大して8つの零虚部に対する型の誤受理を検出し、契約へ理由を記載した。変異中も製品とR&Dのfileを編集していない。"
+  },
+  "incomplete_gates": [
+    "Issue12 GMRES依存の完了",
+    "製品の一般実/複素完全固有値、対称一般化固有値、一般複素Arnoldi入口と認定",
+    "実PG全履歴行列の製品固有値経路による照合",
+    "有理rank/区間平方根等の製品consumer接続のgate棚卸し",
+    "全4数値群と既存の型/世代/予算/投影/親不変の終了gate統合",
+    "両OS clean buildの受入"
+  ],
+  "claimed_state": "選択したfixture整備と代数replayの実装が契約に適合。数値認定、実験妥当性、製品規模性能、実務受入は主張しない。",
+  "redaction": {
+    "method": "tools/rd/redact.py redact_bytes",
+    "files": [
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/windows-debug.log",
+        "before_sha256": "8f445879ced6f058929ad7cba13ec4d753c547cd5185bf93e2c5a447d1ccf335",
+        "after_sha256": "3b196978fe24cb655e250099bd7869883dc5828805f1374ba326e16a12291a48",
+        "replacements": 2
+      },
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/windows-release.log",
+        "before_sha256": "e010934408a3d3a5b236399aa755d22c523ce3af5d8cc7841d94332e203dd925",
+        "after_sha256": "4efd56081221d5a2ab153a6a308bb6b4b513e7f912100214803561465e93f902",
+        "replacements": 2
+      },
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/tool-control.log",
+        "before_sha256": "3c830660f246a4056686046031f556998009a1d657ddd32043b5c3453ad3533e",
+        "after_sha256": "3c830660f246a4056686046031f556998009a1d657ddd32043b5c3453ad3533e",
+        "replacements": 0
+      },
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/tool-source-restamp-mutation.log",
+        "before_sha256": "8afc7a4f7633e5909b7d2328ebc48d862e839ac85a916b5b0822e5f0be9eba6b",
+        "after_sha256": "f4eee2c8ab0630649bf47f3ca79fddc813fdc649f04304de01f24dff3242e151",
+        "replacements": 1
+      },
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/tool-bool-mutation.log",
+        "before_sha256": "8d743c0f0b2f06e743ef8fcf2d0c8ecb5b33169c51b8fe0c82d140915cafed83",
+        "after_sha256": "199882cf277029286bc93a1967c4c9570854d3ce40d262c8f345fe9627867e76",
+        "replacements": 16
+      },
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/cpp-control.log",
+        "before_sha256": "c00ce44f25946521ab3340f96e68ecb4bd35492d84d607fd70119d1e4ac01152",
+        "after_sha256": "c00ce44f25946521ab3340f96e68ecb4bd35492d84d607fd70119d1e4ac01152",
+        "replacements": 0
+      },
+      {
+        "path": "docs/verification/IM-00/im00-11-fixture-preparation/cpp-layout-mutation.log",
+        "before_sha256": "a2f8d6662218076c02df95c8e8ba199663c688506ae71e2027082fd68cbfca80",
+        "after_sha256": "9b23dcbc935a214082478d0c0d241240e09157e5e0fbae57fe8631b1dcc39b43",
+        "replacements": 48
+      }
+    ],
+    "leftovers": 0
+  },
+  "sources": {
+    ".gitattributes": "ece6ec0fdb12a02418d5a0883b99b417a3e422e32138f1315eb74d6891829260",
+    "AGENTS.md": "925a112e22692cd387cce3a53fffe2a645d338ada43ebb765c4c4994368dbd8a",
+    "tests/CMakeLists.txt": "3d66474c84b214388f0bc41f6ec54de133048a91c8d2afaecc524f5b7e811748",
+    "docs/build.md": "c59b43340a5d7dcc1aa3ddde9cf132e568193368c8449663e441257078743506",
+    "docs/specs/foundation/reference-fixture-contract.md": "25820096a319f4947a671ac478cda32c5561aa768d85b8de9c85ecfd34a0c6fe",
+    ".agents/skills/reference-fixture/SKILL.md": "5ae8f05117e48f7c588442057e7d1f3c979f98771f7ab3b5c15875a5e4749c52",
+    ".claude/skills/reference-fixture/SKILL.md": "5ae8f05117e48f7c588442057e7d1f3c979f98771f7ab3b5c15875a5e4749c52",
+    "tests/numerics/foundation_reference_test.cpp": "c909e8422024996f45f456b8e5d4fcc2122c34db62620e15f5d2c46f5328a06f",
+    "tools/qa/foundation_reference.py": "3dc0ed5c24aace4b4816423af79155a74565b16f6d4ede67a2881536ef1ace80",
+    "tools/qa/foundation_reference_test.py": "b2718b475ee4d12d8219cc5d2ea80b8c7eb8b8a54d8ee2f78058325a9c000db9",
+    "tools/rd/data_store.py": "2e0c1d7570221f969c51d7a9ad2c01b26b9b597870be58fdbee271ad7a201149",
+    "tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-11-fixture-preparation/windows-debug.log": "3b196978fe24cb655e250099bd7869883dc5828805f1374ba326e16a12291a48",
+    "docs/verification/IM-00/im00-11-fixture-preparation/windows-release.log": "4efd56081221d5a2ab153a6a308bb6b4b513e7f912100214803561465e93f902",
+    "docs/verification/IM-00/im00-11-fixture-preparation/tool-control.log": "3c830660f246a4056686046031f556998009a1d657ddd32043b5c3453ad3533e",
+    "docs/verification/IM-00/im00-11-fixture-preparation/tool-source-restamp-mutation.log": "f4eee2c8ab0630649bf47f3ca79fddc813fdc649f04304de01f24dff3242e151",
+    "docs/verification/IM-00/im00-11-fixture-preparation/tool-bool-mutation.log": "199882cf277029286bc93a1967c4c9570854d3ce40d262c8f345fe9627867e76",
+    "docs/verification/IM-00/im00-11-fixture-preparation/cpp-control.log": "c00ce44f25946521ab3340f96e68ecb4bd35492d84d607fd70119d1e4ac01152",
+    "docs/verification/IM-00/im00-11-fixture-preparation/cpp-layout-mutation.log": "9b23dcbc935a214082478d0c0d241240e09157e5e0fbae57fe8631b1dcc39b43"
+  }
+}
