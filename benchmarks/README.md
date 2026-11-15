@@ -42,4 +42,4 @@ Benchmarkの生JSONにはexecutableの絶対パス等が入り得る。生デー
 
 いずれも合成小系の費用を追うbaselineで、実翼・実4096系・実務探索の性能受入値ではない。スレッド数は1、反復改善の上限は5、物理消費者checkは空。出力の確保はタイマーに含み、入力作成と最初の分解準備はsolveのタイマーに含めない。準備ケースは独立に測る。
 
-`UpdatedPreparation/{16,64}` と `UpdatedSolve/{16,64}` は複素rank1更新の容量baselineである。A0=4I、Uの全成分はi/32、Vの全成分は(1+i)/16、右辺の全成分は1+i/8、尺度は1、許容差は1e-12とする。prepareは元係数・U/V・尺度・workspace・実LU・複素小Schurを含み、solveは準備済み因子を再利用して元残差の認定と所有する出力の確保を含む。rank、実際の補正回数、出力確保の有無を各ケースのcounterへ記録する。
+`UpdatedPreparation/{16,64}` と `UpdatedSolve/{16,64}` は複素rank1更新の容量baselineである。$$ A_0=4I $$、$$ U $$ の全成分は $$ i/32 $$、$$ V $$ の全成分は $$ (1+i)/16 $$、右辺の全成分は $$ 1+i/8 $$、尺度は1、許容差は1e-12とする。prepareは元係数・U/V・尺度・workspace・実LU・複素小Schurを含み、solveは準備済み因子を再利用して元残差の認定と所有する出力の確保を含む。rank、実際の補正回数、出力確保の有無を各ケースのcounterへ記録する。
