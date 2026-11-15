@@ -89,22 +89,6 @@ const DenseMatrix<Scalar>* low(const PrecisionBuffer<Scalar>& value) noexcept {
     const auto* pair = std::get_if<TwoWord<Scalar>>(&value.storage());
     return pair == nullptr ? nullptr : &pair->lo;
 }
-Result<TwoWordValue> correct(double hi, double lo, double delta) noexcept {
-    const auto first = two_sum(hi, delta);
-    if (!first) {
-        return std::unexpected(first.error());
-    }
-    const auto trailing = two_sum(lo, first->lo);
-    if (!trailing) {
-        return std::unexpected(trailing.error());
-    }
-    const auto leading = two_sum(first->hi, trailing->hi);
-    if (!leading) {
-        return std::unexpected(leading.error());
-    }
-    // Retain the previous low word before renormalizing the new correction.
-    return two_sum(leading->hi, leading->lo + trailing->lo);
-}
 template <StorageScalar Scalar>
 Result<void> residual_product(CompensatedSum& real, CompensatedSum& imag, Scalar a,
                               Scalar x) noexcept {
@@ -253,21 +237,21 @@ add_correction(const PrecisionBuffer<Scalar>& source, const DenseMatrix<Scalar>&
             const auto i =
                 static_cast<std::size_t>(column * source.shape().leading_dimension + row);
             if constexpr (std::same_as<Scalar, double>) {
-                const auto value =
-                    correct(hi->values()[i], lo->values()[i], correction.values()[i]);
+                const auto value = detail::correct_two_word(hi->values()[i], lo->values()[i],
+                                                            correction.values()[i]);
                 if (!value) {
                     return std::unexpected(value.error());
                 }
                 hi->values()[i] = value->hi;
                 lo->values()[i] = value->lo;
             } else {
-                const auto real = correct(hi->values()[i].real(), lo->values()[i].real(),
-                                          correction.values()[i].real());
+                const auto real = detail::correct_two_word(
+                    hi->values()[i].real(), lo->values()[i].real(), correction.values()[i].real());
                 if (!real) {
                     return std::unexpected(real.error());
                 }
-                const auto imag = correct(hi->values()[i].imag(), lo->values()[i].imag(),
-                                          correction.values()[i].imag());
+                const auto imag = detail::correct_two_word(
+                    hi->values()[i].imag(), lo->values()[i].imag(), correction.values()[i].imag());
                 if (!imag) {
                     return std::unexpected(imag.error());
                 }

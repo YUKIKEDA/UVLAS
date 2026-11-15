@@ -102,6 +102,19 @@ core::Result<void> check_solve_inputs(core::Index rows, core::Index update_rank,
     if (!checks) {
         return checks;
     }
+    if (!precision.required_checks.empty()) {
+        const auto supported = precision.evaluator.supported_precision();
+        const auto capability = require_precision(core::Precision::Binary64, supported);
+        if (!capability) {
+            return capability;
+        }
+        // Projection evaluation also reads the exact retained source, so a known
+        // TwoWord RHS cannot bypass that capability requirement through its target tag.
+        const auto initial = require_precision(rhs.values().precision(), supported);
+        if (!initial) {
+            return initial;
+        }
+    }
     if (const auto* projection = std::get_if<Binary64Projection>(&precision.returned)) {
         if (projection->retained_generation == projection->target_generation) {
             return fail(core::FailureCode::InvalidInput);

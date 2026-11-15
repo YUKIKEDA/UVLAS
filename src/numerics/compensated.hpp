@@ -60,4 +60,37 @@ private:
     double sum_ = 0, correction_ = 0, error_ = 0;
 };
 
+inline Result<TwoWordValue> correct_two_word(double hi, double lo, double delta) noexcept {
+    const auto first = two_sum(hi, delta);
+    if (!first)
+        return std::unexpected(first.error());
+    const auto tail = two_sum(lo, first->lo);
+    if (!tail)
+        return std::unexpected(tail.error());
+    const auto lead = two_sum(first->hi, tail->hi);
+    if (!lead)
+        return std::unexpected(lead.error());
+    return two_sum(lead->hi, lead->lo + tail->lo);
+}
+template <StorageScalar Scalar>
+Result<void> apply_two_word_correction(Scalar& hi, Scalar& lo, Scalar delta) noexcept {
+    if constexpr (std::same_as<Scalar, double>) {
+        auto value = correct_two_word(hi, lo, delta);
+        if (!value)
+            return std::unexpected(value.error());
+        hi = value->hi;
+        lo = value->lo;
+    } else {
+        auto r = correct_two_word(hi.real(), lo.real(), delta.real());
+        if (!r)
+            return std::unexpected(r.error());
+        auto i = correct_two_word(hi.imag(), lo.imag(), delta.imag());
+        if (!i)
+            return std::unexpected(i.error());
+        hi = {r->hi, i->hi};
+        lo = {r->lo, i->lo};
+    }
+    return {};
+}
+
 } // namespace uvlas::numerics::detail
