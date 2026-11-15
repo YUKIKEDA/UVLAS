@@ -141,6 +141,12 @@ add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
 
+uvlas_add_test(numerics.backend_memory
+    LABELS unit negative property
+    SOURCES numerics/backend_memory_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics uvlas::eigen)
+target_include_directories(uvlas_test_numerics_backend_memory PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
 uvlas_add_test(numerics.precision
     LABELS unit negative verification
     SOURCES numerics/precision_test.cpp
