@@ -1,0 +1,362 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-00",
+  "issue": 9,
+  "date": "2026-11-15",
+  "source_commit": "5e17a52a7f01e32c5a8c026e07118e789c106166",
+  "scope": "Real/complex precision storage, EFT and compensated stored-operator residuals, explicit immutable qualified projection, actual 4096-grid rejection witness only",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "5e17a52a7f01e32c5a8c026e07118e789c106166",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "provenance": "Final precision tests ran on the pre-commit candidate bytes; their exact implementation/test bytes equal source_commit. After commit only CLI build-info was rebuilt from the clean checkout to capture provenance, without repeating passed numerical tests. The later source prevalidation fix was tested in Debug and Release before its commit. No test execution from a clean commit is claimed.",
+  "verification": [
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.precision$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.precision$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "command": "python tools/qa/export_precision_witness_test.py",
+      "passed": 3,
+      "total": 3,
+      "scope": "No numerical experiment or dependency installation; missing/existing output preflight and exclusive-create race"
+    }
+  ],
+  "checks": {
+    "format": "Three changed C++ files passed clang-format 21.1.2 --dry-run --Werror",
+    "tidy": "precision.cpp and precision_test.cpp passed clang-tidy 21.1.1 with Debug MSVC compile commands and enabled warnings-as-errors",
+    "python": "Two new tools passed ruff 0.17.4 check/format and pyright 1.1.408 strict, zero diagnostics",
+    "trace": "153 defined IDs, zero problems after regenerating the table",
+    "japanese": "Contract independently read by root with natural-japanese; initial lint reported low-burstiness warning and one wording info; wording shortened, technical paragraph structure retained",
+    "integrity": "Bundled check_evidence_manifest.py passed: integrity_passed=true, 38 checked files (manifest plus 37 references), zero errors. Direct checks also matched all ID-bearing metadata. Canonical fixture working/staged/HEAD bytes were equal."
+  },
+  "mutations": {
+    "isolated_copy": true,
+    "build_timeout_seconds": 120,
+    "test_timeout_seconds": 30,
+    "results": [
+      {
+        "name": "control",
+        "compiled": true,
+        "test_exit": 0,
+        "expected": "pass"
+      },
+      {
+        "name": "eft-product-low",
+        "compiled": true,
+        "test_exit": 8,
+        "expected": "caught"
+      },
+      {
+        "name": "residual-drops-low",
+        "compiled": true,
+        "test_exit": 8,
+        "expected": "caught"
+      },
+      {
+        "name": "lost-compensation-bound",
+        "compiled": true,
+        "test_exit": 8,
+        "expected": "caught"
+      },
+      {
+        "name": "consumer-not-evaluated",
+        "compiled": true,
+        "test_exit": 8,
+        "expected": "caught"
+      }
+    ],
+    "scope": "Applied before the final input-before-allocation validation block and final type-privacy/extreme-gap controls were added. Mutation targets and their valid inputs are unaffected by those additions; these are not claimed as repeated final-commit mutation runs."
+  },
+  "fixture_generation": {
+    "original_record": {
+      "id": "uvlm-column-update-result",
+      "sha256": "ddd7649056e4253e5cafdf993322bbe1f8bf0c4ed82ec79c1ec7a9fe0ccc2fc9",
+      "hint": "rd/aero/wake-loads/records/uvlm-column-update-result.json"
+    },
+    "input_hashes_equal": true,
+    "m": 4096,
+    "k": 0.1,
+    "row": 4095,
+    "column": 1,
+    "mode": "pitch-quarter",
+    "row_relative": 1.2444693868682683e-11,
+    "tolerance": 1e-11,
+    "process_peak_bytes": 391802880,
+    "elapsed_seconds": 69.85900000000402,
+    "budget": {
+      "seconds": 300,
+      "peak_working_set_bytes": 536870912,
+      "outer_timeout_seconds": 320
+    },
+    "scope": "One original-system row is a rejection witness; not a product full-system acceptance result",
+    "normalization": {
+      "original_windows_crlf_sha256": "580dcef93b17ac85d79b12d7d9a154dc32e3dfadf8fea516593f40c7413ea968",
+      "canonical_lf_sha256": "ddf9c2b0993de075f2f3faedbaf3bee947e446bdafa2b8baf5d7282eb6240d66",
+      "json_values_equal": true,
+      "numeric_recomputation_for_serialization_change": false
+    }
+  },
+  "sources": {
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "src/numerics/precision.cpp": "bdf78542f7d875493f8f2cbffed292804469b135141e05eae5967703f3ac54f0",
+    "tests/numerics/precision_test.cpp": "7d09adf3b80ab2bd9bcef9c2210627d665265f5a9015b35cd36daefd27ed126f",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "src/numerics/storage.cpp": "a8e6917f308f8d96ce04f93469a5801ff580df731f8744912a45b5f3d82e4d06",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "src/core/checked_dimensions.cpp": "5132c6d9de7be64d5d4d820f436333341baa6a98384bcb7510733066030d484c",
+    "include/uvlas/core/failure.hpp": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d",
+    "include/uvlas/core/identifier.hpp": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+    "include/uvlas/core/error_certificate.hpp": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+    "cmake/CompilerPolicy.cmake": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+    "cmake/ProjectOptions.cmake": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a",
+    "CMakeLists.txt": "78be81ff701b93e11a8bd1ad69c00d6f19a8fa754d116bd6d78ca62f92887893",
+    "tests/CMakeLists.txt": "6b0138321e063629209b97c060e1bb62cef0fb4725fda33a626b0e8742eabc91",
+    "tools/qa/export_precision_witness.py": "e8df867b9c09c71bad915a9fcda218f6afa7c9ec02eefd490074ddbec93cd22b",
+    "tools/qa/export_precision_witness_test.py": "06cfc289f97d833fb3ca3fbbd0277f7e509d567d1ca189f0fed8cb97a51d74e3",
+    "docs/specs/foundation/precision-contract.md": "501be18b371aa6bce6552f7b7c3d483b1eb12164810d1952ef1d16ec380f6399",
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+    "docs/specs/foundation/linear-solve-accuracy-contract.md": "b55514eec4e0915296a3d14a5b89170be398630ae898f62aff47561b7526feaa"
+  },
+  "artifacts": {
+    "tests/numerics/fixtures/precision-4096-row-v1.json": "ddf9c2b0993de075f2f3faedbaf3bee947e446bdafa2b8baf5d7282eb6240d66",
+    "rd/aero/kernel/experiments/check_aerogrid_geometry.py": "260436bdca8d1e5ddacbd772a171f98290b07be7f58a649eb7dc06522f408617",
+    "rd/structure/main-shell/q9-curved/experiments/check_q9_curved_load.py": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+    "rd/structure/main-shell/q9-plate/experiments/check_q9_independent_load.py": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96",
+    "rd/structure/main-shell/q9-plate/experiments/check_q9_interface_reparameterization.py": "becc74504f8d45f769a0a4e66c6f9cca28360ee97fcc7662e14bdd4a5fa9088c",
+    "rd/structure/main-shell/q9-plate/experiments/check_q9_plate_convergence.py": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1",
+    "rd/aero/wake-loads/experiments/check_uvlm_bound_grading.py": "cda7518d4e3458ebd9f9cec94021c9f89ed1f5ac1f2a15560e5daf2f177fc638",
+    "rd/aero/wake-loads/experiments/check_uvlm_column_update.py": "937a55f74e2c53b70251ea7e07f21620ffb8ce4d07b5666ebbc079a89a8d526b",
+    "rd/aero/wake-loads/experiments/check_uvlm_graded_wake_pressure.py": "24c6a216f8e46370727904b5ccc91b7bdc2595035124c355472c3c3c24fa1826",
+    "rd/aero/unsteady-reference/experiments/check_uvlm_harmonic_heave.py": "1f2b41839d49d15d00156083d89c085e37fa90703034b7eedaf825a29ccc3714",
+    "rd/aero/wake-loads/experiments/check_uvlm_local_pressure_pitch.py": "231e09154f71cc0415c2be27e9bbc48758d8a44de4b336ed3cfbf5f3a34f0a45",
+    "rd/aero/wake-loads/experiments/check_uvlm_local_pressure_refinement.py": "b90b57d686a72e531de595157dbfab4257b124bfc43b3da0f1aed340ff782e8f",
+    "rd/aero/wake-loads/experiments/check_uvlm_residual_trace.py": "95844655e031916095537b956df6c4fd400bf1ad7d4575fc1f85c9feda713895",
+    "rd/aero/wake-loads/experiments/check_uvlm_trailing_edge.py": "9a7d1faf4a9345402f3df11ba34929b82f68ff73ae2abe6d56ae9f19b4f4f9c9",
+    "rd/aero/kernel/experiments/check_vortex_core_load.py": "7c139bfb2e239132eb02fa43979b312f4126f44c88bb93a4d32860b5c7b2d616",
+    "rd/rd_paths.py": "4dc68188b2ff18d706540110a50a5bb7ae2d34ae7c552eb61ac36f0313d6e1f2",
+    "rd/aero/wake-loads/records/uvlm-column-update-result.json": "ddd7649056e4253e5cafdf993322bbe1f8bf0c4ed82ec79c1ec7a9fe0ccc2fc9"
+  },
+  "claimed_state": "Implementation conformity and limited numerical verification only",
+  "not_claimed": [
+    "Whole 4096-system product acceptance",
+    "Physical consumer kernels or complete TwoWord propagation (R-04)",
+    "Factorization and iterative refinement (IM00-6)",
+    "Production-scale solver performance",
+    "Linux execution by this agent; affected CI remains separate",
+    "Experimental validity or practical product acceptance"
+  ],
+  "witness_references": [
+    {
+      "id": "im00-5-source-1",
+      "hint": "include/uvlas/numerics/precision.hpp",
+      "sha256": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c"
+    },
+    {
+      "id": "im00-5-source-2",
+      "hint": "src/numerics/precision.cpp",
+      "sha256": "bdf78542f7d875493f8f2cbffed292804469b135141e05eae5967703f3ac54f0"
+    },
+    {
+      "id": "im00-5-source-3",
+      "hint": "tests/numerics/precision_test.cpp",
+      "sha256": "7d09adf3b80ab2bd9bcef9c2210627d665265f5a9015b35cd36daefd27ed126f"
+    },
+    {
+      "id": "im00-5-source-4",
+      "hint": "include/uvlas/numerics/storage.hpp",
+      "sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339"
+    },
+    {
+      "id": "im00-5-source-5",
+      "hint": "src/numerics/storage.cpp",
+      "sha256": "a8e6917f308f8d96ce04f93469a5801ff580df731f8744912a45b5f3d82e4d06"
+    },
+    {
+      "id": "im00-5-source-6",
+      "hint": "include/uvlas/core/resource_plan.hpp",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a"
+    },
+    {
+      "id": "im00-5-source-7",
+      "hint": "include/uvlas/core/checked_dimensions.hpp",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa"
+    },
+    {
+      "id": "im00-5-source-8",
+      "hint": "src/core/checked_dimensions.cpp",
+      "sha256": "5132c6d9de7be64d5d4d820f436333341baa6a98384bcb7510733066030d484c"
+    },
+    {
+      "id": "im00-5-source-9",
+      "hint": "include/uvlas/core/failure.hpp",
+      "sha256": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d"
+    },
+    {
+      "id": "im00-5-source-10",
+      "hint": "include/uvlas/core/identifier.hpp",
+      "sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7"
+    },
+    {
+      "id": "im00-5-source-11",
+      "hint": "include/uvlas/core/error_certificate.hpp",
+      "sha256": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713"
+    },
+    {
+      "id": "im00-5-source-12",
+      "hint": "cmake/CompilerPolicy.cmake",
+      "sha256": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8"
+    },
+    {
+      "id": "im00-5-source-13",
+      "hint": "cmake/ProjectOptions.cmake",
+      "sha256": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a"
+    },
+    {
+      "id": "im00-5-source-14",
+      "hint": "CMakeLists.txt",
+      "sha256": "78be81ff701b93e11a8bd1ad69c00d6f19a8fa754d116bd6d78ca62f92887893"
+    },
+    {
+      "id": "im00-5-source-15",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "6b0138321e063629209b97c060e1bb62cef0fb4725fda33a626b0e8742eabc91"
+    },
+    {
+      "id": "im00-5-source-16",
+      "hint": "tools/qa/export_precision_witness.py",
+      "sha256": "e8df867b9c09c71bad915a9fcda218f6afa7c9ec02eefd490074ddbec93cd22b"
+    },
+    {
+      "id": "im00-5-source-17",
+      "hint": "tools/qa/export_precision_witness_test.py",
+      "sha256": "06cfc289f97d833fb3ca3fbbd0277f7e509d567d1ca189f0fed8cb97a51d74e3"
+    },
+    {
+      "id": "im00-5-source-18",
+      "hint": "docs/specs/foundation/precision-contract.md",
+      "sha256": "501be18b371aa6bce6552f7b7c3d483b1eb12164810d1952ef1d16ec380f6399"
+    },
+    {
+      "id": "im00-5-source-19",
+      "hint": "docs/specs/foundation/numerical-foundation-adoption-specification.md",
+      "sha256": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33"
+    },
+    {
+      "id": "im00-5-source-20",
+      "hint": "docs/specs/foundation/linear-solve-accuracy-contract.md",
+      "sha256": "b55514eec4e0915296a3d14a5b89170be398630ae898f62aff47561b7526feaa"
+    },
+    {
+      "id": "im00-5-projection-4096-row",
+      "hint": "tests/numerics/fixtures/precision-4096-row-v1.json",
+      "sha256": "ddf9c2b0993de075f2f3faedbaf3bee947e446bdafa2b8baf5d7282eb6240d66"
+    },
+    {
+      "id": "check_aerogrid_geometry",
+      "sha256": "260436bdca8d1e5ddacbd772a171f98290b07be7f58a649eb7dc06522f408617",
+      "hint": "rd/aero/kernel/experiments/check_aerogrid_geometry.py"
+    },
+    {
+      "id": "check_q9_curved_load",
+      "sha256": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+      "hint": "rd/structure/main-shell/q9-curved/experiments/check_q9_curved_load.py"
+    },
+    {
+      "id": "check_q9_independent_load",
+      "sha256": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96",
+      "hint": "rd/structure/main-shell/q9-plate/experiments/check_q9_independent_load.py"
+    },
+    {
+      "id": "check_q9_interface_reparameterization",
+      "sha256": "becc74504f8d45f769a0a4e66c6f9cca28360ee97fcc7662e14bdd4a5fa9088c",
+      "hint": "rd/structure/main-shell/q9-plate/experiments/check_q9_interface_reparameterization.py"
+    },
+    {
+      "id": "check_q9_plate_convergence",
+      "sha256": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1",
+      "hint": "rd/structure/main-shell/q9-plate/experiments/check_q9_plate_convergence.py"
+    },
+    {
+      "id": "check_uvlm_bound_grading",
+      "sha256": "cda7518d4e3458ebd9f9cec94021c9f89ed1f5ac1f2a15560e5daf2f177fc638",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_bound_grading.py"
+    },
+    {
+      "id": "check_uvlm_column_update",
+      "sha256": "937a55f74e2c53b70251ea7e07f21620ffb8ce4d07b5666ebbc079a89a8d526b",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_column_update.py"
+    },
+    {
+      "id": "check_uvlm_graded_wake_pressure",
+      "sha256": "24c6a216f8e46370727904b5ccc91b7bdc2595035124c355472c3c3c24fa1826",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_graded_wake_pressure.py"
+    },
+    {
+      "id": "check_uvlm_harmonic_heave",
+      "sha256": "1f2b41839d49d15d00156083d89c085e37fa90703034b7eedaf825a29ccc3714",
+      "hint": "rd/aero/unsteady-reference/experiments/check_uvlm_harmonic_heave.py"
+    },
+    {
+      "id": "check_uvlm_local_pressure_pitch",
+      "sha256": "231e09154f71cc0415c2be27e9bbc48758d8a44de4b336ed3cfbf5f3a34f0a45",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_local_pressure_pitch.py"
+    },
+    {
+      "id": "check_uvlm_local_pressure_refinement",
+      "sha256": "b90b57d686a72e531de595157dbfab4257b124bfc43b3da0f1aed340ff782e8f",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_local_pressure_refinement.py"
+    },
+    {
+      "id": "check_uvlm_residual_trace",
+      "sha256": "95844655e031916095537b956df6c4fd400bf1ad7d4575fc1f85c9feda713895",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_residual_trace.py"
+    },
+    {
+      "id": "check_uvlm_trailing_edge",
+      "sha256": "9a7d1faf4a9345402f3df11ba34929b82f68ff73ae2abe6d56ae9f19b4f4f9c9",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_trailing_edge.py"
+    },
+    {
+      "id": "check_vortex_core_load",
+      "sha256": "7c139bfb2e239132eb02fa43979b312f4126f44c88bb93a4d32860b5c7b2d616",
+      "hint": "rd/aero/kernel/experiments/check_vortex_core_load.py"
+    },
+    {
+      "id": "rd_paths",
+      "sha256": "4dc68188b2ff18d706540110a50a5bb7ae2d34ae7c552eb61ac36f0313d6e1f2",
+      "hint": "rd/rd_paths.py"
+    },
+    {
+      "id": "uvlm-column-update-result",
+      "sha256": "ddd7649056e4253e5cafdf993322bbe1f8bf0c4ed82ec79c1ec7a9fe0ccc2fc9",
+      "hint": "rd/aero/wake-loads/records/uvlm-column-update-result.json"
+    }
+  ]
+}

@@ -137,6 +137,17 @@ uvlas_add_test(core.state
     SOURCES core/state_test.cpp
     LIBS uvlas_core Threads::Threads)
 
+add_test(NAME tools.precision_witness_export
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
+set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
+
+uvlas_add_test(numerics.precision
+    LABELS unit negative verification
+    SOURCES numerics/precision_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision nlohmann_json::nlohmann_json)
+target_compile_definitions(uvlas_test_numerics_precision PRIVATE
+    UVLAS_PRECISION_WITNESS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/precision-4096-row-v1.json")
+
 uvlas_add_test(numerics.storage LABELS unit negative
     SOURCES numerics/storage_test.cpp LIBS uvlas_numerics)
 uvlas_add_test(numerics.eigen_views LABELS integration negative

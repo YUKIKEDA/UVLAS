@@ -50,7 +50,7 @@ if(WIN32)
     target_link_libraries(uvlas_core PRIVATE psapi)
 endif()
 
-add_library(uvlas_numerics STATIC src/numerics/storage.cpp)
+add_library(uvlas_numerics STATIC src/numerics/storage.cpp src/numerics/precision.cpp)
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_numerics PUBLIC uvlas_core)
