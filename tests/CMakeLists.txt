@@ -141,6 +141,18 @@ add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
 
+uvlas_add_test(numerics.linear_result
+    LABELS unit negative verification
+    SOURCES numerics/linear_result_test.cpp
+    LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_linear_result PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.linear_metrics
+    LABELS unit negative verification
+    SOURCES numerics/linear_metrics_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+target_include_directories(uvlas_test_numerics_linear_metrics PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
 uvlas_add_test(numerics.backend_memory
     LABELS unit negative property
     SOURCES numerics/backend_memory_test.cpp support/allocation_audit.cpp

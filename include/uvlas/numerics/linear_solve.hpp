@@ -154,6 +154,14 @@ struct Precision {
 /// most 5. Backend admission is separate from ResourcePlan's cumulative owned-array payload
 /// accounting.
 struct Limits {
+    /// Set every capacity and select a backend admission mode; no unlimited default exists.
+    Limits(core::Index order, core::Index rhs_columns, core::Index update_rank,
+           unsigned refinements, BackendMemoryLimit memory) noexcept
+        : maximum_order(order),
+          maximum_rhs_columns(rhs_columns),
+          maximum_update_rank(update_rank),
+          maximum_refinements(refinements),
+          backend_memory(memory) {}
     core::Index maximum_order; ///< Nonnegative maximum matrix order admitted before decomposition.
     core::Index
         maximum_rhs_columns; ///< Prepared RHS capacity; exceeding it requires new preparation.
