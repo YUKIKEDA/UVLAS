@@ -336,6 +336,8 @@ for method, rest in [(u.TrialState.payload_copy, [None]),
         source = np.zeros(40_000_000, dtype=np.uint8)
         trial = self.success(uvlas.TrialState.initial(model, 1, 1, source, plan))
         packet = self.packet(model, trial)
+        other_trial = self.trial(model, self.plan(), number=2)
+        probe_packet = self.packet(model, other_trial)
         started = threading.Event()
         completed = threading.Event()
         results = []
@@ -356,14 +358,28 @@ for method, rest in [(u.TrialState.payload_copy, [None]),
         overlap = False
         deadline = time.monotonic() + 30
         while not completed.is_set() and time.monotonic() < deadline:
-            result = uvlas.commit_initial(trial, packet, 0)
+            # Observe the worker's ownership through a GIL-held getter first.
+            # Probing a NoGil commit before this could steal the trial lock.
+            result = trial.active()
             if not result.ok:
                 self.failure(result, uvlas.FailureCode.InvalidInput)
                 overlap = True
-                # A rejected multi-owner call must release any acquired packet lock.
-                self.assertFalse(self.success(packet.consumed()))
-                source.fill(9)
-                break
+                # This other-trial packet can never consume the real candidate,
+                # even if the worker finishes between getter and commit probe.
+                probe = uvlas.commit_initial(trial, probe_packet, 0)
+                self.assertFalse(probe.ok)
+                self.assertIn(
+                    probe.failure.code,
+                    (
+                        uvlas.FailureCode.InvalidInput,
+                        uvlas.FailureCode.StaleGeneration,
+                    ),
+                )
+                self.assertFalse(self.success(probe_packet.consumed()))
+                if probe.failure.code == uvlas.FailureCode.InvalidInput:
+                    break
+                # StaleGeneration is a legitimate missed contention window.
+        source.fill(9)
         worker.join(timeout=30)
         self.assertFalse(worker.is_alive())
         if errors:
