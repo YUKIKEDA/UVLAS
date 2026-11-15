@@ -1,7 +1,10 @@
 # Runs the real wrapper in isolated children without changing the caller's VS environment.
 $ErrorActionPreference = 'Stop'
 $wrapper = Join-Path $PSScriptRoot 'msvc.ps1'
-$scratch = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString('N'))
+$tempRoot = (Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).ProviderPath.TrimEnd('\', '/')
+$scratchName = [Guid]::NewGuid().ToString('N')
+$scratch = Join-Path $tempRoot $scratchName
+if (Test-Path -LiteralPath $scratch) { throw 'Probe scratch directory already exists.' }
 [void][IO.Directory]::CreateDirectory($scratch)
 try {
     $probe = Join-Path $scratch 'argument probe.ps1'
@@ -46,4 +49,14 @@ exit ([int]$env:UVLAS_PROBE_EXIT)
     }
     Write-Output 'Passed 5 MSVC argument/exit-code probes.'
 }
-finally { Remove-Item -LiteralPath $scratch -Recurse -Force }
+finally {
+    $resolvedScratch = (Resolve-Path -LiteralPath $scratch).ProviderPath
+    $scratchItem = Get-Item -LiteralPath $resolvedScratch
+    if ([IO.Path]::GetDirectoryName($resolvedScratch) -cne $tempRoot -or
+        [IO.Path]::GetFileName($resolvedScratch) -cne $scratchName -or
+        $resolvedScratch -cne $scratch -or
+        ($scratchItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+        throw 'Refusing to remove an unexpected scratch directory.'
+    }
+    Remove-Item -LiteralPath $resolvedScratch -Recurse -Force
+}
