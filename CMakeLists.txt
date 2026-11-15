@@ -52,6 +52,7 @@ endif()
 
 set(UVLAS_NUMERICS_SOURCES src/numerics/storage.cpp src/numerics/precision.cpp
     src/numerics/backend_memory.cpp src/numerics/linear_metrics.cpp src/numerics/linear_result.cpp src/numerics/linear_validation.cpp
+    src/numerics/gmres_solve.cpp src/numerics/gmres_residual_detail.cpp
     src/numerics/dense_solve.cpp src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp)
 add_library(uvlas_numerics STATIC ${UVLAS_NUMERICS_SOURCES})
 uvlas_configure_target(uvlas_numerics)
