@@ -473,3 +473,32 @@ TEST_CASE("EFT refuses flush-to-zero and denormal-as-zero modes", "[negative][N4
     }
 }
 #endif
+
+TEST_CASE("Projection rejects malformed residual inputs before allocating", "[negative][N4-06]") {
+    core::ResourcePlan inputs{1024ULL * 1024};
+    auto source =
+        PrecisionBuffer<double>::binary64(matrix<double>({1, 1, 1}, {1}, inputs), generation);
+    REQUIRE(source);
+    const auto wrong_shape = matrix<double>({2, 1, 2}, {1, 1}, inputs);
+    const auto identity = matrix<double>({1, 1, 1}, {1}, inputs);
+    auto a = matrix<double>({1, 1, 1}, {1}, inputs);
+    auto b = matrix<double>({1, 1, 1}, {1}, inputs);
+    const Verifier<double> verifier;
+    const std::array scales{1.0};
+    core::ResourcePlan zero{0};
+    const auto shape = project(*source, wrong_shape, b, scales, 0, verifier, zero);
+    REQUIRE_FALSE(shape);
+    CHECK(shape.error().code == core::FailureCode::InvalidInput);
+    CHECK(zero.allocated_bytes() == 0);
+    a.values()[0] = std::numeric_limits<double>::quiet_NaN();
+    const auto bad_a = project(*source, a, b, scales, 0, verifier, zero);
+    REQUIRE_FALSE(bad_a);
+    CHECK(bad_a.error().code == core::FailureCode::Nonfinite);
+    CHECK(zero.allocated_bytes() == 0);
+    b.values()[0] = std::numeric_limits<double>::infinity();
+    const auto bad_b = project(*source, identity, b, scales, 0, verifier, zero);
+    REQUIRE_FALSE(bad_b);
+    CHECK(bad_b.error().code == core::FailureCode::Nonfinite);
+    CHECK(zero.allocated_bytes() == 0);
+    CHECK(verifier.calls == 0);
+}

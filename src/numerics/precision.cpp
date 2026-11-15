@@ -438,6 +438,19 @@ project_binary64(const PrecisionBuffer<Scalar>& source, const DenseMatrix<Scalar
                     return fail(FailureCode::InvalidInput);
                 }
             }
+            // Reject malformed residual inputs before any projection storage is charged.
+            const auto valid_a = a.validate(operation);
+            if (!valid_a) {
+                return std::unexpected(valid_a.error());
+            }
+            const auto valid_b = b.validate(operation);
+            if (!valid_b) {
+                return std::unexpected(valid_b.error());
+            }
+            const auto as = a.shape(), xs = source.shape();
+            if (as.columns != xs.rows || as.rows != bs.rows || xs.columns != bs.columns) {
+                return fail(FailureCode::InvalidInput);
+            }
             auto values =
                 DenseMatrix<Scalar>::copy(source.shape(), high(source).values(), plan, operation);
             if (!values) {

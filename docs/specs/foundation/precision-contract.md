@@ -43,7 +43,7 @@ complexではrealとimagを別々に評価する。各成分の包絡の和を�
 
 ## 必要観測と消費者を実候補へ結び付ける
 
-投影は、尺度・世代・保持値を検査し、論理成分だけを丸め、原残差を再計算してから`ProjectionVerifier`を一回呼ぶ。paddingはhigh側の値を保存し、low側paddingを加算しない。元の配列が有限でも論理成分のhi+loがoverflowすれば失敗する。
+投影は、尺度・世代・A/bの有限性・論理shape整合を確保より先に検査し、論理成分だけを丸め、原残差を再計算してから`ProjectionVerifier`を一回呼ぶ。paddingはhigh側の値を保存し、low側paddingを加算しない。元の配列が有限でも論理成分のhi+loがoverflowすれば失敗する。
 
 Verifierは同期のC++境界であり、元の保持値、実際に投影したconst候補、元世代・投影世代・対象consumerを受け取る。必要な観測量とbinary64消費者の適合性を全て評価したときだけ`Verified`を返す。未評価は`PrecisionUnresolved`、未対応表現は`PrecisionUnsupported`となる。事前作成した`Achieved`証明書を渡して省略する経路は設けない。callback内の例外は失敗値へ変換する。物理評価の正しさは各consumer実装の契約であり、この基盤が代行したとは扱わない。
 
