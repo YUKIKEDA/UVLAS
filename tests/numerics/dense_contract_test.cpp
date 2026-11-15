@@ -242,3 +242,58 @@ TEST_CASE("Dense callback failure and same-workspace reentry preserve reusable p
     CHECK(std::ranges::equal(std::get<Binary64<double>>(rhs.storage()).values.values(),
                              original_rhs));
 }
+
+TEST_CASE("A qualified total does not qualify a distinct local load observation",
+          "[verification][negative][N4-05][N4-06]") {
+    class LinearOutputs final : public ConsumerEvaluator<double> {
+    public:
+        mutable unsigned calls = 0;
+        [[nodiscard]] SupportedPrecision supported_precision() const noexcept override {
+            return SupportedPrecision::Binary64Only;
+        }
+        [[nodiscard]] core::Result<core::ErrorCertificate>
+        assess(const PrecisionBuffer<double>&, const PrecisionBuffer<double>& candidate,
+               const Context&, const ConsumerCheck& check,
+               core::CertificateContext expected) const override {
+            ++calls;
+            const auto& x = std::get<Binary64<double>>(candidate.storage()).values;
+            // This dyadic fixture makes both the sum and subtraction exact in binary64.
+            const bool total = check.observation == core::ObservationId{80};
+            const double quantity = total ? x.values()[0] + x.values()[1] : x.values()[0];
+            const double reference = total ? 2.0 : 1.0;
+            return core::ErrorCertificate::assess(expected, check.budget,
+                                                  std::abs(quantity - reference));
+        }
+    };
+    Inputs input;
+    auto matrix = input.matrix();
+    std::ranges::copy(std::array{1.0, 0.0, 0.0, 1.0}, matrix.values().begin());
+    const double perturbation = std::ldexp(1.0, -20);
+    const std::array loads{1 + perturbation, 1 - perturbation};
+    auto b = DenseReal::copy({2, 1, 2}, loads, input.source_plan, core::Operation::SolveLinear);
+    REQUIRE(b);
+    auto rhs = PrecisionBuffer<double>::binary64(std::move(*b), core::NumericalGeneration{30});
+    REQUIRE(rhs);
+    auto prepared = input.prepare(matrix);
+    const LinearOutputs evaluator;
+    const std::array observations{
+        ConsumerCheck{CheckKind::Observation, core::ObservationId{80}, core::ScopeId{81}, 1.e-8},
+        ConsumerCheck{CheckKind::Observation, core::ObservationId{82}, core::ScopeId{83}, 1.e-8}};
+    const auto solve_with = [&](std::span<const ConsumerCheck> required) {
+        return solve_linear(DenseOperator{matrix, context()},
+                            Rhs<double>{*rhs, context(), core::RhsGeneration{1}}, input.scales(),
+                            Precision<double>{RetainedPrecision{core::NumericalGeneration{40}},
+                                              required, evaluator},
+                            input.accuracy(), input.limits(), prepared, input.result_plan);
+    };
+    const auto total_only = solve_with(std::span{observations}.first(1));
+    REQUIRE(total_only);
+    CHECK(evaluator.calls == 1);
+    CHECK(std::abs(values(*total_only)[0] + values(*total_only)[1] - 2) <= 1.e-12);
+    evaluator.calls = 0;
+    const auto local_required = solve_with(observations);
+    REQUIRE_FALSE(local_required);
+    CHECK(evaluator.calls == 2);
+    CHECK(local_required.error().code == core::FailureCode::PrecisionUnresolved);
+    CHECK(total_only->certificate().consumer_count() == 1);
+}
