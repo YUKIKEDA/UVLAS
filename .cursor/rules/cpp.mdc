@@ -62,3 +62,17 @@ CHECK(EIGEN_WORLD_VERSION == 5);
 // GOOD: read from Eigen/Version in the installed tree, then written
 CHECK(EIGEN_MAJOR_VERSION == 5);
 ```
+
+試験のoptional参照も、通常の制御フローで存在を確認する。Catch2のREQUIREで実行時の失敗を止めても、そのマクロから解析器が後続の存在を証明するとは限らない。2026-11-15、PR #46の版固定試験はWindowsのclang-tidyを通過したが、Linuxのbugprone-unchecked-optional-accessで失敗した（Issue #47）。片方の構成で診断が出ないことを、他方でも解析できる根拠にしない。
+
+```cpp
+// BAD: a test assertion alone may not prove the subsequent access to the analyzer.
+REQUIRE(pin.has_value());
+use(*pin);
+// GOOD: the missing-value path exits explicitly, independently of the assertion macro.
+if (!pin.has_value()) {
+    FAIL("Missing pin");
+    return;
+}
+use(*pin);
+```
