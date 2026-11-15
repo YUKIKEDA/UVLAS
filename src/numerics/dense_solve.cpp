@@ -1,6 +1,7 @@
 #include "backend_memory_detail.hpp"
 #include "compensated.hpp"
 #include "eigen_views.hpp"
+#include "linear_candidate_detail.hpp"
 #include "linear_solve_detail.hpp"
 
 #include <Eigen/LU>
@@ -12,6 +13,7 @@
 #include <limits>
 #include <type_traits>
 #include <uvlas/numerics/dense_solve.hpp>
+#include <variant>
 
 namespace uvlas::numerics::linear {
 namespace {
@@ -225,6 +227,7 @@ struct CommonData {
     core::PlannedBuffer<Scalar> rhs_hi, rhs_lo, residual, correction, proposal;
     core::PlannedBuffer<double> residual_error, denominator_lower;
     core::PlannedBuffer<MagnitudeBounds> x_magnitude;
+    core::PlannedBuffer<RefinementProgress> progress;
 };
 struct DenseData : CommonData<double> {
     using CommonData<double>::CommonData;
@@ -254,6 +257,15 @@ Result<void> prepare_arrays(detail::CommonData<Scalar>& data, Index n, const Sca
     const auto size = count(n, data.capacity.maximum_rhs_columns);
     if (!size) {
         return std::unexpected(size.error());
+    }
+    // Candidate state is prepared once; unpublished metric markers never occupy
+    // certificate fields or allocate inside iterative refinement.
+    if (n > 0) {
+        auto progress =
+            plan.allocate<detail::RefinementProgress>(data.capacity.maximum_rhs_columns, operation);
+        if (!progress)
+            return std::unexpected(progress.error());
+        data.progress = std::move(*progress);
     }
     for (auto* buffer :
          {&data.rhs_hi, &data.rhs_lo, &data.residual, &data.correction, &data.proposal}) {
@@ -644,18 +656,23 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
             }
             data.denominator_lower.values()[at] = denominator.lower;
         }
-        auto metric = detail::evaluate_column_metrics<Scalar>(
+        auto candidate = detail::assess_candidate_column_metrics<Scalar>(
             n, data.residual.values().subspan(offset, size),
             data.residual_error.values().subspan(offset, size),
             data.denominator_lower.values().subspan(offset, size),
             data.rhs_hi.values().subspan(offset, size), data.rhs_lo.values().subspan(offset, size),
             scales.residual, accuracy);
-        if (!metric)
-            return std::unexpected(metric.error());
-        const auto old_correction = metrics[static_cast<std::size_t>(c)].scaled_correction_upper;
-        metric->scaled_correction_upper = std::isfinite(old_correction) ? old_correction : 0;
-        metrics[static_cast<std::size_t>(c)] = *metric;
-        accepted = accepted && detail::meets_accuracy(*metric, accuracy);
+        if (!candidate)
+            return std::unexpected(candidate.error());
+        if (n > 0)
+            data.progress.values()[static_cast<std::size_t>(c)].current = *candidate;
+        if (auto* metric = std::get_if<ColumnMetrics>(&*candidate)) {
+            const auto old_correction =
+                metrics[static_cast<std::size_t>(c)].scaled_correction_upper;
+            metric->scaled_correction_upper = std::isfinite(old_correction) ? old_correction : 0;
+            metrics[static_cast<std::size_t>(c)] = *metric;
+        }
+        accepted = detail::candidate_meets_accuracy(*candidate, accuracy) && accepted;
     }
     return accepted;
 }
@@ -748,26 +765,21 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
         if (refinements == limits.maximum_refinements)
             return fail(FailureCode::LinearUnconverged);
         // Progress is judged in the original system, not only by unchanged rounded coordinates.
-        if (!two && refinements > 0) {
+        if (!two && refinements > 0 && n > 0) {
             for (std::size_t c = 0; c < metadata->retained_columns.size(); ++c) {
-                const auto now = metadata->retained_columns.values()[c],
-                           before = metadata->returned_columns.values()[c];
-                if (!detail::meets_accuracy(now, accuracy) &&
-                    (now.normalized_original_residual_upper <= 1 ||
-                     now.normalized_original_residual_upper >
-                         0.5 * before.normalized_original_residual_upper) &&
-                    (now.componentwise_backward_error_upper <=
-                         accuracy.componentwise_backward_tolerance ||
-                     now.componentwise_backward_error_upper >
-                         0.5 * before.componentwise_backward_error_upper)) {
+                const auto& progress = data.progress.values()[c];
+                if (detail::needs_precision_promotion(progress.current, progress.previous,
+                                                      accuracy)) {
                     two = true;
                     path = RetentionPath::PromotedTwoWord;
                 }
             }
         }
-        std::copy(metadata->retained_columns.values().begin(),
-                  metadata->retained_columns.values().end(),
-                  metadata->returned_columns.values().begin());
+        if (n > 0)
+            for (Index c = 0; c < columns; ++c) {
+                auto& progress = data.progress.values()[static_cast<std::size_t>(c)];
+                progress.previous = progress.current;
+            }
         bool stagnated = false;
         for (Index c = 0; c < columns; ++c) {
             const auto offset = static_cast<std::size_t>(c * n), size = static_cast<std::size_t>(n);
@@ -787,8 +799,9 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
                     return fail(FailureCode::Nonfinite);
                 unchanged = unchanged && (data.proposal.values()[packed] == hi->values()[at]);
             }
-            if (!detail::meets_accuracy(
-                    metadata->retained_columns.values()[static_cast<std::size_t>(c)], accuracy) &&
+            if (n > 0 &&
+                !detail::candidate_meets_accuracy(
+                    data.progress.values()[static_cast<std::size_t>(c)].current, accuracy) &&
                 unchanged)
                 stagnated = true;
         }
