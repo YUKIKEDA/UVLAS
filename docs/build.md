@@ -91,6 +91,9 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | `core.checked_dimensions` | 符号付き64bit寸法・バイト数の検査、ゼロ次元、32bit外部APIへの検査付き変換 |
 | `core.resource_plan` | 累積payloadの確保前照合、超過時の確保禁止、失敗時の計上値不変、所有配列の寿命 |
 | `core.identifier_compilation` | 正のコンパイル対照と、8種類のIDを異種IDから受け取るコンパイル失敗の確認 |
+| `numerics.storage` | 密・complex・CSC疎・PointSoA・DofLayoutの配置、所有、ID・写像・尺度・非有限の検査 |
+| `numerics.eigen_views` | 非公開Eigen境界のpointer一致、padding、scalar・配置・stride・shape・非有限の拒否 |
+| `numerics.storage_compilation` | 正のコンパイル対照、未対応scalarとtemporaryからの借用のコンパイル失敗 |
 | `qa.numeric_canary` | 基準ケースの結果が、このプラットフォームの基準結果とビット一致すること（QA-04）。認定していないプラットフォームでは落ちる |
 | `cli.build_info` | `uvlas --build-info` が来歴を返すこと |
 

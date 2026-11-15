@@ -44,6 +44,11 @@ target_link_libraries(uvlas_core PRIVATE
     uvlas::eigen Spectra::Spectra Boost::headers nlohmann_json::nlohmann_json)
 add_dependencies(uvlas_core uvlas_git_revision)
 
+add_library(uvlas_numerics STATIC src/numerics/storage.cpp)
+uvlas_configure_target(uvlas_numerics)
+target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(uvlas_numerics PUBLIC uvlas_core)
+
 # QA-03: the first baseline case. Built with the product flags, compared by CTest.
 add_executable(uvlas_numeric_canary qa/numeric_canary/main.cpp)
 uvlas_configure_target(uvlas_numeric_canary)
