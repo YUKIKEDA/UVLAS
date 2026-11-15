@@ -1,0 +1,20 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+    Start 25: numerics.linear_validation
+1/4 Test #25: numerics.linear_validation .......   Passed    0.08 sec
+    Start 26: numerics.linear_result
+2/4 Test #26: numerics.linear_result ...........   Passed    0.03 sec
+    Start 34: numerics.dense_contract
+3/4 Test #34: numerics.dense_contract ..........   Passed    0.04 sec
+    Start 35: numerics.dense_allocations
+4/4 Test #35: numerics.dense_allocations .......   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+negative        =   0.15 sec*proc (3 tests)
+property        =   0.05 sec*proc (1 test)
+unit            =   0.15 sec*proc (3 tests)
+verification    =   0.20 sec*proc (4 tests)
+
+Total Test time (real) =   0.21 sec

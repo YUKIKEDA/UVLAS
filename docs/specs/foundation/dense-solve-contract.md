@@ -1,0 +1,63 @@
+# 密線形ソルバーの採用契約
+
+N4-05、N4-06の密基準解法を、`dense_solve.hpp` の型別APIへ移す契約である。共通の尺度・ノルム・誤差包絡・消費者認定は [線形解の認定契約](linear-solve-qualification-contract.md)、表現の保持と投影は [精度buffer契約](precision-contract.md)、外部分解の資源判定は [backendメモリ契約](backend-memory-contract.md) に従う。
+
+## 元の作用素
+
+実系は、入力された列優先binary64係数そのものを元行列とする。Eigen 5の `PartialPivLU` で部分pivot付きLUを準備し、以後は固定された置換・三角因子で初期解と補正を求める。厳密にゼロのpivotを拒否し、条件推定値によるrank閾値を置かない。
+
+複素更新系は実行列 $$ A_0 $$ と複素行列 $$ U,V\in\mathbb C^{n\times r} $$ を受ける。共役を取らず、各係数をrankの昇順にbinary64で評価した値を $$ A_{\mathrm{eff}} $$ と定義する。
+
+$$
+a^{(0)}_{ij}=(a_0)_{ij},\qquad p^{(k)}_{ij}=\operatorname{cmul}_{64}(u_{ik},v_{jk}),
+\qquad a^{(k+1)}_{ij}=\operatorname{cadd}_{64}(a^{(k)}_{ij},p^{(k)}_{ij}),
+\qquad a^{\mathrm{eff}}_{ij}=a^{(r)}_{ij}.
+$$
+
+ここで複素積は、実積をそれぞれbinary64へ丸めた後、実部を $$ \operatorname{fl}(\operatorname{fl}(u_rv_r)-\operatorname{fl}(u_iv_i)) $$、虚部を $$ \operatorname{fl}(\operatorname{fl}(u_rv_i)+\operatorname{fl}(u_iv_r)) $$ とする。複素加算も各実成分の一回の加算である。理想的な複素積を一回だけ丸める定義ではない。
+
+初期解と補正には、実LUによる $$ Y=A_0^{-1}U $$ と複素小行列 $$ S=I+V^TY $$ のLUを使う。
+
+$$
+x=A_0^{-1}b-Y S^{-1}V^T A_0^{-1}b.
+$$
+
+この作用は丸めを含む近似逆である。認定は各 $$ a^{\mathrm{eff}}_{ij} $$ を再構築した元残差と標準成分別後退誤差で行う。段階的な $$ U(V^Tx) $$ の丸めを元作用素と取り違えない。大域の複素行列を保持しない。rankがゼロなら実LUを複素右辺へ作用させる。
+
+## 反復改善と精度
+
+元残差は補償和と誤差の上包絡で評価し、右辺と保持解の両方の低位語を消費する。複素残差は四つの実積を固定順で加え、実部・虚部の誤差包絡の和を複素誤差の十分な上界とする。後退誤差の分母には、実際の高低和の絶対値下界を使う。高低語の絶対値を別々に足した上界を分母下界に代用しない。
+
+補正回数は、Binary64からTwoWordへの昇格前後を通して合計5回以下。呼出側は0〜5の上限を明示する。次のどちらかで全候補をTwoWord保持へ昇格する。
+
+- 未達の列で、binary64補正を適用しても全ての高位成分が変化しない。
+- 前回の評価以後、まだ未達の残差指標・後退誤差指標のいずれにも半分以下への減少がない。既に達成した指標は進展判定から除く。
+
+半減は進展を判別する固定規約であり、要求精度を緩めるものではない。TwoWord更新では、既存低位語と新しい補正の丸め残差を共通EFT helperで保持する。入力がTwoWordなら初期解から両語を消費し、保持する。丸め環境と極小積の対応範囲はEFTの契約に従う。上限まで未達なら `LinearUnconverged`、表現の停滞で進めない場合は `PrecisionUnresolved` を返す。
+
+`scaled_correction_upper` は最後に適用した実IR補正を未知量の物理尺度と要求ノルムで評価した上界。IRがなければ0、投影の前後で同じ値を保持する。
+
+## 準備・所有・資源
+
+準備オブジェクトは元係数、U/V、尺度と単位、完全なContext、因子、再利用scratchを所有する。solve入口では完全なcache identityに加え、元係数の論理成分と尺度・単位を照合する。同世代・同アドレスの書換えも拒否する。paddingは有限性を検査するが物理行の演算には含めない。
+
+返却値の高低平面、投影候補、尺度・単位・全列metric・消費者proof枠は、反復に入る前に出力用ResourcePlanで所有確保する。分解workspaceを借りた結果は返さない。準備workspaceには同期leaseを取り、同じ準備への並行呼出し・再入を拒否する。失敗後も元入力と以前の結果は変化しない。
+
+非空のEigen backendに宣言するpayload予測は $$ 24n^2+64n+48r^2+128r $$ byte。real LU・置換と並存する小複素LU・packing・推定scratchの予測であり、malloc/RSSの保証上界ではない。非空では証明済み上界を持たず、`RequireProvenBound` は `Unsupported`。各solveは準備時の計画を再判定し、より厳しい制限への再利用を無条件で許さない。次数0ではbackendへ作用せず、予測と証明済み上界は0。UVLAS所有配列の実確保は別のResourcePlanに従う。
+
+## 診断と検証範囲
+
+実Denseの条件診断は、元の非尺度化行列の $$ \kappa_1 $$ に対するEigen 5 `PartialPivLU::rcond` の未認定な逆数推定である。有限非負の場合だけ診断を返す。推定の0やoverflowをrank拒否や保証上界へ昇格しない。更新系では、実baseや小Schurの推定を有効行列の推定として返さず `NotEvaluated` とする。小Schurの未認定な逆一ノルム条件推定は、`UpdatedPrepared::schur_condition()` から別対象の診断として読む。rank0・移動後・非有限推定は `NotEvaluated`。この値もrank判定へ使わない。
+
+合力、局所荷重、拘束、反力は別の必要消費者チェックで認定する。チェックのない呼出しが認定するのは代数系だけであり、実務の物理受入を主張しない。
+
+| 決定 | 独立試験 |
+|---|---|
+| pivotと元系 | 非対称3次系の固定係数・右辺、Boost100桁の独立直接Gaussian消去 |
+| 非共役rank2更新 | 二右辺の固定有理数係数・解析解、独立な複素100桁直接求解 |
+| 停滞と高低保持 | 3x=1、13/5を含む3次系の微動停滞反例、厳格投影拒否、初期TwoWord右辺 |
+| 空・ゼロ・特異・非有限 | 0×2、正尺度のゼロ右辺、tiny非零pivot、特異A/小Schur、rank0、各複素成分の非有限、予算0と不正入力の組合せ |
+| cache・所有・失敗 | 別担当のdense_contract試験。入力破棄後の結果、同世代書換え、fingerprint、再判定、move、例外・再入 |
+| 確保 | 全使用TUを監査設定でcompile。監査の実DensePrepared・2RHS・required_checks空の8経路と、複素UpdatedPrepared・rank1・投影有無の2経路で、公開solve全体のC++確保数は予定出力8／投影9、Eigen確保は禁止。これは区間kernelの0確保を直接測った主張とは区別する |
+
+小規模試験とkernel計測は、この基準部品の実装確認である。実4096系の製品認定、実翼の全体系、48GiB・12時間の実務性能はそれぞれIM00-11、対応する物理kernel・連成のIM-03等、実務受入のIM-07で扱う。

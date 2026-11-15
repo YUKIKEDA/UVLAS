@@ -1,0 +1,5 @@
+RNG seed: 1463645471
+capacity_only n=100000 nnz=299998 prepare_seconds=0.0599725 solve_seconds=0.414401 lifetime_peak_rss_bytes=113627136 maximum_relative_error=2.07151e-16
+All tests passed (1 assertion in 1 test case)
+
+

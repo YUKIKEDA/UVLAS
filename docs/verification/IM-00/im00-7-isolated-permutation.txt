@@ -1,0 +1,17 @@
+RNG seed: 424242
+<repo>\tests\numerics\sparse_triangular_test.cpp(54): failed: row_changed for: false
+<repo>\tests\numerics\sparse_triangular_test.cpp(55): failed: column_changed for: false
+<repo>\tests\numerics\sparse_triangular_test.cpp(85): failed: std::abs(result->values()[i] - expected[i]) <= 1e-12 for: 18.12337662337662181 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(85): failed: std::abs(result->values()[i] - expected[i]) <= 1e-12 for: 67.70129870129869687 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(85): failed: std::abs(result->values()[i] - expected[i]) <= 1e-12 for: 19.23376623376622874 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(85): failed: std::abs(result->values()[i] - expected[i]) <= 1e-12 for: 4.24675324675324539 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(85): failed: std::abs(result->values()[i] - expected[i]) <= 1e-12 for: 60.49350649350648723 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(93): failed: std::abs(result->values()[i] - stock.data()[i]) <= 1e-12 for: 18.12337662337662181 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(93): failed: std::abs(result->values()[i] - stock.data()[i]) <= 1e-12 for: 67.70129870129869687 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(93): failed: std::abs(result->values()[i] - stock.data()[i]) <= 1e-12 for: 19.23376623376622874 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(93): failed: std::abs(result->values()[i] - stock.data()[i]) <= 1e-12 for: 4.24675324675324539 <= 0.000000000001
+<repo>\tests\numerics\sparse_triangular_test.cpp(93): failed: std::abs(result->values()[i] - stock.data()[i]) <= 1e-12 for: 60.49350649350648723 <= 0.000000000001
+test cases:  16 |  15 passed |  1 failed
+assertions: 152 | 140 passed | 12 failed
+
+

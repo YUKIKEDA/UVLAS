@@ -141,6 +141,32 @@ add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
 
+uvlas_add_test(numerics.linear_validation
+    LABELS unit negative verification
+    SOURCES numerics/linear_validation_test.cpp
+    LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_linear_validation PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.linear_result
+    LABELS unit negative verification
+    SOURCES numerics/linear_result_test.cpp
+    LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_linear_result PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.linear_metrics
+    LABELS unit negative verification
+    SOURCES numerics/linear_metrics_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+target_include_directories(uvlas_test_numerics_linear_metrics PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.backend_memory
+    LABELS unit negative property
+    SOURCES numerics/backend_memory_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen)
+target_include_directories(uvlas_test_numerics_backend_memory PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_backend_memory)
+uvlas_require_audited_dependencies(uvlas_test_numerics_backend_memory)
+
 uvlas_add_test(numerics.precision
     LABELS unit negative verification
     SOURCES numerics/precision_test.cpp
@@ -162,3 +188,45 @@ add_test(NAME numerics.storage_compilation
         "-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set_tests_properties(numerics.storage_compilation PROPERTIES TIMEOUT 120 LABELS "negative")
+
+uvlas_add_test(numerics.sparse_spd
+    LABELS unit verification negative
+    SOURCES numerics/sparse_spd_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+target_include_directories(uvlas_test_numerics_sparse_spd PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.sparse_triangular
+    LABELS unit verification negative
+    SOURCES numerics/sparse_triangular_test.cpp
+    LIBS uvlas_numerics uvlas::eigen)
+target_include_directories(uvlas_test_numerics_sparse_triangular PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+
+uvlas_add_test(numerics.sparse_solve
+    LABELS unit integration verification negative
+    SOURCES numerics/sparse_solve_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+
+uvlas_add_test(numerics.sparse_capacity
+    LABELS capacity verification
+    SOURCES numerics/sparse_capacity_test.cpp
+    LIBS uvlas_numerics)
+
+uvlas_add_test(numerics.sparse_allocation
+    LABELS property verification
+    SOURCES numerics/sparse_allocation_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen)
+target_include_directories(uvlas_test_numerics_sparse_allocation PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_sparse_allocation)
+uvlas_require_audited_dependencies(uvlas_test_numerics_sparse_allocation)
+
+uvlas_add_test(numerics.dense_solve LABELS unit verification negative
+ SOURCES numerics/dense_solve_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+
+uvlas_add_test(numerics.dense_contract LABELS unit negative verification
+ SOURCES numerics/dense_contract_test.cpp LIBS uvlas_numerics)
+
+uvlas_add_test(numerics.dense_allocations LABELS property verification
+ SOURCES numerics/dense_allocations_test.cpp support/allocation_audit.cpp
+ LIBS uvlas_numerics_audit uvlas::eigen)
+uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
+uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)

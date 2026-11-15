@@ -1,0 +1,306 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-03",
+    "N4-05",
+    "N4-06",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 11,
+  "date": "2026-11-15",
+  "source_commit": "c9ad25a772af6d00c7095165687d7795e214d98e",
+  "merged_dense_head": "6014c7baaadc70bbafdc0004f8a1a5d79f1b082c",
+  "sparse_premerge_head": "18b0620d0620410a66c2e2959eec10f4d8f4b121",
+  "scope": "並行実装した密・疎解法の共有build登録、同一policyの監査target、生成追跡表とロードマップを通常mergeで統合した。実装間の新しいAPI依存は追加しない。",
+  "resolution": {
+    "cmake": "UVLAS_NUMERICS_SOURCESに両実装を登録し、uvlas_numerics_auditへ一本化。疎専用の重複library定義を削除し、両確保監査を共通targetへlinkした。",
+    "trace": "両方の試験・記録からtrace.py matrixで再生成。表の片側採用や手作業の加算は行わない。",
+    "roadmap": "IM00-6と7をDone、現在地をIM00-8へ更新。導入を両解法の実装済みからGMRES/線形精度認定IM00-8、パッケージ判定IM00-11の順へ変更。他行は保持。",
+    "private_history": "絶対pathを持つローカル8310001は祖先へ入れていない。公開用18b0620から通常mergeした。"
+  },
+  "execution_provenance": "通常mergeをsource commitとして先に確定し、clean checkoutからDebug/Releaseの影響3CTestだけを実行。build-infoは同じclean Debugから採取した。数値source/header/test全38ファイルが各固定版のblobとbyte同一だったので、内部SPD/triangular/100k容量・密の他数値試験・Core/Python・benchmarkを再実行しなかった。",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "c9ad25a772af6d00c7095165687d7795e214d98e",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "verification": [
+    {
+      "command": "ctest --test-dir out/build/sparse-msvc -C Debug -R ^numerics.(sparse_solve|sparse_allocation|dense_allocations)$ --output-on-failure",
+      "passed": 3,
+      "total": 3
+    },
+    {
+      "command": "ctest --test-dir out/build/sparse-msvc -C Release -R ^numerics.(sparse_solve|sparse_allocation|dense_allocations)$ --output-on-failure",
+      "passed": 3,
+      "total": 3
+    }
+  ],
+  "checks": {
+    "numeric_byte_identity": "38個のnumerics cpp/hpp/testを、疎は18b0620、その他は6014c7bのblobと比較して一致。数値実装・共通headers・許容差は変更なし。",
+    "allocation_policy": "configure時のuvlas_require_audited_dependenciesで全依存を検査し、両監査の実行がDebug/Releaseとも成功。",
+    "trace": "153定義ID、0問題。新規記録追加後にも再生成する。",
+    "cpp_static": "数値cpp/hppが固定版とbyte同一なのでformat/tidyは重複実行しない。CMakeは両構成でconfigure/buildを確認した。",
+    "linux": "ローカル未実行。CIは待機していない。",
+    "capacity": "既存の100k容量とR-02実務profileの区別は維持し、新しい容量/性能の主張はしない。"
+  },
+  "redaction": {
+    "method": "tools/rd/redact.py redact_bytes",
+    "files": [
+      {
+        "path": "docs/verification/IM-00/im00-7-integration-debug.txt",
+        "before_sha256": "3932cff3fcf3257e69d41a985bff65be38408bcd4bdc5e6d27051b2c586a9451",
+        "after_sha256": "64e543e75821325f01a8de680177d26eee28a122eab7e05daa8365ea3e5d0423",
+        "replacements": 2
+      },
+      {
+        "path": "docs/verification/IM-00/im00-7-integration-release.txt",
+        "before_sha256": "614c2082565181f856150627ef12729154e90d3f1dc6c52a551804555174edce",
+        "after_sha256": "6072dd5a85aab0ac7ac7831225b11845f1e1e079c8e32089aa88dc8146853a71",
+        "replacements": 2
+      }
+    ],
+    "leftovers": 0
+  },
+  "numeric_origin_proof": {
+    "src/numerics/backend_memory.cpp": {
+      "origin": "6014c7b",
+      "sha256": "d89105fbfda46249b2ef5d0355b5bcb73972dcd47607b8d15214997b7da7ce5a"
+    },
+    "src/numerics/backend_memory_detail.hpp": {
+      "origin": "6014c7b",
+      "sha256": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99"
+    },
+    "src/numerics/compensated.hpp": {
+      "origin": "6014c7b",
+      "sha256": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194"
+    },
+    "src/numerics/dense_solve.cpp": {
+      "origin": "6014c7b",
+      "sha256": "74d43eadcd51ff23880fda775cd41897fa37a829dbe51b3bac373475e473190e"
+    },
+    "src/numerics/eigen_views.hpp": {
+      "origin": "6014c7b",
+      "sha256": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87"
+    },
+    "src/numerics/linear_metrics.cpp": {
+      "origin": "6014c7b",
+      "sha256": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738"
+    },
+    "src/numerics/linear_result.cpp": {
+      "origin": "6014c7b",
+      "sha256": "c2609291c7ff9b2a3b941918267d97f36bbfa5671969a57f89df82c657e28186"
+    },
+    "src/numerics/linear_solve_detail.hpp": {
+      "origin": "6014c7b",
+      "sha256": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0"
+    },
+    "src/numerics/linear_validation.cpp": {
+      "origin": "6014c7b",
+      "sha256": "4e6a50603eb991b45f22c2f0db7dca3c0ef002491560fda8f16b2b2dbc132de9"
+    },
+    "src/numerics/precision.cpp": {
+      "origin": "6014c7b",
+      "sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee"
+    },
+    "src/numerics/sparse_solve.cpp": {
+      "origin": "18b0620",
+      "sha256": "2166a62684eecc45ec9d088d07c6df8b2ead6a4f7a2e367faebd964cb19a19c2"
+    },
+    "src/numerics/sparse_spd.cpp": {
+      "origin": "18b0620",
+      "sha256": "c33e0702216468eccf8df150b364be41be8e1a5aee6d1c0e0ac697d95653a2af"
+    },
+    "src/numerics/sparse_spd.hpp": {
+      "origin": "18b0620",
+      "sha256": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32"
+    },
+    "src/numerics/sparse_triangular.cpp": {
+      "origin": "18b0620",
+      "sha256": "fa15d6fef00fbc1821f939099c976fc46f8121ee9a523cf1c7976338dbe6039d"
+    },
+    "src/numerics/sparse_triangular.hpp": {
+      "origin": "18b0620",
+      "sha256": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea"
+    },
+    "src/numerics/storage.cpp": {
+      "origin": "6014c7b",
+      "sha256": "a8e6917f308f8d96ce04f93469a5801ff580df731f8744912a45b5f3d82e4d06"
+    },
+    "include/uvlas/numerics/backend_memory.hpp": {
+      "origin": "6014c7b",
+      "sha256": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322"
+    },
+    "include/uvlas/numerics/dense_solve.hpp": {
+      "origin": "6014c7b",
+      "sha256": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc"
+    },
+    "include/uvlas/numerics/linear_solve.hpp": {
+      "origin": "6014c7b",
+      "sha256": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97"
+    },
+    "include/uvlas/numerics/precision.hpp": {
+      "origin": "6014c7b",
+      "sha256": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c"
+    },
+    "include/uvlas/numerics/sparse_solve.hpp": {
+      "origin": "18b0620",
+      "sha256": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb"
+    },
+    "include/uvlas/numerics/storage.hpp": {
+      "origin": "6014c7b",
+      "sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339"
+    },
+    "tests/numerics/backend_memory_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "ad71c09764eefa401dfd25363bfc491754c375c42dbcb21042ce61e7905e1d95"
+    },
+    "tests/numerics/dense_allocations_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "2f631a1b7ca2497e1b7cc1a4c8f891a81021a2f25e20554f4ea6f87aa6f8741b"
+    },
+    "tests/numerics/dense_contract_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "f80a44de6f5daf67b0bbfe1f406ad266d1e112a3c2061e8da24e2c97348418d6"
+    },
+    "tests/numerics/dense_solve_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "e504d9cbb6f8ec0de6775238198e1fffb18378841a1935a8dfa5fcd2c8b958db"
+    },
+    "tests/numerics/eigen_views_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "5a6bcd1fa4af676c1d383d59493dabf510fd49b4efa5e5d858b8824942a246e4"
+    },
+    "tests/numerics/linear_metrics_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "108d57d9e38e717f7d2710444529ec1101a4de787b71db5d5a0883f9ed3157e6"
+    },
+    "tests/numerics/linear_result_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "0d7952089a6bfe3f0adf29633b0d947e59ef931344aced69fda506c718fe5e4a"
+    },
+    "tests/numerics/linear_validation_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "c578ba8ae845eba85b247870ab39f251f1eaa4d4c92757625bd68849ef1ffb84"
+    },
+    "tests/numerics/precision_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "5a914695b8846256a4c6968ef1a32bae9743247c4b8ff416b9e93f16dc51d7e7"
+    },
+    "tests/numerics/sparse_allocation_test.cpp": {
+      "origin": "18b0620",
+      "sha256": "7783160fa07cae58d14bfe6d0b1d9ee8b4e4fe8f63d8ed874e69dd0636e255dc"
+    },
+    "tests/numerics/sparse_capacity_test.cpp": {
+      "origin": "18b0620",
+      "sha256": "caa01066f735a8bcd810178b568b03f0152d86e28e9c61b699b8afb161fc8596"
+    },
+    "tests/numerics/sparse_solve_test.cpp": {
+      "origin": "18b0620",
+      "sha256": "107bded2c9f8992086523e6a83c4ff43213422ad2b3e3b60cddb7633900cc5d1"
+    },
+    "tests/numerics/sparse_spd_test.cpp": {
+      "origin": "18b0620",
+      "sha256": "3ca1075dd83f72c604cdc01ccf01709a9e8924c0c774bb3dc8c0b42eaf2fcce5"
+    },
+    "tests/numerics/sparse_test_support.hpp": {
+      "origin": "18b0620",
+      "sha256": "98653f3a90ab15ccf350f9aea32adfcf35911fdf909c6b3b03f3a5b05df8c27b"
+    },
+    "tests/numerics/sparse_triangular_test.cpp": {
+      "origin": "18b0620",
+      "sha256": "d0e53b85e3d76a1de0160ac170b080cb9f1d42fe0313453b98714295d87d334a"
+    },
+    "tests/numerics/storage_test.cpp": {
+      "origin": "6014c7b",
+      "sha256": "7522ae49169ad9476b2f93de9173f7ec27598d4ede94ddbcea5afb3b2d0ddb75"
+    }
+  },
+  "historical_evidence": [
+    {
+      "path": "docs/verification/IM-00/im00-7.json",
+      "sha256": "d3d7548a59b4815eb38e951a26b40b45ab909a584d7d6df6d678547e8117be99",
+      "meaning": "以前のsource_commitに対応する固定記録。現在のsource hashへ置き換えない。"
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-redaction.json",
+      "sha256": "6033a04111116f5097489ef1c4bcc9074dc725269eb54f95d6386f7bdcaa70a1",
+      "meaning": "以前のsource_commitに対応する固定記録。現在のsource hashへ置き換えない。"
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-isolated-control.json",
+      "sha256": "0014dab8c9c8e47230dc163a3f52ef48fcf22e85068937adaf9ff972150da0e0",
+      "meaning": "以前のsource_commitに対応する固定記録。現在のsource hashへ置き換えない。"
+    },
+    {
+      "path": "docs/verification/IM-00/im00-6.json",
+      "sha256": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883",
+      "meaning": "以前のsource_commitに対応する固定記録。現在のsource hashへ置き換えない。"
+    }
+  ],
+  "sources": {
+    "src/numerics/backend_memory.cpp": "d89105fbfda46249b2ef5d0355b5bcb73972dcd47607b8d15214997b7da7ce5a",
+    "src/numerics/backend_memory_detail.hpp": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+    "src/numerics/dense_solve.cpp": "74d43eadcd51ff23880fda775cd41897fa37a829dbe51b3bac373475e473190e",
+    "src/numerics/eigen_views.hpp": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/linear_result.cpp": "c2609291c7ff9b2a3b941918267d97f36bbfa5671969a57f89df82c657e28186",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "src/numerics/linear_validation.cpp": "4e6a50603eb991b45f22c2f0db7dca3c0ef002491560fda8f16b2b2dbc132de9",
+    "src/numerics/precision.cpp": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+    "src/numerics/sparse_solve.cpp": "2166a62684eecc45ec9d088d07c6df8b2ead6a4f7a2e367faebd964cb19a19c2",
+    "src/numerics/sparse_spd.cpp": "c33e0702216468eccf8df150b364be41be8e1a5aee6d1c0e0ac697d95653a2af",
+    "src/numerics/sparse_spd.hpp": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+    "src/numerics/sparse_triangular.cpp": "fa15d6fef00fbc1821f939099c976fc46f8121ee9a523cf1c7976338dbe6039d",
+    "src/numerics/sparse_triangular.hpp": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+    "src/numerics/storage.cpp": "a8e6917f308f8d96ce04f93469a5801ff580df731f8744912a45b5f3d82e4d06",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "include/uvlas/numerics/dense_solve.hpp": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "include/uvlas/numerics/sparse_solve.hpp": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "tests/numerics/backend_memory_test.cpp": "ad71c09764eefa401dfd25363bfc491754c375c42dbcb21042ce61e7905e1d95",
+    "tests/numerics/dense_allocations_test.cpp": "2f631a1b7ca2497e1b7cc1a4c8f891a81021a2f25e20554f4ea6f87aa6f8741b",
+    "tests/numerics/dense_contract_test.cpp": "f80a44de6f5daf67b0bbfe1f406ad266d1e112a3c2061e8da24e2c97348418d6",
+    "tests/numerics/dense_solve_test.cpp": "e504d9cbb6f8ec0de6775238198e1fffb18378841a1935a8dfa5fcd2c8b958db",
+    "tests/numerics/eigen_views_test.cpp": "5a6bcd1fa4af676c1d383d59493dabf510fd49b4efa5e5d858b8824942a246e4",
+    "tests/numerics/linear_metrics_test.cpp": "108d57d9e38e717f7d2710444529ec1101a4de787b71db5d5a0883f9ed3157e6",
+    "tests/numerics/linear_result_test.cpp": "0d7952089a6bfe3f0adf29633b0d947e59ef931344aced69fda506c718fe5e4a",
+    "tests/numerics/linear_validation_test.cpp": "c578ba8ae845eba85b247870ab39f251f1eaa4d4c92757625bd68849ef1ffb84",
+    "tests/numerics/precision_test.cpp": "5a914695b8846256a4c6968ef1a32bae9743247c4b8ff416b9e93f16dc51d7e7",
+    "tests/numerics/sparse_allocation_test.cpp": "7783160fa07cae58d14bfe6d0b1d9ee8b4e4fe8f63d8ed874e69dd0636e255dc",
+    "tests/numerics/sparse_capacity_test.cpp": "caa01066f735a8bcd810178b568b03f0152d86e28e9c61b699b8afb161fc8596",
+    "tests/numerics/sparse_solve_test.cpp": "107bded2c9f8992086523e6a83c4ff43213422ad2b3e3b60cddb7633900cc5d1",
+    "tests/numerics/sparse_spd_test.cpp": "3ca1075dd83f72c604cdc01ccf01709a9e8924c0c774bb3dc8c0b42eaf2fcce5",
+    "tests/numerics/sparse_test_support.hpp": "98653f3a90ab15ccf350f9aea32adfcf35911fdf909c6b3b03f3a5b05df8c27b",
+    "tests/numerics/sparse_triangular_test.cpp": "d0e53b85e3d76a1de0160ac170b080cb9f1d42fe0313453b98714295d87d334a",
+    "tests/numerics/storage_test.cpp": "7522ae49169ad9476b2f93de9173f7ec27598d4ede94ddbcea5afb3b2d0ddb75",
+    "CMakeLists.txt": "6e7be037cd0cc7de08a8939974879f0a91e069a8acb5b3e630e71f4da5263b54",
+    "tests/CMakeLists.txt": "d417ff3b00d7fd9df4ffc95b51364145bb21da44e2845873298015a8b9a672b6",
+    "docs/roadmap.md": "f7b5acdb721b791102c1e18e36b1d60c1e0129032fd2b880dc7087a942a1e5e0",
+    "docs/specs/foundation/sparse-solve-contract.md": "8f49845c0436ad38eca6403cd3c87e98bdc1ba8c592001a3d76e0341e433867c",
+    "docs/specs/foundation/dense-solve-contract.md": "0cef925b0219242c05873e992720466329abe9cf47b143613fe7ff3d8d33907b",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "e8f57df001807507a3365d8abae748f19616bcd418d73c4eac2ae1da9d603ed9",
+    "tools/rd/redact.py": "c1d535704d45d44834d7011580b708aa6c8d25f232afaa351b0fd5a1d978529f"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-7-integration-debug.txt": "64e543e75821325f01a8de680177d26eee28a122eab7e05daa8365ea3e5d0423",
+    "docs/verification/IM-00/im00-7-integration-release.txt": "6072dd5a85aab0ac7ac7831225b11845f1e1e079c8e32089aa88dc8146853a71"
+  }
+}

@@ -1,0 +1,4 @@
+2026-11-15T10:46:13.8304499Z <home>/work/UVLAS/UVLAS/tests/support/allocation_audit.cpp:16:19: error: ‘{anonymous}::original_eigen_allowed’ defined but not used [-Werror=unused-variable]
+2026-11-15T10:46:13.8305196Z    16 | thread_local bool original_eigen_allowed = true;
+2026-11-15T10:46:13.8306514Z <home>/work/UVLAS/UVLAS/tests/support/allocation_audit.cpp:15:23: error: ‘{anonymous}::eigen_scopes’ defined but not used [-Werror=unused-variable]
+2026-11-15T10:46:13.8307137Z    15 | thread_local unsigned eigen_scopes = 0;

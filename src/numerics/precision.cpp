@@ -1,3 +1,5 @@
+#include "compensated.hpp"
+
 #include <algorithm>
 #include <array>
 #include <bit>
@@ -50,58 +52,8 @@ int lowest_bit(double value) noexcept {
     const auto significand = (bits & 0xfffffffffffffULL) | (exponent == 0 ? 0ULL : (1ULL << 52));
     return (exponent == 0 ? -1074 : exponent - 1075) + std::countr_zero(significand);
 }
-double outward_add(double a, double b) noexcept {
-    if (a == 0) {
-        return b;
-    }
-    if (b == 0) {
-        return a;
-    }
-    return std::nextafter(a + b, std::numeric_limits<double>::infinity());
-}
-struct SumEvaluation {
-    double value;
-    double error;
-};
-class CompensatedSum {
-public:
-    Result<void> add(double value) noexcept {
-        const auto leading = two_sum(sum_, value);
-        if (!leading) {
-            return std::unexpected(leading.error());
-        }
-        const auto trailing = two_sum(correction_, leading->lo);
-        if (!trailing) {
-            return std::unexpected(trailing.error());
-        }
-        // Enclose rounding lost by compensation itself, even when the estimate becomes zero.
-        error_ = outward_add(error_, std::abs(trailing->lo));
-        sum_ = leading->hi;
-        correction_ = trailing->hi;
-        return {};
-    }
-    Result<void> product(double a, double b, double sign) noexcept {
-        const auto value = two_product(a, b);
-        if (!value) {
-            return std::unexpected(value.error());
-        }
-        const auto leading = add(sign * value->hi);
-        if (!leading) {
-            return leading;
-        }
-        return add(sign * value->lo);
-    }
-    [[nodiscard]] Result<SumEvaluation> result() const noexcept {
-        const auto value = two_sum(sum_, correction_);
-        if (!value) {
-            return std::unexpected(value.error());
-        }
-        return SumEvaluation{value->hi, outward_add(error_, std::abs(value->lo))};
-    }
-
-private:
-    double sum_ = 0, correction_ = 0, error_ = 0;
-};
+using detail::outward_add;
+using CompensatedSum = detail::CompensatedAccumulator;
 // Compare with a downward enclosure of tolerance*scale without forming its extreme exponent.
 bool within_budget(double upper, double scale, double tolerance) noexcept {
     if (!finite(upper)) {
@@ -136,22 +88,6 @@ template <StorageScalar Scalar>
 const DenseMatrix<Scalar>* low(const PrecisionBuffer<Scalar>& value) noexcept {
     const auto* pair = std::get_if<TwoWord<Scalar>>(&value.storage());
     return pair == nullptr ? nullptr : &pair->lo;
-}
-Result<TwoWordValue> correct(double hi, double lo, double delta) noexcept {
-    const auto first = two_sum(hi, delta);
-    if (!first) {
-        return std::unexpected(first.error());
-    }
-    const auto trailing = two_sum(lo, first->lo);
-    if (!trailing) {
-        return std::unexpected(trailing.error());
-    }
-    const auto leading = two_sum(first->hi, trailing->hi);
-    if (!leading) {
-        return std::unexpected(leading.error());
-    }
-    // Retain the previous low word before renormalizing the new correction.
-    return two_sum(leading->hi, leading->lo + trailing->lo);
 }
 template <StorageScalar Scalar>
 Result<void> residual_product(CompensatedSum& real, CompensatedSum& imag, Scalar a,
@@ -301,21 +237,21 @@ add_correction(const PrecisionBuffer<Scalar>& source, const DenseMatrix<Scalar>&
             const auto i =
                 static_cast<std::size_t>(column * source.shape().leading_dimension + row);
             if constexpr (std::same_as<Scalar, double>) {
-                const auto value =
-                    correct(hi->values()[i], lo->values()[i], correction.values()[i]);
+                const auto value = detail::correct_two_word(hi->values()[i], lo->values()[i],
+                                                            correction.values()[i]);
                 if (!value) {
                     return std::unexpected(value.error());
                 }
                 hi->values()[i] = value->hi;
                 lo->values()[i] = value->lo;
             } else {
-                const auto real = correct(hi->values()[i].real(), lo->values()[i].real(),
-                                          correction.values()[i].real());
+                const auto real = detail::correct_two_word(
+                    hi->values()[i].real(), lo->values()[i].real(), correction.values()[i].real());
                 if (!real) {
                     return std::unexpected(real.error());
                 }
-                const auto imag = correct(hi->values()[i].imag(), lo->values()[i].imag(),
-                                          correction.values()[i].imag());
+                const auto imag = detail::correct_two_word(
+                    hi->values()[i].imag(), lo->values()[i].imag(), correction.values()[i].imag());
                 if (!imag) {
                     return std::unexpected(imag.error());
                 }

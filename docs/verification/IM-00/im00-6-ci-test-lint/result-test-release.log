@@ -1,0 +1,13 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+    Start 26: numerics.linear_result
+1/1 Test #26: numerics.linear_result ...........   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+negative        =   0.05 sec*proc (1 test)
+unit            =   0.05 sec*proc (1 test)
+verification    =   0.05 sec*proc (1 test)
+
+Total Test time (real) =   0.05 sec

@@ -1,0 +1,96 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-00",
+  "issue": 10,
+  "date": "2026-11-15",
+  "source_commit": "e58d23f73abd598a98f488e2f5e2661f5ea37594",
+  "scope": "密求解の公開4入口と共通consumer認定の失敗診断を補完し、公開policyの例外境界を整える追加検証。数値kernel・精度予算・成功した解の計算式は変更していない。",
+  "history": {
+    "id": "im00-6",
+    "hint": "docs/verification/IM-00/im00-6.json",
+    "sha256": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883",
+    "role": "旧sourceに対する検証履歴として保持する。この追加記録は診断境界の差分だけを検証する。旧recordや既存R&Dを更新していない。"
+  },
+  "tested_candidate": {
+    "build_commit": "6014c7baaadc70bbafdc0004f8a1a5d79f1b082c",
+    "uncommitted_changes": true,
+    "final_source_bytes_equal_to_candidate": true,
+    "note": "対象試験はcommit前の候補byteで実行した。source_commitはその同一byteを固定したcommitである。clean表示だけを得る再build・再試験は行っておらず、clean commitで試験したという主張ではない。"
+  },
+  "environment": {
+    "platform": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "dependencies": "既存の固定済みprefixを読取り専用で利用。依存版・featureの変更なし。"
+  },
+  "decisions": [
+    "DensePrepared::prepare、UpdatedPrepared::prepare、実数solve_linear、複素更新solve_linearは、guard_entryの返却後に欠落しているmodel/trial/numerical_generationだけをContextのmodel/trial/行列世代から補完する。",
+    "内側に既知の数値世代・問題ID・資源量・親などがある場合は保持する。行列世代によって観測候補の世代を上書きしない。",
+    "共通consumer認定の未対応・例外・未達・不整合では、欠落時だけ要求ObservationIdと実評価buffer世代を補完する。",
+    "公開ReturnedPrecisionはget_ifとnull検査で扱い、valuelessはpreflightでPrecisionUnsupportedにする。noexcept内からstd::getの例外を逃がさない。"
+  ],
+  "verification": [
+    {
+      "command": "pwsh tools/dev/msvc.ps1 ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.(linear_result|linear_validation|dense_contract|dense_allocations)$ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "log": "docs/verification/IM-00/im00-6-diagnostic-context/windows-debug.log"
+    },
+    {
+      "command": "pwsh tools/dev/msvc.ps1 ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.(linear_result|linear_validation|dense_contract|dense_allocations)$ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "log": "docs/verification/IM-00/im00-6-diagnostic-context/windows-release.log"
+    }
+  ],
+  "independent_checks": [
+    "実数・複素それぞれprepareとsolveのPlan0失敗で、既知のmodel1/trial11/行列世代5を確認した。ResourceUsageのBytes単位、必要量、観測量を独立な固定値と比較した。",
+    "consumer由来の既知model/trial/数値世代333・OperatorApplications単位の資源501/101・parent44・problem Scope61を、欠落項目のある場合と全て既知の場合で確認した。既知詳細は全体比較で保持を確認した。",
+    "合力は達成しても局所量が未達のcaseで、要求ObservationId82と実候補世代40がFailureに残ることを確認した。",
+    "policy emplaceの例外後に、実際のvariant状態に応じた結果を確認した。標準libraryが旧alternativeを保持すれば正常、valuelessなら拒否する。両状態をこの環境で強制作成したという主張ではない。",
+    "実数8経路・複素2経路の既存確保監査が成功し、診断補完後も予定出力8／投影9のC++確保数とEigen禁止が維持された。"
+  ],
+  "review": "実装者とは別の担当が、4入口・内側consumerの診断保持・policy境界・追加対照を独立に通読し、未解決指摘なしと確認した。",
+  "checks": {
+    "format": "変更5C++ファイルはclang-format21.1.2の検査成功。",
+    "tidy": "clang-tidy21.1.1を単一Debug構成で実行し、対象コード診断0・exit0。contractログには先行する密sourceも含み、その後のget_if版はtidy-dense.logで確認した。",
+    "trace": "trace.py matrix/checkで153ID・問題0。",
+    "integrity": "既存manifest checkerで21fileを確認し、error0。byte整合の確認であって科学的合否の判定ではない。"
+  },
+  "unchanged_scope": "以前に通過した数値系、変異、容量baselineは繰り返していない。今回の対象は診断とpolicy境界、その認定・入力検査・確保監視の依存先だけ。Linux CIはこの追加headで未確認で、完了を待たない。",
+  "sources": {
+    "src/numerics/dense_solve.cpp": "494f6cd8f8c2932c151dd8d6ac1be7d56fb9eb78163447e701f5621a27e90875",
+    "src/numerics/linear_result.cpp": "ade234c1eb51be8d323b3b97e5ff078afce2597a1cfc46ece04324350ae381f1",
+    "src/numerics/linear_validation.cpp": "ae39d9bdb615f93b6eb18c30575c8e844976a8c1d3b12839315668ac16f5eb98",
+    "tests/numerics/dense_contract_test.cpp": "d60d3aa924e3a6639425e89a81cf8f9b26d981c2adaddd49a055fa5c9affaf69",
+    "tests/numerics/linear_validation_test.cpp": "5b00dcedee96debbce988ab0d1b058a53c824bbb84231ddcadf5043b8166efa5",
+    "tests/numerics/dense_allocations_test.cpp": "2f631a1b7ca2497e1b7cc1a4c8f891a81021a2f25e20554f4ea6f87aa6f8741b",
+    "include/uvlas/core/failure.hpp": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "docs/specs/foundation/failure-certificate-contract.md": "9555b700a595e8b80beec39147cc76ee25f27b9f31d0c070cb8fe5f184a99171",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "e8f57df001807507a3365d8abae748f19616bcd418d73c4eac2ae1da9d603ed9"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-6-diagnostic-context/format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-6-diagnostic-context/redaction.json": "c03e9edb70196c69ebea0a4e363f69b0cc5dadbda4f8c5075167c880899bbefd",
+    "docs/verification/IM-00/im00-6-diagnostic-context/tidy-contract.log": "84d33dcf2ea2cc312a9a7c22d8630f4a3ae21e96bdfa28c8e475da2ae0898523",
+    "docs/verification/IM-00/im00-6-diagnostic-context/tidy-dense.log": "7997e3bb513e6d868fba24b315215241bdd509dfc7a97298cce2c00ae700622c",
+    "docs/verification/IM-00/im00-6-diagnostic-context/tidy-result.log": "d31238ca401842bd88a9c3d4d9dddc2d41512e54b840bbac4430d6856d7d2802",
+    "docs/verification/IM-00/im00-6-diagnostic-context/tidy-validation-test.log": "d5d445835fd1f8bb663bad341f1f7e4d790987999977c2efc38fd38591288f93",
+    "docs/verification/IM-00/im00-6-diagnostic-context/tidy-validation.log": "c85d3dcbf86cb5d488b5c7b52b607f726acea4cc78119fd31fabf58ce64aa917",
+    "docs/verification/IM-00/im00-6-diagnostic-context/windows-debug.log": "f1da08ecb0cc1800b5ec0b0e924daa5ef2cf580615e6125248a6aef07965d476",
+    "docs/verification/IM-00/im00-6-diagnostic-context/windows-release.log": "8f90e98db640b7259cb84b1602c7841af02b9fb8816a46f3fc36bae52c955227",
+    "docs/verification/IM-00/im00-6.json": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883"
+  }
+}

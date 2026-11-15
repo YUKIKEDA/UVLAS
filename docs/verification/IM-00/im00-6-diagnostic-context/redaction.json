@@ -1,0 +1,24 @@
+{
+  "schema": "uvlas.verification-redaction/1",
+  "policy": "既存tools/rd/redact.pyで個人・機械パスだけを伏字にした。試験結果と診断の内容は変更していない。",
+  "files": [
+    {
+      "artifact": "windows-debug.log",
+      "pristine_sha256": "2ebd170afcd11081ee99327c6a197b6f9e53edbc3939647bf789694d140b96ff",
+      "sha256": "f1da08ecb0cc1800b5ec0b0e924daa5ef2cf580615e6125248a6aef07965d476",
+      "replacements": 2
+    },
+    {
+      "artifact": "windows-release.log",
+      "pristine_sha256": "1e1bddaab90d937c50ce9dafdbaa6435f8b1f7a640c060df8c9e8d7d1dca83d4",
+      "sha256": "8f90e98db640b7259cb84b1602c7841af02b9fb8816a46f3fc36bae52c955227",
+      "replacements": 2
+    },
+    {
+      "artifact": "tidy-contract.log",
+      "pristine_sha256": "9f19341b5a9c517f64b7c2880ec7b8fd3fd6b486a555f796cbc7289cc7d34a74",
+      "sha256": "84d33dcf2ea2cc312a9a7c22d8630f4a3ae21e96bdfa28c8e475da2ae0898523",
+      "replacements": 2
+    }
+  ]
+}

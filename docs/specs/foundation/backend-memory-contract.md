@@ -1,0 +1,11 @@
+# 外部backendのメモリ計画を区別して受け付ける
+
+密・疎解法の準備は、UVLAS所有配列と外部backend領域を分ける。ResourcePlanの累積payload計上は変更しない。Eigen内部の分解・packing・一時配列は、その配列台帳の実確保量へ混ぜない。
+
+外部領域のfactoryは固定backend版と構成から`BackendMemoryPlan`を生成する。計画には同時保持する全backend objectと準備scratchを含むpeak payloadの見積り、および証明できる場合だけその上界を持たせる。public APIから任意の数を証明として渡す入口はない。実際のmalloc量とプロセスRSSは、どちらの欄にも書かない。
+
+呼出側は`EstimateAdmission{bytes}`か`RequireProvenBound{bytes}`を明示する。前者は見積りを、後者は証明済上界を上限と比較する。証明のないstrict要求は`Unsupported`、比較した計画量の超過は`ResourceExceeded`となる。等号と零byteの計画は受理する。未知のactual量をFailureのrequired/observedへ書かない。比較自体は確保を行わない。
+
+`EstimateAdmission`の成功は、allocatorの強制上限や48GiBのプロセス上限を満たした証拠ではない。固定Eigenの保持LUとpivot配列だけで、GEMM・triangular packingやrcond作業領域を含む全peak上界を証明したことにしない。証明のない構成はその事実を保持し、実測とR-02の実務規模gateで別に認定する。
+
+準備の各factoryは、入力・寸法とchecked容量計算を終え、計画を比較してからEigen objectを構築する。構築中のbad_allocは外へ出さず`ResourceExceeded`へ変換する。Stock backendの内部allocatorをこのI/Fで置換する仕組みは設けない。

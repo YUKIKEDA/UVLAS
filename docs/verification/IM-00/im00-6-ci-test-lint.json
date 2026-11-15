@@ -1,0 +1,84 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 10,
+  "date": "2026-11-15",
+  "source_commit": "a8ed5985f47298581fd106100b98c98498e14d23",
+  "scope": "PR53のLinux Debugにおけるテスト2ファイルのclang-tidy失敗を修正した。製品コード、数値、許容差、試験の判定内容は変更していない。",
+  "observed_failure": {
+    "head": "ca9afdff716ea453db31a911123336e1db78df5e",
+    "job_url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43706874371/job/132789774096",
+    "tests_passed": 35,
+    "tests_total": 35,
+    "phase": "数値試験の後のclang-tidy",
+    "diagnostics": {
+      "bugprone-unchecked-optional-access": 4,
+      "modernize-use-nodiscard": 2,
+      "performance-enum-size": 1,
+      "misc-const-correctness": 3
+    }
+  },
+  "changes": [
+    "optionalの安定したconst参照を取得し、has_value()のtrue分岐だけで値を比較する。欠落時はFAILし、4箇所の既存ResourceUsage期待値を維持する。",
+    "テスト補助関数へnodiscard、Faultへ明示的uint8_t基底とcstdint直接includeを追加し、変更しない3Evaluatorをconstにする。比較式と期待値、consumerのmutable観測状態は保持する。"
+  ],
+  "tested_tree": {
+    "base_commit": "ca9afdff716ea453db31a911123336e1db78df5e",
+    "uncommitted_test_changes": true,
+    "same_bytes_as_source_commit": true
+  },
+  "environment": {
+    "platform": "Windows AMD64",
+    "compiler": "MSVC19.51",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "tidy": "clang-tidy21.1.1、TUごとに単一Debug構成DB",
+    "format": "clang-format21.1.2"
+  },
+  "verification": [
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.dense_contract$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.dense_contract$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.linear_result$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.linear_result$ --output-on-failure",
+      "passed": 1,
+      "total": 1
+    }
+  ],
+  "static_analysis": "変更した2TUだけを解析し、exit0、対象コードの診断0。検査抑制を追加していない。",
+  "review": "担当を分けて修正し、それぞれ別担当が差分を通読した。欠落optionalの拒否、既存期待値、数値条件が維持されることを確認した。",
+  "scope_of_validation": "静的解析で指摘された2つの試験targetだけを両構成で実行した。無関係な試験、数値kernel、容量計測、変異は繰り返していない。修正後のLinux静的解析とCIの完了は未確認で、待機しない。",
+  "sources": {
+    "tests/numerics/dense_contract_test.cpp": "2df5c441c7d2c62884df618c241a5478bfc25e46db020cae5d55e8d1762c5572",
+    "tests/numerics/linear_result_test.cpp": "1552dd524fca172c48b17eb7c3beff88c4c044e4e7d15fea466c440be5b3069b"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-6-ci-test-lint/result-tidy.log": "9194ee9d1552806cb3cc89780946a3cb643d1eaec05bcf78cb362922820338cd",
+    "docs/verification/IM-00/im00-6-ci-test-lint/result-test-debug.log": "5394a7c438dca7b091df0594f84011e8386a2d4676b6ed7778a3dccf1b959c36",
+    "docs/verification/IM-00/im00-6-ci-test-lint/result-test-release.log": "95ec57a17bee312db67ebc058b469811abb25501d063d4de9de955abddd03fd8",
+    "docs/verification/IM-00/im00-6-ci-test-lint/contract-tidy.log": "b57019d06cd980443bccd1b977b9f139249e41de0e60197e9c2f83bf2e113681",
+    "docs/verification/IM-00/im00-6-ci-test-lint/contract-test-debug.log": "bd28b96b965ae04f9404e8d9ae71e298250a04d892807d7ec6fb9e212548b6af",
+    "docs/verification/IM-00/im00-6-ci-test-lint/contract-test-release.log": "b09c6e113fbf5be8016002cb63511eae70d21137c9cada7de7458fe710b24823",
+    "docs/verification/IM-00/im00-6-ci-test-lint/redaction.json": "3d27deee0135935a4bf52db054650158f30e01e9c5991519dcfd7ec4b80c6776"
+  },
+  "japanese_check": "説明部分のtech lintはlow_burstinessが1件。独立した修正・確認事項を列挙する記録であるため保持し、別担当の通読で意味と範囲を確認した。"
+}

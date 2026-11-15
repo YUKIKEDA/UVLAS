@@ -1,0 +1,98 @@
+{
+  "schema": "uvlas.redaction/1",
+  "date": "2026-11-15",
+  "ids": [
+    "N4-05"
+  ],
+  "scope": "ローカル原証拠は旧branchへ残し、cf237d0を祖先にした公開branchへ別copyを載せた。既存redact_bytesの規則だけを使い、元のaccount/machine pathを公開履歴へ含めない。",
+  "original_local_branch": "feat/11-sparse-solves",
+  "original_local_commit": "83100018c5586d87e291e1473bf549df241746e2",
+  "public_branch": "feat/11-sparse-qualified",
+  "source_commit": "cf237d094ae9fe1af03d105e81b61eddd2c76ea0",
+  "sources": {
+    "tools/rd/redact.py": "c1d535704d45d44834d7011580b708aa6c8d25f232afaa351b0fd5a1d978529f"
+  },
+  "files": [
+    {
+      "path": "docs/verification/IM-00/im00-7-debug-clean.txt",
+      "original_origin": "local original commit 83100018c5586d87e291e1473bf549df241746e2",
+      "before_sha256": "29c6b657de280245ae9e5ca0a23ef577ca35572080e94d668af4db7d2f8a014d",
+      "after_sha256": "c5bfa13bf3f28bd1cecd6190af54623aa6d4505fd5276b2ce53dfe98a1ff01de",
+      "replacements": 2
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-capacity.txt",
+      "original_origin": "local original commit 83100018c5586d87e291e1473bf549df241746e2",
+      "before_sha256": "04ad5f2969ab8373984191a179cae471a36e5e8c80757237d227adbfac6960d2",
+      "after_sha256": "04ad5f2969ab8373984191a179cae471a36e5e8c80757237d227adbfac6960d2",
+      "replacements": 0
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-mutation-content.txt",
+      "original_origin": "local original commit 83100018c5586d87e291e1473bf549df241746e2",
+      "before_sha256": "0b87cbcb1680ca839cc8c99a9848c7dfb63df149eed7e1b78aa6ce0f87b203c5",
+      "after_sha256": "14c28dda1acd6aea85203ce8f44bb269810176b435fff11539a6b42cf7a933e5",
+      "replacements": 1
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-mutation-low-word.txt",
+      "original_origin": "local original commit 83100018c5586d87e291e1473bf549df241746e2",
+      "before_sha256": "905f8becf91564a46f835fefb0aa1e6c6777acfee63d42ae94ac82c451b31815",
+      "after_sha256": "b05adea640bcd6c673872f6bea95942aca46995641252446fdf711ebf254fe37",
+      "replacements": 3
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-mutation-permutation.txt",
+      "original_origin": "local original commit 83100018c5586d87e291e1473bf549df241746e2",
+      "before_sha256": "016ec410dff3b956e5c4a75ad03c5c9497a04f2b8fc357bf6a976d77e39f5080",
+      "after_sha256": "db52d85d26a127266c5b198c2fd713e329281a00349f3975e8a8bf7bf326973e",
+      "replacements": 12
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7.json",
+      "original_origin": "local original commit 83100018c5586d87e291e1473bf549df241746e2",
+      "before_sha256": "1852cc45ac973063c6e2abb9adc8c976cc346ea91850d748a762375984545b45",
+      "after_sha256": "d3d7548a59b4815eb38e951a26b40b45ab909a584d7d6df6d678547e8117be99",
+      "replacements": 0,
+      "metadata_adjustments": "伏字後のartifact hashes、元の対照実行範囲の明確化、公開copyの来歴だけを更新。数値結果は変更なし。"
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-isolated-control.txt",
+      "original_origin": "new isolated execution with seed424242",
+      "before_sha256": "7170d863707852bb96ed96487607149d897af6bda52db0ca3347f9f63ed6f5b9",
+      "after_sha256": "7170d863707852bb96ed96487607149d897af6bda52db0ca3347f9f63ed6f5b9",
+      "replacements": 0
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-isolated-content.txt",
+      "original_origin": "new isolated execution with seed424242",
+      "before_sha256": "23c0b8179c2facc3e7b22090ab359f91198e2e4cc7e6aeb70b09829fe7446bab",
+      "after_sha256": "d22f71dba3bbfe4cadaa0f043c1dca94fa23c540a4f10c5a61239210df293a73",
+      "replacements": 1
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-isolated-low_word.txt",
+      "original_origin": "new isolated execution with seed424242",
+      "before_sha256": "3308a078b1b9b3b4edee0781b468ff5ebfd6f9c3a4abe70c6b25731f66b01339",
+      "after_sha256": "92697359b58141214298d223d66c9070c340abe5afe54e422d4baac5fb3d12aa",
+      "replacements": 3
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-isolated-permutation.txt",
+      "original_origin": "new isolated execution with seed424242",
+      "before_sha256": "fdb1cdeddca0b1ddf7943949b63af2826c65ced8c5c84d45f38b91f5ed982d4f",
+      "after_sha256": "15cbf7bf9d075bb84e6751a6a5def5e471895cb65951927453b27200fffbe27a",
+      "replacements": 12
+    },
+    {
+      "path": "docs/verification/IM-00/im00-7-isolated-runner.cmake.txt",
+      "original_origin": "actual isolated runner configuration; <repo> is substituted for this local checkout",
+      "before_sha256": "95705802f35ae77b3053400dd92d95bc12a70e528b371c04da7b005786b77638",
+      "after_sha256": "6741c00b69a4b4d7283ef2d0875bdb000a592b65df97e58273cc5c9424cfb7f4",
+      "replacements": 26
+    }
+  ],
+  "total_replacements": 60,
+  "metadata_policy": "旧manifestは公開copyのartifact hashesと説明だけを更新。before/after SHAはこのファイルに残し、元commitは公開branchの祖先へ入れない。",
+  "leftovers": 0
+}

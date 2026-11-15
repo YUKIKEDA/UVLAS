@@ -1,0 +1,194 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-03",
+    "N4-05",
+    "N4-06",
+    "N4-09",
+    "R-02"
+  ],
+  "package": "IM-00",
+  "issue": 11,
+  "date": "2026-11-15",
+  "source_commit": "cf237d094ae9fe1af03d105e81b61eddd2c76ea0",
+  "scope": "実SparseLU/COLAMD/int64 CSC、Rump十分条件で資格確認した原行列LLT、所有結果・元残差・必要consumer認定、TwoWord RHS/停滞昇格、合成100k容量。物理kernelと全体メモリprofileの認定は含まない。",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "cf237d094ae9fe1af03d105e81b61eddd2c76ea0",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "provenance": "Debug対象5CTestとbuild-infoはclean source_commitから実行。Release対象4CTestと容量単独はsource_commitと同じ数値実装・試験の候補bytesで実行した。最後にSPD試験の既存header-only Boost依存をCMakeで明記した登録差分はclean Debugで確認した。変異は最終実装bytesの隔離コピーで実行し製品ファイルを変更していない。後続commitはこの新規記録と生成追跡表だけを追加する。",
+  "verification": [
+    {
+      "command": "ctest --test-dir out/build/sparse-msvc -C Debug -R ^numerics.sparse_ --output-on-failure",
+      "passed": 5,
+      "total": 5,
+      "checkout": "clean source_commit"
+    },
+    {
+      "command": "ctest --test-dir out/build/sparse-msvc -C Release -R ^numerics.sparse_(solve|spd|triangular|allocation)$ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "checkout": "final numerical/test candidate bytes"
+    },
+    {
+      "command": "out/build/sparse-msvc/tests/Release/uvlas_test_numerics_sparse_capacity.exe --reporter compact",
+      "passed": 1,
+      "total": 1,
+      "checkout": "final numerical/test candidate bytes"
+    }
+  ],
+  "checks": {
+    "format": "12変更C++/hppをclang-format21.1.1 --dry-run --Werrorで確認、0診断。",
+    "tidy": "MSVC compile databaseから各TUの同一Debug entryを1つ抽出しclang-tidy21.1.1、対象8TUと更新4TUで0診断。既定の全チェックとwarnings-as-errorsを維持した。",
+    "trace": "matrix再生成後、153定義ID、0問題。記録追加後にも再生成・checkする。",
+    "japanese": "natural-japanese tech lintのTTR info1件は正定値/原残差/保持等の同じ術語を正確に使うため維持。im00_12が契約と追加差分を独立通読し、未解決重大指摘なし。",
+    "linux": "ローカル未実行。GCC14とsanitizerはCIで確認し、ここでは成功を主張しない。CI待機は行っていない。"
+  },
+  "independent_review": {
+    "reviewer": "im00_12",
+    "scope": "Rump式・丸め・exact scaling、Eigen5実体のLU/LLT抽出と置換、公開求解、TW、尺度snapshot、consumer/reentry、契約日本語",
+    "tests_reexecuted": false,
+    "unresolved_major_findings": 0
+  },
+  "allocation_audit": {
+    "policy": "製品numerics全体とcoreを同じEIGEN_RUNTIME_NO_MALLOC policyで再compileし、全依存を監査構成checkerで照合。",
+    "private_triangular": {
+      "cpp_allocation_attempts": 0,
+      "eigen_malloc_allowed": false,
+      "scope": "分解・抽出・work確保の後の実三角kernel。"
+    },
+    "public_solve": {
+      "fixed_owning_preparation_allocation_attempts": 8,
+      "additional_attempts_from_stalled_two_word_refinement": 0,
+      "scope": "consumerなし1/3のbinary64達成経路とTwoWord昇格経路。全入口0確保や任意consumerの無確保とは主張しない。"
+    }
+  },
+  "capacity": {
+    "purpose": "合成入力の容量確認だけ。製品graph、実務性能、24/48GiB profile、malloc/RSS hard capの認定ではない。",
+    "order": 100000,
+    "input_nnz": 299998,
+    "matrix": "tridiagonal diagonal4/offdiagonal-1",
+    "reference": "x_i=i+1、b_i=2(i+1)、最後だけ3n+1の閉形式。",
+    "prepare_seconds": 0.0599725,
+    "solve_seconds": 0.414401,
+    "process_lifetime_peak_resident_bytes": 113627136,
+    "maximum_relative_error": 2.07151e-16,
+    "fixed_relative_tolerance": 1e-12,
+    "hardware": {
+      "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+      "logical_processors": 16,
+      "physical_memory_bytes": 51343966208
+    },
+    "conditions": "Release /fp:strict、Eigen内部並列無効。CPU affinity固定なし。同時の密計測・compile・tidyを調整して止めた単独短窓、反復中央値や改善率の主張なし。",
+    "external_memory_admission": "358397952 bytesの宣言forecast、proven upper boundなし。UVLAS所有payloadとは別。",
+    "superseded_candidate": {
+      "scope": "TwoWord/尺度snapshot追加前の未commit探索測定。正確な旧source bytesの再現証拠ではなく、最終測定と混同しない履歴だけとして保存し受入には使わない。",
+      "prepare_seconds": 0.0637516,
+      "solve_seconds": 0.309055,
+      "process_lifetime_peak_resident_bytes": 110653440
+    }
+  },
+  "mutations": {
+    "isolated_copy": true,
+    "compiler_warnings_as_errors": true,
+    "unchanged_control": "元の実行では製品Release CTestsだけを対照にした。同じ隔離runnerの非変異controlは未実行だった。後続のim00-7-isolated-control.jsonでcontrolから3変異まで同一条件で新しく実行した。",
+    "results": [
+      {
+        "name": "content",
+        "exit": 42,
+        "failed_cases": 1,
+        "failed_assertions": 1
+      },
+      {
+        "name": "low_word",
+        "exit": 42,
+        "failed_cases": 3,
+        "failed_assertions": 3
+      },
+      {
+        "name": "permutation",
+        "exit": 42,
+        "failed_cases": 1,
+        "failed_assertions": 12
+      }
+    ],
+    "patches": [
+      {
+        "name": "content",
+        "path": "src/numerics/sparse_solve.cpp",
+        "original": "!same_matrix(original.values(), data.original)",
+        "replacement": "(!same_matrix(original.values(), data.original) && false)",
+        "original_sha256": "2166a62684eecc45ec9d088d07c6df8b2ead6a4f7a2e367faebd964cb19a19c2"
+      },
+      {
+        "name": "low_word",
+        "path": "src/numerics/sparse_solve.cpp",
+        "original": "update->lo;",
+        "replacement": "0;",
+        "original_sha256": "2166a62684eecc45ec9d088d07c6df8b2ead6a4f7a2e367faebd964cb19a19c2"
+      },
+      {
+        "name": "permutation",
+        "path": "src/numerics/sparse_triangular.cpp",
+        "original": "const auto mapped = permutation.indices()[original];",
+        "replacement": "const auto mapped = original + (permutation.size() == n ? 0 : 0);",
+        "original_sha256": "fa15d6fef00fbc1821f939099c976fc46f8121ee9a523cf1c7976338dbe6039d"
+      }
+    ]
+  },
+  "sources": {
+    "CMakeLists.txt": "e0adfd2dc4764d20b956c664b1ec69c50acc07419701b2572848a32dd1cdaad2",
+    "tests/CMakeLists.txt": "e48d4a892bf8d01f3932748f57614d7439297c11afd5885da8cc93797bd0fc33",
+    "docs/build.md": "7f554990027bdc95e21ad979b82d4711bab2093d25bbf06b23b67c5d13e14a91",
+    "docs/conventions.md": "340984aa132f43a678d477c2216e068aa6c5f86f2694bbd487d747f93e791eab",
+    "docs/specs/foundation/sparse-solve-contract.md": "8f49845c0436ad38eca6403cd3c87e98bdc1ba8c592001a3d76e0341e433867c",
+    "include/uvlas/numerics/sparse_solve.hpp": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+    "src/numerics/sparse_solve.cpp": "2166a62684eecc45ec9d088d07c6df8b2ead6a4f7a2e367faebd964cb19a19c2",
+    "src/numerics/sparse_spd.cpp": "c33e0702216468eccf8df150b364be41be8e1a5aee6d1c0e0ac697d95653a2af",
+    "src/numerics/sparse_spd.hpp": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+    "src/numerics/sparse_triangular.cpp": "fa15d6fef00fbc1821f939099c976fc46f8121ee9a523cf1c7976338dbe6039d",
+    "src/numerics/sparse_triangular.hpp": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+    "tests/numerics/sparse_allocation_test.cpp": "7783160fa07cae58d14bfe6d0b1d9ee8b4e4fe8f63d8ed874e69dd0636e255dc",
+    "tests/numerics/sparse_capacity_test.cpp": "caa01066f735a8bcd810178b568b03f0152d86e28e9c61b699b8afb161fc8596",
+    "tests/numerics/sparse_solve_test.cpp": "107bded2c9f8992086523e6a83c4ff43213422ad2b3e3b60cddb7633900cc5d1",
+    "tests/numerics/sparse_spd_test.cpp": "3ca1075dd83f72c604cdc01ccf01709a9e8924c0c774bb3dc8c0b42eaf2fcce5",
+    "tests/numerics/sparse_test_support.hpp": "98653f3a90ab15ccf350f9aea32adfcf35911fdf909c6b3b03f3a5b05df8c27b",
+    "tests/numerics/sparse_triangular_test.cpp": "d0e53b85e3d76a1de0160ac170b080cb9f1d42fe0313453b98714295d87d334a",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/linear_result.cpp": "c2609291c7ff9b2a3b941918267d97f36bbfa5671969a57f89df82c657e28186",
+    "src/numerics/linear_validation.cpp": "4e6a50603eb991b45f22c2f0db7dca3c0ef002491560fda8f16b2b2dbc132de9",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "src/numerics/backend_memory.cpp": "d89105fbfda46249b2ef5d0355b5bcb73972dcd47607b8d15214997b7da7ce5a",
+    "src/numerics/backend_memory_detail.hpp": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-7-debug-clean.txt": "c5bfa13bf3f28bd1cecd6190af54623aa6d4505fd5276b2ce53dfe98a1ff01de",
+    "docs/verification/IM-00/im00-7-capacity.txt": "04ad5f2969ab8373984191a179cae471a36e5e8c80757237d227adbfac6960d2",
+    "docs/verification/IM-00/im00-7-mutation-content.txt": "14c28dda1acd6aea85203ce8f44bb269810176b435fff11539a6b42cf7a933e5",
+    "docs/verification/IM-00/im00-7-mutation-low-word.txt": "b05adea640bcd6c673872f6bea95942aca46995641252446fdf711ebf254fe37",
+    "docs/verification/IM-00/im00-7-mutation-permutation.txt": "db52d85d26a127266c5b198c2fd713e329281a00349f3975e8a8bf7bf326973e"
+  },
+  "publication": {
+    "original_local_evidence_commit": "83100018c5586d87e291e1473bf549df241746e2",
+    "source_commit_retained": "cf237d094ae9fe1af03d105e81b61eddd2c76ea0",
+    "redaction_record": "docs/verification/IM-00/im00-7-redaction.json",
+    "note": "元のローカル証拠は旧branchへ保持。公開copyのログだけ既存redactorで伏字化しartifact hashを更新した。元の実行結果の再実行や上書きではない。"
+  }
+}

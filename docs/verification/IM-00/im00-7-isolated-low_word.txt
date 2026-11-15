@@ -1,0 +1,8 @@
+RNG seed: 424242
+<repo>\tests\numerics\sparse_test_support.hpp(19): failed: explicitly with 1 message: 'Unexpected failure code 7'
+<repo>\tests\numerics\sparse_test_support.hpp(19): failed: explicitly with 1 message: 'Unexpected failure code 7'
+<repo>\tests\numerics\sparse_test_support.hpp(19): failed: explicitly with 1 message: 'Unexpected failure code 7'
+test cases:  16 |  13 passed | 3 failed
+assertions: 141 | 138 passed | 3 failed
+
+
