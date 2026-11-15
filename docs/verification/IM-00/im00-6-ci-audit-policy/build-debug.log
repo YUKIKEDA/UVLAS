@@ -1,0 +1,12 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring done (0.7s)
+-- Generating done (0.2s)
+-- Build files have been written to: <repo>/out/build/windows-msvc
+[0/4] Re-checking globbed directories...
+[1/9] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\windows-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/windows-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/9] Building CXX object tests\CMakeFiles\uvlas_test_numerics_backend_memory.dir\Debug\numerics\backend_memory_test.cpp.obj
+[3/9] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[4/9] Linking CXX static library Debug\uvlas_core_audit.lib
+[5/9] Building CXX object tests\CMakeFiles\uvlas_test_numerics_backend_memory.dir\Debug\support\allocation_audit.cpp.obj
+[6/9] Linking CXX executable tests\Debug\uvlas_test_numerics_backend_memory.exe

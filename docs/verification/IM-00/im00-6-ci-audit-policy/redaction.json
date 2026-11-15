@@ -1,0 +1,42 @@
+{
+  "schema": "uvlas.verification-redaction/1",
+  "policy": "既存tools/rd/redact.pyで個人・機械のパスだけを伏字にした。CI診断と試験結果は変更していない。",
+  "files": [
+    {
+      "artifact": "build-debug.log",
+      "pristine_sha256": "fee55c985bb10975826d3c806bac212a4a4d7e9ce516dd42cdccbd0a6f7c1174",
+      "sha256": "22a549c55b9010a381e69b7074c3866aaafeb4f6b69a9e00cb1393c2fea80369",
+      "replacements": 5
+    },
+    {
+      "artifact": "build-release.log",
+      "pristine_sha256": "b1f76f67cafded591c97ff84a567335ecec262b4cd030269bde88d975b69651e",
+      "sha256": "53812794d00a158401a6a2c16b3ac355cefe5fc90d28bed02769458bf340e193",
+      "replacements": 4
+    },
+    {
+      "artifact": "test-debug.log",
+      "pristine_sha256": "6c161327551c89ecf6a63866d27b77773e1b307c64c7e3169c0b898f741a2946",
+      "sha256": "b462c06b2010997f792999f40940cc179ba585ad93f6c7d5cc702df0b85511d7",
+      "replacements": 2
+    },
+    {
+      "artifact": "test-release.log",
+      "pristine_sha256": "6c161327551c89ecf6a63866d27b77773e1b307c64c7e3169c0b898f741a2946",
+      "sha256": "b462c06b2010997f792999f40940cc179ba585ad93f6c7d5cc702df0b85511d7",
+      "replacements": 2
+    },
+    {
+      "artifact": "registration.log",
+      "pristine_sha256": "a19c7fe542b2be0b7fab06aded7250ac184903f81650edfc8f77490b08c14155",
+      "sha256": "49446f7bff6d7787d7c30c322add69ee11286410f22814771b327d9e5cf073c8",
+      "replacements": 2
+    },
+    {
+      "artifact": "linux-failure-excerpt.log",
+      "pristine_sha256": "70ffd98234a67a8cb5d3b1c4e7f8a842359f27dfae7dc49cef080159107aa4ba",
+      "sha256": "07b7cb16c05518e172177782f0564c33fe0f059d8e54855fb39fb48fa3b8d10a",
+      "replacements": 2
+    }
+  ]
+}
