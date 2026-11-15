@@ -1,0 +1,71 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "IO4-02",
+    "N4-03"
+  ],
+  "package": "IM-00",
+  "issue": 14,
+  "date": "2026-11-15",
+  "scope": "PR50 review correction: explicitly bounded mutex insertion order and non-consuming overlap regression; warnings unchanged",
+  "source_commit": "0695bbbbfcedeca4c8ff202cfcad4ca9e505b289",
+  "native_fix_commit": "5d15be399617ed5b156f62971a08d9cba5631822",
+  "review": {
+    "comment": 4577532825,
+    "reviewed_head": "2be838bf20a6ff78837ad2fdc66980dc81cd395c",
+    "job": 132741363993,
+    "observed_failure": "GCC14 Release -Werror=array-bounds in libstdc++ std::sort expansion from OwnerLocks, before module generation and Python tests"
+  },
+  "correction": "Reject more than 3 or null mutex inputs before locking. Bounded insertion sort uses std::less<mutex*> total order; skip adjacent duplicates and immediately unlock successful prefix after a failed try_lock. All current callers use 1 or 2 mutexes.",
+  "similar_search": "Other product std::sort uses are variable-sized PlannedBuffer ranges in numerics/storage.cpp; no other fixed mutex array sort found.",
+  "execution_provenance": "Module first compiled from clean 5d15be3 and C++ TU linted there. Python contention test corrected in 0695bbb without changing C++ source. Final module relink and python.ownership executed from clean 0695bbb. This new record/trace update is metadata only; older verification records are unchanged historical evidence.",
+  "checks": [
+    {
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build out/build/python-msvc --config Release --target uvlas_python",
+      "result": "success",
+      "environment": "Windows11 MSVC19.51 Release; CPython3.12.8 NumPy2.3.5 pybind11 3.1.0; warnings-as-errors unchanged"
+    },
+    {
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --test-dir out/build/python-msvc -C Release -R '^python.ownership$' --output-on-failure",
+      "passed": 1,
+      "total": 1,
+      "python_unittest_methods": 10
+    },
+    {
+      "command": "uvx clang-tidy@21.1.1 -p out/tidy-python --quiet src/python/module.cpp",
+      "result": "success; one feature-configured Release TU, no warning suppression"
+    },
+    {
+      "command": "uvx clang-format@21.1.2 --dry-run --Werror src/python/module.cpp",
+      "result": "success"
+    },
+    {
+      "command": "uvx ruff@0.17.4 check tests/python/test_ownership.py; uvx ruff@0.17.4 format --check tests/python/test_ownership.py",
+      "result": "success"
+    },
+    {
+      "command": "uv run .agents/skills/natural-japanese/scripts/lint.py --json docs/specs/foundation/python-binding-contract.md",
+      "result": "0 findings"
+    }
+  ],
+  "regression_scope": "The existing real-hash/GIL test first observes busy through a GIL-held getter, then probes commit with a different-trial packet that can never consume the candidate. InvalidInput indicates contention; StaleGeneration permits a missed window after worker completion. The packet remains available and a separate valid packet commits after join. This is not a claim that a specific address order or acquired-prefix failure branch was observed at runtime.",
+  "inspection_scope": "The input-size guard bounds count to 3 before any writes; insertion only shifts within that prefix; std::less orders unrelated mutex pointers portably; adjacent duplicate skip avoids relocking one owner; reverse prefix unlock leaves all unique_locks non-owning on rejection. Capacity3/duplicate inputs are not constructible through current public operations and no production hook was added solely to expose them.",
+  "sources": {
+    "src/python/module.cpp": "e83342e7a1b6a11068192ba4a3ddd869f0dbd7e2dcc1b1c8e26eeb05b631a075",
+    "tests/python/test_ownership.py": "439a188ef6b22c0fa9e2254f9ee9211d0d521d0a6712bfad2938be5aae73bdd2",
+    ".cursor/rules/cpp.mdc": "0d5c989924bc85006ad8ecbae8e6283fad228580a98a1525cf6d4b0f426ace29",
+    "docs/specs/foundation/python-binding-contract.md": "f076da1115a2e53557e0e2f4953a54f1e1efa447e886a5b509f1797379f3e619"
+  },
+  "artifacts": {},
+  "not_rerun": [
+    "Pinned dependency/notices tests",
+    "Precision numerical tests",
+    "Unrelated global tests"
+  ],
+  "not_claimed": [
+    "Linux fix execution",
+    "Both-OS Issue14 completion",
+    "Physical solver correctness or acceptance"
+  ],
+  "ci": "Linux GCC14 validation is delegated to the existing optional PR job; CI not awaited. IM00-10 stays In progress."
+}

@@ -132,3 +132,7 @@ kernelの計測は [benchmarks/README.md](../benchmarks/README.md) の独立し�
 | 2026-11-12 | GitHub Actions：ubuntu-24.04／GCC 14.2.0、windows-2025／MSVC | PR #28のCI。Linuxは `linux-debug`、`linux-release`、`linux-sanitize` のビルドと試験8件、Windowsは同じ8件、フォーマット、Skillの複製、追跡、R&Dツリーの検査 |
 
 開発機にLinux（GCC 14）の環境は無い。Linuxの確認は、CIの実行による。
+
+## Python結合の任意構成
+
+`UVLAS_BUILD_PYTHON=ON` とvcpkgの `tests;python` featureを、通常構成とは別の導入prefixへ指定する。外部CPython 3.12のInterpreter・Development.ModuleとNumPy 2.xを使う。構築例とAPIの使い方は [Python拡張](../src/python/README.md)。通常の `just lint` は任意moduleを除き、その構成のcompile databaseを使う専用のclang-tidyと `python.ownership` をWindows/LinuxのCIで実行する。ケースのrun/resumeとwheel配布はIM-06。

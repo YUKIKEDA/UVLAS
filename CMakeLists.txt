@@ -12,6 +12,7 @@ include(cmake/ProjectOptions.cmake)
 # Resolve CTest's default BUILD_TESTING=ON before selecting required notices.
 include(CTest)
 option(UVLAS_BUILD_BENCHMARKS "Build the separately linked kernel benchmarks" OFF)
+option(UVLAS_BUILD_PYTHON "Build the low-level CPython product bindings" OFF)
 include(cmake/Dependencies.cmake)
 
 # The platform key under which numerical results are qualified (QA-07).
@@ -49,10 +50,18 @@ if(WIN32)
     target_link_libraries(uvlas_core PRIVATE psapi)
 endif()
 
-add_library(uvlas_numerics STATIC src/numerics/storage.cpp)
+add_library(uvlas_numerics STATIC src/numerics/storage.cpp src/numerics/precision.cpp)
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_numerics PUBLIC uvlas_core)
+
+if(UVLAS_BUILD_PYTHON)
+    if(NOT "python" IN_LIST VCPKG_MANIFEST_FEATURES)
+        message(FATAL_ERROR "UVLAS_BUILD_PYTHON requires the vcpkg python feature")
+    endif()
+    set_target_properties(uvlas_core uvlas_numerics PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    add_subdirectory(src/python)
+endif()
 
 # QA-03: the first baseline case. Built with the product flags, compared by CTest.
 add_executable(uvlas_numeric_canary qa/numeric_canary/main.cpp)

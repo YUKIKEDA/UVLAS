@@ -76,3 +76,14 @@ if (!pin.has_value()) {
 }
 use(*pin);
 ```
+
+構造化束縛でコンテナの要素を読むrange-forは、コピーが必要でなければ`const auto& [a, b]`で受ける。2026-11-15、PR #49の試験がpairを値で束縛し、MSVCでは通ったがGCCの`-Werror=range-loop-construct`でLinuxのDebug・Release・sanitizer構成がコンパイルに失敗した。コピーを省く修正だけなら数値経路を再実行せず、影響する翻訳単位をコンパイルする。
+
+```cpp
+// BAD: copying every pair can be rejected by another supported compiler.
+for (const auto [a, b] : pairs) { use(a, b); }
+// GOOD: borrow read-only elements when no independent copy is needed.
+for (const auto& [a, b] : pairs) { use(a, b); }
+```
+
+少数要素用の固定配列を並べる補助処理も、入力件数と添字の上限を明示する。2026-11-15、PR #50のmutex順序付けは、3要素配列のprefixに対するstd::sortからlibstdc++の大範囲処理が展開され、GCC 14 Releaseの `-Werror=array-bounds` で構築に失敗した。容量を検査する小さな挿入ソートへ替え、`std::less` のポインタ全順序、重複排除、try-lock失敗時の取得済みlock解放を維持した。警告を無効にせず、対象翻訳単位と接続する処理で確認する。

@@ -1,0 +1,71 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "IO4-02",
+    "N4-03",
+    "N4-08"
+  ],
+  "package": "IM-00",
+  "issue": 14,
+  "date": "2026-11-15",
+  "scope": "Integration of independently developed precision storage registration with optional Python bindings; generated trace conflict only, no new product API dependency",
+  "source_commit": "53f9e609ce42ed50090088bd33fbaacd4094f8ad",
+  "merged_feature": "2bcb93ff2ea91d0be22b41bcd981e0f13842e072",
+  "python_premerge_head": "0682bfaddbbbf65a183776f793b8611ba89719ca",
+  "execution_provenance": "Normal merge committed before build. Rebuilt precision.cpp in the existing numerics static library and relinked Python module/CLI from clean source_commit; only python.ownership CTest was rerun. This record and the derived trace update are metadata-only follow-up.",
+  "historical_record": "docs/verification/IM-00/im00-10.json remains byte-identical to its original 0682bfa commit and records clean a668b53 evidence. Its shared-file hashes are historical pre-integration hashes, not assertions about this merged head.",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "53f9e609ce42ed50090088bd33fbaacd4094f8ad",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Release",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "checks": [
+    {
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build out/build/python-msvc --config Release --target uvlas_python uvlas_cli",
+      "result": "success",
+      "configuration": "Windows MSVC Release; dedicated Python feature prefix; external CPython3.12.8 NumPy2.3.5 pybind11 3.1.0"
+    },
+    {
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --test-dir out/build/python-msvc -C Release -R '^python.ownership$' --output-on-failure",
+      "passed": 1,
+      "total": 1,
+      "python_unittest_methods": 10
+    },
+    {
+      "command": "python -X utf8 tools/qa/trace.py matrix; python -X utf8 tools/qa/trace.py check",
+      "result": "Generated from both merged source/evidence sets; no manual row arithmetic"
+    }
+  ],
+  "resolution": "Only docs/quality/traceability.md conflicted. Rebuilt it through trace.py matrix. All CMake, tests registration, conventions and roadmap merged automatically. IM00-5 Done, current IM00-6, IM00-10 In progress retained.",
+  "sources": {
+    "CMakeLists.txt": "ca68aa119ecb9b0afc3242bc4899c86a417c7ebd36186fa0cda3ceea09ab99e9",
+    "tests/CMakeLists.txt": "6b0138321e063629209b97c060e1bb62cef0fb4725fda33a626b0e8742eabc91",
+    "docs/conventions.md": "0ee5b38c6221ea605c49b2bb194512ae206dc7b63322520bb9d612667633e9c1",
+    "docs/roadmap.md": "c1cd575e1f67c699fd081c10bfb6796ee1719caa4c4de4e5f8ae9396774e2345",
+    "src/numerics/precision.cpp": "bdf78542f7d875493f8f2cbffed292804469b135141e05eae5967703f3ac54f0",
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "src/python/CMakeLists.txt": "58a3ee3264552d7f908a59ba063da089c94a94559fcd338c03680fa8a1fff5ba",
+    "src/python/module.cpp": "c47cd858e3535a0327977006c142407ed7c2c64e635ef1f08b0606c6c9fb6966",
+    "tests/python/test_ownership.py": "49de5a4e154025c12ba160e064510e606dcdd64525ca8f551346fccea65451fe"
+  },
+  "artifacts": {},
+  "not_claimed": [
+    "Rerun of precision numerical suite or unrelated global tests",
+    "Linux execution or both-OS Issue14 completion",
+    "Physical solver quality or practical acceptance"
+  ],
+  "ci": "Not awaited; Python feature PR should target the precision feature branch until PR49 is adopted, then main."
+}
