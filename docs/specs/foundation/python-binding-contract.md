@@ -28,7 +28,7 @@ viewはWRITEABLEを解除するだけでなく、baseの所有者がwritable buf
 
 入力の検査とコピーをGIL保持中に終え、所有済みC++配列の検査、候補hash、qualify、commitの間だけGILを解放する。その区間にはPython callback、Python属性操作、Python参照カウントの変更を入れない。
 
-ResourcePlan、Trial、資格packetには所有者ごとにmutexを持たせ、各所有者のgetterと変更処理で共用する。残量・有効性の取得も含め、全入口をtry-lockで拒否できるようにする。複数所有者はアドレス順に非blocking取得し、途中で取れなければ解放して `InvalidInput` を返す。GIL保持中にworkerの終了をmutexで待たない。単一の通常GIL interpreterだけを対象とし、free-threaded CPythonと複数interpreterは認定しない。
+ResourcePlan、Trial、資格packetには所有者ごとにmutexを持たせ、各所有者のgetterと変更処理で共用する。残量・有効性の取得も含め、全入口をtry-lockで拒否できるようにする。複数所有者は容量3以下を検査した上で `std::less<std::mutex*>` の全順序に挿入ソートし、重複を除いて非blocking取得する。途中で取れなければ、取得済みlockをその場で解放して `InvalidInput` を返す。GIL保持中にworkerの終了をmutexで待たない。単一の通常GIL interpreterだけを対象とし、free-threaded CPythonと複数interpreterは認定しない。
 
 commitはPythonのResult、成功所有者、holderを先に確保する。native commitの成功後には `noexcept` なAcceptedStateのmove/emplaceだけを残す。置換・cancelもPython Resultとその参照を変更前に準備する。包装用の確保失敗で候補だけが消費され、Accepted結果が失われる順序を作らない。
 

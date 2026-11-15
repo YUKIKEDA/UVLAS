@@ -99,13 +99,35 @@ class OwnerLocks {
 public:
     explicit OwnerLocks(std::initializer_list<std::mutex*> mutexes) {
         std::array<std::mutex*, 3> ordered{};
-        std::copy(mutexes.begin(), mutexes.end(), ordered.begin());
-        auto end = ordered.begin() + static_cast<std::ptrdiff_t>(mutexes.size());
-        std::sort(ordered.begin(), end, std::less<std::mutex*>{});
-        end = std::unique(ordered.begin(), end);
-        for (auto current = ordered.begin(); current != end; ++current) {
-            locks_[size_] = std::unique_lock<std::mutex>{**current, std::try_to_lock};
+        if (mutexes.size() > ordered.size()) {
+            return;
+        }
+        // An explicitly bounded insertion sort avoids libstdc++ introsort's
+        // large-range paths for this tiny prefix, without suppressing warnings.
+        std::size_t count = 0;
+        for (auto* mutex : mutexes) {
+            if (mutex == nullptr) {
+                return;
+            }
+            auto position = count;
+            while (position > 0 && std::less<std::mutex*>{}(mutex, ordered[position - 1])) {
+                ordered[position] = ordered[position - 1];
+                --position;
+            }
+            ordered[position] = mutex;
+            ++count;
+        }
+        for (std::size_t index = 0; index < count; ++index) {
+            if (index > 0 && ordered[index] == ordered[index - 1]) {
+                continue;
+            }
+            locks_[size_] = std::unique_lock<std::mutex>{*ordered[index], std::try_to_lock};
             if (!locks_[size_].owns_lock()) {
+                // Release the successful prefix immediately on partial failure.
+                // No caller waits with the GIL held, even for duplicate owners.
+                while (size_ > 0) {
+                    locks_[--size_].unlock();
+                }
                 return;
             }
             ++size_;

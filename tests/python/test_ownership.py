@@ -335,6 +335,7 @@ for method, rest in [(u.TrialState.payload_copy, [None]),
         model = self.model(plan)
         source = np.zeros(40_000_000, dtype=np.uint8)
         trial = self.success(uvlas.TrialState.initial(model, 1, 1, source, plan))
+        packet = self.packet(model, trial)
         started = threading.Event()
         completed = threading.Event()
         results = []
@@ -355,10 +356,12 @@ for method, rest in [(u.TrialState.payload_copy, [None]),
         overlap = False
         deadline = time.monotonic() + 30
         while not completed.is_set() and time.monotonic() < deadline:
-            result = trial.active()
+            result = uvlas.commit_initial(trial, packet, 0)
             if not result.ok:
                 self.failure(result, uvlas.FailureCode.InvalidInput)
                 overlap = True
+                # A rejected multi-owner call must release any acquired packet lock.
+                self.assertFalse(self.success(packet.consumed()))
                 source.fill(9)
                 break
         worker.join(timeout=30)
@@ -372,6 +375,9 @@ for method, rest in [(u.TrialState.payload_copy, [None]),
         np.testing.assert_array_equal(
             self.success(trial.payload_copy(self.plan(40_000_000))).view(), 0
         )
+        accepted = self.success(uvlas.commit_initial(trial, packet, 0))
+        self.assertTrue(self.success(packet.consumed()))
+        np.testing.assert_array_equal(accepted.payload(), 0)
 
 
 if __name__ == "__main__":
