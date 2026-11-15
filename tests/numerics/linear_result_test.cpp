@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <optional>
 #include <span>
@@ -44,7 +45,7 @@ struct Fixture {
     std::array<double, 1> residual{3};
     std::array<UnitDimensions, 1> unknown_units{UnitDimensions{1, 0, 0, 0, 0, 0, 0}};
     std::array<UnitDimensions, 1> residual_units{UnitDimensions{1, 1, -2, 0, 0, 0, 0}};
-    Scales scales() const {
+    [[nodiscard]] Scales scales() const {
         return {unknown, residual, unknown_units, residual_units, system_context()};
     }
     factory::MetadataBuffers metadata(std::span<const ConsumerCheck> checks = {}) {
@@ -71,7 +72,7 @@ struct Fixture {
         REQUIRE(value);
         return std::move(*value);
     }
-    factory::Finalization finalization(bool two_word = false) const {
+    [[nodiscard]] factory::Finalization finalization(bool two_word = false) const {
         return {system_context(),
                 core::RhsGeneration{30},
                 core::NumericalGeneration{31},
@@ -84,7 +85,7 @@ struct Fixture {
     }
 };
 
-enum class Fault {
+enum class Fault : std::uint8_t {
     None,
     Observation,
     Scope,
@@ -103,13 +104,13 @@ public:
     mutable unsigned calls = 0;
     mutable bool saw_retained_low = false;
     mutable bool saw_projection = false;
-    SupportedPrecision supported_precision() const noexcept override {
+    [[nodiscard]] SupportedPrecision supported_precision() const noexcept override {
         return support;
     }
-    core::Result<core::ErrorCertificate> assess(const PrecisionBuffer<double>& retained,
-                                                const PrecisionBuffer<double>& candidate,
-                                                const Context& context, const ConsumerCheck& check,
-                                                core::CertificateContext expected) const override {
+    [[nodiscard]] core::Result<core::ErrorCertificate>
+    assess(const PrecisionBuffer<double>& retained, const PrecisionBuffer<double>& candidate,
+           const Context& context, const ConsumerCheck& check,
+           core::CertificateContext expected) const override {
         ++calls;
         const auto active_fault = calls == fault_call ? fault : Fault::None;
         CHECK(context == system_context());
@@ -150,7 +151,7 @@ constexpr std::array checks{
 TEST_CASE("Result owns physical metadata and every necessary consumer proof",
           "[unit][verification][N4-05][N4-06]") {
     Fixture fixture;
-    Evaluator evaluator;
+    const Evaluator evaluator;
     auto metadata = fixture.metadata(checks);
     fixture.unknown[0] = 100;
     fixture.residual[0] = 200;
@@ -206,7 +207,7 @@ TEST_CASE("Consumer proofs must match exact identity budget representation and a
 TEST_CASE("Projection certifies the returned candidate while retaining source diagnostics",
           "[verification][negative][N4-06]") {
     Fixture fixture;
-    Evaluator evaluator;
+    const Evaluator evaluator;
     auto result = factory::SolutionFactory::finalize(
         fixture.buffer(core::NumericalGeneration{50}, true),
         std::optional{fixture.buffer(core::NumericalGeneration{51})},
@@ -232,7 +233,7 @@ TEST_CASE("No algebraic failure or uncomputed column is published as an owning s
           "[negative][N4-05][N4-06]") {
     for (int fault = 0; fault < 5; ++fault) {
         Fixture fixture;
-        Evaluator evaluator;
+        const Evaluator evaluator;
         auto metadata = fixture.metadata(checks);
         if (fault == 0) {
             metadata.retained_columns.values()[0].normalized_original_residual_upper = 2;

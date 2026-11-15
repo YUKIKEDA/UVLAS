@@ -307,6 +307,14 @@ void check_known_failure(const core::Result<Value>& result) {
     CHECK(result.error().details.trial == core::TrialId{11});
     CHECK(result.error().details.numerical_generation == core::NumericalGeneration{5});
 }
+void check_resource_usage(const core::Failure& failure, const core::ResourceUsage& expected) {
+    const auto& resources = failure.details.resources;
+    if (resources.has_value()) {
+        CHECK(*resources == expected);
+    } else {
+        FAIL("failure must retain its known resource diagnostic");
+    }
+}
 template <StorageScalar Scalar>
 class DiagnosticConsumer final : public ConsumerEvaluator<Scalar> {
 public:
@@ -332,18 +340,16 @@ TEST_CASE("Every dense public boundary completes known failure identities and pr
     const DenseOperator real_op{a, context()};
     const auto prepare_real = DensePrepared::prepare(real_op, input.scales(), input.limits(), none);
     check_known_failure(prepare_real);
-    REQUIRE(prepare_real.error().details.resources);
-    CHECK(*prepare_real.error().details.resources ==
-          core::ResourceUsage{core::ResourceKind::Bytes, 4 * sizeof(double), 0});
+    check_resource_usage(prepare_real.error(),
+                         core::ResourceUsage{core::ResourceKind::Bytes, 4 * sizeof(double), 0});
     auto real_prepared = input.prepare(a);
     const auto solve_real = solve_linear(
         real_op, Rhs{b, context(), core::RhsGeneration{1}}, input.scales(),
         Precision<double>{RetainedPrecision{core::NumericalGeneration{40}}, {}, input.consumer},
         input.accuracy(), input.limits(), real_prepared, none);
     check_known_failure(solve_real);
-    REQUIRE(solve_real.error().details.resources);
-    CHECK(*solve_real.error().details.resources ==
-          core::ResourceUsage{core::ResourceKind::Bytes, sizeof(ColumnMetrics), 0});
+    check_resource_usage(solve_real.error(),
+                         core::ResourceUsage{core::ResourceKind::Bytes, sizeof(ColumnMetrics), 0});
     using Complex = std::complex<double>;
     const std::array<Complex, 2> zero{Complex{}, Complex{}}, load{Complex{4}, Complex{6}};
     auto u = DenseComplex::copy({2, 1, 2}, zero, input.source_plan, core::Operation::SolveLinear);
@@ -360,9 +366,8 @@ TEST_CASE("Every dense public boundary completes known failure identities and pr
     const auto prepare_complex =
         UpdatedPrepared::prepare(updated, input.scales(), input.limits(), none);
     check_known_failure(prepare_complex);
-    REQUIRE(prepare_complex.error().details.resources);
-    CHECK(*prepare_complex.error().details.resources ==
-          core::ResourceUsage{core::ResourceKind::Bytes, 4 * sizeof(double), 0});
+    check_resource_usage(prepare_complex.error(),
+                         core::ResourceUsage{core::ResourceKind::Bytes, 4 * sizeof(double), 0});
     auto complex_prepared =
         UpdatedPrepared::prepare(updated, input.scales(), input.limits(), input.workspace_plan);
     REQUIRE(complex_prepared);
@@ -372,9 +377,8 @@ TEST_CASE("Every dense public boundary completes known failure identities and pr
         Precision<Complex>{RetainedPrecision{core::NumericalGeneration{40}}, {}, complex_consumer},
         input.accuracy(), input.limits(), *complex_prepared, none);
     check_known_failure(solve_complex);
-    REQUIRE(solve_complex.error().details.resources);
-    CHECK(*solve_complex.error().details.resources ==
-          core::ResourceUsage{core::ResourceKind::Bytes, sizeof(ColumnMetrics), 0});
+    check_resource_usage(solve_complex.error(),
+                         core::ResourceUsage{core::ResourceKind::Bytes, sizeof(ColumnMetrics), 0});
     CHECK(none.allocated_bytes() == 0);
     // Consumer failures can identify a different numerical observation and explicit resource unit.
     for (const bool all_known : {false, true}) {
