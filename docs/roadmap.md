@@ -2,9 +2,9 @@
 
 作業の順序と状態の正本。行が持つのはID、種類、題、Issue、状態だけで、完了条件はIssueに書く。行の追加と削除はGrillの後に行う。「今」を書き換えるのは、その行を終えるPRだけ。
 
-**今**：IM00-8
+**今**：IM00-11
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。密・疎の保持IM00-4、状態契約IM00-9、精度保持・明示投影IM00-5も実装した。Python結合IM00-10は、実装済みの保持・状態処理についてWindows/Linuxの所有権・失敗境界の検証を終え、採用した。密基準解法IM00-6と疎基準解法IM00-7を実装した。次は固定前処理の再始動GMRESと線形精度の認定IM00-8を進め、その後にIM00-11でパッケージを判定する。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。密・疎の保持IM00-4、状態契約IM00-9、精度保持・明示投影IM00-5も実装した。Python結合IM00-10は、実装済みの保持・状態処理についてWindows/Linuxの所有権・失敗境界の検証を終え、採用した。密基準解法IM00-6と疎基準解法IM00-7を実装した。固定前処理の再始動GMRESと線形精度の認定IM00-8も実装した。次はIM00-11で、設計試作の参照を製品経路へ接続してIM-00パッケージを判定する。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -60,7 +60,7 @@ flowchart LR
 | IM00-5 | Feat | PrecisionBuffer、two-product・補償残差、TwoWordの保持と明示投影 | #9 | Done |
 | IM00-6 | Feat | 密基準解法：pivot付きLU、実LU＋複素後縁更新、反復改良 | #10 | Done |
 | IM00-7 | Feat | 疎基準解法：対称正定値を確かめたLLT、不定KKTのSparseLU | #11 | Done |
-| IM00-8 | Feat | 固定前処理の再始動GMRESと線形精度の認定 | #12 | Todo |
+| IM00-8 | Feat | 固定前処理の再始動GMRESと線形精度の認定 | #12 | Done |
 | IM00-9 | Feat | Model参照、AcceptedState／TrialState、Workspace、cache世代、資格と一回確定 | #13 | Done |
 | IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | Done |
 | IM00-11 | Test | IM-00の完了gate：設計試作の4数値群を製品経路で検証する | #15 | Todo |

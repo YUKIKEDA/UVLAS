@@ -40,8 +40,11 @@ public:
                          right = i + 1 < x.size() ? x[i + 1] * 0.25 : 0;
             out[i] = (x[i] - left) - right;
             tail[i] = 0;
-            error[i] = 8 * std::numeric_limits<double>::epsilon() *
-                       (std::abs(x[i]) + std::abs(left) + std::abs(right));
+            // Include gradual-underflow losses even when a scaled term rounds to zero.
+            error[i] = std::nextafter(8 * std::numeric_limits<double>::epsilon() *
+                                              (std::abs(x[i]) + std::abs(left) + std::abs(right)) +
+                                          4 * std::numeric_limits<double>::denorm_min(),
+                                      std::numeric_limits<double>::infinity());
         }
         return {};
     }
