@@ -56,7 +56,7 @@ flowchart LR
 | IM00-1 | Feat | 固定した数値依存の機能とライセンス通知を検査する | #5 | Done |
 | IM00-2 | Feat | 強いID、checked 64bit寸法、ResourcePlan | #6 | Done |
 | IM00-3 | Feat | Failure／expected と ErrorCertificate | #7 | Done |
-| IM00-4 | Feat | 密・CSC疎の保持、DofLayout、PointSoA | #8 | Todo |
+| IM00-4 | Feat | 密・CSC疎の保持、DofLayout、PointSoA | #8 | Done |
 | IM00-5 | Feat | PrecisionBuffer、two-product・補償残差、TwoWordの保持と明示投影 | #9 | Todo |
 | IM00-6 | Feat | 密基準解法：pivot付きLU、実LU＋複素後縁更新、反復改良 | #10 | Todo |
 | IM00-7 | Feat | 疎基準解法：対称正定値を確かめたLLT、不定KKTのSparseLU | #11 | Todo |
