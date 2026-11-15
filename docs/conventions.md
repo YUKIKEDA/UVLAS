@@ -9,6 +9,8 @@
 | `include/uvlas/<module>/` | 製品の公開ヘッダ。現状は内部APIで、互換性は固定していない |
 | `src/<module>/` | 製品の実装。`src/app/` はCLI |
 | `tests/` | 製品の試験（Catch2、CTest）。`tests/<module>/` に分ける |
+| `tests/support/` | 確保経路の監査とthread数別のバイト比較を行う試験専用の枠 |
+| `benchmarks/` | Google Benchmarkによる製品kernelの計測。製品やCTestへリンクしない |
 | `cmake/` | コンパイラ方針、共通オプション、依存、vcpkgのoverlay port |
 | `docs/requirements/` | 製品要求、受入精度、受入計画、利用者決定の履歴 |
 | `docs/specs/<area>/` | 採用仕様。実装の正本 |
@@ -38,7 +40,7 @@
 
 | モジュール | 責任 | 導入するパッケージ |
 |---|---|---|
-| `core` | ビルド情報。強いID、checked寸法、ResourcePlan、`Failure`、`ErrorCertificate` | IM00-3の[失敗・認定の型](specs/foundation/failure-certificate-contract.md)、IM00-2の[寸法・資源契約](specs/foundation/dimensions-resource-contract.md) |
+| `core` | ビルド情報。強いID、checked寸法、ResourcePlan、失敗・誤差認定、工程時間・メモリ計測 | [失敗・認定の型](specs/foundation/failure-certificate-contract.md)、[寸法・資源契約](specs/foundation/dimensions-resource-contract.md)、[計測契約](specs/foundation/instrumentation-contract.md) |
 | `numerics` | 密・疎の保持、基準解法、精度保持、世代とWorkspace | IM-00 |
 | `structure` | PG参照係数、材料、梁、接続、荷重、回復 | IM-01、IM-02 |
 | `aero` | 渦核、後流、荷重、TE所有 | IM-03 |

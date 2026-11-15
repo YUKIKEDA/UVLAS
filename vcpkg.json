@@ -12,6 +12,10 @@
     "spectra"
   ],
   "features": {
+    "benchmarks": {
+      "description": "Kernel measurement only. Never linked into product artifacts.",
+      "dependencies": ["benchmark"]
+    },
     "tests": {
       "description": "Test framework. Never linked into the library, the CLI or the wheel.",
       "dependencies": ["catch2"]
@@ -22,6 +26,7 @@
     }
   },
   "overrides": [
+    { "name": "benchmark", "version-semver": "1.9.5" },
     { "name": "boost-hash2", "version": "1.92.0" },
     { "name": "boost-multiprecision", "version": "1.92.0" },
     { "name": "catch2", "version": "3.16.1" },

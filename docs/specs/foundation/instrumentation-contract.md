@@ -1,0 +1,54 @@
+# IM00-12の計測・確保監査の内部契約
+
+対象はN4-09、N4-03、A5-06、Issue #25。計測と数値処理を分け、計測を無効にしても計算結果を変えない。実務規模の性能を認定する文書ではない。
+
+## 工程時間は固定長の集計に記録する
+
+StageRecorderは8工程の呼出し回数と経過ナノ秒を所有する。StageScopeはsteady_clockで開始・終了を読み、例外によるscope脱出も1回として記録する。無効なrecorderでは時計を読まず、集計も変更しない。集計とscopeの開始・終了はヒープを確保しない。
+
+時間は壁時計の経過時間である。入れ子や並行工程は重なるため、工程の合計をCPU時間や全実行時間と同一視しない。各workerは自分のrecorderを持ち、可変集計を共有しない。観測を外部から追加するrecord_sampleも同じ集計に使える。無効な工程と整数overflowは失敗となり、最初の失敗を保持する。失敗した集計から正常な報告を作らない。
+
+## メモリの実測とpayloadは別の量として保存する
+
+WindowsではGetProcessMemoryInfoのWorkingSetSize／PeakWorkingSetSize、Linuxでは/proc/self/statmの常駐ページ数とgetrusageのru_maxrssをバイトへ変換する。Linuxのru_maxrssはKiB単位である。OS取得の失敗はUnsupported、バイト換算overflowはResourceExceededとし、0を測定成功の代わりに返さない。
+
+ピークはプロセス開始以来の常駐メモリの高水位であり、直前の工程だけのピークではない。ResourcePlanの成功した配列payload、payload上限、現在常駐量、ピーク常駐量を別の欄で報告する。外部ライブラリの内部領域やallocator管理領域をpayloadへ含めたとは扱わない。OSのI/OとJSON化は測定するkernelの外で行う。
+
+## 結果と条件を一緒に残す
+
+measurement_report_jsonは所有するJSON文字列を返す。形式はuvlas.measurement/1で、機械ラベル・CPU記述・論理CPU数・搭載物理メモリ、case ID、実行worker数、設定のJSON object、build-info、工程集計、メモリ4値を保存する。build-infoには版・commit・dirty状態・コンパイラ・構成・浮動小数点方針・命令セット・依存の版がある。
+
+機械条件は呼出側が実際の値を指定する。空のラベルやCPU記述、0のCPU数・搭載メモリ・worker数、objectでない設定はInvalidInputとする。JSONの構築中の例外はFailureへ変換する。コミットする記録に利用者名、hostname、機械の絶対パスを入れない。
+
+## 確保監査は対象経路とthread範囲を宣言して使う
+
+試験用AllocationAuditは、対象kernelが使うbackendを必ず指定してから開始する。標準の数値kernelの宣言はCppとEigenの組とする。Cppだけを指定してEigenやCの確保まで監視できたとは扱わない。
+
+| backend | 監査するもの | 範囲・失敗 |
+|---|---|---|
+| Cpp | global operator new/new[]。通常・aligned・nothrow、対応する解放形式 | 専用試験プロセスの全threadの試行数。scope内のworkerによる確保も数える |
+| Eigen | RuntimeNoMallocで検査されるmalloc、整列malloc、realloc | calling threadの禁止。workerにも個別のguardを置く |
+| CHeap | malloc/calloc/realloc等を直接呼ぶ任意のコード | 未対応。要求した監査はUnsupported |
+| External | 未監査の外部DLLなど、独自の確保経路 | 未対応。要求した監査はUnsupported |
+
+呼出側は必要backendを全て宣言し、省略した監査結果を認定に使わない。枠は宣言の完全性までは検証しない。未対応backendの指定、全threadを単一guardで覆うEigen保証の要求、backend無しの要求はUnsupportedとする。今後CHeapや外部backendを使うconsumerは、対応する監査を実装するまで確保無しを認定できない。Cppカウンタはプロセス全体を観測するため、無関係な負荷がある実行は証拠に使わない。
+
+guardの構築・finish・破棄は同じthreadで行う。Eigenの許可状態はthread_localで、同一threadの入れ子guardが残る間は許可を戻さない。Cppの監視区間では試験フレームワークのCHECKやthreadの生成を行わず、必要なworkerを準備してからkernelを実行し、finish後に結果を検査する。負対照では、通常・配列・aligned・nothrowの8形式と、既に起動したworkerからの確保を直接呼んで検出する。
+
+## 監査用の製品コードを同じ設定で再コンパイルする
+
+Eigenのinline定義を異なる設定で混ぜない。uvlas_core_auditは通常uvlas_coreと同じsource listから再コンパイルし、EIGEN_RUNTIME_NO_MALLOCとassert有効化を全TUへ適用する。Releaseでも監査用targetではNDEBUGを解除する。監査実行ファイルはこの監査用ライブラリだけをリンクし、通常版の製品ライブラリを混在させない。
+
+cmake/AllocationAudit.cmakeの関数は、プロジェクト内の未監査のコンパイル済み依存を、interface越しの依存やTARGET_OBJECTSによるobjectの挿入も含めて構成時に拒否する。外部のバイナリにEigenが埋め込まれている場合、その設定をこの検査で証明したとは扱わず、External backendとして拒否する。
+
+Eigen負対照は同じprobeの正常な準備済み演算を先に成功させる。その後、動的確保とconservativeResizeを別プロセスで呼び、非0終了と「heap allocation is forbidden」の診断をともに確認する。exeやDLLの欠落、別のクラッシュを禁止の成功へ数えない。
+
+## スレッド数ごとの出力をバイトで照合する
+
+tests/support/thread_determinism.hppは指定された全worker数でrunnerを呼び、所有する結果の全バイトを比較する。runnerは実際にそのworker数を使い、初期化済みの数値だけを返す。ポインタや構造体paddingを結果に混ぜない。異なる正のworker数が2種類以上無ければ比較を認めず、空・0・1種類だけの一覧は失敗とする。正対照では1・2・4 workerが同じ配列の互いに異なる成分を計算し、負対照はworker数で出力を変えて不一致を検出する。
+
+## Benchmarkは独立した配布・ビルド経路に置く
+
+Google Benchmark 1.9.5（Apache-2.0）をvcpkgのbenchmarks featureとoverrideで固定する。UVLAS_BUILD_BENCHMARKSを明示したときだけbenchmarks/を構成する。製品ライブラリ・CLI・wheelへBenchmarkをリンクしない。featureの異なる構成は専用の導入prefixを使う。
+
+最初のkernelは製品のchecked_extent_productで、固定寸法5000×64×3の検査付き整数積を測る。kernel内部のデータ準備・ヒープ確保は無い。BenchmarkのJSONには機械条件とbuild-infoの条件をcustom contextとして記録する。入力条件の環境変数が欠ければ実行を拒否する。時間の閾値は試験やCIへ入れない。この小kernelからソルバー全体の速度を見積もらない。

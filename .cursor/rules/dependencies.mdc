@@ -21,6 +21,15 @@ alwaysApply: true
 
 ## 既に決めたこと
 
+feature集合が異なる構成には別の `VCPKG_INSTALLED_DIR` を使う。他のタスクが参照中の導入prefixは読み取り専用とし、借用する構成では `VCPKG_MANIFEST_INSTALL=OFF` にする。バイナリキャッシュは共有できるが、導入prefixの内容を別のfeature集合で入れ替えない。
+
+2026-11-15、IM00-12のBenchmark構成でfeatureの区切りを誤り、共有prefixからCatch2が一時的に除去された。通常のtests構成で復元し、Benchmark用のprefixを分離した。
+
+```text
+BAD   他タスクが参照する通常prefixで、Benchmark用にfeature集合を切り替える
+GOOD  Benchmarkは専用prefixへ導入し、既存prefixの借用はmanifest installを無効にする
+```
+
 - 線形代数はEigen、固有値はSpectra、精密参照と厳密な線形拘束とSHA-256はBoost（Multiprecision、Hash2）、JSONはnlohmann/json、Pythonの結合はpybind11。
 - 試験はCatch2、kernelの計測はGoogle Benchmark。
 - BLAS、別の疎直接法、高速多重極は採用していない。足すなら、同じ原作用素と誤差の予算を、独立に検査する。

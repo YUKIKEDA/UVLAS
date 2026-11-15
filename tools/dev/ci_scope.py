@@ -53,6 +53,9 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
             selected["skills"] = True
         elif path.startswith(".cursor/") or path in {"LICENSE", "THIRD_PARTY_NOTICES.md"}:
             continue
+        elif path.startswith("benchmarks/"):
+            # Benchmarks have a dedicated optional build, never a product CI timing job.
+            selected["format"] |= path.endswith((".cpp", ".hpp"))
         elif path == "tests/toolchain/check_notices.cmake":
             selected["build"] = True
         elif path.startswith(("src/", "include/", "tests/", "qa/", "cmake/")) or path in {

@@ -173,7 +173,7 @@ jobs:
           if [ -n "$CI_CPP_FILES" ]; then
             clang-format --dry-run --Werror $CI_CPP_FILES
           else
-            clang-format --dry-run --Werror $(git ls-files 'src/*.cpp' 'include/*.hpp' 'tests/*.cpp' 'qa/*.cpp')
+            clang-format --dry-run --Werror $(git ls-files 'src/*.cpp' 'src/*.hpp' 'include/*.hpp' 'tests/*.cpp' 'tests/*.hpp' 'qa/*.cpp' 'qa/*.hpp' 'benchmarks/*.cpp' 'benchmarks/*.hpp')
           fi
       - name: Python tools
         if: needs.changes.outputs.python == 'true'

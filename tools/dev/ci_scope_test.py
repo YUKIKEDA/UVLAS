@@ -26,6 +26,11 @@ class ScopeTest(unittest.TestCase):
             "docs/specs/foundation/contract.md": {"trace", "rd", "checks"},
             "rd/foundation/input.json": {"rd", "checks"},
             "ruff.toml": {"python", "checks"},
+            "benchmarks/dimensions_bench.cpp": {"format", "checks"},
+            "benchmarks/private.hpp": {"format", "checks"},
+            "benchmarks/README.md": set(),
+            "benchmarks/CMakeLists.txt": set(),
+            "tests/support/allocation_audit.hpp": {"build", "format", "trace", "checks"},
         }
         for path, expected in cases.items():
             with self.subTest(path=path):
@@ -39,6 +44,8 @@ class ScopeTest(unittest.TestCase):
                 self.assertTrue(all(select([path]).values()))
         self.assertTrue(all(select([], full=True).values()))
         self.assertFalse(any(select([]).values()))
+        self.assertFalse(select(["benchmarks/dimensions_bench.cpp"])["build"])
+        self.assertTrue(select(["benchmarks/dimensions_bench.cpp", "src/core/source.cpp"])["build"])
         self.assertTrue(select(["README.md", "vcpkg.json"])["build"])
 
     def test_independent_tests_are_selected_without_product_tests(self) -> None:

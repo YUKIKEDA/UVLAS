@@ -11,6 +11,7 @@ include(cmake/CompilerPolicy.cmake)
 include(cmake/ProjectOptions.cmake)
 # Resolve CTest's default BUILD_TESTING=ON before selecting required notices.
 include(CTest)
+option(UVLAS_BUILD_BENCHMARKS "Build the separately linked kernel benchmarks" OFF)
 include(cmake/Dependencies.cmake)
 
 # The platform key under which numerical results are qualified (QA-07).
@@ -32,8 +33,9 @@ add_custom_target(uvlas_git_revision ALL
     BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/generated/uvlas/git_revision.hpp"
     VERBATIM)
 
-add_library(uvlas_core STATIC src/core/build_info.cpp src/core/error_certificate.cpp
-    src/core/checked_dimensions.cpp)
+set(UVLAS_CORE_SOURCES src/core/build_info.cpp src/core/error_certificate.cpp
+    src/core/checked_dimensions.cpp src/core/instrumentation.cpp)
+add_library(uvlas_core STATIC ${UVLAS_CORE_SOURCES})
 uvlas_configure_target(uvlas_core)
 target_include_directories(uvlas_core
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -43,6 +45,9 @@ target_compile_definitions(uvlas_core PRIVATE UVLAS_BUILD_CONFIGURATION="$<CONFI
 target_link_libraries(uvlas_core PRIVATE
     uvlas::eigen Spectra::Spectra Boost::headers nlohmann_json::nlohmann_json)
 add_dependencies(uvlas_core uvlas_git_revision)
+if(WIN32)
+    target_link_libraries(uvlas_core PRIVATE psapi)
+endif()
 
 # QA-03: the first baseline case. Built with the product flags, compared by CTest.
 add_executable(uvlas_numeric_canary qa/numeric_canary/main.cpp)
@@ -56,6 +61,29 @@ set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_link_libraries(uvlas_cli PRIVATE uvlas_core)
 
 if(BUILD_TESTING)
+    include(cmake/AllocationAudit.cmake)
+    # Audits recompile product sources; mixing normal Eigen inline definitions is forbidden.
+    add_library(uvlas_core_audit STATIC ${UVLAS_CORE_SOURCES})
+    uvlas_configure_target(uvlas_core_audit)
+    uvlas_enable_allocation_audit(uvlas_core_audit)
+    target_include_directories(uvlas_core_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+    target_compile_definitions(uvlas_core_audit PRIVATE UVLAS_BUILD_CONFIGURATION="$<CONFIG>")
+    target_link_libraries(uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra
+        Boost::headers nlohmann_json::nlohmann_json)
+    if(WIN32)
+        target_link_libraries(uvlas_core_audit PRIVATE psapi)
+    endif()
+    add_dependencies(uvlas_core_audit uvlas_git_revision)
+    uvlas_require_audited_dependencies(uvlas_core_audit)
     add_subdirectory(tests)
+endif()
+
+if(UVLAS_BUILD_BENCHMARKS)
+    if(NOT "benchmarks" IN_LIST VCPKG_MANIFEST_FEATURES)
+        message(FATAL_ERROR "UVLAS_BUILD_BENCHMARKS requires the vcpkg benchmarks feature")
+    endif()
+    find_package(benchmark CONFIG REQUIRED)
+    add_subdirectory(benchmarks)
 endif()
 

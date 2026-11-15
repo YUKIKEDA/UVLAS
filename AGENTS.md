@@ -77,9 +77,10 @@
 - `solver-design-contracts`：要求を、式・離散残差・I/F・不変条件・検証計画へ落とす。開始判定。
 - `solver-package-implementation`：開始審査を通ったパッケージを、製品コードと独立試験へ移す。
 - `solver-performance`：要求から予算を作り、計測と内訳に基づいて改善し、結果の同一性を確かめる。
+- `kernel-profile`：実装済みkernelのCPU profileをWindows WPR/WPA・Linux perfで採り、条件と支配する呼出しを読む。
 - `solver-implementation-review`：実装・変更・完了主張のレビュー。証拠ハッシュの整合検査ツールを含む。
 
-参照データを作り直す手順、プロファイルを採って読む手順は、まだSkillにしていない。その流れが製品に無いためで、最初のfixtureと最初のkernelを足すIssue（IM00-11、IM00-12）で書く。
+参照データを作り直す手順は、最初のfixtureを足すIM00-11でSkillにする。kernelのプロファイル手順は、IM00-12で最初の実kernelとともにkernel-profileへ記載した。手順を記載したことと、そのOSで実際に採取したことは区別する。
 
 ## 環境
 

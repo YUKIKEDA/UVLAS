@@ -24,7 +24,8 @@ int run(int argc, char* argv[]) {
         std::cout << "UVLAS " << info.version << '\n'
                   << "Compiler: " << info.compiler << '\n'
                   << "Platform: " << info.platform << '\n'
-                  << "Configuration: " << info.configuration << '\n';
+                  << "Configuration: " << info.configuration << '\n'
+                  << "Instruction set: " << info.instruction_set << '\n';
         return 0;
     }
 
