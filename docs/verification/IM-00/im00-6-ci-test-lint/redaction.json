@@ -1,0 +1,48 @@
+{
+  "schema": "uvlas.redaction/1",
+  "policy": "tools/rd/redact.py",
+  "files": [
+    {
+      "id": "result-tidy.log",
+      "hint": "docs/verification/IM-00/im00-6-ci-test-lint/result-tidy.log",
+      "before_sha256": "9194ee9d1552806cb3cc89780946a3cb643d1eaec05bcf78cb362922820338cd",
+      "after_sha256": "9194ee9d1552806cb3cc89780946a3cb643d1eaec05bcf78cb362922820338cd",
+      "replacements": 0
+    },
+    {
+      "id": "result-test-debug.log",
+      "hint": "docs/verification/IM-00/im00-6-ci-test-lint/result-test-debug.log",
+      "before_sha256": "288c662247728a81d76fdffe73a448426a8bf877b7e9a224e375ad3cbfff909d",
+      "after_sha256": "5394a7c438dca7b091df0594f84011e8386a2d4676b6ed7778a3dccf1b959c36",
+      "replacements": 2
+    },
+    {
+      "id": "result-test-release.log",
+      "hint": "docs/verification/IM-00/im00-6-ci-test-lint/result-test-release.log",
+      "before_sha256": "3f896563ab377ae0218145dde91b32f05e514e141f29604671e34b663342467d",
+      "after_sha256": "95ec57a17bee312db67ebc058b469811abb25501d063d4de9de955abddd03fd8",
+      "replacements": 2
+    },
+    {
+      "id": "contract-tidy.log",
+      "hint": "docs/verification/IM-00/im00-6-ci-test-lint/contract-tidy.log",
+      "before_sha256": "b57019d06cd980443bccd1b977b9f139249e41de0e60197e9c2f83bf2e113681",
+      "after_sha256": "b57019d06cd980443bccd1b977b9f139249e41de0e60197e9c2f83bf2e113681",
+      "replacements": 0
+    },
+    {
+      "id": "contract-test-debug.log",
+      "hint": "docs/verification/IM-00/im00-6-ci-test-lint/contract-test-debug.log",
+      "before_sha256": "cdb809ff4afb44b1f99d393c47eadd06b51b1f9fbaa2452d2b3908ab45ba45f5",
+      "after_sha256": "bd28b96b965ae04f9404e8d9ae71e298250a04d892807d7ec6fb9e212548b6af",
+      "replacements": 2
+    },
+    {
+      "id": "contract-test-release.log",
+      "hint": "docs/verification/IM-00/im00-6-ci-test-lint/contract-test-release.log",
+      "before_sha256": "e14a98fb570541fd80a7d8f268d994bb62e31ae1d77c45b6703f6b7d6804b01d",
+      "after_sha256": "b09c6e113fbf5be8016002cb63511eae70d21137c9cada7de7458fe710b24823",
+      "replacements": 2
+    }
+  ]
+}
