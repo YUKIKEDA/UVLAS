@@ -1,0 +1,27 @@
+Internal ctest changing into directory: <repo>/out/build/windows-msvc
+Test project <repo>/out/build/windows-msvc
+    Start 35: numerics.sparse_solve
+1/7 Test #35: numerics.sparse_solve ............   Passed    0.05 sec
+    Start 37: numerics.sparse_allocation
+2/7 Test #37: numerics.sparse_allocation .......   Passed    0.04 sec
+    Start 38: numerics.dense_solve
+3/7 Test #38: numerics.dense_solve .............   Passed    0.03 sec
+    Start 39: numerics.dense_contract
+4/7 Test #39: numerics.dense_contract ..........   Passed    0.03 sec
+    Start 40: numerics.dense_allocations
+5/7 Test #40: numerics.dense_allocations .......   Passed    0.05 sec
+    Start 49: numerics.linear_candidate
+6/7 Test #49: numerics.linear_candidate ........   Passed    0.03 sec
+    Start 50: numerics.direct_progress
+7/7 Test #50: numerics.direct_progress .........   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+integration     =   0.05 sec*proc (1 test)
+negative        =   0.19 sec*proc (5 tests)
+property        =   0.09 sec*proc (2 tests)
+unit            =   0.19 sec*proc (5 tests)
+verification    =   0.28 sec*proc (7 tests)
+
+Total Test time (real) =   0.29 sec

@@ -1,0 +1,11 @@
+{
+  "logical_processors": 16,
+  "threads": 1,
+  "physical_memory_bytes": 51343966208,
+  "machine": "windows-local-a",
+  "floating_point": "/fp:strict",
+  "os": "Microsoft Windows 11 Home",
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+  "os_version": "10.0.26300",
+  "cpp": "C++23"
+}

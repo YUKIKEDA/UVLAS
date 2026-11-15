@@ -1,0 +1,331 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 62,
+  "date": "2026-11-15",
+  "source_commit": "eb942f044c773706ffbd44ec58520dd5b908de4b",
+  "scope": "密実数LU・非共役複素rank更新・SparseLU・LLTで、元残差と包絡を評価できた初期/中間候補の指標未表現を反復改良へ渡す。真の包絡計算失敗と認定不能な最終投影は拒否する。",
+  "provenance": {
+    "clean": true,
+    "uncommitted_changes": false,
+    "base_main": "1bed1bce975d815ac5defd5068a588df281697ad",
+    "common_state_commit": "2e040ab905237c0bac642681c3a70e7f87153891",
+    "dense_commit": "8612556",
+    "sparse_commit": "14a17230d6386d0bf6e0552a73ce915ebce18352",
+    "note": "各担当の固定sourceを通常mergeし、共通headerの直接includeと独立回帰を固定した後、上記clean sourceから影響する7CTestをDebug/Releaseで各1回確認した。先行の局所実行を最終clean認定と混同しない。既存の証拠は不変。"
+  },
+  "environment": {
+    "logical_processors": 16,
+    "threads": 1,
+    "physical_memory_bytes": 51343966208,
+    "machine": "windows-local-a",
+    "floating_point": "/fp:strict",
+    "os": "Microsoft Windows 11 Home",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "os_version": "10.0.26300",
+    "cpp": "C++23",
+    "compiler": "MSVC 19.51.36260.0",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "boost": "1.92.0",
+      "catch2": "3.16.1"
+    },
+    "prefix": "既存試験prefixをmanifest install無効で読取り専用再利用。共有prefix/依存feature/他担当のbuildを変更していない。"
+  },
+  "verification": [
+    {
+      "configuration": "Debug",
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.(dense_solve|dense_contract|dense_allocations|sparse_solve|sparse_allocation|linear_candidate|direct_progress)$ --output-on-failure",
+      "passed": 7,
+      "total": 7,
+      "log": "docs/verification/IM-00/im00-62/clean-debug-tests.log"
+    },
+    {
+      "configuration": "Release",
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.(dense_solve|dense_contract|dense_allocations|sparse_solve|sparse_allocation|linear_candidate|direct_progress)$ --output-on-failure",
+      "passed": 7,
+      "total": 7,
+      "log": "docs/verification/IM-00/im00-62/clean-release-tests.log"
+    }
+  ],
+  "completion_evidence": [
+    {
+      "requirement": "四経路の初期/中間未達と真の包絡失敗を区別",
+      "evidence": "Dense/Updated/SparseLU/LLTの全経路を共通候補状態へ接続。raw全行を先に検査し、正規化・集約だけの未表現をmarkerに分ける。先行markerで後続行の非有限/包絡失敗を隠さない。"
+    },
+    {
+      "requirement": "残りの反復枠と精度昇格に従い、真の失敗を拒否する",
+      "evidence": "初回未認定から補正し、IR>=1かつBinary64で両回finiteなら既存の半減規約、どちらかmarkerなら半減を証明できず保守的にTwoWordへ昇格する。最大5補正と座標不変の判定を維持し、カウンタを数え直さない。"
+    },
+    {
+      "requirement": "独立参照、ゼロ/極小正許容差、1e-12対照",
+      "evidence": "8公開回帰cases。3x3整数解、SPD2x2、Aeff=A0+i*e0*e0^Tの非共役複素rank1系をcpp_rationalで元問題から照合。Infinity/L2、予算0/2^-1063/1e-12、maxIR0/5を覆う。初期解がOSにより既に厳密なら成功+IR0を確認し、未達ならLinearUnconvergedを確認する。maxIR5と独立原残差の照合は常に実行する。"
+    },
+    {
+      "requirement": "厳密達成不能/包絡不能で偽成功を返さない",
+      "evidence": "A1.5/b=minsubのEFT格子外と、先行指標未表現の後に現れる真の包絡不能を拒否。全四系列で保持低位2^-80を保存し、ゼロ許容差のbinary64投影を拒否する。"
+    },
+    {
+      "requirement": "元系認定・全consumer・保持/投影・親/世代の不変を維持",
+      "evidence": "rationalで両語の実値から原残差/後退誤差を照合。相対許容差だけのゼロ右辺行は厳密に照合。consumer protocolでは第1達成でも第2bound1/budget1e-8が未達なら拒否し、候補の世代/表現と旧結果/入力不変を確認。物理量の実験妥当性を主張する対照ではない。"
+    },
+    {
+      "requirement": "影響範囲の回帰・隔離変異・記録",
+      "evidence": "既存Dense3/Sparse2と新Candidate/DirectProgressの計7CTestを両構成で確認。共通状態3casesと公開四経路8cases、隔離3変異、3代表caseのbefore/after費用とbit比較を保存。"
+    }
+  ],
+  "invariants": {
+    "metadata": "finite ColumnMetricsだけを最終認定へ格納し、未表現markerや過去のmetricを現在の認定へ使わない。最後のscaled correctionは既存フィールドで別に保持。",
+    "allocation": "非空かつ右辺容量が正の場合、prepareに履歴配列1本を追加（source配置）。空次数では確保しない。公開solveの予定出力8/投影9とEigen禁止は最終監査targetで確認。履歴による反復中の追加確保なし。",
+    "resource_scope": "ResourcePlanの配列payloadとbackend予測を分け、実プロセスRSS/24・48GiB hard capを認定しない。"
+  },
+  "mutations": {
+    "reviewer": "別担当の隔離実行。C4 source/build/入力の変更なし。",
+    "public_control": {
+      "cases": 8,
+      "assertions": 829
+    },
+    "helper_control": {
+      "cases": 3,
+      "assertions": 35
+    },
+    "compiled_detected": 3,
+    "changes": [
+      {
+        "name": "旧metric即failureへ戻す",
+        "failed_assertions": 8,
+        "failed_cases": 5
+      },
+      {
+        "name": "raw error∞検査を除去",
+        "failed_assertions": 1,
+        "failed_cases": 1
+      },
+      {
+        "name": "marker時の昇格を無効化",
+        "failed_assertions": 2,
+        "failed_cases": 1
+      }
+    ],
+    "method": "public変異は同headerでDense/Sparse2TUを再compileし固定libへobject先行link。helper変異はcandidate test単独とlinkmapで未抽出を確認。control成功後、全変異compile/link成功→実行失敗、期限超過0。37入力hash不変、全expanded command/linkmap/source/ログをarchiveへ保存。"
+  },
+  "static_analysis": {
+    "format": "clang-format21.1.2。新headerと変更4TUを整形。",
+    "tidy": "clang-tidy21.1.1。Dense/Sparse/新Candidate/新DirectProgressの4TUで対象診断0。最終header追加は既に経由していた標準headerの直接include2行だけで数式・処理不変。",
+    "documentation": "backendと共通契約を別担当が独立通読。Dense契約lint0、共通契約は術語反復info1のみ意味維持で保持。",
+    "sparse_receipt": {
+      "source_sha256": "cf6dbe07de013182a58408875f9758ceb27e5e5e00314dd3b7ea9764c94a9bfa",
+      "kind": "別担当の実行報告。raw logファイルは未保存であり再構成しない。",
+      "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 uvx --offline clang-tidy@21.1.1 -p out/issue62-tidy-single --quiet src/numerics/sparse_solve.cpp",
+      "exit": 0,
+      "tool_result": "exec session52056、完了chunk deb494。72539 warnings generated.のみ、source診断なし。"
+    }
+  },
+  "comparison": {
+    "scope": "小さい合成系の費用確認だけ。高速化・実務規模性能・48GiB/12時間受入を主張しない。",
+    "baseline_implementation": "main1bedのDense/Sparse2TUをgitから凍結して明示object先行link。その他は修正版と同じ固定core/numerics library、probe object、MSVC Release flags、入力・精度を使う。baseline全projectを1bedとして再buildした主張ではない。",
+    "measurement": "Dense64=4I、Updated64=既存rank1複素fixture、SparseLU1024=tridiag(-1,4,-1)、右辺1列・尺度1、atol/backward1e-12/rtol0。各processでprepare/solveを各128回。before/afterを3巡交互、worker compile/tidy停止中に実行。",
+    "timing_scope": "prepareは準備/破棄、solveは準備済み因子で所有結果の確保/破棄を含む。入力生成と返値bit列の取得は時間外。各巡の平均、3巡中央値とmin/maxを保存。",
+    "bit_scope": "表現tag・存在するhi/lo値・補正回数・保持/返却の列指標をuint64 bit列で全巡比較。今回3caseはBinary64のため低位配列なし。比較語数72/136/1032、全語一致。C++所有オブジェクトのpointer/paddingまでのbyte一致とはしない。",
+    "cost": "右辺容量1の全3caseでprepare配列payloadが64byte増え、solve payloadは不変。新履歴1確保はsourceから確認し、prepareの全malloc/RSSを直接計数したとはしない。時間の範囲は重なっており改善の結論を出さない。",
+    "summary": [
+      {
+        "case": "dense64",
+        "numeric_words_equal": true,
+        "compared_words": 72,
+        "iterations_per_round": 128,
+        "baseline_prepare_payload": 39296,
+        "fixed_prepare_payload": 39360,
+        "baseline_solve_payload": 2992,
+        "fixed_solve_payload": 2992,
+        "baseline_prepare_mean_seconds": {
+          "samples": [
+            8.65625e-05,
+            9.20484375e-05,
+            8.6671875e-05
+          ],
+          "median": 8.6671875e-05,
+          "minimum": 8.65625e-05,
+          "maximum": 9.20484375e-05
+        },
+        "baseline_solve_mean_seconds": {
+          "samples": [
+            0.0020221,
+            0.0020188265625,
+            0.001967878125
+          ],
+          "median": 0.0020188265625,
+          "minimum": 0.001967878125,
+          "maximum": 0.0020221
+        },
+        "fixed_prepare_mean_seconds": {
+          "samples": [
+            9.11875e-05,
+            7.973828125e-05,
+            8.8021875e-05
+          ],
+          "median": 8.8021875e-05,
+          "minimum": 7.973828125e-05,
+          "maximum": 9.11875e-05
+        },
+        "fixed_solve_mean_seconds": {
+          "samples": [
+            0.0019557984375,
+            0.0020019796875,
+            0.0020047515625
+          ],
+          "median": 0.0020019796875,
+          "minimum": 0.0019557984375,
+          "maximum": 0.0020047515625
+        }
+      },
+      {
+        "case": "updated64",
+        "numeric_words_equal": true,
+        "compared_words": 136,
+        "iterations_per_round": 128,
+        "baseline_prepare_payload": 44976,
+        "fixed_prepare_payload": 45040,
+        "baseline_solve_payload": 4016,
+        "fixed_solve_payload": 4016,
+        "baseline_prepare_mean_seconds": {
+          "samples": [
+            7.2621875e-05,
+            7.3803125e-05,
+            6.521796875e-05
+          ],
+          "median": 7.2621875e-05,
+          "minimum": 6.521796875e-05,
+          "maximum": 7.3803125e-05
+        },
+        "baseline_solve_mean_seconds": {
+          "samples": [
+            0.01157556171875,
+            0.01126336875,
+            0.0110952015625
+          ],
+          "median": 0.01126336875,
+          "minimum": 0.0110952015625,
+          "maximum": 0.01157556171875
+        },
+        "fixed_prepare_mean_seconds": {
+          "samples": [
+            7.031796875e-05,
+            7.231171875e-05,
+            7.45375e-05
+          ],
+          "median": 7.231171875e-05,
+          "minimum": 7.031796875e-05,
+          "maximum": 7.45375e-05
+        },
+        "fixed_solve_mean_seconds": {
+          "samples": [
+            0.01134730234375,
+            0.01109606875,
+            0.01096226875
+          ],
+          "median": 0.01109606875,
+          "minimum": 0.01096226875,
+          "maximum": 0.01134730234375
+        }
+      },
+      {
+        "case": "sparse1024",
+        "numeric_words_equal": true,
+        "compared_words": 1032,
+        "iterations_per_round": 128,
+        "baseline_prepare_payload": 515072,
+        "fixed_prepare_payload": 515136,
+        "baseline_solve_payload": 47152,
+        "fixed_solve_payload": 47152,
+        "baseline_prepare_mean_seconds": {
+          "samples": [
+            0.00070945078125,
+            0.0006774234375,
+            0.00068903828125
+          ],
+          "median": 0.00068903828125,
+          "minimum": 0.0006774234375,
+          "maximum": 0.00070945078125
+        },
+        "baseline_solve_mean_seconds": {
+          "samples": [
+            0.0042524375,
+            0.00407320703125,
+            0.00428897890625
+          ],
+          "median": 0.0042524375,
+          "minimum": 0.00407320703125,
+          "maximum": 0.00428897890625
+        },
+        "fixed_prepare_mean_seconds": {
+          "samples": [
+            0.00070271484375,
+            0.00082074453125,
+            0.00068778046875
+          ],
+          "median": 0.00070271484375,
+          "minimum": 0.00068778046875,
+          "maximum": 0.00082074453125
+        },
+        "fixed_solve_mean_seconds": {
+          "samples": [
+            0.00434356796875,
+            0.004256871875,
+            0.00426760859375
+          ],
+          "median": 0.00426760859375,
+          "minimum": 0.004256871875,
+          "maximum": 0.00434356796875
+        }
+      }
+    ],
+    "source_commit": "eb942f044c773706ffbd44ec58520dd5b908de4b",
+    "mutation_window_utc": "2026-11-15T14:45:44.133198Z–14:47:04.397192Z",
+    "measurement_first_utc": "2026-11-15T14:48:21.977057+00:00",
+    "measurement_last_utc": "2026-11-15T14:48:36.297556+00:00"
+  },
+  "excluded": "未変更のGMRES、既存metrics/precision、Python、fixture、100k容量、全体検証は再実行しない。CIの追加head結果は提出時点で未確認、完了を待たない。",
+  "remaining_gates": [
+    "IM00-11の設計試作4数値群の製品経路検証は未完了。Issue62修正だけでIssue15/親Packageを完了にしない。",
+    "IM-04の実物理連成ブロック、IM-07/08の実務数値・性能・実験受入は後続。"
+  ],
+  "redaction": "公開コピーだけを伏字化し前後SHA/件数を保存。バイナリは公開archiveへ入れずhashで同定。旧記録は上書きしない。",
+  "sources": {
+    "docs/specs/foundation/dense-solve-contract.md": "96f875f32be7e0224bde9892626ccc466e3599d9d8a84fd012a9dcc500898871",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "90eee9ef0ab5d4ae0656119aaf2b7b00f69069bba5b98b15fad43f26ac91955c",
+    "docs/specs/foundation/sparse-solve-contract.md": "5b43eb2139f8033d2cbcf72c33e4f848f9d19235a4adf2ec30c0381c36adae96",
+    "src/numerics/dense_solve.cpp": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3",
+    "src/numerics/linear_candidate_detail.hpp": "d0ee5f4aca2f19662aec8724f5d49f5402ad79b77f8400a5aebf3fb7b68c7c72",
+    "src/numerics/sparse_solve.cpp": "cf6dbe07de013182a58408875f9758ceb27e5e5e00314dd3b7ea9764c94a9bfa",
+    "tests/CMakeLists.txt": "17bc8ed5bd81a89ef53ca514446092e39aac1c650986510e76798dc3f7ca5b4c",
+    "tests/numerics/direct_progress_test.cpp": "6a6597c3b8cc66a47fbaba15e9cc879f65ef8cef4da70ee52655eece62e0bc5f",
+    "tests/numerics/linear_candidate_test.cpp": "eec1c5f2b870025f2499fa853c79411691b5e1a3bc2031178376b46d2ec8b3c4",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-62/candidate-tidy.log": "0cb16ff9db202943fe1ca26c84665662769b496566e26e16612c6ee5de1b8c31",
+    "docs/verification/IM-00/im00-62/clean-debug-build.log": "d3d4e6fe2705bc97b3761e52f85d17929302c11a3d9717841725da8bbffa96de",
+    "docs/verification/IM-00/im00-62/clean-debug-tests.log": "735833a61f718930ba04be0bedf048929b5d4e725a25eff72ee229e095bbb0d7",
+    "docs/verification/IM-00/im00-62/clean-release-build.log": "fd2c161e1dd394a2726306b8bff67b99fb96c33c7c554b65e016113b65628573",
+    "docs/verification/IM-00/im00-62/clean-release-tests.log": "8fcf6f3eb2a80828503b784533ca6a29a030000d69afe18576baa172efd1b39f",
+    "docs/verification/IM-00/im00-62/comparison-environment.json": "c1dc7df3e7f725a0cc4db01641a6a85ea93e294ecce23b3b37017cdbab525dd1",
+    "docs/verification/IM-00/im00-62/comparison-measurement-order.json": "0350c4ee3095b0515a51b8f409f86c73c228b93efa7699851629a57f100599aa",
+    "docs/verification/IM-00/im00-62/comparison-summary.json": "b0664baa00e25ead492e47c47f641d06c87dff12a215587fd15ce39d18232692",
+    "docs/verification/IM-00/im00-62/dense-contract-lint.json": "0028abf5ab4f76a910a86c03f74334de238cc8bab19f7301c2dbbf3c12b01bf2",
+    "docs/verification/IM-00/im00-62/dense-tidy.log": "295d3c39b7117f2c39e93bd0c08be2f905a2018112e37c3a395d89a90456af9e",
+    "docs/verification/IM-00/im00-62/direct-comparison.zip": "839e9a269d5ea288c9fd81f704dead918e500f77bf60ea4c3424ddbda6af6139",
+    "docs/verification/IM-00/im00-62/direct-tidy.log": "1bd224deb39aefa39f5ac7852b9d90598af5d0aa2b7e42fc1f20b19e4988f9f0",
+    "docs/verification/IM-00/im00-62/git-revision.hpp": "eeea41bba5555665f288743a77196107ca160c19539f202d1444f20b15f962bc",
+    "docs/verification/IM-00/im00-62/issue62-candidate-mutations.zip": "cc4e82686f81240ef1101a30cda7a00a1bf4345446fa6fb691a6d2acb6440d39",
+    "docs/verification/IM-00/im00-62/redaction.json": "02d03ef09f6e5a989512b20dcfda3a8e36339d29fc5a93b0f857cbe719721e71"
+  }
+}
