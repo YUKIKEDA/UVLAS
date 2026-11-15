@@ -1,3 +1,4 @@
+#include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
@@ -41,6 +42,12 @@ core::Failure inner_failure() {
     details.resources = core::ResourceUsage{core::ResourceKind::Bytes, 107, 109};
     return {core::FailureCode::Cancelled, core::Operation::EvaluateAero, details};
 }
+core::Failure precision_failure() {
+    auto failure = inner_failure();
+    failure.code = core::FailureCode::PrecisionUnresolved;
+    return failure;
+}
+
 enum class Fault : std::uint8_t {
     None,
     Returned,
@@ -68,6 +75,8 @@ public:
     bool validation_failure = false;
     mutable std::uint64_t forwards = 0;
     mutable std::uint64_t absolutes = 0;
+    std::uint64_t unresolved_forward = 0;
+    std::uint64_t unresolved_absolute = 0;
     mutable std::uint64_t validations = 0;
     [[nodiscard]] core::Index order() const noexcept override {
         return n;
@@ -86,6 +95,9 @@ public:
                                                 std::span<double> estimate, std::span<double> tail,
                                                 std::span<double> error) const override {
         ++forwards;
+        if (forwards == unresolved_forward) {
+            return std::unexpected(precision_failure());
+        }
         if (word_fault == Fault::Returned) {
             return std::unexpected(inner_failure());
         }
@@ -120,6 +132,9 @@ public:
     [[nodiscard]] core::Result<void> absolute_action_lower(std::span<const double> weights,
                                                            std::span<double> lower) const override {
         ++absolutes;
+        if (absolutes == unresolved_absolute) {
+            return std::unexpected(precision_failure());
+        }
         if (absolute_fault == Fault::Returned) {
             return std::unexpected(inner_failure());
         }
@@ -211,6 +226,7 @@ struct Fixture {
     Diagonal a;
     Preconditioner p;
     Consumer consumer;
+    core::Index restart_width = 64;
     core::ResourcePlan input_plan{65536};
     core::ResourcePlan workspace_plan{1 << 20};
     core::ResourcePlan output_plan{1 << 20};
@@ -227,7 +243,7 @@ struct Fixture {
                 ::identity()};
     }
     [[nodiscard]] GmresLimits limits(std::uint64_t quota = 512) const {
-        return {a.n, 2, EstimateAdmission{1 << 20}, 64, quota};
+        return {a.n, 2, EstimateAdmission{1 << 20}, restart_width, quota};
     }
     [[nodiscard]] Accuracy accuracy(double budget = 1.e-12) const {
         return {Norm::Infinity,         budget, 0, budget, core::ObservationId{20},
@@ -260,14 +276,16 @@ struct Fixture {
     [[nodiscard]] GmresResult<GmresSolution>
     solve(const PrecisionBuffer<double>& values, GmresPrepared& prepared, std::uint64_t quota = 512,
           std::span<const ConsumerCheck> checks = {}, bool projection = false,
-          double budget = 1.e-12) {
+          double budget = 1.e-12, Norm norm = Norm::Infinity) {
         const Precision<double> precision{
             projection ? ReturnedPrecision{Binary64Projection{core::NumericalGeneration{40},
                                                               core::NumericalGeneration{41}}}
                        : ReturnedPrecision{RetainedPrecision{core::NumericalGeneration{40}}},
             checks, consumer};
+        auto requested_accuracy = accuracy(budget);
+        requested_accuracy.norm = norm;
         return solve_linear(a, p, Rhs<double>{values, ::identity(), core::RhsGeneration{1}},
-                            scales(), precision, accuracy(budget), limits(quota), prepared,
+                            scales(), precision, requested_accuracy, limits(quota), prepared,
                             output_plan);
     }
 };
@@ -277,6 +295,25 @@ struct Fixture {
         throw std::runtime_error("Expected binary64 fixture result");
     }
     return binary->values.values();
+}
+void check_exact_values(const GmresSolution& result, std::span<const double> expected) {
+    using Exact = boost::multiprecision::cpp_rational;
+    const auto& storage = result.solution().values().storage();
+    if (const auto* binary = std::get_if<Binary64<double>>(&storage)) {
+        REQUIRE(binary->values.values().size() == expected.size());
+        for (std::size_t i = 0; i < expected.size(); ++i) {
+            CHECK(Exact{binary->values.values()[i]} == Exact{expected[i]});
+        }
+        return;
+    }
+    const auto* words = std::get_if<TwoWord<double>>(&storage);
+    if (words == nullptr) {
+        throw std::runtime_error("Missing retained representation");
+    }
+    REQUIRE(words->hi.values().size() == expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        CHECK(Exact{words->hi.values()[i]} + Exact{words->lo.values()[i]} == Exact{expected[i]});
+    }
 }
 void check_counts(const GmresDiagnostics& d, const Fixture& f) {
     CHECK(d.forward_actions == f.a.forwards);
@@ -618,4 +655,116 @@ TEST_CASE("GMRES Krylov directions consume a legitimate action center stored ent
     CHECK(result->diagnostics().stop == GmresStopReason::Qualified);
     CHECK(result->diagnostics().restarts == 0);
     check_counts(result->diagnostics(), f);
+}
+
+TEST_CASE("GMRES exact solutions remain reachable when initial metric ratios are unrepresentable",
+          "[verification][negative][N4-05][N4-06]") {
+    // 2^-1063 is a fixed positive binary64 allowance. 1/allowance overflows,
+    // although the final exact residual divided by it is representable zero.
+    const double tiny_allowance = std::ldexp(1.0, -1063);
+    const std::array budgets{0.0, tiny_allowance, 1.e-12};
+    for (const auto norm : {Norm::Infinity, Norm::L2}) {
+        for (const double rhs_value : {0.0, 1.0}) {
+            for (const double budget : budgets) {
+                Fixture f{1};
+                const std::array input{rhs_value};
+                const auto rhs = f.rhs(input);
+                auto prepared = f.prepare();
+                const auto result = f.solve(rhs, prepared, 512, {}, false, budget, norm);
+                REQUIRE(result);
+                check_exact_values(*result, input);
+                const auto metric = result->solution().certificate().columns()[0];
+                CHECK(metric.normalized_original_residual_upper == 0);
+                CHECK(metric.componentwise_backward_error_upper == 0);
+                CHECK(result->diagnostics().stop == GmresStopReason::Qualified);
+                if (rhs_value == 0) {
+                    CHECK(result->diagnostics().total_action_callbacks == 0);
+                } else {
+                    CHECK(result->diagnostics().operator_actions > 0);
+                }
+                check_counts(result->diagnostics(), f);
+            }
+        }
+    }
+}
+
+TEST_CASE("GMRES continues beyond unrepresentable intermediate ratios until its real action limit",
+          "[negative][N4-05][N4-06][N4-09]") {
+    for (const auto norm : {Norm::Infinity, Norm::L2}) {
+        Fixture f;
+        f.a.diagonal = {1, 2};
+        f.restart_width = 1;
+        const auto rhs = f.rhs(std::array{1.0, 1.0});
+        auto prepared = f.prepare();
+        // A one-direction cycle cannot solve this two-eigenvalue RHS exactly.
+        // It uses one Arnoldi action and two qualification actions; the next
+        // Arnoldi action reaches quota four. An intermediate ratio/0 must not
+        // stop earlier as PrecisionUnresolved or manufacture a qualified metric.
+        const auto result = f.solve(rhs, prepared, 4, {}, false, 0, norm);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().failure().code == core::FailureCode::LinearUnconverged);
+        CHECK(result.error().diagnostics().stop == GmresStopReason::OperatorLimit);
+        CHECK(result.error().diagnostics().operator_actions == 4);
+        CHECK(result.error().diagnostics().restarts > 0);
+        check_counts(result.error().diagnostics(), f);
+    }
+}
+
+TEST_CASE("GMRES zero allowances never qualify nonzero producer uncertainty",
+          "[negative][N4-05][N4-06]") {
+    for (const auto norm : {Norm::Infinity, Norm::L2}) {
+        Fixture f{1};
+        f.a.fixed_error_upper = 1.e-6;
+        const auto rhs = f.rhs(std::array{1.0});
+        auto prepared = f.prepare();
+        const auto result = f.solve(rhs, prepared, 24, {}, false, 0, norm);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().failure().code == core::FailureCode::LinearUnconverged);
+        CHECK(result.error().diagnostics().stop == GmresStopReason::KrylovBreakdown);
+        CHECK(f.a.nonzero_error_returned);
+        check_counts(result.error().diagnostics(), f);
+    }
+}
+
+TEST_CASE("GMRES preserves genuine precision failures from initial and later numerical callbacks",
+          "[negative][N4-05][N4-06][N4-08]") {
+    for (unsigned site = 0; site < 4; ++site) {
+        Fixture f;
+        f.a.diagonal = {1, 2};
+        f.restart_width = 1;
+        if (site < 2) {
+            f.a.unresolved_forward = site + 1;
+        } else {
+            f.a.unresolved_absolute = site - 1;
+        }
+        const auto rhs = f.rhs(std::array{1.0, 1.0});
+        auto prepared = f.prepare();
+        const auto result = f.solve(rhs, prepared, 24);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().failure() == precision_failure());
+        CHECK(result.error().diagnostics().stop == GmresStopReason::ActionFailure);
+        if (site < 2) {
+            CHECK(f.a.forwards == site + 1);
+        } else {
+            CHECK(f.a.absolutes == site - 1);
+        }
+        check_counts(result.error().diagnostics(), f);
+    }
+}
+
+TEST_CASE("GMRES cannot replace a genuinely unrepresentable original residual with an unmet marker",
+          "[negative][N4-05][N4-06]") {
+    Fixture f{1};
+    const std::array huge{std::numeric_limits<double>::max()};
+    // Each input word is finite; their initial residual center cannot be
+    // evaluated by this finite-word envelope. No finite residual exists for
+    // a Krylov update, unlike a representable nonzero residual divided by tau=0.
+    const auto rhs = f.rhs(huge, 1, huge);
+    auto prepared = f.prepare();
+    const auto result = f.solve(rhs, prepared);
+    REQUIRE_FALSE(result);
+    CHECK(result.error().failure().code == core::FailureCode::PrecisionUnresolved);
+    CHECK(result.error().diagnostics().stop == GmresStopReason::QualificationFailure);
+    CHECK(result.error().diagnostics().total_action_callbacks == 0);
+    check_counts(result.error().diagnostics(), f);
 }

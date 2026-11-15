@@ -2,6 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <uvlas/numerics/gmres_solve.hpp>
@@ -68,6 +69,7 @@ public:
 };
 class BlockP final : public FixedPreconditioner {
 public:
+    bool identity_map = false;
     [[nodiscard]] core::Index order() const noexcept override {
         return 4;
     }
@@ -79,6 +81,10 @@ public:
     }
     [[nodiscard]] core::Result<void> apply(std::span<const double> r,
                                            std::span<double> x) const override {
+        if (identity_map) {
+            std::copy(r.begin(), r.end(), x.begin());
+            return {};
+        }
         x[1] = r[1] / 3;
         x[0] = (r[0] - x[1]) / 4;
         x[3] = r[3] / 4;
@@ -190,4 +196,43 @@ TEST_CASE("Zero right hand side qualifies without numerical callbacks", "[N4-05]
     REQUIRE(result);
     CHECK(result->diagnostics().operator_actions == 0);
     CHECK(result->diagnostics().preconditioner_actions == 0);
+}
+
+TEST_CASE("Relative-only tolerance continues past a coupled zero-RHS row", "[N4-05][N4-06]") {
+    Blocks a;
+    a.a = {1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    BlockP p;
+    p.identity_map = true;
+    const NoChecks consumer;
+    core::ResourcePlan inputs{1 << 20}, workspace{1 << 20}, output{1 << 20};
+    const std::array<double, 4> scale{1, 1, 1, 1};
+    const std::array<UnitDimensions, 4> units{};
+    const Scales scales{scale, scale, units, units, context()};
+    const GmresLimits limits{4, 1, EstimateAdmission{1024}, 1, 512};
+    auto prepared = GmresPrepared::prepare(a, p, scales, limits, workspace);
+    REQUIRE(prepared);
+    const std::array<double, 4> b{0, 1, 0, 0};
+    auto matrix = DenseReal::copy({4, 1, 4}, b, inputs, core::Operation::SolveLinear);
+    REQUIRE(matrix);
+    auto rhs = PrecisionBuffer<double>::binary64(std::move(*matrix), core::NumericalGeneration{1});
+    REQUIRE(rhs);
+    const Precision<double> precision{
+        RetainedPrecision{core::NumericalGeneration{2}}, {}, consumer};
+    const Accuracy accuracy{Norm::Infinity,        0, 1e-12, 1e-12, core::ObservationId{1},
+                            core::ObservationId{2}};
+    auto result = solve_linear(a, p, Rhs<double>{*rhs, context(), core::RhsGeneration{1}}, scales,
+                               precision, accuracy, limits, *prepared, output);
+    REQUIRE(result);
+    const auto& storage = result->solution().values().storage();
+    const auto* binary = std::get_if<Binary64<double>>(&storage);
+    const auto* words = std::get_if<TwoWord<double>>(&storage);
+    REQUIRE((binary != nullptr || words != nullptr));
+    const std::array<double, 4> expected{-1, 1, 0, 0};
+    for (std::size_t i = 0; i < 4; ++i) {
+        const double actual =
+            binary ? binary->values.values()[i] : words->hi.values()[i] + words->lo.values()[i];
+        CHECK(std::abs(actual - expected[i]) < 1e-12);
+    }
+    CHECK(result->diagnostics().restarts > 0);
+    CHECK(result->diagnostics().operator_actions <= 512);
 }

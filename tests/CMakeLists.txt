@@ -232,7 +232,7 @@ uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
 uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)
 
 uvlas_add_test(numerics.gmres_contract LABELS unit negative verification
-    SOURCES numerics/gmres_contract_test.cpp LIBS uvlas_numerics)
+    SOURCES numerics/gmres_contract_test.cpp LIBS uvlas_numerics Boost::multiprecision)
 uvlas_add_test(numerics.gmres_solve LABELS unit verification
     SOURCES numerics/gmres_solve_test.cpp LIBS uvlas_numerics)
 target_include_directories(uvlas_test_numerics_gmres_solve PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")

@@ -9,6 +9,7 @@
 #include <cmath>
 #include <limits>
 #include <uvlas/numerics/gmres_solve.hpp>
+#include <variant>
 
 namespace uvlas::numerics::linear {
 namespace {
@@ -375,9 +376,18 @@ GmresResult<GmresPrepared> GmresPrepared::prepare(const GmresOperator& op,
 } // namespace uvlas::numerics::linear
 namespace uvlas::numerics::linear {
 namespace {
-Result<ColumnMetrics> evaluate(Runner& run, std::span<const double> xhi,
-                               std::span<const double> xlo, const Scales& scales,
-                               const Accuracy& accuracy) noexcept {
+// A valid raw residual can be too large for a finite normalized metric (including
+// a nonzero residual with zero allowance). That is an unmet candidate, not a
+// failure of the original operator or its residual/error enclosure.
+struct UnrepresentableMetrics {};
+using CandidateEvaluation = std::variant<ColumnMetrics, UnrepresentableMetrics>;
+bool qualifies(const CandidateEvaluation& candidate, const Accuracy& accuracy) noexcept {
+    const auto* metrics = std::get_if<ColumnMetrics>(&candidate);
+    return metrics && detail::meets_accuracy(*metrics, accuracy);
+}
+Result<CandidateEvaluation> evaluate(Runner& run, std::span<const double> xhi,
+                                     std::span<const double> xlo, const Scales& scales,
+                                     const Accuracy& accuracy) noexcept {
     auto& d = run.d;
     const auto n = static_cast<std::size_t>(d.order);
     bool use_hi = false, use_lo = false, use_abs = false;
@@ -428,9 +438,18 @@ Result<ColumnMetrics> evaluate(Runner& run, std::span<const double> xhi,
             detail::add_magnitudes({d.denominator.values()[i], d.denominator.values()[i]}, *b)
                 .lower;
     }
-    return detail::evaluate_column_metrics<double>(
+    auto metrics = detail::evaluate_column_metrics<double>(
         d.order, d.residual.values(), d.residual_error.values(), d.denominator.values(),
         d.rhs_hi.values(), d.rhs_lo.values(), scales.residual, accuracy);
+    if (!metrics) {
+        // Only this final metric conversion is classified as a valid but unmet
+        // candidate. Callback, magnitude and residual-enclosure failures above
+        // must propagate unchanged, even when their code is PrecisionUnresolved.
+        if (metrics.error().code == FailureCode::PrecisionUnresolved)
+            return CandidateEvaluation{UnrepresentableMetrics{}};
+        return std::unexpected(metrics.error());
+    }
+    return CandidateEvaluation{*metrics};
 }
 
 // Left preconditioning acts in physical coordinates; the basis uses the declared
@@ -682,7 +701,7 @@ GmresResult<GmresSolution> solve_linear(const GmresOperator& op, const FixedPrec
                 if (!metrics)
                     return std::unexpected(metrics.error());
                 bool first_cycle = true;
-                while (!detail::meets_accuracy(*metrics, accuracy)) {
+                while (!qualifies(*metrics, accuracy)) {
                     if (!first_cycle) {
                         auto available = runner.admit(1);
                         if (!available)
@@ -699,7 +718,11 @@ GmresResult<GmresSolution> solve_linear(const GmresOperator& op, const FixedPrec
                     if (!metrics)
                         return std::unexpected(metrics.error());
                 }
-                metadata->retained_columns.values()[static_cast<std::size_t>(c)] = *metrics;
+                const auto* retained_metrics = std::get_if<ColumnMetrics>(&*metrics);
+                if (!retained_metrics)
+                    return fail(FailureCode::PrecisionUnresolved, context);
+                metadata->retained_columns.values()[static_cast<std::size_t>(c)] =
+                    *retained_metrics;
                 if (projected) {
                     auto target = projected->values().subspan(offset, size);
                     for (std::size_t i = 0; i < size; ++i) {
@@ -721,12 +744,15 @@ GmresResult<GmresSolution> solve_linear(const GmresOperator& op, const FixedPrec
                         }
                         return std::unexpected(projected_metrics.error());
                     }
-                    if (!detail::meets_accuracy(*projected_metrics, accuracy)) {
+                    if (!qualifies(*projected_metrics, accuracy)) {
                         diagnostics.stop = GmresStopReason::QualificationFailure;
                         return fail(FailureCode::PrecisionUnresolved, context);
                     }
+                    const auto* returned_metrics = std::get_if<ColumnMetrics>(&*projected_metrics);
+                    if (!returned_metrics)
+                        return fail(FailureCode::PrecisionUnresolved, context);
                     metadata->returned_columns.values()[static_cast<std::size_t>(c)] =
-                        *projected_metrics;
+                        *returned_metrics;
                 }
             }
             const auto generation =
