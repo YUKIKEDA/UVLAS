@@ -1,3 +1,3 @@
-add_executable(uvlas_kernel_bench dimensions_bench.cpp dense_solve_bench.cpp main.cpp)
+add_executable(uvlas_kernel_bench dimensions_bench.cpp dense_solve_bench.cpp updated_solve_bench.cpp main.cpp)
 uvlas_configure_target(uvlas_kernel_bench)
 target_link_libraries(uvlas_kernel_bench PRIVATE uvlas_core uvlas_numerics benchmark::benchmark)
