@@ -162,8 +162,10 @@ target_include_directories(uvlas_test_numerics_linear_metrics PRIVATE "${PROJECT
 uvlas_add_test(numerics.backend_memory
     LABELS unit negative property
     SOURCES numerics/backend_memory_test.cpp support/allocation_audit.cpp
-    LIBS uvlas_numerics uvlas::eigen)
+    LIBS uvlas_numerics_audit uvlas::eigen)
 target_include_directories(uvlas_test_numerics_backend_memory PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_backend_memory)
+uvlas_require_audited_dependencies(uvlas_test_numerics_backend_memory)
 
 uvlas_add_test(numerics.precision
     LABELS unit negative verification
