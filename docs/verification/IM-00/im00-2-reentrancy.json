@@ -1,0 +1,138 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02"
+  ],
+  "package": "IM-00",
+  "issue": 6,
+  "date": "2026-11-15",
+  "scope": "ResourcePlan reservations under same-thread allocator/constructor reentry, nested success/rejection, exception rollback and following allocations",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "205011d6b41809985913c6b0a9c2d176cfb90641",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "command": "ctest --preset windows-debug -R '^core\\.resource_plan$'",
+  "ctest": {
+    "passed": 1,
+    "total": 1,
+    "tests": [
+      "core.resource_plan"
+    ]
+  },
+  "reference": "Exact payload sizes and limits, independently observed allocation/constructor counts, successful child charges retained through outer bad_alloc and other exceptions",
+  "sources": [
+    {
+      "id": "im00-2-checked-dimensions-api",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "hint": "include/uvlas/core/checked_dimensions.hpp"
+    },
+    {
+      "id": "im00-2-resource-plan-api",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "hint": "include/uvlas/core/resource_plan.hpp"
+    },
+    {
+      "id": "im00-2-checked-dimensions-implementation",
+      "sha256": "5132c6d9de7be64d5d4d820f436333341baa6a98384bcb7510733066030d484c",
+      "hint": "src/core/checked_dimensions.cpp"
+    },
+    {
+      "id": "im00-2-dimension-tests",
+      "sha256": "cd5db7bfed953601fdc3161f92799cf597df5e063e686fffeddcf77f468311b6",
+      "hint": "tests/core/checked_dimensions_test.cpp"
+    },
+    {
+      "id": "im00-2-resource-plan-tests",
+      "sha256": "d2ac7440a7b49ecb807a077523919173c50bb012eed37e8ed2b28357d64294ee",
+      "hint": "tests/core/resource_plan_test.cpp"
+    },
+    {
+      "id": "im00-2-identity-compiler-controls",
+      "sha256": "b35e63e980635a301a320c249363145d4e95161e812ab697f7064aa376343dad",
+      "hint": "tests/core/identifier_compile/CMakeLists.txt"
+    },
+    {
+      "id": "im00-2-identity-api",
+      "sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "hint": "include/uvlas/core/identifier.hpp"
+    },
+    {
+      "id": "im00-2-failure-api",
+      "sha256": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d",
+      "hint": "include/uvlas/core/failure.hpp"
+    },
+    {
+      "id": "im00-2-dimension-resource-contract",
+      "sha256": "dcd245ece27e7eec1bf446727813fc54f665f33d80222d679ed1208e5b419f89",
+      "hint": "docs/specs/foundation/dimensions-resource-contract.md"
+    },
+    {
+      "id": "im00-2-product-targets",
+      "sha256": "079354b7856c3079c7b8a0ec077f4733d9ea96152bb0db9ed2b051229ae2e660",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im00-2-test-targets",
+      "sha256": "456113ed73b47ac1c0dbf927342e478ef44b5b3eee4c5385179ca3116f91d21b",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im00-2-compiler-policy",
+      "sha256": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+      "hint": "cmake/CompilerPolicy.cmake"
+    },
+    {
+      "id": "im00-2-project-options",
+      "sha256": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a",
+      "hint": "cmake/ProjectOptions.cmake"
+    },
+    {
+      "id": "im00-2-dependency-manifest",
+      "sha256": "f42cc5536e8e9a91cfa2fe84e592e0fe3bbe011f4bd1d8ae02fcde0dca3e9887",
+      "hint": "vcpkg.json"
+    },
+    {
+      "id": "api-reentrancy-rule",
+      "hint": ".cursor/rules/api-contract.mdc",
+      "sha256": "eebf5ada0a6fe4ea194f62657667d8365431a4acca0fd28de10cc8a81b55bc7f"
+    }
+  ],
+  "supersedes_for_scope": {
+    "id": "im00-2-initial-verification",
+    "hint": "docs/verification/IM-00/im00-2.json",
+    "sha256": "76cb0259b6fa8448736dd8a730a8dcedcf9dce80d5613e647867de639d936e7c",
+    "reason": "Initial tests did not establish admission safety under reentry; the reviewed implementation allowed nested allocations to reuse uncharged outer capacity. Original evidence is preserved."
+  },
+  "review": {
+    "head": "293c07c963f42af44b8e94901a8262cfdc9ae890",
+    "comment": "https://github.com/YUKIKEDA/UVLAS/pull/41#discussion_r4576936309",
+    "regression": "New constructor-reentry tests failed against the reviewed header before correction"
+  },
+  "development_mutations": [
+    "omit reservation before reentry",
+    "erase successful nested charges on outer failure",
+    "leak reservation on return"
+  ],
+  "not_claimed": [
+    "physical_solver_accuracy",
+    "process_memory_cap_enforcement",
+    "thread_safe_shared_plan",
+    "product_scale_performance",
+    "practical_acceptance"
+  ],
+  "ci": "Updated CI not awaited; Linux and other configurations are delegated to PR CI"
+}
