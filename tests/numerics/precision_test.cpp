@@ -81,7 +81,7 @@ TEST_CASE("EFT preserves exact sums and products including subnormal boundaries"
                            std::pair{std::ldexp(1.0, -1022), std::ldexp(1.0, -52)},
                            std::pair{std::numeric_limits<double>::denorm_min(), 1.0},
                            std::pair{-0.0, 2.0}};
-    for (const auto [a, b] : pairs) {
+    for (const auto& [a, b] : pairs) {
         const auto sum = two_sum(a, b);
         REQUIRE(sum);
         CHECK(Big(sum->hi) + Big(sum->lo) == Big(a) + Big(b));
