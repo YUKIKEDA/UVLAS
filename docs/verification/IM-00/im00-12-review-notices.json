@@ -1,0 +1,105 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-01"
+  ],
+  "package": "IM-00",
+  "issue": 25,
+  "date": "2026-11-15",
+  "scope": "PR46 review correction for selected Benchmark notices and integration of adopted storage/state packages; no numerical or performance requalification",
+  "source_commit": "76687ecc883afb1a16a359d05785d30a43801ba7",
+  "merge_commit": "105c5f6",
+  "integrated_main": "82264bb",
+  "review_comment": 4577260438,
+  "historical_record": "docs/verification/IM-00/im00-12.json is unchanged; its product executions remain at ad7885f and automation checks at fc85553. Those are historical hashes, not current merge assertions.",
+  "execution_provenance": "Checks executed against candidate file bytes subsequently committed unchanged as source_commit. No clean-build-info qualification is asserted for this follow-up.",
+  "environment": {
+    "os": "Windows",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "python": "3.12.8"
+  },
+  "reproduction": {
+    "command": "ctest --test-dir <isolated-reproduction-build> --output-on-failure -R ^toolchain.third_party_notices$",
+    "registered_tests": 1,
+    "exit_code": 8,
+    "diagnostic": "Missing copied notice: benchmark",
+    "conditions": "BUILD_TESTING=ON; Benchmark default OFF; isolated notice prefix contains Benchmark copyright; real package discovery uses the existing read-only tests prefix"
+  },
+  "checks": [
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug --output-on-failure -R ^toolchain.(third_party_notices|notice_configuration)$",
+      "passed": 2,
+      "total": 2,
+      "tests": [
+        "toolchain.third_party_notices",
+        "toolchain.notice_configuration"
+      ]
+    },
+    {
+      "command": "ctest --test-dir <isolated-reproduction-build> --output-on-failure -R ^toolchain.third_party_notices$",
+      "passed": 1,
+      "total": 1,
+      "purpose": "Exact reproduced failure succeeds after the fix"
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug --output-on-failure -R ^toolchain.notice_configuration$",
+      "passed": 1,
+      "total": 1,
+      "purpose": "Final checker verified-count correction; all feature configuration checks retained"
+    },
+    {
+      "command": "cmake --build out/build/windows-msvc --config Debug --target uvlas_test_core_allocation_audit uvlas_numerics",
+      "result": "success",
+      "scope": "Compile and link integrated state.cpp in normal/audit core and storage.cpp in numerics with existing warning policy; no unrelated product suites rerun"
+    },
+    {
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -N -R ^(core.state|numerics.|core.allocation_audit|toolchain.)",
+      "selected_registrations": 11,
+      "execution": "none; listing only; unbuilt adopted-test executables are not claimed as run"
+    },
+    {
+      "command": "python tools/qa/trace.py check",
+      "defined_ids": 153,
+      "problems": 0
+    },
+    {
+      "command": "git diff --check",
+      "result": "success"
+    }
+  ],
+  "configuration_regression": {
+    "catch2": "Six existing default/ON/OFF BUILD_TESTING and upstream-notice-present/absent configurations retained",
+    "benchmark_positive": [
+      "BUILD_TESTING=ON, Benchmark default OFF",
+      "BUILD_TESTING=ON, Benchmark explicit OFF",
+      "BUILD_TESTING=ON, Benchmark ON",
+      "Same build directory ON to OFF removes stale copy"
+    ],
+    "benchmark_negative": [
+      "ON missing copied notice fails the actual registered CTest with expected diagnostic",
+      "ON missing upstream notice fails configure with expected diagnostic"
+    ],
+    "independence": "Mode-fixed expected presence; configuration-only imported-interface fixture supplies no compiled headers/libraries. Source and notices copied into unique build-local directory; installed dependencies remain read-only.",
+    "actual_registered_test": "Each positive and missing-copy case invokes only toolchain.third_party_notices through CTest, verifies positive test count and checks expected diagnostic on failure"
+  },
+  "independent_review": "Root and im00_4 independently read the correction and documentation; no unresolved major findings reported.",
+  "sources": {
+    "CMakeLists.txt": "42b9731d06014fc2c9cb7a1f0a6fcdc33c7cacec718408e5d2a9d8f335f36763",
+    "tests/CMakeLists.txt": "a9269398da62b07f294f9ffaedf89474646bcafcdfd7aa71716aa6aad19c4fc6",
+    "tests/toolchain/check_notices.cmake": "d4b41eb31f6c05f9a13a02163609e05bdf62c69eba428f7ab537cf88c2a4775e",
+    "tests/toolchain/check_notice_configuration.cmake": "b4b4ac26e8abd921f3cca5850a5fd092a06291e2aae7f2afba103606f757400a",
+    ".cursor/rules/dependencies.mdc": "9946c488942b53bff4a5afa7f4f4516d27f86d235490802667d7d35aecc2f4d7",
+    "docs/build.md": "e7678418661d8771f4f1ed0cb68fc84ea42fdd99d0b6f19b86bd3624a0a7084e",
+    "docs/roadmap.md": "e1afd1cb1ab8d5d23eb1bb77d59893233f5eba0434a637bcffa82b52ccc0ff7b",
+    "docs/conventions.md": "ccf98c8874a7ce787450998c1001090f0419880f9b14141801f32c71558627ff"
+  },
+  "not_claimed": [
+    "Linux execution",
+    "Rerun of adopted PR44/45 product suites",
+    "Rerun of original instrumentation product suites",
+    "Performance improvement",
+    "Physical or practical solver acceptance"
+  ],
+  "ci": "Not awaited; Linux execution is delegated to the existing PR workflow"
+}
