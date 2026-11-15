@@ -122,3 +122,35 @@ TEST_CASE("Dense solve has only its declared owning output allocations",
                     REQUIRE(solved);
             }
 }
+TEST_CASE("Complex rank-update solve has only its declared owning output allocations",
+          "[property][N4-05][N4-06][N4-09]") {
+    Setup f;
+    const NoChecks<Complex> evaluator;
+    auto a = matrix(1, 1, std::array{2.}, f.plan);
+    auto u = matrix(1, 1, std::array{Complex{0, 1. / 16}}, f.plan);
+    auto v = matrix(1, 1, std::array{Complex{1, 0}}, f.plan);
+    auto b = matrix(1, 1, std::array{Complex{31. / 16, 33. / 16}}, f.plan);
+    auto rhs = PrecisionBuffer<Complex>::binary64(std::move(b), core::NumericalGeneration{30});
+    REQUIRE(rhs);
+    const auto scales = f.scales(1);
+    const auto limits = f.limits(1, 1, 1);
+    const ColumnUpdatedOperator op{a, u, v, context()};
+    auto prepared = UpdatedPrepared::prepare(op, scales, limits, f.plan);
+    REQUIRE(prepared);
+    for (const bool projection : {false, true}) {
+        const Precision<Complex> precision{
+            projection ? ReturnedPrecision{Binary64Projection{core::NumericalGeneration{31},
+                                                              core::NumericalGeneration{32}}}
+                       : ReturnedPrecision{RetainedPrecision{core::NumericalGeneration{31}}},
+            {},
+            evaluator};
+        test_support::AllocationAudit audit{test_support::strict_kernel_backends,
+                                            test_support::AuditThreadDomain::CallingThread};
+        auto solved = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales,
+                                   precision, f.accuracy(), limits, *prepared, f.plan);
+        const auto observed = audit.finish();
+        REQUIRE(solved);
+        CHECK(observed.cpp_allocation_attempts == (projection ? 9 : 8));
+        CHECK(observed.status == test_support::AllocationAuditStatus::AllocationObserved);
+    }
+}

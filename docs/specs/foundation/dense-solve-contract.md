@@ -58,6 +58,6 @@ $$
 | 停滞と高低保持 | 3x=1、13/5を含む3次系の微動停滞反例、厳格投影拒否、初期TwoWord右辺 |
 | 空・ゼロ・特異・非有限 | 0×2、正尺度のゼロ右辺、tiny非零pivot、特異A/小Schur、rank0、各複素成分の非有限、予算0と不正入力の組合せ |
 | cache・所有・失敗 | 別担当のdense_contract試験。入力破棄後の結果、同世代書換え、fingerprint、再判定、move、例外・再入 |
-| 確保 | 全使用TUを監査設定でcompile。監査の2RHS・required_checks空の8経路で、公開solve全体のC++確保数は予定出力8／投影9、Eigen確保は禁止。これは区間kernelの0確保を直接測った主張とは区別する |
+| 確保 | 全使用TUを監査設定でcompile。監査の実DensePrepared・2RHS・required_checks空の8経路と、複素UpdatedPrepared・rank1・投影有無の2経路で、公開solve全体のC++確保数は予定出力8／投影9、Eigen確保は禁止。これは区間kernelの0確保を直接測った主張とは区別する |
 
 小規模試験とkernel計測は、この基準部品の実装確認である。実4096系の製品認定、実翼の全体系、48GiB・12時間の実務性能はそれぞれIM00-11、対応する物理kernel・連成のIM-03等、実務受入のIM-07で扱う。
