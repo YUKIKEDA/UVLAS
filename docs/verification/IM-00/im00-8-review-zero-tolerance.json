@@ -1,0 +1,131 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 12,
+  "date": "2026-11-15",
+  "source_commit": "641da912cf7b18820dc1b9594fe7168e0fc63137",
+  "scope": "PR61のゼロ・極小許容差に関するレビュー修正。元残差を評価できた途中候補の指標未表現を、作用や包絡そのものの失敗と区別し、残りの作用枠で反復する。",
+  "review": {
+    "pull_request": 61,
+    "comment_id": 4578536901,
+    "comment_head": "55effa33b586ecce5c35eea663cabc72697366fc",
+    "code_fix_commit": "ebda97e",
+    "finding": "A=P=[1]、b=[1]、尺度1、全許容差0で、初期x=0の1/0による有限metric不能を求解全体のPrecisionUnresolvedとして返し、厳密解へ進めなかった。",
+    "changed_contract": "callback・actual magnitude・raw残差/誤差包絡・分母生成が成功した後、共通metric変換だけのPrecisionUnresolvedをprivateなUnrepresentableMetricsへ分ける。初期/再始動の未認定候補では継続し、投影の最終候補では拒否する。成功とmetadataには有限なColumnMetricsだけを渡す。"
+  },
+  "provenance": {
+    "clean": true,
+    "uncommitted_changes": false,
+    "main_integrated": "37fdb2b",
+    "note": "source修正と独立対照をcommitし、既に受領したMSVC wrapper修正をmainから通常mergeした。既存roadmapのIM00-11にIssue62を名指しした後、上記clean commitから影響するGMRES4CTestを両構成で各1回実行した。旧im00-8.jsonと既存の生データは変更しない。"
+  },
+  "environment": {
+    "os": "Windows 11 AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict、最近接丸めと段階的アンダーフロー。",
+    "dependencies": "既存の固定Eigen5.0.1、Boost1.92.0、Catch2 3.16.1を再利用。manifest install無効の試験用prefixを読み取り専用で使用。"
+  },
+  "verification": [
+    {
+      "configuration": "Debug",
+      "command": "ctest --test-dir out/build/windows-msvc -C Debug -R ^numerics.gmres_ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "cases": 28,
+      "log": "docs/verification/IM-00/im00-8-review-zero-tolerance/clean-debug-tests.log"
+    },
+    {
+      "configuration": "Release",
+      "command": "ctest --test-dir out/build/windows-msvc -C Release -R ^numerics.gmres_ --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "cases": 28,
+      "log": "docs/verification/IM-00/im00-8-review-zero-tolerance/clean-release-tests.log"
+    }
+  ],
+  "regressions": [
+    {
+      "case": "恒等系の厳密な認定",
+      "evidence": "Infinity/L2の2種類、右辺0/1、許容差0/2^-1063/1e-12の12組を固定。A=P=1、非零右辺1は作用を開始して厳密解1へ進み、有限な認定metric0を返す。両wordの実値をcallback外のcpp_rationalで比較する。"
+    },
+    {
+      "case": "再始動途中の未認定指標",
+      "evidence": "diag(1,2)、P=I、restart1、全許容差0、作用quota4。初回更新後も未表現の指標で止まらず次の作用へ進み、実4作用後のOperatorLimit/LinearUnconvergedを確認。厳密収束までの回数を仮定しない。"
+    },
+    {
+      "case": "相対許容差だけが非零の連成行",
+      "evidence": "A=diag-block([[1,1],[0,1]],I2)、b=[0,1,0,0]、P=I、restart1、atol0/rtol1e-12。初期は指標を作れるが、途中にゼロ右辺行の非零残差が生じる。その候補を通り、厳密解[-1,1,0,0]に対して固定の絶対誤差1e-12未満で成功する。"
+    },
+    {
+      "case": "認定できない最終候補",
+      "evidence": "許容差0とloose producer誤差1e-6を組み合わせ、成功を拒否する。既存のstrict保持/明示投影拒否と全consumer認定も4CTestへ含めた。"
+    },
+    {
+      "case": "本物の評価失敗を保持",
+      "evidence": "Aの第1/第2呼出し、絶対作用の第1/第2呼出しが返すPrecisionUnresolvedを、内側のmodel/trial/数値世代/問題/資源情報と作用回数ごと保持する。有限なb_hi=max、b_lo=maxの初期raw包絡overflowもPrecisionUnresolved・0作用のまま返す。"
+    }
+  ],
+  "mutations": {
+    "control_cases": 24,
+    "control_assertions": 630,
+    "compiled_detected": 3,
+    "timeouts": 0,
+    "changes": [
+      "metric未表現を旧来のPrecisionUnresolved即returnへ戻す",
+      "raw combineのPrecisionUnresolvedまで未認定markerへ変換する",
+      "A/絶対作用callbackのPrecisionUnresolvedまで未認定markerへ変換する"
+    ],
+    "method": "同じ固定sourceとRelease ABIの隔離copyへ各mutant objectを明示link。controlのcontract19cases/591assertionsとbasic5cases/39assertionsが成功後、3変異全てcompile/link成功→実行exit42で検出した。raw失敗を無視する変異ではscratchを明示0にして未初期化値の挙動に依存させていない。compile45秒/link30秒/test15秒を各上限とした。元source/build/入力は変更しない。"
+  },
+  "static_analysis": {
+    "clang_format": "21.1.2。変更sourceと2試験TUを整形。",
+    "clang_tidy": "21.1.1。変更source・basic試験・contract試験の3TUで対象診断0。",
+    "documentation": "契約・教訓・roadmapの追加を別担当が独立通読。教訓/roadmap lint0、契約は既存の術語反復info1を意味維持のため保持。"
+  },
+  "reuse": {
+    "benchmarks": "旧3978961の4case baselineと生JSONをそのsourceの証拠として保持する。今回変更したのは候補の認定状態の分岐で、行列作用・MGS2/Givens・補正の算術・配列配置は不変。性能改善や修正版の新たな計測値を主張せず、benchmarkは再実行しない。",
+    "prior_mutations": "旧im00-8の8変異はそのsourceの履歴として保存し、今回の境界3変異だけを追加した。",
+    "unaffected": "密疎solver、Python、参照fixture、受領したMSVC wrapperには今回製品変更を加えず、手元で再試験しない。"
+  },
+  "remaining_gates": [
+    "既存密疎solverの同系列の未達候補即失敗はIssue62で追跡し、IM00-11の完了前提に名指しした。PR61では未変更で、Issue62を閉じない。",
+    "IM00-11の設計試作4数値群の製品検証とIM-04の物理ブロック前処理は後続gate。",
+    "Linuxの追加head CIは提出時点で未確認。CI完了を待たない。"
+  ],
+  "redaction": "公開コピーだけを伏字化し、元/公開のSHAと置換件数を保存。既存記録と元ログは上書きしない。",
+  "sources": {
+    "src/numerics/gmres_solve.cpp": "9432b3bc0ddba0607e2fcaaef40572597ba26d05539d5ef0b49d720d66ae9540",
+    "tests/numerics/gmres_contract_test.cpp": "8e87851acd548fa478b3f16cacbe166aa79b2db6084a8a7b46ec1089aea1ad11",
+    "tests/numerics/gmres_solve_test.cpp": "1862193cd85ca9f2b12e35d48c5ebed139431c855f1e6c9a3c0e089dc411cb0c",
+    "tests/CMakeLists.txt": "8077fa6b30de6c65edee1f6edb6dfa335ac9d3a25622e51cba9d737de853bcaf",
+    "docs/specs/foundation/gmres-solve-contract.md": "2fb3d105b19d84f0b01f4caffbcc285996732f2eedc191b5c14df41c5768d2ca",
+    "docs/engineering/lessons-and-evidence.md": "dce589dfe717654164624d51cd569674889c610468c32109e13e9cc89c8799c0",
+    "docs/roadmap.md": "57f649e8da57c87637d8ac3e8ad884ad89328e9708f5a2d6fc1307d1a3961ad5",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/linear_solve_detail.hpp": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+    "src/numerics/gmres_residual_detail.cpp": "46230d8c26c249212facc401815346b90bfc00a37c68cbb9f3c02be4f95f4a16",
+    "src/numerics/gmres_residual_detail.hpp": "d1ca3a8b763439e66c7525bfe0c46e656f2f7ab9b2e5691ce0f1200ceef4b4e6"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/basic-tidy.log": "c6b10d60edd6f9bcfbbb71a065a59066c095df89d93c6610f467e48d93620a7d",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/candidate-boundary-mutations.zip": "2a65fb830ef2fe8d704accf13bc6afa39cd5c2e834928cd922cab355a8db9bd4",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/clean-debug-build.log": "159f63457aacd24a5991ace03cbdf2187363de393faead5a64bc6b127164f8a7",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/clean-debug-tests.log": "3ea467b225d803186aefe27a28f6bde690f8c01c85d17f80798605851030336a",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/clean-release-build.log": "240e1b43e16e8f7be791562ec9b3a9144db328e34e4cc6fa30069a9007a8422f",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/clean-release-tests.log": "5ee736bd8f1223d11e03d6e42db558383bbb688fc8e3d55521a697a8a81f4e2b",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/contract-lint.json": "c4841e6d2d19b998f03d37c9214c047a3d8911252a16ca52dec59077d274fe54",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/contract-tidy.log": "dc05c807f5a56999006ee2d3ee380fddd44e61531ffb94803894602476cdeebf",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/git-revision.hpp": "dee9359f57538cdc885f355ca854ddeb26f2d2a133123dcffaf38038fb564c93",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/lesson-lint.json": "534737b4dbf60024fe8edc25cc7759e4d1f94571bed8caf80cb4b3a4447c5007",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/redaction.json": "ed90709c0924ff46a1a41e370d9a14d76288f807a18af6e35c5aaf4d88da96a2",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/roadmap-lint.json": "75d7daa8bbf58732e47ff582cbdf525f9fe69a4949c188fb04e79cd704055156",
+    "docs/verification/IM-00/im00-8-review-zero-tolerance/source-tidy.log": "8ba1c529fd49740b56cfb322178d82894da25e9a948c56e95428edd506aae363"
+  }
+}
