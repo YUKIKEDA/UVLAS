@@ -1,0 +1,29 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring done (0.8s)
+-- Generating done (0.3s)
+-- Build files have been written to: <repo>/out/build/windows-msvc
+[0/4] Re-checking globbed directories...
+[1/26] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\windows-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/windows-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/26] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[3/26] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[4/26] Linking CXX static library Debug\uvlas_core.lib
+[5/26] Linking CXX static library Debug\uvlas_core_audit.lib
+[6/26] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\sparse_solve.cpp.obj
+[7/26] Building CXX object tests\CMakeFiles\uvlas_test_numerics_sparse_solve.dir\Debug\numerics\sparse_solve_test.cpp.obj
+[8/26] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Debug\src\numerics\sparse_solve.cpp.obj
+[9/26] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\dense_solve.cpp.obj
+[10/26] Linking CXX static library Debug\uvlas_numerics.lib
+[11/26] Building CXX object tests\CMakeFiles\uvlas_test_numerics_sparse_allocation.dir\Debug\support\allocation_audit.cpp.obj
+[12/26] Building CXX object tests\CMakeFiles\uvlas_test_numerics_linear_candidate.dir\Debug\numerics\linear_candidate_test.cpp.obj
+[13/26] Linking CXX executable tests\Debug\uvlas_test_numerics_sparse_solve.exe
+[14/26] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Debug\src\numerics\dense_solve.cpp.obj
+[15/26] Linking CXX static library Debug\uvlas_numerics_audit.lib
+[16/26] Linking CXX executable tests\Debug\uvlas_test_numerics_dense_solve.exe
+[17/26] Linking CXX executable tests\Debug\uvlas_test_numerics_dense_allocations.exe
+[18/26] Linking CXX executable tests\Debug\uvlas_test_numerics_dense_contract.exe
+[19/26] Linking CXX executable tests\Debug\uvlas_test_numerics_linear_candidate.exe
+[20/26] Building CXX object tests\CMakeFiles\uvlas_test_numerics_direct_progress.dir\Debug\numerics\direct_progress_test.cpp.obj
+[21/26] Linking CXX executable tests\Debug\uvlas_test_numerics_direct_progress.exe
+[22/26] Building CXX object tests\CMakeFiles\uvlas_test_numerics_sparse_allocation.dir\Debug\numerics\sparse_allocation_test.cpp.obj
+[23/26] Linking CXX executable tests\Debug\uvlas_test_numerics_sparse_allocation.exe

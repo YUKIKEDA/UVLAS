@@ -266,3 +266,9 @@ if(WIN32)
             "${PROJECT_SOURCE_DIR}/tools/dev/msvc_test.ps1")
     set_tests_properties(tools.msvc_arguments PROPERTIES TIMEOUT 75 LABELS "unit;negative")
 endif()
+
+uvlas_add_test(numerics.linear_candidate LABELS unit negative verification
+    SOURCES numerics/linear_candidate_test.cpp LIBS uvlas_numerics)
+target_include_directories(uvlas_test_numerics_linear_candidate PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_add_test(numerics.direct_progress LABELS unit negative verification
+    SOURCES numerics/direct_progress_test.cpp LIBS uvlas_numerics Boost::multiprecision)

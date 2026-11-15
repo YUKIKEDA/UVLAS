@@ -1,0 +1,29 @@
+[0/2] Re-checking globbed directories...
+[1/24] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\windows-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/windows-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/24] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[3/24] Linking CXX static library Release\uvlas_core.lib
+[4/24] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[5/24] Linking CXX static library Release\uvlas_core_audit.lib
+[6/24] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\sparse_solve.cpp.obj
+[7/24] Building CXX object tests\CMakeFiles\uvlas_test_numerics_sparse_solve.dir\Release\numerics\sparse_solve_test.cpp.obj
+[8/24] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Release\src\numerics\sparse_solve.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[9/24] Building CXX object tests\CMakeFiles\uvlas_test_numerics_sparse_allocation.dir\Release\support\allocation_audit.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[10/24] Building CXX object tests\CMakeFiles\uvlas_test_numerics_linear_candidate.dir\Release\numerics\linear_candidate_test.cpp.obj
+[11/24] Building CXX object tests\CMakeFiles\uvlas_test_numerics_direct_progress.dir\Release\numerics\direct_progress_test.cpp.obj
+[12/24] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\dense_solve.cpp.obj
+[13/24] Linking CXX static library Release\uvlas_numerics.lib
+[14/24] Building CXX object tests\CMakeFiles\uvlas_test_numerics_sparse_allocation.dir\Release\numerics\sparse_allocation_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[15/24] Linking CXX executable tests\Release\uvlas_test_numerics_sparse_solve.exe
+[16/24] Linking CXX executable tests\Release\uvlas_test_numerics_dense_solve.exe
+[17/24] Linking CXX executable tests\Release\uvlas_test_numerics_dense_contract.exe
+[18/24] Linking CXX executable tests\Release\uvlas_test_numerics_linear_candidate.exe
+[19/24] Linking CXX executable tests\Release\uvlas_test_numerics_direct_progress.exe
+[20/24] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Release\src\numerics\dense_solve.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[21/24] Linking CXX static library Release\uvlas_numerics_audit.lib
+[22/24] Linking CXX executable tests\Release\uvlas_test_numerics_dense_allocations.exe
+[23/24] Linking CXX executable tests\Release\uvlas_test_numerics_sparse_allocation.exe
