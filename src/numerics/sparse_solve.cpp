@@ -1,5 +1,6 @@
 #include "backend_memory_detail.hpp"
 #include "compensated.hpp"
+#include "linear_candidate_detail.hpp"
 #include "linear_solve_detail.hpp"
 #include "sparse_spd.hpp"
 #include "sparse_triangular.hpp"
@@ -132,8 +133,8 @@ public:
         core::PlannedBuffer<double> error_in, core::PlannedBuffer<double> denominator_in,
         core::PlannedBuffer<Accumulator> sums_in,
         core::PlannedBuffer<MagnitudeBounds> magnitudes_in, core::PlannedBuffer<double> last_in,
-        BackendMemoryPlan plan_in, BackendAdmission admission_in, core::Index capacity_in,
-        MetadataBuffers scales_in) noexcept
+        core::PlannedBuffer<RefinementProgress> progress_in, BackendMemoryPlan plan_in,
+        BackendAdmission admission_in, core::Index capacity_in, MetadataBuffers scales_in) noexcept
         : original(std::move(source)),
           triangular(std::move(factors)),
           work(std::move(work_in)),
@@ -146,6 +147,7 @@ public:
           sums(std::move(sums_in)),
           magnitudes(std::move(magnitudes_in)),
           last_correction(std::move(last_in)),
+          progress(std::move(progress_in)),
           memory_plan(plan_in),
           admission(admission_in),
           capacity(capacity_in),
@@ -156,6 +158,7 @@ public:
     core::PlannedBuffer<Accumulator> sums;
     core::PlannedBuffer<MagnitudeBounds> magnitudes;
     core::PlannedBuffer<double> last_correction;
+    core::PlannedBuffer<RefinementProgress> progress;
     BackendMemoryPlan memory_plan;
     BackendAdmission admission;
     core::Index capacity;
@@ -411,12 +414,17 @@ core::Result<SparsePrepared> SparsePrepared::prepare(const SparseOperator& origi
             if (!last) {
                 return std::unexpected(last.error());
             }
+            auto progress = plan.allocate<detail::RefinementProgress>(
+                n == 0 ? 0 : limits.maximum_rhs_columns, operation);
+            if (!progress) {
+                return std::unexpected(progress.error());
+            }
             auto data = std::make_unique<detail::SparsePreparedData>(
                 std::move(*snapshot), std::move(factors), std::move(*work), std::move(*rhs),
                 std::move(*rhs_low), std::move(*residual), std::move(*correction),
                 std::move(*error), std::move(*denominator), std::move(*sums),
-                std::move(*magnitudes), std::move(*last), *forecast, *admitted,
-                limits.maximum_rhs_columns, std::move(*scale_snapshot));
+                std::move(*magnitudes), std::move(*last), std::move(*progress), *forecast,
+                *admitted, limits.maximum_rhs_columns, std::move(*scale_snapshot));
             return SparsePrepared{std::move(data), original.context(), method};
         });
     if (!outcome) {
@@ -523,7 +531,7 @@ core::Result<bool> evaluate_sparse_columns(detail::SparsePreparedData& data,
             data.error.values()[index] = sum->error;
             data.denominator.values()[index] = data.magnitudes.values()[index].lower;
         }
-        const auto metric = detail::evaluate_column_metrics<double>(
+        const auto metric = detail::assess_candidate_column_metrics<double>(
             n, data.residual.values().subspan(start, static_cast<std::size_t>(n)),
             data.error.values(), data.denominator.values(),
             data.rhs.values().subspan(start, static_cast<std::size_t>(n)),
@@ -532,10 +540,16 @@ core::Result<bool> evaluate_sparse_columns(detail::SparsePreparedData& data,
         if (!metric) {
             return std::unexpected(metric.error());
         }
-        metrics[static_cast<std::size_t>(column)] = *metric;
-        metrics[static_cast<std::size_t>(column)].scaled_correction_upper =
-            n == 0 ? 0 : data.last_correction.values()[static_cast<std::size_t>(column)];
-        achieved &= detail::meets_accuracy(*metric, accuracy);
+        const auto c = static_cast<std::size_t>(column);
+        if (n != 0) {
+            data.progress.values()[c].current = *metric;
+        }
+        // A nonrepresentable ratio is an unfinished candidate, never a finite certificate.
+        if (const auto* finite = std::get_if<ColumnMetrics>(&*metric)) {
+            metrics[c] = *finite;
+            metrics[c].scaled_correction_upper = n == 0 ? 0 : data.last_correction.values()[c];
+        }
+        achieved &= detail::candidate_meets_accuracy(*metric, accuracy);
     }
     return achieved;
 }
@@ -679,23 +693,18 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
                 }
                 if (!two && corrections > 0) {
                     for (std::size_t c = 0; c < metadata->retained_columns.size(); ++c) {
-                        const auto now = metadata->retained_columns.values()[c],
-                                   before = metadata->returned_columns.values()[c];
-                        if (!detail::meets_accuracy(now, accuracy) &&
-                            (now.normalized_original_residual_upper <= 1 ||
-                             now.normalized_original_residual_upper >
-                                 0.5 * before.normalized_original_residual_upper) &&
-                            (now.componentwise_backward_error_upper <=
-                                 accuracy.componentwise_backward_tolerance ||
-                             now.componentwise_backward_error_upper >
-                                 0.5 * before.componentwise_backward_error_upper)) {
+                        const auto& progress = data.progress.values()[c];
+                        if (detail::needs_precision_promotion(progress.current, progress.previous,
+                                                              accuracy)) {
                             two = true;
                             retention = RetentionPath::PromotedTwoWord;
                         }
                     }
                 }
-                std::ranges::copy(metadata->retained_columns.values(),
-                                  metadata->returned_columns.values().begin());
+                for (core::Index column = 0; column < shape.columns; ++column) {
+                    auto& progress = data.progress.values()[static_cast<std::size_t>(column)];
+                    progress.previous = progress.current;
+                }
                 solved = detail::solve_sparse_triangular(
                     data.triangular, data.residual.values().first(count), shape.columns,
                     data.work.values(), data.correction.values().first(count));
@@ -714,9 +723,9 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
                         }
                         stagnated |=
                             unchanged &&
-                            !detail::meets_accuracy(metadata->retained_columns
-                                                        .values()[static_cast<std::size_t>(column)],
-                                                    accuracy);
+                            !detail::candidate_meets_accuracy(
+                                data.progress.values()[static_cast<std::size_t>(column)].current,
+                                accuracy);
                     }
                     if (stagnated) {
                         two = true;
