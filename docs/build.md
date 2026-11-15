@@ -86,7 +86,7 @@ cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest 
 | `toolchain.arnoldi` | 実数作用素の複素共役固有値と、複素非Hermitian作用素の固有値を、行列を渡さないArnoldiで求める |
 | `toolchain.precise_arithmetic` | Multiprecisionの精度、有理数の厳密算術、Hash2のSHA-256既知値を照合する |
 | `toolchain.third_party_notices` | vcpkgの著作権・ライセンス通知が構成先へバイト一致で複製されていること。扱いは[第三者通知](../THIRD_PARTY_NOTICES.md) |
-| `toolchain.notice_configuration` | 実ソースの複製を使った新規構成6通り。試験の既定ON・明示ON・OFFと、Catch2通知あり／なしを照合する。依存原本の変更・C++ビルドは行わない |
+| `toolchain.notice_configuration` | 実ソースの複製でCatch2通知の6構成と、Benchmarkの既定OFF・明示OFF・ON・同一ビルド先のON→OFFを確認する。後者は登録済みの通知CTestも走らせ、ONの複製・上流通知欠落を拒否する。構成専用package fixtureを使い、依存原本の変更・C++ビルドは行わない |
 | `core.failure` | 17種類の失敗、所有する診断、識別子の混用拒否、例外をResultへ変換する入口の契約 |
 | `core.error_certificate` | 未評価・達成・未達の区別、予算境界、負値・非有限・未対応表現の拒否 |
 | `core.checked_dimensions` | 符号付き64bit寸法・バイト数の検査、ゼロ次元、32bit外部APIへの検査付き変換 |

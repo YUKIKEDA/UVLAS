@@ -66,6 +66,7 @@ add_test(NAME toolchain.third_party_notices
     COMMAND "${CMAKE_COMMAND}"
         "-DSHARE_DIR=${UVLAS_THIRD_PARTY_SHARE}"
         "-DNOTICES_DIR=${UVLAS_THIRD_PARTY_NOTICES}"
+        "-DBUILD_BENCHMARKS=${UVLAS_BUILD_BENCHMARKS}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notices.cmake")
 set_tests_properties(toolchain.third_party_notices PROPERTIES TIMEOUT 10 LABELS "integration")
 
@@ -77,6 +78,7 @@ add_test(NAME toolchain.notice_configuration
         "-DTRIPLET=${VCPKG_TARGET_TRIPLET}"
         "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
         "-DPYTHON_EXECUTABLE=${Python3_EXECUTABLE}"
+        "-DCTEST_COMMAND=${CMAKE_CTEST_COMMAND}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/toolchain/check_notice_configuration.cmake")
 set_tests_properties(toolchain.notice_configuration PROPERTIES TIMEOUT 180 LABELS "integration;negative")
 

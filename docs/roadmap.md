@@ -4,7 +4,7 @@
 
 **今**：IM00-5
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。次のIM00-5は密・疎の保持IM00-4（PR #44）の採用後に進める。Python結合IM00-10も、状態契約IM00-9（PR #45）の採用後に並行できる。レビュー中の先行PRを完了扱いにはしない。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。方式と契約の採用と受入計画を終え、依存検査、共通の失敗・誤差認定、checked寸法・資源計画、IM00-12の計測基盤を実装した。密・疎の保持IM00-4と状態契約IM00-9も採用済みで、次のIM00-5とPython結合IM00-10を並行して進められる。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
