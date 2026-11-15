@@ -34,3 +34,7 @@ std::expected<Solution, Failure> solve_linear(const Operator& a, const Rhs& b, c
 BAD   予算を検査し、要素を構築してから初めて計上する
 GOOD  予算を予約してから構築し、成功時に計上へ移す。失敗時は自身の予約だけを戻す
 ```
+
+Python結合では、`shared_ptr` 引数の `none(false)` だけでimplicit selfを保護したと判断しない。`Class.method(None)` がmethod本体へnullを渡せるため、全所有者selfを入口で明示拒否し、別プロセスの負対照を置く。2026-11-15、IM00-10の独立レビューでNumPy viewのself Noneがaccess violationを起こすことを確認して修正した。
+
+候補の消費・置換・cancelより先に、Python Result、所有者holderと返却先参照を用意する。native成功後にPython包装を確保すると、包装失敗で結果の所有者を失い、消費済み候補だけが残る。変更後には、例外を出さない値の移動・代入だけを残す。可変長のnative snapshotは明示のResourcePlanで照合し、metadata overhead扱いにしない。

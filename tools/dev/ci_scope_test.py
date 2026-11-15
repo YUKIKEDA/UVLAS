@@ -21,7 +21,19 @@ class ScopeTest(unittest.TestCase):
             "tools/dev/sync_skills.py": {"python", "skills", "checks"},
             "tools/rd/check_tree.py": {"python", "rd", "checks"},
             "tools/qa/trace.py": {"python", "trace", "checks"},
-            "src/core/build_info.cpp": {"build", "benchmark", "format", "trace", "checks"},
+            "src/core/build_info.cpp": {
+                "build",
+                "benchmark",
+                "binding",
+                "format",
+                "trace",
+                "checks",
+            },
+            "src/python/module.cpp": {"binding", "format", "checks"},
+            "src/python/CMakeLists.txt": {"binding"},
+            "tests/python/test_ownership.py": {"binding", "python", "checks"},
+            "tests/python/requirements.txt": {"binding"},
+            "src/python/README.md": set(),
             "tests/toolchain/arnoldi_test.cpp": {"build", "format", "trace", "checks"},
             "tests/toolchain/check_notices.cmake": {"build"},
             "docs/specs/foundation/contract.md": {"trace", "rd", "checks"},
@@ -65,8 +77,18 @@ class ScopeTest(unittest.TestCase):
             "uvlas_git_revision",
         )
 
+    def test_optional_and_normal_sources_keep_independent_format_scope(self) -> None:
+        paths = ["src/python/module.cpp", "tests/toolchain/pinned_dependencies_test.cpp"]
+        scope = test_scope(paths)
+        self.assertEqual(scope["cpp_files"], "tests/toolchain/pinned_dependencies_test.cpp")
+        self.assertEqual(scope["format_files"], " ".join(paths))
+        self.assertEqual(test_scope(paths, full=True)["format_files"], "")
+        mixed = ["benchmarks/dimensions_bench.cpp", *paths]
+        self.assertEqual(test_scope(mixed)["format_files"], " ".join(mixed))
+        self.assertEqual(test_scope(["rd/fixture.cpp", *paths])["format_files"], " ".join(paths))
+
     def test_job_result_matrix(self) -> None:
-        for build, benchmark in product((False, True), repeat=2):
+        for build, benchmark, binding in product((False, True), repeat=3):
             for checks in (False, True):
                 needs: dict[str, object] = {
                     "changes": {
@@ -74,16 +96,18 @@ class ScopeTest(unittest.TestCase):
                         "outputs": {
                             "build": str(build).lower(),
                             "benchmark": str(benchmark).lower(),
+                            "binding": str(binding).lower(),
                             "checks": str(checks).lower(),
                         },
                     },
                     "windows": {"result": "success" if build else "skipped"},
                     "linux": {"result": "success" if build else "skipped"},
                     "benchmark": {"result": "success" if benchmark else "skipped"},
+                    "binding": {"result": "success" if binding else "skipped"},
                     "checks": {"result": "success" if checks else "skipped"},
                 }
                 self.assertEqual(verify_needs(needs), [])
-                for job in ("windows", "linux", "benchmark", "checks"):
+                for job in ("windows", "linux", "benchmark", "binding", "checks"):
                     original = needs[job]
                     for result in ("success", "skipped", "failure", "cancelled"):
                         if original == {"result": result}:
@@ -99,7 +123,8 @@ class ScopeTest(unittest.TestCase):
         self.assertTrue(verify_needs({}))
         for outputs in ({}, {"build": "unknown", "checks": "false"}):
             needs: dict[str, object] = {
-                job: {"result": "skipped"} for job in ("windows", "linux", "benchmark", "checks")
+                job: {"result": "skipped"}
+                for job in ("windows", "linux", "benchmark", "binding", "checks")
             }
             needs["changes"] = {"result": "success", "outputs": outputs}
             self.assertTrue(verify_needs(needs))

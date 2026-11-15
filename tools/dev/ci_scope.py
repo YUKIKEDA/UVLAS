@@ -10,8 +10,8 @@ import subprocess
 from pathlib import Path
 from typing import cast
 
-FLAGS = ("build", "benchmark", "format", "python", "skills", "rd", "trace")
-JOBS = {"changes", "windows", "linux", "benchmark", "checks"}
+FLAGS = ("build", "benchmark", "binding", "format", "python", "skills", "rd", "trace")
+JOBS = {"changes", "windows", "linux", "benchmark", "binding", "checks"}
 TOOLCHAIN_TESTS = {
     "tests/toolchain/pinned_dependencies_test.cpp": "toolchain.pinned_dependencies",
     "tests/toolchain/linear_algebra_test.cpp": "toolchain.linear_algebra",
@@ -22,9 +22,21 @@ TOOLCHAIN_TESTS = {
 
 
 def test_scope(paths: list[str], *, full: bool = False) -> dict[str, str]:
+    format_candidates = [
+        path
+        for path in paths
+        if path.startswith(("src/", "include/", "tests/", "qa/", "benchmarks/"))
+        and path.endswith((".cpp", ".hpp"))
+    ]
+    format_files = " ".join(format_candidates) if not full else ""
     compiled = [path for path in paths if select([path])["build"]]
     if full or not compiled or any(path not in TOOLCHAIN_TESTS for path in compiled):
-        return {"test_regex": ".*", "build_targets": "", "cpp_files": ""}
+        return {
+            "test_regex": ".*",
+            "build_targets": "",
+            "cpp_files": "",
+            "format_files": format_files,
+        }
     tests = sorted({TOOLCHAIN_TESTS[path] for path in compiled})
     # The notice check has no executable target. This anchor builds no product kernel.
     targets = [
@@ -38,6 +50,7 @@ def test_scope(paths: list[str], *, full: bool = False) -> dict[str, str]:
         "test_regex": "^(" + "|".join(re.escape(name) for name in tests) + ")$",
         "build_targets": " ".join(targets),
         "cpp_files": " ".join(path for path in compiled if path.endswith(".cpp")),
+        "format_files": format_files,
     }
 
 
@@ -53,6 +66,10 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
             selected["skills"] = True
         elif path.startswith(".cursor/") or path in {"LICENSE", "THIRD_PARTY_NOTICES.md"}:
             continue
+        elif path.startswith(("src/python/", "tests/python/")):
+            selected["binding"] |= not path.endswith(".md")
+            selected["format"] |= path.endswith((".cpp", ".hpp"))
+            selected["python"] |= path.endswith(".py")
         elif path.startswith("benchmarks/"):
             # Compile the optional feature without running a performance comparison.
             selected["format"] |= path.endswith((".cpp", ".hpp"))
@@ -70,6 +87,7 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
         }:
             selected["build"] = selected["format"] = selected["trace"] = True
             selected["benchmark"] |= not path.startswith(("tests/", "qa/"))
+            selected["binding"] |= not path.startswith(("tests/", "qa/"))
         elif path.startswith(("rd/", "tools/rd/")):
             selected["rd"] = True
             selected["python"] |= path.startswith("tools/")
@@ -91,7 +109,9 @@ def select(paths: list[str], *, full: bool = False) -> dict[str, bool]:
         else:
             # Unknown dependencies must not silently disable required checks.
             selected = dict.fromkeys(FLAGS, True)
-    selected["checks"] = any(selected[key] for key in FLAGS if key not in {"build", "benchmark"})
+    selected["checks"] = any(
+        selected[key] for key in FLAGS if key not in {"build", "benchmark", "binding"}
+    )
     return selected
 
 
@@ -127,13 +147,17 @@ def verify_needs(value: object) -> list[str]:
     if changes.get("result") != "success":
         return ["Change selection did not succeed"]
     outputs = object_map(changes.get("outputs"))
-    if any(outputs.get(flag) not in ("true", "false") for flag in ("build", "benchmark", "checks")):
+    if any(
+        outputs.get(flag) not in ("true", "false")
+        for flag in ("build", "benchmark", "binding", "checks")
+    ):
         return ["Missing or invalid selection outputs"]
     errors: list[str] = []
     for job, flag in (
         ("windows", "build"),
         ("linux", "build"),
         ("benchmark", "benchmark"),
+        ("binding", "binding"),
         ("checks", "checks"),
     ):
         expected = "success" if outputs[flag] == "true" else "skipped"

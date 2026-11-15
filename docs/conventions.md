@@ -46,9 +46,10 @@
 | `aero` | 渦核、後流、荷重、TE所有 | IM-03 |
 | `coupling` | 初期化、強連成、確定、安定性と探索 | IM-04、IM-05 |
 | `io` | ケース、外部格子、結果、checkpoint | IM-06 |
+| `python` | 任意機能のCPython拡張。所有する数値保持と状態protocol、NumPy境界 | IM00-10の[Python境界契約](specs/foundation/python-binding-contract.md) |
 | `app` | CLI | 現在は `--help` と `--version`。解析コマンドはIM-06 |
 
-表のモジュールのうち、いまディレクトリがあるのは `core`、`numerics`、`app`。他は、最初のソースを足すPRで作る。
+表のモジュールのうち、いまディレクトリがあるのは `core`、`numerics`、`app`、`python`。他は、最初のソースを足すPRで作る。
 
 ## 名前
 

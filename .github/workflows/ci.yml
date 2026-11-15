@@ -18,6 +18,7 @@ jobs:
     outputs:
       build: ${{ steps.scope.outputs.build }}
       benchmark: ${{ steps.scope.outputs.benchmark }}
+      binding: ${{ steps.scope.outputs.binding }}
       format: ${{ steps.scope.outputs.format }}
       python: ${{ steps.scope.outputs.python }}
       skills: ${{ steps.scope.outputs.skills }}
@@ -27,6 +28,7 @@ jobs:
       test_regex: ${{ steps.scope.outputs.test_regex }}
       build_targets: ${{ steps.scope.outputs.build_targets }}
       cpp_files: ${{ steps.scope.outputs.cpp_files }}
+      format_files: ${{ steps.scope.outputs.format_files }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -152,7 +154,7 @@ jobs:
           if [ -n "$CI_CPP_FILES" ]; then
             clang-tidy -p out/build/linux-debug --quiet $CI_CPP_FILES
           else
-            clang-tidy -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp')
+            clang-tidy -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp' ':(exclude)src/python/*.cpp')
           fi
 
   benchmark:
@@ -194,13 +196,76 @@ jobs:
           export UVLAS_BENCH_MEMORY_BYTES="$(awk '/^MemTotal:/ {printf "%.0f", $2 * 1024}' /proc/meminfo)"
           out/build/linux-bench/benchmarks/uvlas_kernel_bench --benchmark_list_tests=true | grep '^checked_extent_product$'
 
+  binding:
+    needs: changes
+    if: needs.changes.outputs.binding == 'true'
+    name: Python ownership (${{ matrix.os }}, CPython 3.12)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/checkout@v7
+        with:
+          repository: microsoft/vcpkg
+          path: out/vcpkg
+          fetch-depth: 0
+      - uses: actions/cache@v6
+        with:
+          path: out/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'cmake/vcpkg-ports/**') }}
+      - name: NumPy 2
+        run: python -m pip install -r tests/python/requirements.txt
+      - name: Bootstrap vcpkg (Windows)
+        if: runner.os == 'Windows'
+        run: ./out/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+      - name: Bootstrap vcpkg (Linux)
+        if: runner.os == 'Linux'
+        run: ./out/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+      - name: Configure and build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          New-Item -ItemType Directory -Force out/vcpkg-cache | Out-Null
+          $env:VCPKG_DEFAULT_BINARY_CACHE="$env:GITHUB_WORKSPACE/out/vcpkg-cache"
+          $bindingPython=(Get-Command python).Source
+          pwsh -NoProfile -File tools/dev/msvc.ps1 cmake -S . -B out/build/python -G 'Ninja Multi-Config' -DUVLAS_BUILD_PYTHON=ON -DUVLAS_WARNINGS_AS_ERRORS=ON -DBUILD_TESTING=ON '-DVCPKG_MANIFEST_FEATURES=tests;python' -D "Python3_EXECUTABLE=$bindingPython" -D "CMAKE_TOOLCHAIN_FILE=$env:GITHUB_WORKSPACE/out/vcpkg/scripts/buildsystems/vcpkg.cmake" -D "VCPKG_INSTALLED_DIR=$env:GITHUB_WORKSPACE/out/vcpkg_python_installed"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build out/build/python --config Release --target uvlas_python
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --test-dir out/build/python -C Release -R '^python.ownership$' --output-on-failure
+      - name: Configure, build and test (Linux)
+        if: runner.os == 'Linux'
+        env:
+          CXX: g++-14
+        run: |
+          mkdir -p out/vcpkg-cache
+          export VCPKG_DEFAULT_BINARY_CACHE="$GITHUB_WORKSPACE/out/vcpkg-cache"
+          cmake -S . -B out/build/python -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DUVLAS_BUILD_PYTHON=ON -DUVLAS_WARNINGS_AS_ERRORS=ON -DBUILD_TESTING=ON '-DVCPKG_MANIFEST_FEATURES=tests;python' \
+            -DPython3_EXECUTABLE="$(command -v python)" \
+            -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/out/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_INSTALLED_DIR="$GITHUB_WORKSPACE/out/vcpkg_python_installed"
+          cmake --build out/build/python --target uvlas_python
+          ctest --test-dir out/build/python -R '^python.ownership$' --output-on-failure
+      - name: clang-tidy configured Python module (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          pipx install clang-tidy==21.1.1
+          clang-tidy -p out/build/python --quiet src/python/module.cpp
+
   checks:
     needs: changes
     if: needs.changes.outputs.checks == 'true'
     name: format, skills, R&D tree
     runs-on: ubuntu-24.04
     env:
-      CI_CPP_FILES: ${{ needs.changes.outputs.cpp_files }}
+      CI_FORMAT_FILES: ${{ needs.changes.outputs.format_files }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -210,8 +275,10 @@ jobs:
         if: needs.changes.outputs.format == 'true'
         run: |
           pip install clang-format==21.1.2
-          if [ -n "$CI_CPP_FILES" ]; then
-            clang-format --dry-run --Werror $CI_CPP_FILES
+          if [ -n "$CI_FORMAT_FILES" ]; then
+            for source in $CI_FORMAT_FILES; do
+              [ ! -f "$source" ] || clang-format --dry-run --Werror "$source"
+            done
           else
             clang-format --dry-run --Werror $(git ls-files 'src/*.cpp' 'src/*.hpp' 'include/*.hpp' 'tests/*.cpp' 'tests/*.hpp' 'qa/*.cpp' 'qa/*.hpp' 'benchmarks/*.cpp' 'benchmarks/*.hpp')
           fi
@@ -236,7 +303,7 @@ jobs:
   ci:
     name: ci
     if: always()
-    needs: [changes, windows, linux, benchmark, checks]
+    needs: [changes, windows, linux, benchmark, binding, checks]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7

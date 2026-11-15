@@ -59,11 +59,11 @@ format-python:
 # gate: clang-tidy on product sources and tests, with the compile database of the configured preset
 [windows]
 lint:
-    {{clang_tidy}} -p out/build/windows-msvc --quiet (git ls-files "src/*.cpp" "tests/*.cpp" "qa/*.cpp")
+    {{clang_tidy}} -p out/build/windows-msvc --quiet (git ls-files "src/*.cpp" "tests/*.cpp" "qa/*.cpp" ":(exclude)src/python/*.cpp")
 
 [linux]
 lint:
-    {{clang_tidy}} -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp')
+    {{clang_tidy}} -p out/build/linux-debug --quiet $(git ls-files 'src/*.cpp' 'tests/*.cpp' 'qa/*.cpp' ':(exclude)src/python/*.cpp')
 
 # gate: every ID a test or a record names is defined; the traceability page is current
 trace-check:

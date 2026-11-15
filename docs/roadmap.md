@@ -62,7 +62,7 @@ flowchart LR
 | IM00-7 | Feat | 疎基準解法：対称正定値を確かめたLLT、不定KKTのSparseLU | #11 | Todo |
 | IM00-8 | Feat | 固定前処理の再始動GMRESと線形精度の認定 | #12 | Todo |
 | IM00-9 | Feat | Model参照、AcceptedState／TrialState、Workspace、cache世代、資格と一回確定 | #13 | Done |
-| IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | Todo |
+| IM00-10 | Feat | Python結合の所有権とエラー規約を製品の処理へ移植する | #14 | In progress |
 | IM00-11 | Test | IM-00の完了gate：設計試作の4数値群を製品経路で検証する | #15 | Todo |
 | IM00-12 | Feat | 計測基盤：工程別の時間、ピークメモリ、確保の検査、決定性の試験枠、kernelベンチ | #25 | Done |
 
