@@ -1,0 +1,53 @@
+RNG seed: 424242
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 19.439 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 5.51528 <= 1.04167e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 4.08029 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 6.68672 <= 1.08333e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.217452 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 121.176 <= 1.125e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.486467 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 113.407 <= 1.16667e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 6.82123 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 26.2602 <= 1.20833e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.0966757 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 10.9487 <= 1.25e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.913441 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 1.07841 <= 1.29167e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.217711 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 0.704178 <= 1.33333e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.985341 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 1.68439 <= 1.375e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.352591 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 0.969289 <= 1.41667e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 1.22646 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 1.21045 <= 1.45833e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 1.05734 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 1.05939 <= 1.5e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 1.15849 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 0.932378 <= 1.54167e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 1.40449 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.41238 <= 1.58333e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 1.104 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 1.15186 <= 1.625e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 2.23158 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 27.0305 <= 1.66667e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.470592 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.26877 <= 1.70833e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.478729 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.12948 <= 1.75e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.44399 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.16344 <= 1.79167e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.488243 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.67606 <= 1.83333e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.472197 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.67523 <= 1.875e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 1.6174 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 5.52119 <= 1.91667e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.230589 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 1.11044 <= 1.95833e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(186): failed: abs(values[i] - fixture->reference[i]) / denominator <= Big{"1e-12"} for: 0.72821 <= 1e-12
+<repo>\out\reference-cpp-mutation\transposed.cpp(191): failed: abs(residual) <= Big{"1e-12"} * (1 + abs(Big{fixture->rhs[i]})) for: 2.08292 <= 2e-12
+test cases:  3 |  2 passed |  1 failed
+assertions: 78 | 30 passed | 48 failed
+
+

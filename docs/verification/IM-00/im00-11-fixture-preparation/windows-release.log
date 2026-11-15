@@ -1,0 +1,13 @@
+Internal ctest changing into directory: <repo>/out/build/sparse-msvc
+Test project <repo>/out/build/sparse-msvc
+    Start 41: numerics.foundation_reference
+1/1 Test #41: numerics.foundation_reference ....   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+integration     =   0.07 sec*proc (1 test)
+negative        =   0.07 sec*proc (1 test)
+verification    =   0.07 sec*proc (1 test)
+
+Total Test time (real) =   0.07 sec
