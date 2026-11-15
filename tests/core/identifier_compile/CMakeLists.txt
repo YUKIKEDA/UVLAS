@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 3.25)
+project(UvlasIdentifierCompilation LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+if(NOT PROJECT_INCLUDE)
+    message(FATAL_ERROR "PROJECT_INCLUDE is required")
+endif()
+
+# A positive control distinguishes the intended type error from a broken compiler/include path.
+set(source "${CMAKE_CURRENT_BINARY_DIR}/control.cpp")
+file(WRITE "${source}" "#include <uvlas/core/identifier.hpp>\nusing namespace uvlas::core;\nvoid accept(DofId) {}\nvoid check() { accept(DofId{7}); }\n")
+try_compile(valid SOURCES "${source}" NO_CACHE
+    CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${PROJECT_INCLUDE}" OUTPUT_VARIABLE output)
+if(NOT valid)
+    message(FATAL_ERROR "Positive identifier compilation failed: ${output}")
+endif()
+
+set(domains DofId PanelId WakeVertexId WakeFaceId LayerId TrialId ModelGeneration NumericalGeneration)
+list(LENGTH domains count)
+math(EXPR last "${count} - 1")
+foreach(i RANGE ${last})
+    math(EXPR next "(${i} + 1) % ${count}")
+    list(GET domains ${i} target)
+    list(GET domains ${next} other)
+    set(source "${CMAKE_CURRENT_BINARY_DIR}/${target}.cpp")
+    file(WRITE "${source}" "#include <uvlas/core/identifier.hpp>\nusing namespace uvlas::core;\nvoid accept(${target}) {}\nvoid check() { accept(${other}{7}); }\n")
+    try_compile(mixed SOURCES "${source}" NO_CACHE
+        CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${PROJECT_INCLUDE}" OUTPUT_VARIABLE output)
+    if(mixed)
+        message(FATAL_ERROR "Different identity domains compiled: ${other} -> ${target}")
+    endif()
+    message(STATUS "Rejected ${other} -> ${target}")
+endforeach()

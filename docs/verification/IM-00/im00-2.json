@@ -1,0 +1,125 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02"
+  ],
+  "package": "IM-00",
+  "issue": 6,
+  "date": "2026-11-15",
+  "scope": "Checked integer extents and bytes, signed 32-bit conversion, strong identity compile rejection, cumulative payload budget and owned arrays only",
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "da63020e02b8a6ed6a989286ca5aeff805773432",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Debug",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "command": "ctest --preset windows-debug -R '^core\\.(checked_dimensions|resource_plan|identifier_compilation)$'",
+  "ctest": {
+    "passed": 3,
+    "total": 3,
+    "tests": [
+      "core.checked_dimensions",
+      "core.resource_plan",
+      "core.identifier_compilation"
+    ]
+  },
+  "reference": "Independently fixed exact integers, integer limits, positive compiler control and eight negative domain conversions, observed allocation/constructor counts, injected construction failures",
+  "sources": [
+    {
+      "id": "im00-2-checked-dimensions-api",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "hint": "include/uvlas/core/checked_dimensions.hpp"
+    },
+    {
+      "id": "im00-2-resource-plan-api",
+      "sha256": "c0451d7f3bb48578eb1cd8f7442f9de927fbc4c7ef7ac47e37dcfcf0016c98d0",
+      "hint": "include/uvlas/core/resource_plan.hpp"
+    },
+    {
+      "id": "im00-2-checked-dimensions-implementation",
+      "sha256": "5132c6d9de7be64d5d4d820f436333341baa6a98384bcb7510733066030d484c",
+      "hint": "src/core/checked_dimensions.cpp"
+    },
+    {
+      "id": "im00-2-dimension-tests",
+      "sha256": "cd5db7bfed953601fdc3161f92799cf597df5e063e686fffeddcf77f468311b6",
+      "hint": "tests/core/checked_dimensions_test.cpp"
+    },
+    {
+      "id": "im00-2-resource-plan-tests",
+      "sha256": "b6ed52e774d5411c62436379e09a500cb7206764f1fb6e553b1ab59eabcf637c",
+      "hint": "tests/core/resource_plan_test.cpp"
+    },
+    {
+      "id": "im00-2-identity-compiler-controls",
+      "sha256": "b35e63e980635a301a320c249363145d4e95161e812ab697f7064aa376343dad",
+      "hint": "tests/core/identifier_compile/CMakeLists.txt"
+    },
+    {
+      "id": "im00-2-identity-api",
+      "sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "hint": "include/uvlas/core/identifier.hpp"
+    },
+    {
+      "id": "im00-2-failure-api",
+      "sha256": "c6e7b020208855cfe99d7e89428a766e4ec5672cb33923f6f7ac4983ea92511d",
+      "hint": "include/uvlas/core/failure.hpp"
+    },
+    {
+      "id": "im00-2-dimension-resource-contract",
+      "sha256": "2c421adc1b34ce03d9238cf495fcb3a1c32648f32a514f3133685e1c47d0c133",
+      "hint": "docs/specs/foundation/dimensions-resource-contract.md"
+    },
+    {
+      "id": "im00-2-product-targets",
+      "sha256": "079354b7856c3079c7b8a0ec077f4733d9ea96152bb0db9ed2b051229ae2e660",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im00-2-test-targets",
+      "sha256": "456113ed73b47ac1c0dbf927342e478ef44b5b3eee4c5385179ca3116f91d21b",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im00-2-compiler-policy",
+      "sha256": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+      "hint": "cmake/CompilerPolicy.cmake"
+    },
+    {
+      "id": "im00-2-project-options",
+      "sha256": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a",
+      "hint": "cmake/ProjectOptions.cmake"
+    },
+    {
+      "id": "im00-2-dependency-manifest",
+      "sha256": "f42cc5536e8e9a91cfa2fe84e592e0fe3bbe011f4bd1d8ae02fcde0dca3e9887",
+      "hint": "vcpkg.json"
+    }
+  ],
+  "development_mutations": [
+    "api32 equality rejected",
+    "extent equality rejected",
+    "budget equality rejected",
+    "successful allocation not charged"
+  ],
+  "not_claimed": [
+    "physical_solver_accuracy",
+    "external_library_allocation_coverage",
+    "process_memory_cap_enforcement",
+    "product_scale_performance",
+    "practical_acceptance"
+  ],
+  "ci": "not awaited; Linux and other configurations are delegated to PR CI"
+}
