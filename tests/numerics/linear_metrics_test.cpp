@@ -1,6 +1,7 @@
 #include "linear_solve_detail.hpp"
 
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <array>
@@ -8,6 +9,7 @@
 #include <complex>
 #include <limits>
 #include <span>
+#include <stdexcept>
 #include <utility>
 
 namespace {
@@ -240,4 +242,152 @@ TEST_CASE("Relative allowance includes a nonzero low RHS word",
     CHECK(value->normalized_original_residual_upper >= 0.5);
     CHECK(value->normalized_original_residual_upper < 0.50000000000001);
     CHECK(metrics::meets_accuracy(*value, accuracy(Norm::Infinity, 0, 0.5)));
+}
+
+namespace {
+using ExactInteger = boost::multiprecision::cpp_int;
+using ExactRational = boost::multiprecision::cpp_rational;
+struct ExactSqrtInterval {
+    ExactSqrtInterval(ExactRational low, ExactRational high)
+        : lower(std::move(low)), upper(std::move(high)) {}
+    ExactRational lower, upper;
+};
+ExactRational exact_power_two(int exponent) {
+    // Oracle inputs are finite binary64 words. The wider signed type also
+    // prevents negation overflow when obtaining a negative exponent's magnitude.
+    const auto magnitude =
+        exponent < 0 ? -static_cast<long long>(exponent) : static_cast<long long>(exponent);
+    if (!std::in_range<unsigned>(magnitude)) {
+        throw std::overflow_error("oracle exponent exceeds integer shift range");
+    }
+    const ExactInteger power = ExactInteger(1) << static_cast<unsigned>(magnitude);
+    if (exponent < 0) {
+        return ExactRational(1) / ExactRational(power);
+    }
+    return ExactRational(power);
+}
+ExactSqrtInterval sqrt_interval_256(const ExactRational& squared) {
+    if (squared < 0) {
+        throw std::invalid_argument("negative squared oracle magnitude");
+    }
+    if (squared == 0) {
+        return {0, 0};
+    }
+    const ExactInteger numerator = boost::multiprecision::numerator(squared);
+    const ExactInteger denominator = boost::multiprecision::denominator(squared);
+    const auto numerator_bit = boost::multiprecision::msb(numerator);
+    const auto denominator_bit = boost::multiprecision::msb(denominator);
+    if (!std::in_range<int>(numerator_bit) || !std::in_range<int>(denominator_bit)) {
+        throw std::overflow_error("oracle radicand exponent exceeds signed range");
+    }
+    int exponent = static_cast<int>(numerator_bit) - static_cast<int>(denominator_bit);
+    if (squared < exact_power_two(exponent)) {
+        --exponent;
+    }
+    // Exact power-of-two normalization makes the reference interval narrower
+    // than a binary64 ulp even for physical minsub and near-overflow magnitudes.
+    int half_exponent = exponent / 2;
+    if (exponent % 2 < 0) {
+        --half_exponent;
+    }
+    const ExactRational normalized = squared / exact_power_two(2 * half_exponent);
+    const ExactInteger scale = ExactInteger(1) << 256;
+    const ExactInteger scaled_numerator =
+        boost::multiprecision::numerator(normalized) * scale * scale;
+    const ExactInteger scaled_denominator = boost::multiprecision::denominator(normalized);
+    const ExactInteger radicand = scaled_numerator / scaled_denominator;
+    const ExactInteger root = boost::multiprecision::sqrt(radicand);
+    const ExactRational low = ExactRational(root) / ExactRational(scale);
+    ExactRational high = ExactRational(root + 1) / ExactRational(scale);
+    if (root * root * scaled_denominator == scaled_numerator) {
+        high = low;
+    }
+    const auto physical_scale = exact_power_two(half_exponent);
+    return {low * physical_scale, high * physical_scale};
+}
+void encloses_exact_sqrt(double lower, double upper, const ExactRational& squared) {
+    const auto reference = sqrt_interval_256(squared);
+    REQUIRE(std::isfinite(lower));
+    REQUIRE(std::isfinite(upper));
+    REQUIRE(lower >= 0);
+    REQUIRE(upper >= lower);
+    // Check the original rational inequalities as well as the independently
+    // computed 256-bit bracket; no product sqrt or metric code builds the oracle.
+    CHECK(ExactRational(lower) * ExactRational(lower) <= squared);
+    CHECK(ExactRational(upper) * ExactRational(upper) >= squared);
+    CHECK(ExactRational(lower) <= reference.lower);
+    CHECK(ExactRational(upper) >= reference.upper);
+    const ExactRational allowance =
+        64 * ExactRational(std::numeric_limits<double>::epsilon()) * reference.lower +
+        8 * ExactRational(std::numeric_limits<double>::denorm_min());
+    // This is the existing binary64 envelope limit, not a 2^-256 product-width
+    // requirement. The latter precision belongs to the independent oracle only.
+    CHECK(ExactRational(upper) - ExactRational(lower) <= allowance);
+}
+} // namespace
+
+TEST_CASE("256-bit rational sqrt oracle certifies product two-word complex magnitude bounds",
+          "[verification][negative][N4-06][N4-10]") {
+    const ExactRational original = ExactRational(3) / 2;
+    const auto interval = sqrt_interval_256(original);
+    CHECK(interval.lower * interval.lower <= original);
+    CHECK(interval.upper * interval.upper >= original);
+    CHECK(interval.upper - interval.lower == exact_power_two(-256));
+
+    const double tiny = std::numeric_limits<double>::denorm_min();
+    const std::array fixtures{std::pair{Complex{1, .5}, Complex{}},
+                              std::pair{Complex{3, 4}, Complex{}},
+                              std::pair{Complex{1, 1}, Complex{-1, -1}},
+                              std::pair{Complex{1, 0}, Complex{0, 0x1p-1000}},
+                              std::pair{Complex{1, 0}, Complex{-1, 0x1p-1000}},
+                              std::pair{Complex{0x1p1000, 0x1p1000}, Complex{0x1p946, -0x1p945}},
+                              std::pair{Complex{tiny, tiny}, Complex{}},
+                              std::pair{Complex{std::numeric_limits<double>::min(), tiny},
+                                        Complex{-std::numeric_limits<double>::min(), 0}},
+                              std::pair{Complex{-0., 0.}, Complex{}}};
+    for (std::size_t i = 0; i < fixtures.size(); ++i) {
+        CAPTURE(i);
+        const auto& [high, low] = fixtures[i];
+        const ExactRational real = ExactRational(high.real()) + ExactRational(low.real());
+        const ExactRational imaginary = ExactRational(high.imag()) + ExactRational(low.imag());
+        const ExactRational squared = real * real + imaginary * imaginary;
+        const auto actual = metrics::actual_magnitude_bounds(high, low);
+        REQUIRE(actual.has_value());
+        encloses_exact_sqrt(actual->lower, actual->upper, squared);
+    }
+}
+
+TEST_CASE("256-bit sqrt three halves reference certifies the actual product L2 residual path",
+          "[verification][negative][N4-05][N4-06][N4-10]") {
+    const ExactRational original = ExactRational(3) / 2;
+    const auto reference = sqrt_interval_256(original);
+    REQUIRE(reference.upper - reference.lower == exact_power_two(-256));
+    // Six exact .5 entries have squared norm 3/2. Scaling both model scales
+    // and inputs by an exact power of two must preserve that same original
+    // normalized criterion, including subnormal and very large physical inputs.
+    for (const int exponent : {-1073, -1000, 0, 1000, 1023}) {
+        CAPTURE(exponent);
+        const double scale = std::scalbn(1., exponent);
+        std::array<double, 6> residual{}, scales{}, zero{};
+        residual.fill(scale / 2);
+        scales.fill(scale);
+        for (const double absolute : {1., 2.}) {
+            CAPTURE(absolute);
+            const auto request = accuracy(Norm::L2, absolute, 0, 1);
+            const auto actual = column(residual, zero, scales, zero, scales, request);
+            REQUIRE(actual.has_value());
+            const ExactRational squared =
+                original / (ExactRational(absolute) * ExactRational(absolute));
+            const auto expected = sqrt_interval_256(squared);
+            const auto upper = actual->normalized_original_residual_upper;
+            REQUIRE(std::isfinite(upper));
+            CHECK(ExactRational(upper) * ExactRational(upper) >= squared);
+            CHECK(ExactRational(upper) >= expected.upper);
+            const ExactRational allowance =
+                64 * ExactRational(std::numeric_limits<double>::epsilon()) * expected.lower +
+                8 * ExactRational(std::numeric_limits<double>::denorm_min());
+            CHECK(ExactRational(upper) - expected.lower <= allowance);
+            CHECK(metrics::meets_accuracy(*actual, request) == (absolute == 2));
+        }
+    }
 }
