@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "artifact": "build-debug.log",
+      "before_sha256": "ccf7959fd41e9d4053e37fe6d1a0c40ea364a1946c9109ee7100f06b34ee57a8",
+      "published_sha256": "a688517459dbccf43a379197015388f1e83952d8e583f7408220d612bc4a7e75",
+      "replacements": 4
+    },
+    {
+      "artifact": "build-release.log",
+      "before_sha256": "a7d8e2c45e578258353d66a7848deabfd0729e7e18abc68a1e4bc74fe825b76a",
+      "published_sha256": "076d74eba19f27b2f35cbaf7849e6e3c78cdcc26e4c37db7811779f9769a793e",
+      "replacements": 4
+    },
+    {
+      "artifact": "timing-debug.log",
+      "before_sha256": "71469a6a83308d281fd1fb9489c7f074b2b46fee6c614d14f7e690697df6cad4",
+      "published_sha256": "71469a6a83308d281fd1fb9489c7f074b2b46fee6c614d14f7e690697df6cad4",
+      "replacements": 0
+    },
+    {
+      "artifact": "timing-release.log",
+      "before_sha256": "02928bbf2285fc0937364c4035046c6b17126a49a6977406c4a107c60d87b429",
+      "published_sha256": "02928bbf2285fc0937364c4035046c6b17126a49a6977406c4a107c60d87b429",
+      "replacements": 0
+    },
+    {
+      "artifact": "tidy.log",
+      "before_sha256": "007f3437d2f15af980f786c913faf131641e4c36377150d9f986cb02546933ea",
+      "published_sha256": "007f3437d2f15af980f786c913faf131641e4c36377150d9f986cb02546933ea",
+      "replacements": 0
+    },
+    {
+      "artifact": "tidy-exit.txt",
+      "before_sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "published_sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "replacements": 0
+    },
+    {
+      "artifact": "compile_commands.json",
+      "before_sha256": "f49d544dc4e0f536048b0b96f5b0e3e175c109ba88aa894e221296d9ecafee23",
+      "published_sha256": "68f6582aaf425e6cd199e68942be2f4b619e7a6086c450c5411e3d230aa0f56b",
+      "replacements": 6
+    },
+    {
+      "artifact": "linux-ci-excerpt.log",
+      "before_sha256": "d4dd831f59de0a4f8a692e1cb8a095e1b8972d3a0b15025e4537ee2155d175be",
+      "published_sha256": "553ac3e7ad56c67a2ac3309c6c02f9d808bf98b92b1a09fc7636f3915c42998c",
+      "replacements": 2
+    },
+    {
+      "artifact": "git-revision.hpp",
+      "before_sha256": "3e929d8c6de600242aed7d72363a01aac43cbba455b2b6cb84a304d347c7a6fa",
+      "published_sha256": "3e929d8c6de600242aed7d72363a01aac43cbba455b2b6cb84a304d347c7a6fa",
+      "replacements": 0
+    },
+    {
+      "artifact": "source.patch",
+      "before_sha256": "dc54c9d26339902dc9741bb1e6d676de35aa0f4ab54e55aa2db6fe401ae54d2b",
+      "published_sha256": "dc54c9d26339902dc9741bb1e6d676de35aa0f4ab54e55aa2db6fe401ae54d2b",
+      "replacements": 0
+    },
+    {
+      "artifact": "japanese-cpp.json",
+      "before_sha256": "4d049cdde1508fbca1652cbeacd3b03471963ae186ab0dd52b5647cc3f40b6ed",
+      "published_sha256": "4d049cdde1508fbca1652cbeacd3b03471963ae186ab0dd52b5647cc3f40b6ed",
+      "replacements": 0
+    },
+    {
+      "artifact": "test-results.json",
+      "before_sha256": "1cda783b25e6ce6aff1876842c086a2616321d78086c6816621d63bce1690c19",
+      "published_sha256": "1cda783b25e6ce6aff1876842c086a2616321d78086c6816621d63bce1690c19",
+      "replacements": 0
+    }
+  ],
+  "total_replacements": 16,
+  "leftovers": 0
+}
