@@ -1,0 +1,19 @@
+Preset CMake variables:
+
+  BUILD_TESTING:BOOL="TRUE"
+  CMAKE_CXX_COMPILER="cl"
+  CMAKE_TOOLCHAIN_FILE:FILEPATH="C:\vcpkg/scripts/buildsystems/vcpkg.cmake"
+  UVLAS_WARNINGS_AS_ERRORS:BOOL="TRUE"
+  VCPKG_TARGET_TRIPLET="x64-windows"
+
+-- Found Python3: <dependency-workspace>/out/python-env/Scripts/python.exe (found suitable version "3.12.8", minimum required is "3.10") found components: Interpreter
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Configuring done (2.2s)
+-- Generating done (1.0s)
+-- Build files have been written to: <workspace>/out/issue85-build

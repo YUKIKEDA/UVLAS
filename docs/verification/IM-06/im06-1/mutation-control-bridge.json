@@ -1,0 +1,7 @@
+{
+  "first_control_source_sha256": "1d2ed3ba8b31fe5345d98eac80133a0e6c81efc079e159eb529981cb2d78ace5",
+  "frozen_source_sha256": "139609c41df18fe7d758de1905e58534e08a325b2024684d42c69a96b4459fe1",
+  "first_control_equals_after_newline_normalization": true,
+  "final_control_source_bytes_equal_product": true,
+  "note": "The preliminary runner wrote CRLF copies on Windows. Its outcomes are historical, not the final exact-byte control proof. A corrected write_bytes runner produced a distinct final snapshot and repeated control plus all four mutants; original preliminary bytes were retained."
+}

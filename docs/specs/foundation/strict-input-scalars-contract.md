@@ -14,7 +14,7 @@ SourceSnapshot/hash・JSON構文/tree・runtime node kindはここで生成も�
 
 ## 固定文法、順序、失敗
 
-IDは非空のASCII digit列だけを受け、先頭zeroを許す。符号、前後空白、小数点、指数、nonASCII、embedded NULを拒否する。$$ U=2^{64}-1 $$ とし、左から一桁dを読むごとに $$ v\le(U-d)/10 $$ を確かめてから $$ v\leftarrow10v+d $$ とする。double、locale digit判定、符号を許す汎用文字列変換へ置換しない。
+IDは非空のASCII digit列だけを受け、先頭zeroを許す。符号、前後空白、小数点、指数、nonASCII、embedded NULを拒否する。 $$ U=2^{64}-1 $$ とし、左から一桁dを読むごとに $$ v\le(U-d)/10 $$ を確かめてから $$ v\leftarrow10v+d $$ とする。double、locale digit判定、符号を許す汎用文字列変換へ置換しない。
 
 検査順はdiagnostic reset→empty→各byteのASCII判定→その桁でのoverflow判定→累積。最初の不正byteまたはoverflowで止める。MAX+1にXが続けばIdOverflow/19、MAXにXが続けばInvalidIdCharacter/20である。
 

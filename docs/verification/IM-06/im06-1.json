@@ -1,0 +1,282 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-1-strict-input-scalars",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-03",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-06",
+  "issue": 85,
+  "date": "2026-11-17",
+  "source_commit": "20e2cc0b1c82588dc1fb0fa4f30ed476996ac218",
+  "stack_base": {
+    "branch": "codex/17-19-22-package-decomposition",
+    "pr": 88,
+    "head": "0394e1e0ffe95f8294f2160cff7ff96f5029b606"
+  },
+  "scope": "追加確保のないASCII物理ID/native indexの厳格変換だけ。strong domain、全uint64/native int64範囲、型の拒否、所有するFailure/診断、固定順、同期借用を製品経路で検査した。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "全8 physical ID domainで0/MAX/2^53前後/leading zeroを固定literalへ厳密一致。符号/空白/小数/指数/nonASCII/NUL/MAX+1をInvalidInputと固定位置で拒否。generation/index/SourceIdは型制約の対象外。"
+    },
+    {
+      "condition": 2,
+      "evidence": "NativeIntegerはexact int64/uint64だけから明示構築。bool/float/string/狭い整数/physical IDは構築不能。signed min/-1/0/MAX、unsigned MAX/次/UINT64MAXを全件検査。JSON nodeの動的kindと元sourceは親の文書adapterに残る。"
+    },
+    {
+      "condition": 3,
+      "evidence": "core::Result/PrepareModel、全FailureDetails、owned enum/decoded-byte位置optional、成功resetと失敗copy、入力/既存値不変、noexceptとCpp確保0を検査。std::visitの潜在例外はguard_entryで値へ変換し、通常拒否をfallbackへ落とさない。"
+    },
+    {
+      "condition": 4,
+      "evidence": "regular4case1374assertをD/Rで実行。8domain全組の暗黙混用と入口concept/native constructorの不適合型をstatic_assert、各正常対照も同TUでcompile。expectedは手書き整数/byte/enum、許容差0。"
+    },
+    {
+      "condition": 5,
+      "evidence": "隔離control4case1374assert/exit0、double往復/先頭plus許容/ID overflow拒否除去/unsigned index上限拒否除去の4変異は各compile/link0かつassertion exit42。35入力前後hash一致、全5mapsで元archive producer未抽出、専用producerの両作用を確認。"
+    },
+    {
+      "condition": 6,
+      "evidence": "公開APIの英語Doxygenとoverflow/符号/寿命のinline理由、新規3TUのtidy/format、対象D/R CTestのみ。統合担当がtrace matrix/checkを実行し167IDs/0problems、IM06-1 Done行を同期した。Linux/SanitizerはCIへ委ね、未確認を成功にしない。"
+    }
+  ],
+  "final_verification": {
+    "environment": "Windows 11 x64 / MSVC 19.51.36260.0 / C++23 preview / fp:strict / warnings-as-errors",
+    "build": "専用Ninja Multi-Config out/issue85-buildで対象2targetだけ構成。既存vcpkg tests依存とPython実体をreadonly借用し、manifest installはOFF。依存や共有prefixを変更しない。",
+    "source_state": "20e2cc0、作業tree clean。生成git_revision.hppはcommit一致/dirty0。これは生成ヘッダの記録で、試験exeがbuild_infoを自己出力したという主張ではない。",
+    "debug": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "regular_cases": 4,
+      "regular_assertions": 1374,
+      "allocation_cases": 2,
+      "allocation_assertions": 16
+    },
+    "release": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "regular_cases": 4,
+      "regular_assertions": 1374,
+      "allocation_cases": 2,
+      "allocation_assertions": 16
+    },
+    "allocation": "Cpp backendの対象区間でattempts0。監査の明示operator new positive controlではattempts>0。実装にC heap/Eigen/外部backend操作がないことを通読。Catch/fixture/スレッド生成は監査外。全malloc経路や全製品kernelを監査したとはしない。",
+    "static": "clang-tidy21.1.1新規3TU成功。最初のexpected.value/visit潜在例外・fixture必須初期化・const指摘は修正し、影響TUだけ再検査。system headerのsuppressed警告を含むため全生成warning数0とは呼ばない。clang-format21.1.2の対象4file check成功。新契約日本語lint0。",
+    "linux": "このsourceのLinux/GCC/sanitizerはローカル未実行。PR CIへ委ね、完了待ちはしない。",
+    "review": "rootが公開API/sourceの初稿と新契約を通読、peerが最終header/source/regular/audit/契約を独立通読し未解決なし。rootの最終審査でD/Rログ、同一control source、全4変異のassert失敗とlink map、匿名化派生、6DoDを確認し、checker27files/0errorsでrecord候補を了承した。",
+    "trace": "統合担当がtrace.py matrix/checkを実行、167 IDs / 0 problems。変更sourceを再実行した結果ではなく追跡metadataの検査である。",
+    "not_repeated": "未変更の数値solver/物理/Python/R&D/全C++suite/性能測定を実行しない。新QA数値baselineや実務性能を主張しない。"
+  },
+  "mutations": {
+    "configuration": "MSVC Release、source/test object/header/lib/DBをprivate snapshotへ凍結。制御source bytesは製品sourceと同一。",
+    "source_sha256": "139609c41df18fe7d758de1905e58534e08a325b2024684d42c69a96b4459fe1",
+    "control": {
+      "cases": 4,
+      "assertions": 1374,
+      "run_exit": 0
+    },
+    "mutants_killed": 4,
+    "all_compile_link_success": true,
+    "mutant_assertion_exit": 42,
+    "frozen_inputs": 35,
+    "input_mismatches": 0,
+    "maps": 5,
+    "archive_producer_matches": 0,
+    "archive_sha256": "c01cbb5285234a389ef87f94ed070a2b2ccac5daa3587f9b630275236d5ed634",
+    "archive_entries": 70,
+    "history": "初回runnerがcase sourceをCRLF化し、controlのraw hashが違った。元snapshot/結果を不変に残し、write_bytesへ修正した別snapshotで全5件を再実行した。最初の結果を最終byte同一controlとして扱わない。bridgeに改行だけの差と両hashを保存。"
+  },
+  "document_followup": {
+    "path": "docs/specs/foundation/strict-input-scalars-contract.md",
+    "source_commit_doc_sha256": "18e4231ede480eef58ed3b808333b6769b18846ccdd6fdf6a73a5dbde3bd82f4",
+    "final_doc_sha256": "5b921a52182d999993c919dc1dd32903effd3d75e795dc8e35aa465162953794",
+    "change": "source commit後に、行内LaTeXの$$直前へ半角spaceを一つ追加した文書だけの訂正。製品/header/test/CMakeは変えず、数値/確保試験を再実行しない。"
+  },
+  "source_commit_scope": "source_commitは実行した製品/header/test/CMakeを示す。sourcesの新契約hashだけはdocument_followupの最終文書を示す。終了メタデータを過去実行sourceへ偽って付け替えない。",
+  "evidence_scope": "tracked logとZIPはfilesystem/account表記を匿名化した派生textであり、raw全体やbinary toolchainと呼ばない。元/派生SHAと置換箇所数をlog-provenance/mutation-redactionへ記録し、元rawと隔離source/lib/object/exeはprivate outへ不変保持。ZIPにobj/lib/exe/pdbは含まない。",
+  "not_claimed": [
+    "raw source/UTF-8/JSON/nested schema/SI/参照ファイル/Model membershipの認定。",
+    "CLI/Python/mesh/prepare/run/resume/checkpoint/distribution、IM-06親22の完了。",
+    "全用途の数値認定、実験、実務規模性能、全実務受入。",
+    "Linux CIの実行済み/成功。"
+  ],
+  "status_sync_source": {
+    "docs/roadmap.md": "890252de6d3e36f90539576e3a6e58e978a994c9683a6264a443e1bc5aee25ce",
+    "docs/quality/traceability.md": "f88f44d4eca4563dc417cf062e025837d415bcba76d0a5a04bf59d328fdb7f01"
+  },
+  "sources": {
+    "include/uvlas/io/input_scalar.hpp": "0d90e47897d760aa097fce8bd146995d2679cc615114b92c8ecf77373836cef8",
+    "src/io/input_scalar.cpp": "139609c41df18fe7d758de1905e58534e08a325b2024684d42c69a96b4459fe1",
+    "tests/io/input_scalar_test.cpp": "61afff3e540e94d77023aca2e01608d6849cbf20d370de669a7ac193d91170db",
+    "tests/io/input_scalar_allocations_test.cpp": "8c485ed863e5da79c7dcd2615eb9a780cf4e4b8e1dbaada204f3e344e3d125f0",
+    "CMakeLists.txt": "d61e9e00d3b6b8eb5807bb8621d39ef4c320456649e9bef9db30faa59c5e8ef8",
+    "tests/CMakeLists.txt": "d698c8103aad802329b23b20fe6f5b2165b68244a997c9efb79686e90235dc54",
+    "docs/specs/foundation/input-document-contract.md": "7cfae85238c69a3d7bbcdd487a920a8c0ea1a28fc4cfeb9e58efe30798ecf0cb",
+    "docs/specs/foundation/strict-input-scalars-contract.md": "5b921a52182d999993c919dc1dd32903effd3d75e795dc8e35aa465162953794",
+    "docs/conventions.md": "f9528e89e173e2149b096545520da001ee81a372e72301678df66204a2db0298"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-1/log-provenance.json": "c09f33965cace6c9ff0f2d78b1a9961cd82b1c8d9605bf4d7b3a6c76293b7d07",
+    "docs/verification/IM-06/im06-1/mutation-control-bridge.json": "42d4afc4ea4a653f6efad2bfa4eaa3287d105c26d0083e8ecb52177f188382b6",
+    "docs/verification/IM-06/im06-1/mutation-redaction.json": "af95ea54561c383d9e7259c409f8dd6b63a890d168d16ee032a4699101fd3be5",
+    "docs/verification/IM-06/im06-1/mutation-summary.json": "96f9638e43ddbbe0200852bf2e62bc595f1ec56e2de5ae977855c9e2969ed1dd",
+    "docs/verification/IM-06/im06-1/mutations.zip": "c01cbb5285234a389ef87f94ed070a2b2ccac5daa3587f9b630275236d5ed634",
+    "docs/verification/IM-06/im06-1/safe-build-debug-final.log": "39e341de77091625b0f4e24ae1f9bf78b110dcb4beba18817e6d29f5f1c21fe6",
+    "docs/verification/IM-06/im06-1/safe-build-release-final.log": "7646104f147896f251b76c5cd1c47142d5bc2bb7ea8614cd24e8415fc15795ff",
+    "docs/verification/IM-06/im06-1/safe-configure.log": "71e40979de8fc6dc56a7c3c75860a713f4f072975611a7e68f5ad68e831828d0",
+    "docs/verification/IM-06/im06-1/safe-contract-japanese.log": "889b3c3f895677817dbd838a100a98bbcf5e8208dce44ba75d51fe94fde40683",
+    "docs/verification/IM-06/im06-1/safe-ctest-debug-final.log": "56fae755a2f3b712b58a853cbb45542e534616c3a43ca1e5011e5cceecd9dd52",
+    "docs/verification/IM-06/im06-1/safe-ctest-release-final.log": "66a97ce5bd5973881deff198e23af489ae2955281daa707b438b3c34cc8ffa33",
+    "docs/verification/IM-06/im06-1/safe-format-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-1/safe-mutations-exact-bytes-run.log": "a64f3befc4eaaedb5c8dca0fcd47fb6325e311979af997a1dcaf96489093652b",
+    "docs/verification/IM-06/im06-1/safe-mutations-run.log": "56bbef93258488e6381eed1b39468ad706d0d6fd99baadbce7a4d7de9b964dbd",
+    "docs/verification/IM-06/im06-1/safe-tidy-final-audit.log": "60ed1e0af5e3d4ca801bef757c55a126aebc7699b0194a7f1dd13f739f67ca57",
+    "docs/verification/IM-06/im06-1/safe-tidy-final-source.log": "1448eb17f3538db8b93ac0ba9a034facf5ab43c71e5a64226bafb264b0c22405",
+    "docs/verification/IM-06/im06-1/safe-tidy-first.log": "7068a1b4c7c4a7d42a3b2490c9409f1d8d6dcc7baccad7ec3939c7b8ce225064"
+  },
+  "source_references": [
+    {
+      "id": "im06-1-include-uvlas-io-input_scalar.hpp",
+      "sha256": "0d90e47897d760aa097fce8bd146995d2679cc615114b92c8ecf77373836cef8",
+      "hint": "include/uvlas/io/input_scalar.hpp"
+    },
+    {
+      "id": "im06-1-src-io-input_scalar.cpp",
+      "sha256": "139609c41df18fe7d758de1905e58534e08a325b2024684d42c69a96b4459fe1",
+      "hint": "src/io/input_scalar.cpp"
+    },
+    {
+      "id": "im06-1-tests-io-input_scalar_test.cpp",
+      "sha256": "61afff3e540e94d77023aca2e01608d6849cbf20d370de669a7ac193d91170db",
+      "hint": "tests/io/input_scalar_test.cpp"
+    },
+    {
+      "id": "im06-1-tests-io-input_scalar_allocations_test.cpp",
+      "sha256": "8c485ed863e5da79c7dcd2615eb9a780cf4e4b8e1dbaada204f3e344e3d125f0",
+      "hint": "tests/io/input_scalar_allocations_test.cpp"
+    },
+    {
+      "id": "im06-1-CMakeLists.txt",
+      "sha256": "d61e9e00d3b6b8eb5807bb8621d39ef4c320456649e9bef9db30faa59c5e8ef8",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im06-1-tests-CMakeLists.txt",
+      "sha256": "d698c8103aad802329b23b20fe6f5b2165b68244a997c9efb79686e90235dc54",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im06-1-docs-specs-foundation-input-document-contract.md",
+      "sha256": "7cfae85238c69a3d7bbcdd487a920a8c0ea1a28fc4cfeb9e58efe30798ecf0cb",
+      "hint": "docs/specs/foundation/input-document-contract.md"
+    },
+    {
+      "id": "im06-1-docs-specs-foundation-strict-input-scalars-contract.md",
+      "sha256": "5b921a52182d999993c919dc1dd32903effd3d75e795dc8e35aa465162953794",
+      "hint": "docs/specs/foundation/strict-input-scalars-contract.md"
+    },
+    {
+      "id": "im06-1-docs-conventions.md",
+      "sha256": "f9528e89e173e2149b096545520da001ee81a372e72301678df66204a2db0298",
+      "hint": "docs/conventions.md"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im06-1-log-provenance.json",
+      "sha256": "c09f33965cace6c9ff0f2d78b1a9961cd82b1c8d9605bf4d7b3a6c76293b7d07",
+      "hint": "docs/verification/IM-06/im06-1/log-provenance.json"
+    },
+    {
+      "id": "im06-1-mutation-control-bridge.json",
+      "sha256": "42d4afc4ea4a653f6efad2bfa4eaa3287d105c26d0083e8ecb52177f188382b6",
+      "hint": "docs/verification/IM-06/im06-1/mutation-control-bridge.json"
+    },
+    {
+      "id": "im06-1-mutation-redaction.json",
+      "sha256": "af95ea54561c383d9e7259c409f8dd6b63a890d168d16ee032a4699101fd3be5",
+      "hint": "docs/verification/IM-06/im06-1/mutation-redaction.json"
+    },
+    {
+      "id": "im06-1-mutation-summary.json",
+      "sha256": "96f9638e43ddbbe0200852bf2e62bc595f1ec56e2de5ae977855c9e2969ed1dd",
+      "hint": "docs/verification/IM-06/im06-1/mutation-summary.json"
+    },
+    {
+      "id": "im06-1-mutations.zip",
+      "sha256": "c01cbb5285234a389ef87f94ed070a2b2ccac5daa3587f9b630275236d5ed634",
+      "hint": "docs/verification/IM-06/im06-1/mutations.zip"
+    },
+    {
+      "id": "im06-1-safe-build-debug-final.log",
+      "sha256": "39e341de77091625b0f4e24ae1f9bf78b110dcb4beba18817e6d29f5f1c21fe6",
+      "hint": "docs/verification/IM-06/im06-1/safe-build-debug-final.log"
+    },
+    {
+      "id": "im06-1-safe-build-release-final.log",
+      "sha256": "7646104f147896f251b76c5cd1c47142d5bc2bb7ea8614cd24e8415fc15795ff",
+      "hint": "docs/verification/IM-06/im06-1/safe-build-release-final.log"
+    },
+    {
+      "id": "im06-1-safe-configure.log",
+      "sha256": "71e40979de8fc6dc56a7c3c75860a713f4f072975611a7e68f5ad68e831828d0",
+      "hint": "docs/verification/IM-06/im06-1/safe-configure.log"
+    },
+    {
+      "id": "im06-1-safe-contract-japanese.log",
+      "sha256": "889b3c3f895677817dbd838a100a98bbcf5e8208dce44ba75d51fe94fde40683",
+      "hint": "docs/verification/IM-06/im06-1/safe-contract-japanese.log"
+    },
+    {
+      "id": "im06-1-safe-ctest-debug-final.log",
+      "sha256": "56fae755a2f3b712b58a853cbb45542e534616c3a43ca1e5011e5cceecd9dd52",
+      "hint": "docs/verification/IM-06/im06-1/safe-ctest-debug-final.log"
+    },
+    {
+      "id": "im06-1-safe-ctest-release-final.log",
+      "sha256": "66a97ce5bd5973881deff198e23af489ae2955281daa707b438b3c34cc8ffa33",
+      "hint": "docs/verification/IM-06/im06-1/safe-ctest-release-final.log"
+    },
+    {
+      "id": "im06-1-safe-format-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-06/im06-1/safe-format-check.log"
+    },
+    {
+      "id": "im06-1-safe-mutations-exact-bytes-run.log",
+      "sha256": "a64f3befc4eaaedb5c8dca0fcd47fb6325e311979af997a1dcaf96489093652b",
+      "hint": "docs/verification/IM-06/im06-1/safe-mutations-exact-bytes-run.log"
+    },
+    {
+      "id": "im06-1-safe-mutations-run.log",
+      "sha256": "56bbef93258488e6381eed1b39468ad706d0d6fd99baadbce7a4d7de9b964dbd",
+      "hint": "docs/verification/IM-06/im06-1/safe-mutations-run.log"
+    },
+    {
+      "id": "im06-1-safe-tidy-final-audit.log",
+      "sha256": "60ed1e0af5e3d4ca801bef757c55a126aebc7699b0194a7f1dd13f739f67ca57",
+      "hint": "docs/verification/IM-06/im06-1/safe-tidy-final-audit.log"
+    },
+    {
+      "id": "im06-1-safe-tidy-final-source.log",
+      "sha256": "1448eb17f3538db8b93ac0ba9a034facf5ab43c71e5a64226bafb264b0c22405",
+      "hint": "docs/verification/IM-06/im06-1/safe-tidy-final-source.log"
+    },
+    {
+      "id": "im06-1-safe-tidy-first.log",
+      "sha256": "7068a1b4c7c4a7d42a3b2490c9409f1d8d6dcc7baccad7ec3939c7b8ce225064",
+      "hint": "docs/verification/IM-06/im06-1/safe-tidy-first.log"
+    }
+  ]
+}
