@@ -1,0 +1,22 @@
+Source PR head: dd10c0d4743825349929c20196d77338c44af30c
+Observed CI merge: 60abe0e143ca7057af0400139ccc0e04225963bb
+Job: http<repo>/actions/runs/43810050348/job/133109943424
+2026-11-16T05:29:54.8248553Z 47/63 Test #47: numerics.eigen_arnoldi_allocations ...   Passed    0.00 sec
+2026-11-16T05:29:55.2896990Z 48/63 Test #48: numerics.eigen_arnoldi ...............   Passed    0.46 sec
+2026-11-16T05:29:56.1976370Z 63/63 Test #63: qa.eigen_arnoldi .....................***Failed    0.03 sec
+2026-11-16T05:29:56.1976889Z eigen-arnoldi: platform linux-x64-gnu14.2-sse2 is not qualified (QA-07).
+2026-11-16T05:29:56.1977386Z   qualified platforms: windows-x64-msvc19.51-sse2
+2026-11-16T05:29:56.1977862Z   qualify it with `results.py accept`; if its values differ from every qualified platform, that needs a result change record.
+2026-11-16T05:29:56.1978343Z   values on this platform:
+2026-11-16T05:29:56.1978679Z     root0.imag -1.0000000000002p+2
+2026-11-16T05:29:56.1979025Z     root0.normalization 1.ep-49
+2026-11-16T05:29:56.1979366Z     root0.real 1.772e71682f76fp-53
+2026-11-16T05:29:56.1979696Z     root0.residual 1.3b2428bf622cbp-48
+2026-11-16T05:29:56.1980070Z Errors while running CTest
+2026-11-16T05:29:56.1980361Z     root1.imag 1.0000000000002p+2
+2026-11-16T05:29:56.1980703Z     root1.normalization 1.ep-49
+2026-11-16T05:29:56.1981064Z     root1.real 1.772e71682f76fp-53
+2026-11-16T05:29:56.1981368Z     root1.residual 1.3b2428bf622cbp-48
+2026-11-16T05:29:56.1981569Z 
+2026-11-16T05:29:56.1981573Z 
+2026-11-16T05:29:56.1981732Z 98% tests passed, 1 tests failed out of 63

@@ -1,0 +1,32 @@
+{
+  "path": "tests/numerics/eigen_arnoldi_allocations_test.cpp",
+  "command": [
+    "uvx",
+    "clang-tidy@21.1.1",
+    "tests/numerics/eigen_arnoldi_allocations_test.cpp",
+    "--quiet",
+    "--",
+    "-x",
+    "c++",
+    "-std=c++23",
+    "-Iinclude",
+    "-Isrc/numerics",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include/eigen3",
+    "-fms-extensions",
+    "-fms-compatibility",
+    "-ffp-model=strict",
+    "-DNOMINMAX",
+    "-DWIN32_LEAN_AND_MEAN",
+    "-DEIGEN_MPL2_ONLY",
+    "-DEIGEN_DONT_PARALLELIZE",
+    "-DEIGEN_RUNTIME_NO_MALLOC",
+    "-UNDEBUG"
+  ],
+  "exit_code": 0,
+  "seconds": 25.923028000019258,
+  "source_sha256": "e0efde0976447a5c2343f806df5b66806148b74d423b6c6baf86997f4ca076cf",
+  "log_sha256": "06febfdd9f7826d41660bbb1709622a225a211a332cc2cf85edf1be7dcc2d49b"
+}

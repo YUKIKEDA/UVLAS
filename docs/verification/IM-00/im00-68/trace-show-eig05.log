@@ -1,0 +1,17 @@
+EIG-05  (decision)
+  defined   docs/specs/foundation/eigen-extraction-contract.md:95
+            EIG-05：完全Schur packetとclusterの資格を分ける
+  restated  none
+  mentioned none
+  tests     tests/numerics/eigen_full_contract_test.cpp:153
+            tests/numerics/eigen_full_contract_test.cpp:341
+            tests/numerics/eigen_full_test.cpp:69
+            tests/numerics/eigen_full_test.cpp:112
+            tests/numerics/eigen_full_test.cpp:261
+            tests/numerics/eigen_full_test.cpp:291
+            tests/numerics/eigen_full_test.cpp:354
+            tests/numerics/eigen_full_test.cpp:379
+            tests/numerics/eigen_full_test.cpp:535
+            tests/numerics/eigen_full_test.cpp:577
+  records   docs/verification/IM-00/im00-68.json
+  code      none

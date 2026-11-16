@@ -1,0 +1,15 @@
+[OUTPUT] 
+Internal ctest changing into directory: <repo>/out/issue70-release
+
+[HANDLER_OUTPUT] 
+Test project <repo>/out/issue70-release
+
+    Start 64: qa.eigen_arnoldi
+1/1 Test #64: qa.eigen_arnoldi .................   Passed    0.16 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+verification    =   0.16 sec*proc (1 test)
+
+Total Test time (real) =   0.18 sec

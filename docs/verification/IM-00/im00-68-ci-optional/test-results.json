@@ -1,0 +1,12 @@
+[
+  {
+    "configuration": "Debug",
+    "test_filter": "Full phase timing*",
+    "exit": 0
+  },
+  {
+    "configuration": "Release",
+    "test_filter": "Full phase timing*",
+    "exit": 0
+  }
+]

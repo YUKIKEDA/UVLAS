@@ -1,0 +1,281 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-07",
+    "N4-08",
+    "N4-09",
+    "N4-10",
+    "EIG-01",
+    "EIG-02",
+    "EIG-03",
+    "EIG-04",
+    "EIG-05",
+    "EIG-07",
+    "EIG-10",
+    "EIG-11",
+    "EIG-12",
+    "EIG-13",
+    "EIG-14"
+  ],
+  "package": "IM-00",
+  "issue": 68,
+  "date": "2026-11-16",
+  "source_commit": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+  "scope": "実／複素の一般完全スペクトル、選択した左右pair、左右cluster。代数的な分解・部分空間・実返却値への認定を対象とし、物理mode被覆や実務受入を意味しない。",
+  "provenance": {
+    "clean": true,
+    "uncommitted_changes": false,
+    "implementation_commit": "6abaa41b499063bee1ea8d68a654492f18a9966c",
+    "integration_commit": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+    "stack_base": "975bb99752ba41d44924eec2f769a25c2983e4c7",
+    "trace_metadata": "最終実行後に、各caseへ実際に検証するEIGタグだけを追加した。タグを除き空白を正規化した本文が元snapshotと一致することを検証。前後SHAはtrace-tag-deltas.json。数値式・分岐・期待値は不変なので数値試験を重複実行しない。",
+    "note": "Generalizedとの統合はCMake/conventionsを両能力保持で解消した。Full数値sourceは変異・計測・最終検証で同じfb32e0da。Windows4targetは統合後cleanのDebug/Releaseで各1回実行した。Generalized自体の試験は重複していない。",
+    "current_sources_role": "sourcesは現在の製品/採用契約/検証/追跡metadataをhash照合するmap。clean実行時のbyteはexecution_snapshotに別保存。差は3testのEIGタグとtools.trace登録だけで、数値sourceは同一。",
+    "metadata_integration_commit": "467a9f2a92025ccf31dee02fc1ec31db4d08417c"
+  },
+  "environment": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Release",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "backend": {
+    "real": "Eigen5.0.1 RealSchur、固定30n。その実1x1/共役2x2構造をunitaryで複素上三角化し、全couplingとQを同時更新。",
+    "complex": "Eigen5.0.1 ComplexSchur、固定30n。",
+    "iterations": "backend実反復数は非公開のため未評価。設定上限を実測回数と呼ばない。",
+    "correction": "当初のComplexSchur実根候補に付いた微小虚部を共役整形しようとすると、PG24が未被覆として失敗した。閾値clampや許容差変更をせず、実構造の候補生成へ修正した。失敗ログも保存。",
+    "schur_gate": "実返却λ/sλを包絡する対角と元A作用から、全列の原残差・全Gramを評価する。投影候補も独立世代で再評価する。"
+  },
+  "completion_evidence": [
+    {
+      "requirement": "1. 全成分・Context・寸法・尺度・精度・資源を事前検査。空packet、全n、固定30nと未収束分類。",
+      "evidence": "contract7case、空/型/units/尺度/precision/独立次数と返却数/容量。実6・複素6・PG24は全nを照合。30n/info分類は製品sourceを独立通読し、実NoConvergenceの強制再現は行っていない。"
+    },
+    {
+      "requirement": "2. 実返却λ対応T、原Schur残差と全Gram、所有・独立generation、必要consumer。",
+      "evidence": "Big100による原係数の残差/Gram、sorted値→T対角mapping、保持2作用/投影4作用と不足3拒否、全consumer2件×両世代、所有者破棄/移動後の結果を確認。"
+    },
+    {
+      "requirement": "3. packet集合のunitary交換、独立left、pair照合/感度未認定、defectiveで全basisを強要しない。",
+      "evidence": "二つのJordan3x3で左右の既知projectorを独立照合。右交換が必要な非連続集合も含む。左はQJ/JT*Jから別に交換して元A*認定。解析的左右pair感度sqrt(2026)/45と全basis左逆bound<1、defectiveのSchur成功/全固有basis拒否を区別。感度分母が正と認定できない場合は未認定を所有する。"
+    },
+    {
+      "requirement": "4. 実6/複素6/Jordan/空小次数/非2冪/PG24と各負対照。",
+      "evidence": "最終数値13case/892assert、contract7case/146assert、phase監査1case/4assert。通常参照1e-12を維持し、微小負根は符号/相対誤差と厳密零の個数を別確認。PGはfixture.step_values原Pを使いI−matrixから再生成しない。phaseはcpp_rationalでmax/subnormal/near-tie/非2冪/左右を照合。"
+    },
+    {
+      "requirement": "5. 隔離変異、静的検査・試験、工程計測、新証拠、利用者向けAPIコメント。",
+      "evidence": "Windows Debug/Release各4/4、5TU最終tidy成功と8file format成功。隔離5変異は全てcompile/link0→runtime42で検出。固定8448bit phase比較の最大指数/最小subnormalでC++確保0。製品FullTimingsの4経路×3巡を記録。Linux実CIの新3target成功と実8値から新基準を登録。未登録で失敗した元jobと、登録後新headのCI未確認を分ける。"
+    }
+  ],
+  "checks": {
+    "windows_debug": "4/4成功、clean source338f2d7",
+    "windows_release": "4/4成功、同source",
+    "canary": "8値がD/Rでbyte一致。results.py acceptで新Windows基準登録、両構成CTest比較成功。",
+    "static": "static-final.jsonにTU別対応。途中失敗は別ログ保存。",
+    "linux": {
+      "ci_head": "0abb091d74295f4c9e9d2ad3cec1643c9d23c64d",
+      "ci_merge": "44a5dc5ef90a7cfb6214ae0ba2c4e683541e1529",
+      "run": 43805527327,
+      "job": 133095340975,
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43805527327/job/133095340975",
+      "result": "全59件中58成功。新3数値targetは成功し、唯一の失敗は新qa.eigen_fullのプラットフォーム未登録。job全体を成功と書かない。",
+      "qualification": "実出力8値をresults.py acceptでLinux基準へ正規登録し、保存出力→Linux基準とWindows基準の差が各0をrootがAPIで照合。新headでのCI再実行完了は未確認。"
+    },
+    "scope": "未変更の密疎求解・GMRES・Python・R&D fixtureや全体suiteを再実行していない。",
+    "tool_trace": {
+      "source_commit": "1876884a91f511508545ee3a96f59102aad95bb1",
+      "executor": "root実装、実装担当が独立通読。rootが最終unittest5/5、ruff check/format、pyright strictを各exit0で実行。実stdout4fileを保存。",
+      "registration": "cmake再configure→Debug tools.trace1/1成功。登録確認時は最後のdigit separator修正前4fixture、最終5fixtureはroot direct unittestで確認。module入口/登録内容は同一で再実行していない。",
+      "correction": "EIG接頭辞が未登録で、折返された既存Catch2タグを落としていた。既存macro位置を保ったliteral読取とcomment/raw-string除外、連結literal、未知ID拒否を閉じた。件数増加は追跡欠落の回復で、追加数値実行数ではない。",
+      "scope": "TEST_CASE/SCENARIOの通常literal2引数に限定。現行testsに無いTEMPLATE系やraw literal引数を新機能として追加していない。"
+    },
+    "trace": "167 ID、21種類にtest、23種類にrecord、0 problem。show EIG-05で各Full caseとim00-68へ辿る。増加は折返しタグ/接頭辞の追跡回復であり数値実行追加ではない。"
+  },
+  "mutations": {
+    "artifact": "im00-68/mutations.zip",
+    "executor": "独立peer generalized。実装担当は同じ変異を重複実行していない。",
+    "control": "Release数値890assert/13case、contract146assert/7caseともexit0。最終は数値不変の2assert追加で892assert。",
+    "cases": [
+      "right-exchange-disabled",
+      "left-reuses-right-q",
+      "last-consumer-unchecked",
+      "tiny-eigenvalue-clamped",
+      "projected-forward-proof-reused"
+    ],
+    "result": "全5件compile/link成功後、対応targetがCatch2 assertion失敗exit42。12linkmapは元Full archive member未抽出と専用producer symbolを確認。",
+    "freeze": "43入力hashは変異実行前後で一致。公開ZIPにobj/lib/exe/PDBは含めずhashで識別。"
+  },
+  "resource_and_measurement": {
+    "record": "im00-68/measurement-summary.json",
+    "source_commit": "6abaa41b499063bee1ea8d68a654492f18a9966c",
+    "clean": true,
+    "scope": "小さい上三角合成系、尺度1、各予算1e-12、単一thread、Release /fp:strict。4経路を3巡し全標本を保存。入力作成と結果破棄は製品3工程の時間外。warmup済みとは呼ばない。",
+    "payloads": {
+      "full6": 3366,
+      "full24": 51048,
+      "pairs6x2": 2502,
+      "cluster6x2": 2006
+    },
+    "qualification_full24_ns_range": [
+      182099700,
+      197166700
+    ],
+    "interpretation": "full24は全qualification工程が支配的である。個別EFT関数の寄与を測ったとは主張しない。高速化比較、物理ケース、実務規模の時間/RSS受入ではない。",
+    "memory": "ResourcePlanの所有配列payloadと、外部backendの推定admissionを区別する。非空RequireProvenBoundは未証明として拒否。forecastを実確保/RSS上限へ読み替えない。"
+  },
+  "witness_references": [
+    {
+      "id": "numerical-foundation-adoption-audit",
+      "hint": "rd/foundation/numerics/records/numerical-foundation-adoption-audit.json",
+      "sha256": "e1c9ca1f6103e0651c416bc77eea6280d434a1934970f4779e93c26124ff3ad8"
+    },
+    {
+      "id": "pg-free-step",
+      "hint": "build/analysis/numeric-oracles/pg-free-step.txt",
+      "sha256": "f00f1c669cae57f1c127bd63b98a48e17ff0358c94fa7a97a841dfee98391e78",
+      "bundle": "uvlas-rd-evidence-2026-11-part02.tar"
+    },
+    {
+      "id": "pg-free-oracle",
+      "hint": "build/analysis/numeric-oracles/pg-free-oracle.npz",
+      "sha256": "96924d8e4b08c74648d607e3e2c9ee03f71019694f3ca01ea99be7a6b83c4bd2",
+      "bundle": "uvlas-rd-evidence-2026-11-part02.tar"
+    },
+    {
+      "id": "oracle",
+      "hint": "build/analysis/numeric-oracles/oracle.json",
+      "sha256": "27aa083944feaaebf3eb6e8f96d45a0dbd983212d11b16cecca7d4f3d3e1e4df",
+      "bundle": "uvlas-rd-evidence-2026-11-part02.tar"
+    }
+  ],
+  "remaining_gates": [
+    "IM00-11の他backend/数値基準群と両OS製品gateはIssue15。今回保存したLinux実測値の新基準登録後headのCI完了は未確認。",
+    "物理P/P*・mode被覆はIM-05。",
+    "製品規模の性能/RSS・実験妥当性・実務受入はIM-07/08。"
+  ],
+  "sources": {
+    "CMakeLists.txt": "91557d34b905ca9cc6cac3cf6c7d396143b4b727ddc7834fcd06eea0652b0282",
+    "tests/CMakeLists.txt": "1d75ead3be84111ab6c8370853dd2752ad8631ae3780fd5c1becd83df2626144",
+    "include/uvlas/numerics/eigen_full.hpp": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+    "src/numerics/eigen_full.cpp": "fb32e0daa240da2086ad99640889e6fc82788de2341c878e3dac30042c7f9bc5",
+    "src/numerics/eigen_full_detail.hpp": "15a5178a992e6fb010229e6820e10f9da60cefcb3d361f8d9e624efe01c19e12",
+    "src/numerics/eigen_full_phase_private.hpp": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+    "tests/numerics/eigen_full_test.cpp": "1c54fd90382e1e9dc4f7495cadb3408f026ac07e043d3e84702792f5e1d108c3",
+    "tests/numerics/eigen_full_contract_test.cpp": "80ead3f884c5153525ce450ae02c24904322604db6989499c42bc7b39d5ce1fb",
+    "tests/numerics/eigen_full_phase_audit_test.cpp": "1b7c7245bf3e878ff41a35c9da549b8ba73c3f1839681bed8c37b149d34c4540",
+    "qa/eigen_full/main.cpp": "e84dea343528164a2207ea3e5b3c23b8cc56b052aa823496f5e96d3e29df5ddb",
+    "include/uvlas/numerics/eigen_common.hpp": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+    "include/uvlas/numerics/eigen_metrics.hpp": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+    "src/numerics/eigen_metric_bounds.hpp": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "docs/specs/foundation/eigen-extraction-contract.md": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+    "src/numerics/eigen_common.cpp": "518df296929290b01d1c6b5f5bddfdc5fc9fc21a43331575e11329df63e2e705",
+    "src/numerics/eigen_metrics.cpp": "b9fc0ff4fd0b429c6f6a23a418ece80d709cee83b67851bd23d864a54e322e98",
+    "src/numerics/backend_memory_detail.hpp": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+    "cmake/ProjectOptions.cmake": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a",
+    "tools/qa/trace.py": "615702ba288e5993d31c4761919fe589d96b2b0aac183967289e68f55057e5e1",
+    "tools/qa/trace_test.py": "ae0cec9da5d72e19c86243d3cbb027d81d672ca2692dcd6a449952ee019443c1"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-68/build-info-debug.json": "d63f6d5e79f6de21a7bc519473efa87519d2bb665cabb35b7fee7af0d4e40a21",
+    "docs/verification/IM-00/im00-68/build-info-release.json": "7e3b9ce03c717ceba2cac6faa8e0eff0f91c0b4e0251c924785afb5e0b2a7621",
+    "docs/verification/IM-00/im00-68/canary-debug.txt": "b64b489643a80a5b42eaba2eb629a943532b17f04fd77ab40fe224fc3ea61526",
+    "docs/verification/IM-00/im00-68/canary-release.txt": "b64b489643a80a5b42eaba2eb629a943532b17f04fd77ab40fe224fc3ea61526",
+    "docs/verification/IM-00/im00-68/clean-debug-build.log": "4782b92fc4f5e5512354f43fbb07a96ee801c3785aa166acf41cb50c53496cdc",
+    "docs/verification/IM-00/im00-68/clean-debug-tests.log": "327a5809e9a8e02d27f83e3e3ecb3f59110ba359e67ee9bd4fd898ee766e94e2",
+    "docs/verification/IM-00/im00-68/clean-release-build.log": "73d7df0a358112617ffc7af20866e9134516cecbcd2b55a3b491113e8ff6dbd8",
+    "docs/verification/IM-00/im00-68/clean-release-tests.log": "3a09df9971a5ab0848aafcf3633da025f069adbe26db6a8cff057d90941554ef",
+    "docs/verification/IM-00/im00-68/cmake-metadata-delta.json": "da661c4e2aac90f298274847109641a4675c06c45ee863563eb17e83d3f4cd2a",
+    "docs/verification/IM-00/im00-68/complex-real-pg-failure.log": "d51beab510cefcb9df276e3865abb30e5e7bc7a60aedda8b0a8f5682341796f0",
+    "docs/verification/IM-00/im00-68/linux-canary.txt": "d70895aea7ade55b9d709d4e1aac1891e44da1cfed30e82723e722100962be5b",
+    "docs/verification/IM-00/im00-68/linux-debug-excerpt.log": "83363753d2bcdee679c1064de6cb7129fc2f69fd79fc6f1ffb65c62a4f878983",
+    "docs/verification/IM-00/im00-68/measurement-commands.json": "4ad54cc62e3408c6582d6f6eb46307f7c52ad1804e09ae76c604f255eb3ddbed",
+    "docs/verification/IM-00/im00-68/measurement-execution.json": "eecd68c849d3c11f105fc612d2c99b827f1164605e84f0971d0d0f16a52221db",
+    "docs/verification/IM-00/im00-68/measurement-summary.json": "3ccd82ac4a24acb9ea6335697cf8eb10d87af8b95743ae7e2a669d513cce6f30",
+    "docs/verification/IM-00/im00-68/measurement.cpp": "e7740fe92b6536cb0ec6c016b4574018d13f6adb58aecfa597722041bfa85d64",
+    "docs/verification/IM-00/im00-68/measurements.txt": "a4f90870c07dfb86bc7ab78bbaf3b55373d223aa91fac2d33033733ee4043374",
+    "docs/verification/IM-00/im00-68/mutations.zip": "73933b0eb1e4ce9399a41f4843c954aafcc9ab5c27ac953f77488ec59406bb0f",
+    "docs/verification/IM-00/im00-68/real-schur-regression.log": "04f12a30a9db31759a64f19566e925db4da495829846485d3bc0abc1b685757c",
+    "docs/verification/IM-00/im00-68/redaction.json": "51d913cf91d46b4edbc4d4656d040f283979e4cdde9a3c56d448b6a1e3c6410a",
+    "docs/verification/IM-00/im00-68/release-last-test.log": "4c175b5809b13818773a62963b6335121d00cda1d7545381a3d544b9a9c7c2a5",
+    "docs/verification/IM-00/im00-68/static-audit-final.log": "1be5daa475486a9ea35ac54b670d13a1bdd58d62a12fb49c03957665ae14e672",
+    "docs/verification/IM-00/im00-68/static-canary-final.log": "9237777fed4b2f7480b47fc05e0c75c88bb01dfdab020606e6e8761d2c40d4fc",
+    "docs/verification/IM-00/im00-68/static-compile-commands.json": "dfbbadd42bc3fea03353e79c801b8a56de649df522d426ab594dc6735c298c2d",
+    "docs/verification/IM-00/im00-68/static-contract-final.log": "f2e7d029fdde0c426f23a71b106ba682db6329f935d3dc528c91c7f0aa9edd91",
+    "docs/verification/IM-00/im00-68/static-final.json": "721950db6942b25a5ddaa8811cbd9c65de68f7457af917df73a6b37b666a05df",
+    "docs/verification/IM-00/im00-68/static-initial-summary.json": "0d0e1421fe09a019ef3c52f1512b62505f776ae0fb982f9818b778e3fcac40fb",
+    "docs/verification/IM-00/im00-68/static-intermediate-summary.json": "c1af606a6ba974fc3e4b61287aa4343e0009001f181c68dff9bb81f937354d32",
+    "docs/verification/IM-00/im00-68/static-numeric-final.log": "82c1b95229e748793fd061125a7de4bc1b3d8d6509ab0cdf00a074f494708229",
+    "docs/verification/IM-00/im00-68/static-numeric-initial.log": "54a039daf2d797457b4447001337f1d6ed06397d78d0f61d6d17e5f713358e4f",
+    "docs/verification/IM-00/im00-68/static-source-final.log": "007f3437d2f15af980f786c913faf131641e4c36377150d9f986cb02546933ea",
+    "docs/verification/IM-00/im00-68/static-source-initial.log": "c557f7052969016e4800047bba23ac885e0bdb9e0395990020d173f974fef86f",
+    "docs/verification/IM-00/im00-68/trace-check.log": "1417ba4a2af7cba494df768d9cc002b266880316cea880a553383b082faf8e64",
+    "docs/verification/IM-00/im00-68/trace-configure.log": "5e116a158434ea2bcbafe584692b756c45f647280d85df621fc6d84dade8ba37",
+    "docs/verification/IM-00/im00-68/trace-format-final.log": "97d85b4b6c185a05396e2d09a3c304ff0f7cc77f8b7b7bb7989ec6cd875b3898",
+    "docs/verification/IM-00/im00-68/trace-matrix.log": "725c6840c4b0b21dc1de5c1aaf56aeb169cb4bfd5b1c9e948f568298af14df71",
+    "docs/verification/IM-00/im00-68/trace-pyright-final.log": "fb0f94accf07894a038a8c67be17c87e22e00d5a43e609f1fce444d9a6724088",
+    "docs/verification/IM-00/im00-68/trace-registration.log": "c0406146e055fda0b86a3a90e6228361ff02100b60246522771704e42cc7ff33",
+    "docs/verification/IM-00/im00-68/trace-ruff-final.log": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+    "docs/verification/IM-00/im00-68/trace-show-eig05.log": "6b4c7330afbe3f24e1d8c8c2d4bdf17c03c0daf9a6d04e8763baa16599bedef4",
+    "docs/verification/IM-00/im00-68/trace-tag-deltas.json": "e97be02d93bb3fd547ed82865b8e8011c5a3a3472dce9df0b38d233baf0dd892",
+    "docs/verification/IM-00/im00-68/trace-unittest-final.log": "1097a143614dfced74ca22b1f4f867b856d5d0aca58a7fd692538322405411af",
+    "tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0",
+    "qa/baselines/eigen-full/linux-x64-gnu14.2-sse2.json": "ab0b96078818f015a4098023e2949d2000675b185a01741a6ae9faef5231a768",
+    "qa/baselines/eigen-full/windows-x64-msvc19.51-sse2.json": "04842b969b372d3a81e72cb95f6b805a1f3ae6d21f949a878e36344987cb3c16"
+  },
+  "reference_fixture": {
+    "id": "j1-pg-free-history-24-v1",
+    "sha256": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0",
+    "hint": "tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json"
+  },
+  "redaction": "公開用コピーだけを作り、entryごとの元/派生SHA・件数をredaction.jsonへ記録。通常pathと符号化symbol中のaccount/machine文字列を検査、残存0。原ログ・旧証拠は上書きしていない。",
+  "execution_snapshot": {
+    "commit": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+    "source_sha256_at_execution": {
+      "CMakeLists.txt": "91557d34b905ca9cc6cac3cf6c7d396143b4b727ddc7834fcd06eea0652b0282",
+      "tests/CMakeLists.txt": "61fb328403434db74a46572b175b64ca8bd7e28a862cbb499477a167067845fe",
+      "include/uvlas/numerics/eigen_full.hpp": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+      "src/numerics/eigen_full.cpp": "fb32e0daa240da2086ad99640889e6fc82788de2341c878e3dac30042c7f9bc5",
+      "src/numerics/eigen_full_detail.hpp": "15a5178a992e6fb010229e6820e10f9da60cefcb3d361f8d9e624efe01c19e12",
+      "src/numerics/eigen_full_phase_private.hpp": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "tests/numerics/eigen_full_test.cpp": "e37178ffe9f5a11d0d8e37ea079828592a7e688ddb3f4b8183bb4fe28d45dc6e",
+      "tests/numerics/eigen_full_contract_test.cpp": "3757abfe1f6dd4d88f521c66bc0be1829ed4bbb0c80492b934d350ee6fbb4ed8",
+      "tests/numerics/eigen_full_phase_audit_test.cpp": "26bcc06bbde747403a601039d2f91978b0321ecd587e84c510aea583a672cb93",
+      "qa/eigen_full/main.cpp": "e84dea343528164a2207ea3e5b3c23b8cc56b052aa823496f5e96d3e29df5ddb",
+      "include/uvlas/numerics/eigen_common.hpp": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+      "include/uvlas/numerics/eigen_metrics.hpp": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+      "src/numerics/eigen_metric_bounds.hpp": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+      "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+      "docs/specs/foundation/eigen-extraction-contract.md": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+      "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+      "src/numerics/eigen_common.cpp": "518df296929290b01d1c6b5f5bddfdc5fc9fc21a43331575e11329df63e2e705",
+      "src/numerics/eigen_metrics.cpp": "b9fc0ff4fd0b429c6f6a23a418ece80d709cee83b67851bd23d864a54e322e98",
+      "src/numerics/backend_memory_detail.hpp": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+      "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+      "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+      "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+      "cmake/ProjectOptions.cmake": "4d45d903185ac48173b27171b0fbba37be72a2eb33fb348cd273034bf4371f4a"
+    },
+    "role": "このmapは最終Windows実行時のbyteを識別する。後続のタグ/tool登録を反映した現在のsourcesへ置き換えない。"
+  }
+}

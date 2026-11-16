@@ -15,12 +15,19 @@ struct ActionValues {
 
 /// Fixed component and eigenvalue scales of the original physical problem.
 struct MetricScales {
+    /// Supply both immutable scales explicitly; no uninitialized scale request exists.
+    MetricScales(std::span<const double> d, double lambda) noexcept
+        : components(d), eigenvalue_scale(lambda) {}
     std::span<const double> components; ///< Positive finite diagonal entries of D.
     double eigenvalue_scale; ///< Positive finite eigenvalue scale, in the original units.
 };
 
 /// Identity assigned to the actual candidate whose metrics are being evaluated.
 struct MetricContext {
+    /// Supply every candidate identity explicitly; no default evaluation context exists.
+    MetricContext(Context original, StateDiagnosticContext reporting,
+                  core::NumericalGeneration generation) noexcept
+        : system(original), state(reporting), values_generation(generation) {}
     Context system;               ///< Original problem, layouts, policies and evaluation time.
     StateDiagnosticContext state; ///< Explicit reporting identities; never inferred.
     core::NumericalGeneration values_generation; ///< Generation of the exact candidate words.
@@ -75,6 +82,13 @@ using BackwardCertificate = std::variant<NotRequested, core::ErrorCertificate>;
 
 /// Fixed-size owned proofs for one pair; every present certificate is achieved.
 struct PairMetrics {
+    /// Own evaluated proofs and the positive lower bound used by residual normalization.
+    PairMetrics(core::ErrorCertificate original, core::ErrorCertificate norm,
+                BackwardCertificate additional, double infinity_lower) noexcept
+        : residual(original),
+          normalization(norm),
+          backward(additional),
+          vector_infinity_lower(infinity_lower) {}
     core::ErrorCertificate residual;      ///< Proof for the actual original-system residual.
     core::ErrorCertificate normalization; ///< Proof for the actual dimensionless vector norm.
     BackwardCertificate backward;         ///< Proof of the additional requirement, when requested.

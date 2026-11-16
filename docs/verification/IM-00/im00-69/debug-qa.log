@@ -1,0 +1,11 @@
+Internal ctest changing into directory: <repo>/out/issue69-msvc
+Test project <repo>/out/issue69-msvc
+    Start 37: qa.eigen_generalized
+1/1 Test #37: qa.eigen_generalized .............   Passed    0.08 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+verification    =   0.08 sec*proc (1 test)
+
+Total Test time (real) =   0.09 sec

@@ -1,0 +1,12 @@
+{
+  "tool": "clang-tidy 21.1.1",
+  "format": "clang-format 21.1.2",
+  "exit_code": 0,
+  "files": [
+    "src/numerics/eigen_generalized.cpp",
+    "tests/numerics/eigen_generalized_test.cpp",
+    "qa/eigen_generalized/main.cpp"
+  ],
+  "log": "static-final.log",
+  "scope": "MSVC Debugの製品側一意なcompile entryを各TUに選び、audit/他構成の重複を除外。共有型の全引数constructorと試験optional参照を修正後に実施。後続はAPI shift座標のコメントだけ。"
+}

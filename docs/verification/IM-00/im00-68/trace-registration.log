@@ -1,0 +1,12 @@
+Internal ctest changing into directory: <repo>/out/issue68
+Test project <repo>/out/issue68
+    Start 6: tools.trace
+1/1 Test #6: tools.trace ......................   Passed    0.30 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+unit            =   0.30 sec*proc (1 test)
+verification    =   0.30 sec*proc (1 test)
+
+Total Test time (real) =   0.32 sec

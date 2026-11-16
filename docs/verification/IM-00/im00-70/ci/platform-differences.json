@@ -1,0 +1,23 @@
+{
+  "platform": "linux-x64-gnu14.2-sse2",
+  "matched": 6,
+  "differences": [
+    {
+      "quantity": "root0.residual",
+      "windows": "1.1041e880e6942p-48",
+      "linux": "1.3b2428bf622cbp-48",
+      "absolute_change": 5.951321766890075e-16,
+      "relative_change": 0.1575119144071359,
+      "linux_upper_over_budget": 0.004373463352010216
+    },
+    {
+      "quantity": "root1.residual",
+      "windows": "1.1041e880e6942p-48",
+      "linux": "1.3b2428bf622cbp-48",
+      "absolute_change": 5.951321766890075e-16,
+      "relative_change": 0.1575119144071359,
+      "linux_upper_over_budget": 0.004373463352010216
+    }
+  ],
+  "lambda_analytic_error": 1.7837931047801417e-15
+}

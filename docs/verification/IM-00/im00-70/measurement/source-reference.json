@@ -1,0 +1,6 @@
+{
+  "id": "eigen-arnoldi-qa-action-definitions",
+  "hint": "qa/eigen_arnoldi/main.cpp",
+  "sha256": "a27648d8018d88d189f8a71a526de8fda0643c6cf8c7d9b155158f51824343b5",
+  "copy": "probe.cpp contains context, Rotation and NoConsumer copied verbatim; adds diagonal provider and harness. No external source include."
+}

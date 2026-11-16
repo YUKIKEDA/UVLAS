@@ -32,6 +32,10 @@ endforeach()
 
 # QA-04: results must equal the baseline of this platform bit for bit.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
+add_test(NAME tools.trace
+    COMMAND "${Python3_EXECUTABLE}" -m unittest tools.qa.trace_test)
+set_tests_properties(tools.trace PROPERTIES TIMEOUT 30 LABELS "unit;verification"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" ENVIRONMENT "PYTHONUTF8=1")
 add_test(NAME qa.numeric_canary
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
         --case numeric-canary --run "$<TARGET_FILE:uvlas_numeric_canary>")
@@ -206,6 +210,14 @@ uvlas_add_test(numerics.sparse_solve
     SOURCES numerics/sparse_solve_test.cpp
     LIBS uvlas_numerics Boost::multiprecision)
 
+uvlas_add_test(numerics.eigen_generalized LABELS unit negative verification
+    SOURCES numerics/eigen_generalized_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+
+add_test(NAME qa.eigen_generalized
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-generalized --run "$<TARGET_FILE:uvlas_eigen_generalized_canary>")
+set_tests_properties(qa.eigen_generalized PROPERTIES TIMEOUT 30 LABELS "verification")
+
 uvlas_add_test(numerics.sparse_capacity
     LABELS capacity verification
     SOURCES numerics/sparse_capacity_test.cpp
@@ -222,6 +234,22 @@ uvlas_require_audited_dependencies(uvlas_test_numerics_sparse_allocation)
 uvlas_add_test(numerics.dense_solve LABELS unit verification negative
  SOURCES numerics/dense_solve_test.cpp LIBS uvlas_numerics Boost::multiprecision)
 
+uvlas_add_test(numerics.eigen_full_phase_audit LABELS property verification
+    SOURCES numerics/eigen_full_phase_audit_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen Boost::headers)
+target_include_directories(uvlas_test_numerics_eigen_full_phase_audit PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_eigen_full_phase_audit)
+uvlas_require_audited_dependencies(uvlas_test_numerics_eigen_full_phase_audit)
+
+uvlas_add_test(numerics.eigen_full_contract LABELS unit negative verification
+    SOURCES numerics/eigen_full_contract_test.cpp LIBS uvlas_numerics)
+
+uvlas_add_test(numerics.eigen_full LABELS unit negative verification
+    SOURCES numerics/eigen_full_test.cpp LIBS uvlas_numerics Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_numerics_eigen_full PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+target_compile_definitions(uvlas_test_numerics_eigen_full PRIVATE
+    UVLAS_FULL_FIXTURE_PATH="${PROJECT_SOURCE_DIR}/tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json")
+
 uvlas_add_test(numerics.dense_contract LABELS unit negative verification
  SOURCES numerics/dense_contract_test.cpp LIBS uvlas_numerics)
 
@@ -231,6 +259,17 @@ uvlas_add_test(numerics.dense_allocations LABELS property verification
 uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
 uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)
 
+uvlas_add_test(numerics.eigen_arnoldi_allocations LABELS unit negative verification
+    SOURCES numerics/eigen_arnoldi_allocations_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen Spectra::Spectra)
+target_include_directories(uvlas_test_numerics_eigen_arnoldi_allocations PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_eigen_arnoldi_allocations)
+uvlas_require_audited_dependencies(uvlas_test_numerics_eigen_arnoldi_allocations)
+uvlas_add_test(numerics.eigen_arnoldi LABELS unit negative verification
+    SOURCES numerics/eigen_arnoldi_test.cpp LIBS uvlas_numerics uvlas::eigen Spectra::Spectra Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_numerics_eigen_arnoldi PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+target_compile_definitions(uvlas_test_numerics_eigen_arnoldi PRIVATE
+    UVLAS_ARNOLDI_REFERENCE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/j1-pg-free-history-24-v1")
 uvlas_add_test(numerics.gmres_contract LABELS unit negative verification
     SOURCES numerics/gmres_contract_test.cpp LIBS uvlas_numerics Boost::multiprecision)
 uvlas_add_test(numerics.gmres_solve LABELS unit verification
@@ -284,3 +323,13 @@ add_test(NAME qa.eigen_common
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
         --case eigen-common --run "$<TARGET_FILE:uvlas_eigen_common_canary>")
 set_tests_properties(qa.eigen_common PROPERTIES TIMEOUT 30 LABELS "verification")
+
+add_test(NAME qa.eigen_full
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-full --run "$<TARGET_FILE:uvlas_eigen_full_canary>")
+set_tests_properties(qa.eigen_full PROPERTIES TIMEOUT 30 LABELS "verification")
+
+add_test(NAME qa.eigen_arnoldi
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-arnoldi --run "$<TARGET_FILE:uvlas_eigen_arnoldi_canary>")
+set_tests_properties(qa.eigen_arnoldi PROPERTIES TIMEOUT 30 LABELS "verification")

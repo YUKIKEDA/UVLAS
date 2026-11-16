@@ -1,0 +1,6 @@
+[1/3] Processing file <repo>\src\numerics\eigen_generalized.cpp.
+84197 warnings generated.
+[2/3] Processing file <repo>\tests\numerics\eigen_generalized_test.cpp.
+146829 warnings generated.
+[3/3] Processing file <repo>\qa\eigen_generalized\main.cpp.
+201802 warnings generated.

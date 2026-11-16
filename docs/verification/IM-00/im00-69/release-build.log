@@ -1,0 +1,31 @@
+[0/2] Re-checking globbed directories...
+[1/31] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\issue69-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/issue69-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\error_certificate.cpp.obj
+[3/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\backend_memory.cpp.obj
+[4/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\checked_dimensions.cpp.obj
+[5/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\eigen_common.cpp.obj
+[6/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\linear_validation.cpp.obj
+[7/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\gmres_residual_detail.cpp.obj
+[8/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\linear_metrics.cpp.obj
+[9/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\eigen_action.cpp.obj
+[10/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\precision.cpp.obj
+[11/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\eigen_metrics.cpp.obj
+[12/31] Building CXX object CMakeFiles\uvlas_cli.dir\Release\src\app\main.cpp.obj
+[13/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\storage.cpp.obj
+[14/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\linear_result.cpp.obj
+[15/31] Building CXX object CMakeFiles\uvlas_eigen_generalized_canary.dir\Release\qa\eigen_generalized\main.cpp.obj
+[16/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\sparse_triangular.cpp.obj
+[17/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\gmres_solve.cpp.obj
+[18/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\sparse_spd.cpp.obj
+[19/31] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_generalized.dir\Release\numerics\eigen_generalized_test.cpp.obj
+[20/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[21/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\instrumentation.cpp.obj
+[22/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\state.cpp.obj
+[23/31] Linking CXX static library Release\uvlas_core.lib
+[24/31] Linking CXX executable Release\uvlas.exe
+[25/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\sparse_solve.cpp.obj
+[26/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\eigen_generalized.cpp.obj
+[27/31] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\dense_solve.cpp.obj
+[28/31] Linking CXX static library Release\uvlas_numerics.lib
+[29/31] Linking CXX executable Release\uvlas_eigen_generalized_canary.exe
+[30/31] Linking CXX executable tests\Release\uvlas_test_numerics_eigen_generalized.exe

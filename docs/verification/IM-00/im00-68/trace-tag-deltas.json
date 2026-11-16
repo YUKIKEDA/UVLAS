@@ -1,0 +1,26 @@
+[
+  {
+    "path": "tests/numerics/eigen_full_test.cpp",
+    "before_sha256": "e37178ffe9f5a11d0d8e37ea079828592a7e688ddb3f4b8183bb4fe28d45dc6e",
+    "after_tag_sha256": "5a94435e1913a9d68b4504093712213165507180b92c366a4d9784b6b3e598ac",
+    "change": "既存各caseに実際に検証するEIGタグだけ追加。実行する式・条件・期待値は不変。",
+    "published_sha256": "1c54fd90382e1e9dc4f7495cadb3408f026ac07e043d3e84702792f5e1d108c3",
+    "format_whitespace_only_besides_tags": true
+  },
+  {
+    "path": "tests/numerics/eigen_full_contract_test.cpp",
+    "before_sha256": "3757abfe1f6dd4d88f521c66bc0be1829ed4bbb0c80492b934d350ee6fbb4ed8",
+    "after_tag_sha256": "926077b0eebf34ae3de141c4a01abc1b13c902500d878d70c174a564b8b9184b",
+    "change": "既存各caseに実際に検証するEIGタグだけ追加。実行する式・条件・期待値は不変。",
+    "published_sha256": "80ead3f884c5153525ce450ae02c24904322604db6989499c42bc7b39d5ce1fb",
+    "format_whitespace_only_besides_tags": true
+  },
+  {
+    "path": "tests/numerics/eigen_full_phase_audit_test.cpp",
+    "before_sha256": "26bcc06bbde747403a601039d2f91978b0321ecd587e84c510aea583a672cb93",
+    "after_tag_sha256": "1b7c7245bf3e878ff41a35c9da549b8ba73c3f1839681bed8c37b149d34c4540",
+    "change": "既存各caseに実際に検証するEIGタグだけ追加。実行する式・条件・期待値は不変。",
+    "published_sha256": "1b7c7245bf3e878ff41a35c9da549b8ba73c3f1839681bed8c37b149d34c4540",
+    "format_whitespace_only_besides_tags": true
+  }
+]

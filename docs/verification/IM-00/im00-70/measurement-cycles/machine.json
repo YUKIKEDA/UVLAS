@@ -1,0 +1,10 @@
+{
+  "cpu_names": [
+    "13th Gen Intel(R) Core(TM) i5-13400F"
+  ],
+  "physical_cores": 10.0,
+  "logical_processors": 16.0,
+  "physical_memory_bytes": 51343966208,
+  "os": "Windows 11",
+  "source": "local CIM selected hardware fields"
+}

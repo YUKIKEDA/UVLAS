@@ -1,0 +1,21 @@
+[0/2] Re-checking globbed directories...
+[1/18] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\issue68 && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/issue68/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/18] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[3/18] Linking CXX static library Release\uvlas_core.lib
+[4/18] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[5/18] Linking CXX static library Release\uvlas_core_audit.lib
+[6/18] Building CXX object CMakeFiles\uvlas_numerics.dir\Release\src\numerics\eigen_generalized.cpp.obj
+[7/18] Linking CXX static library Release\uvlas_numerics.lib
+[8/18] Building CXX object CMakeFiles\uvlas_cli.dir\Release\src\app\main.cpp.obj
+[9/18] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Release\src\numerics\eigen_generalized.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[10/18] Linking CXX executable Release\uvlas_eigen_full_canary.exe
+[11/18] Linking CXX executable Release\uvlas.exe
+[12/18] Linking CXX executable tests\Release\uvlas_test_numerics_eigen_full_contract.exe
+[13/18] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_full.dir\Release\numerics\eigen_full_test.cpp.obj
+[14/18] Linking CXX executable tests\Release\uvlas_test_numerics_eigen_full.exe
+[15/18] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Release\src\numerics\eigen_full.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[16/18] Linking CXX static library Release\uvlas_numerics_audit.lib
+[17/18] Linking CXX executable tests\Release\uvlas_test_numerics_eigen_full_phase_audit.exe

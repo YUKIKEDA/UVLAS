@@ -1,0 +1,64 @@
+{
+  "file": ".cursor\\rules\\numerics.mdc",
+  "stats": {
+    "total_findings": 1,
+    "by_category": {
+      "low_burstiness": 1
+    },
+    "genre": "tech",
+    "experimental": false,
+    "total_sentences": 9,
+    "nominal_ending_count": 0,
+    "nominal_ending_ratio": 0.0,
+    "total_paragraphs": 3,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      3,
+      5,
+      1
+    ],
+    "paragraph_sentence_count_cv": null,
+    "rhythm": {
+      "mora_mean": 75.88888888888889,
+      "mora_stdev": 23.06726610225188,
+      "burstiness": -0.5337881488156645,
+      "length_autocorrelation_lag1": 0.26215090912727773
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "����/�⏕�L��/����/�⏕�L��",
+      "lead_pos_4gram_ratio": 0.3333333333333333
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 159,
+      "doc_char_count": 489,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 1,
+      "bold_per_1000_chars": 0.48123195380173245,
+      "bullet_line_count": 13,
+      "non_blank_line_count": 28,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 2,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 25,
+      "category": "low_burstiness",
+      "excerpt": "burstiness=-0.534 (���[���ߎ��� ����=75.9, �W���΍�=23.1)",
+      "severity": "warn",
+      "detail": "burstiness ��臒l(-0.24)�����B���̒��Z�̃����n�����R�����@�B�I�ȃ��Y���̋^��",
+      "related_lines": null
+    }
+  ]
+}

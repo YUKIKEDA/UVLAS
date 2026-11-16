@@ -1,0 +1,7 @@
+Source head: 5be2d2a62b12eca77e1fce09a3d71c85a5c34514
+Job: http<repo>/actions/runs/43808940812/job/133106089145
+build and test (linux, gcc 14, linux-debug)	clang-tidy	2026-11-16T05:33:23.6583655Z 4879166 warnings generated.
+build and test (linux, gcc 14, linux-debug)	clang-tidy	2026-11-16T05:33:23.6625745Z <home>/work/UVLAS/UVLAS/src/numerics/eigen_full.cpp:113:33: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+build and test (linux, gcc 14, linux-debug)	clang-tidy	2026-11-16T05:33:23.6626412Z   113 |             add_timing(data_, (*data_.timings).*stage_, *start_);
+build and test (linux, gcc 14, linux-debug)	clang-tidy	2026-11-16T05:33:23.6626677Z       |                                 ^~~~~~~~~~~~~
+build and test (linux, gcc 14, linux-debug)	clang-tidy	2026-11-16T05:33:23.7223206Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,122 @@
+{
+  "full6": {
+    "samples": [
+      {
+        "repetition": 0,
+        "preparation_ns": 50700,
+        "backend_ns": 28600,
+        "qualification_ns": 3190300,
+        "planned_payload_bytes": 3366
+      },
+      {
+        "repetition": 1,
+        "preparation_ns": 19200,
+        "backend_ns": 5600,
+        "qualification_ns": 3051800,
+        "planned_payload_bytes": 3366
+      },
+      {
+        "repetition": 2,
+        "preparation_ns": 20600,
+        "backend_ns": 9100,
+        "qualification_ns": 3108600,
+        "planned_payload_bytes": 3366
+      }
+    ],
+    "medians_ns": {
+      "preparation_ns": 20600,
+      "backend_ns": 9100,
+      "qualification_ns": 3108600
+    }
+  },
+  "pairs6x2": {
+    "samples": [
+      {
+        "repetition": 0,
+        "preparation_ns": 38000,
+        "backend_ns": 293300,
+        "qualification_ns": 534000,
+        "planned_payload_bytes": 2502
+      },
+      {
+        "repetition": 1,
+        "preparation_ns": 40800,
+        "backend_ns": 285900,
+        "qualification_ns": 490000,
+        "planned_payload_bytes": 2502
+      },
+      {
+        "repetition": 2,
+        "preparation_ns": 34000,
+        "backend_ns": 265300,
+        "qualification_ns": 556500,
+        "planned_payload_bytes": 2502
+      }
+    ],
+    "medians_ns": {
+      "preparation_ns": 38000,
+      "backend_ns": 285900,
+      "qualification_ns": 534000
+    }
+  },
+  "cluster6x2": {
+    "samples": [
+      {
+        "repetition": 0,
+        "preparation_ns": 5700,
+        "backend_ns": 39700,
+        "qualification_ns": 982900,
+        "planned_payload_bytes": 2006
+      },
+      {
+        "repetition": 1,
+        "preparation_ns": 2800,
+        "backend_ns": 33900,
+        "qualification_ns": 960000,
+        "planned_payload_bytes": 2006
+      },
+      {
+        "repetition": 2,
+        "preparation_ns": 4700,
+        "backend_ns": 35000,
+        "qualification_ns": 948000,
+        "planned_payload_bytes": 2006
+      }
+    ],
+    "medians_ns": {
+      "preparation_ns": 4700,
+      "backend_ns": 35000,
+      "qualification_ns": 960000
+    }
+  },
+  "full24": {
+    "samples": [
+      {
+        "repetition": 0,
+        "preparation_ns": 162900,
+        "backend_ns": 22200,
+        "qualification_ns": 197166700,
+        "planned_payload_bytes": 51048
+      },
+      {
+        "repetition": 1,
+        "preparation_ns": 162600,
+        "backend_ns": 24600,
+        "qualification_ns": 191776100,
+        "planned_payload_bytes": 51048
+      },
+      {
+        "repetition": 2,
+        "preparation_ns": 142800,
+        "backend_ns": 20100,
+        "qualification_ns": 182099700,
+        "planned_payload_bytes": 51048
+      }
+    ],
+    "medians_ns": {
+      "preparation_ns": 162600,
+      "backend_ns": 22200,
+      "qualification_ns": 191776100
+    }
+  }
+}

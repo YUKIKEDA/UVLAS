@@ -1,0 +1,227 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-09",
+    "EIG-11"
+  ],
+  "package": "IM-00",
+  "issue": 70,
+  "date": "2026-11-16",
+  "source_commit": "6bb98e20a72710761d73e6a381da590a65f0e2df",
+  "scope": "PR72の計測clock optional確認を通常mergeし、PR73の固定Arnoldi実装と証拠が変わらないことを照合する。新機能・新しい数値／性能主張はない。",
+  "integration": {
+    "previous_head": "e97fd14c28820b2012eb1f0888d9698e1b8a3ab9",
+    "upstream_head": "f2f2b139b865ba1c145c1eb4b21e15dc5f5155f6",
+    "upstream_source_fix": "f65ea5c571a07abc5f97f6c8b40e05ae43ef8260",
+    "method": "通常merge。競合した生成traceability.mdは新toolで再生成し、旧表示を選択しない。上流sourceと証拠は手直ししていない。",
+    "change": "FullStageClockのdestructorで計測先optionalを名前付き参照へ束縛し、start_とその参照の存在を確認してから使用する。cpp規約へ局所確認の教訓を追加した。数値式・backend・精度・資源政策・公開APIは不変。"
+  },
+  "historical_record": {
+    "id": "im00-70-arnoldi-verification",
+    "sha256": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+    "hint": "docs/verification/IM-00/im00-70.json",
+    "note": "e97fd14時点の凍結記録を保持する。旧source-mapのcpp規約は旧revisionの値であり、現在の規約へhashを付け替えない。ここでは旧記録をartifactsで非再帰参照し、旧91files検査を新headで再実行したとはしない。"
+  },
+  "unchanged": {
+    "arnoldi_source_files": 13,
+    "arnoldi_source_mismatches": 0,
+    "references": [
+      {
+        "id": "arnoldi-frozen-include-uvlas-numerics-eigen_arnoldi.hpp",
+        "sha256": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+        "hint": "include/uvlas/numerics/eigen_arnoldi.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi.cpp",
+        "sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+        "hint": "src/numerics/eigen_arnoldi.cpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_build.hpp",
+        "sha256": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+        "hint": "src/numerics/eigen_arnoldi_build.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_cluster.hpp",
+        "sha256": "2822001801a909a1cfa8273096e2db0c5f943a6584c810d597f6aceace4753e6",
+        "hint": "src/numerics/eigen_arnoldi_cluster.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_data.hpp",
+        "sha256": "7e1aa19c1594614e820da7acf5a02661800217cfecf69543a71692954e6cb791",
+        "hint": "src/numerics/eigen_arnoldi_data.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_engine.hpp",
+        "sha256": "447f132579d88a694815d18f9b6a0538f46061a7c8b867d2f65c6945316bf87d",
+        "hint": "src/numerics/eigen_arnoldi_engine.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_entry.hpp",
+        "sha256": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+        "hint": "src/numerics/eigen_arnoldi_entry.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_extract.hpp",
+        "sha256": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+        "hint": "src/numerics/eigen_arnoldi_extract.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_native.hpp",
+        "sha256": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+        "hint": "src/numerics/eigen_arnoldi_native.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-src-numerics-eigen_arnoldi_qualify.hpp",
+        "sha256": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+        "hint": "src/numerics/eigen_arnoldi_qualify.hpp"
+      },
+      {
+        "id": "arnoldi-frozen-tests-numerics-eigen_arnoldi_allocations_test.cpp",
+        "sha256": "e0efde0976447a5c2343f806df5b66806148b74d423b6c6baf86997f4ca076cf",
+        "hint": "tests/numerics/eigen_arnoldi_allocations_test.cpp"
+      },
+      {
+        "id": "arnoldi-frozen-tests-numerics-eigen_arnoldi_test.cpp",
+        "sha256": "8023bcaa1fb6df6ae3fd654172f42bda6e84d58cdba090b6f86ea9b1d1698fee",
+        "hint": "tests/numerics/eigen_arnoldi_test.cpp"
+      },
+      {
+        "id": "arnoldi-frozen-qa-eigen_arnoldi-main.cpp",
+        "sha256": "a27648d8018d88d189f8a71a526de8fda0643c6cf8c7d9b155158f51824343b5",
+        "hint": "qa/eigen_arnoldi/main.cpp"
+      }
+    ],
+    "shared_phase": {
+      "id": "full-physical-phase-fixed-helper",
+      "sha256": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "hint": "src/numerics/eigen_full_phase_private.hpp"
+    },
+    "historical_artifact_files": 58,
+    "historical_artifact_mismatches": 0
+  },
+  "verification": {
+    "upstream_owner": "agent4。root独立レビュー済み。",
+    "upstream_scope": "clean f65ea5cからsource TU1件のclang-tidy21.1.1／clang-format21.1.2成功。既存Full phase timing caseだけDebug/Release各36assertions/1case成功。具体的コマンドとrawは上流追補を参照。",
+    "local_scope": "通常merge後のsource／規約と固定Arnoldi13file・共有phase・旧58artifactのhashを比較。生成traceの再生成／照合と、この追補のbyte整合だけを検査する。",
+    "not_repeated": "Full／Arnoldiの数値集合、Full比較、変異、確保監査、canary、工程計測を再実行しない。Linux修正後tidyと最終CI成功は先取りしない。"
+  },
+  "qa_0002": "Linux基準と残差上界2量の提案は変更しない。所有者のPR73レビュー／mergeによる承認前状態を維持する。",
+  "claimed_state": "親Issue15に従い実装が採用仕様に適合するという限定主張のまま。QA数値認定・実験妥当性・実務性能・実務受入は追加しない。",
+  "sources": {
+    "src/numerics/eigen_full.cpp": "2ce37644316fdffc89646c8b080e812e7ec838dfae629744df74d4857e0194cb",
+    ".cursor/rules/cpp.mdc": "658cceef793775414a757ebbf809c1394f9a16578d647b94b6b0d46f4b1b6907"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-70.json": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+    "docs/verification/IM-00/im00-68-ci-optional.json": "567980977c407ea5290e6fd4b0175cf09e3815765b2836e17de6b3b071876621",
+    "docs/verification/IM-00/im00-68-ci-optional/build-debug.log": "a688517459dbccf43a379197015388f1e83952d8e583f7408220d612bc4a7e75",
+    "docs/verification/IM-00/im00-68-ci-optional/build-release.log": "076d74eba19f27b2f35cbaf7849e6e3c78cdcc26e4c37db7811779f9769a793e",
+    "docs/verification/IM-00/im00-68-ci-optional/compile_commands.json": "68f6582aaf425e6cd199e68942be2f4b619e7a6086c450c5411e3d230aa0f56b",
+    "docs/verification/IM-00/im00-68-ci-optional/git-revision.hpp": "3e929d8c6de600242aed7d72363a01aac43cbba455b2b6cb84a304d347c7a6fa",
+    "docs/verification/IM-00/im00-68-ci-optional/japanese-cpp.json": "4d049cdde1508fbca1652cbeacd3b03471963ae186ab0dd52b5647cc3f40b6ed",
+    "docs/verification/IM-00/im00-68-ci-optional/linux-ci-excerpt.log": "553ac3e7ad56c67a2ac3309c6c02f9d808bf98b92b1a09fc7636f3915c42998c",
+    "docs/verification/IM-00/im00-68-ci-optional/redaction.json": "d00984152290a00ac8585fcec04665d252e309466aa3842f19d602c26de915bf",
+    "docs/verification/IM-00/im00-68-ci-optional/source.patch": "dc54c9d26339902dc9741bb1e6d676de35aa0f4ab54e55aa2db6fe401ae54d2b",
+    "docs/verification/IM-00/im00-68-ci-optional/test-results.json": "1cda783b25e6ce6aff1876842c086a2616321d78086c6816621d63bce1690c19",
+    "docs/verification/IM-00/im00-68-ci-optional/tidy-exit.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs/verification/IM-00/im00-68-ci-optional/tidy.log": "007f3437d2f15af980f786c913faf131641e4c36377150d9f986cb02546933ea",
+    "docs/verification/IM-00/im00-68-ci-optional/timing-debug.log": "71469a6a83308d281fd1fb9489c7f074b2b46fee6c614d14f7e690697df6cad4",
+    "docs/verification/IM-00/im00-68-ci-optional/timing-release.log": "02928bbf2285fc0937364c4035046c6b17126a49a6977406c4a107c60d87b429",
+    "docs/verification/IM-00/im00-68.json": "02085a7f55589d61ac6da36e7ab6359958397f1e1631a7b6b1949b0c99858c56"
+  },
+  "source_references": [
+    {
+      "id": "im00-70-full-optional-sources-src-numerics-eigen_full.cpp",
+      "sha256": "2ce37644316fdffc89646c8b080e812e7ec838dfae629744df74d4857e0194cb",
+      "hint": "src/numerics/eigen_full.cpp"
+    },
+    {
+      "id": "im00-70-full-optional-sources-.cursor-rules-cpp.mdc",
+      "sha256": "658cceef793775414a757ebbf809c1394f9a16578d647b94b6b0d46f4b1b6907",
+      "hint": ".cursor/rules/cpp.mdc"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-70.json",
+      "sha256": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+      "hint": "docs/verification/IM-00/im00-70.json"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional.json",
+      "sha256": "567980977c407ea5290e6fd4b0175cf09e3815765b2836e17de6b3b071876621",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional.json"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-build-debug.log",
+      "sha256": "a688517459dbccf43a379197015388f1e83952d8e583f7408220d612bc4a7e75",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/build-debug.log"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-build-release.log",
+      "sha256": "076d74eba19f27b2f35cbaf7849e6e3c78cdcc26e4c37db7811779f9769a793e",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/build-release.log"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-compile_commands.json",
+      "sha256": "68f6582aaf425e6cd199e68942be2f4b619e7a6086c450c5411e3d230aa0f56b",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/compile_commands.json"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-git-revision.hpp",
+      "sha256": "3e929d8c6de600242aed7d72363a01aac43cbba455b2b6cb84a304d347c7a6fa",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/git-revision.hpp"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-japanese-cpp.json",
+      "sha256": "4d049cdde1508fbca1652cbeacd3b03471963ae186ab0dd52b5647cc3f40b6ed",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/japanese-cpp.json"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-linux-ci-excerpt.log",
+      "sha256": "553ac3e7ad56c67a2ac3309c6c02f9d808bf98b92b1a09fc7636f3915c42998c",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/linux-ci-excerpt.log"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-redaction.json",
+      "sha256": "d00984152290a00ac8585fcec04665d252e309466aa3842f19d602c26de915bf",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/redaction.json"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-source.patch",
+      "sha256": "dc54c9d26339902dc9741bb1e6d676de35aa0f4ab54e55aa2db6fe401ae54d2b",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/source.patch"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-test-results.json",
+      "sha256": "1cda783b25e6ce6aff1876842c086a2616321d78086c6816621d63bce1690c19",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/test-results.json"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-tidy-exit.txt",
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/tidy-exit.txt"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-tidy.log",
+      "sha256": "007f3437d2f15af980f786c913faf131641e4c36377150d9f986cb02546933ea",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/tidy.log"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-timing-debug.log",
+      "sha256": "71469a6a83308d281fd1fb9489c7f074b2b46fee6c614d14f7e690697df6cad4",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/timing-debug.log"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68-ci-optional-timing-release.log",
+      "sha256": "02928bbf2285fc0937364c4035046c6b17126a49a6977406c4a107c60d87b429",
+      "hint": "docs/verification/IM-00/im00-68-ci-optional/timing-release.log"
+    },
+    {
+      "id": "im00-70-full-optional-artifacts-docs-verification-IM-00-im00-68.json",
+      "sha256": "02085a7f55589d61ac6da36e7ab6359958397f1e1631a7b6b1949b0c99858c56",
+      "hint": "docs/verification/IM-00/im00-68.json"
+    }
+  ]
+}

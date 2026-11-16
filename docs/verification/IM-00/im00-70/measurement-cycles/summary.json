@@ -1,0 +1,122 @@
+{
+  "build_info": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "dd10c0d4743825349929c20196d77338c44af30c",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Release",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    }
+  },
+  "affinity": {
+    "process_affinity_mask": 1,
+    "system_affinity_mask": 65535
+  },
+  "cases": {
+    "real8-pairs-both": {
+      "samples": 90,
+      "compared_words": 84,
+      "workspace_payload_bytes": 2600,
+      "result_payload_bytes": 2264,
+      "median_stage_nanoseconds": [
+        1300.0,
+        29200.0,
+        368600.0,
+        0.0
+      ],
+      "minimum_stage_nanoseconds": [
+        1100,
+        27500,
+        364900,
+        0
+      ],
+      "maximum_stage_nanoseconds": [
+        2500,
+        96400,
+        993000,
+        0
+      ]
+    },
+    "real8-cluster-both": {
+      "samples": 9,
+      "compared_words": 92,
+      "workspace_payload_bytes": 2600,
+      "result_payload_bytes": 1400,
+      "median_stage_nanoseconds": [
+        1500,
+        30100,
+        992800,
+        123500
+      ],
+      "minimum_stage_nanoseconds": [
+        1300,
+        28600,
+        984800,
+        121000
+      ],
+      "maximum_stage_nanoseconds": [
+        3400,
+        32200,
+        1136900,
+        129500
+      ]
+    },
+    "real96-pairs": {
+      "samples": 3,
+      "compared_words": 4752,
+      "workspace_payload_bytes": 161352,
+      "result_payload_bytes": 46976,
+      "median_stage_nanoseconds": [
+        16500,
+        3274700,
+        26324800,
+        0
+      ],
+      "minimum_stage_nanoseconds": [
+        15600,
+        3223900,
+        24343600,
+        0
+      ],
+      "maximum_stage_nanoseconds": [
+        16600,
+        3765800,
+        26792900,
+        0
+      ]
+    },
+    "complex6-pairs-both": {
+      "samples": 9,
+      "compared_words": 68,
+      "workspace_payload_bytes": 1536,
+      "result_payload_bytes": 1402,
+      "median_stage_nanoseconds": [
+        1600,
+        22400,
+        277000,
+        0
+      ],
+      "minimum_stage_nanoseconds": [
+        1300,
+        21700,
+        274000,
+        0
+      ],
+      "maximum_stage_nanoseconds": [
+        2100,
+        28000,
+        290300,
+        0
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "uvlas.build-info/1",
+  "version": "0.1.0-dev",
+  "commit": "0bcfea976a957a5f0e36ed5187167ef3e23b2c07",
+  "uncommitted_changes": false,
+  "compiler": "MSVC 19.51.36260.0",
+  "platform": "Windows AMD64",
+  "configuration": "Release",
+  "floating_point": "/fp:strict",
+  "instruction_set": "sse2",
+  "platform_key": "windows-x64-msvc19.51-sse2",
+  "dependencies": {
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "nlohmann_json": "3.12.0"
+  }
+}
+
+{"order":2,"round":0,"repetitions":100,"payload_bytes":814,"resident_bytes":5091328,"process_peak_bytes":5091328,"first_root_bits":13830554455654793217,"stages":[{"calls":100,"nanoseconds":71500},{"calls":100,"nanoseconds":296500},{"calls":100,"nanoseconds":119700},{"calls":100,"nanoseconds":3988800},{"calls":0,"nanoseconds":0}]}
+{"order":32,"round":0,"repetitions":20,"payload_bytes":166024,"resident_bytes":5574656,"process_peak_bytes":5574656,"first_root_bits":4609371051460326415,"stages":[{"calls":20,"nanoseconds":347900},{"calls":20,"nanoseconds":1614700},{"calls":20,"nanoseconds":6284800},{"calls":20,"nanoseconds":1894748300},{"calls":0,"nanoseconds":0}]}
+{"order":2,"round":1,"repetitions":100,"payload_bytes":814,"resident_bytes":5529600,"process_peak_bytes":5574656,"first_root_bits":13830554455654793217,"stages":[{"calls":100,"nanoseconds":74300},{"calls":100,"nanoseconds":427800},{"calls":100,"nanoseconds":115900},{"calls":100,"nanoseconds":4154100},{"calls":0,"nanoseconds":0}]}
+{"order":32,"round":1,"repetitions":20,"payload_bytes":166024,"resident_bytes":5570560,"process_peak_bytes":5574656,"first_root_bits":4609371051460326415,"stages":[{"calls":20,"nanoseconds":319500},{"calls":20,"nanoseconds":1569200},{"calls":20,"nanoseconds":6383500},{"calls":20,"nanoseconds":1939581500},{"calls":0,"nanoseconds":0}]}
+{"order":2,"round":2,"repetitions":100,"payload_bytes":814,"resident_bytes":5570560,"process_peak_bytes":5574656,"first_root_bits":13830554455654793217,"stages":[{"calls":100,"nanoseconds":66800},{"calls":100,"nanoseconds":269600},{"calls":100,"nanoseconds":106900},{"calls":100,"nanoseconds":3630200},{"calls":0,"nanoseconds":0}]}
+{"order":32,"round":2,"repetitions":20,"payload_bytes":166024,"resident_bytes":5570560,"process_peak_bytes":5574656,"first_root_bits":4609371051460326415,"stages":[{"calls":20,"nanoseconds":300800},{"calls":20,"nanoseconds":1536700},{"calls":20,"nanoseconds":6422300},{"calls":20,"nanoseconds":1913870600},{"calls":0,"nanoseconds":0}]}

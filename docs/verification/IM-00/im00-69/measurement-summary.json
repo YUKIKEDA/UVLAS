@@ -1,0 +1,90 @@
+{
+  "stage_names": [
+    "Preparation",
+    "MassQualification",
+    "Backend",
+    "Qualification",
+    "Consumer"
+  ],
+  "measurements": [
+    {
+      "order": 2,
+      "round": 0,
+      "mean_nanoseconds": [
+        715.0,
+        2965.0,
+        1197.0,
+        39888.0,
+        0.0
+      ],
+      "qualification_fraction": 0.8910532782307606,
+      "payload_bytes": 814
+    },
+    {
+      "order": 32,
+      "round": 0,
+      "mean_nanoseconds": [
+        17395.0,
+        80735.0,
+        314240.0,
+        94737415.0,
+        0.0
+      ],
+      "qualification_fraction": 0.9956660963553412,
+      "payload_bytes": 166024
+    },
+    {
+      "order": 2,
+      "round": 1,
+      "mean_nanoseconds": [
+        743.0,
+        4278.0,
+        1159.0,
+        41541.0,
+        0.0
+      ],
+      "qualification_fraction": 0.8704972653548753,
+      "payload_bytes": 814
+    },
+    {
+      "order": 32,
+      "round": 1,
+      "mean_nanoseconds": [
+        15975.0,
+        78460.0,
+        319175.0,
+        96979075.0,
+        0.0
+      ],
+      "qualification_fraction": 0.9957531718116202,
+      "payload_bytes": 166024
+    },
+    {
+      "order": 2,
+      "round": 2,
+      "mean_nanoseconds": [
+        668.0,
+        2696.0,
+        1069.0,
+        36302.0,
+        0.0
+      ],
+      "qualification_fraction": 0.8911746655210507,
+      "payload_bytes": 814
+    },
+    {
+      "order": 32,
+      "round": 2,
+      "mean_nanoseconds": [
+        15040.0,
+        76835.0,
+        321115.0,
+        95693530.0,
+        0.0
+      ],
+      "qualification_fraction": 0.9957027889470974,
+      "payload_bytes": 166024
+    }
+  ],
+  "interpretation": "Qualificationは元K/M全列作用と原残差・M正規化・全Gramの認定を合わせた実測。内部EFT単独への帰属ではない。全成分認定を維持する必要工程として残す。合成小系から実務全体の性能を予測しない。"
+}

@@ -1,0 +1,1007 @@
+{
+  "kind": "derived_public_evidence",
+  "source_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+  "snapshot_source_commit": "c0dd4d61e804bd97f0a3618fa3b4c3a5b369554a",
+  "scaled_action_header_sha256": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+  "test_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+  "note": "修正helperのclean snapshotからproducer/test両TUを同じprivate copyで再compileした。既存の23case/625assertと5変異の束は変更しない。通常/JSON/encoded filesystem prefixとaccount tokenだけを派生束で匿名化し、元rawは変更しない。",
+  "control": {
+    "cases": 26,
+    "assertions": 835,
+    "run_exit": 0
+  },
+  "mutants": 4,
+  "all_compile_link_success": true,
+  "both_translation_units_recompiled": true,
+  "mutant_assertion_exit": 42,
+  "frozen_inputs": 60,
+  "original_input_mismatches": 0,
+  "archive_producer_matches": 0,
+  "map_files": 5,
+  "excluded_binary_extensions": [
+    ".obj",
+    ".lib",
+    ".exe",
+    ".pdb"
+  ],
+  "entry_count_excluding_this_manifest": 112,
+  "entries": [
+    {
+      "entry": "runner/package_scaled_action.py",
+      "raw_sha256": "e891b14661493dd0ae2325394c082c2cfde76de290aea95ab57ba7dc626c8678",
+      "published_sha256": "3298a1eea3eae0aaa72d056265ddee053697c0311b5ee1541be43d14a1981afd",
+      "raw_bytes": 5595,
+      "published_bytes": 5549,
+      "replacements": {
+        "dependency-repository-prefix": 2,
+        "user-directory-prefix": 1,
+        "remaining-account-token": 3
+      }
+    },
+    {
+      "entry": "runner/prepare_scaled_action.py",
+      "raw_sha256": "ba50a4ae1d502d1684d3d1fc780427ff0ab7837e56d1dbda636cf02ed98ea58c",
+      "published_sha256": "ba50a4ae1d502d1684d3d1fc780427ff0ab7837e56d1dbda636cf02ed98ea58c",
+      "raw_bytes": 1509,
+      "published_bytes": 1509,
+      "replacements": {}
+    },
+    {
+      "entry": "runner/run_scaled_action.py",
+      "raw_sha256": "d01a6abefc731291e3e240af9e326b1a37aef86186707ca40f0d74f71572b5d6",
+      "published_sha256": "d01a6abefc731291e3e240af9e326b1a37aef86186707ca40f0d74f71572b5d6",
+      "raw_bytes": 12475,
+      "published_bytes": 12475,
+      "replacements": {}
+    },
+    {
+      "entry": "runner/scaled-action-agreed.json",
+      "raw_sha256": "eeed49cb46dc3f36801a2ea6a2f5341c8ebbd0bc25f7d1f8b3407463ec3fac47",
+      "published_sha256": "eeed49cb46dc3f36801a2ea6a2f5341c8ebbd0bc25f7d1f8b3407463ec3fac47",
+      "raw_bytes": 7110,
+      "published_bytes": 7110,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/compile-command.txt",
+      "raw_sha256": "3609d587ceff0805d03aedf7e1a4985888048fa07ccda4687f553cbd3f21be31",
+      "published_sha256": "56a245f530c3e16fa6cc78b47a63599e6e69a62b367f664c3ec756624ed3a800",
+      "raw_bytes": 1179,
+      "published_bytes": 925,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/control/compile.log",
+      "raw_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "published_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "raw_bytes": 19,
+      "published_bytes": 19,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/eigen_arnoldi.cpp",
+      "raw_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "published_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "raw_bytes": 16634,
+      "published_bytes": 16634,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/eigen_arnoldi.map",
+      "raw_sha256": "acc90418514b116b6e09ae494e7d69bac73feb4fa26c43a1fce109ef1622a709",
+      "published_sha256": "01fe805512fbb0cdbc5ae95457dc634b95248dc8edd2c7c19bd928087169638e",
+      "raw_bytes": 3922280,
+      "published_bytes": 3922271,
+      "replacements": {
+        "user-directory-prefix": 1,
+        "remaining-account-token": 1
+      }
+    },
+    {
+      "entry": "snapshot/control/eigen_arnoldi_test.cpp",
+      "raw_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "published_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "raw_bytes": 88968,
+      "published_bytes": 88968,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/link-command.json",
+      "raw_sha256": "8328d0c1f5bb70d038435c99e4b8108e1083ca21c1544c30adace9215b0c73ae",
+      "published_sha256": "9f39d7818f4a01b8cd88bbee592621468bdb9a6309e121a236dc24f09aec42fe",
+      "raw_bytes": 2124,
+      "published_bytes": 1574,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/control/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/run.log",
+      "raw_sha256": "7e7d26a639295d650b0cf679d3e49892439fce9e41e0f69306c54e4f141d13ad",
+      "published_sha256": "7e7d26a639295d650b0cf679d3e49892439fce9e41e0f69306c54e4f141d13ad",
+      "raw_bytes": 78,
+      "published_bytes": 78,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/test-compile-command.txt",
+      "raw_sha256": "1a500e4b84c7c1b6ba4aea8980484e752e5f7621ff60ab32848f989fd5bc8874",
+      "published_sha256": "d54af96ef4c92609c3c2d6a8b27ef36b568e9cfdccdd102e682db78cb3dd7ae8",
+      "raw_bytes": 1537,
+      "published_bytes": 1195,
+      "replacements": {
+        "repository-prefix": 7,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/control/test-compile.log",
+      "raw_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "published_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "raw_bytes": 24,
+      "published_bytes": 24,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/compile-command.txt",
+      "raw_sha256": "432b512ef86e538772711e592948482f8cc960ebbd4932a7baa23e385e4e1310",
+      "published_sha256": "e76462d3bd82c6bcc661f94216ca859091e6c9dd8f5a1b3acb126b74f33d6004",
+      "raw_bytes": 1255,
+      "published_bytes": 1001,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/compile.log",
+      "raw_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "published_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "raw_bytes": 19,
+      "published_bytes": 19,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/eigen_arnoldi.cpp",
+      "raw_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "published_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "raw_bytes": 16634,
+      "published_bytes": 16634,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/eigen_arnoldi.map",
+      "raw_sha256": "5b3838a345986e4f2aa21c3ee7dce32b6db8327ee23a98f34a8905d1236b9943",
+      "published_sha256": "643c36289340c20261776d56f52c3ade39b417123c56c2a97f5019f780677a1a",
+      "raw_bytes": 3922280,
+      "published_bytes": 3922271,
+      "replacements": {
+        "user-directory-prefix": 1,
+        "remaining-account-token": 1
+      }
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/eigen_arnoldi_cluster.hpp",
+      "raw_sha256": "836fe163494bb824980d5558d629aa608288694bac1955240d6e577955d73544",
+      "published_sha256": "836fe163494bb824980d5558d629aa608288694bac1955240d6e577955d73544",
+      "raw_bytes": 13945,
+      "published_bytes": 13945,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/eigen_arnoldi_test.cpp",
+      "raw_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "published_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "raw_bytes": 88968,
+      "published_bytes": 88968,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/link-command.json",
+      "raw_sha256": "8d32e65915c567700b11c92f35f19024239a4a771a7ac515fbac9f2706515ab9",
+      "published_sha256": "b75b11d203285c02963b72f5b35f975fab5f9ddd4a523d600e1954356244e2bd",
+      "raw_bytes": 2219,
+      "published_bytes": 1669,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/run.log",
+      "raw_sha256": "4e25fe85d8aaeb22e1960567da17257805bd0f33cdf4006efc52011c93799028",
+      "published_sha256": "ededd6adcc3b9d1051f45636f094ab623dbd596df9761fe0f6c70448cfecf323",
+      "raw_bytes": 4822,
+      "published_bytes": 4514,
+      "replacements": {
+        "repository-prefix": 7
+      }
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/test-compile-command.txt",
+      "raw_sha256": "7b2208d2dd13a23c083b940e363cecf40354d942516ce63700fe75ebb3b00489",
+      "published_sha256": "39813b7a2f278a745328044ffcf88b3182e9c6c4c5182060d502fe0abedd3cce",
+      "raw_bytes": 1632,
+      "published_bytes": 1290,
+      "replacements": {
+        "repository-prefix": 7,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/conversion-width-discarded/test-compile.log",
+      "raw_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "published_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "raw_bytes": 24,
+      "published_bytes": 24,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/CMakeCache.txt",
+      "raw_sha256": "021da2420956f95b19d846bf105559e1398523d91a4cf31d236d3db4f2403abe",
+      "published_sha256": "44aaef9721043fce2b9d4363ef9f660b44cb9b2ea00d26ee03a37a4b06ca8e9e",
+      "raw_bytes": 26932,
+      "published_bytes": 25749,
+      "replacements": {
+        "repository-prefix": 13,
+        "dependency-repository-prefix": 35,
+        "user-directory-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/inputs/compile_commands.json",
+      "raw_sha256": "38a4f762ed7c361f35054ce75672f410d4b50ca45978719ec93a5dde59a12f0f",
+      "published_sha256": "584271001661cd3e42caaac12a41a00ebcc390e8aa312a2f1d04e53572ca893e",
+      "raw_bytes": 118257,
+      "published_bytes": 93440,
+      "replacements": {
+        "repository-prefix": 440,
+        "dependency-repository-prefix": 165
+      }
+    },
+    {
+      "entry": "snapshot/inputs/generated/uvlas/build_config.hpp",
+      "raw_sha256": "a61c3582e8e0cf0774b34d47d505049ff882926b4918b7ea8ed4b7202237f160",
+      "published_sha256": "a61c3582e8e0cf0774b34d47d505049ff882926b4918b7ea8ed4b7202237f160",
+      "raw_bytes": 356,
+      "published_bytes": 356,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/generated/uvlas/git_revision.hpp",
+      "raw_sha256": "31f1e9d0fbaa915b84b4b166d8faa6962cf75e9c38bc79ac916fa1390da9fbfc",
+      "published_sha256": "31f1e9d0fbaa915b84b4b166d8faa6962cf75e9c38bc79ac916fa1390da9fbfc",
+      "raw_bytes": 112,
+      "published_bytes": 112,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/build_info.hpp",
+      "raw_sha256": "3b6b67202cb908188bd1400f49030ac577583bb6b2eccb1c47060dc92d4e4a89",
+      "published_sha256": "3b6b67202cb908188bd1400f49030ac577583bb6b2eccb1c47060dc92d4e4a89",
+      "raw_bytes": 1603,
+      "published_bytes": 1603,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/checked_dimensions.hpp",
+      "raw_sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "published_sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "raw_bytes": 2305,
+      "published_bytes": 2305,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/error_certificate.hpp",
+      "raw_sha256": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+      "published_sha256": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+      "raw_bytes": 6667,
+      "published_bytes": 6667,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/failure.hpp",
+      "raw_sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "published_sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "raw_bytes": 8471,
+      "published_bytes": 8471,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/identifier.hpp",
+      "raw_sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "published_sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "raw_bytes": 2538,
+      "published_bytes": 2538,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/instrumentation.hpp",
+      "raw_sha256": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+      "published_sha256": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+      "raw_bytes": 6017,
+      "published_bytes": 6017,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/resource_plan.hpp",
+      "raw_sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "published_sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "raw_bytes": 7997,
+      "published_bytes": 7997,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/state.hpp",
+      "raw_sha256": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+      "published_sha256": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+      "raw_bytes": 22481,
+      "published_bytes": 22481,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/backend_memory.hpp",
+      "raw_sha256": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+      "published_sha256": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+      "raw_bytes": 4007,
+      "published_bytes": 4007,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/dense_solve.hpp",
+      "raw_sha256": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+      "published_sha256": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+      "raw_bytes": 4445,
+      "published_bytes": 4445,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_action.hpp",
+      "raw_sha256": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+      "published_sha256": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+      "raw_bytes": 7949,
+      "published_bytes": 7949,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_arnoldi.hpp",
+      "raw_sha256": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+      "published_sha256": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+      "raw_bytes": 25351,
+      "published_bytes": 25351,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_common.hpp",
+      "raw_sha256": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+      "published_sha256": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+      "raw_bytes": 7960,
+      "published_bytes": 7960,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_full.hpp",
+      "raw_sha256": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+      "published_sha256": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+      "raw_bytes": 19583,
+      "published_bytes": 19583,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_generalized.hpp",
+      "raw_sha256": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+      "published_sha256": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+      "raw_bytes": 17804,
+      "published_bytes": 17804,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_metrics.hpp",
+      "raw_sha256": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+      "published_sha256": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+      "raw_bytes": 8654,
+      "published_bytes": 8654,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/gmres_solve.hpp",
+      "raw_sha256": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+      "published_sha256": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+      "raw_bytes": 13412,
+      "published_bytes": 13412,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/linear_solve.hpp",
+      "raw_sha256": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+      "published_sha256": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+      "raw_bytes": 22885,
+      "published_bytes": 22885,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/precision.hpp",
+      "raw_sha256": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+      "published_sha256": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+      "raw_bytes": 11159,
+      "published_bytes": 11159,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/sparse_solve.hpp",
+      "raw_sha256": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+      "published_sha256": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+      "raw_bytes": 8473,
+      "published_bytes": 8473,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/storage.hpp",
+      "raw_sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+      "published_sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+      "raw_bytes": 14325,
+      "published_bytes": 14325,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/inputs.json",
+      "raw_sha256": "b01dd7ae17813c9420cf41a78734586da6285fbd2cef9a34958cb70c7c640a68",
+      "published_sha256": "43b97d445f2b31d19ca9b2ccb7673c5b5f1daf58c07d2f8c19ac3d8962ca6b84",
+      "raw_bytes": 15960,
+      "published_bytes": 13076,
+      "replacements": {
+        "repository-prefix": 56,
+        "dependency-repository-prefix": 4
+      }
+    },
+    {
+      "entry": "snapshot/inputs/link-input.ninja",
+      "raw_sha256": "a1f439181de1c96027a9dd869d634e094785cb4eeae622cda03ae684355ee0bc",
+      "published_sha256": "6dd7c0fdd8f3f4aa1ce526572679752283565409e9832fd7acedbb2483002225",
+      "raw_bytes": 309759,
+      "published_bytes": 292165,
+      "replacements": {
+        "repository-prefix": 278,
+        "dependency-repository-prefix": 330,
+        "remaining-account-token": 124
+      }
+    },
+    {
+      "entry": "snapshot/inputs/mutations.json",
+      "raw_sha256": "eeed49cb46dc3f36801a2ea6a2f5341c8ebbd0bc25f7d1f8b3407463ec3fac47",
+      "published_sha256": "eeed49cb46dc3f36801a2ea6a2f5341c8ebbd0bc25f7d1f8b3407463ec3fac47",
+      "raw_bytes": 7110,
+      "published_bytes": 7110,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/run.py",
+      "raw_sha256": "d01a6abefc731291e3e240af9e326b1a37aef86186707ca40f0d74f71572b5d6",
+      "published_sha256": "d01a6abefc731291e3e240af9e326b1a37aef86186707ca40f0d74f71572b5d6",
+      "raw_bytes": 12475,
+      "published_bytes": 12475,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/backend_memory_detail.hpp",
+      "raw_sha256": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+      "published_sha256": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+      "raw_bytes": 545,
+      "published_bytes": 545,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/compensated.hpp",
+      "raw_sha256": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+      "published_sha256": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+      "raw_bytes": 3145,
+      "published_bytes": 3145,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi.cpp",
+      "raw_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "published_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "raw_bytes": 16634,
+      "published_bytes": 16634,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_build.hpp",
+      "raw_sha256": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+      "published_sha256": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+      "raw_bytes": 11037,
+      "published_bytes": 11037,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_cluster.hpp",
+      "raw_sha256": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+      "published_sha256": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+      "raw_bytes": 13971,
+      "published_bytes": 13971,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_data.hpp",
+      "raw_sha256": "7e1aa19c1594614e820da7acf5a02661800217cfecf69543a71692954e6cb791",
+      "published_sha256": "7e1aa19c1594614e820da7acf5a02661800217cfecf69543a71692954e6cb791",
+      "raw_bytes": 5751,
+      "published_bytes": 5751,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_engine.hpp",
+      "raw_sha256": "447f132579d88a694815d18f9b6a0538f46061a7c8b867d2f65c6945316bf87d",
+      "published_sha256": "447f132579d88a694815d18f9b6a0538f46061a7c8b867d2f65c6945316bf87d",
+      "raw_bytes": 19405,
+      "published_bytes": 19405,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_entry.hpp",
+      "raw_sha256": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+      "published_sha256": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+      "raw_bytes": 18207,
+      "published_bytes": 18207,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_extract.hpp",
+      "raw_sha256": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+      "published_sha256": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+      "raw_bytes": 20784,
+      "published_bytes": 20784,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_native.hpp",
+      "raw_sha256": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+      "published_sha256": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+      "raw_bytes": 1225,
+      "published_bytes": 1225,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_qualify.hpp",
+      "raw_sha256": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+      "published_sha256": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+      "raw_bytes": 15876,
+      "published_bytes": 15876,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_full_detail.hpp",
+      "raw_sha256": "15a5178a992e6fb010229e6820e10f9da60cefcb3d361f8d9e624efe01c19e12",
+      "published_sha256": "15a5178a992e6fb010229e6820e10f9da60cefcb3d361f8d9e624efe01c19e12",
+      "raw_bytes": 3111,
+      "published_bytes": 3111,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_full_phase_private.hpp",
+      "raw_sha256": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "published_sha256": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "raw_bytes": 2267,
+      "published_bytes": 2267,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_metric_bounds.hpp",
+      "raw_sha256": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+      "published_sha256": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+      "raw_bytes": 7536,
+      "published_bytes": 7536,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_views.hpp",
+      "raw_sha256": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87",
+      "published_sha256": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87",
+      "raw_bytes": 6034,
+      "published_bytes": 6034,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/gmres_residual_detail.hpp",
+      "raw_sha256": "d1ca3a8b763439e66c7525bfe0c46e656f2f7ab9b2e5691ce0f1200ceef4b4e6",
+      "published_sha256": "d1ca3a8b763439e66c7525bfe0c46e656f2f7ab9b2e5691ce0f1200ceef4b4e6",
+      "raw_bytes": 1168,
+      "published_bytes": 1168,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/linear_candidate_detail.hpp",
+      "raw_sha256": "d0ee5f4aca2f19662aec8724f5d49f5402ad79b77f8400a5aebf3fb7b68c7c72",
+      "published_sha256": "d0ee5f4aca2f19662aec8724f5d49f5402ad79b77f8400a5aebf3fb7b68c7c72",
+      "raw_bytes": 5204,
+      "published_bytes": 5204,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/linear_solve_detail.hpp",
+      "raw_sha256": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+      "published_sha256": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+      "raw_bytes": 6066,
+      "published_bytes": 6066,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/sparse_spd.hpp",
+      "raw_sha256": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+      "published_sha256": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+      "raw_bytes": 10252,
+      "published_bytes": 10252,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/sparse_triangular.hpp",
+      "raw_sha256": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+      "published_sha256": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+      "raw_bytes": 2189,
+      "published_bytes": 2189,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/tests/numerics/eigen_arnoldi_test.cpp",
+      "raw_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "published_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "raw_bytes": 88968,
+      "published_bytes": 88968,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json",
+      "raw_sha256": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0",
+      "published_sha256": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0",
+      "raw_bytes": 32710,
+      "published_bytes": 32710,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/tests/numerics/fixtures/j1-pg-free-history-24-v1/source/oracle.json",
+      "raw_sha256": "27aa083944feaaebf3eb6e8f96d45a0dbd983212d11b16cecca7d4f3d3e1e4df",
+      "published_sha256": "27aa083944feaaebf3eb6e8f96d45a0dbd983212d11b16cecca7d4f3d3e1e4df",
+      "raw_bytes": 209,
+      "published_bytes": 209,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/tests/numerics/fixtures/j1-pg-free-history-24-v1/source/pg-free-step.txt",
+      "raw_sha256": "f00f1c669cae57f1c127bd63b98a48e17ff0358c94fa7a97a841dfee98391e78",
+      "published_sha256": "f00f1c669cae57f1c127bd63b98a48e17ff0358c94fa7a97a841dfee98391e78",
+      "raw_bytes": 9680,
+      "published_bytes": 9680,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/compile-command.txt",
+      "raw_sha256": "44a909f8d1b3b85c48584e098481a7663c22e9d8401ce796dc843f8f4952aa65",
+      "published_sha256": "1d3b48935ecbf097bc81fa4cca043999668857562d5e0774dc65959965764f97",
+      "raw_bytes": 1259,
+      "published_bytes": 1005,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/compile.log",
+      "raw_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "published_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "raw_bytes": 19,
+      "published_bytes": 19,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/eigen_arnoldi.cpp",
+      "raw_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "published_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "raw_bytes": 16634,
+      "published_bytes": 16634,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/eigen_arnoldi.map",
+      "raw_sha256": "53078181b4f1f3d8e8a7b25e275edeab03adec86191471e3612ae281b685daf5",
+      "published_sha256": "2269a4d215ffa9b6325f614fcf6463e8e7b193af85f9097d908427239704821d",
+      "raw_bytes": 3919536,
+      "published_bytes": 3919527,
+      "replacements": {
+        "user-directory-prefix": 1,
+        "remaining-account-token": 1
+      }
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/eigen_arnoldi_cluster.hpp",
+      "raw_sha256": "3361f56abdf2b890ac02d647cb83f9bc93e1e501d7a3cc9da590084e5f10c376",
+      "published_sha256": "3361f56abdf2b890ac02d647cb83f9bc93e1e501d7a3cc9da590084e5f10c376",
+      "raw_bytes": 12480,
+      "published_bytes": 12480,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/eigen_arnoldi_test.cpp",
+      "raw_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "published_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "raw_bytes": 88968,
+      "published_bytes": 88968,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/link-command.json",
+      "raw_sha256": "3454bfdd8bcd7b37695b2379162d01d2a33ce2c1418c97c7e07bbdc8da72c36e",
+      "published_sha256": "1f9e1e0f5593f44af8873c7e5044aec784025f51841ab67705fc5843d9973fce",
+      "raw_bytes": 2224,
+      "published_bytes": 1674,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/run.log",
+      "raw_sha256": "4fc7ee7b9d62bc1981e7815ba97a8615b95c3c66c81d8a462a3c0f76c3f53301",
+      "published_sha256": "b19ae686aac3a8ba4ae3e21acd5edf5f2a4641d5c0836bbe43cc91a42508026c",
+      "raw_bytes": 3303,
+      "published_bytes": 2819,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/test-compile-command.txt",
+      "raw_sha256": "211a842e14f6843b9e520fd3ded9eda6faf8dfeb51b1abd42ae3173cc8439df0",
+      "published_sha256": "d7490ee807855bc6fa9a224cc3e87195eac22236574401aa88458ed51b24f658",
+      "raw_bytes": 1637,
+      "published_bytes": 1295,
+      "replacements": {
+        "repository-prefix": 7,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/old-scaling-helper-restored/test-compile.log",
+      "raw_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "published_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "raw_bytes": 24,
+      "published_bytes": 24,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/compile-command.txt",
+      "raw_sha256": "a01f281b5feba37cd7111621312088afa57351ebc71f1c6903dacda62b9beac6",
+      "published_sha256": "d97f86e3582c98a507ceb6e833fd5dd186d9221e204728390a05b90bd7fa08a0",
+      "raw_bytes": 1251,
+      "published_bytes": 997,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/compile.log",
+      "raw_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "published_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "raw_bytes": 19,
+      "published_bytes": 19,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/eigen_arnoldi.cpp",
+      "raw_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "published_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "raw_bytes": 16634,
+      "published_bytes": 16634,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/eigen_arnoldi.map",
+      "raw_sha256": "da013dedf33d82a2c71286cf2b7969dd357cdb5a00fd52188c7cc347ccb8e6f8",
+      "published_sha256": "b0bf8558e1bcbd7e092de361ee25779243ea7407cdf02281bd673470b4d44c2d",
+      "raw_bytes": 3922280,
+      "published_bytes": 3922271,
+      "replacements": {
+        "user-directory-prefix": 1,
+        "remaining-account-token": 1
+      }
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/eigen_arnoldi_cluster.hpp",
+      "raw_sha256": "43649140f6d062cce67a99000587e7e2c59ce46c43915f30800cc8e89e007e1f",
+      "published_sha256": "43649140f6d062cce67a99000587e7e2c59ce46c43915f30800cc8e89e007e1f",
+      "raw_bytes": 13959,
+      "published_bytes": 13959,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/eigen_arnoldi_test.cpp",
+      "raw_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "published_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "raw_bytes": 88968,
+      "published_bytes": 88968,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/link-command.json",
+      "raw_sha256": "5e51dfe459b15bc0cec7b48067b90abb237ff1110d2b2df45ad9f130e760f349",
+      "published_sha256": "af272a819ca5e43e3409af2111c9d775450ff6468aa9083f7c30c71b86f42780",
+      "raw_bytes": 2214,
+      "published_bytes": 1664,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/run.log",
+      "raw_sha256": "0fa5e215206ec9ad07e52681b4d2fa7292cd5f8f69e2106740a501999e19ff30",
+      "published_sha256": "c2fc08d4431a08a42f2a422b8136b0690db247b85a2527794259c19f3263d59a",
+      "raw_bytes": 651,
+      "published_bytes": 563,
+      "replacements": {
+        "repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/test-compile-command.txt",
+      "raw_sha256": "9b4cc4407e9e845c506db5a1910fc0127504a014e40174e2237a482abd8f5a9e",
+      "published_sha256": "51b50febcb6ff717f5e5dbfb6645911c2c5d66d1b82a0cc6c7bf05c7c7a12b13",
+      "raw_bytes": 1627,
+      "published_bytes": 1285,
+      "replacements": {
+        "repository-prefix": 7,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/producer-radius-discarded/test-compile.log",
+      "raw_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "published_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "raw_bytes": 24,
+      "published_bytes": 24,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/report.json",
+      "raw_sha256": "3b93c9b8df02845c20c601d6941ab442b22be0602cfcb2d101efbfe6d0887f58",
+      "published_sha256": "3b93c9b8df02845c20c601d6941ab442b22be0602cfcb2d101efbfe6d0887f58",
+      "raw_bytes": 3736,
+      "published_bytes": 3736,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/compile-command.txt",
+      "raw_sha256": "b425352ceae40f403fd3df35e7723ee9f0b1d2287df27c5ef047dcbde4d83ec2",
+      "published_sha256": "215850427406362cf81ed552bda3f5ca54e25f5cd47d55e29da4ff31a491fc2f",
+      "raw_bytes": 1243,
+      "published_bytes": 989,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/compile.log",
+      "raw_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "published_sha256": "bf05c101064de29eda979c6f4907e34973310a88b3b2d5449bb33d63423c298e",
+      "raw_bytes": 19,
+      "published_bytes": 19,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/eigen_arnoldi.cpp",
+      "raw_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "published_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "raw_bytes": 16634,
+      "published_bytes": 16634,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/eigen_arnoldi.map",
+      "raw_sha256": "0be9c464e1a39285b1bf67730f8b35ae1e3356ee7bd456f1d9b33a61facb2fcd",
+      "published_sha256": "8b39f225da1de129c769b1b37712aa40a1a8fa75d79d2dab936d3cfe0b258368",
+      "raw_bytes": 3922280,
+      "published_bytes": 3922271,
+      "replacements": {
+        "user-directory-prefix": 1,
+        "remaining-account-token": 1
+      }
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/eigen_arnoldi_cluster.hpp",
+      "raw_sha256": "ce5f91ce9115e9ef49236bd669768dbc292eb82b7b7cd61596087b0ef952f913",
+      "published_sha256": "ce5f91ce9115e9ef49236bd669768dbc292eb82b7b7cd61596087b0ef952f913",
+      "raw_bytes": 13951,
+      "published_bytes": 13951,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/eigen_arnoldi_test.cpp",
+      "raw_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "published_sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "raw_bytes": 88968,
+      "published_bytes": 88968,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/link-command.json",
+      "raw_sha256": "e09982c6e089f8bfe92dede82478606df0b4b1689f8b05f6c1e83d2ceac89103",
+      "published_sha256": "6268c1b15b31708ab3eed9e0b6a4c885acfdd0e530fed258c7dc268608985162",
+      "raw_bytes": 2204,
+      "published_bytes": 1654,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/run.log",
+      "raw_sha256": "1237093de2af7b978bbea6fc41aca3d6b7b9afdcf17f94c03a8f6d9e7b569a4c",
+      "published_sha256": "e7fec19fc881f6f7798258df1c0d473c6fe72c6879c61a74f9362eb8276d79e4",
+      "raw_bytes": 3368,
+      "published_bytes": 3016,
+      "replacements": {
+        "repository-prefix": 8
+      }
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/test-compile-command.txt",
+      "raw_sha256": "edb015cf384695a09e64c8295dc932c08539949bd5a011d1f65f2b6aef08e314",
+      "published_sha256": "2537df47b6ae2e1d48697945f6952083acf40885471774b86514e951f6243aa7",
+      "raw_bytes": 1617,
+      "published_bytes": 1275,
+      "replacements": {
+        "repository-prefix": 7,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/sum-eft-error-discarded/test-compile.log",
+      "raw_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "published_sha256": "c9dfd98b5d74f3bb7e36663a60de5f15648c84305525abf6ae4baa52f59372a3",
+      "raw_bytes": 24,
+      "published_bytes": 24,
+      "replacements": {}
+    }
+  ]
+}

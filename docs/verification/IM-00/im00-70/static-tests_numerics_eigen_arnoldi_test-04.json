@@ -1,0 +1,31 @@
+{
+  "path": "tests/numerics/eigen_arnoldi_test.cpp",
+  "command": [
+    "uvx",
+    "clang-tidy@21.1.1",
+    "tests/numerics/eigen_arnoldi_test.cpp",
+    "--quiet",
+    "--",
+    "-x",
+    "c++",
+    "-std=c++23",
+    "-Iinclude",
+    "-Isrc/numerics",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include/eigen3",
+    "-fms-extensions",
+    "-fms-compatibility",
+    "-ffp-model=strict",
+    "-DNOMINMAX",
+    "-DWIN32_LEAN_AND_MEAN",
+    "-DEIGEN_MPL2_ONLY",
+    "-DEIGEN_DONT_PARALLELIZE",
+    "-DUVLAS_ARNOLDI_REFERENCE_ROOT=\"tests/numerics/fixtures/j1-pg-free-history-24-v1\""
+  ],
+  "exit_code": 0,
+  "seconds": 25.788254999992205,
+  "source_sha256": "8023bcaa1fb6df6ae3fd654172f42bda6e84d58cdba090b6f86ea9b1d1698fee",
+  "log_sha256": "abeccd89f2e3b1796d844cf53b4f82d522e1f9f3be17fd519c25be68ea703797"
+}

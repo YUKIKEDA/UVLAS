@@ -23,6 +23,7 @@ globs: "**/*.cpp,**/*.hpp"
 - 整形は `.clang-format`（`just format-check`）、静的検査は `.clang-tidy`（`just lint`）。どちらもゲート。検査を黙らせる `NOLINT` には、理由を同じ行に書く。整形の差分だけのcommitを、他の変更に混ぜない。
 - 警告はエラー。`#pragma warning(disable)` や `-Wno-…` を、ビルドを通すために足さない。原因を直すか、その警告がこのリポジトリに合わないなら、理由をコメントに書いて `cmake/ProjectOptions.cmake` を変えるPRにする。
 - 型は `PascalCase`、関数と変数は `snake_case`、定数は `snake_case`、マクロは `UVLAS_` で始める。名前空間は `uvlas::<module>`。
+- コンストラクタの引数名は、メンバー名と重ねない。2026-11-16、Issue #70の同名引数はMSVCで通ってもGCC 14の `-Werror=shadow` で失敗した。引数名を変え、初期化する値と順序を保つ。
 - マクロは、条件付きコンパイルとビルド情報にだけ使う。
 - ヘッダは自分で完結する（単独でincludeしてコンパイルできる）。includeの順は `.clang-format` が決める。
 - コメントは英語。APIには利用側が守る契約を、実装中には理由と根拠を書く。測ったことは測ったと書き、確かめていない原因は確かめていないと書く（`open-ends`）。
@@ -96,6 +97,26 @@ use(*entries[i]);
 const auto& entry = entries[i];
 if (!entry.has_value()) { return; }
 use(*entry);
+```
+
+optionalを設定する補助関数の呼出しだけを、呼出し側での存在証明にしない。2026-11-16、PR #73のLinux clang-tidyは、最初の失敗を保存する関数の呼出し後の逆参照を拒否した。保存する関数内で存在を確かめ、その値への参照を返せば、呼出し側はoptionalを逆参照せずに同じ失敗を使える。試験の診断フィールドも、既存の確認付き取得関数を通す。
+
+```cpp
+// BAD: the analyzer need not infer engagement across the helper call.
+record_failure(code);
+return std::unexpected(*first);
+// GOOD: the helper returns the value after checking or installing it.
+return std::unexpected(record_failure(code));
+```
+
+別のoptionalが値を持つことや、コンストラクタでの確認だけを、現在逆参照するoptionalの存在証明に使わない。2026-11-16、PR #72のLinux clang-tidyは、開始時刻だけを確認したデストラクタ内で計測先のoptionalを逆参照する形を拒否した。使用する計測先を名前付き参照へ束縛し、使用箇所でも存在を確認する。
+
+```cpp
+// BAD: start being present does not directly establish the destination's presence.
+if (start) { record(*owner.destination, *start); }
+// GOOD: verify the same destination that is dereferenced here.
+auto& destination = owner.destination;
+if (start && destination) { record(*destination, *start); }
 ```
 
 構造化束縛でコンテナの要素を読むrange-forは、コピーが必要でなければ`const auto& [a, b]`で受ける。2026-11-15、PR #49の試験がpairを値で束縛し、MSVCでは通ったがGCCの`-Werror=range-loop-construct`でLinuxのDebug・Release・sanitizer構成がコンパイルに失敗した。コピーを省く修正だけなら数値経路を再実行せず、影響する翻訳単位をコンパイルする。

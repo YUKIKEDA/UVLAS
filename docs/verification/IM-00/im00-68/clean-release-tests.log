@@ -1,0 +1,20 @@
+Internal ctest changing into directory: <repo>/out/issue68
+Test project <repo>/out/issue68
+    Start 41: numerics.eigen_full_phase_audit
+1/4 Test #41: numerics.eigen_full_phase_audit ...   Passed    0.05 sec
+    Start 42: numerics.eigen_full_contract
+2/4 Test #42: numerics.eigen_full_contract ......   Passed    0.05 sec
+    Start 43: numerics.eigen_full
+3/4 Test #43: numerics.eigen_full ...............   Passed    0.42 sec
+    Start 60: qa.eigen_full
+4/4 Test #60: qa.eigen_full .....................   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+negative        =   0.47 sec*proc (2 tests)
+property        =   0.05 sec*proc (1 test)
+unit            =   0.47 sec*proc (2 tests)
+verification    =   0.62 sec*proc (4 tests)
+
+Total Test time (real) =   0.63 sec

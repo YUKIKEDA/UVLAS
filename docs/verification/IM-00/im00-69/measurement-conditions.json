@@ -1,0 +1,22 @@
+{
+  "logical_processors": 16,
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+  "timings": "product GeneralizedTimings",
+  "rounds": 3,
+  "affinity_mask": 1,
+  "source_commit": "03d3471d7db670fd8ef8f052a4c5181f6de481ad",
+  "input_orders": [
+    2,
+    32
+  ],
+  "label": "Windows x64 development PC",
+  "configuration": "Release",
+  "physical_memory_bytes": 51343966208,
+  "warmup_per_case": 1,
+  "build_commit": "0bcfea976a957a5f0e36ed5187167ef3e23b2c07",
+  "threads": 1,
+  "repetitions": [
+    100,
+    20
+  ]
+}

@@ -1,0 +1,363 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-07",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 69,
+  "date": "2026-11-16",
+  "source_commit": "03d3471d7db670fd8ef8f052a4c5181f6de481ad",
+  "scope": "原M資格付き対称一般化全スペクトル。全n実根、物理M正規化basis、元残差/正規化/Gram、尺度/世代/所有、必要consumerと明示投影、作用/試行予算と製品工程計測。物理被覆・一般完全法・Arnoldi・IM00-11全体gateは含まない。",
+  "provenance": {
+    "clean_debug_test_commit": "03d3471d7db670fd8ef8f052a4c5181f6de481ad",
+    "clean_release_build_commit": "0bcfea976a957a5f0e36ed5187167ef3e23b2c07",
+    "base_main": "12fa4cd29f4d8046b7277006ae101e8dfb94a54b",
+    "note": "03d→0bcはconventionsのみ。記録後段のheaderはmass shiftが補助合同変換座標であることのAPIコメントだけを訂正し、数値tokenは03dから変更しない。build-info-debug.jsonは0bcのCLIによる環境captureで、03d時点のDebug試験stdoutそのものではない。"
+  },
+  "environment": {
+    "os": "Windows 11",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict",
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "instruction_set": "sse2"
+  },
+  "verification": [
+    {
+      "configuration": "Debug",
+      "passed": 1,
+      "total": 1,
+      "command": "ctest --test-dir out/issue69-msvc -C Debug -R ^numerics.eigen_generalized$ --output-on-failure",
+      "execution_report": "debug-numerics-execution.json"
+    },
+    {
+      "configuration": "Release",
+      "passed": 2,
+      "total": 2,
+      "command": "ctest --test-dir out/issue69-msvc -C Release -R ^(numerics.eigen_generalized|qa.eigen_generalized)$ --output-on-failure",
+      "log": "release-tests.log"
+    },
+    {
+      "configuration": "Debug QA",
+      "passed": 1,
+      "total": 1,
+      "log": "debug-qa.log"
+    }
+  ],
+  "independent_reference": {
+    "cases": 18,
+    "assertions": 379,
+    "analytic": "M=[[2,2],[2,5]], K=[[-2,-2],[-2,10]]の根−1,4、m0=3で質量正規化方向sqrt(3/2)e0と(-1,1)。微小3次根−2^-60,0,2^-60の符号/零数/相対1e-12。非2冪D=(3,.2),sλ=7,m0=3と異なるleading dimensionでも実返却値を照合。",
+    "exact": "cpp_rationalで原Kphi/MphiからD*(Kphi−lambda*Mphi)/(m0*sλ)を作り、maxabs/||D^-1phi||∞を固定1e-12と報告上界の両方へ比較。質量正規化と各rowのGram絶対和も独立に評価。"
+  },
+  "negative_controls": [
+    "K/M両側の非対称・非有限・padding・shape・個別世代の不一致",
+    "特異/不定/正pivotだけでは原Mを認定できない近境界",
+    "未知TwoWord・非正/非有限scale・不正/非有限budget・物理被覆要求",
+    "作用nちょうど/n−1、投影2nちょうど/2n−1、attempt0、payload0、外部estimate0/未証明RequireProvenBound",
+    "投影後generationで全consumerを再評価、後続consumer未達/誤generation/例外/bad_alloc/callback cause保持",
+    "空0proof・空+consumerはcallback0で未認定拒否、破棄/移動後の結果所有と旧結果/入力の不変"
+  ],
+  "mutations": {
+    "artifact": "mutations.zip",
+    "control_exit": 0,
+    "compiled_and_linked": 5,
+    "killed": 4,
+    "runtime_exit": 42,
+    "names": [
+      "tiny-clamp",
+      "mass-proof-bypass",
+      "consumer-first-only",
+      "quota-extra-call"
+    ],
+    "snapshot_note": "数値cppは最終03dと同じ8b72077ef94934ea9701609c9fad59c95d0bfcb263f2c93e452ec09cf748b599。16case snapshotの入力hashを保存。その後はActionStampの全引数constructor、追加2case、optional診断参照の修正のみ。最終18caseによる変異実行と偽らない。source/header/test/metric-headerの記録した4入力hashは各変異後に一致。link mapは全5exeのentryがmutant.objから供給され、元archiveのgeneralized producerが抽出されていない。"
+  },
+  "baseline": {
+    "case": "eigen-generalized",
+    "windows": "clean Debug/Release実出力9値はbyte一致。results.py acceptで新規登録。",
+    "linux": {
+      "run": 43796203245,
+      "job": 133065546020,
+      "head": "e4bf32f33fbe192b5f315e736796e02d2c51dbb2",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43796203245/job/133065546020",
+      "observed": "numerics.eigen_generalized成功、全55中54成功、唯一の失敗は新QAcase未登録。実ログ9値をresults.py accept --outputで登録し、保存実値とbaselineの差分0、Windowsとbit一致。登録後headのCI成功を主張せず待機しない。"
+    }
+  },
+  "performance": {
+    "conditions": "measurement-conditions.json",
+    "raw": "measurement-raw.log",
+    "summary": "measurement-summary.json",
+    "claim": "1core Releaseでn2非2冪100回/n32合成dense20回を各3巡、warmup1回。Qualificationは元作用と全認定の合計。n32は94.74/96.98/95.69ms、backendは.314/.319/.321ms。n32 payload166024bytes。先頭固有値のbitは各反復/巡で一致。別の試験で計測Enabled/Disabledの全固有値・basis・3認定上界もbit一致。全成分認定を維持する必要工程として残す。内訳のEFT単独への帰属、24/48GiB hard cap、実務性能を主張しない。"
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": "この一般化抽出と小系に限定。IM00-11全体は未完了。",
+    "experimental_validation": false,
+    "practical_performance": false,
+    "practical_acceptance": false,
+    "physical_coverage": "Unresolved"
+  },
+  "limitations": [
+    "unitは呼出側が宣言し、Denseに独立の係数unit台帳はない。",
+    "報告parent/last_acceptedは明示IDを保存し、AcceptedState実体の祖先関係を検証した証拠ではない。",
+    "backend内部の実反復数は未公開、固定停止規約30nとadapterの抽出試行数を区別。",
+    "外部memory96n²doubleは領域を分けたforecastであり証明済み上界/RSS制限ではない。",
+    "旧R&D証拠・既存基準を変更せず、全4数値群と物理のgateは既存IM00-11/IM05/IM07/IM08で扱う。"
+  ],
+  "sources": {
+    "include/uvlas/numerics/eigen_generalized.hpp": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+    "src/numerics/eigen_generalized.cpp": "8b72077ef94934ea9701609c9fad59c95d0bfcb263f2c93e452ec09cf748b599",
+    "tests/numerics/eigen_generalized_test.cpp": "a993ca51d84e7a80218b80d57ba3b20cd7c47672a1cc91459a8e22470b0fa02e",
+    "qa/eigen_generalized/main.cpp": "3e426010f1b58de52aa67c7fc0a172425aac38cf147b89bcad3641f5fd2e032c",
+    "qa/eigen_generalized/README.md": "aa97e71a0d6bc6be271cec711082428df27b1f80df8ea4ffdd4973e827d50c47",
+    "include/uvlas/numerics/eigen_metrics.hpp": "bb105093aa1b05cb032f5deb17da416d30745d6f8a304b2b81cc338d2c4c6f50",
+    "src/numerics/eigen_metrics.cpp": "b9fc0ff4fd0b429c6f6a23a418ece80d709cee83b67851bd23d864a54e322e98",
+    "include/uvlas/numerics/eigen_action.hpp": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+    "src/numerics/compensated.hpp": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+    "src/numerics/sparse_spd.hpp": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+    "src/numerics/sparse_spd.cpp": "c33e0702216468eccf8df150b364be41be8e1a5aee6d1c0e0ac697d95653a2af",
+    "docs/specs/foundation/eigen-extraction-contract.md": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+    "docs/specs/foundation/precision-contract.md": "501be18b371aa6bce6552f7b7c3d483b1eb12164810d1952ef1d16ec380f6399",
+    "docs/specs/foundation/backend-memory-contract.md": "f05af17f5fdd00a72dfe7c1d2d4d0fd220372dc8144de1c7e4eae6e8624e4b66",
+    "qa/baselines/eigen-generalized/windows-x64-msvc19.51-sse2.json": "b5bcc6cf2b754b6a645bd18b8f0019037c2fcf99d293891f45df1a9e91a14091",
+    "qa/baselines/eigen-generalized/linux-x64-gnu14.2-sse2.json": "7865da6f72eaee965300368140fdc45450b7e6ce62751f74d355a0119662d6b8",
+    "CMakeLists.txt": "5f1aeffc42645aa74d22d207936773b4968dd087bff0ff604312797f53abbbd9",
+    "tests/CMakeLists.txt": "57d9097317e970183efb36f14a3657804a159c138de70ff67b639e58f10d8cb2"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-69/build-info-debug.json": "fd35a65481c5bea62e253c8d252a8c740a26974445cd15d39ea77fe8459229cb",
+    "docs/verification/IM-00/im00-69/build-info-release.json": "e62db1fafcdaae856753bbd4296c46bb2c0de1ce2d86dc8ea1b4e7fcc088edca",
+    "docs/verification/IM-00/im00-69/canary-debug.txt": "ab7690908edb6014c50359f5ed3ef10b802c1abe54f5308aa2a69bf3fc52436f",
+    "docs/verification/IM-00/im00-69/canary-release.txt": "ab7690908edb6014c50359f5ed3ef10b802c1abe54f5308aa2a69bf3fc52436f",
+    "docs/verification/IM-00/im00-69/debug-numerics-execution.json": "4ae878b7e249ddf26efa870f16623ddb975c50d9c9cc86d82be8f58be0acc621",
+    "docs/verification/IM-00/im00-69/debug-qa.log": "73d6c176f31ece5b1d6bb0a7f136fad753d2eaf5c899de676128d0cf81858f22",
+    "docs/verification/IM-00/im00-69/linux-canary.txt": "7fbd7ca67eaca5610e6f2a83ede93eb1e8ce17644d526269d1eb0f86e536de74",
+    "docs/verification/IM-00/im00-69/linux-debug-excerpt.log": "6ecdbe1ac7d0e078836388d5e49bca988b84b2947ecfe6bceb210fd2247863a7",
+    "docs/verification/IM-00/im00-69/measurement-conditions.json": "3c50fc47c168dfa1e9b070c9969d04078d84453711898e54b89d2ce571217a54",
+    "docs/verification/IM-00/im00-69/measurement-raw.log": "1286376e08fae87f14ad1cb6b01f9f22134cbd7a71b33dac2b38acb6c4657645",
+    "docs/verification/IM-00/im00-69/measurement-summary.json": "a7a0bbfb56449675e13306e775da31df77970cfdebd0a28b39e863c29f2af40e",
+    "docs/verification/IM-00/im00-69/measurement.cpp": "498d563f61469cedc4d241c952625d546fe75dd8e6280dd878acbfbf8e7284a6",
+    "docs/verification/IM-00/im00-69/mutation-link-inspection.json": "72b939cc2baf533107631fd86ded07653e984a380f4e1577482c68902723f8f4",
+    "docs/verification/IM-00/im00-69/mutations.zip": "bf60072f80cd6ec034e2257937d33365e12c31e800c5d0a8868322b77db51ddc",
+    "docs/verification/IM-00/im00-69/redaction.json": "a92a23fa23144ee850916034444e96a555d3be4b13f3cd08808f8e3cca9fe984",
+    "docs/verification/IM-00/im00-69/release-build.log": "2b78019f68db0ad0b390bd1f66be3addd6557d9f91f2640262ebe349705dd62d",
+    "docs/verification/IM-00/im00-69/release-tests.log": "4937260867622a0f430e7cbb2034054a9b5c5c22bb193c7175f53dc8b95df9ea",
+    "docs/verification/IM-00/im00-69/static-final.log": "fd14d3a4949f5f452b114a7745460829e2f4a57430c7963662c67dd3869a7a57",
+    "docs/verification/IM-00/im00-69/static-initial.log": "be5bf1b431edd5949ccb99bfd2efda2109b97dc90ba99915217aa9b3a4ded3df",
+    "docs/verification/IM-00/im00-69/static-result.json": "3e062b6cb62b1a0b3f9bff45a7fa7c71c97b220491f74d3c7a3727ae0980898b",
+    "docs/verification/IM-00/im00-69/static-second.log": "b04292adef36070992ce76fdfebb2f71bddb0ea8fe3d977477fef2e332acc76e",
+    "docs/verification/IM-00/im00-69/static-third.log": "2da8f2e39d3bd03e97e5c69b2942dd0c89dbed403e92e27aaa24bf98fb6820a7"
+  },
+  "source_references": [
+    {
+      "id": "im00-69-include-uvlas-numerics-eigen_generalized.hpp",
+      "sha256": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+      "hint": "include/uvlas/numerics/eigen_generalized.hpp"
+    },
+    {
+      "id": "im00-69-src-numerics-eigen_generalized.cpp",
+      "sha256": "8b72077ef94934ea9701609c9fad59c95d0bfcb263f2c93e452ec09cf748b599",
+      "hint": "src/numerics/eigen_generalized.cpp"
+    },
+    {
+      "id": "im00-69-tests-numerics-eigen_generalized_test.cpp",
+      "sha256": "a993ca51d84e7a80218b80d57ba3b20cd7c47672a1cc91459a8e22470b0fa02e",
+      "hint": "tests/numerics/eigen_generalized_test.cpp"
+    },
+    {
+      "id": "im00-69-qa-eigen_generalized-main.cpp",
+      "sha256": "3e426010f1b58de52aa67c7fc0a172425aac38cf147b89bcad3641f5fd2e032c",
+      "hint": "qa/eigen_generalized/main.cpp"
+    },
+    {
+      "id": "im00-69-qa-eigen_generalized-README.md",
+      "sha256": "aa97e71a0d6bc6be271cec711082428df27b1f80df8ea4ffdd4973e827d50c47",
+      "hint": "qa/eigen_generalized/README.md"
+    },
+    {
+      "id": "im00-69-include-uvlas-numerics-eigen_metrics.hpp",
+      "sha256": "bb105093aa1b05cb032f5deb17da416d30745d6f8a304b2b81cc338d2c4c6f50",
+      "hint": "include/uvlas/numerics/eigen_metrics.hpp"
+    },
+    {
+      "id": "im00-69-src-numerics-eigen_metrics.cpp",
+      "sha256": "b9fc0ff4fd0b429c6f6a23a418ece80d709cee83b67851bd23d864a54e322e98",
+      "hint": "src/numerics/eigen_metrics.cpp"
+    },
+    {
+      "id": "im00-69-include-uvlas-numerics-eigen_action.hpp",
+      "sha256": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+      "hint": "include/uvlas/numerics/eigen_action.hpp"
+    },
+    {
+      "id": "im00-69-src-numerics-compensated.hpp",
+      "sha256": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+      "hint": "src/numerics/compensated.hpp"
+    },
+    {
+      "id": "im00-69-src-numerics-sparse_spd.hpp",
+      "sha256": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+      "hint": "src/numerics/sparse_spd.hpp"
+    },
+    {
+      "id": "im00-69-src-numerics-sparse_spd.cpp",
+      "sha256": "c33e0702216468eccf8df150b364be41be8e1a5aee6d1c0e0ac697d95653a2af",
+      "hint": "src/numerics/sparse_spd.cpp"
+    },
+    {
+      "id": "im00-69-docs-specs-foundation-eigen-extraction-contract.md",
+      "sha256": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+      "hint": "docs/specs/foundation/eigen-extraction-contract.md"
+    },
+    {
+      "id": "im00-69-docs-specs-foundation-precision-contract.md",
+      "sha256": "501be18b371aa6bce6552f7b7c3d483b1eb12164810d1952ef1d16ec380f6399",
+      "hint": "docs/specs/foundation/precision-contract.md"
+    },
+    {
+      "id": "im00-69-docs-specs-foundation-backend-memory-contract.md",
+      "sha256": "f05af17f5fdd00a72dfe7c1d2d4d0fd220372dc8144de1c7e4eae6e8624e4b66",
+      "hint": "docs/specs/foundation/backend-memory-contract.md"
+    },
+    {
+      "id": "im00-69-qa-baselines-eigen-generalized-windows-x64-msvc19.51-sse2.json",
+      "sha256": "b5bcc6cf2b754b6a645bd18b8f0019037c2fcf99d293891f45df1a9e91a14091",
+      "hint": "qa/baselines/eigen-generalized/windows-x64-msvc19.51-sse2.json"
+    },
+    {
+      "id": "im00-69-qa-baselines-eigen-generalized-linux-x64-gnu14.2-sse2.json",
+      "sha256": "7865da6f72eaee965300368140fdc45450b7e6ce62751f74d355a0119662d6b8",
+      "hint": "qa/baselines/eigen-generalized/linux-x64-gnu14.2-sse2.json"
+    },
+    {
+      "id": "im00-69-CMakeLists.txt",
+      "sha256": "5f1aeffc42645aa74d22d207936773b4968dd087bff0ff604312797f53abbbd9",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im00-69-tests-CMakeLists.txt",
+      "sha256": "57d9097317e970183efb36f14a3657804a159c138de70ff67b639e58f10d8cb2",
+      "hint": "tests/CMakeLists.txt"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-build-info-debug.json",
+      "sha256": "fd35a65481c5bea62e253c8d252a8c740a26974445cd15d39ea77fe8459229cb",
+      "hint": "docs/verification/IM-00/im00-69/build-info-debug.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-build-info-release.json",
+      "sha256": "e62db1fafcdaae856753bbd4296c46bb2c0de1ce2d86dc8ea1b4e7fcc088edca",
+      "hint": "docs/verification/IM-00/im00-69/build-info-release.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-canary-debug.txt",
+      "sha256": "ab7690908edb6014c50359f5ed3ef10b802c1abe54f5308aa2a69bf3fc52436f",
+      "hint": "docs/verification/IM-00/im00-69/canary-debug.txt"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-canary-release.txt",
+      "sha256": "ab7690908edb6014c50359f5ed3ef10b802c1abe54f5308aa2a69bf3fc52436f",
+      "hint": "docs/verification/IM-00/im00-69/canary-release.txt"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-debug-numerics-execution.json",
+      "sha256": "4ae878b7e249ddf26efa870f16623ddb975c50d9c9cc86d82be8f58be0acc621",
+      "hint": "docs/verification/IM-00/im00-69/debug-numerics-execution.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-debug-qa.log",
+      "sha256": "73d6c176f31ece5b1d6bb0a7f136fad753d2eaf5c899de676128d0cf81858f22",
+      "hint": "docs/verification/IM-00/im00-69/debug-qa.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-linux-canary.txt",
+      "sha256": "7fbd7ca67eaca5610e6f2a83ede93eb1e8ce17644d526269d1eb0f86e536de74",
+      "hint": "docs/verification/IM-00/im00-69/linux-canary.txt"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-linux-debug-excerpt.log",
+      "sha256": "6ecdbe1ac7d0e078836388d5e49bca988b84b2947ecfe6bceb210fd2247863a7",
+      "hint": "docs/verification/IM-00/im00-69/linux-debug-excerpt.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-measurement-conditions.json",
+      "sha256": "3c50fc47c168dfa1e9b070c9969d04078d84453711898e54b89d2ce571217a54",
+      "hint": "docs/verification/IM-00/im00-69/measurement-conditions.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-measurement-raw.log",
+      "sha256": "1286376e08fae87f14ad1cb6b01f9f22134cbd7a71b33dac2b38acb6c4657645",
+      "hint": "docs/verification/IM-00/im00-69/measurement-raw.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-measurement-summary.json",
+      "sha256": "a7a0bbfb56449675e13306e775da31df77970cfdebd0a28b39e863c29f2af40e",
+      "hint": "docs/verification/IM-00/im00-69/measurement-summary.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-measurement.cpp",
+      "sha256": "498d563f61469cedc4d241c952625d546fe75dd8e6280dd878acbfbf8e7284a6",
+      "hint": "docs/verification/IM-00/im00-69/measurement.cpp"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-mutation-link-inspection.json",
+      "sha256": "72b939cc2baf533107631fd86ded07653e984a380f4e1577482c68902723f8f4",
+      "hint": "docs/verification/IM-00/im00-69/mutation-link-inspection.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-mutations.zip",
+      "sha256": "bf60072f80cd6ec034e2257937d33365e12c31e800c5d0a8868322b77db51ddc",
+      "hint": "docs/verification/IM-00/im00-69/mutations.zip"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-redaction.json",
+      "sha256": "a92a23fa23144ee850916034444e96a555d3be4b13f3cd08808f8e3cca9fe984",
+      "hint": "docs/verification/IM-00/im00-69/redaction.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-release-build.log",
+      "sha256": "2b78019f68db0ad0b390bd1f66be3addd6557d9f91f2640262ebe349705dd62d",
+      "hint": "docs/verification/IM-00/im00-69/release-build.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-release-tests.log",
+      "sha256": "4937260867622a0f430e7cbb2034054a9b5c5c22bb193c7175f53dc8b95df9ea",
+      "hint": "docs/verification/IM-00/im00-69/release-tests.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-static-final.log",
+      "sha256": "fd14d3a4949f5f452b114a7745460829e2f4a57430c7963662c67dd3869a7a57",
+      "hint": "docs/verification/IM-00/im00-69/static-final.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-static-initial.log",
+      "sha256": "be5bf1b431edd5949ccb99bfd2efda2109b97dc90ba99915217aa9b3a4ded3df",
+      "hint": "docs/verification/IM-00/im00-69/static-initial.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-static-result.json",
+      "sha256": "3e062b6cb62b1a0b3f9bff45a7fa7c71c97b220491f74d3c7a3727ae0980898b",
+      "hint": "docs/verification/IM-00/im00-69/static-result.json"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-static-second.log",
+      "sha256": "b04292adef36070992ce76fdfebb2f71bddb0ea8fe3d977477fef2e332acc76e",
+      "hint": "docs/verification/IM-00/im00-69/static-second.log"
+    },
+    {
+      "id": "im00-69-docs-verification-IM-00-im00-69-static-third.log",
+      "sha256": "2da8f2e39d3bd03e97e5c69b2942dd0c89dbed403e92e27aaa24bf98fb6820a7",
+      "hint": "docs/verification/IM-00/im00-69/static-third.log"
+    }
+  ],
+  "reference_format_note": "source_references/artifact_referencesは識別IDとhashを正本にしhintを所在の手掛かりにする。sources/artifactsのpath-mapは現行uvlas.verification/1 checkerとの互換用に同じ参照から生成した写像で、独立した真実ではない。"
+}

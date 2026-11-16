@@ -1,0 +1,9 @@
+platform linux-x64-gnu14.2-sse2
+cluster.left_residual 0p+0
+pair.component 1p+0
+pair.normalization 0p+0
+root.negative -1p-60
+root.three 1.8p+1
+root.two 1p+1
+schur.gram 0p+0
+schur.residual 0p+0

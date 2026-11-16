@@ -1,0 +1,31 @@
+Filters: "Arnoldi scaled action encloses intermediate exponent loss"
+Randomness seeded to: 4146440715
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_numerics_eigen_arnoldi.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Arnoldi scaled action encloses intermediate exponent loss
+-------------------------------------------------------------------------------
+<repo>\tests\numerics\eigen_arnoldi_test.cpp(1618)
+...............................................................................
+
+<repo>\tests\numerics\eigen_arnoldi_test.cpp(1632): FAILED:
+  CHECK( difference * difference + Rational(value.imag()) * Rational(value.imag()) <= Rational(error) * Rational(error) )
+with expansion:
+  1/1152921504606846976
+  <=
+  20282409603651679431146506027009/
+  1852673427797059126777135760139006525652319754650249024631321344126610074238-
+  976
+
+<repo>\tests\numerics\eigen_arnoldi_test.cpp(1648): FAILED:
+  REQUIRE_FALSE( qualified.has_value() )
+with expansion:
+  !true
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 6 | 4 passed | 2 failed
+

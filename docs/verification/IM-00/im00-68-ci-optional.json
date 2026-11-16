@@ -1,0 +1,87 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-07",
+    "N4-09",
+    "EIG-11"
+  ],
+  "package": "IM-00",
+  "issue": 68,
+  "date": "2026-11-16",
+  "source_commit": "f65ea5c571a07abc5f97f6c8b40e05ae43ef8260",
+  "scope": "PR72のLinux clang-tidyが拒否した計測先optionalの参照を、使用箇所で明示確認する。数値式、backend、精度/資源政策、公開APIを変更しない。",
+  "previous_record": {
+    "id": "im00-68-full-spectrum-verification",
+    "sha256": "02085a7f55589d61ac6da36e7ab6359958397f1e1631a7b6b1949b0c99858c56",
+    "hint": "docs/verification/IM-00/im00-68.json",
+    "unchanged": true
+  },
+  "reported_ci": {
+    "head": "5be2d2a62b12eca77e1fce09a3d71c85a5c34514",
+    "run": 43808940812,
+    "job": 133106089145,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43808940812/job/133106089145",
+    "result": "Linux Debugは60/60試験成功後、FullStageClockのdestructor内でbugprone-unchecked-optional-accessにより失敗。試験成功をCI全成功と扱わない。",
+    "diagnostic": "旧source eigen_full.cpp:113:33のdata_.timings逆参照。start_だけを確認し、計測先の存在はconstructor側の確認に依存していた。",
+    "full_log_sha256": "c00a9cf1c76c69f4ceb87a8d507d4ea89d4e883047c3e5a8c561e87400f0a30e",
+    "excerpt": "im00-68-ci-optional/linux-ci-excerpt.log"
+  },
+  "change": {
+    "before_source_sha256": "fb32e0daa240da2086ad99640889e6fc82788de2341c878e3dac30042c7f9bc5",
+    "after_source_sha256": "2ce37644316fdffc89646c8b080e812e7ec838dfae629744df74d4857e0194cb",
+    "implementation": "data_.timingsを同じ名前付き参照へ束縛し、start_とその参照の存在を確認してからstageへ記録する。正規経路ではtimingsがscope中に解除されないため、数値式とclock呼出し数は不変。計測時間の値自体のbit一致は主張しない。",
+    "suppression": false
+  },
+  "similar_findings": {
+    "search_scope": [
+      "src/**/*.cpp",
+      "src/**/*.hpp",
+      "include/**/*.hpp"
+    ],
+    "patterns": [
+      "optional time_point / optional timing",
+      "timings-> / data_.timings dereference",
+      "timing destructors and finish methods"
+    ],
+    "findings": [
+      "FullPreparationClockは同じstart_とd.timingsの両方を使用前に確認済み。",
+      "core StageScopeは使用するstart_をdestructor内で直接確認する。",
+      "Generalized PhaseClockはstart_をfinish内で直接確認し、記録先GeneralizedTimingsはoptionalではない参照。",
+      "該当する別optional/constructor側の確認だけに依存した計測先逆参照はFullStageClockの1箇所。"
+    ],
+    "action": "関連する製品全体を検索・通読し、同型の未修正箇所なし。"
+  },
+  "verification": {
+    "provenance": "source f65ea5cのclean buildから既存timing caseだけDebug/Releaseで実行。generated revisionのcommit一致とDIRTY=0を確認。",
+    "debug": "Full phase timing* 36assertions/1case成功。",
+    "release": "同filter 36assertions/1case成功。",
+    "covered": "disabledの時計読取0/計測なし、enabledの時計読取6/各stage1回、数値配列のbit一致、未知timing enum拒否。",
+    "format": "変更したsource TUのclang-format21.1.2成功。",
+    "tidy": "clang-tidy21.1.1、通常numericsの単一Debug DB/1entry、eigen_full.cppのみexit0。外部header警告の集約117182件、対象source診断なし。Linuxでの修正後tidyはCIに委ね、先取りしない。",
+    "independent_review": "rootがsource差分とcpp規約を通読し指摘解消。",
+    "japanese": "cpp規約lintの9findingは全てinfo。日付で始まる実例8件の反復と、技術上のoptionalが値を持つという表現は維持。",
+    "not_repeated": "既存60case、変更していないphase整数監査、canary、5変異、工程計測を再実行していない。新しい数値/性能主張は加えていない。"
+  },
+  "claimed_state": "採用仕様への実装適合の限定的なCI訂正。QA数値認定・実務性能・実務受入は主張しない。",
+  "sources": {
+    "src/numerics/eigen_full.cpp": "2ce37644316fdffc89646c8b080e812e7ec838dfae629744df74d4857e0194cb",
+    ".cursor/rules/cpp.mdc": "78542da97ed088a4397ebee03bd3cf6e126a64392af0f8d9fb8508e2acdb5c66",
+    "tests/numerics/eigen_full_test.cpp": "1c54fd90382e1e9dc4f7495cadb3408f026ac07e043d3e84702792f5e1d108c3"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-68-ci-optional/build-debug.log": "a688517459dbccf43a379197015388f1e83952d8e583f7408220d612bc4a7e75",
+    "docs/verification/IM-00/im00-68-ci-optional/build-release.log": "076d74eba19f27b2f35cbaf7849e6e3c78cdcc26e4c37db7811779f9769a793e",
+    "docs/verification/IM-00/im00-68-ci-optional/compile_commands.json": "68f6582aaf425e6cd199e68942be2f4b619e7a6086c450c5411e3d230aa0f56b",
+    "docs/verification/IM-00/im00-68-ci-optional/git-revision.hpp": "3e929d8c6de600242aed7d72363a01aac43cbba455b2b6cb84a304d347c7a6fa",
+    "docs/verification/IM-00/im00-68-ci-optional/japanese-cpp.json": "4d049cdde1508fbca1652cbeacd3b03471963ae186ab0dd52b5647cc3f40b6ed",
+    "docs/verification/IM-00/im00-68-ci-optional/linux-ci-excerpt.log": "553ac3e7ad56c67a2ac3309c6c02f9d808bf98b92b1a09fc7636f3915c42998c",
+    "docs/verification/IM-00/im00-68-ci-optional/redaction.json": "d00984152290a00ac8585fcec04665d252e309466aa3842f19d602c26de915bf",
+    "docs/verification/IM-00/im00-68-ci-optional/source.patch": "dc54c9d26339902dc9741bb1e6d676de35aa0f4ab54e55aa2db6fe401ae54d2b",
+    "docs/verification/IM-00/im00-68-ci-optional/test-results.json": "1cda783b25e6ce6aff1876842c086a2616321d78086c6816621d63bce1690c19",
+    "docs/verification/IM-00/im00-68-ci-optional/tidy-exit.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs/verification/IM-00/im00-68-ci-optional/tidy.log": "007f3437d2f15af980f786c913faf131641e4c36377150d9f986cb02546933ea",
+    "docs/verification/IM-00/im00-68-ci-optional/timing-debug.log": "71469a6a83308d281fd1fb9489c7f074b2b46fee6c614d14f7e690697df6cad4",
+    "docs/verification/IM-00/im00-68-ci-optional/timing-release.log": "02928bbf2285fc0937364c4035046c6b17126a49a6977406c4a107c60d87b429",
+    "docs/verification/IM-00/im00-68.json": "02085a7f55589d61ac6da36e7ab6359958397f1e1631a7b6b1949b0c99858c56"
+  }
+}

@@ -1,0 +1,16 @@
+Run43825824977, Linux Debug job133159551323, headc01819119117f51fd560802858f48741f97f014c
+2026-11-16T07:44:26.6456248Z HEAD is now at c8a4534 Merge c01819119117f51fd560802858f48741f97f014c into 19da8a52e9ec79deb7b4371a2fc9091519c705d4
+2026-11-16T07:48:15.6816022Z 100% tests passed, 0 tests failed out of 63
+2026-11-16T08:05:29.3798524Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:157:8: error: constructor does not initialize these fields: nev, ncv, backend_tolerance, backend_iterations, sides, association, timing [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+2026-11-16T08:05:29.3810098Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:190:8: error: constructor does not initialize these fields: requested_nev, requested_ncv, returned_count, right_krylov_dimension, backend_reported_operations, initial_norm, initial_sha256 [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+2026-11-16T08:05:29.3822241Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:279:8: error: constructor does not initialize these fields: side, candidate, native_output_error_upper [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+2026-11-16T08:05:29.3826647Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:341:5: error: function 'values' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+2026-11-16T08:05:29.3828542Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:344:5: error: function 'retained_values' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+2026-11-16T08:05:29.3830824Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:347:5: error: function 'metadata' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+2026-11-16T08:05:29.3832789Z /home/runner/work/UVLAS/UVLAS/include/uvlas/numerics/eigen_arnoldi.hpp:357:5: error: function 'sensitivities' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+2026-11-16T08:05:29.3834908Z /home/runner/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi_engine.hpp:117:33: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-16T08:05:29.3836435Z /home/runner/work/UVLAS/UVLAS/tests/numerics/eigen_arnoldi_test.cpp:681:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-16T08:05:29.3842581Z /home/runner/work/UVLAS/UVLAS/tests/numerics/eigen_arnoldi_test.cpp:842:12: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-16T08:05:29.3848400Z /home/runner/work/UVLAS/UVLAS/tests/numerics/eigen_arnoldi_test.cpp:1093:60: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-16T08:05:29.3850622Z /home/runner/work/UVLAS/UVLAS/tests/numerics/eigen_arnoldi_test.cpp:1494:12: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+

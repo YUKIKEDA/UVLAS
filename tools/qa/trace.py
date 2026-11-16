@@ -45,7 +45,7 @@ CANON = [
 ]
 KINDS = [
     ("requirement", r"(?:GEO|STR|MAT|PHY|SOL|RUN|QUAL|IO|API|ENV|DIST|OUT|BC|LOAD|PERF)-\d{2}"),
-    ("decision", r"(?:SH-D|ST-|AE-|J1-D|MAT-D|N4-|IO4-|QA-)\d{2}"),
+    ("decision", r"(?:SH-D|ST-|AE-|J1-D|MAT-D|N4-|EIG-|IO4-|QA-)\d{2}"),
     ("acceptance", r"A5-\d{2}|PERF-FL-\d{2}|[VXP]-[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*"),
     ("package", r"IM-\d{2}"),
     ("risk", r"R-\d{2}"),
@@ -59,6 +59,24 @@ DEFINITION = re.compile(
 )
 INLINE = re.compile(r"(?<![A-Za-z0-9_-])(" + "|".join(p for _, p in KINDS) + r")：")
 TAG = re.compile(r"\[(" + "|".join(p for _, p in KINDS) + r")\]")
+# Match the complete literal arguments, not one source line: clang-format often
+# wraps tags onto the line after TEST_CASE. Quoted parentheses belong to the name.
+TEST_MACRO = re.compile(
+    r"^[ \t]*(?P<macro>TEST_CASE|SCENARIO)\s*\(\s*"
+    r'(?:"(?:[^"\\]|\\.)*"\s*)+,\s*'
+    r'(?P<tags>(?:"(?:[^"\\]|\\.)*"\s*)+)\)',
+    re.MULTILINE,
+)
+# Identify non-code regions before looking for declarations. A macro-shaped line
+# in a block comment or raw-string fixture is not an executable test declaration.
+CPP_NONCODE = re.compile(
+    r"(?P<comment>//[^\n]*|/\*[\s\S]*?\*/)"
+    r'|(?P<raw>(?:u8|u|U|L)?R"(?P<delimiter>[^ ()\\\t\v\f\r\n]{0,16})'
+    r'\([\s\S]*?\)(?P=delimiter)")'
+    r'|(?P<literal>(?:u8|u|U|L)?"(?:\\[\s\S]|[^"\\])*"'
+    r"|(?:u8|u|U|L)?'(?:\\[\s\S]|[^'\\\r\n])*')"
+)
+CPP_STRING = re.compile(r'"((?:[^"\\]|\\.)*)"')
 # Acceptance words that look like IDs but are ordinary text.
 NOT_IDS = {"P-CURVED"}
 
@@ -116,14 +134,35 @@ def read_catalog():
     return definitions, restated, mentions
 
 
+def catch2_tags(text: str) -> list[tuple[int, list[str]]]:
+    """Read literal-tag declarations, excluding comments and fixture strings."""
+    visible = list(text)
+    excluded: list[tuple[int, int]] = []
+    for token in CPP_NONCODE.finditer(text):
+        excluded.append(token.span())
+        if token.group("comment") is not None:
+            for index in range(token.start(), token.end()):
+                if visible[index] != "\n":
+                    visible[index] = " "
+    declarations: list[tuple[int, list[str]]] = []
+    for match in TEST_MACRO.finditer("".join(visible)):
+        start = match.start("macro")
+        if any(begin <= start < end for begin, end in excluded):
+            continue
+        # Adjacent C++ literals concatenate before Catch2 receives the tag string.
+        tags = "".join(CPP_STRING.findall(match.group("tags")))
+        declarations.append((text.count("\n", 0, start) + 1, TAG.findall(tags)))
+    return declarations
+
+
 def read_evidence():
     tests: dict[str, list[str]] = defaultdict(list)
     for file in sorted((REPO / "tests").rglob("*.cpp")):
         label = file.relative_to(REPO).as_posix()
-        for number, line in enumerate(file.read_text(encoding="utf-8").splitlines(), 1):
-            if "TEST_CASE" in line or "SCENARIO" in line:
-                for tag in TAG.findall(line):
-                    tests[tag].append(f"{label}:{number}")
+        text = file.read_text(encoding="utf-8")
+        for number, tags in catch2_tags(text):
+            for tag in tags:
+                tests[tag].append(f"{label}:{number}")
     records: dict[str, list[str]] = defaultdict(list)
     root = REPO / "docs" / "verification"
     for file in sorted(root.rglob("*.json")) if root.is_dir() else []:
