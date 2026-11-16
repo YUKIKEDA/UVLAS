@@ -1,0 +1,235 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "EIG-01",
+    "EIG-02",
+    "EIG-03",
+    "EIG-04",
+    "EIG-06",
+    "EIG-07",
+    "EIG-10",
+    "EIG-11",
+    "EIG-12",
+    "EIG-13",
+    "EIG-14"
+  ],
+  "package": "IM-00",
+  "issue": 69,
+  "date": "2026-11-16",
+  "scope": "一般化全スペクトルの既存18caseへEIG追跡タグを追加する。数値source、試験本体、固定許容差、凍結記録、基準値を変更しない。",
+  "metadata_parent_commit": "078a0baa332b50f2e6ad24ac66f393e1a0e4f2b6",
+  "previous_record": {
+    "id": "im00-69-frozen-qualification",
+    "sha256": "19ffac25f73eef6e06a3051b1c549d16549fde1cbb7dd74586ee85e72e8a0069",
+    "hint": "docs/verification/IM-00/im00-69.json",
+    "unchanged": true
+  },
+  "test_snapshot_relation": {
+    "path_hint": "tests/numerics/eigen_generalized_test.cpp",
+    "previous_sha256": "a993ca51d84e7a80218b80d57ba3b20cd7c47672a1cc91459a8e22470b0fa02e",
+    "tagged_sha256": "6b5fb682691380cff1779fd84879f23de742e36bbfd36c835a536b6aeb1bf9b9",
+    "old_snapshot_commit": "03d3471d7db670fd8ef8f052a4c5181f6de481ad",
+    "previous_record_test_sha256": "a993ca51d84e7a80218b80d57ba3b20cd7c47672a1cc91459a8e22470b0fa02e",
+    "only_added_EIG_tags_before_format": true,
+    "nonwhitespace_bytes_equal_after_removing_added_EIG_tags": true,
+    "numeric_suite_rerun": false,
+    "reason": "既存実行は旧test hashのsnapshotを対象とした。追加タグとclang-format由来の空白以外が等しいことを比較し、既存の実行証拠をそのsnapshotの証拠として保持する。新タグ付きsnapshotを実行したとは主張しない。"
+  },
+  "case_mapping": [
+    {
+      "case": "Generalized full extraction preserves signed roots and original mass geometry",
+      "ids": [
+        "EIG-01",
+        "EIG-03",
+        "EIG-04",
+        "EIG-06",
+        "EIG-13"
+      ]
+    },
+    {
+      "case": "Nonbinary scales and units are preserved and certified on actual physical vectors",
+      "ids": [
+        "EIG-02",
+        "EIG-03",
+        "EIG-04",
+        "EIG-06",
+        "EIG-13"
+      ]
+    },
+    {
+      "case": "Tiny generalized eigenvalues keep relative accuracy sign and an exact zero",
+      "ids": [
+        "EIG-03",
+        "EIG-04",
+        "EIG-06",
+        "EIG-13"
+      ]
+    },
+    {
+      "case": "Empty generalized extraction has zero proofs and no backend work",
+      "ids": [
+        "EIG-01",
+        "EIG-06",
+        "EIG-11"
+      ]
+    },
+    {
+      "case": "Original mass qualification and complete symmetry cannot be replaced by scaled LLT",
+      "ids": [
+        "EIG-06",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Generalized entry rejects stale unsupported and physical coverage requests before allocation",
+      "ids": [
+        "EIG-01",
+        "EIG-07",
+        "EIG-10",
+        "EIG-11",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Owned generalized results survive moved and destroyed original sources",
+      "ids": [
+        "EIG-01",
+        "EIG-07",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Projection requalifies its distinct generation and every required consumer",
+      "ids": [
+        "EIG-03",
+        "EIG-10",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Generalized resource bounds and nonfinite data fail without mutating input",
+      "ids": [
+        "EIG-06",
+        "EIG-11",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Generalized values outlive their source plan and all original matrices",
+      "ids": [
+        "EIG-01",
+        "EIG-03",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Empty problems do not call a required consumer or invent its achievement",
+      "ids": [
+        "EIG-10",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Generalized extraction ignores finite padding and preserves distinct source strides",
+      "ids": [
+        "EIG-01",
+        "EIG-03",
+        "EIG-06",
+        "EIG-13"
+      ]
+    },
+    {
+      "case": "Invalid generalized budgets scales and matrix dimensions fail at entry",
+      "ids": [
+        "EIG-01",
+        "EIG-02",
+        "EIG-03",
+        "EIG-10",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Original mass positivity is not inferred from a numerically positive backend pivot",
+      "ids": [
+        "EIG-06",
+        "EIG-12",
+        "EIG-13"
+      ]
+    },
+    {
+      "case": "Generalized original actions and extraction attempts are charged before every application",
+      "ids": [
+        "EIG-10",
+        "EIG-11",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Generalized product timing leaves all numerical bytes unchanged when enabled",
+      "ids": [
+        "EIG-03",
+        "EIG-11"
+      ]
+    },
+    {
+      "case": "Both original matrices validate every logical and padding component",
+      "ids": [
+        "EIG-01",
+        "EIG-06",
+        "EIG-12"
+      ]
+    },
+    {
+      "case": "Generalized consumer allocation failures preserve a value failure and old results",
+      "ids": [
+        "EIG-10",
+        "EIG-12"
+      ]
+    }
+  ],
+  "existing_execution_evidence": {
+    "record_id": "im00-69-frozen-qualification",
+    "debug_source_commit": "03d3471d7db670fd8ef8f052a4c5181f6de481ad",
+    "release_source_commit": "0bcfea976a957a5f0e36ed5187167ef3e23b2c07",
+    "test_cases": 18,
+    "assertions": 379,
+    "note": "Debugのtool実行報告、Release raw、Linux実測、変異の各snapshot差は旧記録の記載を維持する。追跡IDを追加したことだけで、未実行の環境・case・製品gateの認定へ拡張しない。"
+  },
+  "development_partition": {
+    "id": "EIG-14",
+    "implementation_headers": [
+      "include/uvlas/numerics/eigen_generalized.hpp"
+    ],
+    "implementation_sources": [
+      "src/numerics/eigen_generalized.cpp"
+    ],
+    "test_source": "tests/numerics/eigen_generalized_test.cpp",
+    "note": "一般化を専用API/source/testで実装した担当単位への対応を記録する。工程分割を数値TEST_CASEが検査すると装うタグは付けない。一般完全法・Arnoldi・IM00-11全体の完了は主張しない。"
+  },
+  "verification": {
+    "format": "対象testへclang-format 21.1.2を適用。",
+    "comparison": "追加EIGタグを除去して空白を正規化した前後byte列は一致。旧記録に記された他17sourceのhashは全件一致。",
+    "trace_tool": "現branchのtrace.pyは変更しない。EIG prefixと折返しtagの認識修正は別担当の独立commitから後で共有する。"
+  },
+  "source_references": [
+    {
+      "id": "im00-69-tagged-generalized-tests",
+      "sha256": "6b5fb682691380cff1779fd84879f23de742e36bbfd36c835a536b6aeb1bf9b9",
+      "hint": "tests/numerics/eigen_generalized_test.cpp"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im00-69-frozen-qualification",
+      "sha256": "19ffac25f73eef6e06a3051b1c549d16549fde1cbb7dd74586ee85e72e8a0069",
+      "hint": "docs/verification/IM-00/im00-69.json"
+    }
+  ],
+  "sources": {
+    "tests/numerics/eigen_generalized_test.cpp": "6b5fb682691380cff1779fd84879f23de742e36bbfd36c835a536b6aeb1bf9b9"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-69.json": "19ffac25f73eef6e06a3051b1c549d16549fde1cbb7dd74586ee85e72e8a0069"
+  },
+  "reference_format_note": "識別ID/hashを正本としhintを所在の手掛かりにする。sources/artifactsは現行checkerとの互換写像。旧記録内の旧test hashを現在hashへ書き換えない。"
+}

@@ -1,0 +1,22 @@
+Source PR head: 0abb091d74295f4c9e9d2ad3cec1643c9d23c64d
+Observed CI merge: 44a5dc5ef90a7cfb6214ae0ba2c4e683541e1529
+Job: http<repo>/actions/runs/43805527327/job/133095340975
+2026-11-16T04:44:38.6546313Z 41/59 Test #41: numerics.eigen_full_phase_audit .....   Passed    0.00 sec
+2026-11-16T04:44:38.6598458Z 42/59 Test #42: numerics.eigen_full_contract ........   Passed    0.01 sec
+2026-11-16T04:44:39.6907102Z 43/59 Test #43: numerics.eigen_full .................   Passed    1.03 sec
+2026-11-16T04:44:40.5731372Z 59/59 Test #59: qa.eigen_full .......................***Failed    0.03 sec
+2026-11-16T04:44:40.5731830Z eigen-full: platform linux-x64-gnu14.2-sse2 is not qualified (QA-07).
+2026-11-16T04:44:40.5732142Z   qualified platforms: windows-x64-msvc19.51-sse2
+2026-11-16T04:44:40.5732870Z   qualify it with `results.py accept`; if its values differ from every qualified platform, that needs a result change record.
+2026-11-16T04:44:40.5733295Z   values on this platform:
+2026-11-16T04:44:40.5733481Z     cluster.left_residual 0p+0
+2026-11-16T04:44:40.5733673Z     pair.component 1p+0
+2026-11-16T04:44:40.5733851Z     pair.normalization 0p+0
+2026-11-16T04:44:40.5734043Z     root.negative -1p-60
+2026-11-16T04:44:40.5734313Z     root.three 1.8p+1
+2026-11-16T04:44:40.5734512Z     root.two 1p+1
+2026-11-16T04:44:40.5734715Z     schur.gram 0p+0
+2026-11-16T04:44:40.5734906Z     schur.residual 0p+0
+2026-11-16T04:44:40.5735040Z 
+2026-11-16T04:44:40.5735055Z 
+2026-11-16T04:44:40.5735164Z 98% tests passed, 1 tests failed out of 59

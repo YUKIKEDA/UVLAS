@@ -1,0 +1,423 @@
+69528 warnings generated.
+<repo>\include\uvlas/numerics/eigen_full.hpp:145:8: error: constructor does not initialize these fields: association, left, require_full_basis [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  145 | struct FullPairRequest {
+      |        ^
+  146 |     FullOutputRequest common; ///< Representation, capacities and necessary consumer checks.
+  147 |     PairMetricRequest pair;   ///< Actual right and requested left residual/normalization budgets.
+  148 |     FullAssociation association; ///< Explicit one-to-one root association policy.
+      |                                
+      |                                {}
+  149 |     bool left;                   ///< Construct and qualify independent left eigenvectors when true.
+      |              
+      |              {}
+  150 |     bool
+  151 |         require_full_basis; ///< Require all n pairs and a certified left-inverse independence test.
+      |                           
+      |                           {}
+<repo>\include\uvlas/numerics/eigen_full.hpp:154:8: error: constructor does not initialize these fields: association, left [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  154 | struct FullClusterRequest {
+      |        ^
+  155 |     FullRequest common;          ///< Actual subspace budgets, generation, resources and consumers.
+  156 |     FullAssociation association; ///< Matching policy for an independently extracted left space.
+      |                                
+      |                                {}
+  157 |     bool left;                   ///< Never reuse the right subspace as its left counterpart.
+      |              
+      |              {}
+<repo>\include\uvlas/numerics/eigen_metrics.hpp:17:8: error: constructor does not initialize these fields: eigenvalue_scale [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   17 | struct MetricScales {
+      |        ^
+   18 |     std::span<const double> components; ///< Positive finite diagonal entries of D.
+   19 |     double eigenvalue_scale; ///< Positive finite eigenvalue scale, in the original units.
+      |                            
+      |                            {}
+<repo>\tests\numerics\eigen_full_test.cpp:36:81: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+   36 |             FullLimits{96, 96, {10000, 10000, 0, 10}, linear::EstimateAdmission{128 * 1024 * 1024}},
+      |                                                                                 ^
+<repo>\tests\numerics\eigen_full_test.cpp:36:81: note: make conversion explicit to silence this warning
+    6 |             FullLimits{96, 96, {10000, 10000, 0, 10}, linear::EstimateAdmission{128 * 1024 * 1024}},
+      |                                                                                 ^~~~~~~~~~~~~~~~~
+      |                                                                                 static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:36:81: note: perform multiplication in a wider type
+   36 |             FullLimits{96, 96, {10000, 10000, 0, 10}, linear::EstimateAdmission{128 * 1024 * 1024}},
+      |                                                                                 ^~~~~~~~~~
+      |                                                                                 static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:46:5: error: function 'view' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+   46 |     FullScales view() const {
+      |     ^
+      |     [[nodiscard]] 
+<repo>\tests\numerics\eigen_full_test.cpp:65:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+   65 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:65:29: note: make conversion explicit to silence this warning
+   65 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:65:29: note: perform multiplication in a wider type
+   65 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:74:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+   74 |     Scales scales{6};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:82:13: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+   82 |     REQUIRE(v->eigenvalues.size() == 6);
+      |             ^
+<repo>\tests\numerics\eigen_full_test.cpp:86:29: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+   86 |     for (const auto value : v->eigenvalues) {
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:96:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+   96 |     CHECK(v->eigenvalues[1].real() < 0);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:97:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+   97 |     CHECK(std::abs(v->eigenvalues[1].real() + 0x1p-60) <= 0x1p-60 * 1e-12);
+      |                    ^
+<repo>\tests\numerics\eigen_full_test.cpp:106:33: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  106 |         core::ResourcePlan plan{64 * 1024 * 1024};
+      |                                 ^
+<repo>\tests\numerics\eigen_full_test.cpp:106:33: note: make conversion explicit to silence this warning
+  106 |         core::ResourcePlan plan{64 * 1024 * 1024};
+      |                                 ^~~~~~~~~~~~~~~~
+      |                                 static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:106:33: note: perform multiplication in a wider type
+  106 |         core::ResourcePlan plan{64 * 1024 * 1024};
+      |                                 ^~~~~~~~~
+      |                                 static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:109:9: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  109 |         Scales scales{3};
+      |         ^
+      |                const 
+<repo>\tests\numerics\eigen_full_test.cpp:115:9: error: variable 'wanted' of type 'FullClusterRequest' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  115 |         FullClusterRequest wanted{request(core::NumericalGeneration{43}), {1e-12, 1e-12}, true};
+      |         ^
+      |                            const 
+<repo>\tests\numerics\eigen_full_test.cpp:128:15: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  128 |         CHECK(view->columns == 2);
+      |               ^
+<repo>\tests\numerics\eigen_full_test.cpp:129:17: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  129 |         REQUIRE(view->right.size() == 6);
+      |                 ^
+<repo>\tests\numerics\eigen_full_test.cpp:130:17: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  130 |         REQUIRE(view->left.size() == 6);
+      |                 ^
+<repo>\tests\numerics\eigen_full_test.cpp:137:30: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  137 |                     right += view->right[i + k * 3] * std::conj(view->right[j + k * 3]);
+      |                              ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:137:65: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  137 |                     right += view->right[i + k * 3] * std::conj(view->right[j + k * 3]);
+      |                                                                 ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:138:29: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  138 |                     left += view->left[i + k * 3] * std::conj(view->left[j + k * 3]);
+      |                             ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:138:63: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  138 |                     left += view->left[i + k * 3] * std::conj(view->left[j + k * 3]);
+      |                                                               ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:145:15: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  145 |         CHECK(view->left_triangular.size() == 4);
+      |               ^
+<repo>\tests\numerics\eigen_full_test.cpp:157:11: error: the parameter 'a' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  157 | BC add(BC a, BC b) {
+      |           ^
+      |        const  &
+<repo>\tests\numerics\eigen_full_test.cpp:157:17: error: the parameter 'b' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  157 | BC add(BC a, BC b) {
+      |                 ^
+      |              const  &
+<repo>\tests\numerics\eigen_full_test.cpp:160:13: error: the parameter 'a' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  160 | BC minus(BC a, BC b) {
+      |             ^
+      |          const  &
+<repo>\tests\numerics\eigen_full_test.cpp:160:19: error: the parameter 'b' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  160 | BC minus(BC a, BC b) {
+      |                   ^
+      |                const  &
+<repo>\tests\numerics\eigen_full_test.cpp:163:15: error: the parameter 'a' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  163 | BC product(BC a, BC b) {
+      |               ^
+      |            const  &
+<repo>\tests\numerics\eigen_full_test.cpp:163:21: error: the parameter 'b' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  163 | BC product(BC a, BC b) {
+      |                     ^
+      |                  const  &
+<repo>\tests\numerics\eigen_full_test.cpp:166:16: error: the parameter 'a' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  166 | BC quotient(BC a, Big b) {
+      |                ^
+      |             const  &
+<repo>\tests\numerics\eigen_full_test.cpp:166:23: error: the parameter 'b' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  166 | BC quotient(BC a, Big b) {
+      |                       ^
+      |                   const  &
+<repo>\tests\numerics\eigen_full_test.cpp:169:17: error: the parameter 'a' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  169 | BC conjugate(BC a) {
+      |                 ^
+      |              const  &
+<repo>\tests\numerics\eigen_full_test.cpp:172:17: error: the parameter 'a' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  172 | Big absolute(BC a) {
+      |                 ^
+      |              const  &
+<repo>\tests\numerics\eigen_full_test.cpp:252:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  252 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:252:29: note: make conversion explicit to silence this warning
+  252 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:252:29: note: perform multiplication in a wider type
+  252 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:271:19: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  271 |     root_matching(v->eigenvalues, diag);
+      |                   ^
+<repo>\tests\numerics\eigen_full_test.cpp:273:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  273 |     CHECK(v->eigenvalues.back().imag() > 0);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:274:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  274 |     CHECK(std::abs(v->eigenvalues.back() - Complex{7, 1}) <= 1e-12);
+      |                    ^
+<repo>\tests\numerics\eigen_full_test.cpp:280:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  280 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:280:29: note: make conversion explicit to silence this warning
+  280 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:280:29: note: perform multiplication in a wider type
+  280 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:291:5: error: variable 'wanted' of type 'FullPairRequest' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  291 |     FullPairRequest wanted{request(core::NumericalGeneration{43}),
+      |     ^
+      |                     const 
+<repo>\tests\numerics\eigen_full_test.cpp:291:28: error: slicing object from type 'FullRequest' to 'FullOutputRequest' discards 80 bytes of state [cppcoreguidelines-slicing,-warnings-as-errors]
+  291 |     FullPairRequest wanted{request(core::NumericalGeneration{43}),
+      |                            ^
+<repo>\tests\numerics\eigen_full_test.cpp:306:13: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  306 |     REQUIRE(v->right.size() == 4);
+      |             ^
+<repo>\tests\numerics\eigen_full_test.cpp:307:13: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  307 |     REQUIRE(v->left.size() == 4);
+      |             ^
+<repo>\tests\numerics\eigen_full_test.cpp:308:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  308 |     CHECK(v->triangular.empty());
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:309:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  309 |     CHECK(std::abs(v->right[1]) <= 1e-12);
+      |                    ^
+<repo>\tests\numerics\eigen_full_test.cpp:310:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  310 |     CHECK(std::abs(v->right[3] - 3.0 * v->right[2]) <= 1e-12);
+      |                    ^
+<repo>\tests\numerics\eigen_full_test.cpp:310:40: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  310 |     CHECK(std::abs(v->right[3] - 3.0 * v->right[2]) <= 1e-12);
+      |                                        ^
+<repo>\tests\numerics\eigen_full_test.cpp:311:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  311 |     CHECK(std::abs(v->left[0] + 3.0 * v->left[1]) <= 1e-12);
+      |                    ^
+<repo>\tests\numerics\eigen_full_test.cpp:311:39: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  311 |     CHECK(std::abs(v->left[0] + 3.0 * v->left[1]) <= 1e-12);
+      |                                       ^
+<repo>\tests\numerics\eigen_full_test.cpp:312:20: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  312 |     CHECK(std::abs(v->left[2]) <= 1e-12);
+      |                    ^
+<repo>\tests\numerics\eigen_full_test.cpp:333:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  333 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:333:29: note: make conversion explicit to silence this warning
+  333 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:333:29: note: perform multiplication in a wider type
+  333 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:336:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  336 |     Scales scales{2};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:342:5: error: variable 'wanted' of type 'FullPairRequest' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  342 |     FullPairRequest wanted{request(core::NumericalGeneration{43}),
+      |     ^
+      |                     const 
+<repo>\tests\numerics\eigen_full_test.cpp:342:28: error: slicing object from type 'FullRequest' to 'FullOutputRequest' discards 80 bytes of state [cppcoreguidelines-slicing,-warnings-as-errors]
+  342 |     FullPairRequest wanted{request(core::NumericalGeneration{43}),
+      |                            ^
+<repo>\tests\numerics\eigen_full_test.cpp:377:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  377 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:377:29: note: make conversion explicit to silence this warning
+  377 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:377:29: note: perform multiplication in a wider type
+  377 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:379:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  379 |     Scales scales{n};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:388:19: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  388 |     root_matching(v->eigenvalues, oracle);
+      |                   ^
+<repo>\tests\numerics\eigen_full_test.cpp:395:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  395 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:395:29: note: make conversion explicit to silence this warning
+  395 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:395:29: note: perform multiplication in a wider type
+  395 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:398:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  398 |     Scales scales{2};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:411:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  411 |     CHECK(timings->preparation.calls == 1);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:412:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  412 |     CHECK(timings->backend.calls == 1);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:413:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  413 |     CHECK(timings->qualification.calls == 1);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:418:21: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  418 |          {std::pair{ov->eigenvalues, iv->eigenvalues}, std::pair{ov->right, iv->right},
+      |                     ^~
+<repo>\tests\numerics\eigen_full_test.cpp:418:38: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  418 |          {std::pair{ov->eigenvalues, iv->eigenvalues}, std::pair{ov->right, iv->right},
+      |                                      ^~
+<repo>\tests\numerics\eigen_full_test.cpp:418:66: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  418 |          {std::pair{ov->eigenvalues, iv->eigenvalues}, std::pair{ov->right, iv->right},
+      |                                                                  ^~
+<repo>\tests\numerics\eigen_full_test.cpp:418:77: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  418 |          {std::pair{ov->eigenvalues, iv->eigenvalues}, std::pair{ov->right, iv->right},
+      |                                                                             ^~
+<repo>\tests\numerics\eigen_full_test.cpp:419:21: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  419 |           std::pair{ov->triangular, iv->triangular}}) {
+      |                     ^~
+<repo>\tests\numerics\eigen_full_test.cpp:419:37: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  419 |           std::pair{ov->triangular, iv->triangular}}) {
+      |                                     ^~
+<repo>\tests\numerics\eigen_full_test.cpp:437:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  437 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:437:29: note: make conversion explicit to silence this warning
+  437 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:437:29: note: perform multiplication in a wider type
+  437 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:440:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  440 |     Scales scales{2};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:472:12: error: constructor does not initialize these fields: da, db [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  472 |     struct Entry {
+      |            ^
+  473 |         Complex a;
+  474 |         double da;
+      |                  
+      |                  {}
+  475 |         Complex b;
+  476 |         double db;
+      |                  
+      |                  {}
+<repo>\tests\numerics\eigen_full_test.cpp:503:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  503 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:503:29: note: make conversion explicit to silence this warning
+  503 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:503:29: note: perform multiplication in a wider type
+  503 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:506:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  506 |     Scales scales{2};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:513:9: error: variable 'req' of type 'FullClusterRequest' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  513 |         FullClusterRequest req{request(core::NumericalGeneration{43}), {0, 0}, left};
+      |         ^
+      |                            const 
+<repo>\tests\numerics\eigen_full_test.cpp:518:15: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  518 |         CHECK(view->left_requested == left);
+      |               ^
+<repo>\tests\numerics\eigen_full_test.cpp:525:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  525 |     CHECK(metadata->eigenvalue_scale == 1);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:526:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  526 |     CHECK(metadata->components[0] == 1);
+      |           ^
+<repo>\tests\numerics\eigen_full_test.cpp:529:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  529 |     CHECK(full->limits()->maximum_results == 96);
+      |           ^
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~
+<repo>\tests\numerics\eigen_full_test.cpp:537:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  537 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:537:29: note: make conversion explicit to silence this warning
+  537 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:537:29: note: perform multiplication in a wider type
+  537 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:540:5: error: variable 'scales' of type 'Scales' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  540 |     Scales scales{3};
+      |     ^
+      |            const 
+<repo>\tests\numerics\eigen_full_test.cpp:546:5: error: variable 'wanted' of type 'FullClusterRequest' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  546 |     FullClusterRequest wanted{request(core::NumericalGeneration{43}), {1e-12, 1e-12}, true};
+      |     ^
+      |                        const 
+<repo>\tests\numerics\eigen_full_test.cpp:557:22: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  557 |                 r += view->right[i + 3 * k] * std::conj(view->right[j + 3 * k]);
+      |                      ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:557:57: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  557 |                 r += view->right[i + 3 * k] * std::conj(view->right[j + 3 * k]);
+      |                                                         ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:558:22: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  558 |                 l += view->left[i + 3 * k] * std::conj(view->left[j + 3 * k]);
+      |                      ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:558:56: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  558 |                 l += view->left[i + 3 * k] * std::conj(view->left[j + 3 * k]);
+      |                                                        ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:566:29: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  566 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^
+<repo>\tests\numerics\eigen_full_test.cpp:566:29: note: make conversion explicit to silence this warning
+  566 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~~~~~~~~
+      |                             static_cast<std::uint64_t>( )
+<repo>\tests\numerics\eigen_full_test.cpp:566:29: note: perform multiplication in a wider type
+  566 |     core::ResourcePlan plan{64 * 1024 * 1024};
+      |                             ^~~~~~~~~
+      |                             static_cast<long long>( )
+<repo>\tests\numerics\eigen_full_test.cpp:576:5: error: variable 'wanted' of type 'FullPairRequest' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  576 |     FullPairRequest wanted{request(core::NumericalGeneration{43}),
+      |     ^
+      |                     const 
+<repo>\tests\numerics\eigen_full_test.cpp:576:28: error: slicing object from type 'FullRequest' to 'FullOutputRequest' discards 80 bytes of state [cppcoreguidelines-slicing,-warnings-as-errors]
+  576 |     FullPairRequest wanted{request(core::NumericalGeneration{43}),
+      |                            ^
+<repo>\tests\numerics\eigen_full_test.cpp:590:40: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  590 |             const auto values = left ? view->left : view->right;
+      |                                        ^~~~
+<repo>\tests\numerics\eigen_full_test.cpp:590:53: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  590 |             const auto values = left ? view->left : view->right;
+      |                                                     ^~~~

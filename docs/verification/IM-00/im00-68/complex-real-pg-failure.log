@@ -1,0 +1,21 @@
+Randomness seeded to: 1490283616
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_numerics_eigen_full.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Full PG24 roots use the frozen original P and independent SciPy spectrum
+-------------------------------------------------------------------------------
+<repo>\tests\numerics\eigen_full_test.cpp(379)
+...............................................................................
+
+<repo>\tests\numerics\eigen_full_test.cpp(406): FAILED:
+explicitly with messages:
+  result.error().cause.code := '\t'
+  PG24 full spectrum failed
+
+===============================================================================
+test cases:  13 |  12 passed | 1 failed
+assertions: 286 | 285 passed | 1 failed
+

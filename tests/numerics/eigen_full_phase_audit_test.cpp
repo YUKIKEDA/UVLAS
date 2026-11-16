@@ -5,7 +5,7 @@
 
 #include <limits>
 TEST_CASE("Full exact phase comparisons allocate no heap even at extreme exponents",
-          "[property][N4-07][N4-09]") {
+          "[property][N4-07][N4-09][EIG-04][EIG-11][EIG-13]") {
     namespace d = uvlas::numerics::eigen::detail;
     namespace t = uvlas::test_support;
     using uvlas::numerics::eigen::PairSide;

@@ -32,6 +32,10 @@ endforeach()
 
 # QA-04: results must equal the baseline of this platform bit for bit.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
+add_test(NAME tools.trace
+    COMMAND "${Python3_EXECUTABLE}" -m unittest tools.qa.trace_test)
+set_tests_properties(tools.trace PROPERTIES TIMEOUT 30 LABELS "unit;verification"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" ENVIRONMENT "PYTHONUTF8=1")
 add_test(NAME qa.numeric_canary
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
         --case numeric-canary --run "$<TARGET_FILE:uvlas_numeric_canary>")
