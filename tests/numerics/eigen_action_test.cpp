@@ -512,3 +512,26 @@ TEST_CASE("Eigen original coefficient representation is validated independently 
     CHECK(provider.validations == 1);
     CHECK(provider.calls == 0);
 }
+
+TEST_CASE("Eigen capability metadata state changes reject before charging an action",
+          "[negative][N4-07][N4-08][N4-09]") {
+    Provider<double> provider;
+    auto session = ActionSession<double>::make(provider, ample);
+    REQUIRE(session);
+    provider.metadata_site = 2;
+    provider.metadata_hook = [&] {
+        provider.identity.transformation = core::NumericalGeneration{94};
+    };
+    const std::array high{1.0, 2.0};
+    const auto input = WordView<double>::make(high, {}, core::Precision::Binary64);
+    REQUIRE(input);
+    std::array<double, 2> out{}, tail{}, error{};
+    const auto failed = session->apply(provider, ActionKind::Forward, *input, out, tail, error);
+    REQUIRE_FALSE(failed);
+    CHECK(failed.error().cause.code == core::FailureCode::StaleGeneration);
+    CHECK(failed.error().cause.operation == core::Operation::ExtractEigen);
+    CHECK(failed.error().diagnostics.forward_applications == 0);
+    CHECK(provider.calls == 0);
+    CHECK(out == std::array{0.0, 0.0});
+    CHECK(session->first_failure() == failed.error());
+}
