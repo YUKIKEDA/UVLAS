@@ -1,0 +1,186 @@
+{
+  "schema": "uvlas.precision-system-export-verification/1",
+  "scope": "Isolated one-case reference regeneration and standard-library exporter guards; no product full-system acceptance claim.",
+  "fixture": {
+    "path": "tests/numerics/fixtures/precision-4096-system-v1.json",
+    "sha256": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+    "bytes": 1733427,
+    "array_payload_bytes": 851976,
+    "observations": 39
+  },
+  "current_tool_sources": {
+    "tools/qa/export_precision_system.py": "4dd290af53f2d681f46177a081054ac37364bab88c2fceebc54a2833a2506523",
+    "tools/qa/export_precision_system_test.py": "5a82fc1844e823944851366e3a1a24ddf994bb910af059d61208c0162bd7218d"
+  },
+  "frozen_numerical_sources": [
+    {
+      "id": "check_aerogrid_geometry",
+      "sha256": "260436bdca8d1e5ddacbd772a171f98290b07be7f58a649eb7dc06522f408617",
+      "hint": "rd/aero/kernel/experiments/check_aerogrid_geometry.py"
+    },
+    {
+      "id": "check_q9_curved_load",
+      "sha256": "056449d4f57caf9fa9f5dd33179c49e055f0efd1a5ee96189753a8767bd1865b",
+      "hint": "rd/structure/main-shell/q9-curved/experiments/check_q9_curved_load.py"
+    },
+    {
+      "id": "check_q9_independent_load",
+      "sha256": "eb67ad6582aabd2b650521818b3159f036d4512e8e7e15d7928c2bf3918aba96",
+      "hint": "rd/structure/main-shell/q9-plate/experiments/check_q9_independent_load.py"
+    },
+    {
+      "id": "check_q9_interface_reparameterization",
+      "sha256": "becc74504f8d45f769a0a4e66c6f9cca28360ee97fcc7662e14bdd4a5fa9088c",
+      "hint": "rd/structure/main-shell/q9-plate/experiments/check_q9_interface_reparameterization.py"
+    },
+    {
+      "id": "check_q9_plate_convergence",
+      "sha256": "edfc85028ac340326f5a16c3b4beb567d2f084a6a89c1e4ab7296f4dd6068ab1",
+      "hint": "rd/structure/main-shell/q9-plate/experiments/check_q9_plate_convergence.py"
+    },
+    {
+      "id": "check_uvlm_bound_grading",
+      "sha256": "cda7518d4e3458ebd9f9cec94021c9f89ed1f5ac1f2a15560e5daf2f177fc638",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_bound_grading.py"
+    },
+    {
+      "id": "check_uvlm_column_update",
+      "sha256": "937a55f74e2c53b70251ea7e07f21620ffb8ce4d07b5666ebbc079a89a8d526b",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_column_update.py"
+    },
+    {
+      "id": "check_uvlm_graded_wake_pressure",
+      "sha256": "24c6a216f8e46370727904b5ccc91b7bdc2595035124c355472c3c3c24fa1826",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_graded_wake_pressure.py"
+    },
+    {
+      "id": "check_uvlm_harmonic_heave",
+      "sha256": "1f2b41839d49d15d00156083d89c085e37fa90703034b7eedaf825a29ccc3714",
+      "hint": "rd/aero/unsteady-reference/experiments/check_uvlm_harmonic_heave.py"
+    },
+    {
+      "id": "check_uvlm_local_pressure_pitch",
+      "sha256": "231e09154f71cc0415c2be27e9bbc48758d8a44de4b336ed3cfbf5f3a34f0a45",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_local_pressure_pitch.py"
+    },
+    {
+      "id": "check_uvlm_local_pressure_refinement",
+      "sha256": "b90b57d686a72e531de595157dbfab4257b124bfc43b3da0f1aed340ff782e8f",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_local_pressure_refinement.py"
+    },
+    {
+      "id": "check_uvlm_residual_trace",
+      "sha256": "95844655e031916095537b956df6c4fd400bf1ad7d4575fc1f85c9feda713895",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_residual_trace.py"
+    },
+    {
+      "id": "check_uvlm_trailing_edge",
+      "sha256": "9a7d1faf4a9345402f3df11ba34929b82f68ff73ae2abe6d56ae9f19b4f4f9c9",
+      "hint": "rd/aero/wake-loads/experiments/check_uvlm_trailing_edge.py"
+    },
+    {
+      "id": "check_vortex_core_load",
+      "sha256": "7c139bfb2e239132eb02fa43979b312f4126f44c88bb93a4d32860b5c7b2d616",
+      "hint": "rd/aero/kernel/experiments/check_vortex_core_load.py"
+    },
+    {
+      "id": "rd_paths",
+      "sha256": "4dc68188b2ff18d706540110a50a5bb7ae2d34ae7c552eb61ac36f0313d6e1f2",
+      "hint": "rd/rd_paths.py"
+    }
+  ],
+  "dependencies": {
+    "python": "3.12 (uv request)",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "scikit-fem": "12.0.2"
+  },
+  "commands": {
+    "probe": "out/python-env/Scripts/python.exe -X utf8 tools/qa/export_precision_system.py --probe",
+    "export": "out/python-env/Scripts/python.exe -X utf8 tools/qa/export_precision_system.py --output tests/numerics/fixtures/precision-4096-system-v1.json",
+    "unit": "out/python-env/Scripts/python.exe -X utf8 tools/qa/export_precision_system_test.py",
+    "ruff_check": "uvx ruff@0.17.4 check tools/qa/export_precision_system.py tools/qa/export_precision_system_test.py",
+    "ruff_format": "uvx ruff@0.17.4 format tools/qa/export_precision_system.py tools/qa/export_precision_system_test.py",
+    "pyright": "uvx pyright@1.1.408 tools/qa/export_precision_system.py tools/qa/export_precision_system_test.py"
+  },
+  "generation": {
+    "cases": 1,
+    "m": 4096,
+    "k": 0.1,
+    "elapsed_seconds": 59.828000000008615,
+    "peak_working_set_bytes": 394067968,
+    "limits": {
+      "seconds": 300,
+      "peak_working_set_bytes": 536870912,
+      "outer_timeout_seconds": 320
+    },
+    "base_effective_rhs_hashes_equal_frozen": true,
+    "original_rd_all_files_before_after_equal": true,
+    "source_copy_only": true,
+    "original_main_or_sweep_called": false,
+    "max_regenerated_observation_difference": 0.0
+  },
+  "source_timing": {
+    "description": "The numerical export ran before final wrapper guard/format edits and before correction of the observation-budget metadata. Frozen numerical imports and array bytes were verified against the final fixture. The final tool-source hashes identify the unit/static/guard checks, not an unrecorded repeat of generation.",
+    "post_generation_changes": [
+      "qualification.observation_budget changed from 1e-11 to the already adopted observation-transfer budget 1e-8",
+      "frozen generator/dependency hash checks added before subprocess",
+      "Python formatting only"
+    ],
+    "numerical_generation_repeated": false
+  },
+  "metadata_correction": {
+    "private_raw_preserved": true,
+    "original_fixture_sha256": "fb8b8336a445cd6d61e1c9ef6b244559bf8ae545b3ddf7be42223992b9433103",
+    "field": "qualification.observation_budget",
+    "before": 1e-11,
+    "after": 1e-08,
+    "all_other_json_values_equal": true
+  },
+  "unit": {
+    "tests": 8,
+    "exit": 0,
+    "saved_raw": "exporter-unit-control.log",
+    "source": "same final tool/test bytes as the guard control"
+  },
+  "static": {
+    "ruff_check_exit": 0,
+    "ruff_format_exit": 0,
+    "pyright_exit": 0,
+    "diagnostics": 0,
+    "raw_saved": false,
+    "provenance": "Executed locally; console results reported to the integration owner. No raw log is retroactively fabricated."
+  },
+  "guard_mutations": {
+    "cases": [
+      {
+        "name": "control",
+        "exit": 0,
+        "log_sha256": "923bb7d3aaf9abe993a1b8a64557a846081a4a9c729751806f0b551da3e10b52"
+      },
+      {
+        "name": "frozen-hash-guard-removed",
+        "exit": 1,
+        "log_sha256": "46c2f203046ea11351378d74e9c21b322893847155072295019a933ae3a42ce3"
+      },
+      {
+        "name": "race-overwrite-enabled",
+        "exit": 1,
+        "log_sha256": "684ec9ef9bb1bf3f7c5504cbcc219f7edb9a53e4989896408aad3b18ef8c8d74"
+      }
+    ],
+    "control_exit": 0,
+    "mutant_execution_exit": 1,
+    "mutants": 2,
+    "copy_only": true,
+    "numerical_child_executed": false,
+    "report": "exporter-guard-summary.json"
+  },
+  "redaction": "exporter-redaction.json",
+  "not_claimed": [
+    "Product solver acceptance; separate full-system tests are pending.",
+    "Linux numerical execution.",
+    "Exact final-wrapper execution during reference generation.",
+    "Performance or practical-use qualification."
+  ]
+}

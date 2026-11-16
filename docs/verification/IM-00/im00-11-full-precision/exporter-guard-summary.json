@@ -1,0 +1,22 @@
+{
+  "source_sha256": "4dd290af53f2d681f46177a081054ac37364bab88c2fceebc54a2833a2506523",
+  "test_sha256": "5a82fc1844e823944851366e3a1a24ddf994bb910af059d61208c0162bd7218d",
+  "cases": [
+    {
+      "name": "control",
+      "exit": 0,
+      "log_sha256": "923bb7d3aaf9abe993a1b8a64557a846081a4a9c729751806f0b551da3e10b52"
+    },
+    {
+      "name": "frozen-hash-guard-removed",
+      "exit": 1,
+      "log_sha256": "46c2f203046ea11351378d74e9c21b322893847155072295019a933ae3a42ce3"
+    },
+    {
+      "name": "race-overwrite-enabled",
+      "exit": 1,
+      "log_sha256": "684ec9ef9bb1bf3f7c5504cbcc219f7edb9a53e4989896408aad3b18ef8c8d74"
+    }
+  ],
+  "scope": "Standard-library exporter guards only; no numerical subprocess executed"
+}

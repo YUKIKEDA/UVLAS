@@ -1,0 +1,36 @@
+F.FF....
+======================================================================
+FAIL: test_altered_original_rejected_before_copy_or_child (__main__.ExportSystemGuardTest.test_altered_original_rejected_before_copy_or_child)
+----------------------------------------------------------------------
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<workspace>\out\issue15-precision-system-export\guard-mutations\frozen-hash-guard-removed\export_precision_system_test.py", line 51, in test_altered_original_rejected_before_copy_or_child
+    self.assertRaisesRegex(ValueError, "Frozen input hash mismatch"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Frozen input hash mismatch" does not match "Expecting value: line 1 column 1 (char 0)"
+
+======================================================================
+FAIL: test_frozen_source_content_cannot_change_with_record_unchanged (__main__.ExportSystemGuardTest.test_frozen_source_content_cannot_change_with_record_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<workspace>\out\issue15-precision-system-export\guard-mutations\frozen-hash-guard-removed\export_precision_system_test.py", line 115, in test_frozen_source_content_cannot_change_with_record_unchanged
+    with self.assertRaisesRegex(ValueError, "Frozen input hash mismatch"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_hash_guard_accepts_exact_bytes_and_refuses_changed_bytes (__main__.ExportSystemGuardTest.test_hash_guard_accepts_exact_bytes_and_refuses_changed_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<workspace>\out\issue15-precision-system-export\guard-mutations\frozen-hash-guard-removed\export_precision_system_test.py", line 65, in test_hash_guard_accepts_exact_bytes_and_refuses_changed_bytes
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.031s
+
+FAILED (failures=3)

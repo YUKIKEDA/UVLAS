@@ -145,6 +145,21 @@ add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
 
+add_test(NAME tools.precision_system_export
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_system_test.py")
+set_tests_properties(tools.precision_system_export PROPERTIES TIMEOUT 30 LABELS "unit;negative"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" ENVIRONMENT "PYTHONUTF8=1")
+
+configure_file(numerics/fixtures/precision-4096-system-v1.json
+    "${CMAKE_CURRENT_BINARY_DIR}/precision-4096-system-v1.json" COPYONLY)
+uvlas_add_test(numerics.foundation_precision_system
+    LABELS capacity integration verification negative
+    SOURCES numerics/foundation_precision_system_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision Boost::hash2 nlohmann_json::nlohmann_json
+    TIMEOUT 1200)
+target_compile_definitions(uvlas_test_numerics_foundation_precision_system PRIVATE
+    UVLAS_FULL_PRECISION_FIXTURE="${CMAKE_CURRENT_BINARY_DIR}/precision-4096-system-v1.json")
+
 uvlas_add_test(numerics.linear_validation
     LABELS unit negative verification
     SOURCES numerics/linear_validation_test.cpp
