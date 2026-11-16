@@ -216,6 +216,22 @@ uvlas_add_test(numerics.precision
 target_compile_definitions(uvlas_test_numerics_precision PRIVATE
     UVLAS_PRECISION_WITNESS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/precision-4096-row-v1.json")
 
+uvlas_add_test(structure.exact_polynomial
+    LABELS unit property negative verification V-PG
+    SOURCES structure/exact_polynomial_test.cpp
+    LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_exact_polynomial
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_exact_polynomial PRIVATE
+    UVLAS_EXACT_POLYNOMIAL_FIXTURE=\"${PROJECT_SOURCE_DIR}/tests/structure/fixtures/exact-polynomial-v1.json\")
+
+uvlas_add_test(structure.exact_polynomial_resources
+    LABELS property negative verification
+    SOURCES structure/exact_polynomial_resource_test.cpp
+    LIBS uvlas_structure_audit)
+uvlas_enable_allocation_audit(uvlas_test_structure_exact_polynomial_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_exact_polynomial_resources)
+
 uvlas_add_test(numerics.storage LABELS unit negative
     SOURCES numerics/storage_test.cpp LIBS uvlas_numerics)
 uvlas_add_test(numerics.eigen_views LABELS integration negative
