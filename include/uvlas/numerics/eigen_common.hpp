@@ -10,6 +10,7 @@
 #include <new>
 #include <optional>
 #include <span>
+#include <type_traits>
 #include <utility>
 #include <uvlas/numerics/linear_solve.hpp>
 #include <variant>
@@ -73,7 +74,9 @@ using BackwardRequirement = std::variant<NotRequested, MetricRequirement>;
 
 /// Convert allocation/backend exceptions to an owned failure at a synchronous entry boundary.
 /// A returned failure retains its operation and known diagnostics; context only fills gaps.
+/// The callable returns eigen::Result<T>; adapt a core::Result with complete_failure first.
 template <class T, class Function>
+    requires std::same_as<std::invoke_result_t<Function>, Result<T>>
 [[nodiscard]] Result<T> guard_entry(const Context& context, StateDiagnosticContext state,
                                     const AttemptDiagnostics& diagnostics,
                                     Function&& function) noexcept {
