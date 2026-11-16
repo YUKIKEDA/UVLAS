@@ -1,0 +1,19 @@
+{
+  "schema": "uvlas.precision-system-export-check/1",
+  "fixture_sha256": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+  "fixture_bytes": 1733427,
+  "array_bytes": 851976,
+  "array_count": 10,
+  "observations": 39,
+  "source_hashes_verified": 15,
+  "frozen_generator_and_dependencies_verified": true,
+  "original_rd_before_after_hashes_equal": true,
+  "metadata_only_correction": {
+    "field": "qualification.observation_budget",
+    "before": 1e-11,
+    "after": 1e-08,
+    "all_other_json_values_equal": true
+  },
+  "max_regenerated_observation_difference": 0.0,
+  "numerical_regeneration_repeated": false
+}

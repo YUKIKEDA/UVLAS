@@ -1,10 +1,11 @@
 find_package(Catch2 3 CONFIG REQUIRED)
 
-# uvlas_add_test(<name> LABELS <label>... SOURCES <file>... [LIBS <target>...] [TIMEOUT <s>])
+# uvlas_add_test(<name> LABELS <label>... SOURCES <file>... [LIBS <target>...]
+#                [TIMEOUT <s>] [CONFIGURATIONS <configuration>...])
 # One executable is one CTest test. Labels: unit | property | integration |
 # verification | negative, plus the acceptance case it serves (for example V-PG).
 function(uvlas_add_test name)
-    cmake_parse_arguments(arg "" "TIMEOUT" "LABELS;SOURCES;LIBS" ${ARGN})
+    cmake_parse_arguments(arg "" "TIMEOUT" "LABELS;SOURCES;LIBS;CONFIGURATIONS" ${ARGN})
     if(NOT arg_LABELS OR NOT arg_SOURCES)
         message(FATAL_ERROR "uvlas_add_test(${name}) needs LABELS and SOURCES")
     endif()
@@ -12,7 +13,17 @@ function(uvlas_add_test name)
     add_executable(${target} ${arg_SOURCES})
     uvlas_configure_target(${target})
     target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain ${arg_LIBS})
-    add_test(NAME ${name} COMMAND ${target})
+    set(configuration_args)
+    if(arg_CONFIGURATIONS)
+        if(CMAKE_CONFIGURATION_TYPES)
+            list(APPEND configuration_args CONFIGURATIONS ${arg_CONFIGURATIONS})
+        elseif(NOT CMAKE_BUILD_TYPE IN_LIST arg_CONFIGURATIONS)
+            return()
+        endif()
+    endif()
+    # Single-config CTest normally has no -C argument. CONFIGURATIONS there
+    # would silently omit even the matching Release test; select at configure time.
+    add_test(NAME ${name} COMMAND ${target} ${configuration_args})
     if(NOT arg_TIMEOUT)
         set(arg_TIMEOUT 60)
     endif()
@@ -144,6 +155,28 @@ uvlas_add_test(core.state
 add_test(NAME tools.precision_witness_export
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_witness_test.py")
 set_tests_properties(tools.precision_witness_export PROPERTIES TIMEOUT 10 LABELS "unit;negative")
+
+add_test(NAME tools.precision_system_export
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/export_precision_system_test.py")
+set_tests_properties(tools.precision_system_export PROPERTIES TIMEOUT 30 LABELS "unit;negative"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" ENVIRONMENT "PYTHONUTF8=1")
+
+configure_file(numerics/fixtures/precision-4096-system-v1.json
+    "${CMAKE_CURRENT_BINARY_DIR}/precision-4096-system-v1.json" COPYONLY)
+uvlas_add_test(numerics.full_precision_control
+    LABELS unit verification negative
+    SOURCES numerics/full_precision_control_test.cpp
+    LIBS Boost::multiprecision Boost::hash2 nlohmann_json::nlohmann_json)
+target_compile_definitions(uvlas_test_numerics_full_precision_control PRIVATE
+    UVLAS_FULL_PRECISION_FIXTURE="${CMAKE_CURRENT_BINARY_DIR}/precision-4096-system-v1.json")
+uvlas_add_test(numerics.foundation_precision_system
+    LABELS capacity integration verification negative
+    SOURCES numerics/foundation_precision_system_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision Boost::hash2 nlohmann_json::nlohmann_json
+    CONFIGURATIONS Release
+    TIMEOUT 3600)
+target_compile_definitions(uvlas_test_numerics_foundation_precision_system PRIVATE
+    UVLAS_FULL_PRECISION_FIXTURE="${CMAKE_CURRENT_BINARY_DIR}/precision-4096-system-v1.json")
 
 uvlas_add_test(numerics.linear_validation
     LABELS unit negative verification

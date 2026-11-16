@@ -64,4 +64,4 @@ $$
 | cache・所有・失敗 | 別担当のdense_contract試験。入力破棄後の結果、同世代書換え、fingerprint、再判定、move、例外・再入 |
 | 確保 | 全使用TUを監査設定でcompile。監査の実DensePrepared・2RHS・required_checks空の8経路と、複素UpdatedPrepared・rank1・投影有無の2経路で、公開solve全体のC++確保数は予定出力8／投影9、Eigen確保は禁止。これは区間kernelの0確保を直接測った主張とは区別する |
 
-小規模試験とkernel計測は、この基準部品の実装確認である。実4096系の製品認定、実翼の全体系、48GiB・12時間の実務性能はそれぞれIM00-11、対応する物理kernel・連成のIM-03等、実務受入のIM-07で扱う。
+小規模試験とkernel計測は、この基準部品の実装確認である。実4096系の製品認定、実翼の全体系、48GiB・12時間の実務性能はそれぞれIM00-11、対応する物理kernel・連成のIM-03等、実務受入のIM-07で扱う。IM00-11の全行・全3右辺の製品求解と必要観測の条件は、[実4096系の数値基盤検証](full-precision-system-contract.md)に定める。

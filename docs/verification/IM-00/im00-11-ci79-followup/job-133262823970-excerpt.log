@@ -1,0 +1,14 @@
+build and test (windows, msvc)	Run actions/checkout@v7	2026-11-16T11:19:41.2167806Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +9c60f41746525fe61358f037d201144d35514000:refs/remotes/pull/79/merge
+build and test (windows, msvc)	Run actions/checkout@v7	2026-11-16T11:19:43.6617156Z  * [new ref]         9c60f41746525fe61358f037d201144d35514000 -> pull/79/merge
+build and test (windows, msvc)	Run actions/checkout@v7	2026-11-16T11:19:44.4402384Z HEAD is now at 9c60f41 Merge fc9776fb3f84b01d7383b8ecabe605973541df99 into 1a3c98f40030aa1ef492219669a32584a110ff7c
+build and test (windows, msvc)	Run actions/checkout@v7	2026-11-16T11:19:44.5278824Z 9c60f41746525fe61358f037d201144d35514000
+build and test (windows, msvc)	Test Debug	﻿2026-11-16T11:24:36.4610791Z ##[group]Run pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-debug -R $env:CI_TEST_REGEX
+build and test (windows, msvc)	Test Debug	2026-11-16T11:24:38.6090844Z Test project <checkout>/out/build/windows-msvc
+build and test (windows, msvc)	Test Debug	2026-11-16T11:25:50.9795806Z 100% tests passed out of 67
+build and test (windows, msvc)	Test Debug	2026-11-16T11:25:50.9799322Z Total Test time (real) =  72.37 sec
+build and test (windows, msvc)	Test Release	﻿2026-11-16T11:31:04.4853653Z ##[group]Run pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --preset windows-release -R $env:CI_TEST_REGEX
+build and test (windows, msvc)	Test Release	2026-11-16T11:31:05.8949184Z Test project <checkout>/out/build/windows-msvc
+build and test (windows, msvc)	Test Release	2026-11-16T11:31:47.1425820Z       Start 28: numerics.foundation_precision_system
+build and test (windows, msvc)	Test Release	2026-11-16T11:34:31.3095725Z 28/68 Test #28: numerics.foundation_precision_system ...   Passed  164.17 sec
+build and test (windows, msvc)	Test Release	2026-11-16T11:34:45.5027022Z 100% tests passed out of 68
+build and test (windows, msvc)	Test Release	2026-11-16T11:34:45.5029817Z Total Test time (real) = 219.60 sec

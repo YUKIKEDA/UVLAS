@@ -1,0 +1,315 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-10"
+  ],
+  "package": "IM-00",
+  "issue": 15,
+  "date": "2026-11-16",
+  "source_commit": "fc9776fb3f84b01d7383b8ecabe605973541df99",
+  "scope": "PR79初回CIの完了済みC++4jobsを独立に読取り、両OS Releaseの全4096系と各構成の実CTest成功を追補する。元runのRuff/aggregate失敗を成功へ置換しない。",
+  "execution_provenance": {
+    "run": 43856705878,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43856705878",
+    "event": "pull_request",
+    "head": "fc9776fb3f84b01d7383b8ecabe605973541df99",
+    "checkout_commit": "9c60f41746525fe61358f037d201144d35514000",
+    "checkout_parents": [
+      "1a3c98f40030aa1ef492219669a32584a110ff7c",
+      "fc9776fb3f84b01d7383b8ecabe605973541df99"
+    ],
+    "checkout_tree": "e4264626459f60e5e8f213f504034f98b87118c8",
+    "head_tree": "e4264626459f60e5e8f213f504034f98b87118c8",
+    "checkout_tree_equals_head_tree": true,
+    "current_cpp_test_sources_equal_head": true,
+    "retrieval": "Completed-job logs downloaded once; no CI waiting, dispatch, or numerical re-execution."
+  },
+  "cpp_jobs": [
+    {
+      "job": 133262823970,
+      "name": "build and test (windows, msvc)",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43856705878/job/133262823970",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-16T11:19:36Z",
+      "completed_at": "2026-11-16T11:34:53Z",
+      "steps": [
+        {
+          "name": "Test Debug",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test Release",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job": 133262823976,
+      "name": "build and test (linux, gcc 14, linux-sanitize)",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43856705878/job/133262823976",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-16T11:19:36Z",
+      "completed_at": "2026-11-16T11:27:09Z",
+      "steps": [
+        {
+          "name": "Configure, build, test",
+          "conclusion": "success"
+        },
+        {
+          "name": "clang-tidy",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "job": 133262824055,
+      "name": "build and test (linux, gcc 14, linux-release)",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43856705878/job/133262824055",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-16T11:19:36Z",
+      "completed_at": "2026-11-16T11:33:01Z",
+      "steps": [
+        {
+          "name": "Configure, build, test",
+          "conclusion": "success"
+        },
+        {
+          "name": "clang-tidy",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "job": 133262824141,
+      "name": "build and test (linux, gcc 14, linux-debug)",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43856705878/job/133262824141",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-16T11:19:36Z",
+      "completed_at": "2026-11-16T11:45:22Z",
+      "steps": [
+        {
+          "name": "Configure, build, test",
+          "conclusion": "success"
+        },
+        {
+          "name": "clang-tidy",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "ctest": {
+    "windows_debug": {
+      "tests": 67,
+      "passed": 67,
+      "failed": 0,
+      "total_seconds": 72.37,
+      "full4096_registered": false
+    },
+    "windows_release": {
+      "tests": 68,
+      "passed": 68,
+      "failed": 0,
+      "total_seconds": 219.6,
+      "full4096": {
+        "name": "numerics.foundation_precision_system",
+        "test_number": 28,
+        "result": "Passed",
+        "seconds": 164.17
+      }
+    },
+    "linux_debug": {
+      "tests": 66,
+      "passed": 66,
+      "failed": 0,
+      "total_seconds": 26.68,
+      "full4096_registered": false,
+      "clang_tidy": "success"
+    },
+    "linux_release": {
+      "tests": 67,
+      "passed": 67,
+      "failed": 0,
+      "total_seconds": 552.29,
+      "full4096": {
+        "name": "numerics.foundation_precision_system",
+        "test_number": 28,
+        "result": "Passed",
+        "seconds": 537.76
+      }
+    },
+    "linux_sanitize": {
+      "tests": 66,
+      "passed": 66,
+      "failed": 0,
+      "total_seconds": 44.7,
+      "full4096_registered": false
+    }
+  },
+  "full4096_scope": "通常登録の単一Release targetがWindows/Linuxとも最後までPassed。製品3列、参照保持/実投影、39必要観測、親/既存解不変を含む2case。成功ログにCatch assertion数や各列のraw数値は出力されていないため、その値を推定して足さない。Debug/sanitizeには全系の実行成功を主張しない。",
+  "original_run_failure": {
+    "run_conclusion": "failure",
+    "checks_job": 133262824073,
+    "checks_url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43856705878/job/133262824073",
+    "checks_conclusion": "failure",
+    "ruff_errors": 22,
+    "reason": "Ruff selected frozen Python evidence under docs/verification/IM-00/im00-70.",
+    "aggregate_job": 133275826125,
+    "aggregate_conclusion": "failure",
+    "fixed_in_this_record": false,
+    "subsequent_configuration_fix": "The local correction is recorded separately below; the original run and aggregate remain failure. No corrected-head CI result is asserted.",
+    "ruff_configuration": {
+      "commit": "fc9776fb3f84b01d7383b8ecabe605973541df99",
+      "path_hint": "ruff.toml",
+      "sha256": "4c40ed732731de43b1771f2429f8a2332c61e4346868f0d2775b55eda80d4c71",
+      "historical_only": true
+    }
+  },
+  "history": "初回ローカル1200秒timeoutとfiltered参照追実行の記録は不変に残す。この新CIはその後の独立した両OS Release全target実行であり、旧fragmentを合成した成功ではない。",
+  "sources": {
+    "tests/numerics/foundation_precision_system_test.cpp": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+    "tests/numerics/full_precision_control_test.cpp": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+    "tests/numerics/full_precision_fixture.hpp": "7a8a2b9bbd34d764458e87cbf02afb2a30047e8ebcb88dc0c04b797ede8ad38c",
+    "tests/numerics/full_precision_oracle.hpp": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+    "tests/CMakeLists.txt": "ffe9090391ad0780d0e3858b4449f59100c42d51762372b96338741e641b7a03",
+    "ruff.toml": "e561b1b873a67c7dbeefcba8ee72f9c003cb36d057d07563188ccad01141a1ec"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-11-ci79-followup/job-133262823970-excerpt.log": "94c8fd2bc1b52512e531a4021f22d4e7cb27e14668b4e2970b69a9c90c4e7038",
+    "docs/verification/IM-00/im00-11-ci79-followup/job-133262823976-excerpt.log": "20115463d2c079cd3c19dbc0ba15ff3771448f1a5f21fb2dd3e4f41b42a012ce",
+    "docs/verification/IM-00/im00-11-ci79-followup/job-133262824055-excerpt.log": "9ab2dd68b352dfd35b92c8a1c9d83537eedc1966afe944e57fc4d2fbf44eebb7",
+    "docs/verification/IM-00/im00-11-ci79-followup/job-133262824141-excerpt.log": "13aa0a7f8d6605e8603999b5c0e57c49e880998448e84ae96bc0ffdebb905737",
+    "docs/verification/IM-00/im00-11-ci79-followup/ruff-original-failure-excerpt.log": "0fd7f704879c5df3c0002c72888bff985696044746c84fecc035464144256c14",
+    "docs/verification/IM-00/im00-11-ci79-followup/run.json": "132a05d6530336144274745860f69c87ba32edfda8b58005a246537e3a6eef0b",
+    "docs/verification/IM-00/im00-11-ci79-followup/checkout-commit.json": "fec511166e026fece9079c961e7371c63a530ef3fc7d38e5ef91b1ae0da97217",
+    "docs/verification/IM-00/im00-11-ci79-followup/excerpt-provenance.json": "a98912d5e2327f272a3d8af1113aceaf05b972feaa8966ed102ea70db26a9057",
+    "docs/verification/IM-00/im00-11-full-precision.json": "b9266f484785f1c8dbb159c8f9bd620f0d67fa6a9253003c073cf2826d1a06d7",
+    "tests/numerics/fixtures/precision-4096-system-v1.json": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee"
+  },
+  "not_claimed": [
+    "CI run全体の成功、Ruff修正後headのCI成功。",
+    "Python ownership/optional benchmarkの再検証（本runではskipped）。",
+    "物理kernel、実務規模性能、実験妥当性、全実務受入。",
+    "CI test所要時間からの製品性能認定。"
+  ],
+  "local_static_fix": {
+    "provenance": "Integration owner reported execution; this independent C++ log reviewer did not repeat the Python gate.",
+    "change": "Anchor ./docs in Ruff exclusions so frozen evidence is not selected. The active tools scope remains selected.",
+    "current_ruff_sha256": "e561b1b873a67c7dbeefcba8ee72f9c003cb36d057d07563188ccad01141a1ec",
+    "ruff_check": {
+      "command": "uvx ruff@0.17.4 check .",
+      "exit": 0
+    },
+    "ruff_format": {
+      "command": "uvx ruff@0.17.4 format --check .",
+      "exit": 0,
+      "files_already_formatted": 32
+    },
+    "pyright": {
+      "command": "uvx pyright@1.1.408",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 0,
+      "informations": 0
+    },
+    "scope": {
+      "tracked_tool_files": 18,
+      "missing_tool_files": 0,
+      "docs_selected": false,
+      "tools_rd_check_tree_selected": true
+    },
+    "cpp_reexecuted": false,
+    "corrected_head_ci_verified": false
+  },
+  "source_commit_scope": "source_commit identifies the C++/CTest execution. ruff.toml in sources is the later local-only correction identified by local_static_fix.current_ruff_sha256, not a file claimed to have run in that failed CI.",
+  "source_references": [
+    {
+      "id": "foundation_precision_system_test",
+      "sha256": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+      "hint": "tests/numerics/foundation_precision_system_test.cpp"
+    },
+    {
+      "id": "full_precision_control_test",
+      "sha256": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+      "hint": "tests/numerics/full_precision_control_test.cpp"
+    },
+    {
+      "id": "full_precision_fixture",
+      "sha256": "7a8a2b9bbd34d764458e87cbf02afb2a30047e8ebcb88dc0c04b797ede8ad38c",
+      "hint": "tests/numerics/full_precision_fixture.hpp"
+    },
+    {
+      "id": "full_precision_oracle",
+      "sha256": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+      "hint": "tests/numerics/full_precision_oracle.hpp"
+    },
+    {
+      "id": "tests-CMakeLists",
+      "sha256": "ffe9090391ad0780d0e3858b4449f59100c42d51762372b96338741e641b7a03",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "ruff",
+      "sha256": "e561b1b873a67c7dbeefcba8ee72f9c003cb36d057d07563188ccad01141a1ec",
+      "hint": "ruff.toml"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "job-133262823970-excerpt",
+      "sha256": "94c8fd2bc1b52512e531a4021f22d4e7cb27e14668b4e2970b69a9c90c4e7038",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/job-133262823970-excerpt.log"
+    },
+    {
+      "id": "job-133262823976-excerpt",
+      "sha256": "20115463d2c079cd3c19dbc0ba15ff3771448f1a5f21fb2dd3e4f41b42a012ce",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/job-133262823976-excerpt.log"
+    },
+    {
+      "id": "job-133262824055-excerpt",
+      "sha256": "9ab2dd68b352dfd35b92c8a1c9d83537eedc1966afe944e57fc4d2fbf44eebb7",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/job-133262824055-excerpt.log"
+    },
+    {
+      "id": "job-133262824141-excerpt",
+      "sha256": "13aa0a7f8d6605e8603999b5c0e57c49e880998448e84ae96bc0ffdebb905737",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/job-133262824141-excerpt.log"
+    },
+    {
+      "id": "ruff-original-failure-excerpt",
+      "sha256": "0fd7f704879c5df3c0002c72888bff985696044746c84fecc035464144256c14",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/ruff-original-failure-excerpt.log"
+    },
+    {
+      "id": "run",
+      "sha256": "132a05d6530336144274745860f69c87ba32edfda8b58005a246537e3a6eef0b",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/run.json"
+    },
+    {
+      "id": "checkout-commit",
+      "sha256": "fec511166e026fece9079c961e7371c63a530ef3fc7d38e5ef91b1ae0da97217",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/checkout-commit.json"
+    },
+    {
+      "id": "excerpt-provenance",
+      "sha256": "a98912d5e2327f272a3d8af1113aceaf05b972feaa8966ed102ea70db26a9057",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup/excerpt-provenance.json"
+    },
+    {
+      "id": "im00-11-full-precision",
+      "sha256": "b9266f484785f1c8dbb159c8f9bd620f0d67fa6a9253003c073cf2826d1a06d7",
+      "hint": "docs/verification/IM-00/im00-11-full-precision.json"
+    },
+    {
+      "id": "precision-4096-system-v1",
+      "sha256": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+      "hint": "tests/numerics/fixtures/precision-4096-system-v1.json"
+    }
+  ]
+}

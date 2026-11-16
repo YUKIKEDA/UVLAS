@@ -4,10 +4,11 @@
 # The R&D scripts under rd/ are records and are not edited, so they are not
 # linted. The skills under .agents/ and .claude/ include code that comes from
 # outside (skills-lock.json) and is kept as received.
+# Archived verification producers under docs/ are immutable evidence too.
 target-version = "py310"
 line-length = 100
 # Patterns are anchored at the repository root: a bare "rd" would also exclude tools/rd.
-extend-exclude = ["./rd", "./out", "./build", "./.agents", "./.claude"]
+extend-exclude = ["./rd", "./out", "./build", "./.agents", "./.claude", "./docs"]
 
 [lint]
 select = [

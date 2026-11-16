@@ -1,0 +1,62 @@
+{
+  "schema": "uvlas.precision-system-export-relocation/1",
+  "scope": "Resolve the existing frozen record by unique filename below rd and retain its fixed hash; historical RECORD constant is a location hint only. No numerical generation or C++ test rerun.",
+  "sources": {
+    "tools/qa/export_precision_system.py": "00119aba1d521126a30b7b64215a5ed0f88fdcb29e7a44e9ab0c5d15534294bc",
+    "tools/qa/export_precision_system_test.py": "6dbcfb924ab3bbfe33abc21604f29538b4828b41f59eeb519a283631f8c5f0e6"
+  },
+  "worker_payload_sha256": "7b59f6f2bf5bcc83260a7095e961fd674b0c8fe7bc917180d3f1b32361196299",
+  "worker_payload_equal_head": true,
+  "comparison_base_commit": "fd1cb5209933fd74ba54e97e5b9540c031e34223",
+  "fixture": {
+    "path": "tests/numerics/fixtures/precision-4096-system-v1.json",
+    "sha256": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+    "changed": false
+  },
+  "verification": {
+    "ruff_check_exit": 0,
+    "ruff_format_exit": 0,
+    "pyright_exit": 0,
+    "unit_exit": 0,
+    "unit_tests": 10,
+    "added_cases": [
+      "relocated record found and its exact hash still enforced",
+      "missing or duplicate record refused before child subprocess"
+    ],
+    "existing_source_generator_ambiguity_test_preserved": true
+  },
+  "artifacts": [
+    {
+      "path": "exporter-relocation-ruff-format.log",
+      "sha256": "6d203e0ccd3937f8faab76ea8be422f8dd0cae98330d2e9412d3a5e9ff76363b",
+      "original_sha256": "6d203e0ccd3937f8faab76ea8be422f8dd0cae98330d2e9412d3a5e9ff76363b",
+      "redaction_count": 0
+    },
+    {
+      "path": "exporter-relocation-ruff-check.log",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "original_sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "redaction_count": 0
+    },
+    {
+      "path": "exporter-relocation-pyright.log",
+      "sha256": "fb0f94accf07894a038a8c67be17c87e22e00d5a43e609f1fce444d9a6724088",
+      "original_sha256": "fb0f94accf07894a038a8c67be17c87e22e00d5a43e609f1fce444d9a6724088",
+      "redaction_count": 0
+    },
+    {
+      "path": "exporter-relocation-unit.log",
+      "sha256": "bb312fda4bd4cae8a1760f8ecc79074a04842e7cf2d93d5681c82b9f5b2e9d3b",
+      "original_sha256": "bb312fda4bd4cae8a1760f8ecc79074a04842e7cf2d93d5681c82b9f5b2e9d3b",
+      "redaction_count": 0
+    }
+  ],
+  "historical_records_unchanged": [
+    "exporter-verification.json",
+    "exporter-redaction.json",
+    "exporter-guard-summary.json"
+  ],
+  "original_raw_preserved": true,
+  "numerical_regeneration_repeated": false,
+  "product_source_changed": false
+}

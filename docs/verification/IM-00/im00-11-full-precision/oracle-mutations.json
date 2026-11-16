@@ -1,0 +1,48 @@
+{
+  "scope": "独立な全体系oracleの小literal自己試験に限定した隔離変異検査。製品の4096系を再実行した記録ではない。",
+  "environment": "Windows MSVC、/O2 /std:c++latest /fp:strict、固定Boost依存。",
+  "original_header_sha256_before": "7fef9e0f6ac9126f20769cdfaaed54fb3aba65ba711f37edbabff20e137d4b35",
+  "original_header_sha256_after": "7fef9e0f6ac9126f20769cdfaaed54fb3aba65ba711f37edbabff20e137d4b35",
+  "original_unchanged": true,
+  "runner_sha256": "e453e3f797f2d499f231ba23d4d6b1039bb077abf5b299b8a4e2f6664db49b35",
+  "runner_note": "公開用記録は個人パスを含む私有compile command/rawの内容を転載せず、その原本SHA256を保持する。実行stdout/stderrはパスを含まずbyte同一でコピーした。",
+  "cases": [
+    {
+      "id": "control",
+      "change": "固定した原本の自己試験。",
+      "header_sha256": "7fef9e0f6ac9126f20769cdfaaed54fb3aba65ba711f37edbabff20e137d4b35",
+      "probe_sha256": "d9ee8f05fc9b1c94c51c7ea1d4a938147d6a1ec2cc02aa3bb90e33fa592f503b",
+      "command_sha256": "5e29604513db6681aa4b44da5c204f1c023f47cffdc85ebac91eb04fd7a22e49",
+      "compile_log_sha256": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+      "compile_exit": 0,
+      "run_exit": 0,
+      "run_log_sha256": "a830be2a84e9a3f29d0d674ed78bad53553b7e0486296d2b4633bffe428d2cb1",
+      "run_log": "oracle-control-run.log"
+    },
+    {
+      "id": "drop_low",
+      "change": "actual_words の実部・虚部への低位語加算をともに省略。",
+      "header_sha256": "d370f548ee0703b29fb4e84adbf0b19f710723ced1f08c1b78b1bcaf14d5357b",
+      "probe_sha256": "d9ee8f05fc9b1c94c51c7ea1d4a938147d6a1ec2cc02aa3bb90e33fa592f503b",
+      "command_sha256": "26095ab106b891375a79c60fc34fece3865b84f8faab83f39b9f9b22012d8df6",
+      "compile_log_sha256": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+      "compile_exit": 0,
+      "run_exit": 42,
+      "run_log_sha256": "79a54420593014b092a3a248e1c0f917012297c5749e2ed809ff03641302b69e",
+      "run_log": "oracle-drop_low-run.log"
+    },
+    {
+      "id": "conjugated_dot",
+      "change": "exact_complex_dot の係数虚部の2項を共役積の符号へ反転。",
+      "header_sha256": "94b0cf087eb0011f283c96e20236ee79133e874efb19e06bd3a2e20f57aa4ae8",
+      "probe_sha256": "d9ee8f05fc9b1c94c51c7ea1d4a938147d6a1ec2cc02aa3bb90e33fa592f503b",
+      "command_sha256": "775a7a6eb70f19131ad4bde20311ce99451f79e3ab47eec500b7f3ef60612af6",
+      "compile_log_sha256": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+      "compile_exit": 0,
+      "run_exit": 42,
+      "run_log_sha256": "79a54420593014b092a3a248e1c0f917012297c5749e2ed809ff03641302b69e",
+      "run_log": "oracle-conjugated_dot-run.log"
+    }
+  ],
+  "interpretation": "全3候補のcompileは成功。原本controlは成功し、低位語破棄と複素積の共役化はともに自己試験の例外による実行exit42で検出した。期待値・定義域・許容差は変更していない。"
+}

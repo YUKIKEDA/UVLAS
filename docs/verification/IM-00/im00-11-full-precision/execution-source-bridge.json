@@ -1,0 +1,22 @@
+{
+  "scope": "Byte comparison of executed snapshots and final test sources; not an additional numerical execution.",
+  "product_run_commit": "cb8503229c1781f8c67e9bb1494a38a0521c4452",
+  "reference_run_commit": "becd8ab1f4d5082cc10fc3d88a7ca7597398c776",
+  "executed_product_test_sha256": "568a416fe46e681a099b8095b785f4e9046148f14dcc30cf11aacdbd37bac4f4",
+  "executed_reference_test_sha256": "da72866cb603c746a9b18237fbdfcc5adef9db11efaa86f692fa3685f1e3370d",
+  "final_full_test_sha256": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+  "all_full_test_cases_sha256": "c57db862268d30862900ac0223af51fd1c5793e2e32290738b4a75d6ff47554a",
+  "all_full_cases_and_helpers_unchanged": true,
+  "short_control_case_unchanged": true,
+  "removed_unused_includes": [
+    "fstream",
+    "iterator"
+  ],
+  "executed_oracle_header_sha256": "7fef9e0f6ac9126f20769cdfaaed54fb3aba65ba711f37edbabff20e137d4b35",
+  "final_oracle_header_sha256": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+  "oracle_delta": "Only the unused squared_distance function was removed; all used definitions are byte-identical.",
+  "product_executable_sha256": "88cd0acf8204e1537dd25ed0b6b90b205133df88daa850474c2d9a7f8f096549",
+  "reference_executable_sha256": "dc98c08d5ca7755f68b5a5ffcd7d77f33e7361a48a75b6a695d1f5b4500e6772",
+  "combined_initial_ctest_result": "Timeout; never relabeled as a passed target.",
+  "final_combined_ctest": "Delegated to PR CI at 3600s timeout; no local combined success claim."
+}

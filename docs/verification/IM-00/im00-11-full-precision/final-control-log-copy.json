@@ -1,0 +1,6 @@
+{
+  "original_sha256": "f7630ebad12f75c70dfb4bbdf5441d1ae29c92d7b6e81d1978eca457f46b3820",
+  "published_sha256": "539182683fc1844f99b06324bf87ea60dd012aad081a7550c25e85f2b67177ba",
+  "replacements": 2,
+  "reason": "私有workspace prefixだけを置換し、試験結果と元rawを保持する。"
+}

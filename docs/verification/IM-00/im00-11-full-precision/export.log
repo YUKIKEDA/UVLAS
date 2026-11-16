@@ -1,0 +1,7 @@
+WARN `--no-project` was provided, but no project was found
+{"stage": "refinement", "m": 4096, "corrections": 0, "max_residual": 7.800237519047949e-11}
+{"stage": "refinement", "m": 4096, "corrections": 1, "max_residual": 1.7098877104693742e-11}
+{"stage": "high_low_refinement", "m": 4096, "corrections": 0, "max_residual": 7.800237519047949e-11}
+{"stage": "high_low_refinement", "m": 4096, "corrections": 1, "max_residual": 6.644286373682125e-23}
+{"stage": "exported", "array_bytes": 851976, "observations": 39, "peak_working_set_bytes": 394067968, "elapsed_seconds": 59.828000000008615}
+{"sha256": "fb8b8336a445cd6d61e1c9ef6b244559bf8ae545b3ddf7be42223992b9433103"}

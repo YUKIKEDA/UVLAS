@@ -1,0 +1,503 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-05",
+    "N4-06",
+    "N4-10"
+  ],
+  "package": "IM-00",
+  "issue": 15,
+  "date": "2026-11-16",
+  "source_commit": "62cb30b945f43aa5c2cde744285a9785e77418ea",
+  "base_main": "1a3c98f40030aa1ef492219669a32584a110ff7c",
+  "scope": "実4096系・全3右辺・39観測の検証追加。IM00-11全体の終了、QA上の数値認定、製品性能、実務受入は主張しない。",
+  "gate_status": "保留。最終版の両OS Release一括試験はPR CIで確認する。",
+  "initial_combined_run": {
+    "commit": "cb8503229c1781f8c67e9bb1494a38a0521c4452",
+    "clean": true,
+    "ctest_passed": 0,
+    "ctest_total": 1,
+    "result": "Timeout",
+    "seconds": 1200.03,
+    "product_observation": "全3列の出力後、製品case末尾を経て次の参照caseに到達。Catch失敗表示なし。target成功とは呼ばない。",
+    "product_columns": [
+      {
+        "column": "0",
+        "precision": "TwoWord",
+        "relative_l2": "1.8787837741576942e-26",
+        "backward_upper": "5.9322768322772338e-31",
+        "maximum_observation_error": "1.7058318572850849e-15"
+      },
+      {
+        "column": "1",
+        "precision": "TwoWord",
+        "relative_l2": "1.5766713658745058e-26",
+        "backward_upper": "6.5393863605902476e-31",
+        "maximum_observation_error": "1.2692909677149927e-14"
+      },
+      {
+        "column": "2",
+        "precision": "Binary64",
+        "relative_l2": "8.4651605062917673e-12",
+        "backward_upper": "8.4857747328035261e-17",
+        "maximum_observation_error": "3.2610458055808647e-15"
+      }
+    ]
+  },
+  "reference_filtered_run": {
+    "commit": "becd8ab1f4d5082cc10fc3d88a7ca7597398c776",
+    "clean": true,
+    "ctest_passed": 1,
+    "ctest_total": 1,
+    "catch_cases": 1,
+    "assertions": 33,
+    "seconds": 270.93,
+    "columns": [
+      {
+        "column": "0",
+        "retained_relative_l2": "5.1036117420664544e-23",
+        "projected_relative_l2": "1.7098877104694566e-11",
+        "retained_backward_upper": "9.0836004314219918e-28",
+        "retained_maximum_observation_error": "1.7058318575612564e-15"
+      },
+      {
+        "column": "1",
+        "retained_relative_l2": "6.6442863736821129e-23",
+        "projected_relative_l2": "1.5327253204195513e-11",
+        "retained_backward_upper": "8.7722891102355969e-28",
+        "retained_maximum_observation_error": "1.2692909663103185e-14"
+      },
+      {
+        "column": "2",
+        "retained_relative_l2": "5.3762681536673336e-23",
+        "projected_relative_l2": "8.4651605062917673e-12",
+        "retained_backward_upper": "9.5314748097410668e-28",
+        "retained_maximum_observation_error": "3.8466095709320788e-14"
+      }
+    ],
+    "projection_outcome": [
+      "PrecisionUnresolved",
+      "PrecisionUnresolved",
+      "AcceptedAfterFullVerification"
+    ]
+  },
+  "final_control": {
+    "commit": "fd1cb5209933fd74ba54e97e5b9540c031e34223",
+    "clean": true,
+    "ctest_passed": 1,
+    "ctest_total": 1,
+    "assertions": 7,
+    "seconds": 0.15
+  },
+  "configuration": {
+    "large": "Windows/Linux Release、全4096行・3右辺・39観測。",
+    "controls": "全構成で小literal・fixture改変拒否。",
+    "registration": "single Debug/Releaseは-Cなし、multi Debug/Releaseは-C指定の4構成で確認。",
+    "final_combined_timeout_seconds": 3600,
+    "timeout_meaning": "試験ハーネスの上限修正。数値許容差・製品性能の受入条件を変えない。",
+    "combined_final_run": "手元で再実行せず、PR CIへ委ねる。"
+  },
+  "budgets": {
+    "relative_l2": 1e-11,
+    "componentwise_backward": 1e-12,
+    "scaled_observations": 1e-08,
+    "resource_plan_each_payload_bytes": 1073741824,
+    "resource_boundary": "payloadの累積計上であり、外部backendやRSSのhard capの認定ではない。"
+  },
+  "static": {
+    "clang_tidy_21_1_1": {
+      "translation_units": 2,
+      "exit": 0
+    },
+    "clang_format_21_1_2": "新規4 C++ fileを確認。",
+    "japanese": "契約・追補・先行審査・READMEのnatural-japanese lintは0件、独立通読も実施。"
+  },
+  "references": "fixture全体と原A0/Aeff/Bの固定hashを照合。元R&Dを一時コピーし、原本の前後hash一致と15 import sourceを確認。新規生成hi/loと旧39観測を区別する。",
+  "mutations": "低語破棄・共役化のoracle2変異、原hashガード除去・上書き許可のexporter2変異を隔離コピーで検出。最終工具の追加検査は別追補を参照する。",
+  "source_bridge": "短control抽出、未使用include/未使用関数の除去だけで、実行済み大型caseと使用helperの数値本体は同一。snapshot・最終hashを別に保存する。",
+  "prior_ci": {
+    "pr": 78,
+    "head": "ab76a5eb878d11534adad51c5cf139359c3d08e4",
+    "run": 43838473326,
+    "checked_tree": "c43fa80faf70564fba0d838c3dcb7edd7196fcc7",
+    "checkout": "1be1d6b0f902abb7ea0a33d67d2323e435e2be0a",
+    "main_tree_equal": true,
+    "jobs": "Linux Debug/Release/sanitizer、Windows、集約ci成功。今回の新規試験の成功とは扱わない。"
+  },
+  "not_repeated": "製品src/include・基準結果・凍結R&Dは不変。完了部分の製品求解、他backend、全体suite、基準生成を手元で繰り返さない。",
+  "raw_language": "工具stdout/stderr/生成JSONの英語は原出力として保持し、解釈と主張の境界は本記録と日本語追補に記す。",
+  "sources": {
+    "tests/CMakeLists.txt": "ffe9090391ad0780d0e3858b4449f59100c42d51762372b96338741e641b7a03",
+    "tests/numerics/foundation_precision_system_test.cpp": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+    "tests/numerics/full_precision_control_test.cpp": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+    "tests/numerics/full_precision_fixture.hpp": "7a8a2b9bbd34d764458e87cbf02afb2a30047e8ebcb88dc0c04b797ede8ad38c",
+    "tests/numerics/full_precision_oracle.hpp": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+    "tools/qa/export_precision_system.py": "00119aba1d521126a30b7b64215a5ed0f88fdcb29e7a44e9ab0c5d15534294bc",
+    "tools/qa/export_precision_system_test.py": "6dbcfb924ab3bbfe33abc21604f29538b4828b41f59eeb519a283631f8c5f0e6",
+    "docs/specs/foundation/full-precision-system-contract.md": "962bd8e8a6bcf3d1ddbbbf999be6513a6f6f09a524ffd85381be23c98e13a978",
+    "docs/specs/foundation/precision-contract.md": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "src/numerics/dense_solve.cpp": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3",
+    "src/numerics/precision.cpp": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "source_references": [
+    {
+      "id": "CMakeLists",
+      "sha256": "ffe9090391ad0780d0e3858b4449f59100c42d51762372b96338741e641b7a03",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "foundation_precision_system_test",
+      "sha256": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+      "hint": "tests/numerics/foundation_precision_system_test.cpp"
+    },
+    {
+      "id": "full_precision_control_test",
+      "sha256": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+      "hint": "tests/numerics/full_precision_control_test.cpp"
+    },
+    {
+      "id": "full_precision_fixture",
+      "sha256": "7a8a2b9bbd34d764458e87cbf02afb2a30047e8ebcb88dc0c04b797ede8ad38c",
+      "hint": "tests/numerics/full_precision_fixture.hpp"
+    },
+    {
+      "id": "full_precision_oracle",
+      "sha256": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+      "hint": "tests/numerics/full_precision_oracle.hpp"
+    },
+    {
+      "id": "export_precision_system",
+      "sha256": "00119aba1d521126a30b7b64215a5ed0f88fdcb29e7a44e9ab0c5d15534294bc",
+      "hint": "tools/qa/export_precision_system.py"
+    },
+    {
+      "id": "export_precision_system_test",
+      "sha256": "6dbcfb924ab3bbfe33abc21604f29538b4828b41f59eeb519a283631f8c5f0e6",
+      "hint": "tools/qa/export_precision_system_test.py"
+    },
+    {
+      "id": "full-precision-system-contract",
+      "sha256": "962bd8e8a6bcf3d1ddbbbf999be6513a6f6f09a524ffd85381be23c98e13a978",
+      "hint": "docs/specs/foundation/full-precision-system-contract.md"
+    },
+    {
+      "id": "precision-contract",
+      "sha256": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+      "hint": "docs/specs/foundation/precision-contract.md"
+    },
+    {
+      "id": "dense-solve-contract",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+      "hint": "docs/specs/foundation/dense-solve-contract.md"
+    },
+    {
+      "id": "dense_solve",
+      "sha256": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3",
+      "hint": "src/numerics/dense_solve.cpp"
+    },
+    {
+      "id": "precision",
+      "sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+      "hint": "src/numerics/precision.cpp"
+    },
+    {
+      "id": "linear_metrics",
+      "sha256": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+      "hint": "src/numerics/linear_metrics.cpp"
+    },
+    {
+      "id": "vcpkg",
+      "sha256": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+      "hint": "vcpkg.json"
+    },
+    {
+      "id": "vcpkg-configuration",
+      "sha256": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+      "hint": "vcpkg-configuration.json"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-00/im00-11-full-precision/build-info-final.json": "0032f3db32661a03d035b6c2688b73af7ba3e618da8b5ed00e99064b8f957e86",
+    "docs/verification/IM-00/im00-11-full-precision/build-info-product.json": "a5bb0caff5bb5c94de28c9f3cbb24d747b24378e1c360133aa98c70e3997ecb9",
+    "docs/verification/IM-00/im00-11-full-precision/build-info-reference.json": "1f0f991355ae2e87b024b2d91691376785ec9aabaae3836b993154501a567eea",
+    "docs/verification/IM-00/im00-11-full-precision/clang-tidy-foundation_precision_system_test.log": "f2e5ff342ac77c78f74c818caea828f1c695c6964f190af6ef9ebdff480f1666",
+    "docs/verification/IM-00/im00-11-full-precision/clang-tidy-full_precision_control_test.log": "652b4da35d54d89412ba4f9086b09e55b37cf59d8c8f285062620083958988b0",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-configure-multi.log": "a292a89e4ac8a875a4bf8d8c61e2b334904aabc8d28099e6a7f9ffe733fa86c8",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-configure-single-debug.log": "013801b7c4a4fba482737710a6a369715be5e7dc6d60d266cf1bb1ab28ff3c8c",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-configure-single-release.log": "8470a1670be2c88a2de90782fdbc1815ff0bfe25a323cb325214d7cbcb6bf9ba",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-registration-multi-debug.log": "1df17b778fec0082f21d1b3d8cd0efcfa2e45e4d4d9d5374eaab38ea2d74343c",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-registration-multi-release.log": "4d7dde1f7d566101fa87aeae2b01b2373db2d41cbdbc48cc7735aaaf75db90f1",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-registration-single-debug.log": "8f505139a209848729a525faf58eba03ef793aea505f375ef722f57c7457f0ba",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-registration-single-release.log": "5b4ffdc335e05c47f892acda8f2d0b3cc36d530ea30339240352c98ca65622db",
+    "docs/verification/IM-00/im00-11-full-precision/configuration-registration.json": "ae1d39918a30c64a2b93a5441e2fb4c439f7063dd8474cd3258ccfbaa03c2293",
+    "docs/verification/IM-00/im00-11-full-precision/execution-source-bridge.json": "fa1e7e7cf8cd4c5f6cf841e205e6dd9d1d2ad00a06428b837ae3da6618134852",
+    "docs/verification/IM-00/im00-11-full-precision/export.log": "b0048f8f7908b170b9262ad2f6386c6a03c1f1802d46a828c222e608651c25ed",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-guard-summary.json": "37277e1fe358363044384d6ca671aaa3a5827d49a8e4cc276a4c4c7dd17f7469",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-hash-guard-mutant.log": "93a00f25effae1c8ac979d2b5373cf3b011e88a891f3474c08042f5f09b05b2e",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-overwrite-mutant.log": "6edefdf4a3ff1b255ba9affdd5ac436e39a76f59412766d9a4acbb356abfb8d6",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-redaction.json": "29678c7d189e1f8ecd7381d27ecb2c4f2432308d46eef26adfa606937ce96372",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-pyright.log": "fb0f94accf07894a038a8c67be17c87e22e00d5a43e609f1fce444d9a6724088",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-ruff-check.log": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-ruff-format.log": "6d203e0ccd3937f8faab76ea8be422f8dd0cae98330d2e9412d3a5e9ff76363b",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-unit.log": "bb312fda4bd4cae8a1760f8ecc79074a04842e7cf2d93d5681c82b9f5b2e9d3b",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-relocation.json": "2d00b5e2f352f5062e79cb7f7687c3577e4e97063a197f5d06d919d9413ef51a",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-unit-control.log": "923bb7d3aaf9abe993a1b8a64557a846081a4a9c729751806f0b551da3e10b52",
+    "docs/verification/IM-00/im00-11-full-precision/exporter-verification.json": "a09a91550a669830a32b53ccf6ca5aeae11d7ac638f85b2dbfe0bd1350053ce5",
+    "docs/verification/IM-00/im00-11-full-precision/final-control-ctest.log": "539182683fc1844f99b06324bf87ea60dd012aad081a7550c25e85f2b67177ba",
+    "docs/verification/IM-00/im00-11-full-precision/final-control-log-copy.json": "1b21f6f299e07e2f5572d627ee203e04bc2de7b18fdbbfeb1d01e47a6cce46f5",
+    "docs/verification/IM-00/im00-11-full-precision/full-reference-log-copy.json": "9c974f0188fb7d28b53752cf2a37cc9decaeeb9a0ad6d478f2a7065a85aa8672",
+    "docs/verification/IM-00/im00-11-full-precision/full-reference-run.log": "b71e771ee5a8c0359ec6f089c3feed8f7e252b0cd3450beb49f6940fca480e5d",
+    "docs/verification/IM-00/im00-11-full-precision/full-system-timeout-copy.json": "53a325f635bc17816501519aad77e1d2a6f0e6f8e07514d0759768bd7c136bfa",
+    "docs/verification/IM-00/im00-11-full-precision/full-system-timeout.log": "45b4ed402838e809f267a086c138d59f5f14eb460c72e4f63809d87b626b9688",
+    "docs/verification/IM-00/im00-11-full-precision/oracle-conjugated_dot-run.log": "79a54420593014b092a3a248e1c0f917012297c5749e2ed809ff03641302b69e",
+    "docs/verification/IM-00/im00-11-full-precision/oracle-control-run.log": "a830be2a84e9a3f29d0d674ed78bad53553b7e0486296d2b4633bffe428d2cb1",
+    "docs/verification/IM-00/im00-11-full-precision/oracle-drop_low-run.log": "79a54420593014b092a3a248e1c0f917012297c5749e2ed809ff03641302b69e",
+    "docs/verification/IM-00/im00-11-full-precision/oracle-mutations.json": "0f9896d91a346118f4a0e21430079f66717dd5d14d2ae10b56b681e50d1a3487",
+    "docs/verification/IM-00/im00-11-full-precision/static-checks.json": "d138d52397b24720c6c076511b39350f2118c8a03c1e1fe678643686abbef5df",
+    "docs/verification/IM-00/im00-11-full-precision/validation.json": "1384e42faf061ba1f65e831f78e6ee6b8d82f28c788928106000b2341fe70fbd",
+    "tests/numerics/fixtures/precision-4096-system-v1.json": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+    "rd/aero/wake-loads/records/uvlm-column-update-result.json": "ddd7649056e4253e5cafdf993322bbe1f8bf0c4ed82ec79c1ec7a9fe0ccc2fc9",
+    "docs/verification/IM-00/im00-11-full-system-review.md": "ea1bc0664e138b0e2d758adddd36fcdba8d916a4e75678f6b9e41ced1af4536a",
+    "docs/verification/IM-00/im00-11-numerical-review.md": "fa022c3ea251030f8008e64654dd2ce64be4396b8d0264f6451c1f409186171f",
+    "docs/plans/im00-handoff-review.md": "f17e501a3c675b80d49647e34ecdd835c9bfd7df4c546f0a0e6dfa5ecdcbd7d8",
+    "docs/verification/IM-00/im00-5.json": "9283af8c788baad6cd118fa96194bb6ed39f48205caa677173f0938a8c10ea4b",
+    "docs/verification/IM-00/im00-6.json": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883",
+    "docs/verification/IM-00/im00-77.json": "def86f1547432898413ee2790680c0a862f8b456f9225ee4bf35e3810ebdef1a"
+  },
+  "artifact_references": [
+    {
+      "id": "build-info-final",
+      "sha256": "0032f3db32661a03d035b6c2688b73af7ba3e618da8b5ed00e99064b8f957e86",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/build-info-final.json"
+    },
+    {
+      "id": "build-info-product",
+      "sha256": "a5bb0caff5bb5c94de28c9f3cbb24d747b24378e1c360133aa98c70e3997ecb9",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/build-info-product.json"
+    },
+    {
+      "id": "build-info-reference",
+      "sha256": "1f0f991355ae2e87b024b2d91691376785ec9aabaae3836b993154501a567eea",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/build-info-reference.json"
+    },
+    {
+      "id": "clang-tidy-foundation_precision_system_test",
+      "sha256": "f2e5ff342ac77c78f74c818caea828f1c695c6964f190af6ef9ebdff480f1666",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/clang-tidy-foundation_precision_system_test.log"
+    },
+    {
+      "id": "clang-tidy-full_precision_control_test",
+      "sha256": "652b4da35d54d89412ba4f9086b09e55b37cf59d8c8f285062620083958988b0",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/clang-tidy-full_precision_control_test.log"
+    },
+    {
+      "id": "configuration-configure-multi",
+      "sha256": "a292a89e4ac8a875a4bf8d8c61e2b334904aabc8d28099e6a7f9ffe733fa86c8",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-configure-multi.log"
+    },
+    {
+      "id": "configuration-configure-single-debug",
+      "sha256": "013801b7c4a4fba482737710a6a369715be5e7dc6d60d266cf1bb1ab28ff3c8c",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-configure-single-debug.log"
+    },
+    {
+      "id": "configuration-configure-single-release",
+      "sha256": "8470a1670be2c88a2de90782fdbc1815ff0bfe25a323cb325214d7cbcb6bf9ba",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-configure-single-release.log"
+    },
+    {
+      "id": "configuration-registration-multi-debug",
+      "sha256": "1df17b778fec0082f21d1b3d8cd0efcfa2e45e4d4d9d5374eaab38ea2d74343c",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-registration-multi-debug.log"
+    },
+    {
+      "id": "configuration-registration-multi-release",
+      "sha256": "4d7dde1f7d566101fa87aeae2b01b2373db2d41cbdbc48cc7735aaaf75db90f1",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-registration-multi-release.log"
+    },
+    {
+      "id": "configuration-registration-single-debug",
+      "sha256": "8f505139a209848729a525faf58eba03ef793aea505f375ef722f57c7457f0ba",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-registration-single-debug.log"
+    },
+    {
+      "id": "configuration-registration-single-release",
+      "sha256": "5b4ffdc335e05c47f892acda8f2d0b3cc36d530ea30339240352c98ca65622db",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-registration-single-release.log"
+    },
+    {
+      "id": "configuration-registration",
+      "sha256": "ae1d39918a30c64a2b93a5441e2fb4c439f7063dd8474cd3258ccfbaa03c2293",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/configuration-registration.json"
+    },
+    {
+      "id": "execution-source-bridge",
+      "sha256": "fa1e7e7cf8cd4c5f6cf841e205e6dd9d1d2ad00a06428b837ae3da6618134852",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/execution-source-bridge.json"
+    },
+    {
+      "id": "export",
+      "sha256": "b0048f8f7908b170b9262ad2f6386c6a03c1f1802d46a828c222e608651c25ed",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/export.log"
+    },
+    {
+      "id": "exporter-guard-summary",
+      "sha256": "37277e1fe358363044384d6ca671aaa3a5827d49a8e4cc276a4c4c7dd17f7469",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-guard-summary.json"
+    },
+    {
+      "id": "exporter-hash-guard-mutant",
+      "sha256": "93a00f25effae1c8ac979d2b5373cf3b011e88a891f3474c08042f5f09b05b2e",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-hash-guard-mutant.log"
+    },
+    {
+      "id": "exporter-overwrite-mutant",
+      "sha256": "6edefdf4a3ff1b255ba9affdd5ac436e39a76f59412766d9a4acbb356abfb8d6",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-overwrite-mutant.log"
+    },
+    {
+      "id": "exporter-redaction",
+      "sha256": "29678c7d189e1f8ecd7381d27ecb2c4f2432308d46eef26adfa606937ce96372",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-redaction.json"
+    },
+    {
+      "id": "exporter-relocation-pyright",
+      "sha256": "fb0f94accf07894a038a8c67be17c87e22e00d5a43e609f1fce444d9a6724088",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-pyright.log"
+    },
+    {
+      "id": "exporter-relocation-ruff-check",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-ruff-check.log"
+    },
+    {
+      "id": "exporter-relocation-ruff-format",
+      "sha256": "6d203e0ccd3937f8faab76ea8be422f8dd0cae98330d2e9412d3a5e9ff76363b",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-ruff-format.log"
+    },
+    {
+      "id": "exporter-relocation-unit",
+      "sha256": "bb312fda4bd4cae8a1760f8ecc79074a04842e7cf2d93d5681c82b9f5b2e9d3b",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-relocation-unit.log"
+    },
+    {
+      "id": "exporter-relocation",
+      "sha256": "2d00b5e2f352f5062e79cb7f7687c3577e4e97063a197f5d06d919d9413ef51a",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-relocation.json"
+    },
+    {
+      "id": "exporter-unit-control",
+      "sha256": "923bb7d3aaf9abe993a1b8a64557a846081a4a9c729751806f0b551da3e10b52",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-unit-control.log"
+    },
+    {
+      "id": "exporter-verification",
+      "sha256": "a09a91550a669830a32b53ccf6ca5aeae11d7ac638f85b2dbfe0bd1350053ce5",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/exporter-verification.json"
+    },
+    {
+      "id": "final-control-ctest",
+      "sha256": "539182683fc1844f99b06324bf87ea60dd012aad081a7550c25e85f2b67177ba",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/final-control-ctest.log"
+    },
+    {
+      "id": "final-control-log-copy",
+      "sha256": "1b21f6f299e07e2f5572d627ee203e04bc2de7b18fdbbfeb1d01e47a6cce46f5",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/final-control-log-copy.json"
+    },
+    {
+      "id": "full-reference-log-copy",
+      "sha256": "9c974f0188fb7d28b53752cf2a37cc9decaeeb9a0ad6d478f2a7065a85aa8672",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/full-reference-log-copy.json"
+    },
+    {
+      "id": "full-reference-run",
+      "sha256": "b71e771ee5a8c0359ec6f089c3feed8f7e252b0cd3450beb49f6940fca480e5d",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/full-reference-run.log"
+    },
+    {
+      "id": "full-system-timeout-copy",
+      "sha256": "53a325f635bc17816501519aad77e1d2a6f0e6f8e07514d0759768bd7c136bfa",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/full-system-timeout-copy.json"
+    },
+    {
+      "id": "full-system-timeout",
+      "sha256": "45b4ed402838e809f267a086c138d59f5f14eb460c72e4f63809d87b626b9688",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/full-system-timeout.log"
+    },
+    {
+      "id": "oracle-conjugated_dot-run",
+      "sha256": "79a54420593014b092a3a248e1c0f917012297c5749e2ed809ff03641302b69e",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/oracle-conjugated_dot-run.log"
+    },
+    {
+      "id": "oracle-control-run",
+      "sha256": "a830be2a84e9a3f29d0d674ed78bad53553b7e0486296d2b4633bffe428d2cb1",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/oracle-control-run.log"
+    },
+    {
+      "id": "oracle-drop_low-run",
+      "sha256": "79a54420593014b092a3a248e1c0f917012297c5749e2ed809ff03641302b69e",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/oracle-drop_low-run.log"
+    },
+    {
+      "id": "oracle-mutations",
+      "sha256": "0f9896d91a346118f4a0e21430079f66717dd5d14d2ae10b56b681e50d1a3487",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/oracle-mutations.json"
+    },
+    {
+      "id": "static-checks",
+      "sha256": "d138d52397b24720c6c076511b39350f2118c8a03c1e1fe678643686abbef5df",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/static-checks.json"
+    },
+    {
+      "id": "validation",
+      "sha256": "1384e42faf061ba1f65e831f78e6ee6b8d82f28c788928106000b2341fe70fbd",
+      "hint": "docs/verification/IM-00/im00-11-full-precision/validation.json"
+    },
+    {
+      "id": "precision-4096-system-v1",
+      "sha256": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+      "hint": "tests/numerics/fixtures/precision-4096-system-v1.json"
+    },
+    {
+      "id": "uvlm-column-update-result",
+      "sha256": "ddd7649056e4253e5cafdf993322bbe1f8bf0c4ed82ec79c1ec7a9fe0ccc2fc9",
+      "hint": "rd/aero/wake-loads/records/uvlm-column-update-result.json"
+    },
+    {
+      "id": "im00-11-full-system-review",
+      "sha256": "ea1bc0664e138b0e2d758adddd36fcdba8d916a4e75678f6b9e41ced1af4536a",
+      "hint": "docs/verification/IM-00/im00-11-full-system-review.md"
+    },
+    {
+      "id": "im00-11-numerical-review",
+      "sha256": "fa022c3ea251030f8008e64654dd2ce64be4396b8d0264f6451c1f409186171f",
+      "hint": "docs/verification/IM-00/im00-11-numerical-review.md"
+    },
+    {
+      "id": "im00-handoff-review",
+      "sha256": "f17e501a3c675b80d49647e34ecdd835c9bfd7df4c546f0a0e6dfa5ecdcbd7d8",
+      "hint": "docs/plans/im00-handoff-review.md"
+    },
+    {
+      "id": "im00-5",
+      "sha256": "9283af8c788baad6cd118fa96194bb6ed39f48205caa677173f0938a8c10ea4b",
+      "hint": "docs/verification/IM-00/im00-5.json"
+    },
+    {
+      "id": "im00-6",
+      "sha256": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883",
+      "hint": "docs/verification/IM-00/im00-6.json"
+    },
+    {
+      "id": "im00-77",
+      "sha256": "def86f1547432898413ee2790680c0a862f8b456f9225ee4bf35e3810ebdef1a",
+      "hint": "docs/verification/IM-00/im00-77.json"
+    }
+  ]
+}

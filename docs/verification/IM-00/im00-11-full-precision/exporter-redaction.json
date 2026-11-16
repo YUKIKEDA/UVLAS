@@ -1,0 +1,66 @@
+{
+  "schema": "uvlas.exporter-evidence-redaction/1",
+  "original_raw_preserved": true,
+  "files": [
+    {
+      "public_file": "export.log",
+      "private_source_hint": "out/issue15-precision-system-export/export.log",
+      "original_sha256": "b0048f8f7908b170b9262ad2f6386c6a03c1f1802d46a828c222e608651c25ed",
+      "published_sha256": "b0048f8f7908b170b9262ad2f6386c6a03c1f1802d46a828c222e608651c25ed",
+      "original_bytes": 673,
+      "published_bytes": 673,
+      "replacements": 0,
+      "reason": "No redaction required; byte-identical copy."
+    },
+    {
+      "public_file": "validation.json",
+      "private_source_hint": "out/issue15-precision-system-export/validation.json",
+      "original_sha256": "1384e42faf061ba1f65e831f78e6ee6b8d82f28c788928106000b2341fe70fbd",
+      "published_sha256": "1384e42faf061ba1f65e831f78e6ee6b8d82f28c788928106000b2341fe70fbd",
+      "original_bytes": 654,
+      "published_bytes": 654,
+      "replacements": 0,
+      "reason": "No redaction required; byte-identical copy."
+    },
+    {
+      "public_file": "exporter-unit-control.log",
+      "private_source_hint": "out/issue15-precision-system-export/guard-mutations/control/unittest.log",
+      "original_sha256": "923bb7d3aaf9abe993a1b8a64557a846081a4a9c729751806f0b551da3e10b52",
+      "published_sha256": "923bb7d3aaf9abe993a1b8a64557a846081a4a9c729751806f0b551da3e10b52",
+      "original_bytes": 111,
+      "published_bytes": 111,
+      "replacements": 0,
+      "reason": "No redaction required; byte-identical copy."
+    },
+    {
+      "public_file": "exporter-hash-guard-mutant.log",
+      "private_source_hint": "out/issue15-precision-system-export/guard-mutations/frozen-hash-guard-removed/unittest.log",
+      "original_sha256": "46c2f203046ea11351378d74e9c21b322893847155072295019a933ae3a42ce3",
+      "published_sha256": "93a00f25effae1c8ac979d2b5373cf3b011e88a891f3474c08042f5f09b05b2e",
+      "original_bytes": 2580,
+      "published_bytes": 2463,
+      "replacements": 3,
+      "reason": "Replace the absolute checkout prefix in Python traceback paths with <workspace>; preserve all assertions and numerical output."
+    },
+    {
+      "public_file": "exporter-overwrite-mutant.log",
+      "private_source_hint": "out/issue15-precision-system-export/guard-mutations/race-overwrite-enabled/unittest.log",
+      "original_sha256": "684ec9ef9bb1bf3f7c5504cbcc219f7edb9a53e4989896408aad3b18ef8c8d74",
+      "published_sha256": "6edefdf4a3ff1b255ba9affdd5ac436e39a76f59412766d9a4acbb356abfb8d6",
+      "original_bytes": 862,
+      "published_bytes": 823,
+      "replacements": 1,
+      "reason": "Replace the absolute checkout prefix in Python traceback paths with <workspace>; preserve all assertions and numerical output."
+    },
+    {
+      "public_file": "exporter-guard-summary.json",
+      "private_source_hint": "out/issue15-precision-system-export/guard-mutations/summary.json",
+      "original_sha256": "37277e1fe358363044384d6ca671aaa3a5827d49a8e4cc276a4c4c7dd17f7469",
+      "published_sha256": "37277e1fe358363044384d6ca671aaa3a5827d49a8e4cc276a4c4c7dd17f7469",
+      "original_bytes": 759,
+      "published_bytes": 759,
+      "replacements": 0,
+      "reason": "No redaction required; byte-identical copy."
+    }
+  ]
+}

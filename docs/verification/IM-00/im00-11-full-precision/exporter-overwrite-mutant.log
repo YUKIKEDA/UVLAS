@@ -1,0 +1,15 @@
+{"sha256": "859550c46c948cb10e450756d1aea28996e3310bc34f57fac8c9dab23b4e2951"}
+.......F
+======================================================================
+FAIL: test_raced_destination_is_not_overwritten (__main__.ExportSystemGuardTest.test_raced_destination_is_not_overwritten)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<workspace>\out\issue15-precision-system-export\guard-mutations\race-overwrite-enabled\export_precision_system_test.py", line 86, in test_raced_destination_is_not_overwritten
+    self.assertRaises(FileExistsError),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: FileExistsError not raised
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.026s
+
+FAILED (failures=1)
