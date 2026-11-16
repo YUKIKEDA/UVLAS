@@ -1,0 +1,8 @@
+[0/2] Re-checking globbed directories...
+[1/8] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\issue68 && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/issue68/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/8] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[3/8] Linking CXX static library Debug\uvlas_core.lib
+[4/8] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_full.dir\Debug\numerics\eigen_full_test.cpp.obj
+[5/8] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\eigen_full.cpp.obj
+[6/8] Linking CXX static library Debug\uvlas_numerics.lib
+[7/8] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_full.exe

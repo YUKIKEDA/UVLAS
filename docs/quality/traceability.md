@@ -67,7 +67,7 @@
 | EIG-08 | [eigen-extraction-contract.md:142](../specs/foundation/eigen-extraction-contract.md) | 0 | 0 | 0 |
 | EIG-09 | [eigen-extraction-contract.md:158](../specs/foundation/eigen-extraction-contract.md) | 0 | 0 | 0 |
 | EIG-10 | [eigen-extraction-contract.md:166](../specs/foundation/eigen-extraction-contract.md) | 12 | 2 | 0 |
-| EIG-11 | [eigen-extraction-contract.md:176](../specs/foundation/eigen-extraction-contract.md) | 10 | 2 | 0 |
+| EIG-11 | [eigen-extraction-contract.md:176](../specs/foundation/eigen-extraction-contract.md) | 10 | 3 | 0 |
 | EIG-12 | [eigen-extraction-contract.md:192](../specs/foundation/eigen-extraction-contract.md) | 18 | 2 | 0 |
 | EIG-13 | [eigen-extraction-contract.md:215](../specs/foundation/eigen-extraction-contract.md) | 13 | 2 | 0 |
 | EIG-14 | [eigen-extraction-contract.md:235](../specs/foundation/eigen-extraction-contract.md) | 0 | 2 | 0 |
@@ -106,9 +106,9 @@
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 99 | 14 | 0 |
 | N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 99 | 14 | 0 |
-| N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 71 | 3 | 0 |
+| N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 71 | 4 | 0 |
 | N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 34 | 13 | 1 |
-| N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 33 | 14 | 1 |
+| N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 33 | 15 | 1 |
 | N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 4 | 2 | 0 |
 | QA-01 | [quality-plan.md:13](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-02 | [quality-plan.md:23](../quality/quality-plan.md) | 0 | 0 | 0 |
