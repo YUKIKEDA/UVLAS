@@ -163,6 +163,11 @@ uvlas_add_test(numerics.linear_metrics
     LIBS uvlas_numerics Boost::multiprecision)
 target_include_directories(uvlas_test_numerics_linear_metrics PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
 
+uvlas_add_test(numerics.foundation_precision_rank
+    LABELS integration verification negative
+    SOURCES numerics/foundation_precision_rank_test.cpp
+    LIBS uvlas_numerics Boost::multiprecision)
+
 uvlas_add_test(numerics.backend_memory
     LABELS unit negative property
     SOURCES numerics/backend_memory_test.cpp support/allocation_audit.cpp

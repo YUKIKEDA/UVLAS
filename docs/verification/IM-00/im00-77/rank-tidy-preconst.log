@@ -1,0 +1,5 @@
+<repository>\tests\numerics\foundation_precision_rank_test.cpp:124:5: error: variable 'verifier' of type 'AlgebraicVerifier' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  124 |     AlgebraicVerifier verifier;
+      |     ^
+      |                       const 
+62047 warnings generated.

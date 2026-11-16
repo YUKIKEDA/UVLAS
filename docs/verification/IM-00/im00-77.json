@@ -1,0 +1,231 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-01",
+    "N4-05",
+    "N4-06",
+    "N4-10"
+  ],
+  "package": "IM-00",
+  "issue": 77,
+  "date": "2026-11-16",
+  "source_commit": "1065d5fc572f5bf309336f1cbe6e2a7b9fdb3d35",
+  "base_main": "19221137cc86f2b0cc116cb048e0fe5b60d66ae5",
+  "scope": "凍結精密基準を既存製品の保持・消費・包絡へ接続する試験。製品src/include・公開API・予算・基準結果は変更しない。IM00-11全体の完了は主張しない。",
+  "rank": {
+    "reference": "t=2^-180、det[[1,1],[1,1+t]]=t。Binary64化で全成分1へ崩れ、製品DensePreparedはRankUnresolvedを返す。",
+    "product": "TwoWordのx=(1,1+t)、C=(-1,1)、b=tで製品original_residual=b-Cx=0。低語を失う投影では残差t、入力尺度t・固定1e-12で拒否。零低語は投影成功の正対照。入力・世代を保持する。",
+    "sparse_existing": "tests/numerics/sparse_solve_test.cppのall-ones GeneralLu拒否は既存の根拠として対応づけ、今回重複追加・再実行しない。",
+    "boundary": "任意有理rankやTwoWord係数行列のsolverの実装完了を意味しない。PG係数・疎拘束consumerはIM-01。"
+  },
+  "sqrt": {
+    "oracle": "cpp_int整数平方根とcpp_rationalだけで独立参照を作る。元sqrt(3/2)の区間幅2^-256を保持。負指数を正確に正規化し、完全平方では区間を一点にする。",
+    "product": "actual_magnitude_boundsの9複素/TwoWord fixtureと、6half成分のL2残差を5指数×2要求へ接続。元の有理平方不等式・参照両端包含・finiteを検査。",
+    "width": "製品には既存の固定64eps/8minsub幅を使う。2^-256はoracleの幅であり、製品幅の要求ではない。"
+  },
+  "final_verification": {
+    "platform": "Windows/MSVC Release",
+    "clean_checkout": true,
+    "build": "既存Release構成で影響する2targetをincremental rebuild。新規build directoryのclean buildとは呼ばない。generated revisionは1065d5f/dirty0。",
+    "ctest": "2/2成功。linear_metrics11case291assert、foundation_precision_rank2case45assert、合計13case336assert。",
+    "new_cases": "追加4caseはrank45assert、sqrt154assert。元のmetrics9caseも変更TUの最終対象に含む。",
+    "static": "clang-tidy21.1.1の対象2TU成功、clang-format21.1.2対象2file、契約日本語lint0。初回rank tidyのconst指摘だけを直し、同TUを再検査。",
+    "review": "別担当がsqrt oracleと境界、rootがrank test、別担当が契約の数学・日本語を通読。歴史表見出しの指摘を反映。",
+    "linux": "この追加test版のLinux CIは未確認。push後のCI完了は待たない。過去の成功をこの版へ付け替えない。",
+    "not_repeated": "製品src/include不変。他backend、Debug、既存QA値生成、性能測定、全体suiteは手元で繰り返さない。"
+  },
+  "mutations": {
+    "rank": {
+      "control": "2case45assert/run0",
+      "mutants": [
+        "original_residual low word discarded",
+        "projection budget bypass"
+      ],
+      "producer_compile_link": [
+        0,
+        0
+      ],
+      "run_exits": [
+        42,
+        42
+      ],
+      "maps": 3,
+      "original_archive_producer_members": 0,
+      "explicit_producer_symbols": 2,
+      "frozen_inputs": 57,
+      "input_mismatches": 0,
+      "snapshot_test_sha256": "a75afae0b9756860dc8754e29f7606dc100a6c6f5530a5a41ed701b8fa2490ef",
+      "bridge": "最終testとの差はAlgebraicVerifier変数のconst修飾1箇所だけ。旧snapshotは保持し、byte置換で最終a3bf7c2eの一致を確認。数値・比較・タグ・制御フローは不変。変異を新source commitで実行したとは書かない。"
+    },
+    "sqrt": {
+      "control": "新2case154assert/run0",
+      "mutants": [
+        "sqrt bound directions reversed",
+        "hypot upper moved inward by one ulp"
+      ],
+      "producer_compile_link": [
+        0,
+        0
+      ],
+      "run_exits": [
+        42,
+        42
+      ],
+      "maps": 3,
+      "original_archive_producer_members": 0,
+      "explicit_producer_symbols": 5,
+      "frozen_inputs": 52,
+      "input_mismatches": 0
+    },
+    "scope": "専用snapshotでproducerをcompileし元archiveの同producer抽出がないことをmap確認。元製品source/build/rawは変更しない。変異は未commit候補の固定byte、最終2CTestはclean commitでの別実行。"
+  },
+  "existing_precise_paths": {
+    "two_product": "src/numerics/precision.cppとtests/numerics/precision_test.cpp。EFT、低位語、投影拒否の既存製品試験を保持。",
+    "sha": "src/core/state.cppとtests/core/state_test.cppの独立Python hashlib既知値、tests/toolchain/precise_arithmetic_test.cppの標準3KAT。新SHA APIは作らない。"
+  },
+  "historical_ci": {
+    "head": "b791ab0a4089dc7fa99407ba665cbef39406e5b7",
+    "run": 43832119061,
+    "result": "最終PR73のLinux Debug/Release/sanitize・Windows・集約ciが全成功。main1922113はmerge前headとfile差分なし。今回追加testのLinux成功とは区別。"
+  },
+  "sources": {
+    "tests/CMakeLists.txt": "9b63bb79080ee7cef7b4c067628fd13d40019614e158c68fc4f4c6b9724fa25f",
+    "tests/numerics/foundation_precision_rank_test.cpp": "a3bf7c2ef08ff1c41454ba4679894c7935f9e8c3d17027be09a389b853891a61",
+    "tests/numerics/linear_metrics_test.cpp": "1359456442449332ed6f66b271e008f1bfa59903917e576dd68a2b6d89399c91",
+    "docs/specs/foundation/reference-fixture-contract.md": "6d48f8fea9af9211641cb52adfd8bce24aed818d14376c9cacf154bcd29ddfe7",
+    "src/numerics/precision.cpp": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+    "src/numerics/linear_metrics.cpp": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+    "src/numerics/dense_solve.cpp": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3",
+    "rd/foundation/numerics/experiments/cpp-numerics/precision_hash.cpp": "6c512fa9951f143627b5ac1be847625bf15000e5123b6d5529372d21af9217ce"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-77/windows-release-ctest.log": "9cb6aebf739b93db837a216c59aec8f5250fe23fd56a0e128e3d2d9ade63514f",
+    "docs/verification/IM-00/im00-77/git_revision.hpp": "be18a6586fc7c997b5e508638ac64162695266bc04a480d6c90e818de2cb25eb",
+    "docs/verification/IM-00/im00-77/rank-tidy.log": "819d0d0aedeecf6dbb90258e43e9b1848088b19de4ae178a645df76ea4e9c7a5",
+    "docs/verification/IM-00/im00-77/rank-tidy-preconst.log": "34862a487efa3682ba590e165db980b61fe883c767f02c5a9e3b8ae8ceaaf1b7",
+    "docs/verification/IM-00/im00-77/sqrt-tidy.log": "656d8bf2ee68aa43badeb88967f4b995cf312777d20adf69379baea7db769411",
+    "docs/verification/IM-00/im00-77/sqrt-preliminary.log": "7f83b6eac34b642d3b7bc57cb9db79604980083e2e39c90512626768ff73525c",
+    "docs/verification/IM-00/im00-77/contract-japanese.json": "4251e2dd606121920c5b3b6b318a17d3f807fc4b1bbc03331cb7d28524cbb6fc",
+    "docs/verification/IM-00/im00-77/rank-mutations.zip": "a8d3b16f7d946b2f485707f0eeec05d17197a468af396c4287c96934a2b0a435",
+    "docs/verification/IM-00/im00-77/rank-redaction.json": "a4b6c57156f14fd5b0ff0a1467c9593e4660eb9401137b27b27f8c4a985c7718",
+    "docs/verification/IM-00/im00-77/sqrt-mutations.zip": "13f4887d7ffbcb660b452a24ac4e06197630ef90f4c2914d2b298b918d14aade",
+    "docs/verification/IM-00/im00-77/sqrt-redaction.json": "eef3e6ec8ed2a8261efb7e4d2430073be0623465ccf6b9f4158042fc7f10f972",
+    "docs/verification/IM-00/im00-77/redaction.json": "2b8f73fad77e85b1a0166355ba39a3437a13296d475fd472f5e5f207553f6816",
+    "docs/verification/IM-00/im00-5.json": "9283af8c788baad6cd118fa96194bb6ed39f48205caa677173f0938a8c10ea4b",
+    "docs/verification/IM-00/im00-9.json": "ebcb65d1cb6f0b92cbb1ed94573567b861c3af17198fbee6b800fc1635878194"
+  },
+  "source_references": [
+    {
+      "id": "im00-77-source-0",
+      "sha256": "9b63bb79080ee7cef7b4c067628fd13d40019614e158c68fc4f4c6b9724fa25f",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im00-77-source-1",
+      "sha256": "a3bf7c2ef08ff1c41454ba4679894c7935f9e8c3d17027be09a389b853891a61",
+      "hint": "tests/numerics/foundation_precision_rank_test.cpp"
+    },
+    {
+      "id": "im00-77-source-2",
+      "sha256": "1359456442449332ed6f66b271e008f1bfa59903917e576dd68a2b6d89399c91",
+      "hint": "tests/numerics/linear_metrics_test.cpp"
+    },
+    {
+      "id": "im00-77-source-3",
+      "sha256": "6d48f8fea9af9211641cb52adfd8bce24aed818d14376c9cacf154bcd29ddfe7",
+      "hint": "docs/specs/foundation/reference-fixture-contract.md"
+    },
+    {
+      "id": "im00-77-source-4",
+      "sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+      "hint": "src/numerics/precision.cpp"
+    },
+    {
+      "id": "im00-77-source-5",
+      "sha256": "57f6131284f5c1b2108b6348d2ffa6a039b8b315d4cd09799b3f291d26a74738",
+      "hint": "src/numerics/linear_metrics.cpp"
+    },
+    {
+      "id": "im00-77-source-6",
+      "sha256": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3",
+      "hint": "src/numerics/dense_solve.cpp"
+    },
+    {
+      "id": "im00-77-source-7",
+      "sha256": "6c512fa9951f143627b5ac1be847625bf15000e5123b6d5529372d21af9217ce",
+      "hint": "rd/foundation/numerics/experiments/cpp-numerics/precision_hash.cpp"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im00-77-artifact-0",
+      "sha256": "9cb6aebf739b93db837a216c59aec8f5250fe23fd56a0e128e3d2d9ade63514f",
+      "hint": "docs/verification/IM-00/im00-77/windows-release-ctest.log"
+    },
+    {
+      "id": "im00-77-artifact-1",
+      "sha256": "be18a6586fc7c997b5e508638ac64162695266bc04a480d6c90e818de2cb25eb",
+      "hint": "docs/verification/IM-00/im00-77/git_revision.hpp"
+    },
+    {
+      "id": "im00-77-artifact-2",
+      "sha256": "819d0d0aedeecf6dbb90258e43e9b1848088b19de4ae178a645df76ea4e9c7a5",
+      "hint": "docs/verification/IM-00/im00-77/rank-tidy.log"
+    },
+    {
+      "id": "im00-77-artifact-3",
+      "sha256": "34862a487efa3682ba590e165db980b61fe883c767f02c5a9e3b8ae8ceaaf1b7",
+      "hint": "docs/verification/IM-00/im00-77/rank-tidy-preconst.log"
+    },
+    {
+      "id": "im00-77-artifact-4",
+      "sha256": "656d8bf2ee68aa43badeb88967f4b995cf312777d20adf69379baea7db769411",
+      "hint": "docs/verification/IM-00/im00-77/sqrt-tidy.log"
+    },
+    {
+      "id": "im00-77-artifact-5",
+      "sha256": "7f83b6eac34b642d3b7bc57cb9db79604980083e2e39c90512626768ff73525c",
+      "hint": "docs/verification/IM-00/im00-77/sqrt-preliminary.log"
+    },
+    {
+      "id": "im00-77-artifact-6",
+      "sha256": "4251e2dd606121920c5b3b6b318a17d3f807fc4b1bbc03331cb7d28524cbb6fc",
+      "hint": "docs/verification/IM-00/im00-77/contract-japanese.json"
+    },
+    {
+      "id": "im00-77-artifact-7",
+      "sha256": "a8d3b16f7d946b2f485707f0eeec05d17197a468af396c4287c96934a2b0a435",
+      "hint": "docs/verification/IM-00/im00-77/rank-mutations.zip"
+    },
+    {
+      "id": "im00-77-artifact-8",
+      "sha256": "a4b6c57156f14fd5b0ff0a1467c9593e4660eb9401137b27b27f8c4a985c7718",
+      "hint": "docs/verification/IM-00/im00-77/rank-redaction.json"
+    },
+    {
+      "id": "im00-77-artifact-9",
+      "sha256": "13f4887d7ffbcb660b452a24ac4e06197630ef90f4c2914d2b298b918d14aade",
+      "hint": "docs/verification/IM-00/im00-77/sqrt-mutations.zip"
+    },
+    {
+      "id": "im00-77-artifact-10",
+      "sha256": "eef3e6ec8ed2a8261efb7e4d2430073be0623465ccf6b9f4158042fc7f10f972",
+      "hint": "docs/verification/IM-00/im00-77/sqrt-redaction.json"
+    },
+    {
+      "id": "im00-77-artifact-11",
+      "sha256": "2b8f73fad77e85b1a0166355ba39a3437a13296d475fd472f5e5f207553f6816",
+      "hint": "docs/verification/IM-00/im00-77/redaction.json"
+    },
+    {
+      "id": "im00-77-artifact-12",
+      "sha256": "9283af8c788baad6cd118fa96194bb6ed39f48205caa677173f0938a8c10ea4b",
+      "hint": "docs/verification/IM-00/im00-5.json"
+    },
+    {
+      "id": "im00-77-artifact-13",
+      "sha256": "ebcb65d1cb6f0b92cbb1ed94573567b861c3af17198fbee6b800fc1635878194",
+      "hint": "docs/verification/IM-00/im00-9.json"
+    }
+  ]
+}
