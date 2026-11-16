@@ -1,0 +1,12 @@
+build and test (linux, gcc 14, linux-release)	Run actions/checkout@v7	2026-11-16T11:19:37.6627226Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +9c60f41746525fe61358f037d201144d35514000:refs/remotes/pull/79/merge
+build and test (linux, gcc 14, linux-release)	Run actions/checkout@v7	2026-11-16T11:19:39.1577449Z  * [new ref]         9c60f41746525fe61358f037d201144d35514000 -> pull/79/merge
+build and test (linux, gcc 14, linux-release)	Run actions/checkout@v7	2026-11-16T11:19:39.4214089Z HEAD is now at 9c60f41 Merge fc9776fb3f84b01d7383b8ecabe605973541df99 into 1a3c98f40030aa1ef492219669a32584a110ff7c
+build and test (linux, gcc 14, linux-release)	Run actions/checkout@v7	2026-11-16T11:19:39.4261757Z [command]/usr/bin/git log -1 --format=%H
+build and test (linux, gcc 14, linux-release)	Run actions/checkout@v7	2026-11-16T11:19:39.4283707Z 9c60f41746525fe61358f037d201144d35514000
+build and test (linux, gcc 14, linux-release)	vcpkg at a commit that holds the manifest baseline	2026-11-16T11:19:51.5982960Z [command]/usr/bin/git log -1 --format=%H
+build and test (linux, gcc 14, linux-release)	Configure, build, test	2026-11-16T11:19:52.4839116Z   CMAKE_BUILD_TYPE="Release"
+build and test (linux, gcc 14, linux-release)	Configure, build, test	2026-11-16T11:23:46.4516093Z Test project <checkout>/out/build/linux-release
+build and test (linux, gcc 14, linux-release)	Configure, build, test	2026-11-16T11:23:52.5344328Z       Start 28: numerics.foundation_precision_system
+build and test (linux, gcc 14, linux-release)	Configure, build, test	2026-11-16T11:32:50.2897337Z 28/67 Test #28: numerics.foundation_precision_system ...   Passed  537.76 sec
+build and test (linux, gcc 14, linux-release)	Configure, build, test	2026-11-16T11:32:58.7406807Z 100% tests passed, 0 tests failed out of 67
+build and test (linux, gcc 14, linux-release)	Configure, build, test	2026-11-16T11:32:58.7408909Z Total Test time (real) = 552.29 sec

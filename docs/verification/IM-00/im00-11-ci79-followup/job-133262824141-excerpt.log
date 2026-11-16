@@ -1,0 +1,10 @@
+build and test (linux, gcc 14, linux-debug)	Run actions/checkout@v7	2026-11-16T11:19:38.6179636Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +9c60f41746525fe61358f037d201144d35514000:refs/remotes/pull/79/merge
+build and test (linux, gcc 14, linux-debug)	Run actions/checkout@v7	2026-11-16T11:19:40.1136548Z  * [new ref]         9c60f41746525fe61358f037d201144d35514000 -> pull/79/merge
+build and test (linux, gcc 14, linux-debug)	Run actions/checkout@v7	2026-11-16T11:19:40.4050044Z HEAD is now at 9c60f41 Merge fc9776fb3f84b01d7383b8ecabe605973541df99 into 1a3c98f40030aa1ef492219669a32584a110ff7c
+build and test (linux, gcc 14, linux-debug)	Run actions/checkout@v7	2026-11-16T11:19:40.4208906Z [command]/usr/bin/git log -1 --format=%H
+build and test (linux, gcc 14, linux-debug)	Run actions/checkout@v7	2026-11-16T11:19:40.4209343Z 9c60f41746525fe61358f037d201144d35514000
+build and test (linux, gcc 14, linux-debug)	vcpkg at a commit that holds the manifest baseline	2026-11-16T11:19:53.4905809Z [command]/usr/bin/git log -1 --format=%H
+build and test (linux, gcc 14, linux-debug)	Configure, build, test	2026-11-16T11:19:54.6008812Z   CMAKE_BUILD_TYPE="Debug"
+build and test (linux, gcc 14, linux-debug)	Configure, build, test	2026-11-16T11:23:58.8728675Z Test project <checkout>/out/build/linux-debug
+build and test (linux, gcc 14, linux-debug)	Configure, build, test	2026-11-16T11:24:25.5519542Z 100% tests passed, 0 tests failed out of 66
+build and test (linux, gcc 14, linux-debug)	Configure, build, test	2026-11-16T11:24:25.5521661Z Total Test time (real) =  26.68 sec

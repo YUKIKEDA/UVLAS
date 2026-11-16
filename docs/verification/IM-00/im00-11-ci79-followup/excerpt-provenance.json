@@ -1,0 +1,62 @@
+{
+  "schema": "uvlas.ci-log-excerpt/1",
+  "files": [
+    {
+      "artifact": "job-133262823970-excerpt.log",
+      "raw_sha256": "1e0152c6023fb690c1fc561817285cd584d05701e6d04a1842ed25146225ccc4",
+      "selected_before_redaction_sha256": "91e6cba381a107d28c30fb11c85be66582983e0a4386f776b4c6445e2c751fc4",
+      "published_sha256": "94c8fd2bc1b52512e531a4021f22d4e7cb27e14668b4e2970b69a9c90c4e7038",
+      "raw_lines": 1868,
+      "selected_lines": 14,
+      "redaction_count": 2,
+      "redaction_reason": "Replace generic CI checkout absolute prefixes with <checkout>; no numeric values or job outcomes changed.",
+      "raw_private_hint": "out/issue15-ci79/job-133262823970.log",
+      "raw_preserved": true
+    },
+    {
+      "artifact": "job-133262823976-excerpt.log",
+      "raw_sha256": "58729422e7515340a2116b43602e76f872626efedab8db1b8f930ac76e2a67fb",
+      "selected_before_redaction_sha256": "a2b2130fbae9396751c6ba80bd77a3a5e7efe3c76bddaf6ad2517d78cb81ff18",
+      "published_sha256": "20115463d2c079cd3c19dbc0ba15ff3771448f1a5f21fb2dd3e4f41b42a012ce",
+      "raw_lines": 1447,
+      "selected_lines": 10,
+      "redaction_count": 1,
+      "redaction_reason": "Replace generic CI checkout absolute prefixes with <checkout>; no numeric values or job outcomes changed.",
+      "raw_private_hint": "out/issue15-ci79/job-133262823976.log",
+      "raw_preserved": true
+    },
+    {
+      "artifact": "job-133262824055-excerpt.log",
+      "raw_sha256": "3eb2826198e5c83b331393239d781abd6b3dae13af94b74bab2e272f322d9b03",
+      "selected_before_redaction_sha256": "71a3a77350bed6c484b205739bece559a163880afb038bc8dac19decb80f892e",
+      "published_sha256": "9ab2dd68b352dfd35b92c8a1c9d83537eedc1966afe944e57fc4d2fbf44eebb7",
+      "raw_lines": 1447,
+      "selected_lines": 12,
+      "redaction_count": 1,
+      "redaction_reason": "Replace generic CI checkout absolute prefixes with <checkout>; no numeric values or job outcomes changed.",
+      "raw_private_hint": "out/issue15-ci79/job-133262824055.log",
+      "raw_preserved": true
+    },
+    {
+      "artifact": "job-133262824141-excerpt.log",
+      "raw_sha256": "b5e148718745ac7916fa1934a9a63cc5df26d601607c46909db0e1992564a646",
+      "selected_before_redaction_sha256": "1349c92f4f7f2f596a2f5be99ee1c42289d88590fde14aad6bfc17d1ef1b946f",
+      "published_sha256": "13aa0a7f8d6605e8603999b5c0e57c49e880998448e84ae96bc0ffdebb905737",
+      "raw_lines": 1681,
+      "selected_lines": 10,
+      "redaction_count": 1,
+      "redaction_reason": "Replace generic CI checkout absolute prefixes with <checkout>; no numeric values or job outcomes changed.",
+      "raw_private_hint": "out/issue15-ci79/job-133262824141.log",
+      "raw_preserved": true
+    },
+    {
+      "artifact": "ruff-original-failure-excerpt.log",
+      "raw_sha256": "7dd9a17fb676429b013f96d68be60acd62f8f6cde47b1635635fc84f5c4a5178",
+      "published_sha256": "0fd7f704879c5df3c0002c72888bff985696044746c84fecc035464144256c14",
+      "raw_private_hint": "out/issue15-ci79/checks-failure.log",
+      "redaction_count": 0,
+      "selection_reason": "Only frozen-evidence source paths and the Ruff error total; full raw kept privately.",
+      "raw_preserved": true
+    }
+  ]
+}
