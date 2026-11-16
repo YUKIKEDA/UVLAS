@@ -1,0 +1,13 @@
+[0/2] Re-checking globbed directories...
+[1/13] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace-or-dependency>\out\issue86-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace-or-dependency> -DOUTPUT=<workspace-or-dependency>/out/issue86-build/generated/uvlas/git_revision.hpp -P <workspace-or-dependency>/cmake/GitRevision.cmake"
+[2/13] Building CXX object CMakeFiles\uvlas_aero.dir\Debug\src\aero\exact_triangle_predicates.cpp.obj
+[3/13] Building CXX object tests\CMakeFiles\uvlas_test_aero_exact_triangle_allocations.dir\Debug\aero\exact_triangle_allocations_test.cpp.obj
+[4/13] Building CXX object tests\CMakeFiles\uvlas_test_aero_exact_triangle_predicates.dir\Debug\aero\exact_triangle_predicates_test.cpp.obj
+[5/13] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[6/13] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[7/13] Linking CXX static library Debug\uvlas_core_audit.lib
+[8/13] Linking CXX static library Debug\uvlas_core.lib
+[9/13] Linking CXX static library Debug\uvlas_aero.lib
+[10/13] Linking CXX executable tests\Debug\uvlas_test_aero_exact_triangle_resources.exe
+[11/13] Linking CXX executable tests\Debug\uvlas_test_aero_exact_triangle_predicates.exe
+[12/13] Linking CXX executable tests\Debug\uvlas_test_aero_exact_triangle_allocations.exe

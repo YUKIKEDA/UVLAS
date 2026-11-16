@@ -1,0 +1,62 @@
+Internal ctest changing into directory: <workspace-or-dependency>/out/issue86-build
+UpdateCTestConfiguration  from :<workspace-or-dependency>/out/issue86-build/DartConfiguration.tcl
+Parse Config file:<workspace-or-dependency>/out/issue86-build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<workspace-or-dependency>/out/issue86-build/DartConfiguration.tcl
+Parse Config file:<workspace-or-dependency>/out/issue86-build/DartConfiguration.tcl
+Test project <workspace-or-dependency>/out/issue86-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 19
+    Start 19: aero.exact_triangle_predicates
+
+19: Test command: <workspace-or-dependency>\out\issue86-build\tests\Release\uvlas_test_aero_exact_triangle_predicates.exe
+19: Working Directory: <workspace-or-dependency>/out/issue86-build/tests
+19: Test timeout computed to be: 60
+19: Randomness seeded to: 3236855941
+19: ===============================================================================
+19: All tests passed (5042 assertions in 7 test cases)
+19: 
+1/3 Test #19: aero.exact_triangle_predicates ....   Passed    0.32 sec
+test 20
+    Start 20: aero.exact_triangle_allocations
+
+20: Test command: <workspace-or-dependency>\out\issue86-build\tests\Release\uvlas_test_aero_exact_triangle_allocations.exe
+20: Working Directory: <workspace-or-dependency>/out/issue86-build/tests
+20: Test timeout computed to be: 60
+20: Randomness seeded to: 486041299
+20: aero exact preparation allocations=51 elapsed_ns=289200 planned_workspace_bytes=156008 planned_result_bytes=12344 process_peak_bytes=6488064
+20: ===============================================================================
+20: All tests passed (13 assertions in 2 test cases)
+20: 
+2/3 Test #20: aero.exact_triangle_allocations ...   Passed    0.03 sec
+test 21
+    Start 21: aero.exact_triangle_resources
+
+21: Test command: <workspace-or-dependency>\out\issue86-build\tests\Release\uvlas_test_aero_exact_triangle_resources.exe
+21: Working Directory: <workspace-or-dependency>/out/issue86-build/tests
+21: Test timeout computed to be: 60
+21: Randomness seeded to: 3380234050
+21: ===============================================================================
+21: All tests passed (38 assertions in 1 test case)
+21: 
+3/3 Test #21: aero.exact_triangle_resources .....   Passed    0.04 sec
+
+The following tests passed:
+	aero.exact_triangle_predicates
+	aero.exact_triangle_allocations
+	aero.exact_triangle_resources
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+V-AERO          =   0.32 sec*proc (1 test)
+negative        =   0.39 sec*proc (3 tests)
+property        =   0.39 sec*proc (3 tests)
+unit            =   0.32 sec*proc (1 test)
+verification    =   0.39 sec*proc (3 tests)
+
+Total Test time (real) =   0.40 sec

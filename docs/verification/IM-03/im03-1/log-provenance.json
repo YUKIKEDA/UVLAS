@@ -1,0 +1,171 @@
+[
+  {
+    "id": "safe-issue86-final-configure.log",
+    "original_sha256": "0bafcf99f76e45939c64c0f173aaa682d5cca1f7ea4d5bebaa5b26f8598b3817",
+    "published_sha256": "6d2b4a68fbcbb38648daf6b6c16a07571aaf2fd33cc1b15483b8221805207694",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 1,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-final-build-debug.log",
+    "original_sha256": "edde34aa5030880b5bf29b50995ce16005f1c8df68b916f24fe7de3028a57bdf",
+    "published_sha256": "8f94214b66f7fde1493ef97d54965c7a54915d7560a525c1d139c8acbb51f710",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 4,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-final-build-release.log",
+    "original_sha256": "c06fa7459e5f96edb6e75767bd7ec4410b96759d6a2141142ebadb056df150c1",
+    "published_sha256": "63e30f9a682816e6b311f7b282ddf9cc04245a51f41337f7e93286f613cc135a",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 4,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-final-test-debug.log",
+    "original_sha256": "352f44c16a268a03a336d3f1d9c8ae1065816f01f3bedc2e548faf8bbafc713e",
+    "published_sha256": "58d199de1b0c5713ae53a0bbcbb1211c42dad9f92b223b7b60f39df4fefccc11",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 12,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-final-test-release.log",
+    "original_sha256": "1903b1001dfb0a330adf75b21885777b50cb7981a1af2e78acf8a6e5721c591e",
+    "published_sha256": "df2d197a2fa4eb1d519651779ec53c49e2db015af0c612e689af0e016c76519b",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 12,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-tidy-passkey.log",
+    "original_sha256": "95b93b43b7b88761ab81e8b626ba41817516080a520972098bdb27bbc9e5b23b",
+    "published_sha256": "0d16fd6cf271e51fbc33a32f678a117dc3628069f4eade9a8d334bee4d7d9a5c",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 2,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-tidy-final-tests.log",
+    "original_sha256": "e56db048f76427a00b35e2516c05e0b7e37dde285c06292407f58ad061c74736",
+    "published_sha256": "4d551a92ac3a3c1621f268eee0ef0f39b6e2ace569971da1e4ab52e9071fa5e1",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 2,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-tidy-tests-final.log",
+    "original_sha256": "6de40d0de1698d26b75c80c761c27a398cf2a028fb72698a0153e3208b648912",
+    "published_sha256": "3d8d9ceabe91818344889f96bd980817c4e701464bcf04e2a393c91b970e29f0",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 2,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-japanese-lint.json",
+    "original_sha256": "90e4b3f653d6f59e60066b66b7e21f1c8ea9bee0b323efe4ad36dcbd1decfcbe",
+    "published_sha256": "449c220fbbe83b252de7efc9dba1664b39be10babe3241c799c17ed2dbb5dd60",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-types-japanese.json",
+    "original_sha256": "a8bf43081aeec9b531cef1e24920213a9170315b42806a2127c21734b4027196",
+    "published_sha256": "df534419bce0cd5eb751fee0371614f17c85d7c028b3b4ed117b466e399ac885",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-machine.json",
+    "original_sha256": "0d9d1ac50e9613ee208d85862de909d5c27a7e6abfbee172051edde354be04b0",
+    "published_sha256": "f0d084bfb2444d968becee5e1cd2721d3a6953faaa04a657f57ba32b466d99fa",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately. The initial RAM field label is corrected to reported_total_physical_memory_bytes; actual installed module capacity is in the separate supplement. Numerical values are preserved."
+  },
+  {
+    "id": "safe-issue86-machine-supplement.json",
+    "original_sha256": "c33300489950cc4188f52a927d950df220a24436097d5fbe75d2ba605914192b",
+    "published_sha256": "42b5b5c9466f78e60e1f0aaad59a8f34c06b9ceaa06ac9212199ff7a9595ab5b",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-trace-tool-unittest.log",
+    "original_sha256": "bcbc2bc9e5490188d5c61db7cb2eb8ec96470174eaed3ce82349e909a2148005",
+    "published_sha256": "69ffe27d79a956add3e24a834b103efc7ae9ce34d4f50b55c471d791f031c819",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-trace-tool-ruff.log",
+    "original_sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+    "published_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-trace-tool-format-final.log",
+    "original_sha256": "97d85b4b6c185a05396e2d09a3c304ff0f7cc77f8b7b7bb7989ec6cd875b3898",
+    "published_sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-trace-tool-pyright.log",
+    "original_sha256": "fb0f94accf07894a038a8c67be17c87e22e00d5a43e609f1fce444d9a6724088",
+    "published_sha256": "3ad2d843353727d542e7367b203d155ef69e68c7e533e1a57e7c5f8a2337fa84",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-final-trace-matrix-fixed.log",
+    "original_sha256": "3f779d02c1d3a1ec6b84662f16576db84e85eb49dab54d2f83024bd317f7f473",
+    "published_sha256": "df67d6a82a4c0f3fd8ee012fe7152ad5a509bc8885fbbf7031dba41b01725611",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "safe-issue86-final-trace-check-fixed.log",
+    "original_sha256": "49f49ee4812bff7afa957927bfecd2b0fa92d35a22a7736d8624e1c382be54b0",
+    "published_sha256": "37cea060842c01ce459239dcede63b4631d6770abad386e7d39b60336f64d386",
+    "original_encoding": "utf-8-sig",
+    "published_encoding": "utf-8",
+    "redactions": 0,
+    "reason": "Remove local account/worktree paths; transcode logs to UTF-8/LF without changing test numbers. Original raw line endings are preserved separately."
+  },
+  {
+    "id": "clean-git-revision.hpp",
+    "original_sha256": "faf71ee0f29db4a447ad1d81355905f25a1101227f8f5733dc5000e6a5152f67",
+    "published_sha256": "e9bf72b0e71d8f5d5c3e635ad2fa48d76f692287dee5d8e95f53fa14589d40ee",
+    "redactions": 0,
+    "reason": "LF-only public copy; original generated metadata preserved."
+  }
+]

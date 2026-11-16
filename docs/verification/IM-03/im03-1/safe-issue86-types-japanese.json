@@ -1,0 +1,57 @@
+WARN `--no-project` was provided, but no project was found
+{
+  "file": ".cursor\\rules\\types.mdc",
+  "stats": {
+    "total_findings": 0,
+    "by_category": {},
+    "genre": "tech",
+    "experimental": false,
+    "total_sentences": 14,
+    "nominal_ending_count": 2,
+    "nominal_ending_ratio": 0.14285714285714285,
+    "total_paragraphs": 6,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      3,
+      2,
+      1,
+      1,
+      2,
+      5
+    ],
+    "paragraph_sentence_count_cv": 0.5890150893739515,
+    "rhythm": {
+      "mora_mean": 49.642857142857146,
+      "mora_stdev": 35.684344592266115,
+      "burstiness": -0.1635880735187087,
+      "length_autocorrelation_lag1": 0.04025865444639629
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "����/����/����/����",
+      "lead_pos_4gram_ratio": 0.15384615384615385
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 113,
+      "doc_char_count": 486,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 10,
+      "non_blank_line_count": 30,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 2,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": []
+}

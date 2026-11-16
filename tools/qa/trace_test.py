@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -36,6 +37,36 @@ class TraceTest(unittest.TestCase):
         self.assertEqual(set(definitions), {"EIG-01", "EIG-14"})
         self.assertEqual(trace.kind_of("EIG-01"), "decision")
         self.assertEqual(trace.ANY.findall("xEIG-01 EIG-01x EIG-001 EIG-01"), ["EIG-01"])
+
+    def test_adopted_families_trace_definitions_tags_records_and_reject_unknown(self) -> None:
+        for family in ("UI-D", "UW-D", "BM-D", "CN-D", "SI-D"):
+            with self.subTest(family=family):
+                identifier = f"{family}01"
+                self.write("docs/specs/adopted.md", f"| {identifier} | adopted decision |\n")
+                self.write(
+                    "tests/adopted.cpp",
+                    f'TEST_CASE(\n "adopted",\n "[{identifier}][verification]") {{}}\n',
+                )
+                self.write("docs/verification/adopted.json", json.dumps({"ids": [identifier]}))
+                definitions, _, _ = trace.read_catalog()
+                tests, records, _ = trace.read_evidence()
+                self.assertEqual(set(definitions), {identifier})
+                self.assertEqual(trace.kind_of(identifier), "decision")
+                self.assertEqual(tests[identifier], ["tests/adopted.cpp:1"])
+                self.assertEqual(records[identifier], ["docs/verification/adopted.json"])
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(trace.main(["matrix"]), 0)
+                    self.assertEqual(trace.main(["check"]), 0)
+                self.write("tests/adopted.cpp", f'TEST_CASE("unknown", "[{family}99]") {{}}\n')
+                self.write("docs/verification/adopted.json", json.dumps({"ids": [f"{family}98"]}))
+                output = io.StringIO()
+                with contextlib.redirect_stdout(output):
+                    self.assertEqual(trace.main(["matrix"]), 0)
+                    self.assertEqual(trace.main(["check"]), 1)
+                self.assertIn(f"test names an undefined ID {family}99", output.getvalue())
+                self.assertIn(
+                    f"verification record names an undefined ID {family}98", output.getvalue()
+                )
 
     def test_formatted_macros_keep_tags_and_macro_line_numbers(self) -> None:
         self.write(

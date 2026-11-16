@@ -1,0 +1,5 @@
+{
+  "installed_memory_bytes": 51539607552,
+  "reported_total_physical_memory_bytes": 51343966208,
+  "scope": "Installed capacity is the sum of physical memory modules. ComputerSystem TotalPhysicalMemory is separately reported, without machine name or private paths."
+}
