@@ -2,6 +2,8 @@
 
 IM00-11に残した全体系の検証を定める。[精度契約](precision-contract.md)の一行witnessと[密解法契約](dense-solve-contract.md)の小規模検査を、この検証の代わりにしない。対象は凍結した `uvlm-column-update-result` の4096分割・無次元振動数0.1である。製品による空力行列・荷重kernelの組立や、全実務性能の認定ではない。
 
+大型検証はWindows/LinuxのRelease構成で実行する。Debugとsanitizerでは、独立oracleの小規模厳密対照とfixture改変拒否を実行し、既存の製品部品試験も維持する。大型LUを全構成で重複させず、全4096行・3右辺・39観測という検証範囲は両OSのReleaseで保つ。
+
 ## 元の入力を両OSで一致させる
 
 実基準行列と複素rank-one更新から、元の有効係数を定める。

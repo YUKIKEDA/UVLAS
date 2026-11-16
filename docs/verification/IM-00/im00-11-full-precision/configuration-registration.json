@@ -1,0 +1,56 @@
+{
+  "scope": "実際のuvlas_add_test関数を文字列のまま抽出した独立最小projectによる登録経路確認。製品数値試験の実行ではない。",
+  "helper_sha256": "593fecb5e406cbe111e0c5004e938965050329fb0595e19562bfdb65b9c32800",
+  "helper_hash_encoding": "UTF-8、function行からendfunction()まで、LF、終端改行なし。",
+  "fixture": "uvlas_configure_targetを空stub、Catch2::Catch2WithMainをimported interface、ソースをdummy.cppに置換。関数本文は変更していない。",
+  "cases": [
+    {
+      "generator": "Ninja",
+      "build_type": "Debug",
+      "ctest_configuration": null,
+      "registered": [
+        "control"
+      ],
+      "exit": 0
+    },
+    {
+      "generator": "Ninja",
+      "build_type": "Release",
+      "ctest_configuration": null,
+      "registered": [
+        "control",
+        "full"
+      ],
+      "exit": 0
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "ctest_configuration": "Debug",
+      "registered": [
+        "control"
+      ],
+      "exit": 0
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "ctest_configuration": "Release",
+      "registered": [
+        "control",
+        "full"
+      ],
+      "exit": 0
+    }
+  ],
+  "results": "単構成は-Cを指定せずDebugでcontrolのみ、Releaseでcontrolとfull。多構成は-C Debugでcontrolのみ、-C Releaseで両方を登録。",
+  "logs": {
+    "configuration-configure-multi.log": "a292a89e4ac8a875a4bf8d8c61e2b334904aabc8d28099e6a7f9ffe733fa86c8",
+    "configuration-configure-single-debug.log": "013801b7c4a4fba482737710a6a369715be5e7dc6d60d266cf1bb1ab28ff3c8c",
+    "configuration-configure-single-release.log": "8470a1670be2c88a2de90782fdbc1815ff0bfe25a323cb325214d7cbcb6bf9ba",
+    "configuration-registration-multi-debug.log": "1df17b778fec0082f21d1b3d8cd0efcfa2e45e4d4d9d5374eaab38ea2d74343c",
+    "configuration-registration-multi-release.log": "4d7dde1f7d566101fa87aeae2b01b2373db2d41cbdbc48cc7735aaaf75db90f1",
+    "configuration-registration-single-debug.log": "8f505139a209848729a525faf58eba03ef793aea505f375ef722f57c7457f0ba",
+    "configuration-registration-single-release.log": "5b4ffdc335e05c47f892acda8f2d0b3cc36d530ea30339240352c98ca65622db"
+  },
+  "redaction": "各commandのstdout/stderrを捕捉し、実worktree絶対pathを[WORKTREE]へ置換して公開logへ保存した。非伏字stdoutの別ファイルは保存していない。実行器と独立projectは私有outに保持。",
+  "raw_source_sha256": "95e880ee63e9450a49a2d9043046124717c6b1fecb2fd863d5f63a8d8e03c704"
+}

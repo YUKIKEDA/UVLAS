@@ -13,6 +13,7 @@ globs: "tests/**"
 - Catch2 v3（ADR 0004）。`uvlas_add_test()`（`tests/CMakeLists.txt`）で登録し、1実行ファイルが1つのCTestの試験になる。
 - 走らせるのは `ctest --preset <preset>`、一部だけなら `-R <名前>` か `-L <ラベル>`。終了コードと、走った件数を読む。0件の実行は合格ではない（Presetがエラーにする）。
 - 影響する試験を選び、Debug、Release、Linuxのsanitizerのうち必要な構成で走らせる。検証範囲と最後の全体検証の扱いは `workflow` に従う。文書や独立した道具だけの変更でC++の全試験を走らせない。
+- 実行構成を限定するときは、single-configとmulti-configの両方で対象の登録を確認する。`add_test(CONFIGURATIONS Release)`だけでは、`-C`を渡さないsingle-configのRelease試験も登録されない。single-configでは構成時の `CMAKE_BUILD_TYPE`、multi-configではCTestの `-C` に合わせて選び、期待した試験名が `ctest -N` に現れることを確かめる。
 
 ## 層とラベル
 
