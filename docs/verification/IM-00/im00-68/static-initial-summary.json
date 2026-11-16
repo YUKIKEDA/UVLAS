@@ -1,0 +1,22 @@
+[
+  {
+    "file": "<repo>\\src\\numerics\\eigen_full.cpp",
+    "exit": 1
+  },
+  {
+    "file": "<repo>\\tests\\numerics\\eigen_full_test.cpp",
+    "exit": 1
+  },
+  {
+    "file": "<repo>\\tests\\numerics\\eigen_full_contract_test.cpp",
+    "exit": 1
+  },
+  {
+    "file": "<repo>\\tests\\numerics\\eigen_full_phase_audit_test.cpp",
+    "exit": 1
+  },
+  {
+    "file": "<repo>\\qa\\eigen_full\\main.cpp",
+    "exit": 1
+  }
+]

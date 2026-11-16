@@ -1,0 +1,78 @@
+90007 warnings generated.
+<repo>\include\uvlas/numerics/eigen_full.hpp:145:8: error: constructor does not initialize these fields: association, left, require_full_basis [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  145 | struct FullPairRequest {
+      |        ^
+  146 |     FullOutputRequest common; ///< Representation, capacities and necessary consumer checks.
+  147 |     PairMetricRequest pair;   ///< Actual right and requested left residual/normalization budgets.
+  148 |     FullAssociation association; ///< Explicit one-to-one root association policy.
+      |                                
+      |                                {}
+  149 |     bool left;                   ///< Construct and qualify independent left eigenvectors when true.
+      |              
+      |              {}
+  150 |     bool
+  151 |         require_full_basis; ///< Require all n pairs and a certified left-inverse independence test.
+      |                           
+      |                           {}
+<repo>\include\uvlas/numerics/eigen_full.hpp:154:8: error: constructor does not initialize these fields: association, left [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  154 | struct FullClusterRequest {
+      |        ^
+  155 |     FullRequest common;          ///< Actual subspace budgets, generation, resources and consumers.
+  156 |     FullAssociation association; ///< Matching policy for an independently extracted left space.
+      |                                
+      |                                {}
+  157 |     bool left;                   ///< Never reuse the right subspace as its left counterpart.
+      |              
+      |              {}
+<repo>\src\numerics\eigen_full.cpp:92:27: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+   92 |             add_timing(d, d.timings->preparation, *start_);
+      |                           ^~~~~~~~~
+<repo>\src\numerics\eigen_full.cpp:208:10: error: variable 'v' of type 'double' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  208 |     for (double v : s.components) {
+      |          ^
+      |                 const 
+<repo>\src\numerics\eigen_full.cpp:232:53: error: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  232 |     const std::array extents{PayloadExtent{n, n, n, 16 * 24}, PayloadExtent{n, 1, n, 16 * 16}};
+      |                                                     ^
+<repo>\src\numerics\eigen_full.cpp:232:53: note: make conversion explicit to silence this warning
+    9 |     const std::array extents{PayloadExtent{n, n, n, 16 * 24}, PayloadExtent{n, 1, n, 16 * 16}};
+      |                                                     ^~~~~~~
+      |                                                     static_cast<std::size_t>( )
+<repo>\src\numerics\eigen_full.cpp:232:53: note: perform multiplication in a wider type
+  232 |     const std::array extents{PayloadExtent{n, n, n, 16 * 24}, PayloadExtent{n, 1, n, 16 * 16}};
+      |                                                     ^~
+      |                                                     static_cast<long long>( )
+<repo>\src\numerics\eigen_full.cpp:232:86: error: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  232 |     const std::array extents{PayloadExtent{n, n, n, 16 * 24}, PayloadExtent{n, 1, n, 16 * 16}};
+      |                                                                                      ^
+<repo>\src\numerics\eigen_full.cpp:232:86: note: make conversion explicit to silence this warning
+  232 |     const std::array extents{PayloadExtent{n, n, n, 16 * 24}, PayloadExtent{n, 1, n, 16 * 16}};
+      |                                                                                      ^~~~~~~
+      |                                                                                      static_cast<std::size_t>( )
+<repo>\src\numerics\eigen_full.cpp:232:86: note: perform multiplication in a wider type
+  232 |     const std::array extents{PayloadExtent{n, n, n, 16 * 24}, PayloadExtent{n, 1, n, 16 * 16}};
+      |                                                                                      ^~
+      |                                                                                      static_cast<long long>( )
+<repo>\src\numerics\eigen_full.cpp:331:8: error: constructor does not initialize these fields: error [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  331 | struct Evaluation {
+      |        ^
+  332 |     Complex value;
+  333 |     double error;
+      |                 
+      |                 {}
+<repo>\src\numerics\eigen_full.cpp:623:9: error: variable 'a' of type 'Matrix' (aka 'Matrix<complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>') can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  623 |         Matrix a = scaled_matrix(*data), q(n, n), t(n, n);
+      |         ^
+<repo>\src\numerics\eigen_full.cpp:846:17: error: repeated branch body in conditional chain [bugprone-branch-clone,-warnings-as-errors]
+  846 |                 rotation = Eigen::JacobiRotation<Complex>{0, 1};
+      |                 ^
+<repo>\src\numerics\eigen_full.cpp:846:64: note: end of the original
+  846 |                 rotation = Eigen::JacobiRotation<Complex>{0, 1};
+      |                                                                ^
+<repo>\src\numerics\eigen_full.cpp:850:17: note: clone 1 starts here
+  850 |                 rotation = Eigen::JacobiRotation<Complex>{0, 1};
+      |                 ^
+<repo>\src\numerics\eigen_full.cpp:1178:5: error: variable 'lu' of type 'Eigen::PartialPivLU<Matrix>' (aka 'PartialPivLU<Matrix<complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>>') can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+ 1178 |     Eigen::PartialPivLU<Matrix> lu(z);
+      |     ^
+      |                                 const 

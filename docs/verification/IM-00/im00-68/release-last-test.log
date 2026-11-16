@@ -1,0 +1,85 @@
+Start testing: Nov 16 13:39 東京 (標準時)
+----------------------------------------------------------
+41/60 Testing: numerics.eigen_full_phase_audit
+41/60 Test: numerics.eigen_full_phase_audit
+Command: "<repo>/out/issue68/tests/Release/uvlas_test_numerics_eigen_full_phase_audit.exe"
+Directory: <repo>/out/issue68/tests
+"numerics.eigen_full_phase_audit" start time: Nov 16 13:39 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 1798371366
+===============================================================================
+All tests passed (4 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"numerics.eigen_full_phase_audit" end time: Nov 16 13:39 東京 (標準時)
+"numerics.eigen_full_phase_audit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/60 Testing: numerics.eigen_full_contract
+42/60 Test: numerics.eigen_full_contract
+Command: "<repo>/out/issue68/tests/Release/uvlas_test_numerics_eigen_full_contract.exe"
+Directory: <repo>/out/issue68/tests
+"numerics.eigen_full_contract" start time: Nov 16 13:39 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2324061900
+===============================================================================
+All tests passed (146 assertions in 7 test cases)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"numerics.eigen_full_contract" end time: Nov 16 13:39 東京 (標準時)
+"numerics.eigen_full_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/60 Testing: numerics.eigen_full
+43/60 Test: numerics.eigen_full
+Command: "<repo>/out/issue68/tests/Release/uvlas_test_numerics_eigen_full.exe"
+Directory: <repo>/out/issue68/tests
+"numerics.eigen_full" start time: Nov 16 13:39 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2448124025
+===============================================================================
+All tests passed (892 assertions in 13 test cases)
+
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"numerics.eigen_full" end time: Nov 16 13:39 東京 (標準時)
+"numerics.eigen_full" time elapsed: 00:00:00
+----------------------------------------------------------
+
+60/60 Testing: qa.eigen_full
+60/60 Test: qa.eigen_full
+Command: "<home>/AppData/Roaming/uv/python/cpython-3.13.1-windows-x86_64-none/python.exe" "<repo>/tools/qa/results.py" "check" "--case" "eigen-full" "--run" "<repo>/out/issue68/Release/uvlas_eigen_full_canary.exe"
+Directory: <repo>/out/issue68/tests
+"qa.eigen_full" start time: Nov 16 13:39 東京 (標準時)
+Output:
+----------------------------------------------------------
+eigen-full on windows-x64-msvc19.51-sse2: 8 values equal the baseline bit for bit
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"qa.eigen_full" end time: Nov 16 13:39 東京 (標準時)
+"qa.eigen_full" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 16 13:39 東京 (標準時)
+
+negative =   0.47 sec*proc
+
+property =   0.05 sec*proc
+
+unit =   0.47 sec*proc
+
+verification =   0.62 sec*proc
+

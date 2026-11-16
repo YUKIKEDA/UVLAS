@@ -1,0 +1,8 @@
+{
+  "path_hint": "tests/CMakeLists.txt",
+  "executed_commit": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+  "executed_sha256": "61fb328403434db74a46572b175b64ca8bd7e28a862cbb499477a167067845fe",
+  "registered_tool_sha256": "1d75ead3be84111ab6c8370853dd2752ad8631ae3780fd5c1becd83df2626144",
+  "only_change": "Pythonのtools.trace登録4行だけ。C++source、compile設定、数値testの登録は不変。",
+  "registered_test": "Debugのtools.trace1/1成功。その後の最後の字句修正はrootがunittest5/5で確認した。module入口は同じで、登録確認の再実行はしていない。"
+}

@@ -1,0 +1,30 @@
+{
+  "version": "clang-tidy 21.1.1",
+  "compilation_database": "Debugのみ、各TU1entry。旧失敗と修正後成功は別ログで保存。",
+  "translation_units": {
+    "src/numerics/eigen_full.cpp": {
+      "exit": 0,
+      "log": "static-source-final.log",
+      "snapshot_sha256": "fb32e0daa240da2086ad99640889e6fc82788de2341c878e3dac30042c7f9bc5"
+    },
+    "tests/numerics/eigen_full_test.cpp": {
+      "exit": 0,
+      "log": "static-numeric-final.log",
+      "snapshot_sha256": "e9e39b7fdedd3d29c830ab260dc6a21d08d952801aa28390286d66604e90545c",
+      "note": "最終static後に厳密零の個数とbackend識別の2assertionだけを追加した。最終cleanのMSVC両構成でcompileと全case実行を確認した。数値処理は不変。"
+    },
+    "tests/numerics/eigen_full_contract_test.cpp": {
+      "exit": 0,
+      "log": "static-contract-final.log"
+    },
+    "tests/numerics/eigen_full_phase_audit_test.cpp": {
+      "exit": 0,
+      "log": "static-audit-final.log"
+    },
+    "qa/eigen_full/main.cpp": {
+      "exit": 0,
+      "log": "static-canary-final.log"
+    }
+  },
+  "format": "clang-format21.1.2 --dry-run --Werror、公開/私有headerを含む8fileで成功。"
+}

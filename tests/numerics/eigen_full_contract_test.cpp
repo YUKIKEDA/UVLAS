@@ -126,7 +126,7 @@ constexpr std::array checks{
 } // namespace
 
 TEST_CASE("Full results outlive every borrowed input and safely expose moved-from status",
-          "[N4-07][N4-08][property]") {
+          "[N4-07][N4-08][property][EIG-10][EIG-12]") {
     auto result = owned_diagonal();
     REQUIRE(result);
     auto moved = std::move(*result);
@@ -151,7 +151,7 @@ TEST_CASE("Full results outlive every borrowed input and safely expose moved-fro
 }
 
 TEST_CASE("Empty full packets perform no callback including capability metadata",
-          "[N4-07][N4-02][negative]") {
+          "[N4-07][N4-02][negative][EIG-01][EIG-05][EIG-10]") {
     core::ResourcePlan inputs{0}, work{0};
     const auto original = input<double>({0, 0, 0}, {}, inputs);
     Consumer consumer;
@@ -181,7 +181,7 @@ TEST_CASE("Empty full packets perform no callback including capability metadata"
 }
 
 TEST_CASE("Full preflight rejects stale units scales budgets and unsupported words before payload",
-          "[N4-07][N4-06][negative]") {
+          "[N4-07][N4-06][negative][EIG-01][EIG-02][EIG-11][EIG-12]") {
     core::ResourcePlan inputs{1024};
     const auto original = input<double>({2, 2, 2}, std::array{2., 0., 0., 5.}, inputs);
     for (unsigned mode = 0; mode < 8; ++mode) {
@@ -249,7 +249,7 @@ TEST_CASE("Full preflight rejects stale units scales budgets and unsupported wor
 }
 
 TEST_CASE("Full action budgets admit equality and reject before one excess application",
-          "[N4-07][N4-02][negative]") {
+          "[N4-07][N4-02][negative][EIG-07][EIG-11]") {
     core::ResourcePlan inputs{1024};
     const auto original = input<double>({2, 2, 2}, std::array{2., 0., 0., 5.}, inputs);
     const ScaleInput scales;
@@ -279,7 +279,7 @@ TEST_CASE("Full action budgets admit equality and reject before one excess appli
 }
 
 TEST_CASE("Full explicit projection requalifies consumers for both actual generations",
-          "[N4-07][N4-06][negative]") {
+          "[N4-07][N4-06][negative][EIG-03][EIG-10][EIG-12]") {
     core::ResourcePlan inputs{1024}, work{std::uint64_t{1024} * 1024};
     const auto original = input<double>({2, 2, 2}, std::array{2., 0., 0., 5.}, inputs);
     const ScaleInput scales;
@@ -339,7 +339,7 @@ TEST_CASE("Full explicit projection requalifies consumers for both actual genera
 }
 
 TEST_CASE("Full selections validate every index and are bound to the original owning packet",
-          "[N4-07][N4-08][negative]") {
+          "[N4-07][N4-08][negative][EIG-05][EIG-12]") {
     const auto first = owned_diagonal();
     const auto second = owned_diagonal();
     REQUIRE(first);
@@ -364,7 +364,8 @@ TEST_CASE("Full selections validate every index and are bound to the original ow
     CHECK(none.allocated_bytes() == 0);
 }
 
-TEST_CASE("Unrequested full consumers never call capability metadata", "[N4-07][N4-10][negative]") {
+TEST_CASE("Unrequested full consumers never call capability metadata",
+          "[N4-07][N4-10][negative][EIG-10][EIG-12]") {
     core::ResourcePlan inputs{1024}, work{std::uint64_t{1024} * 1024};
     const auto original = input<double>({2, 2, 2}, std::array{2., 0., 0., 5.}, inputs);
     Consumer consumer;

@@ -67,7 +67,7 @@ PrecisionBuffer<Scalar> input(core::Index n, std::span<const Scalar> values,
 }
 } // namespace
 TEST_CASE("Full Schur extracts all real roots without clipping the tiny negative root",
-          "[unit][N4-07][N4-06]") {
+          "[unit][N4-07][N4-06][EIG-01][EIG-04][EIG-05]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     std::array<double, 36> a{};
     a[1] = 2;
@@ -110,7 +110,7 @@ TEST_CASE("Full Schur extracts all real roots without clipping the tiny negative
 }
 
 TEST_CASE("Noncontiguous Schur clusters preserve Jordan multiplicity and independent left spaces",
-          "[unit][N4-07][N4-06]") {
+          "[unit][N4-07][N4-06][EIG-04][EIG-05][EIG-07][EIG-13]") {
     for (const double delta : {0.0, 0x1p-40}) {
         core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
         const std::array<double, 9> a{1, 0, 0, 1, 3, 0, 1, 0, 1 + delta};
@@ -260,7 +260,7 @@ void root_matching(std::span<const Complex> actual, std::span<const Complex> exp
 
 TEST_CASE(
     "Complex full roots and nonbinary scales are qualified against the original literal matrix",
-    "[verification][N4-07][N4-06]") {
+    "[verification][N4-07][N4-06][EIG-02][EIG-03][EIG-05][EIG-13]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     std::array<Complex, 36> a{};
     const std::array diag{Complex{7, 1}, Complex{3, 0},  Complex{2, 0},
@@ -290,7 +290,7 @@ TEST_CASE(
 
 TEST_CASE(
     "Full selected pairs retain physical scales left correspondence and rigorous independence",
-    "[verification][N4-07][N4-06]") {
+    "[verification][N4-07][N4-06][EIG-02][EIG-03][EIG-04][EIG-05][EIG-13]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<double, 4> a{2, 0, 1, 5};
     auto original = input<double>(2, a, plan);
@@ -352,7 +352,7 @@ TEST_CASE(
 }
 
 TEST_CASE("A defective Schur packet does not pretend to have a complete eigenvector basis",
-          "[negative][N4-07]") {
+          "[negative][N4-07][EIG-05][EIG-10]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<double, 4> a{1, 0, 1, 1};
     auto original = input<double>(2, a, plan);
@@ -377,7 +377,7 @@ TEST_CASE("A defective Schur packet does not pretend to have a complete eigenvec
 }
 
 TEST_CASE("Full PG24 roots use the frozen original P and independent SciPy spectrum",
-          "[verification][N4-07][N4-06]") {
+          "[verification][N4-07][N4-06][EIG-03][EIG-05][EIG-13]") {
     std::ifstream file{UVLAS_FULL_FIXTURE_PATH};
     REQUIRE(file.good());
     nlohmann::json fixture;
@@ -417,7 +417,7 @@ TEST_CASE("Full PG24 roots use the frozen original P and independent SciPy spect
 }
 
 TEST_CASE("Full phase timing is owned and disabled mode leaves numerical bytes unchanged",
-          "[unit][N4-07][N4-09]") {
+          "[unit][N4-07][N4-09][EIG-11][EIG-12]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<double, 4> a{2, 0, 1, 5};
     auto original = input<double>(2, a, plan);
@@ -465,7 +465,7 @@ TEST_CASE("Full phase timing is owned and disabled mode leaves numerical bytes u
 }
 
 TEST_CASE("Full result capacity is independent from original order capacity",
-          "[negative][N4-07][N4-09]") {
+          "[negative][N4-07][N4-09][EIG-01][EIG-11]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<double, 4> a{2, 0, 0, 5};
     auto original = input<double>(2, a, plan);
@@ -497,7 +497,7 @@ TEST_CASE("Full result capacity is independent from original order capacity",
 }
 
 TEST_CASE("Physical phase ordering is exact across the complete binary64 exponent range",
-          "[unit][N4-07][N4-06]") {
+          "[unit][N4-07][N4-06][EIG-04][EIG-13]") {
     using Rational = boost::multiprecision::cpp_rational;
     const double maximum = std::numeric_limits<double>::max(),
                  tiny = std::numeric_limits<double>::denorm_min();
@@ -532,7 +532,8 @@ TEST_CASE("Physical phase ordering is exact across the complete binary64 exponen
                                                                                side) == (b > a));
         }
 }
-TEST_CASE("Empty clusters retain whether a left basis was requested", "[unit][N4-07][N4-08]") {
+TEST_CASE("Empty clusters retain whether a left basis was requested",
+          "[unit][N4-07][N4-08][EIG-01][EIG-05][EIG-10]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<double, 4> a{2, 0, 0, 5};
     auto original = input<double>(2, a, plan);
@@ -574,7 +575,7 @@ TEST_CASE("Empty clusters retain whether a left basis was requested", "[unit][N4
 }
 
 TEST_CASE("A noncontiguous Jordan cluster needs a genuine right unitary exchange",
-          "[verification][N4-07]") {
+          "[verification][N4-07][EIG-05][EIG-07][EIG-13]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<double, 9> a{1, 0, 0, 1, 3, 0, 2, 1, 1};
     auto original = input<double>(3, a, plan);
@@ -605,7 +606,7 @@ TEST_CASE("A noncontiguous Jordan cluster needs a genuine right unitary exchange
         }
 }
 TEST_CASE("Pair phases are chosen from actual physical complex vectors after nonpower scaling",
-          "[verification][N4-07]") {
+          "[verification][N4-07][EIG-02][EIG-03][EIG-04][EIG-13]") {
     core::ResourcePlan plan{64 * std::uint64_t{1024} * 1024};
     const std::array<Complex, 4> a{Complex{1, 0}, Complex{0, 0}, Complex{0, 30}, Complex{3, 0}};
     auto original = input<Complex>(2, a, plan);
@@ -654,7 +655,7 @@ TEST_CASE("Pair phases are chosen from actual physical complex vectors after non
 }
 
 TEST_CASE("A nonzero scaled coefficient is never silently replaced by an underflowed zero",
-          "[negative][N4-07][N4-06]") {
+          "[negative][N4-07][N4-06][EIG-02][EIG-03]") {
     core::ResourcePlan plan{std::uint64_t{1024} * 1024};
     const std::array<double, 1> a{std::numeric_limits<double>::denorm_min()};
     auto original = input<double>(1, a, plan);

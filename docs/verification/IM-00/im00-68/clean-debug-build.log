@@ -1,0 +1,28 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring done (0.8s)
+-- Generating done (0.3s)
+-- Build files have been written to: <repo>/out/issue68
+[0/4] Re-checking globbed directories...
+[1/25] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\issue68 && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/issue68/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/25] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[3/25] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[4/25] Linking CXX static library Debug\uvlas_core.lib
+[5/25] Linking CXX static library Debug\uvlas_core_audit.lib
+[6/25] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Debug\src\numerics\eigen_metrics.cpp.obj
+[7/25] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\eigen_generalized.cpp.obj
+[8/25] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Debug\src\numerics\eigen_generalized.cpp.obj
+[9/25] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\eigen_full.cpp.obj
+[10/25] Building CXX object CMakeFiles\uvlas_eigen_full_canary.dir\Debug\qa\eigen_full\main.cpp.obj
+[11/25] Linking CXX static library Debug\uvlas_numerics.lib
+[12/25] Building CXX object CMakeFiles\uvlas_cli.dir\Debug\src\app\main.cpp.obj
+[13/25] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_full_contract.dir\Debug\numerics\eigen_full_contract_test.cpp.obj
+[14/25] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_full_phase_audit.dir\Debug\numerics\eigen_full_phase_audit_test.cpp.obj
+[15/25] Linking CXX executable Debug\uvlas_eigen_full_canary.exe
+[16/25] Linking CXX executable Debug\uvlas.exe
+[17/25] Building CXX object CMakeFiles\uvlas_numerics_audit.dir\Debug\src\numerics\eigen_full.cpp.obj
+[18/25] Linking CXX static library Debug\uvlas_numerics_audit.lib
+[19/25] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_full_contract.exe
+[20/25] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_full_phase_audit.exe
+[21/25] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_full.dir\Debug\numerics\eigen_full_test.cpp.obj
+[22/25] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_full.exe
