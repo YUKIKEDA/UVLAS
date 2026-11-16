@@ -106,6 +106,31 @@ uvlas_add_test(core.error_certificate
     SOURCES core/error_certificate_test.cpp
     LIBS uvlas_core)
 
+uvlas_add_test(aero.exact_triangle_predicates
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/exact_triangle_predicates_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_exact_triangle_predicates
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(aero.exact_triangle_allocations
+    LABELS property negative verification
+    SOURCES aero/exact_triangle_allocations_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_aero_audit uvlas::eigen Boost::headers)
+target_include_directories(uvlas_test_aero_exact_triangle_allocations
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_exact_triangle_allocations)
+uvlas_require_audited_dependencies(uvlas_test_aero_exact_triangle_allocations)
+
+uvlas_add_test(aero.exact_triangle_resources
+    LABELS property negative verification
+    SOURCES aero/exact_triangle_resource_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_exact_triangle_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_exact_triangle_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_exact_triangle_resources)
+
 uvlas_add_test(core.checked_dimensions
     LABELS unit negative
     SOURCES core/checked_dimensions_test.cpp

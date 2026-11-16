@@ -69,6 +69,13 @@ if(UVLAS_BUILD_PYTHON)
     add_subdirectory(src/python)
 endif()
 
+# Internal exact geometry preparation; does not expose a qualified physical packet.
+set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp)
+add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})
+uvlas_configure_target(uvlas_aero)
+target_include_directories(uvlas_aero PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_link_libraries(uvlas_aero PUBLIC uvlas_core PRIVATE Boost::headers)
+
 # QA-03: the first baseline case. Built with the product flags, compared by CTest.
 add_executable(uvlas_numeric_canary qa/numeric_canary/main.cpp)
 uvlas_configure_target(uvlas_numeric_canary)
@@ -118,6 +125,12 @@ if(BUILD_TESTING)
     target_include_directories(uvlas_numerics_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
     target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
     uvlas_require_audited_dependencies(uvlas_numerics_audit)
+    add_library(uvlas_aero_audit STATIC ${UVLAS_AERO_SOURCES})
+    uvlas_configure_target(uvlas_aero_audit)
+    uvlas_enable_allocation_audit(uvlas_aero_audit)
+    target_include_directories(uvlas_aero_audit PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    target_link_libraries(uvlas_aero_audit PUBLIC uvlas_core_audit PRIVATE Boost::headers)
+    uvlas_require_audited_dependencies(uvlas_aero_audit)
     add_subdirectory(tests)
 endif()
 
