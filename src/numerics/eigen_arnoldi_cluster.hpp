@@ -46,42 +46,82 @@ namespace uvlas::numerics::eigen::detail {
     return {};
 }
 
-// Transform an enclosed physical action to the original dimensionless action.
-// Roundoff of each explicit scaling is included, never absorbed into the budget.
+// Transform every signed word directly into the final coordinate system.
+// The positive interval scale composes all exponents before scalbn: an
+// intermediate underflow must never be hidden by a denorm floor in final units.
 [[nodiscard]] inline core::Result<void> arnoldi_scaled_action(ArnoldiComplex hi, ArnoldiComplex lo,
                                                               double error, double d,
                                                               double lambda_scale, ArnoldiSide side,
                                                               ArnoldiComplex& value,
                                                               double& upper) noexcept {
-    const auto unscaled = hi + lo;
-    const auto coordinate = side == ArnoldiSide::Right ? unscaled / d : unscaled * d;
-    value = coordinate / lambda_scale;
-    if (!arnoldi_finite(unscaled) || !arnoldi_finite(coordinate) || !arnoldi_finite(value)) {
-        return std::unexpected(core::Failure{ArnoldiCode::PrecisionUnresolved, arnoldi_operation});
+    if (!arnoldi_finite(hi) || !arnoldi_finite(lo) || !std::isfinite(error) || !std::isfinite(d) ||
+        !std::isfinite(lambda_scale)) {
+        return std::unexpected(core::Failure{ArnoldiCode::Nonfinite, arnoldi_operation});
+    }
+    if (error < 0 || d <= 0 || lambda_scale <= 0 ||
+        (side != ArnoldiSide::Right && side != ArnoldiSide::Left)) {
+        return std::unexpected(core::Failure{ArnoldiCode::InvalidInput, arnoldi_operation});
+    }
+    struct Lane {
+        double center;
+        double radius;
+    };
+    const auto transform = [&](double word) -> core::Result<Lane> {
+        const auto absolute = std::abs(word);
+        const auto enclosed = side == ArnoldiSide::Right
+                                  ? scale({absolute, absolute}, 1, d, lambda_scale)
+                                  : scale({absolute, absolute}, d, lambda_scale);
+        if (!std::isfinite(enclosed.upper)) {
+            return std::unexpected(
+                core::Failure{ArnoldiCode::PrecisionUnresolved, arnoldi_operation});
+        }
+        // A final sub-grid value may have center zero and a positive enclosure.
+        // Unlike physical_input, this output is an approximation, not an exact
+        // two-word input for an opaque callback.
+        const auto radius = enclosed.upper == enclosed.lower
+                                ? 0.0
+                                : std::nextafter(enclosed.upper - enclosed.lower,
+                                                 std::numeric_limits<double>::infinity());
+        return Lane{std::copysign(enclosed.lower, word), radius};
+    };
+    Sum<ArnoldiComplex> accumulated;
+    double conversion_error = 0;
+    for (const auto word : {hi, lo}) {
+        const auto real = transform(word.real());
+        const auto imaginary = transform(word.imag());
+        if (!real) {
+            return std::unexpected(real.error());
+        }
+        if (!imaginary) {
+            return std::unexpected(imaginary.error());
+        }
+        const auto added = accumulated.add({real->center, imaginary->center});
+        if (!added) {
+            return added;
+        }
+        conversion_error =
+            add_magnitudes({conversion_error, conversion_error}, {real->radius, real->radius})
+                .upper;
+        conversion_error = add_magnitudes({conversion_error, conversion_error},
+                                          {imaginary->radius, imaginary->radius})
+                               .upper;
+    }
+    const auto result = accumulated.finish();
+    if (!result) {
+        return std::unexpected(result.error());
     }
     const auto producer = side == ArnoldiSide::Right ? scale({error, error}, 1, d, lambda_scale)
                                                      : scale({error, error}, d, lambda_scale);
-    const auto high_magnitude = magnitude(hi), low_magnitude = magnitude(lo);
-    if (!high_magnitude) {
-        return std::unexpected(high_magnitude.error());
-    }
-    if (!low_magnitude) {
-        return std::unexpected(low_magnitude.error());
-    }
-    const auto magnitude_input = add_magnitudes(*high_magnitude, *low_magnitude);
-    const auto normalized = side == ArnoldiSide::Right ? scale(magnitude_input, 1, d, lambda_scale)
-                                                       : scale(magnitude_input, d, lambda_scale);
-    constexpr auto epsilon = std::numeric_limits<double>::epsilon();
-    // Each complex scaling is real and diagonal. Six rounded real operations,
-    // L1 bounding the real/imaginary errors, fit in this conservative gamma.
-    const auto rounding = multiply_magnitudes(normalized, {16 * epsilon, 16 * epsilon});
-    upper = add_magnitudes(producer, rounding).upper;
-    upper = add_magnitudes({upper, upper}, {16 * std::numeric_limits<double>::denorm_min(),
-                                            16 * std::numeric_limits<double>::denorm_min()})
-                .upper;
-    if (!std::isfinite(upper)) {
+    auto total =
+        add_magnitudes({conversion_error, conversion_error}, {result->error, result->error});
+    total = add_magnitudes(total, producer);
+    if (!std::isfinite(total.upper)) {
         return std::unexpected(core::Failure{ArnoldiCode::PrecisionUnresolved, arnoldi_operation});
     }
+    // L1 conversion radii enclose the complex Euclidean error; the producer's
+    // complex error ball is scaled once and added in these same final units.
+    value = result->value;
+    upper = total.upper;
     return {};
 }
 

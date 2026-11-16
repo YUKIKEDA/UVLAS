@@ -1,5 +1,5 @@
 #include "../support/allocation_audit.hpp"
-#include "eigen_arnoldi_engine.hpp"
+#include "eigen_arnoldi_cluster.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -192,4 +192,30 @@ TEST_CASE("Arnoldi production real complex and shifted adapters allocate no memo
     verify_adapter<double, double, false>();
     verify_adapter<Complex, Complex, false>();
     verify_adapter<double, Complex, true>();
+}
+
+TEST_CASE("Arnoldi enclosed action scaling allocates no memory",
+          "[N4-07][EIG-02][EIG-11][negative][verification]") {
+    const std::array<Complex, 3> high{{{0x1p-500, -0x1p-502}, {0x1p500, 0}, {1, -.5}}};
+    const std::array<Complex, 3> low{{{0x1p-554, 0}, {}, {0x1p-54, 0}}};
+    const std::array<double, 3> right{0x1p600, 0x1p-600, 3}, left{0x1p-600, 0x1p600, 3},
+        lambda{0x1p-1070, 0x1p1000, .2};
+    std::array<Complex, 6> values{};
+    std::array<double, 6> upper{};
+    bool all_succeeded = true;
+    test_support::AllocationAudit audit(test_support::strict_kernel_backends,
+                                        test_support::AuditThreadDomain::CallingThread);
+    for (std::size_t side = 0; side < 2; ++side) {
+        for (std::size_t i = 0; i < high.size(); ++i) {
+            const auto transformed = eig::detail::arnoldi_scaled_action(
+                high[i], low[i], 0x1p-1000, side == 0 ? right[i] : left[i], lambda[i],
+                side == 0 ? eig::ArnoldiSide::Right : eig::ArnoldiSide::Left,
+                values[side * high.size() + i], upper[side * high.size() + i]);
+            all_succeeded = all_succeeded && transformed.has_value();
+        }
+    }
+    const auto result = audit.finish();
+    REQUIRE(all_succeeded);
+    CHECK(result.status == test_support::AllocationAuditStatus::Clean);
+    CHECK(result.cpp_allocation_attempts == 0);
 }

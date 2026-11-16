@@ -1613,3 +1613,142 @@ TEST_CASE("Arnoldi canonical phase inspects the actual returned near tie",
         CHECK(side->vectors.values[maximum].real() >= 0);
     }
 }
+
+TEST_CASE("Arnoldi scaled action encloses intermediate exponent loss",
+          "[N4-07][EIG-02][EIG-03][negative][verification]") {
+    using Rational = boost::multiprecision::cpp_rational;
+    // The exact final action is 2^-30. Performing the first physical scale
+    // separately would underflow to zero before the small eigenvalue scale.
+    for (const auto side : {eig::ArnoldiSide::Right, eig::ArnoldiSide::Left}) {
+        const double d = side == eig::ArnoldiSide::Right ? 0x1p600 : 0x1p-600;
+        Complex value{};
+        double error = 0;
+        const auto transformed = eig::detail::arnoldi_scaled_action({0x1p-500, 0}, {}, 0, d,
+                                                                    0x1p-1070, side, value, error);
+        REQUIRE(transformed.has_value());
+        const Rational exact{0x1p-30};
+        const Rational difference = Rational(value.real()) - exact;
+        CHECK(difference * difference + Rational(value.imag()) * Rational(value.imag()) <=
+              Rational(error) * Rational(error));
+        const std::array<Complex, 1> q{{{1, 0}}}, t{}, action{{value}};
+        const std::array<double, 1> zero{}, errors{{error}};
+        const auto q_words = eig::WordView<Complex>::make(q, {}, core::Precision::Binary64);
+        const auto t_words = eig::WordView<Complex>::make(t, {}, core::Precision::Binary64);
+        const auto a_words = eig::WordView<Complex>::make(action, {}, core::Precision::Binary64);
+        REQUIRE(q_words.has_value());
+        REQUIRE(t_words.has_value());
+        REQUIRE(a_words.has_value());
+        const eig::BasisMetricRequest budgets{{1e-12, core::ObservationId{31}, core::ScopeId{32}},
+                                              {1e-12, core::ObservationId{33}, core::ScopeId{32}},
+                                              eig::NotRequested{}};
+        const auto qualified = eig::assess_schur_metrics(
+            1, 1, *q_words, eig::ActionValues<Complex>{*t_words, zero},
+            eig::ActionValues<Complex>{*a_words, errors}, budgets,
+            eig::MetricContext{context(), {}, core::NumericalGeneration{40}});
+        REQUIRE_FALSE(qualified.has_value());
+        CHECK(qualified.error().cause.code == core::FailureCode::PrecisionUnresolved);
+    }
+}
+
+TEST_CASE("Arnoldi scaled action contains rational complex error balls",
+          "[N4-07][EIG-02][EIG-03][verification]") {
+    using R = boost::multiprecision::cpp_rational;
+    struct Fixture {
+        Fixture(Complex leading, Complex trailing, double producer_bound, double right_scale,
+                double left_scale, double lambda_scale) noexcept
+            : high(leading),
+              low(trailing),
+              producer(producer_bound),
+              right_d(right_scale),
+              left_d(left_scale),
+              lambda(lambda_scale) {}
+        Complex high, low;
+        double producer, right_d, left_d, lambda;
+    };
+    const std::array fixtures{
+        Fixture{{0x1p-500, 0}, {}, 0, 0x1p600, 0x1p-600, 0x1p-1070},
+        Fixture{{0x1p500, 0}, {}, 0, 0x1p-600, 0x1p600, 0x1p1000},
+        Fixture{{0x1p-500, -0x1p-502}, {0x1p-554, 0x1p-557}, 0, 0x1p600, 0x1p-600, 0x1p-1070},
+        Fixture{
+            {-0x1p-500, 0x1p-502}, {0x1p-554, -0x1p-557}, 0x1p-1000, 0x1p600, 0x1p-600, 0x1p-1070},
+        Fixture{{1, -.5}, {.125, -0x1p-55}, 0x1p-50, 3, 3, .2},
+        Fixture{{0x1p-500, -0x1p-501}, {}, 0, 3 * 0x1p598, 3 * 0x1p-600, 3 * 0x1p-1070},
+        Fixture{{}, {}, 0x1p-1000, 0x1p100, 0x1p-100, 0x1p-1070},
+        Fixture{{1, 0}, {}, 0, 0x1p600, 0x1p-600, 0x1p470},
+        Fixture{{1, -.5}, {}, 0, 0x1p600, 0x1p-600, 0x1p475},
+        Fixture{{1, 0}, {}, 0, 3 * 0x1p600, 3 * 0x1p-600, 0x1p470},
+        Fixture{{std::numeric_limits<double>::max(), 0}, {0x1p970, 0}, 0, 0x1p600, 0x1p-600, 1},
+        // These three isolate conversion width, producer error, and Sum's EFT
+        // residual. A mutation dropping any one term must fail independently.
+        Fixture{{1, 0}, {}, 0, 3, 1, 1}, Fixture{{}, {}, 0x1p-50, 1, 1, 1},
+        Fixture{{1, 0}, {0x1p-54, 0}, 0, 1, 1, 1}};
+    for (std::size_t index = 0; index < fixtures.size(); ++index) {
+        const auto& fixture = fixtures[index];
+        for (const auto side : {eig::ArnoldiSide::Right, eig::ArnoldiSide::Left}) {
+            CAPTURE(index, side);
+            const double d = side == eig::ArnoldiSide::Right ? fixture.right_d : fixture.left_d;
+            Complex value{};
+            double upper = 0;
+            const auto transformed = eig::detail::arnoldi_scaled_action(
+                fixture.high, fixture.low, fixture.producer, d, fixture.lambda, side, value, upper);
+            REQUIRE(transformed.has_value());
+            REQUIRE(std::isfinite(value.real()));
+            REQUIRE(std::isfinite(value.imag()));
+            REQUIRE(std::isfinite(upper));
+            const R factor = side == eig::ArnoldiSide::Right ? R(1) / R(d) / R(fixture.lambda)
+                                                             : R(d) / R(fixture.lambda);
+            const R exact_real = (R(fixture.high.real()) + R(fixture.low.real())) * factor;
+            const R exact_imag = (R(fixture.high.imag()) + R(fixture.low.imag())) * factor;
+            const R delta_real = exact_real - R(value.real());
+            const R delta_imag = exact_imag - R(value.imag());
+            const R producer = R(fixture.producer) * factor;
+            const R total{upper};
+            REQUIRE(total >= producer);
+            const R remaining = total - producer;
+            // This contains the entire complex producer-error ball, not only
+            // one chosen error direction. All arithmetic here is exact rational.
+            CHECK(delta_real * delta_real + delta_imag * delta_imag <= remaining * remaining);
+        }
+    }
+}
+
+TEST_CASE("Arnoldi scaled action rejects nonfinite final bounds and accepts ordinary Schur data",
+          "[EIG-02][EIG-03][negative][verification]") {
+    for (const auto side : {eig::ArnoldiSide::Right, eig::ArnoldiSide::Left}) {
+        for (const bool producer_only : {false, true}) {
+            Complex value{17, -19};
+            double error = 23;
+            const auto failed = eig::detail::arnoldi_scaled_action(
+                producer_only ? Complex{} : Complex{1, 0}, {}, producer_only ? 1. : 0.,
+                side == eig::ArnoldiSide::Right ? 0x1p-1074 : 0x1p1023,
+                side == eig::ArnoldiSide::Right ? 1. : 0x1p-1023, side, value, error);
+            REQUIRE_FALSE(failed.has_value());
+            CHECK(failed.error().code == core::FailureCode::PrecisionUnresolved);
+            CHECK(value == Complex{17, -19});
+            CHECK(error == 23);
+        }
+        Complex value{};
+        double error = 0;
+        const auto ordinary = eig::detail::arnoldi_scaled_action(
+            {6, 0}, {}, 0, side == eig::ArnoldiSide::Right ? 3. : 1.,
+            side == eig::ArnoldiSide::Right ? 1. : 3., side, value, error);
+        REQUIRE(ordinary.has_value());
+        CHECK(value == Complex{2, 0});
+        const std::array<Complex, 1> q{{{1, 0}}}, t{{{2, 0}}}, action{{value}};
+        const std::array<double, 1> zero{}, errors{{error}};
+        const auto q_words = eig::WordView<Complex>::make(q, {}, core::Precision::Binary64);
+        const auto t_words = eig::WordView<Complex>::make(t, {}, core::Precision::Binary64);
+        const auto a_words = eig::WordView<Complex>::make(action, {}, core::Precision::Binary64);
+        REQUIRE(q_words.has_value());
+        REQUIRE(t_words.has_value());
+        REQUIRE(a_words.has_value());
+        const eig::BasisMetricRequest budgets{{1e-12, core::ObservationId{31}, core::ScopeId{32}},
+                                              {1e-12, core::ObservationId{33}, core::ScopeId{32}},
+                                              eig::NotRequested{}};
+        const auto qualified = eig::assess_schur_metrics(
+            1, 1, *q_words, eig::ActionValues<Complex>{*t_words, zero},
+            eig::ActionValues<Complex>{*a_words, errors}, budgets,
+            eig::MetricContext{context(), {}, core::NumericalGeneration{40}});
+        REQUIRE(qualified.has_value());
+    }
+}
