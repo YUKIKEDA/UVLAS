@@ -137,7 +137,7 @@ public:
 };
 } // namespace
 TEST_CASE("Generalized full extraction preserves signed roots and original mass geometry",
-          "[N4-07][verification]") {
+          "[N4-07][verification][EIG-01][EIG-03][EIG-04][EIG-06][EIG-13]") {
     core::ResourcePlan input(10000), plan(1000000);
     const auto k = matrix(2, std::array{-2., -2., -2., 10.}, input);
     const auto m = matrix(2, std::array{2., 2., 2., 5.}, input);
@@ -165,7 +165,7 @@ TEST_CASE("Generalized full extraction preserves signed roots and original mass 
     CHECK(phi[3] > 0);
 }
 TEST_CASE("Nonbinary scales and units are preserved and certified on actual physical vectors",
-          "[N4-07][verification]") {
+          "[N4-07][verification][EIG-02][EIG-03][EIG-04][EIG-06][EIG-13]") {
     core::ResourcePlan input(10000), plan(1000000);
     const auto k = matrix(2, std::array{-2., -2., -2., 10.}, input);
     const auto m = matrix(2, std::array{2., 2., 2., 5.}, input);
@@ -191,7 +191,7 @@ TEST_CASE("Nonbinary scales and units are preserved and certified on actual phys
     CHECK(result->mass_units()[0] == 2);
 }
 TEST_CASE("Tiny generalized eigenvalues keep relative accuracy sign and an exact zero",
-          "[N4-07][negative][verification]") {
+          "[N4-07][negative][verification][EIG-03][EIG-04][EIG-06][EIG-13]") {
     constexpr double delta = 0x1p-60;
     core::ResourcePlan input(10000), plan(1000000);
     const auto k = matrix(3, std::array{-delta, 0., 0., 0., 0., 0., 0., 0., 16 * delta}, input);
@@ -208,7 +208,8 @@ TEST_CASE("Tiny generalized eigenvalues keep relative accuracy sign and an exact
     CHECK(std::abs(result->eigenvalues()[2] / delta - 1) < 1.e-12);
     exact_original_check(*result);
 }
-TEST_CASE("Empty generalized extraction has zero proofs and no backend work", "[N4-07][negative]") {
+TEST_CASE("Empty generalized extraction has zero proofs and no backend work",
+          "[N4-07][negative][EIG-01][EIG-06][EIG-11]") {
     const numerics::DenseReal k, m;
     core::ResourcePlan plan(0);
     auto r = request({}, {});
@@ -224,7 +225,7 @@ TEST_CASE("Empty generalized extraction has zero proofs and no backend work", "[
     CHECK(plan.allocated_bytes() == 0);
 }
 TEST_CASE("Original mass qualification and complete symmetry cannot be replaced by scaled LLT",
-          "[N4-07][negative]") {
+          "[N4-07][negative][EIG-06][EIG-12]") {
     const std::array d{1., 1.};
     const std::array<numerics::linear::UnitDimensions, 2> units{};
     core::ResourcePlan input(10000);
@@ -247,7 +248,7 @@ TEST_CASE("Original mass qualification and complete symmetry cannot be replaced 
 }
 TEST_CASE(
     "Generalized entry rejects stale unsupported and physical coverage requests before allocation",
-    "[N4-07][negative]") {
+    "[N4-07][negative][EIG-01][EIG-07][EIG-10][EIG-11][EIG-12]") {
     core::ResourcePlan input(10000);
     const auto k = matrix(1, std::array{2.}, input), m = matrix(1, std::array{1.}, input);
     const std::array d{1.};
@@ -275,7 +276,7 @@ TEST_CASE(
     }
 }
 TEST_CASE("Owned generalized results survive moved and destroyed original sources",
-          "[N4-07][property]") {
+          "[N4-07][property][EIG-01][EIG-07][EIG-12]") {
     const std::array d{1.};
     const std::array<numerics::linear::UnitDimensions, 1> units{};
     core::ResourcePlan input(10000), plan(1000000);
@@ -292,7 +293,7 @@ TEST_CASE("Owned generalized results survive moved and destroyed original source
     CHECK(moved.basis().values()[0] == .5);
 }
 TEST_CASE("Projection requalifies its distinct generation and every required consumer",
-          "[N4-07][N4-06][negative]") {
+          "[N4-07][N4-06][negative][EIG-03][EIG-10][EIG-12]") {
     core::ResourcePlan input(10000), plan(1000000);
     const auto k = matrix(1, std::array{2.}, input), m = matrix(1, std::array{4.}, input);
     const std::array d{1.};
@@ -340,7 +341,7 @@ TEST_CASE("Projection requalifies its distinct generation and every required con
     }
 }
 TEST_CASE("Generalized resource bounds and nonfinite data fail without mutating input",
-          "[N4-07][N4-02][negative]") {
+          "[N4-07][N4-02][negative][EIG-06][EIG-11][EIG-12]") {
     core::ResourcePlan input(10000);
     auto k = matrix(1, std::array{2.}, input), m = matrix(1, std::array{4.}, input);
     const std::array d{1.};
@@ -383,7 +384,7 @@ static_assert(!RvalueStiffness<eig::GeneralizedSpectrum>);
 static_assert(!RvalueMetrics<eig::GeneralizedSpectrum>);
 } // namespace
 TEST_CASE("Generalized values outlive their source plan and all original matrices",
-          "[N4-07][property]") {
+          "[N4-07][property][EIG-01][EIG-03][EIG-12]") {
     auto retained = [] {
         core::ResourcePlan input(10000), plan(1000000);
         const auto k = matrix(1, std::array{2.}, input), m = matrix(1, std::array{4.}, input);
@@ -400,7 +401,7 @@ TEST_CASE("Generalized values outlive their source plan and all original matrice
     exact_original_check(*retained);
 }
 TEST_CASE("Empty problems do not call a required consumer or invent its achievement",
-          "[N4-07][N4-06][negative]") {
+          "[N4-07][N4-06][negative][EIG-10][EIG-12]") {
     const numerics::DenseReal k, m;
     core::ResourcePlan plan(0);
     Consumer evaluator;
@@ -418,7 +419,7 @@ TEST_CASE("Empty problems do not call a required consumer or invent its achievem
     CHECK(plan.allocated_bytes() == 0);
 }
 TEST_CASE("Generalized extraction ignores finite padding and preserves distinct source strides",
-          "[N4-07][verification]") {
+          "[N4-07][verification][EIG-01][EIG-03][EIG-06][EIG-13]") {
     core::ResourcePlan input(10000), plan(1000000);
     const std::array kval{-2., -2., 12345., -2., 10., -54321.};
     const std::array mval{2., 2., 999., 888., 2., 5., -777., -666.};
@@ -439,7 +440,7 @@ TEST_CASE("Generalized extraction ignores finite padding and preserves distinct 
     exact_original_check(*result);
 }
 TEST_CASE("Invalid generalized budgets scales and matrix dimensions fail at entry",
-          "[N4-07][negative]") {
+          "[N4-07][negative][EIG-01][EIG-02][EIG-03][EIG-10][EIG-12]") {
     core::ResourcePlan input(10000);
     const auto k = matrix(1, std::array{2.}, input), m = matrix(1, std::array{4.}, input);
     const std::array good{1.};
@@ -485,7 +486,7 @@ TEST_CASE("Invalid generalized budgets scales and matrix dimensions fail at entr
     CHECK(result.error().cause.code == core::FailureCode::InvalidInput);
 }
 TEST_CASE("Original mass positivity is not inferred from a numerically positive backend pivot",
-          "[N4-07][negative]") {
+          "[N4-07][negative][EIG-06][EIG-12][EIG-13]") {
     core::ResourcePlan input(10000), plan(1000000);
     const auto k = matrix(2, std::array{1., 0., 0., 1.}, input);
     const auto m = matrix(2, std::array{1., 1., 1., 1. + 0x1p-52}, input);
@@ -499,7 +500,7 @@ TEST_CASE("Original mass positivity is not inferred from a numerically positive 
 }
 TEST_CASE(
     "Generalized original actions and extraction attempts are charged before every application",
-    "[N4-07][N4-02][negative]") {
+    "[N4-07][N4-02][negative][EIG-10][EIG-11][EIG-12]") {
     core::ResourcePlan input(10000);
     const auto k = matrix(2, std::array{-2., -2., -2., 10.}, input);
     const auto m = matrix(2, std::array{2., 2., 2., 5.}, input);
@@ -548,7 +549,7 @@ TEST_CASE(
     CHECK(refused.error().diagnostics.forward_applications == 0);
 }
 TEST_CASE("Generalized product timing leaves all numerical bytes unchanged when enabled",
-          "[N4-07][N4-09][property]") {
+          "[N4-07][N4-09][property][EIG-03][EIG-11]") {
     core::ResourcePlan input(10000), first_plan(1000000), second_plan(1000000);
     const auto k = matrix(2, std::array{-2., -2., -2., 10.}, input);
     const auto m = matrix(2, std::array{2., 2., 2., 5.}, input);
@@ -586,7 +587,7 @@ TEST_CASE("Generalized product timing leaves all numerical bytes unchanged when 
     CHECK(second->timings().stages[4].calls == 0);
 }
 TEST_CASE("Both original matrices validate every logical and padding component",
-          "[N4-07][negative]") {
+          "[N4-07][negative][EIG-01][EIG-06][EIG-12]") {
     core::ResourcePlan input(10000);
     const std::array d{1., 1.};
     const std::array<numerics::linear::UnitDimensions, 2> units{};
@@ -621,7 +622,7 @@ TEST_CASE("Both original matrices validate every logical and padding component",
     CHECK(refused.error().cause.code == core::FailureCode::Nonfinite);
 }
 TEST_CASE("Generalized consumer allocation failures preserve a value failure and old results",
-          "[N4-07][N4-06][negative]") {
+          "[N4-07][N4-06][negative][EIG-10][EIG-12]") {
     core::ResourcePlan input(10000), good_plan(1000000), bad_plan(1000000);
     const auto k = matrix(1, std::array{2.}, input), m = matrix(1, std::array{4.}, input);
     const std::array d{1.};
