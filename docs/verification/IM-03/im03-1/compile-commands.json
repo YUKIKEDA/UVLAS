@@ -1,0 +1,92 @@
+[
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Debug\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 /std:c++23preview -MDd -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /FoCMakeFiles\\uvlas_aero.dir\\Debug\\src\\aero\\exact_triangle_predicates.cpp.obj /FdCMakeFiles\\uvlas_aero.dir\\Debug\\uvlas_aero.pdb /FS -c <workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "file": "<workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "output": "CMakeFiles\\uvlas_aero.dir\\Debug\\src\\aero\\exact_triangle_predicates.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Release\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG /std:c++23preview -MD /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /FoCMakeFiles\\uvlas_aero.dir\\Release\\src\\aero\\exact_triangle_predicates.cpp.obj /FdCMakeFiles\\uvlas_aero.dir\\Release\\uvlas_aero.pdb /FS -c <workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "file": "<workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "output": "CMakeFiles\\uvlas_aero.dir\\Release\\src\\aero\\exact_triangle_predicates.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"RelWithDebInfo\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG /std:c++23preview -MD -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /FoCMakeFiles\\uvlas_aero.dir\\RelWithDebInfo\\src\\aero\\exact_triangle_predicates.cpp.obj /FdCMakeFiles\\uvlas_aero.dir\\RelWithDebInfo\\uvlas_aero.pdb /FS -c <workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "file": "<workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "output": "CMakeFiles\\uvlas_aero.dir\\RelWithDebInfo\\src\\aero\\exact_triangle_predicates.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Debug\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 /std:c++23preview -MDd -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /FoCMakeFiles\\uvlas_aero_audit.dir\\Debug\\src\\aero\\exact_triangle_predicates.cpp.obj /FdCMakeFiles\\uvlas_aero_audit.dir\\Debug\\uvlas_aero_audit.pdb /FS -c <workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "file": "<workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "output": "CMakeFiles\\uvlas_aero_audit.dir\\Debug\\src\\aero\\exact_triangle_predicates.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Release\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG /std:c++23preview -MD /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /FoCMakeFiles\\uvlas_aero_audit.dir\\Release\\src\\aero\\exact_triangle_predicates.cpp.obj /FdCMakeFiles\\uvlas_aero_audit.dir\\Release\\uvlas_aero_audit.pdb /FS -c <workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "file": "<workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "output": "CMakeFiles\\uvlas_aero_audit.dir\\Release\\src\\aero\\exact_triangle_predicates.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"RelWithDebInfo\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG /std:c++23preview -MD -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /FoCMakeFiles\\uvlas_aero_audit.dir\\RelWithDebInfo\\src\\aero\\exact_triangle_predicates.cpp.obj /FdCMakeFiles\\uvlas_aero_audit.dir\\RelWithDebInfo\\uvlas_aero_audit.pdb /FS -c <workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "file": "<workspace-or-dependency>\\src\\aero\\exact_triangle_predicates.cpp",
+    "output": "CMakeFiles\\uvlas_aero_audit.dir\\RelWithDebInfo\\src\\aero\\exact_triangle_predicates.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DBOOST_CONTAINER_DYN_LINK -DBOOST_CONTAINER_NO_LIB -DBOOST_RANDOM_DYN_LINK -DBOOST_RANDOM_NO_LIB -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Debug\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 /std:c++23preview -MDd -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\Debug\\aero\\exact_triangle_predicates_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\Debug\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_predicates_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_predicates_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\Debug\\aero\\exact_triangle_predicates_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DBOOST_CONTAINER_DYN_LINK -DBOOST_CONTAINER_NO_LIB -DBOOST_RANDOM_DYN_LINK -DBOOST_RANDOM_NO_LIB -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Release\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG /std:c++23preview -MD /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\Release\\aero\\exact_triangle_predicates_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\Release\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_predicates_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_predicates_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\Release\\aero\\exact_triangle_predicates_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DBOOST_CONTAINER_DYN_LINK -DBOOST_CONTAINER_NO_LIB -DBOOST_RANDOM_DYN_LINK -DBOOST_RANDOM_NO_LIB -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"RelWithDebInfo\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG /std:c++23preview -MD -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\RelWithDebInfo\\aero\\exact_triangle_predicates_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\RelWithDebInfo\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_predicates_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_predicates_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_predicates.dir\\RelWithDebInfo\\aero\\exact_triangle_predicates_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_DONT_PARALLELIZE -DEIGEN_MPL2_ONLY -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Debug\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include\\eigen3 -external:W0 /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 /std:c++23preview -MDd -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\Debug\\aero\\exact_triangle_allocations_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\Debug\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_allocations_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_allocations_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\Debug\\aero\\exact_triangle_allocations_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_DONT_PARALLELIZE -DEIGEN_MPL2_ONLY -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Release\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include\\eigen3 -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG /std:c++23preview -MD /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\Release\\aero\\exact_triangle_allocations_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\Release\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_allocations_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_allocations_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\Release\\aero\\exact_triangle_allocations_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_DONT_PARALLELIZE -DEIGEN_MPL2_ONLY -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"RelWithDebInfo\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include\\eigen3 -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG /std:c++23preview -MD -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\RelWithDebInfo\\aero\\exact_triangle_allocations_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\RelWithDebInfo\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_allocations_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_allocations_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_allocations.dir\\RelWithDebInfo\\aero\\exact_triangle_allocations_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Debug\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 /std:c++23preview -MDd -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\Debug\\aero\\exact_triangle_resource_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\Debug\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_resource_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_resource_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\Debug\\aero\\exact_triangle_resource_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"Release\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG /std:c++23preview -MD /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\Release\\aero\\exact_triangle_resource_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\Release\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_resource_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_resource_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\Release\\aero\\exact_triangle_resource_test.cpp.obj"
+  },
+  {
+    "directory": "<workspace-or-dependency>/out/issue86-build",
+    "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DEIGEN_RUNTIME_NO_MALLOC -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\\\"RelWithDebInfo\\\" -I<workspace-or-dependency>\\src -I<workspace-or-dependency>\\include -external:I<workspace-or-dependency>\\out\\vcpkg_python_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG /std:c++23preview -MD -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /UNDEBUG /Fotests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\RelWithDebInfo\\aero\\exact_triangle_resource_test.cpp.obj /Fdtests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\RelWithDebInfo\\ /FS -c <workspace-or-dependency>\\tests\\aero\\exact_triangle_resource_test.cpp",
+    "file": "<workspace-or-dependency>\\tests\\aero\\exact_triangle_resource_test.cpp",
+    "output": "tests\\CMakeFiles\\uvlas_test_aero_exact_triangle_resources.dir\\RelWithDebInfo\\aero\\exact_triangle_resource_test.cpp.obj"
+  }
+]

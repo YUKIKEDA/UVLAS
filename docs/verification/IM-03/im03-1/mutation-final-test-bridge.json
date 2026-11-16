@@ -1,0 +1,10 @@
+{
+  "mutations_test_sha256": "d5ff8c45764eeee4d519e9099e463437e2cd017bb52a531c9d7f797a7fbbce3b",
+  "final_test_sha256": "d26dbcc9545bc78fa8b1ce026f503ec6f0121043d34faaf3e9cb976348bc4e75",
+  "differences": [
+    "Parallel comparison adds plane/projection/longest/unit/steps/context.",
+    "LG-F04 edge literal uses x=.75 instead of x=1.",
+    "Adds the adopted thin-triangle on-plane query alongside the off-plane query."
+  ],
+  "invariants": "Product source/header and existing mutation assertions unchanged. Mutation run is the older fixed 7-case/5024-assert snapshot; final suite has 7 cases/5042 assertions."
+}

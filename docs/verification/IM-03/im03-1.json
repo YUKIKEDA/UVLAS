@@ -1,0 +1,420 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "UI-D01",
+    "UI-D03",
+    "UI-D05",
+    "UI-D06",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 86,
+  "date": "2026-11-17",
+  "source_commit": "774f6eb99920cd6b7b389a4bf17aabcc9eefc41a",
+  "implementation_commit": "d7b100862555804877f8632eda98e3a5dae272c6",
+  "stacked_io_commit": "c8c40bb73b83113f7e33d3aa5f1ab8e235fbf89c",
+  "source_commit_scope": "774f6ebは幾何の最終C++実行版。後続の追跡工具・規約・roadmap/matrixと本記録はmetadata差分として同PRへ追加し、ファイル単位のhashを別に保持する。",
+  "scope": "有限三角形とqueryの12実座標を厳密dyadicとして消費する内部準備部品。物理incidence/自己/近接政策、法線やsqrt包絡、物質位置式、大域幾何、P1渦核/全微分/後流/荷重、IM-03全体は認定しない。",
+  "basis": {
+    "arithmetic": "q=2^-2148、checked signed32768bit、et_off。距離q²N/D、正D、同単位のlongest edge²。最大式別容量31770bit。",
+    "reference": "cpp_rationalから原座標の最近点を独立構成し、元差の距離を検査。全候補以下かつattained、全閉候補mask/plane/projection/farを許容差0で照合。",
+    "named_cases": "LG-F01/04/05/06/07/08/09/10/11/12の担当exact部分、6頂点順序、全2098のBinary64 power exponent、minsub/max/巨大原点low/符号付き零。頂点0のmask105。",
+    "limits": "Estimate28672byte以上、proof AbsentでstrictはUnsupported。plan payload、external forecast、実Cpp確保、process lifetime peakを区別。",
+    "downstream": "A1は正確な物質位置式から整数coreへ接続し、二語に収まらない位置を本入口へ先丸めしない。"
+  },
+  "final_verification": {
+    "platform": "windows-x64-msvc19.51",
+    "compiler": "MSVC 19.51.36260.0",
+    "floating_point": "/fp:strict",
+    "clean_source": true,
+    "build": "専用out/issue86-buildへreadonly依存prefixを借用。統合source774f6eb/dirty0で対象だけincremental rebuild。",
+    "ctest": {
+      "Debug": {
+        "passed": 3,
+        "selected": 3
+      },
+      "Release": {
+        "passed": 3,
+        "selected": 3
+      }
+    },
+    "per_configuration": {
+      "regular": {
+        "cases": 7,
+        "assertions": 5042
+      },
+      "allocations": {
+        "cases": 2,
+        "assertions": 13
+      },
+      "resources": {
+        "cases": 1,
+        "assertions": 38
+      }
+    },
+    "static": "新規4TUのclang-tidy21.1.1 exit0。source/common-test、allocation-test、最終regular/fault TUのログを区別。clang-format21.1.2対象5file exit0。",
+    "japanese": "quick lintは新補足契約の術語反復TTRinfo1を維持、types追記findings0。rootと別担当が数学/日本語/所有/資源を独立通読。",
+    "latex": "新補足のinline数式38組は前後半角spaceを検査。",
+    "trace": "208 IDs、0 problems。IM03-1行だけDoneへ更新し、matrixを工具で再生成。",
+    "linux": "手元のこの版では未実行。PRのCIへ委ねる。過去の成功をこの版の結果としない。CI完了待ちは行わない。",
+    "not_repeated": "IO/PG/numericsの既存試験、他QA、全体suite、R&Dは再実行しない。"
+  },
+  "allocation_failures": {
+    "scope": "専用process標準new/delete置換。普通の合法三角形、workspace準備後のresult payloadと最初のBoost Karatsuba scratchだけを単発失敗。",
+    "checks": "ResourceExceeded/EvaluateAero、既知details、最初の失敗はPlan予約解放、後の失敗は成功payload累積維持、入力/旧結果/lease解放/正常再実行。38assert。",
+    "other_exception": "合法入力から起こせない内部logic error等は既存core guardの例外変換を再利用。製品hookを追加せず、既存core/failure_testをsource根拠へ対応づける。"
+  },
+  "mutations": {
+    "control": {
+      "cases": 7,
+      "assertions": 5024,
+      "run_exit": 0
+    },
+    "mutants": [
+      "drop_low",
+      "unclamped_edge",
+      "allow_exterior_face",
+      "far_equality",
+      "omit_denominator_cross"
+    ],
+    "compile_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "link_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "run_exits": [
+      0,
+      42,
+      42,
+      42,
+      42,
+      42
+    ],
+    "original_archive_producer_members_extracted": 0,
+    "explicit_producer_symbols_per_map": 505,
+    "frozen_inputs": 7,
+    "input_hash_mismatches": 0,
+    "byte_identical_control_sha256": "1de5e6ceea70593ee13088a6a2009ceb4f054439fb529a0bf9b3a99d567c645d",
+    "scope": "source commit前の固定候補bytesによる新byte-exact snapshot。製品source/headerは最終774f6ebと同bytes、testの差はbridgeへ明記。準備時core libraryのbuild metadataはbase0394e1e/dirty1で、最終clean774の実行とは区別する。この試験はbuild-info getterを呼ばない。最初のtext-mode試行はLF→CRLFだけ異なり、旧raw/runnerを不変保持して別snapshotを実行した。採用結果は後者。"
+  },
+  "preparation_observation": {
+    "cpp_allocations": 51,
+    "planned_workspace_bytes": 156008,
+    "planned_result_bytes": 12344,
+    "external_forecast_bytes": 28672,
+    "proven_external_bound": null,
+    "Debug": {
+      "elapsed_ns": 1420100,
+      "process_peak_resident_bytes": 7499776
+    },
+    "Release": {
+      "elapsed_ns": 289200,
+      "process_peak_resident_bytes": 6488064
+    },
+    "scope": "各構成の独立試験processで1標本。workspace準備とprocess sampleは計時外、結果確保+exact算術は計時内。process値はlifetime RSS peakで、Boost単独peakでない。性能比較/採否/無確保/全heap上限を主張しない。"
+  },
+  "corrections": [
+    "頂点0maskの手計算89を独立oracleの指摘で105へ訂正。製品式は不変。",
+    "factory passkeyをprivate aggregateからprivate constructor付きclassへ訂正し、{}迂回のcompile負対照を追加。",
+    "未監査compiled Boostcontainerを除外せず、監査の必要header-only依存をBoostheadersへ限定。",
+    "隔離controlの改行変換をbyteコピーへ訂正し、別snapshotでcontrolと5変異を再実行。"
+  ],
+  "baseline": "exact integer/enumの名前付き基準ケースを独立有理完全一致で保持。近似FP QA baselineは一切変更しない。",
+  "automation_followup": {
+    "problem": "最初の最終traceでUI-D01/03/05/06がundefined。全採用tableとの照合でUI-D/UW-D/BM-D/CN-D/SI-Dの5既存族のwhitelist欠落を確認。",
+    "fix": "定義・複数行Catchタグ・recordの全3経路と、未知タグ/未知record拒否を5familyのsubTestで固定。採用IDや既存証拠を削除して通していない。",
+    "verification": "tools.qa.trace_test 6tests成功、Ruff0.17.4 check成功/format2files既整形、Pyright1.1.408 strict 0errors/0warnings/0informations。rootがtool2file/quality規約を独立通読。",
+    "boundary": "数値式/入力/試験/許容差/既存QA値は不変で、C++数値試験は追加再実行していない。167→208 IDは既存41決定の追跡回復であり、新たな数値認定件数ではない。"
+  },
+  "claimed_state": [
+    "実装が採用仕様の当部品範囲に適合"
+  ],
+  "not_claimed": [
+    "QA上の数値認定",
+    "物理妥当性",
+    "製品規模の性能",
+    "実務受入",
+    "IM-03全体の完了"
+  ],
+  "sources": {
+    "src/aero/exact_triangle_predicates.hpp": "ed38b7f29e53855c2cd47d7ba9f0c6b8b0d043b67256a4e3b3286ed3ed4c3f45",
+    "src/aero/exact_triangle_predicates.cpp": "1de5e6ceea70593ee13088a6a2009ceb4f054439fb529a0bf9b3a99d567c645d",
+    "tests/aero/exact_triangle_predicates_test.cpp": "d26dbcc9545bc78fa8b1ce026f503ec6f0121043d34faaf3e9cb976348bc4e75",
+    "tests/aero/exact_triangle_allocations_test.cpp": "5be31953704fbe9613a5bab38988d0a7bde09d27704e54710565c8c4c9492640",
+    "tests/aero/exact_triangle_resource_test.cpp": "fec6395352aeee3fcd34d015b1ee1e35b51d0613517a5776a37e5832b641d5e1",
+    "CMakeLists.txt": "914b98512fe5a6480e587dcdd1abe0dee89594bdaa6e68fdc241502db6d4a88e",
+    "tests/CMakeLists.txt": "8fdf4401750eb67147dc57fb9c48257f585b8315e5598c7f5f4659a51c162113",
+    "docs/conventions.md": "72d058807266423f74a6c74638e6b0871fd1fc1e0f64f0aa653f4d03e7c12162",
+    "docs/specs/aero/exact-triangle-predicates-contract.md": "99284f3896062710e712dfb002ec0e76b911766605354faaef65c3ad0841bdeb",
+    "docs/specs/aero/local-geometry-contract.md": "83c92b8cbae773eff487aab005717ab7514cfbf038df6db99cb27bb6aa00f52f",
+    ".cursor/rules/types.mdc": "520f23dd2979c8bb354605ac3cf8ffcd78cfddfbb3d55f96ae967de12a78528f",
+    ".cursor/rules/testing.mdc": "38741c8b22e0cdadc7bb3cff32f245db689050dc8cced829c0d253a676a49900",
+    ".cursor/rules/numeric-tests.mdc": "d5b5c5f52c9e6a871b36af96efc9e1c26383e12d017941622fd898913e600c6d",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "tests/core/failure_test.cpp": "1a2318394bf5c3c25e97fe855fa0c92f2334692a92b4ba494333700150d7980f",
+    "tools/qa/trace.py": "9669909d571dfb9d5bebb6ea218d3cbba6362e6c0569402944043d90022958f2",
+    "tools/qa/trace_test.py": "3380671286a99cb8db037a731407c372f120bcf922ed9a9bd168af1a7bdeff35",
+    ".cursor/rules/quality.mdc": "98c1b6e22c0c2777ae97f4935d81dfa84909db0abe7fa0cc648d089b51a0dbd9"
+  },
+  "source_references": [
+    {
+      "id": "im03-1-source-1",
+      "sha256": "ed38b7f29e53855c2cd47d7ba9f0c6b8b0d043b67256a4e3b3286ed3ed4c3f45",
+      "hint": "src/aero/exact_triangle_predicates.hpp"
+    },
+    {
+      "id": "im03-1-source-2",
+      "sha256": "1de5e6ceea70593ee13088a6a2009ceb4f054439fb529a0bf9b3a99d567c645d",
+      "hint": "src/aero/exact_triangle_predicates.cpp"
+    },
+    {
+      "id": "im03-1-source-3",
+      "sha256": "d26dbcc9545bc78fa8b1ce026f503ec6f0121043d34faaf3e9cb976348bc4e75",
+      "hint": "tests/aero/exact_triangle_predicates_test.cpp"
+    },
+    {
+      "id": "im03-1-source-4",
+      "sha256": "5be31953704fbe9613a5bab38988d0a7bde09d27704e54710565c8c4c9492640",
+      "hint": "tests/aero/exact_triangle_allocations_test.cpp"
+    },
+    {
+      "id": "im03-1-source-5",
+      "sha256": "fec6395352aeee3fcd34d015b1ee1e35b51d0613517a5776a37e5832b641d5e1",
+      "hint": "tests/aero/exact_triangle_resource_test.cpp"
+    },
+    {
+      "id": "im03-1-source-6",
+      "sha256": "914b98512fe5a6480e587dcdd1abe0dee89594bdaa6e68fdc241502db6d4a88e",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im03-1-source-7",
+      "sha256": "8fdf4401750eb67147dc57fb9c48257f585b8315e5598c7f5f4659a51c162113",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im03-1-source-8",
+      "sha256": "72d058807266423f74a6c74638e6b0871fd1fc1e0f64f0aa653f4d03e7c12162",
+      "hint": "docs/conventions.md"
+    },
+    {
+      "id": "im03-1-source-9",
+      "sha256": "99284f3896062710e712dfb002ec0e76b911766605354faaef65c3ad0841bdeb",
+      "hint": "docs/specs/aero/exact-triangle-predicates-contract.md"
+    },
+    {
+      "id": "im03-1-source-10",
+      "sha256": "83c92b8cbae773eff487aab005717ab7514cfbf038df6db99cb27bb6aa00f52f",
+      "hint": "docs/specs/aero/local-geometry-contract.md"
+    },
+    {
+      "id": "im03-1-source-11",
+      "sha256": "520f23dd2979c8bb354605ac3cf8ffcd78cfddfbb3d55f96ae967de12a78528f",
+      "hint": ".cursor/rules/types.mdc"
+    },
+    {
+      "id": "im03-1-source-12",
+      "sha256": "38741c8b22e0cdadc7bb3cff32f245db689050dc8cced829c0d253a676a49900",
+      "hint": ".cursor/rules/testing.mdc"
+    },
+    {
+      "id": "im03-1-source-13",
+      "sha256": "d5b5c5f52c9e6a871b36af96efc9e1c26383e12d017941622fd898913e600c6d",
+      "hint": ".cursor/rules/numeric-tests.mdc"
+    },
+    {
+      "id": "im03-1-source-14",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "hint": "include/uvlas/core/resource_plan.hpp"
+    },
+    {
+      "id": "im03-1-source-15",
+      "sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "hint": "include/uvlas/core/failure.hpp"
+    },
+    {
+      "id": "im03-1-source-16",
+      "sha256": "1a2318394bf5c3c25e97fe855fa0c92f2334692a92b4ba494333700150d7980f",
+      "hint": "tests/core/failure_test.cpp"
+    },
+    {
+      "id": "im03-1-source-17",
+      "sha256": "9669909d571dfb9d5bebb6ea218d3cbba6362e6c0569402944043d90022958f2",
+      "hint": "tools/qa/trace.py"
+    },
+    {
+      "id": "im03-1-source-18",
+      "sha256": "3380671286a99cb8db037a731407c372f120bcf922ed9a9bd168af1a7bdeff35",
+      "hint": "tools/qa/trace_test.py"
+    },
+    {
+      "id": "im03-1-source-19",
+      "sha256": "98c1b6e22c0c2777ae97f4935d81dfa84909db0abe7fa0cc648d089b51a0dbd9",
+      "hint": ".cursor/rules/quality.mdc"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/im03-1/clean-git-revision.hpp": "e9bf72b0e71d8f5d5c3e635ad2fa48d76f692287dee5d8e95f53fa14589d40ee",
+    "docs/verification/IM-03/im03-1/compile-commands.json": "a9a9f37aef7f75bbeb1354ae81c678e29c18d8ac038137f81204c22aaa945efe",
+    "docs/verification/IM-03/im03-1/log-provenance.json": "68a35deeb231ed33470bcfa4309ed29f9e5ff99a9fd45d5ebdff9aa51b5c2a46",
+    "docs/verification/IM-03/im03-1/mutation-final-test-bridge.json": "b123691ab0619f4fda29a0b23da98abe011affd73ecd55c2536809e5323a0d7e",
+    "docs/verification/IM-03/im03-1/mutation-mutations.zip": "d11f4320b16bc925bd120a22703560fae24ccad286f0c31d003172179459fd80",
+    "docs/verification/IM-03/im03-1/mutation-redaction.json": "cbd8db67a8afa2f7534fe0b5b39bc76c085fd081ea15137d68c80f703b02954b",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-build-debug.log": "8f94214b66f7fde1493ef97d54965c7a54915d7560a525c1d139c8acbb51f710",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-build-release.log": "63e30f9a682816e6b311f7b282ddf9cc04245a51f41337f7e93286f613cc135a",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-configure.log": "6d2b4a68fbcbb38648daf6b6c16a07571aaf2fd33cc1b15483b8221805207694",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-test-debug.log": "58d199de1b0c5713ae53a0bbcbb1211c42dad9f92b223b7b60f39df4fefccc11",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-test-release.log": "df2d197a2fa4eb1d519651779ec53c49e2db015af0c612e689af0e016c76519b",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-trace-check-fixed.log": "37cea060842c01ce459239dcede63b4631d6770abad386e7d39b60336f64d386",
+    "docs/verification/IM-03/im03-1/safe-issue86-final-trace-matrix-fixed.log": "df67d6a82a4c0f3fd8ee012fe7152ad5a509bc8885fbbf7031dba41b01725611",
+    "docs/verification/IM-03/im03-1/safe-issue86-japanese-lint.json": "449c220fbbe83b252de7efc9dba1664b39be10babe3241c799c17ed2dbb5dd60",
+    "docs/verification/IM-03/im03-1/safe-issue86-machine-supplement.json": "42b5b5c9466f78e60e1f0aaad59a8f34c06b9ceaa06ac9212199ff7a9595ab5b",
+    "docs/verification/IM-03/im03-1/safe-issue86-machine.json": "f0d084bfb2444d968becee5e1cd2721d3a6953faaa04a657f57ba32b466d99fa",
+    "docs/verification/IM-03/im03-1/safe-issue86-tidy-final-tests.log": "4d551a92ac3a3c1621f268eee0ef0f39b6e2ace569971da1e4ab52e9071fa5e1",
+    "docs/verification/IM-03/im03-1/safe-issue86-tidy-passkey.log": "0d16fd6cf271e51fbc33a32f678a117dc3628069f4eade9a8d334bee4d7d9a5c",
+    "docs/verification/IM-03/im03-1/safe-issue86-tidy-tests-final.log": "3d8d9ceabe91818344889f96bd980817c4e701464bcf04e2a393c91b970e29f0",
+    "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-format-final.log": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+    "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-pyright.log": "3ad2d843353727d542e7367b203d155ef69e68c7e533e1a57e7c5f8a2337fa84",
+    "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-unittest.log": "69ffe27d79a956add3e24a834b103efc7ae9ce34d4f50b55c471d791f031c819",
+    "docs/verification/IM-03/im03-1/safe-issue86-types-japanese.json": "df534419bce0cd5eb751fee0371614f17c85d7c028b3b4ed117b466e399ac885"
+  },
+  "artifact_references": [
+    {
+      "id": "im03-1-artifact-1",
+      "sha256": "e9bf72b0e71d8f5d5c3e635ad2fa48d76f692287dee5d8e95f53fa14589d40ee",
+      "hint": "docs/verification/IM-03/im03-1/clean-git-revision.hpp"
+    },
+    {
+      "id": "im03-1-artifact-2",
+      "sha256": "a9a9f37aef7f75bbeb1354ae81c678e29c18d8ac038137f81204c22aaa945efe",
+      "hint": "docs/verification/IM-03/im03-1/compile-commands.json"
+    },
+    {
+      "id": "im03-1-artifact-3",
+      "sha256": "68a35deeb231ed33470bcfa4309ed29f9e5ff99a9fd45d5ebdff9aa51b5c2a46",
+      "hint": "docs/verification/IM-03/im03-1/log-provenance.json"
+    },
+    {
+      "id": "im03-1-artifact-4",
+      "sha256": "b123691ab0619f4fda29a0b23da98abe011affd73ecd55c2536809e5323a0d7e",
+      "hint": "docs/verification/IM-03/im03-1/mutation-final-test-bridge.json"
+    },
+    {
+      "id": "im03-1-artifact-5",
+      "sha256": "d11f4320b16bc925bd120a22703560fae24ccad286f0c31d003172179459fd80",
+      "hint": "docs/verification/IM-03/im03-1/mutation-mutations.zip"
+    },
+    {
+      "id": "im03-1-artifact-6",
+      "sha256": "cbd8db67a8afa2f7534fe0b5b39bc76c085fd081ea15137d68c80f703b02954b",
+      "hint": "docs/verification/IM-03/im03-1/mutation-redaction.json"
+    },
+    {
+      "id": "im03-1-artifact-7",
+      "sha256": "8f94214b66f7fde1493ef97d54965c7a54915d7560a525c1d139c8acbb51f710",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-build-debug.log"
+    },
+    {
+      "id": "im03-1-artifact-8",
+      "sha256": "63e30f9a682816e6b311f7b282ddf9cc04245a51f41337f7e93286f613cc135a",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-build-release.log"
+    },
+    {
+      "id": "im03-1-artifact-9",
+      "sha256": "6d2b4a68fbcbb38648daf6b6c16a07571aaf2fd33cc1b15483b8221805207694",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-configure.log"
+    },
+    {
+      "id": "im03-1-artifact-10",
+      "sha256": "58d199de1b0c5713ae53a0bbcbb1211c42dad9f92b223b7b60f39df4fefccc11",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-test-debug.log"
+    },
+    {
+      "id": "im03-1-artifact-11",
+      "sha256": "df2d197a2fa4eb1d519651779ec53c49e2db015af0c612e689af0e016c76519b",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-test-release.log"
+    },
+    {
+      "id": "im03-1-artifact-12",
+      "sha256": "37cea060842c01ce459239dcede63b4631d6770abad386e7d39b60336f64d386",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-trace-check-fixed.log"
+    },
+    {
+      "id": "im03-1-artifact-13",
+      "sha256": "df67d6a82a4c0f3fd8ee012fe7152ad5a509bc8885fbbf7031dba41b01725611",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-final-trace-matrix-fixed.log"
+    },
+    {
+      "id": "im03-1-artifact-14",
+      "sha256": "449c220fbbe83b252de7efc9dba1664b39be10babe3241c799c17ed2dbb5dd60",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-japanese-lint.json"
+    },
+    {
+      "id": "im03-1-artifact-15",
+      "sha256": "42b5b5c9466f78e60e1f0aaad59a8f34c06b9ceaa06ac9212199ff7a9595ab5b",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-machine-supplement.json"
+    },
+    {
+      "id": "im03-1-artifact-16",
+      "sha256": "f0d084bfb2444d968becee5e1cd2721d3a6953faaa04a657f57ba32b466d99fa",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-machine.json"
+    },
+    {
+      "id": "im03-1-artifact-17",
+      "sha256": "4d551a92ac3a3c1621f268eee0ef0f39b6e2ace569971da1e4ab52e9071fa5e1",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-tidy-final-tests.log"
+    },
+    {
+      "id": "im03-1-artifact-18",
+      "sha256": "0d16fd6cf271e51fbc33a32f678a117dc3628069f4eade9a8d334bee4d7d9a5c",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-tidy-passkey.log"
+    },
+    {
+      "id": "im03-1-artifact-19",
+      "sha256": "3d8d9ceabe91818344889f96bd980817c4e701464bcf04e2a393c91b970e29f0",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-tidy-tests-final.log"
+    },
+    {
+      "id": "im03-1-artifact-20",
+      "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-format-final.log"
+    },
+    {
+      "id": "im03-1-artifact-21",
+      "sha256": "3ad2d843353727d542e7367b203d155ef69e68c7e533e1a57e7c5f8a2337fa84",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-pyright.log"
+    },
+    {
+      "id": "im03-1-artifact-22",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-ruff.log"
+    },
+    {
+      "id": "im03-1-artifact-23",
+      "sha256": "69ffe27d79a956add3e24a834b103efc7ae9ce34d4f50b55c471d791f031c819",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-trace-tool-unittest.log"
+    },
+    {
+      "id": "im03-1-artifact-24",
+      "sha256": "df534419bce0cd5eb751fee0371614f17c85d7c028b3b4ed117b466e399ac885",
+      "hint": "docs/verification/IM-03/im03-1/safe-issue86-types-japanese.json"
+    }
+  ]
+}
