@@ -19,6 +19,10 @@ enum class ActionKind : std::uint8_t {
 
 /// Complete original identity and the fixed spectral transformation, shared by all actions.
 struct ActionStamp {
+    /// Supply the original identity and fixed transformation explicitly.
+    ActionStamp(Context context, core::NumericalGeneration generation,
+                std::complex<double> physical_shift) noexcept
+        : original(context), transformation(generation), shift(physical_shift) {}
     Context original; ///< Original model, coefficients, layout, scales, time and backend policy.
     core::NumericalGeneration transformation; ///< Generation of shift/factor/transform policy.
     std::complex<double> shift;               ///< Physical shift; zero for an unshifted policy.
