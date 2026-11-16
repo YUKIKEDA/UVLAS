@@ -206,6 +206,14 @@ uvlas_add_test(numerics.sparse_solve
     SOURCES numerics/sparse_solve_test.cpp
     LIBS uvlas_numerics Boost::multiprecision)
 
+uvlas_add_test(numerics.eigen_generalized LABELS unit negative verification
+    SOURCES numerics/eigen_generalized_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+
+add_test(NAME qa.eigen_generalized
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-generalized --run "$<TARGET_FILE:uvlas_eigen_generalized_canary>")
+set_tests_properties(qa.eigen_generalized PROPERTIES TIMEOUT 30 LABELS "verification")
+
 uvlas_add_test(numerics.sparse_capacity
     LABELS capacity verification
     SOURCES numerics/sparse_capacity_test.cpp
