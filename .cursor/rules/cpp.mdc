@@ -86,6 +86,18 @@ if (!pin.has_value()) {
 use(*pin);
 ```
 
+配列内のoptionalは、要素を名前付き参照へ束縛し、その参照で存在確認と逆参照を行う。2026-11-16、PR #67のLinux clang-tidy 21.1.1は、`evaluator.seen[i]`を確認後に同じ添字で読み直す試験を未検査参照と診断した。明示的なreturnがあっても、添字式を再評価する形では解析器が同じ要素と認識するとは限らない。
+
+```cpp
+// BAD: checking and dereferencing separate subscript expressions.
+if (!entries[i]) { return; }
+use(*entries[i]);
+// GOOD: check and dereference the same named optional.
+const auto& entry = entries[i];
+if (!entry.has_value()) { return; }
+use(*entry);
+```
+
 構造化束縛でコンテナの要素を読むrange-forは、コピーが必要でなければ`const auto& [a, b]`で受ける。2026-11-15、PR #49の試験がpairを値で束縛し、MSVCでは通ったがGCCの`-Werror=range-loop-construct`でLinuxのDebug・Release・sanitizer構成がコンパイルに失敗した。コピーを省く修正だけなら数値経路を再実行せず、影響する翻訳単位をコンパイルする。
 
 ```cpp

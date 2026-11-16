@@ -691,11 +691,12 @@ void verify_consumer_gate(System& system, const PrecisionBuffer<Scalar>& rhs) {
     CHECK(refused.error().details.problem == core::ProblemId{core::ObservationId{82}});
     CHECK(evaluator.calls == 2);
     for (std::size_t i = 0; i < 2; ++i) {
-        if (!evaluator.seen[i]) {
+        const auto& recorded = evaluator.seen[i];
+        if (!recorded.has_value()) {
             FAIL_CHECK("Every necessary consumer must evaluate the current candidate");
             return;
         }
-        const auto& seen = *evaluator.seen[i];
+        const auto& seen = *recorded;
         CHECK(seen.observation == checks[i].observation);
         CHECK(seen.scope == checks[i].scope);
         CHECK(seen.numerical_generation != generation);
