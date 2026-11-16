@@ -1,0 +1,40 @@
+54211 warnings generated.
+<repo>\include\uvlas/structure/exact_polynomial.hpp:47:27: error: std::move of the variable 'memory' of the trivially-copyable type 'ExactMemoryLimit' (aka 'variant<ExactEstimateAdmission, ExactRequireProvenBound>') has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+   47 |           external_memory(std::move(memory)),
+      |                           ^~~~~~~~~~      ~
+<repo>\include\uvlas/structure/exact_polynomial.hpp:133:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  133 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:178:5: error: function 'terms' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  178 |     std::span<const ExactTerm> terms() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:180:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  180 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:304:5: error: function 'terms' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  304 |     std::span<const ExactTerm> terms() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:319:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  319 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\tests\structure\exact_polynomial_resource_test.cpp:178:13: error: variable 'fault' of type 'FaultScope' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  178 |             FaultScope fault{site};
+      |             ^
+      |                        const
+<repo>\tests\structure\exact_polynomial_resource_test.cpp:197:9: error: variable 'counter' of type 'FaultScope' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  197 |         FaultScope counter{-2};
+      |         ^
+      |                    const
+<repo>\tests\structure\exact_polynomial_resource_test.cpp:207:9: error: variable 'counter' of type 'FaultScope' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  207 |         FaultScope counter{-2};
+      |         ^
+      |                    const
+<repo>\tests\structure\exact_polynomial_resource_test.cpp:215:9: error: variable 'counter' of type 'FaultScope' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  215 |         FaultScope counter{-2};
+      |         ^
+      |                    const

@@ -1,0 +1,8 @@
+{
+  "begin_utc": "2026-11-16T16:11:09.004471+00:00",
+  "end_utc": "2026-11-16T16:11:09.049347+00:00",
+  "exit": 0,
+  "samples": 27,
+  "warmups_per_size": 1,
+  "condition": "参加agentの重負荷compile/解析停止を調整した。宿主全processのidleは保証しない。"
+}

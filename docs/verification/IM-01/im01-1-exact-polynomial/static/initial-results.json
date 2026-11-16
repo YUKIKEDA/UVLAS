@@ -1,0 +1,14 @@
+[
+  {
+    "source": "src/structure/exact_polynomial.cpp",
+    "exit": 1
+  },
+  {
+    "source": "tests/structure/exact_polynomial_test.cpp",
+    "exit": 1
+  },
+  {
+    "source": "tests/structure/exact_polynomial_resource_test.cpp",
+    "exit": 1
+  }
+]

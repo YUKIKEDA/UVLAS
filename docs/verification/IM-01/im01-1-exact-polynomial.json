@@ -1,0 +1,236 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "SH-D01",
+    "SH-D03",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 87,
+  "date": "2026-11-17",
+  "source_commit": "2538a5199a8a025ee2124779da5b68469eeea548",
+  "scope": "PG参照準備のexact有理数・座標tag付き二変数疎多項式。PG係数族・活動域・条件付け・PreparedPatch・物理kernel・実graphのR-02を完成としない。",
+  "provenance": {
+    "implementation_commit": "b108c35129b65e80ccdc7857c5ee170441aa1bcf",
+    "higher_derivative_test_commit": "ddd99f94c10147c95f8fd3b7dcc3623c770009cd",
+    "base_decomposition_head": "0394e1e0ffe95f8294f2160cff7ff96f5029b606",
+    "final_clean_verification": "IO/Aero/PGのsource/CMake統合後、上記固定sourceで影響する2CTestをDebug/Release各1回確認した。untracked証拠scaffoldはbuild入力ではなく、build-infoのtracked dirty判定はfalse。",
+    "note": "旧R&D/採用仕様/基準値/既存の検証記録は変更しない。",
+    "clean": true,
+    "uncommitted_changes": false,
+    "integration_note": "後続の証拠・roadmap/trace同期はmetadataであり、演算source/headers/CMakeが同一なら追加数値再試験しない。",
+    "serialization": "新規公開textは明示LFへ統一し、原rawSHA/伏字前後SHA/LF正規化前後をredaction.jsonで保持する。元raw/既存の凍結証拠は変更しない。ZIP内はbyte列として保持する。 新規派生log等の行末空白と末尾空行の除去も前後SHAで明示する。",
+    "private_harness_note": "対象2CTestの成功後、私有build-info probeの初回compileは相対/Fdが存在しないdirを指してC1041となった。専用絶対PDBpathへ修正したfinish-provenance.pyでcompile/link成功・dirtyfalseを確認した。対象製品や数値試験は変更/再実行していない。初回のraw logfileは保持していない実行報告である。",
+    "metadata_integration_head": "9a7ea64e623fdfde7ea005724717a4886eab20e3",
+    "upstream_aero_head": "3f5d13403a1e18b171990306f4b04d3e959a692a",
+    "metadata_integration_note": "Aero最終metadataを通常mergeした。2538からのinclude/src/tests/CMakeLists/cmake差分0をgit diffで確認し、tools/qa/trace.py・trace_test.pyの既存5IDfamily読取回復と品質規則/上流証拠だけを受領した。上流工具の5fixture/ruff/pyright検証はim03-1記録へ保持し、PG数値試験は繰り返さない。"
+  },
+  "completion_evidence": [
+    {
+      "requirement": "既約有理数・4則/比較・整数pair/十進/Binary64・型付き失敗",
+      "evidence": "private storageから観測した分子/分母を独立literalへ許容差0で比較する。十進0.1とBinary64 0.1、2^53超、最小subnormal、最大finite、分母符号とcanonical zeroを含む。"
+    },
+    {
+      "requirement": "座標tag・canonical sparse項列・全代数演算",
+      "evidence": "手展開の項配列、座標変換、両軸非零高階微分、点評価、明示非零下端積分を検査する。異なる座標の加減とrvalueからのborrowはcompile時拒否。"
+    },
+    {
+      "requirement": "事前bit/項/指数/byte受入と資源失敗不変",
+      "evidence": "数学上限B、guard付きword-rounded planned_work_bits、observed_output_value_bitsを区別する。外部limb推定は固定Boostsourceのcapacity/resize同居/gcd/除算/乗算一時領域から計画し、未証明RequireProvenBoundをUnsupportedで拒否する。owned配列payloadはResourcePlanで計上する。"
+    },
+    {
+      "requirement": "独立参照・型/所有/clone/資源境界",
+      "evidence": "入力字句、未知axis、負次数、合成次数preflight、zero置換、同値上限/1不足、初期valueと旧結果不変、並行の独立cloneを検査。専用processのnew失敗#0/#1でlimb copy/owned storage失敗を確認する。"
+    },
+    {
+      "requirement": "制御成功後の隔離変異",
+      "evidence": "control7cases357assert成功後、約分省略/minsub指数/微分係数/積分下端符号の4変異はすべてcompile/link0後runtime42で検出。元archive producer未抽出と元source/header/test/fixtureのbyte不変を確認。最終8caseには非零高階微分の20assertを追加したが、製品sourceは変えず変異は繰り返さない。"
+    },
+    {
+      "requirement": "API文書・inline・対象検証と来歴",
+      "evidence": "publicheaderにBoost型を漏らさず英語利用者docを付ける。初回tidy失敗は保持し、製品/通常/資源TU各最終tidy成功と試験追加後の通常TU成功を区別して保存する。既存数値suiteは影響外。Linuxはローカル未実行。 最終Windows対象2CTestはDebug/Release各2/2成功、通常8cases377assertions・資源監査2cases25assertions。"
+    },
+    {
+      "requirement": "小容量準備工程と資源量の区別",
+      "evidence": "clean2538の実Release binaryから32/256/2048bit×parse/multiply/substitute×3巡27標本を保存した。各サイズで1warmup後に製品Preparation時間を観測し、parse/multiplyは各巡のcanonical値一致、substituteは各巡とtimingOFFの全係数/指数一致を確認。入力準備/比較/OS採取は時計外。dirty予備27標本は別artifactのまま保持し、正本結果へ合成しない。外部malloc量は未観測であり、実務性能/hard RSS capは未主張。"
+    }
+  ],
+  "verification": [
+    {
+      "configuration": "Debug",
+      "command": "cmake --build out/issue87-build --config Debug --target uvlas_test_structure_exact_polynomial uvlas_test_structure_exact_polynomial_resources; ctest --test-dir out/issue87-build -C Debug -R ^structure.exact_polynomial(_resources)?$ --output-on-failure -V",
+      "passed": 2,
+      "total": 2,
+      "normal_cases": 8,
+      "normal_assertions": 377,
+      "resource_cases": 2,
+      "resource_assertions": 25
+    },
+    {
+      "configuration": "Release",
+      "command": "cmake --build out/issue87-build --config Release --target uvlas_test_structure_exact_polynomial uvlas_test_structure_exact_polynomial_resources; ctest --test-dir out/issue87-build -C Release -R ^structure.exact_polynomial(_resources)?$ --output-on-failure -V",
+      "passed": 2,
+      "total": 2,
+      "normal_cases": 8,
+      "normal_assertions": 377,
+      "resource_cases": 2,
+      "resource_assertions": 25
+    }
+  ],
+  "static_analysis": {
+    "compiler": "MSVC 19.51.36260.0",
+    "clang_format": "21.1.2",
+    "clang_tidy": "21.1.1",
+    "configuration": "Debug単一entry DB",
+    "final_source_sha256": "1ee471a317e0a0ac70ce2ecce01d1fa628d9f9e85bbb5822bb7e33c150e8a687",
+    "note": "initial-*は修正前の失敗。final-0/2は最終製品/資源TUの成功、通常TUは追加比較後expanded-test-final、非零高階追加後higher-derivative-test-finalで成功。初回や中間のsource snapshot全体を保存していないため、最終版と同一だったとは主張しない。"
+  },
+  "independent_reference": {
+    "path": "tests/structure/fixtures/exact-polynomial-v1.json",
+    "schema": "uvlas.exact-polynomial-reference/1",
+    "tolerance": 0,
+    "origin": "手導出canonical分子/分母と多項式展開。特殊Binary64は独立IEEE整数式から固定。製品演算で期待値を作らず、演算にも使うprivate accessorで実値を観測する。"
+  },
+  "remaining_gates": [
+    "親Issue17のPG係数族・活動map・全trace・条件付け・chart/graphとR-02は今回の成功とは独立に残る。",
+    "製品規模性能、物理/実験妥当性、実務受入は未主張。",
+    "Linux CIはローカル実行していない。新PRheadのCI完了は待たない。"
+  ],
+  "sources": {
+    "CMakeLists.txt": "9bc31f9bb39e5c6872260d303dc780f429751c862d1467a01ec12ee31e20a5aa",
+    "tests/CMakeLists.txt": "0df3977a4bbb3bc74f14acc40d93ccdf0ac9c9bc6d0421d4d774343255129c41",
+    "docs/conventions.md": "61ab0d66f61f1d918120a2c3897f9dd71397a1213d449b036831663e62c770fd",
+    "docs/specs/structure/pg-exact-algebra-resource-contract.md": "a91db105cc00dc46cf95519277ab1896afcd87a360e2d5fc1f295bcdd0212c5a",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "src/structure/exact_polynomial.cpp": "1ee471a317e0a0ac70ce2ecce01d1fa628d9f9e85bbb5822bb7e33c150e8a687",
+    "src/structure/exact_polynomial_detail.hpp": "bf7b32b15914a3da686a4e7b76bc5691a225479273a7b9e73f04f2007e8ecaa1",
+    "tests/structure/exact_polynomial_test.cpp": "d8bd2512db5d9da0baea820418f9856f343f1af1e235bafa03fa5e7ad325812f",
+    "tests/structure/exact_polynomial_resource_test.cpp": "43c6845877f899a2669490d9b7cc7c9b27bbf8fef6dac9f3f94ba0a623fef4d1",
+    "tests/structure/fixtures/exact-polynomial-v1.json": "c7005a2c104018ed0408c88c712819fac9167d892181000f7f8372e63e0243c3"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/im01-1-exact-polynomial/mutations.zip": "1878bc1cd0f44115f4f095a41e83d363b99d2e8154d2d5dd0923e6a8bd7af3a6",
+    "docs/verification/IM-01/im01-1-exact-polynomial/redaction.json": "d9967f2cad28dbf3c33e8ab2fbc1b956d304be5d3ecf4207e8b80b1501368abe",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/build.py": "59c8962ba2e9feae489eb006fe1cb26ed10a8d924111bfe270593dc8ecc0a99e",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/compile-command.txt": "e89be1e0aa67b32ade989852d02794192fdb12b260f753f9b56b092e24a4b1ac",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/compile.log": "eb8139c688f0402b70e7300a8c68342793f975776f502ef4b7bfee54480f98d0",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/final-build-info.json": "80e9690a4894bf2d8837a1896b6b5234ba33f25ab88cc83159014146d63ea33d",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/final-raw.jsonl": "3838325823ab72c94e6285e0e3b3e5885def0dedccaf421634d1a8e22f245f5b",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/final-run.json": "8586c8f731725de712aad2fe276f3595ffb5b41ac36cbef52b6a8031fa4d76d9",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/link-command.json": "4a91546d6dac652da4a69e09704030815f20a6b378f70045f97411091a3702a7",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/probe.cpp": "74482b0667ad71125b9d6efcc732ffc17a4d77e256e1bc9948b174be8e659dc7",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/raw.jsonl": "f08efb3376b43eec86b6bc556808a50ad0b15f114be95a831a3fb8c4ebd38b4d",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/run.json": "cc929358e828d8a0efc5d92442ae52554c22607b0437cd6ab5089f9b5f29d41b",
+    "docs/verification/IM-01/im01-1-exact-polynomial/measurement/summary.json": "0c97bb3970bd68e0557edb5e61ea9da71e4a978a778075fa9dc9685cabdc89f3",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/expanded-test-final.log": "ddb47eff6c76ad48157f36663e4a54126161f1670b735156c200a44e0e22faa6",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/final-0.log": "49cab938dd0c19fa7df17feadcefb45c165fa55df28dd89b53c7ac9c704288d4",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/final-1.log": "9f7c93a8fbb3d1f2e5d0803a5baf1357cd07fff7e023f1537a827edd451adba8",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/final-2.log": "61b1d41bf1ab5c81d0c533d1fe4570033da8a16757e814630656689f6189b99f",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/final-results.json": "55e56953ee517d7cd08994ec93cf89e6c090c042ec3156415a55078b4a73978a",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/higher-derivative-test-final.log": "ddb47eff6c76ad48157f36663e4a54126161f1670b735156c200a44e0e22faa6",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/initial-0.log": "8c2e70dab7e27d73cb1329c32f41a7629dd3bb73e8bcd20ee458302ae380108b",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/initial-1.log": "d28d8809ccbf465709ce73e437d2647c03f5ce52a3b64f881122333d4be83dbc",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/initial-2.log": "1b97f6f2f3c8e5296977d297769321eaf2de6afcafec91bc7a76c611ffc53869",
+    "docs/verification/IM-01/im01-1-exact-polynomial/static/initial-results.json": "88634c676a6b44770aa25eb7926be95024473ef2267e6981dd9af8f2088886e2",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/debug-build-info.json": "234cd9bdda687bb89546f172f0fd6123cb1220646abbefe5165a45fab8de872c",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/debug-build.log": "95d9c657de48c96de6bc791a2996de1191a77f661a9b8236b956af5da7995711",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/debug-tests.log": "9cc140e2d8485b6515b77df34c879b7eb89565c5d70ae2d3234fa9db9251f158",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/final-verify.py": "3563be8af4e0bec9a33949660cfd8285f30c2d6208c4061f1b3da6beec6b4897",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/finish-provenance.py": "f582434b28bcbd861926a5609046da5b74bcddb7d731168d43b801ffc9d3d1f1",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/mutation-snapshot-abi.json": "20881064017b3a2337d31d5f67ea69aaebec192fd401733f8a4b33056d7562bb",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/release-build.log": "d4f093542cb91088739c458e5bf58e471f1fe23be46f71d0bd04f09739ea6f4e",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/release-tests.log": "8b562906a83b8ac139f4715aeb8b23028c2e9de1a333e1b9a26478664dfe4bc9",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/trace-check.log": "f80976be73f623af94ba708d29e49c97abedbedd4c89b9128169d837e88c7801",
+    "docs/verification/IM-01/im01-1-exact-polynomial/verification/trace-matrix.log": "df67d6a82a4c0f3fd8ee012fe7152ad5a509bc8885fbbf7031dba41b01725611"
+  },
+  "environment": {
+    "platform": "Windows x64",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict",
+    "boost": "1.92.0",
+    "clang_format": "21.1.2",
+    "clang_tidy": "21.1.1",
+    "limb_bits": 32,
+    "threads": 1,
+    "dependency_prefix": "既存prefixをmanifest install OFFで読取り専用再利用。共有prefix/featureを変更しない。",
+    "load": "参加agentの重負荷compile/解析停止を調整し、宿主全processのidleは保証しない。"
+  },
+  "mutations": {
+    "control_cases": 7,
+    "control_assertions": 357,
+    "source_sha256": "1ee471a317e0a0ac70ce2ecce01d1fa628d9f9e85bbb5822bb7e33c150e8a687",
+    "variants": [
+      {
+        "case": "control",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 0,
+        "source_sha256": "1ee471a317e0a0ac70ce2ecce01d1fa628d9f9e85bbb5822bb7e33c150e8a687",
+        "original_archive_member_extracted": false
+      },
+      {
+        "case": "normalization",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "source_sha256": "fca8b25943abba9b7780daf193bac16ed8c5ca0fe34abd1a3a8ec356f10679dc",
+        "original_archive_member_extracted": false
+      },
+      {
+        "case": "binary64_subnormal",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "source_sha256": "5b50dcc24f39ec433db84a3ad65db220db4730ce6f3812e3dea5c740615c91ae",
+        "original_archive_member_extracted": false
+      },
+      {
+        "case": "derivative_factor",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "source_sha256": "9fd06349f960da6006be0df4afd5bb77b966b69388911cbd53fb5127d74183cc",
+        "original_archive_member_extracted": false
+      },
+      {
+        "case": "integral_lower_sign",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "source_sha256": "7f43e1c5a4a23afde9b5517b45df164cb5eb9fd1743b582ca248d2a151608a96",
+        "original_archive_member_extracted": false
+      }
+    ],
+    "note": "各変異compile120秒/link30秒/test30秒の上限。byte同一controlを先に検査し、4mutantすべてcompile/link0後runtime42。追加高階literal20assert前の独立test snapshotであり最終8caseと同一と偽らない。final sourceは不変。公開ZIPはsource/commands/logs/mapsだけでbinaryを含まない。"
+  },
+  "independent_review": {
+    "root": "数式/資源/DoDと型/実装の通読。",
+    "peer": "source/新補足契約/資源監査/両軸非零高階literalを独立通読し未解決重大指摘なし。runtimeは実装担当の実行でありreviewer実行へ読み替えない。"
+  },
+  "dependency_sources": {
+    "scope": "固定Boost 1.92 sourceの容量/生存領域forecastを開始前に独立照合した。外部header本文は本recordへ複製しない。",
+    "sha256": {
+      "cpp_int.hpp": "4099045e8ac3e3507779c08980272b261a86498a23a4d0bb0786849f5424595a",
+      "rational_adaptor.hpp": "23757733a6f1111aab0af98bb0bf5105fde08ac412c2cbf18d51bbad42656012",
+      "cpp_int/cpp_int_config.hpp": "ca7cfa2c2fcc6f6c5e4c6daaec365d60b49dbd3f85e0a1c5cce0208a031204bf",
+      "cpp_int/multiply.hpp": "25413c62b71c24e9a4a42ea210ee206701c2a97b976960a2f9a39299905ab64c",
+      "cpp_int/divide.hpp": "88c7ca149a95f70d06034ba80b40374a1ec7d40f2e8b93e0470cdd178fc569ef",
+      "cpp_int/misc.hpp": "3a5ad04afdcf7cd02f499d09ea980ee0654da117c1c3d5062bd392c3d8ef226a",
+      "cpp_int/bitwise.hpp": "6d075b99640c61d46a2932673ef8aa613649666f8a8823f73cdca4133494caf1"
+    }
+  },
+  "trace": {
+    "command": [
+      "python tools/qa/trace.py matrix",
+      "python tools/qa/trace.py check"
+    ],
+    "defined_ids": 208,
+    "with_tests": 30,
+    "with_records": 32,
+    "problems": 0,
+    "note": "IM01-1だけDoneへ同期し、親IM01-0は未完了のまま保持。既存IO/Aero証拠はbyte不変。"
+  }
+}

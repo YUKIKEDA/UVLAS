@@ -89,7 +89,7 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
-| IM01-1 | Feat | PG参照準備用のexact有理数・多項式 | #87 | Todo |
+| IM01-1 | Feat | PG参照準備用のexact有理数・多項式 | #87 | Done |
 | IM03-1 | Feat | 有限三角形の厳密な幾何述語 | #86 | Done |
 | IM06-1 | Feat | 厳格な入力ID・index変換 | #85 | Done |
 
