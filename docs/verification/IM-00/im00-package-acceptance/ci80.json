@@ -1,0 +1,56 @@
+{
+  "run": {
+    "id": 43870618483,
+    "name": "ci",
+    "status": "completed",
+    "conclusion": "success",
+    "run_number": 79,
+    "jobs_url": "https://api.github.com/repos/YUKIKEDA/UVLAS/actions/runs/43870618483/jobs",
+    "logs_url": "https://api.github.com/repos/YUKIKEDA/UVLAS/actions/runs/43870618483/logs",
+    "workflow_id": 414909606
+  },
+  "jobs": [
+    {
+      "id": 133310495437,
+      "name": "select affected checks",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 133310567886,
+      "name": "format, skills, R&D tree",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 133310569667,
+      "name": "build and test (windows, msvc)",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 133310569963,
+      "name": "compile optional benchmark (linux, gcc 14)",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 133310570396,
+      "name": "Python ownership (${{ matrix.os }}, CPython 3.12)",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 133310570620,
+      "name": "build and test (linux, gcc 14, ${{ matrix.preset }})",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 133310750255,
+      "name": "ci",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

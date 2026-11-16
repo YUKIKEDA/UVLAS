@@ -1,0 +1,203 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im00-package-acceptance",
+  "ids": [
+    "N4-10"
+  ],
+  "package": "IM-00",
+  "issue": 16,
+  "date": "2026-11-16",
+  "source_commit": "8b6f2ae08cf5f55cbbd63b4fa740605ab4019adb",
+  "scope": "最後の子Issue15閉鎖後の親IM-00の終了確認。元の基盤実装・検証・失敗・保留記録は不変にし、全子閉鎖と入口引継ぎを別記する。",
+  "decision": "親Issue16の4完了条件を満たす。主張はIM-00の採用仕様への実装適合まで。",
+  "conditions": [
+    {
+      "condition": 1,
+      "met": true,
+      "basis": "IM00-11終了記録の独立基準群/全4096系/型・世代・資源・投影/親不変/両OS成功と版対応を再利用する。"
+    },
+    {
+      "condition": 2,
+      "met": true,
+      "basis": "GitHubで12子Issueのclosedを確認。Issue本文の古いcheckboxで代替しない。"
+    },
+    {
+      "condition": 3,
+      "met": true,
+      "basis": "docs/verification/IM-00内の既存記録と今回の全子閉鎖snapshotを参照し、実装適合と未受入の軸を区別する。"
+    },
+    {
+      "condition": 4,
+      "met": true,
+      "basis": "IM-01/03/06の基盤依存が閉じた。個別の式/shape/単位/所有/失敗/精度/資源/oracle契約を閉じて子作業へ分ける入口であり、未分解パッケージの一括実装許可ではない。"
+    }
+  ],
+  "children": [
+    {
+      "number": 5,
+      "state": "closed",
+      "closed_at": "2026-11-14T16:59:03Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/5"
+    },
+    {
+      "number": 6,
+      "state": "closed",
+      "closed_at": "2026-11-15T04:43:47Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/6"
+    },
+    {
+      "number": 7,
+      "state": "closed",
+      "closed_at": "2026-11-14T18:27:49Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/7"
+    },
+    {
+      "number": 8,
+      "state": "closed",
+      "closed_at": "2026-11-15T05:43:52Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/8"
+    },
+    {
+      "number": 9,
+      "state": "closed",
+      "closed_at": "2026-11-15T08:03:52Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/9"
+    },
+    {
+      "number": 10,
+      "state": "closed",
+      "closed_at": "2026-11-15T11:40:44Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/10"
+    },
+    {
+      "number": 11,
+      "state": "closed",
+      "closed_at": "2026-11-15T11:40:46Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/11"
+    },
+    {
+      "number": 12,
+      "state": "closed",
+      "closed_at": "2026-11-15T13:54:45Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/12"
+    },
+    {
+      "number": 13,
+      "state": "closed",
+      "closed_at": "2026-11-15T05:52:56Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/13"
+    },
+    {
+      "number": 14,
+      "state": "closed",
+      "closed_at": "2026-11-15T08:16:41Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/14"
+    },
+    {
+      "number": 15,
+      "state": "closed",
+      "closed_at": "2026-11-16T13:20:11Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/15"
+    },
+    {
+      "number": 25,
+      "state": "closed",
+      "closed_at": "2026-11-15T06:35:23Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/25"
+    }
+  ],
+  "ci80": {
+    "run": 43870618483,
+    "status": "completed",
+    "conclusion": "success",
+    "checkout": "86d3c83c715cccc1159e2e388845d32120b5497f",
+    "head": "6ea32130366d1f66cbd10030af4e0c96ca9a3918",
+    "merge": "8b6f2ae08cf5f55cbbd63b4fa740605ab4019adb",
+    "same_tree": "259598608a9533c8ef089dbcd4aa522777b996cd",
+    "executed": "対象選択・整形/追跡/R&D整合・集約ci。",
+    "not_repeated": "C++、Python ownership、任意benchmarkは差分に従ってskipped。数値条件の成功はIM00-11完了記録の既存CIを根拠とする。"
+  },
+  "handoff": "PG係数、局所空力幾何、入力文書の独立契約を既存Issue17/19/22の範囲で並列に具体化する。本体は個別契約と作業分解の後に開始。",
+  "claims": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "unchanged": "製品src/include/tests/数値構成・依存・基準結果・凍結R&D・旧検証記録は不変。今回数値試験も参照生成も繰り返していない。",
+  "sources": {
+    "docs/plans/implementation-start-review.md": "81f345ed94e0ccaaef53c523695cfc359c328e23de8fc9193c1a341edea8b868",
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33"
+  },
+  "source_references": [
+    {
+      "id": "implementation-start-review",
+      "sha256": "81f345ed94e0ccaaef53c523695cfc359c328e23de8fc9193c1a341edea8b868",
+      "hint": "docs/plans/implementation-start-review.md"
+    },
+    {
+      "id": "numerical-foundation-adoption-specification",
+      "sha256": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+      "hint": "docs/specs/foundation/numerical-foundation-adoption-specification.md"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-00/im00-package-acceptance/checkout.json": "bd525c906ebb5fba081cdb9b2901f7745a60e3235ca66e44ca90c78fb6b0d3b9",
+    "docs/verification/IM-00/im00-package-acceptance/children.json": "ce004d2f320dde51eaa05c9c53b8b486582619e99b7f4a7e607410f959f3982b",
+    "docs/verification/IM-00/im00-package-acceptance/ci80-checks-excerpt.log": "2ecfed10724b928c883ffa78cfe5bd37cd7a7f66d6afe89695afaa4d03a218d0",
+    "docs/verification/IM-00/im00-package-acceptance/ci80.json": "34c2ab2216c8169795cb083bf24ee31589af62f435808a3cf924f77df8763a38",
+    "docs/plans/im00-package-acceptance.md": "1da481a879b627f3f63edfac90eb24322a15a481a826fc5891f3a0c71e6add10",
+    "docs/plans/im00-completion-review.md": "3295cfe421b4fe561d88de610f98be0a6e6243c4912744a689fd9928dd50f1d6",
+    "docs/plans/im00-handoff-review.md": "f17e501a3c675b80d49647e34ecdd835c9bfd7df4c546f0a0e6dfa5ecdcbd7d8",
+    "docs/verification/IM-00/im00-11-completion.json": "094fe13d647476725f19cdaa4fb36cf70d14572c074bec9bc4f32434f6332d48",
+    "docs/verification/IM-00/im00-11-ci79-followup.json": "3c5f00d0aa47edc139e83f1210582d29b974fc21fb3f21783a0b5fddaff5aa1f"
+  },
+  "artifact_references": [
+    {
+      "id": "im00-package-checkout",
+      "sha256": "bd525c906ebb5fba081cdb9b2901f7745a60e3235ca66e44ca90c78fb6b0d3b9",
+      "hint": "docs/verification/IM-00/im00-package-acceptance/checkout.json"
+    },
+    {
+      "id": "im00-package-children",
+      "sha256": "ce004d2f320dde51eaa05c9c53b8b486582619e99b7f4a7e607410f959f3982b",
+      "hint": "docs/verification/IM-00/im00-package-acceptance/children.json"
+    },
+    {
+      "id": "im00-package-ci80-checks-excerpt",
+      "sha256": "2ecfed10724b928c883ffa78cfe5bd37cd7a7f66d6afe89695afaa4d03a218d0",
+      "hint": "docs/verification/IM-00/im00-package-acceptance/ci80-checks-excerpt.log"
+    },
+    {
+      "id": "im00-package-ci80",
+      "sha256": "34c2ab2216c8169795cb083bf24ee31589af62f435808a3cf924f77df8763a38",
+      "hint": "docs/verification/IM-00/im00-package-acceptance/ci80.json"
+    },
+    {
+      "id": "im00-package-im00-package-acceptance",
+      "sha256": "1da481a879b627f3f63edfac90eb24322a15a481a826fc5891f3a0c71e6add10",
+      "hint": "docs/plans/im00-package-acceptance.md"
+    },
+    {
+      "id": "im00-package-im00-completion-review",
+      "sha256": "3295cfe421b4fe561d88de610f98be0a6e6243c4912744a689fd9928dd50f1d6",
+      "hint": "docs/plans/im00-completion-review.md"
+    },
+    {
+      "id": "im00-package-im00-handoff-review",
+      "sha256": "f17e501a3c675b80d49647e34ecdd835c9bfd7df4c546f0a0e6dfa5ecdcbd7d8",
+      "hint": "docs/plans/im00-handoff-review.md"
+    },
+    {
+      "id": "im00-package-im00-11-completion",
+      "sha256": "094fe13d647476725f19cdaa4fb36cf70d14572c074bec9bc4f32434f6332d48",
+      "hint": "docs/verification/IM-00/im00-11-completion.json"
+    },
+    {
+      "id": "im00-package-im00-11-ci79-followup",
+      "sha256": "3c5f00d0aa47edc139e83f1210582d29b974fc21fb3f21783a0b5fddaff5aa1f",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup.json"
+    }
+  ]
+}

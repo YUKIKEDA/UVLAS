@@ -1,0 +1,77 @@
+{
+  "reviewed_main": "8b6f2ae08cf5f55cbbd63b4fa740605ab4019adb",
+  "children": [
+    {
+      "number": 5,
+      "state": "closed",
+      "closed_at": "2026-11-14T16:59:03Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/5"
+    },
+    {
+      "number": 6,
+      "state": "closed",
+      "closed_at": "2026-11-15T04:43:47Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/6"
+    },
+    {
+      "number": 7,
+      "state": "closed",
+      "closed_at": "2026-11-14T18:27:49Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/7"
+    },
+    {
+      "number": 8,
+      "state": "closed",
+      "closed_at": "2026-11-15T05:43:52Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/8"
+    },
+    {
+      "number": 9,
+      "state": "closed",
+      "closed_at": "2026-11-15T08:03:52Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/9"
+    },
+    {
+      "number": 10,
+      "state": "closed",
+      "closed_at": "2026-11-15T11:40:44Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/10"
+    },
+    {
+      "number": 11,
+      "state": "closed",
+      "closed_at": "2026-11-15T11:40:46Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/11"
+    },
+    {
+      "number": 12,
+      "state": "closed",
+      "closed_at": "2026-11-15T13:54:45Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/12"
+    },
+    {
+      "number": 13,
+      "state": "closed",
+      "closed_at": "2026-11-15T05:52:56Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/13"
+    },
+    {
+      "number": 14,
+      "state": "closed",
+      "closed_at": "2026-11-15T08:16:41Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/14"
+    },
+    {
+      "number": 15,
+      "state": "closed",
+      "closed_at": "2026-11-16T13:20:11Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/15"
+    },
+    {
+      "number": 25,
+      "state": "closed",
+      "closed_at": "2026-11-15T06:35:23Z",
+      "url": "https://github.com/YUKIKEDA/UVLAS/issues/25"
+    }
+  ]
+}
