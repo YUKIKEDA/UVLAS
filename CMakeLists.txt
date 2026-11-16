@@ -51,7 +51,7 @@ if(WIN32)
 endif()
 
 set(UVLAS_NUMERICS_SOURCES src/numerics/storage.cpp src/numerics/precision.cpp
-    src/numerics/eigen_common.cpp
+    src/numerics/eigen_common.cpp src/numerics/eigen_metrics.cpp src/numerics/eigen_action.cpp
     src/numerics/backend_memory.cpp src/numerics/linear_metrics.cpp src/numerics/linear_result.cpp src/numerics/linear_validation.cpp
     src/numerics/gmres_solve.cpp src/numerics/gmres_residual_detail.cpp
     src/numerics/dense_solve.cpp src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp)
@@ -73,6 +73,10 @@ add_executable(uvlas_numeric_canary qa/numeric_canary/main.cpp)
 uvlas_configure_target(uvlas_numeric_canary)
 target_link_libraries(uvlas_numeric_canary PRIVATE
     uvlas_core uvlas::eigen Boost::multiprecision)
+
+add_executable(uvlas_eigen_common_canary qa/eigen_common/main.cpp)
+uvlas_configure_target(uvlas_eigen_common_canary)
+target_link_libraries(uvlas_eigen_common_canary PRIVATE uvlas_numerics)
 
 add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)

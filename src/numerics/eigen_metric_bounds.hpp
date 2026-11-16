@@ -58,10 +58,6 @@ inline double divide_bound(double numerator, double denominator, bool upper) noe
     return std::nextafter(rounded, upper ? infinity : 0.0);
 }
 
-inline Bounds divide(Bounds numerator, double denominator) noexcept {
-    return {divide_bound(numerator.lower, denominator, false),
-            divide_bound(numerator.upper, denominator, true)};
-}
 inline double power_scale(double value, int exponent, bool upper) noexcept {
     if (value == 0)
         return 0;
