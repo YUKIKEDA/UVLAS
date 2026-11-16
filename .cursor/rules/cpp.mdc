@@ -23,6 +23,7 @@ globs: "**/*.cpp,**/*.hpp"
 - 整形は `.clang-format`（`just format-check`）、静的検査は `.clang-tidy`（`just lint`）。どちらもゲート。検査を黙らせる `NOLINT` には、理由を同じ行に書く。整形の差分だけのcommitを、他の変更に混ぜない。
 - 警告はエラー。`#pragma warning(disable)` や `-Wno-…` を、ビルドを通すために足さない。原因を直すか、その警告がこのリポジトリに合わないなら、理由をコメントに書いて `cmake/ProjectOptions.cmake` を変えるPRにする。
 - 型は `PascalCase`、関数と変数は `snake_case`、定数は `snake_case`、マクロは `UVLAS_` で始める。名前空間は `uvlas::<module>`。
+- constructorの引数もmemberをshadowしない名前にする。2026-11-16、Issue #70の同名引数はMSVCで通ってもGCC 14の `-Werror=shadow` で失敗した。引数名を変え、初期化する値と順序を保つ。
 - マクロは、条件付きコンパイルとビルド情報にだけ使う。
 - ヘッダは自分で完結する（単独でincludeしてコンパイルできる）。includeの順は `.clang-format` が決める。
 - コメントは英語。APIには利用側が守る契約を、実装中には理由と根拠を書く。測ったことは測ったと書き、確かめていない原因は確かめていないと書く（`open-ends`）。

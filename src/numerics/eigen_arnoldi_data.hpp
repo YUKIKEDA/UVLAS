@@ -39,7 +39,8 @@ struct ArnoldiData {
                 linear::ReturnedPrecision precision, ArnoldiAssociation matching,
                 ArnoldiSelectionMetadata transform, ArnoldiBackend versions,
                 linear::UnitDimensions lambda_units, double lambda_scale, bool request_left,
-                bool request_subspace, ArnoldiSettings settings, ArnoldiLimits limits) noexcept
+                bool request_subspace, ArnoldiSettings configured_settings,
+                ArnoldiLimits configured_limits) noexcept
         : context(original),
           original_stamp(action_stamp),
           state(reporting),
@@ -51,8 +52,8 @@ struct ArnoldiData {
           eigenvalue_scale(lambda_scale),
           left_requested(request_left),
           subspace_requested(request_subspace),
-          settings(settings),
-          limits(limits) {}
+          settings(configured_settings),
+          limits(configured_limits) {}
     Context context;
     ActionStamp original_stamp;
     StateDiagnosticContext state;
