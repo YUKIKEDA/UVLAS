@@ -46,7 +46,8 @@ enum class Operation : std::uint8_t {
     LinearizeEquilibrium, ///< Equilibrium linearization.
     SearchFlutter,        ///< Flutter search.
     Recover,              ///< Checkpoint recovery.
-    CertifyError          ///< Error-certificate input validation.
+    CertifyError,         ///< Error-certificate input validation.
+    ExtractEigen          ///< Eigenvalue extraction and qualification of the original problem.
 };
 
 /// Unit shared by the required and observed counts in ResourceUsage.
