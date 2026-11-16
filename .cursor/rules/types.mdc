@@ -28,6 +28,8 @@ globs: "**/*.cpp,**/*.hpp"
 
 仕様が既に名指しする入力の拒否（非有限、寸法の不一致、世代の不一致、資源の超過）は、境界の `expected` のままである。それは、設定の矛盾を `expected` へ押し込む許可ではない。
 
+factory専用の構築キーは、型名をprivateにするだけでは足りない。public constructorが受け取るキーをaggregateのままにすると、呼出側は型名を使わず `{}` で渡せる。キー自身のconstructorをprivateにし、factoryだけをfriendにする。Issue #86では空workspaceの注入につながるこの迂回を独立レビューで発見した。正規factoryの成功対照と、外から `Owner({}, empty_storage)` を構築できないコンパイル時の負対照を置く。
+
 ```cpp
 // BAD: any integer indexes anything; a wrong-kind index compiles
 double gamma(std::int64_t panel);

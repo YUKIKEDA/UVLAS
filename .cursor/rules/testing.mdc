@@ -59,3 +59,5 @@ TEST_CASE("solve_linear reports failures") { /* singular matrix only */ }
 // GOOD: each kind has the input that causes it, and the parent is checked after each
 TEST_CASE("solve_linear rejects a non-finite right-hand side with Nonfinite", "[negative][N4-08]")
 ```
+
+確保監査へヘッダだけの多倍長演算をつなぐときも、imported targetの実際の依存閉包を読む。2026-11-17、Issue #86の監査試験は `Boost::multiprecision` が当該構成でコンパイル済み `Boost::container` を連れ、opaque artifact検査に拒否された。使うものは `cpp_int` / `cpp_rational` のヘッダだけだったため、依存を `Boost::headers` へ限定した。必要なコンパイル済み依存がある場合はその認定を行い、監査の除外で通さない。このリンクの選択を、整数演算自体が無確保である証拠にしない。

@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/14] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue85-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue85-build/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/14] Building CXX object CMakeFiles\uvlas_io_audit.dir\Release\src\io\input_scalar.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[3/14] Building CXX object CMakeFiles\uvlas_io.dir\Release\src\io\input_scalar.cpp.obj
+[4/14] Building CXX object tests\CMakeFiles\uvlas_test_io_input_scalar.dir\Release\io\input_scalar_test.cpp.obj
+[5/14] Building CXX object tests\CMakeFiles\uvlas_test_io_input_scalar_allocations.dir\Release\io\input_scalar_allocations_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[6/14] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[7/14] Linking CXX static library Release\uvlas_core.lib
+[8/14] Linking CXX static library Release\uvlas_io.lib
+[9/14] Linking CXX executable tests\Release\uvlas_test_io_input_scalar.exe
+[10/14] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[11/14] Linking CXX static library Release\uvlas_core_audit.lib
+[12/14] Linking CXX static library Release\uvlas_io_audit.lib
+[13/14] Linking CXX executable tests\Release\uvlas_test_io_input_scalar_allocations.exe
