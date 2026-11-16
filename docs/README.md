@@ -55,6 +55,7 @@
 | [implementation-start-review.md](plans/implementation-start-review.md) | 開始審査。実装パッケージIM-00〜08、残リスクR-01〜07 |
 | [im00-completion-review.md](plans/im00-completion-review.md) | IM-00製品検証の終了審査と、構造・空力・入出力へ渡す条件 |
 | [im00-package-acceptance.md](plans/im00-package-acceptance.md) | 全子Issue閉鎖後のIM-00パッケージ受入と、後続の個別契約への引継ぎ |
+| [next-package-work-breakdown.md](plans/next-package-work-breakdown.md) | IM-01/03/06の依存分解、最初の3子Issue、実装開始を止める条件 |
 
 実装前の計画、要求と証拠の対応表（当時のもの。現在は追跡表）、当時の現在地の記録は、履歴として [rd/planning/](../rd/planning/) にある。
 
