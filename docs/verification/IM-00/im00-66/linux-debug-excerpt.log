@@ -1,0 +1,42 @@
+Source: http<repo>/actions/runs/43785192509/job/133031222401
+PR head: 601471aaf6bbade6ab7e6810390a5082a9c4996e
+Excerpt from the actual Linux Debug job; the unqualified new baseline is the sole test failure.
+2026-11-16T01:19:04.5577352Z       Start 50: numerics.eigen_common
+2026-11-16T01:19:04.5595218Z 50/53 Test #50: numerics.eigen_common ...............   Passed    0.00 sec
+2026-11-16T01:19:04.5596390Z       Start 51: numerics.eigen_metrics
+2026-11-16T01:19:04.5629061Z 51/53 Test #51: numerics.eigen_metrics ..............   Passed    0.00 sec
+2026-11-16T01:19:04.5629548Z       Start 52: numerics.eigen_action
+2026-11-16T01:19:04.5648120Z 52/53 Test #52: numerics.eigen_action ...............   Passed    0.00 sec
+2026-11-16T01:19:04.5648779Z       Start 53: qa.eigen_common
+2026-11-16T01:19:04.5963259Z 53/53 Test #53: qa.eigen_common .....................***Failed    0.03 sec
+2026-11-16T01:19:04.5963717Z eigen-common: platform linux-x64-gnu14.2-sse2 is not qualified (QA-07).
+2026-11-16T01:19:04.5964127Z   qualified platforms: windows-x64-msvc19.51-sse2
+2026-11-16T01:19:04.5964622Z   qualify it with `results.py accept`; if its values differ from every qualified platform, that needs a result change record.
+2026-11-16T01:19:04.5965140Z   values on this platform:
+2026-11-16T01:19:04.5965379Z     generalized.normalization 0p+0
+2026-11-16T01:19:04.5965627Z     generalized.orthogonality 0p+0
+2026-11-16T01:19:04.5965873Z     generalized.residual 0p+0
+2026-11-16T01:19:04.5966284Z     pair.norm_lower 1p+0
+2026-11-16T01:19:04.5966512Z     pair.normalization 1p-52
+2026-11-16T01:19:04.5966696Z     pair.residual 1p-78
+2026-11-16T01:19:04.5966897Z     schur.orthogonality 0p+0
+2026-11-16T01:19:04.5967085Z     schur.residual 0p+0
+2026-11-16T01:19:04.5967227Z 
+2026-11-16T01:19:04.5967229Z 
+2026-11-16T01:19:04.5967318Z 98% tests passed, 1 tests failed out of 53
+2026-11-16T01:19:04.5967455Z 
+2026-11-16T01:19:04.5967526Z Label Time Summary:
+2026-11-16T01:19:04.5967702Z capacity        =   2.09 sec*proc (1 test)
+2026-11-16T01:19:04.5967915Z integration     =   3.64 sec*proc (12 tests)
+2026-11-16T01:19:04.5968131Z negative        =  13.27 sec*proc (36 tests)
+2026-11-16T01:19:04.5968338Z property        =   0.01 sec*proc (4 tests)
+2026-11-16T01:19:04.5968742Z unit            =   1.26 sec*proc (33 tests)
+2026-11-16T01:19:04.5968957Z verification    =   3.27 sec*proc (29 tests)
+2026-11-16T01:19:04.5969103Z 
+2026-11-16T01:19:04.5969183Z Total Test time (real) =  15.54 sec
+2026-11-16T01:19:04.5969302Z 
+2026-11-16T01:19:04.5969379Z The following tests FAILED:
+2026-11-16T01:19:04.5969619Z 	 53 - qa.eigen_common (Failed)                          verification
+2026-11-16T01:19:04.5969869Z Errors while running CTest
+2026-11-16T01:19:04.5985206Z ##[error]Process completed with exit code 8.
+

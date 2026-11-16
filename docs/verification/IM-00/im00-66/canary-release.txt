@@ -1,0 +1,9 @@
+platform windows-x64-msvc19.51-sse2
+pair.residual 1p-78
+pair.normalization 1p-52
+pair.norm_lower 1p+0
+schur.residual 0p+0
+schur.orthogonality 0p+0
+generalized.residual 0p+0
+generalized.normalization 0p+0
+generalized.orthogonality 0p+0

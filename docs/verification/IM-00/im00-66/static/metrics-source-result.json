@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "source_commit": "eb3ec4d1f123f4ede154012cb2e994b1339a687e",
+  "command": "pwsh -NoProfile -File tools/dev/msvc.ps1 uvx --offline clang-tidy@21.1.1 -p out/issue66-metrics-tidy --quiet src/numerics/eigen_metrics.cpp"
+}

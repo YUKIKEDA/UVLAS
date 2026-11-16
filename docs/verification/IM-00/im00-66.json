@@ -1,0 +1,238 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-07",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "issue": 66,
+  "date": "2026-11-16",
+  "source_commit": "cc2b4ddc0e3f28b08ac66f3cf7b960ae31a5d3c9",
+  "scope": "固有抽出の共通型・作用guard・元残差/正規化/Gram・任意の成分別後退誤差・checked容量を検証する。三つの固有値backendと物理被覆は未実装。",
+  "provenance": {
+    "clean": true,
+    "uncommitted_changes": false,
+    "base_main": "5f5907713998781f146391e2b2997f704b3056e0",
+    "note": "固定sourceのclean build-infoを持つWindows Debug/Releaseから、影響する新3targetとcore.failureだけを最終実行した。先行の局所試験と変異は各snapshotに対応させる。旧証拠は変更しない。"
+  },
+  "environment": {
+    "os": "Windows 11",
+    "cpp": "C++23",
+    "compiler": "MSVC 19.51.36260.0",
+    "floating_point": "/fp:strict",
+    "platform": "windows-x64-msvc19.51-sse2",
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "threads": 1
+  },
+  "verification": [
+    {
+      "configuration": "Debug",
+      "command": "ctest --test-dir out/build/python-msvc -C Debug -R \"^(core.failure|numerics.eigen_common|numerics.eigen_metrics|numerics.eigen_action)$\" --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "log": "docs/verification/IM-00/im00-66/clean-debug-tests.log"
+    },
+    {
+      "configuration": "Release",
+      "command": "ctest --test-dir out/build/python-msvc -C Release -R \"^(core.failure|numerics.eigen_common|numerics.eigen_metrics|numerics.eigen_action)$\" --output-on-failure",
+      "passed": 4,
+      "total": 4,
+      "log": "docs/verification/IM-00/im00-66/clean-release-tests.log"
+    }
+  ],
+  "completion_evidence": [
+    {
+      "requirement": "ExtractEigen・所有する失敗/診断とmissing-only補完・Python enum整合",
+      "evidence": "共通型8caseとcore.failureを最終両構成で確認。既知cause/世代/資源/親を保持し、例外を値に変換。Python OwnershipTests.test_failure_and_operation_namesはDebug拡張で1件成功、Release拡張はbuild成功で同methodの再実行なし（root実行報告toolchunk60f412、raw未保存）。"
+    },
+    {
+      "requirement": "保持両語の借用・非重複・stamp・未記入出力・最初の失敗保持",
+      "evidence": "作用guard14caseで実/複素の高低/実虚成分、9alias、再入、全出力sentinel、前後stampとcapability getter変更の0課金拒否、未知係数精度、空系/move、例外を検査。借用入力の数値と、親/最後確定/世代の報告用識別を保持する。"
+    },
+    {
+      "requirement": "pair/Schur/一般化の元残差・尺度・正規化・Gramを共通評価",
+      "evidence": "独立な精密/有理参照を持つmetrics11caseで保持値、固定尺度、producer誤差、外向き包絡を確認。非空Gram誤差<1、空の零、真の包絡不能/非有限を拒否する。固有値backendの候補生成能力は検証していない。"
+    },
+    {
+      "requirement": "成分別後退誤差のNotRequested/Requiredと低位保持を区別",
+      "evidence": "A=diag(5,1),λ=5,v=(1,2^-80)でnormの合格と追加β要求の未達を独立に確認。低位破棄、producer誤差無視、Gram独立性省略、必須β無効化の変異を検出。"
+    },
+    {
+      "requirement": "作用別・試行別前課金とchecked容量/外部admissionの分離",
+      "evidence": "forward/adjoint/inverse/attemptの正確な開始数と上限不足、全alias・不正形状の0課金、padding・寸法積/byte和overflowを確認。配列payloadだけを数え、backend予測を実測RSSや証明済み上限へ読み替えない。"
+    },
+    {
+      "requirement": "独立参照・隔離変異・不変性・影響範囲の記録",
+      "evidence": "Windows両構成4/4、新canary8値のbit一致、7変異のcompile/link成功と実行失敗を保存。Linux DebugのCIで新3targetは全て成功、唯一の新QA基準未登録による52/53と、取得8値の一致に基づく登録を区別する。"
+    }
+  ],
+  "baseline": {
+    "case": "eigen-common",
+    "windows_commit": "601471aaf6bbade6ab7e6810390a5082a9c4996e",
+    "values": 8,
+    "debug_release_bitwise_identical": true,
+    "windows_check": "qa.eigen_commonをDebug/Release各1/1成功（root実行報告toolchunkf8d2b9、rawファイルなし）。新caseの初回基準であり既存値は変更しない。",
+    "linux": {
+      "status": "取得した実値をWindows基準と照合し、新platformを正規登録した。登録後headのCI再成功は未確認。",
+      "ci_head": "601471aaf6bbade6ab7e6810390a5082a9c4996e",
+      "run": 43785192509,
+      "job": 133031222401,
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43785192509/job/133031222401",
+      "passed": 52,
+      "total": 53,
+      "sole_failure": "qa.eigen_commonの新platform未登録。新しいnumerics.eigen_common/eigen_metrics/eigen_actionは全て成功。",
+      "original_log_sha256": "52c69aac5f6d38986d46152c2de367d4e19479fb37241b567e39c5fd6a521c94",
+      "published_excerpt": "docs/verification/IM-00/im00-66/linux-debug-excerpt.log",
+      "values_equal_windows": true,
+      "values": 8,
+      "registration": "results.py acceptでlinux-x64-gnu14.2-sse2をidentical_to Windowsとして作成。既存基準は変更しない。保存CI出力を公開parse_output/differencesで照合し、8値/差分0を確認（root実行報告toolchunk35df74、製品数値再実行なし）。"
+    }
+  },
+  "static_checks": {
+    "version": "clang-format21.1.2 / clang-tidy21.1.1",
+    "source": {
+      "src/numerics/eigen_common.cpp": "static/common-source.log、Debug単一entry exit0。924a724以降source同一。",
+      "src/numerics/eigen_action.cpp": "static/action-final.log、Debug単一entry exit0。",
+      "src/numerics/eigen_metrics.cpp": "static/metrics-source.logとresult JSON。eb3ec4dの最終sourceをDebug単一entryでclang-tidy exit0。後続差分はprivate headerの未使用divide wrapper削除のみで、算術cppは同一。",
+      "src/python/module.cpp": "static/python-module.log、Debug単一entry exit0。",
+      "qa/eigen_common/main.cpp": "static/canary-final.log exit0。初回のexception-escape失敗はinitial-failure logとして保持。"
+    },
+    "tests": {
+      "tests/numerics/eigen_common_test.cpp": "担当12のexit0実行報告、raw未保存。",
+      "tests/numerics/eigen_action_test.cpp": "static/action-final.log、Debug単一entry exit0。",
+      "tests/numerics/eigen_metrics_test.cpp": "static/metrics-test.logとcommand JSON。最終TUの独立tidy exit0。",
+      "tests/python/test_ownership.py": "Ruff0.17.5でruff check成功（root実行報告、raw未保存）。"
+    },
+    "note": "外部headerの警告集計を製品source診断と混同しない。",
+    "document_lint": "natural-japanese lintをtechで実行、exit0。TTRとsource/artifactパス列の反復に関するinfoのみ。固定パス/hashと技術語を維持し、説明を言い換えて証拠を変えない。"
+  },
+  "mutations": {
+    "compiled_detected": 7,
+    "metric": {
+      "archive": "docs/verification/IM-00/im00-66/metric-mutations.zip",
+      "control": {
+        "cases": 11,
+        "assertions": 1046
+      },
+      "mutants": [
+        {
+          "change": "低位破棄",
+          "failed_assertions": 2,
+          "failed_cases": 2
+        },
+        {
+          "change": "producer誤差省略",
+          "failed_assertions": 2,
+          "failed_cases": 1
+        },
+        {
+          "change": "Gram<1省略",
+          "failed_assertions": 2,
+          "failed_cases": 2
+        },
+        {
+          "change": "必須β省略",
+          "failed_assertions": 1,
+          "failed_cases": 1
+        }
+      ],
+      "build_exit": 0,
+      "mutant_test_exit": 42,
+      "snapshot": "eb3ec4dのmetrics sourceと固定入力。最終private headerから未使用divide wrapperを除いた差分だけが後続。各mapで元metrics archive memberの未抽出を確認。",
+      "timeouts_seconds": {
+        "compile": 120,
+        "link": 30,
+        "test": 30
+      },
+      "publication": "元ZIP SHA2959139969423ea01ef4948410f87636ba324618b93481e39901c83c346a2f40を保持し、5つのmapのmangled account名だけを追加伏字した派生公開ZIP。元の数値/合否/リンク判定は不変、各entryの追加前後hash/countはZIP内post-redaction.json。"
+    },
+    "action": {
+      "archive": "docs/verification/IM-00/im00-66/action-mutations.zip",
+      "control": {
+        "cases": 12,
+        "assertions": 320
+      },
+      "mutants": [
+        {
+          "change": "入力低位破棄",
+          "failed_assertions": 4,
+          "failed_cases": 2
+        },
+        {
+          "change": "low出力sentinel省略",
+          "failed_assertions": 1,
+          "failed_cases": 1
+        },
+        {
+          "change": "作用上限の>=を>へ変更",
+          "failed_assertions": 1,
+          "failed_cases": 1
+        }
+      ],
+      "build_exit": 0,
+      "mutant_test_exit": 42,
+      "test_timeout_seconds": 30,
+      "snapshot": "実体を複製した隔離sourceにだけ変異を入れた。snapshot後にRAII変数のconst宣言、未知係数精度の入口guard/1case、capability取得後stamp再検査/1caseを追加した。最終sourceとbyte同一とは扱わず、原snapshotと最終sourceを両方hashで保持する。",
+      "note": "compileには独立の時間上限を設定せず、実際は数秒。バイナリは公開束へ含めない。"
+    }
+  },
+  "resource_qualification": "guardと容量関数は所有領域を確保しない。producer所有のbackend/workspaceは別責務。外部admissionは宣言値の比較であり実確保/RSS/24・48GiB制限の達成ではない。速度改善・before/after性能比較は主張しない。",
+  "remaining_gates": [
+    "基準登録後headのCI結果は未確認。CI待機せず提出し、Linux Release/sanitizer等の未取得結果を成功扱いしない。",
+    "IM00-11/#15：三backendの製品実装、完全法/対称一般化/ArnoldiとPG24の接続・両OS認定。",
+    "IM-05：同一平衡P/P*、物理mode被覆と臨界区間。",
+    "IM-07/08：実務規模の性能・実験受入。"
+  ],
+  "sources": {
+    "CMakeLists.txt": "65dd39f2440f74f8e0e5df60266c127cbb6c1a9d53a6c2ec4fa17d4ef37b3b22",
+    "docs/conventions.md": "3a155bfd88d8e15984220c8d93ac837dfffffb03c747d49d124fa77def2d01c6",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "include/uvlas/numerics/eigen_action.hpp": "45317a9d9dd62efca572238012c1841b0eaf9158aeb8d1800ca97f552980d9b4",
+    "include/uvlas/numerics/eigen_common.hpp": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+    "include/uvlas/numerics/eigen_metrics.hpp": "724de0d8717844bfe31976e6d7e4c2718e1d874859efe5c34f65cdcd38675182",
+    "qa/eigen_common/README.md": "efffa18ec61769c982d87e0fdf3d5bb061f13a97a569afe084952484917a9d05",
+    "qa/eigen_common/main.cpp": "0553896195c5399d640c1f8e59b3ad9a5b819e8f2426cbc87addc4398f336f31",
+    "src/numerics/eigen_action.cpp": "5c853820765cbd3325c1a6ede5831526510975885032c2e985b07809685e6a2b",
+    "src/numerics/eigen_common.cpp": "518df296929290b01d1c6b5f5bddfdc5fc9fc21a43331575e11329df63e2e705",
+    "src/numerics/eigen_metric_bounds.hpp": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+    "src/numerics/eigen_metrics.cpp": "b9fc0ff4fd0b429c6f6a23a418ece80d709cee83b67851bd23d864a54e322e98",
+    "src/python/module.cpp": "fe7f0fae78723adeb0b978de57a62092f36a252a09541ced044920f9acabe227",
+    "tests/CMakeLists.txt": "76913f4c10a73d038fec67c48da68fb8d60776e75df65ce8c283e84f58dcc6d9",
+    "tests/numerics/eigen_action_test.cpp": "1879bc8223784eb43125f3397c5e58bd6de404facd2035173ec603cfddab9e44",
+    "tests/numerics/eigen_common_test.cpp": "684211149ab0531488e92759595292a4324641bc3dd79b2f2c4c794bf6b20290",
+    "tests/numerics/eigen_metrics_test.cpp": "22ce3347abc5e02b12af36e0d1b36e7251a5101a52fb1447816355c8623a57b5",
+    "tests/python/test_ownership.py": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-66/action-mutations.zip": "d4bf2740fb99be48982741aceefc4c88d184319ba4e6ce14e1587fada890bcd9",
+    "docs/verification/IM-00/im00-66/build-info-debug.json": "11e69a6892a460130e86ab54ae28d30f2b2eb9a003d958c28dc7b52e66fd4558",
+    "docs/verification/IM-00/im00-66/build-info-release.json": "a9f536082434dfa6bb6693944a8de896e54635044e3d28f9299553d60ed044e9",
+    "docs/verification/IM-00/im00-66/canary-debug.txt": "c4ba61d32f67b358a5d02fbddb02b33684e7ec9c56e22f08d487421ee9f84dde",
+    "docs/verification/IM-00/im00-66/canary-release.txt": "c4ba61d32f67b358a5d02fbddb02b33684e7ec9c56e22f08d487421ee9f84dde",
+    "docs/verification/IM-00/im00-66/clean-debug-build.log": "0fbf50705beccd6cec53a021ef7300ffc60876e0e40c9510601b976ea9565bff",
+    "docs/verification/IM-00/im00-66/clean-debug-tests.log": "c90b33f8bd03259469f4b7ccc1a94cba9ad57096dbb243279fb79cea3f957117",
+    "docs/verification/IM-00/im00-66/clean-release-build.log": "0bb6174143c2f8a9a5a32f11c742870f86a1df9a3946efcb022a5910ac7c4c86",
+    "docs/verification/IM-00/im00-66/clean-release-tests.log": "a700a8739b3914e734f0a07b51e98af4dd6673bb1cf693d954e820daccfa2892",
+    "docs/verification/IM-00/im00-66/linux-canary.txt": "38096a11dcfea80626d85f2de18c1f31699a919202a4fe74c19b9901543807f8",
+    "docs/verification/IM-00/im00-66/linux-debug-excerpt.log": "59e4003da2d9bc118d5dfb7e4e153668e85b742bda89ca45af10378412e8e06b",
+    "docs/verification/IM-00/im00-66/metric-mutations.zip": "498b6d30ffe89126869e70b3f8ef3861460a308f650452abe1838bf3517e889f",
+    "docs/verification/IM-00/im00-66/redaction.json": "6f07d753cd45c2edef5fee2b0d8aa884fb374bd6f77009e445ef172dd6e83404",
+    "docs/verification/IM-00/im00-66/static/action-final.log": "8ff829281125b2e91683d53b5dccecfe6917705fcf545f44523ecbf4359c85fd",
+    "docs/verification/IM-00/im00-66/static/canary-final.log": "dce93abf992dfe477bc7351e85e51cf260729c9219746830f675f80f2a416564",
+    "docs/verification/IM-00/im00-66/static/canary-initial-failure.log": "9ec1335b5ddf653bb6a49cccdbe646a47aac43953093f46b8f83de781dd5f15c",
+    "docs/verification/IM-00/im00-66/static/common-source.log": "d2b37801b0d529c531bd9b0095de860b7b597bb14ace2d2c9eed8de14925fe26",
+    "docs/verification/IM-00/im00-66/static/metrics-source-result.json": "ad2ef843f3cab8f73d41c089ca3e05d6f2213051753dbdabf156bc23e63f6122",
+    "docs/verification/IM-00/im00-66/static/metrics-source.log": "be9eb60e352d3f9b84a6fc4134fbd69dc421703ed0b0386dea38bd5a7cd2369a",
+    "docs/verification/IM-00/im00-66/static/metrics-test-command.json": "4f4c82e3fa74ba3fc6a6cc17af5ceebde7f5c93f841a8e0423b0b10c3f67ecbe",
+    "docs/verification/IM-00/im00-66/static/metrics-test.log": "23104ab2fbb869dca607d19705dfad63ea03a436ed70cefd72848f2877271379",
+    "docs/verification/IM-00/im00-66/static/python-module.log": "3718275de64f4c98ea838a8fe404d71987438c397dbe5890a719985e513083d2",
+    "qa/baselines/eigen-common/windows-x64-msvc19.51-sse2.json": "f87a852f356c980b2bab731b3f46a2e93f6a76294ca9649234c7cce111053708",
+    "qa/baselines/eigen-common/linux-x64-gnu14.2-sse2.json": "997cb0d0adca25a9a36cde0f3fadefcdf7641c7d5680f1cba59f2836c93b2b47"
+  }
+}

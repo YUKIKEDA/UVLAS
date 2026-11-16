@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/17] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\python-msvc && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/python-msvc/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/17] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\eigen_action.cpp.obj
+[3/17] Building CXX object CMakeFiles\uvlas_numerics.dir\Debug\src\numerics\eigen_metrics.cpp.obj
+[4/17] Building CXX object CMakeFiles\uvlas_cli.dir\Debug\src\app\main.cpp.obj
+[5/17] Building CXX object CMakeFiles\uvlas_eigen_common_canary.dir\Debug\qa\eigen_common\main.cpp.obj
+[6/17] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[7/17] Linking CXX static library Debug\uvlas_core.lib
+[8/17] Linking CXX static library Debug\uvlas_numerics.lib
+[9/17] Linking CXX executable Debug\uvlas_eigen_common_canary.exe
+[10/17] Linking CXX executable Debug\uvlas.exe
+[11/17] Linking CXX executable tests\Debug\uvlas_test_core_failure.exe
+[12/17] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_common.exe
+[13/17] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_action.dir\Debug\numerics\eigen_action_test.cpp.obj
+[14/17] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_action.exe
+[15/17] Building CXX object tests\CMakeFiles\uvlas_test_numerics_eigen_metrics.dir\Debug\numerics\eigen_metrics_test.cpp.obj
+[16/17] Linking CXX executable tests\Debug\uvlas_test_numerics_eigen_metrics.exe
