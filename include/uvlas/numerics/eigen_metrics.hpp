@@ -34,6 +34,10 @@ enum class PairSide : std::uint8_t {
 
 /// Independent budgets for one eigenpair's residual, vector norm and optional backward error.
 struct PairMetricRequest {
+    /// Supply all criteria explicitly; no uninitialized implicit default request exists.
+    PairMetricRequest(MetricRequirement original, MetricRequirement norm,
+                      BackwardRequirement additional) noexcept
+        : residual(original), normalization(norm), backward(additional) {}
     MetricRequirement
         residual; ///< Original dimensionless residual divided by vector infinity norm.
     MetricRequirement normalization; ///< Absolute error from unit dimensionless Euclidean norm.
@@ -43,6 +47,10 @@ struct PairMetricRequest {
 
 /// Independent budgets for a Schur/invariant or mass-orthonormal basis.
 struct BasisMetricRequest {
+    /// Supply the residual, Gram and optional extra requirements together.
+    BasisMetricRequest(MetricRequirement original, MetricRequirement gram,
+                       BackwardRequirement additional) noexcept
+        : residual(original), orthogonality(gram), backward(additional) {}
     MetricRequirement residual; ///< Original matrix residual or maximum generalized-column metric.
     MetricRequirement orthogonality; ///< Infinity norm of the complete Gram error matrix.
     BackwardRequirement
@@ -51,6 +59,10 @@ struct BasisMetricRequest {
 
 /// Independent budgets for a mass-normalized generalized full basis.
 struct GeneralizedMetricRequest {
+    /// Keep diagonal normalization and full mass-Gram requirements independent.
+    GeneralizedMetricRequest(MetricRequirement original, MetricRequirement norm,
+                             MetricRequirement gram, BackwardRequirement additional) noexcept
+        : residual(original), normalization(norm), orthogonality(gram), backward(additional) {}
     MetricRequirement residual;      ///< Maximum original residual over all generalized columns.
     MetricRequirement normalization; ///< Maximum diagonal mass-Gram error from one.
     MetricRequirement orthogonality; ///< Infinity norm of the complete mass-Gram error.

@@ -88,7 +88,7 @@ inline Bounds scale(Bounds value, double numerator, double first_denominator = 1
         exponent += next;
         const auto product = multiply_magnitudes({leading, leading}, {factor, factor});
         double result = upper ? product.upper : product.lower;
-        for (double denominator : {first_denominator, second_denominator}) {
+        for (const double denominator : {first_denominator, second_denominator}) {
             const double mantissa = std::frexp(denominator, &next);
             exponent -= next;
             result = divide_bound(result, mantissa, upper);
@@ -107,7 +107,7 @@ inline double lower_subtract(double a, double b) noexcept {
 }
 inline double distance_from_one(Bounds norm) noexcept {
     double result = 0;
-    for (double value : {norm.lower, norm.upper}) {
+    for (const double value : {norm.lower, norm.upper}) {
         const auto difference = two_sum(value, -1.0);
         if (!difference)
             return std::numeric_limits<double>::infinity();

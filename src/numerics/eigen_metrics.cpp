@@ -57,7 +57,7 @@ core::Result<void> validate(ActionValues<Scalar> action) noexcept {
         return words;
     if (action.absolute_error_upper.size() != action.values.size())
         return fail(FailureCode::InvalidInput);
-    for (double error : action.absolute_error_upper) {
+    for (const double error : action.absolute_error_upper) {
         // Nonfinite supplied bounds are invalid external data. Overflow of a
         // bound computed below is instead an unresolved internal enclosure.
         if (!std::isfinite(error))
@@ -87,7 +87,7 @@ core::Result<void> validate(MetricScales scales, std::size_t rows) noexcept {
         return fail(FailureCode::Nonfinite);
     if (scales.eigenvalue_scale <= 0)
         return fail(FailureCode::InvalidInput);
-    for (double scale : scales.components) {
+    for (const double scale : scales.components) {
         if (!std::isfinite(scale))
             return fail(FailureCode::Nonfinite);
         if (scale <= 0)
