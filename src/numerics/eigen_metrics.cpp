@@ -423,6 +423,9 @@ assess_schur_metrics(core::Index rows, core::Index columns, WordView<Scalar> bas
                 }
                 gram = std::max(gram, row_error);
             }
+            // An unrepresentable enclosure is not a finite rank diagnostic.
+            if (!std::isfinite(gram))
+                return fail(context, FailureCode::PrecisionUnresolved);
             if (k != 0 && !(gram < 1))
                 return fail(context, FailureCode::RankUnresolved);
             if (k != 0 && !(basis_norm_lower > 0))
@@ -586,6 +589,8 @@ Result<GeneralizedMetrics> assess_generalized_metrics(core::Index rows, WordView
                 }
                 gram = std::max(gram, row_error);
             }
+            if (!std::isfinite(gram))
+                return fail(context, FailureCode::PrecisionUnresolved);
             if (n != 0 && !(gram < 1))
                 return fail(context, FailureCode::RankUnresolved);
             const auto precision = representation(basis, eigenvalues);
