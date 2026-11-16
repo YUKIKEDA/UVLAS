@@ -1,0 +1,24 @@
+{
+  "clang_tidy": "21.1.1",
+  "cases": [
+    {
+      "path": "tests/numerics/foundation_precision_system_test.cpp",
+      "exit": 0,
+      "seconds": 36.62687559999176,
+      "source_sha256": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+      "log_sha256": "f2e5ff342ac77c78f74c818caea828f1c695c6964f190af6ef9ebdff480f1666"
+    },
+    {
+      "path": "tests/numerics/full_precision_control_test.cpp",
+      "exit": 0,
+      "seconds": 34.59352890000446,
+      "source_sha256": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+      "log_sha256": "652b4da35d54d89412ba4f9086b09e55b37cf59d8c8f285062620083958988b0"
+    }
+  ],
+  "scope": "最終2翻訳単位と、それらが含むtest専用ヘッダを検査。私有compiler commandは原本hashのみ保持する。",
+  "raw_command_records_sha256": [
+    "b8b55a9886f43d8bab4ba594d45b61d664736d337d657195064487311b5d9ed9",
+    "e2bbf90256c81f62c7d27215a4d6ad1ea7f133747e1200d4b7186f7b1d6f0478"
+  ]
+}

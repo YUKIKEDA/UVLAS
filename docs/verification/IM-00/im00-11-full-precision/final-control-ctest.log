@@ -1,0 +1,17 @@
+[OUTPUT] 
+Internal ctest changing into directory: <workspace>/out/issue70-release
+
+[HANDLER_OUTPUT] 
+Test project <workspace>/out/issue70-release
+
+    Start 27: numerics.full_precision_control
+1/1 Test #27: numerics.full_precision_control ...   Passed    0.15 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+negative        =   0.15 sec*proc (1 test)
+unit            =   0.15 sec*proc (1 test)
+verification    =   0.15 sec*proc (1 test)
+
+Total Test time (real) =   0.15 sec
