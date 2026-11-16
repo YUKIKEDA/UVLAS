@@ -1,0 +1,409 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im00-11-completion",
+  "ids": [
+    "N4-10"
+  ],
+  "package": "IM-00",
+  "issue": 15,
+  "date": "2026-11-16",
+  "source_commit": "778335ed0f243b89943a3fd1087f8962095e197d",
+  "adopted_merge_commit": "664b9864e4b0bfb852562b38d5ca2cf166742c7b",
+  "execution_checkout": "b7a13022ac3ba285be59ee44818814c2b7818ca8",
+  "verified_tree": "554be953c14eb17143487a94c61ffc3548f82b96",
+  "checkout_head_main_trees_equal": true,
+  "scope": "IM00-11の7終了条件を、実行済みの製品経路と独立参照へ照合した終了審査。今の変更は文書・メタデータだけで、数値再実行・参照再生成をしていない。",
+  "decision": "IM00-11の終了条件を満たす。IM-00基盤を使う後続の個別契約具体化へ進む。未分解の物理パッケージの一括実装許可ではない。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "met": true,
+      "evidence": "密実/複素更新、不定KKT、100k疎、一般化/一般/Arnoldi、凍結PG全履歴P、EFT/有理rank/区間平方根/SHAの製品基準群。初回数値審査の4096不足は両OSの通常Release target成功で解消。"
+    },
+    {
+      "condition": 2,
+      "met": true,
+      "evidence": "小系の固定1e-12級、原残差・全Gram/正規化・独立既知解/完全固有値集合の一対一照合。製品自身からexpectedを作らない。"
+    },
+    {
+      "condition": 3,
+      "met": true,
+      "evidence": "強いID、寸法/予算、世代/内容、投影/必要consumerの負対照。固定4096参照は2列投影拒否、1列全行/観測再認定で受理。"
+    },
+    {
+      "condition": 4,
+      "met": true,
+      "evidence": "状態/所有/準備/求解/Python包装の失敗・再入・取消後の親不変と既存結果寿命。新4096 caseも係数・右辺・既存返却値・世代を検査。"
+    },
+    {
+      "condition": 5,
+      "met": true,
+      "evidence": "最終CI run43864289897のWindows Debug/Release・Linux Debug/Release/sanitizeが成功し、checkout/head/mainのtreeが同一。"
+    },
+    {
+      "condition": 6,
+      "met": true,
+      "evidence": "新規・既存の参照/入力/実行条件をID・SHA-256・hintで対応づけ、旧recordのsource-mapを書き換えずartifactとして保持。"
+    },
+    {
+      "condition": 7,
+      "met": true,
+      "evidence": "主張はIM-00の仕様適合のみ。物理kernel/全consumer/実務数値/実験/製品性能/実務受入は各後続IMのgateに残す。"
+    }
+  ],
+  "ci": {
+    "run": 43864289897,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43864289897",
+    "status": "completed",
+    "conclusion": "success",
+    "compiler_windows": "MSVC 19.51.36260.0",
+    "compiler_linux": "GNU 14.2.0",
+    "tests": {
+      "windows_debug": {
+        "passed": 67,
+        "total": 67,
+        "seconds": 115.39
+      },
+      "windows_release": {
+        "passed": 68,
+        "total": 68,
+        "seconds": 314.64,
+        "full4096_seconds": 230.16
+      },
+      "linux_debug": {
+        "passed": 66,
+        "total": 66,
+        "seconds": 26.24
+      },
+      "linux_release": {
+        "passed": 67,
+        "total": 67,
+        "seconds": 198.62,
+        "full4096_seconds": 176.35
+      },
+      "linux_sanitize": {
+        "passed": 66,
+        "total": 66,
+        "seconds": 32.74
+      }
+    },
+    "full4096_scope": "Windows/Linux Releaseだけ。Debug/sanitizeは短い独立oracle/fixture改変拒否と既存部品試験を含む。",
+    "python_checks": "Ruff check/formatとPyright strict成功。32 files already formatted、0 errors/0 warnings/0 informations。",
+    "other_checks": "対象選択、clang-tidy、追跡、R&D整合、集約ci成功。",
+    "skipped": "任意benchmarkとPython ownershipは差分に従い省略。このrunで再検証したとは言わず、IM00-12/10の既存採用記録を参照する。"
+  },
+  "preserved_history": "一行witnessだけの旧不足判定、ローカル1200秒Timeout、参照filtered成功、先行run43856705878のRuff/aggregate failureとCpp成功は別のまま保持し、最終runの成功へ置換しない。",
+  "handoff": {
+    "next_existing_issues": [
+      17,
+      19,
+      22
+    ],
+    "state": "採用式を変えず、個別契約と子作業分解を並列に具体化する。子契約の開始審査まで本実装を先走らない。",
+    "owner_decisions": "最初の内部契約整理で追加owner判断は見つからない。公開先・対応環境・署名の未決定はREL-1で、実artifact調査後に確認する。"
+  },
+  "parent_issue": {
+    "number": 16,
+    "other_children_closed": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      25
+    ],
+    "remaining_open_child_at_review": 15,
+    "closure": "このPRが15を閉じ、16はPart ofとして残す。16の全子閉鎖は15のマージ後に再確認する。"
+  },
+  "unchanged": "src/include/tests/cmake/数値依存/基準結果/凍結R&Dと旧検証記録は不変。通過済みの数値・全体CIをこの文書変更だけで繰り返さない。",
+  "sources": {
+    "docs/plans/implementation-start-review.md": "81f345ed94e0ccaaef53c523695cfc359c328e23de8fc9193c1a341edea8b868",
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+    "docs/specs/foundation/full-precision-system-contract.md": "962bd8e8a6bcf3d1ddbbbf999be6513a6f6f09a524ffd85381be23c98e13a978",
+    "docs/specs/foundation/precision-contract.md": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "docs/specs/foundation/eigen-extraction-contract.md": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+    "tests/CMakeLists.txt": "ffe9090391ad0780d0e3858b4449f59100c42d51762372b96338741e641b7a03",
+    "tests/numerics/foundation_precision_system_test.cpp": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+    "tests/numerics/full_precision_control_test.cpp": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+    "tests/numerics/full_precision_fixture.hpp": "7a8a2b9bbd34d764458e87cbf02afb2a30047e8ebcb88dc0c04b797ede8ad38c",
+    "tests/numerics/full_precision_oracle.hpp": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+    "CMakeLists.txt": "995df356a804209236632c1491235efbd2012c3606b8efca30109ecd8427e519",
+    "CMakePresets.json": "a6494703858c4f3dbd992e9ec9a53fd184dfc437052c2d1470a044bd7c597a4f",
+    "cmake/CompilerPolicy.cmake": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+    "vcpkg.json": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "ruff.toml": "e561b1b873a67c7dbeefcba8ee72f9c003cb36d057d07563188ccad01141a1ec"
+  },
+  "source_references": [
+    {
+      "id": "im00-completion-docs-plans-implementation-start-review.md",
+      "sha256": "81f345ed94e0ccaaef53c523695cfc359c328e23de8fc9193c1a341edea8b868",
+      "hint": "docs/plans/implementation-start-review.md"
+    },
+    {
+      "id": "im00-completion-docs-specs-foundation-numerical-foundation-adoption-specification.md",
+      "sha256": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+      "hint": "docs/specs/foundation/numerical-foundation-adoption-specification.md"
+    },
+    {
+      "id": "im00-completion-docs-specs-foundation-full-precision-system-contract.md",
+      "sha256": "962bd8e8a6bcf3d1ddbbbf999be6513a6f6f09a524ffd85381be23c98e13a978",
+      "hint": "docs/specs/foundation/full-precision-system-contract.md"
+    },
+    {
+      "id": "im00-completion-docs-specs-foundation-precision-contract.md",
+      "sha256": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+      "hint": "docs/specs/foundation/precision-contract.md"
+    },
+    {
+      "id": "im00-completion-docs-specs-foundation-dense-solve-contract.md",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+      "hint": "docs/specs/foundation/dense-solve-contract.md"
+    },
+    {
+      "id": "im00-completion-docs-specs-foundation-eigen-extraction-contract.md",
+      "sha256": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+      "hint": "docs/specs/foundation/eigen-extraction-contract.md"
+    },
+    {
+      "id": "im00-completion-tests-CMakeLists.txt",
+      "sha256": "ffe9090391ad0780d0e3858b4449f59100c42d51762372b96338741e641b7a03",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im00-completion-tests-numerics-foundation_precision_system_test.cpp",
+      "sha256": "e874f5537df9e1184c138af3fdc0d93e39a3bba1892f8f162bf9e46f4513aa29",
+      "hint": "tests/numerics/foundation_precision_system_test.cpp"
+    },
+    {
+      "id": "im00-completion-tests-numerics-full_precision_control_test.cpp",
+      "sha256": "d2ac331a4695b26e92a20e2e1f0d4abdfdba357a689292eafc5c38bce7f4b6b1",
+      "hint": "tests/numerics/full_precision_control_test.cpp"
+    },
+    {
+      "id": "im00-completion-tests-numerics-full_precision_fixture.hpp",
+      "sha256": "7a8a2b9bbd34d764458e87cbf02afb2a30047e8ebcb88dc0c04b797ede8ad38c",
+      "hint": "tests/numerics/full_precision_fixture.hpp"
+    },
+    {
+      "id": "im00-completion-tests-numerics-full_precision_oracle.hpp",
+      "sha256": "d3906dedcb8bdb29c993ac5498f3e0c7e4c0b22fcd4a9f2dc20a787a18b0747c",
+      "hint": "tests/numerics/full_precision_oracle.hpp"
+    },
+    {
+      "id": "im00-completion-CMakeLists.txt",
+      "sha256": "995df356a804209236632c1491235efbd2012c3606b8efca30109ecd8427e519",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im00-completion-CMakePresets.json",
+      "sha256": "a6494703858c4f3dbd992e9ec9a53fd184dfc437052c2d1470a044bd7c597a4f",
+      "hint": "CMakePresets.json"
+    },
+    {
+      "id": "im00-completion-cmake-CompilerPolicy.cmake",
+      "sha256": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+      "hint": "cmake/CompilerPolicy.cmake"
+    },
+    {
+      "id": "im00-completion-vcpkg.json",
+      "sha256": "63dce72af1f15b7e115c3cd5bae48c1f7a5b0f006a725dfe4cd5cd19c9ced2ec",
+      "hint": "vcpkg.json"
+    },
+    {
+      "id": "im00-completion-vcpkg-configuration.json",
+      "sha256": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+      "hint": "vcpkg-configuration.json"
+    },
+    {
+      "id": "im00-completion-ruff.toml",
+      "sha256": "e561b1b873a67c7dbeefcba8ee72f9c003cb36d057d07563188ccad01141a1ec",
+      "hint": "ruff.toml"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-00/im00-11-completion/checkout.json": "f4ddb7625c04463b382a46e649b9fd691f81c8a354f582b6801b51dc67d2f01c",
+    "docs/verification/IM-00/im00-11-completion/ci-jobs.json": "4c659dc7678b57fc3770318b998d79f73d4cfa359036fcbad5478c79d1c371c9",
+    "docs/verification/IM-00/im00-11-completion/excerpt-provenance.json": "0964266874ec40ce0f642ef4901b23eb764dffe513a2e9c3728367ce6a3ce405",
+    "docs/verification/IM-00/im00-11-completion/job-133288812966-excerpt.log": "a8853c1ce8c4d29855112b8205e3c12413b0eb87c6501c357e07deb0edd31d0b",
+    "docs/verification/IM-00/im00-11-completion/job-133288812997-excerpt.log": "e48c131a2b54ff24b0036740f3218af6b4c448a85660a3a31ea14145d2db7848",
+    "docs/verification/IM-00/im00-11-completion/job-133288812998-excerpt.log": "c4cfe6c8aaddb4b240a8678be9c0a908b151bdc75954617a557e6cc6fcaefe50",
+    "docs/verification/IM-00/im00-11-completion/job-133288813038-excerpt.log": "54730bf0615f4035011d5f8c9e560704fd4af2842978f6831a98ebe09e74403d",
+    "docs/verification/IM-00/im00-11-completion/python-checks-excerpt.log": "d8285a6f955c737ceb719fdc1008a103ed7982ecc9ca393b69040bdb049213de",
+    "docs/plans/im00-completion-review.md": "3295cfe421b4fe561d88de610f98be0a6e6243c4912744a689fd9928dd50f1d6",
+    "docs/plans/im00-handoff-review.md": "f17e501a3c675b80d49647e34ecdd835c9bfd7df4c546f0a0e6dfa5ecdcbd7d8",
+    "docs/verification/IM-00/im00-11-numerical-review.md": "fa022c3ea251030f8008e64654dd2ce64be4396b8d0264f6451c1f409186171f",
+    "docs/verification/IM-00/im00-11-full-system-review.md": "ea1bc0664e138b0e2d758adddd36fcdba8d916a4e75678f6b9e41ced1af4536a",
+    "docs/verification/IM-00/im00-11-full-precision.json": "b9266f484785f1c8dbb159c8f9bd620f0d67fa6a9253003c073cf2826d1a06d7",
+    "docs/verification/IM-00/im00-11-ci79-followup.json": "3c5f00d0aa47edc139e83f1210582d29b974fc21fb3f21783a0b5fddaff5aa1f",
+    "docs/verification/IM-00/im00-11-fixture-preparation.json": "0dca84c553719d182afb3988d975e315732ce02782a883e7997557cdf7d1b61e",
+    "docs/verification/IM-00/im00-77.json": "def86f1547432898413ee2790680c0a862f8b456f9225ee4bf35e3810ebdef1a",
+    "docs/verification/IM-00/im00-5.json": "9283af8c788baad6cd118fa96194bb6ed39f48205caa677173f0938a8c10ea4b",
+    "docs/verification/IM-00/im00-6.json": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883",
+    "docs/verification/IM-00/im00-7.json": "d3d7548a59b4815eb38e951a26b40b45ab909a584d7d6df6d678547e8117be99",
+    "docs/verification/IM-00/im00-8.json": "3694ba1cab010b65b41b5a7152fb07cad0c0dc603581e41e1d16871238a90c0b",
+    "docs/verification/IM-00/im00-9.json": "ebcb65d1cb6f0b92cbb1ed94573567b861c3af17198fbee6b800fc1635878194",
+    "docs/verification/IM-00/im00-10-ci-acceptance.json": "ca062640299761c064eccbeda1d85b448dbd10044b71f981fa0a7dbe3e2f0d23",
+    "docs/verification/IM-00/im00-12.json": "ba04e63b86665ec28d436834df0c64594cbec397c0cef8cb54a70be57ce1ee18",
+    "docs/verification/IM-00/im00-68.json": "02085a7f55589d61ac6da36e7ab6359958397f1e1631a7b6b1949b0c99858c56",
+    "docs/verification/IM-00/im00-69.json": "19ffac25f73eef6e06a3051b1c549d16549fde1cbb7dd74586ee85e72e8a0069",
+    "docs/verification/IM-00/im00-70.json": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+    "docs/verification/IM-00/im00-70-review-scaled-action.json": "bda27297fedc9fb7a9f270162b9c45a394808e71228cca0eb278e8269417274d",
+    "tests/numerics/fixtures/precision-4096-system-v1.json": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee"
+  },
+  "artifact_references": [
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-checkout.json",
+      "sha256": "f4ddb7625c04463b382a46e649b9fd691f81c8a354f582b6801b51dc67d2f01c",
+      "hint": "docs/verification/IM-00/im00-11-completion/checkout.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-ci-jobs.json",
+      "sha256": "4c659dc7678b57fc3770318b998d79f73d4cfa359036fcbad5478c79d1c371c9",
+      "hint": "docs/verification/IM-00/im00-11-completion/ci-jobs.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-excerpt-provenance.json",
+      "sha256": "0964266874ec40ce0f642ef4901b23eb764dffe513a2e9c3728367ce6a3ce405",
+      "hint": "docs/verification/IM-00/im00-11-completion/excerpt-provenance.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-job-133288812966-excerpt.log",
+      "sha256": "a8853c1ce8c4d29855112b8205e3c12413b0eb87c6501c357e07deb0edd31d0b",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288812966-excerpt.log"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-job-133288812997-excerpt.log",
+      "sha256": "e48c131a2b54ff24b0036740f3218af6b4c448a85660a3a31ea14145d2db7848",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288812997-excerpt.log"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-job-133288812998-excerpt.log",
+      "sha256": "c4cfe6c8aaddb4b240a8678be9c0a908b151bdc75954617a557e6cc6fcaefe50",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288812998-excerpt.log"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-job-133288813038-excerpt.log",
+      "sha256": "54730bf0615f4035011d5f8c9e560704fd4af2842978f6831a98ebe09e74403d",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288813038-excerpt.log"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-completion-python-checks-excerpt.log",
+      "sha256": "d8285a6f955c737ceb719fdc1008a103ed7982ecc9ca393b69040bdb049213de",
+      "hint": "docs/verification/IM-00/im00-11-completion/python-checks-excerpt.log"
+    },
+    {
+      "id": "im00-completion-docs-plans-im00-completion-review.md",
+      "sha256": "3295cfe421b4fe561d88de610f98be0a6e6243c4912744a689fd9928dd50f1d6",
+      "hint": "docs/plans/im00-completion-review.md"
+    },
+    {
+      "id": "im00-completion-docs-plans-im00-handoff-review.md",
+      "sha256": "f17e501a3c675b80d49647e34ecdd835c9bfd7df4c546f0a0e6dfa5ecdcbd7d8",
+      "hint": "docs/plans/im00-handoff-review.md"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-numerical-review.md",
+      "sha256": "fa022c3ea251030f8008e64654dd2ce64be4396b8d0264f6451c1f409186171f",
+      "hint": "docs/verification/IM-00/im00-11-numerical-review.md"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-full-system-review.md",
+      "sha256": "ea1bc0664e138b0e2d758adddd36fcdba8d916a4e75678f6b9e41ced1af4536a",
+      "hint": "docs/verification/IM-00/im00-11-full-system-review.md"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-full-precision.json",
+      "sha256": "b9266f484785f1c8dbb159c8f9bd620f0d67fa6a9253003c073cf2826d1a06d7",
+      "hint": "docs/verification/IM-00/im00-11-full-precision.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-ci79-followup.json",
+      "sha256": "3c5f00d0aa47edc139e83f1210582d29b974fc21fb3f21783a0b5fddaff5aa1f",
+      "hint": "docs/verification/IM-00/im00-11-ci79-followup.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-11-fixture-preparation.json",
+      "sha256": "0dca84c553719d182afb3988d975e315732ce02782a883e7997557cdf7d1b61e",
+      "hint": "docs/verification/IM-00/im00-11-fixture-preparation.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-77.json",
+      "sha256": "def86f1547432898413ee2790680c0a862f8b456f9225ee4bf35e3810ebdef1a",
+      "hint": "docs/verification/IM-00/im00-77.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-5.json",
+      "sha256": "9283af8c788baad6cd118fa96194bb6ed39f48205caa677173f0938a8c10ea4b",
+      "hint": "docs/verification/IM-00/im00-5.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-6.json",
+      "sha256": "98b4cf857c68af13ef3a56e4694389e847fef828e87f80c1b199a0d65939e883",
+      "hint": "docs/verification/IM-00/im00-6.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-7.json",
+      "sha256": "d3d7548a59b4815eb38e951a26b40b45ab909a584d7d6df6d678547e8117be99",
+      "hint": "docs/verification/IM-00/im00-7.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-8.json",
+      "sha256": "3694ba1cab010b65b41b5a7152fb07cad0c0dc603581e41e1d16871238a90c0b",
+      "hint": "docs/verification/IM-00/im00-8.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-9.json",
+      "sha256": "ebcb65d1cb6f0b92cbb1ed94573567b861c3af17198fbee6b800fc1635878194",
+      "hint": "docs/verification/IM-00/im00-9.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-10-ci-acceptance.json",
+      "sha256": "ca062640299761c064eccbeda1d85b448dbd10044b71f981fa0a7dbe3e2f0d23",
+      "hint": "docs/verification/IM-00/im00-10-ci-acceptance.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-12.json",
+      "sha256": "ba04e63b86665ec28d436834df0c64594cbec397c0cef8cb54a70be57ce1ee18",
+      "hint": "docs/verification/IM-00/im00-12.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-68.json",
+      "sha256": "02085a7f55589d61ac6da36e7ab6359958397f1e1631a7b6b1949b0c99858c56",
+      "hint": "docs/verification/IM-00/im00-68.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-69.json",
+      "sha256": "19ffac25f73eef6e06a3051b1c549d16549fde1cbb7dd74586ee85e72e8a0069",
+      "hint": "docs/verification/IM-00/im00-69.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-70.json",
+      "sha256": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+      "hint": "docs/verification/IM-00/im00-70.json"
+    },
+    {
+      "id": "im00-completion-docs-verification-IM-00-im00-70-review-scaled-action.json",
+      "sha256": "bda27297fedc9fb7a9f270162b9c45a394808e71228cca0eb278e8269417274d",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action.json"
+    },
+    {
+      "id": "im00-completion-tests-numerics-fixtures-precision-4096-system-v1.json",
+      "sha256": "9ce2ec50d12a321f0c64dabb052a1a54358cb4c27422751c17b5a2c173f8e1ee",
+      "hint": "tests/numerics/fixtures/precision-4096-system-v1.json"
+    }
+  ]
+}

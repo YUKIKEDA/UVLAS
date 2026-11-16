@@ -1,0 +1,11 @@
+2026-11-16T12:11:42.4485618Z HEAD is now at b7a1302 Merge 778335ed0f243b89943a3fd1087f8962095e197d into 1a3c98f40030aa1ef492219669a32584a110ff7c
+2026-11-16T12:11:42.4560565Z b7a13022ac3ba285be59ee44818814c2b7818ca8
+2026-11-16T12:11:51.5451648Z All checks passed!
+2026-11-16T12:11:51.5552567Z 32 files already formatted
+2026-11-16T12:11:57.5091412Z 0 errors, 0 warnings, 0 informations
+2026-11-16T12:11:57.7498525Z 167 IDs defined ({'requirement': 37, 'acceptance': 26, 'decision': 88, 'package': 9, 'risk': 7}), 23 with tests, 25 with records, 0 problems
+2026-11-16T12:12:01.4359058Z links: 0 problems; 0 links to files removed by plan, 3 links to evidence files outside the repository
+2026-11-16T12:12:01.4359696Z scripts: 0 problems
+2026-11-16T12:12:01.4359938Z files: 0 problems
+2026-11-16T12:12:01.4360858Z hashes: 0 problems; matches 6296, large evidence file, matches the index 9682, hash under a field name, not a file 9656, matches by file name 639, names a copy under build/, by plan 1, earlier version of a file, as at the baseline 1, large evidence file by name, matches the index 586, file outside the repository and the index, by plan 12, status page at an earlier state 42
+2026-11-16T12:12:01.4361885Z controls: 0 problems

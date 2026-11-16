@@ -1,0 +1,41 @@
+{
+  "decoded_log_encoding": "UTF-8、CRLFをLFへ正規化",
+  "private_logs_preserved": true,
+  "entries": [
+    {
+      "id": "job-133288812966",
+      "normalized_decoded_log_sha256": "fb6cc585eba81c60626011f4158f77b57740bde70e79ef220d499cad6fe5084b",
+      "excerpt_sha256": "a8853c1ce8c4d29855112b8205e3c12413b0eb87c6501c357e07deb0edd31d0b",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288812966-excerpt.log",
+      "selection": "checkout識別行・CTest件数/時間・全4096 targetの完了行を抽出。APIのデコード済みlogをLFへ正規化して保存した私有原本は維持する。"
+    },
+    {
+      "id": "job-133288812997",
+      "normalized_decoded_log_sha256": "6144a939e1f2ecfc00d73a6c798b4491051b72a2c6ec6a4859b789438657c4cc",
+      "excerpt_sha256": "e48c131a2b54ff24b0036740f3218af6b4c448a85660a3a31ea14145d2db7848",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288812997-excerpt.log",
+      "selection": "checkout識別行・CTest件数/時間・全4096 targetの完了行を抽出。APIのデコード済みlogをLFへ正規化して保存した私有原本は維持する。"
+    },
+    {
+      "id": "job-133288812998",
+      "normalized_decoded_log_sha256": "996c60b5a66d3bd4158eee9f72eb03604b109e2523d0cf2d799e60c25bca027f",
+      "excerpt_sha256": "c4cfe6c8aaddb4b240a8678be9c0a908b151bdc75954617a557e6cc6fcaefe50",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288812998-excerpt.log",
+      "selection": "checkout識別行・CTest件数/時間・全4096 targetの完了行を抽出。APIのデコード済みlogをLFへ正規化して保存した私有原本は維持する。"
+    },
+    {
+      "id": "job-133288813038",
+      "normalized_decoded_log_sha256": "aa888c24e4be82b2b0203a6160be2fff74d1e21e8a51bfd80901fd8fb97cc808",
+      "excerpt_sha256": "54730bf0615f4035011d5f8c9e560704fd4af2842978f6831a98ebe09e74403d",
+      "hint": "docs/verification/IM-00/im00-11-completion/job-133288813038-excerpt.log",
+      "selection": "checkout識別行・CTest件数/時間・全4096 targetの完了行を抽出。APIのデコード済みlogをLFへ正規化して保存した私有原本は維持する。"
+    },
+    {
+      "id": "python-checks",
+      "normalized_decoded_log_sha256": "abd936b30732c38639d6b5f2a966871be335abd76a3632a8256f610dc073dfc2",
+      "excerpt_sha256": "d8285a6f955c737ceb719fdc1008a103ed7982ecc9ca393b69040bdb049213de",
+      "hint": "docs/verification/IM-00/im00-11-completion/python-checks-excerpt.log",
+      "selection": "checkout・Python工具の成功・整形・追跡・R&D整合検査の完了行。生の数値判定をこの整合検査へ置換しない。"
+    }
+  ]
+}

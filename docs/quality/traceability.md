@@ -109,7 +109,7 @@
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
 | N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 34 | 14 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 33 | 17 | 1 |
-| N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 11 | 5 | 0 |
+| N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 11 | 6 | 0 |
 | QA-01 | [quality-plan.md:13](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-02 | [quality-plan.md:23](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-03 | [quality-plan.md:31](../quality/quality-plan.md) | 0 | 0 | 0 |
