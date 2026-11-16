@@ -2,9 +2,9 @@
 
 作業の順序と状態の正本。行が持つのはID、種類、題、Issue、状態だけで、完了条件はIssueに書く。行の追加と削除はGrillの後に行う。「今」を書き換えるのは、その行を終えるPRだけ。
 
-**今**：IM01-0・IM03-0・IM06-0（個別契約の具体化と子作業への分解）
+**今**：IM01-0・IM03-0・IM06-0（最初の子作業の開始審査と実装）
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通の数値表現・密疎求解・固有抽出・精度保持・状態・Python結合・計測基盤を実装し、凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。次は既存の3行で、採用PG・疎拘束、有限渦kernel、入力・配布基盤の個別契約を並列に具体化する。所有者の未決定だけをGrillし、子作業への分解と開始審査を経て本実装へ進む。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通の数値表現・密疎求解・固有抽出・精度保持・状態・Python結合・計測基盤を実装し、凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。採用PG・疎拘束、有限渦kernel、入力・配布基盤の個別契約を具体化し、既存3行の最初の依存閉包から開始審査・実装へ進む。全体の依存と停止条件は [作業分解](plans/next-package-work-breakdown.md) に記載する。所有者の未決定だけをGrillし、内部の通常実装選択は担当が決める。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -74,14 +74,24 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
-| IM01-0 | Feat | IM-01 PG参照係数・疎拘束 | #17 | Grill後に分解 |
+| IM01-0 | Feat | IM-01 PG参照係数・疎拘束 | #17 | In progress |
 | IM02-0 | Feat | IM-02 構造全体 | #18 | Grill後に分解 |
-| IM03-0 | Feat | IM-03 UVLM | #19 | Grill後に分解 |
+| IM03-0 | Feat | IM-03 UVLM | #19 | In progress |
 | IM04-0 | Feat | IM-04 強連成・再開 | #20 | Grill後に分解 |
 | IM05-0 | Feat | IM-05 安定性・探索 | #21 | Grill後に分解 |
-| IM06-0 | Feat | IM-06 入出力・利用・配布 | #22 | Grill後に分解 |
+| IM06-0 | Feat | IM-06 入出力・利用・配布 | #22 | In progress |
 | IM07-0 | Feat | IM-07 実務数値・性能 | #23 | Grill後に分解 |
 | IM08-0 | Feat | IM-08 実験・全実務受入 | #24 | Grill後に分解 |
+
+### 最初の依存閉包
+
+[作業分解と開始条件](plans/next-package-work-breakdown.md)に、既存3パッケージ全体の依存と停止条件を記載する。各子の式・型・資源・独立参照が揃った部分から開始し、未達の開始条件がある部分は実装しない。親の完了を主張する行ではない。
+
+| ID | 種類 | 題 | Issue | 状態 |
+|---|---|---|---|---|
+| IM01-1 | Feat | PG参照準備用のexact有理数・多項式 | #87 | Todo |
+| IM03-1 | Feat | 有限三角形の厳密な幾何述語 | #86 | Todo |
+| IM06-1 | Feat | 厳格な入力ID・index変換 | #85 | Todo |
 
 ## 残リスクと止める位置
 
