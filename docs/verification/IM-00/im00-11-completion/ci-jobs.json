@@ -1,0 +1,392 @@
+{
+  "run": {
+    "id": 43864289897,
+    "name": "ci",
+    "status": "completed",
+    "conclusion": "success",
+    "run_number": 78,
+    "jobs_url": "https://api.github.com/repos/YUKIKEDA/UVLAS/actions/runs/43864289897/jobs",
+    "logs_url": "https://api.github.com/repos/YUKIKEDA/UVLAS/actions/runs/43864289897/logs",
+    "workflow_id": 414909606
+  },
+  "jobs": [
+    {
+      "id": 133288745576,
+      "name": "select affected checks",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check selection and aggregation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Select affected checks",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 133288812966,
+      "name": "build and test (windows, msvc)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Bootstrap vcpkg",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg environment",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compiler version",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Debug",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test Debug",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Release",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test Release",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 133288812997,
+      "name": "build and test (linux, gcc 14, linux-release)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Bootstrap vcpkg",
+          "conclusion": "success"
+        },
+        {
+          "name": "Tools",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compiler version",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure, build, test",
+          "conclusion": "success"
+        },
+        {
+          "name": "clang-tidy",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 133288812998,
+      "name": "build and test (linux, gcc 14, linux-debug)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Bootstrap vcpkg",
+          "conclusion": "success"
+        },
+        {
+          "name": "Tools",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compiler version",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure, build, test",
+          "conclusion": "success"
+        },
+        {
+          "name": "clang-tidy",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 133288813038,
+      "name": "build and test (linux, gcc 14, linux-sanitize)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Bootstrap vcpkg",
+          "conclusion": "success"
+        },
+        {
+          "name": "Tools",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compiler version",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure, build, test",
+          "conclusion": "success"
+        },
+        {
+          "name": "clang-tidy",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post vcpkg binary cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post vcpkg at a commit that holds the manifest baseline",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 133288813049,
+      "name": "format, skills, R&D tree",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Formatting",
+          "conclusion": "success"
+        },
+        {
+          "name": "Python tools",
+          "conclusion": "success"
+        },
+        {
+          "name": "Traceability",
+          "conclusion": "success"
+        },
+        {
+          "name": "Skill copies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "R&D tree",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 133288815395,
+      "name": "compile optional benchmark (linux, gcc 14)",
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": []
+    },
+    {
+      "id": 133288815547,
+      "name": "Python ownership (${{ matrix.os }}, CPython 3.12)",
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": []
+    },
+    {
+      "id": 133301164120,
+      "name": "ci",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Every required job passed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}
