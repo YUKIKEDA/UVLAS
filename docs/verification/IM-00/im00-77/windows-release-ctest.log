@@ -1,0 +1,48 @@
+Internal ctest changing into directory: <repository>/out/issue70-release
+UpdateCTestConfiguration  from :<repository>/out/issue70-release/DartConfiguration.tcl
+Parse Config file:<repository>/out/issue70-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repository>/out/issue70-release/DartConfiguration.tcl
+Parse Config file:<repository>/out/issue70-release/DartConfiguration.tcl
+Test project <repository>/out/issue70-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 28
+    Start 28: numerics.linear_metrics
+
+28: Test command: <repository>\out\issue70-release\tests\uvlas_test_numerics_linear_metrics.exe
+28: Working Directory: <repository>/out/issue70-release/tests
+28: Test timeout computed to be: 60
+28: Randomness seeded to: 1546474220
+28: ===============================================================================
+28: All tests passed (291 assertions in 11 test cases)
+28: 
+1/2 Test #28: numerics.linear_metrics ..............   Passed    0.06 sec
+test 29
+    Start 29: numerics.foundation_precision_rank
+
+29: Test command: <repository>\out\issue70-release\tests\uvlas_test_numerics_foundation_precision_rank.exe
+29: Working Directory: <repository>/out/issue70-release/tests
+29: Test timeout computed to be: 60
+29: Randomness seeded to: 3403327155
+29: ===============================================================================
+29: All tests passed (45 assertions in 2 test cases)
+29: 
+2/2 Test #29: numerics.foundation_precision_rank ...   Passed    0.05 sec
+
+The following tests passed:
+	numerics.linear_metrics
+	numerics.foundation_precision_rank
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+integration     =   0.05 sec*proc (1 test)
+negative        =   0.11 sec*proc (2 tests)
+unit            =   0.06 sec*proc (1 test)
+verification    =   0.11 sec*proc (2 tests)
+
+Total Test time (real) =   0.11 sec

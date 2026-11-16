@@ -1,0 +1,70 @@
+{
+  "file": "docs\\specs\\foundation\\reference-fixture-contract.md",
+  "stats": {
+    "total_findings": 0,
+    "by_category": {},
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 70,
+    "nominal_ending_count": 1,
+    "nominal_ending_ratio": 0.014285714285714285,
+    "total_paragraphs": 20,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      4,
+      3,
+      4,
+      4,
+      3,
+      3,
+      3,
+      4,
+      5,
+      4,
+      3,
+      3,
+      3,
+      4,
+      3,
+      1,
+      3,
+      6,
+      5,
+      2
+    ],
+    "paragraph_sentence_count_cv": 0.306394436993246,
+    "rhythm": {
+      "mora_mean": 75.6,
+      "mora_stdev": 57.97324506060656,
+      "burstiness": -0.131963215622976,
+      "length_autocorrelation_lag1": 0.17022965361369793
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "名詞/名詞/助詞/名詞",
+      "lead_pos_4gram_ratio": 0.17647058823529413
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 856,
+      "doc_char_count": 3491,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 37,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 18,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": []
+}

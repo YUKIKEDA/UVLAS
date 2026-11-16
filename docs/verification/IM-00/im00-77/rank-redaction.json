@@ -1,0 +1,680 @@
+{
+  "kind": "derived_public_evidence",
+  "source_sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+  "product_base_main": "19221137cc86f2b0cc116cb048e0fe5b60d66ae5",
+  "test_sha256": "a75afae0b9756860dc8754e29f7606dc100a6c6f5530a5a41ed701b8fa2490ef",
+  "frozen_reference_sha256": "6c512fa9951f143627b5ac1be847625bf15000e5123b6d5529372d21af9217ce",
+  "note": "新規rank参照testの未commit候補byteから作った隔離controlと2変異。clean製品認定とは呼ばない。既存precision.cppと固定test objectを使い、変異だけ専用producerへ入れた。通常/JSON/encoded filesystem prefixとaccount tokenだけを派生束で匿名化し、元rawと凍結R&D原本は変更しない。任意有理rankやTwoWord係数solverの実装完了は主張しない。",
+  "control": {
+    "cases": 2,
+    "assertions": 45,
+    "run_exit": 0
+  },
+  "mutants": 2,
+  "all_compile_link_success": true,
+  "mutant_assertion_exit": 42,
+  "frozen_inputs": 57,
+  "original_input_mismatches": 0,
+  "archive_producer_matches": 0,
+  "map_files": 3,
+  "excluded_binary_extensions": [
+    ".obj",
+    ".lib",
+    ".exe",
+    ".pdb"
+  ],
+  "entry_count_excluding_this_manifest": 76,
+  "entries": [
+    {
+      "entry": "runner/agreed.json",
+      "raw_sha256": "325204957d42965b88a136b4616beadd7d1dccbf5a361dce65a60fc346650185",
+      "published_sha256": "325204957d42965b88a136b4616beadd7d1dccbf5a361dce65a60fc346650185",
+      "raw_bytes": 690,
+      "published_bytes": 690,
+      "replacements": {}
+    },
+    {
+      "entry": "runner/package.py",
+      "raw_sha256": "ab89c1d975caf3dd4e1f6c23d2af4564ac17d9e9b1220811684ec2eb6cf0f884",
+      "published_sha256": "fd0b2d77c23a1be9a6aa23987554788386ab5cf01367c9ac08ef5d6dacb44dd7",
+      "raw_bytes": 5388,
+      "published_bytes": 5342,
+      "replacements": {
+        "dependency-repository-prefix": 2,
+        "user-directory-prefix": 1,
+        "remaining-account-token": 3
+      }
+    },
+    {
+      "entry": "runner/run.py",
+      "raw_sha256": "c913eceaae72f12ee8154a84bc3e04e67676ae28d108237e6efe358e81ac6300",
+      "published_sha256": "c913eceaae72f12ee8154a84bc3e04e67676ae28d108237e6efe358e81ac6300",
+      "raw_bytes": 10852,
+      "published_bytes": 10852,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/compile-command.txt",
+      "raw_sha256": "87b810fb8541770fb56f46dada35a03a182e36419b4c900063672eed602b4f4a",
+      "published_sha256": "5ec18efb2776cc9951a0139d4d05d9f76f7519791688d6ee84d5eaa2f9c2826a",
+      "raw_bytes": 1115,
+      "published_bytes": 861,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/control/compile.log",
+      "raw_sha256": "77de7135ffde644cfbc1599c7954e61bdaf9c4c81aab4695d3bc9789d2008b4b",
+      "published_sha256": "77de7135ffde644cfbc1599c7954e61bdaf9c4c81aab4695d3bc9789d2008b4b",
+      "raw_bytes": 15,
+      "published_bytes": 15,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/link-command.json",
+      "raw_sha256": "6f2949eba46f90d9eb5024af50517c0c77827048546d2798e04274a34eb4bbd8",
+      "published_sha256": "1b3d6705c5d1a74bcc324b1a086ffaed109979c519f2f1d89c34ad7a7497f36d",
+      "raw_bytes": 2025,
+      "published_bytes": 1475,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/control/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/precision.cpp",
+      "raw_sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+      "published_sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+      "raw_bytes": 20743,
+      "published_bytes": 20743,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/control/precision.map",
+      "raw_sha256": "c64b320a504c5e29cfe52fb9a40fce70c3de21cb3f019524c4ff5dc169eaf5c0",
+      "published_sha256": "30ca250bc9791d7c3833a81109d5d5c6431e39f9a200947361e8631f6cfab778",
+      "raw_bytes": 1947588,
+      "published_bytes": 1947577,
+      "replacements": {
+        "user-directory-prefix": 1
+      }
+    },
+    {
+      "entry": "snapshot/control/run.log",
+      "raw_sha256": "966303fe392efb45af0be9681323037a51a821ab339daecc88983aab5412408c",
+      "published_sha256": "966303fe392efb45af0be9681323037a51a821ab339daecc88983aab5412408c",
+      "raw_bytes": 76,
+      "published_bytes": 76,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/CMakeCache.txt",
+      "raw_sha256": "021da2420956f95b19d846bf105559e1398523d91a4cf31d236d3db4f2403abe",
+      "published_sha256": "44aaef9721043fce2b9d4363ef9f660b44cb9b2ea00d26ee03a37a4b06ca8e9e",
+      "raw_bytes": 26932,
+      "published_bytes": 25749,
+      "replacements": {
+        "repository-prefix": 13,
+        "dependency-repository-prefix": 35,
+        "user-directory-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/inputs/compile_commands.json",
+      "raw_sha256": "b3f7c865422a21b892c10a093d16326f0e2dba29d0145d4524ad3d7cb69a1555",
+      "published_sha256": "811acb5e2d5138a4fb21c1aa91f084cb6512a41afc3c080eee1cbbed5723ca4c",
+      "raw_bytes": 119474,
+      "published_bytes": 94442,
+      "replacements": {
+        "repository-prefix": 444,
+        "dependency-repository-prefix": 166
+      }
+    },
+    {
+      "entry": "snapshot/inputs/generated/uvlas/build_config.hpp",
+      "raw_sha256": "a61c3582e8e0cf0774b34d47d505049ff882926b4918b7ea8ed4b7202237f160",
+      "published_sha256": "a61c3582e8e0cf0774b34d47d505049ff882926b4918b7ea8ed4b7202237f160",
+      "raw_bytes": 356,
+      "published_bytes": 356,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/generated/uvlas/git_revision.hpp",
+      "raw_sha256": "652d8b3f07f476b3d3282224ab2750dec7bc3ff8f3bd0b7c83cb32328df8b2da",
+      "published_sha256": "652d8b3f07f476b3d3282224ab2750dec7bc3ff8f3bd0b7c83cb32328df8b2da",
+      "raw_bytes": 112,
+      "published_bytes": 112,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/build_info.hpp",
+      "raw_sha256": "3b6b67202cb908188bd1400f49030ac577583bb6b2eccb1c47060dc92d4e4a89",
+      "published_sha256": "3b6b67202cb908188bd1400f49030ac577583bb6b2eccb1c47060dc92d4e4a89",
+      "raw_bytes": 1603,
+      "published_bytes": 1603,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/checked_dimensions.hpp",
+      "raw_sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "published_sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "raw_bytes": 2305,
+      "published_bytes": 2305,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/error_certificate.hpp",
+      "raw_sha256": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+      "published_sha256": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+      "raw_bytes": 6667,
+      "published_bytes": 6667,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/failure.hpp",
+      "raw_sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "published_sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "raw_bytes": 8471,
+      "published_bytes": 8471,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/identifier.hpp",
+      "raw_sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "published_sha256": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+      "raw_bytes": 2538,
+      "published_bytes": 2538,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/instrumentation.hpp",
+      "raw_sha256": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+      "published_sha256": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+      "raw_bytes": 6017,
+      "published_bytes": 6017,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/resource_plan.hpp",
+      "raw_sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "published_sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "raw_bytes": 7997,
+      "published_bytes": 7997,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/core/state.hpp",
+      "raw_sha256": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+      "published_sha256": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+      "raw_bytes": 22481,
+      "published_bytes": 22481,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/backend_memory.hpp",
+      "raw_sha256": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+      "published_sha256": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+      "raw_bytes": 4007,
+      "published_bytes": 4007,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/dense_solve.hpp",
+      "raw_sha256": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+      "published_sha256": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+      "raw_bytes": 4445,
+      "published_bytes": 4445,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_action.hpp",
+      "raw_sha256": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+      "published_sha256": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+      "raw_bytes": 7949,
+      "published_bytes": 7949,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_arnoldi.hpp",
+      "raw_sha256": "26a6055f86ef5b5916eee4a1adbb48b5bda865944cb57cb1c0712deeaffbe4b9",
+      "published_sha256": "26a6055f86ef5b5916eee4a1adbb48b5bda865944cb57cb1c0712deeaffbe4b9",
+      "raw_bytes": 28248,
+      "published_bytes": 28248,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_common.hpp",
+      "raw_sha256": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+      "published_sha256": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+      "raw_bytes": 7960,
+      "published_bytes": 7960,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_full.hpp",
+      "raw_sha256": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+      "published_sha256": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+      "raw_bytes": 19583,
+      "published_bytes": 19583,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_generalized.hpp",
+      "raw_sha256": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+      "published_sha256": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+      "raw_bytes": 17804,
+      "published_bytes": 17804,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/eigen_metrics.hpp",
+      "raw_sha256": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+      "published_sha256": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+      "raw_bytes": 8654,
+      "published_bytes": 8654,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/gmres_solve.hpp",
+      "raw_sha256": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+      "published_sha256": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+      "raw_bytes": 13412,
+      "published_bytes": 13412,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/linear_solve.hpp",
+      "raw_sha256": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+      "published_sha256": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+      "raw_bytes": 22885,
+      "published_bytes": 22885,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/precision.hpp",
+      "raw_sha256": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+      "published_sha256": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+      "raw_bytes": 11159,
+      "published_bytes": 11159,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/sparse_solve.hpp",
+      "raw_sha256": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+      "published_sha256": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+      "raw_bytes": 8473,
+      "published_bytes": 8473,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/include/uvlas/numerics/storage.hpp",
+      "raw_sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+      "published_sha256": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+      "raw_bytes": 14325,
+      "published_bytes": 14325,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/inputs.json",
+      "raw_sha256": "cd1095737181e9b00c3dc0d21f179199701608864650bb789078641da1f51b9d",
+      "published_sha256": "d91a9807d95f1624df289b3946082ddb7d68e440200372271e7718e81b3bbf6b",
+      "raw_bytes": 14988,
+      "published_bytes": 12254,
+      "replacements": {
+        "repository-prefix": 53,
+        "dependency-repository-prefix": 4
+      }
+    },
+    {
+      "entry": "snapshot/inputs/link-input.ninja",
+      "raw_sha256": "f445a764a587bcee78535cbc22c3253ae457ebdf467000adba220ce7f4055fd8",
+      "published_sha256": "33ef83bdfc9d57da47bd3f4f83880e8eed2b9e01c436e8e222eee84e609fc4d4",
+      "raw_bytes": 314291,
+      "published_bytes": 296465,
+      "replacements": {
+        "repository-prefix": 281,
+        "dependency-repository-prefix": 336,
+        "remaining-account-token": 125
+      }
+    },
+    {
+      "entry": "snapshot/inputs/mutations.json",
+      "raw_sha256": "325204957d42965b88a136b4616beadd7d1dccbf5a361dce65a60fc346650185",
+      "published_sha256": "325204957d42965b88a136b4616beadd7d1dccbf5a361dce65a60fc346650185",
+      "raw_bytes": 690,
+      "published_bytes": 690,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/rd/foundation/numerics/experiments/cpp-numerics/precision_hash.cpp",
+      "raw_sha256": "6c512fa9951f143627b5ac1be847625bf15000e5123b6d5529372d21af9217ce",
+      "published_sha256": "6c512fa9951f143627b5ac1be847625bf15000e5123b6d5529372d21af9217ce",
+      "raw_bytes": 2142,
+      "published_bytes": 2142,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/run.py",
+      "raw_sha256": "c913eceaae72f12ee8154a84bc3e04e67676ae28d108237e6efe358e81ac6300",
+      "published_sha256": "c913eceaae72f12ee8154a84bc3e04e67676ae28d108237e6efe358e81ac6300",
+      "raw_bytes": 10852,
+      "published_bytes": 10852,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/backend_memory_detail.hpp",
+      "raw_sha256": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+      "published_sha256": "e1bdedbce784e39ae4b4628861beb797d556ae952729bdd760a3df5d835ccd99",
+      "raw_bytes": 545,
+      "published_bytes": 545,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/compensated.hpp",
+      "raw_sha256": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+      "published_sha256": "f879bb1b0391a3a06b45fbddfd90070a9a0c677b59d930b2d38c060f59254194",
+      "raw_bytes": 3145,
+      "published_bytes": 3145,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_build.hpp",
+      "raw_sha256": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+      "published_sha256": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+      "raw_bytes": 11037,
+      "published_bytes": 11037,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_cluster.hpp",
+      "raw_sha256": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+      "published_sha256": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+      "raw_bytes": 13971,
+      "published_bytes": 13971,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_data.hpp",
+      "raw_sha256": "02e7e67775d6b54b66ca419285bbd85b807a9a379324f648dcfa69632fca284b",
+      "published_sha256": "02e7e67775d6b54b66ca419285bbd85b807a9a379324f648dcfa69632fca284b",
+      "raw_bytes": 5882,
+      "published_bytes": 5882,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_engine.hpp",
+      "raw_sha256": "12054ca542ea2d630ef8f66358a771cd174d33ee8aa6131ba89eceb5c050b672",
+      "published_sha256": "12054ca542ea2d630ef8f66358a771cd174d33ee8aa6131ba89eceb5c050b672",
+      "raw_bytes": 19578,
+      "published_bytes": 19578,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_entry.hpp",
+      "raw_sha256": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+      "published_sha256": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+      "raw_bytes": 18207,
+      "published_bytes": 18207,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_extract.hpp",
+      "raw_sha256": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+      "published_sha256": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+      "raw_bytes": 20784,
+      "published_bytes": 20784,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_native.hpp",
+      "raw_sha256": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+      "published_sha256": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+      "raw_bytes": 1225,
+      "published_bytes": 1225,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_arnoldi_qualify.hpp",
+      "raw_sha256": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+      "published_sha256": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+      "raw_bytes": 15876,
+      "published_bytes": 15876,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_full_detail.hpp",
+      "raw_sha256": "15a5178a992e6fb010229e6820e10f9da60cefcb3d361f8d9e624efe01c19e12",
+      "published_sha256": "15a5178a992e6fb010229e6820e10f9da60cefcb3d361f8d9e624efe01c19e12",
+      "raw_bytes": 3111,
+      "published_bytes": 3111,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_full_phase_private.hpp",
+      "raw_sha256": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "published_sha256": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "raw_bytes": 2267,
+      "published_bytes": 2267,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_metric_bounds.hpp",
+      "raw_sha256": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+      "published_sha256": "138ee948601460dc338665f6aa8d1251dbbd41ad3ecb973efd9515e948ca33d5",
+      "raw_bytes": 7536,
+      "published_bytes": 7536,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/eigen_views.hpp",
+      "raw_sha256": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87",
+      "published_sha256": "151bd9714309def3226ef14dd2f3fc0d3686377d43678e2ddef528faf339af87",
+      "raw_bytes": 6034,
+      "published_bytes": 6034,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/gmres_residual_detail.hpp",
+      "raw_sha256": "d1ca3a8b763439e66c7525bfe0c46e656f2f7ab9b2e5691ce0f1200ceef4b4e6",
+      "published_sha256": "d1ca3a8b763439e66c7525bfe0c46e656f2f7ab9b2e5691ce0f1200ceef4b4e6",
+      "raw_bytes": 1168,
+      "published_bytes": 1168,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/linear_candidate_detail.hpp",
+      "raw_sha256": "d0ee5f4aca2f19662aec8724f5d49f5402ad79b77f8400a5aebf3fb7b68c7c72",
+      "published_sha256": "d0ee5f4aca2f19662aec8724f5d49f5402ad79b77f8400a5aebf3fb7b68c7c72",
+      "raw_bytes": 5204,
+      "published_bytes": 5204,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/linear_solve_detail.hpp",
+      "raw_sha256": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+      "published_sha256": "285ffbad3026c0bd98a125a6a666dc06b101a7a8b0f6d686600ca1d2107127b0",
+      "raw_bytes": 6066,
+      "published_bytes": 6066,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/precision.cpp",
+      "raw_sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+      "published_sha256": "906e008c866f2d3c07e29b16d78dafd5b466956daf9dd95e09142697c59d6fee",
+      "raw_bytes": 20743,
+      "published_bytes": 20743,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/sparse_spd.hpp",
+      "raw_sha256": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+      "published_sha256": "a1e62b5170554a22ff0fc5c9714355072911d118fbd1f3ff94bcdfcb9b9fef32",
+      "raw_bytes": 10252,
+      "published_bytes": 10252,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/src/numerics/sparse_triangular.hpp",
+      "raw_sha256": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+      "published_sha256": "5f051eb092bd8ca37456f39e301244389db00e32f272a60eff50e14e6474fbea",
+      "raw_bytes": 2189,
+      "published_bytes": 2189,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/inputs/tests/numerics/foundation_precision_rank_test.cpp",
+      "raw_sha256": "a75afae0b9756860dc8754e29f7606dc100a6c6f5530a5a41ed701b8fa2490ef",
+      "published_sha256": "a75afae0b9756860dc8754e29f7606dc100a6c6f5530a5a41ed701b8fa2490ef",
+      "raw_bytes": 7679,
+      "published_bytes": 7679,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/compile-command.txt",
+      "raw_sha256": "de967b50bded6859188f0191eeae665546bb5235729488331f2add056dad6667",
+      "published_sha256": "30f12a8289e5f6e1f8489ca0fec8d02608acdf2dbd801da4ee727e2726bbc5d3",
+      "raw_bytes": 1227,
+      "published_bytes": 973,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/compile.log",
+      "raw_sha256": "77de7135ffde644cfbc1599c7954e61bdaf9c4c81aab4695d3bc9789d2008b4b",
+      "published_sha256": "77de7135ffde644cfbc1599c7954e61bdaf9c4c81aab4695d3bc9789d2008b4b",
+      "raw_bytes": 15,
+      "published_bytes": 15,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/link-command.json",
+      "raw_sha256": "483a7b30c692210b38c731aba60fe58c47e426dce493a45eee1d906d5ee26fd2",
+      "published_sha256": "2a935f8047b315fe509365ba8eeea87af678dac278828cd17204c152eea679c2",
+      "raw_bytes": 2137,
+      "published_bytes": 1587,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/precision.cpp",
+      "raw_sha256": "bfdf2984090a8564080472dc38b69f5805c9404e37189b35a9e16e7ecbac7c54",
+      "published_sha256": "bfdf2984090a8564080472dc38b69f5805c9404e37189b35a9e16e7ecbac7c54",
+      "raw_bytes": 20785,
+      "published_bytes": 20785,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/precision.map",
+      "raw_sha256": "7e85925648812cfea4725402202917e2388334ab9330962885f8c69323283112",
+      "published_sha256": "939f5935f8821dcf8db69cabc10798f8997227d5abfa78982b98344a11b5da9e",
+      "raw_bytes": 1947588,
+      "published_bytes": 1947577,
+      "replacements": {
+        "user-directory-prefix": 1
+      }
+    },
+    {
+      "entry": "snapshot/original-residual-low-plane-dropped/run.log",
+      "raw_sha256": "b9bf63c4ef34e5e9c342fabbae8c97d0fa4389d61b6ff623b6fc5afe6036588e",
+      "published_sha256": "1660afa1b5e669e2538c5b377802b1dfd4fdc478e3c1dd98cf3e5a00f0521241",
+      "raw_bytes": 261,
+      "published_bytes": 217,
+      "replacements": {
+        "repository-prefix": 1
+      }
+    },
+    {
+      "entry": "snapshot/report.json",
+      "raw_sha256": "f8c900a4a5daf3d58aaf9194707d4a27ed3e56063b70a286b2012840249e141e",
+      "published_sha256": "f8c900a4a5daf3d58aaf9194707d4a27ed3e56063b70a286b2012840249e141e",
+      "raw_bytes": 1824,
+      "published_bytes": 1824,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/compile-command.txt",
+      "raw_sha256": "4fdc1c12d1bc0c440d2a50cae80002a8010f1fdf56ebcd4a0bd09719d06205f2",
+      "published_sha256": "7eee2ceaa99a2fb0cf43b53fed575eceeaaec7d9c76e6dff491befa4ad464933",
+      "raw_bytes": 1191,
+      "published_bytes": 937,
+      "replacements": {
+        "repository-prefix": 5,
+        "dependency-repository-prefix": 2
+      }
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/compile.log",
+      "raw_sha256": "77de7135ffde644cfbc1599c7954e61bdaf9c4c81aab4695d3bc9789d2008b4b",
+      "published_sha256": "77de7135ffde644cfbc1599c7954e61bdaf9c4c81aab4695d3bc9789d2008b4b",
+      "raw_bytes": 15,
+      "published_bytes": 15,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/link-command.json",
+      "raw_sha256": "137fd3462bbc43b954abb74177ca7cf0358a226a61405dffed0f12a934dda59f",
+      "published_sha256": "4acd1751ff87634148f57474ac0248da9d72b52b1b67bed158dda40675f18f65",
+      "raw_bytes": 2101,
+      "published_bytes": 1551,
+      "replacements": {
+        "repository-prefix": 11
+      }
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/precision.cpp",
+      "raw_sha256": "ae2e4a87e0f86e75bfcf0d8b5bbef8d0d4014237b3fb550f2c905d874d3cc740",
+      "published_sha256": "ae2e4a87e0f86e75bfcf0d8b5bbef8d0d4014237b3fb550f2c905d874d3cc740",
+      "raw_bytes": 20737,
+      "published_bytes": 20737,
+      "replacements": {}
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/precision.map",
+      "raw_sha256": "9285f1d4fd847edbd209a5bc9992d30fffec5f06d2220e9311ca3ac72cc86df9",
+      "published_sha256": "ebdbd2b673adf510a166d4bf897925a6560d11d5a9a93a55e8503bc0beccad66",
+      "raw_bytes": 1947588,
+      "published_bytes": 1947577,
+      "replacements": {
+        "user-directory-prefix": 1
+      }
+    },
+    {
+      "entry": "snapshot/unsafe-projection-accepted/run.log",
+      "raw_sha256": "44d255e2fec282723c3e70d91bf2e2e0e28b774b925b7b5fd5d9a6b673f60f45",
+      "published_sha256": "215d5c0f34e5ea78fcec2debae0f2057d9b34f13d663a0c3f67b0e46ec7fd5a7",
+      "raw_bytes": 255,
+      "published_bytes": 211,
+      "replacements": {
+        "repository-prefix": 1
+      }
+    }
+  ]
+}
