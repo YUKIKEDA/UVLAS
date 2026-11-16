@@ -255,6 +255,17 @@ uvlas_add_test(numerics.dense_allocations LABELS property verification
 uvlas_enable_allocation_audit(uvlas_test_numerics_dense_allocations)
 uvlas_require_audited_dependencies(uvlas_test_numerics_dense_allocations)
 
+uvlas_add_test(numerics.eigen_arnoldi_allocations LABELS unit negative verification
+    SOURCES numerics/eigen_arnoldi_allocations_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen Spectra::Spectra)
+target_include_directories(uvlas_test_numerics_eigen_arnoldi_allocations PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_eigen_arnoldi_allocations)
+uvlas_require_audited_dependencies(uvlas_test_numerics_eigen_arnoldi_allocations)
+uvlas_add_test(numerics.eigen_arnoldi LABELS unit negative verification
+    SOURCES numerics/eigen_arnoldi_test.cpp LIBS uvlas_numerics uvlas::eigen Spectra::Spectra Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_numerics_eigen_arnoldi PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+target_compile_definitions(uvlas_test_numerics_eigen_arnoldi PRIVATE
+    UVLAS_ARNOLDI_REFERENCE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/numerics/fixtures/j1-pg-free-history-24-v1")
 uvlas_add_test(numerics.gmres_contract LABELS unit negative verification
     SOURCES numerics/gmres_contract_test.cpp LIBS uvlas_numerics Boost::multiprecision)
 uvlas_add_test(numerics.gmres_solve LABELS unit verification
@@ -313,3 +324,8 @@ add_test(NAME qa.eigen_full
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
         --case eigen-full --run "$<TARGET_FILE:uvlas_eigen_full_canary>")
 set_tests_properties(qa.eigen_full PROPERTIES TIMEOUT 30 LABELS "verification")
+
+add_test(NAME qa.eigen_arnoldi
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-arnoldi --run "$<TARGET_FILE:uvlas_eigen_arnoldi_canary>")
+set_tests_properties(qa.eigen_arnoldi PROPERTIES TIMEOUT 30 LABELS "verification")
