@@ -1,0 +1,126 @@
+[1/2] Processing file <repo>\src\numerics\eigen_generalized.cpp.
+77194 warnings generated.
+[2/2] Processing file <repo>\tests\numerics\eigen_generalized_test.cpp.
+139826 warnings generated.
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:40:8: error: constructor does not initialize these fields: mass_scale, eigenvalue_units, mass_units, context [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   40 | struct GeneralizedScales {
+      |        ^
+   41 |     MetricScales metric; ///< Fixed positive D and eigenvalue scale s_lambda.
+   42 |     double mass_scale;   ///< Positive scale of phi^T M phi, including coordinate units.
+      |                      
+      |                      {}
+   43 |     std::span<const linear::UnitDimensions> component_units; ///< One SI exponent vector per row.
+   44 |     linear::UnitDimensions eigenvalue_units; ///< SI exponent vector of physical lambda.
+      |                                            
+      |                                            {}
+   45 |     linear::UnitDimensions mass_units;       ///< SI exponent vector of phi^T M phi.
+      |                                      
+      |                                      {}
+   46 |     Context context; ///< Matches stiffness identity; mass may have its own matrix generation.
+      |                    
+      |                    {}
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:50:8: error: constructor does not initialize these fields: maximum_order, maximum_results [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   50 | struct GeneralizedLimits {
+      |        ^
+   51 |     core::Index maximum_order;   ///< Maximum admitted order, including zero.
+      |                              
+      |                              {}
+   52 |     core::Index maximum_results; ///< Capacity for every eigenvalue; no clipping occurs.
+      |                                
+      |                                {}
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:74:8: error: constructor does not initialize these fields: input, evaluator [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   74 | struct GeneralizedPrecision {
+      |        ^
+   75 |     core::Precision input; ///< Currently Binary64 only; TwoWord is rejected before computation.
+   76 |     linear::ReturnedPrecision
+   77 |         returned; ///< Retained or explicit Binary64 projection, never implicit.
+   78 |     std::span<const linear::ConsumerCheck> required_checks; ///< All checks must pass.
+   79 |     const GeneralizedConsumer*
+   80 |         evaluator; ///< Required when checks are nonempty; synchronous borrow.
+      |                  
+      |                  {}
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:84:8: error: constructor does not initialize these fields: require_physical_coverage [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   84 | struct GeneralizedRequest {
+      |        ^
+   85 |     GeneralizedScales scales; ///< Fixed model scales and SI units.
+   86 |     GeneralizedMetricRequest
+   87 |         accuracy;                   ///< Independent residual, mass-normalization and Gram budgets.
+   88 |     GeneralizedPrecision precision; ///< Input and actual returned representations/generations.
+   89 |     GeneralizedLimits limits;       ///< Owned dimensions and external memory admission.
+   90 |     StateDiagnosticContext state;   ///< Optional reporting IDs, not physical ancestry validation.
+   91 |     bool require_physical_coverage; ///< True rejects: algebraic extraction cannot prove physical
+      |                                   
+      |                                   {}
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:115:5: error: function 'eigenvalues' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  115 |     std::span<const double> eigenvalues() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:121:5: error: function 'basis' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  121 |     const DenseReal& basis() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:127:5: error: function 'stiffness' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  127 |     const DenseReal& stiffness() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:133:5: error: function 'mass' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  133 |     const DenseReal& mass() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:151:5: error: function 'metrics' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  151 |     const GeneralizedMetrics& metrics() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:161:5: error: function 'component_scales' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  161 |     std::span<const double> component_scales() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_generalized.hpp:175:5: error: function 'component_units' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  175 |     std::span<const linear::UnitDimensions> component_units() const&& = delete;
+      |     ^
+      |     [[nodiscard]] 
+<repo>\include\uvlas/numerics/eigen_metrics.hpp:17:8: error: constructor does not initialize these fields: eigenvalue_scale [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   17 | struct MetricScales {
+      |        ^
+   18 |     std::span<const double> components; ///< Positive finite diagonal entries of D.
+   19 |     double eigenvalue_scale; ///< Positive finite eigenvalue scale, in the original units.
+      |                            
+      |                            {}
+<repo>\include\uvlas/numerics/eigen_metrics.hpp:23:8: error: constructor does not initialize these fields: system, values_generation [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   23 | struct MetricContext {
+      |        ^
+   24 |     Context system;               ///< Original problem, layouts, policies and evaluation time.
+      |                   
+      |                   {}
+   25 |     StateDiagnosticContext state; ///< Explicit reporting identities; never inferred.
+   26 |     core::NumericalGeneration values_generation; ///< Generation of the exact candidate words.
+      |                                                
+      |                                                {}
+<repo>\include\uvlas/numerics/eigen_metrics.hpp:77:8: error: constructor does not initialize these fields: vector_infinity_lower [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   77 | struct PairMetrics {
+      |        ^
+   78 |     core::ErrorCertificate residual;      ///< Proof for the actual original-system residual.
+   79 |     core::ErrorCertificate normalization; ///< Proof for the actual dimensionless vector norm.
+   80 |     BackwardCertificate backward;         ///< Proof of the additional requirement, when requested.
+   81 |     double
+   82 |         vector_infinity_lower; ///< Positive certified lower bound used in residual normalization.
+      |                              
+      |                              {}
+<repo>\src\numerics\eigen_generalized.cpp:288:16: error: std::move of the variable 'metrics' of the trivially-copyable type 'GeneralizedMetrics' has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+  288 |       metrics_(std::move(metrics)),
+      |                ^~~~~~~~~~       ~
+<repo>\src\numerics\eigen_generalized.cpp:345:36: error: std::move of the expression of the trivially-copyable type 'uvlas::numerics::eigen::GeneralizedMetrics' has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+  345 |                                    std::move(*proof),
+      |                                    ^~~~~~~~~~      ~
+<repo>\src\numerics\eigen_generalized.cpp:494:17: error: variable 'mass_factor' of type 'Eigen::LLT<Matrix>' (aka 'LLT<Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>>') can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  494 |                 Eigen::LLT<Matrix> mass_factor(m);
+      |                 ^
+      |                                    const 
+<repo>\src\numerics\eigen_generalized.cpp:501:17: error: variable 'solver' of type 'Eigen::GeneralizedSelfAdjointEigenSolver<Matrix>' (aka 'GeneralizedSelfAdjointEigenSolver<Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>>') can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  501 |                 Eigen::GeneralizedSelfAdjointEigenSolver<Matrix> solver(k, m);
+      |                 ^
+      |                                                                  const 
+<repo>\src\numerics\eigen_generalized.cpp:538:13: error: variable 'retained_generation' of type 'core::NumericalGeneration' (aka 'Identifier<detail::NumericalGenerationTag>') can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  538 |             core::NumericalGeneration retained_generation = std::visit(
+      |             ^
+      |                                       const 

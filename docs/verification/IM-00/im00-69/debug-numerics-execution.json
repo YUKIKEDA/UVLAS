@@ -1,0 +1,11 @@
+{
+  "kind": "tool_execution_report",
+  "raw_stdout_saved": false,
+  "tool_chunk": "e2d593",
+  "source_commit": "03d3471d7db670fd8ef8f052a4c5181f6de481ad",
+  "command": "ctest --test-dir out/issue69-msvc -C Debug -R ^numerics.eigen_generalized$ --output-on-failure",
+  "passed": 1,
+  "total": 1,
+  "elapsed_seconds": 0.05,
+  "note": "最終数値sourceのclean Debug実行。後の0bcfea9はconventionsのみで数値tokenは不変。raw未保存を直接stdoutのlogと混同しない。"
+}

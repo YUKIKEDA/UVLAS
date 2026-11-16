@@ -216,7 +216,9 @@ public:
     }
     /// Temporaries cannot supply borrowed result storage.
     [[nodiscard]] const GeneralizedMetrics& metrics() const&& = delete;
-    /// Original-M Rump qualification shift, zero for an empty matrix.
+    /// Shift used to qualify the original mass after exact congruence/permutation.
+    /// It is expressed in the auxiliary validation coordinates, not physical M units.
+    /// Zero denotes the empty matrix qualification.
     [[nodiscard]] double mass_qualification_shift() const noexcept {
         return mass_shift_;
     }

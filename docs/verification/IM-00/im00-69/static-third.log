@@ -1,0 +1,33 @@
+[1/3] Processing file <repo>\src\numerics\eigen_generalized.cpp.
+84198 warnings generated.
+[2/3] Processing file <repo>\tests\numerics\eigen_generalized_test.cpp.
+146832 warnings generated.
+[3/3] Processing file <repo>\qa\eigen_generalized\main.cpp.
+201806 warnings generated.
+<repo>\include\uvlas/numerics/eigen_action.hpp:21:8: error: constructor does not initialize these fields: original, transformation [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   21 | struct ActionStamp {
+      |        ^
+   22 |     Context original; ///< Original model, coefficients, layout, scales, time and backend policy.
+      |                     
+      |                     {}
+   23 |     core::NumericalGeneration transformation; ///< Generation of shift/factor/transform policy.
+      |                                             
+      |                                             {}
+<repo>\tests\numerics\eigen_generalized_test.cpp:528:23: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  528 |                 CHECK(result.error().cause.details.resources->observed == necessary - 1);
+      |                       ^
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~
+<repo>\tests\numerics\eigen_generalized_test.cpp:529:23: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  529 |                 CHECK(result.error().cause.details.resources->required == necessary);
+      |                       ^
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~
