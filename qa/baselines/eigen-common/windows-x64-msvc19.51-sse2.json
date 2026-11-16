@@ -1,0 +1,16 @@
+{
+ "schema": "uvlas.baseline/1",
+ "case": "eigen-common",
+ "platform": "windows-x64-msvc19.51-sse2",
+ "note": "first baseline of a new case",
+ "values": {
+  "generalized.normalization": "0p+0",
+  "generalized.orthogonality": "0p+0",
+  "generalized.residual": "0p+0",
+  "pair.norm_lower": "1p+0",
+  "pair.normalization": "1p-52",
+  "pair.residual": "1p-78",
+  "schur.orthogonality": "0p+0",
+  "schur.residual": "0p+0"
+ }
+}
