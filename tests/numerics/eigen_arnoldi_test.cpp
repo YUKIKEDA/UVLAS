@@ -678,7 +678,7 @@ TEST_CASE("Arnoldi preserves first provider failures and global action quotas",
         if (mutation == 3) {
             CHECK(failed.error().cause.operation == core::Operation::CertifyError);
             REQUIRE(failed.error().cause.details.resources.has_value());
-            CHECK(*failed.error().cause.details.resources ==
+            CHECK(checked(failed.error().cause.details.resources) ==
                   core::ResourceUsage{core::ResourceKind::Bytes, 900, 800});
         }
     }
@@ -839,7 +839,7 @@ TEST_CASE("Arnoldi maps a complex shift to the real original pair and distinct i
     CHECK(failed.error().diagnostics.inverse_applications ==
           (inverse.right.calls - right_before) + (inverse.left.calls - left_before));
     REQUIRE(failed.error().cause.details.resources.has_value());
-    CHECK(*failed.error().cause.details.resources ==
+    CHECK(checked(failed.error().cause.details.resources) ==
           core::ResourceUsage{core::ResourceKind::Bytes, 70, 60});
     inverse.left.fail = false;
     inverse.replay = true;
@@ -1090,7 +1090,7 @@ TEST_CASE("Arnoldi normalizes extreme working seeds and timing leaves every valu
         }
         const auto measured = extracted->measurements();
         REQUIRE(measured.has_value());
-        CHECK(std::holds_alternative<eig::ArnoldiTimings>(*measured) == (exponent == 900));
+        CHECK(std::holds_alternative<eig::ArnoldiTimings>(checked(measured)) == (exponent == 900));
         if (baseline) {
             const auto current = extracted->values(), previous = baseline->values();
             REQUIRE(current.has_value());
@@ -1491,7 +1491,8 @@ TEST_CASE("Arnoldi uses one owning snapshot for values scales units and required
     REQUIRE_FALSE(refused.has_value());
     CHECK(refused.error().cause.code == core::FailureCode::PrecisionUnresolved);
     REQUIRE(refused.error().cause.details.problem.has_value());
-    CHECK(*refused.error().cause.details.problem == core::ProblemId{core::ObservationId{102}});
+    CHECK(checked(refused.error().cause.details.problem) ==
+          core::ProblemId{core::ObservationId{102}});
     CHECK(refused.error().cause.details.numerical_generation == core::NumericalGeneration{40});
     CHECK(refused.error().cause.details.trial == core::TrialId{11});
     CHECK(checked(extracted->values()).generation == core::NumericalGeneration{40});

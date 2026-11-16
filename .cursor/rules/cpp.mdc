@@ -99,6 +99,16 @@ if (!entry.has_value()) { return; }
 use(*entry);
 ```
 
+optionalを設定する補助関数の呼出しだけを、呼出し側での存在証明にしない。2026-11-16、PR #73のLinux clang-tidyは、最初の失敗を保存する関数の呼出し後の逆参照を拒否した。保存する関数内で存在を確かめ、その値への参照を返せば、呼出し側はoptionalを逆参照せずに同じ失敗を使える。試験の診断フィールドも、既存の確認付き取得関数を通す。
+
+```cpp
+// BAD: the analyzer need not infer engagement across the helper call.
+record_failure(code);
+return std::unexpected(*first);
+// GOOD: the helper returns the value after checking or installing it.
+return std::unexpected(record_failure(code));
+```
+
 別のoptionalが値を持つことや、コンストラクタでの確認だけを、現在逆参照するoptionalの存在証明に使わない。2026-11-16、PR #72のLinux clang-tidyは、開始時刻だけを確認したデストラクタ内で計測先のoptionalを逆参照する形を拒否した。使用する計測先を名前付き参照へ束縛し、使用箇所でも存在を確認する。
 
 ```cpp

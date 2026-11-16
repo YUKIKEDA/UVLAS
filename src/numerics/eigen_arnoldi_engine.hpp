@@ -107,14 +107,16 @@ struct ArnoldiRunner {
     [[nodiscard]] EigenFailure failure(core::Failure cause) const noexcept {
         return complete_failure(cause, scales.context, request.state, counters());
     }
-    void record_failure(ArnoldiCode code) noexcept {
+    // Return the checked value; callers need not infer optional engagement
+    // across this helper, and every path still preserves the first cause.
+    const EigenFailure& record_failure(ArnoldiCode code) noexcept {
         if (!first) {
             first = failure(core::Failure{code, arnoldi_operation});
         }
+        return *first;
     }
     [[nodiscard]] ArnoldiResult<void> fail(ArnoldiCode code) noexcept {
-        record_failure(code);
-        return std::unexpected(*first);
+        return std::unexpected(record_failure(code));
     }
     [[nodiscard]] ArnoldiResult<void> remember(EigenFailure failed) noexcept {
         if (!first) {

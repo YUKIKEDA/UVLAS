@@ -53,7 +53,9 @@ struct ArnoldiData {
           left_requested(request_left),
           subspace_requested(request_subspace),
           settings(configured_settings),
-          limits(configured_limits) {}
+          limits(configured_limits),
+          diagnostics({}, {}, configured_settings.nev, configured_settings.ncv, 0, 0, std::nullopt,
+                      0, 0, {}) {}
     Context context;
     ActionStamp original_stamp;
     StateDiagnosticContext state;
@@ -78,7 +80,7 @@ struct ArnoldiData {
     core::PlannedBuffer<std::optional<ArnoldiInverseAssessment>> inverse_assessments;
     core::PlannedBuffer<std::optional<core::ErrorCertificate>> consumer_proofs;
     std::size_t inverse_count = 0, consumer_count = 0;
-    ArnoldiDiagnostics diagnostics{};
+    ArnoldiDiagnostics diagnostics;
     ArnoldiMeasurements measurements{ArnoldiUnmeasured{}};
     std::optional<linear::BackendAdmission> admission;
 };

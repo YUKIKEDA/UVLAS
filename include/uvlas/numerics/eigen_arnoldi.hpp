@@ -155,6 +155,30 @@ public:
 /// The provider/evaluator remain alive, and the provider frozen, for the whole call.
 template <StorageScalar Scalar>
 struct ArnoldiRequest {
+    /// Supply every search and qualification setting explicitly; no default request exists.
+    /// Values are copied, while seed/check spans and evaluator retain their documented borrow.
+    ArnoldiRequest(core::Index requested_count, core::Index subspace_width, WordView<Scalar> seed,
+                   double tolerance, std::uint64_t iteration_limit,
+                   const ArnoldiSelection& transformation, const ArnoldiQualification& requirements,
+                   ArnoldiSides requested_sides, ArnoldiAssociation matching,
+                   const linear::ReturnedPrecision& precision, StateDiagnosticContext reporting,
+                   std::span<const linear::ConsumerCheck> checks,
+                   const ArnoldiConsumerEvaluator& consumer,
+                   ArnoldiTimingMode measurements) noexcept
+        : nev(requested_count),
+          ncv(subspace_width),
+          initial(seed),
+          backend_tolerance(tolerance),
+          backend_iterations(iteration_limit),
+          selection(transformation),
+          qualification(requirements),
+          sides(requested_sides),
+          association(matching),
+          returned(precision),
+          state(reporting),
+          required_checks(checks),
+          evaluator(consumer),
+          timing(measurements) {}
     core::Index nev; ///< Minimum requested count; real conjugate completion can return nev+1.
     core::Index ncv; ///< Explicit Krylov width; must satisfy nev+2<=ncv<=n, with no clipping.
     WordView<Scalar> initial; ///< Explicit finite nonzero Binary64 native-coordinate seed.
@@ -188,6 +212,23 @@ struct ArnoldiLimits {
 struct ArnoldiRestartsNotExposed {};
 /// Fixed owned extraction counters and explicitly unexposed backend information.
 struct ArnoldiDiagnostics {
+    /// Own explicit execution counters, absence markers and the exact seed fingerprint.
+    /// No field is inferred from an omitted argument or an implicit default snapshot.
+    ArnoldiDiagnostics(const AttemptDiagnostics& counts, ArnoldiRestartsNotExposed restarts,
+                       core::Index requested_count, core::Index requested_width,
+                       core::Index actual_count, core::Index right_dimension,
+                       std::optional<core::Index> left_dimension, std::uint64_t operations,
+                       double seed_norm, const std::array<std::byte, 32>& fingerprint) noexcept
+        : attempts(counts),
+          actual_restarts(restarts),
+          requested_nev(requested_count),
+          requested_ncv(requested_width),
+          returned_count(actual_count),
+          right_krylov_dimension(right_dimension),
+          left_krylov_dimension(left_dimension),
+          backend_reported_operations(operations),
+          initial_norm(seed_norm),
+          initial_sha256(fingerprint) {}
     AttemptDiagnostics attempts; ///< Counts across both sides and final qualification.
     ArnoldiRestartsNotExposed actual_restarts; ///< Not a measured zero or a hard restart cap.
     core::Index requested_nev;                 ///< Caller request, never silently clipped.
@@ -277,6 +318,14 @@ struct ArnoldiMetadataView {
 
 /// One actual shifted-inverse call's independently owned numerical guarantees.
 struct ArnoldiInverseAssessment {
+    /// Own one inverse call's side, actual candidate, output-error bound and linear proof together.
+    /// The certificate is copied; it never borrows the producer's proof storage.
+    ArnoldiInverseAssessment(ArnoldiSide inverse_side, core::NumericalGeneration generation,
+                             double output_error, const core::ErrorCertificate& proof) noexcept
+        : side(inverse_side),
+          candidate(generation),
+          native_output_error_upper(output_error),
+          linear(proof) {}
     ArnoldiSide side;                    ///< Physical right inverse or its shifted adjoint inverse.
     core::NumericalGeneration candidate; ///< Unique actual output words of this call.
     double
@@ -338,13 +387,13 @@ public:
     [[nodiscard]] bool active() const noexcept;
     /// Borrow actual consumed values; the owner must outlive this view.
     [[nodiscard]] std::optional<ArnoldiCandidateView> values() const& noexcept;
-    std::optional<ArnoldiCandidateView> values() const&& = delete;
+    [[nodiscard]] std::optional<ArnoldiCandidateView> values() const&& = delete;
     /// Borrow actual retained pre-projection values and their original generation.
     [[nodiscard]] std::optional<ArnoldiCandidateView> retained_values() const& noexcept;
-    std::optional<ArnoldiCandidateView> retained_values() const&& = delete;
+    [[nodiscard]] std::optional<ArnoldiCandidateView> retained_values() const&& = delete;
     /// Borrow owned scales, seed, units and actual selection/backend metadata.
     [[nodiscard]] std::optional<ArnoldiMetadataView> metadata() const& noexcept;
-    std::optional<ArnoldiMetadataView> metadata() const&& = delete;
+    [[nodiscard]] std::optional<ArnoldiMetadataView> metadata() const&& = delete;
     /// Explicit qualification, or no value after moving from this owner.
     [[nodiscard]] std::optional<ArnoldiQualificationState> qualification() const noexcept;
     /// Copy one actual returned pair proof; absent for the other output kind or invalid index/side.
@@ -354,7 +403,7 @@ public:
     [[nodiscard]] std::optional<BasisMetrics> subspace_metric(ArnoldiSide side) const noexcept;
     /// Borrow per-pair sensitivity diagnostics. Empty for a subspace or moved-from owner.
     [[nodiscard]] std::span<const ArnoldiSensitivity> sensitivities() const& noexcept;
-    std::span<const ArnoldiSensitivity> sensitivities() const&& = delete;
+    [[nodiscard]] std::span<const ArnoldiSensitivity> sensitivities() const&& = delete;
     /// Original problem identity, retained independently of callbacks and workspace.
     [[nodiscard]] std::optional<Context> context() const noexcept;
     /// Explicit optional parent/last accepted identifiers, not an ancestry proof.
