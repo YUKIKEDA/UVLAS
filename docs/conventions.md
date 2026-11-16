@@ -45,11 +45,11 @@
 | `structure` | PG参照係数、材料、梁、接続、荷重、回復 | IM-01、IM-02 |
 | `aero` | 渦核、後流、荷重、TE所有 | IM-03 |
 | `coupling` | 初期化、強連成、確定、安定性と探索 | IM-04、IM-05 |
-| `io` | ケース、外部格子、結果、checkpoint | IM-06 |
+| `io` | 復号済みASCII IDとnative整数の厳格変換。ケース、外部格子、結果、checkpointは後続 | IM06-1の[厳格scalar契約](specs/foundation/strict-input-scalars-contract.md)と [input_scalar.hpp](../include/uvlas/io/input_scalar.hpp)。文書parserや物理Modelは生成しない |
 | `python` | 任意機能のCPython拡張。所有する数値保持と状態protocol、NumPy境界 | IM00-10の[Python境界契約](specs/foundation/python-binding-contract.md) |
 | `app` | CLI | 現在は `--help` と `--version`。解析コマンドはIM-06 |
 
-表のモジュールのうち、いまディレクトリがあるのは `core`、`numerics`、`app`、`python`。他は、最初のソースを足すPRで作る。
+表のモジュールのうち、いまディレクトリがあるのは `core`、`numerics`、`io`、`app`、`python`。他は、最初のソースを足すPRで作る。
 
 ## 名前
 
