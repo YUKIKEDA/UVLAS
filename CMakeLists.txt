@@ -54,7 +54,7 @@ set(UVLAS_NUMERICS_SOURCES src/numerics/storage.cpp src/numerics/precision.cpp
     src/numerics/eigen_common.cpp src/numerics/eigen_metrics.cpp src/numerics/eigen_action.cpp
     src/numerics/backend_memory.cpp src/numerics/linear_metrics.cpp src/numerics/linear_result.cpp src/numerics/linear_validation.cpp
     src/numerics/gmres_solve.cpp src/numerics/gmres_residual_detail.cpp
-    src/numerics/eigen_full.cpp src/numerics/dense_solve.cpp src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp)
+    src/numerics/eigen_full.cpp src/numerics/dense_solve.cpp src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp src/numerics/eigen_generalized.cpp)
 add_library(uvlas_numerics STATIC ${UVLAS_NUMERICS_SOURCES})
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -86,6 +86,10 @@ add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_link_libraries(uvlas_cli PRIVATE uvlas_core)
+
+add_executable(uvlas_eigen_generalized_canary qa/eigen_generalized/main.cpp)
+uvlas_configure_target(uvlas_eigen_generalized_canary)
+target_link_libraries(uvlas_eigen_generalized_canary PRIVATE uvlas_numerics)
 
 if(BUILD_TESTING)
     include(cmake/AllocationAudit.cmake)

@@ -1,0 +1,23 @@
+Source: https://github.com/YUKIKEDA/UVLAS/actions/runs/43796203245/job/133065546020
+Head: e4bf32f33fbe192b5f315e736796e02d2c51dbb2
+2026-11-16T03:12:03.0761218Z       Start 36: numerics.eigen_generalized
+2026-11-16T03:12:03.0832384Z 36/55 Test #36: numerics.eigen_generalized ..........   Passed    0.01 sec
+2026-11-16T03:12:03.0834196Z       Start 37: qa.eigen_generalized
+2026-11-16T03:12:03.1276965Z 37/55 Test #37: qa.eigen_generalized ................***Failed    0.04 sec
+2026-11-16T03:12:03.1277671Z eigen-generalized: platform linux-x64-gnu14.2-sse2 is not qualified (QA-07).
+2026-11-16T03:12:03.1278186Z   qualified platforms: windows-x64-msvc19.51-sse2
+2026-11-16T03:12:03.1278928Z   qualify it with `results.py accept`; if its values differ from every qualified platform, that needs a result change record.
+2026-11-16T03:12:03.1279464Z   values on this platform:
+2026-11-16T03:12:03.1279708Z     basis.diagonal.0 1p+0
+2026-11-16T03:12:03.1279942Z     basis.diagonal.1 1p-1
+2026-11-16T03:12:03.1280213Z     basis.diagonal.2 1p-2
+2026-11-16T03:12:03.1280480Z     normalization 0p+0
+2026-11-16T03:12:03.1280695Z     orthogonality 0p+0
+2026-11-16T03:12:03.1280899Z     residual 0p+0
+2026-11-16T03:12:03.1281096Z     root.0 -1p-60
+2026-11-16T03:12:03.1281286Z     root.1 0p+0
+2026-11-16T03:12:03.1281488Z     root.2 1p-60
+2026-11-16T03:12:03.1281608Z 
+2026-11-16T03:12:08.3222765Z 98% tests passed, 1 tests failed out of 55
+2026-11-16T03:12:08.3228243Z Errors while running CTest
+2026-11-16T03:12:08.3235226Z 	 37 - qa.eigen_generalized (Failed)                     verification

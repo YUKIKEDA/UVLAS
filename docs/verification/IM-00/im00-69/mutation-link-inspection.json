@@ -1,0 +1,27 @@
+[
+  {
+    "case": "control",
+    "old_archive_producer_matches": 0,
+    "entry_symbols_from_mutant_obj": 125
+  },
+  {
+    "case": "tiny-clamp",
+    "old_archive_producer_matches": 0,
+    "entry_symbols_from_mutant_obj": 125
+  },
+  {
+    "case": "mass-proof-bypass",
+    "old_archive_producer_matches": 0,
+    "entry_symbols_from_mutant_obj": 125
+  },
+  {
+    "case": "consumer-first-only",
+    "old_archive_producer_matches": 0,
+    "entry_symbols_from_mutant_obj": 125
+  },
+  {
+    "case": "quota-extra-call",
+    "old_archive_producer_matches": 0,
+    "entry_symbols_from_mutant_obj": 125
+  }
+]

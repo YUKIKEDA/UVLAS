@@ -1,0 +1,26 @@
+[1/3] Processing file <repo>\src\numerics\eigen_generalized.cpp.
+77173 warnings generated.
+[2/3] Processing file <repo>\tests\numerics\eigen_generalized_test.cpp.
+139795 warnings generated.
+[3/3] Processing file <repo>\qa\eigen_generalized\main.cpp.
+191781 warnings generated.
+<repo>\include\uvlas/numerics/eigen_metrics.hpp:23:8: error: constructor does not initialize these fields: system, values_generation [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   23 | struct MetricContext {
+      |        ^
+   24 |     Context system;               ///< Original problem, layouts, policies and evaluation time.
+      |                   
+      |                   {}
+   25 |     StateDiagnosticContext state; ///< Explicit reporting identities; never inferred.
+   26 |     core::NumericalGeneration values_generation; ///< Generation of the exact candidate words.
+      |                                                
+      |                                                {}
+<repo>\include\uvlas/numerics/eigen_metrics.hpp:77:8: error: constructor does not initialize these fields: vector_infinity_lower [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   77 | struct PairMetrics {
+      |        ^
+   78 |     core::ErrorCertificate residual;      ///< Proof for the actual original-system residual.
+   79 |     core::ErrorCertificate normalization; ///< Proof for the actual dimensionless vector norm.
+   80 |     BackwardCertificate backward;         ///< Proof of the additional requirement, when requested.
+   81 |     double
+   82 |         vector_infinity_lower; ///< Positive certified lower bound used in residual normalization.
+      |                              
+      |                              {}

@@ -41,7 +41,7 @@
 | モジュール | 責任 | 導入するパッケージ |
 |---|---|---|
 | `core` | ビルド情報、強いID、checked寸法、ResourcePlan、`Failure`、`ErrorCertificate`、状態・資格・cache・Workspace、工程時間・メモリ計測 | IM00-3の[失敗・認定の型](specs/foundation/failure-certificate-contract.md)、IM00-2の[寸法・資源契約](specs/foundation/dimensions-resource-contract.md)、IM00-9の[状態契約](specs/foundation/state-contract.md)、[計測契約](specs/foundation/instrumentation-contract.md) |
-| `numerics` | 密・疎の保持、PointSoA、DofLayout、精度保持・補償原残差・明示投影、疎LU/正定値資格付き疎LLT。密基準解法はIM00-6。固有抽出の共通型・原残差／Gram認定・作用予算はIM00-11 | IM00-4の[保持・境界契約](specs/foundation/numerical-storage-contract.md)、IM00-5の[精度契約](specs/foundation/precision-contract.md)、IM00-7の[疎求解契約](specs/foundation/sparse-solve-contract.md)、[固有抽出契約](specs/foundation/eigen-extraction-contract.md)。一般密行列の完全スペクトル、選択pair、独立した左右clusterは `eigen_full.hpp`。所有packetは固定尺度・元係数・精度世代・認定を保持する。一般化系とArnoldiは別の実装単位 |
+| `numerics` | 密・疎の保持、PointSoA、DofLayout、精度保持・補償原残差・明示投影、疎LU/正定値資格付き疎LLT。密基準解法はIM00-6。固有抽出の共通型・原残差／Gram認定・作用予算はIM00-11 | IM00-4の[保持・境界契約](specs/foundation/numerical-storage-contract.md)、IM00-5の[精度契約](specs/foundation/precision-contract.md)、IM00-7の[疎求解契約](specs/foundation/sparse-solve-contract.md)、[固有抽出契約](specs/foundation/eigen-extraction-contract.md)。一般密行列の完全スペクトル、選択pair、独立した左右clusterは `eigen_full.hpp`。所有packetは固定尺度・元係数・精度世代・認定を保持する。原M資格付き対称一般化全スペクトルは [eigen_generalized.hpp](../include/uvlas/numerics/eigen_generalized.hpp)。Arnoldiは別の実装単位 |
 | `structure` | PG参照係数、材料、梁、接続、荷重、回復 | IM-01、IM-02 |
 | `aero` | 渦核、後流、荷重、TE所有 | IM-03 |
 | `coupling` | 初期化、強連成、確定、安定性と探索 | IM-04、IM-05 |
