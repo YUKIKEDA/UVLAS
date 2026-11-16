@@ -1,0 +1,8 @@
+2026-11-16T12:53:35.6711392Z HEAD is now at 86d3c83 Merge 6ea32130366d1f66cbd10030af4e0c96ca9a3918 into 664b9864e4b0bfb852562b38d5ca2cf166742c7b
+2026-11-16T12:53:35.6799920Z 86d3c83c715cccc1159e2e388845d32120b5497f
+2026-11-16T12:53:37.7193553Z 167 IDs defined ({'requirement': 37, 'acceptance': 26, 'decision': 88, 'package': 9, 'risk': 7}), 23 with tests, 25 with records, 0 problems
+2026-11-16T12:53:41.6606410Z links: 0 problems; 0 links to files removed by plan, 3 links to evidence files outside the repository
+2026-11-16T12:53:41.6607210Z scripts: 0 problems
+2026-11-16T12:53:41.6607572Z files: 0 problems
+2026-11-16T12:53:41.6608906Z hashes: 0 problems; matches 6296, large evidence file, matches the index 9682, hash under a field name, not a file 9656, matches by file name 639, names a copy under build/, by plan 1, earlier version of a file, as at the baseline 1, large evidence file by name, matches the index 586, file outside the repository and the index, by plan 12, status page at an earlier state 42
+2026-11-16T12:53:41.6610256Z controls: 0 problems
