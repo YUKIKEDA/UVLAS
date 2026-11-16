@@ -109,8 +109,9 @@ public:
         }
     }
     ~FullStageClock() {
-        if (start_)
-            add_timing(data_, (*data_.timings).*stage_, *start_);
+        auto& timings = data_.timings;
+        if (start_ && timings)
+            add_timing(data_, (*timings).*stage_, *start_);
     }
     FullStageClock(const FullStageClock&) = delete;
     FullStageClock& operator=(const FullStageClock&) = delete;
