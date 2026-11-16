@@ -33,3 +33,5 @@ commandの残りの引数をsplatする場合、`$rest = @($args | Select-Object
 BAD   $t.Replace('HASH = re.compile', ...)          当たった数を見ない
 GOOD  assert t.count(a) == 1; t = t.replace(a, b)    一回でなければ止まる
 ```
+
+補助関数には既存のaliasと衝突しない名前を付け、呼出し前に`Get-Command`で解決先を確認する。編集前の原本をバイトで退避し、置換数と出力長を検査してから書く。2026-11-16、置換補助を`R`と命名したが、同名aliasの`Invoke-History`が呼ばれた。非終了エラー後の空出力を未追跡の`eigen_full.cpp`へ書き、編集中の本文を失った。`$ErrorActionPreference = 'Stop'`でPowerShell自身のエラーを停止させ、期待した関数の戻り値が非空で長さ条件を満たすことを確認する。外部コマンドの終了コードを別途検査する既存規則とは区別する。

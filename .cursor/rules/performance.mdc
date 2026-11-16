@@ -74,3 +74,5 @@ GOOD  Eigen::VectorXd r = A * x - b;
 BAD   合成の三重対角100kが1秒だったので、構造10万自由度は問題ない
 GOOD  実際の接続graphでfillと分解時間を測る
 ```
+
+固定長のBoost整数でも、`cpp_int_backend` のallocatorが `void` というだけで全演算がheapを使わないとは判断しない。固定版の乗算経路には、桁数に応じて動的なKaratsuba作業域を使うものがある。固有vectorの位相比較では、53bitのsignificandを小さいうちに掛け、その後に固定配列内でshift・加算・比較する経路に限定し、最大指数と最小subnormalを含む確保監査で確認する。この限定経路の結果を、任意の固定長整数乗算へ一般化しない。

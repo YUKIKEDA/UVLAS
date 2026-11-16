@@ -222,6 +222,22 @@ uvlas_require_audited_dependencies(uvlas_test_numerics_sparse_allocation)
 uvlas_add_test(numerics.dense_solve LABELS unit verification negative
  SOURCES numerics/dense_solve_test.cpp LIBS uvlas_numerics Boost::multiprecision)
 
+uvlas_add_test(numerics.eigen_full_phase_audit LABELS property verification
+    SOURCES numerics/eigen_full_phase_audit_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_numerics_audit uvlas::eigen Boost::headers)
+target_include_directories(uvlas_test_numerics_eigen_full_phase_audit PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+uvlas_enable_allocation_audit(uvlas_test_numerics_eigen_full_phase_audit)
+uvlas_require_audited_dependencies(uvlas_test_numerics_eigen_full_phase_audit)
+
+uvlas_add_test(numerics.eigen_full_contract LABELS unit negative verification
+    SOURCES numerics/eigen_full_contract_test.cpp LIBS uvlas_numerics)
+
+uvlas_add_test(numerics.eigen_full LABELS unit negative verification
+    SOURCES numerics/eigen_full_test.cpp LIBS uvlas_numerics Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_numerics_eigen_full PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
+target_compile_definitions(uvlas_test_numerics_eigen_full PRIVATE
+    UVLAS_FULL_FIXTURE_PATH="${PROJECT_SOURCE_DIR}/tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json")
+
 uvlas_add_test(numerics.dense_contract LABELS unit negative verification
  SOURCES numerics/dense_contract_test.cpp LIBS uvlas_numerics)
 
@@ -284,3 +300,8 @@ add_test(NAME qa.eigen_common
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
         --case eigen-common --run "$<TARGET_FILE:uvlas_eigen_common_canary>")
 set_tests_properties(qa.eigen_common PROPERTIES TIMEOUT 30 LABELS "verification")
+
+add_test(NAME qa.eigen_full
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-full --run "$<TARGET_FILE:uvlas_eigen_full_canary>")
+set_tests_properties(qa.eigen_full PROPERTIES TIMEOUT 30 LABELS "verification")

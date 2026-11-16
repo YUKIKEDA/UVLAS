@@ -54,11 +54,11 @@ set(UVLAS_NUMERICS_SOURCES src/numerics/storage.cpp src/numerics/precision.cpp
     src/numerics/eigen_common.cpp src/numerics/eigen_metrics.cpp src/numerics/eigen_action.cpp
     src/numerics/backend_memory.cpp src/numerics/linear_metrics.cpp src/numerics/linear_result.cpp src/numerics/linear_validation.cpp
     src/numerics/gmres_solve.cpp src/numerics/gmres_residual_detail.cpp
-    src/numerics/dense_solve.cpp src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp)
+    src/numerics/eigen_full.cpp src/numerics/dense_solve.cpp src/numerics/sparse_spd.cpp src/numerics/sparse_triangular.cpp src/numerics/sparse_solve.cpp)
 add_library(uvlas_numerics STATIC ${UVLAS_NUMERICS_SOURCES})
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen)
+target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Boost::headers)
 
 if(UVLAS_BUILD_PYTHON)
     if(NOT "python" IN_LIST VCPKG_MANIFEST_FEATURES)
@@ -77,6 +77,10 @@ target_link_libraries(uvlas_numeric_canary PRIVATE
 add_executable(uvlas_eigen_common_canary qa/eigen_common/main.cpp)
 uvlas_configure_target(uvlas_eigen_common_canary)
 target_link_libraries(uvlas_eigen_common_canary PRIVATE uvlas_numerics)
+
+add_executable(uvlas_eigen_full_canary qa/eigen_full/main.cpp)
+uvlas_configure_target(uvlas_eigen_full_canary)
+target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 
 add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)
@@ -103,7 +107,7 @@ if(BUILD_TESTING)
     uvlas_configure_target(uvlas_numerics_audit)
     uvlas_enable_allocation_audit(uvlas_numerics_audit)
     target_include_directories(uvlas_numerics_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen)
+    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Boost::headers)
     uvlas_require_audited_dependencies(uvlas_numerics_audit)
     add_subdirectory(tests)
 endif()
