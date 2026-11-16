@@ -409,3 +409,28 @@ TEST_CASE("Exact ordering and coordinate conversion retain literal algebra",
     const auto recovered = take(derivative.evaluate(two, one, limits(), plan));
     fraction_is(recovered, "-7", "6");
 }
+
+TEST_CASE("Nonzero higher derivatives preserve both falling factorials and coordinate powers",
+          "[SH-D01][SH-D03][N4-02][verification]") {
+    core::ResourcePlan plan{budget};
+    const auto f = F(plan);
+    const auto first = take(f.differentiate(ExactAxis::First, 2, limits(), plan));
+    const auto second = take(f.differentiate(ExactAxis::Second, 2, limits(), plan));
+    REQUIRE(first.terms().size() == 1);
+    CHECK(first.terms()[0].powers.first == 0);
+    CHECK(first.terms()[0].powers.second == 1);
+    fraction_is(first.terms()[0].coefficient, "1", "1");
+    REQUIRE(second.terms().size() == 1);
+    CHECK(second.terms()[0].powers.first == 1);
+    CHECK(second.terms()[0].powers.second == 0);
+    fraction_is(second.terms()[0].coefficient, "-3", "2");
+    constexpr std::array cubes{std::array{3, 0, 1, 1}, std::array{0, 3, 1, 1}};
+    const auto sum = polynomial(cubes, plan);
+    for (const auto axis : {ExactAxis::First, ExactAxis::Second}) {
+        const auto derivative = take(sum.differentiate(axis, 2, limits(), plan));
+        REQUIRE(derivative.terms().size() == 1);
+        CHECK(derivative.terms()[0].powers.first == (axis == ExactAxis::First ? 1 : 0));
+        CHECK(derivative.terms()[0].powers.second == (axis == ExactAxis::Second ? 1 : 0));
+        fraction_is(derivative.terms()[0].coefficient, "6", "1");
+    }
+}
