@@ -1,0 +1,30 @@
+{
+  "path": "qa/eigen_arnoldi/main.cpp",
+  "command": [
+    "uvx",
+    "clang-tidy@21.1.1",
+    "qa/eigen_arnoldi/main.cpp",
+    "--quiet",
+    "--",
+    "-x",
+    "c++",
+    "-std=c++23",
+    "-Iinclude",
+    "-Isrc/numerics",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include/eigen3",
+    "-fms-extensions",
+    "-fms-compatibility",
+    "-ffp-model=strict",
+    "-DNOMINMAX",
+    "-DWIN32_LEAN_AND_MEAN",
+    "-DEIGEN_MPL2_ONLY",
+    "-DEIGEN_DONT_PARALLELIZE"
+  ],
+  "exit_code": 0,
+  "seconds": 10.865453900012653,
+  "source_sha256": "a27648d8018d88d189f8a71a526de8fda0643c6cf8c7d9b155158f51824343b5",
+  "log_sha256": "000afe73f7c624aa78fc0c9af9b8653cc08468e815cdd4d3b2102c6cbf287170"
+}

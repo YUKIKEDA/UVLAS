@@ -1,0 +1,18 @@
+{
+  "source_base": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+  "sources": {
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+    "src/numerics/eigen_arnoldi.cpp": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+    "src/numerics/eigen_arnoldi_build.hpp": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+    "src/numerics/eigen_arnoldi_cluster.hpp": "2822001801a909a1cfa8273096e2db0c5f943a6584c810d597f6aceace4753e6",
+    "src/numerics/eigen_arnoldi_data.hpp": "4e0b627b589036ebdb69a263f6ab037d5cd75bce46246ec5dd408777cccc5755",
+    "src/numerics/eigen_arnoldi_engine.hpp": "447f132579d88a694815d18f9b6a0538f46061a7c8b867d2f65c6945316bf87d",
+    "src/numerics/eigen_arnoldi_entry.hpp": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+    "src/numerics/eigen_arnoldi_extract.hpp": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+    "src/numerics/eigen_arnoldi_native.hpp": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+    "src/numerics/eigen_arnoldi_qualify.hpp": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+    "tests/numerics/eigen_arnoldi_allocations_test.cpp": "e0efde0976447a5c2343f806df5b66806148b74d423b6c6baf86997f4ca076cf",
+    "tests/numerics/eigen_arnoldi_test.cpp": "8023bcaa1fb6df6ae3fd654172f42bda6e84d58cdba090b6f86ea9b1d1698fee",
+    "qa/eigen_arnoldi/main.cpp": "a27648d8018d88d189f8a71a526de8fda0643c6cf8c7d9b155158f51824343b5"
+  }
+}

@@ -1,0 +1,18 @@
+Source PR head: c8e21e6af43ac02b629562e75204eff071f4ba92
+Observed CI merge: b59db84165ffb2ca49eeaf3c61858d39910dab59
+Job: http<repo>/actions/runs/43808723168/job/133105391033
+2026-11-16T05:15:03.2267710Z In file included from <home>/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi.cpp:2:
+2026-11-16T05:15:04.9618730Z <home>/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi_data.hpp: In constructor ‘uvlas::numerics::eigen::detail::ArnoldiData::ArnoldiData(uvlas::numerics::eigen::Context, uvlas::numerics::eigen::ActionStamp, uvlas::numerics::eigen::StateDiagnosticContext, uvlas::numerics::linear::ReturnedPrecision, uvlas::numerics::eigen::ArnoldiAssociation, uvlas::numerics::eigen::ArnoldiSelectionMetadata, uvlas::numerics::eigen::ArnoldiBackend, uvlas::numerics::linear::UnitDimensions, double, bool, bool, uvlas::numerics::eigen::ArnoldiSettings, uvlas::numerics::eigen::ArnoldiLimits)’:
+2026-11-16T05:15:04.9640784Z <home>/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi_data.hpp:42:80: error: declaration of ‘limits’ shadows a member of ‘uvlas::numerics::eigen::detail::ArnoldiData’ [-Werror=shadow]
+2026-11-16T05:15:04.9641906Z    42 |                 bool request_subspace, ArnoldiSettings settings, ArnoldiLimits limits) noexcept
+2026-11-16T05:15:04.9642619Z       |                                                                  ~~~~~~~~~~~~~~^~~~~~
+2026-11-16T05:15:04.9643294Z <home>/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi_data.hpp:68:19: note: shadowed declaration is here
+2026-11-16T05:15:04.9643926Z    68 |     ArnoldiLimits limits;
+2026-11-16T05:15:04.9644319Z       |                   ^~~~~~
+2026-11-16T05:15:04.9645432Z <home>/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi_data.hpp:42:56: error: declaration of ‘settings’ shadows a member of ‘uvlas::numerics::eigen::detail::ArnoldiData’ [-Werror=shadow]
+2026-11-16T05:15:04.9646426Z    42 |                 bool request_subspace, ArnoldiSettings settings, ArnoldiLimits limits) noexcept
+2026-11-16T05:15:04.9647198Z       |                                        ~~~~~~~~~~~~~~~~^~~~~~~~
+2026-11-16T05:15:04.9647903Z <home>/work/UVLAS/UVLAS/src/numerics/eigen_arnoldi_data.hpp:67:21: note: shadowed declaration is here
+2026-11-16T05:15:04.9648524Z    67 |     ArnoldiSettings settings;
+2026-11-16T05:15:04.9648866Z       |                     ^~~~~~~~
+2026-11-16T05:15:04.9649259Z cc1plus: all warnings being treated as errors

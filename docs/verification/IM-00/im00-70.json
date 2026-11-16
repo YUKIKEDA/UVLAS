@@ -1,0 +1,751 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-02",
+    "N4-03",
+    "N4-07",
+    "N4-08",
+    "N4-09",
+    "EIG-01",
+    "EIG-02",
+    "EIG-03",
+    "EIG-04",
+    "EIG-05",
+    "EIG-07",
+    "EIG-08",
+    "EIG-09",
+    "EIG-10",
+    "EIG-11",
+    "EIG-12",
+    "EIG-13",
+    "EIG-14"
+  ],
+  "package": "IM-00",
+  "issue": 70,
+  "date": "2026-11-16",
+  "source_commit": "c829cd28a9c56325efcdcc79848ea17409e24259",
+  "scope": "一般実／複素作用の要求部分集合・部分空間抽出。左右・shift逆作用、実働Krylov V/H、元作用資格、所有結果、保持／投影と必要consumer。PhysicalCoverageUnresolvedを常に保持し、IM00-11全体・物理mode被覆・実験妥当性・実務性能は認定しない。",
+  "provenance": {
+    "source_base": "338f2d7bc93f00bc1381409997c2ea61d96da83c",
+    "debug_numerics": "clean c829cd2を再linkして対象2CTestを1回実行。",
+    "release_numerics": "c829cd2と同一の数値source hashでcommit直前に構築。core build-infoは旧head/dirtyであり、clean commit実行とは呼ばない。数値sourceとtestのhashはstatic snapshotへ対応する。",
+    "windows_qa": "clean c829cd2 Debugの実8量を初回登録。基準追加commit c8e21e6では数値sourceを変更していない。",
+    "preliminary": "開発中の正対照／静的検査失敗は修正済み。全preliminary rawを保存したとは主張しない。最終static04と対象集合だけを保存する。",
+    "corrections": "native→physical格納loopのrange編集による欠落を正対照と独立レビューで発見し復旧。実返却phaseは共通の厳密座標比較へ接続。minsub/1.5の商の非表現性はEFT逆関係で拒否する。Rulesに教訓を記録。",
+    "integration_head": "1ee358254acbcc793df8c56287ad1a3a71caad13",
+    "release_qa": "通常mergeでFull最終metadataを統合後、canary/core build-infoだけを再link。head1ee358/dirty=falseでQA CTest1/1、c829 Debug基準8値とbit一致。数値source／private13fileはc829から不変。",
+    "locale_log": "Release LastTest派生ログは日本語locale時刻6行のみdecode replacement54文字。数値・ASCII判定行は不変。元一時LastTest bytesは後続QAで更新済みなので恒久保存とは呼ばず、元hash／派生hash・別CTest output-log・peer独立controlを区別する。"
+  },
+  "environment": {
+    "os": "Windows 11",
+    "compiler": "MSVC 19.51.36260.0",
+    "cpp": "C++23",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "debug_warnings_as_errors": false,
+    "release_warnings_as_errors": true
+  },
+  "verification": [
+    {
+      "configuration": "Debug",
+      "target": "numerics.eigen_arnoldi|numerics.eigen_arnoldi_allocations",
+      "passed": 2,
+      "total": 2,
+      "log": "debug-numerics.log"
+    },
+    {
+      "configuration": "Release",
+      "target": "numerics.eigen_arnoldi|numerics.eigen_arnoldi_allocations",
+      "passed": 2,
+      "total": 2,
+      "regular_cases": 23,
+      "regular_assertions": 625,
+      "audit_cases": 1,
+      "audit_assertions": 35,
+      "log": "release-numerics-assertions.log"
+    },
+    {
+      "configuration": "Debug",
+      "target": "qa.eigen_arnoldi",
+      "passed": 1,
+      "total": 1,
+      "log": "debug-qa.log"
+    },
+    {
+      "configuration": "Release",
+      "target": "qa.eigen_arnoldi",
+      "passed": 1,
+      "total": 1,
+      "log": "release-qa.log"
+    }
+  ],
+  "independent_references": {
+    "analytic": "実8次±5i、複素6次nonconjugating V^T、n96/nev24/ncv64、shift解析、Jordan部分空間、cpp_rationalによる元作用残差／fixture丸め包絡／actual位相。固定1e-12。",
+    "pg24": "fixture.step_valuesのstored Pそのものを使う。rounded I−PのmatrixからPを復元しない。nev6/ncv20の3共役対をSciPy凍結参照および採用Full全24根へ重複消費なし照合。",
+    "phase_boundary": "直接8ケース中6安定ケースは成功を必須化。D=1,tail=2^-30の左右2ケースは丸め後anchorが循環するためPrecisionUnresolvedを許す。成功を返す場合はactual値の厳密最大座標を検査。公開complex左右の成功対照は別に必須。",
+    "provider_bounds": "行毎の実非零積数に対する保守丸め上界を使い、零積を誤って全密gammaへ数えない。cpp_rationalの独立包絡対照を持つ。"
+  },
+  "static": {
+    "tool": "clang-tidy 21.1.1",
+    "translation_units": 4,
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "snapshot": "static04",
+    "format_tool": "clang-format 21.1.2",
+    "format_files": 13,
+    "format_exit_code": 0,
+    "post_fix_translation_units": 1,
+    "post_fix_exit_code": 0,
+    "post_fix_header_format_exit_code": 0
+  },
+  "pending": [],
+  "source_references": [
+    {
+      "id": "im00-70-sources-include-uvlas-numerics-eigen_arnoldi.hpp",
+      "sha256": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+      "hint": "include/uvlas/numerics/eigen_arnoldi.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi.cpp",
+      "sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+      "hint": "src/numerics/eigen_arnoldi.cpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_build.hpp",
+      "sha256": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+      "hint": "src/numerics/eigen_arnoldi_build.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_cluster.hpp",
+      "sha256": "2822001801a909a1cfa8273096e2db0c5f943a6584c810d597f6aceace4753e6",
+      "hint": "src/numerics/eigen_arnoldi_cluster.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_data.hpp",
+      "sha256": "7e1aa19c1594614e820da7acf5a02661800217cfecf69543a71692954e6cb791",
+      "hint": "src/numerics/eigen_arnoldi_data.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_engine.hpp",
+      "sha256": "447f132579d88a694815d18f9b6a0538f46061a7c8b867d2f65c6945316bf87d",
+      "hint": "src/numerics/eigen_arnoldi_engine.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_entry.hpp",
+      "sha256": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+      "hint": "src/numerics/eigen_arnoldi_entry.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_extract.hpp",
+      "sha256": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+      "hint": "src/numerics/eigen_arnoldi_extract.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_native.hpp",
+      "sha256": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+      "hint": "src/numerics/eigen_arnoldi_native.hpp"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_arnoldi_qualify.hpp",
+      "sha256": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+      "hint": "src/numerics/eigen_arnoldi_qualify.hpp"
+    },
+    {
+      "id": "im00-70-sources-tests-numerics-eigen_arnoldi_allocations_test.cpp",
+      "sha256": "e0efde0976447a5c2343f806df5b66806148b74d423b6c6baf86997f4ca076cf",
+      "hint": "tests/numerics/eigen_arnoldi_allocations_test.cpp"
+    },
+    {
+      "id": "im00-70-sources-tests-numerics-eigen_arnoldi_test.cpp",
+      "sha256": "8023bcaa1fb6df6ae3fd654172f42bda6e84d58cdba090b6f86ea9b1d1698fee",
+      "hint": "tests/numerics/eigen_arnoldi_test.cpp"
+    },
+    {
+      "id": "im00-70-sources-qa-eigen_arnoldi-main.cpp",
+      "sha256": "a27648d8018d88d189f8a71a526de8fda0643c6cf8c7d9b155158f51824343b5",
+      "hint": "qa/eigen_arnoldi/main.cpp"
+    },
+    {
+      "id": "im00-70-sources-qa-eigen_arnoldi-README.md",
+      "sha256": "55e7aac4639854882033e8237efc8a41c8f392608b9c12dde03fd0d509902b94",
+      "hint": "qa/eigen_arnoldi/README.md"
+    },
+    {
+      "id": "im00-70-sources-src-numerics-eigen_full_phase_private.hpp",
+      "sha256": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+      "hint": "src/numerics/eigen_full_phase_private.hpp"
+    },
+    {
+      "id": "im00-70-sources-tests-numerics-fixtures-j1-pg-free-history-24-v1-fixture.json",
+      "sha256": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0",
+      "hint": "tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json"
+    },
+    {
+      "id": "im00-70-sources-docs-specs-foundation-eigen-extraction-contract.md",
+      "sha256": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+      "hint": "docs/specs/foundation/eigen-extraction-contract.md"
+    },
+    {
+      "id": "im00-70-sources-CMakeLists.txt",
+      "sha256": "995df356a804209236632c1491235efbd2012c3606b8efca30109ecd8427e519",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im00-70-sources-tests-CMakeLists.txt",
+      "sha256": "78e93e272869a7a366600c5f78aeb2038e7e3a560309ceb0bf66e5c7c3a47612",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im00-70-sources-qa-baselines-eigen-arnoldi-windows-x64-msvc19.51-sse2.json",
+      "sha256": "7e7dd82276e4874c9f5c9425e65687979cd9934ce3dc361cc847a30573a1a5a2",
+      "hint": "qa/baselines/eigen-arnoldi/windows-x64-msvc19.51-sse2.json"
+    },
+    {
+      "id": "im00-70-sources-qa-baselines-eigen-arnoldi-linux-x64-gnu14.2-sse2.json",
+      "sha256": "18f3ebb0184028c777cbbf6fb42a9087457cd094b5358575a6b96dd192e7f3ea",
+      "hint": "qa/baselines/eigen-arnoldi/linux-x64-gnu14.2-sse2.json"
+    },
+    {
+      "id": "im00-70-sources-docs-quality-result-changes-0002-linux-arnoldi-residual-bounds.md",
+      "sha256": "94f2bff3ff66b131a4a5301e6ad0ed5d54eaf194207dcde7f37a70450aa608ce",
+      "hint": "docs/quality/result-changes/0002-linux-arnoldi-residual-bounds.md"
+    },
+    {
+      "id": "im00-70-sources-.cursor-rules-cpp.mdc",
+      "sha256": "a871e4962b87dafd1491cb7c5e8c8a82c25508a53018aac5ea96d4d276edb885",
+      "hint": ".cursor/rules/cpp.mdc"
+    },
+    {
+      "id": "im00-70-sources-.cursor-rules-quality.mdc",
+      "sha256": "f075a6ea561ee1aca76b508648ba383cf44aead6dcf4d9334646f12f593fb474",
+      "hint": ".cursor/rules/quality.mdc"
+    },
+    {
+      "id": "im00-70-sources-.cursor-rules-numerics.mdc",
+      "sha256": "00a5ac8210ba8f804e112680daa3eaefbfadf453e859fd2027b44a5c6800ee08",
+      "hint": ".cursor/rules/numerics.mdc"
+    },
+    {
+      "id": "im00-70-sources-.cursor-rules-powershell-shell.mdc",
+      "sha256": "6221093cfe777b97528e1d21e6d19e85af6e276fa02b1fc425bd5e25ee31bf25",
+      "hint": ".cursor/rules/powershell-shell.mdc"
+    },
+    {
+      "id": "im00-70-sources-docs-conventions.md",
+      "sha256": "096270529d63aa36a5c110863ea50d67dfc8c6c372d063d672296993b5d32656",
+      "hint": "docs/conventions.md"
+    }
+  ],
+  "sources": {
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+    "src/numerics/eigen_arnoldi.cpp": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+    "src/numerics/eigen_arnoldi_build.hpp": "680cfb67d5c77c94b85ec8007f7216c5f0d367cf480b92323fdb40287b28a428",
+    "src/numerics/eigen_arnoldi_cluster.hpp": "2822001801a909a1cfa8273096e2db0c5f943a6584c810d597f6aceace4753e6",
+    "src/numerics/eigen_arnoldi_data.hpp": "7e1aa19c1594614e820da7acf5a02661800217cfecf69543a71692954e6cb791",
+    "src/numerics/eigen_arnoldi_engine.hpp": "447f132579d88a694815d18f9b6a0538f46061a7c8b867d2f65c6945316bf87d",
+    "src/numerics/eigen_arnoldi_entry.hpp": "c0c72782420da2e78b45d11d8240f8ce97449713d428481a7e453db89ce4f1b8",
+    "src/numerics/eigen_arnoldi_extract.hpp": "065ed3ae7a5b0984a02d8ce99f571412e46c5e3cdd6cb797d05267fb5ff5091d",
+    "src/numerics/eigen_arnoldi_native.hpp": "37c15eb40913ef66f9ff33d0053ce5d205be32b8faa0f7a1879ba575a38c4b03",
+    "src/numerics/eigen_arnoldi_qualify.hpp": "9331a99ca6ac6089143703c1eedcc2a0c48d5bc0307697097370b783b359edac",
+    "tests/numerics/eigen_arnoldi_allocations_test.cpp": "e0efde0976447a5c2343f806df5b66806148b74d423b6c6baf86997f4ca076cf",
+    "tests/numerics/eigen_arnoldi_test.cpp": "8023bcaa1fb6df6ae3fd654172f42bda6e84d58cdba090b6f86ea9b1d1698fee",
+    "qa/eigen_arnoldi/main.cpp": "a27648d8018d88d189f8a71a526de8fda0643c6cf8c7d9b155158f51824343b5",
+    "qa/eigen_arnoldi/README.md": "55e7aac4639854882033e8237efc8a41c8f392608b9c12dde03fd0d509902b94",
+    "src/numerics/eigen_full_phase_private.hpp": "d8a3be2b178727f66a0c1b356d9b62cbcd511441bcce3e8a80c29a1d556af680",
+    "tests/numerics/fixtures/j1-pg-free-history-24-v1/fixture.json": "da07b7f6df98a1b864f73863659d029a7d85b2c66b712d38252aef0f938b5ad0",
+    "docs/specs/foundation/eigen-extraction-contract.md": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c",
+    "CMakeLists.txt": "995df356a804209236632c1491235efbd2012c3606b8efca30109ecd8427e519",
+    "tests/CMakeLists.txt": "78e93e272869a7a366600c5f78aeb2038e7e3a560309ceb0bf66e5c7c3a47612",
+    "qa/baselines/eigen-arnoldi/windows-x64-msvc19.51-sse2.json": "7e7dd82276e4874c9f5c9425e65687979cd9934ce3dc361cc847a30573a1a5a2",
+    "qa/baselines/eigen-arnoldi/linux-x64-gnu14.2-sse2.json": "18f3ebb0184028c777cbbf6fb42a9087457cd094b5358575a6b96dd192e7f3ea",
+    "docs/quality/result-changes/0002-linux-arnoldi-residual-bounds.md": "94f2bff3ff66b131a4a5301e6ad0ed5d54eaf194207dcde7f37a70450aa608ce",
+    ".cursor/rules/cpp.mdc": "a871e4962b87dafd1491cb7c5e8c8a82c25508a53018aac5ea96d4d276edb885",
+    ".cursor/rules/quality.mdc": "f075a6ea561ee1aca76b508648ba383cf44aead6dcf4d9334646f12f593fb474",
+    ".cursor/rules/numerics.mdc": "00a5ac8210ba8f804e112680daa3eaefbfadf453e859fd2027b44a5c6800ee08",
+    ".cursor/rules/powershell-shell.mdc": "6221093cfe777b97528e1d21e6d19e85af6e276fa02b1fc425bd5e25ee31bf25",
+    "docs/conventions.md": "096270529d63aa36a5c110863ea50d67dfc8c6c372d063d672296993b5d32656"
+  },
+  "artifact_references": [
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-canary-release.txt",
+      "sha256": "dc736683ce8c7aa83181d1593e63328c22b0badd03c74cb7c6d87b4096977f55",
+      "hint": "docs/verification/IM-00/im00-70/canary-release.txt"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-debug-numerics.log",
+      "sha256": "d975e56cd035f7c040c7992eca11fd619a81fa1a4c2912b43a3e1cad7b05b321",
+      "hint": "docs/verification/IM-00/im00-70/debug-numerics.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-debug-qa.log",
+      "sha256": "1f17afab33c65f66b8bb5dfceb4e8135f0a764d726d794b6de3d090a353a6718",
+      "hint": "docs/verification/IM-00/im00-70/debug-qa.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-format-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-00/im00-70/format-final.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-format-result.json",
+      "sha256": "98962a5885c7b842a768e885e9c26e6431048bd3277956c1836c4bfeeeb977f2",
+      "hint": "docs/verification/IM-00/im00-70/format-result.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-issue70-measurement-analysis.json",
+      "sha256": "1811e4b69cf18922852b07f6afda9b4c5284c0ae38c16752a37038f391858ea4",
+      "hint": "docs/verification/IM-00/im00-70/issue70-measurement-analysis.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-issue70-measurement-ram-supplement.json",
+      "sha256": "81478904e6330324c4a2e82a2874bbf2a5460637f9b45c61b1b7d34059ea6892",
+      "hint": "docs/verification/IM-00/im00-70/issue70-measurement-ram-supplement.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-analysis-before-review.json",
+      "sha256": "3e60ce6249d9d341ebfef111946d8e35b18ab4aeb85449a8c8006d05ef7c1191",
+      "hint": "docs/verification/IM-00/im00-70/measurement-analysis-before-review.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-mutation-redaction.json",
+      "sha256": "d6100b917fae938b4c46f870c493b1b96a06add58dda07a5997e1a41411c6c6a",
+      "hint": "docs/verification/IM-00/im00-70/mutation-redaction.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-mutation-summary.json",
+      "sha256": "9d45b81a05c9378e50ea18d2841e084a477839d954a4761b138bf222efef6d79",
+      "hint": "docs/verification/IM-00/im00-70/mutation-summary.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-mutations.zip",
+      "sha256": "05a3c963741ecae2195d41c3fb40376d3a9c1273ef16b491b1efaa8e7f92d07c",
+      "hint": "docs/verification/IM-00/im00-70/mutations.zip"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-redaction.json",
+      "sha256": "2edb2e0ce23fa017da57334f8311ee8665630cd05ab63edc024f858a801bad6e",
+      "hint": "docs/verification/IM-00/im00-70/redaction.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-release-numerics-assertions.log",
+      "sha256": "214271348ef358dbbde07872dbad986c633a6722ada8770b690755a03d010007",
+      "hint": "docs/verification/IM-00/im00-70/release-numerics-assertions.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-release-numerics.log",
+      "sha256": "b63476e268fbe4299e71952b5d8aca3487fe3e9867a2c388f0907cbecae0d6e8",
+      "hint": "docs/verification/IM-00/im00-70/release-numerics.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-release-qa.log",
+      "sha256": "d4e872634673333079aab238638f7f0c279f4cd44e82796cd6c069e75891dc99",
+      "hint": "docs/verification/IM-00/im00-70/release-qa.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-source-shadow-final.json",
+      "sha256": "a626744033d4dec07c415bafec7aa0b544465af312fd762e0a7250ccaa04aa64",
+      "hint": "docs/verification/IM-00/im00-70/source-shadow-final.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-source-shadow-final.log",
+      "sha256": "15e215378915d9ada1773af08236d0a080b99866169ba82a10715884379454d4",
+      "hint": "docs/verification/IM-00/im00-70/source-shadow-final.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-qa_eigen_arnoldi_main-04.json",
+      "sha256": "a0d8daeda23ea74cb0960431997b2f3355c609ccc99aa2b656c8d31dd951eadf",
+      "hint": "docs/verification/IM-00/im00-70/static-qa_eigen_arnoldi_main-04.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-qa_eigen_arnoldi_main-04.log",
+      "sha256": "15cf2b7feb66ee342876fa0e7f6cd52aa431c76c8c6b4dd0c8ac848a4563efc6",
+      "hint": "docs/verification/IM-00/im00-70/static-qa_eigen_arnoldi_main-04.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-source-snapshot.json",
+      "sha256": "158fb6653510714833bc3fc75a86736145f99d4c503864dc2e673138e557c857",
+      "hint": "docs/verification/IM-00/im00-70/static-source-snapshot.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-src_numerics_eigen_arnoldi-04.json",
+      "sha256": "9d2400a56443bb03c38f941642b18bc115adae873de566662c36b34c4b9970db",
+      "hint": "docs/verification/IM-00/im00-70/static-src_numerics_eigen_arnoldi-04.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-src_numerics_eigen_arnoldi-04.log",
+      "sha256": "15e215378915d9ada1773af08236d0a080b99866169ba82a10715884379454d4",
+      "hint": "docs/verification/IM-00/im00-70/static-src_numerics_eigen_arnoldi-04.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-tests_numerics_eigen_arnoldi_allocations_test-04.json",
+      "sha256": "c76e291ec7642e97aa2d7f23fe96f17873dd48d0f8eca649ec75fc622bdf110f",
+      "hint": "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_allocations_test-04.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-tests_numerics_eigen_arnoldi_allocations_test-04.log",
+      "sha256": "874ed31e3db7f4a91a431a6b41b51c407083af088b501033d89b7dc1832ae152",
+      "hint": "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_allocations_test-04.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-tests_numerics_eigen_arnoldi_test-04.json",
+      "sha256": "a0377fa34fd86655eda43d58b1f71ee5cda1d3ecdcd8efda828bb63665979035",
+      "hint": "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_test-04.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-static-tests_numerics_eigen_arnoldi_test-04.log",
+      "sha256": "d8bec415daa693e3afd3843e3e58567adac11dcf6c8ec7a775231df9c92a431c",
+      "hint": "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_test-04.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-ci-linux-canary.txt",
+      "sha256": "1598da7a362ab1d558ecae5e3589cf19cf3b5e3856f9d0524a001cea2fcd1eea",
+      "hint": "docs/verification/IM-00/im00-70/ci/linux-canary.txt"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-ci-linux-debug-excerpt.log",
+      "sha256": "388c4144b03816a73398d3dfeabe00b6a258c81347aa3cb7b3e0806c18c09f74",
+      "hint": "docs/verification/IM-00/im00-70/ci/linux-debug-excerpt.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-ci-linux-release-excerpt.log",
+      "sha256": "592059ab086bfa393ade2f244abb6cb6b49f60c1db057dc5b2b7e448ce67a7a3",
+      "hint": "docs/verification/IM-00/im00-70/ci/linux-release-excerpt.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-ci-linux-sanitize-excerpt.log",
+      "sha256": "63b26ed93300e99c41da1a87ba116d4359baab0e085122bf8958ed9251eae511",
+      "hint": "docs/verification/IM-00/im00-70/ci/linux-sanitize-excerpt.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-ci-linux-shadow-failure.log",
+      "sha256": "fa98760d0d5a96271ae21fa1367d01670d1454e20799d6f02a5585c14116c91b",
+      "hint": "docs/verification/IM-00/im00-70/ci/linux-shadow-failure.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-ci-platform-differences.json",
+      "sha256": "3c93515e70a6c51cbada169b0a2ed45aeb79d76a9ffdd4c411220ab8560d4d03",
+      "hint": "docs/verification/IM-00/im00-70/ci/platform-differences.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-build.py",
+      "sha256": "a15dbb7d61e2ac9186b8070b476e789dabeb45e8fbf8d0bfc65fe4881d8dcff2",
+      "hint": "docs/verification/IM-00/im00-70/measurement/build.py"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-commands.json",
+      "sha256": "f976de4e73624a2771e8cfdfc917ecdbc0a1cd24238a0644658feebf9b682148",
+      "hint": "docs/verification/IM-00/im00-70/measurement/commands.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-compile.log",
+      "sha256": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+      "hint": "docs/verification/IM-00/im00-70/measurement/compile.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-conditions.json",
+      "sha256": "1ccfc161118014d985d2b9a653207eb25af065a06de24a177154ad6c6de7ef02",
+      "hint": "docs/verification/IM-00/im00-70/measurement/conditions.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-execution.json",
+      "sha256": "6f222f4d44692e8158f6f29a5ff4e6e0e381256de5f09064cb73bde2195159c6",
+      "hint": "docs/verification/IM-00/im00-70/measurement/execution.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-link.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-00/im00-70/measurement/link.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-machine.json",
+      "sha256": "df0dd06fdc17b58da91d83ec92773abacaf70c8efcac82a4d0597a0152f254e5",
+      "hint": "docs/verification/IM-00/im00-70/measurement/machine.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-probe.cpp",
+      "sha256": "c5fbef809c50a54ee541edae5575e4650d1602a6f255561aaf72a7b202094705",
+      "hint": "docs/verification/IM-00/im00-70/measurement/probe.cpp"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-raw.log",
+      "sha256": "23756986009138513849f88a7e1e939595e673be62453864d40818c45c8f7991",
+      "hint": "docs/verification/IM-00/im00-70/measurement/raw.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-run.py",
+      "sha256": "7ba41336adc7e373fbe5154dea264d012327d9cd123772e8c7d332ea34e752f1",
+      "hint": "docs/verification/IM-00/im00-70/measurement/run.py"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-source-reference.json",
+      "sha256": "a8516339570572b8b00fcee2ca4ca6cb94ffffb2b6bed750bbd5edc852c42b47",
+      "hint": "docs/verification/IM-00/im00-70/measurement/source-reference.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-00/im00-70/measurement/stderr.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-summary.json",
+      "sha256": "3e965e9786d5a39bf4cd3aae45558e4643a300d4c58f956e7cb2cece3b4d4ce8",
+      "hint": "docs/verification/IM-00/im00-70/measurement/summary.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-build.py",
+      "sha256": "05bc80e93c3306ac0d80519b25f78a38ea53afe5acabc7f2608fe2f980faed0d",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/build.py"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-commands.json",
+      "sha256": "07b463fb4cf0c670093829b29b163ffe197eea1372079008a5e63a2db31cb4b1",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/commands.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-compile.log",
+      "sha256": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/compile.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-conditions.json",
+      "sha256": "19029bee065c6442a6e6e0fb80d9bf0be8973540a044d0364fdcf1df63255eae",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/conditions.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-execution.json",
+      "sha256": "022e988557ccffb066baeb5db9cd23dddbe796fcdf4f7b720969cedebe50da7c",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/execution.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-link.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/link.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-machine.json",
+      "sha256": "df0dd06fdc17b58da91d83ec92773abacaf70c8efcac82a4d0597a0152f254e5",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/machine.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-probe.cpp",
+      "sha256": "bd3cc283af7675b4cf6c4635d9e71b05975d6587f3dfc8350dec8ba8c814e3fb",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/probe.cpp"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-raw.log",
+      "sha256": "04f31eddbdb6d6e6a699bddd7fcb241fc22c6d16d0eeeb068d85cf9afd49dfda",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/raw.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-run.py",
+      "sha256": "7a41c969aca300a2f8db4a884525e92738fa7e479d88c3997bbe61c71fc7da6b",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/run.py"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-source-reference.json",
+      "sha256": "a8516339570572b8b00fcee2ca4ca6cb94ffffb2b6bed750bbd5edc852c42b47",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/source-reference.json"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/stderr.log"
+    },
+    {
+      "id": "im00-70-artifacts-docs-verification-IM-00-im00-70-measurement-cycles-summary.json",
+      "sha256": "0b4cb6e783b3aef395630f1aac520e6573571d8df6a85a8c0afddd5ec4230f81",
+      "hint": "docs/verification/IM-00/im00-70/measurement-cycles/summary.json"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-00/im00-70/canary-release.txt": "dc736683ce8c7aa83181d1593e63328c22b0badd03c74cb7c6d87b4096977f55",
+    "docs/verification/IM-00/im00-70/debug-numerics.log": "d975e56cd035f7c040c7992eca11fd619a81fa1a4c2912b43a3e1cad7b05b321",
+    "docs/verification/IM-00/im00-70/debug-qa.log": "1f17afab33c65f66b8bb5dfceb4e8135f0a764d726d794b6de3d090a353a6718",
+    "docs/verification/IM-00/im00-70/format-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-70/format-result.json": "98962a5885c7b842a768e885e9c26e6431048bd3277956c1836c4bfeeeb977f2",
+    "docs/verification/IM-00/im00-70/issue70-measurement-analysis.json": "1811e4b69cf18922852b07f6afda9b4c5284c0ae38c16752a37038f391858ea4",
+    "docs/verification/IM-00/im00-70/issue70-measurement-ram-supplement.json": "81478904e6330324c4a2e82a2874bbf2a5460637f9b45c61b1b7d34059ea6892",
+    "docs/verification/IM-00/im00-70/measurement-analysis-before-review.json": "3e60ce6249d9d341ebfef111946d8e35b18ab4aeb85449a8c8006d05ef7c1191",
+    "docs/verification/IM-00/im00-70/mutation-redaction.json": "d6100b917fae938b4c46f870c493b1b96a06add58dda07a5997e1a41411c6c6a",
+    "docs/verification/IM-00/im00-70/mutation-summary.json": "9d45b81a05c9378e50ea18d2841e084a477839d954a4761b138bf222efef6d79",
+    "docs/verification/IM-00/im00-70/mutations.zip": "05a3c963741ecae2195d41c3fb40376d3a9c1273ef16b491b1efaa8e7f92d07c",
+    "docs/verification/IM-00/im00-70/redaction.json": "2edb2e0ce23fa017da57334f8311ee8665630cd05ab63edc024f858a801bad6e",
+    "docs/verification/IM-00/im00-70/release-numerics-assertions.log": "214271348ef358dbbde07872dbad986c633a6722ada8770b690755a03d010007",
+    "docs/verification/IM-00/im00-70/release-numerics.log": "b63476e268fbe4299e71952b5d8aca3487fe3e9867a2c388f0907cbecae0d6e8",
+    "docs/verification/IM-00/im00-70/release-qa.log": "d4e872634673333079aab238638f7f0c279f4cd44e82796cd6c069e75891dc99",
+    "docs/verification/IM-00/im00-70/source-shadow-final.json": "a626744033d4dec07c415bafec7aa0b544465af312fd762e0a7250ccaa04aa64",
+    "docs/verification/IM-00/im00-70/source-shadow-final.log": "15e215378915d9ada1773af08236d0a080b99866169ba82a10715884379454d4",
+    "docs/verification/IM-00/im00-70/static-qa_eigen_arnoldi_main-04.json": "a0d8daeda23ea74cb0960431997b2f3355c609ccc99aa2b656c8d31dd951eadf",
+    "docs/verification/IM-00/im00-70/static-qa_eigen_arnoldi_main-04.log": "15cf2b7feb66ee342876fa0e7f6cd52aa431c76c8c6b4dd0c8ac848a4563efc6",
+    "docs/verification/IM-00/im00-70/static-source-snapshot.json": "158fb6653510714833bc3fc75a86736145f99d4c503864dc2e673138e557c857",
+    "docs/verification/IM-00/im00-70/static-src_numerics_eigen_arnoldi-04.json": "9d2400a56443bb03c38f941642b18bc115adae873de566662c36b34c4b9970db",
+    "docs/verification/IM-00/im00-70/static-src_numerics_eigen_arnoldi-04.log": "15e215378915d9ada1773af08236d0a080b99866169ba82a10715884379454d4",
+    "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_allocations_test-04.json": "c76e291ec7642e97aa2d7f23fe96f17873dd48d0f8eca649ec75fc622bdf110f",
+    "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_allocations_test-04.log": "874ed31e3db7f4a91a431a6b41b51c407083af088b501033d89b7dc1832ae152",
+    "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_test-04.json": "a0377fa34fd86655eda43d58b1f71ee5cda1d3ecdcd8efda828bb63665979035",
+    "docs/verification/IM-00/im00-70/static-tests_numerics_eigen_arnoldi_test-04.log": "d8bec415daa693e3afd3843e3e58567adac11dcf6c8ec7a775231df9c92a431c",
+    "docs/verification/IM-00/im00-70/ci/linux-canary.txt": "1598da7a362ab1d558ecae5e3589cf19cf3b5e3856f9d0524a001cea2fcd1eea",
+    "docs/verification/IM-00/im00-70/ci/linux-debug-excerpt.log": "388c4144b03816a73398d3dfeabe00b6a258c81347aa3cb7b3e0806c18c09f74",
+    "docs/verification/IM-00/im00-70/ci/linux-release-excerpt.log": "592059ab086bfa393ade2f244abb6cb6b49f60c1db057dc5b2b7e448ce67a7a3",
+    "docs/verification/IM-00/im00-70/ci/linux-sanitize-excerpt.log": "63b26ed93300e99c41da1a87ba116d4359baab0e085122bf8958ed9251eae511",
+    "docs/verification/IM-00/im00-70/ci/linux-shadow-failure.log": "fa98760d0d5a96271ae21fa1367d01670d1454e20799d6f02a5585c14116c91b",
+    "docs/verification/IM-00/im00-70/ci/platform-differences.json": "3c93515e70a6c51cbada169b0a2ed45aeb79d76a9ffdd4c411220ab8560d4d03",
+    "docs/verification/IM-00/im00-70/measurement/build.py": "a15dbb7d61e2ac9186b8070b476e789dabeb45e8fbf8d0bfc65fe4881d8dcff2",
+    "docs/verification/IM-00/im00-70/measurement/commands.json": "f976de4e73624a2771e8cfdfc917ecdbc0a1cd24238a0644658feebf9b682148",
+    "docs/verification/IM-00/im00-70/measurement/compile.log": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+    "docs/verification/IM-00/im00-70/measurement/conditions.json": "1ccfc161118014d985d2b9a653207eb25af065a06de24a177154ad6c6de7ef02",
+    "docs/verification/IM-00/im00-70/measurement/execution.json": "6f222f4d44692e8158f6f29a5ff4e6e0e381256de5f09064cb73bde2195159c6",
+    "docs/verification/IM-00/im00-70/measurement/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-70/measurement/machine.json": "df0dd06fdc17b58da91d83ec92773abacaf70c8efcac82a4d0597a0152f254e5",
+    "docs/verification/IM-00/im00-70/measurement/probe.cpp": "c5fbef809c50a54ee541edae5575e4650d1602a6f255561aaf72a7b202094705",
+    "docs/verification/IM-00/im00-70/measurement/raw.log": "23756986009138513849f88a7e1e939595e673be62453864d40818c45c8f7991",
+    "docs/verification/IM-00/im00-70/measurement/run.py": "7ba41336adc7e373fbe5154dea264d012327d9cd123772e8c7d332ea34e752f1",
+    "docs/verification/IM-00/im00-70/measurement/source-reference.json": "a8516339570572b8b00fcee2ca4ca6cb94ffffb2b6bed750bbd5edc852c42b47",
+    "docs/verification/IM-00/im00-70/measurement/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-70/measurement/summary.json": "3e965e9786d5a39bf4cd3aae45558e4643a300d4c58f956e7cb2cece3b4d4ce8",
+    "docs/verification/IM-00/im00-70/measurement-cycles/build.py": "05bc80e93c3306ac0d80519b25f78a38ea53afe5acabc7f2608fe2f980faed0d",
+    "docs/verification/IM-00/im00-70/measurement-cycles/commands.json": "07b463fb4cf0c670093829b29b163ffe197eea1372079008a5e63a2db31cb4b1",
+    "docs/verification/IM-00/im00-70/measurement-cycles/compile.log": "25d4f66c7c01d5b35c220cb97ffdd1608405f4ab45160497e6cc7ea3079676cf",
+    "docs/verification/IM-00/im00-70/measurement-cycles/conditions.json": "19029bee065c6442a6e6e0fb80d9bf0be8973540a044d0364fdcf1df63255eae",
+    "docs/verification/IM-00/im00-70/measurement-cycles/execution.json": "022e988557ccffb066baeb5db9cd23dddbe796fcdf4f7b720969cedebe50da7c",
+    "docs/verification/IM-00/im00-70/measurement-cycles/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-70/measurement-cycles/machine.json": "df0dd06fdc17b58da91d83ec92773abacaf70c8efcac82a4d0597a0152f254e5",
+    "docs/verification/IM-00/im00-70/measurement-cycles/probe.cpp": "bd3cc283af7675b4cf6c4635d9e71b05975d6587f3dfc8350dec8ba8c814e3fb",
+    "docs/verification/IM-00/im00-70/measurement-cycles/raw.log": "04f31eddbdb6d6e6a699bddd7fcb241fc22c6d16d0eeeb068d85cf9afd49dfda",
+    "docs/verification/IM-00/im00-70/measurement-cycles/run.py": "7a41c969aca300a2f8db4a884525e92738fa7e479d88c3997bbe61c71fc7da6b",
+    "docs/verification/IM-00/im00-70/measurement-cycles/source-reference.json": "a8516339570572b8b00fcee2ca4ca6cb94ffffb2b6bed750bbd5edc852c42b47",
+    "docs/verification/IM-00/im00-70/measurement-cycles/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-00/im00-70/measurement-cycles/summary.json": "0b4cb6e783b3aef395630f1aac520e6573571d8df6a85a8c0afddd5ec4230f81"
+  },
+  "reference_format_note": "idとsha256が正本、hintは探索用。sources/artifactsは現行checker互換写像。",
+  "mutations": {
+    "owner": "independent peer review agent",
+    "source_cpp_sha256": "5ec906dacdc80948e16303843b9b4f5697790903cd522deba06095c919089cd7",
+    "snapshot_commit": "c829cd28a9c56325efcdcc79848ea17409e24259",
+    "control": {
+      "cases": 23,
+      "assertions": 625,
+      "exit_code": 0
+    },
+    "mutants": [
+      "producer absolute error ignored",
+      "last required consumer omitted",
+      "selected Ritz roots to original restriction all-k matching omitted",
+      "inverse candidate certificate identity ignored",
+      "actual returned canonical phase omitted"
+    ],
+    "compile_link_exit_codes": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "runtime_exit_codes": [
+      42,
+      42,
+      42,
+      42,
+      42
+    ],
+    "input_hash_count": 60,
+    "input_mismatches": 0,
+    "original_archive_producer_members": 0,
+    "explicit_producer_symbols_per_map": 56,
+    "maps": 6,
+    "timeout_count": 0,
+    "public_archive": "mutations.zip",
+    "note": "コンパイル失敗を検出に数えず、全5件ともCatch assertion失敗で検出。原raw/archiveは不変、公開用派生束は106entry、binaryを除外し通常／JSON／MSVC encoded account pathを匿名化。"
+  },
+  "post_source_changes": [
+    {
+      "commit": "1ee358254acbcc793df8c56287ad1a3a71caad13",
+      "change": "Full最終証拠・追跡tool・基準の通常merge、Arnoldi数値13file不変。"
+    },
+    {
+      "commit": "dd10c0d4743825349929c20196d77338c44af30c",
+      "change": "GCC14実CIのshadow診断へ、private ctor引数settings/limitsをconfigured_settings/configured_limitsへrenameした。初期化値・順序・算術・公開型は不変。source TU1件の追加tidy exit0。既存製品試験・変異はこのrenameのためだけに繰り返さない。"
+    }
+  ],
+  "ci_initial": {
+    "head": "c8e21e6af43ac02b629562e75204eff071f4ba92",
+    "run": 43808723168,
+    "linux_debug_job": 133105391033,
+    "result": "QA前にGCC14 -Werror=shadowで失敗。settings/limitsの同名引数が原因。QA未実行なのでLinux数値合格とは数えない。"
+  },
+  "claimed_state": "実装が採用仕様に適合。内部certificate・解析例の合格とQA上の数値認定を区別し、親Issue15の状態主張を超えない。",
+  "qa_platforms": {
+    "windows": {
+      "platform": "windows-x64-msvc19.51-sse2",
+      "source_commit": "c829cd28a9c56325efcdcc79848ea17409e24259",
+      "actual_values": 8
+    },
+    "linux": {
+      "platform": "linux-x64-gnu14.2-sse2",
+      "head_commit": "dd10c0d4743825349929c20196d77338c44af30c",
+      "ci_merge_commit": "60abe0e143ca7057af0400139ccc0e04225963bb",
+      "run": 43810050348,
+      "jobs": {
+        "Debug": 133109943424,
+        "Release": 133109943434,
+        "Sanitize": 133109943464
+      },
+      "per_job_passed": 62,
+      "per_job_total": 63,
+      "sole_failure": "新規qa.eigen_arnoldiの基準未登録。数値・確保・Full比較は成功。登録後CI成功を先取りしない。",
+      "actual_values": 8
+    },
+    "comparison": "固有値実虚4量＋正規化上界2量の計6量はbit一致。原残差上界2量のみ異なる。",
+    "result_change_record": "0002-linux-arnoldi-residual-bounds.md",
+    "owner_approval": "提案。PR73レビュー／mergeで所有者が判断する。承認済みとはしない。",
+    "budgets_unchanged": true
+  },
+  "measurement": {
+    "source_commit": "dd10c0d4743825349929c20196d77338c44af30c",
+    "source_clean_build_info": true,
+    "configuration": "Release",
+    "routes": [
+      "real8-pairs-both",
+      "real8-cluster-both",
+      "real96-pairs",
+      "complex6-pairs-both"
+    ],
+    "rounds": 3,
+    "first_samples": 111,
+    "supplement_samples": 111,
+    "source_owner": "root agent; independent read-only review by agent4",
+    "scope": "合成作用の容量工程基準。高速化・製品規模・RSS hard cap・実務性能を主張しない。",
+    "timing_exclusions": "workspace準備、比較、RSS標本、破棄は4工程外。4工程はcall全体の網羅計測でもない。whole-call対照でscope外を別表示し、特定関数へ費用を帰属しない。",
+    "word_comparison": "各run内でwarmupを含め全返却値/vector/Q/T/mapping/metric/sensitivityの数値word一致。2run間で全bit比較したとは主張しない。",
+    "memory": "Plan計上、プロセス常駐量標本と生涯peakを区別。過去route・保持比較領域も含みphaseのpeakと呼ばない。搭載RAMは別追補でWin32_PhysicalMemory.Capacity合計を保存。",
+    "supplement": "壁時計の単発上振れを受け、別source/条件hashのQueryThreadCycleTime＋whole-call測定を1回追加。cyclesを時間へ換算せず、OS等の原因へ断定しない。元111raw不変。",
+    "analysis_artifact": "issue70-measurement-analysis.json"
+  },
+  "reviews": {
+    "source": "rootは固定14file＋phase6必須成功／timingsコメントの限定差分を確認し、未解決重大指摘なし。",
+    "measurement": "agent4が111×2標本、16参照hash、全中央値／差分、Linux3構成・上界2量差・解析根差、ctor引数名だけのGit差分を独立再集計／通読。outlierをroute内最大へ限定、seedを内部作業用正規化へ明確化した。",
+    "japanese": "rootがREADME・numerics／powershell教訓・conventions・cpp追記・PR本文を独立通読。0002はagent12が独立通読。Claimed stateはQA数値認定をcheckしない。"
+  }
+}

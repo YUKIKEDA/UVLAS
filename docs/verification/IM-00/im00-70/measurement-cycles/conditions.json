@@ -1,0 +1,63 @@
+{
+  "source_commit": "dd10c0d4743825349929c20196d77338c44af30c",
+  "configuration": "Release",
+  "compile_method": "QA target flags, private source/object/PDB and executable; original libraries read-only",
+  "threads": 1,
+  "affinity": "lowest eligible logical CPU, actual child mask printed and checked",
+  "rounds": 3,
+  "warmup": "one extraction per route per round, compared but not recorded as measured sample",
+  "stage_order": [
+    "preparation",
+    "krylov",
+    "qualification",
+    "subspace"
+  ],
+  "timing_exclusions": [
+    "seed and units construction",
+    "Workspace::create",
+    "RSS query",
+    "numerical-word comparison",
+    "result destruction"
+  ],
+  "process_memory_scope": "whole process including controls and previous routes; peak is process lifetime, not a route peak or product hard bound",
+  "fixed_budgets": {
+    "original_residual": 1e-12,
+    "normalization_or_Gram": 1e-12,
+    "backend_tolerance": 1e-14,
+    "max_backend_iterations": 100
+  },
+  "files": {
+    "out/issue70-measure-cycles/probe.cpp": "bd3cc283af7675b4cf6c4635d9e71b05975d6587f3dfc8350dec8ba8c814e3fb",
+    "out/issue70-measure-cycles/probe.obj": "de3b8fd1673c52b599bda5ae4d49b4a4960ac3af7d3e36cf265ba4891c3f6e5a",
+    "out/issue70-measure-cycles/probe.exe": "e74c29eba5672bc692e098dd77f0ebe005374ba6f78e97c0363da10841d817cb",
+    "out/issue70-measure-cycles/commands.json": "5066891fe8df37eda6a88f5defc03fbfcd272c3e4bf6c3add895e7f2a4c83906",
+    "out/issue70-release/uvlas_numerics.lib": "de5b663ccbaacf5518d7c1800f4bf5d00e8b2afc16ff1f431dc8152ba04c9265",
+    "out/issue70-release/uvlas_core.lib": "e09c18eabc74f37d07e96087227c02755d5bfea0d45410ed0ba64c59f87e0084",
+    "include/uvlas/core/build_info.hpp": "3b6b67202cb908188bd1400f49030ac577583bb6b2eccb1c47060dc92d4e4a89",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/error_certificate.hpp": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "include/uvlas/core/identifier.hpp": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+    "include/uvlas/core/instrumentation.hpp": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/state.hpp": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "include/uvlas/numerics/dense_solve.hpp": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+    "include/uvlas/numerics/eigen_action.hpp": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "ffeacdc5be13604fe963caa9a2779252dd8528ae7741efbf3f8d1b3f3fdb3ebe",
+    "include/uvlas/numerics/eigen_common.hpp": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+    "include/uvlas/numerics/eigen_full.hpp": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+    "include/uvlas/numerics/eigen_generalized.hpp": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+    "include/uvlas/numerics/eigen_metrics.hpp": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+    "include/uvlas/numerics/gmres_solve.hpp": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "include/uvlas/numerics/sparse_solve.hpp": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "out/issue70-measure-cycles/build.py": "05bc80e93c3306ac0d80519b25f78a38ea53afe5acabc7f2608fe2f980faed0d",
+    "out/issue70-measure-cycles/run.py": "7a41c969aca300a2f8db4a884525e92738fa7e479d88c3997bbe61c71fc7da6b",
+    "out/issue70-measure-cycles/machine.json": "df0dd06fdc17b58da91d83ec92773abacaf70c8efcac82a4d0597a0152f254e5",
+    "out/issue70-measure-cycles/source-reference.json": "a8516339570572b8b00fcee2ca4ca6cb94ffffb2b6bed750bbd5edc852c42b47"
+  },
+  "supplement": "One bounded rerun adds CPU cycles and whole extraction wall outside product phase timers. CPU cycles are not converted to time. Original first-run evidence remains unchanged."
+}

@@ -7,6 +7,8 @@ alwaysApply: true
 
 決定の本文は [品質保証計画](../../docs/quality/quality-plan.md)（QA-01〜10）。この規則は、毎回の変更で守ることである。
 
+- PRの `Claimed state` は完了条件が指定する範囲に従う。内部certificateや解析例の合格だけで、QA上の「数値認定」を自動でcheckしない。
+
 ## 追跡
 
 - 数値試験の `TEST_CASE` は、確かめる決定のIDをタグに持つ：`"[negative][N4-08]"`。IDのない数値試験を書かない。

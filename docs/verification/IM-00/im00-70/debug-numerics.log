@@ -1,0 +1,19 @@
+[OUTPUT] 
+Internal ctest changing into directory: <repo>/out/issue70-build
+
+[HANDLER_OUTPUT] 
+Test project <repo>/out/issue70-build
+
+    Start 46: numerics.eigen_arnoldi_allocations
+1/2 Test #46: numerics.eigen_arnoldi_allocations ...   Passed    0.04 sec
+    Start 47: numerics.eigen_arnoldi
+2/2 Test #47: numerics.eigen_arnoldi ...............   Passed    0.77 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+negative        =   0.80 sec*proc (2 tests)
+unit            =   0.80 sec*proc (2 tests)
+verification    =   0.80 sec*proc (2 tests)
+
+Total Test time (real) =   0.81 sec

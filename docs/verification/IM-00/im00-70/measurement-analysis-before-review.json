@@ -1,0 +1,139 @@
+{
+  "scope": "Windows単一論理CPUでの合成4経路の工程基準。高速化、製品規模、RSS hard cap、実務受入を主張しない。",
+  "source_commit": "dd10c0d4743825349929c20196d77338c44af30c",
+  "source_clean": true,
+  "runs": [
+    {
+      "id": "first",
+      "samples": 111,
+      "summary_hint": "out/issue70-measure/summary.json"
+    },
+    {
+      "id": "cycles-supplement",
+      "samples": 111,
+      "summary_hint": "out/issue70-measure-cycles/summary.json"
+    }
+  ],
+  "controls": "各route・各roundのwarmup1回も含め、各run内で全返却固有値/vector/Q/T/mapping、要求metric上界とpair norm下界、sensitivity種別/値のbit列を比較し全て一致。111出力行はwarmupを含まない。二つのrun間で全bit列を比較したという主張ではない。",
+  "whole_call_scope": {
+    "real8-pairs-both": {
+      "whole_call_median_ns": 547750.0,
+      "four_scope_sum_median_ns": 400250.0,
+      "outside_four_scopes_median_ns": 146300.0
+    },
+    "real8-cluster-both": {
+      "whole_call_median_ns": 1152500,
+      "four_scope_sum_median_ns": 1149600,
+      "outside_four_scopes_median_ns": 2900
+    },
+    "real96-pairs": {
+      "whole_call_median_ns": 36052900,
+      "four_scope_sum_median_ns": 30033300,
+      "outside_four_scopes_median_ns": 6019600
+    },
+    "complex6-pairs-both": {
+      "whole_call_median_ns": 334700,
+      "four_scope_sum_median_ns": 300100,
+      "outside_four_scopes_median_ns": 33900
+    }
+  },
+  "scope_note": "製品4scopeはcall全体の網羅計測ではない。差分にはsolver構築・seed準備・Ritz値/物理vector変換・phase・共役closure・左右対応・最終診断等のscope外処理が含まれる。特定関数だけの費用へ帰属しない。workspace作成・RSS query・比較・破棄はcall外。stage.callsは工程scopeの完了数で、operatorの適用回数ではない。",
+  "wall_outlier": {
+    "first_qualification_max_ns": 2120900,
+    "supplement_qualification_max_ns": 993000,
+    "supplement_median_wall_ns": 547750.0,
+    "supplement_median_thread_cycles": 1361318.5,
+    "largest_wall_sample": {
+      "round": 0,
+      "repeat": 22,
+      "wall_ns": 1172600,
+      "thread_cycles": 1394264,
+      "wall_over_median": 2.1407576449109995,
+      "cycles_over_median": 1.024201169674841
+    },
+    "interpretation": "追加の最大壁時計標本は中央値の約2.14倍だが、thread cycleは約1.024倍だった。壁時計の上振れを同率のCPU cycle増加と扱えないことを実測した。CPU cyclesを時間へ換算せず、OSの特定事象や個別関数へ原因を断定しない。元の最大標本も除外せず全rawとmin/median/maxを残す。安定した高速化比や実務性能は主張しない。"
+  },
+  "resource_scope": "Planはworkspace/resultの所有payload。RSSとpeakは比較用mapや過去routeを含むプロセス全体であり、route専用peak、外部backendの実確保上限ではない。",
+  "references": [
+    {
+      "id": "issue70-measure-probe.cpp",
+      "sha256": "c5fbef809c50a54ee541edae5575e4650d1602a6f255561aaf72a7b202094705",
+      "hint": "out/issue70-measure/probe.cpp"
+    },
+    {
+      "id": "issue70-measure-build.py",
+      "sha256": "a15dbb7d61e2ac9186b8070b476e789dabeb45e8fbf8d0bfc65fe4881d8dcff2",
+      "hint": "out/issue70-measure/build.py"
+    },
+    {
+      "id": "issue70-measure-run.py",
+      "sha256": "7ba41336adc7e373fbe5154dea264d012327d9cd123772e8c7d332ea34e752f1",
+      "hint": "out/issue70-measure/run.py"
+    },
+    {
+      "id": "issue70-measure-conditions.json",
+      "sha256": "1ccfc161118014d985d2b9a653207eb25af065a06de24a177154ad6c6de7ef02",
+      "hint": "out/issue70-measure/conditions.json"
+    },
+    {
+      "id": "issue70-measure-raw.log",
+      "sha256": "23756986009138513849f88a7e1e939595e673be62453864d40818c45c8f7991",
+      "hint": "out/issue70-measure/raw.log"
+    },
+    {
+      "id": "issue70-measure-summary.json",
+      "sha256": "3e965e9786d5a39bf4cd3aae45558e4643a300d4c58f956e7cb2cece3b4d4ce8",
+      "hint": "out/issue70-measure/summary.json"
+    },
+    {
+      "id": "issue70-measure-execution.json",
+      "sha256": "6f222f4d44692e8158f6f29a5ff4e6e0e381256de5f09064cb73bde2195159c6",
+      "hint": "out/issue70-measure/execution.json"
+    },
+    {
+      "id": "issue70-measure-machine.json",
+      "sha256": "df0dd06fdc17b58da91d83ec92773abacaf70c8efcac82a4d0597a0152f254e5",
+      "hint": "out/issue70-measure/machine.json"
+    },
+    {
+      "id": "issue70-measure-source-reference.json",
+      "sha256": "a8516339570572b8b00fcee2ca4ca6cb94ffffb2b6bed750bbd5edc852c42b47",
+      "hint": "out/issue70-measure/source-reference.json"
+    },
+    {
+      "id": "issue70-measure-cycles-probe.cpp",
+      "sha256": "bd3cc283af7675b4cf6c4635d9e71b05975d6587f3dfc8350dec8ba8c814e3fb",
+      "hint": "out/issue70-measure-cycles/probe.cpp"
+    },
+    {
+      "id": "issue70-measure-cycles-build.py",
+      "sha256": "05bc80e93c3306ac0d80519b25f78a38ea53afe5acabc7f2608fe2f980faed0d",
+      "hint": "out/issue70-measure-cycles/build.py"
+    },
+    {
+      "id": "issue70-measure-cycles-run.py",
+      "sha256": "7a41c969aca300a2f8db4a884525e92738fa7e479d88c3997bbe61c71fc7da6b",
+      "hint": "out/issue70-measure-cycles/run.py"
+    },
+    {
+      "id": "issue70-measure-cycles-conditions.json",
+      "sha256": "19029bee065c6442a6e6e0fb80d9bf0be8973540a044d0364fdcf1df63255eae",
+      "hint": "out/issue70-measure-cycles/conditions.json"
+    },
+    {
+      "id": "issue70-measure-cycles-raw.log",
+      "sha256": "04f31eddbdb6d6e6a699bddd7fcb241fc22c6d16d0eeeb068d85cf9afd49dfda",
+      "hint": "out/issue70-measure-cycles/raw.log"
+    },
+    {
+      "id": "issue70-measure-cycles-summary.json",
+      "sha256": "0b4cb6e783b3aef395630f1aac520e6573571d8df6a85a8c0afddd5ec4230f81",
+      "hint": "out/issue70-measure-cycles/summary.json"
+    },
+    {
+      "id": "issue70-measure-cycles-execution.json",
+      "sha256": "022e988557ccffb066baeb5db9cd23dddbe796fcdf4f7b720969cedebe50da7c",
+      "hint": "out/issue70-measure-cycles/execution.json"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+Start testing: Nov 16 14:08 ���� (�W����)
+----------------------------------------------------------
+46/63 Testing: numerics.eigen_arnoldi_allocations
+46/63 Test: numerics.eigen_arnoldi_allocations
+Command: "<repo>/out/issue70-release/tests/uvlas_test_numerics_eigen_arnoldi_allocations.exe"
+Directory: <repo>/out/issue70-release/tests
+"numerics.eigen_arnoldi_allocations" start time: Nov 16 14:08 ���� (�W����)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2378467688
+===============================================================================
+All tests passed (35 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"numerics.eigen_arnoldi_allocations" end time: Nov 16 14:08 ���� (�W����)
+"numerics.eigen_arnoldi_allocations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/63 Testing: numerics.eigen_arnoldi
+47/63 Test: numerics.eigen_arnoldi
+Command: "<repo>/out/issue70-release/tests/uvlas_test_numerics_eigen_arnoldi.exe"
+Directory: <repo>/out/issue70-release/tests
+"numerics.eigen_arnoldi" start time: Nov 16 14:08 ���� (�W����)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 1424848600
+===============================================================================
+All tests passed (625 assertions in 23 test cases)
+
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"numerics.eigen_arnoldi" end time: Nov 16 14:08 ���� (�W����)
+"numerics.eigen_arnoldi" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 16 14:08 ���� (�W����)
+
+negative =   0.37 sec*proc
+
+unit =   0.37 sec*proc
+
+verification =   0.37 sec*proc
+

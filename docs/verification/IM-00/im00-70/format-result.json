@@ -1,0 +1,20 @@
+{
+  "tool": "clang-format 21.1.2",
+  "files": [
+    "include/uvlas/numerics/eigen_arnoldi.hpp",
+    "src/numerics/eigen_arnoldi.cpp",
+    "src/numerics/eigen_arnoldi_build.hpp",
+    "src/numerics/eigen_arnoldi_cluster.hpp",
+    "src/numerics/eigen_arnoldi_data.hpp",
+    "src/numerics/eigen_arnoldi_engine.hpp",
+    "src/numerics/eigen_arnoldi_entry.hpp",
+    "src/numerics/eigen_arnoldi_extract.hpp",
+    "src/numerics/eigen_arnoldi_native.hpp",
+    "src/numerics/eigen_arnoldi_qualify.hpp",
+    "tests/numerics/eigen_arnoldi_allocations_test.cpp",
+    "tests/numerics/eigen_arnoldi_test.cpp",
+    "qa/eigen_arnoldi/main.cpp"
+  ],
+  "exit_code": 0,
+  "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

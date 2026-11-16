@@ -1,0 +1,39 @@
+{
+  "compile": [
+    "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe",
+    "/nologo",
+    "/TP",
+    "-DNOMINMAX",
+    "-DWIN32_LEAN_AND_MEAN",
+    "-I<repo>\\include",
+    "/DWIN32",
+    "/D_WINDOWS",
+    "/EHsc",
+    "/O2",
+    "/Ob2",
+    "/DNDEBUG",
+    "/std:c++23preview",
+    "-MD",
+    "/W4",
+    "/permissive-",
+    "/utf-8",
+    "/Zc:__cplusplus",
+    "/fp:strict",
+    "/WX",
+    "/Fo<repo>\\out\\issue70-measure-cycles\\probe.obj",
+    "/Fd<repo>\\out\\issue70-measure-cycles\\probe.pdb",
+    "/FS",
+    "-c",
+    "<repo>\\out\\issue70-measure-cycles\\probe.cpp"
+  ],
+  "link": [
+    "link.exe",
+    "/nologo",
+    "<repo>\\out\\issue70-measure-cycles\\probe.obj",
+    "<repo>\\out\\issue70-release\\uvlas_numerics.lib",
+    "<repo>\\out\\issue70-release\\uvlas_core.lib",
+    "psapi.lib",
+    "/OUT:<repo>\\out\\issue70-measure-cycles\\probe.exe",
+    "/PDB:<repo>\\out\\issue70-measure-cycles\\link.pdb"
+  ]
+}
