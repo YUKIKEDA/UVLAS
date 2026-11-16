@@ -341,7 +341,11 @@ assess_schur_metrics(core::Index rows, core::Index columns, WordView<Scalar> bas
                     const auto absolute = word_magnitude(triangular.values, i + j * k);
                     if (!absolute)
                         return forward_failure(context, absolute);
-                    if (absolute->upper != 0 || triangular.absolute_error_upper[i + j * k] != 0)
+                    // Nontriangular actual words violate the input structure;
+                    // uncertainty around an actual zero is an enclosure failure.
+                    if (absolute->upper != 0)
+                        return fail(context, FailureCode::InvalidInput);
+                    if (triangular.absolute_error_upper[i + j * k] != 0)
                         return fail(context, FailureCode::PrecisionUnresolved);
                 }
             }
