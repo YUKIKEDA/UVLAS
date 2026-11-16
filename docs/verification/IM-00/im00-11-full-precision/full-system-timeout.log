@@ -1,0 +1,24 @@
+Start testing: Nov 16 19:38 東京 (標準時)
+----------------------------------------------------------
+1/1 Testing: numerics.foundation_precision_system
+1/1 Test: numerics.foundation_precision_system
+Command: "<workspace>/out/issue15-full-run/full4096.exe"
+Directory: <workspace>/out/issue15-full-run
+"numerics.foundation_precision_system" start time: Nov 16 19:38 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2101211800
+full4096 product column=0 precision=TwoWord relative_l2=1.8787837741576942e-26 backward_upper=5.9322768322772338e-31 maximum_observation_error=1.7058318572850849e-15
+full4096 product column=1 precision=TwoWord relative_l2=1.5766713658745058e-26 backward_upper=6.5393863605902476e-31 maximum_observation_error=1.2692909677149927e-14
+full4096 product column=2 precision=Binary64 relative_l2=8.4651605062917673e-12 backward_upper=8.4857747328035261e-17 maximum_observation_error=3.2610458055808647e-15
+full4096 reference column=0 retained_relative_l2=5.1036117420664544e-23 projected_relative_l2=1.7098877104694566e-11 retained_backward_upper=9.0836004314219918e-28 retained_maximum_observation_error=1.7058318575612564e-15
+full4096 reference column=1 retained_relative_l2=6.6442863736821129e-23 projected_relative_l2=1.5327253204195513e-11 retained_backward_upper=8.7722891102355969e-28 retained_maximum_observation_error=1.2692909663103185e-14
+<end of output>
+Test time = 1200.03 sec
+----------------------------------------------------------
+Test Failed.
+"numerics.foundation_precision_system" end time: Nov 16 19:58 東京 (標準時)
+"numerics.foundation_precision_system" time elapsed: 00:20:00
+----------------------------------------------------------
+
+End testing: Nov 16 19:58 東京 (標準時)

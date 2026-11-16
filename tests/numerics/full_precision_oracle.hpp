@@ -287,13 +287,6 @@ inline ExactComplex exact_complex_dot(std::span<const Complex> coefficients,
     }
     return {dyadic(real, 504), dyadic(imag, 504)};
 }
-inline Rational squared_distance(const ExactComplex& value, Complex reference) {
-    detail::require(std::isfinite(reference.real()) && std::isfinite(reference.imag()),
-                    "Nonfinite frozen observation");
-    const Rational real = value.real - Rational{reference.real()};
-    const Rational imag = value.imag - Rational{reference.imag()};
-    return real * real + imag * imag;
-}
 inline double observation_error_upper(std::span<const Complex> coefficients,
                                       std::span<const Complex> high, std::span<const Complex> low,
                                       Complex reference, double scale) {

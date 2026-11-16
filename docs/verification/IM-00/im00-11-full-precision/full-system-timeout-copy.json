@@ -1,0 +1,10 @@
+{
+  "schema": "uvlas.execution-log-copy/1",
+  "source_commit": "cb8503229c1781f8c67e9bb1494a38a0521c4452",
+  "original_raw_preserved": true,
+  "log_encoding": "cp932",
+  "original_sha256": "f983318a5000e3d5bef3afa212b7682e662416656294762611065df4e4713ceb",
+  "published_sha256": "45b4ed402838e809f267a086c138d59f5f14eb460c72e4f63809d87b626b9688",
+  "replacements": 2,
+  "reason": "Replace only the private workspace prefix; preserve all numerical output and line endings."
+}

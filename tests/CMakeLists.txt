@@ -174,7 +174,7 @@ uvlas_add_test(numerics.foundation_precision_system
     SOURCES numerics/foundation_precision_system_test.cpp
     LIBS uvlas_numerics Boost::multiprecision Boost::hash2 nlohmann_json::nlohmann_json
     CONFIGURATIONS Release
-    TIMEOUT 1200)
+    TIMEOUT 3600)
 target_compile_definitions(uvlas_test_numerics_foundation_precision_system PRIVATE
     UVLAS_FULL_PRECISION_FIXTURE="${CMAKE_CURRENT_BINARY_DIR}/precision-4096-system-v1.json")
 

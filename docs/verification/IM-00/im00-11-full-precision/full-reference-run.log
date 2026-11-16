@@ -1,0 +1,26 @@
+Start testing: Nov 16 19:59 東京 (標準時)
+----------------------------------------------------------
+1/1 Testing: numerics.foundation_precision_system.reference
+1/1 Test: numerics.foundation_precision_system.reference
+Command: "<workspace>/out/issue15-reference-run/full4096.exe" "Full frozen TwoWord reference*"
+Directory: <workspace>/out/issue15-reference-run
+"numerics.foundation_precision_system.reference" start time: Nov 16 19:59 東京 (標準時)
+Output:
+----------------------------------------------------------
+Filters: "Full frozen TwoWord reference*"
+Randomness seeded to: 646558043
+full4096 reference column=0 retained_relative_l2=5.1036117420664544e-23 projected_relative_l2=1.7098877104694566e-11 retained_backward_upper=9.0836004314219918e-28 retained_maximum_observation_error=1.7058318575612564e-15
+full4096 reference column=1 retained_relative_l2=6.6442863736821129e-23 projected_relative_l2=1.5327253204195513e-11 retained_backward_upper=8.7722891102355969e-28 retained_maximum_observation_error=1.2692909663103185e-14
+full4096 reference column=2 retained_relative_l2=5.3762681536673336e-23 projected_relative_l2=8.4651605062917673e-12 retained_backward_upper=9.5314748097410668e-28 retained_maximum_observation_error=3.8466095709320788e-14
+===============================================================================
+All tests passed (33 assertions in 1 test case)
+
+<end of output>
+Test time = 270.93 sec
+----------------------------------------------------------
+Test Passed.
+"numerics.foundation_precision_system.reference" end time: Nov 16 20:04 東京 (標準時)
+"numerics.foundation_precision_system.reference" time elapsed: 00:04:30
+----------------------------------------------------------
+
+End testing: Nov 16 20:04 東京 (標準時)
