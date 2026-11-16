@@ -272,3 +272,15 @@ uvlas_add_test(numerics.linear_candidate LABELS unit negative verification
 target_include_directories(uvlas_test_numerics_linear_candidate PRIVATE "${PROJECT_SOURCE_DIR}/src/numerics")
 uvlas_add_test(numerics.direct_progress LABELS unit negative verification
     SOURCES numerics/direct_progress_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+
+uvlas_add_test(numerics.eigen_common LABELS unit negative verification
+    SOURCES numerics/eigen_common_test.cpp LIBS uvlas_numerics)
+uvlas_add_test(numerics.eigen_metrics LABELS unit negative verification
+    SOURCES numerics/eigen_metrics_test.cpp LIBS uvlas_numerics Boost::multiprecision)
+uvlas_add_test(numerics.eigen_action LABELS unit negative verification
+    SOURCES numerics/eigen_action_test.cpp LIBS uvlas_numerics)
+
+add_test(NAME qa.eigen_common
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
+        --case eigen-common --run "$<TARGET_FILE:uvlas_eigen_common_canary>")
+set_tests_properties(qa.eigen_common PROPERTIES TIMEOUT 30 LABELS "verification")

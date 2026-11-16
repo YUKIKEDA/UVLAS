@@ -1,0 +1,24 @@
+{
+  "source": "tests\\numerics\\eigen_metrics_test.cpp",
+  "source_sha256": "22ce3347abc5e02b12af36e0d1b36e7251a5101a52fb1447816355c8623a57b5",
+  "command": [
+    "uvx",
+    "clang-tidy@21.1.1",
+    "tests\\numerics\\eigen_metrics_test.cpp",
+    "--quiet",
+    "--",
+    "-x",
+    "c++",
+    "-std=c++23",
+    "-Iinclude",
+    "-isystem",
+    "<repo>/out/vcpkg_installed/x64-windows/include",
+    "-fms-extensions",
+    "-fms-compatibility",
+    "-ffp-model=strict",
+    "-DNOMINMAX",
+    "-DWIN32_LEAN_AND_MEAN"
+  ],
+  "exit": 0,
+  "log_sha256": "23104ab2fbb869dca607d19705dfad63ea03a436ed70cefd72848f2877271379"
+}

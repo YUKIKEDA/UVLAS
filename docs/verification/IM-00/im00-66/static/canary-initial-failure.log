@@ -1,0 +1,31 @@
+51983 warnings generated.
+<repo>\qa\eigen_common\main.cpp:98:5: error: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+   98 | int main() {
+      |     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xiosbase:163:13: note: frame #0: unhandled exception of type 'std::ios_base::failure' may be thrown in function 'clear' here
+  163 |             _THROW(failure(_Msg));
+      |             ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\yvals.h:484:21: note: expanded from macro '_THROW'
+  484 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\ios:40:9: note: frame #1: function 'clear' calls function 'clear' here
+   40 |         ios_base::clear(_State | (_Mystrbuf ? ios_base::goodbit : ios_base::badbit), _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\ios:51:9: note: frame #2: function 'setstate' calls function 'clear' here
+   51 |         clear(rdstate() | _State, _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\__msvc_ostream.hpp:569:17: note: frame #3: function 'flush' calls function 'setstate' here
+  569 |                 _CATCH_IO_END
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\iosfwd:30:9: note: expanded from macro '_CATCH_IO_END'
+   30 |         _Myios::setstate(ios_base::badbit, true); /* set badbit and rethrow */ \
+      |         ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\__msvc_ostream.hpp:102:13: note: frame #4: function 'sentry' calls function 'flush' here
+  102 |             _Tied->flush();
+      |             ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\__msvc_ostream.hpp:815:34: note: frame #5: function 'operator<<<std::char_traits<char>>' calls function 'sentry' here
+  815 |     const typename _Myos::sentry _Ok(_Ostr);
+      |                                  ^
+<repo>\qa\eigen_common\main.cpp:104:35: note: frame #6: function 'main' calls function 'operator<<<std::char_traits<char>>' here
+  104 |         std::cerr << error.what() << '\n';
+      |                                   ^

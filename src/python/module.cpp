@@ -770,7 +770,8 @@ PYBIND11_MODULE(_uvlas, module) {
         .value("LinearizeEquilibrium", core::Operation::LinearizeEquilibrium)
         .value("SearchFlutter", core::Operation::SearchFlutter)
         .value("Recover", core::Operation::Recover)
-        .value("CertifyError", core::Operation::CertifyError);
+        .value("CertifyError", core::Operation::CertifyError)
+        .value("ExtractEigen", core::Operation::ExtractEigen);
     py::enum_<core::ResourceKind>(module, "ResourceKind",
                                   "Unit shared by required and observed resource counts.")
         .value("Bytes", core::ResourceKind::Bytes)

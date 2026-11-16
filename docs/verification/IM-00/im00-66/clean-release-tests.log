@@ -1,0 +1,19 @@
+Internal ctest changing into directory: <repo>/out/build/python-msvc
+Test project <repo>/out/build/python-msvc
+    Start 15: core.failure
+1/4 Test #15: core.failure .....................   Passed    0.03 sec
+    Start 52: numerics.eigen_common
+2/4 Test #52: numerics.eigen_common ............   Passed    0.03 sec
+    Start 53: numerics.eigen_metrics
+3/4 Test #53: numerics.eigen_metrics ...........   Passed    0.04 sec
+    Start 54: numerics.eigen_action
+4/4 Test #54: numerics.eigen_action ............   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+negative        =   0.14 sec*proc (4 tests)
+unit            =   0.14 sec*proc (4 tests)
+verification    =   0.10 sec*proc (3 tests)
+
+Total Test time (real) =   0.15 sec

@@ -169,6 +169,7 @@ class OwnershipTests(unittest.TestCase):
                 "SearchFlutter",
                 "Recover",
                 "CertifyError",
+                "ExtractEigen",
             },
         )
 

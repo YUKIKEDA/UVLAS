@@ -1,0 +1,112 @@
+{
+  "files": {
+    "clean-debug-build.log": {
+      "original_sha256": "7f00a60f3941bfe386f1f25e2c8961f54a4bc400aaf944abb1e6937dd9f5c0fa",
+      "published_sha256": "0fbf50705beccd6cec53a021ef7300ffc60876e0e40c9510601b976ea9565bff",
+      "replacements": 4
+    },
+    "clean-debug-tests.log": {
+      "original_sha256": "c18e68985f706ad0cdb8762a125a25b364d61eee6130fef2174863d1e5ae058a",
+      "published_sha256": "c90b33f8bd03259469f4b7ccc1a94cba9ad57096dbb243279fb79cea3f957117",
+      "replacements": 2
+    },
+    "clean-release-build.log": {
+      "original_sha256": "b3b059bb46903f76e2b3fa999e9ef345cdf3d73e08f3c540b9107d16e1f7d413",
+      "published_sha256": "0bb6174143c2f8a9a5a32f11c742870f86a1df9a3946efcb022a5910ac7c4c86",
+      "replacements": 4
+    },
+    "clean-release-tests.log": {
+      "original_sha256": "0dddb596c5e41e43edad2eccd341c92ac31c7e2c179d5b908ef5b69235cbae2c",
+      "published_sha256": "a700a8739b3914e734f0a07b51e98af4dd6673bb1cf693d954e820daccfa2892",
+      "replacements": 2
+    },
+    "build-info-debug.json": {
+      "original_sha256": "11e69a6892a460130e86ab54ae28d30f2b2eb9a003d958c28dc7b52e66fd4558",
+      "published_sha256": "11e69a6892a460130e86ab54ae28d30f2b2eb9a003d958c28dc7b52e66fd4558",
+      "replacements": 0
+    },
+    "build-info-release.json": {
+      "original_sha256": "a9f536082434dfa6bb6693944a8de896e54635044e3d28f9299553d60ed044e9",
+      "published_sha256": "a9f536082434dfa6bb6693944a8de896e54635044e3d28f9299553d60ed044e9",
+      "replacements": 0
+    },
+    "canary-debug.txt": {
+      "original_sha256": "c4ba61d32f67b358a5d02fbddb02b33684e7ec9c56e22f08d487421ee9f84dde",
+      "published_sha256": "c4ba61d32f67b358a5d02fbddb02b33684e7ec9c56e22f08d487421ee9f84dde",
+      "replacements": 0
+    },
+    "canary-release.txt": {
+      "original_sha256": "c4ba61d32f67b358a5d02fbddb02b33684e7ec9c56e22f08d487421ee9f84dde",
+      "published_sha256": "c4ba61d32f67b358a5d02fbddb02b33684e7ec9c56e22f08d487421ee9f84dde",
+      "replacements": 0
+    },
+    "static/common-source.log": {
+      "original_sha256": "d2b37801b0d529c531bd9b0095de860b7b597bb14ace2d2c9eed8de14925fe26",
+      "published_sha256": "d2b37801b0d529c531bd9b0095de860b7b597bb14ace2d2c9eed8de14925fe26",
+      "replacements": 0
+    },
+    "static/python-module.log": {
+      "original_sha256": "3718275de64f4c98ea838a8fe404d71987438c397dbe5890a719985e513083d2",
+      "published_sha256": "3718275de64f4c98ea838a8fe404d71987438c397dbe5890a719985e513083d2",
+      "replacements": 0
+    },
+    "static/canary-final.log": {
+      "original_sha256": "dce93abf992dfe477bc7351e85e51cf260729c9219746830f675f80f2a416564",
+      "published_sha256": "dce93abf992dfe477bc7351e85e51cf260729c9219746830f675f80f2a416564",
+      "replacements": 0
+    },
+    "static/canary-initial-failure.log": {
+      "original_sha256": "48606160340f05bc74047d5e648484ade6986fc4c09f5270aec7fe8540c28077",
+      "published_sha256": "9ec1335b5ddf653bb6a49cccdbe646a47aac43953093f46b8f83de781dd5f15c",
+      "replacements": 2
+    },
+    "static/metrics-test.log": {
+      "original_sha256": "23104ab2fbb869dca607d19705dfad63ea03a436ed70cefd72848f2877271379",
+      "published_sha256": "23104ab2fbb869dca607d19705dfad63ea03a436ed70cefd72848f2877271379",
+      "replacements": 0
+    },
+    "static/metrics-test-command.json": {
+      "original_sha256": "60ccee58073eb186141bf289da6b882ec1891ce3ba8886f3d82eb6ec3bfcd7e6",
+      "published_sha256": "4f4c82e3fa74ba3fc6a6cc17af5ceebde7f5c93f841a8e0423b0b10c3f67ecbe",
+      "replacements": 1
+    },
+    "static/action-final.log": {
+      "original_sha256": "5c71de0e1302bb4a21c2e631ea1d84220e328d5b946e1c35240b44d5196da056",
+      "published_sha256": "8ff829281125b2e91683d53b5dccecfe6917705fcf545f44523ecbf4359c85fd",
+      "replacements": 2
+    },
+    "linux-canary.txt": {
+      "original_sha256": "38096a11dcfea80626d85f2de18c1f31699a919202a4fe74c19b9901543807f8",
+      "published_sha256": "38096a11dcfea80626d85f2de18c1f31699a919202a4fe74c19b9901543807f8",
+      "replacements": 0
+    },
+    "linux-debug-excerpt.log": {
+      "original_sha256": "9b421f9a270d7c69c8669e870bd33214d00e375ce75ba1c7e38d5acc2391c138",
+      "published_sha256": "59e4003da2d9bc118d5dfb7e4e153668e85b742bda89ca45af10378412e8e06b",
+      "replacements": 1
+    },
+    "static/metrics-source.log": {
+      "original_sha256": "be9eb60e352d3f9b84a6fc4134fbd69dc421703ed0b0386dea38bd5a7cd2369a",
+      "published_sha256": "be9eb60e352d3f9b84a6fc4134fbd69dc421703ed0b0386dea38bd5a7cd2369a",
+      "replacements": 0
+    },
+    "static/metrics-source-result.json": {
+      "original_sha256": "ad2ef843f3cab8f73d41c089ca3e05d6f2213051753dbdabf156bc23e63f6122",
+      "published_sha256": "ad2ef843f3cab8f73d41c089ca3e05d6f2213051753dbdabf156bc23e63f6122",
+      "replacements": 0
+    }
+  },
+  "action_archive": {
+    "entries": 37,
+    "replacements": 12,
+    "leftovers": 0
+  },
+  "metric_archive": {
+    "original_archive_sha256": "2959139969423ea01ef4948410f87636ba324618b93481e39901c83c346a2f40",
+    "published_archive_sha256": "498b6d30ffe89126869e70b3f8ef3861460a308f650452abe1838bf3517e889f",
+    "additional_redaction_files": 5,
+    "additional_replacements": 40,
+    "note": "元ZIPのredaction.jsonを保持し、追加伏字の前後hash/countをpost-redaction.jsonへ保存。元ZIPの証拠は不変。"
+  },
+  "note": "テキストだけを既存redactorで置換し、数値と合否は変更していない。ZIP内にバイナリは含めない。"
+}
