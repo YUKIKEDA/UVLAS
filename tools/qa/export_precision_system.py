@@ -122,9 +122,17 @@ def source_hashes(root: Path) -> dict[str, str]:
     }
 
 
+def resolve_record(root: Path) -> Path:
+    """Resolve the frozen record by filename; RECORD is a historical location hint."""
+    matches = [p for p in (root / "rd").rglob(Path(RECORD).name) if p.is_file()]
+    if len(matches) != 1:
+        raise ValueError("Frozen record must have one location below rd")
+    return matches[0]
+
+
 def require_record_sources(root: Path) -> None:
     """Bind the generator and its frozen dependencies to the immutable record."""
-    raw: object = json.loads((root / RECORD).read_text(encoding="utf-8"))
+    raw: object = json.loads(resolve_record(root).read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise ValueError("Frozen record must be an object")
     record = cast("dict[str, object]", raw)
@@ -150,7 +158,7 @@ def run_export(root: Path, output: Path | None, *, probe: bool = False) -> None:
         raise ValueError("An output path is required")
     if output is not None and output.exists():
         raise FileExistsError("Refusing to overwrite existing system fixture")
-    require_hash(root / RECORD, RECORD_SHA256)
+    require_hash(resolve_record(root), RECORD_SHA256)
     require_record_sources(root)
     before = source_hashes(root)
     try:
@@ -158,7 +166,7 @@ def run_export(root: Path, output: Path | None, *, probe: bool = False) -> None:
             work = Path(temporary)
             shutil.copy2(root / "AGENTS.md", work / "AGENTS.md")
             shutil.copytree(root / "rd", work / "rd", ignore=shutil.ignore_patterns("__pycache__"))
-            require_hash(work / RECORD, RECORD_SHA256)
+            require_hash(resolve_record(work), RECORD_SHA256)
             require_record_sources(work)
             command = [
                 "uv",
