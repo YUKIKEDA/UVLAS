@@ -15,6 +15,9 @@ struct ActionValues {
 
 /// Fixed component and eigenvalue scales of the original physical problem.
 struct MetricScales {
+    /// Supply both immutable scales explicitly; no uninitialized scale request exists.
+    MetricScales(std::span<const double> d, double lambda) noexcept
+        : components(d), eigenvalue_scale(lambda) {}
     std::span<const double> components; ///< Positive finite diagonal entries of D.
     double eigenvalue_scale; ///< Positive finite eigenvalue scale, in the original units.
 };
