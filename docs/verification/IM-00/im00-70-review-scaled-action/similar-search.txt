@@ -1,0 +1,78 @@
+include\uvlas\core\state.hpp:355:/// Generation of the constraint coordinate chart.
+include\uvlas\numerics\eigen_arnoldi.hpp:114:/// Read-only eigenvector matrix in physical coordinates; each column belongs to one value.
+include\uvlas\numerics\eigen_arnoldi.hpp:160:    WordView<Scalar> initial; ///< Explicit finite nonzero Binary64 native-coordinate seed.
+include\uvlas\numerics\eigen_arnoldi.hpp:201:    double initial_norm;             ///< Actual native-coordinate Euclidean seed norm.
+include\uvlas\numerics\eigen_arnoldi.hpp:263:    std::span<const double> components; ///< Original fixed physical coordinate scales.
+include\uvlas\numerics\eigen_generalized.hpp:55:    double mass_scale;   ///< Positive scale of phi^T M phi, including coordinate units.
+include\uvlas\numerics\eigen_generalized.hpp:220:    /// It is expressed in the auxiliary validation coordinates, not physical M units.
+include\uvlas\numerics\eigen_generalized.hpp:225:    /// Model's fixed diagonal coordinate scales, copied into this packet.
+include\uvlas\numerics\eigen_full.hpp:48:/// Policy for matching eigenvalues in dimensionless coordinates, never a separation proof.
+include\uvlas\numerics\linear_solve.hpp:18:/// Layout identities name component order, SI units and physical-coordinate meaning in the model.
+include\uvlas\numerics\linear_solve.hpp:71:    std::span<const double> unknown; ///< Positive physical coordinate scales, fixed before solving.
+include\uvlas\numerics\linear_solve.hpp:244:    /// Read owned physical coordinate scales after input/model buffers have expired.
+include\uvlas\numerics\sparse_solve.hpp:74:    /// Borrow a nonzero n-by-1 witness in original coordinates, or nullptr if none was proved.
+include\uvlas\numerics\storage.hpp:81:/// One uncompressed contribution. Duplicate coordinates are legal input.
+include\uvlas\numerics\storage.hpp:175:    /// Explicitly copy coordinates and identities in input order.
+include\uvlas\numerics\storage.hpp:186:    /// Borrow x coordinates until assignment, moving from, or destruction.
+include\uvlas\numerics\storage.hpp:190:    /// Borrow y coordinates until assignment, moving from, or destruction.
+include\uvlas\numerics\storage.hpp:194:    /// Borrow z coordinates until assignment, moving from, or destruction.
+include\uvlas\numerics\storage.hpp:201:    /// A temporary cannot supply a borrowed coordinate array.
+include\uvlas\numerics\storage.hpp:203:    /// A temporary cannot supply a borrowed coordinate array.
+include\uvlas\numerics\storage.hpp:205:    /// A temporary cannot supply a borrowed coordinate array.
+include\uvlas\numerics\storage.hpp:219:/// Metadata for a full coordinate; array order defines component order.
+include\uvlas\numerics\storage.hpp:227:/// Patch or member associated with a coordinate; several owners are legal.
+include\uvlas\numerics\storage.hpp:229:/// Associate a full coordinate index with a patch or member.
+include\uvlas\numerics\storage.hpp:231:    core::Index full_index = 0; ///< Full-coordinate index.
+include\uvlas\numerics\storage.hpp:235:/// Owns coordinate metadata, topology and independent-coordinate index selection.
+include\uvlas\numerics\storage.hpp:236:/// Dependent coordinates are recovered by the model's nonlinear constraint map, not
+include\uvlas\numerics\storage.hpp:237:/// set to zero. These index maps do not evaluate a physical coordinate transformation.
+include\uvlas\numerics\storage.hpp:253:    /// independent-coordinate order. Every full coordinate needs an owner association.
+include\uvlas\numerics\storage.hpp:261:    /// Full-coordinate count.
+include\uvlas\numerics\storage.hpp:265:    /// Independent-coordinate count.
+include\uvlas\numerics\storage.hpp:282:    /// Return an independent index, nullopt for a dependent coordinate, or InvalidInput.
+src\numerics\eigen_arnoldi.cpp:21:        const auto coordinate =
+src\numerics\eigen_arnoldi.cpp:23:        if (!arnoldi_finite(coordinate)) {
+src\numerics\eigen_arnoldi_cluster.hpp:49:// Transform every signed word directly into the final coordinate system.
+src\numerics\eigen_arnoldi_cluster.hpp:50:// The positive interval scale composes all exponents before scalbn: an
+src\numerics\eigen_arnoldi_cluster.hpp:52:[[nodiscard]] inline core::Result<void> arnoldi_scaled_action(ArnoldiComplex hi, ArnoldiComplex lo,
+src\numerics\eigen_arnoldi_cluster.hpp:149:            auto transformed = arnoldi_scaled_action(
+src\numerics\eigen_arnoldi_cluster.hpp:232:            wanted[j] = lambda / runner.scales.metric.eigenvalue_scale;
+src\numerics\eigen_arnoldi_engine.hpp:314:        // These rounded coordinates belong only to candidate generation. The
+src\numerics\eigen_arnoldi_extract.hpp:90:[[nodiscard]] inline core::Result<void> arnoldi_dimensionless_coordinate(ArnoldiComplex physical,
+src\numerics\eigen_arnoldi_extract.hpp:158:        const auto converted_a = arnoldi_dimensionless_coordinate(a[i], scales[i], side, x, xerror);
+src\numerics\eigen_arnoldi_extract.hpp:159:        const auto converted_b = arnoldi_dimensionless_coordinate(b[i], scales[i], side, y, yerror);
+src\numerics\eigen_arnoldi_qualify.hpp:141:                const auto converted = arnoldi_scaled_action(
+src\numerics\eigen_full_phase_private.hpp:42:inline bool full_phase_coordinate_larger(std::complex<double> a, double da, std::complex<double> b,
+src\numerics\eigen_full.cpp:921:    // Ahat*=Q T* Q*. Reversing both Schur coordinates turns T* into an
+src\numerics\eigen_full.cpp:1128:            if (detail::full_phase_coordinate_larger(candidate[i], scales[i], candidate[maximum],
+src\numerics\eigen_generalized.cpp:37:    double mantissa = std::frexp(value, &exponent);
+src\numerics\eigen_generalized.cpp:39:        mantissa *= std::frexp(factor, &next);
+src\numerics\eigen_generalized.cpp:43:        mantissa /= std::frexp(factor, &next);
+src\numerics\eigen_generalized.cpp:46:    const double result = std::scalbn(mantissa, exponent);
+src\numerics\eigen_generalized.cpp:53:core::Result<bool> larger_coordinate(double first, double first_scale, double second,
+src\numerics\eigen_generalized.cpp:62:        const double x = std::frexp(std::abs(value), &a), y = std::frexp(scale, &b);
+src\numerics\eigen_metric_bounds.hpp:64:    const double rounded = std::scalbn(value, exponent);
+src\numerics\eigen_metric_bounds.hpp:69:    const double restored = std::scalbn(rounded, -exponent);
+src\numerics\eigen_metric_bounds.hpp:82:        const double leading = std::frexp(input, &exponent);
+src\numerics\eigen_metric_bounds.hpp:83:        const double factor = std::frexp(numerator, &next);
+src\numerics\eigen_metric_bounds.hpp:88:            const double mantissa = std::frexp(denominator, &next);
+src\numerics\eigen_metrics.cpp:188:core::Result<Bounds> scaled_vector_magnitude(WordView<Scalar> vector, std::size_t index,
+src\numerics\eigen_metrics.cpp:243:                const auto coordinate = scaled_vector_magnitude(vector, i, scales, side);
+src\numerics\eigen_metrics.cpp:357:                    const auto coordinate = word_magnitude(basis, i + j * n);
+src\numerics\eigen_metrics.cpp:513:                    const auto coordinate = word_magnitude(basis, i + j * n);
+src\numerics\eigen_metrics.cpp:517:                        infinity_lower, detail::scale(*coordinate, 1, scales.components[i]).lower);
+src\numerics\eigen_metrics.cpp:571:                        const auto coordinate = word_magnitude(basis, inner + i * n);
+src\numerics\eigen_metrics.cpp:577:                                         detail::multiply_magnitudes(*coordinate, {error, error}))
+src\numerics\gmres_solve.cpp:455:// Left preconditioning acts in physical coordinates; the basis uses the declared
+src\numerics\precision.cpp:69:    const double sf = std::frexp(scale, &se), tf = std::frexp(tolerance, &te);
+src\numerics\precision.cpp:75:    const double bf = std::frexp(lower, &be), uf = std::frexp(upper, &ue);
+src\numerics\sparse_solve.cpp:496:        for (core::Index coordinate = 0; coordinate < n; ++coordinate) {
+src\numerics\sparse_solve.cpp:505:                 entry < matrix.column_offsets()[static_cast<std::size_t>(coordinate + 1)];
+src\numerics\sparse_spd.hpp:174:        std::frexp(diagonal, &exponent);
+src\numerics\sparse_spd.hpp:188:            const double scaled = std::scalbn(values[index], power);
+src\numerics\sparse_spd.hpp:189:            if (!std::isfinite(scaled) || std::scalbn(scaled, -power) != values[index]) {
+src\numerics\sparse_spd.hpp:213:            scaled->values()[index] = std::scalbn(values[index], power);
+src\numerics\storage.cpp:223:    // The original order is part of the key: equal coordinates retain a fixed
+src\numerics\storage.cpp:300:    for (const auto coordinates : {x, y, z}) {
+src\numerics\storage.cpp:301:        if (const auto checked = check_finite(coordinates, operation); !checked) {
+src\numerics\sparse_triangular.hpp:19:// nonzero pivot. Both original-index maps point INTO factor coordinate order.

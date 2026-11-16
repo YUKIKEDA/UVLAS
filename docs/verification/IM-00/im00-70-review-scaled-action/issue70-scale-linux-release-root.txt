@@ -1,0 +1,26 @@
+# PR73 scaled-action correction — Linux Release CI excerpt
+
+Repository: YUKIKEDA/UVLAS
+Head: c0dd4d61e804bd97f0a3618fa3b4c3a5b369554a
+Run: 43824088025
+Job: 133153747354
+URL: http<repo>/actions/runs/43824088025/job/133153747354
+Scope: verbatim selected lines from completed job log; whole CI success is not asserted.
+
+2026-11-16T07:28:42.2236582Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4e0649ff436038e18ebc5a8c29d7a730a05bba39:refs/remotes/pull/73/merge
+2026-11-16T07:28:44.2623427Z  * [new ref]         4e0649ff436038e18ebc5a8c29d7a730a05bba39 -> pull/73/merge
+2026-11-16T07:28:44.5089763Z HEAD is now at 4e0649f Merge c0dd4d61e804bd97f0a3618fa3b4c3a5b369554a into 19da8a52e9ec79deb7b4371a2fc9091519c705d4
+2026-11-16T07:28:44.5147766Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T07:28:44.5168586Z 4e0649ff436038e18ebc5a8c29d7a730a05bba39
+2026-11-16T07:28:55.5933755Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T07:28:58.7312328Z g++-14 (Ubuntu 14.2.0-4ubuntu2~24.04.1) 14.2.0
+2026-11-16T07:28:59.6355333Z   CMAKE_BUILD_TYPE="Release"
+2026-11-16T07:29:46.3269372Z -- The CXX compiler identification is GNU 14.2.0
+2026-11-16T07:32:41.4025560Z       Start 47: numerics.eigen_arnoldi_allocations
+2026-11-16T07:32:41.4039968Z 47/63 Test #47: numerics.eigen_arnoldi_allocations ...   Passed    0.00 sec
+2026-11-16T07:32:41.4041127Z       Start 48: numerics.eigen_arnoldi
+2026-11-16T07:32:41.7120647Z 48/63 Test #48: numerics.eigen_arnoldi ...............   Passed    0.31 sec
+2026-11-16T07:32:42.5706187Z       Start 63: qa.eigen_arnoldi
+2026-11-16T07:32:42.6024867Z 63/63 Test #63: qa.eigen_arnoldi .....................   Passed    0.03 sec
+2026-11-16T07:32:42.6027281Z 100% tests passed, 0 tests failed out of 63
+

@@ -1,0 +1,113 @@
+{
+  "records": [
+    {
+      "id": "issue70-scale-baseline.log",
+      "original_sha256": "5b667fe398a9bcca6e94ea6191dd68eba6a1f64c0cfe3a2bbeec11ac996b4183",
+      "published_sha256": "156caa1dd9a1c50f462729ca2fd0839482e6073dfeeefd66aa65bd60aae0b2d6",
+      "standard_redactions": 3
+    },
+    {
+      "id": "issue70-scale-fixed-preliminary.log",
+      "original_sha256": "378880215734139ffd1658cdfe750b33023f3ff5414f32e292048395f72a664d",
+      "published_sha256": "378880215734139ffd1658cdfe750b33023f3ff5414f32e292048395f72a664d",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-debug-regular.log",
+      "original_sha256": "9f2025bcc849e6a77e28d6c06b4e694dcf0cda9464096f510efc03927b50f0d4",
+      "published_sha256": "9f2025bcc849e6a77e28d6c06b4e694dcf0cda9464096f510efc03927b50f0d4",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-debug-audit.log",
+      "original_sha256": "a6adda973a131164932b10ae69626f0c5a8c619b1d74aa98542d4902e6d0af05",
+      "published_sha256": "a6adda973a131164932b10ae69626f0c5a8c619b1d74aa98542d4902e6d0af05",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-release-regular.log",
+      "original_sha256": "3ccecc761bcad1e54aa7debf02da94482a005cc7967fce99240c46fc8c43486b",
+      "published_sha256": "3ccecc761bcad1e54aa7debf02da94482a005cc7967fce99240c46fc8c43486b",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-release-audit.log",
+      "original_sha256": "d65b1c4e0cb3026b18c8d3ef28804938b344898b3b5983beb0556292eef30c2f",
+      "published_sha256": "d65b1c4e0cb3026b18c8d3ef28804938b344898b3b5983beb0556292eef30c2f",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-canary.txt",
+      "original_sha256": "afe81d1e3b99568c3aa7f7f5ef9af489593209e3eefac10fbfa67dce593f3ee8",
+      "published_sha256": "afe81d1e3b99568c3aa7f7f5ef9af489593209e3eefac10fbfa67dce593f3ee8",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-qa-result.json",
+      "original_sha256": "e1627ad9ddd8598c788ccdec5cf95234850e2b82efce7a208501151a888c727d",
+      "published_sha256": "e1627ad9ddd8598c788ccdec5cf95234850e2b82efce7a208501151a888c727d",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-japanese.json",
+      "original_sha256": "979568d576bae0dd166462fa290bc3d61b45786c4111ae20745087aed0b47ed2",
+      "published_sha256": "979568d576bae0dd166462fa290bc3d61b45786c4111ae20745087aed0b47ed2",
+      "standard_redactions": 0
+    },
+    {
+      "id": "issue70-scale-linux-release-root.txt",
+      "original_sha256": "14ae28b8ce6cd71d30e23d58a03720f9311b01778ac8c44f73b7f7fcb83cc538",
+      "published_sha256": "4b1074575b9f59795a7dff074b40a5cf60891a78ae2aaebf9515e742bf95ff11",
+      "standard_redactions": 1
+    },
+    {
+      "id": "static/src_numerics_eigen_arnoldi-04.json",
+      "original_sha256": "0bb9ba0ebc823b65a98f137d4a5ecf0ae543e97ade38e7d2c47ac4db65954bc0",
+      "published_sha256": "d70f4fcc57a74ab5bb83b73de2b882b6b0a3c5ecb5c882d5c034b5cb9edace4b",
+      "standard_redactions": 2
+    },
+    {
+      "id": "static/src_numerics_eigen_arnoldi-04.log",
+      "original_sha256": "49ba4986e3e4b48a7eebe5f0c12008619bc90d15ec8ac5f0322aa19c7f7a47fb",
+      "published_sha256": "49ba4986e3e4b48a7eebe5f0c12008619bc90d15ec8ac5f0322aa19c7f7a47fb",
+      "standard_redactions": 0
+    },
+    {
+      "id": "static/test-final.json",
+      "original_sha256": "2d0783f43ce4e910778d7ef5aa50eb10c485c2b88975375b15e005e916d5e3ae",
+      "published_sha256": "57b28eb73b76d401c3931cd2d9717433f49478866425f0a0828bc36f2d528a07",
+      "standard_redactions": 2
+    },
+    {
+      "id": "static/test-final.log",
+      "original_sha256": "af3be4d6df05efc9704e7654a10988f8d53e33be68fce91c57b273f03545bccc",
+      "published_sha256": "af3be4d6df05efc9704e7654a10988f8d53e33be68fce91c57b273f03545bccc",
+      "standard_redactions": 0
+    },
+    {
+      "id": "static/tests_numerics_eigen_arnoldi_allocations_test-04.json",
+      "original_sha256": "a5451cb99d886729c95b5a46e93e5cbc805fa7170f99d149f438c6e399a1a6ad",
+      "published_sha256": "919e7599e2bdfb90727dcedcf841d1f6ed3c05af5b90384fb8a46c1b0e12b361",
+      "standard_redactions": 2
+    },
+    {
+      "id": "static/tests_numerics_eigen_arnoldi_allocations_test-04.log",
+      "original_sha256": "df9be13e74cc4c35e95caa1771606d93e0f249b77c178d8edb751308d3dc6221",
+      "published_sha256": "df9be13e74cc4c35e95caa1771606d93e0f249b77c178d8edb751308d3dc6221",
+      "standard_redactions": 0
+    },
+    {
+      "id": "static/tests_numerics_eigen_arnoldi_test-04.json",
+      "original_sha256": "ba3efb4849808a46b26727e8da8e55d13d199002f7ebd6452476c9e090db427f",
+      "published_sha256": "04fd04d24663db5e2a3314009ebf57292e3423346f40a5ce4b5512301f8fd0b7",
+      "standard_redactions": 2
+    },
+    {
+      "id": "static/tests_numerics_eigen_arnoldi_test-04.log",
+      "original_sha256": "c3c010808ba9a2c9b52ebf0885b8646f3793b40f6a668c3cd9bcd65aa3b84807",
+      "published_sha256": "bf9ff792831a7be7d32b59016cc71722a9144cd9a4ed9e42b2cba3d189113d30",
+      "standard_redactions": 1
+    }
+  ],
+  "note": "元rawと旧証拠は不変。公開用コピーだけを匿名化。Windows手元ログとCI抜粋は独立の実行であり混同しない。"
+}

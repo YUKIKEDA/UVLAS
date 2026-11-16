@@ -1,0 +1,335 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-07",
+    "EIG-02",
+    "EIG-03",
+    "EIG-08",
+    "EIG-11",
+    "EIG-13"
+  ],
+  "package": "IM-00",
+  "issue": 70,
+  "date": "2026-11-16",
+  "source_commit": "c0dd4d61e804bd97f0a3618fa3b4c3a5b369554a",
+  "scope": "PR73 P1レビュー指摘4582558399の原作用変換の偽包絡を訂正。cluster生成と最終Schur原認定で使うhelperを指数安全な区間へ変更する。数値予算・公開API・既存QA値を変えない。",
+  "review": {
+    "pr": 73,
+    "head": "4e0b7048cfd7ed8bb10e6ab6eb61c41447cbce32",
+    "comment": 4582558399,
+    "thread": "PRRT_kwDOVqf2-c63zZtu"
+  },
+  "reproduction": {
+    "level": "helper→assess_schur_metrics。full Arnoldi extractionを再現したという主張ではない。",
+    "input": "Right high=2^-500,low=0,error=0,D=2^600,lambda_scale=2^-1070。LeftはD=2^-600。厳密な変換値2^-30。",
+    "failure": "旧中心は最初のscaleでunderflowし、次のscaleでも零。最終値の相対gammaと最終denorm定数では、失った途中の絶対誤差を包めない。Q=1/T=0/budget1e-12のSchur資格が偽成功する。",
+    "actual_baseline": "旧helperの現headに新しい最小回帰だけを加えてcompile/link成功後exit42。厳密包含とSchur拒否のassert2件が失敗した。追加testによるdirty buildでありclean製品認定と呼ばない。rawを別保存。"
+  },
+  "fix": {
+    "method": "hi/loの実虚4laneを個別にfrexp指数合成付きscale(Bounds)で最終座標へ移す。符号付き区間下端を中心にし、上向き区間幅をL1で足し、SumのEFT合成誤差と同じ単位へ変換したproducer複素誤差球を加算する。",
+    "underflow": "最終subgridの零中心＋正上界は包含できれば許す。opaque callback入力の厳密2語制約とは異なる。中間underflowを最終単位の定数へ隠さない。",
+    "failure": "非有限入力はNonfinite、不正domainはInvalidInput。最終endpoint/上界が無限ならPrecisionUnresolved、出力は成功まで書き換えない。警告抑制・予算緩和なし。",
+    "impact": "arnoldi_apply_basisでのHorig生成とarnoldi_qualify_basisでの原Schur再評価の2site。pair資格は物理actionを共通metricsへ渡す別経路。"
+  },
+  "independent_tests": {
+    "oracle": "cpp_rationalで各binary64語と各因子を厳密に取り込む。製品scale/Sumを参照計算に使わない。",
+    "criterion": "producer球の最終半径E、中心差delta、上界Uに対し U>=E かつ Re(delta)^2+Im(delta)^2 <= (U-E)^2 を厳密比較する。sqrtを使わず全方向の複素誤差球を包含する。",
+    "fixtures": "14fixtures×左右。途中under/overflow救済、±低語、非2冪、producerのみ、final subnormal/halfminsub、変換前hi+lo overflowを含む。conversion幅・producer項・Sum EFT項の独立fixtureを持つ。",
+    "qualification": "Q1/T0の偽認定拒否と、通常scaleでQ1/T2の資格成功を両方確認。",
+    "preliminary": "修正後の新3case210assert成功。最初のtest tidyはfixtureの暗黙default field未初期化を指摘し、全項必須ctorで訂正。製品source/audit tidyは初回成功。最終test tidyを別rawで保存。"
+  },
+  "windows": {
+    "compiler": "MSVC19.51.36260.0",
+    "floating_point": "/fp:strict",
+    "commit": "c0dd4d6",
+    "clean_generated_revision": true,
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "per_configuration": {
+      "regular_cases": 26,
+      "regular_assertions": 835,
+      "new_direct_audit_cases": 1,
+      "new_direct_audit_assertions": 3
+    },
+    "audit": "新helper6変換をCallingThreadのC++/Eigen strict監視内で実行し、C++確保0・Eigen確保禁止成功。既存3adapter caseは今回の手元範囲へ足さない。",
+    "not_repeated": "他backendの試験、旧変異、旧工程計測を再実行しない。必要なlibrary依存のcompileだけは行った。"
+  },
+  "static": {
+    "tool": "clang-tidy21.1.1",
+    "affected_translation_units": 3,
+    "final_exit_codes": [
+      0,
+      0,
+      0
+    ],
+    "format": "clang-format21.1.2、変更した3C++file成功",
+    "japanese": "新規numerics規約のlint exit0、root独立通読で追加指摘なし。"
+  },
+  "linux": {
+    "local_availability": "WSL Ubuntu22.04/GCC11.4のみ。GCC14/cmake/ninja/固定依存/Catch2が揃わず、インストールはしない。必要なaffected対象だけ既存CIから取得する例外を適用。",
+    "head": "c0dd4d61e804bd97f0a3618fa3b4c3a5b369554a",
+    "checkout_merge": "4e0649ff436038e18ebc5a8c29d7a730a05bba39",
+    "run": 43824088025,
+    "configuration": "Release",
+    "job": 133153747354,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43824088025/job/133153747354",
+    "result": "63/63成功、affected regular#48/audit#47/QA#63がPassed。他構成や全CI完了を成功扱いしない。",
+    "known_checks_failure": "同source runのchecks job133153747315は、追加testのtrace matrix未再生成だけで失敗。最終metadataで再生成して照合する。"
+  },
+  "qa": {
+    "windows_actual_values": 8,
+    "all_bit_identical": true,
+    "linux_qa_passed": true,
+    "unchanged_reason": "固定QAはpair routeであり、修正helperを呼ぶcluster／Schur routeとは別。実8量も保存し既存Windows基準へ照合した。Linux QAは既存0002の基準に対し成功。",
+    "baseline_modified": false,
+    "record_0002": "不変。所有者のPR73レビュー／merge承認前のまま。"
+  },
+  "mutations": {
+    "independent_owner": "generalized review agent",
+    "control_cases": 26,
+    "control_assertions": 835,
+    "control_exit": 0,
+    "mutants": [
+      "old helper restored",
+      "conversion interval width removed",
+      "producer error removed",
+      "Sum EFT error removed"
+    ],
+    "producer_compile_exit": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "test_compile_exit": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "link_exit": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "run_exit": [
+      42,
+      42,
+      42,
+      42
+    ],
+    "maps": 5,
+    "explicit_producer_symbols": 56,
+    "frozen_inputs": 60,
+    "input_mismatches": 0,
+    "scope": "inline helperのため各caseでsource/test両TUを同じprivate全copyから再compile。旧lib内の正規helperへ迂回しないことをmapでも確認。元snapshot/rawは不変、新ZIP113entryだけを派生公開。",
+    "original_archive_producer_members_extracted": 0
+  },
+  "similar_findings": {
+    "search": "全製品src/includeでscale変換を検索し、原問題認定と候補生成を区別した。",
+    "safe_paths": [
+      "Full scaled()は指数合成区間の端点＋幅を使用。",
+      "generalized scaled()はfrexp→最終scalbnで、共通認定は元作用のBoundsを評価。",
+      "pair/generalized common metricsは正のBoundsを指数合成し途中誤差を落とさない。"
+    ],
+    "candidate_only": "ArnoldiEngine.performの丸めた逐次centerは探索候補だけに用いる。原資格では今回修正した変換で実候補を再評価する。",
+    "other_changes": false
+  },
+  "historical": {
+    "main_record_sha256": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+    "artifacts_unchanged": 58,
+    "note": "旧im00-70と旧訂正記録／0002／既存証拠は書換えない。旧source-mapは各歴史revisionを指すので現sourceへhashを付け替えない。旧容量計測はdd10 snapshotの値で、今回helperの速度値へ読み替えない。新しい速度／実務性能主張はない。"
+  },
+  "claimed_state": "親Issue15に従い実装が採用仕様に適合という限定主張。内部certificateとQA数値認定は区別し、実験妥当性・実務性能・実務受入を追加しない。",
+  "sources": {
+    "src/numerics/eigen_arnoldi_cluster.hpp": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+    "tests/numerics/eigen_arnoldi_test.cpp": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+    "tests/numerics/eigen_arnoldi_allocations_test.cpp": "9db0de8e3034138e3a63c2881c619f693ec79188b6bdb98f0f5811252fea3817",
+    ".cursor/rules/numerics.mdc": "087269fd25a823301bdf861c5406165215ad1b5f4fb29ceed9d14b016ada0afb"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-baseline.log": "156caa1dd9a1c50f462729ca2fd0839482e6073dfeeefd66aa65bd60aae0b2d6",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-canary.txt": "afe81d1e3b99568c3aa7f7f5ef9af489593209e3eefac10fbfa67dce593f3ee8",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-debug-audit.log": "a6adda973a131164932b10ae69626f0c5a8c619b1d74aa98542d4902e6d0af05",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-debug-regular.log": "9f2025bcc849e6a77e28d6c06b4e694dcf0cda9464096f510efc03927b50f0d4",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-fixed-preliminary.log": "378880215734139ffd1658cdfe750b33023f3ff5414f32e292048395f72a664d",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-japanese.json": "979568d576bae0dd166462fa290bc3d61b45786c4111ae20745087aed0b47ed2",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-linux-release-root.txt": "4b1074575b9f59795a7dff074b40a5cf60891a78ae2aaebf9515e742bf95ff11",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-qa-result.json": "e1627ad9ddd8598c788ccdec5cf95234850e2b82efce7a208501151a888c727d",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-release-audit.log": "d65b1c4e0cb3026b18c8d3ef28804938b344898b3b5983beb0556292eef30c2f",
+    "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-release-regular.log": "3ccecc761bcad1e54aa7debf02da94482a005cc7967fce99240c46fc8c43486b",
+    "docs/verification/IM-00/im00-70-review-scaled-action/mutation-redaction.json": "9f1774a865e7324a9ebbd6d0c277002c7513e65f0bf56077135a97936df5e0df",
+    "docs/verification/IM-00/im00-70-review-scaled-action/mutation-summary.json": "d1fb344f63f067fc6aa95786bedbae90d1dfb7dddbc875b21f93cbcfaf867c87",
+    "docs/verification/IM-00/im00-70-review-scaled-action/mutations.zip": "0d95cd5c5466f8b36a43819237fbb0aa4886dfafc8e8cdb0a0672861ba660055",
+    "docs/verification/IM-00/im00-70-review-scaled-action/redaction.json": "b8cd02b3b6a7a53572359e002e23f41bac91392cdfe431d196ecf33237925e72",
+    "docs/verification/IM-00/im00-70-review-scaled-action/similar-search.txt": "92d23f239c1c198f521551d3cb409d974255dc9e8144abd67234aa33085a9382",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/src_numerics_eigen_arnoldi-04.json": "d70f4fcc57a74ab5bb83b73de2b882b6b0a3c5ecb5c882d5c034b5cb9edace4b",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/src_numerics_eigen_arnoldi-04.log": "49ba4986e3e4b48a7eebe5f0c12008619bc90d15ec8ac5f0322aa19c7f7a47fb",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/test-final.json": "57b28eb73b76d401c3931cd2d9717433f49478866425f0a0828bc36f2d528a07",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/test-final.log": "af3be4d6df05efc9704e7654a10988f8d53e33be68fce91c57b273f03545bccc",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_allocations_test-04.json": "919e7599e2bdfb90727dcedcf841d1f6ed3c05af5b90384fb8a46c1b0e12b361",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_allocations_test-04.log": "df9be13e74cc4c35e95caa1771606d93e0f249b77c178d8edb751308d3dc6221",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_test-04.json": "04fd04d24663db5e2a3314009ebf57292e3423346f40a5ce4b5512301f8fd0b7",
+    "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_test-04.log": "bf9ff792831a7be7d32b59016cc71722a9144cd9a4ed9e42b2cba3d189113d30",
+    "docs/verification/IM-00/im00-70.json": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+    "docs/verification/IM-00/im00-70-full-optional-integration.json": "5dfaee2811d484d514024e6cde596e8c33755d6de4fee2d63348796fc9f3e9cf",
+    "docs/quality/result-changes/0002-linux-arnoldi-residual-bounds.md": "94f2bff3ff66b131a4a5301e6ad0ed5d54eaf194207dcde7f37a70450aa608ce"
+  },
+  "source_references": [
+    {
+      "id": "im00-70-scaled-action-sources-src-numerics-eigen_arnoldi_cluster.hpp",
+      "sha256": "c37eb6cef3473b3e66ed0b8bc1558964571d7ed07ed06622ee6e8e40d95fabac",
+      "hint": "src/numerics/eigen_arnoldi_cluster.hpp"
+    },
+    {
+      "id": "im00-70-scaled-action-sources-tests-numerics-eigen_arnoldi_test.cpp",
+      "sha256": "582e5b01f088ab81c90bc891a377785a10b9bc580c68765af99d013d68ea2c59",
+      "hint": "tests/numerics/eigen_arnoldi_test.cpp"
+    },
+    {
+      "id": "im00-70-scaled-action-sources-tests-numerics-eigen_arnoldi_allocations_test.cpp",
+      "sha256": "9db0de8e3034138e3a63c2881c619f693ec79188b6bdb98f0f5811252fea3817",
+      "hint": "tests/numerics/eigen_arnoldi_allocations_test.cpp"
+    },
+    {
+      "id": "im00-70-scaled-action-sources-.cursor-rules-numerics.mdc",
+      "sha256": "087269fd25a823301bdf861c5406165215ad1b5f4fb29ceed9d14b016ada0afb",
+      "hint": ".cursor/rules/numerics.mdc"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-baseline.log",
+      "sha256": "156caa1dd9a1c50f462729ca2fd0839482e6073dfeeefd66aa65bd60aae0b2d6",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-baseline.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-canary.txt",
+      "sha256": "afe81d1e3b99568c3aa7f7f5ef9af489593209e3eefac10fbfa67dce593f3ee8",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-canary.txt"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-debug-audit.log",
+      "sha256": "a6adda973a131164932b10ae69626f0c5a8c619b1d74aa98542d4902e6d0af05",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-debug-audit.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-debug-regular.log",
+      "sha256": "9f2025bcc849e6a77e28d6c06b4e694dcf0cda9464096f510efc03927b50f0d4",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-debug-regular.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-fixed-preliminary.log",
+      "sha256": "378880215734139ffd1658cdfe750b33023f3ff5414f32e292048395f72a664d",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-fixed-preliminary.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-japanese.json",
+      "sha256": "979568d576bae0dd166462fa290bc3d61b45786c4111ae20745087aed0b47ed2",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-japanese.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-linux-release-root.txt",
+      "sha256": "4b1074575b9f59795a7dff074b40a5cf60891a78ae2aaebf9515e742bf95ff11",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-linux-release-root.txt"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-qa-result.json",
+      "sha256": "e1627ad9ddd8598c788ccdec5cf95234850e2b82efce7a208501151a888c727d",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-qa-result.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-release-audit.log",
+      "sha256": "d65b1c4e0cb3026b18c8d3ef28804938b344898b3b5983beb0556292eef30c2f",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-release-audit.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-issue70-scale-release-regular.log",
+      "sha256": "3ccecc761bcad1e54aa7debf02da94482a005cc7967fce99240c46fc8c43486b",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/issue70-scale-release-regular.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-mutation-redaction.json",
+      "sha256": "9f1774a865e7324a9ebbd6d0c277002c7513e65f0bf56077135a97936df5e0df",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/mutation-redaction.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-mutation-summary.json",
+      "sha256": "d1fb344f63f067fc6aa95786bedbae90d1dfb7dddbc875b21f93cbcfaf867c87",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/mutation-summary.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-mutations.zip",
+      "sha256": "0d95cd5c5466f8b36a43819237fbb0aa4886dfafc8e8cdb0a0672861ba660055",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/mutations.zip"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-redaction.json",
+      "sha256": "b8cd02b3b6a7a53572359e002e23f41bac91392cdfe431d196ecf33237925e72",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/redaction.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-similar-search.txt",
+      "sha256": "92d23f239c1c198f521551d3cb409d974255dc9e8144abd67234aa33085a9382",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/similar-search.txt"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-src_numerics_eigen_arnoldi-04.json",
+      "sha256": "d70f4fcc57a74ab5bb83b73de2b882b6b0a3c5ecb5c882d5c034b5cb9edace4b",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/src_numerics_eigen_arnoldi-04.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-src_numerics_eigen_arnoldi-04.log",
+      "sha256": "49ba4986e3e4b48a7eebe5f0c12008619bc90d15ec8ac5f0322aa19c7f7a47fb",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/src_numerics_eigen_arnoldi-04.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-test-final.json",
+      "sha256": "57b28eb73b76d401c3931cd2d9717433f49478866425f0a0828bc36f2d528a07",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/test-final.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-test-final.log",
+      "sha256": "af3be4d6df05efc9704e7654a10988f8d53e33be68fce91c57b273f03545bccc",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/test-final.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-tests_numerics_eigen_arnoldi_allocations_test-04.json",
+      "sha256": "919e7599e2bdfb90727dcedcf841d1f6ed3c05af5b90384fb8a46c1b0e12b361",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_allocations_test-04.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-tests_numerics_eigen_arnoldi_allocations_test-04.log",
+      "sha256": "df9be13e74cc4c35e95caa1771606d93e0f249b77c178d8edb751308d3dc6221",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_allocations_test-04.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-tests_numerics_eigen_arnoldi_test-04.json",
+      "sha256": "04fd04d24663db5e2a3314009ebf57292e3423346f40a5ce4b5512301f8fd0b7",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_test-04.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-review-scaled-action-static-tests_numerics_eigen_arnoldi_test-04.log",
+      "sha256": "bf9ff792831a7be7d32b59016cc71722a9144cd9a4ed9e42b2cba3d189113d30",
+      "hint": "docs/verification/IM-00/im00-70-review-scaled-action/static/tests_numerics_eigen_arnoldi_test-04.log"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70.json",
+      "sha256": "632680bb52eb5c84612b4b05563a7e37b5dbbb8ed6e3e649f710d085da850074",
+      "hint": "docs/verification/IM-00/im00-70.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-verification-IM-00-im00-70-full-optional-integration.json",
+      "sha256": "5dfaee2811d484d514024e6cde596e8c33755d6de4fee2d63348796fc9f3e9cf",
+      "hint": "docs/verification/IM-00/im00-70-full-optional-integration.json"
+    },
+    {
+      "id": "im00-70-scaled-action-artifacts-docs-quality-result-changes-0002-linux-arnoldi-residual-bounds.md",
+      "sha256": "94f2bff3ff66b131a4a5301e6ad0ed5d54eaf194207dcde7f37a70450aa608ce",
+      "hint": "docs/quality/result-changes/0002-linux-arnoldi-residual-bounds.md"
+    }
+  ]
+}
