@@ -1,0 +1,56 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-07",
+    "EIG-03",
+    "EIG-11"
+  ],
+  "package": "IM-00",
+  "date": "2026-11-16",
+  "source_commit": "9bfc70f7f8bd7a5f3fc59c337dd4aad567d585d5",
+  "scope": "PR73のLinux Debug clang-tidy診断を訂正する。数値式・尺度変換・予算・依存・コンパイラ設定は変えない。",
+  "original_failure": {
+    "head": "c01819119117f51fd560802858f48741f97f014c",
+    "run": 43825824977,
+    "job": 133159551323,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/43825824977/job/133159551323",
+    "result": "数値試験63/63成功後、未初期化3型・deleted getterのnodiscard4件・optional参照5件のclang-tidy診断で失敗。"
+  },
+  "changes": [
+    "Request・Diagnostics・InverseAssessmentへ全項必須constructorを追加。既存の位置引数順を保ち、公開defaultや省略時の数値設定を追加しない。aggregateではなくなるため指定初期化は使えない。リポジトリ内の構築箇所を照合した。",
+    "Dataの開始前診断値を明示し、要求nev/ncvは同じsettingsから初期化する。entryでの同値代入と公開結果は変えない。",
+    "最初の失敗を確認・保存する関数が値への参照を返す。呼出し側でoptionalの存在を推論せず、最初の原因とcounterの評価順を保つ。",
+    "試験のoptional4件は既存の確認付き取得処理へ接続。deleted rvalue getter4件にもnodiscardを明記。警告抑制なし。"
+  ],
+  "verification": {
+    "platform": "Windows/MSVC Release",
+    "clean_revision": true,
+    "regular_cases": 26,
+    "regular_assertions": 835,
+    "tidy": "clang-tidy21.1.1、Arnoldi source・regular test・audit test・QAの4TUが各exit0。Windows構成での結果であり、新headのLinux clang-tidy成功は未確認。",
+    "format": "clang-format21.1.2、変更C++4fileを整形。",
+    "trace": "167IDs、0problems。新記録追加後にmatrixを再生成する。",
+    "independent_review": "別担当がfirst cause、counter評価順、参照寿命、開始前診断値と規約の日本語を通読し追加指摘なし。",
+    "not_repeated": "数値式を変えないCI修正なので他backend、Debug、確保監査実行、QA値再生成、変異、性能測定を繰り返さない。必要な製品依存だけ再compile。",
+    "ci": "最終push後のCI完了は待たず、成功を先取りしない。"
+  },
+  "history": "過去の記録と証拠、結果変更記録0002、基準結果は書き換えない。過去source-mapは各歴史版を指すためartifactとして参照する。",
+  "sources": {
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "26a6055f86ef5b5916eee4a1adbb48b5bda865944cb57cb1c0712deeaffbe4b9",
+    "src/numerics/eigen_arnoldi_data.hpp": "02e7e67775d6b54b66ca419285bbd85b807a9a379324f648dcfa69632fca284b",
+    "src/numerics/eigen_arnoldi_engine.hpp": "12054ca542ea2d630ef8f66358a771cd174d33ee8aa6131ba89eceb5c050b672",
+    "tests/numerics/eigen_arnoldi_test.cpp": "44fbf7525de64483e0656086ca40c354246a3d1f5d5b9104cfd36fe5ed23a672",
+    ".cursor/rules/cpp.mdc": "549a0c413d90dcb7a95a97e302f1ce17065f0622aeedf640e1203a77fd6a21f7"
+  },
+  "artifacts": {
+    "docs/verification/IM-00/im00-70-ci-tidy/pr73-ci-original-excerpt.txt": "44ee71ed49ffd008f8ebd0aac8e890cea410864d8e21d2e48edbf4f319cb4a15",
+    "docs/verification/IM-00/im00-70-ci-tidy/pr73-ci-regular.log": "3f296caa0bcbdb86d8326adc92d9cdda145f30ef5faa6cd111e588570bc488ab",
+    "docs/verification/IM-00/im00-70-ci-tidy/git_revision.hpp": "cee18e9162e021c172011d9c407c71672184628f0e5089c81fd6cb9fab9bcb63",
+    "docs/verification/IM-00/im00-70-ci-tidy/qa_eigen_arnoldi_main-04.log": "f43373f10532e3492371a88f4539adbea9bfad2a5d705d461dc389a17b5cd4b6",
+    "docs/verification/IM-00/im00-70-ci-tidy/src_numerics_eigen_arnoldi-04.log": "32a16498d3c332b47f2f03122cfe140b9cd739b494dbdc9a50528bbccaf65371",
+    "docs/verification/IM-00/im00-70-ci-tidy/tests_numerics_eigen_arnoldi_allocations_test-04.log": "3927e96f6d315289217d4ba591c20c3ca50957cfba067180cea7af474e6d17b6",
+    "docs/verification/IM-00/im00-70-ci-tidy/tests_numerics_eigen_arnoldi_test-04.log": "548b31abefc263bc4b76fa97848a02257b64037ab42b6174985e0ab44d314624",
+    "docs/verification/IM-00/im00-70-ci-tidy/summary.json": "aaafd0d2a45de18adf32183a8f6d713f462e95345b40fb0bda043c29b8bf5de0",
+    "docs/verification/IM-00/im00-70-review-scaled-action.json": "bda27297fedc9fb7a9f270162b9c45a394808e71228cca0eb278e8269417274d"
+  }
+}
