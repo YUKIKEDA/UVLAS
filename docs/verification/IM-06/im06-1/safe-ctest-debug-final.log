@@ -1,0 +1,48 @@
+Internal ctest changing into directory: <workspace>/out/issue85-build
+UpdateCTestConfiguration  from :<workspace>/out/issue85-build/DartConfiguration.tcl
+Parse Config file:<workspace>/out/issue85-build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<workspace>/out/issue85-build/DartConfiguration.tcl
+Parse Config file:<workspace>/out/issue85-build/DartConfiguration.tcl
+Test project <workspace>/out/issue85-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: io.input_scalar
+
+1: Test command: <workspace>\out\issue85-build\tests\Debug\uvlas_test_io_input_scalar.exe
+1: Working Directory: <workspace>/out/issue85-build/tests
+1: Test timeout computed to be: 60
+1: Randomness seeded to: 2643905102
+1: ===============================================================================
+1: All tests passed (1374 assertions in 4 test cases)
+1: 
+1/2 Test #1: io.input_scalar ..................   Passed    0.03 sec
+test 2
+    Start 2: io.input_scalar_allocations
+
+2: Test command: <workspace>\out\issue85-build\tests\Debug\uvlas_test_io_input_scalar_allocations.exe
+2: Working Directory: <workspace>/out/issue85-build/tests
+2: Test timeout computed to be: 60
+2: Randomness seeded to: 1199951479
+2: ===============================================================================
+2: All tests passed (16 assertions in 2 test cases)
+2: 
+2/2 Test #2: io.input_scalar_allocations ......   Passed    0.03 sec
+
+The following tests passed:
+	io.input_scalar
+	io.input_scalar_allocations
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+negative        =   0.07 sec*proc (2 tests)
+property        =   0.07 sec*proc (2 tests)
+unit            =   0.03 sec*proc (1 test)
+verification    =   0.03 sec*proc (1 test)
+
+Total Test time (real) =   0.09 sec

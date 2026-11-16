@@ -14,23 +14,23 @@
 
 ## 同じ整数単位で行う式
 
-全入力語を $$ x=qX $$ の整数へ復号してから加算する。以下のベクトルは整数単位とし、$$ e=X_1-X_0,\ f=X_2-X_0,\ r=P-X_0,\ c=e\times f,\ J^2=c\cdot c,\ h=c\cdot r $$ と置く。$$ J^2=0 $$ だけを退化とする。平面側は $$ h $$ の厳密な符号である。
+全入力語を $$ x=qX $$ の整数へ復号してから加算する。以下のベクトルは整数単位とし、 $$ e=X_1-X_0,\ f=X_2-X_0,\ r=P-X_0,\ c=e\times f,\ J^2=c\cdot c,\ h=c\cdot r $$ と置く。 $$ J^2=0 $$ だけを退化とする。平面側は $$ h $$ の厳密な符号である。
 
-$$ E=e\cdot e,\ F=f\cdot f,\ G=e\cdot f,\ u=e\cdot r,\ v=f\cdot r $$ とし、射影の重心分子は $$ N_1=Fu-Gv,\ N_2=Ev-Gu,\ N_0=J^2-N_1-N_2 $$。分母は正の $$ J^2 $$ で、各分子の負・零・正からOutside、開いたFace、各Edge、各Vertexを分ける。平面外でもこの射影分類を行う。
+ $$ E=e\cdot e,\ F=f\cdot f,\ G=e\cdot f,\ u=e\cdot r,\ v=f\cdot r $$ とし、射影の重心分子は $$ N_1=Fu-Gv,\ N_2=Ev-Gu,\ N_0=J^2-N_1-N_2 $$ 。分母は正の $$ J^2 $$ で、各分子の負・零・正からOutside、開いたFace、各Edge、各Vertexを分ける。平面外でもこの射影分類を行う。
 
-距離候補は次の閉集合から作る。各候補は $$ q^2N/D $$、$$ N\ge0,\ D>0 $$ を表す。
+距離候補は次の閉集合から作る。各候補は $$ q^2N/D $$ 、 $$ N\ge0,\ D>0 $$ を表す。
 
 | 候補 | 整数分子・分母 | 有効条件 |
 |---|---|---|
 | 頂点 $$ X_i $$ | $$ N=(P-X_i)\cdot(P-X_i),\ D=1 $$ | 常に |
-| 辺 $$ a\to b $$、$$ t=b-a,\ w=P-a,\ L=t\cdot t,\ s=t\cdot w $$ | $$ s\le0 $$ はa、$$ s\ge L $$ はbの頂点距離。内点は $$ N=(w\cdot w)L-s^2,\ D=L $$ | 常に。非退化三角形の各辺は非零 |
+| 辺 $$ a\to b $$ 、 $$ t=b-a,\ w=P-a,\ L=t\cdot t,\ s=t\cdot w $$ | $$ s\le0 $$ はa、 $$ s\ge L $$ はbの頂点距離。内点は $$ N=(w\cdot w)L-s^2,\ D=L $$ | 常に。非退化三角形の各辺は非零 |
 | 面への直交射影 | $$ N=h^2,\ D=J^2 $$ | $$ N_0,N_1,N_2\ge0 $$ |
 
 候補間の比較は交差積の符号による。返却最小値は全有効候補以下で、少なくとも一候補と等しい。距離零は $$ N=0,D=1 $$ へ正規化する。その他の分数へGCD簡約を要求しない。返却単位指数は常に−4296である。
 
 maskのbit0〜2は頂点0〜2、bit3〜5は閉じた辺01/12/20、bit6は閉じた面射影を表す。同じ最近点を与える全候補を含むため、最小次元のsupportの一意ラベルとは異なる。例えば頂点0上の点では、頂点0・辺01・辺20・面が同時に最小となりmaskは105（1+8+32+64）である。後続の物理ID選択は別途、採用済みの最低次元と安定IDの政策に従う。
 
-$$ \ell^2=\max(E,F,(X_2-X_1)\cdot(X_2-X_1)) $$ とする。farは $$ N>16\ell^2D $$ の場合だけで、等号はBoundary、厳密な未満はNearと返す。Boundaryは近側に属する。ε、絶対長さの接触閾値、相対許容差は導入しない。
+ $$ \ell^2=\max(E,F,(X_2-X_1)\cdot(X_2-X_1)) $$ とする。farは $$ N>16\ell^2D $$ の場合だけで、等号はBoundary、厳密な未満はNearと返す。Boundaryは近側に属する。ε、絶対長さの接触閾値、相対許容差は導入しない。
 
 ## 固定整数の容量根拠
 
@@ -64,7 +64,7 @@ Boost 1.92の `cpp_int_backend<32768,32768,signed_magnitude,checked,void>` と `
 
 workspaceは実際に使用する固定整数配列・候補配列をResourcePlanへ計上し、結果payloadは別のResourcePlanへ計上する。workspaceのatomic leaseを入力読取りより先に取得し、同じworkspaceの再入・同時使用をInvalidInputで拒否する。独立workspace間の並行実行は妨げない。例外と早期失敗でもleaseを解放する。
 
-固定整数であっても乗算の外部scratchが確保され得る。Boostのfixed Karatsuba setupは、最大operand limb数sに対し5s、結果側容量が不足する分岐では $$ sz+5s $$ limbを確保し、$$ sz\le2L,s\le L,L=\lceil32768/w\rceil $$ から単一bufferのforecastを $$ 7L\,sizeof(limb)=28672 $$ byteとする。逐次評価・et_offの当部品に限定した事前見積りで、allocator overhead、全process/RSS、全外部確保の証明済み上界ではない。
+固定整数であっても乗算の外部scratchが確保され得る。Boostのfixed Karatsuba setupは、最大operand limb数sに対し5s、結果側容量が不足する分岐では $$ sz+5s $$ limbを確保し、 $$ sz\le2L,s\le L,L=\lceil32768/w\rceil $$ から単一bufferのforecastを $$ 7L\,sizeof(limb)=28672 $$ byteとする。逐次評価・et_offの当部品に限定した事前見積りで、allocator overhead、全process/RSS、全外部確保の証明済み上界ではない。
 
 専用factoryだけがこの見積りを生成し、proven boundはAbsentを返す。EstimateAdmissionでは28672byte以上を要求し、それ未満はResourceExceeded。RequireProvenBoundは指定値によらずUnsupportedで、算術・結果確保の前に拒否する。ResourcePlanのpayloadを外部確保実測へ読み替えない。準備時のCpp確保回数とprocess peakは別に記録し、物理反復kernelの無確保を主張しない。
 
@@ -80,7 +80,7 @@ max_stepsは算術開始前に課金する名前付き準備段階の上限で�
 
 試験は入力語をcpp_rationalへ直接取り込み、別の最近点構成を使う。辺では有理な線分パラメータをclampし、面では射影点を原座標へ戻して向き付き辺で内外を判定する。各最近点から元の座標差を作り距離を計算し、製品の分子・分母の式を期待値生成へ転用しない。最小値が全候補以下かつ一候補と等しいこと、全最小mask、平面符号、射影feature、最長辺とfarを許容差0で照合する。
 
-局所幾何契約のLG-F01/04/05/06/07/08/09/10/11/12の厳密部分、6頂点順序、符号付き零、全Binary64指数、最小subnormal、最大有限語、highだけでは潰れるlow、尺度・回転を対象にする。3-4-5三角形の内側射影を持つ高さ20は $$ \ell^2=25,d^2=400=16\ell^2 $$、直前/直後の語をNear/Farと固定する。T22の(3,3,0)は有限面距離二乗8で、無限平面距離0を使う変異を拒否する。
+局所幾何契約のLG-F01/04/05/06/07/08/09/10/11/12の厳密部分、6頂点順序、符号付き零、全Binary64指数、最小subnormal、最大有限語、highだけでは潰れるlow、尺度・回転を対象にする。3-4-5三角形の内側射影を持つ高さ20は $$ \ell^2=25,d^2=400=16\ell^2 $$ 、直前/直後の語をNear/Farと固定する。T22の(3,3,0)は有限面距離二乗8で、無限平面距離0を使う変異を拒否する。
 
 独立workspace、旧結果の所有、移動、同じworkspace拒否、全既知診断、寸法・非有限・正確な容量境界を検証する。隔離変異はlow破棄、辺clamp/面適格性/交差積/far等号等を壊し、controlとcompile/linkの成功後のassert失敗だけを検出に数える。固定source・依存版・実行条件と実際の未検証OSは検証記録へ分離する。
 

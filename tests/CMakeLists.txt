@@ -30,6 +30,17 @@ function(uvlas_add_test name)
     set_tests_properties(${name} PROPERTIES LABELS "${arg_LABELS}" TIMEOUT ${arg_TIMEOUT})
 endfunction()
 
+uvlas_add_test(io.input_scalar
+    LABELS unit property negative verification
+    SOURCES io/input_scalar_test.cpp
+    LIBS uvlas_io Threads::Threads)
+uvlas_add_test(io.input_scalar_allocations
+    LABELS property negative
+    SOURCES io/input_scalar_allocations_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_io_audit uvlas::eigen)
+uvlas_enable_allocation_audit(uvlas_test_io_input_scalar_allocations)
+uvlas_require_audited_dependencies(uvlas_test_io_input_scalar_allocations)
+
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
     add_test(NAME cli.${case}
         COMMAND "${CMAKE_COMMAND}"
