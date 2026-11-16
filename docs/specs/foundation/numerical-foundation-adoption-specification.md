@@ -132,7 +132,3 @@ Failure.codeは`InvalidInput, Unsupported, GeometryInvalid, RankUnresolved, Char
 両OSの密実／複素更新、不定KKT、負の一般化固有値、100k疎、一般複素Arnoldi、実PG／自由後流の全履歴行列、two-product／有理rank／区間平方根／SHAの基準試験を保持する。さらに製品化時に、疎チャートとJ/Jᵀの随伴一致、TwoWord全消費者、世代不一致・予算超過・失敗時不変、並列Workspace、Python寿命、実格子I/O、再開、代表graph性能を追加する。これらの将来試験を今回の通過済み項目に数えない。
 
 公式取得元： [Eigen](https://libeigen.gitlab.io/)、[Spectra](https://spectralib.org/)、[Boost 1.92.0](https://www.boost.org/releases/1.92.0/)。採用版の実ソースと取得ロックを仕様の根拠とし、最新版へ黙って追従しない。
-
-## 2026-11-16：固有抽出の製品契約を具体化する
-
-Issue #64の[固有抽出契約](eigen-extraction-contract.md)を、N4-07の追加規約とする。元問題の尺度・左右／Schur／部分空間、対称一般化のM資格、作用とshift、保持・投影・世代・資源、代数抽出と物理被覆の境界を定義する。既決の方式・品質・実務範囲は変更しない。この追加規約の存在は製品実装やIM00-11の数値gate通過を意味しない。
