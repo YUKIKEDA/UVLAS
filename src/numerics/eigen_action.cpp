@@ -171,6 +171,10 @@ Result<void> ActionSession<Scalar>::apply(const ActionProvider<Scalar>& provider
         return remember(
             core::Failure{supported.error().code, operation, supported.error().details});
     }
+    // Capability metadata is user code too; detect its state change before any action charge.
+    auto before_callback = check_stamp();
+    if (!before_callback)
+        return before_callback;
     auto* count = &diagnostics_.forward_applications;
     std::uint64_t limit = limits_.forward;
     if (kind == ActionKind::Adjoint) {
