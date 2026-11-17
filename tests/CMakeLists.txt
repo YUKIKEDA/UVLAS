@@ -346,6 +346,11 @@ uvlas_add_test(structure.pg_coefficients
     LABELS unit property negative verification V-PG
     SOURCES structure/pg_coefficients_test.cpp structure/pg_coefficients_reference_test.cpp
     LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+# The instrumented exact-coefficient test exceeded the ordinary 300-second deadline.
+# Keep the normal limit and a separate finite budget for instrumented execution.
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_coefficients PROPERTIES TIMEOUT 900)
+endif()
 target_include_directories(uvlas_test_structure_pg_coefficients
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 target_compile_definitions(uvlas_test_structure_pg_coefficients PRIVATE
