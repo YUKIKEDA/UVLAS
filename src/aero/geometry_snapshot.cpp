@@ -885,14 +885,13 @@ AeroResult<QueryRequest> ResolvedQuery::definition() const noexcept {
         if (!active())
             return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
         const auto& q = query_.values()[0];
-        if (const auto* free = std::get_if<FreeStorage>(&q.definition)) {
-            if (const auto* s = std::get_if<std::array<double, 3>>(free))
-                return QueryRequest{QueryId{q.id}, FreePoint{FreeSingle{*s}}};
-            if (const auto* s = std::get_if<std::array<double, 6>>(free))
-                return QueryRequest{QueryId{q.id},
-                                    FreePoint{FreeDouble{{(*s)[0], (*s)[1], (*s)[2]},
-                                                         {(*s)[3], (*s)[4], (*s)[5]}}}};
-        } else if (const auto* vertex = std::get_if<VertexStorage>(&q.definition))
+        if (const auto* single = std::get_if<FreeSingleStorage>(&q.definition))
+            return QueryRequest{QueryId{q.id}, FreePoint{FreeSingle{*single}}};
+        else if (const auto* pair = std::get_if<FreeDoubleStorage>(&q.definition))
+            return QueryRequest{QueryId{q.id},
+                                FreePoint{FreeDouble{{(*pair)[0], (*pair)[1], (*pair)[2]},
+                                                     {(*pair)[3], (*pair)[4], (*pair)[5]}}}};
+        else if (const auto* vertex = std::get_if<VertexStorage>(&q.definition))
             return QueryRequest{QueryId{q.id}, SourceVertex{PointId{vertex->point}}};
         else if (const auto* edge = std::get_if<EdgeQueryStorage>(&q.definition))
             return QueryRequest{QueryId{q.id},
@@ -945,17 +944,15 @@ GeometryEngine::resolve(const OwnedGeometry& geometry, const QueryRequest& reque
                     if (!finite(value))
                         return std::unexpected(
                             rejected(core::FailureCode::Nonfinite, context, request.id));
-                query.definition.emplace<FreeStorage>(std::in_place_type<std::array<double, 3>>,
-                                                      single->words);
+                query.definition.emplace<FreeSingleStorage>(single->words);
             } else if (const auto* pair = std::get_if<FreeDouble>(&free->words)) {
                 for (std::size_t i = 0; i < 3; ++i)
                     if (!finite(pair->high[i]) || !finite(pair->low[i]))
                         return std::unexpected(
                             rejected(core::FailureCode::Nonfinite, context, request.id));
-                query.definition.emplace<FreeStorage>(std::in_place_type<std::array<double, 6>>,
-                                                      std::array{pair->high[0], pair->high[1],
-                                                                 pair->high[2], pair->low[0],
-                                                                 pair->low[1], pair->low[2]});
+                query.definition.emplace<FreeDoubleStorage>(std::array{pair->high[0], pair->high[1],
+                                                                       pair->high[2], pair->low[0],
+                                                                       pair->low[1], pair->low[2]});
             } else
                 return std::unexpected(
                     rejected(core::FailureCode::InvalidInput, context, request.id));
@@ -1062,19 +1059,21 @@ GeometryEngine::resolve(const OwnedGeometry& geometry, const QueryRequest& reque
 AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const QueryStorage& query,
                                                 ExactPoints& points,
                                                 QueryArithmeticScratch& scratch, Run& run) {
-    if (const auto* free = std::get_if<FreeStorage>(&query.definition)) {
+    if (const auto* single = std::get_if<FreeSingleStorage>(&query.definition)) {
         for (std::size_t axis = 0; axis < 3; ++axis) {
             if (auto r = run.step(QueryId{query.id}); !r)
                 return r;
-            if (const auto* s = std::get_if<std::array<double, 3>>(free))
-                decode_into((*s)[axis], 1074, points[3][axis]);
-            else if (const auto* p = std::get_if<std::array<double, 6>>(free)) {
-                decode_into((*p)[axis], 1074, points[3][axis]);
-                decode_into((*p)[axis + 3], 1074, scratch.word);
-                points[3][axis] += scratch.word;
-            } else
-                return std::unexpected(
-                    rejected(core::FailureCode::InvalidInput, run.context, QueryId{query.id}));
+            decode_into((*single)[axis], 1074, points[3][axis]);
+        }
+        return {};
+    }
+    if (const auto* pair = std::get_if<FreeDoubleStorage>(&query.definition)) {
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            if (auto r = run.step(QueryId{query.id}); !r)
+                return r;
+            decode_into((*pair)[axis], 1074, points[3][axis]);
+            decode_into((*pair)[axis + 3], 1074, scratch.word);
+            points[3][axis] += scratch.word;
         }
         return {};
     }

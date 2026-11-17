@@ -140,11 +140,13 @@ for (const auto& [a, b] : pairs) { use(a, b); }
 
 少数要素用の固定配列を並べる補助処理も、入力件数と添字の上限を明示する。2026-11-15、PR #50のmutex順序付けは、3要素配列のprefixに対するstd::sortからlibstdc++の大範囲処理が展開され、GCC 14 Releaseの `-Werror=array-bounds` で構築に失敗した。容量を検査する小さな挿入ソートへ替え、`std::less` のポインタ全順序、重複排除、try-lock失敗時の取得済みlock解放を維持した。警告を無効にせず、対象翻訳単位と接続する処理で確認する。
 
-全入力語とactive alternativeの初期化を先に確認する。入れ子の`std::variant`への一時代入が最適化時だけ未初期化診断となる場合は、選択した内外のalternativeを`emplace`と`in_place_type`で直接構築する形も確認する。2026-11-17、PR #102はGCC14 Releaseの`-O3 -Werror=maybe-uninitialized`がFreeStorageの一時代入を拒否し、Debug・sanitizer・MSVCでは通った。意味のない初期値や警告抑制を足さず、元のkind・全語の順序・検査を保持し、対象構成と正常な全alternativeを確認する。
+全入力語とactive alternativeの初期化を先に確認する。入れ子の`std::variant`は直接`emplace`しても、標準libの強い例外保証の分岐が一時variantを作ることがある。2026-11-17、PR #102のGCC14 Releaseは、一時代入を直接emplaceへ替えた後も`-O3 -Werror=maybe-uninitialized`で失敗した。libstdc++の分岐条件を読み、private storageの3語/6語を外側の別alternativeへ平坦化した。公開型・元語・数値式を変えず、選択型のnothrow構築とEdge/Faceのcopy/move条件を確認する。意味のない初期値や警告抑制を足さず、最適化構成が未確認なら解消済みとは書かない。
 
 ```cpp
-// BAD: the nested temporary assignment obscures which active storage is constructed.
-outer = Inner{words};
-// GOOD: construct exactly the selected inner alternative in its final storage.
+// BAD: nested emplace can still use an exception-guarantee temporary.
 outer.emplace<Inner>(std::in_place_type<Words>, words);
+// GOOD: preserve the private payload alternatives with direct nonthrowing construction.
+using Storage = std::variant<Words3, Words6, Vertex, Edge, Face>;
+Storage storage;
+storage.emplace<Words3>(words);
 ```
