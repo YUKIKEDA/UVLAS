@@ -207,6 +207,39 @@ TEST_CASE("Strict JSON and UTF8 reject every malformed literal without accepting
     CHECK(take(valid.view()).identity.byte_count == minimal.size() + 7);
 }
 
+TEST_CASE("Parser failure reasons ignore diagnostic words copied from source text",
+          "[verification][negative][IO4-01][N4-08]") {
+    constexpr std::array<std::string_view, 7> prefixes{
+        "hello",
+        "ill-formed UTF-8",
+        "surrogate",
+        "4 hex digits",
+        "after backslash",
+        "; last read: 'ill-formed UTF-8 surrogate 4 hex digits after backslash",
+        "; last read: 'surrogate'; last read: 'ill-formed UTF-8"};
+    for (const auto prefix : prefixes) {
+        CAPTURE(prefix);
+        // The fixed lexer cause, not a word inside its last-read quotation,
+        // determines the reason. Check both a model value and strict EOF scan.
+        const auto bad_escape = "\"" + std::string{prefix} + R"(\q")";
+        rejected(envelope(bad_escape), core::FailureCode::InvalidInput,
+                 InputDiagnosticReason::InvalidStringEscape);
+        rejected(std::string{minimal} + " " + bad_escape, core::FailureCode::InvalidInput,
+                 InputDiagnosticReason::InvalidStringEscape);
+        rejected(envelope("\"" + std::string{prefix} + "\n\""), core::FailureCode::InvalidInput,
+                 InputDiagnosticReason::JsonSyntax);
+        rejected(envelope("\"" + std::string{prefix} + "\xc0\xaf\""),
+                 core::FailureCode::InvalidInput, InputDiagnosticReason::InvalidUtf8);
+    }
+    for (const auto suffix : {R"(\uZZZZ")", R"(\uD800")", R"(\uDC00")"})
+        rejected(envelope("\"ill-formed UTF-8" + std::string{suffix}),
+                 core::FailureCode::InvalidInput, InputDiagnosticReason::InvalidStringEscape);
+    // A valid extra token takes the parser's unexpected-token path, which does
+    // not append the token's user text to the generated diagnostic.
+    rejected(std::string{minimal} + R"( "ill-formed UTF-8 surrogate 4 hex digits")",
+             core::FailureCode::InvalidInput, InputDiagnosticReason::JsonSyntax);
+}
+
 TEST_CASE("Native integer nodes preserve the entire binary64 boundary before strict conversion",
           "[verification][negative][IO4-01][N4-03][N4-08]") {
     const auto value = document(envelope("[9007199254740991,9007199254740992,9007199254740993,"

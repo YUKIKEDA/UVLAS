@@ -304,11 +304,15 @@ ParserFailureClassification classify_parser_failure(ParserFailureClass kind, int
         return {core::FailureCode::Nonfinite, InputDiagnosticReason::NumberRange};
     if (kind != ParserFailureClass::Syntax)
         return {core::FailureCode::InvalidInput, InputDiagnosticReason::UnexpectedException};
-    if (message.find("ill-formed UTF-8") != std::string_view::npos)
+    // The pinned parser appends this delimiter before quoting user-controlled
+    // last-read bytes. Only its preceding generated diagnostic is a cause;
+    // input text may itself contain delimiters, quotes and diagnostic words.
+    const auto cause = message.substr(0, message.find("; last read: '"));
+    if (cause.find("ill-formed UTF-8") != std::string_view::npos)
         return {core::FailureCode::InvalidInput, InputDiagnosticReason::InvalidUtf8};
-    if (message.find("surrogate") != std::string_view::npos ||
-        message.find("4 hex digits") != std::string_view::npos ||
-        message.find("after backslash") != std::string_view::npos)
+    if (cause.find("surrogate") != std::string_view::npos ||
+        cause.find("4 hex digits") != std::string_view::npos ||
+        cause.find("after backslash") != std::string_view::npos)
         return {core::FailureCode::InvalidInput, InputDiagnosticReason::InvalidStringEscape};
     return {core::FailureCode::InvalidInput, InputDiagnosticReason::JsonSyntax};
 }

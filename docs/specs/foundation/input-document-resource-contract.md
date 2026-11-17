@@ -114,6 +114,8 @@ factoryは標準libのfamilyとrevision、ABI、pointer/size_t/word幅、CHAR_BI
 
 通常は`core::guard_entry`でbad_allocをResourceExceededへ翻訳する。第三者message/whatは同期処理中の分類にだけ使い、Failureや補助診断へ借用しない。error.idと取得可能なbyte位置から分類し、reason/source/digest/eventを所有値として残す。raw error.idを返却するAPIは追加しない。
 
+構文errorの分類に使う部分は、固定parserが生成した診断だけとする。nlohmann 3.12.0の`parser::exception_message`はlexerの固定診断、固定区切り`; last read: '`、入力由来tokenの順に連結する。最初の区切りより前だけを分類し、後ろに引用された入力の原因語・引用符・追加の同じ区切りを使わない。区切りのないunexpected-token経路は、parserが生成したtoken種別名だけを含む。PR #104のレビューでは全文検索により、入力の`ill-formed UTF-8`が実際の不正escapeをUTF-8異常へ、`surrogate`等が生改行をescape異常へ誤分類することを確認した。原因の分類だけを訂正し、失敗code・検査順・位置の所有・CRT fallbackの扱いを変えない。
+
 MSVCの`std_exception.cpp::__std_exception_copy`はmessage長+NULをmallocで複製し、失敗してもthrowせず_Whatをnullのままにする。`vcruntime_exception.h::what()`はそのとき固定`Unknown exception`を返す。nlohmannが生成したparse_error/out_of_rangeだけに入口を限定し、通常生成messageの固定`[json.exception.<class>.<id>] ` prefixが失われたCRT fallbackを、通常id/byte分類より先にResourceExceeded/Allocationへ変換する。無関係な標準例外をこのfallbackへ分類しない。
 
 private分類関数へ同じfallbackを与える対照は、実CRT mallocを失敗させた実行とは区別して記録する。C++ newの故障対照だけでCRT malloc全量を監査したとは書かない。libstdc++の例外COW文字列生成はbad_allocを伝播するので既存guardで翻訳する。
