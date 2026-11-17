@@ -49,7 +49,7 @@
     },
     {
       "condition": 5,
-      "evidence": "独立技術・型照合・読みやすさ・構造レビュー、3文書lint/outline/terms。指摘を追加sourcecommitへ反映。trace/共有入口はroot所有metadataで同期。"
+      "evidence": "独立技術・型照合・読みやすさ・構造レビュー、3文書lint/outline/terms。指摘を追加sourcecommitへ反映。rootが共有入口とIM06-3のDoneを同期。trace matrix/checkは208 IDs、試験あり32、記録あり39、0 problems。"
     }
   ],
   "verification": {
