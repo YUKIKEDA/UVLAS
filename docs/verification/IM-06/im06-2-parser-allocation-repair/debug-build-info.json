@@ -1,0 +1,19 @@
+{
+  "schema": "uvlas.build-info/1",
+  "version": "0.1.0-dev",
+  "commit": "b11535dfb94f71b0e947e08e8d369a9df1a097cc",
+  "uncommitted_changes": false,
+  "compiler": "MSVC 19.51.36260.0",
+  "platform": "Windows AMD64",
+  "configuration": "Debug",
+  "floating_point": "/fp:strict",
+  "instruction_set": "sse2",
+  "platform_key": "windows-x64-msvc19.51-sse2",
+  "dependencies": {
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "nlohmann_json": "3.12.0"
+  },
+  "dependency_repairs": {"nlohmann_json_sax_allocation": 1}
+}

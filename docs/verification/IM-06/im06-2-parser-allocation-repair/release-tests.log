@@ -1,0 +1,86 @@
+Internal ctest changing into directory: <workspace>/out/issue99-build-clean
+UpdateCTestConfiguration  from :<workspace>/out/issue99-build-clean/DartConfiguration.tcl
+Parse Config file:<workspace>/out/issue99-build-clean/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<workspace>/out/issue99-build-clean/DartConfiguration.tcl
+Parse Config file:<workspace>/out/issue99-build-clean/DartConfiguration.tcl
+Test project <workspace>/out/issue99-build-clean
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 10
+    Start 10: cli.build_info
+
+10: Test command: <workspace>\out\issue99-build-clean\Release\uvlas.exe "--build-info"
+10: Working Directory: <workspace>/out/issue99-build-clean/tests
+10: Test timeout computed to be: 10
+10: {
+10:   "schema": "uvlas.build-info/1",
+10:   "version": "0.1.0-dev",
+10:   "commit": "b11535dfb94f71b0e947e08e8d369a9df1a097cc",
+10:   "uncommitted_changes": false,
+10:   "compiler": "MSVC 19.51.36260.0",
+10:   "platform": "Windows AMD64",
+10:   "configuration": "Release",
+10:   "floating_point": "/fp:strict",
+10:   "instruction_set": "sse2",
+10:   "platform_key": "windows-x64-msvc19.51-sse2",
+10:   "dependencies": {
+10:     "eigen": "5.0.1",
+10:     "spectra": "1.2.0",
+10:     "boost": "1.92.0",
+10:     "nlohmann_json": "3.12.0"
+10:   },
+10:   "dependency_repairs": {"nlohmann_json_sax_allocation": 1}
+10: }
+1/4 Test #10: cli.build_info .........................   Passed    0.03 sec
+test 11
+    Start 11: toolchain.pinned_dependencies
+
+11: Test command: <workspace>\out\issue99-build-clean\tests\Release\uvlas_test_toolchain_pinned_dependencies.exe
+11: Working Directory: <workspace>/out/issue99-build-clean/tests
+11: Test timeout computed to be: 60
+11: Randomness seeded to: 1654157058
+11: ===============================================================================
+11: All tests passed (74 assertions in 4 test cases)
+11: 
+2/4 Test #11: toolchain.pinned_dependencies ..........   Passed    0.03 sec
+test 12
+    Start 12: toolchain.json_allocation_exceptions
+
+12: Test command: <user>\AppData\Roaming\uv\python\cpython-3.12.8-windows-x86_64-none\python.exe "-m" "tools.qa.json_allocation_probe_test" "--probe" "<workspace>/out/issue99-build-clean/tests/Release/uvlas_json_allocation_probe.exe"
+12: Working Directory: <workspace>
+12: Environment variables: 
+12:  PYTHONUTF8=1
+12: Test timeout computed to be: 180
+12: {"constructor_controls": [{"case": "default-vector", "fault_exit": null, "new_count": 0}, {"case": "explicit-bool", "fault_exit": null, "new_count": 0}, {"case": "explicit-char", "fault_exit": null, "new_count": 0}, {"case": "explicit-string", "fault_exit": null, "new_count": 0}], "debug_proxies": false, "sax_cases": [{"case": "all-kinds", "caught": 11, "new_count": 11}, {"case": "surrogate", "caught": 20, "new_count": 20}, {"case": "range", "caught": 12, "new_count": 12}, {"case": "deep", "caught": 15, "new_count": 15}, {"case": "long-token", "caught": 63, "new_count": 63}], "sax_faults_caught": 121, "schema": "uvlas.json-allocation-probe/1", "scope": "Selected JSON SAX C++new sites; no CRT malloc injection or all-format guarantee"}
+3/4 Test #12: toolchain.json_allocation_exceptions ...   Passed    1.26 sec
+test 26
+    Start 26: core.instrumentation
+
+26: Test command: <workspace>\out\issue99-build-clean\tests\Release\uvlas_test_core_instrumentation.exe
+26: Working Directory: <workspace>/out/issue99-build-clean/tests
+26: Test timeout computed to be: 60
+26: Randomness seeded to: 658761392
+26: ===============================================================================
+26: All tests passed (104 assertions in 4 test cases)
+26: 
+4/4 Test #26: core.instrumentation ...................   Passed    0.05 sec
+
+The following tests passed:
+	cli.build_info
+	toolchain.pinned_dependencies
+	toolchain.json_allocation_exceptions
+	core.instrumentation
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+integration     =   0.07 sec*proc (2 tests)
+negative        =   1.30 sec*proc (2 tests)
+unit            =   0.08 sec*proc (2 tests)
+verification    =   1.26 sec*proc (1 test)
+
+Total Test time (real) =   1.37 sec

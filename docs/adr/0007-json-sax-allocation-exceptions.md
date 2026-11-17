@@ -1,6 +1,6 @@
 # 0007: JSON SAXの割当失敗を例外境界へ返す
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-17
 - Issue: #98
 
