@@ -1,0 +1,7 @@
+{
+  "id": "im06-3-integrity-output-redaction",
+  "before_sha256": "fdb612dcc8f23f6a3d107b213bea0553cf18d3341664fbcd1121e44edd10641e",
+  "after_sha256": "97eeed6b984f3a33628768619709964165afc1e576c4eb721d1be41947f502d6",
+  "replacements": 1,
+  "scope": "checker出力のroot機械pathだけを既存redact規則で伏せた。判定/件数を変えていない。"
+}

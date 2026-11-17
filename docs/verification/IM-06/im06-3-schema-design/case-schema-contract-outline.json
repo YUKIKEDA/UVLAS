@@ -1,0 +1,202 @@
+{
+  "outline": [
+    {
+      "line": 1,
+      "kind": "heading",
+      "level": 1,
+      "text": "全ケースschemaと段階別検証の契約"
+    },
+    {
+      "line": 3,
+      "kind": "lead",
+      "level": null,
+      "text": "2026-11-17。"
+    },
+    {
+      "line": 5,
+      "kind": "heading",
+      "level": 2,
+      "text": "CS-01 対象と検証段階"
+    },
+    {
+      "line": 7,
+      "kind": "lead",
+      "level": null,
+      "text": "`InputDocument` は構文、元のバイト列、値のkind、root envelopeを所有する。"
+    },
+    {
+      "line": 18,
+      "kind": "lead",
+      "level": null,
+      "text": "これらは別型である。"
+    },
+    {
+      "line": 20,
+      "kind": "heading",
+      "level": 2,
+      "text": "CS-02 字句型と閉じたobject"
+    },
+    {
+      "line": 22,
+      "kind": "lead",
+      "level": null,
+      "text": "フィールド辞書の各行はobjectの**全許可key**を列挙する。"
+    },
+    {
+      "line": 42,
+      "kind": "lead",
+      "level": null,
+      "text": "`Number`は元token、sign、digits、十進指数、出典nodeを所有する。"
+    },
+    {
+      "line": 44,
+      "kind": "lead",
+      "level": null,
+      "text": "有理係数とJSON Numberは別型である。"
+    },
+    {
+      "line": 46,
+      "kind": "heading",
+      "level": 2,
+      "text": "CS-03 所有・同一性・既定値"
+    },
+    {
+      "line": 48,
+      "kind": "lead",
+      "level": null,
+      "text": "`SchemaCase`はmove-onlyで、元`InputDocument`と型付きpayload、参照表、単位系、未SIの値、出典位置を所有する。"
+    },
+    {
+      "line": 50,
+      "kind": "lead",
+      "level": null,
+      "text": "型付き結果は元bytesの`SourceIdentity`とschema版を持つ。"
+    },
+    {
+      "line": 52,
+      "kind": "lead",
+      "level": null,
+      "text": "省略可能keyの全てに辞書で解決規則を付ける。"
+    },
+    {
+      "line": 54,
+      "kind": "heading",
+      "level": 2,
+      "text": "CS-04 参照・IDと検査順"
+    },
+    {
+      "line": 56,
+      "kind": "lead",
+      "level": null,
+      "text": "IDは `Geometry, Material, Shell, Beam, Joint, Support, Mass, AeroSurface, Layer, Load, Observation, Source, Frame, Branch, WakeRow, WakePoint, WakeBand` の各名前空間で一意である。"
+    },
+    {
+      "line": 58,
+      "kind": "lead",
+      "level": null,
+      "text": "検査の順序は次の一か所で定める。"
+    },
+    {
+      "line": 60,
+      "kind": "bullets",
+      "level": null,
+      "text": "(箇条書き 6 項目)"
+    },
+    {
+      "line": 67,
+      "kind": "lead",
+      "level": null,
+      "text": "重複weldや物理拘束の従属はschemaの単なる参照循環と異なる。"
+    },
+    {
+      "line": 69,
+      "kind": "lead",
+      "level": null,
+      "text": "パスはNUL/空文字を拒否し、`FileRef`のpathはmanifest directory基準である。"
+    },
+    {
+      "line": 71,
+      "kind": "heading",
+      "level": 2,
+      "text": "CS-05 失敗・資源と例外"
+    },
+    {
+      "line": 73,
+      "kind": "lead",
+      "level": null,
+      "text": "入口の論理I/Fは `validate_case_schema(const InputDocument&, SchemaLimits, ResourcePlan&, SchemaDiagnostic*) -> Result<SchemaCase>` とする。"
+    },
+    {
+      "line": 83,
+      "kind": "lead",
+      "level": null,
+      "text": "`SchemaLimits`は元文書上限とは別に、typed payload bytes、全entity件数、全参照件数、全scalar件数、全多項式term件数、全table sample件数、式node/edge数・深さ・整数冪絶対値・評価点数、全text bytes、診断path bytesの最大値を全て明示する。"
+    },
+    {
+      "line": 85,
+      "kind": "lead",
+      "level": null,
+      "text": "固定型metadataを除く成功payload、辞書、ID索引、参照配列、exact比較用の可変scratchは`ResourcePlan`で確保前に計上する。"
+    },
+    {
+      "line": 87,
+      "kind": "lead",
+      "level": null,
+      "text": "quota失敗でも元文書、呼出し前のModel、Accepted/Trialは変更しない。"
+    },
+    {
+      "line": 89,
+      "kind": "heading",
+      "level": 2,
+      "text": "CS-06 採用仕様への対応と開始条件"
+    },
+    {
+      "line": 102,
+      "kind": "lead",
+      "level": null,
+      "text": "実装開始には、辞書の全型が閉じていること、各variantの最小例、全種類に対する型/未知key/欠落/相互条件/参照の負例、巨大ID/十進低位保持、入力不変/所有/資源境界を独立に審査する。"
+    },
+    {
+      "line": 104,
+      "kind": "lead",
+      "level": null,
+      "text": "本書の設計審査、schema実装、SI/snapshot、物理prepare、全機能受入は別々に状態を記録する。"
+    }
+  ],
+  "heading_stats": {
+    "total_headings": 7,
+    "level_distribution": {
+      "1": 1,
+      "2": 6
+    },
+    "by_level": {
+      "1": {
+        "count": 1,
+        "length_mean": 19.0,
+        "length_cv": 0.0,
+        "nominal_ending_ratio": 1.0,
+        "dominant_pos_signature_ratio": 1.0,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      },
+      "2": {
+        "count": 6,
+        "length_mean": 16.0,
+        "length_cv": 0.144,
+        "nominal_ending_ratio": 1.0,
+        "dominant_pos_signature_ratio": 0.5,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      }
+    },
+    "overall": {
+      "count": 7,
+      "length_mean": 16.43,
+      "length_cv": 0.145,
+      "nominal_ending_ratio": 1.0,
+      "dominant_pos_signature_ratio": 0.429,
+      "template_hits": [],
+      "structural_pattern_ratio": 0.0
+    }
+  }
+}

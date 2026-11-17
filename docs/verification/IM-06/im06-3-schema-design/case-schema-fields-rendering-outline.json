@@ -1,0 +1,350 @@
+{
+  "outline": [
+    {
+      "line": 1,
+      "kind": "heading",
+      "level": 1,
+      "text": "uvlas.case/1 フィールド辞書"
+    },
+    {
+      "line": 3,
+      "kind": "lead",
+      "level": null,
+      "text": "[全schema契約](case-schema-contract.md)の規範的な型辞書である。"
+    },
+    {
+      "line": 5,
+      "kind": "lead",
+      "level": null,
+      "text": "有限式入力の採用はIssue #110に記録した利用者決定Aに基づく。"
+    },
+    {
+      "line": 7,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-01 rootと単位"
+    },
+    {
+      "line": 16,
+      "kind": "lead",
+      "level": null,
+      "text": "角度はroot angleによる物理角を明示し、無次元ひずみ/法線/回転行列へangle倍率を掛けない。"
+    },
+    {
+      "line": 18,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-02 共通の物理点・場・時間系列"
+    },
+    {
+      "line": 38,
+      "kind": "lead",
+      "level": null,
+      "text": "ReferenceFieldとTimeSeriesはFD-12の限定式variantも持つ。"
+    },
+    {
+      "line": 40,
+      "kind": "lead",
+      "level": null,
+      "text": "MotionはPCHIPのC1だけを加速度のC2資格へ流用しない。"
+    },
+    {
+      "line": 42,
+      "kind": "lead",
+      "level": null,
+      "text": "PGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat/2) $$ とする。"
+    },
+    {
+      "line": 44,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-03 幾何と外部source"
+    },
+    {
+      "line": 59,
+      "kind": "lead",
+      "level": null,
+      "text": "Nastran/Gmshのsidecar内容は本caseと同じ型辞書の幾何・材料・所有/対応定義を使用し、別の暗黙単位/材料補完を作らない。"
+    },
+    {
+      "line": 61,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-04 材料・シェル・梁"
+    },
+    {
+      "line": 79,
+      "kind": "lead",
+      "level": null,
+      "text": "梁のmatrix剛性の(i,j)単位は、一般化ひずみの長さ指数をa=(0,0,0,−1,−1,−1)としてenergy/lengthからL^(a_i+a_j)を除いた単位である。"
+    },
+    {
+      "line": 81,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-05 接続・支持・質量・荷重"
+    },
+    {
+      "line": 104,
+      "kind": "lead",
+      "level": null,
+      "text": "支持の(並進,回転)混合単位は各相対座標の次元を使ってenergyから導く。"
+    },
+    {
+      "line": 106,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-06 空力・既知流れ"
+    },
+    {
+      "line": 127,
+      "kind": "lead",
+      "level": null,
+      "text": "指定移流をfreeと同じ物理モデルとして扱わない。"
+    },
+    {
+      "line": 129,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-07 解析・枝・探索"
+    },
+    {
+      "line": 150,
+      "kind": "lead",
+      "level": null,
+      "text": "physics=aerodynamicはaero_surfaces1以上、shells/beams/masses/joints/supports空を許し、架空の構造物性を要求しない。"
+    },
+    {
+      "line": 152,
+      "kind": "lead",
+      "level": null,
+      "text": "`Analysis.loads`は部材をまたぐ重力/荷重を置く。"
+    },
+    {
+      "line": 154,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-08 初期状態と再開要求"
+    },
+    {
+      "line": 175,
+      "kind": "lead",
+      "level": null,
+      "text": "transientには `initial` と `restart` のどちらか一方が必須。"
+    },
+    {
+      "line": 177,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-09 観測・誤差配分"
+    },
+    {
+      "line": 197,
+      "kind": "heading",
+      "level": 3,
+      "text": "観測の成分形状"
+    },
+    {
+      "line": 199,
+      "kind": "lead",
+      "level": null,
+      "text": "表のnは`ObservationBudget.absolute/relative/scale`の各長さである。"
+    },
+    {
+      "line": 216,
+      "kind": "lead",
+      "level": null,
+      "text": "Greenひずみは配置から定まる単一テンソルであり、弾性応力/粘性応力の和へ分解しない。"
+    },
+    {
+      "line": 218,
+      "kind": "lead",
+      "level": null,
+      "text": "`basis`は表のx/y/z軸を定める。"
+    },
+    {
+      "line": 220,
+      "kind": "lead",
+      "level": null,
+      "text": "interface=bothではlower/upperを別packetとして返し、**それぞれ**同じn成分予算を適用する。"
+    },
+    {
+      "line": 222,
+      "kind": "lead",
+      "level": null,
+      "text": "各ObservationBudget.groupsとNumerics.error_groupsは全12群を各1回宣言する。"
+    },
+    {
+      "line": 224,
+      "kind": "lead",
+      "level": null,
+      "text": "`Comparison.window`は静的caseでは同じ評価時刻の単一点とする。"
+    },
+    {
+      "line": 226,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-10 数値政策と求解上限"
+    },
+    {
+      "line": 268,
+      "kind": "heading",
+      "level": 3,
+      "text": "尺度の明示的な展開"
+    },
+    {
+      "line": 270,
+      "kind": "lead",
+      "level": null,
+      "text": "`uniform_components`のvaluesは下表の成分数と完全一致する。"
+    },
+    {
+      "line": 285,
+      "kind": "lead",
+      "level": null,
+      "text": "constraint/newton_correction/arclength_stateは準備済み混合layoutに依存するため`uniform_components`を拒否する。"
+    },
+    {
+      "line": 287,
+      "kind": "heading",
+      "level": 3,
+      "text": "初回mixed layoutを物理尺度から閉じる"
+    },
+    {
+      "line": 289,
+      "kind": "lead",
+      "level": null,
+      "text": "`physical_layout_policy`は以下の必須primary宣言と組み合わせる。"
+    },
+    {
+      "line": 300,
+      "kind": "lead",
+      "level": null,
+      "text": "拘束の原成分を $$ C_i $$ 、対応するcallerの正物理尺度を $$ c_i $$ とする。"
+    },
+    {
+      "line": 302,
+      "kind": "lead",
+      "level": null,
+      "text": "無次元化拘束へ共役な内部乗数は仕事次元を持つ。"
+    },
+    {
+      "line": 304,
+      "kind": "lead",
+      "level": null,
+      "text": "各Newton未知量/原残差slotはprepareで物理由来（primary field、target、axis、必要なwork block）と同じ単位を持つ。"
+    },
+    {
+      "line": 306,
+      "kind": "lead",
+      "level": null,
+      "text": "Arnoldiのuniform seedも同じく、実nをprepare後に知ってから全n列を事前確保して展開し、実vector・列順・generation・内容を記録する。"
+    },
+    {
+      "line": 308,
+      "kind": "lead",
+      "level": null,
+      "text": "prepareはuniform宣言から各対象の実列への展開表を作り、元の宣言、単位、対象、実列順、正尺度の全配列と内容identityを所有する。"
+    },
+    {
+      "line": 310,
+      "kind": "lead",
+      "level": null,
+      "text": "数値政策の配置は内部のencodingであり、ケースが既存の受入精度を緩める許可ではない。"
+    },
+    {
+      "line": 312,
+      "kind": "lead",
+      "level": null,
+      "text": "`step_map`の固有値とshift、sλは無次元であり、物理growth/frequencyは採用J1に従いlog(λ)/hから得る。"
+    },
+    {
+      "line": 314,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-11 資源・出力・保存"
+    },
+    {
+      "line": 326,
+      "kind": "lead",
+      "level": null,
+      "text": "ホストが先に与えたInputLimits/SchemaLimitsは、入力文書自身の資源宣言によって拡張しない。"
+    },
+    {
+      "line": 328,
+      "kind": "heading",
+      "level": 2,
+      "text": "FD-12 限定式入力"
+    },
+    {
+      "line": 330,
+      "kind": "lead",
+      "level": null,
+      "text": "利用者決定A（Issue #110）により、算術・整数冪・sin/cos・exp/log・sqrtだけを持つ式DAGを追加する。"
+    },
+    {
+      "line": 348,
+      "kind": "lead",
+      "level": null,
+      "text": "各domainは、必要な全評価点と時刻を含む契約である。"
+    },
+    {
+      "line": 350,
+      "kind": "lead",
+      "level": null,
+      "text": "schema段階は全nodeの型・次元、acyclic、index、出力数、domainと必要変数の適合を検査する。"
+    },
+    {
+      "line": 352,
+      "kind": "lead",
+      "level": null,
+      "text": "DAGのnode数/edge数/最大深さ/指数絶対値/評価点数は明示上限で確保前に検査する。"
+    }
+  ],
+  "heading_stats": {
+    "total_headings": 16,
+    "level_distribution": {
+      "1": 1,
+      "2": 12,
+      "3": 3
+    },
+    "by_level": {
+      "1": {
+        "count": 1,
+        "length_mean": 20.0,
+        "length_cv": 0.0,
+        "nominal_ending_ratio": 1.0,
+        "dominant_pos_signature_ratio": 1.0,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      },
+      "2": {
+        "count": 12,
+        "length_mean": 14.5,
+        "length_cv": 0.148,
+        "nominal_ending_ratio": 1.0,
+        "dominant_pos_signature_ratio": 0.583,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      },
+      "3": {
+        "count": 3,
+        "length_mean": 13.33,
+        "length_cv": 0.569,
+        "nominal_ending_ratio": 0.667,
+        "dominant_pos_signature_ratio": 0.667,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      }
+    },
+    "overall": {
+      "count": 16,
+      "length_mean": 14.62,
+      "length_cv": 0.277,
+      "nominal_ending_ratio": 0.938,
+      "dominant_pos_signature_ratio": 0.5,
+      "template_hits": [],
+      "structural_pattern_ratio": 0.0
+    }
+  }
+}

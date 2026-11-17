@@ -1,0 +1,137 @@
+{
+  "terms": [
+    {
+      "term": "Issue",
+      "first_line": 3,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "# 全schemaの設計検査と実装への引継ぎ\n\n本書はIssue #110の設計審査表である。[辞書](case-schema-fields.md)と[JSONの最小fragment集](case-schema-exampl"
+    },
+    {
+      "term": "JSON",
+      "first_line": 3,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "# 全schemaの設計検査と実装への引継ぎ\n\n本書はIssue #110の設計審査表である。[辞書](case-schema-fields.md)と[JSONの最小fragment集](case-schema-examples.json)を照合する。fragment集とroot全体のschema例を分けている。sch"
+    },
+    {
+      "term": "フラッタ",
+      "first_line": 3,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "する。fragment集とroot全体のschema例を分けている。schema_examplesの5例は空力単体の定常/指定運動過渡、構造単体静的、連成過渡/フラッタに全rootを当てた設計例である。実ファイル・物理prepareを備えたcaseではない。これをCLIの有効case、数値通過例、実務入力として配布しない。"
+    },
+    {
+      "term": "ファイル",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "hema例を分けている。schema_examplesの5例は空力単体の定常/指定運動過渡、構造単体静的、連成過渡/フラッタに全rootを当てた設計例である。実ファイル・物理prepareを備えたcaseではない。これをCLIの有効case、数値通過例、実務入力として配布しない。\n\n## DC-01 各variantの最小例"
+    },
+    {
+      "term": "CLI",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "は空力単体の定常/指定運動過渡、構造単体静的、連成過渡/フラッタに全rootを当てた設計例である。実ファイル・物理prepareを備えたcaseではない。これをCLIの有効case、数値通過例、実務入力として配布しない。\n\n## DC-01 各variantの最小例\n\nfragment名の `Type.tag` は辞書の対応"
+    },
+    {
+      "term": "DC",
+      "first_line": 5,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "ootを当てた設計例である。実ファイル・物理prepareを備えたcaseではない。これをCLIの有効case、数値通過例、実務入力として配布しない。\n\n## DC-01 各variantの最小例\n\nfragment名の `Type.tag` は辞書の対応variantである。単一型は型名を使う。JSONはnative i"
+    },
+    {
+      "term": "SHA",
+      "first_line": 7,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ntである。単一型は型名を使う。JSONはnative integer、decimal number、string、boolを区別し、shapeを明示する。例のSHA-256は設計検証記録に保持する。全fragmentを同一caseへ結合してはならない。例えば各Material例のid=1は各局所例の定義であり、同一mode"
+    },
+    {
+      "term": "Material",
+      "first_line": 7,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "string、boolを区別し、shapeを明示する。例のSHA-256は設計検証記録に保持する。全fragmentを同一caseへ結合してはならない。例えば各Material例のid=1は各局所例の定義であり、同一modelの重複IDを許す意味ではない。\n\n| 対象 | fragment名 | 局所registry/条件 |\n|--"
+    },
+    {
+      "term": "ID",
+      "first_line": 7,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "は設計検証記録に保持する。全fragmentを同一caseへ結合してはならない。例えば各Material例のid=1は各局所例の定義であり、同一modelの重複IDを許す意味ではない。\n\n| 対象 | fragment名 | 局所registry/条件 |\n|---|---|---|\n| root構成 | Units、Ge"
+    },
+    {
+      "term": "NaN",
+      "first_line": 87,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "kはsnapshot処理 |\n| formula評価に外部コード/任意q/乱数/loop/条件分岐 | Unsupported | 許可演算のDAGだけ |\n\nNaN/Infinityは元文書が構文時点で拒否する。引用文字列はNumberへ変換しない。有限な元decimalのSI変換不能・丸め包絡失敗は、schemaのUnk"
+    },
+    {
+      "term": "Infinity",
+      "first_line": 87,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "apshot処理 |\n| formula評価に外部コード/任意q/乱数/loop/条件分岐 | Unsupported | 許可演算のDAGだけ |\n\nNaN/Infinityは元文書が構文時点で拒否する。引用文字列はNumberへ変換しない。有限な元decimalのSI変換不能・丸め包絡失敗は、schemaのUnknownKindと"
+    },
+    {
+      "term": "Number",
+      "first_line": 87,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "任意q/乱数/loop/条件分岐 | Unsupported | 許可演算のDAGだけ |\n\nNaN/Infinityは元文書が構文時点で拒否する。引用文字列はNumberへ変換しない。有限な元decimalのSI変換不能・丸め包絡失敗は、schemaのUnknownKindと混同しない。\n\n## DC-03 採用仕様の漏れを調べ"
+    },
+    {
+      "term": "SI",
+      "first_line": 87,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "orted | 許可演算のDAGだけ |\n\nNaN/Infinityは元文書が構文時点で拒否する。引用文字列はNumberへ変換しない。有限な元decimalのSI変換不能・丸め包絡失敗は、schemaのUnknownKindと混同しない。\n\n## DC-03 採用仕様の漏れを調べる\n\n| 必須内容 | 契約箇所 | 設計"
+    },
+    {
+      "term": "UnknownKind",
+      "first_line": 87,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "NaN/Infinityは元文書が構文時点で拒否する。引用文字列はNumberへ変換しない。有限な元decimalのSI変換不能・丸め包絡失敗は、schemaのUnknownKindと混同しない。\n\n## DC-03 採用仕様の漏れを調べる\n\n| 必須内容 | 契約箇所 | 設計の判定対象 |\n|---|---|---|\n| IO4 roo"
+    },
+    {
+      "term": "レビュー",
+      "first_line": 107,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "定時刻、atomic保存要求 |\n\n## DC-04 状態と引継ぎ\n\nIssue #110は設計であり、schema実装/数値合格/物理受入の報告ではない。独立レビューが閉じた項目だけを設計検証記録へ記す。型辞書に未定義語や、必要fieldを「後で決める」とした箇所が残る場合、全schema実装開始条件を満たしたとしない。"
+    },
+    {
+      "term": "oracle",
+      "first_line": 109,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "全schema実装開始条件を満たしたとしない。\n\n次の実装Issueでは、辞書全variantの正常/負例を実際のtyped validatorへ接続する。独立oracleは手書きの型/shape/厳密値/参照関係であり、製品validator自身が再出力したJSONを正解にしない。SI、式評価/微分、snapshot/impor"
+    },
+    {
+      "term": "Python",
+      "first_line": 109,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "lidator自身が再出力したJSONを正解にしない。SI、式評価/微分、snapshot/importer、物理prepare、checkpoint/CLI/Pythonはそれぞれ既存IM06の依存段階へ渡し、本設計の機械検査だけで完了しない。"
+    },
+    {
+      "term": "IM06",
+      "first_line": 109,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "したJSONを正解にしない。SI、式評価/微分、snapshot/importer、物理prepare、checkpoint/CLI/Pythonはそれぞれ既存IM06の依存段階へ渡し、本設計の機械検査だけで完了しない。"
+    },
+    {
+      "term": "IM",
+      "first_line": 109,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "したJSONを正解にしない。SI、式評価/微分、snapshot/importer、物理prepare、checkpoint/CLI/Pythonはそれぞれ既存IM06の依存段階へ渡し、本設計の機械検査だけで完了しない。"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "integrity_passed": true,
+  "scientific_acceptance": "not_evaluated",
+  "scope": "Recorded local bytes only; not dependency completeness or reproduction",
+  "root": "<repo>",
+  "checked_files": 31,
+  "inspected_manifests": 2,
+  "manifest_statuses": [],
+  "errors": []
+}
