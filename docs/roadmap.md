@@ -4,7 +4,7 @@
 
 **今**：IM01-0・IM03-0・IM06-0（子作業の開始審査と実装）
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通の数値表現・密疎求解・固有抽出・精度保持・状態・Python結合・計測基盤を実装し、凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。PGのexact代数、空力のexact局所述語、厳格な入力ID・index変換はPR #89〜#91で実装した。PGの有理グラフ・全half-cell、空力の所有幾何・厳密query位置式、元bytesと型を所有する入力文書を実装した。次は各親Issueの依存に従い、PG辞書・積分分割、空力の包絡・適格性、入力schemaの閉包へ進む。全体の依存と停止条件は [作業分解](plans/next-package-work-breakdown.md) に記載する。所有者の未決定だけをGrillし、内部の通常実装選択は担当が決める。物理kernelは未実装。経緯は [実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は [開始審査](plans/implementation-start-review.md) が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通数値基盤と凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。PGのexact代数・有理グラフ・全half-cellに加え、全原辞書・anchor補完・必須場mapを実装した。空力は厳密局所述語・所有幾何・query位置式・局所包絡と接触資格を実装した。入出力は厳格scalar・所有入力文書と全schemaの設計契約が揃った。schema validator・SI変換・実行接続は後続である。次は既存の[作業分解](plans/next-package-work-breakdown.md)に従い、PGの多角形と全積分分割、空力のP1核と大域幾何、入力schemaの検証・変換を進める。所有者の未決定だけをGrillし、内部の通常実装選択は担当が決める。物理kernelは未実装。経緯は[実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は[開始審査](plans/implementation-start-review.md)が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -109,7 +109,7 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
-| IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | In progress |
+| IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | Done |
 | IM03-3 | Feat | 空力局所幾何の包絡と所有する適格packet | #109 | Done |
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 

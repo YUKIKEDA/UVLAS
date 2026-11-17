@@ -1,0 +1,197 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-3-integration",
+  "ids": [
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 108,
+  "date": "2026-11-17",
+  "preintegration_head": "e41482deb60b4329866e2f0324b51012fdeebadf",
+  "aero_head": "6b25eaeff430f2197059274c4a1aa69c6ddfd1f1",
+  "scope": "並行実装の共有文書・CMake・追跡の統合確認。数値検証は固定版のim01-3記録へ分離する。",
+  "verification": {
+    "integrated_sources": 15,
+    "integration_byte_mismatches": 0,
+    "numeric_reexecution": "統合後の15sourceは統合前とbyte一致。数値処理・試験条件の追加変更がないため、通過済み試験・変異・計測は反復しない。",
+    "epochs": "de292e7の対象2CTest D/Rと7隔離変異、998ae13の直接jet補強1case D/Rを区別する。",
+    "review": "製品式・資源・API、新しい直接jet試験、共有文書をrootと別担当が独立通読し、重大な未解決指摘なし。",
+    "trace": {
+      "defined_ids": 208,
+      "with_tests": 34,
+      "with_records": 41,
+      "problems": 0
+    },
+    "integrity": {
+      "parent_files": 72,
+      "parent_manifests": 2,
+      "integration_files": 26,
+      "integration_manifests": 2,
+      "errors": 0
+    },
+    "japanese": "roadmap/conventionsのquick lint各0 findings、別担当の本文読み完了。"
+  },
+  "claimed_state": "IM01-3の実装適合。活動rank・条件付け・物理N・全trace・R-02・実務受入の資格は後続。",
+  "sources": {
+    "docs/specs/structure/pg-full-dictionary-contract.md": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+    "src/structure/pg_coefficients.cpp": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+    "src/structure/pg_coefficients_algebra.hpp": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+    "src/structure/pg_coefficients_anchor.hpp": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+    "src/structure/pg_coefficients_basis.hpp": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+    "src/structure/pg_coefficients_detail.hpp": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+    "src/structure/pg_coefficients_generate.hpp": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+    "src/structure/pg_coefficients_maps.hpp": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+    "src/structure/pg_coefficients_plan.hpp": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+    "tests/structure/fixtures/generate_pg_coefficients.py": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+    "tests/structure/fixtures/pg-coefficients-v1.json": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+    "tests/structure/pg_coefficients_reference_test.cpp": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+    "tests/structure/pg_coefficients_resource_test.cpp": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+    "tests/structure/pg_coefficients_test.cpp": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be",
+    "CMakeLists.txt": "0b8712f86658d4e925e6e042d72d457cb0ddf59ec1b675333f9cd8d324bd15f8",
+    "tests/CMakeLists.txt": "8c4e9db803035c61b460edc53cfcec33c0567df5bfa41d5f5f60c75446989b81",
+    "docs/conventions.md": "5c3e6e0e0cc44a590626b0f3430b928f5bbda4991ff4103d4e620c06c0f8bce8",
+    "docs/roadmap.md": "3b8c3236994724942a9004b811d1961b8d877437d38f14842ae2d7a62675c058",
+    ".cursor/rules/numeric-tests.mdc": "b5f591ac8da9b248236190c928787f779466d22cda8a6354d0c04399df49366f",
+    "docs/quality/traceability.md": "11561fd26d4b32d39cdee2bc81fc6522fc6bdd22c1a5ebc77c0fda2a83c61150"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/im01-3.json": "1df57b36a6ccada638773cb007348776e3828a62d7c022191f26922af4ebb021",
+    "docs/verification/IM-01/im01-3/comment-source-bridge.json": "20f409b3a8ae002b2d07cae04eddc0bc36cc3ffe1fcbd98d52266733042fbd0d",
+    "docs/verification/IM-01/im01-3/test-strengthening-bridge.json": "d0f9fff0c036cb2c4bf9d18fc0a550c62af1e27abe79ab594ce0e6a85619ae48",
+    "docs/verification/IM-01/im01-3-integration/source-audit.json": "8b6bc7757b094643e302fe7857a4d83697e1e753307f5ad9e7ee94819a17dd2b"
+  },
+  "source_references": [
+    {
+      "id": "im01-3-integration-source-docs-specs-structure-pg-full-dictionary-contract-md",
+      "sha256": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+      "hint": "docs/specs/structure/pg-full-dictionary-contract.md"
+    },
+    {
+      "id": "im01-3-integration-source-include-uvlas-structure-pg_coefficients-hpp",
+      "sha256": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+      "hint": "include/uvlas/structure/pg_coefficients.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients-cpp",
+      "sha256": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+      "hint": "src/structure/pg_coefficients.cpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_algebra-hpp",
+      "sha256": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+      "hint": "src/structure/pg_coefficients_algebra.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_anchor-hpp",
+      "sha256": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+      "hint": "src/structure/pg_coefficients_anchor.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_basis-hpp",
+      "sha256": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+      "hint": "src/structure/pg_coefficients_basis.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_detail-hpp",
+      "sha256": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+      "hint": "src/structure/pg_coefficients_detail.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_generate-hpp",
+      "sha256": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+      "hint": "src/structure/pg_coefficients_generate.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_maps-hpp",
+      "sha256": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+      "hint": "src/structure/pg_coefficients_maps.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-src-structure-pg_coefficients_plan-hpp",
+      "sha256": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+      "hint": "src/structure/pg_coefficients_plan.hpp"
+    },
+    {
+      "id": "im01-3-integration-source-tests-structure-fixtures-generate_pg_coefficients-py",
+      "sha256": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+      "hint": "tests/structure/fixtures/generate_pg_coefficients.py"
+    },
+    {
+      "id": "im01-3-integration-source-tests-structure-fixtures-pg-coefficients-v1-json",
+      "sha256": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+      "hint": "tests/structure/fixtures/pg-coefficients-v1.json"
+    },
+    {
+      "id": "im01-3-integration-source-tests-structure-pg_coefficients_reference_test-cpp",
+      "sha256": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+      "hint": "tests/structure/pg_coefficients_reference_test.cpp"
+    },
+    {
+      "id": "im01-3-integration-source-tests-structure-pg_coefficients_resource_test-cpp",
+      "sha256": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+      "hint": "tests/structure/pg_coefficients_resource_test.cpp"
+    },
+    {
+      "id": "im01-3-integration-source-tests-structure-pg_coefficients_test-cpp",
+      "sha256": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be",
+      "hint": "tests/structure/pg_coefficients_test.cpp"
+    },
+    {
+      "id": "im01-3-integration-source-CMakeLists-txt",
+      "sha256": "0b8712f86658d4e925e6e042d72d457cb0ddf59ec1b675333f9cd8d324bd15f8",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "im01-3-integration-source-tests-CMakeLists-txt",
+      "sha256": "8c4e9db803035c61b460edc53cfcec33c0567df5bfa41d5f5f60c75446989b81",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im01-3-integration-source-docs-conventions-md",
+      "sha256": "5c3e6e0e0cc44a590626b0f3430b928f5bbda4991ff4103d4e620c06c0f8bce8",
+      "hint": "docs/conventions.md"
+    },
+    {
+      "id": "im01-3-integration-source-docs-roadmap-md",
+      "sha256": "3b8c3236994724942a9004b811d1961b8d877437d38f14842ae2d7a62675c058",
+      "hint": "docs/roadmap.md"
+    },
+    {
+      "id": "im01-3-integration-source--cursor-rules-numeric-tests-mdc",
+      "sha256": "b5f591ac8da9b248236190c928787f779466d22cda8a6354d0c04399df49366f",
+      "hint": ".cursor/rules/numeric-tests.mdc"
+    },
+    {
+      "id": "im01-3-integration-source-docs-quality-traceability-md",
+      "sha256": "11561fd26d4b32d39cdee2bc81fc6522fc6bdd22c1a5ebc77c0fda2a83c61150",
+      "hint": "docs/quality/traceability.md"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im01-3-integration-artifact-docs-verification-IM-01-im01-3-json",
+      "sha256": "1df57b36a6ccada638773cb007348776e3828a62d7c022191f26922af4ebb021",
+      "hint": "docs/verification/IM-01/im01-3.json"
+    },
+    {
+      "id": "im01-3-integration-artifact-docs-verification-IM-01-im01-3-comment-source-bridge-json",
+      "sha256": "20f409b3a8ae002b2d07cae04eddc0bc36cc3ffe1fcbd98d52266733042fbd0d",
+      "hint": "docs/verification/IM-01/im01-3/comment-source-bridge.json"
+    },
+    {
+      "id": "im01-3-integration-artifact-docs-verification-IM-01-im01-3-test-strengthening-bridge-json",
+      "sha256": "d0f9fff0c036cb2c4bf9d18fc0a550c62af1e27abe79ab594ce0e6a85619ae48",
+      "hint": "docs/verification/IM-01/im01-3/test-strengthening-bridge.json"
+    },
+    {
+      "id": "im01-3-integration-artifact-docs-verification-IM-01-im01-3-integration-source-audit-json",
+      "sha256": "8b6bc7757b094643e302fe7857a4d83697e1e753307f5ad9e7ee94819a17dd2b",
+      "hint": "docs/verification/IM-01/im01-3-integration/source-audit.json"
+    }
+  ]
+}

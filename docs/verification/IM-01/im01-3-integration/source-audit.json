@@ -1,0 +1,108 @@
+{
+  "schema": "uvlas.integration-source-audit/1",
+  "id": "im01-3-integration-source-audit",
+  "execution_source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+  "preintegration_head": "e41482deb60b4329866e2f0324b51012fdeebadf",
+  "aero_head": "6b25eaeff430f2197059274c4a1aa69c6ddfd1f1",
+  "merge_commit": "8c40e0045d0dffdf1f7f5bf6d95ae7687e2340da",
+  "checked_sources": 15,
+  "integration_byte_mismatches": 0,
+  "parent_manifest_sources_checked": 21,
+  "parent_manifest_source_mismatches": 0,
+  "changes_before_integration": [
+    "tests/structure/pg_coefficients_test.cpp"
+  ],
+  "test_change_scope": "API差コメント2行と実製品jetの直接照合を追加した試験補強。製品source・fixture・他試験は実行de292のbytesを保持。補強は998ae13で対象1caseをD/R再検証。",
+  "sources": [
+    {
+      "path": "docs/specs/structure/pg-full-dictionary-contract.md",
+      "executed_sha256": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+      "preintegration_sha256": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+      "integrated_sha256": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465"
+    },
+    {
+      "path": "include/uvlas/structure/pg_coefficients.hpp",
+      "executed_sha256": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+      "preintegration_sha256": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+      "integrated_sha256": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c"
+    },
+    {
+      "path": "src/structure/pg_coefficients.cpp",
+      "executed_sha256": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+      "preintegration_sha256": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+      "integrated_sha256": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162"
+    },
+    {
+      "path": "src/structure/pg_coefficients_algebra.hpp",
+      "executed_sha256": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+      "preintegration_sha256": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+      "integrated_sha256": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209"
+    },
+    {
+      "path": "src/structure/pg_coefficients_anchor.hpp",
+      "executed_sha256": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+      "preintegration_sha256": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+      "integrated_sha256": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7"
+    },
+    {
+      "path": "src/structure/pg_coefficients_basis.hpp",
+      "executed_sha256": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+      "preintegration_sha256": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+      "integrated_sha256": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2"
+    },
+    {
+      "path": "src/structure/pg_coefficients_detail.hpp",
+      "executed_sha256": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+      "preintegration_sha256": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+      "integrated_sha256": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a"
+    },
+    {
+      "path": "src/structure/pg_coefficients_generate.hpp",
+      "executed_sha256": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+      "preintegration_sha256": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+      "integrated_sha256": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949"
+    },
+    {
+      "path": "src/structure/pg_coefficients_maps.hpp",
+      "executed_sha256": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+      "preintegration_sha256": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+      "integrated_sha256": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7"
+    },
+    {
+      "path": "src/structure/pg_coefficients_plan.hpp",
+      "executed_sha256": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+      "preintegration_sha256": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+      "integrated_sha256": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890"
+    },
+    {
+      "path": "tests/structure/fixtures/generate_pg_coefficients.py",
+      "executed_sha256": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+      "preintegration_sha256": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+      "integrated_sha256": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e"
+    },
+    {
+      "path": "tests/structure/fixtures/pg-coefficients-v1.json",
+      "executed_sha256": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+      "preintegration_sha256": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+      "integrated_sha256": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b"
+    },
+    {
+      "path": "tests/structure/pg_coefficients_reference_test.cpp",
+      "executed_sha256": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+      "preintegration_sha256": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+      "integrated_sha256": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0"
+    },
+    {
+      "path": "tests/structure/pg_coefficients_resource_test.cpp",
+      "executed_sha256": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+      "preintegration_sha256": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+      "integrated_sha256": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768"
+    },
+    {
+      "path": "tests/structure/pg_coefficients_test.cpp",
+      "executed_sha256": "078567dac6d841aaca9b4f0e0fc2a5d940189958dd09831f009568b119ae42e9",
+      "preintegration_sha256": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be",
+      "integrated_sha256": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be"
+    }
+  ]
+}
