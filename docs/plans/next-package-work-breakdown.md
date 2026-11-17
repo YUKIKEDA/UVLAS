@@ -12,7 +12,21 @@
 
 IM-00の完了は [終了判定](im00-package-acceptance.md)で確認済み。3件の入力・返値・独立参照に相互依存はない。PGと空力の資源審査は、それぞれの子Issueの開始条件であり、入力変換まで待たせない。数学的bit上限を、Boostの確保byteやRSSの証明へ読み替えない。推定で受理する要求と、証明済み上界を要求する場合を区別する。
 
-以下の表は親Issueが保持する全体の依存と停止条件である。各段階は、全必須能力を落とさず実装単位を決めるために使う。正式に起票した最初の3件以外について、Issue番号・着手済み・開始審査済みとは扱わない。親を閉じる前に全段階の実装・検証と子Issueの閉鎖を確認する。
+以下の表は親Issueが保持する全体の依存と停止条件である。各段階は、全必須能力を落とさず実装単位を決めるために使う。本書で子Issueを明示していない段階を、起票済み・着手済み・開始審査済みとは扱わない。親を閉じる前に全段階の実装・検証と子Issueの閉鎖を確認する。
+
+## 最初の3件を取り込んだ後の実装
+
+PR #89〜#91はmain `0f201a39dfb849115f90c559fec67f13e75c7645`へ統合済み。最初の3子作業の実装適合を次の入力とする。全PG空間、誘導核、物理caseの認定を済ませたという意味ではない。
+
+| 子Issue | 入力 → 今回の成果物 | コード開始前に確認するもの |
+|---|---|---|
+| [#94](https://github.com/YUKIKEDA/UVLAS/issues/94) | exact代数 → 有理グラフ、全half-cell、明示片側・微分尺度、矩形活動map | graph内容identityの所有・canonical化、完全参照identityとの境界、一つのcallの入力/出力/最大scratchを集計する資源式。全辞書・多角形・rankは後続 |
+| [#95](https://github.com/YUKIKEDA/UVLAS/issues/95) | exact局所述語 → 参照/現在の所有geometry、正規ID/alias/整数接続、4種queryのexact位置式 | 元語から物質重みを掛けるdyadic表現と式別bit上限、固定分割/符号/支持正規化、context・所有・検査順。包絡・自己/接触政策・局所適格packetは後続 |
+| [#93](https://github.com/YUKIKEDA/UVLAS/issues/93) | 厳格scalarとparser計画 → 元bytes/hash、全kind/順序/十進tokenを所有するInputDocument | 固定nlohmann/STLのtoken・stack・例外生成の同時領域forecast、製品payloadとquota、例外/位置の固定順。全nested schema・SI・実行は後続 |
+
+3件の実装は互いの成果物を必要としない。開始条件を独立に審査し、それぞれ別branch/worktree、別ビルド先で進める。PGと空力のexact数値資源を、JSONの外部parser計画へ流用しない。
+
+共通CMake・conventionsは統合担当が各branchへ追加する。製品本体と独立試験の実装を並列に進め、提出時のロードマップ・追跡表だけを順に統合する。所有者の製品判断が新たに必要な変更がなければ、操作ごとの確認待ちは挟まない。各子は親Issueへ残る段階と未認定の状態を明記する。
 
 ## IM-01：exact係数から全trace・疎chartへつなぐ
 
@@ -21,7 +35,7 @@ IM-00の完了は [終了判定](im00-package-acceptance.md)で確認済み。3�
 | 段階 | 必要な入力 → 完成させるもの |
 |---|---|
 | exact代数 | IM-00 → #87。有理数、疎多項式、明示座標tag、canonical値、所有・資源・独立literal |
-| グラフとセル | exact代数 → x₀/w/a/f、n=1/2/4、half-cellと片側、微分尺度、参照identity、矩形活動map |
+| グラフとセル | exact代数 → #94。x₀/w/a/f、n=1/2/4、half-cellと片側、微分尺度、graph内容identity、矩形活動map。完全参照identityへの合成は参照準備側が行う |
 | 全原辞書・full V | グラフとセル → 基本r/d/c、s/t両P7族、R/P/Cとg、アンカー補完、由来、30必須場と並進のexact map |
 | 多角形と全積分分割 | exact代数・セル → 全背景cellとの正確な共通部分、正面積/零/重複、全被覆、辺/面/層の同じ分割、専用活動map factory |
 | 局所独立化 | 全辞書・根拠付き活動map → exact rank、独立列と原列の座標、全再構成と必須場・アンカー核の包含。多角形は交差判定器の検証を必須にする |
@@ -42,7 +56,7 @@ IM-00の完了は [終了判定](im00-package-acceptance.md)で確認済み。3�
 | 段階 | 必要な入力 → 完成させるもの |
 |---|---|
 | exact局所述語 | IM-00 → #86。両語の実値、有限面の退化/内外/距離二乗、全最小実体、farの厳密不等号 |
-| 所有幾何・ID・query | 局所述語と並列に型を設計 → 点/辺/面/帯の安定ID、alias、固定分割、整数接続、物質位置式、半径/世代、所有snapshot |
+| 所有幾何・ID・query | #95。局所述語と並列に型を設計 → 点/辺/面/帯の安定ID、alias、固定分割、整数接続、物質位置式、半径/世代、所有snapshot |
 | 包絡と局所packet | 上記2段階 → 尺度、法線/面積/距離の包絡、LG-F01〜14、位置式の微分散布、LocalOnly状態、lease/資源/失敗 |
 | P1核・全13変数 | 局所packet → 同じRM核の解析辺/渦層、理想面外極限、far12対8、全3基底/全Jacobian、両語消費。独立面積分/complex-stepとの採用基準で照合 |
 | 共有・四辺形・全作用 | P1核・接続 → 固定分割とL/R散布、共有全出現の鎖則、同じcore/μ traceだけの相殺、実/複素両語のJVP/VJPと双対内積 |
@@ -64,8 +78,8 @@ IM-00の完了は [終了判定](im00-package-acceptance.md)で確認済み。3�
 | 段階 | 必要な入力 → 完成させるもの |
 |---|---|
 | 厳格scalar変換 | IM-00 → #85。全uint64の強いID、native整数からIndex、所有診断、確保なし/例外なし |
-| parser資源計画 | scalarと独立 → 固定nlohmann/標準ライブラリのtoken/stack/error同時領域、forecast式、推定受入/真の上界要求。未成立なら文書kernelだけを止める |
-| 所有文書 | scalar・parser計画 → 全値kind/順序/十進token/raw source/hash/root envelope、重複拒否、全quota/UTF-8/例外/診断。ValidatedCaseへ暗黙変換しない |
+| parser資源計画 | #93の開始gate。scalarと独立 → 固定nlohmann/標準ライブラリのtoken/stack/error同時領域、forecast式、推定受入/真の上界要求。未成立なら文書kernelだけを止める |
+| 所有文書 | scalar・parser計画 → #93。全値kind/順序/十進token/raw source/hash/root envelope、重複拒否、全quota/UTF-8/例外/診断。ValidatedCaseへ暗黙変換しない |
 | 全schema | 文書・物理の値契約 → modelの8集合と全root/nested key、shape/variant/相互条件、ID/参照種別。物理kernel全完成より先に型と検証を定義できる |
 | SI・精度変換 | schema・物理寸法 → 元値・単位・軸/角度/基底、丸め予算、既定値解決。十進tokenを先にbinary64へ落とさない |
 | 参照snapshot | 文書・schema → manifest相対path、実bytes/hash/由来、欠落/循環/改変/quota。同じsnapshotをhashと消費に使う |
