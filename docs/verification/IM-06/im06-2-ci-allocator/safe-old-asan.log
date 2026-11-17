@@ -1,0 +1,18 @@
+=================================================================
+==395==ERROR: AddressSanitizer: alloc-dealloc-mismatch (operator new vs free) on 0x503000000040
+    #0 0x7c3e5e8b4537 in __interceptor_free ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:127
+    #1 0x6495a85bfa8b in operator delete(void*, unsigned long) /mnt/c/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue104-ci-resource/old-asan.cpp:74
+    #2 0x6495a85c0ec5 in main /mnt/c/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue104-ci-resource/old-asan.cpp:213
+    #3 0x7c3e5e029d8f in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #4 0x7c3e5e029e3f in __libc_start_main_impl ../csu/libc-start.c:392
+    #5 0x6495a85bf524 in _start (/mnt/c/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue104-ci-resource/old-asan+0x3524)
+
+0x503000000040 is located 0 bytes inside of 32-byte region [0x503000000040,0x503000000060)
+allocated by thread T0 here:
+    #0 0x7c3e5e8b64c7 in operator new(unsigned long, std::nothrow_t const&) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:105
+    #1 0x6495a85c0ead in main /mnt/c/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue104-ci-resource/old-asan.cpp:212
+    #2 0x7c3e5e029d8f in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+
+SUMMARY: AddressSanitizer: alloc-dealloc-mismatch ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:127 in __interceptor_free
+==395==HINT: if you don't care about these errors you may set ASAN_OPTIONS=alloc_dealloc_mismatch=0
+==395==ABORTING

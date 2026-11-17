@@ -1,0 +1,15 @@
+[0/2] Re-checking globbed directories...
+[1/15] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\ACCOUNT\.codex\worktrees\IO_WORKTREE\UVLAS\out\issue93-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS -DOUTPUT=C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/generated/uvlas/git_revision.hpp -P C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/cmake/GitRevision.cmake"
+[2/15] Building CXX object CMakeFiles\uvlas_cli.dir\Debug\src\app\main.cpp.obj
+[3/15] Building CXX object tests\CMakeFiles\uvlas_test_io_input_document_resources.dir\Debug\io\input_document_resource_test.cpp.obj
+[4/15] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\input_document.cpp.obj
+[5/15] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[6/15] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\input_document.cpp.obj
+[7/15] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[8/15] Linking CXX static library Debug\uvlas_core.lib
+[9/15] Linking CXX static library Debug\uvlas_core_audit.lib
+[10/15] Linking CXX static library Debug\uvlas_io.lib
+[11/15] Linking CXX static library Debug\uvlas_io_audit.lib
+[12/15] Linking CXX executable tests\Debug\uvlas_test_io_input_document.exe
+[13/15] Linking CXX executable Debug\uvlas.exe
+[14/15] Linking CXX executable tests\Debug\uvlas_test_io_input_document_resources.exe

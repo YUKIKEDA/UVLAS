@@ -1,0 +1,14 @@
+{
+  "before_full_tu_sha256": "f5a1877bbacd024a85714327244432bb3a63356bf368b4de712023c26ccb457b",
+  "final_full_tu_sha256": "4bf972b19217487354272b328dc89ccf7be583f35b78af80b7f5f7088e177b4c",
+  "only_added_align_api_comment": true,
+  "final_preamble_sha256": "609bd035153420dcd0ee100bb24fa4f634cb811e06b464a867b7b27e7c40d3d2",
+  "preamble_equal_to_asan_input": true,
+  "old_asan_exit": 1,
+  "old_diagnostic": "alloc-dealloc-mismatch (operator new vs free)",
+  "new_asan_exit": 0,
+  "new_control_checks": 122,
+  "standalone_scope": "Existing WSL Ubuntu GCC11.4 C++20/ASan, actual fault TU allocation preambles only, not product GCC14/Catch2 execution",
+  "old_binary_sha256": "063b6b5533139770fc682943eb12c304c3cd5eb541dc9509ee0cedd63ada07dd",
+  "new_binary_sha256": "18dac744eb63fce7243d8f250c8a187fcc1c3227c7f3a55fec7aa7aec73dc6b9"
+}

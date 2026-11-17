@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/14] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\ACCOUNT\.codex\worktrees\IO_WORKTREE\UVLAS\out\issue93-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS -DOUTPUT=C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/generated/uvlas/git_revision.hpp -P C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/cmake/GitRevision.cmake"
+[2/14] Building CXX object tests\CMakeFiles\uvlas_test_io_input_document_resources.dir\Release\io\input_document_resource_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[3/14] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[4/14] Linking CXX static library Release\uvlas_core.lib
+[5/14] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[6/14] Linking CXX static library Release\uvlas_core_audit.lib
+[7/14] Linking CXX executable Release\uvlas.exe
+[8/14] Building CXX object CMakeFiles\uvlas_io_audit.dir\Release\src\io\input_document.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[9/14] Building CXX object CMakeFiles\uvlas_io.dir\Release\src\io\input_document.cpp.obj
+[10/14] Linking CXX static library Release\uvlas_io_audit.lib
+[11/14] Linking CXX static library Release\uvlas_io.lib
+[12/14] Linking CXX executable tests\Release\uvlas_test_io_input_document_resources.exe
+[13/14] Linking CXX executable tests\Release\uvlas_test_io_input_document.exe
