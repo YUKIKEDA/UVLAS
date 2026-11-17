@@ -326,6 +326,24 @@ uvlas_add_test(structure.pg_graph_resources
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_graph_resources)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_graph_resources)
 
+uvlas_add_test(structure.pg_coefficients
+    TIMEOUT 300
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_coefficients_test.cpp structure/pg_coefficients_reference_test.cpp
+    LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_coefficients
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_coefficients PRIVATE
+    UVLAS_PG_COEFFICIENTS_FIXTURE=\"${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-coefficients-v1.json\")
+uvlas_add_test(structure.pg_coefficients_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_coefficients_resource_test.cpp
+    LIBS uvlas_structure_audit)
+target_include_directories(uvlas_test_structure_pg_coefficients_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_coefficients_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_coefficients_resources)
+
 uvlas_add_test(numerics.storage LABELS unit negative
     SOURCES numerics/storage_test.cpp LIBS uvlas_numerics)
 uvlas_add_test(numerics.eigen_views LABELS integration negative

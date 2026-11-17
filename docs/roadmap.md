@@ -103,6 +103,14 @@ flowchart LR
 | IM03-2 | Feat | 空力の所有geometryとexact query位置式 | #95 | Done |
 | IM06-2 | Feat | 元bytesと型を保持する所有入力文書 | #93 | Done |
 
+### 後続の作業
+
+既存親の作業分解に従って、完了済みの準備部品を使う。互いの成果物に依存しない本体は並列に進める。設計の行は、その契約の審査後に実装へ渡す。
+
+| ID | 種類 | 題 | Issue | 状態 |
+|---|---|---|---|---|
+| IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | In progress |
+
 ## 残リスクと止める位置
 
 [開始審査4節](plans/implementation-start-review.md) のR-01〜07。消えた課題ではなく、該当パッケージのgateで止める課題である。
