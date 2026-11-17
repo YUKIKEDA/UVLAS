@@ -144,7 +144,7 @@ ParserEnvironment environment(Context& context) {
     context.reject(core::FailureCode::Unsupported, InputDiagnosticReason::UnsupportedMemoryModel);
 #endif
     // Add another revision only after inspecting its source/model correspondence.
-    if constexpr (_GLIBCXX_RELEASE != 14 || __GLIBCXX__ != 20240801 ||
+    if constexpr (_GLIBCXX_RELEASE != 14 || (__GLIBCXX__ != 20240801 && __GLIBCXX__ != 20240908) ||
                   _GLIBCXX_USE_CXX11_ABI != 1 || sizeof(unsigned long) != 8)
         context.reject(core::FailureCode::Unsupported,
                        InputDiagnosticReason::UnsupportedMemoryModel);
@@ -220,7 +220,11 @@ ParserMemoryPlan memory_plan(std::uint64_t n, std::uint64_t depth, Context& cont
         evidence(ParserSourceRole::VectorGrowth,
                  fixed_digest("dc5dad860d9f9add7ccbbea1e67f315c6f0f74d6398ccdd6459391a976cd0dc2"));
         evidence(ParserSourceRole::BitVector,
+#if defined(__GLIBCXX__) && __GLIBCXX__ == 20240908
+                 fixed_digest("7abd919ef3579f6199fb87981f80239e25ec57bc0f80e16e0ca792d44bb14f29"));
+#else
                  fixed_digest("a5e4a8743d833591f6809d5d2bdb9998f7f681c1248a5e2c49623676d29ab4ea"));
+#endif
         evidence(ParserSourceRole::String,
                  fixed_digest("4f8dbb49a708622d994acc0b6ad3e69cf72a746732c4ff2362d078b4699d478d"));
         evidence(ParserSourceRole::CowString,

@@ -158,3 +158,13 @@ MSVCは19.51.36260.0、実header/CRT sourceは14.51.36231。GCCは一次source�
 | GCC cow_string.h | `0cb671deeb0d99a38b6171290d056034ef6c2c804078a4fca30b4541f16f4d5b` |
 
 私有候補と正式port導入後の3headerはhash一致を確認した。parser SHAは`8f219283e1b1a5ad3dc413acfa33c4ee3901c0366f60676c3a93b0d37aeda7b6`、lexerは`9ab10d7a6060e048842465836c9f11ec3b064125197f388e2e9792f7ca1211f2`、concatは`666b4e48add7381f4b995cd451d3923c1a6b261d633dd9c9ad6f80e54298020b`。将来のpatchでcomment等が変わる場合は新hashと対応を記録し、旧候補へ実行証拠を付替えない。
+
+## GNU実環境の受入表への追補
+
+2026-11-17、依存補修PR #101の[Linux Debug job](https://github.com/YUKIKEDA/UVLAS/actions/runs/44008552697/job/133789790410)が、実環境の識別JSONを出力した。採取対象はcommit `77f690414088ae2006442a4e289bb776d22cd27d`、packageは`g++-14`と`libstdc++-14-dev`の`14.2.0-4ubuntu2~24.04.1`である。`_GLIBCXX_RELEASE=14`、`__GLIBCXX__=20240908`、C++11 ABI=1、long/pointer/size_t各8byte、CHAR_BIT=8、C++23、debug系macro不在を確認した。この採取は環境識別であり、本入力文書のLinux試験成功を示さない。
+
+実headerの`stl_vector.h`、`vector.tcc`、`basic_string.tcc`、`cow_string.h`は上表のGCC一次sourceと同じSHAだった。`stl_bvector.h`だけは`7abd919ef3579f6199fb87981f80239e25ec57bc0f80e16e0ca792d44bb14f29`と異なったため、[Ubuntu公式の同版deb](https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-14/libstdc++-14-dev_14.2.0-4ubuntu2~24.04.1_amd64.deb)を私有directoryへ取得した。依存の導入は行わず、該当headerだけを展開して実CIのSHAとの一致を確認した。deb全体のSHA-256は`6d223262b8cbe6d5150435056d58dffa8159d8582fc0df47fb45ea550cd37424`である。
+
+差分は二つのconstructorだけだった。`_Bvector_impl`のdefault constructorは、requiresの条件へ`__glibcxx_type_trait_variable_templates`を加える。allocatorを受け取る`_Bvector_base` constructorは、`_M_impl(__a)`を`_M_impl(_Bit_alloc_type(__a))`へ変更する。SAXの`std::vector<bool>`は標準allocatorを使い、後者は同じword allocatorへの変換を明示する。word数への切上げ、保持layout、allocate/deallocate、`_M_check_len`の成長式に差分はない。このためVboolと他のforecast式・model revision 1を維持し、GNUの受入revisionへ20240908を追加する。返却するsource証拠のBitVector欄は、20240801には一次sourceのSHA、20240908には実Ubuntu版のSHAを保持する。未知revision/debug設定を許可する変更ではない。
+
+Windows D/Rは追補前後に同じ製品source pathをMSVCで前処理した。追加したpreprocessor directiveの位置に四つの空行が増えたため、raw出力bytesは一致しなかった。空行だけを除去した後は、残る全行がbyte一致した。文字列内の空白やtokenを除去・変更した比較ではない。この結果からWindowsの前処理tokenが変わらないことを確認し、既存dbe8a03のWindows試験・変異証拠を保持して、数値試験を反復しない。rawと比較用表現の両hash・比較手順、および実CIの環境JSONは今回の検証記録へ別artifactとして残す。
