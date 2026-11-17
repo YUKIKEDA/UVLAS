@@ -1,0 +1,28 @@
+{
+  "id": "im01-3-timeout-registration-and-source",
+  "actual_platform": "Windows/MSVC Ninja Multi-Config",
+  "normal_registration": [
+    {
+      "configuration": "Debug",
+      "registered_tests": 2,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      },
+      "tests_executed": 0
+    },
+    {
+      "configuration": "Release",
+      "registered_tests": 2,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      },
+      "tests_executed": 0
+    }
+  ],
+  "pg_manifest_sources_unchanged": 21,
+  "only_cmake_addition": "# Instrumented exact fixture preparation exceeded the ordinary 300-second deadline.\n# Keep the normal limit and a separate finite budget for instrumented execution.\nif(UVLAS_SANITIZERS AND NOT MSVC)\n    set_tests_properties(structure.pg_coefficients PROPERTIES TIMEOUT 900)\nendif()\n",
+  "numerical_tests_reexecuted": false,
+  "new_linux_sanitizer_completion": "not verified"
+}

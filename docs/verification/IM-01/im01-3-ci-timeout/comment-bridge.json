@@ -1,0 +1,9 @@
+{
+  "id": "im01-3-timeout-comment-bridge",
+  "before": "# Instrumented exact fixture preparation exceeded the ordinary 300-second deadline.",
+  "after": "# The instrumented exact-coefficient test exceeded the ordinary 300-second deadline.",
+  "registered_cmake_sha256": "d06dbd244f491b935a8914f3177af28882cc72b932f209da7c5ccac56dcc090a",
+  "final_cmake_sha256": "646ee9b68f3a0b37da7775a302dace5ec06c8832663077a56ec8f6c35f8d53e6",
+  "only_this_comment_replacement": true,
+  "numeric_or_registration_logic_changed": false
+}

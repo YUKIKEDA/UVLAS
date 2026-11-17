@@ -1,0 +1,129 @@
+{
+  "schema": "uvlas.timeout-registration-check/1",
+  "scope": "Compiler-free guard input probes and CTest registration only; no Linux compiler or sanitizer execution.",
+  "cmake_sha256": "d06dbd244f491b935a8914f3177af28882cc72b932f209da7c5ccac56dcc090a",
+  "extracted_guard_sha256": "d503b04de885125fdcfded55251dee50357a54f8d3a2ca2378689c8ef67c3ca2",
+  "configurations": [
+    {
+      "generator": "Ninja",
+      "configuration": "Debug",
+      "msvc_input": false,
+      "sanitizers_input": false,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja",
+      "configuration": "Debug",
+      "msvc_input": false,
+      "sanitizers_input": true,
+      "timeouts": {
+        "structure.pg_coefficients": 900.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja",
+      "configuration": "Debug",
+      "msvc_input": true,
+      "sanitizers_input": false,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja",
+      "configuration": "Debug",
+      "msvc_input": true,
+      "sanitizers_input": true,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Debug",
+      "msvc_input": false,
+      "sanitizers_input": false,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Release",
+      "msvc_input": false,
+      "sanitizers_input": false,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Debug",
+      "msvc_input": false,
+      "sanitizers_input": true,
+      "timeouts": {
+        "structure.pg_coefficients": 900.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Release",
+      "msvc_input": false,
+      "sanitizers_input": true,
+      "timeouts": {
+        "structure.pg_coefficients": 900.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Debug",
+      "msvc_input": true,
+      "sanitizers_input": false,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Release",
+      "msvc_input": true,
+      "sanitizers_input": false,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Debug",
+      "msvc_input": true,
+      "sanitizers_input": true,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    },
+    {
+      "generator": "Ninja Multi-Config",
+      "configuration": "Release",
+      "msvc_input": true,
+      "sanitizers_input": true,
+      "timeouts": {
+        "structure.pg_coefficients": 300.0,
+        "structure.pg_coefficients_resources": 60.0
+      }
+    }
+  ],
+  "passed": true
+}
