@@ -324,6 +324,8 @@ TEST_CASE("Predicate limits and failures preserve borrowed words and existing re
     failure(subject::classify_triangle(subject::Binary64Coordinates{input}, *scratch, sufficient,
                                        {numerics::linear::EstimateAdmission{28672}, 0}),
             core::FailureCode::ResourceExceeded);
+    // MSVC 14.51 request_stop() is non-const; libstdc++ declares it const.
+    // NOLINTNEXTLINE(misc-const-correctness): keep the MSVC call well-formed.
     std::stop_source stop;
     stop.request_stop();
     failure(subject::classify_triangle(subject::Binary64Coordinates{input}, *scratch, sufficient,
