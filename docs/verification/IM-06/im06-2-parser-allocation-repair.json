@@ -1,0 +1,96 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "N4-01",
+    "N4-03",
+    "N4-08",
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 99,
+  "date": "2026-11-17",
+  "source_commit": "b11535dfb94f71b0e947e08e8d369a9df1a097cc",
+  "clean_source": true,
+  "scope": "固定JSON SAXの割当例外補修と、影響する依存consumerだけを確認する。InputDocument本体、ソルバー/パッケージ全体、物理/実務受入は認定しない。",
+  "basis": {
+    "upstream": "nlohmann/json 3.12.0",
+    "baseline_port_revision": 2,
+    "overlay_port_revision": 3,
+    "repair_revision": 1,
+    "changes": "3header9箇所。空値をthrow可能なconstructorで作り、lexer外側のnoexceptを外し、文字列をoptional NRVOに依存しないcopy prvalueで返す。既存のvcpkg修正2件と通知は保持する。",
+    "installed_headers_sha256": {
+      "detail/input/parser.hpp": "8f219283e1b1a5ad3dc413acfa33c4ee3901c0366f60676c3a93b0d37aeda7b6",
+      "detail/input/lexer.hpp": "9ab10d7a6060e048842465836c9f11ec3b064125197f388e2e9792f7ca1211f2",
+      "detail/string_concat.hpp": "666b4e48add7381f4b995cd451d3923c1a6b261d633dd9c9ad6f80e54298020b"
+    },
+    "copyright_sha256": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+    "installation": "専用prefixへvcpkg overlayから導入し、既存共有prefixは変更しない。初回のdrive分割引数を訂正し、この作業で生成したprefixだけを所定のoutへ移動して、PowerShellの直接引数配列で構成し直した。"
+  },
+  "verification": {
+    "environment": "Windows x64 / MSVC 19.51.36260.0 / STL 14.51.36231 / C++23preview / fp:strict / WX",
+    "Debug": {
+      "ctest_passed": 4,
+      "ctest_selected": 4,
+      "sax_controls": 5,
+      "sax_cpp_new_fault_sites": 200,
+      "sax_caught": 200,
+      "unexpected_terminate": 0,
+      "stock_default_constructor_negative_sites": 2,
+      "stock_default_constructor_exit": 77,
+      "explicit_empty_constructor_sites_caught": 4
+    },
+    "Release": {
+      "ctest_passed": 4,
+      "ctest_selected": 4,
+      "sax_controls": 5,
+      "sax_cpp_new_fault_sites": 121,
+      "sax_caught": 121,
+      "unexpected_terminate": 0,
+      "empty_constructor_cpp_new_sites": 0
+    },
+    "selected": [
+      "toolchain.pinned_dependencies",
+      "toolchain.json_allocation_exceptions",
+      "core.instrumentation",
+      "cli.build_info"
+    ],
+    "reference": "手書きのSAX kind/値/元token/復号UTF-8/順序byte列と固定のerror ID/位置へ照合する。各故障位置は独立child processのcontrol件数から取得し、SAX 0件・timeout・異なる終了codeを拒否する。",
+    "binary_provenance": "両構成の実binaryで上記source commit、uncommitted_changes=false、dependency_repairs.nlohmann_json_sax_allocation=1を確認した。",
+    "static": "対象4fileのclang-format21.1.2成功。build_info.cpp・pinned_dependencies_test.cpp・json_allocation_probe.cppのclang-tidy21.1.1成功。初回診断を直しprobeだけ再検査した。派生Debug専用解析DBからClang非対応のMSVC /Zc:nrvo-だけを外し、実MSVC buildには維持した。driverの対象Ruff/format/Pyright strictも成功。",
+    "not_repeated": "未変更の物理/数値suite、過去の変異試験と性能計測は再実行していない。Linux/sanitizerの実行はCIへ委ね、完了を待たない。"
+  },
+  "limits": [
+    "選定したJSON-text SAX経路のみ。全nlohmann機能やbinary形式の保証ではない。",
+    "C++newへの故障注入でCRT mallocを注入/計測したとはしない。InputDocumentのCRT message fallback分類は後続の別gateである。",
+    "未補修prefixの診断はrepair revision 0を報告できるが、固定依存試験と後続InputDocument consumerはrevision 1を要求する。"
+  ],
+  "metadata_followup": "PR100のmerge後にADR0007をAcceptedへ変更し、traceを同期した。後続parserメモリモデルのため、Linux CIへ実stdlib macro/header hashの軽量採取を追加した。これは実target全flagの資格やLinux実行成功を意味せず、追加の数値再試験も行わない。最終検証したsource/test/依存bytesは不変。",
+  "sources": {
+    ".gitattributes": "bd079bc663d0eda460142aa5051c95490bf49961a460bc4bd84161892e7253de",
+    ".cursor/rules/powershell-shell.mdc": "d19d42c654545e44ffc0cface0c3c67dbe01e5737305a771f7c43e396358fcf8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "src/core/build_info.cpp": "78ba2a6cd427f6d9f447e83f883a521e18cfd9459ca2169e3e13aa40c8998588",
+    "include/uvlas/core/build_info.hpp": "860e103e51257d7c9ef3a19fcc2a20c2d03b96ec25d9865abfec3c854d5cb4aa",
+    "tests/CMakeLists.txt": "01d676cb57e41b4794c3ef3f9a7bec4ab89146a891060c3022440dc078d19705",
+    "tests/toolchain/pinned_dependencies_test.cpp": "99bf846fb1ca482be1442d278cf2b1c33874b1dc49482c42a03592aa9616c462",
+    "tests/toolchain/json_allocation_probe.cpp": "97e642af42fe9167c41b7ecc5541d8155113f988b56ef3459120e48b3ee93215",
+    "tools/qa/json_allocation_probe_test.py": "b76e0fdba2a680b3e96583bf4069b8953c1ff961d9a03e2defb75b836c2394fd",
+    "docs/build.md": "62de34452ea440807ce25c4dc039d06d857e7127af52984e342d1d4cc08a2103",
+    "cmake/vcpkg-ports/nlohmann-json/fix-4736_char8_t.patch": "4c0177c5b4c4fb0978b54e2e113d2c76865059a85aa1b060b87f441056813fde",
+    "cmake/vcpkg-ports/nlohmann-json/fix-4742_std_optional.patch": "218c2182366f1e9b997fc81f1b27b951a1438a3578f8e0cb22a1957cc326ccbd",
+    "cmake/vcpkg-ports/nlohmann-json/portfile.cmake": "c487897a1582307935267f1725dfc3f8809ea607f16e10bea076330c7d4cf4b9",
+    "cmake/vcpkg-ports/nlohmann-json/propagate-sax-allocation-failure.patch": "6805b6f8fc7e18b3a3c37e017d665478485a743739a29fd82bc530e54039c5f2",
+    "cmake/vcpkg-ports/nlohmann-json/usage": "ec6460d4688d7908d8adc698700f77639013641f1ab27066e9324c9ca11276c3",
+    "cmake/vcpkg-ports/nlohmann-json/vcpkg.json": "48c7b9e825b599fdf8f4792e75aa9676d31c6f7b5d4a59b0eb7b35e961b1d9d6"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/debug-build.log": "b13e617773a9303b60802053c779379fff6fdb21f29938ad090de29eb2e2c63c",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/debug-tests.log": "868a50bfff21149405035880c224163ee31e3af980dd6715073d17e9b7823781",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/debug-build-info.json": "90f4af0e803d0ff0a7175d026e0f25741a7652fbda150243c5b10b671dbc4c08",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/release-build.log": "f3f66da8e8b7c2e341de1637590c89bf0261389918a30dc2cab39c3fe069b599",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/release-tests.log": "aff5e071fe38e95fd50b3788aeb3e9bdc937651565788750ea2748f5f1a71152",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/release-build-info.json": "d64db01c21d36931a54b44bd179b73c5d1c0918f6e4def35a1658d3cda611c22",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair/log-provenance.json": "740d777b20242e700da7758084ceff5d7e47bc23cebdb5d74d3306e873323878"
+  },
+  "claimed_state": "この依存補修の、審査した選定SAX経路の実装適合まで。数値/実験/製品規模性能/実務受入は認定しない。"
+}

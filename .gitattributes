@@ -29,3 +29,6 @@ AGENTS.md -text
 
 # The imported historical PG artifacts retain the bytes cited by the R&D evidence index.
 tests/numerics/fixtures/j1-pg-free-history-24-v1/source/** -text
+
+# Preserve the imported baseline port's usage text verbatim.
+cmake/vcpkg-ports/nlohmann-json/usage -text

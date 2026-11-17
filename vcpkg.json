@@ -31,7 +31,7 @@
     { "name": "boost-multiprecision", "version": "1.92.0" },
     { "name": "catch2", "version": "3.16.1" },
     { "name": "eigen3", "version": "5.0.1" },
-    { "name": "nlohmann-json", "version": "3.12.0" },
+    { "name": "nlohmann-json", "version": "3.12.0", "port-version": 3 },
     { "name": "pybind11", "version": "3.1.0" },
     { "name": "spectra", "version": "1.2.0" }
   ]

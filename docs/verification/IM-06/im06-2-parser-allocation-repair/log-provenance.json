@@ -1,0 +1,38 @@
+{
+  "debug-build.log": {
+    "raw_private_path": "out/issue99-verification/debug-build.log",
+    "raw_sha256": "26b67b915582dabfd910f1028222bdfbff77cb9354efc06f8c87be4f2afdd145",
+    "published_sha256": "b13e617773a9303b60802053c779379fff6fdb21f29938ad090de29eb2e2c63c",
+    "transformation": "CRLFをLFへ変換しworkspace/user pathを匿名化した公開派生text。元の私有rawは変更していない。"
+  },
+  "debug-tests.log": {
+    "raw_private_path": "out/issue99-verification/debug-tests.log",
+    "raw_sha256": "80ed928e731b5366cea0a8080882c1d0fe9d0b538398d804f4cecc292f5f4347",
+    "published_sha256": "868a50bfff21149405035880c224163ee31e3af980dd6715073d17e9b7823781",
+    "transformation": "CRLFをLFへ変換しworkspace/user pathを匿名化した公開派生text。元の私有rawは変更していない。"
+  },
+  "debug-build-info.json": {
+    "raw_private_path": "out/issue99-verification/debug-build-info.json",
+    "raw_sha256": "87a86ecf68b5d0d7fde354439397e7be24e56075a44fac83b3e4935646b67d75",
+    "published_sha256": "90f4af0e803d0ff0a7175d026e0f25741a7652fbda150243c5b10b671dbc4c08",
+    "transformation": "CRLFをLFへ変換しworkspace/user pathを匿名化した公開派生text。元の私有rawは変更していない。"
+  },
+  "release-build.log": {
+    "raw_private_path": "out/issue99-verification/release-build.log",
+    "raw_sha256": "6ca61d57d761d8c01c61b75c349ec03dcae20fea2eab271a1c0549e59b9abeb4",
+    "published_sha256": "f3f66da8e8b7c2e341de1637590c89bf0261389918a30dc2cab39c3fe069b599",
+    "transformation": "CRLFをLFへ変換しworkspace/user pathを匿名化した公開派生text。元の私有rawは変更していない。"
+  },
+  "release-tests.log": {
+    "raw_private_path": "out/issue99-verification/release-tests.log",
+    "raw_sha256": "20f5511e9924016e5750afafa7129dd1e078199994603200d16be9c456866cc9",
+    "published_sha256": "aff5e071fe38e95fd50b3788aeb3e9bdc937651565788750ea2748f5f1a71152",
+    "transformation": "CRLFをLFへ変換しworkspace/user pathを匿名化した公開派生text。元の私有rawは変更していない。"
+  },
+  "release-build-info.json": {
+    "raw_private_path": "out/issue99-verification/release-build-info.json",
+    "raw_sha256": "2233a11486afef56587f9c45efcb233d5667c78b0279d5abfabf98f2fdb9d754",
+    "published_sha256": "d64db01c21d36931a54b44bd179b73c5d1c0918f6e4def35a1658d3cda611c22",
+    "transformation": "CRLFをLFへ変換しworkspace/user pathを匿名化した公開派生text。元の私有rawは変更していない。"
+  }
+}

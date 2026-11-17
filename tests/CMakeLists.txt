@@ -75,6 +75,21 @@ uvlas_add_test(toolchain.pinned_dependencies
 target_compile_definitions(uvlas_test_toolchain_pinned_dependencies PRIVATE
     UVLAS_MANIFEST_PATH="${PROJECT_SOURCE_DIR}/vcpkg.json")
 
+# Isolate injected allocation failures from the test runner and exercise
+# optional-NRVO-disabled MSVC Debug paths through the installed JSON package.
+add_executable(uvlas_json_allocation_probe toolchain/json_allocation_probe.cpp)
+uvlas_configure_target(uvlas_json_allocation_probe)
+target_link_libraries(uvlas_json_allocation_probe PRIVATE nlohmann_json::nlohmann_json)
+if(MSVC)
+    target_compile_options(uvlas_json_allocation_probe PRIVATE /Zc:nrvo-)
+endif()
+add_test(NAME toolchain.json_allocation_exceptions
+    COMMAND "${Python3_EXECUTABLE}" -m tools.qa.json_allocation_probe_test
+        --probe "$<TARGET_FILE:uvlas_json_allocation_probe>")
+set_tests_properties(toolchain.json_allocation_exceptions PROPERTIES
+    TIMEOUT 180 LABELS "negative;verification"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" ENVIRONMENT "PYTHONUTF8=1")
+
 uvlas_add_test(toolchain.linear_algebra
     LABELS unit verification
     SOURCES toolchain/linear_algebra_test.cpp
@@ -141,6 +156,21 @@ target_include_directories(uvlas_test_aero_exact_triangle_resources
     PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_exact_triangle_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_exact_triangle_resources)
+
+uvlas_add_test(aero.geometry_snapshot
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/geometry_snapshot_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_geometry_snapshot
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_add_test(aero.geometry_snapshot_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/geometry_snapshot_resources_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_geometry_snapshot_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_geometry_snapshot_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_geometry_snapshot_resources)
 
 uvlas_add_test(core.checked_dimensions
     LABELS unit negative

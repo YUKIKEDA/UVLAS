@@ -1,0 +1,71 @@
+{
+  "schema": "uvlas.integration/1",
+  "source_commit": "cd4777a26386fd9fe3ec3e48063012526c72a496",
+  "upstream_commit": "77f690414088ae2006442a4e289bb776d22cd27d",
+  "merge_commit": "5d84a181a2439e4b6465981fadff4b71cddd2249",
+  "a0_a1_files": [
+    {
+      "hint": "src/aero/exact_triangle_predicates.cpp",
+      "before_sha256": "fb3af684aac1ec71eed742e9ebe37b088e8ea68e71376c04c6b921bf83cd7364",
+      "after_sha256": "fb3af684aac1ec71eed742e9ebe37b088e8ea68e71376c04c6b921bf83cd7364",
+      "unchanged": true
+    },
+    {
+      "hint": "tests/aero/geometry_snapshot_resources_test.cpp",
+      "before_sha256": "a54396faf60bcfaf7136fe3520f9017af57451bc8e180d6cb122fdf9e00049aa",
+      "after_sha256": "a54396faf60bcfaf7136fe3520f9017af57451bc8e180d6cb122fdf9e00049aa",
+      "unchanged": true
+    },
+    {
+      "hint": "src/aero/geometry_snapshot.hpp",
+      "before_sha256": "a3b3f3ff1f3b9160a9e6f36187560db79d455cd5f0ac96d5bbc249117e7cb6a6",
+      "after_sha256": "a3b3f3ff1f3b9160a9e6f36187560db79d455cd5f0ac96d5bbc249117e7cb6a6",
+      "unchanged": true
+    },
+    {
+      "hint": "tests/aero/geometry_snapshot_test.cpp",
+      "before_sha256": "a9c1ac43f085d31d08368118e8453d62cb7381ca6d6949d87a79624b3979cafa",
+      "after_sha256": "a9c1ac43f085d31d08368118e8453d62cb7381ca6d6949d87a79624b3979cafa",
+      "unchanged": true
+    },
+    {
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "before_sha256": "d71ae978b549943f2a701fb82f2378502fb86e7a1e77b184a89791c5569c0fd0",
+      "after_sha256": "d71ae978b549943f2a701fb82f2378502fb86e7a1e77b184a89791c5569c0fd0",
+      "unchanged": true
+    },
+    {
+      "hint": "src/aero/exact_triangle_predicates.hpp",
+      "before_sha256": "f2769e1a158d129264b3bb87d3b6c6f48d36910cf09dbb399e0bc493a983a062",
+      "after_sha256": "f2769e1a158d129264b3bb87d3b6c6f48d36910cf09dbb399e0bc493a983a062",
+      "unchanged": true
+    },
+    {
+      "hint": "src/aero/exact_triangle_private.hpp",
+      "before_sha256": "790de5e6659b137e3668e22f5039b706f1ef6eb3868fa5f5c51ea0168268a045",
+      "after_sha256": "790de5e6659b137e3668e22f5039b706f1ef6eb3868fa5f5c51ea0168268a045",
+      "unchanged": true
+    },
+    {
+      "hint": "src/aero/geometry_snapshot_storage.hpp",
+      "before_sha256": "feb1735107c2c7a12277073453c74510354979c44f6b3fbdee88cb9e6215d2b5",
+      "after_sha256": "feb1735107c2c7a12277073453c74510354979c44f6b3fbdee88cb9e6215d2b5",
+      "unchanged": true
+    },
+    {
+      "hint": "tests/aero/geometry_snapshot_fixture.hpp",
+      "before_sha256": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+      "after_sha256": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+      "unchanged": true
+    }
+  ],
+  "historical_registration": {
+    "id": "im03-2-source-2",
+    "hint": "tests/CMakeLists.txt",
+    "historical_commit": "cd4777a26386fd9fe3ec3e48063012526c72a496",
+    "expected_sha256": "6516b7d710bcc97604c902fda3f50bc5035a01d526bc6fee45ca2b6ae8bbf1b3",
+    "git_show_sha256": "6516b7d710bcc97604c902fda3f50bc5035a01d526bc6fee45ca2b6ae8bbf1b3",
+    "passed": true
+  },
+  "scope": "数学source/header/test9filesのbytes不変。JSON依存補修・別module登録と環境metadataのみを通常mergeし、既存実行結果を後続版の再実行としない。"
+}
