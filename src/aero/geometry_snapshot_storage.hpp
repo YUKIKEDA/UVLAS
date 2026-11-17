@@ -2,6 +2,8 @@
 
 #include "geometry_snapshot.hpp"
 
+#include <type_traits>
+
 namespace uvlas::aero::detail {
 // These are private, budgeted storage records. Zero initializes a builder slot;
 // it is never interpreted as an absent physical ID or published before filling.
@@ -51,7 +53,8 @@ struct IdLookup {
     core::Index ordinal = 0;
 };
 using ParameterStorage = std::variant<double, std::array<double, 2>>;
-using FreeStorage = std::variant<std::array<double, 3>, std::array<double, 6>>;
+using FreeSingleStorage = std::array<double, 3>;
+using FreeDoubleStorage = std::array<double, 6>;
 struct VertexStorage {
     std::uint64_t point = 0;
 };
@@ -74,10 +77,21 @@ struct FacetSupportStorage {
 };
 struct QueryStorage {
     std::uint64_t id = 0;
-    std::variant<FreeStorage, VertexStorage, EdgeQueryStorage, FaceQueryStorage> definition;
+    std::variant<FreeSingleStorage, FreeDoubleStorage, VertexStorage, EdgeQueryStorage,
+                 FaceQueryStorage>
+        definition;
     std::variant<NoMaterialSupport, PointSupportStorage, EdgeSupportStorage, FacetSupportStorage>
         support;
 };
+// These selected alternatives construct/copy/move without a throwing inner
+// variant conversion, so no outer strong-guarantee temporary is needed.
+static_assert(std::is_nothrow_copy_constructible_v<FreeSingleStorage>);
+static_assert(std::is_nothrow_copy_constructible_v<FreeDoubleStorage>);
+static_assert(std::is_nothrow_move_constructible_v<EdgeQueryStorage>);
+static_assert(std::is_nothrow_copy_constructible_v<EdgeQueryStorage>);
+static_assert(std::is_nothrow_move_constructible_v<FaceQueryStorage>);
+static_assert(std::is_nothrow_copy_constructible_v<FaceQueryStorage>);
+static_assert(std::is_nothrow_copy_assignable_v<QueryStorage>);
 struct QueryArithmeticScratch {
     std::array<ExactInteger, 3> weights;
     ExactInteger word, coordinate, product, sum;
