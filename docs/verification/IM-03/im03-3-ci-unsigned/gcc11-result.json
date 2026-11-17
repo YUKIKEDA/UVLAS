@@ -1,0 +1,5 @@
+{
+  "after_compile_exit": 0,
+  "scope": "GCC11 scalar type-conversion probe only; not a GCC14 product build",
+  "before_compile_exit": 1
+}

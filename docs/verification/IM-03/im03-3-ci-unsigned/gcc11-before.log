@@ -1,0 +1,5 @@
+<workspace>/out/issue109-ci-linux/before.cpp: In function ‘int main()’:
+<workspace>/out/issue109-ci-linux/before.cpp:5:43: error: conversion to ‘uint64_t’ {aka ‘long unsigned int’} from ‘int’ may change the sign of the result [-Werror=sign-conversion]
+    5 |     for (const std::uint64_t cap : {16, 17}) total+=cap;
+      |                                           ^
+cc1plus: all warnings being treated as errors

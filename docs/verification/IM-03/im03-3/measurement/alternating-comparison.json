@@ -1,0 +1,396 @@
+{
+  "source_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+  "order": [
+    "before",
+    "after",
+    "before",
+    "after",
+    "before",
+    "after"
+  ],
+  "outer_rounds": 3,
+  "inner_samples_per_case_per_invocation": 3,
+  "samples_per_case_per_version": 9,
+  "workers": 1,
+  "affinity_mask": 1,
+  "same_compile_flags": true,
+  "same_probe_input_source": true,
+  "unchanged_producer_cpp": {
+    "src/aero/local_geometry_packet.cpp": "49b4807807072ee61d85aa8f83dfdc6bc8221d504f60ce61a76161aabdf328d0",
+    "src/aero/geometry_snapshot.cpp": "90010d2c3bd6e53ced89c1a568f2c3477734aff207813da5d7a822be0d96f952"
+  },
+  "different_build_identity": "before is diagnostic dirty snapshot; after clean6ad95bb. Only bound header common2pow optimization changes numerical implementation. Old binaries/source/flags/raw are preserved.",
+  "selection": "best of nine nested samples for each condition/version; medians/ranges retained; no whole-product performance acceptance",
+  "raw": [
+    {
+      "version": "before",
+      "round": 0,
+      "file": "out/issue109-measure/before/alternating-0.json-stream",
+      "sha256": "7803e74cb89646edf21d88660307526b7ed870c482a5a8ec97acab31eae27961"
+    },
+    {
+      "version": "after",
+      "round": 0,
+      "file": "out/issue109-measure/after/alternating-0.json-stream",
+      "sha256": "7336b3aa4a664bd6ec6093a0269d464020de128d28aa840076aa304f26f95b0c"
+    },
+    {
+      "version": "before",
+      "round": 1,
+      "file": "out/issue109-measure/before/alternating-1.json-stream",
+      "sha256": "317526f78fd6ecc3d3462c103ad18f1145e83a5d45c136537b1725c400a1ddbb"
+    },
+    {
+      "version": "after",
+      "round": 1,
+      "file": "out/issue109-measure/after/alternating-1.json-stream",
+      "sha256": "1e66e055c352c7fbcc348c5e2fcac6754b4d2ad39918dd4a7c4ac1e99f741b10"
+    },
+    {
+      "version": "before",
+      "round": 2,
+      "file": "out/issue109-measure/before/alternating-2.json-stream",
+      "sha256": "149a1023f2a1d8e21613581313ba0ebbb7b20f9e3a4b511821654c7cd020d03f"
+    },
+    {
+      "version": "after",
+      "round": 2,
+      "file": "out/issue109-measure/after/alternating-2.json-stream",
+      "sha256": "8e646520808f258a26a523fdcf241325ccb96d18f2c3d1da9ced010c6fa2997f"
+    }
+  ],
+  "cases": [
+    {
+      "scenario": 0,
+      "all_output_words_radius_exponents_work_payload_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 1543900,
+          "median": 1553800,
+          "max": 1623800
+        },
+        "classification_ns": {
+          "min": 115700,
+          "median": 119100,
+          "max": 132200
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 1417000,
+          "median": 1431400,
+          "max": 1492300
+        },
+        "root_ns": {
+          "min": 1372200,
+          "median": 1387300,
+          "max": 1445800
+        },
+        "width_ns": {
+          "min": 37200,
+          "median": 38300,
+          "max": 39600
+        },
+        "best_sample": {
+          "outer_round": 1,
+          "sample": 1,
+          "wall_ns": 1543900,
+          "root_ns": 1372200
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 254600,
+          "median": 259700,
+          "max": 518000
+        },
+        "classification_ns": {
+          "min": 114200,
+          "median": 117000,
+          "max": 371400
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 133500,
+          "median": 135100,
+          "max": 146100
+        },
+        "root_ns": {
+          "min": 90000,
+          "median": 91100,
+          "max": 92600
+        },
+        "width_ns": {
+          "min": 37100,
+          "median": 37500,
+          "max": 48600
+        },
+        "best_sample": {
+          "outer_round": 0,
+          "sample": 2,
+          "wall_ns": 254600,
+          "root_ns": 90400
+        }
+      },
+      "best_wall_ratio_after_over_before": 0.16490705356564545,
+      "separated_observed_ranges": true,
+      "decision": "adopt exact common-power cancellation for this preparation implementation; no threshold or precision change"
+    },
+    {
+      "scenario": 1,
+      "all_output_words_radius_exponents_work_payload_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 1583100,
+          "median": 1764300,
+          "max": 2073000
+        },
+        "classification_ns": {
+          "min": 129200,
+          "median": 139100,
+          "max": 145200
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 100,
+          "max": 200
+        },
+        "enclosure_ns": {
+          "min": 1436200,
+          "median": 1615800,
+          "max": 1927300
+        },
+        "root_ns": {
+          "min": 1384900,
+          "median": 1566600,
+          "max": 1879400
+        },
+        "width_ns": {
+          "min": 39400,
+          "median": 40800,
+          "max": 44700
+        },
+        "best_sample": {
+          "outer_round": 0,
+          "sample": 2,
+          "wall_ns": 1583100,
+          "root_ns": 1384900
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 263000,
+          "median": 270300,
+          "max": 388500
+        },
+        "classification_ns": {
+          "min": 121400,
+          "median": 122700,
+          "max": 130700
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 134600,
+          "median": 136000,
+          "max": 259100
+        },
+        "root_ns": {
+          "min": 90300,
+          "median": 92000,
+          "max": 214200
+        },
+        "width_ns": {
+          "min": 37700,
+          "median": 38200,
+          "max": 41500
+        },
+        "best_sample": {
+          "outer_round": 0,
+          "sample": 0,
+          "wall_ns": 263000,
+          "root_ns": 90400
+        }
+      },
+      "best_wall_ratio_after_over_before": 0.16612974543616954,
+      "separated_observed_ranges": true,
+      "decision": "adopt exact common-power cancellation for this preparation implementation; no threshold or precision change"
+    },
+    {
+      "scenario": 2,
+      "all_output_words_radius_exponents_work_payload_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 879700,
+          "median": 898800,
+          "max": 1163800
+        },
+        "classification_ns": {
+          "min": 71700,
+          "median": 75800,
+          "max": 113600
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 800100,
+          "median": 809900,
+          "max": 1085700
+        },
+        "root_ns": {
+          "min": 762900,
+          "median": 772600,
+          "max": 915600
+        },
+        "width_ns": {
+          "min": 31700,
+          "median": 32500,
+          "max": 234200
+        },
+        "best_sample": {
+          "outer_round": 2,
+          "sample": 0,
+          "wall_ns": 879700,
+          "root_ns": 765800
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 203000,
+          "median": 210000,
+          "max": 358800
+        },
+        "classification_ns": {
+          "min": 69600,
+          "median": 71700,
+          "max": 79000
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 126300,
+          "median": 128800,
+          "max": 284200
+        },
+        "root_ns": {
+          "min": 89400,
+          "median": 91500,
+          "max": 95600
+        },
+        "width_ns": {
+          "min": 31500,
+          "median": 32100,
+          "max": 185700
+        },
+        "best_sample": {
+          "outer_round": 2,
+          "sample": 0,
+          "wall_ns": 203000,
+          "root_ns": 90900
+        }
+      },
+      "best_wall_ratio_after_over_before": 0.23076048652949868,
+      "separated_observed_ranges": true,
+      "decision": "adopt exact common-power cancellation for this preparation implementation; no threshold or precision change"
+    },
+    {
+      "scenario": 3,
+      "all_output_words_radius_exponents_work_payload_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 2159300,
+          "median": 2304200,
+          "max": 4333200
+        },
+        "classification_ns": {
+          "min": 132200,
+          "median": 135500,
+          "max": 231500
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 2019200,
+          "median": 2143400,
+          "max": 4188200
+        },
+        "root_ns": {
+          "min": 1972500,
+          "median": 2088300,
+          "max": 2560500
+        },
+        "width_ns": {
+          "min": 39000,
+          "median": 41600,
+          "max": 48300
+        },
+        "best_sample": {
+          "outer_round": 1,
+          "sample": 2,
+          "wall_ns": 2159300,
+          "root_ns": 1973100
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 274200,
+          "median": 288500,
+          "max": 422300
+        },
+        "classification_ns": {
+          "min": 130700,
+          "median": 136900,
+          "max": 274000
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 134500,
+          "median": 137100,
+          "max": 154500
+        },
+        "root_ns": {
+          "min": 88600,
+          "median": 91300,
+          "max": 102700
+        },
+        "width_ns": {
+          "min": 38500,
+          "median": 40000,
+          "max": 44500
+        },
+        "best_sample": {
+          "outer_round": 0,
+          "sample": 2,
+          "wall_ns": 274200,
+          "root_ns": 90600
+        }
+      },
+      "best_wall_ratio_after_over_before": 0.12698559718427269,
+      "separated_observed_ranges": true,
+      "decision": "adopt exact common-power cancellation for this preparation implementation; no threshold or precision change"
+    }
+  ]
+}

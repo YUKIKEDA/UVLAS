@@ -1,0 +1,43 @@
+2026-11-17T12:13:44.3137370Z 
+2026-11-17T12:13:44.3137674Z HEAD is now at 969be43 Merge fc7fb993201b482f18c6ea9a95ab29421564c6fb into 870926d1af73bd9a3d01db45618e873067f1ed0a
+2026-11-17T12:13:44.3147254Z ##[endgroup]
+2026-11-17T12:13:44.3151730Z [command]/usr/bin/git log -1 --format=%H
+2026-11-17T12:13:44.3186488Z 969be432386acd4ec404fb00aacd6985dbc3701c
+2026-11-17T12:13:44.3382661Z ##[group]Run actions/checkout@v7
+2026-11-17T12:13:44.3382810Z with:
+2026-11-17T12:13:44.3382935Z   repository: microsoft/vcpkg
+2026-11-17T12:13:54.5748061Z ##[endgroup]
+2026-11-17T12:13:54.5796659Z [command]/usr/bin/git log -1 --format=%H
+2026-11-17T12:13:54.5831386Z 0df93a05b9de080129e653ec4776d7e14a1b2e4f
+2026-11-17T12:13:54.6473907Z ##[group]Run actions/cache@v6
+2026-11-17T12:13:54.6474051Z with:
+2026-11-17T12:13:54.6474158Z   path: out/vcpkg-cache
+2026-11-17T12:16:55.5937752Z       Start 27: aero.local_geometry_packet
+2026-11-17T12:16:55.6531792Z 27/82 Test #27: aero.local_geometry_packet .............   Passed    0.06 sec
+2026-11-17T12:16:55.6532959Z       Start 28: aero.local_geometry_packet_resources
+2026-11-17T12:16:55.6653410Z 28/82 Test #28: aero.local_geometry_packet_resources ...   Passed    0.01 sec
+2026-11-17T12:16:55.6654383Z       Start 29: core.checked_dimensions
+2026-11-17T12:16:55.6671647Z 29/82 Test #29: core.checked_dimensions ................   Passed    0.00 sec
+2026-11-17T12:16:55.6672512Z       Start 30: core.resource_plan
+2026-11-17T12:16:55.6691368Z 30/82 Test #30: core.resource_plan .....................   Passed    0.00 sec
+2026-11-17T12:17:08.8263978Z 
+2026-11-17T12:17:08.8264186Z 100% tests passed, 0 tests failed out of 82
+2026-11-17T12:17:08.8264448Z 
+2026-11-17T12:17:08.8264557Z Label Time Summary:
+2026-11-17T12:17:08.8266169Z V-AERO          =   0.94 sec*proc (5 tests)
+2026-11-17T12:17:08.8266564Z V-PG            =   0.15 sec*proc (3 tests)
+2026-11-17T12:36:50.4715954Z 7306143 warnings generated.
+2026-11-17T12:36:50.4755918Z /home/runner/work/UVLAS/UVLAS/tests/aero/local_geometry_packet_test.cpp:538:32: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-17T12:36:50.4756750Z   538 |         contains(packet_value(*packets[i], LocalQuantity::AreaZ), Rat{6});
+2026-11-17T12:36:50.4756966Z       |                                ^~~~~~~~~~
+2026-11-17T12:36:50.4758214Z /home/runner/work/UVLAS/UVLAS/tests/aero/local_geometry_packet_test.cpp:540:33: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-17T12:36:50.4758662Z   540 |     CHECK(center(*packet_value(*packets[0], LocalQuantity::Length)) ==
+2026-11-17T12:36:50.4758860Z       |                                 ^
+2026-11-17T12:36:50.4759167Z /home/runner/work/UVLAS/UVLAS/out/vcpkg_installed/x64-linux/include/catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+2026-11-17T12:36:50.4759597Z   141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+2026-11-17T12:36:50.4761064Z       |                                                                      ^~~~~~~~~~~
+2026-11-17T12:36:50.4761464Z /home/runner/work/UVLAS/UVLAS/tests/aero/local_geometry_packet_test.cpp:541:33: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-17T12:36:50.4761882Z   541 |           center(*packet_value(*packets[1], LocalQuantity::Length)));
+2026-11-17T12:36:50.4762067Z       |                                 ^
+2026-11-17T12:36:50.4762363Z /home/runner/work/UVLAS/UVLAS/out/vcpkg_installed/x64-linux/include/catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+2026-11-17T12:36:50.4762776Z   141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )

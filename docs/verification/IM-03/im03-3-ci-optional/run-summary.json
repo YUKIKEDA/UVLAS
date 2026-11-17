@@ -1,0 +1,80 @@
+{
+  "run_id": 44081121170,
+  "head": "fc7fb993201b482f18c6ea9a95ab29421564c6fb",
+  "checkout_merge": "969be432386acd4ec404fb00aacd6985dbc3701c",
+  "jobs": [
+    {
+      "id": 134031668847,
+      "name": "select affected checks",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031668847"
+    },
+    {
+      "id": 134031760042,
+      "name": "build and test (windows, msvc)",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760042"
+    },
+    {
+      "id": 134031760101,
+      "name": "Python ownership (windows-2025, CPython 3.12)",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760101"
+    },
+    {
+      "id": 134031760109,
+      "name": "build and test (linux, gcc 14, linux-debug)",
+      "conclusion": "failure",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760109"
+    },
+    {
+      "id": 134031760131,
+      "name": "compile optional benchmark (linux, gcc 14)",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760131"
+    },
+    {
+      "id": 134031760151,
+      "name": "build and test (linux, gcc 14, linux-sanitize)",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760151"
+    },
+    {
+      "id": 134031760172,
+      "name": "Python ownership (ubuntu-24.04, CPython 3.12)",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760172"
+    },
+    {
+      "id": 134031760214,
+      "name": "build and test (linux, gcc 14, linux-release)",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760214"
+    },
+    {
+      "id": 134031760251,
+      "name": "format, skills, R&D tree",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760251"
+    },
+    {
+      "id": 134044271281,
+      "name": "ci",
+      "conclusion": "failure",
+      "status": "completed",
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134044271281"
+    }
+  ],
+  "debug_raw_private_sha256": "0a00895d51860b5724ad9ec0252700f0e76471e99edcb631ae3c4ad40dff7cce",
+  "excerpt_sha256": "73b835738fad1c32eec961f56fc6a03f0055b8adc6cdfdf08577c21be7804d91",
+  "excerpt_scope": "checkout/Aero target successes/82 CTest pass/3 tidy errors only; ANSI omitted; complete raw preserved privately"
+}

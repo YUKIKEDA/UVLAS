@@ -1,0 +1,19 @@
+{
+  "source_commit": "d87e7c36ef7c800b8a212f5a9e5473db91088f8b",
+  "source_hashes": {
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "a8eea2057dfebd280d66b73c11cb32f0df731e9b07da5afa5fa9c0dfedb16265",
+    "docs/specs/foundation/case-schema-design-cases.md": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe"
+  },
+  "source_files_match_git_blob_contents_sha256": true,
+  "adopted_spec_bytes_match_initial_main_912f8d9": true,
+  "base": "caa815364ce3b0cf5f63d71d2c3937e5a8a690fa",
+  "uncommitted_root_metadata": [
+    "docs/conventions.md",
+    "docs/roadmap.md"
+  ],
+  "build_executed": false,
+  "product_schema_validator_executed": false,
+  "scope": "設計sourceのみ固定。共有metadataの未commit状態をclean製品buildの証拠に見せない。"
+}

@@ -1,0 +1,133 @@
+import json,re,sys
+from pathlib import Path
+root=Path('.')
+paths=list(root.glob('docs/specs/foundation/case-schema-*.md'))
+errors=[]
+for p in paths:
+ t=p.read_text(encoding='utf-8')
+ if any(ord(c)<32 and c not in '\r\n\t' for c in t):errors.append(f'{p}: control character')
+ for x in re.findall(r'\[[^\]]+\]\(([^)]+)\)',t):
+  if '://' in x or x.startswith('#'):continue
+  q=x.split('#')[0]
+  if q and not (p.parent/q).exists():errors.append(f'{p}: missing link {x}')
+ t=t.replace('\r\n','\n')
+ columns=None
+ for i,l in enumerate(t.splitlines(),1):
+  if not l.startswith('|'):
+   columns=None
+   continue
+  actual=len(l.split('|'))
+  if columns is None:columns=actual
+  elif actual!=columns:errors.append(f'{p}:{i}: table columns')
+
+d=json.loads((root/'docs/specs/foundation/case-schema-examples.json').read_text(encoding='utf-8'))
+req={'schema','units','model','flow','analysis','observations','numerics','resources','output'}
+opt={'initial','restart','provenance'}
+collections={'geometry','materials','shells','beams','joints','supports','masses','aero_surfaces'}
+for name,c in d['schema_examples'].items():
+ if not req<=c.keys() or not c.keys()<=req|opt:errors.append(name+': root keys')
+ if c['model'].keys()!=collections:errors.append(name+': collections')
+ for arr in collections:
+  ids=[x['id'] for x in c['model'][arr]]
+  if len(ids)!=len(set(ids)):errors.append(name+': duplicate '+arr)
+ n=len(c['model']['aero_surfaces'])
+ if not n:
+  for label,v in [('flow',c['flow']),('wake',c['analysis']['wake']),('wake_rows',c['numerics']['wake_rows'])]:
+   if v!={'kind':'none'}:errors.append(name+': unused '+label)
+ else:
+  if c['flow']['kind']!='known' or c['analysis']['wake']['kind']!='active':errors.append(name+': active aero')
+  geos={g['id']:g for g in c['model']['geometry']}
+  for a in c['model']['aero_surfaces']:
+   if max(a['leading'],a['trailing'])>=len(geos[a['geometry']]['boundaries']):errors.append(name+': boundary index')
+ if c['analysis']['kind']=='transient' and (('initial'in c)+('restart'in c))!=1:errors.append(name+': initial/restart')
+ if c['analysis']['kind']=='flutter':
+  if c['analysis']['search']['coverage']['require_physical'] is not True or c['numerics']['eigen']['requirements']['physical_coverage'] is not True:errors.append(name+': coverage')
+ for o in c['observations']:
+  b=o['budget'];n=len(b['scale'])
+  if len(b['absolute'])!=n or len(b['relative'])!=n:errors.append(name+': budget shape')
+  if len(b['groups'])!=12 or len({g['kind'] for g in b['groups']})!=12:errors.append(name+': groups')
+  for g in b['groups']:
+   if g['status']=='required' and (len(g['absolute'])!=n or len(g['relative'])!=n):errors.append(name+': group shape')
+  for lane in range(n):
+   for mode in ['absolute','relative']:
+    if sum(g[mode][lane] for g in b['groups'] if g['status']=='required')>b[mode][lane]:errors.append(name+': allocation')
+def group_graph_ok(groups):
+ registry={g['kind']:g for g in groups}
+ if len(groups)!=12 or len(registry)!=12:return False
+ seen=set()
+ for kind,g in registry.items():
+  if g['status']=='required':
+   covers=g['covers']
+   if kind not in covers or len(covers)!=len(set(covers)):return False
+   for member in covers:
+    if member in seen or member not in registry:return False
+    target=registry[member]
+    if member!=kind and (target['status']!='covered_by' or target['representative']!=kind):return False
+    seen.add(member)
+  elif g['status']=='covered_by':
+   target=registry.get(g['representative'])
+   if target is None or target['status']!='required' or kind not in target['covers']:return False
+  elif g['status']!='not_applicable':return False
+ return seen=={k for k,g in registry.items() if g['status']!='not_applicable'}
+def component_count(o):
+ if o['kind']=='stress':return 9 if o['measure']=='first_pk' else 6
+ if o['kind']=='reaction':return 6
+ if o['kind']=='mode':return 1
+ return 3
+for name,c in d['schema_examples'].items():
+ for o in c['observations']:
+  n=component_count(o)
+  if any(len(o['budget'][k])!=n for k in ['absolute','relative','scale']):errors.append(name+': quantity component count')
+  if not group_graph_ok(o['budget']['groups']):errors.append(name+': group graph')
+ def check_scales(x):
+  if isinstance(x,dict):
+   if x.get('kind')=='uniform_components':
+    three={'shell_position','beam_translation','beam_rotation','rigid_translation','rigid_rotation','structural_velocity','structural_angular_velocity','wake_position','force_balance','moment_balance','transport_residual'}
+    one={'circulation','wake_strength','aero_residual'}
+    n=3 if x['field'] in three else 1 if x['field'] in one else -1
+    if len(x['values'])!=n or not all(v>0 for v in x['values']):errors.append(name+': uniform component shape')
+   for v in x.values():check_scales(v)
+  elif isinstance(x,list):
+   for v in x:check_scales(v)
+ check_scales(c)
+if not group_graph_ok(d['combined_group_example']):errors.append('combined group normal example')
+from copy import deepcopy
+negative_checks=0
+for mutate in ['cycle','missing','duplicate']:
+ g=deepcopy(d['combined_group_example'])
+ if mutate=='cycle':g[0]={'status':'covered_by','kind':'geometry','representative':'load_mapping'}
+ if mutate=='missing':g[1]['representative']='core'
+ if mutate=='duplicate':g[0]['covers'].append('load_mapping')
+ if group_graph_ok(g):errors.append('negative group not rejected: '+mutate)
+ negative_checks+=1
+def initial_scale_closure(c):
+ scales=c['numerics']['scales'];fields={v['field'] for v in scales}
+ required={'mixed_blocks'};m=c['model']
+ if m['shells']:required.update({'shell_position','force_balance'})
+ if m['shells'] and c['analysis']['kind'] in ['transient','flutter']:required.add('structural_velocity')
+ if m['aero_surfaces']:required.update({'circulation','wake_position','wake_strength','aero_residual','transport_residual'})
+ if not required<=fields:return False
+ policies=[v for v in scales if v['kind']=='physical_layout_policy']
+ if len(policies)!=1:return False
+ hard=m['joints']+[v for v in m['supports'] if v['kind'] in ['constraint','trace_constraint']]
+ p=policies[0]['constraint']
+ if hard:
+  if p['kind']!='physical' or p['position']['kind']!='values' or p['multiplier_work_scale']<=0:return False
+ elif p!={'kind':'none'}:return False
+ e=c['numerics']['eigen']
+ if e['kind']=='arnoldi' and e['seed']['kind']=='uniform_nonzero' and not any(e['seed']['value'].values()):return False
+ return True
+for name,c in d['schema_examples'].items():
+ if not initial_scale_closure(c):errors.append(name+': initial scale dependency closure')
+closure_negative_checks=0
+for mode in ['missing_primary','missing_constraint_scale','zero_work','zero_seed']:
+ c=deepcopy(d['schema_examples']['coupled_flutter'])
+ if mode=='missing_primary':c['numerics']['scales']=[v for v in c['numerics']['scales'] if v['field']!='shell_position']
+ if mode=='missing_constraint_scale':c['numerics']['scales'][-1]['constraint']['position']={'kind':'none'}
+ if mode=='zero_work':c['numerics']['scales'][-1]['constraint']['multiplier_work_scale']=0
+ if mode=='zero_seed':c['numerics']['eigen']['seed']['value']={'real':0,'imaginary':0}
+ if initial_scale_closure(c):errors.append('closure negative not rejected: '+mode)
+ closure_negative_checks+=1
+# These are author-side structural checks, not a product schema validator.
+print(json.dumps({'kind':'author_design_audit','markdown_files':len(paths),'fragments':len(d['fragments']),'root_examples':len(d['schema_examples']),'negative_group_checks':negative_checks,'negative_closure_checks':closure_negative_checks,'errors':errors},ensure_ascii=False,indent=2))
+sys.exit(bool(errors))

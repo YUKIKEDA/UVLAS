@@ -1,0 +1,242 @@
+{
+  "terms": [
+    {
+      "term": "ケース",
+      "first_line": 1,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "# 全ケースschemaと段階別検証の契約\n\n2026-11-17。Issue [#110](https://github.com/YUKIKEDA/UVLAS/issue"
+    },
+    {
+      "term": "Issue",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "# 全ケースschemaと段階別検証の契約\n\n2026-11-17。Issue [#110](https://github.com/YUKIKEDA/UVLAS/issues/110)。IO4-01の `uvlas.case/1` を、型"
+    },
+    {
+      "term": "IO4",
+      "first_line": 3,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "段階別検証の契約\n\n2026-11-17。Issue [#110](https://github.com/YUKIKEDA/UVLAS/issues/110)。IO4-01の `uvlas.case/1` を、型検証の実装へ渡す追加契約である。構造・空力・J1の採用式を変更しない。旧仕様のバイト列は保持する。本書と[フィール"
+    },
+    {
+      "term": "IO",
+      "first_line": 3,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "段階別検証の契約\n\n2026-11-17。Issue [#110](https://github.com/YUKIKEDA/UVLAS/issues/110)。IO4-01の `uvlas.case/1` を、型検証の実装へ渡す追加契約である。構造・空力・J1の採用式を変更しない。旧仕様のバイト列は保持する。本書と[フィー"
+    },
+    {
+      "term": "バイト",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "AS/issues/110)。IO4-01の `uvlas.case/1` を、型検証の実装へ渡す追加契約である。構造・空力・J1の採用式を変更しない。旧仕様のバイト列は保持する。本書と[フィールド辞書](case-schema-fields.md)、[設計検査](case-schema-design-cases.md)を一"
+    },
+    {
+      "term": "フィールド",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "。IO4-01の `uvlas.case/1` を、型検証の実装へ渡す追加契約である。構造・空力・J1の採用式を変更しない。旧仕様のバイト列は保持する。本書と[フィールド辞書](case-schema-fields.md)、[設計検査](case-schema-design-cases.md)を一組として読む。\n\n## CS-0"
+    },
+    {
+      "term": "CS",
+      "first_line": 5,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "ィールド辞書](case-schema-fields.md)、[設計検査](case-schema-design-cases.md)を一組として読む。\n\n## CS-01 対象と検証段階\n\n`InputDocument` は構文、元のバイト列、値のkind、root envelopeを所有する。全schemaはその後の処理"
+    },
+    {
+      "term": "IM06",
+      "first_line": 7,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "元のバイト列、値のkind、root envelopeを所有する。全schemaはその後の処理であり、物理kernelの完成を待たず定義する。根拠は[作業分解のIM06](../../plans/next-package-work-breakdown.md)と[入力文書契約](input-document-contract.m"
+    },
+    {
+      "term": "IM",
+      "first_line": 7,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "元のバイト列、値のkind、root envelopeを所有する。全schemaはその後の処理であり、物理kernelの完成を待たず定義する。根拠は[作業分解のIM06](../../plans/next-package-work-breakdown.md)と[入力文書契約](input-document-contract"
+    },
+    {
+      "term": "CLI",
+      "first_line": 18,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "同じ離散問題の数値認定 | 未評価用途の妥当性 |\n\nこれらは別型である。暗黙変換、共通の `valid=true`、未検査nodeを含む部分成功を設けない。CLI `validate` の成功には構文、全schema、参照整合が必要であり、schema単体を接続しない。SI変換・snapshotの実装はIM06の後続依存"
+    },
+    {
+      "term": "SI",
+      "first_line": 18,
+      "count": 12,
+      "has_gloss_hint": false,
+      "context": "e`、未検査nodeを含む部分成功を設けない。CLI `validate` の成功には構文、全schema、参照整合が必要であり、schema単体を接続しない。SI変換・snapshotの実装はIM06の後続依存段階、物理準備はIM01〜05との統合へ渡す。\n\n## CS-02 字句型と閉じたobject\n\nフィールド辞書"
+    },
+    {
+      "term": "IM01",
+      "first_line": 18,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "te` の成功には構文、全schema、参照整合が必要であり、schema単体を接続しない。SI変換・snapshotの実装はIM06の後続依存段階、物理準備はIM01〜05との統合へ渡す。\n\n## CS-02 字句型と閉じたobject\n\nフィールド辞書の各行はobjectの**全許可key**を列挙する。`?` の付いたk"
+    },
+    {
+      "term": "JSON",
+      "first_line": 44,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "・整数条件は元十進値の厳密比較で検査し、桁数/指数の資源限界超過を資源失敗として返す。指数の巨大さを扱うために巨大な10の冪を無条件に生成しない。\n\n有理係数とJSON Numberは別型である。PGの厳密なrank根拠をdecimal→binary64→有理復元で作らない。元decimalを厳密有理化する経路はSI変換契約で"
+    },
+    {
+      "term": "Number",
+      "first_line": 44,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "は元十進値の厳密比較で検査し、桁数/指数の資源限界超過を資源失敗として返す。指数の巨大さを扱うために巨大な10の冪を無条件に生成しない。\n\n有理係数とJSON Numberは別型である。PGの厳密なrank根拠をdecimal→binary64→有理復元で作らない。元decimalを厳密有理化する経路はSI変換契約で定め、入力が明"
+    },
+    {
+      "term": "PG",
+      "first_line": 44,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "し、桁数/指数の資源限界超過を資源失敗として返す。指数の巨大さを扱うために巨大な10の冪を無条件に生成しない。\n\n有理係数とJSON Numberは別型である。PGの厳密なrank根拠をdecimal→binary64→有理復元で作らない。元decimalを厳密有理化する経路はSI変換契約で定め、入力が明示した有理係数の原"
+    },
+    {
+      "term": "Model",
+      "first_line": 50,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "を別字面で記述した文書は同じsource digestにはならない。schema結果の同一性は元digest、schema契約版、型付き内部表現版で識別し、物理Model fingerprintと同一視しない。内部参照に使うIDは利用者値であり、hashの代わりではない。\n\n省略可能keyの全てに辞書で解決規則を付ける。物理値、"
+    },
+    {
+      "term": "ID",
+      "first_line": 50,
+      "count": 12,
+      "has_gloss_hint": false,
+      "context": "い。schema結果の同一性は元digest、schema契約版、型付き内部表現版で識別し、物理Model fingerprintと同一視しない。内部参照に使うIDは利用者値であり、hashの代わりではない。\n\n省略可能keyの全てに辞書で解決規則を付ける。物理値、材料、減衰、密度、支持剛性、基準量、精度、資源に暗黙の既定"
+    },
+    {
+      "term": "Source",
+      "first_line": 56,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "rial, Shell, Beam, Joint, Support, Mass, AeroSurface, Layer, Load, Observation, Source, Frame, Branch, WakeRow, WakePoint, WakeBand` の各名前空間で一意である。Sourceは各FileRefの初出で文"
+    },
+    {
+      "term": "FileRef",
+      "first_line": 56,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "tion, Source, Frame, Branch, WakeRow, WakePoint, WakeBand` の各名前空間で一意である。Sourceは各FileRefの初出で文書全体のSource registryへ登録する（rootに別collectionは置かない）。複数FileRefから同じ定義を再参照できるが、同じS"
+    },
+    {
+      "term": "SourceId",
+      "first_line": 56,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "fの初出で文書全体のSource registryへ登録する（rootに別collectionは置かない）。複数FileRefから同じ定義を再参照できるが、同じSourceIdに異なるpath/hash/roleを宣言してはならない。同じ数字を別名前空間で使える。型付きtargetがshell/beamのどちらかを表す場合は、`kin"
+    },
+    {
+      "term": "前空",
+      "first_line": 56,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "yer, Load, Observation, Source, Frame, Branch, WakeRow, WakePoint, WakeBand` の各名前空間で一意である。Sourceは各FileRefの初出で文書全体のSource registryへ登録する（rootに別collectionは置かない）。複数Fi"
+    },
+    {
+      "term": "beam",
+      "first_line": 56,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "義を再参照できるが、同じSourceIdに異なるpath/hash/roleを宣言してはならない。同じ数字を別名前空間で使える。型付きtargetがshell/beamのどちらかを表す場合は、`kind`と対応するIDを両方持つ。名前空間をまたぐ曖昧検索をしない。出典が同じファイルであることと、物理entityが同じであること"
+    },
+    {
+      "term": "ファイル",
+      "first_line": 56,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "空間で使える。型付きtargetがshell/beamのどちらかを表す場合は、`kind`と対応するIDを両方持つ。名前空間をまたぐ曖昧検索をしない。出典が同じファイルであることと、物理entityが同じであることを混同しない。\n\n検査の順序は次の一か所で定める。\n\n1. 契約版・呼出し上限の正当性と文書identityを検査"
+    },
+    {
+      "term": "グラフ",
+      "first_line": 67,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "敗を返し、途中結果は公開しない。\n\n重複weldや物理拘束の従属はschemaの単なる参照循環と異なる。参照座標/材料継承/参照ファイル依存は循環禁止、物理接続グラフは閉路が存在してもschemaだけで削除しない。固定・非線形拘束の大域整合はCN-D04のprepareで判定する。\n\nパスはNUL/空文字を拒否し、`File"
+    },
+    {
+      "term": "CN",
+      "first_line": 67,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "なる参照循環と異なる。参照座標/材料継承/参照ファイル依存は循環禁止、物理接続グラフは閉路が存在してもschemaだけで削除しない。固定・非線形拘束の大域整合はCN-D04のprepareで判定する。\n\nパスはNUL/空文字を拒否し、`FileRef`のpathはmanifest directory基準である。schema"
+    },
+    {
+      "term": "NUL",
+      "first_line": 69,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "イル依存は循環禁止、物理接続グラフは閉路が存在してもschemaだけで削除しない。固定・非線形拘束の大域整合はCN-D04のprepareで判定する。\n\nパスはNUL/空文字を拒否し、`FileRef`のpathはmanifest directory基準である。schemaでは文字列と役割を検査する。存在、正規化、親ディレク"
+    },
+    {
+      "term": "ディレクトリ",
+      "first_line": 69,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "はNUL/空文字を拒否し、`FileRef`のpathはmanifest directory基準である。schemaでは文字列と役割を検査する。存在、正規化、親ディレクトリへの脱出、symlink/junction、同じfileの重複・循環、取得中改変は参照snapshot契約で検査し、schema成功をその代替にしない。出力先p"
+    },
+    {
+      "term": "GIL",
+      "first_line": 73,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ts, ResourcePlan&, SchemaDiagnostic*) -> Result<SchemaCase>` とする。外部状態・ファイルを変更せず、GIL/callback/物理評価を必要としない。`SchemaDiagnostic`は入力source/digest、node index、key path、期待型"
+    },
+    {
+      "term": "Pointer",
+      "first_line": 73,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "別、quotaと実必要量を所有する。存在しないbyte位置を創作しない。key pathは元のdecoded keyとarray indexから作り、JSON Pointerの`~0`/`~1`を用いる。診断slotは失敗後も借用に依存しない。\n\n| 原因 | core分類 | 補助理由 |\n|---|---|---|\n| 未知/欠"
+    },
+    {
+      "term": "edge",
+      "first_line": 83,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "、typed payload bytes、全entity件数、全参照件数、全scalar件数、全多項式term件数、全table sample件数、式node/edge数・深さ・整数冪絶対値・評価点数、全text bytes、診断path bytesの最大値を全て明示する。無制限の既定値を設けない。元documentのquot"
+    },
+    {
+      "term": "コピー",
+      "first_line": 85,
+      "count": 2,
+      "has_gloss_hint": true,
+      "context": "を除く成功payload、辞書、ID索引、参照配列、exact比較用の可変scratchは`ResourcePlan`で確保前に計上する。入力文書を保持する所有コピーも計上し、借用だから無費用とはしない。最大同時scratchと成功payloadのforecastを検査してから構築する。cumulative計上は既存契約どお"
+    },
+    {
+      "term": "Accepted",
+      "first_line": 87,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "容器等の外部確保を使うなら固定版の計画/推定受入と真の上界要求を分け、根拠なしにhard capと呼ばない。\n\nquota失敗でも元文書、呼出し前のModel、Accepted/Trialは変更しない。`ResourcePlan`の過去の成功確保計上は巻き戻さない。並列呼出しは各workspace/diagnostic/planの所有"
+    },
+    {
+      "term": "Trial",
+      "first_line": 87,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "使うなら固定版の計画/推定受入と真の上界要求を分け、根拠なしにhard capと呼ばない。\n\nquota失敗でも元文書、呼出し前のModel、Accepted/Trialは変更しない。`ResourcePlan`の過去の成功確保計上は巻き戻さない。並列呼出しは各workspace/diagnostic/planの所有規約に従う。"
+    },
+    {
+      "term": "DoD",
+      "first_line": 102,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "iantの最小例、全種類に対する型/未知key/欠落/相互条件/参照の負例、巨大ID/十進低位保持、入力不変/所有/資源境界を独立に審査する。製品実装で試験するDoDは設計検査の表を使用する。例文のparse成功だけでschema適合を証明しない。\n\n本書の設計審査、schema実装、SI/snapshot、物理prepar"
+    }
+  ]
+}

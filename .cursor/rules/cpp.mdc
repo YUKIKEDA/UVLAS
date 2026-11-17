@@ -97,7 +97,7 @@ if (!pin.has_value()) {
 use(*pin);
 ```
 
-配列内のoptionalは、要素を名前付き参照へ束縛し、その参照で存在確認と逆参照を行う。2026-11-16、PR #67のLinux clang-tidy 21.1.1は、`evaluator.seen[i]`を確認後に同じ添字で読み直す試験を未検査参照と診断した。明示的なreturnがあっても、添字式を再評価する形では解析器が同じ要素と認識するとは限らない。
+配列内のoptionalは、要素を名前付き参照へ束縛し、その参照で存在確認と逆参照を行う。2026-11-17、PR #112ではthreadのjoin後にREQUIREで確認した配列を再添字で読む3参照がLinuxだけで未検査と診断された。joinによる完了・同期を成功値の存在証明にせず、比較する各slotを同じ名前付き参照と通常のifで検査する。2026-11-16、PR #67のLinux clang-tidy 21.1.1は、`evaluator.seen[i]`を確認後に同じ添字で読み直す試験を未検査参照と診断した。明示的なreturnがあっても、添字式を再評価する形では解析器が同じ要素と認識するとは限らない。
 
 ```cpp
 // BAD: checking and dereferencing separate subscript expressions.
@@ -149,4 +149,14 @@ outer.emplace<Inner>(std::in_place_type<Words>, words);
 using Storage = std::variant<Words3, Words6, Vertex, Edge, Face>;
 Storage storage;
 storage.emplace<Words3>(words);
+```
+
+
+range-forの変数だけをunsigned型にしても、`{16, 17}`の要素型はintのままである。2026-11-17、PR #112の資源境界試験はMSVCで通ったが、GCC14の`-Werror=sign-conversion`でLinuxのDebug/Release/sanitizer構成がコンパイルに失敗した。境界値の意味を変えず、initializer側にも必要な型を明示する。符号を保つ拡大型変換と区別し、同じunsigned range-forを検索して確認する。
+
+```cpp
+// BAD: initializer_list<int> converts each element to uint64_t.
+for (const std::uint64_t cap : {16, 17}) { use(cap); }
+// GOOD: the fixture values already have the required unsigned type.
+for (const std::uint64_t cap : {std::uint64_t{16}, std::uint64_t{17}}) { use(cap); }
 ```

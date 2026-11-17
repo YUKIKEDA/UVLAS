@@ -1,0 +1,239 @@
+{
+  "inputs_before": {
+    "<workspace>\\src\\aero\\local_geometry_packet.cpp": "49b4807807072ee61d85aa8f83dfdc6bc8221d504f60ce61a76161aabdf328d0",
+    "<workspace>\\src\\aero\\geometry_snapshot.cpp": "90010d2c3bd6e53ced89c1a568f2c3477734aff207813da5d7a822be0d96f952",
+    "<workspace>\\tests\\aero\\local_geometry_packet_test.cpp": "cf0b8e93178ad88583a76d264e5a4fbf0453b7e71c798203deed0d002a1253dd",
+    "<workspace>\\src\\aero\\exact_triangle_predicates.hpp": "f2769e1a158d129264b3bb87d3b6c6f48d36910cf09dbb399e0bc493a983a062",
+    "<workspace>\\src\\aero\\exact_triangle_private.hpp": "790de5e6659b137e3668e22f5039b706f1ef6eb3868fa5f5c51ea0168268a045",
+    "<workspace>\\src\\aero\\geometry_snapshot.hpp": "a3b3f3ff1f3b9160a9e6f36187560db79d455cd5f0ac96d5bbc249117e7cb6a6",
+    "<workspace>\\src\\aero\\geometry_snapshot_storage.hpp": "09efaf06f2df4a57bc26d5bba756c2e604a1605004668131008649a6139ecea9",
+    "<workspace>\\src\\aero\\local_geometry_bounds_private.hpp": "e71c9ba9432fc16b321c291ed5a191d3a672a35589fbe7377867f7c2a47ed760",
+    "<workspace>\\src\\aero\\local_geometry_input_private.hpp": "22716d32222918f2fa0026ea0588e88760fa0820cee9c2e6cded367034fb91d6",
+    "<workspace>\\src\\aero\\local_geometry_packet.hpp": "1aa3f6b0b84c1638763128753fde98ff0b1cdc767ab64c5eb55f64e267f81e98",
+    "<workspace>\\tests\\aero\\geometry_snapshot_fixture.hpp": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+    "<workspace>\\out\\issue95-build\\compile_commands.json": "f385182150867dfa36a709f279413e993819c50c1df6604681df54f623f82dcf",
+    "<workspace>\\out\\issue95-build\\Release\\uvlas_aero.lib": "1e2f97fbe8cc40a0735e553f66d15fd26656e9d381eec4ae60695684b7a3846b",
+    "<workspace>\\out\\issue95-build\\Release\\uvlas_core.lib": "83b56b2da765de1a9a2b6944ac77bdde4e07b022ea60a16fb51cc7ffbd16c44c"
+  },
+  "cases": [
+    {
+      "name": "control",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.2161275999969803
+        },
+        {
+          "exit": 0,
+          "seconds": 5.055343999993056
+        },
+        {
+          "exit": 0,
+          "seconds": 4.080642499990063
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.14062449999619275
+      },
+      "run": {
+        "exit": 0,
+        "seconds": 0.07732339997892268
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1462,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "none"
+    },
+    {
+      "name": "discard_low_without_bound",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.182362199993804
+        },
+        {
+          "exit": 0,
+          "seconds": 5.203718000004301
+        },
+        {
+          "exit": 0,
+          "seconds": 4.097945799992885
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.1362393000163138
+      },
+      "run": {
+        "exit": 42,
+        "seconds": 0.06890569999814034
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1465,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "Catch assertion"
+    },
+    {
+      "name": "discard_root_uncertainty",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.1176111999957357
+        },
+        {
+          "exit": 0,
+          "seconds": 5.026776100014104
+        },
+        {
+          "exit": 0,
+          "seconds": 4.332055900013074
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.13853789999848232
+      },
+      "run": {
+        "exit": 42,
+        "seconds": 0.07352840001112781
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1462,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "Catch assertion"
+    },
+    {
+      "name": "radius_instead_of_full_width",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.1480983000074048
+        },
+        {
+          "exit": 0,
+          "seconds": 5.024393400002737
+        },
+        {
+          "exit": 0,
+          "seconds": 4.095440399978543
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.13654090001364239
+      },
+      "run": {
+        "exit": 42,
+        "seconds": 0.06629229997633956
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1462,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "Catch assertion"
+    },
+    {
+      "name": "permit_free_contact",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.2373089999891818
+        },
+        {
+          "exit": 0,
+          "seconds": 5.301962400000775
+        },
+        {
+          "exit": 0,
+          "seconds": 4.1981334000010975
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.14066239999374375
+      },
+      "run": {
+        "exit": 42,
+        "seconds": 0.07275880000088364
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1462,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "Catch assertion"
+    },
+    {
+      "name": "permit_ideal_self",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.1272638000082225
+        },
+        {
+          "exit": 0,
+          "seconds": 5.003415900020627
+        },
+        {
+          "exit": 0,
+          "seconds": 4.086871400009841
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.13806430000113323
+      },
+      "run": {
+        "exit": 42,
+        "seconds": 0.07604189999983646
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1462,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "Catch assertion"
+    },
+    {
+      "name": "ignore_snapshot_context",
+      "compile": [
+        {
+          "exit": 0,
+          "seconds": 3.1932697000156622
+        },
+        {
+          "exit": 0,
+          "seconds": 5.2371869000198785
+        },
+        {
+          "exit": 0,
+          "seconds": 4.2518341000250075
+        }
+      ],
+      "link": {
+        "exit": 0,
+        "seconds": 0.16846000001532957
+      },
+      "run": {
+        "exit": 42,
+        "seconds": 0.11769579999963753
+      },
+      "original_archive_producer_members_extracted": 0,
+      "explicit_producer_symbols": 1461,
+      "input_hash_mismatches": 0,
+      "runtime_failure_kind": "Catch assertion"
+    }
+  ],
+  "inputs_after": {
+    "<workspace>\\src\\aero\\local_geometry_packet.cpp": "49b4807807072ee61d85aa8f83dfdc6bc8221d504f60ce61a76161aabdf328d0",
+    "<workspace>\\src\\aero\\geometry_snapshot.cpp": "90010d2c3bd6e53ced89c1a568f2c3477734aff207813da5d7a822be0d96f952",
+    "<workspace>\\tests\\aero\\local_geometry_packet_test.cpp": "cf0b8e93178ad88583a76d264e5a4fbf0453b7e71c798203deed0d002a1253dd",
+    "<workspace>\\src\\aero\\exact_triangle_predicates.hpp": "f2769e1a158d129264b3bb87d3b6c6f48d36910cf09dbb399e0bc493a983a062",
+    "<workspace>\\src\\aero\\exact_triangle_private.hpp": "790de5e6659b137e3668e22f5039b706f1ef6eb3868fa5f5c51ea0168268a045",
+    "<workspace>\\src\\aero\\geometry_snapshot.hpp": "a3b3f3ff1f3b9160a9e6f36187560db79d455cd5f0ac96d5bbc249117e7cb6a6",
+    "<workspace>\\src\\aero\\geometry_snapshot_storage.hpp": "09efaf06f2df4a57bc26d5bba756c2e604a1605004668131008649a6139ecea9",
+    "<workspace>\\src\\aero\\local_geometry_bounds_private.hpp": "e71c9ba9432fc16b321c291ed5a191d3a672a35589fbe7377867f7c2a47ed760",
+    "<workspace>\\src\\aero\\local_geometry_input_private.hpp": "22716d32222918f2fa0026ea0588e88760fa0820cee9c2e6cded367034fb91d6",
+    "<workspace>\\src\\aero\\local_geometry_packet.hpp": "1aa3f6b0b84c1638763128753fde98ff0b1cdc767ab64c5eb55f64e267f81e98",
+    "<workspace>\\tests\\aero\\geometry_snapshot_fixture.hpp": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+    "<workspace>\\out\\issue95-build\\compile_commands.json": "f385182150867dfa36a709f279413e993819c50c1df6604681df54f623f82dcf",
+    "<workspace>\\out\\issue95-build\\Release\\uvlas_aero.lib": "1e2f97fbe8cc40a0735e553f66d15fd26656e9d381eec4ae60695684b7a3846b",
+    "<workspace>\\out\\issue95-build\\Release\\uvlas_core.lib": "83b56b2da765de1a9a2b6944ac77bdde4e07b022ea60a16fb51cc7ffbd16c44c"
+  }
+}

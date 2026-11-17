@@ -1,0 +1,30 @@
+{
+  "source_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+  "historical_source_references": [
+    {
+      "id": "im03-3-build-CMakeLists-txt",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "CMakeLists.txt",
+      "sha256": "57ad37522241e165b5717d7088627b895088cc58a018552718f6bba73901e487"
+    },
+    {
+      "id": "im03-3-build-tests-CMakeLists-txt",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "c48b7b22182bceccdf2950d09fe4c532ff952acc166759ce6547ed663d70fe5d"
+    },
+    {
+      "id": "im03-3-build-docs-conventions-md",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "docs/conventions.md",
+      "sha256": "ba5734e8e97e87ffeb17e31c93f712f82d9a025732dc1cffb8abfa14f8d8f328"
+    },
+    {
+      "id": "im03-3-build-docs-roadmap-md",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "docs/roadmap.md",
+      "sha256": "dcf9721028bede0612d271c0c28a98d96985d751dd0bbaa118f60cac92ae01fd"
+    }
+  ],
+  "verification": "Each byte digest obtained directly from git show source_commit:path; these references describe execution source and are not retargeted after metadata integration."
+}

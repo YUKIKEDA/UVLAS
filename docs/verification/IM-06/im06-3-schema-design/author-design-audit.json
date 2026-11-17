@@ -1,0 +1,9 @@
+{
+  "kind": "author_design_audit",
+  "markdown_files": 3,
+  "fragments": 144,
+  "root_examples": 5,
+  "negative_group_checks": 3,
+  "negative_closure_checks": 4,
+  "errors": []
+}

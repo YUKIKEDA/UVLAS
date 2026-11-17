@@ -1,0 +1,114 @@
+{
+  "entries": [
+    {
+      "origin": "out/issue109-ci-linux/run-source.json",
+      "original_sha256": "a3aef09cfc5090126ee9091df9624c1fd17d4ceca0b8e33b0c88bb40d62ce9bc",
+      "published": "run-source.json",
+      "published_sha256": "a3aef09cfc5090126ee9091df9624c1fd17d4ceca0b8e33b0c88bb40d62ce9bc",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/gcc11-version.txt",
+      "original_sha256": "9eaf9b7f4b11c2e84e2478c2ceb0e4f48f4ba88565bcfc832b3bce49847dda6d",
+      "published": "gcc11-version.txt",
+      "published_sha256": "9eaf9b7f4b11c2e84e2478c2ceb0e4f48f4ba88565bcfc832b3bce49847dda6d",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/gcc11-before.log",
+      "original_sha256": "9297313c61201155e55560cd24fb970487cb5966fe8465c16294af5d57737490",
+      "published": "gcc11-before.log",
+      "published_sha256": "dbe8fe0c9e9049167b78bd61ccf8a50ba06c2a63cd15f9259612238eed0c983e",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 2,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/gcc11-after.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published": "gcc11-after.log",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/gcc11-result.json",
+      "original_sha256": "2f6bac0fa6d9a93cc2ba09260bba7998ce4334a627847fcef41307952255f7b8",
+      "published": "gcc11-result.json",
+      "published_sha256": "ed1235e5078abf4b465e609cc4ee24bd4a4823a3ef2aebdaa435aa0dc78ad65e",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/before.cpp",
+      "original_sha256": "4cbe82ccb28b84ece6865f228d0cb89fb522bacc0895a464e6984b4ad1075000",
+      "published": "before.cpp",
+      "published_sha256": "4cbe82ccb28b84ece6865f228d0cb89fb522bacc0895a464e6984b4ad1075000",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/after.cpp",
+      "original_sha256": "1d0bec498426c55d2b88802effa19564386636b3c462c309a9a7e5c3bbc7f568",
+      "published": "after.cpp",
+      "published_sha256": "1d0bec498426c55d2b88802effa19564386636b3c462c309a9a7e5c3bbc7f568",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/tidy.log",
+      "original_sha256": "199d46b8a6b898ad948a9dc10081fb568f66837ae70f5f6c7d9c4f29c64f61fc",
+      "published": "tidy.log",
+      "published_sha256": "a82dda0df1cb23f11453f2a53e07c82b92e8029a289337dc21b37cff0b61bfd6",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/debug-build.log",
+      "original_sha256": "815e83bda571da96c44034b75d6acbc666bda33a3da54208cc91e8febc1d18de",
+      "published": "debug-build.log",
+      "published_sha256": "907640c48fc3a9b06f967d7af708c73721dfb79d41e58a54fcf4f547cd8917c6",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 4,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/debug-test.log",
+      "original_sha256": "e5cdc3fae9e620257b6000a924056d61feb5163c50d8d2464f2e8505a743f0f5",
+      "published": "debug-test.log",
+      "published_sha256": "7b9ce7a6b1abc8e173eade5df9b1dc62f36426624eb4f52e6f3ee8500c2aa30d",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/release-build.log",
+      "original_sha256": "b27d3d2c759f4c0017c1621c4ca4d850d8564924abf3edd8a827088c28474c58",
+      "published": "release-build.log",
+      "published_sha256": "fe8f1a188f50108dd6e889625211ad47055bfac6ddcc2914435834b5eab92b19",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 4,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-linux/release-test.log",
+      "original_sha256": "c7983b1ce6687d7fece50b94194b6ce037d51520d95c829b6e47ef6d37d59502",
+      "published": "release-test.log",
+      "published_sha256": "5048ea5f8f51d12e8a6d9183d23c9a3c6608553abf3ef05b69cb485844e84bd8",
+      "encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "transform": "UTF-8 LF derived text; remaining body and terminal blank lines preserved; original private raw unchanged"
+    }
+  ],
+  "ci_excerpt_policy": "ANSI escapes omitted from published selected lines only; complete raw CI logs retained privately with full hashes in parent record.",
+  "whitespace": "Preserve native terminal blank lines; published raw-derived *.log are excluded from whitespace diffcheck only."
+}

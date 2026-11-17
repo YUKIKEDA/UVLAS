@@ -1,5 +1,6 @@
 #include "exact_triangle_private.hpp"
 #include "geometry_snapshot_storage.hpp"
+#include "local_geometry_input_private.hpp"
 
 #include <boost/hash2/sha2.hpp>
 
@@ -247,8 +248,19 @@ AeroResult<void> build_lookup(core::PlannedBuffer<IdLookup>& output, F&& id, Run
 }
 } // namespace
 
+enum class GeometryWorkAccounting : std::uint8_t {
+    GeometryAndPredicateBudgets,
+    TotalAndPredicateSubcap
+};
 class GeometryEngine {
 public:
+    static OwnedGeometry retain(const LocalGeometryInput& input) noexcept {
+        return OwnedGeometry{input.owner, input.owner->context};
+    }
+    static AeroResult<LocalGeometryInput> local(const OwnedGeometry&, const ResolvedQuery&, FacetId,
+                                                const GeometryLimits&, GeometryWorkspace&,
+                                                const PredicateLease&, core::ResourcePlan&,
+                                                std::stop_token, GeometryWorkAccounting) noexcept;
     static AeroResult<OwnedGeometry> prepare(const GeometryInput&, const GeometryLimits&,
                                              GeometryWorkspace&, core::ResourcePlan&,
                                              std::stop_token) noexcept;
@@ -1164,15 +1176,13 @@ AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const 
     return {};
 }
 
-AeroResult<ExactTriangleResult>
-GeometryEngine::classify(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
-                         const GeometryLimits& limits, GeometryWorkspace& workspace,
-                         core::ResourcePlan& plan, std::stop_token stop) noexcept {
+AeroResult<LocalGeometryInput>
+GeometryEngine::local(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
+                      const GeometryLimits& limits, GeometryWorkspace& workspace,
+                      const PredicateLease& lease, core::ResourcePlan& plan, std::stop_token stop,
+                      GeometryWorkAccounting accounting) noexcept {
     const auto context = geometry.context_;
-    auto lease = workspace.acquire(context.diagnostics);
-    if (!lease)
-        return std::unexpected(OwnedGeometryFailure{complete(lease.error(), context), {}, context});
-    return guarded(context, [&]() -> AeroResult<ExactTriangleResult> {
+    return guarded(context, [&]() -> AeroResult<LocalGeometryInput> {
         if (!geometry.data_ || !query.active())
             return std::unexpected(rejected(core::FailureCode::InvalidInput, context));
         const auto& data = *geometry.data_;
@@ -1197,7 +1207,7 @@ GeometryEngine::classify(const OwnedGeometry& geometry, const ResolvedQuery& que
             return std::unexpected(
                 OwnedGeometryFailure{complete(owned.error(), context), QueryId{q.id}, context});
         auto slots =
-            ExactPredicateAccess::coordinates(*workspace.predicate_, *lease, context.diagnostics);
+            ExactPredicateAccess::coordinates(*workspace.predicate_, lease, context.diagnostics);
         if (!slots)
             return std::unexpected(
                 OwnedGeometryFailure{complete(slots.error(), context), QueryId{q.id}, context});
@@ -1210,15 +1220,56 @@ GeometryEngine::classify(const OwnedGeometry& geometry, const ResolvedQuery& que
                                     slots->get()[vertex], workspace.arithmetic_.values()[0], run);
                 !r)
                 return std::unexpected(r.error());
-        auto result = ExactPredicateAccess::finish(*workspace.predicate_, *lease, std::move(*owned),
-                                                   limits.predicate, stop, context.diagnostics, 0);
+        auto predicate_limits = limits.predicate;
+        if (accounting == GeometryWorkAccounting::TotalAndPredicateSubcap) {
+            if (run.steps > limits.max_steps)
+                return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
+            predicate_limits.max_steps =
+                std::min(predicate_limits.max_steps, limits.max_steps - run.steps);
+        }
+        auto result = ExactPredicateAccess::finish(*workspace.predicate_, lease, std::move(*owned),
+                                                   predicate_limits, stop, context.diagnostics, 0);
         if (!result)
             return std::unexpected(
                 OwnedGeometryFailure{complete(result.error(), context), target, context});
-        return std::move(*result);
+        std::uint64_t work = 0;
+        if (accounting == GeometryWorkAccounting::TotalAndPredicateSubcap) {
+            if (result->steps() > limits.max_steps - run.steps)
+                return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
+            work = run.steps + result->steps();
+        }
+        return LocalGeometryInput{geometry.data_,     q,   *index, slots->get(),
+                                  std::move(*result), work};
     });
 }
 
+AeroResult<ExactTriangleResult>
+GeometryEngine::classify(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
+                         const GeometryLimits& limits, GeometryWorkspace& workspace,
+                         core::ResourcePlan& plan, std::stop_token stop) noexcept {
+    const auto context = geometry.context_;
+    auto lease = workspace.acquire(context.diagnostics);
+    if (!lease)
+        return std::unexpected(OwnedGeometryFailure{complete(lease.error(), context), {}, context});
+    auto result = local(geometry, query, target, limits, workspace, *lease, plan, std::move(stop),
+                        GeometryWorkAccounting::GeometryAndPredicateBudgets);
+    if (!result)
+        return std::unexpected(result.error());
+    return std::move(result->classification);
+}
+
+OwnedGeometry GeometryPacketAccess::retain(const LocalGeometryInput& input) noexcept {
+    return GeometryEngine::retain(input);
+}
+
+AeroResult<LocalGeometryInput>
+GeometryPacketAccess::load(const OwnedGeometry& geometry, const ResolvedQuery& query,
+                           FacetId target, const GeometryLimits& limits,
+                           GeometryWorkspace& workspace, const PredicateLease& lease,
+                           core::ResourcePlan& plan, std::stop_token stop) noexcept {
+    return GeometryEngine::local(geometry, query, target, limits, workspace, lease, plan,
+                                 std::move(stop), GeometryWorkAccounting::TotalAndPredicateSubcap);
+}
 AeroResult<OwnedGeometry> prepare_owned_geometry(const GeometryInput& input,
                                                  const GeometryLimits& limits,
                                                  GeometryWorkspace& workspace,

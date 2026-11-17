@@ -1,0 +1,378 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-3-local-geometry-packet",
+  "ids": [
+    "UI-D01",
+    "UI-D03",
+    "UI-D04",
+    "UI-D05",
+    "UI-D06",
+    "UW-D07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 109,
+  "date": "2026-11-17",
+  "source_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+  "claimed_state": "局所幾何の所有・包絡・incidence/contact資格が採用契約へ適合することの対象確認。QA数値認定、物理実務受入、P1核・大域幾何の資格は主張しない。",
+  "scope": {
+    "inputs": "A1 immutable geometry/query; current configuration; original Binary64/TwoWord and exact material expression at q=2^-2148. No rounded query injection.",
+    "outputs": "12 scaled centers and absolute radii, full-width qualification, stable closest entity/far, verified incidence or detached, owned snapshot/query/ambient scatter, limits/work, optional StageTiming, GlobalGeometryNotChecked.",
+    "precision": "tau finite/nonnegative; full width2r; exact integer sqrt trials with 256fraction enclosure; common powers2 cancellation changes no trial/equality/output/work.",
+    "budgets": "23 fixed integers in planned workspace; checked32768/et_off; scalar comparison <=21000bit; width area RHS<=16904bit. Payload vs external28672byte estimate vs RSS separated; strict proven bound absent =>Unsupported."
+  },
+  "definition_of_done": [
+    "LG-F01〜14を既存A1拒否境界と新packet経路へ接続。exact軸tau0成功と非exact長さtau0拒否、全幅係数4、subgrid残差を固定。",
+    "全4query/頂点辺面支持、6頂点置換、quad両子の全LR散布、最近実体/厳密far隣接を検査。",
+    "元query/immutable snapshot/context/identity/全ambient順と元語を所有。元入力/両workspace破棄後の消費と移動元拒否を検査。",
+    "製品sqrtを共有しないcpp_rational＋integer sqrt256bit囲い。tau1e-10、共変1e-8、分類tol0、thin、2^±900、巨大原点low、word-gapを検査。",
+    "content/時刻不一致、payload等号/不足、総work/subcap境界、設定済取消、再入、別workspace並列、実allocation全ordinalのbad_alloc→ResourceExceededとlease解放/旧owner不変を検査。",
+    "byte同一controlと6隔離変異をproducer2TU＋test再compileで検出。inline helperの元testobj迂回なし。",
+    "影響A1既存2＋新2CTestのclean D/R、対象static/format、日本語とroot数理/型/資源レビュー、工程/bit比較、source/artifact hashを保存。rootの最終record審査とIO head870926dの許可済みローカル統合を完了。14source hashは実行版6ad95bbと一致。IM03-3 Done/traceを同期し208 IDs、試験あり33、記録あり40、0 problems。"
+  ],
+  "verification": {
+    "platform": "Windows x64 MSVC19.51 /fp:strict /W4 /WX",
+    "clean_source": true,
+    "Debug": {
+      "selected": 4,
+      "passed": 4,
+      "scope": "aero.geometry_snapshot/resources + aero.local_geometry_packet/resources"
+    },
+    "Release": {
+      "selected": 4,
+      "passed": 4,
+      "a1_regular_cases": 17,
+      "a1_regular_assertions": 418,
+      "a1_resource_cases": 1,
+      "a1_resource_assertions": 30,
+      "a2_regular_cases": 17,
+      "a2_regular_assertions": 837,
+      "a2_resource_cases": 4,
+      "a2_resource_assertions": 292
+    },
+    "static": "clang-format21.1.2対象7files exit0。clang-tidy21.1.1最終変更3TU batch exit0。geometry sourceは2回目4TU batchで診断0; batch全体は別testのoptional5診断でexit1、そのtestを最終3TU batchで再確認exit0。rawを区別して保持。",
+    "independent_review": "rootが型/式/符号/平方根包含/全幅係数4/23slot/実bit16904/lease/資格/所有を通読し重大未解決なし。",
+    "japanese": "新補足quick lintは術語反復TTR info1。rootの限定教訓numerics段落も別読者が通読し指摘なし。",
+    "linux": "この固定sourceのGCC14/Linuxは手元未実行。MSVC結果をLinux成功へ読み替えない。PR対象CIへ委ね、CI完了を待たない。",
+    "not_repeated": "A0三角形述語producerは変更なし、旧A0 3tests/旧変異/他module/全suite/R&D再生成は繰り返さない。A1影響2testsを最終D/R集合へ含める。",
+    "cancellation": "設定済取消・work0/1・subcap/残量境界は実行。特定の走査途中時刻に取消を誘導したと主張せず、各root trial/phaseの取消guardをsource審査。",
+    "baselines": "既存qa/baselinesは不変。新しい名前付きLG literal/独立irrational referenceを基準caseとして追加。物理I1の基準/認定の代わりにはしない。",
+    "artifact_line_endings": "New metadata is UTF-8 LF. Text copies preserve raw body after declared encoding/path/CRLF conversion; release-lasttest.log retains its terminal blank line and is excluded only from whitespace diffcheck.",
+    "trace": "rootがIO head870926dを許可範囲でローカル統合しIM03-3 Doneを同期。matrix/check: 208定義ID、試験あり33、記録あり40、0問題。",
+    "integrity": "root独立checker43files/0errors、実行6ad95bbの14source hash一致、公開account scan0を確認。source/artifactの実行時参照は付替えない。"
+  },
+  "mutations": {
+    "control_cases": 17,
+    "control_assertions": 837,
+    "mutants_detected": 6,
+    "compile_units_per_case": 3,
+    "all_compile_and_link_exit": 0,
+    "mutant_runtime_exit": 42,
+    "runtime_failure_kind": "Catch assertion",
+    "original_archive_producer_members_extracted": 0,
+    "input_hash_mismatches": 0,
+    "zip_entries": 132,
+    "source_revision": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+    "boundary": "Only packet/geometry producer archive members are excluded; other unchanged archive members link normally."
+  },
+  "measurement": {
+    "source_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+    "conditions": "before and after separately compiled at same flags/input, single worker/CPUmask1, B→A three outer rounds; each exe3 inner samples per case =>9samples/condition/version.",
+    "before": "Dirty development snapshot retained with exact source/lib/flags/raw; not called clean final evidence.",
+    "after": "clean6ad95bb Release build-info dirtyfalse verified.",
+    "acceptance": "Use per-case best values in alternating-comparison.json; min/median/max and raw retained. All output high/low/radius/exponent/work/payload identical for all72samples; ranges separated in every case. Exact common2pow cancellation adopted.",
+    "scope": "Local preparation only. Root/width timings are subsets of enclosure, not additive phases. Setup/workspace creation outside measured call. RSS is process/lifetime peak, not external allocator hard bound. No whole-kernel or R03 performance qualification."
+  },
+  "historical_source_references": [
+    {
+      "id": "im03-3-build-CMakeLists-txt",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "CMakeLists.txt",
+      "sha256": "57ad37522241e165b5717d7088627b895088cc58a018552718f6bba73901e487"
+    },
+    {
+      "id": "im03-3-build-tests-CMakeLists-txt",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "c48b7b22182bceccdf2950d09fe4c532ff952acc166759ce6547ed663d70fe5d"
+    },
+    {
+      "id": "im03-3-build-docs-conventions-md",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "docs/conventions.md",
+      "sha256": "ba5734e8e97e87ffeb17e31c93f712f82d9a025732dc1cffb8abfa14f8d8f328"
+    },
+    {
+      "id": "im03-3-build-docs-roadmap-md",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "docs/roadmap.md",
+      "sha256": "dcf9721028bede0612d271c0c28a98d96985d751dd0bbaa118f60cac92ae01fd"
+    }
+  ],
+  "historical_evidence": "既存IM03-1/IM03-2/各CI・review追補、既存ZIP/raw/hash、R&Dを上書きしない。",
+  "sources": {
+    "src/aero/local_geometry_packet.hpp": "1aa3f6b0b84c1638763128753fde98ff0b1cdc767ab64c5eb55f64e267f81e98",
+    "src/aero/local_geometry_packet.cpp": "49b4807807072ee61d85aa8f83dfdc6bc8221d504f60ce61a76161aabdf328d0",
+    "src/aero/local_geometry_bounds_private.hpp": "e71c9ba9432fc16b321c291ed5a191d3a672a35589fbe7377867f7c2a47ed760",
+    "src/aero/local_geometry_input_private.hpp": "22716d32222918f2fa0026ea0588e88760fa0820cee9c2e6cded367034fb91d6",
+    "src/aero/geometry_snapshot.cpp": "90010d2c3bd6e53ced89c1a568f2c3477734aff207813da5d7a822be0d96f952",
+    "tests/aero/local_geometry_packet_test.cpp": "cf0b8e93178ad88583a76d264e5a4fbf0453b7e71c798203deed0d002a1253dd",
+    "tests/aero/local_geometry_packet_resources_test.cpp": "18f4c1b7423d469bd079fac96e948f849e70ae5f25e3a38a21f8d0ed3c1be758",
+    "tests/aero/geometry_snapshot_fixture.hpp": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+    "docs/specs/aero/local-geometry-packet-contract.md": "662eb892eef9295312ee54b1de3c2bd911f553f44d855740722874589e368c1c",
+    "docs/specs/aero/local-geometry-contract.md": "83c92b8cbae773eff487aab005717ab7514cfbf038df6db99cb27bb6aa00f52f",
+    "docs/specs/aero/owned-geometry-query-contract.md": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3",
+    "docs/specs/aero/exact-triangle-predicates-contract.md": "99284f3896062710e712dfb002ec0e76b911766605354faaef65c3ad0841bdeb",
+    ".cursor/rules/numerics.mdc": "72714a0a86b7dc46ed3070107c9527dc18a84a565256fe7d59bbcc9080568785",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be"
+  },
+  "source_references": [
+    {
+      "id": "im03-3-source-src-aero-local_geometry_packet-hpp",
+      "sha256": "1aa3f6b0b84c1638763128753fde98ff0b1cdc767ab64c5eb55f64e267f81e98",
+      "hint": "src/aero/local_geometry_packet.hpp"
+    },
+    {
+      "id": "im03-3-source-src-aero-local_geometry_packet-cpp",
+      "sha256": "49b4807807072ee61d85aa8f83dfdc6bc8221d504f60ce61a76161aabdf328d0",
+      "hint": "src/aero/local_geometry_packet.cpp"
+    },
+    {
+      "id": "im03-3-source-src-aero-local_geometry_bounds_private-hpp",
+      "sha256": "e71c9ba9432fc16b321c291ed5a191d3a672a35589fbe7377867f7c2a47ed760",
+      "hint": "src/aero/local_geometry_bounds_private.hpp"
+    },
+    {
+      "id": "im03-3-source-src-aero-local_geometry_input_private-hpp",
+      "sha256": "22716d32222918f2fa0026ea0588e88760fa0820cee9c2e6cded367034fb91d6",
+      "hint": "src/aero/local_geometry_input_private.hpp"
+    },
+    {
+      "id": "im03-3-source-src-aero-geometry_snapshot-cpp",
+      "sha256": "90010d2c3bd6e53ced89c1a568f2c3477734aff207813da5d7a822be0d96f952",
+      "hint": "src/aero/geometry_snapshot.cpp"
+    },
+    {
+      "id": "im03-3-source-tests-aero-local_geometry_packet_test-cpp",
+      "sha256": "cf0b8e93178ad88583a76d264e5a4fbf0453b7e71c798203deed0d002a1253dd",
+      "hint": "tests/aero/local_geometry_packet_test.cpp"
+    },
+    {
+      "id": "im03-3-source-tests-aero-local_geometry_packet_resources_test-cpp",
+      "sha256": "18f4c1b7423d469bd079fac96e948f849e70ae5f25e3a38a21f8d0ed3c1be758",
+      "hint": "tests/aero/local_geometry_packet_resources_test.cpp"
+    },
+    {
+      "id": "im03-3-source-tests-aero-geometry_snapshot_fixture-hpp",
+      "sha256": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+      "hint": "tests/aero/geometry_snapshot_fixture.hpp"
+    },
+    {
+      "id": "im03-3-source-docs-specs-aero-local-geometry-packet-contract-md",
+      "sha256": "662eb892eef9295312ee54b1de3c2bd911f553f44d855740722874589e368c1c",
+      "hint": "docs/specs/aero/local-geometry-packet-contract.md"
+    },
+    {
+      "id": "im03-3-source-docs-specs-aero-local-geometry-contract-md",
+      "sha256": "83c92b8cbae773eff487aab005717ab7514cfbf038df6db99cb27bb6aa00f52f",
+      "hint": "docs/specs/aero/local-geometry-contract.md"
+    },
+    {
+      "id": "im03-3-source-docs-specs-aero-owned-geometry-query-contract-md",
+      "sha256": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3",
+      "hint": "docs/specs/aero/owned-geometry-query-contract.md"
+    },
+    {
+      "id": "im03-3-source-docs-specs-aero-exact-triangle-predicates-contract-md",
+      "sha256": "99284f3896062710e712dfb002ec0e76b911766605354faaef65c3ad0841bdeb",
+      "hint": "docs/specs/aero/exact-triangle-predicates-contract.md"
+    },
+    {
+      "id": "im03-3-source--cursor-rules-numerics-mdc",
+      "sha256": "72714a0a86b7dc46ed3070107c9527dc18a84a565256fe7d59bbcc9080568785",
+      "hint": ".cursor/rules/numerics.mdc"
+    },
+    {
+      "id": "im03-3-source-vcpkg-json",
+      "sha256": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+      "hint": "vcpkg.json"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/im03-3/compile-arguments.json": "fdb9adfeb1dafead847e1c32bb18c4cd8846d2e01abfd4823e68e732a6002050",
+    "docs/verification/IM-03/im03-3/debug-build.log": "8a394ae0dc4c63597066cde2acd4926a6d29ef6ae3907eb6f194fd21e4ac8f22",
+    "docs/verification/IM-03/im03-3/debug-test.log": "369d1094d1a5edd506d389eac3efa0946826d00b8f693cef828c4ca449a3a3ca",
+    "docs/verification/IM-03/im03-3/historical-build-references.json": "fc484348c4ec67449fd3dad7e63b416c69142b7a1366927c4366f87e3ef2f607",
+    "docs/verification/IM-03/im03-3/japanese.json": "494c220b6210b66d8ad7a9b35d89cd5d56f50ce071ab95d3124de326c6b50523",
+    "docs/verification/IM-03/im03-3/measurement/after-alternating-0.json-stream": "e52bf98cb05b58fb8e64159771d620a21a20e61a9e3bf9abd8259ab794fc2ae4",
+    "docs/verification/IM-03/im03-3/measurement/after-alternating-1.json-stream": "587c12faf7947f1e2c8fdc35dd83a53a2dcafcbb1b6c433e575ffa2841b93826",
+    "docs/verification/IM-03/im03-3/measurement/after-alternating-2.json-stream": "9ed503b4d8ec4e7701ced14d1b2bef54878f5541950076474aa43e3254488b4f",
+    "docs/verification/IM-03/im03-3/measurement/after-conditions.json": "f8d60fdeb33a23c97f32b057f8a7300950081a0433fe14e0dd9b88fc6e5eaa76",
+    "docs/verification/IM-03/im03-3/measurement/after-raw.json-stream": "1982f73d13fca777739cf2122ebc004fba64f921f73fd3eda5b093d41859dd87",
+    "docs/verification/IM-03/im03-3/measurement/alternating-comparison.json": "74c7d5a5ac30b393ab85b4aacbeafc96b79f341fda118ef27767b116fd997399",
+    "docs/verification/IM-03/im03-3/measurement/before-alternating-0.json-stream": "a6d5733efea7126fb71e6445017acb835c5298ca73cd132fdc100e87f544af56",
+    "docs/verification/IM-03/im03-3/measurement/before-alternating-1.json-stream": "3c87a2e76f01356f036e38085debb7e90ce21cae2af4e05d45de7ccea419aae4",
+    "docs/verification/IM-03/im03-3/measurement/before-alternating-2.json-stream": "fe853f9dc359c94b5e03979163f4ea68e52ce3964f5542ad6c8641351cfcb511",
+    "docs/verification/IM-03/im03-3/measurement/before-bounds.hpp": "d1a49f2a78aec381c66c88231f75738c2fdfa7bf2a307b9443312206a94bd567",
+    "docs/verification/IM-03/im03-3/measurement/before-conditions.json": "6bcaf6c854bdbc097481178cfea8d6bfe19d39407c0b01fee7fe0a9798f03b93",
+    "docs/verification/IM-03/im03-3/measurement/before-raw.json-stream": "11612814582988b11088dca3611481379a2330aa661db1197af886536e88c004",
+    "docs/verification/IM-03/im03-3/measurement/machine.json": "e757dcc63975c2221b4bd5381aecdf077f0ae584e4e74d3257b990016888d42c",
+    "docs/verification/IM-03/im03-3/measurement/preliminary-comparison.json": "3fcc02acde55191d92bca74a24eba6ef2cb91ecdf6338cb36eb3d499aa3a270b",
+    "docs/verification/IM-03/im03-3/measurement/probe.cpp": "bed4d82eb14caa0c1bc35054566c1a27933ef8d2ade2dd8725812d7857fe7466",
+    "docs/verification/IM-03/im03-3/mutation-summary.json": "6a9ae696581c2a78e489e1c132e2f73e1adb3246bc7460f24a0ed6df941b5f87",
+    "docs/verification/IM-03/im03-3/mutations.zip": "ebdff39aba5ba3e69980ea0d2ccc92f108c0bdb57acb2eee3beba2fc2df45418",
+    "docs/verification/IM-03/im03-3/redaction.json": "ce40e93630328353125309f92a1acee02b9fc52ee79183ebfef3a8de5a1de6a7",
+    "docs/verification/IM-03/im03-3/release-build.log": "6ee9de811f8c070fb165a0040c30833c85cedd9901f83265b15ca08ad6966e15",
+    "docs/verification/IM-03/im03-3/release-lasttest.log": "86d2f6c6601681d4f2f12b967f26bd11a95a085471002ccc660f24756ad5ff1b",
+    "docs/verification/IM-03/im03-3/release-test.log": "d77477d508a1d8797d1503f411f143e10d9693a69b03c56f42068a72680c569e",
+    "docs/verification/IM-03/im03-3/tidy-final.log": "1e566bc92b804d5154d35b8d89de9d73b5b2c6453bb29da4a4c1b6a629803c66",
+    "docs/verification/IM-03/im03-3/tidy-geometry-batch.log": "64cd8035deeac2ac40cf737038b5dfe9bf1b921114851f75ff7a2118a0b4593e"
+  },
+  "artifact_references": [
+    {
+      "id": "im03-3-artifact-im03-3-compile-arguments-json",
+      "sha256": "fdb9adfeb1dafead847e1c32bb18c4cd8846d2e01abfd4823e68e732a6002050",
+      "hint": "docs/verification/IM-03/im03-3/compile-arguments.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-debug-build-log",
+      "sha256": "8a394ae0dc4c63597066cde2acd4926a6d29ef6ae3907eb6f194fd21e4ac8f22",
+      "hint": "docs/verification/IM-03/im03-3/debug-build.log"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-debug-test-log",
+      "sha256": "369d1094d1a5edd506d389eac3efa0946826d00b8f693cef828c4ca449a3a3ca",
+      "hint": "docs/verification/IM-03/im03-3/debug-test.log"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-historical-build-references-json",
+      "sha256": "fc484348c4ec67449fd3dad7e63b416c69142b7a1366927c4366f87e3ef2f607",
+      "hint": "docs/verification/IM-03/im03-3/historical-build-references.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-japanese-json",
+      "sha256": "494c220b6210b66d8ad7a9b35d89cd5d56f50ce071ab95d3124de326c6b50523",
+      "hint": "docs/verification/IM-03/im03-3/japanese.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-after-alternating-0-json-stream",
+      "sha256": "e52bf98cb05b58fb8e64159771d620a21a20e61a9e3bf9abd8259ab794fc2ae4",
+      "hint": "docs/verification/IM-03/im03-3/measurement/after-alternating-0.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-after-alternating-1-json-stream",
+      "sha256": "587c12faf7947f1e2c8fdc35dd83a53a2dcafcbb1b6c433e575ffa2841b93826",
+      "hint": "docs/verification/IM-03/im03-3/measurement/after-alternating-1.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-after-alternating-2-json-stream",
+      "sha256": "9ed503b4d8ec4e7701ced14d1b2bef54878f5541950076474aa43e3254488b4f",
+      "hint": "docs/verification/IM-03/im03-3/measurement/after-alternating-2.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-after-conditions-json",
+      "sha256": "f8d60fdeb33a23c97f32b057f8a7300950081a0433fe14e0dd9b88fc6e5eaa76",
+      "hint": "docs/verification/IM-03/im03-3/measurement/after-conditions.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-after-raw-json-stream",
+      "sha256": "1982f73d13fca777739cf2122ebc004fba64f921f73fd3eda5b093d41859dd87",
+      "hint": "docs/verification/IM-03/im03-3/measurement/after-raw.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-alternating-comparison-json",
+      "sha256": "74c7d5a5ac30b393ab85b4aacbeafc96b79f341fda118ef27767b116fd997399",
+      "hint": "docs/verification/IM-03/im03-3/measurement/alternating-comparison.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-before-alternating-0-json-stream",
+      "sha256": "a6d5733efea7126fb71e6445017acb835c5298ca73cd132fdc100e87f544af56",
+      "hint": "docs/verification/IM-03/im03-3/measurement/before-alternating-0.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-before-alternating-1-json-stream",
+      "sha256": "3c87a2e76f01356f036e38085debb7e90ce21cae2af4e05d45de7ccea419aae4",
+      "hint": "docs/verification/IM-03/im03-3/measurement/before-alternating-1.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-before-alternating-2-json-stream",
+      "sha256": "fe853f9dc359c94b5e03979163f4ea68e52ce3964f5542ad6c8641351cfcb511",
+      "hint": "docs/verification/IM-03/im03-3/measurement/before-alternating-2.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-before-bounds-hpp",
+      "sha256": "d1a49f2a78aec381c66c88231f75738c2fdfa7bf2a307b9443312206a94bd567",
+      "hint": "docs/verification/IM-03/im03-3/measurement/before-bounds.hpp"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-before-conditions-json",
+      "sha256": "6bcaf6c854bdbc097481178cfea8d6bfe19d39407c0b01fee7fe0a9798f03b93",
+      "hint": "docs/verification/IM-03/im03-3/measurement/before-conditions.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-before-raw-json-stream",
+      "sha256": "11612814582988b11088dca3611481379a2330aa661db1197af886536e88c004",
+      "hint": "docs/verification/IM-03/im03-3/measurement/before-raw.json-stream"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-machine-json",
+      "sha256": "e757dcc63975c2221b4bd5381aecdf077f0ae584e4e74d3257b990016888d42c",
+      "hint": "docs/verification/IM-03/im03-3/measurement/machine.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-preliminary-comparison-json",
+      "sha256": "3fcc02acde55191d92bca74a24eba6ef2cb91ecdf6338cb36eb3d499aa3a270b",
+      "hint": "docs/verification/IM-03/im03-3/measurement/preliminary-comparison.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-measurement-probe-cpp",
+      "sha256": "bed4d82eb14caa0c1bc35054566c1a27933ef8d2ade2dd8725812d7857fe7466",
+      "hint": "docs/verification/IM-03/im03-3/measurement/probe.cpp"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-mutation-summary-json",
+      "sha256": "6a9ae696581c2a78e489e1c132e2f73e1adb3246bc7460f24a0ed6df941b5f87",
+      "hint": "docs/verification/IM-03/im03-3/mutation-summary.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-mutations-zip",
+      "sha256": "ebdff39aba5ba3e69980ea0d2ccc92f108c0bdb57acb2eee3beba2fc2df45418",
+      "hint": "docs/verification/IM-03/im03-3/mutations.zip"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-redaction-json",
+      "sha256": "ce40e93630328353125309f92a1acee02b9fc52ee79183ebfef3a8de5a1de6a7",
+      "hint": "docs/verification/IM-03/im03-3/redaction.json"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-release-build-log",
+      "sha256": "6ee9de811f8c070fb165a0040c30833c85cedd9901f83265b15ca08ad6966e15",
+      "hint": "docs/verification/IM-03/im03-3/release-build.log"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-release-lasttest-log",
+      "sha256": "86d2f6c6601681d4f2f12b967f26bd11a95a085471002ccc660f24756ad5ff1b",
+      "hint": "docs/verification/IM-03/im03-3/release-lasttest.log"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-release-test-log",
+      "sha256": "d77477d508a1d8797d1503f411f143e10d9693a69b03c56f42068a72680c569e",
+      "hint": "docs/verification/IM-03/im03-3/release-test.log"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-tidy-final-log",
+      "sha256": "1e566bc92b804d5154d35b8d89de9d73b5b2c6453bb29da4a4c1b6a629803c66",
+      "hint": "docs/verification/IM-03/im03-3/tidy-final.log"
+    },
+    {
+      "id": "im03-3-artifact-im03-3-tidy-geometry-batch-log",
+      "sha256": "64cd8035deeac2ac40cf737038b5dfe9bf1b921114851f75ff7a2118a0b4593e",
+      "hint": "docs/verification/IM-03/im03-3/tidy-geometry-batch.log"
+    }
+  ],
+  "pending": []
+}

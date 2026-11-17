@@ -1,0 +1,50 @@
+{
+  "entries": [
+    {
+      "origin": "out/issue109-ci-tidy/tidy.log",
+      "original_sha256": "64ae58d50d6301658df0214f4d21be24c755a2343c9e9f58823dc224a01b57b3",
+      "published": "tidy.log",
+      "published_sha256": "c3a3a31f097be86cacb0178264fb9062cefe5f46bc44301d10904519fe529eee",
+      "original_encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "conversion": "UTF8 LF copy; remaining native body/terminal blank lines preserved; raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-tidy/debug-build.log",
+      "original_sha256": "42e7b6dbf1a9d02500c5cc5285800186b2b45283d509666b846216c5087c66d0",
+      "published": "debug-build.log",
+      "published_sha256": "93a6211855a6737b2250724c0472429108bbf397bb95a385f444453d805df339",
+      "original_encoding": "utf-8-sig",
+      "personal_path_replacements": 4,
+      "conversion": "UTF8 LF copy; remaining native body/terminal blank lines preserved; raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-tidy/debug-test.log",
+      "original_sha256": "9bd963ebb34d4c763d5f4120d9ef61428670b9f888d10ea8858b150429ffaf6b",
+      "published": "debug-test.log",
+      "published_sha256": "1ee3a2d18e201bccfbffb4460dbc102ccf611fdfbf84d31c0ec0cc2ea65aa2b4",
+      "original_encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "conversion": "UTF8 LF copy; remaining native body/terminal blank lines preserved; raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-tidy/release-build.log",
+      "original_sha256": "b568deb7219dd5fad7b3aa7f35300958f2441fd00cd9b5ff571cbdd8db194143",
+      "published": "release-build.log",
+      "published_sha256": "f4a37b8a4b3092ac6b77e1b953e73a7e383df7ad6ec2365575aa475b87d9deaa",
+      "original_encoding": "utf-8-sig",
+      "personal_path_replacements": 4,
+      "conversion": "UTF8 LF copy; remaining native body/terminal blank lines preserved; raw unchanged"
+    },
+    {
+      "origin": "out/issue109-ci-tidy/release-test.log",
+      "original_sha256": "9773257efc45e6a8d47f6b0d3ca13e0db0f3d18de945e98aecd34fd3efeaa13d",
+      "published": "release-test.log",
+      "published_sha256": "4bddb50d60eaba444c7c1f4087a27b7b12ce809c97998047b90269b61118e624",
+      "original_encoding": "utf-8-sig",
+      "personal_path_replacements": 0,
+      "conversion": "UTF8 LF copy; remaining native body/terminal blank lines preserved; raw unchanged"
+    }
+  ],
+  "raw_policy": "Old raw unchanged. New *.log bodies preserve terminal blank lines and are excluded only from whitespace diffcheck."
+}

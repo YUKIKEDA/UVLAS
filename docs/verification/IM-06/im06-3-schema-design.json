@@ -1,0 +1,143 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-3-schema-design",
+  "ids": [
+    "IO4-01",
+    "IO4-02",
+    "IO4-03",
+    "IO4-04",
+    "IO4-05",
+    "IO4-06",
+    "IO4-07"
+  ],
+  "package": "IM-06",
+  "issue": 110,
+  "date": "2026-11-17",
+  "source_commit": "da46cc632bb3e68a06d842c1aa3628a5c09befff",
+  "dependency_source_commit": "caa815364ce3b0cf5f63d71d2c3937e5a8a690fa",
+  "scope": "全case schemaの設計契約、未SI所有型と検証段階、全nested辞書、限定式、144 fragment/5用途別root例。製品validator/式評価/物理kernelの実装・実行ではない。",
+  "claimed_state": {
+    "design_contract_reviewed": true,
+    "implementation_conforms": false,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "owner_decision": {
+    "choice": "A",
+    "response": "A。推奨案でok。",
+    "scope": "算術/整数冪/sin/cos/exp/log/sqrt、領域別座標と単位/domain/必要微分/資源検査を持つ限定式。外部コードprovider無し。",
+    "issue": "https://github.com/YUKIKEDA/UVLAS/issues/110"
+  },
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "CS02/04・FD01〜12のroot9+3/model8、nested key/kind/shape/variant/参照型。null/空/欠落/未知を区別。"
+    },
+    {
+      "condition": 2,
+      "evidence": "CS06/DC03の構造・材料・梁・接続・空力・J1・N4・IO対応。I1/I2の不要必須を除いた5全体例。physical coverageの迂回禁止。"
+    },
+    {
+      "condition": 3,
+      "evidence": "CS01〜05の未SI型/所有/ID/Source registry/既定値/検査順/失敗/診断/資源、SI/snapshot/prepareの別型。mixed尺度とseedは初回layoutを推測しない。"
+    },
+    {
+      "condition": 4,
+      "evidence": "144 fragment/5全体例とDC01/02の正常・負例期待を独立通読。作者auditは限定構造検査でerrors0。全製品validatorを実行したという判定ではない。"
+    },
+    {
+      "condition": 5,
+      "evidence": "独立技術・型照合・読みやすさ・構造レビュー、3文書lint/outline/terms。指摘を追加sourcecommitへ反映。rootが共有入口とIM06-3のDoneを同期。trace matrix/checkは208 IDs、試験あり32、記録あり39、0 problems。"
+    }
+  ],
+  "verification": {
+    "environment": "Windows/PowerShell。作者auditはCPython3.12.8標準ライブラリ。日本語toolはuv inline-script環境（Python版未採取）。コンパイラ実行無し。",
+    "author_audit": {
+      "exit": 0,
+      "markdown_files": 3,
+      "fragments": 144,
+      "root_examples": 5,
+      "negative_group_checks": 3,
+      "negative_closure_checks": 4,
+      "errors": 0,
+      "scope": "作者の限定検査：root keys/model8/ID/適用none/境界index/初期排他/coverage/観測成分形状/uniform尺度/予算配分/結合群/初回primary依存。全nestedの独立製品実装でも数値oracleでもない。",
+      "negative_checks": "正常control後、copyでcovered_by循環/代表不在/covers重複と、primary欠落/必要拘束尺度none/work非正/seed零を拒否。製品の変異実行ではない。"
+    },
+    "japanese": {
+      "lint": "3文書exit0。主文0、design0、fields warn low_burstiness1。型辞書の同型条件を保つため残す。",
+      "outline_terms": "全3文書各exit0。構造/語彙レビューの入力であり自動承認ではない。",
+      "encoding_correction": "cp932出力失敗とPowerShell nativeデコードの文字化けを確認。最終9出力はPYTHONUTF8=1のuvをCPython subprocessから起動しstdout bytes直接保存。UTF8 JSON/U+FFFD無しを検査し旧rawを流用しない。",
+      "rendering_followup": "3spaceのみ修正後のfieldsでlint/outline/terms各exit0。lint warn low_burstiness1、他0。旧9rawは変更せず保存。"
+    },
+    "links": "作者auditは相対path存在のみ。一般fragment checkerではない。rootが誤IM06 anchorを発見し6adf33aで除去。観測形状anchorは実見出しに通読照合。",
+    "git": "4source固定時と今回fieldsのみのcached diff checkは成功。raw artifact integrity-check.jsonのCRLF10行を含む記録stageのcached diff checkはtrailing whitespaceでexit1だった。実checker stdoutのbyte/hashは保存し、raw込み全体の差分検査が成功したとは主張しない。",
+    "not_run": "製品C++/Python試験、CLI validate、物理case、両OSCIは実行していない。製品source不変のため対象外。"
+  },
+  "commands": [
+    "CPython3.12.8 .dev/issue110/check_design.py（公開snapshot author-design-audit.py.txt）",
+    "PYTHONUTF8=1 uv run --offline .agents/skills/natural-japanese/scripts/<lint|outline|terms>.py --json docs/specs/foundation/case-schema-<contract|fields|design-cases>.md（9組個別実行、stdout bytes保存）",
+    "git diff --cached --check",
+    "check_evidence_manifest.py --root . --manifest docs/verification/IM-06/im06-3-schema-design.json（記録作成後）",
+    "CPython3.12.8 .agents/skills/solver-implementation-review/scripts/check_evidence_manifest.py --root . --manifest docs/verification/IM-06/im06-3-schema-design.json",
+    "CPython3.12.8 docs/verification/IM-06/im06-3-schema-design/author-design-audit.py.txt（repo rootから再実行できる相対snapshot）"
+  ],
+  "review_provenance": {
+    "initial_views": "rootが技術/仕様を通読。Aero担当は型/仕様照合、PG担当は読みやすさ、別の一般固有値担当は構造をread-only通読。旧snapshotと後の差分確認を区別する。",
+    "corrections": "ζ/H係数、PG graph/固定anchor、全trace写像、Motion C1/C2、角度、Beam両端、Wake ID、単体none、coverage、Source registry、観測shape、尺度/covered_by、Green contribution、anchorを修正。",
+    "final_followup": "rootが初回mixed policy節を独立通読し、C/c→無次元T→行尺度、explicit work/元反力/原拘束、Newtonslot、弧長W、seedは整合・未解決追加無しと返した。承認差分をd87e7c3で固定。",
+    "numerical_execution": "この設計で製品数値試験は実施していない。"
+  },
+  "not_claimed": [
+    "SchemaCase製品validatorの実装・試験成功",
+    "SI/式評価・微分/domain証明/snapshot/importer/prepare/run/resume/CLI/Python",
+    "IM06-0/Issue22全体の完了、物理/実務受入"
+  ],
+  "sources": {
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-design-cases.md": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe"
+  },
+  "immutable": {
+    "docs/specs/foundation/io-execution-adoption-specification.md": "df926d9f6726a62af313e534e04c6a9b9aa4b838f7fa252567f3a50519039123",
+    "docs/specs/foundation/input-document-contract.md": "7cfae85238c69a3d7bbcdd487a920a8c0ea1a28fc4cfeb9e58efe30798ecf0cb",
+    "docs/specs/foundation/strict-input-scalars-contract.md": "5b921a52182d999993c919dc1dd32903effd3d75e795dc8e35aa465162953794",
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/material-layer-adoption-contract.md": "cafea600ef53cb76426b6b980c9cac463eb73c96eb3223cd9a2950c33a2b8155",
+    "docs/specs/structure/material-shell-adopted-specification.md": "8ec70e11104e3b9f79d077ffb2735d881b90e7fb413d5649cc3f12cc48888ca1",
+    "docs/specs/structure/beam-adopted-specification.md": "a192a38dfcc81725af727b8637a51bcfa20f808202fe2cdf99bc99fc2bd11e8c",
+    "docs/specs/structure/connection-adopted-specification.md": "dbe318730a5024f9095e10f4ad1bbe5c70d2033f4e8ae812edb466a5ef5f7056",
+    "docs/specs/structure/structural-adopted-specification.md": "5e2e8ae0229fbdbf9cbb1a35dee1be9b5ea867611e3c9e1de42c5a554d00e325",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/coupled/coupled-adopted-specification.md": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d",
+    "docs/specs/foundation/eigen-extraction-contract.md": "7c5c2dba0f930f91e7cd8ef76cde0a583335c15caa4bbb6beff30dbcf2d1574c"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-3-schema-design/author-design-audit.json": "3397c5b6071b36e440f322addd24dcefb9e783b28c83368057eb9bb53063b556",
+    "docs/verification/IM-06/im06-3-schema-design/author-design-audit.py.txt": "e68c965d7e1d152d978a43e1cec7a3c451d15ff0947c1072420c0436aee59dba",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-contract-lint.json": "a123f3b214e3c23b757f64237631d08367deb5e4116bfcc78dab90f741339a1d",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-contract-outline.json": "841a0ec77366e19e118ee6381752a46a9645c7b5dfe21d4e1f02767d42216241",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-contract-terms.json": "b9dd20cc6a732fe58a8b4f182786d588061310805b915e3b8aeb2d30962c0ce0",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-design-cases-lint.json": "fbf8bf39f0ae9b1607ec94008ecefc9ea6580b815cbe0b3d2c0d3955f9b7463e",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-design-cases-outline.json": "16709b9b6544b0089804e21bcbe1011159570f3dcc670cc1dbd0785b99fbe41a",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-design-cases-terms.json": "7d236d2c05ba11c71fff2af06a7177ea15cbf8ba636f4614107b6c0f6e952dfb",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-lint.json": "f785f3d2c5d9f32f96bded61601359fc30b83de3da6a6f945477477ebf53e3d5",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-outline.json": "1d806954745d48457ecc3d331047be954f38b2d50cc2450234725a275c72b8b8",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-terms.json": "d0b2c6b54523e0816aa162cb7c36c4904bb4bb503dff5aa707fa16679819506f",
+    "docs/verification/IM-06/im06-3-schema-design/json-newline-normalization.json": "8244f17fd83f1c2f47ffdf4e6b8318a013032bc6e9571185331e418615624d18",
+    "docs/verification/IM-06/im06-3-schema-design/privacy-check.json": "b4778acac32dcfc96e790fbd7d27648c8beb40860e8e3af1f08ec23d37ce3bd4",
+    "docs/verification/IM-06/im06-3-schema-design/source-provenance.json": "645e41ff948dcc1d6c0a99249d218447ac66612303ee1f2f434706384520c689",
+    "docs/verification/IM-06/im06-3-schema-design/integrity-check.json": "97eeed6b984f3a33628768619709964165afc1e576c4eb721d1be41947f502d6",
+    "docs/verification/IM-06/im06-3-schema-design/integrity-output-redaction.json": "0be6500cc4ebe9b312e0e63bd7182078f5e95229a0251e7532f437f08fc2a314",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-rendering-lint.json": "d45e2724af82f5bf3f340230df5ca7538b342ae7ad02629e845c055accf60bb9",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-rendering-outline.json": "185d820e2235a0d04b359ffee5a347618818abc1ae10bd8dea34d828cec6907b",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-rendering-terms.json": "c1107319ba75a7d12da7ed8a69bad0f00fd00bc96e5c760726fa41b31b49fd75",
+    "docs/verification/IM-06/im06-3-schema-design/rendering-bridge.json": "57295c3a931462e3dbb69bbe5cd80944b09f27a356e7a7ecbb9aea45e95c08a6",
+    "docs/verification/IM-06/im06-3-schema-design/integrity-rendering-check.json": "aa6a8f9543f9706e53b07489fcb7bd18f7a7c11617cdba602f362fde8b5b41a6",
+    "docs/verification/IM-06/im06-3-schema-design/integrity-rendering-output-provenance.json": "154a20c62f632a41cc937217508b9813ae97a864df67b61012b6a21d9e4db255"
+  },
+  "audited_source_commit": "d87e7c36ef7c800b8a212f5a9e5473db91088f8b",
+  "source_commit_scope": "source_commitは3space修正後の現在版。作者audit/旧9言語rawはaudited_source_commit=d87e7c3の実行で保持し、rendering-bridgeが元/後hash・3置換・逆復元で数学/JSON値不変を結ぶ。fieldsの言語3toolだけ現在版で再確認した。"
+}

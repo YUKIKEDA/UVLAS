@@ -1,0 +1,522 @@
+{
+  "terms": [
+    {
+      "term": "フィールド",
+      "first_line": 1,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "# uvlas.case/1 フィールド辞書\n\n[全schema契約](case-schema-contract.md)の規範的な型辞書である。表のkeyは全許可keyであり、`?`以外は必須である。"
+    },
+    {
+      "term": "JSON",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "以上」で示す。行列はrow arrayで保持する。dの単位指数は`(length,mass,time,angle)`の順とし、`1`は無次元を表す。以下の型名はJSON上のkeyではない。\n\n有限式入力の採用はIssue #110に記録した利用者決定Aに基づく。数値kernelの実装済みを示さない。\n\n## FD-01 roo"
+    },
+    {
+      "term": "Issue",
+      "first_line": 5,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "dの単位指数は`(length,mass,time,angle)`の順とし、`1`は無次元を表す。以下の型名はJSON上のkeyではない。\n\n有限式入力の採用はIssue #110に記録した利用者決定Aに基づく。数値kernelの実装済みを示さない。\n\n## FD-01 rootと単位\n\n| 型 | key:型 | 条件 |\n|"
+    },
+    {
+      "term": "FD",
+      "first_line": 7,
+      "count": 14,
+      "has_gloss_hint": false,
+      "context": "下の型名はJSON上のkeyではない。\n\n有限式入力の採用はIssue #110に記録した利用者決定Aに基づく。数値kernelの実装済みを示さない。\n\n## FD-01 rootと単位\n\n| 型 | key:型 | 条件 |\n|---|---|---|\n| Case | schema:Tag{uvlas.case/1},"
+    },
+    {
+      "term": "ReferenceField",
+      "first_line": 38,
+      "count": 11,
+      "has_gloss_hint": false,
+      "context": "explicit}, columns:ReferenceField<1,9> | row-major3×3の行列成分。SO(3)/連続性はprepare |\n\nReferenceFieldとTimeSeriesはFD-12の限定式variantも持つ。callback、任意コード、名前だけの外部providerを受けない。空力の状態依存荷重は既存"
+    },
+    {
+      "term": "TimeSeries",
+      "first_line": 38,
+      "count": 16,
+      "has_gloss_hint": false,
+      "context": "mns:ReferenceField<1,9> | row-major3×3の行列成分。SO(3)/連続性はprepare |\n\nReferenceFieldとTimeSeriesはFD-12の限定式variantも持つ。callback、任意コード、名前だけの外部providerを受けない。空力の状態依存荷重は既存couplingが同じ"
+    },
+    {
+      "term": "コード",
+      "first_line": 38,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "分。SO(3)/連続性はprepare |\n\nReferenceFieldとTimeSeriesはFD-12の限定式variantも持つ。callback、任意コード、名前だけの外部providerを受けない。空力の状態依存荷重は既存couplingが同じmodelから作る。近似多項式を入力する場合は座標・出自・誤差を保持し"
+    },
+    {
+      "term": "Motion",
+      "first_line": 40,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "態依存荷重は既存couplingが同じmodelから作る。近似多項式を入力する場合は座標・出自・誤差を保持し、必要微分と物理予算をprepareで検査する。\n\nMotionはPCHIPのC1だけを加速度のC2資格へ流用しない。支持運動の各table節点は明示イベントとし、左右の二階微分を同じ補間から生成して各区間で評価する。節点加"
+    },
+    {
+      "term": "PCHIP",
+      "first_line": 40,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "存couplingが同じmodelから作る。近似多項式を入力する場合は座標・出自・誤差を保持し、必要微分と物理予算をprepareで検査する。\n\nMotionはPCHIPのC1だけを加速度のC2資格へ流用しない。支持運動の各table節点は明示イベントとし、左右の二階微分を同じ補間から生成して各区間で評価する。節点加速度が一意で"
+    },
+    {
+      "term": "イベント",
+      "first_line": 40,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "差を保持し、必要微分と物理予算をprepareで検査する。\n\nMotionはPCHIPのC1だけを加速度のC2資格へ流用しない。支持運動の各table節点は明示イベントとし、左右の二階微分を同じ補間から生成して各区間で評価する。節点加速度が一意でない場合はsideを要求し、滑らかなC2運動と表示しない。C2を要求する連続区間で"
+    },
+    {
+      "term": "C",
+      "first_line": 40,
+      "count": 139,
+      "has_gloss_hint": false,
+      "context": "couplingが同じmodelから作る。近似多項式を入力する場合は座標・出自・誤差を保持し、必要微分と物理予算をprepareで検査する。\n\nMotionはPCHIPのC1だけを加速度のC2資格へ流用しない。支持運動の各table節点は明示イベントとし、左右の二階微分を同じ補間から生成して各区間で評価する。節点加速度が"
+    },
+    {
+      "term": "AE",
+      "first_line": 40,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "速度が一意でない場合はsideを要求し、滑らかなC2運動と表示しない。C2を要求する連続区間で左右二階微分が一致しなければprepareで拒否する。gustにはAE-07のC1を要求する。\n\nPGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q("
+    },
+    {
+      "term": "PG",
+      "first_line": 42,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "要求し、滑らかなC2運動と表示しない。C2を要求する連続区間で左右二階微分が一致しなければprepareで拒否する。gustにはAE-07のC1を要求する。\n\nPGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat"
+    },
+    {
+      "term": "x",
+      "first_line": 42,
+      "count": 219,
+      "has_gloss_hint": false,
+      "context": "。C2を要求する連続区間で左右二階微分が一致しなければprepareで拒否する。gustにはAE-07のC1を要求する。\n\nPGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat/2) $$ とする。thickn"
+    },
+    {
+      "term": "X",
+      "first_line": 42,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "否する。gustにはAE-07のC1を要求する。\n\nPGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat/2) $$ とする。thickness.valuesは物理全厚H、Hhat=H/Lref、ζ∈[−1,1"
+    },
+    {
+      "term": "Lref",
+      "first_line": 42,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "ustにはAE-07のC1を要求する。\n\nPGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat/2) $$ とする。thickness.valuesは物理全厚H、Hhat=H/Lref、ζ∈[−1,1]で実法線厚さ["
+    },
+    {
+      "term": "Hhat",
+      "first_line": 42,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "1を要求する。\n\nPGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat/2) $$ とする。thickness.valuesは物理全厚H、Hhat=H/Lref、ζ∈[−1,1]で実法線厚さ[−H/2,H/2]へ写す"
+    },
+    {
+      "term": "アンカー",
+      "first_line": 42,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ζ nhat/2) $$ とする。thickness.valuesは物理全厚H、Hhat=H/Lref、ζ∈[−1,1]で実法線厚さ[−H/2,H/2]へ写す。アンカーは採用graph規約s=0であり自由入力ではない。\n\n## FD-03 幾何と外部source\n\n| 型 | key:型 | 条件 |\n|---|---|---"
+    },
+    {
+      "term": "Nastran",
+      "first_line": 59,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "n_observations:List<Ref<Observation>> | degree≤4、予算>0、観測1以上。有限点から未観測曲率を認定しない |\n\nNastran/Gmshのsidecar内容は本caseと同じ型辞書の幾何・材料・所有/対応定義を使用し、別の暗黙単位/材料補完を作らない。カード/mesh構文とsideca"
+    },
+    {
+      "term": "Gmsh",
+      "first_line": 59,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ations:List<Ref<Observation>> | degree≤4、予算>0、観測1以上。有限点から未観測曲率を認定しない |\n\nNastran/Gmshのsidecar内容は本caseと同じ型辞書の幾何・材料・所有/対応定義を使用し、別の暗黙単位/材料補完を作らない。カード/mesh構文とsidecarのファイ"
+    },
+    {
+      "term": "カード",
+      "first_line": 59,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "を認定しない |\n\nNastran/Gmshのsidecar内容は本caseと同じ型辞書の幾何・材料・所有/対応定義を使用し、別の暗黙単位/材料補完を作らない。カード/mesh構文とsidecarのファイルschemaは各importer契約が閉じる。`SchemaCase`はFileRefの役割とcase内対応を検査し、フ"
+    },
+    {
+      "term": "ファイル",
+      "first_line": 59,
+      "count": 3,
+      "has_gloss_hint": true,
+      "context": "mshのsidecar内容は本caseと同じ型辞書の幾何・材料・所有/対応定義を使用し、別の暗黙単位/材料補完を作らない。カード/mesh構文とsidecarのファイルschemaは各importer契約が閉じる。`SchemaCase`はFileRefの役割とcase内対応を検査し、ファイル内のcardを検査済みとは返さない"
+    },
+    {
+      "term": "FileRef",
+      "first_line": 59,
+      "count": 9,
+      "has_gloss_hint": true,
+      "context": "使用し、別の暗黙単位/材料補完を作らない。カード/mesh構文とsidecarのファイルschemaは各importer契約が閉じる。`SchemaCase`はFileRefの役割とcase内対応を検査し、ファイル内のcardを検査済みとは返さない。\n\n## FD-04 材料・シェル・梁\n\n| 型 | key:型 | 条件 |\n|-"
+    },
+    {
+      "term": "シェル",
+      "first_line": 61,
+      "count": 2,
+      "has_gloss_hint": true,
+      "context": "r契約が閉じる。`SchemaCase`はFileRefの役割とcase内対応を検査し、ファイル内のcardを検査済みとは返さない。\n\n## FD-04 材料・シェル・梁\n\n| 型 | key:型 | 条件 |\n|---|---|---|\n| Material isotropic | kind:Tag{isotropic},"
+    },
+    {
+      "term": "グラフ",
+      "first_line": 104,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "てenergyから導く。剛体frameのないtargetをbody座標の偶力へ暗黙変換しない。接触/摩擦/離脱/拘束反りは未知tagとして未対応を返す。物理接着グラフの閉路だけで拒否したり従属行を削除しない。\n\n## FD-06 空力・既知流れ\n\n| 型 | key:型 | 条件 |\n|---|---|---|\n| Aero"
+    },
+    {
+      "term": "モデル",
+      "first_line": 127,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "r_budget:Q<1> | duration/distance>0、error>0。閉端/退役台帳と誤差認定を後続で保持 |\n\n指定移流をfreeと同じ物理モデルとして扱わない。wakeのRは資源上限であり、窓の物理時間/距離と別項目である。\n\n## FD-07 解析・枝・探索\n\n| 型 | key:型 | 条件 |\n|"
+    },
+    {
+      "term": "Coverage",
+      "first_line": 150,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "es空、flow/wake/wake_rowsはnone。physics=coupledは構造部材と構造attachmentを持つ面が各1以上。flutterのCoverage.require_physicalとEigenRequirements.physical_coverageはtrue必須であり、falseで実務flutterの"
+    },
+    {
+      "term": "EigenRequirements",
+      "first_line": 150,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "ne。physics=coupledは構造部材と構造attachmentを持つ面が各1以上。flutterのCoverage.require_physicalとEigenRequirements.physical_coverageはtrue必須であり、falseで実務flutterの終了gateを迂回できない。内部の代数抽出APIで未認定packetを"
+    },
+    {
+      "term": "API",
+      "first_line": 150,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "enRequirements.physical_coverageはtrue必須であり、falseで実務flutterの終了gateを迂回できない。内部の代数抽出APIで未認定packetを扱えることとは別である。構造単体に空力density/coreを要求しない。\n\n`Analysis.loads`は部材をまたぐ重力/荷重を"
+    },
+    {
+      "term": "Shell",
+      "first_line": 152,
+      "count": 7,
+      "has_gloss_hint": true,
+      "context": "定packetを扱えることとは別である。構造単体に空力density/coreを要求しない。\n\n`Analysis.loads`は部材をまたぐ重力/荷重を置く。Shell/BeamのloadsとLoadIdを全域で一意にし、同じ荷重を二重計上しない。staticでは初期条件の動的履歴を消費しない。flutterでは対象枝ごとに同"
+    },
+    {
+      "term": "Beam",
+      "first_line": 152,
+      "count": 12,
+      "has_gloss_hint": true,
+      "context": "tを扱えることとは別である。構造単体に空力density/coreを要求しない。\n\n`Analysis.loads`は部材をまたぐ重力/荷重を置く。Shell/BeamのloadsとLoadIdを全域で一意にし、同じ荷重を二重計上しない。staticでは初期条件の動的履歴を消費しない。flutterでは対象枝ごとに同じ支持/材"
+    },
+    {
+      "term": "LoadId",
+      "first_line": 152,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ある。構造単体に空力density/coreを要求しない。\n\n`Analysis.loads`は部材をまたぐ重力/荷重を置く。Shell/BeamのloadsとLoadIdを全域で一意にし、同じ荷重を二重計上しない。staticでは初期条件の動的履歴を消費しない。flutterでは対象枝ごとに同じ支持/材料/モデル/後流政策を固定"
+    },
+    {
+      "term": "seed",
+      "first_line": 175,
+      "count": 7,
+      "has_gloss_hint": false,
+      "context": "ちらか一方が必須。static/flutterには `initial` を置かず、restartは探索/平衡保存状態の再開に限る。static/flutterのseedはBranchに持つ。restartは既存checkpoint manifestとchunkのschema/type/shape/bytes/hash/Mode"
+    },
+    {
+      "term": "Branch",
+      "first_line": 175,
+      "count": 11,
+      "has_gloss_hint": false,
+      "context": "が必須。static/flutterには `initial` を置かず、restartは探索/平衡保存状態の再開に限る。static/flutterのseedはBranchに持つ。restartは既存checkpoint manifestとchunkのschema/type/shape/bytes/hash/Model/参照/精度"
+    },
+    {
+      "term": "Model",
+      "first_line": 175,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "seedはBranchに持つ。restartは既存checkpoint manifestとchunkのschema/type/shape/bytes/hash/Model/参照/精度/時刻/ID/履歴を検査する要求であり、caseに不透明な任意state objectを埋め込まない。IO4-06の実状態形式は後続checkpoi"
+    },
+    {
+      "term": "ID",
+      "first_line": 175,
+      "count": 9,
+      "has_gloss_hint": false,
+      "context": "restartは既存checkpoint manifestとchunkのschema/type/shape/bytes/hash/Model/参照/精度/時刻/ID/履歴を検査する要求であり、caseに不透明な任意state objectを埋め込まない。IO4-06の実状態形式は後続checkpoint契約が閉じる。sch"
+    },
+    {
+      "term": "IO4",
+      "first_line": 175,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "/shape/bytes/hash/Model/参照/精度/時刻/ID/履歴を検査する要求であり、caseに不透明な任意state objectを埋め込まない。IO4-06の実状態形式は後続checkpoint契約が閉じる。schema段階はディレクトリを開かない。\n\n## FD-09 観測・誤差配分\n\n| 型 | key:"
+    },
+    {
+      "term": "IO",
+      "first_line": 175,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "/shape/bytes/hash/Model/参照/精度/時刻/ID/履歴を検査する要求であり、caseに不透明な任意state objectを埋め込まない。IO4-06の実状態形式は後続checkpoint契約が閉じる。schema段階はディレクトリを開かない。\n\n## FD-09 観測・誤差配分\n\n| 型 | key"
+    },
+    {
+      "term": "ディレクトリ",
+      "first_line": 175,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "する要求であり、caseに不透明な任意state objectを埋め込まない。IO4-06の実状態形式は後続checkpoint契約が閉じる。schema段階はディレクトリを開かない。\n\n## FD-09 観測・誤差配分\n\n| 型 | key:型 | 条件 |\n|---|---|---|\n| Observation point |"
+    },
+    {
+      "term": "Green",
+      "first_line": 216,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "gle | angle。同じpoints順・targets・正の物理尺度で作った二つの対応部分空間の最大主角。単一vectorの位相差や係数の差ではない |\n\nGreenひずみは配置から定まる単一テンソルであり、弾性応力/粘性応力の和へ分解しない。green/totalはその全Greenひずみを意味し、E−E0を無断で返さない。"
+    },
+    {
+      "term": "テンソル",
+      "first_line": 216,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "ts順・targets・正の物理尺度で作った二つの対応部分空間の最大主角。単一vectorの位相差や係数の差ではない |\n\nGreenひずみは配置から定まる単一テンソルであり、弾性応力/粘性応力の和へ分解しない。green/totalはその全Greenひずみを意味し、E−E0を無断で返さない。弾性/粘性/合計のcontribu"
+    },
+    {
+      "term": "green",
+      "first_line": 216,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "応部分空間の最大主角。単一vectorの位相差や係数の差ではない |\n\nGreenひずみは配置から定まる単一テンソルであり、弾性応力/粘性応力の和へ分解しない。green/totalはその全Greenひずみを意味し、E−E0を無断で返さない。弾性/粘性/合計のcontributionはsecond_pk/first_pk/cau"
+    },
+    {
+      "term": "cauchy",
+      "first_line": 216,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "een/totalはその全Greenひずみを意味し、E−E0を無断で返さない。弾性/粘性/合計のcontributionはsecond_pk/first_pk/cauchyの同じ応力測度へ適用する。\n\n`basis`は表のx/y/z軸を定める。応力・ひずみは同じmeasureのテンソルを指定基底へ変換してからこの順に並べる。第一P"
+    },
+    {
+      "term": "PK",
+      "first_line": 218,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "yの同じ応力測度へ適用する。\n\n`basis`は表のx/y/z軸を定める。応力・ひずみは同じmeasureのテンソルを指定基底へ変換してからこの順に並べる。第一PKの二つの添字には指定basisの現在側/参照側への同じ物理対応を保持する。材料軸の初期Green場の入力順/Mandel変換とは別の出力境界である。\n\ninte"
+    },
+    {
+      "term": "Mandel",
+      "first_line": 218,
+      "count": 3,
+      "has_gloss_hint": true,
+      "context": "ソルを指定基底へ変換してからこの順に並べる。第一PKの二つの添字には指定basisの現在側/参照側への同じ物理対応を保持する。材料軸の初期Green場の入力順/Mandel変換とは別の出力境界である。\n\ninterface=bothではlower/upperを別packetとして返し、**それぞれ**同じn成分予算を適用する。nを"
+    },
+    {
+      "term": "Unavailable",
+      "first_line": 220,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "比較参照は同じ物理観測・次元・尺度を持つ必要がある。`ComparisonReference.none`では比較角の達成を認定できず、subspaceの比較値はUnavailableとする。一般化問題の正のλはsqrt(λ)/(2π)とし、負/零λを勝手に正へ射影しない。step mapのalias/対数枝はJ1の刻み細分化・連続mode追"
+    },
+    {
+      "term": "ObservationBudget",
+      "first_line": 222,
+      "count": 10,
+      "has_gloss_hint": false,
+      "context": "枝はJ1の刻み細分化・連続mode追跡と照合する。固有振動数を出せない負λ/零mode、位相分岐未確定、対応未解像も理由付き未認定状態とし、0で埋めない。\n\n各ObservationBudget.groupsとNumerics.error_groupsは全12群を各1回宣言する。物理的に適用する群はrequiredまたはcovered_by、適用しない"
+    },
+    {
+      "term": "Numerics",
+      "first_line": 222,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "固有振動数を出せない負λ/零mode、位相分岐未確定、対応未解像も理由付き未認定状態とし、0で埋めない。\n\n各ObservationBudget.groupsとNumerics.error_groupsは全12群を各1回宣言する。物理的に適用する群はrequiredまたはcovered_by、適用しない群だけnot_applicabl"
+    },
+    {
+      "term": "newton",
+      "first_line": 285,
+      "count": 8,
+      "has_gloss_hint": false,
+      "context": "calar、1 | L/Tの非貫通残差 |\n| transport_residual | x/y/z、3 | L/Tの物質輸送残差 |\n\nconstraint/newton_correction/arclength_stateは準備済み混合layoutに依存するため`uniform_components`を拒否する。初回caseは"
+    },
+    {
+      "term": "元量",
+      "first_line": 300,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "る。非零独立行だけを資格付きで持つため $$ s'_k>0 $$ が必要であり、表現不能/零行を小値cutで修復しない。mとradの値を直接加えない。変換誤差も元量の単位へ戻して伝播する。\n\n無次元化拘束へ共役な内部乗数は仕事次元を持つ。内部乗数を使うKKT/補正/反力回復経路には明示した正の`multiplier_wor"
+    },
+    {
+      "term": "KKT",
+      "first_line": 302,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "行を小値cutで修復しない。mとradの値を直接加えない。変換誤差も元量の単位へ戻して伝播する。\n\n無次元化拘束へ共役な内部乗数は仕事次元を持つ。内部乗数を使うKKT/補正/反力回復経路には明示した正の`multiplier_work_scale`を適用する。forward行変換の列包絡から逆dual尺度を推定しない。既存C"
+    },
+    {
+      "term": "CN",
+      "first_line": 302,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "T/補正/反力回復経路には明示した正の`multiplier_work_scale`を適用する。forward行変換の列包絡から逆dual尺度を推定しない。既存CNの双対写像を同じ元/変換系へ保存し、rank削減時には非一意な元乗数の個別尺度保証を生成しない。原拘束は $$ c_i $$、元力学残差はprimaryのfor"
+    },
+    {
+      "term": "Newton",
+      "first_line": 304,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "rce/moment、物理反力はreaction_force/reaction_momentで、それぞれ独立に資格を確認する。変換後の小残差で代替しない。\n\n各Newton未知量/原残差slotはprepareで物理由来（primary field、target、axis、必要なwork block）と同じ単位を持つ。Newton"
+    },
+    {
+      "term": "Continuation",
+      "first_line": 304,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "分類slotや不足primaryを内部既定1で埋めない。全slotが対応したことをsolve前に検査する。枝の弧長は同じ状態尺度 $$ s_{z,i} $$ とContinuationの正speed_scale $$ s_U $$ から $$ W_z=\\operatorname{diag}(1/s_{z,i}^2),\\ w_U=1/s_U^2"
+    },
+    {
+      "term": "ArcLength",
+      "first_line": 304,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "diag}(1/s_{z,i}^2),\\ w_U=1/s_U^2 $$ と固定する。数値評価は先に尺度化し、二乗のoverflow/underflowを避ける。ArcLength.state_scalesの同じfield/targetはNumerics側の同じ宣言内容と一致させ、別の動的列数を要求しない。\n\nArnoldiのunifor"
+    },
+    {
+      "term": "Arnoldi",
+      "first_line": 306,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "を避ける。ArcLength.state_scalesの同じfield/targetはNumerics側の同じ宣言内容と一致させ、別の動的列数を要求しない。\n\nArnoldiのuniform seedも同じく、実nをprepare後に知ってから全n列を事前確保して展開し、実vector・列順・generation・内容を記録する。明"
+    },
+    {
+      "term": "ncv",
+      "first_line": 306,
+      "count": 4,
+      "has_gloss_hint": true,
+      "context": "m seedも同じく、実nをprepare後に知ってから全n列を事前確保して展開し、実vector・列順・generation・内容を記録する。明示したnev/ncvを小nへclipせず、実nで成立しなければ失敗する。seed展開や上の尺度展開が物理mode被覆の資格を与えることはない。\n\nprepareはuniform宣言"
+    },
+    {
+      "term": "Cartesian",
+      "first_line": 308,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "repareはuniform宣言から各対象の実列への展開表を作り、元の宣言、単位、対象、実列順、正尺度の全配列と内容identityを所有する。同じxyz値を各Cartesian係数群へ適用することは**指定した政策の展開**であり、短いexplicit_layout配列の不足埋めではない。基底/座標変換がある場合は同じ物理成分の意味を"
+    },
+    {
+      "term": "ケース",
+      "first_line": 310,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "e前にはN4の全成分尺度/単位・内容同一性を照合する。未被覆の必要成分には既定1を補わず、欠落として診断する。\n\n数値政策の配置は内部のencodingであり、ケースが既存の受入精度を緩める許可ではない。`Scale.field`は上の列挙だけを受理し、SI/prepareで実layout・寸法・成分数を全照合する。値を勝手"
+    },
+    {
+      "term": "SI",
+      "first_line": 310,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "として診断する。\n\n数値政策の配置は内部のencodingであり、ケースが既存の受入精度を緩める許可ではない。`Scale.field`は上の列挙だけを受理し、SI/prepareで実layout・寸法・成分数を全照合する。値を勝手にbroadcastしない。`EigenCluster.members`は明示した固定原問題"
+    },
+    {
+      "term": "shift",
+      "first_line": 312,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "r.members`は明示した固定原問題の完全packetへの要求であり、風速を変えた物理mode追跡IDとして再利用しない。\n\n`step_map`の固有値とshift、sλは無次元であり、物理growth/frequencyは採用J1に従いlog(λ)/hから得る。`structural_modes`のλとsλは1/T²、周"
+    },
+    {
+      "term": "s",
+      "first_line": 312,
+      "count": 1358,
+      "has_gloss_hint": false,
+      "context": "い。`EigenCluster.members`は明示した固定原問題の完全packetへの要求であり、風速を変えた物理mode追跡IDとして再利用しない。\n\n`step_map`の固有値とshift、sλは無次元であり、物理growth/frequencyは採用J1に従いlog(λ)/hから得る。`structural_"
+    },
+    {
+      "term": "FullSelection",
+      "first_line": 312,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ural_modes`のλとsλは1/T²、周波数は負λや零を勝手に切らず別状態で解釈する。association予算はλ/sλに対する無次元値である。実行時にFullSelectionを作るindexは、同じ完全packetのsorted physical eigenvalues順へ結び付ける。別風速/別packetへindexだけを流用しな"
+    },
+    {
+      "term": "ホスト",
+      "first_line": 326,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "ry→flush/close/hash→manifest last→同FSrename。確定dir上書き不可。retainで現確定や利用中親を削除しない |\n\nホストが先に与えたInputLimits/SchemaLimitsは、入力文書自身の資源宣言によって拡張しない。24/48GiBは全caseの予算・外部backend"
+    },
+    {
+      "term": "InputLimits",
+      "first_line": 326,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "close/hash→manifest last→同FSrename。確定dir上書き不可。retainで現確定や利用中親を削除しない |\n\nホストが先に与えたInputLimits/SchemaLimitsは、入力文書自身の資源宣言によって拡張しない。24/48GiBは全caseの予算・外部backend・実測認定の対象であり、本sche"
+    },
+    {
+      "term": "SchemaLimits",
+      "first_line": 326,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "anifest last→同FSrename。確定dir上書き不可。retainで現確定や利用中親を削除しない |\n\nホストが先に与えたInputLimits/SchemaLimitsは、入力文書自身の資源宣言によって拡張しない。24/48GiBは全caseの予算・外部backend・実測認定の対象であり、本schemaの字句検査を通っただけ"
+    },
+    {
+      "term": "GiB",
+      "first_line": 326,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "で現確定や利用中親を削除しない |\n\nホストが先に与えたInputLimits/SchemaLimitsは、入力文書自身の資源宣言によって拡張しない。24/48GiBは全caseの予算・外部backend・実測認定の対象であり、本schemaの字句検査を通っただけではPERF受入にならない。保存先の安全な作成/既存検査/re"
+    },
+    {
+      "term": "PERF",
+      "first_line": 326,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "入力文書自身の資源宣言によって拡張しない。24/48GiBは全caseの予算・外部backend・実測認定の対象であり、本schemaの字句検査を通っただけではPERF受入にならない。保存先の安全な作成/既存検査/renameとOS差は実行・checkpoint実装の責任である。\n\n## FD-12 限定式入力\n\n利用者決定A"
+    },
+    {
+      "term": "OS",
+      "first_line": 326,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "eの予算・外部backend・実測認定の対象であり、本schemaの字句検査を通っただけではPERF受入にならない。保存先の安全な作成/既存検査/renameとOS差は実行・checkpoint実装の責任である。\n\n## FD-12 限定式入力\n\n利用者決定A（Issue #110）により、算術・整数冪・sin/cos・e"
+    },
+    {
+      "term": "DAG",
+      "first_line": 330,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "の責任である。\n\n## FD-12 限定式入力\n\n利用者決定A（Issue #110）により、算術・整数冪・sin/cos・exp/log・sqrtだけを持つ式DAGを追加する。定数、多項式、表、AE-07の解析gustは維持する。これは外部コードの実行許可ではない。\n\n| 型 | key:型 | 条件 |\n|---|---"
+    },
+    {
+      "term": "sqrt",
+      "first_line": 348,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "）、exp/logは無次元、sqrtは全次元指数偶数 |\n\n各domainは、必要な全評価点と時刻を含む契約である。範囲外での評価、零を含む除算、logの非正、sqrtの負を拒否する。必要二階微分のあるsqrtは引数の正の下界を要求し、微分不能な零を有限微分としない。式の定義域は、nodeの区間包絡を使用してprepareで検"
+    },
+    {
+      "term": "Nonfinite",
+      "first_line": 348,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "立が示せなければ区間を明示的に再分割するか未解決を返し、clamp/微小値補完で続行しない。有限入力からoverflowした評価/微分は精度未解決、入力非有限はNonfiniteを区別する。\n\nschema段階は全nodeの型・次元、acyclic、index、出力数、domainと必要変数の適合を検査する。SI段階は十進値/角度/次元"
+    },
+    {
+      "term": "edge",
+      "first_line": 352,
+      "count": 9,
+      "has_gloss_hint": false,
+      "context": "分、定義域、連続性、誤差を検査する。次数のある微分は同じ式から生成する。利用者が別の速度・加速度式を渡して位置と不整合にしてはならない。\n\nDAGのnode数/edge数/最大深さ/指数絶対値/評価点数は明示上限で確保前に検査する。資源計画はnode値、区間値、同時生存する全一階/二階微分、型情報と出力のbytesを含む。中間"
+    },
+    {
+      "term": "ループ",
+      "first_line": 352,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "間値、同時生存する全一階/二階微分、型情報と出力のbytesを含む。中間値の同一性はnodeの参照によるものであり、式文字列の任意eval、ファイル読込、再帰、ループ、条件分岐、外部symbol、乱数、任意関数、callbackを認めない。イベントによる区分はdomain表で明示する。"
+    }
+  ]
+}
