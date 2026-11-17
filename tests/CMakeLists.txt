@@ -185,6 +185,21 @@ target_include_directories(uvlas_test_aero_geometry_snapshot_resources
 uvlas_enable_allocation_audit(uvlas_test_aero_geometry_snapshot_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_geometry_snapshot_resources)
 
+uvlas_add_test(aero.local_geometry_packet
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/local_geometry_packet_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_local_geometry_packet
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_add_test(aero.local_geometry_packet_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/local_geometry_packet_resources_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_local_geometry_packet_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_local_geometry_packet_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_local_geometry_packet_resources)
+
 uvlas_add_test(core.checked_dimensions
     LABELS unit negative
     SOURCES core/checked_dimensions_test.cpp
