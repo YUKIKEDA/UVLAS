@@ -544,7 +544,7 @@ public:
         const auto index = static_cast<core::Index>(data_.member_count++);
         auto& member = data_.members.values()[static_cast<std::size_t>(index)];
         member.key = store(key_value, false);
-        member.event = *context_.event;
+        member.event = current_event();
         data_.keys.values()[slot] = {frame.node, index, hash};
         if (object->members.tail == -1)
             object->members.head = index;
@@ -582,6 +582,14 @@ private:
         context_.reject(core::FailureCode::InvalidInput,
                         InputDiagnosticReason::UnexpectedException);
     }
+    std::uint64_t current_event() {
+        // Every callback publishes its event before storing a node or member.
+        // Keep the checked observation local across other mutable helper calls.
+        const auto ordinal = context_.event;
+        if (!ordinal)
+            impossible();
+        return *ordinal;
+    }
     void event() {
         context_.position.reset();
         context_.event = next_event_;
@@ -601,7 +609,7 @@ private:
         ensure_node();
         const auto index = static_cast<core::Index>(data_.node_count++);
         at(index).value = value;
-        at(index).event = *context_.event;
+        at(index).event = current_event();
         if (depth_ == 0) {
             if (index != 0)
                 impossible();

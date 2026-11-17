@@ -68,3 +68,10 @@ TEST_CASE("solve_linear rejects a non-finite right-hand side with Nonfinite", "[
 BAD   sorted lookupを作ったので全段もID順とみなし、単独の不備だけ試す。
 GOOD  接続/有限性/幾何の各段で複数不備を並べ替え、選ばれる最小IDを照合する。
 ```
+
+試験専用のglobal new/deleteも、通常・配列・nothrow・aligned・sizedと失敗時deleteの対応を確認する。2026-11-17、PR #104のLinux sanitizerではCatch2の一時bufferが未置換のnothrow newで確保され、置換済みdeleteのfreeと組み合わされてalloc-dealloc-mismatchとなった。各familyを対応するallocator/deallocatorへ揃え、ASanの検査を無効にして通さない。故障注入の例外型も置換入口の保証に合わせる。global newから任意例外を投げる試験でguard全体を検証したとはせず、任意例外の翻訳はcallable境界のguard試験と区別する。
+
+```text
+BAD   通常new/deleteだけを置換し、nothrowやalignedの経路も監査できたとする。
+GOOD  全形式の成功・故障・対応する解放を確認し、標準libが使うnothrow経路も含める。
+```

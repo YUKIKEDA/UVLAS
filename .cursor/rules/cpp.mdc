@@ -109,7 +109,7 @@ if (!entry.has_value()) { return; }
 use(*entry);
 ```
 
-optionalを設定する補助関数の呼出しだけを、呼出し側での存在証明にしない。2026-11-16、PR #73のLinux clang-tidyは、最初の失敗を保存する関数の呼出し後の逆参照を拒否した。保存する関数内で存在を確かめ、その値への参照を返せば、呼出し側はoptionalを逆参照せずに同じ失敗を使える。試験の診断フィールドも、既存の確認付き取得関数を通す。
+optionalを設定する補助関数の呼出しだけを、呼出し側での存在証明にしない。2026-11-16、PR #73のLinux clang-tidyは、最初の失敗を保存する関数の呼出し後の逆参照を拒否した。保存する関数内で存在を確かめ、その値への参照を返せば、呼出し側はoptionalを逆参照せずに同じ失敗を使える。試験の診断フィールドも、既存の確認付き取得関数を通す。 2026-11-17、PR #104のSAX eventでも、callback冒頭の設定後にhelperを通ってから逆参照する形がLinuxだけで失敗した。可変なcontextのoptionalを使う入口でローカル値へコピーし、同じ値を検査して返す。存在しない場合を0などの架空値で補わない。
 
 ```cpp
 // BAD: the analyzer need not infer engagement across the helper call.
