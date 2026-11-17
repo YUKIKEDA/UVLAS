@@ -24,8 +24,8 @@ fragment名の `Type.tag` は辞書の対応variantである。単一型は型�
 | 解析 | Analysis.static/transient/flutter、BranchSeed.reference/prepared | transientは1区間[0,1],h1。flutterは速度[0,1]で物理coverage要求を保持し、成功を主張しない |
 | 初期・再開 | Initial.equilibrium/cold_start/prepared_history、Perturbation.none/physical、Planes.binary64/two_word、FrameStatePayload、Restart | coldは動的配列のschema形状例でありprepare後の係数数適合は別。hi/loの微小値を保持 |
 | 観測 | Observation.point/stress/section/reaction/aero/mode、Basis.world/reference_material/current_material/explicit、ComparisonReference.none/file | material basisはstressのlayerをregistryに置く。成分数・順序・次元は[観測の成分形状](case-schema-fields.md#観測の成分形状) |
-| 尺度・誤差群 | Scale.uniform_components/explicit_layout、ErrorGroup.required/not_applicable/covered_by | xyz尺度の明示展開、prepared layoutの全列、結合群の単一代表を区別 |
-| 数値抽出 | EigenPolicy.none/full/generalized/arnoldi、EigenSelector.largest_magnitude/shift_invert、Backward.not_requested/required | Arnoldi例はn3/nev1/ncv3、seed非零。全物理modeの被覆と呼ばない |
+| 尺度・誤差群 | Scale.uniform_components/physical_layout_policy/explicit_layout、ErrorGroup.required/not_applicable/covered_by | xyz尺度とmixed物理政策の明示展開、prepared layoutの全列、結合群の単一代表を区別 |
+| 数値抽出 | EigenPolicy.none/full/generalized/arnoldi、EigenSelector.largest_magnitude/shift_invert、Backward.not_requested/required | Arnoldi例はn3/nev1/ncv3、uniform seedを実nへ明示展開、非零。全物理modeの被覆と呼ばない |
 | 保存 | CheckpointOutput.off/on | onのpathは未作成。実OS保存試験の代替ではない |
 | 式 | ExprNode.constant/variable/add/subtract/multiply/divide/negate/integer_power/sin/cos/exp/log/sqrt | node単体はoperand型の文脈が必要。以下の閉じた式例でtype/定義域を照合 |
 
@@ -75,6 +75,7 @@ fragment名の `Type.tag` は辞書の対応variantである。単一型は型�
 | transient initial+restart両方/どちらも無し | InvalidInput | root任意keyだからと物理条件を省略しない |
 | node operand未来/自己/範囲外、未使用node、未知op、型/次元不一致 | InvalidInput/Unsupported | callback名をTextのまま通さない |
 | point.position予算長1、stress.first_pk予算長6、reaction予算長3 | InvalidInput | FD-09の3/9/6成分を全て要求 |
+| 初回mixed policyのprimary欠落/必要位置・姿勢尺度none/work尺度非正、uniform seed=0 | InvalidInput | 初回の未知layoutを推測せず、明示政策の全slot被覆を要求 |
 | uniform尺度のxyz長1、mixed constraintをuniform指定、explicit_layout短列/別digest | InvalidInput/準備版不一致 | uniformの意味付き展開と暗黙不足埋めを区別 |
 | stress.greenとcontribution=elastic/viscousの組合せ | InvalidInput | Greenひずみを応力の加法分解と混同しない |
 | 結合評価のcovered_by循環/連鎖/代表不在、covers重複/未被覆 | InvalidInput | 物理的な適用と予算所有を分離 |

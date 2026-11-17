@@ -238,6 +238,11 @@ interface=bothではlower/upperを別packetとして返し、**それぞれ**同
 | AeroQuadrature none | kind:Tag{none} | 空力積分を消費しない |
 | AeroQuadrature active | kind:Tag{wp1_induction_v1}, absolute:Q<1>, relative:Q<1> | 予算≥0。近接解析式/遠方12対8/距離4の採用評価法を保つ |
 | Scale uniform_components | kind:Tag{uniform_components}, field:Tag{shell_position,beam_translation,beam_rotation,rigid_translation,rigid_rotation,structural_velocity,structural_angular_velocity,circulation,wake_position,wake_strength,constraint,force_balance,moment_balance,aero_residual,transport_residual,newton_correction,arclength_state}, targets:List<Target>, values:List<Number> | 下表で許可する物理成分の正尺度。対象の全対応DOFへ明示政策として展開し、係数数を利用者に推測させない |
+| Scale physical_layout_policy | kind:Tag{physical_layout_policy}, field:Tag{mixed_blocks}, constraint:ConstraintScalePolicy | 全caseで高々1件。拘束/乗数/Newton/弧長を物理primary尺度から構成する初回政策。実layoutの推測を要求しない |
+| ConstraintScalePolicy none | kind:Tag{none} | jointsとconstraint/trace_constraint支持が空、内部constraint/乗数block無し。弾性/減衰支持だけならnone可 |
+| ConstraintScalePolicy physical | kind:Tag{physical}, position:ComponentScale3, orientation:ComponentScale3, multiplier_work_scale:Q<energy>, reaction_force:Vec<Q<force>,3>, reaction_moment:Vec<Q<force*L>,3> | 必要なposition/orientationを下の条件で明示、work/force/moment尺度は全正。元反力を内部乗数の尺度で代用しない |
+| ComponentScale3 none | kind:Tag{none} | 対応する物理拘束成分を持たないときだけ |
+| ComponentScale3 values | kind:Tag{values}, values:Vec<Number,3> | 全正。positionはL、orientationはangle。xyzまたは右局所回転xyz順 |
 | Scale explicit_layout | kind:Tag{explicit_layout}, field:Tag{shell_position,beam_translation,beam_rotation,rigid_translation,rigid_rotation,structural_velocity,structural_angular_velocity,circulation,wake_position,wake_strength,constraint,force_balance,moment_balance,aero_residual,transport_residual,newton_correction,arclength_state}, targets:List<Target>, layout:Digest, dimensions:List<Vec<signed-native-integer,4>>, values:List<Number> | 同じ準備済layoutの全列順。両配列は同長、values全正、dimension指数int16範囲。digest/内容/列数の不一致を拒否 |
 | LinearPolicy direct | backend:Tag{dense_lu,sparse_lu,sparse_llt}, accuracy:LinearAccuracy, maximum_refinements:Count, backend_memory:BackendMemory | refinemement≤5。LLTのSPD資格、元残差/制約/反力を省かない |
 | LinearPolicy gmres | backend:Tag{gmres}, accuracy:LinearAccuracy, maximum_iterations:PositiveCount, restart:PositiveCount, maximum_applications:Count, maximum_adjoint:Count, maximum_preconditioner:Count, maximum_true_residual_checks:Count, backend_memory:BackendMemory | restartとmaxiterの実n条件はprepare。認定用作用も課金 |
@@ -248,8 +253,10 @@ interface=bothではlower/upperを別packetとして返し、**それぞれ**同
 | EigenPolicy none | kind:Tag{none} | flutterでは拒否 |
 | EigenPolicy full | kind:Tag{full}, target:Tag{step_map}, eigenvalue_scale:Number, packet:Tag{spectrum,pairs,subspace}, requirements:EigenRequirements, limits:EigenLimits | 完全Schur/pair/要求clusterを既存製品入口へ |
 | EigenPolicy generalized | kind:Tag{generalized}, target:Tag{structural_modes}, eigenvalue_scale:Q<1/T²>, requirements:EigenRequirements, limits:EigenLimits | K/M対称性とM正定値を原系で認定、負λを削除しない |
-| EigenPolicy arnoldi | kind:Tag{arnoldi}, target:Tag{step_map}, eigenvalue_scale:Number, packet:Tag{pairs,subspace}, selector:EigenSelector, nev:PositiveCount, ncv:PositiveCount, seed:List<Complex>, backend_tolerance:Q<1>, requirements:EigenRequirements, limits:EigenLimits | eigenvalue_scale>0、backend_tolerance>0。1≤nev≤n−2、nev+2≤ncv≤nは実n判明後prepareで検査。24/64を小nへclipしない。seedは明示非零 |
+| EigenPolicy arnoldi | kind:Tag{arnoldi}, target:Tag{step_map}, eigenvalue_scale:Number, packet:Tag{pairs,subspace}, selector:EigenSelector, nev:PositiveCount, ncv:PositiveCount, seed:ArnoldiSeed, backend_tolerance:Q<1>, requirements:EigenRequirements, limits:EigenLimits | eigenvalue_scale>0、backend_tolerance>0。1≤nev≤n−2、nev+2≤ncv≤nは実n判明後prepareで検査。24/64を小nへclipしない。seedは明示非零 |
 | Complex | real:Number, imaginary:Number | 実入力でもJSON boolean/arrayの再解釈なし |
+| ArnoldiSeed uniform | kind:Tag{uniform_nonzero}, value:Complex | value≠0。実n全列へ同じ値を明示展開。nをcaseで推測しない |
+| ArnoldiSeed explicit | kind:Tag{explicit_layout}, layout:Digest, values:List<Complex> | 同じ準備済layoutの全n列、少なくとも1値非零。全列/内容を照合 |
 | EigenSelector largest | kind:Tag{largest_magnitude} | 元作用の固有値絶対値 |
 | EigenSelector shift | kind:Tag{shift_invert}, shift:Complex | step mapの無次元λ。sλも正の無次元。shifted残差だけで認定しない |
 | EigenRequirements | residual:Q<1>, residual_observation:Ref<Observation>, normalization:Q<1>, normalization_observation:Ref<Observation>, orthogonality:Q<1>, orthogonality_observation:Ref<Observation>, backward:Backward, association_absolute:Q<1>, association_relative:Q<1>, left:Bool, clusters:List<EigenCluster>, physical_coverage:Bool | 各予算≥0。Gram<1、実A共役対、左右別空間/associationは採用契約。clusters空可。flutterではphysical_coverage=true必須 |
@@ -275,7 +282,28 @@ interface=bothではlower/upperを別packetとして返し、**それぞれ**同
 | aero_residual | scalar、1 | L/Tの非貫通残差 |
 | transport_residual | x/y/z、3 | L/Tの物質輸送残差 |
 
-constraint/newton_correction/arclength_stateは準備済み混合layoutに依存するため`uniform_components`を拒否し、`explicit_layout`を要求する。これらの特殊layoutの列数を先に推測したcaseを作らない。準備前の通常入力は物理成分のuniform宣言を用い、prepareが実際の全未知量/原残差のlayoutと適用先を構成する。特殊layoutを利用者が明示指定する場合は、その同じprepare成果物のdigestと全列を用いる別経路とする。
+constraint/newton_correction/arclength_stateは準備済み混合layoutに依存するため`uniform_components`を拒否する。初回caseは`physical_layout_policy`を用いて下の有限規則から構成し、準備後の全列を指定する場合だけ`explicit_layout`を用いる。初回からlayout digest/係数数を推測させない。両経路を同じfieldに重複指定してはならない。
+
+### 初回mixed layoutを物理尺度から閉じる
+
+`physical_layout_policy`は以下の必須primary宣言と組み合わせる。各primaryの値は利用者が計算前に指定した代表物理量であり、結果・現在の解・ゼロ右辺から推定しない。
+
+| 適用対象 | 必須のuniform_componentsまたは同じprepared explicit_layout |
+|---|---|
+| 各shell | shell_position、force_balance |
+| 各beam | beam_translation、beam_rotation、force_balance、moment_balance |
+| 各rigid Mass | rigid_translation、rigid_rotation、force_balance、moment_balance |
+| 構造を含むtransient/flutter | structural_velocity、beam/rigidがあればstructural_angular_velocity |
+| active aero | circulation、wake_position、wake_strength、aero_residual、transport_residual |
+| jointsまたはconstraint/trace_constraint支持あり | ConstraintScalePolicy physical。並進位置拘束があればposition=values、姿勢拘束があればorientation=values。該当しない方だけnone |
+
+拘束の原成分を $$ C_i $$、対応するcallerの正物理尺度を $$ c_i $$ とする。元componentの物理kind/axis/targetと $$ c_i $$ をprepareが保持し、**先に** $$ \widehat C_i=C_i/c_i $$ と無次元化する。その後の同次元の独立化行変換を $$ T $$ とすると、変換後は $$ C'_k=\sum_i T_{ki}\widehat C_i $$、正の行尺度は $$ s'_k=\sum_i|T_{ki}| $$ の上向き包絡とする。非零独立行だけを資格付きで持つため $$ s'_k>0 $$ が必要であり、表現不能/零行を小値cutで修復しない。mとradの値を直接加えない。変換誤差も元量の単位へ戻して伝播する。
+
+無次元化拘束へ共役な内部乗数は仕事次元を持つ。内部乗数を使うKKT/補正/反力回復経路には明示した正の`multiplier_work_scale`を適用する。forward行変換の列包絡から逆dual尺度を推定しない。既存CNの双対写像を同じ元/変換系へ保存し、rank削減時には非一意な元乗数の個別尺度保証を生成しない。原拘束は $$ c_i $$、元力学残差はprimaryのforce/moment、物理反力はreaction_force/reaction_momentで、それぞれ独立に資格を確認する。変換後の小残差で代替しない。
+
+各Newton未知量/原残差slotはprepareで物理由来（primary field、target、axis、必要なwork block）と同じ単位を持つ。Newtonのcorrection尺度はこの明示尺度を同じ実slot順へ連結し、状態/拘束変換には上記の無次元化と同じ対応を使う。未分類slotや不足primaryを内部既定1で埋めない。全slotが対応したことをsolve前に検査する。枝の弧長は同じ状態尺度 $$ s_{z,i} $$ とContinuationの正speed_scale $$ s_U $$ から $$ W_z=\operatorname{diag}(1/s_{z,i}^2),\ w_U=1/s_U^2 $$ と固定する。数値評価は先に尺度化し、二乗のoverflow/underflowを避ける。ArcLength.state_scalesの同じfield/targetはNumerics側の同じ宣言内容と一致させ、別の動的列数を要求しない。
+
+Arnoldiのuniform seedも同じく、実nをprepare後に知ってから全n列を事前確保して展開し、実vector・列順・generation・内容を記録する。明示したnev/ncvを小nへclipせず、実nで成立しなければ失敗する。seed展開や上の尺度展開が物理mode被覆の資格を与えることはない。
 
 prepareはuniform宣言から各対象の実列への展開表を作り、元の宣言、単位、対象、実列順、正尺度の全配列と内容identityを所有する。同じxyz値を各Cartesian係数群へ適用することは**指定した政策の展開**であり、短いexplicit_layout配列の不足埋めではない。基底/座標変換がある場合は同じ物理成分の意味を保持する対応を準備版に含め、宣言を無検査で別layoutへ流用しない。実solve前にはN4の全成分尺度/単位・内容同一性を照合する。未被覆の必要成分には既定1を補わず、欠落として診断する。
 

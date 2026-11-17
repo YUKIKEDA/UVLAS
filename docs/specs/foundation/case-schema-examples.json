@@ -3182,20 +3182,13 @@
       },
       "nev": 1,
       "ncv": 3,
-      "seed": [
-        {
-          "real": 1,
-          "imaginary": 0
-        },
-        {
-          "real": 1,
-          "imaginary": 0
-        },
-        {
+      "seed": {
+        "kind": "uniform_nonzero",
+        "value": {
           "real": 1,
           "imaginary": 0
         }
-      ],
+      },
       "backend_tolerance": 1e-12
     },
     "CheckpointOutput.off": {
@@ -3762,19 +3755,107 @@
       },
       "scales": [
         {
+          "kind": "uniform_components",
           "field": "shell_position",
-          "targets": [
-            {
-              "kind": "shell",
-              "id": "1"
-            }
-          ],
+          "targets": [],
           "values": [
             1,
             1,
             1
-          ],
-          "kind": "uniform_components"
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "structural_velocity",
+          "targets": [],
+          "values": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "circulation",
+          "targets": [],
+          "values": [
+            1
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "wake_position",
+          "targets": [],
+          "values": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "wake_strength",
+          "targets": [],
+          "values": [
+            1
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "force_balance",
+          "targets": [],
+          "values": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "aero_residual",
+          "targets": [],
+          "values": [
+            1
+          ]
+        },
+        {
+          "kind": "uniform_components",
+          "field": "transport_residual",
+          "targets": [],
+          "values": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "kind": "physical_layout_policy",
+          "field": "mixed_blocks",
+          "constraint": {
+            "kind": "physical",
+            "position": {
+              "kind": "values",
+              "values": [
+                1,
+                1,
+                1
+              ]
+            },
+            "orientation": {
+              "kind": "none"
+            },
+            "multiplier_work_scale": 1,
+            "reaction_force": [
+              1,
+              1,
+              1
+            ],
+            "reaction_moment": [
+              1,
+              1,
+              1
+            ]
+          }
         }
       ],
       "error_groups": [
@@ -4456,6 +4537,99 @@
       "interface": "both",
       "measure": "green",
       "contribution": "total"
+    },
+    "Scale.physical_layout_policy": {
+      "kind": "physical_layout_policy",
+      "field": "mixed_blocks",
+      "constraint": {
+        "kind": "physical",
+        "position": {
+          "kind": "values",
+          "values": [
+            1,
+            1,
+            1
+          ]
+        },
+        "orientation": {
+          "kind": "none"
+        },
+        "multiplier_work_scale": 1,
+        "reaction_force": [
+          1,
+          1,
+          1
+        ],
+        "reaction_moment": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "ConstraintScalePolicy.none": {
+      "kind": "none"
+    },
+    "ConstraintScalePolicy.physical": {
+      "kind": "physical",
+      "position": {
+        "kind": "values",
+        "values": [
+          1,
+          1,
+          1
+        ]
+      },
+      "orientation": {
+        "kind": "none"
+      },
+      "multiplier_work_scale": 1,
+      "reaction_force": [
+        1,
+        1,
+        1
+      ],
+      "reaction_moment": [
+        1,
+        1,
+        1
+      ]
+    },
+    "ComponentScale3.none": {
+      "kind": "none"
+    },
+    "ComponentScale3.values": {
+      "kind": "values",
+      "values": [
+        1,
+        1,
+        1
+      ]
+    },
+    "ArnoldiSeed.uniform_nonzero": {
+      "kind": "uniform_nonzero",
+      "value": {
+        "real": 1,
+        "imaginary": 0
+      }
+    },
+    "ArnoldiSeed.explicit_layout": {
+      "kind": "explicit_layout",
+      "layout": "0000000000000000000000000000000000000000000000000000000000000000",
+      "values": [
+        {
+          "real": 1,
+          "imaginary": 0
+        },
+        {
+          "real": 1,
+          "imaginary": 0
+        },
+        {
+          "real": 1,
+          "imaginary": 0
+        }
+      ]
     }
   },
   "schema_examples": {
@@ -5292,19 +5466,107 @@
         },
         "scales": [
           {
+            "kind": "uniform_components",
             "field": "shell_position",
-            "targets": [
-              {
-                "kind": "shell",
-                "id": "1"
-              }
-            ],
+            "targets": [],
             "values": [
               1,
               1,
               1
-            ],
-            "kind": "uniform_components"
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "structural_velocity",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "circulation",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_position",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_strength",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "force_balance",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "aero_residual",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "transport_residual",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "physical_layout_policy",
+            "field": "mixed_blocks",
+            "constraint": {
+              "kind": "physical",
+              "position": {
+                "kind": "values",
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "orientation": {
+                "kind": "none"
+              },
+              "multiplier_work_scale": 1,
+              "reaction_force": [
+                1,
+                1,
+                1
+              ],
+              "reaction_moment": [
+                1,
+                1,
+                1
+              ]
+            }
           }
         ],
         "error_groups": [
@@ -6232,19 +6494,53 @@
         },
         "scales": [
           {
+            "kind": "uniform_components",
             "field": "shell_position",
-            "targets": [
-              {
-                "kind": "shell",
-                "id": "1"
-              }
-            ],
+            "targets": [],
             "values": [
               1,
               1,
               1
-            ],
-            "kind": "uniform_components"
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "force_balance",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "physical_layout_policy",
+            "field": "mixed_blocks",
+            "constraint": {
+              "kind": "physical",
+              "position": {
+                "kind": "values",
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "orientation": {
+                "kind": "none"
+              },
+              "multiplier_work_scale": 1,
+              "reaction_force": [
+                1,
+                1,
+                1
+              ],
+              "reaction_moment": [
+                1,
+                1,
+                1
+              ]
+            }
           }
         ],
         "error_groups": [
@@ -6955,12 +7251,55 @@
         },
         "scales": [
           {
+            "kind": "uniform_components",
             "field": "circulation",
             "targets": [],
             "values": [
               1
-            ],
-            "kind": "uniform_components"
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_position",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_strength",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "aero_residual",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "transport_residual",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "physical_layout_policy",
+            "field": "mixed_blocks",
+            "constraint": {
+              "kind": "none"
+            }
           }
         ],
         "error_groups": [
@@ -7757,12 +8096,55 @@
         },
         "scales": [
           {
+            "kind": "uniform_components",
             "field": "circulation",
             "targets": [],
             "values": [
               1
-            ],
-            "kind": "uniform_components"
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_position",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_strength",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "aero_residual",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "transport_residual",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "physical_layout_policy",
+            "field": "mixed_blocks",
+            "constraint": {
+              "kind": "none"
+            }
           }
         ],
         "error_groups": [
@@ -8517,19 +8899,50 @@
               "arclength": {
                 "state_scales": [
                   {
+                    "kind": "uniform_components",
                     "field": "shell_position",
-                    "targets": [
-                      {
-                        "kind": "shell",
-                        "id": "1"
-                      }
-                    ],
+                    "targets": [],
                     "values": [
                       1,
                       1,
                       1
-                    ],
-                    "kind": "uniform_components"
+                    ]
+                  },
+                  {
+                    "kind": "uniform_components",
+                    "field": "structural_velocity",
+                    "targets": [],
+                    "values": [
+                      1,
+                      1,
+                      1
+                    ]
+                  },
+                  {
+                    "kind": "uniform_components",
+                    "field": "circulation",
+                    "targets": [],
+                    "values": [
+                      1
+                    ]
+                  },
+                  {
+                    "kind": "uniform_components",
+                    "field": "wake_position",
+                    "targets": [],
+                    "values": [
+                      1,
+                      1,
+                      1
+                    ]
+                  },
+                  {
+                    "kind": "uniform_components",
+                    "field": "wake_strength",
+                    "targets": [],
+                    "values": [
+                      1
+                    ]
                   }
                 ],
                 "speed_scale": 1,
@@ -8832,20 +9245,13 @@
           },
           "nev": 1,
           "ncv": 3,
-          "seed": [
-            {
-              "real": 1,
-              "imaginary": 0
-            },
-            {
-              "real": 1,
-              "imaginary": 0
-            },
-            {
+          "seed": {
+            "kind": "uniform_nonzero",
+            "value": {
               "real": 1,
               "imaginary": 0
             }
-          ],
+          },
           "backend_tolerance": 1e-12
         },
         "wake_rows": {
@@ -8854,19 +9260,107 @@
         },
         "scales": [
           {
+            "kind": "uniform_components",
             "field": "shell_position",
-            "targets": [
-              {
-                "kind": "shell",
-                "id": "1"
-              }
-            ],
+            "targets": [],
             "values": [
               1,
               1,
               1
-            ],
-            "kind": "uniform_components"
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "structural_velocity",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "circulation",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_position",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_strength",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "force_balance",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "aero_residual",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "transport_residual",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "physical_layout_policy",
+            "field": "mixed_blocks",
+            "constraint": {
+              "kind": "physical",
+              "position": {
+                "kind": "values",
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "orientation": {
+                "kind": "none"
+              },
+              "multiplier_work_scale": 1,
+              "reaction_force": [
+                1,
+                1,
+                1
+              ],
+              "reaction_moment": [
+                1,
+                1,
+                1
+              ]
+            }
           }
         ],
         "error_groups": [
