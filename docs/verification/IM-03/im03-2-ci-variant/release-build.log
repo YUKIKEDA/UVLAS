@@ -1,0 +1,23 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring done (1.0s)
+-- Generating done (0.6s)
+-- Build files have been written to: <workspace>/out/issue95-build
+[0/4] Re-checking globbed directories...
+[1/17] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue95-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue95-build/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/17] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[3/17] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[4/17] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\instrumentation.cpp.obj
+[5/17] Linking CXX static library Release\uvlas_core.lib
+[6/17] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\instrumentation.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[7/17] Linking CXX static library Release\uvlas_core_audit.lib
+[8/17] Building CXX object tests\CMakeFiles\uvlas_test_aero_geometry_snapshot.dir\Release\aero\geometry_snapshot_test.cpp.obj
+[9/17] Building CXX object CMakeFiles\uvlas_aero.dir\Release\src\aero\geometry_snapshot.cpp.obj
+[10/17] Linking CXX static library Release\uvlas_aero.lib
+[11/17] Linking CXX executable tests\Release\uvlas_test_aero_geometry_snapshot.exe
+[12/17] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Release\src\aero\geometry_snapshot.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[13/17] Linking CXX static library Release\uvlas_aero_audit.lib
+[14/17] Linking CXX executable tests\Release\uvlas_test_aero_geometry_snapshot_resources.exe

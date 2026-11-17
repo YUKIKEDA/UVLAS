@@ -1,0 +1,78 @@
+{
+  "schema": "uvlas.redacted-artifacts/1",
+  "reason": "個人worktreeパス伏字・UTF8/LFの公開派生copy。原rawと旧記録は不変。",
+  "entries": [
+    {
+      "id": "linux-release-excerpt.log",
+      "original_sha256": "4e46d29a2e085a7b0f9631004828f0a04982bde03c9c1ef7cac62e1d49cf52c5",
+      "published_sha256": "4e46d29a2e085a7b0f9631004828f0a04982bde03c9c1ef7cac62e1d49cf52c5",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "release-build.log",
+      "original_sha256": "8dc4ba5b8afe8a465fc4db1074802ddf0328c90deaa0404169c14f8fec24914e",
+      "published_sha256": "67d990da7774ea0de9f0033a14d06df61ee4ae04eb25e049f28140d9406784e9",
+      "redactions": 5,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "release-ctest.log",
+      "original_sha256": "a35d3659a3bde31403ea607e52834774f039ba3db80ea787acd1346c4d616ede",
+      "published_sha256": "72852811c7ce37a2a4a9d3168c2bf766826960d2186bfa76d7cc63d740aecd73",
+      "redactions": 2,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "release-raw.log",
+      "original_sha256": "8a6f4bfc8e86b546e97f8e4e488ee80c50022e16d16d57581d359266b4bf2329",
+      "published_sha256": "26dbffb565f4a9296054691510f9a02f26fbb15fd1be81c6d4dbd059407997ee",
+      "redactions": 4,
+      "original_encoding": "cp932",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "tidy.log",
+      "original_sha256": "a91524880f62ed3f733cf6d8851cb58194dd16ef6da5309f8dd03952ff6d6604",
+      "published_sha256": "6c6333324fc5d9ab32cae5fd9b2a316e97ca2cc4d3a317007323181f2461c739",
+      "redactions": 2,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "format.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "japanese-lint.log",
+      "original_sha256": "d2b55d7f4ea77489d9c246867765881a2a85ae5961a5bb3d0361ca1cf3e87e0f",
+      "published_sha256": "044a064600613d5c4ba90d5fa1871a245d806cc6aa642a8ad82fee24b3db989f",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "git-revision.hpp",
+      "original_sha256": "3a44b13d82a1353d972cc436eae3cea2b6df278877f58e33ec1a791b261c7f4f",
+      "published_sha256": "bfc58a4ea5960a975d76f11d4575be247f1c52b464300ad8f0f6f967fd0fbc46",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    }
+  ]
+}

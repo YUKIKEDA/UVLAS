@@ -945,15 +945,17 @@ GeometryEngine::resolve(const OwnedGeometry& geometry, const QueryRequest& reque
                     if (!finite(value))
                         return std::unexpected(
                             rejected(core::FailureCode::Nonfinite, context, request.id));
-                query.definition = FreeStorage{single->words};
+                query.definition.emplace<FreeStorage>(std::in_place_type<std::array<double, 3>>,
+                                                      single->words);
             } else if (const auto* pair = std::get_if<FreeDouble>(&free->words)) {
                 for (std::size_t i = 0; i < 3; ++i)
                     if (!finite(pair->high[i]) || !finite(pair->low[i]))
                         return std::unexpected(
                             rejected(core::FailureCode::Nonfinite, context, request.id));
-                query.definition =
-                    FreeStorage{std::array{pair->high[0], pair->high[1], pair->high[2],
-                                           pair->low[0], pair->low[1], pair->low[2]}};
+                query.definition.emplace<FreeStorage>(std::in_place_type<std::array<double, 6>>,
+                                                      std::array{pair->high[0], pair->high[1],
+                                                                 pair->high[2], pair->low[0],
+                                                                 pair->low[1], pair->low[2]});
             } else
                 return std::unexpected(
                     rejected(core::FailureCode::InvalidInput, context, request.id));

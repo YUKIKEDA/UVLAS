@@ -139,3 +139,12 @@ for (const auto& [a, b] : pairs) { use(a, b); }
 ```
 
 少数要素用の固定配列を並べる補助処理も、入力件数と添字の上限を明示する。2026-11-15、PR #50のmutex順序付けは、3要素配列のprefixに対するstd::sortからlibstdc++の大範囲処理が展開され、GCC 14 Releaseの `-Werror=array-bounds` で構築に失敗した。容量を検査する小さな挿入ソートへ替え、`std::less` のポインタ全順序、重複排除、try-lock失敗時の取得済みlock解放を維持した。警告を無効にせず、対象翻訳単位と接続する処理で確認する。
+
+全入力語とactive alternativeの初期化を先に確認する。入れ子の`std::variant`への一時代入が最適化時だけ未初期化診断となる場合は、選択した内外のalternativeを`emplace`と`in_place_type`で直接構築する形も確認する。2026-11-17、PR #102はGCC14 Releaseの`-O3 -Werror=maybe-uninitialized`がFreeStorageの一時代入を拒否し、Debug・sanitizer・MSVCでは通った。意味のない初期値や警告抑制を足さず、元のkind・全語の順序・検査を保持し、対象構成と正常な全alternativeを確認する。
+
+```cpp
+// BAD: the nested temporary assignment obscures which active storage is constructed.
+outer = Inner{words};
+// GOOD: construct exactly the selected inner alternative in its final storage.
+outer.emplace<Inner>(std::in_place_type<Words>, words);
+```
