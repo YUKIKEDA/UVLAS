@@ -41,6 +41,19 @@ uvlas_add_test(io.input_scalar_allocations
 uvlas_enable_allocation_audit(uvlas_test_io_input_scalar_allocations)
 uvlas_require_audited_dependencies(uvlas_test_io_input_scalar_allocations)
 
+uvlas_add_test(io.input_document
+    LABELS unit property negative verification
+    SOURCES io/input_document_test.cpp
+    LIBS uvlas_io Threads::Threads)
+target_include_directories(uvlas_test_io_input_document PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_add_test(io.input_document_resources
+    LABELS property negative verification
+    SOURCES io/input_document_resource_test.cpp
+    LIBS uvlas_io_audit uvlas::eigen)
+target_include_directories(uvlas_test_io_input_document_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_enable_allocation_audit(uvlas_test_io_input_document_resources)
+uvlas_require_audited_dependencies(uvlas_test_io_input_document_resources)
+
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
     add_test(NAME cli.${case}
         COMMAND "${CMAKE_COMMAND}"
@@ -74,6 +87,21 @@ uvlas_add_test(toolchain.pinned_dependencies
          nlohmann_json::nlohmann_json)
 target_compile_definitions(uvlas_test_toolchain_pinned_dependencies PRIVATE
     UVLAS_MANIFEST_PATH="${PROJECT_SOURCE_DIR}/vcpkg.json")
+
+# Isolate injected allocation failures from the test runner and exercise
+# optional-NRVO-disabled MSVC Debug paths through the installed JSON package.
+add_executable(uvlas_json_allocation_probe toolchain/json_allocation_probe.cpp)
+uvlas_configure_target(uvlas_json_allocation_probe)
+target_link_libraries(uvlas_json_allocation_probe PRIVATE nlohmann_json::nlohmann_json)
+if(MSVC)
+    target_compile_options(uvlas_json_allocation_probe PRIVATE /Zc:nrvo-)
+endif()
+add_test(NAME toolchain.json_allocation_exceptions
+    COMMAND "${Python3_EXECUTABLE}" -m tools.qa.json_allocation_probe_test
+        --probe "$<TARGET_FILE:uvlas_json_allocation_probe>")
+set_tests_properties(toolchain.json_allocation_exceptions PROPERTIES
+    TIMEOUT 180 LABELS "negative;verification"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" ENVIRONMENT "PYTHONUTF8=1")
 
 uvlas_add_test(toolchain.linear_algebra
     LABELS unit verification
@@ -141,6 +169,21 @@ target_include_directories(uvlas_test_aero_exact_triangle_resources
     PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_exact_triangle_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_exact_triangle_resources)
+
+uvlas_add_test(aero.geometry_snapshot
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/geometry_snapshot_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_geometry_snapshot
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_add_test(aero.geometry_snapshot_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/geometry_snapshot_resources_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_geometry_snapshot_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_geometry_snapshot_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_geometry_snapshot_resources)
 
 uvlas_add_test(core.checked_dimensions
     LABELS unit negative
@@ -267,6 +310,21 @@ uvlas_add_test(structure.exact_polynomial_resources
     LIBS uvlas_structure_audit)
 uvlas_enable_allocation_audit(uvlas_test_structure_exact_polynomial_resources)
 uvlas_require_audited_dependencies(uvlas_test_structure_exact_polynomial_resources)
+
+uvlas_add_test(structure.pg_graph
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_graph_test.cpp
+    LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_graph
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_graph PRIVATE
+    UVLAS_PG_GRAPH_FIXTURE=\"${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-graph-v1.json\")
+uvlas_add_test(structure.pg_graph_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_graph_resource_test.cpp
+    LIBS uvlas_structure_audit)
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_graph_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_graph_resources)
 
 uvlas_add_test(numerics.storage LABELS unit negative
     SOURCES numerics/storage_test.cpp LIBS uvlas_numerics)

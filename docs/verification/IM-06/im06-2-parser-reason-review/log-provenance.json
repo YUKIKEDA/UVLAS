@@ -1,0 +1,116 @@
+{
+  "schema": "uvlas.redacted-text/1",
+  "note": "Derived full captured text, not original raw bytes. Private originals are retained.",
+  "files": [
+    {
+      "entry": "safe-repro-build.log",
+      "raw_sha256": "53939a8d2f257e90cfdcba2512bdecd0e51c5bb99086e7b12fb07f537ad1df37",
+      "published_sha256": "34d8f9713b979eaa187780c0aac8820649da47cce2ff508c9a3c86ccf70304f7",
+      "raw_bytes": 1196,
+      "published_bytes": 1153,
+      "original_encoding": "UTF-8",
+      "account_replacements": 5,
+      "workspace_replacements": 5,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-repro-test.log",
+      "raw_sha256": "c11dd22d3da1ffbfa7f46da141b0d87558f8fd10bca877e3876688d3e684c2d0",
+      "published_sha256": "1ac6342c36861c3d20db12011792f172792ab490d0a993d3284073e850cf02c5",
+      "raw_bytes": 2579,
+      "published_bytes": 2489,
+      "original_encoding": "UTF-8",
+      "account_replacements": 12,
+      "workspace_replacements": 12,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-debug-build.log",
+      "raw_sha256": "ea6c6a3389171f90479e4d9946c42467e96bfb8554a9b2a1bc030981e7ed9429",
+      "published_sha256": "d07287395d631b892d0f5a24a134a1fc4f6d0ad3822996ae6b2035fd7ee252f9",
+      "raw_bytes": 1357,
+      "published_bytes": 1320,
+      "original_encoding": "UTF-8",
+      "account_replacements": 4,
+      "workspace_replacements": 4,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-debug-test.log",
+      "raw_sha256": "86c2fe8da0be68a9f04e4c2d8509d5dc72e5e0869cb44c02f169d0c3e73a9ad0",
+      "published_sha256": "a87119d58d2655d536e02de7bef76d3210798ef527918a35877fadec86f97cd8",
+      "raw_bytes": 2497,
+      "published_bytes": 2388,
+      "original_encoding": "UTF-8",
+      "account_replacements": 10,
+      "workspace_replacements": 10,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-release-build.log",
+      "raw_sha256": "8af96260b9d9e44e54ca0fc13f8d6cc622bb64b63c65e57d5752fd26df9f05fd",
+      "published_sha256": "01c6c68a65ec327f95cf18be0a76b27a0d9aa352d6c7b2d2aee65d6aeb1c8d20",
+      "raw_bytes": 1525,
+      "published_bytes": 1486,
+      "original_encoding": "UTF-8",
+      "account_replacements": 4,
+      "workspace_replacements": 4,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-release-test.log",
+      "raw_sha256": "6c3fcbe45b3cc2ab44f9be0d1c09fc4b16ccf17cdee32ef2d4fc9c4a30e88187",
+      "published_sha256": "6b8fc20b3c05c5e33734e7b328284604e09d5f74dd94e1b1da738cae6d70311e",
+      "raw_bytes": 2499,
+      "published_bytes": 2390,
+      "original_encoding": "UTF-8",
+      "account_replacements": 10,
+      "workspace_replacements": 10,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-tidy-source.log",
+      "raw_sha256": "55a88327ef299aecb91e8d9881c35886d36be8fc741ddaa1c8c5d78ff6b25901",
+      "published_sha256": "b1434a6daa0323f1ad3b8ee1873818407afd7181348a8a1578b6b7204b59e85f",
+      "raw_bytes": 27,
+      "published_bytes": 26,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-tidy-test.log",
+      "raw_sha256": "e37ffc7d34b47f7f3221a63bc7ac06368c6f613c3e5f5594c11c33219eec4ef6",
+      "published_sha256": "c34cbb554cbd2def0e9ffe9de05fcb64848702bad4b7fce6224fb4b090070be6",
+      "raw_bytes": 27,
+      "published_bytes": 26,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-japanese.log",
+      "raw_sha256": "a08d254fd3cbc49e50d24611c6cfbebbc299680ebf11b496273f5aa8c0211f0a",
+      "published_sha256": "8d4389b1b20f3edcd53d0be66d4ed66700ad372d78d45583254fcae0311e3a10",
+      "raw_bytes": 2365,
+      "published_bytes": 2260,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-build-info.json",
+      "raw_sha256": "5e40dea9a703b6feda573caacc1399e1aec5d5d26a0f06eb82dff9f58f08e1d4",
+      "published_sha256": "6f771b7b49cc3fdde459000e9489170efae450fddd6e6bdc86cad622de12920f",
+      "raw_bytes": 563,
+      "published_bytes": 544,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    }
+  ]
+}

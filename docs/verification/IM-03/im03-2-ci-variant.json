@@ -1,0 +1,140 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-2-ci-variant-correction",
+  "ids": [
+    "UI-D03",
+    "UI-D05",
+    "N4-03",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-03",
+  "issue": 95,
+  "pull_request": 102,
+  "date": "2026-11-17",
+  "source_commit": "47aafe77166d17f35be0d6295cd75e53da2f66b4",
+  "failure": {
+    "run": 44010772218,
+    "job": 133797072560,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44010772218/job/133797072560",
+    "head": "41a617720122ff446b1a5d658c9f26e33151a224",
+    "checkout_merge": "a831d1898b76a05a0d9257da5b132f3a00c7ce35",
+    "configuration": "GCC14 Release -O3 -Werror=maybe-uninitialized",
+    "stage": "geometry_snapshot.cpp:948 compile、数値CTest未到達。",
+    "cause": "nested variantのFreeStorage一時代入をinlineしたlibstdc++ operator=が未初期化の可能性を診断。実際の未初期化動作が起きたと断定せず、入力全語と選択alternativeの構築を確認した。"
+  },
+  "change": {
+    "production": "FreeSingle/FreeDoubleの2代入を、内外alternativeのemplace/in_place_type直接構築へ変更。3語/6語の順序・有限性検査・精度保持・数値式・予算は不変。警告を抑制せず、無意味なdefault値も足さない。",
+    "regression": "両word alternativeの元語/kind/NoMaterialSupportを固定期待と比較。TW lowを含む高さの距離二乗を独立cpp_rationalから照合する1case。",
+    "similar_search": "src/aeroのFreeStorage一時代入は当該2箇所のみ。他のVertex/Edge/Face代入はこのFreeStorage一時値を使わない。",
+    "lesson": "既存cpp規則へ、全入力とactive alternative初期化の確認後、直接構築と対象最適化構成を確認する限定例を追加。"
+  },
+  "verification": {
+    "platform": "Windows x64 MSVC19.51 /fp:strict /W4 /WX",
+    "clean_source": true,
+    "release_ctest": {
+      "passed": 2,
+      "selected": 2,
+      "normal_cases": 13,
+      "normal_assertions": 344,
+      "resource_cases": 1,
+      "resource_assertions": 30
+    },
+    "static": "変更source/testのclang-tidy21.1.1 exit0、clang-format21.1.2対象2file exit0。",
+    "japanese": "cpp全体のquick lintは反復11・既存訳調1の計12findings。追加段落の反復1は日付付き訂正例の共通文体として維持し、他の新規指摘はない。rootが規則文を独立通読し、追加findingなし。",
+    "linux": "修正版のGCC14 -O3はローカル未確認。WSLはGCC11.4のみでGCC14なし。導入せず、新headの既存CIへ確認を委ね、CI完了待ちは行わない。",
+    "not_repeated": "Debug、旧A0の3tests、旧5変異、他module、全体suite、工程計測は反復しない。意味が変わらないvariant構築の訂正としてRelease新2targetsに限定。",
+    "trace": "matrix再生成/check済み。208定義ID、31 IDがtest、33 IDがrecordで追跡され、問題0。",
+    "independent_review": "rootが2emplace、FreeSingle/FreeDoubleの元語保存とexact距離対照、cpp規則を独立通読し、未解決findingなし。",
+    "integrity": "current source3/artifact10をcheckerで確認、14files/1manifest/errors0。旧recordは非再帰参照。"
+  },
+  "historical_evidence": "旧im03-2.jsonと旧ZIP/log/source hashは上書きしない。旧数学検証source cd4777a、今回実行source47aafeを分ける。旧記録はartifactsとして非再帰参照する。",
+  "claimed_state": "このC++構築訂正と両word alternativeのWindows対象確認まで。修正後Linux成功、数値/実験/製品規模性能/実務受入を追加主張しない。",
+  "pending": [],
+  "sources": {
+    "src/aero/geometry_snapshot.cpp": "bf54bb1f7eb17d7851b9ed12f547209a577a75e590b553df29d59fd28ec9f9f1",
+    "tests/aero/geometry_snapshot_test.cpp": "818f909fb5c0ca95ffe6a0dee0e29e1c1f0eb7ae3b58b2fff44f627edb741b05",
+    ".cursor/rules/cpp.mdc": "94fb30f69e9fe5b0d3b8fe9e7760202904ce7525434f4a2b601c9b8aacbb4a10"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/im03-2-ci-variant/format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-03/im03-2-ci-variant/git-revision.hpp": "bfc58a4ea5960a975d76f11d4575be247f1c52b464300ad8f0f6f967fd0fbc46",
+    "docs/verification/IM-03/im03-2-ci-variant/japanese-lint.log": "044a064600613d5c4ba90d5fa1871a245d806cc6aa642a8ad82fee24b3db989f",
+    "docs/verification/IM-03/im03-2-ci-variant/linux-release-excerpt.log": "4e46d29a2e085a7b0f9631004828f0a04982bde03c9c1ef7cac62e1d49cf52c5",
+    "docs/verification/IM-03/im03-2-ci-variant/publication.json": "207d224bfd2c5904238bace967e63290043ae0e3b6f22b9534670737853c2982",
+    "docs/verification/IM-03/im03-2-ci-variant/release-build.log": "67d990da7774ea0de9f0033a14d06df61ee4ae04eb25e049f28140d9406784e9",
+    "docs/verification/IM-03/im03-2-ci-variant/release-ctest.log": "72852811c7ce37a2a4a9d3168c2bf766826960d2186bfa76d7cc63d740aecd73",
+    "docs/verification/IM-03/im03-2-ci-variant/release-raw.log": "26dbffb565f4a9296054691510f9a02f26fbb15fd1be81c6d4dbd059407997ee",
+    "docs/verification/IM-03/im03-2-ci-variant/tidy.log": "6c6333324fc5d9ab32cae5fd9b2a316e97ca2cc4d3a317007323181f2461c739",
+    "docs/verification/IM-03/im03-2.json": "45459deae124ba72b8c8ba45708f1271ece25f3b7e259503310007b539e58286"
+  },
+  "source_references": [
+    {
+      "id": "im03-2-ci-variant-source-1",
+      "sha256": "bf54bb1f7eb17d7851b9ed12f547209a577a75e590b553df29d59fd28ec9f9f1",
+      "hint": "src/aero/geometry_snapshot.cpp"
+    },
+    {
+      "id": "im03-2-ci-variant-source-2",
+      "sha256": "818f909fb5c0ca95ffe6a0dee0e29e1c1f0eb7ae3b58b2fff44f627edb741b05",
+      "hint": "tests/aero/geometry_snapshot_test.cpp"
+    },
+    {
+      "id": "im03-2-ci-variant-source-3",
+      "sha256": "94fb30f69e9fe5b0d3b8fe9e7760202904ce7525434f4a2b601c9b8aacbb4a10",
+      "hint": ".cursor/rules/cpp.mdc"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im03-2-ci-variant-artifact-1",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/format.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-2",
+      "sha256": "bfc58a4ea5960a975d76f11d4575be247f1c52b464300ad8f0f6f967fd0fbc46",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/git-revision.hpp"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-3",
+      "sha256": "044a064600613d5c4ba90d5fa1871a245d806cc6aa642a8ad82fee24b3db989f",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/japanese-lint.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-4",
+      "sha256": "4e46d29a2e085a7b0f9631004828f0a04982bde03c9c1ef7cac62e1d49cf52c5",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/linux-release-excerpt.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-5",
+      "sha256": "207d224bfd2c5904238bace967e63290043ae0e3b6f22b9534670737853c2982",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/publication.json"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-6",
+      "sha256": "67d990da7774ea0de9f0033a14d06df61ee4ae04eb25e049f28140d9406784e9",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/release-build.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-7",
+      "sha256": "72852811c7ce37a2a4a9d3168c2bf766826960d2186bfa76d7cc63d740aecd73",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/release-ctest.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-8",
+      "sha256": "26dbffb565f4a9296054691510f9a02f26fbb15fd1be81c6d4dbd059407997ee",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/release-raw.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-9",
+      "sha256": "6c6333324fc5d9ab32cae5fd9b2a316e97ca2cc4d3a317007323181f2461c739",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant/tidy.log"
+    },
+    {
+      "id": "im03-2-ci-variant-artifact-10",
+      "sha256": "45459deae124ba72b8c8ba45708f1271ece25f3b7e259503310007b539e58286",
+      "hint": "docs/verification/IM-03/im03-2.json"
+    }
+  ]
+}

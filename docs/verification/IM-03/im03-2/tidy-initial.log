@@ -1,0 +1,51 @@
+[1/4] Processing file <workspace>\src\aero\exact_triangle_predicates.cpp.
+59680 warnings generated.
+[2/4] Processing file <workspace>\src\aero\geometry_snapshot.cpp.
+119480 warnings generated.
+[3/4] Processing file <workspace>\tests\aero\geometry_snapshot_test.cpp.
+182522 warnings generated.
+[4/4] Processing file <workspace>\tests\aero\geometry_snapshot_resources_test.cpp.
+245031 warnings generated.
+<workspace>\src\aero\geometry_snapshot.cpp:131:39: error: parameter 's' is passed by value and only copied once; consider moving it to avoid unnecessary copies [performance-unnecessary-value-param,-warnings-as-errors]
+  131 |         : limits(l), context(c), stop(s) {}
+      |                                       ^
+      |                                       std::move( )
+<workspace>\src\aero\geometry_snapshot.cpp:1186:68: error: parameter 'stop' is passed by value and only copied once; consider moving it to avoid unnecessary copies [performance-unnecessary-value-param,-warnings-as-errors]
+ 1186 |     return GeometryEngine::prepare(input, limits, workspace, plan, stop);
+      |                                                                    ^   
+      |                                                                    std::move( )
+<workspace>\src\aero\geometry_snapshot.cpp:1192:88: error: parameter 'stop' is passed by value and only copied once; consider moving it to avoid unnecessary copies [performance-unnecessary-value-param,-warnings-as-errors]
+ 1192 |     return GeometryEngine::resolve(geometry, query, expected, limits, workspace, plan, stop);
+      |                                                                                        ^   
+      |                                                                                        std::move( )
+<workspace>\src\aero\geometry_snapshot.cpp:1198:87: error: parameter 'stop' is passed by value and only copied once; consider moving it to avoid unnecessary copies [performance-unnecessary-value-param,-warnings-as-errors]
+ 1198 |     return GeometryEngine::classify(geometry, query, target, limits, workspace, plan, stop);
+      |                                                                                       ^   
+      |                                                                                       std::move( )
+<workspace>\tests\aero\geometry_snapshot_test.cpp:45:44: error: std::move of the variable 'd' of the trivially-copyable type 'QueryDefinition' (aka 'variant<FreePoint, SourceVertex, SourceEdgePoint, SourceFacePoint>') has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+   45 |         take(resolve_query(g, {QueryId{0}, std::move(d)}, g.context(), limits(), w, plan));
+      |                                            ^~~~~~~~~~ ~
+<workspace>\tests\aero\geometry_snapshot_test.cpp:84:5: error: variable 'fixture' of type 'TriangleFixture' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+   84 |     TriangleFixture fixture;
+      |     ^
+      |                     const 
+<workspace>\tests\aero\geometry_snapshot_test.cpp:377:5: error: variable 'fixture' of type 'TriangleFixture' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  377 |     TriangleFixture fixture;
+      |     ^
+      |                     const 
+<workspace>\tests\aero\geometry_snapshot_test.cpp:411:17: error: 'g' used after it was moved [bugprone-use-after-move,-warnings-as-errors]
+  411 |     CHECK_FALSE(g.active());
+      |                 ^
+<workspace>\tests\aero\geometry_snapshot_test.cpp:410:18: note: move occurred here
+  410 |     auto moved = std::move(g);
+      |                  ^
+<workspace>\tests\aero\geometry_snapshot_test.cpp:416:17: error: 'q' used after it was moved [bugprone-use-after-move,-warnings-as-errors]
+  416 |     CHECK_FALSE(q.active());
+      |                 ^
+<workspace>\tests\aero\geometry_snapshot_test.cpp:415:24: note: move occurred here
+  415 |     auto moved_query = std::move(q);
+      |                        ^
+<workspace>\tests\aero\geometry_snapshot_test.cpp:482:9: error: variable 'f' of type 'TriangleFixture' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  482 |         TriangleFixture f;
+      |         ^
+      |                         const 

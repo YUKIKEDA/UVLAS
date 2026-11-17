@@ -1,0 +1,159 @@
+{
+  "schema": "uvlas.redacted-artifacts/1",
+  "reason": "個人path伏字・UTF8/LF公開copy。原rawと旧2記録は不変。",
+  "entries": [
+    {
+      "id": "linux-release-excerpt.log",
+      "original_sha256": "46f5ffadd533d8c787804f53ec9d48ce3f6b8b70b32c945209fc14224577c801",
+      "published_sha256": "46f5ffadd533d8c787804f53ec9d48ce3f6b8b70b32c945209fc14224577c801",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "release-build.log",
+      "original_sha256": "5dc6116d6ecfafbbe52f52985ccaa148d1eb5dd46157b428eb6023b5a588c4eb",
+      "published_sha256": "71615b0ccd5ec9d3ced426f0d4b50bd0f73e484f4fc54a03adccff4d65704828",
+      "redactions": 4,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "release-ctest.log",
+      "original_sha256": "b0ecb5175d82075e2b46edd64242ac3d34bc1828772196999a623cbbb42d21ea",
+      "published_sha256": "762765441aeec136a8920e664e4b550f7b2d00c1ca21ab7be482d1d4577f3095",
+      "redactions": 2,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "release-raw.log",
+      "original_sha256": "e41b6d4437189e44662622a1888a48ffef1aa90bb72152cf2cf4861dacc4cbdb",
+      "published_sha256": "ed2add03852bb0bd97414f4bfac46be5323bd0552ad5ce17e2b495df26a50e39",
+      "redactions": 4,
+      "original_encoding": "cp932",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "tidy.log",
+      "original_sha256": "afa30e304f546413b198d206cc499a29c26b4084de3a11507f85ff976d3a97c7",
+      "published_sha256": "317d9b13cfd450ce85d38b783ec4a0a0df58111cd1be97d0c6555e3cfd033edd",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "format.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "git-revision.hpp",
+      "original_sha256": "5d314b90baec338b0abb595f48e69825ff371229e881bf740aca4c4fd320e5dd",
+      "published_sha256": "d50eb788c34d3a4d02e8d7f518723aabbe7a696e1c91af42cfc81a9869ffc6a4",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "gcc-version.txt",
+      "original_sha256": "9eaf9b7f4b11c2e84e2478c2ceb0e4f48f4ba88565bcfc832b3bce49847dda6d",
+      "published_sha256": "9eaf9b7f4b11c2e84e2478c2ceb0e4f48f4ba88565bcfc832b3bce49847dda6d",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "nested-compile.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "flat-compile.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "nested-layout.log",
+      "original_sha256": "55ebb5d1fed797231f4ffc5cbda7694f5e28c71a060112faf9eea4b4030b036e",
+      "published_sha256": "55ebb5d1fed797231f4ffc5cbda7694f5e28c71a060112faf9eea4b4030b036e",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "flat-layout.log",
+      "original_sha256": "df362724e332b45f0ad422ca0a8ca57628f10785ab83461807c8990828d13f7a",
+      "published_sha256": "df362724e332b45f0ad422ca0a8ca57628f10785ab83461807c8990828d13f7a",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "nested-probe.cpp",
+      "original_sha256": "fd402ace7298b39e4f419832b95a2a3a21b72dc429de9521a682b26a4cd19050",
+      "published_sha256": "fd402ace7298b39e4f419832b95a2a3a21b72dc429de9521a682b26a4cd19050",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "flat-probe.cpp",
+      "original_sha256": "b2bada42b4277991ec5163686d609f6051904f247f1f4f85be95f2ea119d1be9",
+      "published_sha256": "b2bada42b4277991ec5163686d609f6051904f247f1f4f85be95f2ea119d1be9",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "make-layout.py",
+      "original_sha256": "4066cc55b959796094ec3ca93eda0f1a915c132ba89df534d08f448795856666",
+      "published_sha256": "fa0abad1eb5c114a459d1c1729158602af3861c18db64d0266b3f5fc1adde6b8",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "japanese-cpp.log",
+      "original_sha256": "cfe07704f80d910becdbd9b40b2b27ff644c90b3ffa60b5deaec4d1537e055e4",
+      "published_sha256": "efd78d89c6c16271a845a47083ad07d5c9fea56615d1480277929fd2ba68c6c7",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "japanese-contract.log",
+      "original_sha256": "f01399eadfe3197173769bbb6f8acc6c42e265a21d316117d0132efe2936433a",
+      "published_sha256": "fbb5849f5fbef9f94e63837581614ad7897999b671d236514ec8ceebd9a4f956",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+Internal ctest changing into directory: <WORKTREE>/out/issue94-build
+UpdateCTestConfiguration  from :<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+Parse Config file:<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+Parse Config file:<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+Test project <WORKTREE>/out/issue94-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 42
+    Start 42: structure.pg_graph
+
+42: Test command: <WORKTREE>\out\issue94-build\tests\Release\uvlas_test_structure_pg_graph.exe
+42: Working Directory: <WORKTREE>/out/issue94-build/tests
+42: Test timeout computed to be: 60
+42: Randomness seeded to: 1391415724
+42: ===============================================================================
+42: All tests passed (5303 assertions in 10 test cases)
+42:
+1/2 Test #42: structure.pg_graph ...............   Passed    0.06 sec
+test 43
+    Start 43: structure.pg_graph_resources
+
+43: Test command: <WORKTREE>\out\issue94-build\tests\Release\uvlas_test_structure_pg_graph_resources.exe
+43: Working Directory: <WORKTREE>/out/issue94-build/tests
+43: Test timeout computed to be: 60
+43: Randomness seeded to: 1361862758
+43: ===============================================================================
+43: All tests passed (21 assertions in 1 test case)
+43:
+2/2 Test #43: structure.pg_graph_resources .....   Passed    0.04 sec
+
+The following tests passed:
+	structure.pg_graph
+	structure.pg_graph_resources
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-PG            =   0.11 sec*proc (2 tests)
+negative        =   0.11 sec*proc (2 tests)
+property        =   0.11 sec*proc (2 tests)
+unit            =   0.06 sec*proc (1 test)
+verification    =   0.11 sec*proc (2 tests)
+
+Total Test time (real) =   0.11 sec

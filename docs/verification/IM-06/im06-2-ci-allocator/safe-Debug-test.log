@@ -1,0 +1,49 @@
+Internal ctest changing into directory: C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build
+UpdateCTestConfiguration  from :C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/DartConfiguration.tcl
+Parse Config file:C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/DartConfiguration.tcl
+Parse Config file:C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/DartConfiguration.tcl
+Test project C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 3
+    Start 3: io.input_document
+
+3: Test command: C:\Users\ACCOUNT\.codex\worktrees\IO_WORKTREE\UVLAS\out\issue93-build\tests\Debug\uvlas_test_io_input_document.exe
+3: Working Directory: C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/tests
+3: Test timeout computed to be: 60
+3: Randomness seeded to: 1737874008
+3: ===============================================================================
+3: All tests passed (636 assertions in 10 test cases)
+3: 
+1/2 Test #3: io.input_document ................   Passed    0.04 sec
+test 4
+    Start 4: io.input_document_resources
+
+4: Test command: C:\Users\ACCOUNT\.codex\worktrees\IO_WORKTREE\UVLAS\out\issue93-build\tests\Debug\uvlas_test_io_input_document_resources.exe
+4: Working Directory: C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/tests
+4: Test timeout computed to be: 60
+4: Randomness seeded to: 2190415550
+4: input-document actual C++new fault sites=22
+4: ===============================================================================
+4: All tests passed (499 assertions in 4 test cases)
+4: 
+2/2 Test #4: io.input_document_resources ......   Passed    0.06 sec
+
+The following tests passed:
+	io.input_document
+	io.input_document_resources
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+negative        =   0.10 sec*proc (2 tests)
+property        =   0.10 sec*proc (2 tests)
+unit            =   0.04 sec*proc (1 test)
+verification    =   0.10 sec*proc (2 tests)
+
+Total Test time (real) =   0.11 sec

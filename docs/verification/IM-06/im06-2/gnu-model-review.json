@@ -1,0 +1,28 @@
+{
+  "schema": "uvlas.parser-model-review/1",
+  "date": "2026-11-17",
+  "environment_job": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44008552697/job/133789790410",
+  "environment_commit": "77f690414088ae2006442a4e289bb776d22cd27d",
+  "environment_time_utc": "2026-11-17T03:13:21Z",
+  "package": "libstdc++-14-dev 14.2.0-4ubuntu2~24.04.1 amd64",
+  "package_url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-14/libstdc++-14-dev_14.2.0-4ubuntu2~24.04.1_amd64.deb",
+  "package_sha256": "6d223262b8cbe6d5150435056d58dffa8159d8582fc0df47fb45ea550cd37424",
+  "primary_header_sha256": "a5e4a8743d833591f6809d5d2bdb9998f7f681c1248a5e2c49623676d29ab4ea",
+  "ubuntu_header_sha256": "7abd919ef3579f6199fb87981f80239e25ec57bc0f80e16e0ca792d44bb14f29",
+  "other_headers_identical_to_primary": [
+    "stl_vector.h",
+    "vector.tcc",
+    "basic_string.tcc",
+    "cow_string.h"
+  ],
+  "differences": [
+    "The _Bvector_impl default constructor additionally guards its requires clause by __glibcxx_type_trait_variable_templates.",
+    "The allocator-taking _Bvector_base constructor makes conversion to _Bit_alloc_type explicit before _M_impl construction."
+  ],
+  "assessment": "The parser uses std::allocator<bool>; the explicit conversion selects the same rebound word allocator. No changes in word rounding, storage layout, _M_check_len growth or allocation/deallocation. Vbool(d)=3*ceil(d/64)*8 and memory model revision 1 remain unchanged.",
+  "accepted_revisions": [
+    20240801,
+    20240908
+  ],
+  "not_claimed": "No IO93 Linux test or sanitizer execution; no new environment installation. Windows tests retain their original source snapshot; only preprocessing was compared."
+}

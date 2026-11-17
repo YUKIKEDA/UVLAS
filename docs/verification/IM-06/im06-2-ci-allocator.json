@@ -1,0 +1,116 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-2-ci-allocator",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-03",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 93,
+  "pr": 104,
+  "date": "2026-11-17",
+  "source_commit": "eca669b0e56ab76e09155c42faec33a85c5e824b",
+  "scope": "IO文書fault TUの置換new/deleteを対応させ、注入をbad_allocだけへ限定するCI修正。製品のevent optionalは局所copyを検査して同じ値を返す。例外の抑制、架空event、物理/数値方式の変更ではない。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "observed_ci_failures": {
+    "head": "cfa224e",
+    "run": 44028567363,
+    "sanitizer_job": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44028567363/job/133854829954",
+    "sanitizer_failure": "Catch2 stable_sortの一時bufferが未置換のnothrow operator newで確保され、custom sized deleteのfreeへ渡されてASan alloc-dealloc-mismatch(operator new vs free)。",
+    "debug_tidy_job": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44028567363/job/133854829859",
+    "debug_tidy_failure": "製品context eventのoptional直接逆参照2箇所と、global newからのNonstandardException注入がlibstdc++のnoexcept string move/to_string等へ届く経路3件を検出。"
+  },
+  "changes": {
+    "allocator": "通常/配列/nothrow/aligned、unsized/sizedと失敗時deleteの全20形式を同じallocator familyで組み合わせた。通常はmalloc/free、Windows alignedは_aligned_malloc/_aligned_free、GNU alignedは丸上げしたaligned_alloc/free。nothrowはbad_allocをnullへ変換する。",
+    "faults": "global newからForeignException/NonstandardExceptionを投げる注入と該当8assertを削除。置換入口の標準OOMだけを注入する。任意例外をnoexcept標準lib内部へ投げ込むことでguard全体を証明したとはしない。",
+    "controls": "16対応routeで全形式の成功、要求byteへの書込み、aligned条件、1回課金、throw-vs-nullと対応する解放を確認する。libstdc++型のnothrow new→normal sized deleteの組も明示。zero byteも含め122assert。",
+    "event": "current_event()がcontext_.eventをconst local optionalへcopyし、その同じ値を検査して返す。不在は既存noreturn impossibleへ進み、ID0や割当を追加しない。",
+    "rules": "cpp規則へhelper越しのoptional使用時の局所検査、testing規則へ全割当形式/ASan/注入例外の限定を記録した。"
+  },
+  "verification": {
+    "environment": "Windows11 x64 / MSVC19.51.36260 / C++23 preview / fp:strict / WX",
+    "clean_source": true,
+    "Debug": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "regular_cases": 10,
+      "regular_assertions": 636,
+      "resource_cases": 4,
+      "resource_assertions": 499
+    },
+    "Release": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "regular_cases": 10,
+      "regular_assertions": 636,
+      "resource_cases": 4,
+      "resource_assertions": 435
+    },
+    "build_info": "各構成の最小CLI実binaryがeca669b/uncommitted_changes:false/repair1を自己出力した。試験exe自体の自己出力ではない。",
+    "static": "source TUとresource TUのclang-tidy21.1.1はexit0。抑制されたsystem header警告があり、全warning数0とは呼ばない。両C++ sourceのclang-format21.1.2確認済み。resourceの局所NOLINTはstd::alignが要求するvoid*&型の説明だけであり、例外escape診断は抑制していない。",
+    "root_review": "担当がrootのcurrent_event実装とcpp/testing規則を独立読了し、追加の具体的欠陥なし。新記録の本文・公開artifact一覧はrootが独立に読み、対象source、構成別件数、限定ASan対照と未実行範囲の区別を確認した。",
+    "trace": "matrix/checkを実行。208 IDs、試験あり32、記録あり34、0 problems。",
+    "not_repeated": "未変更の全C++/core guard/物理/Python/R&D suite、旧変異、計測を反復していない。製品Linux/GCC14/sanitizerのこの修正sourceは未実行・未確認。"
+  },
+  "limited_asan_control": {
+    "environment": "既存WSL Ubuntu / g++-11 (Ubuntu 11.4.0-1ubuntu1~22.04.3)11.4.0",
+    "compile_flags": "-std=c++20 -Wall -Wextra -Werror -g -fsanitize=address -fno-omit-frame-pointer",
+    "runtime_options": "ASAN_OPTIONS=alloc_dealloc_mismatch=1",
+    "scope": "実fault TUからallocation preambleをbyte抽出したstandalone。実Catch2のstable_sortや製品IOをGCC11で実行したものではない。新旧に同じ手書きnothrow new→sized deleteと、実testの122check routeを付けた。",
+    "old_compile_exit": 0,
+    "old_run_exit": 1,
+    "old_failure": "alloc-dealloc-mismatch (operator new vs free)",
+    "new_compile_exit": 0,
+    "new_run_exit": 0,
+    "new_checks": 122,
+    "source_bridge": "ASan実行時TUはf5a1877b。最終TU4bf972b1との差はstd::align用の説明comment1行だけ。実preamble SHA609bd035はbyte不変。新recordのfinal-resource-bridge.jsonとasan-inputs.jsonに元/最終/standalone/binary hashを保存した。",
+    "not_claimed": "製品Linux/GCC14全体のsanitizer合格や、全malloc経路・CRT allocationの注入ではない。"
+  },
+  "existing_guard_reference": {
+    "path": "tests/core/failure_test.cpp",
+    "sha256": "1a2318394bf5c3c25e97fe855fa0c92f2334692a92b4ba494333700150d7980f",
+    "case": "entry guard translates allocation standard and nonstandard exceptions",
+    "scope": "callable境界でbad_alloc/runtime_error/整数17をthrowし、guardの値Failure翻訳とcontext保持を検査する既存source。今回再実行せず、IO global new注入の代替実行結果とも呼ばない。"
+  },
+  "historical_records": {
+    "docs/verification/IM-06/im06-1.json": "f836d708aeedb31caad134b42533d85d844d206c34d03d94249444f6bb2957b4",
+    "docs/verification/IM-06/im06-2-parser-allocation-repair.json": "888777afa06464815f12c37ddb9abcccb4a0efda73d92d46c2eff52f1b2c1f27",
+    "docs/verification/IM-06/im06-2-parser-reason-review.json": "5fc9f1bf29fa96b29b50244dc181b424f4dec8fd1cff07e7a2a1b4c7004f04b7",
+    "docs/verification/IM-06/im06-2.json": "2fa2c78153cbc444422564c164ebac892f77368df96d6b3b216be38b35fd1807"
+  },
+  "historical_scope": "旧記録/log/ZIPは変更せず、旧source-mapを現在sourceへ付替えない。新CI失敗と訂正はこの追補だけへ記録する。",
+  "sources": {
+    "src/io/input_document.cpp": "a1d13d34cfe75e1817096f469e4af9878f8b99e0a8e8fe63a4f4e03e6a07f3ec",
+    "tests/io/input_document_resource_test.cpp": "4bf972b19217487354272b328dc89ccf7be583f35b78af80b7f5f7088e177b4c",
+    ".cursor/rules/cpp.mdc": "1858c73d298e8b56ee3b5ff044a71229ae9e9db6ba73151738d0b6e34255d5b7",
+    ".cursor/rules/testing.mdc": "3e5f2ffea412f121c7356477457ccb12ca8a156903e1a3b21fab143492e22514"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-2-ci-allocator/asan-inputs.json": "ac3d2f0fb9807a74559dffbd59acf4ad73b609b809d18b9b846d0771eeb3f235",
+    "docs/verification/IM-06/im06-2-ci-allocator/final-resource-bridge.json": "7d9c978d10828aa0ad44b49b18a695772350a3056962ea12d99204a3b8312c4d",
+    "docs/verification/IM-06/im06-2-ci-allocator/log-provenance.json": "f125955d66445a6e0b03acf12477dbfd9e036db66d8dcb90aac44e311467856b",
+    "docs/verification/IM-06/im06-2-ci-allocator/make_asan_probe.py": "c00e614215d56e4e036681be9fd31da2f1da20ad181e448cb137abede5b118da",
+    "docs/verification/IM-06/im06-2-ci-allocator/new-asan.cpp": "0bf560705747031a0aa1f336b7101e2cba59cde99d1474df09f46b131d7cc29b",
+    "docs/verification/IM-06/im06-2-ci-allocator/old-asan.cpp": "8c2bcf3a0612bb3386a309b10dbe1b8e68b7ad42ad197b7d834fcf9e55f928af",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-Debug-build-info.json": "834d7b05f2d40e435329a57b8f6a986ac3171006a8e8eb7b6985cd609f3cf912",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-Debug-build.log": "ff0081e833cd2b88c8447c0e11e42038dfbf5d5eab0cc22e9fad06d13b6119ae",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-Debug-test.log": "fde777c3c14c590008cb6c257a103cd1bbb5c4edd0eff76d2d71761c43be57e3",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-new-asan.log": "e33c5767d9de1584eecc47b4b15650bf5983876d5d0b346fe4a9551cba42a778",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-new-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-old-asan.log": "8050412b67529502b5ab60f0f166417eade2d039bd183404838fbf833cb39b79",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-old-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-Release-build-info.json": "73f32c315b342716cb18dd853a107c78dd33a827ad49d02570e088b8edc743c2",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-Release-build.log": "97e496438a3c6c45d36fc5e055ec91965c9ca03c1f688d3e2d51462942d909ab",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-Release-test.log": "adc4df86f5075bdc24589439369dd7d330d4eec7e95e96dbdd698e29b617dbb6",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-tidy-resource.log": "e45b4fb83fe8e873432e8a76afacc1df84818a65cef6a4bf47da1146220904ad",
+    "docs/verification/IM-06/im06-2-ci-allocator/safe-tidy-source.log": "b1434a6daa0323f1ad3b8ee1873818407afd7181348a8a1578b6b7204b59e85f"
+  }
+}

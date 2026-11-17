@@ -1,0 +1,233 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-2-review-canonical-diagnostic-order",
+  "ids": [
+    "UI-D01",
+    "UI-D05",
+    "UI-D06",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-03",
+  "issue": 95,
+  "pull_request": 102,
+  "date": "2026-11-17",
+  "source_commit": "79e8ecda01f97b8785fd84f6cdb3e09cd792181a",
+  "review": {
+    "comment_id": 4595739594,
+    "url": "https://github.com/YUKIKEDA/UVLAS/pull/102#discussion_r4595739594",
+    "head": "b0fd950ae5561a3b8efd724fcc644597748b148a",
+    "finding": "sorted lookupを持つ一方でtriangle/quad接続が元配列順であり、複数の不正参照から返すproblemが契約順でなかった。",
+    "reproduction": "旧head製品sourceに新literalだけ追加してRelease compile0→Catch42。1case/6assert中1fail。原sourceとgit showのhash一致を別artifactで照合。"
+  },
+  "correction": {
+    "connections": "既存facet_lookupを種別でfilterし、独立triangle→quad展開子の順、各表でFacetId/元ordinal順に検査する。保存配列・元ordinal・quad half・固定splitは変えない。",
+    "similar_findings": "有限性passもinput順だったため、参照/現在を合わせた点表の最小(PointId,ordinal)を全走査で選ぶ。既存alias/edge/physical-face/duplicate lookupと非退化の展開facet順は適合していた。これらも複数不備の入替え対照で固定。",
+    "control_priority": "設定済取消を先に確認し、checked6N scalarの残step予算を事前比較。比較自体は課金せず、実訪問scalarごとの1stepは維持。TW両語も1scalar。未完了passの制御失敗にはcanonical problemを推測して入れない。",
+    "metadata_priority": "点の非有限→time→radiusを維持。非退化段は単一展開facet表のID順、各facetで参照→現在。補足へ段とキー/制御優先を明記し、testing規則へ複数不備の並べ替え回帰を追記。",
+    "scope": "数学式、exact単位/bit容量、所有payload、公開APIと各sourceの元表現は不変。追加可変長配列や新依存はない。"
+  },
+  "fixed_regressions": [
+    "Facet90/10の同じ未解決Face999を両入力順で与え、Facet10を固定。",
+    "複数quadのhalf1に最小Facet10を置き、全子ID順とtriangle種別の優先を検査。正常な固定split/LRも両行順で保持。",
+    "Point90の参照NaNとPoint10の現在low infinity、metadata非有限を同時に与え、両行順でPoint10。17step拒否/18step等号、設定済取消優先、Plan0・空problemを照合。",
+    "alias/edge/face/非退化の複数不備を両行順で与え、typed IDとcodeを固定。"
+  ],
+  "verification": {
+    "platform": "Windows x64 MSVC19.51 /fp:strict /W4 /WX",
+    "clean_source": true,
+    "Debug": {
+      "passed": 2,
+      "selected": 2,
+      "regular_cases": 17,
+      "regular_assertions": 418,
+      "resource_cases": 1,
+      "resource_assertions": 30
+    },
+    "Release": {
+      "passed": 2,
+      "selected": 2,
+      "regular_cases": 17,
+      "regular_assertions": 418,
+      "resource_cases": 1,
+      "resource_assertions": 30
+    },
+    "static": "変更source/test TUの最終clang-tidy21.1.1 exit0、clang-format21.1.2対象2file exit0。",
+    "japanese": "補足quick lintは術語TTRinfo1、testing規則findings0。rootがsource/4追加cases/補足/規則を独立読了し追加製品findingなし。",
+    "cancellation_boundary": "設定済取消とwhole-pass予算拒否は実行した。走査途中取消は各step guardとcanonical選定前のreturnをsource通読で確認し、特定の途中時刻を誘導した実行とは主張しない。",
+    "not_repeated": "旧A0 3tests、旧5変異、他module、全体suite、工程計測、R&Dを再実行しない。新Linux結果を待たず、過去Linux成功をこの版へ付替えない。",
+    "trace": "matrix/check済み。208定義ID、31 IDにtest、33 IDにrecord、問題0。",
+    "integrity": "新recordをcurrent byte checkerで照合し26files/1manifest/errors0。rootが本文と版/主張境界を独立通読し、追加findingなし。"
+  },
+  "historical_source_references": [
+    {
+      "id": "im03-2-order-reviewed-source",
+      "historical_commit": "b0fd950ae5561a3b8efd724fcc644597748b148a",
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "sha256": "83fa606f19aa643da0dd215a893029e02fa3bce3780cb3cef3eeecb943c21768"
+    }
+  ],
+  "historical_evidence": "旧3record/ZIP/log/hashは不変。旧記録はartifactとして非再帰参照し、今回source79e8と区別。",
+  "claimed_state": "ID順の失敗選定と影響する所有geometry製品経路の対象確認。新しい数学/物理資格・性能の主張はない。",
+  "pending": [],
+  "sources": {
+    "src/aero/geometry_snapshot.cpp": "0cd1fe4a7f15884541150b79c1cfd23aefe646e24551f1f4bac7e945c1f07999",
+    "tests/aero/geometry_snapshot_test.cpp": "45c0a9e116ec419609b4c61ff4da8ff1f1d9751c7edd4e8b35b95135f09891d4",
+    "tests/aero/geometry_snapshot_fixture.hpp": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+    "docs/specs/aero/owned-geometry-query-contract.md": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3",
+    ".cursor/rules/testing.mdc": "187e7c5eeecbe1fefcbf0c14da0d1a5eb7920e5710e2c948bc61653e91d8658a"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/im03-2-review-order/build-config.hpp": "e36c58cbddb7adc53ed5c0be17729339f39d8e1dbb8a79aa855bba8e67f47214",
+    "docs/verification/IM-03/im03-2-review-order/Debug-build.log": "010cfa6c0f4092fb00c5cc32188cf8e73b0887fb11bc0d99d010ceee713f5c58",
+    "docs/verification/IM-03/im03-2-review-order/Debug-ctest.log": "f0cfd6d95eafef32aa981873f1044609b731fa1b31177c7b19efcd2706fb070e",
+    "docs/verification/IM-03/im03-2-review-order/Debug-raw.log": "8ca4e2a28403c00bb7aa3380d971c8727a99c423a5f3c09d2333dcdbe1033b8b",
+    "docs/verification/IM-03/im03-2-review-order/format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-03/im03-2-review-order/git-revision.hpp": "433113a68480e13d355cbef0f199952dd7c1749cb76e9bb5e66d661c19a0064e",
+    "docs/verification/IM-03/im03-2-review-order/japanese-contract.log": "9bcb27f191e98a8a536f0853ee1073bfe7b896009681c0fa1e28922e074a72a3",
+    "docs/verification/IM-03/im03-2-review-order/japanese-testing.log": "51f2783beea19adba2a2663442712c5325a949ec660bf01d46658430bd903ad5",
+    "docs/verification/IM-03/im03-2-review-order/publication.json": "5f33d87785815bcb95be5cb5f1732496deaf3cc17808b30f031aa6cd76a4bdda",
+    "docs/verification/IM-03/im03-2-review-order/Release-build.log": "b64e41a784dabff213a6c157ece3d3aa8625861734401d0b218cefa6fddc3688",
+    "docs/verification/IM-03/im03-2-review-order/Release-ctest.log": "2e126a53cddd56a6b62f4a15e77dc6809d7372a287891176dd79fc8c8457aef8",
+    "docs/verification/IM-03/im03-2-review-order/Release-raw.log": "538be1ac1adce18617582223b14089d48fd901304ccfd6ef541b70e23ba6ed2b",
+    "docs/verification/IM-03/im03-2-review-order/reproduce.log": "27ab9aca9caa4b37a13672e7f7005da41f194dc32a65619f7070a7602c6fa6ad",
+    "docs/verification/IM-03/im03-2-review-order/reproducer-case.cpp": "f6ba49e093ba081b5cf7044f86809d471c7212741534574558faf09529987922",
+    "docs/verification/IM-03/im03-2-review-order/reproducer-provenance.json": "48ab8f3981094c4279316f3de384440eeb2ad7552a9ee784a803f88166a1d9ba",
+    "docs/verification/IM-03/im03-2-review-order/tidy-source-final.log": "317d9b13cfd450ce85d38b783ec4a0a0df58111cd1be97d0c6555e3cfd033edd",
+    "docs/verification/IM-03/im03-2-review-order/tidy-test-final.log": "385327cd7597c1e895cad509bff27093686abd4097ffc30642c77e49e4532082",
+    "docs/verification/IM-03/im03-2.json": "45459deae124ba72b8c8ba45708f1271ece25f3b7e259503310007b539e58286",
+    "docs/verification/IM-03/im03-2-ci-variant.json": "cc63d009437496863a7f894589f80c010d7e227c2a4b908ba4d212e0b041bb99",
+    "docs/verification/IM-03/im03-2-ci-flat-variant.json": "0854040977a51a532fc672e4d9c13abe32a4785f5f2676fae3650753068f8ff3"
+  },
+  "source_references": [
+    {
+      "id": "im03-2-order-source-1",
+      "sha256": "0cd1fe4a7f15884541150b79c1cfd23aefe646e24551f1f4bac7e945c1f07999",
+      "hint": "src/aero/geometry_snapshot.cpp"
+    },
+    {
+      "id": "im03-2-order-source-2",
+      "sha256": "45c0a9e116ec419609b4c61ff4da8ff1f1d9751c7edd4e8b35b95135f09891d4",
+      "hint": "tests/aero/geometry_snapshot_test.cpp"
+    },
+    {
+      "id": "im03-2-order-source-3",
+      "sha256": "faf1c5933a6e6b3f330596f01ae064f1f3dbb028f5356c2438b272584658dd5d",
+      "hint": "tests/aero/geometry_snapshot_fixture.hpp"
+    },
+    {
+      "id": "im03-2-order-source-4",
+      "sha256": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3",
+      "hint": "docs/specs/aero/owned-geometry-query-contract.md"
+    },
+    {
+      "id": "im03-2-order-source-5",
+      "sha256": "187e7c5eeecbe1fefcbf0c14da0d1a5eb7920e5710e2c948bc61653e91d8658a",
+      "hint": ".cursor/rules/testing.mdc"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im03-2-order-artifact-1",
+      "sha256": "e36c58cbddb7adc53ed5c0be17729339f39d8e1dbb8a79aa855bba8e67f47214",
+      "hint": "docs/verification/IM-03/im03-2-review-order/build-config.hpp"
+    },
+    {
+      "id": "im03-2-order-artifact-2",
+      "sha256": "010cfa6c0f4092fb00c5cc32188cf8e73b0887fb11bc0d99d010ceee713f5c58",
+      "hint": "docs/verification/IM-03/im03-2-review-order/Debug-build.log"
+    },
+    {
+      "id": "im03-2-order-artifact-3",
+      "sha256": "f0cfd6d95eafef32aa981873f1044609b731fa1b31177c7b19efcd2706fb070e",
+      "hint": "docs/verification/IM-03/im03-2-review-order/Debug-ctest.log"
+    },
+    {
+      "id": "im03-2-order-artifact-4",
+      "sha256": "8ca4e2a28403c00bb7aa3380d971c8727a99c423a5f3c09d2333dcdbe1033b8b",
+      "hint": "docs/verification/IM-03/im03-2-review-order/Debug-raw.log"
+    },
+    {
+      "id": "im03-2-order-artifact-5",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-03/im03-2-review-order/format.log"
+    },
+    {
+      "id": "im03-2-order-artifact-6",
+      "sha256": "433113a68480e13d355cbef0f199952dd7c1749cb76e9bb5e66d661c19a0064e",
+      "hint": "docs/verification/IM-03/im03-2-review-order/git-revision.hpp"
+    },
+    {
+      "id": "im03-2-order-artifact-7",
+      "sha256": "9bcb27f191e98a8a536f0853ee1073bfe7b896009681c0fa1e28922e074a72a3",
+      "hint": "docs/verification/IM-03/im03-2-review-order/japanese-contract.log"
+    },
+    {
+      "id": "im03-2-order-artifact-8",
+      "sha256": "51f2783beea19adba2a2663442712c5325a949ec660bf01d46658430bd903ad5",
+      "hint": "docs/verification/IM-03/im03-2-review-order/japanese-testing.log"
+    },
+    {
+      "id": "im03-2-order-artifact-9",
+      "sha256": "5f33d87785815bcb95be5cb5f1732496deaf3cc17808b30f031aa6cd76a4bdda",
+      "hint": "docs/verification/IM-03/im03-2-review-order/publication.json"
+    },
+    {
+      "id": "im03-2-order-artifact-10",
+      "sha256": "b64e41a784dabff213a6c157ece3d3aa8625861734401d0b218cefa6fddc3688",
+      "hint": "docs/verification/IM-03/im03-2-review-order/Release-build.log"
+    },
+    {
+      "id": "im03-2-order-artifact-11",
+      "sha256": "2e126a53cddd56a6b62f4a15e77dc6809d7372a287891176dd79fc8c8457aef8",
+      "hint": "docs/verification/IM-03/im03-2-review-order/Release-ctest.log"
+    },
+    {
+      "id": "im03-2-order-artifact-12",
+      "sha256": "538be1ac1adce18617582223b14089d48fd901304ccfd6ef541b70e23ba6ed2b",
+      "hint": "docs/verification/IM-03/im03-2-review-order/Release-raw.log"
+    },
+    {
+      "id": "im03-2-order-artifact-13",
+      "sha256": "27ab9aca9caa4b37a13672e7f7005da41f194dc32a65619f7070a7602c6fa6ad",
+      "hint": "docs/verification/IM-03/im03-2-review-order/reproduce.log"
+    },
+    {
+      "id": "im03-2-order-artifact-14",
+      "sha256": "f6ba49e093ba081b5cf7044f86809d471c7212741534574558faf09529987922",
+      "hint": "docs/verification/IM-03/im03-2-review-order/reproducer-case.cpp"
+    },
+    {
+      "id": "im03-2-order-artifact-15",
+      "sha256": "48ab8f3981094c4279316f3de384440eeb2ad7552a9ee784a803f88166a1d9ba",
+      "hint": "docs/verification/IM-03/im03-2-review-order/reproducer-provenance.json"
+    },
+    {
+      "id": "im03-2-order-artifact-16",
+      "sha256": "317d9b13cfd450ce85d38b783ec4a0a0df58111cd1be97d0c6555e3cfd033edd",
+      "hint": "docs/verification/IM-03/im03-2-review-order/tidy-source-final.log"
+    },
+    {
+      "id": "im03-2-order-artifact-17",
+      "sha256": "385327cd7597c1e895cad509bff27093686abd4097ffc30642c77e49e4532082",
+      "hint": "docs/verification/IM-03/im03-2-review-order/tidy-test-final.log"
+    },
+    {
+      "id": "im03-2-order-artifact-18",
+      "sha256": "45459deae124ba72b8c8ba45708f1271ece25f3b7e259503310007b539e58286",
+      "hint": "docs/verification/IM-03/im03-2.json"
+    },
+    {
+      "id": "im03-2-order-artifact-19",
+      "sha256": "cc63d009437496863a7f894589f80c010d7e227c2a4b908ba4d212e0b041bb99",
+      "hint": "docs/verification/IM-03/im03-2-ci-variant.json"
+    },
+    {
+      "id": "im03-2-order-artifact-20",
+      "sha256": "0854040977a51a532fc672e4d9c13abe32a4785f5f2676fae3650753068f8ff3",
+      "hint": "docs/verification/IM-03/im03-2-ci-flat-variant.json"
+    }
+  ]
+}

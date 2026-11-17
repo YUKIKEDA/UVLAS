@@ -61,3 +61,17 @@ TEST_CASE("solve_linear rejects a non-finite right-hand side with Nonfinite", "[
 ```
 
 確保監査へヘッダだけの多倍長演算をつなぐときも、imported targetの実際の依存閉包を読む。2026-11-17、Issue #86の監査試験は `Boost::multiprecision` が当該構成でコンパイル済み `Boost::container` を連れ、opaque artifact検査に拒否された。使うものは `cpp_int` / `cpp_rational` のヘッダだけだったため、依存を `Boost::headers` へ限定した。必要なコンパイル済み依存がある場合はその認定を行い、監査の除外で通さない。このリンクの選択を、整数演算自体が無確保である証拠にしない。
+
+最初の不備をID順で返す契約は、lookupのsortだけでなく各検査段の走査順まで照合する。2026-11-17、PR #102はlookupが正規順でもtriangle/quad接続だけが元配列順で、二つの未解決参照を並べ替えると別のproblemを返した。単独不備の負対照だけで終えず、同段の複数不備を両順序で与え、選ばれるcode/typed IDを固定する。元配列・ordinalの保持と、検査順の正規化を混同しない。
+
+```text
+BAD   sorted lookupを作ったので全段もID順とみなし、単独の不備だけ試す。
+GOOD  接続/有限性/幾何の各段で複数不備を並べ替え、選ばれる最小IDを照合する。
+```
+
+試験専用のglobal new/deleteも、通常・配列・nothrow・aligned・sizedと失敗時deleteの対応を確認する。2026-11-17、PR #104のLinux sanitizerではCatch2の一時bufferが未置換のnothrow newで確保され、置換済みdeleteのfreeと組み合わされてalloc-dealloc-mismatchとなった。各familyを対応するallocator/deallocatorへ揃え、ASanの検査を無効にして通さない。故障注入の例外型も置換入口の保証に合わせる。global newから任意例外を投げる試験でguard全体を検証したとはせず、任意例外の翻訳はcallable境界のguard試験と区別する。
+
+```text
+BAD   通常new/deleteだけを置換し、nothrowやalignedの経路も監査できたとする。
+GOOD  全形式の成功・故障・対応する解放を確認し、標準libが使うnothrow経路も含める。
+```

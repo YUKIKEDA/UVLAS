@@ -1,0 +1,17 @@
+{
+  "scope": "Actual fault-TU preambles with one identical standalone wrapper; no product or Catch2 build on GCC11.",
+  "cases": {
+    "old": {
+      "full_tu_sha256": "34b3c890ed3e11cad15ab2b8d189a231ee6957d7eaa360d146af15797cdf6343",
+      "preamble_sha256": "00e10cf50206e74e473128a851173aa27219534be35f4ad4feea618cc7e3c4fe",
+      "preamble_bytes": 2400,
+      "standalone_sha256": "8c2bcf3a0612bb3386a309b10dbe1b8e68b7ad42ad197b7d834fcf9e55f928af"
+    },
+    "new": {
+      "full_tu_sha256": "f5a1877bbacd024a85714327244432bb3a63356bf368b4de712023c26ccb457b",
+      "preamble_sha256": "609bd035153420dcd0ee100bb24fa4f634cb811e06b464a867b7b27e7c40d3d2",
+      "preamble_bytes": 5028,
+      "standalone_sha256": "0bf560705747031a0aa1f336b7101e2cba59cde99d1474df09f46b131d7cc29b"
+    }
+  }
+}

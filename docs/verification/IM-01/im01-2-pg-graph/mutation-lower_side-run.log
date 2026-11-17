@@ -1,0 +1,3065 @@
+Randomness seeded to: 429886031
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Half-cell boundary choices are exact and never average neighboring coordinates
+-------------------------------------------------------------------------------
+<WORKTREE>\tests\structure\pg_graph_test.cpp(208)
+...............................................................................
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  1 == 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  1 == 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  2 == 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  3 == 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(224): FAILED:
+  CHECK( lv.cell == PgCellIndex{a, b} )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(225): FAILED:
+  CHECK( lv.u == *u )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(226): FAILED:
+  CHECK( lv.v == *v )
+with expansion:
+  {?} == {?}
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  1 == 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  2 == 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  3 == 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  4 == 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  5 == 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  6 == 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(236): FAILED:
+  CHECK( lo.cell.first == j - 1 )
+with expansion:
+  7 == 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(43): FAILED:
+  CHECK( backend.num().str(0, std::ios_base::dec) == p )
+with expansion:
+  "-1" == "1"
+
+===============================================================================
+test cases:   10 |    9 passed |   1 failed
+assertions: 5303 | 4693 passed | 610 failed

@@ -1,0 +1,286 @@
+{
+  "schema": "uvlas.evidence-redaction/1",
+  "note": "原rawをoutへ保持し、公開派生だけ個人pathの匿名化とLF・行末空白の正規化を一度行った。バイナリは公開しない。",
+  "files": [
+    {
+      "original": "out/issue94-final/debug-build.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/debug-build.log",
+      "original_sha256": "6032f9dc3b3bc8305d9c991d5afd7ef3262165a5c8c908d48061eb6567c624ff",
+      "published_sha256": "deaca98fa1dc637af486e40e4c1de216abfce782826ca37a4bab02c19b3a77b1",
+      "path_replacements": 4,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-final/debug-tests.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/debug-tests.log",
+      "original_sha256": "56e0de728435e73975c1700070efeae012ea112d32d61075fdd8c957ea950cfd",
+      "published_sha256": "545f0d7572d3c7d30e0c96531a18ae9e44d5965d08a4e95df7ec9f8cc88df1cd",
+      "path_replacements": 10,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-final/build-info-debug.json",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/build-info-debug.json",
+      "original_sha256": "a12543d0179dafbd3f77d75f7ec7dcb1c21ba9d58d0c5c04ea4b50c55f162a28",
+      "published_sha256": "0514edf8a1317cd976e36cf6b01afcd1b281535cb15fa5fe05fb4f099ecd2107",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-final/release-build.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/release-build.log",
+      "original_sha256": "7369d3bb8e18050a302aa7e6dd9d5aa343120fc6329b8e3e332bf07ad8123c24",
+      "published_sha256": "7e3afa3bf2e81d127b41e6785b6e557e22e9a61cd5807623d07837d8cba5ac90",
+      "path_replacements": 4,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-final/release-tests.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/release-tests.log",
+      "original_sha256": "8c7ad75587052e16d736f92080ba7a6d12c46aa789da2d7d5a8748c855df4a03",
+      "published_sha256": "6979220d27f71266c7921904d11d914dd1c6ae419707b04b86e17e116226efb2",
+      "path_replacements": 10,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-final/build-info-release.json",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/build-info-release.json",
+      "original_sha256": "c787400f1c25254e71dfe5eac0ae37f6becd348fe6b5f10694e8858e43568864",
+      "published_sha256": "21596a2999f6ea8a0cdf41ef214ece51473901702d90eaef177dac30b79c4890",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/last-0.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-graph-final.log",
+      "original_sha256": "c7f4adc5137f42ecb7b6b93c7af065c5571b4c7fa26220554cae162fb99d721b",
+      "published_sha256": "2fcfb0a28322eb851dc4e14170d2d02020e3398281133d669167aceb2dad3b69",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/last-1.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-test-final.log",
+      "original_sha256": "d16e99b7b0267d50942fa8d800f048d78d82f2d293c265648ff2ecdcf6d4673f",
+      "published_sha256": "6532249c76ddc2ce7658bf0a0028ac7be9ee1bb4d785e7ffe51c6be42beaa3f1",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/final-1.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-layout-final.log",
+      "original_sha256": "062a12566751219cb079cc5443c5d453e30f3d7a62a29e1639fb3d7d375de2a9",
+      "published_sha256": "49cab938dd0c19fa7df17feadcefb45c165fa55df28dd89b53c7ac9c704288d4",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/final-3.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-resource-final.log",
+      "original_sha256": "9604d203b36fed50f24d0b4443f7984aa531080ec9d70b9195cfa9b867e80299",
+      "published_sha256": "d0bf55765b221a0bf0e5c35ca1119b3c546228eaf32f17752ff8942b668da040",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/initial-0.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-0.log",
+      "original_sha256": "d782f19406925fd5f88383eb618867197dbc958e9bb1850da25a98bc823bff90",
+      "published_sha256": "0c40364e8957392405047eaefa4074c72b8c2769ae64fc328e449b1649938450",
+      "path_replacements": 1,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/initial-1.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-1.log",
+      "original_sha256": "062a12566751219cb079cc5443c5d453e30f3d7a62a29e1639fb3d7d375de2a9",
+      "published_sha256": "49cab938dd0c19fa7df17feadcefb45c165fa55df28dd89b53c7ac9c704288d4",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/initial-2.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-2.log",
+      "original_sha256": "7bfcea7d9e77d8f51663fe7ce2fd9b0185c03c05b4c1d44c0e598eb05a8b1d19",
+      "published_sha256": "1ac09216f5bd3336e98b2847f00478a99de3a1f3e56ee9d1007649b0fa5588f1",
+      "path_replacements": 3,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/initial-3.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-3.log",
+      "original_sha256": "50d7c17fb012890f46e91da61319d98c11be8cb42443533d9ac481845c0cc63c",
+      "published_sha256": "1d5e13f135ee44e0182d089794a5db3db472907e7858336de0df580257c43d63",
+      "path_replacements": 3,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/control/compile.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-control-compile.log",
+      "original_sha256": "ab88025cf857b52fc960545f7a31fb1892e457c281614779f26c4fd8c8d305b7",
+      "published_sha256": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/control/link.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-control-link.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/control/run.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-control-run.log",
+      "original_sha256": "60b2acdd771fbed8ef4567c85d77ea25a1450dfe013b2fb5cca7e78f0733e36a",
+      "published_sha256": "0731cd791b37e3b92f747ff0de8e831016a4281d7f9b72d9fcb4e80c786a7b1c",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/lower_side/compile.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-lower_side-compile.log",
+      "original_sha256": "ab88025cf857b52fc960545f7a31fb1892e457c281614779f26c4fd8c8d305b7",
+      "published_sha256": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/lower_side/link.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-lower_side-link.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/lower_side/run.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-lower_side-run.log",
+      "original_sha256": "eee7c0241cd10c29ac89d7b3c8793f6dc9fc4b15a311a92393ad7e46403f7dcd",
+      "published_sha256": "8f839962c1a03a58ddbe04004915d40925349254ea2fdcc29e027d6ace556277",
+      "path_replacements": 611,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/local_scale/compile.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-local_scale-compile.log",
+      "original_sha256": "ab88025cf857b52fc960545f7a31fb1892e457c281614779f26c4fd8c8d305b7",
+      "published_sha256": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/local_scale/link.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-local_scale-link.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/local_scale/run.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-local_scale-run.log",
+      "original_sha256": "441748f11b987aafb0232d63e05262a3b2536c5debb7cd20e3a171c2407be865",
+      "published_sha256": "4fcb457bf7d67e43cb8e6b1f2db5f6870f9664a403bf9333ba7b9de5b3aec2d7",
+      "path_replacements": 423,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/identity_skew/compile.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-identity_skew-compile.log",
+      "original_sha256": "ab88025cf857b52fc960545f7a31fb1892e457c281614779f26c4fd8c8d305b7",
+      "published_sha256": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/identity_skew/link.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-identity_skew-link.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/identity_skew/run.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-identity_skew-run.log",
+      "original_sha256": "d7b89ee2cca4a5e2794e1569d36aa9291e7dc3e81bad58a21ccc2b859d9c2f6b",
+      "published_sha256": "9beb283a0129f4eecc6b382aac9b8cc68a22d368029dcaccc407b5cb9c9e17b3",
+      "path_replacements": 8,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/cell_index/compile.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-cell_index-compile.log",
+      "original_sha256": "ab88025cf857b52fc960545f7a31fb1892e457c281614779f26c4fd8c8d305b7",
+      "published_sha256": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/cell_index/link.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-cell_index-link.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/cell_index/run.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-cell_index-run.log",
+      "original_sha256": "318899010d5c69bdb069119c914cbdb2d883490249fd0559e6b461f88eb89fc5",
+      "published_sha256": "d90058196d072cef5276c9f9d73e345aabc62cbea3f3f7dc186e96ec6057281e",
+      "path_replacements": 78,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/run.py",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-runner.py",
+      "original_sha256": "24d6b72a794e1a9bf0d0152bdc851b122fa611e08fda39a3ca610009cc2b2d98",
+      "published_sha256": "410446797d89e141f7086a9d3a22b4949a4c3103d447beab103815fd3104de2f",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-mutations/results.json",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/mutation-results.json",
+      "original_sha256": "c20062e57ee2526b3f15d7a66d1ffc475809b185640282827be484572ca91f76",
+      "published_sha256": "aa505fd1c89779066c24ab8bc084737b58a073a3d0c3fc39a177bdc397ab38a7",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-reference/generate.py",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/canonical-reference-generator.py",
+      "original_sha256": "1e252a19d2af18c76a3cea3344c82e18dd992fb28486c69704c22b17f9784b0e",
+      "published_sha256": "1e252a19d2af18c76a3cea3344c82e18dd992fb28486c69704c22b17f9784b0e",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-evidence/execution-CMakeLists.txt",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/execution-CMakeLists.txt",
+      "original_sha256": "20683f403375802e35d5a9d3080b0b8b5f959eee0d4196f6f06bae0890ae4d5e",
+      "published_sha256": "51f14e5d4898e6e2b10787d8c3b196e4b5e5349f424185724868f0b5835de04d",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-evidence/execution-tests-CMakeLists.txt",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/execution-tests-CMakeLists.txt",
+      "original_sha256": "90335478a946f7c17d845da26a33d41b4f7c9aae606879680badee4a3a81887e",
+      "published_sha256": "90335478a946f7c17d845da26a33d41b4f7c9aae606879680badee4a3a81887e",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    },
+    {
+      "original": "out/issue94-tidy/comment-final.log",
+      "published": "docs/verification/IM-01/im01-2-pg-graph/tidy-comment-final.log",
+      "original_sha256": "d16e99b7b0267d50942fa8d800f048d78d82f2d293c265648ff2ecdcf6d4673f",
+      "published_sha256": "6532249c76ddc2ce7658bf0a0028ac7be9ee1bb4d785e7ffe51c6be42beaa3f1",
+      "path_replacements": 0,
+      "lf_and_trailing_whitespace_normalization": true
+    }
+  ]
+}

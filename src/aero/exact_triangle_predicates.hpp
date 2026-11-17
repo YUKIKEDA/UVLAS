@@ -123,6 +123,7 @@ public:
 
 private:
     friend class PredicateLease;
+    friend class ExactPredicateAccess;
     friend core::Result<class ExactTriangleResult>
     classify_triangle(CoordinateView, PredicateWorkspace&, core::ResourcePlan&, PredicateLimits,
                       std::stop_token, core::FailureDetails) noexcept;
@@ -140,6 +141,7 @@ public:
 
 private:
     friend class PredicateWorkspace;
+    friend class ExactPredicateAccess;
     explicit PredicateLease(PredicateWorkspace& owner) noexcept : owner_(&owner) {}
     PredicateWorkspace* owner_;
 };
@@ -174,6 +176,7 @@ public:
     }
 
 private:
+    friend class ExactPredicateAccess;
     friend core::Result<ExactTriangleResult> classify_triangle(CoordinateView, PredicateWorkspace&,
                                                                core::ResourcePlan&, PredicateLimits,
                                                                std::stop_token,

@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/17] C:\WINDOWS\system32\cmd.exe /C "cd /D <WORKTREE>\out\issue94-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<WORKTREE> -DOUTPUT=<WORKTREE>/out/issue94-build/generated/uvlas/git_revision.hpp -P <WORKTREE>/cmake/GitRevision.cmake"
+[2/17] Building CXX object CMakeFiles\uvlas_cli.dir\Debug\src\app\main.cpp.obj
+[3/17] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_graph_resources.dir\Debug\structure\pg_graph_resource_test.cpp.obj
+[4/17] Building CXX object CMakeFiles\uvlas_structure_audit.dir\Debug\src\structure\exact_polynomial.cpp.obj
+[5/17] Building CXX object CMakeFiles\uvlas_structure.dir\Debug\src\structure\pg_graph.cpp.obj
+[6/17] Building CXX object CMakeFiles\uvlas_structure_audit.dir\Debug\src\structure\pg_graph.cpp.obj
+[7/17] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[8/17] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[9/17] Linking CXX static library Debug\uvlas_core.lib
+[10/17] Linking CXX static library Debug\uvlas_core_audit.lib
+[11/17] Linking CXX static library Debug\uvlas_structure.lib
+[12/17] Linking CXX static library Debug\uvlas_structure_audit.lib
+[13/17] Linking CXX executable tests\Debug\uvlas_test_structure_pg_graph_resources.exe
+[14/17] Linking CXX executable Debug\uvlas.exe
+[15/17] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_graph.dir\Debug\structure\pg_graph_test.cpp.obj
+[16/17] Linking CXX executable tests\Debug\uvlas_test_structure_pg_graph.exe

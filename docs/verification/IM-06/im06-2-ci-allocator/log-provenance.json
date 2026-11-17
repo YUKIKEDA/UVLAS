@@ -1,0 +1,193 @@
+{
+  "schema": "uvlas.redacted-text/1",
+  "note": "Logs are LF/redacted derived full captured text; source snapshots are byte-preserved and contain no account path. Private originals and executables remain unchanged.",
+  "files": [
+    {
+      "entry": "safe-Debug-build.log",
+      "raw_sha256": "738789cdbce096eed7b2a92ce9ce0c76ecd8420e4b98df1507fdd28cf262db1a",
+      "published_sha256": "ff0081e833cd2b88c8447c0e11e42038dfbf5d5eab0cc22e9fad06d13b6119ae",
+      "raw_bytes": 1505,
+      "published_bytes": 1466,
+      "original_encoding": "UTF-8",
+      "account_replacements": 4,
+      "workspace_replacements": 4,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-Debug-test.log",
+      "raw_sha256": "7e8b94e7643562098a1c3344f97c84abcd00ca81e166be684348ee8ee682cb72",
+      "published_sha256": "fde777c3c14c590008cb6c257a103cd1bbb5c4edd0eff76d2d71761c43be57e3",
+      "raw_bytes": 2497,
+      "published_bytes": 2388,
+      "original_encoding": "UTF-8",
+      "account_replacements": 10,
+      "workspace_replacements": 10,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-Release-build.log",
+      "raw_sha256": "ab06e448ce2fe4cbdfa631d2e36b018c2e0f19903124368b5a4f92d8044aaace",
+      "published_sha256": "97e496438a3c6c45d36fc5e055ec91965c9ca03c1f688d3e2d51462942d909ab",
+      "raw_bytes": 1667,
+      "published_bytes": 1626,
+      "original_encoding": "UTF-8",
+      "account_replacements": 4,
+      "workspace_replacements": 4,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-Release-test.log",
+      "raw_sha256": "33ca583bd3ceca8578576cdb57d197d95c0b005ac5531b946eb7e2cc39cbef63",
+      "published_sha256": "adc4df86f5075bdc24589439369dd7d330d4eec7e95e96dbdd698e29b617dbb6",
+      "raw_bytes": 2501,
+      "published_bytes": 2392,
+      "original_encoding": "UTF-8",
+      "account_replacements": 10,
+      "workspace_replacements": 10,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-Debug-build-info.json",
+      "raw_sha256": "87634a1f2a0ed6dea5ae9b5f000d6ae5827532db9053d341bbbb531b845211b8",
+      "published_sha256": "834d7b05f2d40e435329a57b8f6a986ac3171006a8e8eb7b6985cd609f3cf912",
+      "raw_bytes": 561,
+      "published_bytes": 542,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-Release-build-info.json",
+      "raw_sha256": "6df2bc6034921d598b6cb8b1e3d6760d25f8b23fa91ddf63306a23b25c07d2d2",
+      "published_sha256": "73f32c315b342716cb18dd853a107c78dd33a827ad49d02570e088b8edc743c2",
+      "raw_bytes": 563,
+      "published_bytes": 544,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-tidy-source.log",
+      "raw_sha256": "55a88327ef299aecb91e8d9881c35886d36be8fc741ddaa1c8c5d78ff6b25901",
+      "published_sha256": "b1434a6daa0323f1ad3b8ee1873818407afd7181348a8a1578b6b7204b59e85f",
+      "raw_bytes": 27,
+      "published_bytes": 26,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-tidy-resource.log",
+      "raw_sha256": "f8f8cd886677c86427b4921bf30b4900f0431b99b27e9176142bbe9f4305756e",
+      "published_sha256": "e45b4fb83fe8e873432e8a76afacc1df84818a65cef6a4bf47da1146220904ad",
+      "raw_bytes": 27,
+      "published_bytes": 26,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-old-asan.log",
+      "raw_sha256": "cfe7da8dd0a349477380bb7cdd9bd34ca613d2b67af59240f614da40b3c48b9a",
+      "published_sha256": "8050412b67529502b5ab60f0f166417eade2d039bd183404838fbf833cb39b79",
+      "raw_bytes": 1611,
+      "published_bytes": 1569,
+      "original_encoding": "UTF-8",
+      "account_replacements": 4,
+      "workspace_replacements": 4,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-new-asan.log",
+      "raw_sha256": "dca94f9239c6175603f80565a8c8f8fde0aa51faf8ddc52e4d4ee950966d72d4",
+      "published_sha256": "e33c5767d9de1584eecc47b4b15650bf5983876d5d0b346fe4a9551cba42a778",
+      "raw_bytes": 31,
+      "published_bytes": 30,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-old-compile.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "safe-new-compile.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "original_encoding": "UTF-8",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "UTF-8 without BOM; CRLF to LF"
+    },
+    {
+      "entry": "old-asan.cpp",
+      "raw_sha256": "8c2bcf3a0612bb3386a309b10dbe1b8e68b7ad42ad197b7d834fcf9e55f928af",
+      "published_sha256": "8c2bcf3a0612bb3386a309b10dbe1b8e68b7ad42ad197b7d834fcf9e55f928af",
+      "raw_bytes": 8912,
+      "published_bytes": 8912,
+      "original_encoding": "byte-preserved source snapshot",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "none"
+    },
+    {
+      "entry": "new-asan.cpp",
+      "raw_sha256": "0bf560705747031a0aa1f336b7101e2cba59cde99d1474df09f46b131d7cc29b",
+      "published_sha256": "0bf560705747031a0aa1f336b7101e2cba59cde99d1474df09f46b131d7cc29b",
+      "raw_bytes": 11540,
+      "published_bytes": 11540,
+      "original_encoding": "byte-preserved source snapshot",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "none"
+    },
+    {
+      "entry": "asan-inputs.json",
+      "raw_sha256": "ac3d2f0fb9807a74559dffbd59acf4ad73b609b809d18b9b846d0771eeb3f235",
+      "published_sha256": "ac3d2f0fb9807a74559dffbd59acf4ad73b609b809d18b9b846d0771eeb3f235",
+      "raw_bytes": 794,
+      "published_bytes": 794,
+      "original_encoding": "byte-preserved source snapshot",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "none"
+    },
+    {
+      "entry": "final-resource-bridge.json",
+      "raw_sha256": "7d9c978d10828aa0ad44b49b18a695772350a3056962ea12d99204a3b8312c4d",
+      "published_sha256": "7d9c978d10828aa0ad44b49b18a695772350a3056962ea12d99204a3b8312c4d",
+      "raw_bytes": 834,
+      "published_bytes": 834,
+      "original_encoding": "byte-preserved source snapshot",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "none"
+    },
+    {
+      "entry": "make_asan_probe.py",
+      "raw_sha256": "c00e614215d56e4e036681be9fd31da2f1da20ad181e448cb137abede5b118da",
+      "published_sha256": "c00e614215d56e4e036681be9fd31da2f1da20ad181e448cb137abede5b118da",
+      "raw_bytes": 2346,
+      "published_bytes": 2346,
+      "original_encoding": "byte-preserved source snapshot",
+      "account_replacements": 0,
+      "workspace_replacements": 0,
+      "normalization": "none"
+    }
+  ]
+}

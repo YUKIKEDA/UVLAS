@@ -1,0 +1,93 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-2-parser-reason-review",
+  "ids": [
+    "IO4-01",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 93,
+  "pr": 104,
+  "date": "2026-11-17",
+  "review_comment": 4595739742,
+  "reviewed_head": "4c3a184f92f4b0f1abfeddbe1377300fbb6b3f8c",
+  "source_commit": "78b9fb0ce15cb4fb935536f34d030a357a3fbfe7",
+  "scope": "構文失敗reasonを固定parser生成診断だけから分類する訂正。入力のlast-read引用語を原因にしない。失敗code・位置・所有・資源方式は変えない。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "reproduction": {
+    "producer_sha256": "6a86e1db9428315dd1c5d414368a5cb70e0a0184ff661995d100f59631d16106",
+    "entry": "read_input_document",
+    "state": "旧producerと、未commitの初期6prefix版回帰caseをDebugでbuildした予備再現。正式受入のclean source実行ではない。",
+    "cases": 1,
+    "assertions": 140,
+    "failed_assertions": 12,
+    "exit": 42,
+    "failure": "ill-formed UTF-8を含む不正escapeがInvalidUtf8、生改行を含むsurrogate等の文字列がInvalidStringEscapeに誤分類された。",
+    "difference_from_final_test": "最終版では同じ区切り・引用符を複数含む第7prefixを追加し、160assertへ増やした。旧予備再現をこの最終版の実行と呼ばない。"
+  },
+  "source_basis": {
+    "parser": "nlohmann3.12.0 allocation repair1、detail/input/parser.hpp478–501のexception_message",
+    "parser_sha256": "8f219283e1b1a5ad3dc413acfa33c4ee3901c0366f60676c3a93b0d37aeda7b6",
+    "lexer_sha256": "9ab10d7a6060e048842465836c9f11ec3b064125197f388e2e9792f7ca1211f2",
+    "boundary": "固定lexer診断→固定delimiter ; last read: '→入力由来tokenの順。最初のdelimiter前だけをstring_viewで分類し追加確保しない。delimiter無しのunexpected-tokenは固定token種別名だけ。",
+    "similar_search": "src全体のmessage.find/what分類を検索し、同じ原因語分類はclassify_parser_failureの1routineだけだった。",
+    "preserved": "NumberRange406、typed CRT Unknown exception、未知例外分類、byte/eventの所有、検査順はそのまま。"
+  },
+  "verification": {
+    "environment": "Windows11 x64 / MSVC19.51.36260 / C++23 preview / fp:strict / WX",
+    "source_state": "78b9fb0 cleanで対象2targetをD/R build。既存CLI最小targetのbuild-infoも同commit/uncommitted_changes:false/repair1を自己出力。試験exe自体の自己出力ではない。",
+    "literal_oracle": "7手書きprefix×不正escape/strict EOF後不正escape/生改行/真の不正UTF8の4経路、真unicode escape異常3、正常な追加token1。失敗enum/codeの許容差0。原因語・同delimiter複数・引用符を含む。",
+    "debug": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "regular_cases": 10,
+      "regular_assertions": 636,
+      "resource_cases": 3,
+      "resource_assertions": 385,
+      "cpp_new_fault_sites": 22
+    },
+    "release": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "regular_cases": 10,
+      "regular_assertions": 636,
+      "resource_cases": 3,
+      "resource_assertions": 321,
+      "cpp_new_fault_sites": 18
+    },
+    "static": "変更2TUのclang-tidy21.1.1 exit0、clang-format21.1.2の2file check成功。抑制されたsystem header警告を含むため全warning数0とは呼ばない。補足日本語lintは別logへ保存。",
+    "independent_review": "rootが変更3file、固定parser一次source、全literalの期待原因を独立読了し追加findingなし。 rootが新追補record全文、予備再現6prefixと最終7prefix/160assertの区別、環境/CRT/旧証拠不変を独立読了し追加findingなし。",
+    "trace": "rootがtrace matrix/checkを実行し208IDs/32tests/34records/0問題を確認。共有の生成traceを同期した。",
+    "not_repeated": "旧全suite、旧5変異、性能測定は反復しない。旧分類器での実入口失敗と修正版成功を回帰の負対照にした。",
+    "linux": "この訂正sourceのLinux/GCC/Sanitizerは未実行・未確認。CI終了待ちはしない。"
+  },
+  "historical_record": {
+    "path": "docs/verification/IM-06/im06-2.json",
+    "sha256": "2fa2c78153cbc444422564c164ebac892f77368df96d6b3b216be38b35fd1807",
+    "note": "旧記録・旧log/ZIPのbytesは変更しない。旧sourceの成功が今回の診断reasonを保証したという主張もしない。"
+  },
+  "sources": {
+    "src/io/input_document.cpp": "77d8787174170f05562c17d14c8722bf02af26af3c83599b0391942427ab8d0a",
+    "tests/io/input_document_test.cpp": "e0ecfe54d2c55c8d8e50e267dfc67f67fdc020e62338d47ba3f96b2a75597696",
+    "docs/specs/foundation/input-document-resource-contract.md": "126401611090b850f02dcbdf58dffbfbb3e26fb3af9991b8bd7d1e09199e626c"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-2-parser-reason-review/log-provenance.json": "a30a599ec73b28e40901e87701ee94915cf1cd01b4e4da6032946d0c3b81bf5c",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-build-info.json": "6f771b7b49cc3fdde459000e9489170efae450fddd6e6bdc86cad622de12920f",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-debug-build.log": "d07287395d631b892d0f5a24a134a1fc4f6d0ad3822996ae6b2035fd7ee252f9",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-debug-test.log": "a87119d58d2655d536e02de7bef76d3210798ef527918a35877fadec86f97cd8",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-japanese.log": "8d4389b1b20f3edcd53d0be66d4ed66700ad372d78d45583254fcae0311e3a10",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-release-build.log": "01c6c68a65ec327f95cf18be0a76b27a0d9aa352d6c7b2d2aee65d6aeb1c8d20",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-release-test.log": "6b8fc20b3c05c5e33734e7b328284604e09d5f74dd94e1b1da738cae6d70311e",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-repro-build.log": "34d8f9713b979eaa187780c0aac8820649da47cce2ff508c9a3c86ccf70304f7",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-repro-test.log": "1ac6342c36861c3d20db12011792f172792ab490d0a993d3284073e850cf02c5",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-tidy-source.log": "b1434a6daa0323f1ad3b8ee1873818407afd7181348a8a1578b6b7204b59e85f",
+    "docs/verification/IM-06/im06-2-parser-reason-review/safe-tidy-test.log": "c34cbb554cbd2def0e9ffe9de05fcb64848702bad4b7fce6224fb4b090070be6"
+  }
+}

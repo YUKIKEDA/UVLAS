@@ -1,0 +1,36 @@
+{
+  "schema": "uvlas.preprocessing-bridge/1",
+  "before_commit": "dbe8a0381c974cb0b9e05c0b718b6f4541d357cd",
+  "before_source_sha256": "a531442c1cf20226dd9ed0ec7a7bd83b071e1c1486093e85dda753a1f7f17b05",
+  "after_source_sha256": "6a86e1db9428315dd1c5d414368a5cb70e0a0184ff661995d100f59631d16106",
+  "method": "Identical original product path, dependency prefix, generated header and compile DB; MSVC /EP instead of -c. Drop only completely empty output lines. All remaining bytes must match; never strip token or string whitespace.",
+  "configurations": {
+    "Debug": {
+      "before_raw_bytes": 6805098,
+      "after_raw_bytes": 6805106,
+      "before_raw_sha256": "9afd91a2cd819c675670f423fd9c4a779d2118c33ab9db306412ef1e3d1c5ef4",
+      "after_raw_sha256": "fde91aa053e8416e8f6f3f1c5e240ea330f19a69610f27eed7f029445abacb1a",
+      "raw_byte_equal": false,
+      "added_empty_lines": 4,
+      "nonempty_bytes": 6672370,
+      "nonempty_sha256": "3fc919419024607ca738d3b82df292f336a7311f98e05658fe3cd75ab6fd3e7a",
+      "nonempty_byte_equal": true,
+      "preprocess_exit_before": 0,
+      "preprocess_exit_after": 0
+    },
+    "Release": {
+      "before_raw_bytes": 6550237,
+      "after_raw_bytes": 6550245,
+      "before_raw_sha256": "d3255946855465dfc2f6ba0e661bddbb37f53c687636af81622eadd1fcc8071d",
+      "after_raw_sha256": "9809655e435e506eba2bb3592025c5f2da5c5e2c2c3a6fec996382649fd35089",
+      "raw_byte_equal": false,
+      "added_empty_lines": 4,
+      "nonempty_bytes": 6413921,
+      "nonempty_sha256": "59c9a7075d820c33133d662faa1aae677eb8730fd241ce4b5ee4e34ea563edf6",
+      "nonempty_byte_equal": true,
+      "preprocess_exit_before": 0,
+      "preprocess_exit_after": 0
+    }
+  },
+  "numerical_tests_repeated": false
+}

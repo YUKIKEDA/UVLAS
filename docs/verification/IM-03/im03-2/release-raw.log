@@ -1,0 +1,110 @@
+Start testing: Nov 17 12:18 東京 (標準時)
+----------------------------------------------------------
+19/77 Testing: aero.exact_triangle_predicates
+19/77 Test: aero.exact_triangle_predicates
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_exact_triangle_predicates.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.exact_triangle_predicates" start time: Nov 17 12:18 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 371261059
+===============================================================================
+All tests passed (5042 assertions in 7 test cases)
+
+<end of output>
+Test time =   0.36 sec
+----------------------------------------------------------
+Test Passed.
+"aero.exact_triangle_predicates" end time: Nov 17 12:18 東京 (標準時)
+"aero.exact_triangle_predicates" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/77 Testing: aero.exact_triangle_allocations
+20/77 Test: aero.exact_triangle_allocations
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_exact_triangle_allocations.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.exact_triangle_allocations" start time: Nov 17 12:18 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 1077535360
+aero exact preparation allocations=51 elapsed_ns=309700 planned_workspace_bytes=156008 planned_result_bytes=12344 process_peak_bytes=6500352
+===============================================================================
+All tests passed (13 assertions in 2 test cases)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"aero.exact_triangle_allocations" end time: Nov 17 12:18 東京 (標準時)
+"aero.exact_triangle_allocations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/77 Testing: aero.exact_triangle_resources
+21/77 Test: aero.exact_triangle_resources
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_exact_triangle_resources.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.exact_triangle_resources" start time: Nov 17 12:18 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2341135670
+===============================================================================
+All tests passed (38 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"aero.exact_triangle_resources" end time: Nov 17 12:18 東京 (標準時)
+"aero.exact_triangle_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/77 Testing: aero.geometry_snapshot
+22/77 Test: aero.geometry_snapshot
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_geometry_snapshot.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.geometry_snapshot" start time: Nov 17 12:18 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 3285158110
+===============================================================================
+All tests passed (328 assertions in 12 test cases)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"aero.geometry_snapshot" end time: Nov 17 12:18 東京 (標準時)
+"aero.geometry_snapshot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/77 Testing: aero.geometry_snapshot_resources
+23/77 Test: aero.geometry_snapshot_resources
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_geometry_snapshot_resources.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.geometry_snapshot_resources" start time: Nov 17 12:18 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 404685199
+===============================================================================
+All tests passed (30 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"aero.geometry_snapshot_resources" end time: Nov 17 12:18 東京 (標準時)
+"aero.geometry_snapshot_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 17 12:18 東京 (標準時)
+
+V-AERO =   0.46 sec*proc
+
+negative =   0.55 sec*proc
+
+property =   0.55 sec*proc
+
+unit =   0.42 sec*proc
+
+verification =   0.55 sec*proc
+

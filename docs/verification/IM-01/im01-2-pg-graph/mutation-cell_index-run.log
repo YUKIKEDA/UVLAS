@@ -1,0 +1,693 @@
+Randomness seeded to: 3449571548
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Every adopted half-cell has independent rational geometry and derivative scales
+-------------------------------------------------------------------------------
+<WORKTREE>\tests\structure\pg_graph_test.cpp(138)
+...............................................................................
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 1
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 1
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 2
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 0
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 1
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 2
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 3
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 4
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 5
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 6
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(149): FAILED:
+  CHECK( definition.cells[static_cast<std::size_t>(a * (2 * n) + b)] == cell )
+with expansion:
+  {?} == {?}
+with messages:
+  n := 4
+  a := 7
+  b := 7
+
+-------------------------------------------------------------------------------
+Graph canonical identities match independent versioned byte fixtures
+-------------------------------------------------------------------------------
+<WORKTREE>\tests\structure\pg_graph_test.cpp(272)
+...............................................................................
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "5cd7658c315185d3fc64629d8f4bf12d2f9be30d0c3e0a184a7b9fab3b63ca1c"
+  ==
+  "1a71ed2e9864aa9219a5940238ba0ceb2cdc24f4658251748b40352af0afbf5d"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "2b28541c35ad25dc7e4c84bfddbf64e6481174dc966f3c8ed254d4be265076ba"
+  ==
+  "a88e46857845326fe670e9fc5cd823dfce814e26f0715fd643c567532aae845d"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "0d0121bd026552650cbe5186997358b08e28ad7f3971dac6116dbc10e4ea1dcc"
+  ==
+  "b55927ce43c8aef51ffbf06187a596e72e707eae0dbcdbef0d1e0e27fc95dba7"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "d923f1b3015d682588eaaa5d79e7539718b739d32126a162a2eb4a30ba216c33"
+  ==
+  "d001a53d4079e12d8e3d53b9ed78e2944ab2d6bde1e088b3f0472a105d7abf0c"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "165755f3c6b435bea5fa7177ea3d386cf8ca3423dab08b1ba3fbcaa08f0b70a7"
+  ==
+  "44d51061973decf1c13ef1552a6bbf7e717176a50ccb4d6b8c78e0e65ac449b9"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "7beeeb1091829c8c68bfa8c061e3c40ad929d212e6c0eb24360d5708607064e1"
+  ==
+  "1b1b660dbe5c559f944219d1f188cc682f2dd4a5e01cd75bae4602c9a9ee678d"
+
+===============================================================================
+test cases:   10 |    8 passed |  2 failed
+assertions: 5303 | 5227 passed | 76 failed

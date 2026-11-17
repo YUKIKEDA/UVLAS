@@ -109,7 +109,7 @@ if (!entry.has_value()) { return; }
 use(*entry);
 ```
 
-optionalを設定する補助関数の呼出しだけを、呼出し側での存在証明にしない。2026-11-16、PR #73のLinux clang-tidyは、最初の失敗を保存する関数の呼出し後の逆参照を拒否した。保存する関数内で存在を確かめ、その値への参照を返せば、呼出し側はoptionalを逆参照せずに同じ失敗を使える。試験の診断フィールドも、既存の確認付き取得関数を通す。
+optionalを設定する補助関数の呼出しだけを、呼出し側での存在証明にしない。2026-11-16、PR #73のLinux clang-tidyは、最初の失敗を保存する関数の呼出し後の逆参照を拒否した。保存する関数内で存在を確かめ、その値への参照を返せば、呼出し側はoptionalを逆参照せずに同じ失敗を使える。試験の診断フィールドも、既存の確認付き取得関数を通す。 2026-11-17、PR #104のSAX eventでも、callback冒頭の設定後にhelperを通ってから逆参照する形がLinuxだけで失敗した。可変なcontextのoptionalを使う入口でローカル値へコピーし、同じ値を検査して返す。存在しない場合を0などの架空値で補わない。
 
 ```cpp
 // BAD: the analyzer need not infer engagement across the helper call.
@@ -139,3 +139,14 @@ for (const auto& [a, b] : pairs) { use(a, b); }
 ```
 
 少数要素用の固定配列を並べる補助処理も、入力件数と添字の上限を明示する。2026-11-15、PR #50のmutex順序付けは、3要素配列のprefixに対するstd::sortからlibstdc++の大範囲処理が展開され、GCC 14 Releaseの `-Werror=array-bounds` で構築に失敗した。容量を検査する小さな挿入ソートへ替え、`std::less` のポインタ全順序、重複排除、try-lock失敗時の取得済みlock解放を維持した。警告を無効にせず、対象翻訳単位と接続する処理で確認する。
+
+全入力語とactive alternativeの初期化を先に確認する。入れ子の`std::variant`は直接`emplace`しても、標準libの強い例外保証の分岐が一時variantを作ることがある。2026-11-17、PR #102のGCC14 Releaseは、一時代入を直接emplaceへ替えた後も`-O3 -Werror=maybe-uninitialized`で失敗した。libstdc++の分岐条件を読み、private storageの3語/6語を外側の別alternativeへ平坦化した。公開型・元語・数値式を変えず、選択型のnothrow構築とEdge/Faceのcopy/move条件を確認する。意味のない初期値や警告抑制を足さず、最適化構成が未確認なら解消済みとは書かない。
+
+```cpp
+// BAD: nested emplace can still use an exception-guarantee temporary.
+outer.emplace<Inner>(std::in_place_type<Words>, words);
+// GOOD: preserve the private payload alternatives with direct nonthrowing construction.
+using Storage = std::variant<Words3, Words6, Vertex, Edge, Face>;
+Storage storage;
+storage.emplace<Words3>(words);
+```

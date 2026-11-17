@@ -1,0 +1,7 @@
+62498 warnings generated.
+<WORKTREE>\src\structure\pg_graph.cpp:199:8: error: constructor does not initialize these fields: work, raw, held, payload, borrowed [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  199 | struct Bounds {
+      |        ^
+  200 |     std::uint64_t work, raw, held, payload, borrowed;
+      |
+      |                       {}   {}    {}       {}        {}

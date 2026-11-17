@@ -1,0 +1,64 @@
+Randomness seeded to: 1087257932
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Graph canonical identities match independent versioned byte fixtures
+-------------------------------------------------------------------------------
+<WORKTREE>\tests\structure\pg_graph_test.cpp(272)
+...............................................................................
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "ffb9e20e03c42f38309429fc637a577679b831369032437fdd374f0722f5eb23"
+  ==
+  "1a71ed2e9864aa9219a5940238ba0ceb2cdc24f4658251748b40352af0afbf5d"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "5fe1ec81f5faa51acc33f36f000908513b3d5007ea552291e828e4b41dc3ef2d"
+  ==
+  "a88e46857845326fe670e9fc5cd823dfce814e26f0715fd643c567532aae845d"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "5d590ecbb892bb8d4a92c935b75e365242ef12005a6056e97dc6cecdfb03c586"
+  ==
+  "b55927ce43c8aef51ffbf06187a596e72e707eae0dbcdbef0d1e0e27fc95dba7"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "d1e45b3aea54caaed85419203f19e3fe5f7a906d2cb59cd93bb69842bb3ca5f9"
+  ==
+  "d001a53d4079e12d8e3d53b9ed78e2944ab2d6bde1e088b3f0472a105d7abf0c"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "3153c3c827193e5518d932281747606950670ab9ed63b75a6db86aae263d47cc"
+  ==
+  "44d51061973decf1c13ef1552a6bbf7e717176a50ccb4d6b8c78e0e65ac449b9"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(286): FAILED:
+  CHECK( digest(v.identity) == row.at("sha256").get<std::string>() )
+with expansion:
+  "07d264136800fa806896082fd55149d58e8bd967eae01a88b347f07fcb4e0d10"
+  ==
+  "1b1b660dbe5c559f944219d1f188cc682f2dd4a5e01cd75bae4602c9a9ee678d"
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(313): FAILED:
+  CHECK_FALSE( take(changed.view()).identity == base.identity )
+with expansion:
+  !({?} == {?})
+with message:
+  field := 2
+
+===============================================================================
+test cases:   10 |    9 passed | 1 failed
+assertions: 5303 | 5296 passed | 7 failed
