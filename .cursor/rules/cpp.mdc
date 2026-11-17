@@ -97,7 +97,7 @@ if (!pin.has_value()) {
 use(*pin);
 ```
 
-配列内のoptionalは、要素を名前付き参照へ束縛し、その参照で存在確認と逆参照を行う。2026-11-16、PR #67のLinux clang-tidy 21.1.1は、`evaluator.seen[i]`を確認後に同じ添字で読み直す試験を未検査参照と診断した。明示的なreturnがあっても、添字式を再評価する形では解析器が同じ要素と認識するとは限らない。
+配列内のoptionalは、要素を名前付き参照へ束縛し、その参照で存在確認と逆参照を行う。2026-11-17、PR #112ではthreadのjoin後にREQUIREで確認した配列を再添字で読む3参照がLinuxだけで未検査と診断された。joinによる完了・同期を成功値の存在証明にせず、比較する各slotを同じ名前付き参照と通常のifで検査する。2026-11-16、PR #67のLinux clang-tidy 21.1.1は、`evaluator.seen[i]`を確認後に同じ添字で読み直す試験を未検査参照と診断した。明示的なreturnがあっても、添字式を再評価する形では解析器が同じ要素と認識するとは限らない。
 
 ```cpp
 // BAD: checking and dereferencing separate subscript expressions.

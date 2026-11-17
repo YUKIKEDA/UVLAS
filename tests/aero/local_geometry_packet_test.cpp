@@ -532,13 +532,18 @@ TEST_CASE("Local packet workspaces run independently and reject a live lease wit
     std::thread first{worker, 0}, second{worker, 1};
     first.join();
     second.join();
-    for (std::size_t i = 0; i < 2; ++i) {
-        REQUIRE_FALSE(failed[i]);
-        REQUIRE(packets[i]);
-        contains(packet_value(*packets[i], LocalQuantity::AreaZ), Rat{6});
+    for (const bool worker_failed : failed)
+        REQUIRE_FALSE(worker_failed);
+    const auto& left = packets[0];
+    const auto& right = packets[1];
+    if (!left || !right) {
+        FAIL_CHECK("A completed worker did not publish its owned packet");
+        return;
     }
-    CHECK(center(*packet_value(*packets[0], LocalQuantity::Length)) ==
-          center(*packet_value(*packets[1], LocalQuantity::Length)));
+    contains(packet_value(*left, LocalQuantity::AreaZ), Rat{6});
+    contains(packet_value(*right, LocalQuantity::AreaZ), Rat{6});
+    CHECK(center(*packet_value(*left, LocalQuantity::Length)) ==
+          center(*packet_value(*right, LocalQuantity::Length)));
 }
 TEST_CASE(
     "Local packet covariance uses the fixed geometric tolerance without widening qualification",
