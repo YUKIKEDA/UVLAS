@@ -95,7 +95,7 @@ storageの固定フィールドは、pointがID/正規owner ordinal/写像ID/写
 
 展開facetはFacetId、親面ordinal、点ordinal3個、辺ordinal3個、incidence符号3個と、`variant<IndependentTriangle{source_ordinal},QuadHalf{source_ordinal,half}>` の生成元を持つ。独立三角形に無意味なhalf欄を持たせない。 $$ S_{facet} $$ はこのstorageの実 `sizeof`、lookupはuint64 IDとint64 ordinalの16byteとし、その他のpaddingも `sizeof` へ含める。
 
-`QueryStorage`のフィールドはraw uint64 query ID、所有する定義variant、正規支持variant。内部定義は `variant<FreeSingleWords,FreeDoubleWords,VertexId,EdgeIdAndParameter,FacetIdAndTwoParameters>` とし、座標3語/両面6語を別alternativeへ直接保持する。公開FreePointの型は変更しない。各parameterは1語/2語のvariantである。支持は `variant<NoMaterialSupport,PointId,EdgeId,FacetId>`。raw storageでは各IDの数値を保持し、getterで正しいdomainへ明示構築する。query payloadは $$ S_Q=sizeof(QueryStorage) $$ の1個。固定query metadata/ownerは別として、可変長配列を追加しない。
+`QueryStorage`のフィールドはraw uint64 query ID、所有する定義variant、正規支持variant。内部定義は `variant<FreeSingleWords,FreeDoubleWords,VertexId,EdgeIdAndParameter,FacetIdAndTwoParameters>` とし、座標3語/座標のhigh/low計6語を別alternativeへ直接保持する。公開FreePointの型は変更しない。各parameterは1語/2語のvariantである。支持は `variant<NoMaterialSupport,PointId,EdgeId,FacetId>`。raw storageでは各IDの数値を保持し、getterで正しいdomainへ明示構築する。query payloadは $$ S_Q=sizeof(QueryStorage) $$ の1個。固定query metadata/ownerは別として、可変長配列を追加しない。
 
 ```cpp
 struct QueryArithmeticScratch {
