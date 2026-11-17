@@ -1,0 +1,3346 @@
+{
+  "schema": "uvlas.case-initial-physical-state-design/1",
+  "description": "完全な初期物理場・状態のschema設計資料。context/expected/patchesは製品入力keyではない。入力場のexact恒等式の照合と製品prepareの精度・拘束・非貫通資格を区別する。",
+  "cases": {
+    "flat_clamped_global": {
+      "context": {
+        "units": {
+          "length": "m",
+          "mass": "kg",
+          "time": "s",
+          "angle": "rad"
+        },
+        "shell_ids": [
+          "1"
+        ],
+        "beam_ids": [],
+        "rigid_ids": [],
+        "reference": {
+          "n": 1,
+          "x0": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "height_terms": [],
+          "reference_length": 1,
+          "thickness": 1,
+          "domain": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        "active_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "support": {
+          "kind": "full_thickness_clamp",
+          "shell": "1",
+          "s": 0
+        },
+        "equilibrium": {
+          "kind": "reference_at_rest"
+        }
+      },
+      "perturbation": {
+        "kind": "physical",
+        "shells": [
+          {
+            "shell": "1",
+            "displacement": {
+              "kind": "global_polynomial",
+              "r": {
+                "terms": [
+                  {
+                    "powers": [
+                      2,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "100"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "p": {
+                "terms": []
+              },
+              "c": {
+                "terms": []
+              }
+            },
+            "velocity": {
+              "kind": "global_polynomial",
+              "r": {
+                "terms": [
+                  {
+                    "powers": [
+                      2,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "50"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "p": {
+                "terms": []
+              },
+              "c": {
+                "terms": []
+              }
+            }
+          }
+        ],
+        "beams": [],
+        "rigids": [],
+        "displacements": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                0
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              0.01
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ],
+        "velocities": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                0
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              0.02
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "scope": "schema design and exact structural input field only; no product prepare qualification",
+        "point_differences": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                0
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "displacement": [
+              0,
+              0,
+              {
+                "numerator": "1",
+                "denominator": "100"
+              }
+            ],
+            "velocity": [
+              0,
+              0,
+              {
+                "numerator": "1",
+                "denominator": "50"
+              }
+            ]
+          }
+        ],
+        "root_all_thickness_displacement": [
+          0,
+          0,
+          0
+        ],
+        "root_all_thickness_velocity": [
+          0,
+          0,
+          0
+        ],
+        "s_root_derivative_r": [
+          0,
+          0,
+          0
+        ],
+        "source_point_residual": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "flat_full_thickness": {
+      "context": {
+        "units": {
+          "length": "m",
+          "mass": "kg",
+          "time": "s",
+          "angle": "rad"
+        },
+        "shell_ids": [
+          "1"
+        ],
+        "beam_ids": [],
+        "rigid_ids": [],
+        "reference": {
+          "n": 1,
+          "x0": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "height_terms": [],
+          "reference_length": 1,
+          "thickness": 1,
+          "domain": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        "active_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "support": {
+          "kind": "full_thickness_clamp",
+          "shell": "1",
+          "s": 0
+        },
+        "equilibrium": {
+          "kind": "reference_at_rest"
+        }
+      },
+      "perturbation": {
+        "kind": "physical",
+        "shells": [
+          {
+            "shell": "1",
+            "displacement": {
+              "kind": "global_polynomial",
+              "r": {
+                "terms": []
+              },
+              "p": {
+                "terms": [
+                  {
+                    "powers": [
+                      1,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "100"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "c": {
+                "terms": [
+                  {
+                    "powers": [
+                      1,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "200"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "velocity": {
+              "kind": "global_polynomial",
+              "r": {
+                "terms": []
+              },
+              "p": {
+                "terms": [
+                  {
+                    "powers": [
+                      1,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "50"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "c": {
+                "terms": [
+                  {
+                    "powers": [
+                      1,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "100"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "beams": [],
+        "rigids": [],
+        "displacements": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                1
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              0.005625
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          },
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                -1
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              -0.004375
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ],
+        "velocities": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                1
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              0.01125
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          },
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                -1
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              -0.00875
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "scope": "exact input-field identity; positive tolerance still requires product error qualification",
+        "midplane_displacement": [
+          0,
+          0,
+          0
+        ],
+        "midplane_velocity": [
+          0,
+          0,
+          0
+        ],
+        "point_differences": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                1
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "displacement": [
+              0,
+              0,
+              {
+                "numerator": "9",
+                "denominator": "1600"
+              }
+            ],
+            "velocity": [
+              0,
+              0,
+              {
+                "numerator": "9",
+                "denominator": "800"
+              }
+            ]
+          },
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                -1
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "displacement": [
+              0,
+              0,
+              {
+                "numerator": "-7",
+                "denominator": "1600"
+              }
+            ],
+            "velocity": [
+              0,
+              0,
+              {
+                "numerator": "-7",
+                "denominator": "800"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "flat_half_cells": {
+      "context": {
+        "units": {
+          "length": "m",
+          "mass": "kg",
+          "time": "s",
+          "angle": "rad"
+        },
+        "shell_ids": [
+          "1"
+        ],
+        "beam_ids": [],
+        "rigid_ids": [],
+        "reference": {
+          "n": 1,
+          "x0": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "height_terms": [],
+          "reference_length": 1,
+          "thickness": 1,
+          "domain": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        "active_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "support": {
+          "kind": "full_thickness_clamp",
+          "shell": "1",
+          "s": 0
+        },
+        "equilibrium": {
+          "kind": "reference_at_rest"
+        }
+      },
+      "perturbation": {
+        "kind": "physical",
+        "shells": [
+          {
+            "shell": "1",
+            "displacement": {
+              "kind": "half_cells",
+              "cells": [
+                {
+                  "cell": [
+                    0,
+                    0
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "1600"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "1600"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                },
+                {
+                  "cell": [
+                    0,
+                    1
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "1600"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "1600"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                },
+                {
+                  "cell": [
+                    1,
+                    0
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "9",
+                            "denominator": "1600"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "3",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "1600"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                },
+                {
+                  "cell": [
+                    1,
+                    1
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "9",
+                            "denominator": "1600"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "3",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "1600"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                }
+              ]
+            },
+            "velocity": {
+              "kind": "half_cells",
+              "cells": [
+                {
+                  "cell": [
+                    0,
+                    0
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "400"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                },
+                {
+                  "cell": [
+                    0,
+                    1
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "400"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                },
+                {
+                  "cell": [
+                    1,
+                    0
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "9",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "3",
+                            "denominator": "400"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                },
+                {
+                  "cell": [
+                    1,
+                    1
+                  ],
+                  "r": {
+                    "terms": [
+                      {
+                        "powers": [
+                          0,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "9",
+                            "denominator": "800"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          1,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "3",
+                            "denominator": "400"
+                          }
+                        ]
+                      },
+                      {
+                        "powers": [
+                          2,
+                          0
+                        ],
+                        "value": [
+                          0,
+                          0,
+                          {
+                            "numerator": "1",
+                            "denominator": "800"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "p": {
+                    "terms": []
+                  },
+                  "c": {
+                    "terms": []
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "beams": [],
+        "rigids": [],
+        "displacements": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                0
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              0.01
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ],
+        "velocities": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                0
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "value": [
+              0,
+              0,
+              0.02
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "equivalent_case": "flat_clamped_global",
+        "scope": "exact local coefficient pullback on all four cells; no product prepare qualification",
+        "point_differences": [
+          {
+            "point": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "coordinates": [
+                1,
+                0.5,
+                0
+              ],
+              "side_s": "lower",
+              "side_t": "lower"
+            },
+            "displacement": [
+              0,
+              0,
+              {
+                "numerator": "1",
+                "denominator": "100"
+              }
+            ],
+            "velocity": [
+              0,
+              0,
+              {
+                "numerator": "1",
+                "denominator": "50"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "beam_rigid_nonzero": {
+      "context": {
+        "units": {
+          "length": "m",
+          "mass": "kg",
+          "time": "s",
+          "angle": "rad"
+        },
+        "shell_ids": [],
+        "beam_ids": [
+          "2"
+        ],
+        "rigid_ids": [
+          "3"
+        ],
+        "beam_reference_frames": [
+          {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "origin": [
+              1,
+              0,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "equilibrium_rigid": {
+          "position": [
+            1,
+            0,
+            0
+          ],
+          "rotation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "linear_velocity": [
+            0,
+            0,
+            0
+          ],
+          "angular_velocity": [
+            0,
+            0,
+            0
+          ]
+        },
+        "beam_length": 1,
+        "support": {
+          "kind": "root_frame_fixed",
+          "beam": "2",
+          "node": 0
+        },
+        "attachment": {
+          "kind": "same_tip_frame",
+          "beam": "2",
+          "node": 1,
+          "rigid": "3",
+          "offset": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        }
+      },
+      "perturbation": {
+        "kind": "physical",
+        "shells": [],
+        "beams": [
+          {
+            "beam": "2",
+            "nodes": [
+              {
+                "position": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "linear_velocity": [
+                  0,
+                  0,
+                  0
+                ],
+                "angular_velocity": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "position": [
+                  1,
+                  0,
+                  0
+                ],
+                "rotation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ],
+                "linear_velocity": [
+                  0,
+                  0,
+                  0
+                ],
+                "angular_velocity": [
+                  0,
+                  0,
+                  1
+                ]
+              }
+            ]
+          }
+        ],
+        "rigids": [
+          {
+            "rigid": "3",
+            "state": {
+              "position": [
+                1,
+                0,
+                0
+              ],
+              "rotation": [
+                [
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  -1
+                ],
+                [
+                  0,
+                  1,
+                  0
+                ]
+              ],
+              "linear_velocity": [
+                0,
+                0,
+                0
+              ],
+              "angular_velocity": [
+                0,
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "displacements": [
+          {
+            "point": {
+              "target": {
+                "kind": "rigid",
+                "id": "3"
+              },
+              "coordinates": [
+                1,
+                0,
+                0
+              ]
+            },
+            "value": [
+              0,
+              0,
+              0
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ],
+        "velocities": [
+          {
+            "point": {
+              "target": {
+                "kind": "rigid",
+                "id": "3"
+              },
+              "coordinates": [
+                1,
+                0,
+                0
+              ]
+            },
+            "value": [
+              0,
+              0,
+              1
+            ],
+            "tolerance": [
+              1e-12,
+              1e-12,
+              1e-12
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "scope": "SO(3), attachment and body/world velocity identities; no dynamic prepare qualification",
+        "tip_body_angular_velocity": [
+          0,
+          0,
+          1
+        ],
+        "tip_world_angular_velocity": [
+          0,
+          -1,
+          0
+        ],
+        "rigid_point_world_position": [
+          2,
+          0,
+          0
+        ],
+        "rigid_point_world_velocity": [
+          0,
+          0,
+          1
+        ],
+        "point_differences": [
+          {
+            "point": {
+              "target": {
+                "kind": "rigid",
+                "id": "3"
+              },
+              "coordinates": [
+                1,
+                0,
+                0
+              ]
+            },
+            "displacement": [
+              0,
+              0,
+              0
+            ],
+            "velocity": [
+              0,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "negative_cases": [
+    {
+      "id": "point_only_underdetermined",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation",
+          "value": {
+            "kind": "physical",
+            "displacements": [
+              {
+                "point": {
+                  "target": {
+                    "kind": "shell",
+                    "id": "1"
+                  },
+                  "coordinates": [
+                    1,
+                    0.5,
+                    0
+                  ],
+                  "side_s": "lower",
+                  "side_t": "lower"
+                },
+                "value": [
+                  0,
+                  0,
+                  0.01
+                ]
+              }
+            ],
+            "velocities": []
+          }
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "完全な3状態集合が欠落。点値から未指定自由成分を選ばない。"
+    },
+    {
+      "id": "missing_shell_state",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/shells/0"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "既知のShell 1が欠落。"
+    },
+    {
+      "id": "duplicate_shell_state",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "add",
+          "path": "/perturbation/shells/-",
+          "value": {
+            "shell": "1",
+            "displacement": {
+              "kind": "global_polynomial",
+              "r": {
+                "terms": [
+                  {
+                    "powers": [
+                      2,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "100"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "p": {
+                "terms": []
+              },
+              "c": {
+                "terms": []
+              }
+            },
+            "velocity": {
+              "kind": "global_polynomial",
+              "r": {
+                "terms": [
+                  {
+                    "powers": [
+                      2,
+                      0
+                    ],
+                    "value": [
+                      0,
+                      0,
+                      {
+                        "numerator": "1",
+                        "denominator": "50"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "p": {
+                "terms": []
+              },
+              "c": {
+                "terms": []
+              }
+            }
+          }
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "同じShellの二重指定。"
+    },
+    {
+      "id": "missing_velocity_field",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/shells/0/velocity"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "変位から初期速度を補完しない。"
+    },
+    {
+      "id": "missing_director_numerator",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/shells/0/displacement/p"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "中央面場だけでは厚さ方向状態が不足。"
+    },
+    {
+      "id": "nonpositive_denominator",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/shells/0/displacement/r/terms/0/value/2/denominator",
+          "value": "0"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "既存Rationalの正分母条件に違反。"
+    },
+    {
+      "id": "degree_over_limit",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/shells/0/displacement/r/terms/0/powers",
+          "value": [
+            14,
+            0
+          ]
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "R総次数13の形状上限を超える。"
+    },
+    {
+      "id": "nonmember_c_squared",
+      "base_case": "flat_full_thickness",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/shells/0/displacement/c/terms/0/powers",
+          "value": [
+            2,
+            0
+          ]
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "Cの次数上限内でも区分双一次空間へ非所属。"
+    },
+    {
+      "id": "missing_active_cell",
+      "base_case": "flat_half_cells",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/shells/0/displacement/cells/3"
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "正面積cellの完全被覆が欠落。"
+    },
+    {
+      "id": "duplicate_cell",
+      "base_case": "flat_half_cells",
+      "patches": [
+        {
+          "op": "add",
+          "path": "/perturbation/shells/0/displacement/cells/-",
+          "value": {
+            "cell": [
+              0,
+              0
+            ],
+            "r": {
+              "terms": [
+                {
+                  "powers": [
+                    0,
+                    0
+                  ],
+                  "value": [
+                    0,
+                    0,
+                    {
+                      "numerator": "1",
+                      "denominator": "1600"
+                    }
+                  ]
+                },
+                {
+                  "powers": [
+                    1,
+                    0
+                  ],
+                  "value": [
+                    0,
+                    0,
+                    {
+                      "numerator": "1",
+                      "denominator": "800"
+                    }
+                  ]
+                },
+                {
+                  "powers": [
+                    2,
+                    0
+                  ],
+                  "value": [
+                    0,
+                    0,
+                    {
+                      "numerator": "1",
+                      "denominator": "1600"
+                    }
+                  ]
+                }
+              ]
+            },
+            "p": {
+              "terms": []
+            },
+            "c": {
+              "terms": []
+            }
+          }
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "同じhalf-cellを二重指定。"
+    },
+    {
+      "id": "discontinuous_cell_field",
+      "base_case": "flat_half_cells",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/shells/0/displacement/cells/0/r/terms/0/value/2",
+          "value": {
+            "numerator": "2",
+            "denominator": "1600"
+          }
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "一方のcellだけ定数を変更し、既存R空間の連続性に反する。"
+    },
+    {
+      "id": "point_value_contradiction",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/displacements/0/value/2",
+          "value": 0.02
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "明示完全場の1/100と点の1/50が矛盾。"
+    },
+    {
+      "id": "negative_point_tolerance",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/velocities/0/tolerance/2",
+          "value": -1e-12
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "点予算は成分ごとに非負。"
+    },
+    {
+      "id": "missing_side_t",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/displacements/0/point/side_t"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "shellの両chart軸の片側tagを明示する。"
+    },
+    {
+      "id": "outward_side_at_s1",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/displacements/0/point/side_s",
+          "value": "upper"
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "s=1でupperは外向き。既存PgGraph境界規約に反する。"
+    },
+    {
+      "id": "unknown_point_target",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/displacements/0/point/target/id",
+          "value": "404"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "存在しない対象を零状態にしない。"
+    },
+    {
+      "id": "support_contradiction",
+      "base_case": "flat_clamped_global",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/shells/0/displacement/r/terms/0/powers",
+          "value": [
+            0,
+            0
+          ]
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "R定数1/100は元s=0の全厚固定と矛盾。"
+    },
+    {
+      "id": "missing_beam_endpoint",
+      "base_case": "beam_rigid_nonzero",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/beams/0/nodes/1"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "両端の完全なframe状態が必要。"
+    },
+    {
+      "id": "missing_rigid_state",
+      "base_case": "beam_rigid_nonzero",
+      "patches": [
+        {
+          "op": "remove",
+          "path": "/perturbation/rigids/0"
+        }
+      ],
+      "expected_stage": "schema",
+      "expected_failure": "InvalidInput",
+      "reason": "取付で従属する剛体も完全状態の明示と整合確認が必要。"
+    },
+    {
+      "id": "non_so3_tip",
+      "base_case": "beam_rigid_nonzero",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/beams/0/nodes/1/rotation/1/2",
+          "value": -2
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "非直交行列をSO(3)へ修復しない。"
+    },
+    {
+      "id": "rigid_attachment_contradiction",
+      "base_case": "beam_rigid_nonzero",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/rigids/0/state/rotation",
+          "value": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "梁先端Rx90と同じ取付frameの剛体Iが矛盾。"
+    },
+    {
+      "id": "body_world_velocity_contradiction",
+      "base_case": "beam_rigid_nonzero",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/perturbation/velocities/0/value",
+          "value": [
+            0,
+            1,
+            0
+          ]
+        }
+      ],
+      "expected_stage": "prepare",
+      "expected_failure": "InvalidInput",
+      "reason": "body角速度から得る世界点速度z=1と矛盾。"
+    }
+  ],
+  "root_cases": {
+    "coupled_transient_nonzero": {
+      "schema": "uvlas.case/1",
+      "units": {
+        "length": "m",
+        "mass": "kg",
+        "time": "s",
+        "angle": "rad"
+      },
+      "model": {
+        "geometry": [
+          {
+            "kind": "pg",
+            "id": "1",
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                [
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1
+                ]
+              ]
+            },
+            "reference_length": 1,
+            "x0": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "width": {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            "skew": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "degree": [
+              0,
+              0
+            ],
+            "coefficients": [],
+            "domain": [
+              [
+                {
+                  "numerator": "0",
+                  "denominator": "1"
+                },
+                {
+                  "numerator": "0",
+                  "denominator": "1"
+                }
+              ],
+              [
+                {
+                  "numerator": "1",
+                  "denominator": "1"
+                },
+                {
+                  "numerator": "0",
+                  "denominator": "1"
+                }
+              ],
+              [
+                {
+                  "numerator": "1",
+                  "denominator": "1"
+                },
+                {
+                  "numerator": "1",
+                  "denominator": "1"
+                }
+              ],
+              [
+                {
+                  "numerator": "0",
+                  "denominator": "1"
+                },
+                {
+                  "numerator": "1",
+                  "denominator": "1"
+                }
+              ]
+            ],
+            "thickness": {
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ],
+              "triangles": [
+                [
+                  0,
+                  1,
+                  2
+                ],
+                [
+                  0,
+                  2,
+                  3
+                ]
+              ],
+              "values": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "n": 1,
+            "convention": "pg-graph-v1",
+            "boundaries": [
+              {
+                "name": "leading",
+                "vertices": [
+                  [
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    }
+                  ],
+                  [
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    }
+                  ]
+                ]
+              },
+              {
+                "name": "trailing",
+                "vertices": [
+                  [
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    }
+                  ],
+                  [
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    }
+                  ]
+                ]
+              },
+              {
+                "name": "root",
+                "vertices": [
+                  [
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    }
+                  ],
+                  [
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    }
+                  ]
+                ]
+              },
+              {
+                "name": "tip",
+                "vertices": [
+                  [
+                    {
+                      "numerator": "0",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    }
+                  ],
+                  [
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    },
+                    {
+                      "numerator": "1",
+                      "denominator": "1"
+                    }
+                  ]
+                ]
+              }
+            ],
+            "continuity": []
+          }
+        ],
+        "materials": [
+          {
+            "kind": "isotropic",
+            "id": "1",
+            "young": 1,
+            "poisson": 0,
+            "density": 1,
+            "provenance": {
+              "description": "設計検査用の合成値",
+              "references": [],
+              "assumptions": []
+            },
+            "applicability": {
+              "kind": "unevaluated"
+            }
+          }
+        ],
+        "shells": [
+          {
+            "id": "1",
+            "geometry": "1",
+            "layers": [
+              {
+                "id": "1",
+                "interval": [
+                  {
+                    "numerator": "-1",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ],
+                "material": "1",
+                "axis": {
+                  "kind": "projected",
+                  "direction": {
+                    "kind": "constant",
+                    "value": [
+                      1,
+                      0,
+                      0
+                    ]
+                  },
+                  "angle": {
+                    "kind": "constant",
+                    "value": [
+                      0
+                    ]
+                  }
+                },
+                "initial_green": {
+                  "kind": "constant",
+                  "value": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "viscosity": [
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            ],
+            "damping_components": "mandel",
+            "loads": []
+          }
+        ],
+        "beams": [],
+        "joints": [],
+        "supports": [
+          {
+            "kind": "trace_constraint",
+            "id": "1",
+            "region": {
+              "target": {
+                "kind": "shell",
+                "id": "1"
+              },
+              "kind": "edge",
+              "geometry": "1",
+              "boundary": 0,
+              "side": "interior"
+            },
+            "components": [
+              0,
+              1,
+              2
+            ],
+            "motion": {
+              "origin": {
+                "origin": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "translation": {
+                "kind": "constant",
+                "value": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "rotation_vector": {
+                "kind": "constant",
+                "value": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "events": []
+            }
+          }
+        ],
+        "masses": [],
+        "aero_surfaces": [
+          {
+            "id": "1",
+            "geometry": "1",
+            "chord": [
+              0,
+              1
+            ],
+            "span": [
+              0,
+              1
+            ],
+            "leading": 0,
+            "trailing": 1,
+            "orientation": "positive",
+            "sharing": [],
+            "attachment": {
+              "kind": "structural",
+              "host": "1"
+            }
+          }
+        ]
+      },
+      "flow": {
+        "density": 1,
+        "uniform": {
+          "kind": "constant",
+          "value": [
+            1,
+            0,
+            0
+          ]
+        },
+        "gust": {
+          "kind": "none"
+        },
+        "reference": {
+          "density": 1,
+          "speed": 1,
+          "area": 1,
+          "chord": 1,
+          "span": 1,
+          "moment_origin": [
+            0,
+            0,
+            0
+          ]
+        },
+        "events": [],
+        "kind": "known"
+      },
+      "analysis": {
+        "kind": "transient",
+        "branch": {
+          "id": "1",
+          "seed": {
+            "kind": "reference"
+          },
+          "continuation": {
+            "kind": "fixed"
+          }
+        },
+        "wake": {
+          "convection": {
+            "kind": "free"
+          },
+          "retention": {
+            "kind": "all"
+          },
+          "core_radius": 0.01,
+          "model": "wp1-stream-p0-span",
+          "mapping": "dual-quarter-v1",
+          "kind": "active"
+        },
+        "loads": [],
+        "intervals": [
+          {
+            "start": 0,
+            "end": 1,
+            "step": 1,
+            "restart": "initial"
+          }
+        ],
+        "physics": "coupled"
+      },
+      "observations": [
+        {
+          "id": "1",
+          "basis": {
+            "kind": "world"
+          },
+          "comparison": {
+            "window": [
+              0,
+              0
+            ],
+            "statistic": "instantaneous",
+            "side": "right",
+            "reference": {
+              "kind": "none"
+            }
+          },
+          "budget": {
+            "absolute": [
+              1e-12,
+              1e-12,
+              1e-12
+            ],
+            "relative": [
+              1e-12,
+              1e-12,
+              1e-12
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "groups": [
+              {
+                "status": "required",
+                "kind": "geometry",
+                "covers": [
+                  "geometry"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "structure_grid",
+                "covers": [
+                  "structure_grid"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "aero_grid",
+                "covers": [
+                  "aero_grid"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "time_wake_age",
+                "covers": [
+                  "time_wake_age"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "wake_length",
+                "covers": [
+                  "wake_length"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "core",
+                "covers": [
+                  "core"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "quadrature",
+                "covers": [
+                  "quadrature"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "algebra",
+                "covers": [
+                  "algebra"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "required",
+                "kind": "newton",
+                "covers": [
+                  "newton"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              },
+              {
+                "status": "not_applicable",
+                "kind": "eigen_range",
+                "reason": "この解析の物理量を消費しない"
+              },
+              {
+                "status": "not_applicable",
+                "kind": "search_width",
+                "reason": "この解析の物理量を消費しない"
+              },
+              {
+                "status": "required",
+                "kind": "load_mapping",
+                "covers": [
+                  "load_mapping"
+                ],
+                "absolute": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ],
+                "relative": [
+                  1e-14,
+                  1e-14,
+                  1e-14
+                ]
+              }
+            ]
+          },
+          "kind": "point",
+          "point": {
+            "target": {
+              "kind": "shell",
+              "id": "1"
+            },
+            "coordinates": [
+              0,
+              0,
+              0
+            ],
+            "side": "interior"
+          },
+          "quantity": "position"
+        }
+      ],
+      "numerics": {
+        "patch": {
+          "kind": "active",
+          "maximum_degree": 4,
+          "maximum_partition": 1,
+          "geometry_error": 1e-12,
+          "trace_error": 1e-12,
+          "rank": "exact_no_drop"
+        },
+        "quadrature": {
+          "structure": {
+            "surface_degree": 7,
+            "thickness_points": 7,
+            "independent_surface_degree": 9,
+            "independent_thickness_points": 9,
+            "absolute": 1e-12,
+            "relative": 1e-12,
+            "maximum_subdivisions": 10,
+            "kind": "active"
+          },
+          "aero": {
+            "kind": "wp1_induction_v1",
+            "absolute": 1e-12,
+            "relative": 1e-12
+          }
+        },
+        "linear": {
+          "backend": "dense_lu",
+          "accuracy": {
+            "absolute": 1e-12,
+            "relative": 1e-12,
+            "backward": 1e-12,
+            "norm": "infinity"
+          },
+          "maximum_refinements": 5,
+          "backend_memory": {
+            "admission": "estimate",
+            "maximum_bytes": 16777216
+          }
+        },
+        "newton": {
+          "maximum_iterations": 20,
+          "maximum_line_searches": 10,
+          "absolute": 1e-12,
+          "relative": 1e-12,
+          "correction": 1e-12,
+          "minimum_step": 0.001
+        },
+        "precision": {
+          "input": "preserve",
+          "retained": "adaptive_binary64_two_word",
+          "returned": "retained",
+          "projection_absolute": 1e-12,
+          "projection_relative": 1e-12
+        },
+        "eigen": {
+          "kind": "none"
+        },
+        "wake_rows": {
+          "kind": "limited",
+          "maximum_rows": 100
+        },
+        "scales": [
+          {
+            "kind": "uniform_components",
+            "field": "shell_position",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "structural_velocity",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "circulation",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_position",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "wake_strength",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "force_balance",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "aero_residual",
+            "targets": [],
+            "values": [
+              1
+            ]
+          },
+          {
+            "kind": "uniform_components",
+            "field": "transport_residual",
+            "targets": [],
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "physical_layout_policy",
+            "field": "mixed_blocks",
+            "constraint": {
+              "kind": "physical",
+              "position": {
+                "kind": "values",
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "orientation": {
+                "kind": "none"
+              },
+              "multiplier_work_scale": 1,
+              "reaction_force": [
+                1,
+                1,
+                1
+              ],
+              "reaction_moment": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "error_groups": [
+          {
+            "status": "required",
+            "kind": "geometry",
+            "covers": [
+              "geometry"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "structure_grid",
+            "covers": [
+              "structure_grid"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "aero_grid",
+            "covers": [
+              "aero_grid"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "time_wake_age",
+            "covers": [
+              "time_wake_age"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "wake_length",
+            "covers": [
+              "wake_length"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "core",
+            "covers": [
+              "core"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "quadrature",
+            "covers": [
+              "quadrature"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "algebra",
+            "covers": [
+              "algebra"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "required",
+            "kind": "newton",
+            "covers": [
+              "newton"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          },
+          {
+            "status": "not_applicable",
+            "kind": "eigen_range",
+            "reason": "この解析の物理量を消費しない"
+          },
+          {
+            "status": "not_applicable",
+            "kind": "search_width",
+            "reason": "この解析の物理量を消費しない"
+          },
+          {
+            "status": "required",
+            "kind": "load_mapping",
+            "covers": [
+              "load_mapping"
+            ],
+            "absolute": [
+              1e-14
+            ],
+            "relative": [
+              1e-14
+            ]
+          }
+        ]
+      },
+      "resources": {
+        "profile": "custom",
+        "threads": 1,
+        "maximum_memory_bytes": 67108864,
+        "maximum_wall_seconds": 10,
+        "maximum_steps": 10,
+        "maximum_total_iterations": 1000,
+        "checkpoint_temporary_bytes": 1048576,
+        "input": {
+          "maximum_source_bytes": 1000000,
+          "maximum_depth": 1000000,
+          "maximum_nodes": 1000000,
+          "maximum_members": 1000000,
+          "maximum_decoded_string_bytes": 1000000,
+          "maximum_decimal_token_bytes": 1000000,
+          "maximum_total_text_bytes": 1000000,
+          "maximum_typed_bytes": 1000000,
+          "maximum_entities": 1000000,
+          "maximum_references": 1000000,
+          "maximum_scalars": 1000000,
+          "maximum_polynomial_terms": 1000000,
+          "maximum_table_samples": 1000000,
+          "maximum_diagnostic_path_bytes": 1000000,
+          "maximum_expression_nodes": 1000000,
+          "maximum_expression_edges": 1000000,
+          "maximum_expression_depth": 1000000,
+          "maximum_expression_power": 1000000,
+          "maximum_expression_points": 1000000
+        }
+      },
+      "output": {
+        "directory": "results",
+        "observations": {
+          "every_steps": 1,
+          "observations": [
+            "1"
+          ]
+        },
+        "visualization": {
+          "enabled": false,
+          "every_steps": 1,
+          "layers": [],
+          "interfaces": "both",
+          "reference_geometry": false,
+          "current_geometry": false
+        },
+        "checkpoint": {
+          "kind": "off"
+        },
+        "overwrite": "reject_existing",
+        "resume": "explicit_only"
+      },
+      "initial": {
+  "kind": "equilibrium",
+  "branch": "1",
+  "perturbation": {
+    "kind": "physical",
+    "shells": [
+      {
+        "shell": "1",
+        "displacement": {
+          "kind": "global_polynomial",
+          "r": {
+            "terms": [
+              {
+                "powers": [
+                  2,
+                  0
+                ],
+                "value": [
+                  0,
+                  0,
+                  {
+                    "numerator": "1",
+                    "denominator": "100"
+                  }
+                ]
+              }
+            ]
+          },
+          "p": {
+            "terms": []
+          },
+          "c": {
+            "terms": []
+          }
+        },
+        "velocity": {
+          "kind": "global_polynomial",
+          "r": {
+            "terms": [
+              {
+                "powers": [
+                  2,
+                  0
+                ],
+                "value": [
+                  0,
+                  0,
+                  {
+                    "numerator": "1",
+                    "denominator": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          "p": {
+            "terms": []
+          },
+          "c": {
+            "terms": []
+          }
+        }
+      }
+    ],
+    "beams": [],
+    "rigids": [],
+    "displacements": [
+      {
+        "point": {
+          "target": {
+            "kind": "shell",
+            "id": "1"
+          },
+          "coordinates": [
+            1,
+            0.5,
+            0
+          ],
+          "side_s": "lower",
+          "side_t": "lower"
+        },
+        "value": [
+          0,
+          0,
+          0.01
+        ],
+        "tolerance": [
+          1e-12,
+          1e-12,
+          1e-12
+        ]
+      }
+    ],
+    "velocities": [
+      {
+        "point": {
+          "target": {
+            "kind": "shell",
+            "id": "1"
+          },
+          "coordinates": [
+            1,
+            0.5,
+            0
+          ],
+          "side_s": "lower",
+          "side_t": "lower"
+        },
+        "value": [
+          0,
+          0,
+          0.02
+        ],
+        "tolerance": [
+          1e-12,
+          1e-12,
+          1e-12
+        ]
+      }
+    ]
+  }
+}
+    }
+  },
+  "root_case_status": {
+    "coupled_transient_nonzero": "schema design only; inherited equilibrium circulation/wake may fail nonpenetration after a structural perturbation; no coupled initialization qualification claimed"
+  }
+}
