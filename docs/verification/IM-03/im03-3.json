@@ -32,7 +32,7 @@
     "製品sqrtを共有しないcpp_rational＋integer sqrt256bit囲い。tau1e-10、共変1e-8、分類tol0、thin、2^±900、巨大原点low、word-gapを検査。",
     "content/時刻不一致、payload等号/不足、総work/subcap境界、設定済取消、再入、別workspace並列、実allocation全ordinalのbad_alloc→ResourceExceededとlease解放/旧owner不変を検査。",
     "byte同一controlと6隔離変異をproducer2TU＋test再compileで検出。inline helperの元testobj迂回なし。",
-    "影響A1既存2＋新2CTestのclean D/R、対象static/format、日本語とroot数理/型/資源レビュー、工程/bit比較、source/artifact hashを保存。trace/root最終record審査は後続metadata。"
+    "影響A1既存2＋新2CTestのclean D/R、対象static/format、日本語とroot数理/型/資源レビュー、工程/bit比較、source/artifact hashを保存。rootの最終record審査とIO head870926dの許可済みローカル統合を完了。14source hashは実行版6ad95bbと一致。IM03-3 Done/traceを同期し208 IDs、試験あり33、記録あり40、0 problems。"
   ],
   "verification": {
     "platform": "Windows x64 MSVC19.51 /fp:strict /W4 /WX",
