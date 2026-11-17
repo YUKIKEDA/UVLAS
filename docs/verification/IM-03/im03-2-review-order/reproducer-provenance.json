@@ -1,0 +1,16 @@
+{
+  "schema": "uvlas.reproduction/1",
+  "reviewed_head": "b0fd950ae5561a3b8efd724fcc644597748b148a",
+  "source_hint": "src/aero/geometry_snapshot.cpp",
+  "source_sha256": "83fa606f19aa643da0dd215a893029e02fa3bce3780cb3cef3eeecb943c21768",
+  "git_show_sha256": "83fa606f19aa643da0dd215a893029e02fa3bce3780cb3cef3eeecb943c21768",
+  "source_matches_reviewed_head": true,
+  "test_scope": "その製品sourceへ新しいliteral caseだけ追加。Facet90/10がFace999を参照し、両順序で期待Facet10を照合。テスト追加状態での再現でありclean本採用実行とは区別。",
+  "case_sha256": "f6ba49e093ba081b5cf7044f86809d471c7212741534574558faf09529987922",
+  "compile_exit": 0,
+  "run_exit": 42,
+  "cases": 1,
+  "assertions": 6,
+  "failures": 1,
+  "observation": "90先行の配列で期待10が失敗し、10先行では合格。新規人工変異は実行しない。"
+}

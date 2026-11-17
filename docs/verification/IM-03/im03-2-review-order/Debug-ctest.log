@@ -1,0 +1,17 @@
+Internal ctest changing into directory: <workspace>/out/issue95-build
+Test project <workspace>/out/issue95-build
+    Start 23: aero.geometry_snapshot
+1/2 Test #23: aero.geometry_snapshot .............   Passed    0.10 sec
+    Start 24: aero.geometry_snapshot_resources
+2/2 Test #24: aero.geometry_snapshot_resources ...   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-AERO          =   0.14 sec*proc (2 tests)
+negative        =   0.14 sec*proc (2 tests)
+property        =   0.14 sec*proc (2 tests)
+unit            =   0.10 sec*proc (1 test)
+verification    =   0.14 sec*proc (2 tests)
+
+Total Test time (real) =   0.15 sec

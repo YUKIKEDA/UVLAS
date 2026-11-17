@@ -1,0 +1,52 @@
+Start testing: Nov 17 14:54 東京 (標準時)
+----------------------------------------------------------
+23/78 Testing: aero.geometry_snapshot
+23/78 Test: aero.geometry_snapshot
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_geometry_snapshot.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.geometry_snapshot" start time: Nov 17 14:54 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 59382725
+===============================================================================
+All tests passed (418 assertions in 17 test cases)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"aero.geometry_snapshot" end time: Nov 17 14:54 東京 (標準時)
+"aero.geometry_snapshot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/78 Testing: aero.geometry_snapshot_resources
+24/78 Test: aero.geometry_snapshot_resources
+Command: "<workspace>/out/issue95-build/tests/Release/uvlas_test_aero_geometry_snapshot_resources.exe"
+Directory: <workspace>/out/issue95-build/tests
+"aero.geometry_snapshot_resources" start time: Nov 17 14:54 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 3924544308
+===============================================================================
+All tests passed (30 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"aero.geometry_snapshot_resources" end time: Nov 17 14:54 東京 (標準時)
+"aero.geometry_snapshot_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 17 14:54 東京 (標準時)
+
+V-AERO =   0.08 sec*proc
+
+negative =   0.08 sec*proc
+
+property =   0.08 sec*proc
+
+unit =   0.05 sec*proc
+
+verification =   0.08 sec*proc
+
