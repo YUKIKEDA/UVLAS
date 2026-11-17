@@ -1,0 +1,33 @@
+{
+  "failed_head": "8c9e739aa4ccdf181f633985557c437a73d1a480",
+  "fixed_source": "fa74876c01263858b6794c64e5c7ed69b920b735",
+  "old_source": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+  "old_tu_sha256": "18f4c1b7423d469bd079fac96e948f849e70ae5f25e3a38a21f8d0ed3c1be758",
+  "new_tu_sha256": "4df550602d4800f490d62c04195c0be04f696c98d77cab604997aea0e87c5ff7",
+  "difference": "One initializer_list type declaration; literal values16/17 and all expected failures/successes unchanged.",
+  "producer_files_unchanged": [
+    {
+      "hint": "src/aero/local_geometry_packet.hpp",
+      "sha256": "1aa3f6b0b84c1638763128753fde98ff0b1cdc767ab64c5eb55f64e267f81e98"
+    },
+    {
+      "hint": "src/aero/local_geometry_packet.cpp",
+      "sha256": "49b4807807072ee61d85aa8f83dfdc6bc8221d504f60ce61a76161aabdf328d0"
+    },
+    {
+      "hint": "src/aero/local_geometry_bounds_private.hpp",
+      "sha256": "e71c9ba9432fc16b321c291ed5a191d3a672a35589fbe7377867f7c2a47ed760"
+    },
+    {
+      "hint": "src/aero/local_geometry_input_private.hpp",
+      "sha256": "22716d32222918f2fa0026ea0588e88760fa0820cee9c2e6cded367034fb91d6"
+    },
+    {
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "sha256": "90010d2c3bd6e53ced89c1a568f2c3477734aff207813da5d7a822be0d96f952"
+    }
+  ],
+  "old_record_sha256": "82fb4591017df5beaec15537721f9e12cf27a4152cb417aacc981b5cfc469e87",
+  "old_artifacts_checked_unchanged": 28,
+  "boundary": "The old record is frozen source6ad evidence; its old TU live hint no longer matches this current tree. This is NOT a recursive integrity pass of the old manifest against the fixed tree."
+}
