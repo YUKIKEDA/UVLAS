@@ -1,0 +1,297 @@
+WARN `--no-project` was provided, but no project was found
+{
+  "file": ".cursor\\rules\\cpp.mdc",
+  "stats": {
+    "total_findings": 12,
+    "by_category": {
+      "repeated_sentence_lead": 11,
+      "translationese": 1
+    },
+    "genre": "tech",
+    "experimental": false,
+    "total_sentences": 47,
+    "nominal_ending_count": 1,
+    "nominal_ending_ratio": 0.02127659574468085,
+    "total_paragraphs": 14,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      2,
+      4,
+      3,
+      5,
+      2,
+      2,
+      4,
+      4,
+      3,
+      4,
+      3,
+      3,
+      4,
+      4
+    ],
+    "paragraph_sentence_count_cv": 0.2665949805562057,
+    "rhythm": {
+      "mora_mean": 79.14893617021276,
+      "mora_stdev": 52.9105944920917,
+      "burstiness": -0.1986857105013976,
+      "length_autocorrelation_lag1": 0.06781958372790484
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "名詞/補助記号/名詞/補助記号",
+      "lead_pos_4gram_ratio": 0.2391304347826087
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 605,
+      "doc_char_count": 2477,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 23,
+      "non_blank_line_count": 116,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 12,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 42,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-15、PR #53はLi",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 44,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-17、PR #90ではl",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 59,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-15、PR #40で共通",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 76,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-11、Eigen 5.0",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 86,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-15、PR #46の版固",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 100,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-16、PR #67のLi",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 112,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-16、PR #73のLi",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 122,
+      "category": "translationese",
+      "excerpt": "optionalが値を持つことや、コンストラクタで",
+      "severity": "info",
+      "detail": "翻訳調パターン: /を持つ(こと|存在)/ に一致",
+      "related_lines": null
+    },
+    {
+      "line": 122,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-16、PR #72のLi",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 132,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-15、PR #49の試験",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 141,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-15、PR #50のmu",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    },
+    {
+      "line": 143,
+      "category": "repeated_sentence_lead",
+      "excerpt": "2026-11-17、PR #102はG",
+      "severity": "info",
+      "detail": "文頭2形態素「2026-」が11回反復（閾値7回以上）。人間の意図的な反復技法との区別がつかないため参考情報として提示。対応箇所: L42, L44, L59, L76, L86, L100, L112, L122, L132, L141, L143",
+      "related_lines": [
+        42,
+        44,
+        59,
+        76,
+        86,
+        100,
+        112,
+        122,
+        132,
+        141,
+        143
+      ]
+    }
+  ]
+}
