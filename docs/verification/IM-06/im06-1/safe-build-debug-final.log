@@ -1,0 +1,23 @@
+[0/2] Re-checking globbed directories...
+[1/23] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue85-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue85-build/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/23] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\error_certificate.cpp.obj
+[3/23] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\checked_dimensions.cpp.obj
+[4/23] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\state.cpp.obj
+[5/23] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\error_certificate.cpp.obj
+[6/23] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\checked_dimensions.cpp.obj
+[7/23] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[8/23] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\state.cpp.obj
+[9/23] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\instrumentation.cpp.obj
+[10/23] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\input_scalar.cpp.obj
+[11/23] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[12/23] Linking CXX static library Debug\uvlas_core.lib
+[13/23] Linking CXX static library Debug\uvlas_io.lib
+[14/23] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\input_scalar.cpp.obj
+[15/23] Building CXX object tests\CMakeFiles\uvlas_test_io_input_scalar.dir\Debug\io\input_scalar_test.cpp.obj
+[16/23] Building CXX object tests\CMakeFiles\uvlas_test_io_input_scalar_allocations.dir\Debug\support\allocation_audit.cpp.obj
+[17/23] Building CXX object tests\CMakeFiles\uvlas_test_io_input_scalar_allocations.dir\Debug\io\input_scalar_allocations_test.cpp.obj
+[18/23] Linking CXX executable tests\Debug\uvlas_test_io_input_scalar.exe
+[19/23] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\instrumentation.cpp.obj
+[20/23] Linking CXX static library Debug\uvlas_core_audit.lib
+[21/23] Linking CXX static library Debug\uvlas_io_audit.lib
+[22/23] Linking CXX executable tests\Debug\uvlas_test_io_input_scalar_allocations.exe

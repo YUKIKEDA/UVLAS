@@ -1,0 +1,73 @@
+62465 warnings generated.
+<repo>\include\uvlas/structure/exact_polynomial.hpp:47:27: error: std::move of the variable 'memory' of the trivially-copyable type 'ExactMemoryLimit' (aka 'variant<ExactEstimateAdmission, ExactRequireProvenBound>') has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+   47 |           external_memory(std::move(memory)),
+      |                           ^~~~~~~~~~      ~
+<repo>\include\uvlas/structure/exact_polynomial.hpp:133:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  133 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:178:5: error: function 'terms' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  178 |     std::span<const ExactTerm> terms() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:180:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  180 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:304:5: error: function 'terms' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  304 |     std::span<const ExactTerm> terms() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:319:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  319 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\src\structure\exact_polynomial.cpp:104:12: error: enum 'Scratch' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size,-warnings-as-errors]
+  104 | enum class Scratch { Rational, Normalize, Compare, Copy };
+      |            ^
+<repo>\src\structure\exact_polynomial.cpp:146:17: error: variable 'scope' of type 'core::StageScope' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  146 |                 core::StageScope scope{recorder, core::MeasurementStage::Preparation};
+      |                 ^
+      |                                  const
+<repo>\src\structure\exact_polynomial.cpp:167:12: error: enum 'Arithmetic' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size,-warnings-as-errors]
+  167 | enum class Arithmetic { Add, Subtract, Multiply, Divide };
+      |            ^
+<repo>\src\structure\exact_polynomial.cpp:367:31: error: an exception may be thrown in function 'value' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+  367 | const Rational& ExactFactory::value(const ExactRational& value) noexcept {
+      |                               ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xmemory:108:5: note: frame #0: unhandled exception of type 'std::bad_array_new_length' may be thrown in function '_Throw_bad_array_new_length' here
+  108 |     _THROW(bad_array_new_length{});
+      |     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\yvals.h:484:21: note: expanded from macro '_THROW'
+  484 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xmemory:186:9: note: frame #1: function '_Allocate_manually_vector_aligned<std::_Default_allocate_traits>' calls function '_Throw_bad_array_new_length' here
+  186 |         _Throw_bad_array_new_length(); // add overflow
+      |         ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xmemory:253:20: note: frame #2: function '_Allocate<16ULL, std::_Default_allocate_traits>' calls function '_Allocate_manually_vector_aligned<std::_Default_allocate_traits>' here
+  253 |             return _Allocate_manually_vector_aligned<_Traits>(_Bytes);
+      |                    ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xmemory:994:34: note: frame #3: function 'allocate' calls function '_Allocate<16ULL, std::_Default_allocate_traits>' here
+  994 |         return static_cast<_Ty*>(_STD _Allocate<_New_alignof<_Ty>>(_Get_size_of_n<sizeof(_Ty)>(_Count)));
+      |                                  ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\yvals_core.h:1906:17: note: expanded from macro '_STD'
+ 1906 | #define _STD    ::std::
+      |                 ^
+<repo>\out\vcpkg_installed\x64-windows\include\boost/multiprecision/cpp_int.hpp:381:28: note: frame #4: function 'resize' calls function 'allocate' here
+  381 |          limb_pointer pl = allocator().allocate(cap);
+      |                            ^
+<repo>\out\vcpkg_installed\x64-windows\include\boost/multiprecision/cpp_int.hpp:411:10: note: frame #5: function 'cpp_int_base' calls function 'resize' here
+  411 |          resize(o.size(), o.size());
+      |          ^
+<repo>\out\vcpkg_installed\x64-windows\include\boost/multiprecision/cpp_int.hpp:1368:120: note: frame #6: function 'cpp_int_backend' calls function 'cpp_int_base' here
+ 1368 |    BOOST_MP_FORCEINLINE constexpr cpp_int_backend(const cpp_int_backend& o) noexcept(std::is_void<Allocator>::value) : base_type(o) {}
+      |                                                                                                                        ^
+<repo>\out\vcpkg_installed\x64-windows\include\boost/multiprecision/rational_adaptor.hpp:91:9: note: frame #7: function 'rational_adaptor' calls function 'cpp_int_backend' here
+   91 |       : m_num(zero()), m_denom(one()) {}
+      |         ^
+<repo>\out\vcpkg_installed\x64-windows\include\boost/multiprecision/number.hpp:53:35: note: frame #8: function 'number' calls function 'rational_adaptor' here
+   53 |    BOOST_MP_FORCEINLINE constexpr number() noexcept(noexcept(Backend())) {}
+      |                                   ^
+<repo>\src\structure\exact_polynomial.cpp:368:27: note: frame #9: function 'value' calls function 'number' here
+  368 |     static const Rational zero_value;
+      |                           ^

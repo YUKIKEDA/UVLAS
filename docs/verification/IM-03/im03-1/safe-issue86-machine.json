@@ -1,0 +1,13 @@
+{
+  "cpu": {
+    "Name": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "Manufacturer": "GenuineIntel",
+    "NumberOfLogicalProcessors": 16,
+    "NumberOfCores": 10
+  },
+  "logical_processors": 16,
+  "platform": "windows-x64-msvc19.51",
+  "floating_point": "/fp:strict",
+  "scope": "Single diagnostic preparation sample per configuration; not a timing threshold or performance acceptance.",
+  "reported_total_physical_memory_bytes": 51343966208
+}

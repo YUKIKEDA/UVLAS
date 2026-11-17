@@ -1,0 +1,43 @@
+68729 warnings generated.
+<repo>\include\uvlas/structure/exact_polynomial.hpp:47:27: error: std::move of the variable 'memory' of the trivially-copyable type 'ExactMemoryLimit' (aka 'variant<ExactEstimateAdmission, ExactRequireProvenBound>') has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+   47 |           external_memory(std::move(memory)),
+      |                           ^~~~~~~~~~      ~
+<repo>\include\uvlas/structure/exact_polynomial.hpp:133:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  133 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:178:5: error: function 'terms' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  178 |     std::span<const ExactTerm> terms() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:180:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  180 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:304:5: error: function 'terms' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  304 |     std::span<const ExactTerm> terms() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\include\uvlas/structure/exact_polynomial.hpp:319:5: error: function 'preparation' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  319 |     const ExactPreparationInfo& preparation() const&& = delete;
+      |     ^
+      |     [[nodiscard]]
+<repo>\tests\structure\exact_polynomial_test.cpp:72:9: error: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation,-warnings-as-errors]
+   71 |     for (std::size_t i = 0; i < terms.size(); ++i)
+   72 |         input.push_back({{terms[i][0], terms[i][1]}, coefficients[i]});
+      |         ^
+<repo>\tests\structure\exact_polynomial_test.cpp:252:11: error: 'kept' used after it was moved [bugprone-use-after-move,-warnings-as-errors]
+  252 |     CHECK(kept.terms().empty());
+      |           ^
+<repo>\tests\structure\exact_polynomial_test.cpp:251:18: note: move occurred here
+  251 |     auto moved = std::move(kept);
+      |                  ^
+<repo>\tests\structure\exact_polynomial_test.cpp:285:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  285 |     CHECK(timed.preparation().timing->calls == 1);
+      |           ^
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<repo>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~

@@ -1,0 +1,49 @@
+Internal ctest changing into directory: <repo>/out/issue87-build
+UpdateCTestConfiguration  from :<repo>/out/issue87-build/DartConfiguration.tcl
+Parse Config file:<repo>/out/issue87-build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/out/issue87-build/DartConfiguration.tcl
+Parse Config file:<repo>/out/issue87-build/DartConfiguration.tcl
+Test project <repo>/out/issue87-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 39
+    Start 39: structure.exact_polynomial
+
+39: Test command: <repo>\out\issue87-build\tests\Debug\uvlas_test_structure_exact_polynomial.exe
+39: Working Directory: <repo>/out/issue87-build/tests
+39: Test timeout computed to be: 60
+39: Randomness seeded to: 3807067698
+39: ===============================================================================
+39: All tests passed (377 assertions in 8 test cases)
+39:
+1/2 Test #39: structure.exact_polynomial .............   Passed    0.14 sec
+test 40
+    Start 40: structure.exact_polynomial_resources
+
+40: Test command: <repo>\out\issue87-build\tests\Debug\uvlas_test_structure_exact_polynomial_resources.exe
+40: Working Directory: <repo>/out/issue87-build/tests
+40: Test timeout computed to be: 60
+40: Randomness seeded to: 1897280636
+40: ===============================================================================
+40: All tests passed (25 assertions in 2 test cases)
+40:
+2/2 Test #40: structure.exact_polynomial_resources ...   Passed    0.03 sec
+
+The following tests passed:
+	structure.exact_polynomial
+	structure.exact_polynomial_resources
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-PG            =   0.14 sec*proc (1 test)
+negative        =   0.17 sec*proc (2 tests)
+property        =   0.17 sec*proc (2 tests)
+unit            =   0.14 sec*proc (1 test)
+verification    =   0.17 sec*proc (2 tests)
+
+Total Test time (real) =   0.19 sec

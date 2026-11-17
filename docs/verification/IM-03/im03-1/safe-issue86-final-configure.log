@@ -1,0 +1,12 @@
+Preset CMake variables:
+
+  BUILD_TESTING:BOOL="TRUE"
+  CMAKE_CXX_COMPILER="cl"
+  CMAKE_TOOLCHAIN_FILE:FILEPATH="C:\vcpkg/scripts/buildsystems/vcpkg.cmake"
+  UVLAS_WARNINGS_AS_ERRORS:BOOL="TRUE"
+  VCPKG_MANIFEST_FEATURES="tests"
+  VCPKG_TARGET_TRIPLET="x64-windows"
+
+-- Configuring done (1.0s)
+-- Generating done (0.5s)
+-- Build files have been written to: <workspace-or-dependency>/out/issue86-build

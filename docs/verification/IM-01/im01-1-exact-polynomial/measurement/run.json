@@ -1,0 +1,6 @@
+{
+  "end_utc": "2026-11-16T15:57:29.7259238Z",
+  "begin_utc": "2026-11-16T15:57:29.5083123Z",
+  "exit": 0,
+  "condition": "Other participating agents paused heavy local builds; whole-host idle not guaranteed"
+}

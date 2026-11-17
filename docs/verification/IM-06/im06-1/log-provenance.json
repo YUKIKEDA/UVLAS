@@ -1,0 +1,122 @@
+{
+  "schema": "uvlas.redacted-text/1",
+  "source_commit": "20e2cc0b1c82588dc1fb0fa4f30ed476996ac218",
+  "note": "Full text was redacted, not original raw bytes. Filesystem/account tokens only; raw private logs are retained.",
+  "files": [
+    {
+      "entry": "safe-configure.log",
+      "raw_sha256": "6ceb5ae91475a81d9096c2adca711a0e45d4d1c905caae02fa809e923037f88a",
+      "published_sha256": "71e40979de8fc6dc56a7c3c75860a713f4f072975611a7e68f5ad68e831828d0",
+      "raw_bytes": 920,
+      "published_bytes": 846,
+      "replacements": {
+        "workspace-prefix": 1,
+        "dependency-prefix": 1
+      }
+    },
+    {
+      "entry": "safe-build-debug-final.log",
+      "raw_sha256": "f6f755447155f071f1b5829cdd381a8e152dc2f2547e54f087a6ffd075d24b64",
+      "published_sha256": "39e341de77091625b0f4e24ae1f9bf78b110dcb4beba18817e6d29f5f1c21fe6",
+      "raw_bytes": 2377,
+      "published_bytes": 2193,
+      "replacements": {
+        "workspace-prefix": 4
+      }
+    },
+    {
+      "entry": "safe-build-release-final.log",
+      "raw_sha256": "cad88c2c219af625d1730681c8625c536f9d7c2c27e6a69b584bdbf8f73b9660",
+      "published_sha256": "7646104f147896f251b76c5cd1c47142d5bc2bb7ea8614cd24e8415fc15795ff",
+      "raw_bytes": 1726,
+      "published_bytes": 1542,
+      "replacements": {
+        "workspace-prefix": 4
+      }
+    },
+    {
+      "entry": "safe-ctest-debug-final.log",
+      "raw_sha256": "8d8c9f5bb6b7026eaf3b32bdb88f50de778264d07ea4ecaa5e825d34c1544956",
+      "published_sha256": "56fae755a2f3b712b58a853cbb45542e534616c3a43ca1e5011e5cceecd9dd52",
+      "raw_bytes": 2441,
+      "published_bytes": 1981,
+      "replacements": {
+        "workspace-prefix": 10
+      }
+    },
+    {
+      "entry": "safe-ctest-release-final.log",
+      "raw_sha256": "bb6582249465204f3499a8b886a639d731cd357c987bf8b1c51b1e28dfea0871",
+      "published_sha256": "66a97ce5bd5973881deff198e23af489ae2955281daa707b438b3c34cc8ffa33",
+      "raw_bytes": 2445,
+      "published_bytes": 1985,
+      "replacements": {
+        "workspace-prefix": 10
+      }
+    },
+    {
+      "entry": "safe-format-check.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "published_bytes": 0,
+      "replacements": {}
+    },
+    {
+      "entry": "safe-tidy-first.log",
+      "raw_sha256": "c452c5095c1ef9f76bda175ba5ebe44c4a974a74e4207fd683eb7fc421ab22bc",
+      "published_sha256": "7068a1b4c7c4a7d42a3b2490c9409f1d8d6dcc7baccad7ec3939c7b8ce225064",
+      "raw_bytes": 7880,
+      "published_bytes": 7006,
+      "replacements": {
+        "workspace-prefix": 19
+      }
+    },
+    {
+      "entry": "safe-tidy-final-source.log",
+      "raw_sha256": "e27119e6681598c16fd2d923e0e2efe09b68e183176c4814a2c6f574b1f29002",
+      "published_sha256": "1448eb17f3538db8b93ac0ba9a034facf5ab43c71e5a64226bafb264b0c22405",
+      "raw_bytes": 273,
+      "published_bytes": 181,
+      "replacements": {
+        "workspace-prefix": 2
+      }
+    },
+    {
+      "entry": "safe-tidy-final-audit.log",
+      "raw_sha256": "60ed1e0af5e3d4ca801bef757c55a126aebc7699b0194a7f1dd13f739f67ca57",
+      "published_sha256": "60ed1e0af5e3d4ca801bef757c55a126aebc7699b0194a7f1dd13f739f67ca57",
+      "raw_bytes": 27,
+      "published_bytes": 27,
+      "replacements": {}
+    },
+    {
+      "entry": "safe-mutations-run.log",
+      "raw_sha256": "11b68ec54dbdc893245502be535d4a503028e774d97fc3a1e8f807f4ee480940",
+      "published_sha256": "56bbef93258488e6381eed1b39468ad706d0d6fd99baadbce7a4d7de9b964dbd",
+      "raw_bytes": 2376,
+      "published_bytes": 2324,
+      "replacements": {
+        "workspace-prefix": 1
+      }
+    },
+    {
+      "entry": "safe-mutations-exact-bytes-run.log",
+      "raw_sha256": "389aeed011b1c31de0e0bd22135f940f7304e638d5342541534ea4da0e73e0d2",
+      "published_sha256": "a64f3befc4eaaedb5c8dca0fcd47fb6325e311979af997a1dcaf96489093652b",
+      "raw_bytes": 2390,
+      "published_bytes": 2338,
+      "replacements": {
+        "workspace-prefix": 1
+      }
+    },
+    {
+      "entry": "safe-contract-japanese.log",
+      "raw_sha256": "889b3c3f895677817dbd838a100a98bbcf5e8208dce44ba75d51fe94fde40683",
+      "published_sha256": "889b3c3f895677817dbd838a100a98bbcf5e8208dce44ba75d51fe94fde40683",
+      "raw_bytes": 1688,
+      "published_bytes": 1688,
+      "replacements": {}
+    }
+  ]
+}
