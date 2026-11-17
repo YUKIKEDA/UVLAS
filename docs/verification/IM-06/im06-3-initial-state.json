@@ -1,0 +1,161 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-3-initial-state-design-correction",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 110,
+  "pull_request": 111,
+  "date": "2026-11-17",
+  "source_commit": "cb45e4ab4c10c21b1f054034780e882b1ee4b569",
+  "reviewed_previous_head": "870926d1af73bd9a3d01db45618e873067f1ed0a",
+  "claimed_state": "初期摂動FD-08の設計訂正。製品validator・物理prepare・数値認定・実務受入は未実施。",
+  "correction": "点値から未指定の全状態を選ぶ旧行を、全R/P/C場・全梁/剛体frameの明示入力と一意なexact係数写像、最終保持状態の点確認で置換する追加規約。元q/vとJ1を維持。",
+  "checks": {
+    "independent_design_oracle": {
+      "positive_cases": 4,
+      "negative_cases_rejected": 22,
+      "counterexample_l2_squared": "1/2400000",
+      "allowance": "exact rational identities, tolerance 0 for mathematical witnesses; positive user point budgets are explicitly 1e-12",
+      "all_thickness_and_all_four_cells": true,
+      "frame_body_world_velocity": true,
+      "unit_covariance_mm": true
+    },
+    "old_schema_sources_unchanged": 4,
+    "root_noninitial_decimal_values_unchanged": true,
+    "japanese_files": 4,
+    "technical_independent_review": "root + separate reviewer",
+    "no_solver_reexecution": "製品C++・Python binding・CMake・既存数値入力を変更しないため、既存D/R・数値CI・R&D生成を再実行しない。",
+    "integrity": {
+      "old_files": 39,
+      "old_manifests": 2,
+      "errors": 0,
+      "new_files": 18,
+      "new_manifests": 3
+    },
+    "trace": {
+      "defined": 208,
+      "with_tests": 32,
+      "with_records": 39,
+      "problems": 0
+    },
+    "publication": "日本語lint stdoutの公開派生4件だけCRLFをLFへ変換し、JSON全値の一致と元/公開hashを記録。元rawはoutへ保持。"
+  },
+  "commands": [
+    "python -B -X utf8 out/pr111-initial-review/audit_initial_physical.py --examples docs/specs/foundation/case-initial-physical-state-examples.json --output out/pr111-initial-review/initial-physical-audit-v1.json",
+    "PYTHONUTF8=1 uv run --offline --python 3.12 --script .agents/skills/natural-japanese/scripts/lint.py --json <new contract / conventions / engineering README / spec-checks>"
+  ],
+  "historical_evidence": "旧im06-3-schema-designは当時の設計検査を固定するartifact。初期入力の完全性に関する旧主張は本訂正で更新し、旧39件のhash合格を初期状態の一意性の証明として流用しない。",
+  "remaining": "schema/SI/snapshot実装は既存IM06-0、一般PG独立化・条件付けはIM01-0、連成初期化と実務受入は既存IM04-0/IM08-0。",
+  "sources": {
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-design-cases.md": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "docs/specs/foundation/case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "docs/specs/foundation/case-initial-physical-state-examples.json": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-3-initial-state/historical-entry-references.json": "86562f94aa7c4538e2e28f741745c748de2f20b550bcf8d427d68aad97c09031",
+    "docs/verification/IM-06/im06-3-initial-state/independent-design-audit.json": "22c0fb7c8d56ab4849bc95a3db242dd7e549e0a353c450c5fb94ebf83ae86c95",
+    "docs/verification/IM-06/im06-3-initial-state/independent-design-audit.py.txt": "3977bfa28a0d7e06250aa095636c05c425097e5f11d906c518baab89730ad24b",
+    "docs/verification/IM-06/im06-3-initial-state/japanese-contract.json": "bd421d3238966950c6255aaa323f4420d18c29080f5fad26744b5a907433b121",
+    "docs/verification/IM-06/im06-3-initial-state/japanese-conventions.json": "bd54068dc30fbcc57cf0881b7b04590e697ac285068e2abce8a1747e93b03ccb",
+    "docs/verification/IM-06/im06-3-initial-state/japanese-entry.json": "1c084d46933c4c807a99bdb57f2f204df86577022a5cf844eab4e5ddc3e5b4ca",
+    "docs/verification/IM-06/im06-3-initial-state/japanese-rule.json": "db6e915bb8b6b02e1451fe5acf9a6cc49d5933952812b0a781e2ecda165a1f60",
+    "docs/verification/IM-06/im06-3-initial-state/preservation-check.json": "166585af8e4771465ee96e8822e8c48b6c6728564176d2d68f4e58116040f613",
+    "docs/verification/IM-06/im06-3-initial-state/review-disposition.json": "ece7d1bbecdcd1ccfa958c57873cdccb0e8032ff39d8ad0acb04f1a9030f72ff",
+    "docs/verification/IM-06/im06-3-schema-design.json": "71b560af698095e7548b07634720c0332710ef113992af101d990071729408ad",
+    "docs/verification/IM-06/im06-3-initial-state/japanese-newline-provenance.json": "0c05895c89e25c1bdf01f11305790e692374f524c3d12763869f3f79f3bf8961"
+  },
+  "source_references": [
+    {
+      "id": "initial-state-source-docs-specs-foundation-case-schema-contract-md",
+      "sha256": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+      "hint": "docs/specs/foundation/case-schema-contract.md"
+    },
+    {
+      "id": "initial-state-source-docs-specs-foundation-case-schema-fields-md",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+      "hint": "docs/specs/foundation/case-schema-fields.md"
+    },
+    {
+      "id": "initial-state-source-docs-specs-foundation-case-schema-design-cases-md",
+      "sha256": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+      "hint": "docs/specs/foundation/case-schema-design-cases.md"
+    },
+    {
+      "id": "initial-state-source-docs-specs-foundation-case-schema-examples-json",
+      "sha256": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+      "hint": "docs/specs/foundation/case-schema-examples.json"
+    },
+    {
+      "id": "initial-state-source-docs-specs-foundation-case-initial-physical-state-contract-md",
+      "sha256": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+      "hint": "docs/specs/foundation/case-initial-physical-state-contract.md"
+    },
+    {
+      "id": "initial-state-source-docs-specs-foundation-case-initial-physical-state-examples-json",
+      "sha256": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+      "hint": "docs/specs/foundation/case-initial-physical-state-examples.json"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-historical-entry-references-json",
+      "sha256": "86562f94aa7c4538e2e28f741745c748de2f20b550bcf8d427d68aad97c09031",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/historical-entry-references.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-independent-design-audit-json",
+      "sha256": "22c0fb7c8d56ab4849bc95a3db242dd7e549e0a353c450c5fb94ebf83ae86c95",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/independent-design-audit.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-independent-design-audit-py-txt",
+      "sha256": "3977bfa28a0d7e06250aa095636c05c425097e5f11d906c518baab89730ad24b",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/independent-design-audit.py.txt"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-japanese-contract-json",
+      "sha256": "bd421d3238966950c6255aaa323f4420d18c29080f5fad26744b5a907433b121",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-contract.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-japanese-conventions-json",
+      "sha256": "bd54068dc30fbcc57cf0881b7b04590e697ac285068e2abce8a1747e93b03ccb",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-conventions.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-japanese-entry-json",
+      "sha256": "1c084d46933c4c807a99bdb57f2f204df86577022a5cf844eab4e5ddc3e5b4ca",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-entry.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-japanese-rule-json",
+      "sha256": "db6e915bb8b6b02e1451fe5acf9a6cc49d5933952812b0a781e2ecda165a1f60",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-rule.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-preservation-check-json",
+      "sha256": "166585af8e4771465ee96e8822e8c48b6c6728564176d2d68f4e58116040f613",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/preservation-check.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-review-disposition-json",
+      "sha256": "ece7d1bbecdcd1ccfa958c57873cdccb0e8032ff39d8ad0acb04f1a9030f72ff",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/review-disposition.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-schema-design-json",
+      "sha256": "71b560af698095e7548b07634720c0332710ef113992af101d990071729408ad",
+      "hint": "docs/verification/IM-06/im06-3-schema-design.json"
+    },
+    {
+      "id": "initial-state-artifact-docs-verification-IM-06-im06-3-initial-state-japanese-newline-provenance-json",
+      "sha256": "0c05895c89e25c1bdf01f11305790e692374f524c3d12763869f3f79f3bf8961",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-newline-provenance.json"
+    }
+  ]
+}

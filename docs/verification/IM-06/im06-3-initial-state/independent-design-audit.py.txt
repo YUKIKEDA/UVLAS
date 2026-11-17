@@ -1,0 +1,342 @@
+"""Exact design witnesses, not a product validator or general PG converter.
+
+Audits only flat g=1 global basic tensor fields and exact half-cell pullbacks.
+No conditioned q/v, floating-point error bounds, arbitrary curved PG rank,
+aerodynamic initial circulation, history or full coupled state is qualified.
+"""
+from __future__ import annotations
+import argparse
+from copy import deepcopy
+from decimal import Decimal
+from fractions import Fraction as F
+from hashlib import sha256
+import json
+from math import comb
+from pathlib import Path
+
+class Rejected(Exception):
+    def __init__(self, stage, reason, failure="InvalidInput"):
+        super().__init__(reason)
+        self.stage, self.reason, self.failure = stage, reason, failure
+
+def reject(stage, reason):
+    raise Rejected(stage, reason)
+
+def quantity(x):
+    if isinstance(x, bool): reject("schema", "boolean quantity")
+    if isinstance(x, F): return x
+    if isinstance(x, (int, Decimal)): return F(x)
+    if isinstance(x, dict) and set(x) == {"numerator", "denominator"}:
+        a,b=x["numerator"],x["denominator"]
+        if not isinstance(a,str) or not isinstance(b,str): reject("schema", "rational token type")
+        digits=a[1:] if a.startswith("-") else a
+        if not digits.isascii() or not digits.isdigit(): reject("schema", "rational numerator")
+        if not b.isascii() or not b.isdigit() or int(b)<=0: reject("schema", "positive rational denominator")
+        return F(int(a),int(b))
+    reject("schema", "exact quantity type")
+
+def keys(x, expected, reason):
+    if not isinstance(x,dict) or set(x)!=set(expected): reject("schema", reason)
+
+def vec(x):
+    if not isinstance(x,list) or len(x)!=3: reject("schema", "vector length")
+    return tuple(quantity(v) for v in x)
+
+ZERO=(F(0),F(0),F(0))
+def add(a,b): return tuple(x+y for x,y in zip(a,b,strict=True))
+def scale(a,b): return tuple(x*b for x in a)
+def sub(a,b): return add(a,scale(b,-1))
+def cross(a,b): return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
+def mv(a,b): return tuple(sum(x*y for x,y in zip(r,b,strict=True)) for r in a)
+
+def matrix(x):
+    if not isinstance(x,list) or len(x)!=3: reject("schema", "matrix rows")
+    return tuple(vec(r) for r in x)
+
+def so3(a):
+    if any(sum(a[k][i]*a[k][j] for k in range(3))!=int(i==j) for i in range(3) for j in range(3)):
+        reject("prepare", "rotation is not orthogonal")
+    if sum(a[0][i]*cross(a[1],a[2])[i] for i in range(3))!=1: reject("prepare", "rotation determinant")
+
+def frame(x):
+    keys(x,["position","rotation","linear_velocity","angular_velocity"],"complete frame state required")
+    return (vec(x["position"]),matrix(x["rotation"]),vec(x["linear_velocity"]),vec(x["angular_velocity"]))
+
+def poly(x, limit):
+    keys(x,["terms"],"polynomial keys")
+    if not isinstance(x["terms"],list): reject("schema", "term list")
+    result={}
+    for t in x["terms"]:
+        keys(t,["powers","value"],"term keys")
+        p=t["powers"]
+        if not isinstance(p,list) or len(p)!=2 or any(not isinstance(a,int) or isinstance(a,bool) or a<0 for a in p):
+            reject("schema", "powers")
+        p=tuple(p)
+        if sum(p)>limit: reject("schema", "degree envelope")
+        if p in result: reject("schema", "duplicate powers")
+        result[p]=vec(t["value"])
+    return {p:v for p,v in result.items() if any(v)}
+
+def evaluate(p,s,t):
+    result=ZERO
+    for (i,j),v in p.items(): result=add(result,scale(v,s**i*t**j))
+    return result
+
+def derivative(p,axis):
+    result={}
+    for powers,v in p.items():
+        if powers[axis]:
+            q=list(powers);q[axis]-=1
+            result[tuple(q)]=scale(v,powers[axis])
+    return result
+
+def pullback(p,os,ss,ot,st):
+    result={}
+    for (i,j),v in p.items():
+        for a in range(i+1):
+            for b in range(j+1):
+                c=comb(i,a)*comb(j,b)*os**(i-a)*ss**a*ot**(j-b)*st**b
+                result[a,b]=add(result.get((a,b),ZERO),scale(v,c))
+    return {p:v for p,v in result.items() if any(v)}
+
+def face(p,axis,x):
+    result={}
+    for powers,v in p.items():
+        k=powers[1-axis]
+        result[k]=add(result.get(k,ZERO),scale(v,x**powers[axis]))
+    return {k:v for k,v in result.items() if any(v)}
+
+def parse_field(x,n):
+    if not isinstance(x,dict) or "kind" not in x: reject("schema", "full-field kind")
+    if x["kind"]=="global_polynomial":
+        keys(x,["kind","r","p","c"],"complete r/p/c required")
+        return {"global":tuple(poly(x[k],d) for k,d in (("r",13),("p",21),("c",2)))}
+    if x["kind"]!="half_cells": reject("schema", "full-field variant")
+    keys(x,["kind","cells"],"half-cell keys")
+    if not isinstance(x["cells"],list): reject("schema", "half-cell list")
+    cells={}
+    for c in x["cells"]:
+        keys(c,["cell","r","p","c"],"complete cell r/p/c required")
+        p=c["cell"]
+        if not isinstance(p,list) or len(p)!=2 or any(not isinstance(i,int) or isinstance(i,bool) or i<0 or i>=2*n for i in p):
+            reject("schema", "cell index")
+        p=tuple(p)
+        if p in cells: reject("schema", "duplicate half-cell")
+        local=tuple(poly(c[k],d) for k,d in (("r",13),("p",21),("c",2)))
+        cells[p]=tuple(pullback(a,F(-(2*p[0]+1)),F(4*n),F(-(2*p[1]+1)),F(4*n)) for a in local)
+    return {"cells":cells}
+
+def global_field(x,context):
+    if "global" in x: result=x["global"]
+    else:
+        cells=x["cells"]; n=context["reference"]["n"]
+        expected={tuple(p) for p in context["active_cells"]}
+        if set(cells)!=expected: reject("prepare", "active half-cell coverage")
+        if expected!={(i,j) for i in range(2*n) for j in range(2*n)}:
+            raise Rejected("oracle_scope","only a complete flat square is audited","Unsupported")
+        for (i,j),a in cells.items():
+            for axis,other,boundary in ((0,(i+1,j),F(i+1,2*n)),(1,(i,j+1),F(j+1,2*n))):
+                if other not in cells: continue
+                for k,(p,q) in enumerate(zip(a,cells[other],strict=True)):
+                    if face(p,axis,boundary)!=face(q,axis,boundary): reject("prepare", "discontinuous field trace")
+                    if k==0 and face(derivative(p,axis),axis,boundary)!=face(derivative(q,axis),axis,boundary):
+                        reject("prepare", "discontinuous R first trace")
+        result=next(iter(cells.values()))
+        if any(a!=result for a in cells.values()):
+            raise Rejected("oracle_scope","only exact global-polynomial pullbacks are certified","Unsupported")
+    for k,p in enumerate(result):
+        degree=1 if k==2 else 2
+        if any(i>degree or j>degree for i,j in p):
+            if k==2: reject("prepare", "C is outside the bilinear hat space")
+            raise Rejected("oracle_scope","R/P outside the certified basic tensor subset","Unsupported")
+    return result
+
+def field_value(p,s,t,zeta,context):
+    ref=context["reference"]
+    z=quantity(ref["thickness"])*zeta/(2*quantity(ref["reference_length"]))
+    return add(add(evaluate(p[0],s,t),scale(evaluate(p[1],s,t),z)),scale(evaluate(p[2],s,t),z*z/2))
+
+def coverage(entries,key,expected):
+    if not isinstance(entries,list): reject("schema", "entity state list")
+    ids=[e.get(key) if isinstance(e,dict) else None for e in entries]
+    if len(ids)!=len(set(ids)) or set(ids)!=set(expected): reject("schema", "entity coverage or duplicate state")
+
+def point_schema(x,context):
+    keys(x,["point","value","tolerance"],"complete point check required")
+    p=x["point"]
+    if not isinstance(p,dict) or "target" not in p: reject("schema", "point keys")
+    keys(p["target"],["kind","id"],"point target keys")
+    kind=p["target"]["kind"]
+    groups={"shell":"shell_ids","beam":"beam_ids","rigid":"rigid_ids"}
+    if kind not in groups or p["target"]["id"] not in context[groups[kind]]: reject("schema", "point target reference")
+    coordinates=vec(p["coordinates"])
+    if kind=="shell":
+        keys(p,["target","coordinates","side_s","side_t"],"shell side_s/side_t required")
+        for coordinate,tag in zip(coordinates[:2],[p["side_s"],p["side_t"]],strict=True):
+            if tag not in ["interior","lower","upper"]: reject("schema", "chart side tag")
+            if coordinate<0 or coordinate>1: reject("prepare", "chart point outside domain")
+            n=context["reference"]["n"]
+            on_knot=(coordinate*(2*n)).denominator==1
+            valid=(tag=="upper" if coordinate==0 else tag=="lower" if coordinate==1
+                   else tag in ["lower","upper"] if on_knot else tag=="interior")
+            if not valid: reject("prepare", "chart side does not select a domain half-cell")
+    else:
+        keys(p,["target","coordinates"],"frame point has no chart-side key")
+    vec(x["value"])
+    if any(a<0 for a in vec(x["tolerance"])): reject("schema", "negative point tolerance")
+
+def point_value(p,case,states):
+    context=case["context"];kind=p["target"]["kind"];target=p["target"]["id"]
+    q=vec(p["coordinates"])
+    if kind=="shell":
+        a,b=states["shells"][target]
+        return field_value(a,*q,context),field_value(b,*q,context)
+    if kind!="rigid": raise Rejected("oracle_scope","beam-interior point interpolation is not audited","Unsupported")
+    a=states["rigids"][target]; b=frame(context["equilibrium_rigid"])
+    position=lambda x:add(x[0],mv(x[1],q))
+    velocity=lambda x:add(x[2],mv(x[1],cross(x[3],q)))
+    return sub(position(a),position(b)),sub(velocity(a),velocity(b))
+
+def audit_case(case):
+    context=case["context"];p=case["perturbation"]
+    keys(p,["kind","shells","beams","rigids","displacements","velocities"],"complete physical state collections required")
+    if p["kind"]!="physical": reject("schema", "physical tag")
+    for entries,key,ids in ((p["shells"],"shell",context["shell_ids"]),(p["beams"],"beam",context["beam_ids"]),(p["rigids"],"rigid",context["rigid_ids"])):
+        coverage(entries,key,ids)
+    parsed={"shells":{},"beams":{},"rigids":{}}
+    for s in p["shells"]:
+        keys(s,["shell","displacement","velocity"],"complete shell state required")
+        n=context["reference"]["n"]
+        parsed["shells"][s["shell"]]=(parse_field(s["displacement"],n),parse_field(s["velocity"],n))
+    for b in p["beams"]:
+        keys(b,["beam","nodes"],"beam state keys")
+        if not isinstance(b["nodes"],list) or len(b["nodes"])!=2: reject("schema", "two complete beam endpoints required")
+        parsed["beams"][b["beam"]]=tuple(frame(n) for n in b["nodes"])
+    for r in p["rigids"]:
+        keys(r,["rigid","state"],"rigid state keys")
+        parsed["rigids"][r["rigid"]]=frame(r["state"])
+    for collection in ["displacements","velocities"]:
+        if not isinstance(p[collection],list): reject("schema", "point check list")
+        seen=set()
+        for c in p[collection]:
+            point_schema(c,context)
+            k=json.dumps(c["point"],sort_keys=True,default=str)
+            if k in seen: reject("schema", "duplicate point check")
+            seen.add(k)
+    for target,pair in parsed["shells"].items():
+        ref=context["reference"]
+        if ref["height_terms"] or quantity(ref["width"])!=1 or quantity(ref["skew"])!=0:
+            raise Rejected("oracle_scope","only flat unit graph is audited","Unsupported")
+        parsed["shells"][target]=tuple(global_field(a,context) for a in pair)
+        if context["support"]["kind"]=="full_thickness_clamp":
+            s=quantity(context["support"]["s"])
+            if any(face(a,0,s) for field in parsed["shells"][target] for a in field): reject("prepare", "full-thickness support contradiction")
+    for b in parsed["beams"].values():
+        for f in b: so3(f[1])
+    for f in parsed["rigids"].values(): so3(f[1])
+    if parsed["beams"]:
+        support=context["support"]; fixed=parsed["beams"][support["beam"]][support["node"]]
+        base=context["beam_reference_frames"][support["node"]]
+        if fixed[0]!=vec(base["origin"]) or fixed[1]!=matrix(base["rotation"]) or fixed[2]!=ZERO or fixed[3]!=ZERO:
+            reject("prepare", "beam root support contradiction")
+        a=context["attachment"]
+        if parsed["beams"][a["beam"]][a["node"]]!=parsed["rigids"][a["rigid"]]: reject("prepare", "rigid attachment contradiction")
+    points=[]
+    for collection,index in (("displacements",0),("velocities",1)):
+        for c in p[collection]:
+            got=point_value(c["point"],case,parsed)[index]
+            residual=sub(got,vec(c["value"]))
+            if any(abs(a)>b for a,b in zip(residual,vec(c["tolerance"]),strict=True)):
+                reject("prepare", "point value contradicts complete input field")
+            points.append({"kind":collection,"computed":got,"residual":residual,"scope":"exact input field only; retained-state evaluation bounds are not computed"})
+    return parsed,points
+
+def apply_patches(case,patches):
+    case=deepcopy(case)
+    for p in patches:
+        parts=[a.replace("~1","/").replace("~0","~") for a in p["path"].split("/")[1:]]
+        node=case
+        for k in parts[:-1]: node=node[int(k)] if isinstance(node,list) else node[k]
+        k=parts[-1];op=p["op"]
+        if isinstance(node,list):
+            if k=="-":
+                assert op=="add";node.append(deepcopy(p["value"]))
+            elif op=="remove": node.pop(int(k))
+            elif op=="add": node.insert(int(k),deepcopy(p["value"]))
+            else: assert op=="replace";node[int(k)]=deepcopy(p["value"])
+        elif op=="remove": del node[k]
+        else: assert op in ["add","replace"];node[k]=deepcopy(p["value"])
+    return case
+
+def text(x):
+    if isinstance(x,F): return f"{x.numerator}/{x.denominator}"
+    if isinstance(x,(tuple,list)): return [text(a) for a in x]
+    if isinstance(x,dict): return {k:text(v) for k,v in x.items()}
+    return x
+
+def witness():
+    d,e=F(1,100),F(1,200)
+    a={(2,0):(F(0),F(0),d)};b={(2,0):(F(0),F(0),d-e/2),(2,1):(F(0),F(0),e)}
+    assert evaluate(a,F(1),F(1,2))==evaluate(b,F(1),F(1,2))
+    assert not face(a,0,F(0)) and not face(b,0,F(0))
+    assert not face(derivative(a,0),0,F(0)) and not face(derivative(b,0),0,F(0))
+    assert evaluate(a,F(1),F(0))!=evaluate(b,F(1),F(0))
+    norm=e*e*F(1,5)*(F(1,3)-F(1,2)+F(1,4))
+    assert norm==e*e/60>0
+    return {"same_point":evaluate(a,F(1),F(1,2)),"root_value_and_slope_zero":True,"l2_difference_squared":norm,"membership":"Both are global flat basic R tensor polynomials, per-axis degree <=2."}
+
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--examples",type=Path,required=True)
+    parser.add_argument("--output",type=Path,required=True)
+    args=parser.parse_args()
+    if args.output.exists(): raise FileExistsError("Refusing to overwrite an existing result")
+    raw=args.examples.read_bytes();data=json.loads(raw,parse_float=Decimal)
+    results=[];states={}
+    for name,case in data["cases"].items():
+        state,points=audit_case(case);states[name]=state
+        for expected in case["expected"]["point_differences"]:
+            got=point_value(expected["point"],case,state)
+            assert got==(vec(expected["displacement"]),vec(expected["velocity"])),name
+        results.append({"id":name,"input_field_checks_passed":True,"points":points})
+    a=states["flat_clamped_global"]["shells"]["1"]
+    b=states["flat_half_cells"]["shells"]["1"]
+    assert a==b
+    # Full polynomial identity after inverse pullback, not agreement at sampled points.
+    assert len(data["cases"]["flat_half_cells"]["perturbation"]["shells"][0]["displacement"]["cells"])==4
+    full=states["flat_full_thickness"]["shells"]["1"]
+    assert full[0][1] and full[0][2]
+    ctx=data["cases"]["flat_full_thickness"]["context"]
+    v=field_value(full[0],F(1),F(1,2),F(1),ctx)
+    enlarged=deepcopy(ctx)
+    enlarged["reference"]["reference_length"]=quantity(ctx["reference"]["reference_length"])*1000
+    enlarged["reference"]["thickness"]=quantity(ctx["reference"]["thickness"])*1000
+    p=tuple({k:scale(c,1000) for k,c in part.items()} for part in full[0])
+    assert scale(field_value(p,F(1),F(1,2),F(1),enlarged),F(1,1000))==v
+    bm=data["cases"]["beam_rigid_nonzero"]
+    f=states["beam_rigid_nonzero"]["beams"]["2"][1]
+    exp=bm["expected"]
+    assert f[3]==vec(exp["tip_body_angular_velocity"])
+    assert mv(f[1],f[3])==vec(exp["tip_world_angular_velocity"])
+    body_point=vec(exp["point_differences"][0]["point"]["coordinates"])
+    rigid=states["beam_rigid_nonzero"]["rigids"]["3"]
+    assert add(rigid[0],mv(rigid[1],body_point))==vec(exp["rigid_point_world_position"])
+    assert add(rigid[2],mv(rigid[1],cross(rigid[3],body_point)))==vec(exp["rigid_point_world_velocity"])
+    negatives=[]
+    for n in data["negative_cases"]:
+        changed=apply_patches(data["cases"][n["base_case"]],n["patches"])
+        try: audit_case(changed)
+        except Rejected as failure:
+            assert failure.stage==n["expected_stage"],(n["id"],failure.stage)
+            assert failure.failure==n["expected_failure"],n["id"]
+            negatives.append({"id":n["id"],"stage":failure.stage,"failure":failure.failure,"reason":failure.reason,"rejected":True})
+        else: raise AssertionError("Negative survived: "+n["id"])
+    root=data["root_cases"]["coupled_transient_nonzero"]
+    assert root["initial"]["perturbation"]==data["cases"]["flat_clamped_global"]["perturbation"]
+    assert set(root["initial"]["perturbation"]["shells"][i]["shell"] for i in range(len(root["initial"]["perturbation"]["shells"])))==set(x["id"] for x in root["model"]["shells"])
+    assert args.examples.read_bytes()==raw
+    report={"schema":"uvlas.initial-physical-design-audit/1","id":"im06-3-initial-physical-independent-oracle","examples_sha256":sha256(raw).hexdigest(),"scope":"Exact input-field design witnesses for four flat/basic/frame cases only; no product schema validator, arbitrary curved PG rank/conditioning, retained q/v error bounds, J1 or coupled initialization qualification.","counterexample":witness(),"positive_cases":results,"negative_cases":negatives,"global_half_cell_polynomial_identity":True,"all_thickness_p_and_c_nonzero":True,"millimetre_unit_covariance":True,"body_world_velocity_identity":True,"root_case_schema_structure_checked":True,"root_case_physical_initialization_qualified":False,"positive_count":len(results),"negative_count":len(negatives),"passed":True}
+    args.output.write_bytes((json.dumps(text(report),ensure_ascii=False,indent=2)+"\n").encode())
+    print(json.dumps({"passed":True,"positive_count":len(results),"negative_count":len(negatives),"examples_sha256":sha256(raw).hexdigest(),"report_sha256":sha256(args.output.read_bytes()).hexdigest()}))
+
+if __name__=="__main__": main()
