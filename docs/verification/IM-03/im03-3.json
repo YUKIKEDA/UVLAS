@@ -61,7 +61,9 @@
     "not_repeated": "A0三角形述語producerは変更なし、旧A0 3tests/旧変異/他module/全suite/R&D再生成は繰り返さない。A1影響2testsを最終D/R集合へ含める。",
     "cancellation": "設定済取消・work0/1・subcap/残量境界は実行。特定の走査途中時刻に取消を誘導したと主張せず、各root trial/phaseの取消guardをsource審査。",
     "baselines": "既存qa/baselinesは不変。新しい名前付きLG literal/独立irrational referenceを基準caseとして追加。物理I1の基準/認定の代わりにはしない。",
-    "artifact_line_endings": "New metadata is UTF-8 LF. Text copies preserve raw body after declared encoding/path/CRLF conversion; release-lasttest.log retains its terminal blank line and is excluded only from whitespace diffcheck."
+    "artifact_line_endings": "New metadata is UTF-8 LF. Text copies preserve raw body after declared encoding/path/CRLF conversion; release-lasttest.log retains its terminal blank line and is excluded only from whitespace diffcheck.",
+    "trace": "rootがIO head870926dを許可範囲でローカル統合しIM03-3 Doneを同期。matrix/check: 208定義ID、試験あり33、記録あり40、0問題。",
+    "integrity": "root独立checker43files/0errors、実行6ad95bbの14source hash一致、公開account scan0を確認。source/artifactの実行時参照は付替えない。"
   },
   "mutations": {
     "control_cases": 17,
@@ -372,8 +374,5 @@
       "hint": "docs/verification/IM-03/im03-3/tidy-geometry-batch.log"
     }
   ],
-  "pending": [
-    "root final record/hash/privacy review",
-    "trace matrix/check and roadmap acceptance after IO metadata integration"
-  ]
+  "pending": []
 }
