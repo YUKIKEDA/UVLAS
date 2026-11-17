@@ -1,0 +1,8 @@
+[0/2] Re-checking globbed directories...
+[1/8] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue99-build-clean && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue99-build-clean/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/8] Building CXX object tests\CMakeFiles\uvlas_json_allocation_probe.dir\Debug\toolchain\json_allocation_probe.cpp.obj
+[3/8] Linking CXX executable tests\Debug\uvlas_json_allocation_probe.exe
+[4/8] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[5/8] Linking CXX static library Debug\uvlas_core.lib
+[6/8] Linking CXX executable Debug\uvlas.exe
+[7/8] Linking CXX executable tests\Debug\uvlas_test_core_instrumentation.exe

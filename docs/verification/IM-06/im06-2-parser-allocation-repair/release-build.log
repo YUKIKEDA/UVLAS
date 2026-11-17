@@ -1,0 +1,16 @@
+[0/2] Re-checking globbed directories...
+[1/16] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue99-build-clean && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue99-build-clean/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/16] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\checked_dimensions.cpp.obj
+[3/16] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\error_certificate.cpp.obj
+[4/16] Building CXX object CMakeFiles\uvlas_cli.dir\Release\src\app\main.cpp.obj
+[5/16] Building CXX object tests\CMakeFiles\uvlas_json_allocation_probe.dir\Release\toolchain\json_allocation_probe.cpp.obj
+[6/16] Linking CXX executable tests\Release\uvlas_json_allocation_probe.exe
+[7/16] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[8/16] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\state.cpp.obj
+[9/16] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\instrumentation.cpp.obj
+[10/16] Linking CXX static library Release\uvlas_core.lib
+[11/16] Linking CXX executable Release\uvlas.exe
+[12/16] Building CXX object tests\CMakeFiles\uvlas_test_core_instrumentation.dir\Release\core\instrumentation_test.cpp.obj
+[13/16] Linking CXX executable tests\Release\uvlas_test_core_instrumentation.exe
+[14/16] Building CXX object tests\CMakeFiles\uvlas_test_toolchain_pinned_dependencies.dir\Release\toolchain\pinned_dependencies_test.cpp.obj
+[15/16] Linking CXX executable tests\Release\uvlas_test_toolchain_pinned_dependencies.exe

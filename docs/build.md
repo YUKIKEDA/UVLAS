@@ -26,7 +26,7 @@
 | Eigen | 5.0.1 | 密・疎の線形代数（MPL-2.0部分のみ） |
 | Spectra | 1.2.0（overlay port） | 非対称・複素固有値 |
 | Boost Multiprecision、Hash2 | 1.92.0 | 精密参照、正確な線形拘束、SHA-256 |
-| nlohmann/json | 3.12.0 | ケースと状態のJSON |
+| nlohmann/json | 3.12.0（UVLAS例外補修1、port #3） | ケースと状態のJSON |
 | Catch2 | 3.16.1 | 試験（feature `tests`） |
 | Google Benchmark | 1.9.5 | kernel計測専用（feature `benchmarks`、通常Presetは導入しない） |
 | pybind11 | 3.1.0 | Python結合（feature `python`。現在のPresetでは導入しない） |

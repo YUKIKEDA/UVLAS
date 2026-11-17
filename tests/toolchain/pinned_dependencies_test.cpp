@@ -95,6 +95,9 @@ TEST_CASE("pinned dependency versions reach the compiler", "[toolchain][N4-01]")
             return;
         }
         versions.emplace(item.at("name").get<std::string>(), *pin);
+        if (item.at("name") == "nlohmann-json") {
+            CHECK(item.at("port-version").get<int>() == 3);
+        }
     }
     const auto version = [](int major, int minor, int patch) {
         return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(patch);
@@ -122,6 +125,11 @@ TEST_CASE("pinned dependency versions reach the compiler", "[toolchain][N4-01]")
     CHECK(NLOHMANN_JSON_VERSION_MAJOR == 3);
     CHECK(NLOHMANN_JSON_VERSION_MINOR == 12);
     CHECK(NLOHMANN_JSON_VERSION_PATCH == 0);
+#ifdef UVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR
+    CHECK(UVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR == 1);
+#else
+    FAIL("The JSON package must provide the UVLAS allocation-exception repair");
+#endif
 }
 
 TEST_CASE("numerical build policy is in effect", "[toolchain][N4-01][N4-02]") {
