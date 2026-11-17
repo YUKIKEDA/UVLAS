@@ -99,7 +99,7 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
-| IM01-2 | Feat | PG有理グラフとhalf-cell・矩形活動map | #94 | Todo |
+| IM01-2 | Feat | PG有理グラフとhalf-cell・矩形活動map | #94 | Done |
 | IM03-2 | Feat | 空力の所有geometryとexact query位置式 | #95 | Done |
 | IM06-2 | Feat | 元bytesと型を保持する所有入力文書 | #93 | Todo |
 

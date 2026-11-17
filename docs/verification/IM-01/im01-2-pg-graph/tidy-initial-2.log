@@ -1,0 +1,11 @@
+68884 warnings generated.
+<WORKTREE>\tests\structure\pg_graph_test.cpp:103:15: error: the parameter 'x' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  103 | Ref power(Ref x, unsigned n) {
+      |               ^
+      |           const  &
+<WORKTREE>\tests\structure\pg_graph_test.cpp:346:17: error: 'moved' used after it was moved [bugprone-use-after-move,-warnings-as-errors]
+  346 |     CHECK_FALSE(moved.view());
+      |                 ^
+<WORKTREE>\tests\structure\pg_graph_test.cpp:343:18: note: move occurred here
+  343 |     auto owner = std::move(moved);
+      |                  ^

@@ -1,0 +1,35 @@
+54290 warnings generated.
+<WORKTREE>\include\uvlas/structure/pg_graph.hpp:99:8: error: constructor does not initialize these fields: side_s, side_t, identity [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+   99 | struct PgCellPointView {
+      |        ^
+  100 |     const ExactRational& s; ///< Exact chart s in [0,1].
+  101 |     const ExactRational& t; ///< Exact chart t in [0,1].
+  102 |     const ExactRational& u; ///< Exact local u in [-1,1].
+  103 |     const ExactRational& v; ///< Exact local v in [-1,1].
+  104 |     PgCellIndex cell;       ///< Selected one-sided cell.
+  105 |     PgSide side_s;          ///< Explicit s-boundary choice.
+  106 |     PgSide side_t;          ///< Explicit t-boundary choice.
+  107 |     PgGraphContentIdentity
+  108 |         identity; ///< Producing graph-content identity, not physical qualification.
+      |
+      |                 {}
+<WORKTREE>\include\uvlas/structure/pg_graph.hpp:111:8: error: constructor does not initialize these fields: identity [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  111 | struct PgCellPolynomialsView {
+      |        ^
+  112 |     std::span<const ExactCellPolynomial> components; ///< Exactly three polynomials in x,y,z order.
+  113 |     PgCellIndex cell;                                ///< Selected one-sided cell.
+  114 |     PgGraphContentIdentity
+  115 |         identity; ///< Producing graph-content identity, not physical qualification.
+      |
+      |                 {}
+<WORKTREE>\include\uvlas/structure/pg_graph.hpp:118:8: error: constructor does not initialize these fields: frame, identity [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+  118 | struct PgGraphValueView {
+      |        ^
+  119 |     std::span<const ExactRational> components; ///< Exactly three values in x,y,z order.
+  120 |     PgCellIndex cell;                          ///< Selected one-sided cell.
+  121 |     PgDerivativeOrders orders;                 ///< Mixed derivative used for all three components.
+  122 |     PgDerivativeFrame frame;                   ///< Coordinate frame of the derivative values.
+  123 |     PgGraphContentIdentity
+  124 |         identity; ///< Producing graph-content identity, not physical qualification.
+      |
+      |                 {}

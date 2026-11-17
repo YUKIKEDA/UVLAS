@@ -459,8 +459,8 @@ TEST_CASE("Graph resource preflight and invalid requests preserve input and old 
     REQUIRE_FALSE(unproved);
     CHECK(unproved.error().code == core::FailureCode::Unsupported);
     CHECK(output.allocated_bytes() == 0);
-    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop is non-const; libstdc++
-    // declares it const.
+    // MSVC 14.51 request_stop is non-const; libstdc++ declares it const.
+    // NOLINTNEXTLINE(misc-const-correctness)
     std::stop_source cancellation;
     CHECK(cancellation.request_stop());
     auto stopped = limits();
