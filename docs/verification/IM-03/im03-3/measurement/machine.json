@@ -1,0 +1,14 @@
+{
+  "label": "windows-x64-local-preparation",
+  "physical_memory_bytes": 51343966208,
+  "scope": "preparation only; product kernel and R03 not evaluated",
+  "warmup_per_case": 1,
+  "samples_per_case": 3,
+  "cpu": [
+    "13th Gen Intel(R) Core(TM) i5-13400F"
+  ],
+  "logical_processors": 16.0,
+  "cases": 4,
+  "workers": 1,
+  "affinity_mask": 1
+}

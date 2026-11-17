@@ -1,0 +1,23 @@
+[1/4] Processing file <workspace>\src\aero\local_geometry_packet.cpp.
+62584 warnings generated.
+[2/4] Processing file <workspace>\src\aero\geometry_snapshot.cpp.
+122380 warnings generated.
+[3/4] Processing file <workspace>\tests\aero\local_geometry_packet_test.cpp.
+185552 warnings generated.
+[4/4] Processing file <workspace>\tests\aero\local_geometry_packet_resources_test.cpp.
+248070 warnings generated.
+<workspace>\tests\aero\local_geometry_packet_test.cpp:629:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  629 |     CHECK(timing->classification.calls == 1);
+      |           ^
+<workspace>\tests\aero\local_geometry_packet_test.cpp:630:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  630 |     CHECK(timing->qualification.calls == 1);
+      |           ^
+<workspace>\tests\aero\local_geometry_packet_test.cpp:631:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  631 |     CHECK(timing->enclosure.calls == 1);
+      |           ^
+<workspace>\tests\aero\local_geometry_packet_test.cpp:632:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  632 |     CHECK(timing->root.calls == 5);
+      |           ^
+<workspace>\tests\aero\local_geometry_packet_test.cpp:633:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  633 |     CHECK(timing->width.calls == 12);
+      |           ^

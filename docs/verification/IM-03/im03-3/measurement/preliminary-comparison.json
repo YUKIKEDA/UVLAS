@@ -1,0 +1,432 @@
+{
+  "source_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+  "build": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+    "uncommitted_changes": false,
+    "compiler": "MSVC 19.51.36260.0",
+    "platform": "Windows AMD64",
+    "configuration": "Release",
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    },
+    "dependency_repairs": {
+      "nlohmann_json_sax_allocation": 0
+    }
+  },
+  "before_scope": "dirty development snapshot only; exact source/lib/flags frozen in conditions-before.json and before/; not final clean evidence",
+  "after_scope": "clean source fixed; four preparation cases only; root/width subset of enclosure; lifetime RSS not local heap bound",
+  "cases": [
+    {
+      "scenario": 0,
+      "samples_each": 3,
+      "all_output_words_and_steps_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 1546800,
+          "median": 1558800,
+          "max": 1576600
+        },
+        "classification_ns": {
+          "min": 115700,
+          "median": 115800,
+          "max": 116600
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 1422900,
+          "median": 1435900,
+          "max": 1454100
+        },
+        "root_ns": {
+          "min": 1379200,
+          "median": 1392200,
+          "max": 1408000
+        },
+        "width_ns": {
+          "min": 37200,
+          "median": 37400,
+          "max": 39400
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 255500,
+          "median": 257400,
+          "max": 257400
+        },
+        "classification_ns": {
+          "min": 114100,
+          "median": 115700,
+          "max": 115900
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 100,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 134500,
+          "median": 134700,
+          "max": 134900
+        },
+        "root_ns": {
+          "min": 90700,
+          "median": 91300,
+          "max": 91400
+        },
+        "width_ns": {
+          "min": 36900,
+          "median": 37100,
+          "max": 37900
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "wall_ratio_after_over_before": 0.1651270207852194
+    },
+    {
+      "scenario": 1,
+      "samples_each": 3,
+      "all_output_words_and_steps_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 1530900,
+          "median": 1535300,
+          "max": 1546000
+        },
+        "classification_ns": {
+          "min": 121800,
+          "median": 121900,
+          "max": 122700
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 1402700,
+          "median": 1406100,
+          "max": 1417700
+        },
+        "root_ns": {
+          "min": 1359400,
+          "median": 1361600,
+          "max": 1373900
+        },
+        "width_ns": {
+          "min": 37100,
+          "median": 37500,
+          "max": 38100
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 262400,
+          "median": 264500,
+          "max": 264800
+        },
+        "classification_ns": {
+          "min": 121900,
+          "median": 123300,
+          "max": 123500
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 0
+        },
+        "enclosure_ns": {
+          "min": 134100,
+          "median": 134500,
+          "max": 135000
+        },
+        "root_ns": {
+          "min": 90600,
+          "median": 90700,
+          "max": 91200
+        },
+        "width_ns": {
+          "min": 37200,
+          "median": 37500,
+          "max": 37700
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "wall_ratio_after_over_before": 0.17227903341366507
+    },
+    {
+      "scenario": 2,
+      "samples_each": 3,
+      "all_output_words_and_steps_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 875500,
+          "median": 887600,
+          "max": 908400
+        },
+        "classification_ns": {
+          "min": 71100,
+          "median": 71500,
+          "max": 72100
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 0
+        },
+        "enclosure_ns": {
+          "min": 799700,
+          "median": 810700,
+          "max": 832100
+        },
+        "root_ns": {
+          "min": 762700,
+          "median": 774400,
+          "max": 794800
+        },
+        "width_ns": {
+          "min": 31300,
+          "median": 31800,
+          "max": 32200
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 206100,
+          "median": 206400,
+          "max": 208300
+        },
+        "classification_ns": {
+          "min": 71400,
+          "median": 71500,
+          "max": 71700
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 130000,
+          "median": 130200,
+          "max": 131800
+        },
+        "root_ns": {
+          "min": 93100,
+          "median": 93500,
+          "max": 94400
+        },
+        "width_ns": {
+          "min": 31100,
+          "median": 31700,
+          "max": 31900
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "wall_ratio_after_over_before": 0.23253717890941866
+    },
+    {
+      "scenario": 3,
+      "samples_each": 3,
+      "all_output_words_and_steps_identical": true,
+      "before": {
+        "wall_ns": {
+          "min": 2165700,
+          "median": 2174200,
+          "max": 2296500
+        },
+        "classification_ns": {
+          "min": 130700,
+          "median": 131100,
+          "max": 136400
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 100
+        },
+        "enclosure_ns": {
+          "min": 2027000,
+          "median": 2030100,
+          "max": 2158000
+        },
+        "root_ns": {
+          "min": 1981000,
+          "median": 1983000,
+          "max": 2109500
+        },
+        "width_ns": {
+          "min": 38800,
+          "median": 39700,
+          "max": 40800
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "after": {
+        "wall_ns": {
+          "min": 279500,
+          "median": 280500,
+          "max": 282100
+        },
+        "classification_ns": {
+          "min": 132000,
+          "median": 133600,
+          "max": 134200
+        },
+        "qualification_ns": {
+          "min": 0,
+          "median": 0,
+          "max": 0
+        },
+        "enclosure_ns": {
+          "min": 139400,
+          "median": 140000,
+          "max": 140100
+        },
+        "root_ns": {
+          "min": 93700,
+          "median": 93900,
+          "max": 94700
+        },
+        "width_ns": {
+          "min": 38300,
+          "median": 38500,
+          "max": 39300
+        },
+        "workspace_payload": {
+          "min": 279128,
+          "median": 279128,
+          "max": 279128
+        },
+        "result_plan_payload": {
+          "min": 13688,
+          "median": 13688,
+          "max": 13688
+        },
+        "observed_steps": {
+          "min": 573,
+          "median": 573,
+          "max": 573
+        }
+      },
+      "wall_ratio_after_over_before": 0.129012970287922
+    }
+  ],
+  "raw_hashes": {
+    "out\\issue109-measure\\before-raw.jsonl": "dc2e3ab06b886f0abf69e680a1167c85f2c9095fb6213d78d43c405d889786e5",
+    "out\\issue109-measure\\after\\raw.json-stream": "7e0bc307ae11ee8db566838cbe429ba5c168c022d17bf40793fa5a39e272c845"
+  }
+}
