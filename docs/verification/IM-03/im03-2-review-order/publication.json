@@ -1,0 +1,150 @@
+{
+  "schema": "uvlas.redacted-artifacts/1",
+  "reason": "個人worktreeパス伏字・UTF8/LFの公開copy。原rawと旧記録は不変。",
+  "entries": [
+    {
+      "id": "reproduce.log",
+      "original_sha256": "3a493ea1676d83a79640b9bc7cdb3d30970047df775589774adc41e276d4a827",
+      "published_sha256": "27ab9aca9caa4b37a13672e7f7005da41f194dc32a65619f7070a7602c6fa6ad",
+      "redactions": 2,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "reproducer-case.cpp",
+      "original_sha256": "f6ba49e093ba081b5cf7044f86809d471c7212741534574558faf09529987922",
+      "published_sha256": "f6ba49e093ba081b5cf7044f86809d471c7212741534574558faf09529987922",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "reproducer-provenance.json",
+      "original_sha256": "48ab8f3981094c4279316f3de384440eeb2ad7552a9ee784a803f88166a1d9ba",
+      "published_sha256": "48ab8f3981094c4279316f3de384440eeb2ad7552a9ee784a803f88166a1d9ba",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "Debug-build.log",
+      "original_sha256": "252f408e53489701b48f5e27b2413cc47204698df687641d8edafe9d4763998c",
+      "published_sha256": "010cfa6c0f4092fb00c5cc32188cf8e73b0887fb11bc0d99d010ceee713f5c58",
+      "redactions": 4,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "Debug-ctest.log",
+      "original_sha256": "7f26e43ae6c5df2c5be92ef634829e27e1ceef268f91816357123b1b1fd9d43f",
+      "published_sha256": "f0cfd6d95eafef32aa981873f1044609b731fa1b31177c7b19efcd2706fb070e",
+      "redactions": 2,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "Debug-raw.log",
+      "original_sha256": "bdf9291bb5b731ee731ed8e4deae347fe76535300e42444b1c466254c60371f2",
+      "published_sha256": "8ca4e2a28403c00bb7aa3380d971c8727a99c423a5f3c09d2333dcdbe1033b8b",
+      "redactions": 4,
+      "original_encoding": "cp932",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "Release-build.log",
+      "original_sha256": "236c50076e605767db306b2e8728601e96bc36da703ca87884a69f946a80b22f",
+      "published_sha256": "b64e41a784dabff213a6c157ece3d3aa8625861734401d0b218cefa6fddc3688",
+      "redactions": 4,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "Release-ctest.log",
+      "original_sha256": "564669436761f4ca2e6a73496777da5e1f512e86a287f2cdac7720562ce62c1f",
+      "published_sha256": "2e126a53cddd56a6b62f4a15e77dc6809d7372a287891176dd79fc8c8457aef8",
+      "redactions": 2,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "Release-raw.log",
+      "original_sha256": "4b7364c2440b03df7a3a695fd2da612f7b836a930c7692141ffef80f9e07d344",
+      "published_sha256": "538be1ac1adce18617582223b14089d48fd901304ccfd6ef541b70e23ba6ed2b",
+      "redactions": 4,
+      "original_encoding": "cp932",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "tidy-source-final.log",
+      "original_sha256": "afa30e304f546413b198d206cc499a29c26b4084de3a11507f85ff976d3a97c7",
+      "published_sha256": "317d9b13cfd450ce85d38b783ec4a0a0df58111cd1be97d0c6555e3cfd033edd",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "tidy-test-final.log",
+      "original_sha256": "c02bbc5854f840030b5eedb8bfd1089c59687fe9d874fa3b04f676f01fa37478",
+      "published_sha256": "385327cd7597c1e895cad509bff27093686abd4097ffc30642c77e49e4532082",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "format.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "japanese-contract.log",
+      "original_sha256": "74a2ab74acbb0461d1aec753ab7e08654f7c93cc16f58bc179b7f1cb6db93133",
+      "published_sha256": "9bcb27f191e98a8a536f0853ee1073bfe7b896009681c0fa1e28922e074a72a3",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "japanese-testing.log",
+      "original_sha256": "ed75ac87d9f845bd68b13e112d7f93c0213f9c02009e6bd6439cc2982efcc070",
+      "published_sha256": "51f2783beea19adba2a2663442712c5325a949ec660bf01d46658430bd903ad5",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "git-revision.hpp",
+      "original_sha256": "955412ff75f26230afff8a48dcdddae86398a4cde7a3a8aed7ee84de1065bbde",
+      "published_sha256": "433113a68480e13d355cbef0f199952dd7c1749cb76e9bb5e66d661c19a0064e",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    },
+    {
+      "id": "build-config.hpp",
+      "original_sha256": "a61c3582e8e0cf0774b34d47d505049ff882926b4918b7ea8ed4b7202237f160",
+      "published_sha256": "e36c58cbddb7adc53ed5c0be17729339f39d8e1dbb8a79aa855bba8e67f47214",
+      "redactions": 0,
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8",
+      "line_endings": "LF"
+    }
+  ]
+}

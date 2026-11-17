@@ -1,0 +1,23 @@
+Filters: "Connection diagnostics select the lowest facet ID independently of source row order"
+Randomness seeded to: 102
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_aero_geometry_snapshot.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Connection diagnostics select the lowest facet ID independently of source row
+order
+-------------------------------------------------------------------------------
+<workspace>\tests\aero\geometry_snapshot_test.cpp(681)
+...............................................................................
+
+<workspace>\tests\aero\geometry_snapshot_test.cpp(707): FAILED:
+  CHECK( *problem == FacetId{10} )
+with expansion:
+  {?} == {?}
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 6 | 5 passed | 1 failed
+

@@ -1,0 +1,93 @@
+WARN `--no-project` was provided, but no project was found
+{
+  "file": "docs\\specs\\aero\\owned-geometry-query-contract.md",
+  "stats": {
+    "total_findings": 1,
+    "by_category": {
+      "low_lexical_diversity_ttr": 1
+    },
+    "genre": "tech",
+    "experimental": false,
+    "total_sentences": 135,
+    "nominal_ending_count": 8,
+    "nominal_ending_ratio": 0.05925925925925926,
+    "total_paragraphs": 31,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      4,
+      5,
+      4,
+      3,
+      3,
+      6,
+      5,
+      3,
+      4,
+      7,
+      5,
+      3,
+      3,
+      3,
+      6,
+      5,
+      3,
+      3,
+      3,
+      2,
+      3,
+      8,
+      7,
+      6,
+      3,
+      4,
+      7,
+      7,
+      3,
+      5,
+      2
+    ],
+    "paragraph_sentence_count_cv": 0.3804552900265558,
+    "rhythm": {
+      "mora_mean": 75.42962962962963,
+      "mora_stdev": 65.51850637522656,
+      "burstiness": -0.07031751916223702,
+      "length_autocorrelation_lag1": -0.0903799391249772
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "名詞/助詞/名詞/名詞",
+      "lead_pos_4gram_ratio": 0.13636363636363635
+    },
+    "lexical_diversity": {
+      "ttr": 0.3490909090909091,
+      "mtld": 82.9045859805539,
+      "content_token_count": 1650,
+      "doc_char_count": 7034,
+      "skipped_too_short": false
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 82,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 31,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 3,
+      "category": "low_lexical_diversity_ttr",
+      "excerpt": "TTR=0.349 (内容語 1650 語中 576 種類)",
+      "severity": "info",
+      "detail": "TTR(Type-Token Ratio)が閾値0.45未満。同じ語彙の使い回しが多い疑い",
+      "related_lines": null
+    }
+  ]
+}
