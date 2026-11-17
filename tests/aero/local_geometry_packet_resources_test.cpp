@@ -303,7 +303,7 @@ TEST_CASE("Local packet cumulative admission has an exact remainder boundary",
             CHECK(take(result->steps()) <= cap);
         }
     }
-    for (const std::uint64_t cap : {16, 17}) {
+    for (const std::uint64_t cap : {std::uint64_t{16}, std::uint64_t{17}}) {
         auto bounded = limits();
         bounded.predicate.max_steps = cap;
         auto result = prepare_local_packet(geometry, query, FacetId{70},

@@ -150,3 +150,13 @@ using Storage = std::variant<Words3, Words6, Vertex, Edge, Face>;
 Storage storage;
 storage.emplace<Words3>(words);
 ```
+
+
+range-forの変数だけをunsigned型にしても、`{16, 17}`の要素型はintのままである。2026-11-17、PR #112の資源境界試験はMSVCで通ったが、GCC14の`-Werror=sign-conversion`でLinuxのDebug/Release/sanitizer構成がコンパイルに失敗した。境界値の意味を変えず、initializer側にも必要な型を明示する。符号を保つ拡大型変換と区別し、同じunsigned range-forを検索して確認する。
+
+```cpp
+// BAD: initializer_list<int> converts each element to uint64_t.
+for (const std::uint64_t cap : {16, 17}) { use(cap); }
+// GOOD: the fixture values already have the required unsigned type.
+for (const std::uint64_t cap : {std::uint64_t{16}, std::uint64_t{17}}) { use(cap); }
+```
