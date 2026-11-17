@@ -642,3 +642,38 @@ TEST_CASE("Material word products retain extreme dyadic scales and either orient
                   coordinate * coordinate);
         }
 }
+TEST_CASE("Free queries construct the selected word alternative and preserve every original word",
+          "[UI-D03][UI-D05][N4-03][N4-06][verification]") {
+    const TriangleFixture fixture;
+    core::ResourcePlan prep{budget}, out{budget};
+    auto w = workspace(prep);
+    const auto g = take(prepare_owned_geometry(fixture.input(), limits(), *w, out));
+    const std::array<PointWords, 2> words{FreeSingle{{.75, 1, 20}},
+                                          FreeDouble{{.75, 1, 20}, {0x1p-80, -0x1p-90, 0x1p-100}}};
+    for (const auto& source : words) {
+        core::ResourcePlan qp{budget}, rp{budget};
+        const auto q =
+            take(resolve_query(g, {QueryId{17}, FreePoint{source}}, g.context(), limits(), *w, qp));
+        CHECK(std::holds_alternative<NoMaterialSupport>(take(q.support())));
+        const auto retained = take(q.definition());
+        const auto* point = std::get_if<FreePoint>(&retained.definition);
+        REQUIRE(point != nullptr);
+        CHECK(point->words.index() == source.index());
+        Rat height{20};
+        if (const auto* single = std::get_if<FreeSingle>(&source)) {
+            const auto* saved = std::get_if<FreeSingle>(&point->words);
+            REQUIRE(saved != nullptr);
+            CHECK(saved->words == single->words);
+        } else {
+            const auto* pair = std::get_if<FreeDouble>(&source);
+            REQUIRE(pair != nullptr);
+            const auto* saved = std::get_if<FreeDouble>(&point->words);
+            REQUIRE(saved != nullptr);
+            CHECK(saved->high == pair->high);
+            CHECK(saved->low == pair->low);
+            height += Rat{pair->low[2]};
+        }
+        CHECK(distance(take(classify_resolved_query(g, q, FacetId{70}, limits(), *w, rp))) ==
+              height * height);
+    }
+}
