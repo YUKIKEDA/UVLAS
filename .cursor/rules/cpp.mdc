@@ -41,6 +41,8 @@ GOOD  全項を受け取るコンストラクタを用意し、既存の呼出�
 
 2026-11-15、PR #53はLinux Debugで35試験が成功した後、試験2ファイルのclang-tidy診断で失敗した。optionalの存在確認、nodiscard、enumの基底型、constは試験コードにも適用される。optionalの直し方は後述の既存規則に従い、検査対象の漏れとは分けて確認する。
 
+共有状態を操作するhandleのconst性は、対象の標準ライブラリごとに確認する。2026-11-17、PR #90ではlibstdc++が`request_stop()`をconstと宣言する一方、MSVC 14.51は非constだった。Linuxの静的診断だけに合わせたconst化はMSVCで成立しないため、当該宣言へAPI差を理由とする限定NOLINTを付け、両方で呼べる非const宣言を維持した。BAD：一方の実装だけを根拠に一律const化する。GOOD：実ヘッダを照合し、可搬な呼出しと限定例外の根拠を同じ行付近に残す。
+
 ```text
 BAD   製品sourceのtidy成功を、新規試験・supportの検査済みという意味で報告する
 GOOD  変更TUと検査済みTUを照合し、構成と結果をファイルごとに対応させる
