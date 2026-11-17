@@ -297,9 +297,9 @@ constraint/newton_correction/arclength_stateは準備済み混合layoutに依存
 | active aero | circulation、wake_position、wake_strength、aero_residual、transport_residual |
 | jointsまたはconstraint/trace_constraint支持あり | ConstraintScalePolicy physical。並進位置拘束があればposition=values、姿勢拘束があればorientation=values。該当しない方だけnone |
 
-拘束の原成分を $$ C_i $$、対応するcallerの正物理尺度を $$ c_i $$ とする。元componentの物理kind/axis/targetと $$ c_i $$ をprepareが保持し、**先に** $$ \widehat C_i=C_i/c_i $$ と無次元化する。その後の同次元の独立化行変換を $$ T $$ とすると、変換後は $$ C'_k=\sum_i T_{ki}\widehat C_i $$、正の行尺度は $$ s'_k=\sum_i|T_{ki}| $$ の上向き包絡とする。非零独立行だけを資格付きで持つため $$ s'_k>0 $$ が必要であり、表現不能/零行を小値cutで修復しない。mとradの値を直接加えない。変換誤差も元量の単位へ戻して伝播する。
+拘束の原成分を $$ C_i $$ 、対応するcallerの正物理尺度を $$ c_i $$ とする。元componentの物理kind/axis/targetと $$ c_i $$ をprepareが保持し、**先に** $$ \widehat C_i=C_i/c_i $$ と無次元化する。その後の同次元の独立化行変換を $$ T $$ とすると、変換後は $$ C'_k=\sum_i T_{ki}\widehat C_i $$ 、正の行尺度は $$ s'_k=\sum_i|T_{ki}| $$ の上向き包絡とする。非零独立行だけを資格付きで持つため $$ s'_k>0 $$ が必要であり、表現不能/零行を小値cutで修復しない。mとradの値を直接加えない。変換誤差も元量の単位へ戻して伝播する。
 
-無次元化拘束へ共役な内部乗数は仕事次元を持つ。内部乗数を使うKKT/補正/反力回復経路には明示した正の`multiplier_work_scale`を適用する。forward行変換の列包絡から逆dual尺度を推定しない。既存CNの双対写像を同じ元/変換系へ保存し、rank削減時には非一意な元乗数の個別尺度保証を生成しない。原拘束は $$ c_i $$、元力学残差はprimaryのforce/moment、物理反力はreaction_force/reaction_momentで、それぞれ独立に資格を確認する。変換後の小残差で代替しない。
+無次元化拘束へ共役な内部乗数は仕事次元を持つ。内部乗数を使うKKT/補正/反力回復経路には明示した正の`multiplier_work_scale`を適用する。forward行変換の列包絡から逆dual尺度を推定しない。既存CNの双対写像を同じ元/変換系へ保存し、rank削減時には非一意な元乗数の個別尺度保証を生成しない。原拘束は $$ c_i $$ 、元力学残差はprimaryのforce/moment、物理反力はreaction_force/reaction_momentで、それぞれ独立に資格を確認する。変換後の小残差で代替しない。
 
 各Newton未知量/原残差slotはprepareで物理由来（primary field、target、axis、必要なwork block）と同じ単位を持つ。Newtonのcorrection尺度はこの明示尺度を同じ実slot順へ連結し、状態/拘束変換には上記の無次元化と同じ対応を使う。未分類slotや不足primaryを内部既定1で埋めない。全slotが対応したことをsolve前に検査する。枝の弧長は同じ状態尺度 $$ s_{z,i} $$ とContinuationの正speed_scale $$ s_U $$ から $$ W_z=\operatorname{diag}(1/s_{z,i}^2),\ w_U=1/s_U^2 $$ と固定する。数値評価は先に尺度化し、二乗のoverflow/underflowを避ける。ArcLength.state_scalesの同じfield/targetはNumerics側の同じ宣言内容と一致させ、別の動的列数を要求しない。
 
