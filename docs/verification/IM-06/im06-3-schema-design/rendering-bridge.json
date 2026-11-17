@@ -1,0 +1,29 @@
+{
+  "before_sha256": "a8eea2057dfebd280d66b73c11cb32f0df731e9b07da5afa5fa9c0dfedb16265",
+  "after_sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+  "replacement_count": 3,
+  "replacement": "closing $$ followed by Japanese comma -> closing $$ space Japanese comma",
+  "reverse_exact_offsets_restore_original_bytes": true,
+  "old_audit_source_commit": "d87e7c36ef7c800b8a212f5a9e5473db91088f8b",
+  "mathematics_and_json_values_changed": false,
+  "current_source_commit": "da46cc632bb3e68a06d842c1aa3628a5c09befff",
+  "old_record_source_commit": "d87e7c36ef7c800b8a212f5a9e5473db91088f8b",
+  "language_recheck": [
+    {
+      "tool": "lint",
+      "exit": 0,
+      "findings": 1
+    },
+    {
+      "tool": "outline",
+      "exit": 0,
+      "findings": 0
+    },
+    {
+      "tool": "terms",
+      "exit": 0,
+      "findings": 0
+    }
+  ],
+  "not_repeated": "作者の全audit/C++/数値試験は繰り返していない。旧9言語rawは保存。変更は3spaceだけ。"
+}
