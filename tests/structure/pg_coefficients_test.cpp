@@ -197,6 +197,8 @@ TEST_CASE("PG full preparation admits before allocating and owns its graph and e
         CHECK(busy.error().operation == core::Operation::PrepareModel);
         CHECK(output.allocated_bytes() == 0);
     }
+    // MSVC 14.51 request_stop is non-const; libstdc++ declares it const.
+    // NOLINTNEXTLINE(misc-const-correctness): preserve the portable non-const handle.
     std::stop_source stop;
     REQUIRE(stop.request_stop());
     auto cancelled_limits = limits;
@@ -319,6 +321,14 @@ OracleRational oracle_at_midpoint(const PgPoly& value) {
             return oracle_value(term.coefficient);
     return 0;
 }
+OracleRational oracle_chart_derivative_at_midpoint(const PgPoly& value, ExactAxis axis,
+                                                   core::Index n) {
+    const ExactPowers selected = axis == ExactAxis::First ? ExactPowers{1, 0} : ExactPowers{0, 1};
+    for (const auto& term : value.terms())
+        if (term.powers.first == selected.first && term.powers.second == selected.second)
+            return oracle_value(term.coefficient) * (4 * n);
+    return 0;
+}
 // Explicit classical Legendre coefficients, independent of the product recurrence.
 constexpr std::array<std::array<int, 8>, 8> oracle_legendre{{{{1, 0, 0, 0, 0, 0, 0, 0}},
                                                              {{0, 1, 0, 0, 0, 0, 0, 0}},
@@ -433,9 +443,15 @@ TEST_CASE("PG all quartic monomials and both full P7 families satisfy independen
                                 vr[0] = oracle_scale(vr[0], OracleRational{5} / 4);
                                 vr[1] = vr[1] - oracle_scale(vr[0], OracleRational{3} / 20);
                                 const OracleRational fxr = f.ds * 5 / 4, fyr = f.dt - fxr * 3 / 20;
-                                std::array<OracleRational, 3> dx, dy;
+                                std::array<OracleRational, 3> dx, dy, actual_ds, actual_dt;
                                 for (std::size_t c = 0; c < 3; ++c) {
                                     CHECK(oracle_at_midpoint(v[c]) == vr[c].value);
+                                    actual_ds[c] = oracle_chart_derivative_at_midpoint(
+                                        v[c], ExactAxis::First, n);
+                                    actual_dt[c] = oracle_chart_derivative_at_midpoint(
+                                        v[c], ExactAxis::Second, n);
+                                    CHECK(actual_ds[c] == vr[c].ds);
+                                    CHECK(actual_dt[c] == vr[c].dt);
                                     dx[c] = vr[c].ds * 5 / 4;
                                     dy[c] = vr[c].dt - dx[c] * 3 / 20;
                                 }
@@ -452,20 +468,29 @@ TEST_CASE("PG all quartic monomials and both full P7 families satisfy independen
                                         op.d(op.d(v[c], ExactAxis::First), ExactAxis::Second),
                                         op.d(op.d(v[c], ExactAxis::Second), ExactAxis::First)));
                                 }
+                                CHECK(oracle_at_midpoint(fx) == fxr);
+                                CHECK(oracle_at_midpoint(fy) == fyr);
+                                const OracleRational actual_tx =
+                                    (actual_ds[2] - fxr * actual_ds[0] - fyr * actual_ds[1]) * 5 /
+                                    4;
+                                const OracleRational actual_ty = actual_dt[2] - fxr * actual_dt[0] -
+                                                                 fyr * actual_dt[1] -
+                                                                 actual_tx * 3 / 20;
                                 const OracleRational g = 1 + fxr * fxr + fyr * fyr;
-                                CHECK(actual_p[0] + fxr * actual_p[2] + g * tx == 0);
-                                CHECK(actual_p[1] + fyr * actual_p[2] + g * ty == 0);
+                                CHECK(actual_p[0] + fxr * actual_p[2] + g * actual_tx == 0);
+                                CHECK(actual_p[1] + fyr * actual_p[2] + g * actual_ty == 0);
                                 CHECK(-fxr * actual_p[0] - fyr * actual_p[1] + actual_p[2] == 0);
                                 // Only the along-family membrane component and shear
                                 // vanish. The remaining component is generally nonzero.
                                 const OracleRational ess =
-                                    OracleRational{4} * vr[0].ds / 5 + f.ds * vr[2].ds;
-                                const OracleRational ett =
-                                    vr[1].dt + OracleRational{3} * vr[0].dt / 20 + f.dt * vr[2].dt;
-                                const OracleRational shear = OracleRational{4} * vr[0].dt / 5 +
-                                                             vr[1].ds +
-                                                             OracleRational{3} * vr[0].ds / 20 +
-                                                             f.ds * vr[2].dt + f.dt * vr[2].ds;
+                                    OracleRational{4} * actual_ds[0] / 5 + f.ds * actual_ds[2];
+                                const OracleRational ett = actual_dt[1] +
+                                                           OracleRational{3} * actual_dt[0] / 20 +
+                                                           f.dt * actual_dt[2];
+                                const OracleRational shear =
+                                    OracleRational{4} * actual_dt[0] / 5 + actual_ds[1] +
+                                    OracleRational{3} * actual_ds[0] / 20 + f.ds * actual_dt[2] +
+                                    f.dt * actual_ds[2];
                                 CHECK(shear == 0);
                                 CHECK((axis == PgPairedAxis::S ? ess : ett) == 0);
                                 const OracleRational remaining =
