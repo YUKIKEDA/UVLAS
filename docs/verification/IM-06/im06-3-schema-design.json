@@ -13,7 +13,7 @@
   "package": "IM-06",
   "issue": 110,
   "date": "2026-11-17",
-  "source_commit": "d87e7c36ef7c800b8a212f5a9e5473db91088f8b",
+  "source_commit": "da46cc632bb3e68a06d842c1aa3628a5c09befff",
   "dependency_source_commit": "caa815364ce3b0cf5f63d71d2c3937e5a8a690fa",
   "scope": "全case schemaの設計契約、未SI所有型と検証段階、全nested辞書、限定式、144 fragment/5用途別root例。製品validator/式評価/物理kernelの実装・実行ではない。",
   "claimed_state": {
@@ -68,10 +68,11 @@
     "japanese": {
       "lint": "3文書exit0。主文0、design0、fields warn low_burstiness1。型辞書の同型条件を保つため残す。",
       "outline_terms": "全3文書各exit0。構造/語彙レビューの入力であり自動承認ではない。",
-      "encoding_correction": "cp932出力失敗とPowerShell nativeデコードの文字化けを確認。最終9出力はPYTHONUTF8=1のuvをCPython subprocessから起動しstdout bytes直接保存。UTF8 JSON/U+FFFD無しを検査し旧rawを流用しない。"
+      "encoding_correction": "cp932出力失敗とPowerShell nativeデコードの文字化けを確認。最終9出力はPYTHONUTF8=1のuvをCPython subprocessから起動しstdout bytes直接保存。UTF8 JSON/U+FFFD無しを検査し旧rawを流用しない。",
+      "rendering_followup": "3spaceのみ修正後のfieldsでlint/outline/terms各exit0。lint warn low_burstiness1、他0。旧9rawは変更せず保存。"
     },
     "links": "作者auditは相対path存在のみ。一般fragment checkerではない。rootが誤IM06 anchorを発見し6adf33aで除去。観測形状anchorは実見出しに通読照合。",
-    "git": "source4fileのworking bytes/git blob内容SHA256一致。cached diff check成功。新例JSON CRLF→LFはJSON値同一。",
+    "git": "4source固定時と今回fieldsのみのcached diff checkは成功。raw artifact integrity-check.jsonのCRLF10行を含む記録stageのcached diff checkはtrailing whitespaceでexit1だった。実checker stdoutのbyte/hashは保存し、raw込み全体の差分検査が成功したとは主張しない。",
     "not_run": "製品C++/Python試験、CLI validate、物理case、両OSCIは実行していない。製品source不変のため対象外。"
   },
   "commands": [
@@ -95,7 +96,7 @@
   ],
   "sources": {
     "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
-    "docs/specs/foundation/case-schema-fields.md": "a8eea2057dfebd280d66b73c11cb32f0df731e9b07da5afa5fa9c0dfedb16265",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
     "docs/specs/foundation/case-schema-design-cases.md": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
     "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe"
   },
@@ -129,6 +130,14 @@
     "docs/verification/IM-06/im06-3-schema-design/privacy-check.json": "b4778acac32dcfc96e790fbd7d27648c8beb40860e8e3af1f08ec23d37ce3bd4",
     "docs/verification/IM-06/im06-3-schema-design/source-provenance.json": "645e41ff948dcc1d6c0a99249d218447ac66612303ee1f2f434706384520c689",
     "docs/verification/IM-06/im06-3-schema-design/integrity-check.json": "97eeed6b984f3a33628768619709964165afc1e576c4eb721d1be41947f502d6",
-    "docs/verification/IM-06/im06-3-schema-design/integrity-output-redaction.json": "0be6500cc4ebe9b312e0e63bd7182078f5e95229a0251e7532f437f08fc2a314"
-  }
+    "docs/verification/IM-06/im06-3-schema-design/integrity-output-redaction.json": "0be6500cc4ebe9b312e0e63bd7182078f5e95229a0251e7532f437f08fc2a314",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-rendering-lint.json": "d45e2724af82f5bf3f340230df5ca7538b342ae7ad02629e845c055accf60bb9",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-rendering-outline.json": "185d820e2235a0d04b359ffee5a347618818abc1ae10bd8dea34d828cec6907b",
+    "docs/verification/IM-06/im06-3-schema-design/case-schema-fields-rendering-terms.json": "c1107319ba75a7d12da7ed8a69bad0f00fd00bc96e5c760726fa41b31b49fd75",
+    "docs/verification/IM-06/im06-3-schema-design/rendering-bridge.json": "57295c3a931462e3dbb69bbe5cd80944b09f27a356e7a7ecbb9aea45e95c08a6",
+    "docs/verification/IM-06/im06-3-schema-design/integrity-rendering-check.json": "aa6a8f9543f9706e53b07489fcb7bd18f7a7c11617cdba602f362fde8b5b41a6",
+    "docs/verification/IM-06/im06-3-schema-design/integrity-rendering-output-provenance.json": "154a20c62f632a41cc937217508b9813ae97a864df67b61012b6a21d9e4db255"
+  },
+  "audited_source_commit": "d87e7c36ef7c800b8a212f5a9e5473db91088f8b",
+  "source_commit_scope": "source_commitは3space修正後の現在版。作者audit/旧9言語rawはaudited_source_commit=d87e7c3の実行で保持し、rendering-bridgeが元/後hash・3置換・逆復元で数学/JSON値不変を結ぶ。fieldsの言語3toolだけ現在版で再確認した。"
 }

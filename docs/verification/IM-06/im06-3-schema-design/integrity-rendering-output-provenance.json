@@ -1,0 +1,8 @@
+{
+  "before_redaction_sha256": "dfa16ae0e63e4b143a616b7f2a6701a5185374084f4aec68eff793f32bc67072",
+  "after_redaction_sha256": "1ed7ce06ec69f30d0fb674914f739f8a142116233853f4d055672a150aaedc11",
+  "published_lf_sha256": "aa6a8f9543f9706e53b07489fcb7bd18f7a7c11617cdba602f362fde8b5b41a6",
+  "root_path_redactions": 1,
+  "crlf_to_lf_pairs": 10,
+  "scope": "新しいchecker出力だけを別artifactとして保存。旧integrity-check.jsonのCRLF/raw/hashは保全。JSON判定値は同一。"
+}
