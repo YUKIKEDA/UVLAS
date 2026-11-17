@@ -1,0 +1,93 @@
+{
+  "source_commit": "1ae6d19f91a95b820ce3f2bf17f8907cdf2d5f16",
+  "inputs": {
+    "src/structure/pg_graph.cpp": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+    "src/structure/pg_graph_detail.hpp": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+    "src/structure/exact_polynomial_detail.hpp": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+    "tests/structure/pg_graph_test.cpp": "744389e2a6bf9e5a9971f2f4f315b8ea8cd69983409015d726a7be1190150079",
+    "tests/structure/fixtures/pg-graph-v1.json": "fd79624e1197fa084064500fef8f83a5a23dc5422bcd950817a88f19159be40f",
+    "include/uvlas/core/build_info.hpp": "3b6b67202cb908188bd1400f49030ac577583bb6b2eccb1c47060dc92d4e4a89",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/error_certificate.hpp": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "include/uvlas/core/identifier.hpp": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+    "include/uvlas/core/instrumentation.hpp": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/state.hpp": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+    "include/uvlas/io/input_scalar.hpp": "0d90e47897d760aa097fce8bd146995d2679cc615114b92c8ecf77373836cef8",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "include/uvlas/numerics/dense_solve.hpp": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+    "include/uvlas/numerics/eigen_action.hpp": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "26a6055f86ef5b5916eee4a1adbb48b5bda865944cb57cb1c0712deeaffbe4b9",
+    "include/uvlas/numerics/eigen_common.hpp": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+    "include/uvlas/numerics/eigen_full.hpp": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+    "include/uvlas/numerics/eigen_generalized.hpp": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+    "include/uvlas/numerics/eigen_metrics.hpp": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+    "include/uvlas/numerics/gmres_solve.hpp": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "include/uvlas/numerics/sparse_solve.hpp": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "include/uvlas/structure/pg_graph.hpp": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+    "out/issue94-build/tests/CMakeFiles/uvlas_test_structure_pg_graph.dir/Release/structure/pg_graph_test.cpp.obj": "68d32a0dbcb96d2f9fe58e95881388ccebd3d8fa53ab15e37ae8a08fef1561f7",
+    "out/issue94-build/Release/uvlas_structure.lib": "c7d44ce62cb7d63d79fd41aa1270d959057cb90eb8ed6415aaada58649ed5ac1",
+    "out/issue94-build/Release/uvlas_core.lib": "d9349e60788cfd266e8f3a0970ee3fb17eede9fde562f9fcf9c781cfedd7a443",
+    "out/issue94-build/compile_commands.json": "de94d728ea1b677bee7edd4d2c63cb0cca8953d7dc4f495402736a1e0da932dd"
+  },
+  "results": [
+    {
+      "case": "control",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 0,
+      "source_sha256": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+      "original_archive_member_extracted": false,
+      "completed_by_prior_invocation": true,
+      "old_bytes": null,
+      "new_bytes": null
+    },
+    {
+      "case": "lower_side",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 42,
+      "source_sha256": "2138517313bbf61ce01012aba495e7b1323a56118c34ce35808d4b1722ed1b86",
+      "original_archive_member_extracted": false,
+      "completed_by_prior_invocation": true,
+      "old_bytes": "if (side == PgSide::Lower && boundary > 0)\n                return boundary - 1;",
+      "new_bytes": "if (side == PgSide::Lower && boundary > 0)\n                return boundary;"
+    },
+    {
+      "case": "local_scale",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 42,
+      "source_sha256": "c97004c7dc1f6c0449f83582f98d718dae4b320c89f28100498d815a7bb31d01",
+      "original_archive_member_extracted": false,
+      "old_bytes": "denominator = mul(denominator, static_cast<std::uint64_t>(4 * d.n));\n                const auto scale",
+      "new_bytes": "denominator = mul(denominator, static_cast<std::uint64_t>(2 * d.n));\n                const auto scale"
+    },
+    {
+      "case": "identity_skew",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 42,
+      "source_sha256": "c8ec69123295bb01e8c467df3dc34de3ae4975c81f039e12b791d4e68d500d4c",
+      "original_archive_member_extracted": false,
+      "old_bytes": "    append_rational(hash, d.skew);",
+      "new_bytes": "    // mutant: omitted skew identity contribution"
+    },
+    {
+      "case": "cell_index",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 42,
+      "source_sha256": "20c0a025d35a21d86711b1268be5113c608afaf3109d0c7246bf8e8789ce615e",
+      "original_archive_member_extracted": false,
+      "old_bytes": "d.cells.values()[static_cast<std::size_t>(a * axis + b)] = {a, b};",
+      "new_bytes": "d.cells.values()[static_cast<std::size_t>(a * axis + b)] = {a, 0};"
+    }
+  ],
+  "original_input_mismatches": 0
+}

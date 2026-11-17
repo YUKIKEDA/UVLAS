@@ -3,6 +3,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 
+#include <cstddef>
 #include <uvlas/structure/exact_polynomial.hpp>
 
 namespace uvlas::structure::detail {
@@ -11,6 +12,8 @@ using Integer = boost::multiprecision::number<IntegerBackend, boost::multiprecis
 using Rational =
     boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntegerBackend>,
                                   boost::multiprecision::et_off>;
+/// Payload layout used by callers that preflight cumulative exact-algebra arrays.
+[[nodiscard]] std::size_t exact_polynomial_raw_term_bytes() noexcept;
 struct RationalStorage {
     Rational value;
 };

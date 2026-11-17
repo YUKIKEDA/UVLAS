@@ -364,6 +364,9 @@ ExactPreparationInfo poly_plan(const ExactLimits& limits, std::uint64_t work, st
 } // namespace
 
 namespace detail {
+std::size_t exact_polynomial_raw_term_bytes() noexcept {
+    return sizeof(RawTerm);
+}
 const Rational& ExactFactory::value(const ExactRational& value) {
     static const Rational zero_value;
     return value.storage_.size() == 0 ? zero_value : value.storage_.values()[0].value;

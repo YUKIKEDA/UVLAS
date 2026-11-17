@@ -1,0 +1,3806 @@
+Randomness seeded to: 1563284945
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+PG graph control uses exact graph and half-cell anchor literals
+-------------------------------------------------------------------------------
+<WORKTREE>\tests\structure\pg_graph_test.cpp(63)
+...............................................................................
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "2" == "32"
+
+-------------------------------------------------------------------------------
+Every adopted half-cell has independent rational geometry and derivative scales
+-------------------------------------------------------------------------------
+<WORKTREE>\tests\structure\pg_graph_test.cpp(138)
+...............................................................................
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "40" == "80"
+with messages:
+  n := 1
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "2" == "4"
+with messages:
+  n := 1
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "120" == "240"
+with messages:
+  n := 1
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "6" == "48"
+with messages:
+  n := 1
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "5" == "80"
+with messages:
+  n := 1
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "40" == "80"
+with messages:
+  n := 1
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "2" == "4"
+with messages:
+  n := 1
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "60" == "120"
+with messages:
+  n := 1
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "6" == "48"
+with messages:
+  n := 1
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "5" == "80"
+with messages:
+  n := 1
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "40" == "80"
+with messages:
+  n := 1
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "2" == "4"
+with messages:
+  n := 1
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "40" == "80"
+with messages:
+  n := 1
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "6" == "48"
+with messages:
+  n := 1
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "5" == "80"
+with messages:
+  n := 1
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "40" == "80"
+with messages:
+  n := 1
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "2" == "4"
+with messages:
+  n := 1
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20" == "40"
+with messages:
+  n := 1
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "6" == "48"
+with messages:
+  n := 1
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "5" == "80"
+with messages:
+  n := 1
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "768" == "1536"
+with messages:
+  n := 2
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "2560"
+with messages:
+  n := 2
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "2560"
+with messages:
+  n := 2
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "256" == "512"
+with messages:
+  n := 2
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "2560"
+with messages:
+  n := 2
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "768" == "1536"
+with messages:
+  n := 2
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "768" == "1536"
+with messages:
+  n := 2
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "160"
+with messages:
+  n := 2
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4" == "8"
+with messages:
+  n := 2
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "3840" == "7680"
+with messages:
+  n := 2
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "48" == "384"
+with messages:
+  n := 2
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "80" == "1280"
+with messages:
+  n := 2
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 0
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 0
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 0
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 0
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 0
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 0
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 0
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 0
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4096" == "8192"
+with messages:
+  n := 4
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 1
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 1
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 1
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 1
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 1
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4096" == "8192"
+with messages:
+  n := 4
+  a := 1
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 1
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 1
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 2
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 2
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 2
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 2
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 2
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 2
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 2
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 2
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 3
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 3
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 3
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 3
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 3
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 3
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 3
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 3
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 4
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 4
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4096" == "8192"
+with messages:
+  n := 4
+  a := 4
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 4
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 4
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 4
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 4
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 4
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 4
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4096" == "8192"
+with messages:
+  n := 4
+  a := 4
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 4
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 4
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 5
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 5
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 5
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 5
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 5
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 5
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 5
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 5
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 5
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 5
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 5
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 5
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 6
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 6
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 6
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 6
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 6
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 6
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "61440" == "122880"
+with messages:
+  n := 4
+  a := 6
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 6
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 6
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "12288" == "24576"
+with messages:
+  n := 4
+  a := 6
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 6
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 6
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 7
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 0
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 7
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 1
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4096" == "8192"
+with messages:
+  n := 4
+  a := 7
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 2
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 7
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 3
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 7
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 4
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 7
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 5
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "20480" == "40960"
+with messages:
+  n := 4
+  a := 7
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 6
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "160" == "320"
+with messages:
+  n := 4
+  a := 7
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "8" == "16"
+with messages:
+  n := 4
+  a := 7
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "4096" == "8192"
+with messages:
+  n := 4
+  a := 7
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "384" == "3072"
+with messages:
+  n := 4
+  a := 7
+  b := 7
+
+<WORKTREE>\tests\structure\pg_graph_test.cpp(44): FAILED:
+  CHECK( backend.denom().str(0, std::ios_base::dec) == q )
+with expansion:
+  "1280" == "20480"
+with messages:
+  n := 4
+  a := 7
+  b := 7
+
+===============================================================================
+test cases:   10 |    8 passed |   2 failed
+assertions: 5303 | 4882 passed | 421 failed

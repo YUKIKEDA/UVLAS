@@ -1,0 +1,49 @@
+Internal ctest changing into directory: <WORKTREE>/out/issue94-build
+UpdateCTestConfiguration  from :<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+Parse Config file:<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+Parse Config file:<WORKTREE>/out/issue94-build/DartConfiguration.tcl
+Test project <WORKTREE>/out/issue94-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 41
+    Start 41: structure.pg_graph
+
+41: Test command: <WORKTREE>\out\issue94-build\tests\Debug\uvlas_test_structure_pg_graph.exe
+41: Working Directory: <WORKTREE>/out/issue94-build/tests
+41: Test timeout computed to be: 60
+41: Randomness seeded to: 2880761164
+41: ===============================================================================
+41: All tests passed (5303 assertions in 10 test cases)
+41:
+1/2 Test #41: structure.pg_graph ...............   Passed    0.27 sec
+test 42
+    Start 42: structure.pg_graph_resources
+
+42: Test command: <WORKTREE>\out\issue94-build\tests\Debug\uvlas_test_structure_pg_graph_resources.exe
+42: Working Directory: <WORKTREE>/out/issue94-build/tests
+42: Test timeout computed to be: 60
+42: Randomness seeded to: 1912696993
+42: ===============================================================================
+42: All tests passed (21 assertions in 1 test case)
+42:
+2/2 Test #42: structure.pg_graph_resources .....   Passed    0.05 sec
+
+The following tests passed:
+	structure.pg_graph
+	structure.pg_graph_resources
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-PG            =   0.31 sec*proc (2 tests)
+negative        =   0.31 sec*proc (2 tests)
+property        =   0.31 sec*proc (2 tests)
+unit            =   0.27 sec*proc (1 test)
+verification    =   0.31 sec*proc (2 tests)
+
+Total Test time (real) =   0.32 sec

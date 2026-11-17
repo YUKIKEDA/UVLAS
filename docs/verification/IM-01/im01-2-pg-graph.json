@@ -1,0 +1,332 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 94,
+  "date": "2026-11-17",
+  "source_commit": "1ae6d19f91a95b820ce3f2bf17f8907cdf2d5f16",
+  "scope": "有理PGグラフ、n=1/2/4の全half-cell、exact片側評価・任意階微分、グラフ内容identity（完全な物理参照identityの一部）、UnitSquareの矩形活動map。辞書/多角形/質量/条件付け/完全参照資格・物理受入は含まない。",
+  "provenance": {
+    "clean": true,
+    "uncommitted_changes": false,
+    "base_shared_head": "2ccc7de1ec6ec367f409227d50fbd595cfa475d2",
+    "source_bytes": "新規sourceと既存exactのpure layout accessorを含む実行版12fileはworktreeとGit blobのLF bytes一致を確認した。実行版の両CMakeを別artifactとして保存し、後続共有metadataの統合と区別する。",
+    "old_algebra": "既存exactの変更はprivate RawTerm sizeofのpure accessorとその宣言/includeのみ。算術・呼出順不変のため旧代数suite/旧変異/性能採取は繰り返さない。",
+    "publication": "原rawはoutへ保持。新規公開派生だけ匿名化・LF化・行末空白除去し、redaction.jsonに元/派生SHAと置換件数を記録した。旧証拠/R&Dは変更しない。"
+  },
+  "completion_evidence": [
+    {
+      "requirement": "x0/w/a/fの所有、次数・n・版の事前検査、opaque所有と失敗不変",
+      "evidence": "移動元拒否、入力/Plan破棄後のpoint、別等値graphでの評価、独立並行clone、入力/旧結果保持とbad_alloc後の回復を確認。public borrowはconst&&を削除した。"
+    },
+    {
+      "requirement": "全セル順序と正逆写像、明示片側",
+      "evidence": "全84cellの中点と全corner、全内部境界のLower/Upper、2^-100とminsubの境界近傍をexactに比較。Interiorの境界利用、未知side、外向きsideは確保前に拒否した。"
+    },
+    {
+      "requirement": "rhat、cell多項式、任意階微分とchart anchor",
+      "evidence": "非単位w=4/5、a=3/20、flat/quarticで位置・両軸first・mixed・非零4階とchart/local尺度を独立有理式へ許容差0で照合。次数超過の最大Index orderは尺度生成せず零。cs>0の左端とs=0 anchorを区別した。"
+    },
+    {
+      "requirement": "実内容から生成する部分GraphContentIdentity",
+      "evidence": "標準Fraction/hashlibで独立生成した6組のcanonical bytes/SHAと比較。等値分数は同一、x0/w/a/f/nの変更は別identityとなり、borrowしたpoint/mapの実snapshotも比較する。Q/o/L_ref/厚さの資格を作らない。"
+    },
+    {
+      "requirement": "矩形活動mapの全被覆",
+      "evidence": "factory-only型で全4/16/64cellを標準順に所有し、各chart面積1/(4n²)と総面積1をexactに照合。任意boolmap、多角形の資格を生成しない。"
+    },
+    {
+      "requirement": "全call事前bit/項/指数/byteと外部受入",
+      "evidence": "L18/27/35/42/64/22の保持集合、全allocate累積上限とmaxscratchを別計上。raw129、上限同値/1不足、構造zeroのscratch0、内部native字句の事前上限、全公開生成入口の取消を確認。独立processでowned先頭と外部limb copy/storageのnew失敗#0/#1/#2を注入し、資源Failure/入力保全/回復を検査した。"
+    },
+    {
+      "requirement": "独立literal・変異・APIと対象検証",
+      "evidence": "下記Windows対象2CTestを両構成で各1回。通常10cases5303assert、資源1case21assert。byte同一control後、Lower選択/local尺度/skew hash欠落/cell indexの4変異がcompile/link0後runtime42で失敗した。英語API/重要inline、補足契約と独立レビューを含む。"
+    }
+  ],
+  "checks": {
+    "platform": "Windows 11 x64 / MSVC 19.51.36260.0 / C++23 /fp:strict /W4 /WX / Boost1.92.0",
+    "debug": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "normal_cases": 10,
+      "normal_assertions": 5303,
+      "resource_cases": 1,
+      "resource_assertions": 21
+    },
+    "release": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "normal_cases": 10,
+      "normal_assertions": 5303,
+      "resource_cases": 1,
+      "resource_assertions": 21
+    },
+    "commands": [
+      "cmake --build out/issue94-build --config <Debug|Release> --target uvlas_test_structure_pg_graph uvlas_test_structure_pg_graph_resources uvlas_cli",
+      "ctest --test-dir out/issue94-build -C <Debug|Release> -R ^structure[.]pg_graph(_resources)?$ --output-on-failure -V",
+      "uvx --offline clang-tidy@21.1.1 -p out/issue94-tidy --quiet <TU>",
+      "uvx --offline clang-format@21.1.2 --dry-run --Werror <7 files>"
+    ],
+    "static": {
+      "final_tu_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "最初の診断は初回4logを保持。Bounds/viewの明示constructor、Ref const&、意図的move対照の理由を補完後、最終graph/testと既存layout/resourceの各TUが成功した。以後製品source変更なし。"
+    },
+    "japanese": "quick lintは術語反復のTTR info1のみを意味維持で保持。relative linksは実在確認、root/peerが数学と日本語を独立通読した。",
+    "unexecuted": "Linux手元・sanitizerは未実行。CIを待たず、実行していない成功は主張しない。",
+    "trace": {
+      "definitions": 208,
+      "with_tests": 32,
+      "with_records": 34,
+      "problems": 0,
+      "provenance": "rootが共有roadmap IM01-2 Doneとmatrixを同期し、trace check結果208/32/34/0を報告した。PG演算を再実行した結果ではない。"
+    }
+  },
+  "mutations": {
+    "control": {
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 0,
+      "cases": 10,
+      "assertions": 5303
+    },
+    "variants": [
+      {
+        "name": "lower_side",
+        "failed_cases": 1,
+        "failed_assertions": 610
+      },
+      {
+        "name": "local_scale",
+        "failed_cases": 2,
+        "failed_assertions": 421
+      },
+      {
+        "name": "identity_skew",
+        "failed_cases": 1,
+        "failed_assertions": 7
+      },
+      {
+        "name": "cell_index",
+        "failed_cases": 2,
+        "failed_assertions": 76
+      }
+    ],
+    "all_variant_compile_link_exit": 0,
+    "all_variant_run_exit": 42,
+    "original_archive_member_extracted": false,
+    "original_input_hash_mismatches": 0,
+    "runner_correction": "初回はcontrol/Lower実行後、local_scale置換anchorが計画と実行の2箇所に一致して実行前停止した。実数値scale生成の1箇所へ限定し、残3変異だけ継続した。既存control/rawは上書き・再実行していない。"
+  },
+  "reference": {
+    "path": "tests/structure/fixtures/pg-graph-v1.json",
+    "kind": "版付きcanonical exact基準。独立標準Fraction/hashlibだけで6組のbytesとSHAを生成し、製品出力から期待値を生成しない。数値は許容差0。",
+    "oracle": "幾何・微分は手書きliteralと別cpp_rational式。canonical照合はprivate製品accessorから実分子/分母を観測する。"
+  },
+  "resource_qualification": {
+    "owned": "ResourcePlanの累積payloadだけが実allocate計上。planとobserved deltaを区別し、予約dummyやOS実測への読み替えなし。",
+    "external": "固定Boost1.92のlimb capacity/lifetimeに基づくEstimateAdmission。RequireProvenBoundは未証明Unsupported。外部推定を実heap/RSSの上界としない。",
+    "timing": "任意Preparation計時のEnabled/Disabledでpoint/値/identity一致を検査した。性能採取や高速化/実務性能は主張しない。"
+  },
+  "remaining_gates": "親Issue17の辞書、全分割/多角形、rank、保証付き条件付け、PreparedPatch、全trace、疎chart、実graph R-02は未完了。物理材料/質量はIM-02。",
+  "sources": {
+    "include/uvlas/structure/pg_graph.hpp": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+    "src/structure/pg_graph.cpp": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+    "src/structure/pg_graph_detail.hpp": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+    "src/structure/exact_polynomial.cpp": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+    "src/structure/exact_polynomial_detail.hpp": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "tests/structure/pg_graph_test.cpp": "e830d59e3c892db5ea8f517563d86e22bfaf160228ac91332d1804741342cb4e",
+    "tests/structure/pg_graph_resource_test.cpp": "dd6f00f4643498a6d1ab7fa1244a479131e25723a3a437c40c4d8ab94e934995",
+    "tests/structure/fixtures/pg-graph-v1.json": "fd79624e1197fa084064500fef8f83a5a23dc5422bcd950817a88f19159be40f",
+    "docs/specs/structure/pg-graph-cell-contract.md": "d40c432a1a147d16d65e0bff9d3c4a530303dcad41e19aa7d36f04d5779068fa",
+    "CMakeLists.txt": "996dddbcb4141cfe3f233e5b9f6b48c101b51c4c8eea45616e09fdb649bf391f",
+    "tests/CMakeLists.txt": "ce7140a83577512b80bce3c5d952e32564caa9aaa7327d0c415a6f37a7af92de"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/im01-2-pg-graph/debug-build.log": "deaca98fa1dc637af486e40e4c1de216abfce782826ca37a4bab02c19b3a77b1",
+    "docs/verification/IM-01/im01-2-pg-graph/debug-tests.log": "545f0d7572d3c7d30e0c96531a18ae9e44d5965d08a4e95df7ec9f8cc88df1cd",
+    "docs/verification/IM-01/im01-2-pg-graph/build-info-debug.json": "0514edf8a1317cd976e36cf6b01afcd1b281535cb15fa5fe05fb4f099ecd2107",
+    "docs/verification/IM-01/im01-2-pg-graph/release-build.log": "7e3afa3bf2e81d127b41e6785b6e557e22e9a61cd5807623d07837d8cba5ac90",
+    "docs/verification/IM-01/im01-2-pg-graph/release-tests.log": "6979220d27f71266c7921904d11d914dd1c6ae419707b04b86e17e116226efb2",
+    "docs/verification/IM-01/im01-2-pg-graph/build-info-release.json": "21596a2999f6ea8a0cdf41ef214ece51473901702d90eaef177dac30b79c4890",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-graph-final.log": "2fcfb0a28322eb851dc4e14170d2d02020e3398281133d669167aceb2dad3b69",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-test-final.log": "6532249c76ddc2ce7658bf0a0028ac7be9ee1bb4d785e7ffe51c6be42beaa3f1",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-layout-final.log": "49cab938dd0c19fa7df17feadcefb45c165fa55df28dd89b53c7ac9c704288d4",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-resource-final.log": "d0bf55765b221a0bf0e5c35ca1119b3c546228eaf32f17752ff8942b668da040",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-0.log": "0c40364e8957392405047eaefa4074c72b8c2769ae64fc328e449b1649938450",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-1.log": "49cab938dd0c19fa7df17feadcefb45c165fa55df28dd89b53c7ac9c704288d4",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-2.log": "1ac09216f5bd3336e98b2847f00478a99de3a1f3e56ee9d1007649b0fa5588f1",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-initial-3.log": "1d5e13f135ee44e0182d089794a5db3db472907e7858336de0df580257c43d63",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-control-compile.log": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-control-link.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-control-run.log": "0731cd791b37e3b92f747ff0de8e831016a4281d7f9b72d9fcb4e80c786a7b1c",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-lower_side-compile.log": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-lower_side-link.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-lower_side-run.log": "8f839962c1a03a58ddbe04004915d40925349254ea2fdcc29e027d6ace556277",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-local_scale-compile.log": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-local_scale-link.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-local_scale-run.log": "4fcb457bf7d67e43cb8e6b1f2db5f6870f9664a403bf9333ba7b9de5b3aec2d7",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-identity_skew-compile.log": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-identity_skew-link.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-identity_skew-run.log": "9beb283a0129f4eecc6b382aac9b8cc68a22d368029dcaccc407b5cb9c9e17b3",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-cell_index-compile.log": "2338cab0646d549b21d7a5391ee26dd8728bd0195a71e95b83d05ec7e9586b8b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-cell_index-link.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-cell_index-run.log": "d90058196d072cef5276c9f9d73e345aabc62cbea3f3f7dc186e96ec6057281e",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-runner.py": "410446797d89e141f7086a9d3a22b4949a4c3103d447beab103815fd3104de2f",
+    "docs/verification/IM-01/im01-2-pg-graph/mutation-results.json": "aa505fd1c89779066c24ab8bc084737b58a073a3d0c3fc39a177bdc397ab38a7",
+    "docs/verification/IM-01/im01-2-pg-graph/canonical-reference-generator.py": "1e252a19d2af18c76a3cea3344c82e18dd992fb28486c69704c22b17f9784b0e",
+    "docs/verification/IM-01/im01-2-pg-graph/execution-CMakeLists.txt": "51f14e5d4898e6e2b10787d8c3b196e4b5e5349f424185724868f0b5835de04d",
+    "docs/verification/IM-01/im01-2-pg-graph/execution-tests-CMakeLists.txt": "90335478a946f7c17d845da26a33d41b4f7c9aae606879680badee4a3a81887e",
+    "docs/verification/IM-01/im01-2-pg-graph/redaction.json": "0e0c3de5512f005b03b881ce807098bda3984e747d7614002b1ca7c200f48b34",
+    "docs/verification/IM-01/im01-2-pg-graph/tidy-comment-final.log": "6532249c76ddc2ce7658bf0a0028ac7be9ee1bb4d785e7ffe51c6be42beaa3f1"
+  },
+  "post_execution_comment_delta": {
+    "file": "tests/structure/pg_graph_test.cpp",
+    "execution_sha256": "744389e2a6bf9e5a9971f2f4f315b8ea8cd69983409015d726a7be1190150079",
+    "current_sha256": "e830d59e3c892db5ea8f517563d86e22bfaf160228ac91332d1804741342cb4e",
+    "execution_commit": "1ae6d19f91a95b820ce3f2bf17f8907cdf2d5f16",
+    "reason": "request_stopの標準ライブラリAPI差を扱う既存NOLINTNEXTLINEを、理由の折返しcommentではなく宣言の直前へ配置した。実行tokenと行数は不変で、数値/故障/変異の再実行は不要。当該TUだけformat/tidyを再確認する。",
+    "format_exit": 0,
+    "tidy_exit": 0
+  },
+  "execution_source_hashes": {
+    "include/uvlas/structure/pg_graph.hpp": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+    "src/structure/pg_graph.cpp": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+    "src/structure/pg_graph_detail.hpp": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+    "src/structure/exact_polynomial.cpp": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+    "src/structure/exact_polynomial_detail.hpp": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "tests/structure/pg_graph_test.cpp": "744389e2a6bf9e5a9971f2f4f315b8ea8cd69983409015d726a7be1190150079",
+    "tests/structure/pg_graph_resource_test.cpp": "dd6f00f4643498a6d1ab7fa1244a479131e25723a3a437c40c4d8ab94e934995",
+    "tests/structure/fixtures/pg-graph-v1.json": "fd79624e1197fa084064500fef8f83a5a23dc5422bcd950817a88f19159be40f",
+    "docs/specs/structure/pg-graph-cell-contract.md": "d40c432a1a147d16d65e0bff9d3c4a530303dcad41e19aa7d36f04d5779068fa",
+    "CMakeLists.txt": "20683f403375802e35d5a9d3080b0b8b5f959eee0d4196f6f06bae0890ae4d5e",
+    "tests/CMakeLists.txt": "90335478a946f7c17d845da26a33d41b4f7c9aae606879680badee4a3a81887e"
+  },
+  "integration": {
+    "merge_commit": "23116348d3c005d7cafe864d717f4b208914d35f",
+    "upstream_aero_head": "41a617720122ff446b1a5d658c9f26e33151a224",
+    "reference_state": "上記merge後のworking tree。testのcomment訂正と新証拠はmetadata commit前であり、実行clean状態と混同しない。rootの後続roadmap/trace同期は数値経路を変更しない。",
+    "comparison": [
+      {
+        "file": "include/uvlas/structure/pg_graph.hpp",
+        "execution_sha256": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+        "current_sha256": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "src/structure/pg_graph.cpp",
+        "execution_sha256": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+        "current_sha256": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "src/structure/pg_graph_detail.hpp",
+        "execution_sha256": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+        "current_sha256": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "src/structure/exact_polynomial.cpp",
+        "execution_sha256": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+        "current_sha256": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "src/structure/exact_polynomial_detail.hpp",
+        "execution_sha256": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+        "current_sha256": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "include/uvlas/structure/exact_polynomial.hpp",
+        "execution_sha256": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+        "current_sha256": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "tests/structure/pg_graph_test.cpp",
+        "execution_sha256": "744389e2a6bf9e5a9971f2f4f315b8ea8cd69983409015d726a7be1190150079",
+        "current_sha256": "e830d59e3c892db5ea8f517563d86e22bfaf160228ac91332d1804741342cb4e",
+        "byte_identical": false,
+        "classification": "標準ライブラリAPI差NOLINTのcomment配置だけ。実行token/行数不変"
+      },
+      {
+        "file": "tests/structure/pg_graph_resource_test.cpp",
+        "execution_sha256": "dd6f00f4643498a6d1ab7fa1244a479131e25723a3a437c40c4d8ab94e934995",
+        "current_sha256": "dd6f00f4643498a6d1ab7fa1244a479131e25723a3a437c40c4d8ab94e934995",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "tests/structure/fixtures/pg-graph-v1.json",
+        "execution_sha256": "fd79624e1197fa084064500fef8f83a5a23dc5422bcd950817a88f19159be40f",
+        "current_sha256": "fd79624e1197fa084064500fef8f83a5a23dc5422bcd950817a88f19159be40f",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "docs/specs/structure/pg-graph-cell-contract.md",
+        "execution_sha256": "d40c432a1a147d16d65e0bff9d3c4a530303dcad41e19aa7d36f04d5779068fa",
+        "current_sha256": "d40c432a1a147d16d65e0bff9d3c4a530303dcad41e19aa7d36f04d5779068fa",
+        "byte_identical": true,
+        "classification": "byte一致"
+      },
+      {
+        "file": "CMakeLists.txt",
+        "execution_sha256": "20683f403375802e35d5a9d3080b0b8b5f959eee0d4196f6f06bae0890ae4d5e",
+        "current_sha256": "996dddbcb4141cfe3f233e5b9f6b48c101b51c4c8eea45616e09fdb649bf391f",
+        "byte_identical": false,
+        "classification": "先行JSON補修とAero準備部品の共有build登録を統合。実行版CMakeは別artifactとして保持"
+      },
+      {
+        "file": "tests/CMakeLists.txt",
+        "execution_sha256": "90335478a946f7c17d845da26a33d41b4f7c9aae606879680badee4a3a81887e",
+        "current_sha256": "ce7140a83577512b80bce3c5d952e32564caa9aaa7327d0c415a6f37a7af92de",
+        "byte_identical": false,
+        "classification": "先行JSON補修とAero準備部品の共有build登録を統合。実行版CMakeは別artifactとして保持"
+      }
+    ],
+    "upstream_changed_build_inputs": [
+      "CMakeLists.txt",
+      "include/uvlas/core/build_info.hpp",
+      "src/aero/exact_triangle_predicates.cpp",
+      "src/aero/exact_triangle_predicates.hpp",
+      "src/aero/exact_triangle_private.hpp",
+      "src/aero/geometry_snapshot.cpp",
+      "src/aero/geometry_snapshot.hpp",
+      "src/aero/geometry_snapshot_storage.hpp",
+      "src/core/build_info.cpp",
+      "tests/CMakeLists.txt",
+      "tests/aero/geometry_snapshot_fixture.hpp",
+      "tests/aero/geometry_snapshot_resources_test.cpp",
+      "tests/aero/geometry_snapshot_test.cpp",
+      "tests/toolchain/json_allocation_probe.cpp",
+      "tests/toolchain/pinned_dependencies_test.cpp"
+    ],
+    "unchanged_pg_files": 9,
+    "note": "PG本体/API/private設計、既存exact本体とprivate helper、独立fixture、資源test、補足契約、既存exact public APIは実行版とbyte一致。通常testはcommentだけ。共有統合はAeroとJSON依存補修の別scopeで、PG2CTestの再試験や新たな変異・性能採取は行わない。",
+    "upstream_records": [
+      "docs/verification/IM-03/im03-2.json",
+      "docs/verification/IM-06/im06-2-parser-allocation-repair.json"
+    ],
+    "old_record_policy": "source_commit/build-info/元raw/実行source hashは1ae6の履歴として保持する。sourcesは現在参照、execution_source_hashesとcomparison.execution_sha256は実行版の参照と明記する。"
+  }
+}

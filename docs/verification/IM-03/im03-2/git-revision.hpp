@@ -1,0 +1,4 @@
+#pragma once
+
+#define UVLAS_GIT_COMMIT "cd4777a26386fd9fe3ec3e48063012526c72a496"
+#define UVLAS_GIT_DIRTY 0

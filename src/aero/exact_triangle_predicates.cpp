@@ -1,4 +1,4 @@
-#include "exact_triangle_predicates.hpp"
+#include "exact_triangle_private.hpp"
 
 #include <algorithm>
 #include <array>
@@ -134,56 +134,60 @@ PredicateMemoryPlan predicate_memory_plan() noexcept {
 PredicateMemoryPlan ExactTriangleResult::memory_plan() const noexcept {
     return predicate_memory_plan();
 }
+namespace {
+bool coordinate_bound(const ExactInteger& value) {
+    if (value == 0)
+        return true;
+    const ExactInteger magnitude = value < 0 ? -value : value;
+    return boost::multiprecision::msb(magnitude) < 3173;
+}
+} // namespace
+core::Result<std::reference_wrapper<ExactPoints>>
+ExactPredicateAccess::coordinates(PredicateWorkspace& workspace, const PredicateLease& lease,
+                                  core::FailureDetails details) noexcept {
+    if (lease.owner_ != &workspace)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, operation, details});
+    return std::ref(workspace.scratch_.values()[0].points);
+}
+core::Result<bool> ExactPredicateAccess::nondegenerate(PredicateWorkspace& workspace,
+                                                       const PredicateLease& lease,
+                                                       core::FailureDetails details) noexcept {
+    return core::guard_entry(
+        operation, core::FailureCode::PrecisionUnresolved, details, [&]() -> core::Result<bool> {
+            auto points = coordinates(workspace, lease, details);
+            if (!points)
+                return std::unexpected(points.error());
+            for (std::size_t i = 0; i < 3; ++i)
+                for (const auto& value : points->get()[i])
+                    if (!coordinate_bound(value))
+                        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved,
+                                                             operation, details});
+            auto& scratch = workspace.scratch_.values()[0];
+            scratch.e = subtract(scratch.points[1], scratch.points[0]);
+            scratch.f = subtract(scratch.points[2], scratch.points[0]);
+            scratch.normal = cross(scratch.e, scratch.f);
+            return dot(scratch.normal, scratch.normal) != 0;
+        });
+}
 core::Result<ExactTriangleResult>
-classify_triangle(CoordinateView coordinates, PredicateWorkspace& workspace,
-                  core::ResourcePlan& result_plan, PredicateLimits limits,
-                  std::stop_token cancellation, core::FailureDetails details) noexcept {
-    auto lease = workspace.acquire(details);
-    if (!lease)
-        return std::unexpected(lease.error());
+ExactPredicateAccess::finish(PredicateWorkspace& workspace, const PredicateLease& lease,
+                             core::PlannedBuffer<TriangleOutcome> owned, PredicateLimits limits,
+                             std::stop_token cancellation, core::FailureDetails details,
+                             std::uint64_t steps) noexcept {
     return core::guard_entry(
         operation, core::FailureCode::PrecisionUnresolved, details,
         [&]() -> core::Result<ExactTriangleResult> {
-            const auto fail = [&](core::FailureCode code) -> core::Result<ExactTriangleResult> {
-                return std::unexpected(core::Failure{code, operation, details});
-            };
-            std::span<const double> high, low;
-            if (const auto* single = std::get_if<Binary64Coordinates>(&coordinates)) {
-                high = single->values;
-            } else if (const auto* pair = std::get_if<TwoWordCoordinates>(&coordinates)) {
-                high = pair->high;
-                low = pair->low;
-                if (low.size() != 12)
-                    return fail(core::FailureCode::InvalidInput);
-            } else {
-                return fail(core::FailureCode::InvalidInput);
-            }
-            if (high.size() != 12)
-                return fail(core::FailureCode::InvalidInput);
-            // Snapshot all words before allocations or exact arithmetic; no later external read.
-            std::array<double, 12> input_high{}, input_low{};
-            for (std::size_t i = 0; i < 12; ++i) {
-                if (!finite_word(high[i]) || (!low.empty() && !finite_word(low[i])))
-                    return fail(core::FailureCode::Nonfinite);
-                input_high[i] = high[i];
-                if (!low.empty())
-                    input_low[i] = low[i];
-            }
-            if (cancellation.stop_requested())
-                return fail(core::FailureCode::Cancelled);
-            const auto memory = limits.external_memory.selection();
-            if (std::holds_alternative<numerics::linear::RequireProvenBound>(memory))
-                return fail(core::FailureCode::Unsupported);
-            const auto* estimate = std::get_if<numerics::linear::EstimateAdmission>(&memory);
-            if (estimate == nullptr)
-                return fail(core::FailureCode::InvalidInput);
-            if (estimate->bytes < predicate_memory_plan().peak_payload_estimate_bytes())
-                return fail(core::FailureCode::ResourceExceeded);
-            auto owned = result_plan.allocate<TriangleOutcome>(1, operation);
-            if (!owned)
-                return std::unexpected(complete_allocation_failure(owned.error(), details));
+            auto points = coordinates(workspace, lease, details);
+            if (!points)
+                return std::unexpected(points.error());
+            // Only fixed-q factory values enter here. Check the proved magnitude
+            // bound again before any product; raw arbitrary integers cannot bypass it.
+            for (const auto& point : points->get())
+                for (const auto& value : point)
+                    if (!coordinate_bound(value))
+                        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved,
+                                                             operation, details});
             auto& scratch = workspace.scratch_.values()[0];
-            std::uint64_t steps = 0;
             const auto checkpoint = [&] {
                 if (cancellation.stop_requested())
                     return core::Result<void>{std::unexpected(
@@ -194,11 +198,6 @@ classify_triangle(CoordinateView coordinates, PredicateWorkspace& workspace,
                 ++steps;
                 return core::Result<void>{};
             };
-            for (std::size_t i = 0; i < 12; ++i) {
-                if (auto check = checkpoint(); !check)
-                    return std::unexpected(check.error());
-                scratch.points[i / 3][i % 3] = decode(input_high[i]) + decode(input_low[i]);
-            }
             if (auto check = checkpoint(); !check)
                 return std::unexpected(check.error());
             scratch.e = subtract(scratch.points[1], scratch.points[0]);
@@ -207,7 +206,7 @@ classify_triangle(CoordinateView coordinates, PredicateWorkspace& workspace,
             scratch.normal = cross(scratch.e, scratch.f);
             const auto jacobian_squared = dot(scratch.normal, scratch.normal);
             if (jacobian_squared == 0)
-                return ExactTriangleResult{std::move(*owned), limits.external_memory, steps,
+                return ExactTriangleResult{std::move(owned), limits.external_memory, steps,
                                            details};
             if (auto check = checkpoint(); !check)
                 return std::unexpected(check.error());
@@ -290,14 +289,83 @@ classify_triangle(CoordinateView coordinates, PredicateWorkspace& workspace,
                                                : FarRelation::Near;
             if (best->numerator < 0 || best->denominator <= 0)
                 throw std::logic_error("Invalid exact distance candidate");
-            auto& outcome = owned->values()[0];
+            auto& outcome = owned.values()[0];
             outcome.emplace<NondegenerateTriangle>(
                 side, projection,
                 ExactSquaredDistance{best->numerator,
                                      best->numerator == 0 ? ExactInteger{1} : best->denominator,
                                      squared_unit},
                 longest, mask, far);
-            return ExactTriangleResult{std::move(*owned), limits.external_memory, steps, details};
+            return ExactTriangleResult{std::move(owned), limits.external_memory, steps, details};
+        });
+}
+core::Result<ExactTriangleResult>
+classify_triangle(CoordinateView coordinates, PredicateWorkspace& workspace,
+                  core::ResourcePlan& result_plan, PredicateLimits limits,
+                  std::stop_token cancellation, core::FailureDetails details) noexcept {
+    auto lease = workspace.acquire(details);
+    if (!lease)
+        return std::unexpected(lease.error());
+    return core::guard_entry(
+        operation, core::FailureCode::PrecisionUnresolved, details,
+        [&]() -> core::Result<ExactTriangleResult> {
+            const auto fail = [&](core::FailureCode code) -> core::Result<ExactTriangleResult> {
+                return std::unexpected(core::Failure{code, operation, details});
+            };
+            std::span<const double> high, low;
+            if (const auto* single = std::get_if<Binary64Coordinates>(&coordinates)) {
+                high = single->values;
+            } else if (const auto* pair = std::get_if<TwoWordCoordinates>(&coordinates)) {
+                high = pair->high;
+                low = pair->low;
+                if (low.size() != 12)
+                    return fail(core::FailureCode::InvalidInput);
+            } else {
+                return fail(core::FailureCode::InvalidInput);
+            }
+            if (high.size() != 12)
+                return fail(core::FailureCode::InvalidInput);
+            // Snapshot all words before allocations or exact arithmetic; no later external read.
+            std::array<double, 12> input_high{}, input_low{};
+            for (std::size_t i = 0; i < 12; ++i) {
+                if (!finite_word(high[i]) || (!low.empty() && !finite_word(low[i])))
+                    return fail(core::FailureCode::Nonfinite);
+                input_high[i] = high[i];
+                if (!low.empty())
+                    input_low[i] = low[i];
+            }
+            if (cancellation.stop_requested())
+                return fail(core::FailureCode::Cancelled);
+            const auto memory = limits.external_memory.selection();
+            if (std::holds_alternative<numerics::linear::RequireProvenBound>(memory))
+                return fail(core::FailureCode::Unsupported);
+            const auto* estimate = std::get_if<numerics::linear::EstimateAdmission>(&memory);
+            if (estimate == nullptr)
+                return fail(core::FailureCode::InvalidInput);
+            if (estimate->bytes < predicate_memory_plan().peak_payload_estimate_bytes())
+                return fail(core::FailureCode::ResourceExceeded);
+            auto owned = result_plan.allocate<TriangleOutcome>(1, operation);
+            if (!owned)
+                return std::unexpected(complete_allocation_failure(owned.error(), details));
+            auto& scratch = workspace.scratch_.values()[0];
+            std::uint64_t steps = 0;
+            const auto checkpoint = [&] {
+                if (cancellation.stop_requested())
+                    return core::Result<void>{std::unexpected(
+                        core::Failure{core::FailureCode::Cancelled, operation, details})};
+                if (steps == limits.max_steps)
+                    return core::Result<void>{std::unexpected(
+                        core::Failure{core::FailureCode::ResourceExceeded, operation, details})};
+                ++steps;
+                return core::Result<void>{};
+            };
+            for (std::size_t i = 0; i < 12; ++i) {
+                if (auto check = checkpoint(); !check)
+                    return std::unexpected(check.error());
+                scratch.points[i / 3][i % 3] = decode(input_high[i]) + decode(input_low[i]);
+            }
+            return ExactPredicateAccess::finish(workspace, *lease, std::move(*owned), limits,
+                                                cancellation, details, steps);
         });
 }
 } // namespace uvlas::aero::detail

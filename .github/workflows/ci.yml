@@ -142,6 +142,23 @@ jobs:
           ninja --version
       - name: Compiler version
         run: g++-14 --version
+      - name: Standard library model identity
+        if: matrix.preset == 'linux-debug'
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, subprocess
+          result = subprocess.run(["g++-14", "-std=c++23", "-dM", "-E", "-x", "c++", "-include", "bits/c++config.h", "-"], input="", text=True, capture_output=True, check=True)
+          names = {"__cplusplus", "__GLIBCXX__", "_GLIBCXX_RELEASE", "_GLIBCXX_USE_CXX11_ABI", "_GLIBCXX_DEBUG", "__SIZEOF_POINTER__", "__SIZEOF_SIZE_T__", "__SIZEOF_LONG__", "__CHAR_BIT__"}
+          macros = {}
+          for line in result.stdout.splitlines():
+              parts = line.split(maxsplit=2)
+              if len(parts) >= 2 and parts[1] in names:
+                  macros[parts[1]] = parts[2] if len(parts) == 3 else ""
+          headers = pathlib.Path("/usr/include/c++/14/bits")
+          hashes = {name: hashlib.sha256((headers / name).read_bytes()).hexdigest() for name in ("stl_vector.h", "vector.tcc", "stl_bvector.h", "basic_string.tcc", "cow_string.h")}
+          packages = subprocess.run(["dpkg-query", "-W", "g++-14", "libstdc++-14-dev"], text=True, capture_output=True, check=True).stdout
+          print(json.dumps({"schema": "uvlas.stdlib-model-environment/1", "macros": macros, "header_sha256": hashes, "packages": packages}, indent=2, sort_keys=True))
+          PY
       - name: Configure, build, test
         run: |
           cmake --preset ${{ matrix.preset }}

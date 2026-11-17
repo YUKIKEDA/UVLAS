@@ -170,6 +170,21 @@ target_include_directories(uvlas_test_aero_exact_triangle_resources
 uvlas_enable_allocation_audit(uvlas_test_aero_exact_triangle_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_exact_triangle_resources)
 
+uvlas_add_test(aero.geometry_snapshot
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/geometry_snapshot_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_geometry_snapshot
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_add_test(aero.geometry_snapshot_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/geometry_snapshot_resources_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_geometry_snapshot_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_geometry_snapshot_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_geometry_snapshot_resources)
+
 uvlas_add_test(core.checked_dimensions
     LABELS unit negative
     SOURCES core/checked_dimensions_test.cpp
@@ -295,6 +310,21 @@ uvlas_add_test(structure.exact_polynomial_resources
     LIBS uvlas_structure_audit)
 uvlas_enable_allocation_audit(uvlas_test_structure_exact_polynomial_resources)
 uvlas_require_audited_dependencies(uvlas_test_structure_exact_polynomial_resources)
+
+uvlas_add_test(structure.pg_graph
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_graph_test.cpp
+    LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_graph
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_graph PRIVATE
+    UVLAS_PG_GRAPH_FIXTURE=\"${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-graph-v1.json\")
+uvlas_add_test(structure.pg_graph_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_graph_resource_test.cpp
+    LIBS uvlas_structure_audit)
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_graph_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_graph_resources)
 
 uvlas_add_test(numerics.storage LABELS unit negative
     SOURCES numerics/storage_test.cpp LIBS uvlas_numerics)
