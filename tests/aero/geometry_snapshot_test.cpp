@@ -677,3 +677,202 @@ TEST_CASE("Free queries construct the selected word alternative and preserve eve
               height * height);
     }
 }
+TEST_CASE("Connection diagnostics select the lowest facet ID independently of source row order",
+          "[UI-D05][UI-D06][N4-03][negative][verification]") {
+    const TriangleFixture fixture;
+    std::array rows{
+        TriangleInput{
+            FacetId{90}, PhysicalFaceId{999}, fixture.points, {EdgeId{10}, EdgeId{20}, EdgeId{30}}},
+        TriangleInput{FacetId{10},
+                      PhysicalFaceId{999},
+                      fixture.points,
+                      {EdgeId{10}, EdgeId{20}, EdgeId{30}}}};
+    core::ResourcePlan prep{budget};
+    auto w = workspace(prep);
+    for (unsigned order = 0; order < 2; ++order) {
+        auto input = fixture.input();
+        input.triangles = rows;
+        core::ResourcePlan plan{budget};
+        const auto rejected = prepare_owned_geometry(input, limits(), *w, plan);
+        failure(rejected, core::FailureCode::InvalidInput);
+        if (rejected || !rejected.error().problem) {
+            FAIL_CHECK("Missing typed facet failure");
+            return;
+        }
+        const auto* problem = std::get_if<FacetId>(&*rejected.error().problem);
+        if (problem == nullptr) {
+            FAIL_CHECK("Wrong typed geometry problem");
+            return;
+        }
+        CHECK(*problem == FacetId{10});
+        std::swap(rows[0], rows[1]);
+    }
+}
+namespace {
+void expected_problem(const AeroResult<OwnedGeometry>& result, core::FailureCode code,
+                      GeometryProblem wanted) {
+    failure(result, code);
+    if (result || !result.error().problem) {
+        FAIL_CHECK("Missing typed geometry failure");
+        return;
+    }
+    CHECK(*result.error().problem == wanted);
+}
+} // namespace
+TEST_CASE("Quad connection checks use child IDs and preserve original split ordinals",
+          "[UI-D01][UI-D05][UI-D06][N4-03][negative][verification]") {
+    const std::array p{PointId{1}, PointId{2}, PointId{3}, PointId{4}};
+    const std::array b{binding(), binding(), binding(), binding()};
+    const std::array<double, 12> xyz{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0};
+    const std::array edges{EdgeInput{EdgeId{1}, {p[0], p[1]}}, EdgeInput{EdgeId{2}, {p[1], p[2]}},
+                           EdgeInput{EdgeId{3}, {p[2], p[3]}}, EdgeInput{EdgeId{4}, {p[3], p[0]}},
+                           EdgeInput{EdgeId{5}, {p[0], p[2]}}};
+    const std::array faces{FaceInput{PhysicalFaceId{50}, BandId{100}},
+                           FaceInput{PhysicalFaceId{51}, BandId{100}}};
+    const std::array bands{BandId{100}};
+    std::array rows{QuadInput{PhysicalFaceId{999},
+                              p,
+                              {EdgeId{1}, EdgeId{2}, EdgeId{3}, EdgeId{4}},
+                              EdgeId{5},
+                              {FacetId{90}, FacetId{100}}},
+                    QuadInput{PhysicalFaceId{999},
+                              p,
+                              {EdgeId{1}, EdgeId{2}, EdgeId{3}, EdgeId{4}},
+                              EdgeId{5},
+                              {FacetId{70}, FacetId{10}}}};
+    core::ResourcePlan prep{budget};
+    auto w = workspace(prep);
+    for (unsigned order = 0; order < 2; ++order) {
+        GeometryInput input{p,
+                            b,
+                            SinglePositions{xyz},
+                            SinglePositions{xyz},
+                            edges,
+                            faces,
+                            bands,
+                            {},
+                            rows,
+                            SingleWord{0},
+                            context()};
+        core::ResourcePlan plan{budget};
+        expected_problem(prepare_owned_geometry(input, limits(), *w, plan),
+                         core::FailureCode::InvalidInput, FacetId{10});
+        const std::array triangle{TriangleInput{FacetId{900},
+                                                PhysicalFaceId{999},
+                                                {p[0], p[2], p[1]},
+                                                {EdgeId{5}, EdgeId{2}, EdgeId{1}}}};
+        input.triangles = triangle;
+        expected_problem(prepare_owned_geometry(input, limits(), *w, plan),
+                         core::FailureCode::InvalidInput, FacetId{900});
+        input.triangles = {};
+        rows[0].face = PhysicalFaceId{50};
+        rows[1].face = PhysicalFaceId{51};
+        auto owned = take(prepare_owned_geometry(input, limits(), *w, plan));
+        CHECK(take(owned.facet_points(FacetId{10})) == std::array{p[0], p[3], p[2]});
+        CHECK(std::get<QuadLRScatter>(take(owned.scatter(FacetId{10}))).coefficients ==
+              std::array<std::int8_t, 6>{1, 0, 0, 1, 0, 1});
+        rows[0].face = PhysicalFaceId{999};
+        rows[1].face = PhysicalFaceId{999};
+        std::swap(rows[0], rows[1]);
+    }
+}
+TEST_CASE("Finite point diagnostics complete the admitted pass before canonical selection",
+          "[UI-D05][UI-D06][N4-02][N4-03][N4-06][negative][verification]") {
+    TriangleFixture f;
+    f.two_word = true;
+    f.points = {PointId{90}, PointId{10}, PointId{30}};
+    f.edges = {EdgeInput{EdgeId{10}, {f.points[0], f.points[1]}},
+               EdgeInput{EdgeId{20}, {f.points[1], f.points[2]}},
+               EdgeInput{EdgeId{30}, {f.points[2], f.points[0]}}};
+    f.triangles[0] = TriangleInput{
+        FacetId{70}, PhysicalFaceId{50}, f.points, {EdgeId{10}, EdgeId{20}, EdgeId{30}}};
+    core::ResourcePlan prep{budget};
+    auto w = workspace(prep);
+    f.reference[0] = std::numeric_limits<double>::quiet_NaN();
+    f.current_low[3] = std::numeric_limits<double>::infinity();
+    f.stamp.time = std::numeric_limits<double>::quiet_NaN();
+    f.radius = SingleWord{std::numeric_limits<double>::infinity()};
+    for (unsigned order = 0; order < 2; ++order) {
+        core::ResourcePlan plan{budget};
+        expected_problem(prepare_owned_geometry(f.input(), limits(), *w, plan),
+                         core::FailureCode::Nonfinite, PointId{10});
+        auto low = limits();
+        low.max_steps = 17; // Six scalar checks per point, including both words.
+        const auto budget_failure = prepare_owned_geometry(f.input(), low, *w, plan);
+        failure(budget_failure, core::FailureCode::ResourceExceeded);
+        if (!budget_failure)
+            CHECK_FALSE(budget_failure.error().problem);
+        low.max_steps = 18; // Equality admits the complete scan and finds the canonical bad point.
+        expected_problem(prepare_owned_geometry(f.input(), low, *w, plan),
+                         core::FailureCode::Nonfinite, PointId{10});
+        // MSVC request_stop is nonconst; preserve the shared cancellation state handle.
+        // NOLINTNEXTLINE(misc-const-correctness)
+        std::stop_source stop;
+        CHECK(stop.request_stop());
+        low.max_steps = 0;
+        const auto cancelled = prepare_owned_geometry(f.input(), low, *w, plan, stop.get_token());
+        failure(cancelled, core::FailureCode::Cancelled);
+        if (!cancelled)
+            CHECK_FALSE(cancelled.error().problem);
+        CHECK(plan.allocated_bytes() == 0);
+        std::swap(f.points[0], f.points[1]);
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            std::swap(f.reference[axis], f.reference[3 + axis]);
+            std::swap(f.current[axis], f.current[3 + axis]);
+            std::swap(f.reference_low[axis], f.reference_low[3 + axis]);
+            std::swap(f.current_low[axis], f.current_low[3 + axis]);
+        }
+    }
+}
+TEST_CASE("Alias edge face and geometric failures retain their existing canonical table order",
+          "[UI-D05][UI-D06][N4-03][N4-06][negative][verification]") {
+    const TriangleFixture fixture;
+    core::ResourcePlan prep{budget};
+    auto w = workspace(prep);
+    std::array points{PointId{11}, PointId{3}, PointId{7}, PointId{90}, PointId{10}};
+    std::array bindings{
+        binding(), binding(), binding(),
+        PointBinding{ReferenceMapId{1}, MappingGeneration{1}, AliasOf{PointId{999}}},
+        PointBinding{ReferenceMapId{1}, MappingGeneration{1}, AliasOf{PointId{999}}}};
+    const std::array<double, 15> xyz{0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0};
+    std::array edges{fixture.edges[0], fixture.edges[1], fixture.edges[2],
+                     EdgeInput{EdgeId{90}, {PointId{999}, PointId{1000}}},
+                     EdgeInput{EdgeId{40}, {PointId{999}, PointId{1000}}}};
+    std::array faces{fixture.faces[0], FaceInput{PhysicalFaceId{90}, BandId{999}},
+                     FaceInput{PhysicalFaceId{40}, BandId{999}}};
+    std::array triangles{
+        TriangleInput{
+            FacetId{90}, PhysicalFaceId{50}, fixture.points, {EdgeId{10}, EdgeId{20}, EdgeId{30}}},
+        TriangleInput{
+            FacetId{10}, PhysicalFaceId{50}, fixture.points, {EdgeId{10}, EdgeId{20}, EdgeId{30}}}};
+    auto degenerate = fixture.current;
+    degenerate[7] = 0;
+    for (unsigned order = 0; order < 2; ++order) {
+        core::ResourcePlan plan{budget};
+        auto input = fixture.input();
+        input.points = points;
+        input.bindings = bindings;
+        input.reference = SinglePositions{xyz};
+        input.current = SinglePositions{xyz};
+        expected_problem(prepare_owned_geometry(input, limits(), *w, plan),
+                         core::FailureCode::InvalidInput, PointId{10});
+        input = fixture.input();
+        input.edges = edges;
+        expected_problem(prepare_owned_geometry(input, limits(), *w, plan),
+                         core::FailureCode::InvalidInput, EdgeId{40});
+        input = fixture.input();
+        input.faces = faces;
+        expected_problem(prepare_owned_geometry(input, limits(), *w, plan),
+                         core::FailureCode::InvalidInput, PhysicalFaceId{40});
+        input = fixture.input();
+        input.triangles = triangles;
+        input.current = SinglePositions{degenerate};
+        expected_problem(prepare_owned_geometry(input, limits(), *w, plan),
+                         core::FailureCode::GeometryInvalid, FacetId{10});
+        std::swap(points[3], points[4]);
+        std::swap(bindings[3], bindings[4]);
+        std::swap(edges[3], edges[4]);
+        std::swap(faces[1], faces[2]);
+        std::swap(triangles[0], triangles[1]);
+    }
+}

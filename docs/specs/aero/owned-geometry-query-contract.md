@@ -114,6 +114,10 @@ workspaceのPlan要素はA0の `PredicateScratch` 1個と上記scratch1個だけ
 
 lease→shape/checked寸法→全外部語の有限性→ID/接続→context→半径/物質座標の実範囲→両配置の厳密非退化の順に検査する。同段はテーブル種別固定順、正規ID、入力ordinalの順で最初の原因を返す。alias先未解決/重複ID/不正接続/負半径/物質範囲はInvalidInput、非有限はNonfinite、版不一致はStaleGeneration、alias実位置不一致/厳密退化はGeometryInvalid。資源不足、取消、bad_alloc、未証明strict要求は既存A0と同じ分類とする。
 
+固定順を段ごとに適用する。座標の有限性は参照/現在を合わせた論理点表から、非有限を持つ最小の(PointId,入力ordinal)を選ぶ。その後にtime、radiusの非有限を検査する。重複IDはpoint、edge、physical face、band、展開facetの順、接続はalias point、edge、physical face、独立triangle、quad展開子の順である。各表内はID/元ordinal順とし、quadは子FacetIdで選ぶためhalf0が常に先とは限らない。最後の非退化段は単一の展開facet表をFacetId/元ordinal順に検査し、各facetで参照→現在を検査する。所有配列・元ordinal・half・固定splitをこの順へ並べ替えず、既存lookupから検査対象を選ぶ。
+
+点数を $$ N $$ とする。有限性の走査前に、設定済取消を先に確認し、checkedな $$ 6N $$ scalar分の残step予算を確認する。この確認自体では課金せず、各座標scalarの実訪問で1stepを数える。TwoWordもhigh/lowの検査を合わせて1scalarである。whole-pass予算拒否または走査途中の取消では、その時点で制御失敗を返し、未完了のcanonical不備を推測してproblemへ埋めない。完了した有限性走査だけから最小の非有限点を選ぶ。snapshotコピーの進捗とsemantic検査順は分け、推定stepや未訪問語をobserved量へ入れない。
+
 新IDを既存 `core::ProblemId` の別domainへcastしない。決めた `OwnedGeometryFailure` に共通Failureを原形で所有し、補助problem/contextを値で保持する。内側の既知cause/resourcesを保持し、欠落だけを補完する。
 
 実装開始前に、この型/配列順、Sの全フィールドと資源式、private exact入口のbound/lease、独立oracleをrootが審査する。oracleはcpp_rationalで元の両語と位置式を直接計算し、全query/零重み/全6頂点置換/alias同値別分解/±0/uint64端/固定split/整数境界/両配置を許容差0で比較する。false alias、split、incidence符号、weight-low、内容/世代を壊す隔離変異を選ぶ。A0refactorを含む場合は既存A0の影響3testと新規対象を、固定sourceからD/R各一度にまとめる。包絡・物理核・大域認定の完了は主張しない。

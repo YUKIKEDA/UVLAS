@@ -135,6 +135,14 @@ struct Run {
     std::uint64_t steps = 0;
     Run(const GeometryLimits& l, GeometryContext c, std::stop_token s) noexcept
         : limits(l), context(c), stop(std::move(s)) {}
+    // This checks a whole phase without charging unvisited work.
+    [[nodiscard]] AeroResult<void> check_steps(std::uint64_t count) const noexcept {
+        if (stop.stop_requested())
+            return std::unexpected(rejected(core::FailureCode::Cancelled, context));
+        if (steps > limits.max_steps || count > limits.max_steps - steps)
+            return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
+        return {};
+    }
     AeroResult<void> step(Problem problem = {}) noexcept {
         if (stop.stop_requested())
             return std::unexpected(rejected(core::FailureCode::Cancelled, context, problem));
@@ -293,15 +301,30 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
         auto bytes = footprint(n, word_count(input.reference), word_count(input.current), context);
         if (!bytes)
             return std::unexpected(bytes.error());
-        // All external words precede any identity resolution or interval policy.
+        // Admit the complete point-word phase before selecting its canonical
+        // failure. No lookup/payload is needed and no future step is charged.
+        if (stop.stop_requested())
+            return std::unexpected(rejected(core::FailureCode::Cancelled, context));
+        if (n.points > std::numeric_limits<std::uint64_t>::max() / 6)
+            return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
+        if (auto admitted = run.check_steps(6 * n.points); !admitted)
+            return std::unexpected(admitted.error());
+        std::optional<IdLookup> nonfinite;
         for (const auto view : {input.reference, input.current})
             for (std::size_t i = 0; i < input.points.size() * 3; ++i) {
-                if (auto step = run.step(input.points[i / 3]); !step)
+                if (auto step = run.step(); !step)
                     return std::unexpected(step.error());
-                if (!finite(input_position(view, i)))
-                    return std::unexpected(
-                        rejected(core::FailureCode::Nonfinite, context, input.points[i / 3]));
+                if (!finite(input_position(view, i))) {
+                    const IdLookup candidate{input.points[i / 3].value(),
+                                             static_cast<core::Index>(i / 3)};
+                    if (!nonfinite || candidate.id < nonfinite->id ||
+                        (candidate.id == nonfinite->id && candidate.ordinal < nonfinite->ordinal))
+                        nonfinite = candidate;
+                }
             }
+        if (nonfinite)
+            return std::unexpected(
+                rejected(core::FailureCode::Nonfinite, context, PointId{nonfinite->id}));
         if (!finite(context.time) || !finite(input.core_radius))
             return std::unexpected(rejected(core::FailureCode::Nonfinite, context));
         if (auto admitted = run.admission(); !admitted)
@@ -553,30 +576,41 @@ AeroResult<void> GeometryEngine::connect(GeometryData& data, GeometryWorkspace& 
             return std::unexpected(
                 rejected(core::FailureCode::InvalidInput, run.context, PhysicalFaceId{face.id}));
     }
-    for (std::size_t i = 0; i < data.triangles.size(); ++i) {
-        const auto& t = data.triangles.values()[i];
-        if (auto result = fill_facet(data, i, t.id, t.parent, t.points, t.edges,
-                                     IndependentOrigin{static_cast<core::Index>(i)}, run);
+    // Inspect sorted IDs while writing each source's original expanded ordinal.
+    // Independent triangles precede quad children; half order follows child IDs.
+    for (const auto entry : data.facet_lookup.values()) {
+        const auto ordinal = static_cast<std::size_t>(entry.ordinal);
+        if (ordinal >= data.triangles.size())
+            continue;
+        const auto& t = data.triangles.values()[ordinal];
+        if (auto result = fill_facet(data, ordinal, t.id, t.parent, t.points, t.edges,
+                                     IndependentOrigin{entry.ordinal}, run);
             !result)
             return result;
     }
-    for (std::size_t i = 0; i < data.quads.size(); ++i) {
+    for (const auto entry : data.facet_lookup.values()) {
+        const auto ordinal = static_cast<std::size_t>(entry.ordinal);
+        if (ordinal < data.triangles.size())
+            continue;
+        const auto expanded = ordinal - data.triangles.size();
+        const auto i = expanded / 2, half = expanded % 2;
         const auto& q = data.quads.values()[i];
-        const auto base = data.triangles.size() + 2 * i;
-        // The geometric boundary of each positive triangle is distinct from
-        // the reversed induction contour; neither sort nor input order changes it.
-        if (auto r = fill_facet(data, base, q.facets[0], q.parent,
-                                {q.points[0], q.points[2], q.points[1]},
-                                {q.diagonal, q.edges[1], q.edges[0]},
-                                QuadOrigin{static_cast<core::Index>(i), 0}, run);
-            !r)
-            return r;
-        if (auto r = fill_facet(data, base + 1, q.facets[1], q.parent,
-                                {q.points[0], q.points[3], q.points[2]},
-                                {q.edges[3], q.edges[2], q.diagonal},
-                                QuadOrigin{static_cast<core::Index>(i), 1}, run);
-            !r)
-            return r;
+        // Fixed positive geometry is independent of validation order.
+        if (half == 0) {
+            if (auto r = fill_facet(data, ordinal, q.facets[0], q.parent,
+                                    {q.points[0], q.points[2], q.points[1]},
+                                    {q.diagonal, q.edges[1], q.edges[0]},
+                                    QuadOrigin{static_cast<core::Index>(i), 0}, run);
+                !r)
+                return r;
+        } else {
+            if (auto r = fill_facet(data, ordinal, q.facets[1], q.parent,
+                                    {q.points[0], q.points[3], q.points[2]},
+                                    {q.edges[3], q.edges[2], q.diagonal},
+                                    QuadOrigin{static_cast<core::Index>(i), 1}, run);
+                !r)
+                return r;
+        }
     }
     return {};
 }
