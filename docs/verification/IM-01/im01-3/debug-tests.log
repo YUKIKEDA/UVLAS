@@ -1,0 +1,17 @@
+Internal ctest changing into directory: <PG_WORKTREE>/out/issue94-build
+Test project <PG_WORKTREE>/out/issue94-build
+    Start 48: structure.pg_coefficients
+1/2 Test #48: structure.pg_coefficients .............   Passed  181.15 sec
+    Start 49: structure.pg_coefficients_resources
+2/2 Test #49: structure.pg_coefficients_resources ...   Passed    0.14 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-PG            = 181.29 sec*proc (2 tests)
+negative        = 181.29 sec*proc (2 tests)
+property        = 181.29 sec*proc (2 tests)
+unit            = 181.15 sec*proc (1 test)
+verification    = 181.29 sec*proc (2 tests)
+
+Total Test time (real) = 181.32 sec

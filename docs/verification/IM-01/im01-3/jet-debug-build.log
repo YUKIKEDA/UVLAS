@@ -1,0 +1,7 @@
+[0/2] Re-checking globbed directories...
+[1/7] C:\WINDOWS\system32\cmd.exe /C "cd /D <PG_WORKTREE>\out\issue94-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<PG_WORKTREE> -DOUTPUT=<PG_WORKTREE>/out/issue94-build/generated/uvlas/git_revision.hpp -P <PG_WORKTREE>/cmake/GitRevision.cmake"
+[2/7] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[3/7] Linking CXX static library Debug\uvlas_core.lib
+[4/7] Linking CXX executable Debug\uvlas.exe
+[5/7] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_coefficients.dir\Debug\structure\pg_coefficients_test.cpp.obj
+[6/7] Linking CXX executable tests\Debug\uvlas_test_structure_pg_coefficients.exe

@@ -1,0 +1,7889 @@
+Randomness seeded to: 2831374959
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+kernel-test.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+PG all quartic monomials and both full P7 families satisfy independent exact
+jets
+-------------------------------------------------------------------------------
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(312)
+...............................................................................
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/16 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/64 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/128 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/192 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/256 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1536 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/2 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/8 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/16 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -5/48 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -5/64 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/32 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/24 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/32 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/64 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/384 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/512 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/3840 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/12 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/16 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/32 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/48 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/64 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/80 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/64 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/256 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/512 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/3840 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/5120 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/7680 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/120 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/160 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 2
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/768 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 3
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1024 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 3
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -11/53760 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1120 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/384 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/512 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1024 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1536 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 4
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/2048 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 4
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/24576 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/6144 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 5
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/8192 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 5
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/12288 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1024 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/4096 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/8192 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/4096 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 6
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/16384 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 6
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/20480 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/20480 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 7
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/81920 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 7
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/40960 == 0
+with messages:
+  n := 1
+  axis := 0
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/3072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/24576 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/32 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/64 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -125/768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -15/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  25/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/128 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -125/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -45/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  75/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/6144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/12288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/327680 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/128 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/20480 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/2048 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/12288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/327680 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/24576 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/655360 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/1310720 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/10240 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/256 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/512 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/40960 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/1024 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/12288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -55/172032 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -33/4587520 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  11/114688 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/3584 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/286720 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/7168 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/6144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/4096 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/24576 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/393216 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/2097152 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/8192 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/524288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/98304 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/524288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/196608 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/1048576 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/2097152 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/16384 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/32768 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/1048576 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/5242880 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/1048576 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/4194304 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/524288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/2097152 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/65536 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/5242880 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/131072 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/10485760 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -15/262144 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/20971520 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  9/524288 == 0
+with messages:
+  n := 1
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/64 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/512 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/2048 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1536 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/4096 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/24576 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/8 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/64 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/256 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -17/384 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -17/1024 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -11/1536 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/96 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/256 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1024 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/3072 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/8192 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/61440 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/48 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/128 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/512 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -5/384 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -5/1024 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -13/3840 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/256 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/2048 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/8192 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/30720 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/81920 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/122880 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/960 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/2560 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1920 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/6144 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 3
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/16384 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 3
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -11/860160 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/17920 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1536 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/4096 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/16384 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/12288 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 4
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/32768 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 4
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/393216 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/49152 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 5
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/131072 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 5
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/196608 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/4096 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/32768 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/131072 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/32768 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 6
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/262144 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 6
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/327680 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/163840 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 7
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/1310720 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 7
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/655360 == 0
+with messages:
+  n := 2
+  axis := 0
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/1024 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/2048 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/24576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/393216 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/128 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/2048 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/256 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -425/6144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -51/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  85/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -275/24576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -33/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  55/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -225/1024 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -81/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  135/2048 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -425/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -153/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  255/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -225/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -81/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  135/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/1536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/1024 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/49152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/196608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/5242880 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/512 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -125/6144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -15/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  25/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -65/12288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -39/327680 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  13/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/2048 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -125/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -45/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  75/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/98304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/2621440 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/393216 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/10485760 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/32768 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/20971520 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/3072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/81920 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/2048 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/6144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/163840 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  1/4096 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/8192 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/655360 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/98304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -55/2752512 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -33/73400320 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  11/1835008 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/57344 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/4587520 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/114688 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/24576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/16384 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/196608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/6291456 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/33554432 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/8388608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/262144 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/786432 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/3145728 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/16777216 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/33554432 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/65536 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/131072 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/8388608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/83886080 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/8388608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/67108864 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/8388608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/33554432 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/524288 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/41943040 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/1048576 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/2097152 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/167772160 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -15/4194304 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/335544320 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  9/8388608 == 0
+with messages:
+  n := 2
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/256 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/4096 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/32768 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/12288 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/65536 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/393216 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -7/32 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -21/512 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -21/4096 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := true
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -41/3072 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -41/16384 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/8192 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/384 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/2048 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/16384 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/24576 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/131072 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/983040 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/192 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1024 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/8192 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := true
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -13/3072 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -13/16384 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -11/20480 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1024 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/16384 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/131072 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/245760 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1310720 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/1966080 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/7680 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := true
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/40960 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := true
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/10240 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/49152 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 3
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/262144 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 3
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -11/13762560 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/286720 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/6144 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/32768 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/262144 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 4
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/98304 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 4
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/524288 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 4
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/6291456 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/393216 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 5
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/2097152 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 5
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  1/3145728 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/16384 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/262144 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/2097152 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 6
+  completed := false
+  i := 0
+  j := 4
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/262144 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 6
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/4194304 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 6
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/5242880 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/1310720 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 7
+  completed := false
+  i := 1
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/20971520 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 7
+  completed := false
+  i := 1
+  j := 3
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -1/10485760 == 0
+with messages:
+  n := 4
+  axis := 0
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/4096 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/8192 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/196608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/6291456 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/16777216 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -175/512 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -63/8192 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  105/1024 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -1025/49152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -123/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  205/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -225/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -81/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  135/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -525/8192 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -189/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  315/16384 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -1025/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -369/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  615/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -525/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -189/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  315/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 0
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/6144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/4096 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/393216 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/3145728 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/83886080 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/3072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/16384 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/2048 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -325/49152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -39/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  65/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -55/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -99/5242880 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  33/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/16384 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -325/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -117/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  195/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 1
+  completed := true
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/16384 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/786432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/20971520 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/6291456 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/167772160 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/335544320 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/2097152 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/24576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/655360 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -1/16384 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/32768 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/2621440 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/131072 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/10485760 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 2
+  completed := true
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/786432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -3/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  5/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -55/44040192 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -33/1174405120 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  11/29360128 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  5/917504 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/73400320 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -3/1835008 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 3
+  completed := true
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/98304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/65536 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/1572864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/100663296 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/536870912 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/1048576 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/134217728 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/16777216 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 4
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/6291456 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/50331648 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  3/268435456 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -5/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  25/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  9/536870912 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  -15/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 5
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/262144 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/524288 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -25/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  15/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/16777216 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/1342177280 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/1073741824 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/134217728 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -75/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/536870912 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  45/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 6
+  completed := false
+  i := 4
+  j := 0
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/4194304 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/335544320 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/8388608 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -5/33554432 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -9/2684354560 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  3/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 2
+  j := 2
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(382): FAILED:
+  CHECK( dx[0]+fxr*dx[2]==0 )
+with expansion:
+  -15/67108864 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(383): FAILED:
+  CHECK( dy[1]+fyr*dy[2]==0 )
+with expansion:
+  -27/5368709120 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp(384): FAILED:
+  CHECK( dy[0]+dx[1]+fxr*dy[2]+fyr*dx[2]==0 )
+with expansion:
+  9/134217728 == 0
+with messages:
+  n := 4
+  axis := 1
+  degree := 7
+  completed := false
+  i := 3
+  j := 1
+
+===============================================================================
+test cases:     5 |     4 passed |   1 failed
+assertions: 15786 | 15130 passed | 656 failed
+

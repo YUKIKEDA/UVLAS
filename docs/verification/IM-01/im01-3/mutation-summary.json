@@ -1,0 +1,237 @@
+{
+  "schema": "uvlas.isolated-mutations/1",
+  "id": "pg-coefficient-seven-mutations",
+  "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+  "control_source_files": 42,
+  "control_source_bytes_match_git_blob": true,
+  "source_set_sha256": "c7d29665c747ab5e07e6c836c56d9a25bdbb2bd5cf45a4cf484f12f3871fbafe",
+  "source_files": {
+    "include/uvlas/core/build_info.hpp": "860e103e51257d7c9ef3a19fcc2a20c2d03b96ec25d9865abfec3c854d5cb4aa",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/error_certificate.hpp": "0056e3b9a63e069dc66241984b432fade11e842bd6876026ea34a1181eba9713",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "include/uvlas/core/identifier.hpp": "c664bb89628a85e1c33dbb961ce9ce0e4beb8e9127b746c27eea6f915e024ed7",
+    "include/uvlas/core/instrumentation.hpp": "1c11133ca602f3debdd2eab1f689701bb017daa6c13e21c3d5267baab84ffe53",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/state.hpp": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+    "include/uvlas/io/input_document.hpp": "a924f78c4e11e70938d073f9fc9de44a1d498cbf4a1be088cbcbd2d32f74a5f9",
+    "include/uvlas/io/input_scalar.hpp": "0d90e47897d760aa097fce8bd146995d2679cc615114b92c8ecf77373836cef8",
+    "include/uvlas/numerics/backend_memory.hpp": "eb8e72fb32db492dc3f839db2f22b4016622096a2408dcd9890b498fce056322",
+    "include/uvlas/numerics/dense_solve.hpp": "3656be4191273683fa8f0c4394a1fc20919852852847a3fb05888523140ab9fc",
+    "include/uvlas/numerics/eigen_action.hpp": "2021c95e7d081f4e24cc388ce737462ab627d1dfbd60dde03606eb64eddfffe2",
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "26a6055f86ef5b5916eee4a1adbb48b5bda865944cb57cb1c0712deeaffbe4b9",
+    "include/uvlas/numerics/eigen_common.hpp": "c198b81a63759aff59bd6d794501850251b89199e1551e76cb0bbf2558e88138",
+    "include/uvlas/numerics/eigen_full.hpp": "e0441c32931db87babf996baad2b6eb099bc781ae58ab71c241091ed2714a9a2",
+    "include/uvlas/numerics/eigen_generalized.hpp": "ed625ee9ad8424c1185996b5c3f2717c58b576e1ab83673ac3689788ab69808c",
+    "include/uvlas/numerics/eigen_metrics.hpp": "645c7de4080e042c6ba668ce80f776812af85adf58f8e0329fbbc9d6dec769a4",
+    "include/uvlas/numerics/gmres_solve.hpp": "bdded15cfcf6c46c6f040aa2e061755c80a0cf486a686cfb0863b1b7b2c11673",
+    "include/uvlas/numerics/linear_solve.hpp": "7d41ef7ca642c40d54917995e26072a3b51886e51113f5b41a643da530b95f97",
+    "include/uvlas/numerics/precision.hpp": "009150818629c94e87f3d0a553ecd8a8cf9e8ef0502c8d468fd2609d1d6f9a9c",
+    "include/uvlas/numerics/sparse_solve.hpp": "a41ce6bd03b8d95e1875f970538062e9f0e4e7c87d54421d7d3987db9a9bb7fb",
+    "include/uvlas/numerics/storage.hpp": "fa15fdec2c054145469cb9e4dd7b17bce962439b4dd4fad82a46a4f1918fa339",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+    "include/uvlas/structure/pg_graph.hpp": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+    "src/structure/exact_polynomial.cpp": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+    "src/structure/exact_polynomial_detail.hpp": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+    "src/structure/pg_coefficients.cpp": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+    "src/structure/pg_coefficients_algebra.hpp": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+    "src/structure/pg_coefficients_anchor.hpp": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+    "src/structure/pg_coefficients_basis.hpp": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+    "src/structure/pg_coefficients_detail.hpp": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+    "src/structure/pg_coefficients_generate.hpp": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+    "src/structure/pg_coefficients_maps.hpp": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+    "src/structure/pg_coefficients_plan.hpp": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+    "src/structure/pg_graph.cpp": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+    "src/structure/pg_graph_detail.hpp": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+    "tests/structure/fixtures/pg-coefficients-v1.json": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+    "tests/structure/pg_coefficients_reference_test.cpp": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+    "tests/structure/pg_coefficients_resource_test.cpp": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+    "tests/structure/pg_coefficients_test.cpp": "078567dac6d841aaca9b4f0e0fc2a5d940189958dd09831f009568b119ae42e9"
+  },
+  "producer": "src/structure/pg_coefficients.cpp and its private header closure",
+  "input_fixture_sha256": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+  "build": "MSVC Release O2 Ob2 MD WX fp:strict, stock command database; readonly repaired vcpkg prefix; no configure/install",
+  "control": "One unchanged isolated executable passed the union of all selected filters first. Tests use fixed rational inputs; Catch auto RNG seeds are reporting metadata, not numeric generators.",
+  "variants": [
+    {
+      "name": "control",
+      "compile_exits": [
+        0,
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 0,
+      "timed_out": false,
+      "filter": "PG flat lifted fields retain full moment carry and physical-plane signs,PG full preparation admits before allocating and owns its graph and exact values,PG complete dictionaries match the independent canonical coefficient fixture",
+      "abort_option": "--abort",
+      "executable_sha256": "bcd1ac67e24ed32ad7aced208f5fa2f3fbafaedb870a2c2b040ab722871dbded",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer",
+        "normal",
+        "reference"
+      ],
+      "control_passed": true,
+      "assertions": 200581,
+      "test_cases": 3
+    },
+    {
+      "name": "omit-t-family",
+      "compile_exits": [
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+      "abort_option": "--abort",
+      "executable_sha256": "0a04865f7249b3d96f961a3e3470445a8e7f5b7bf52934d4aa1dab92a1420b3d",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer",
+        "normal"
+      ],
+      "killed": true
+    },
+    {
+      "name": "reset-moment-carry",
+      "compile_exits": [
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG flat lifted fields retain full moment carry and physical-plane signs",
+      "abort_option": "--abort",
+      "executable_sha256": "a716ded1ca3756893019384c754fb7de2a9efc133e8363b1ed97c6b970e495e3",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer",
+        "normal"
+      ],
+      "killed": true
+    },
+    {
+      "name": "reverse-director-x-sign",
+      "compile_exits": [
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG flat lifted fields retain full moment carry and physical-plane signs",
+      "abort_option": "--abort",
+      "executable_sha256": "a7e82112fd895b00b59fd731b70ddbe3ba3bd328989fe1585835255977228696",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer",
+        "normal"
+      ],
+      "killed": true
+    },
+    {
+      "name": "replace-4n-by-3n",
+      "compile_exits": [
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG complete dictionaries match the independent canonical coefficient fixture",
+      "abort_option": "--abort",
+      "executable_sha256": "ee9470455e4a0cfb849cbc2ee2825e5518528de744077a9cf565110b6d74bb52",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer"
+      ],
+      "killed": true
+    },
+    {
+      "name": "anchor-at-each-cell-left",
+      "compile_exits": [
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG complete dictionaries match the independent canonical coefficient fixture",
+      "abort_option": "--abort",
+      "executable_sha256": "4911b763fc4bd26eafd2ac7f3f26ea9236aaa6b766e60df2cd15410a63d7e1c4",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer",
+        "normal"
+      ],
+      "killed": true,
+      "first_attempt": {
+        "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+        "run_exit": 0,
+        "assertions": 62,
+        "test_cases": 1,
+        "log": "anchor-at-each-cell-left/run.log"
+      },
+      "final_attempt_log": "anchor-at-each-cell-left/run-reference.log"
+    },
+    {
+      "name": "omit-p-anchor-family",
+      "compile_exits": [
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+      "abort_option": "--abort",
+      "executable_sha256": "ba3898c92f5cd9c8ee8f711376c0738f59d89b93336b60abbbcda21c87ee6c5d",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer",
+        "normal"
+      ],
+      "killed": true
+    },
+    {
+      "name": "omit-required-map",
+      "compile_exits": [
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 42,
+      "timed_out": false,
+      "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+      "abort_option": "--abort",
+      "executable_sha256": "964f02f0943ca8fcdc88098e202ae53b00362a4f1d8aff74ec53a56117a6a551",
+      "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "archive_producer_extractions": 0,
+      "recompiled_roles": [
+        "producer"
+      ],
+      "killed": true
+    }
+  ],
+  "odr": "Header mutations recompiled producer and normal TU, which includes the producer inline hierarchy. The reference TU includes only exact_polynomial_detail.hpp among private headers and no pg_coefficients_* implementation header, confirmed by MSVC sourceDependencies. Its control object was reused unchanged. Cpp-only mutations reused both unchanged test objects.",
+  "unchanged": {
+    "original_sources_at_finish": true,
+    "control_copy_at_finish": true,
+    "libraries_at_finish": true
+  },
+  "anchor_survival": "The first public property filter did not observe off-anchor completed coefficients. It passed on the mutant; the existing independent fixture filter then killed the same executable without a recompile or another control. Both runs remain in the archive.",
+  "scope": "Compiled Catch failures, not compile failures/timeouts. This is not product physical validation or a performance baseline.",
+  "inputs": "Support object/library hashes and executed argv are in result-final.json. Binaries remain in the local raw directory; the public archive stores source, commands, dependency lists, maps and logs. Paths are hints; hashes identify content.",
+  "redaction": "Existing tools/rd/redact.py plus encoded account-token replacement, with per-file before/after hashes. Product source and fixture bytes were not altered.",
+  "raw_source_release": "Original-source hash audit finished before the author was notified that later comment-only work may resume."
+}

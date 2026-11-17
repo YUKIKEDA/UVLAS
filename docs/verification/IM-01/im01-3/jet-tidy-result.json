@@ -1,0 +1,1 @@
+{"exit_code": 0, "command": "uvx --offline clang-tidy@21.1.1 -p out/issue108-tidy --quiet tests/structure/pg_coefficients_test.cpp"}

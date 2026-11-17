@@ -1,0 +1,8 @@
+{
+  "source_sha256": "6ce58a088af7df027a6df3a09e367b414a6c3cb462a0c72274f41b80236f220e",
+  "exit_code": 0,
+  "started_unix_seconds": 1794917177.8631356,
+  "finished_unix_seconds": 1794917204.4492364,
+  "command": "out/issue108-contract/public-n4-measure.exe",
+  "scope": "one public n4 call; input preparation outside whole-call timing"
+}

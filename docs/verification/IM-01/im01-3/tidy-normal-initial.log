@@ -1,0 +1,79 @@
+65356 warnings and 1 error generated.
+Error while processing <PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp.
+<PG_WORKTREE>\src\structure\pg_coefficients_generate.hpp:70:5: error: function 'key' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+   70 |     std::uint64_t key(const PgCoefficientRecord& entry) const noexcept {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_generate.hpp:83:5: error: function 'get' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+   83 |     const PgPoly& get(core::Index column, PgCellIndex cell,
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_maps.hpp:17:12: error: returning a constant reference parameter may cause use-after-free when the parameter is constructed from a temporary [bugprone-return-const-ref-from-parameter,-warnings-as-errors]
+   17 |     return zero;
+      |            ^~~~
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:118:5: error: function 'value_bits' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  118 |     std::uint64_t value_bits(const PgBudgetPolynomial& value) const {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:134:5: error: function 'external_owner' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  134 |     std::uint64_t external_owner(const PgBudgetPolynomial& value) const {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:138:5: error: function 'generic_scratch' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  138 |     std::uint64_t generic_scratch(std::uint64_t work, std::uint64_t raw) const {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:830:78: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  830 |         9 + 4 * cells, pg_add(4 * nodes + 2 * axis * (3 * n + 7) + 8 * axis, 4 * 19 + 80 * axis));
+      |                                                                              ^
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:830:78: note: make conversion explicit to silence this warning
+  830 |         9 + 4 * cells, pg_add(4 * nodes + 2 * axis * (3 * n + 7) + 8 * axis, 4 * 19 + 80 * axis));
+      |                                                                              ^~~~~~
+      |                                                                              static_cast<std::uint64_t>( )
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:830:78: note: perform multiplication in a wider type
+  830 |         9 + 4 * cells, pg_add(4 * nodes + 2 * axis * (3 * n + 7) + 8 * axis, 4 * 19 + 80 * axis));
+      |                                                                              ^
+      |                                                                              static_cast<long long>( )
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:152:9: error: switching on non-enum value without default case may not cover all cases [bugprone-switch-missing-default-case,-warnings-as-errors]
+  152 |         switch (fault) {
+      |         ^
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:224:17: error: 'value' used after it was moved [bugprone-use-after-move,-warnings-as-errors]
+  224 |     CHECK_FALSE(value.columns());
+      |                 ^
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:223:18: note: move occurred here
+  223 |     auto moved = std::move(value);
+      |                  ^
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:255:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  255 |     CHECK(enabled->preparation().timings->coefficients.calls == 1);
+      |           ^
+<MAIN_WORKTREE>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<MAIN_WORKTREE>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:256:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  256 |     CHECK(enabled->preparation().timings->anchor.calls == 1);
+      |           ^
+<MAIN_WORKTREE>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<MAIN_WORKTREE>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:257:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+  257 |     CHECK(enabled->preparation().timings->verification.calls == 1);
+      |           ^
+<MAIN_WORKTREE>\out\vcpkg_installed\x64-windows\include\catch2/catch_test_macros.hpp:141:99: note: expanded from macro 'CHECK'
+  141 |   #define CHECK( ... ) INTERNAL_CATCH_TEST( "CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__ )
+      |                                                                                                   ^~~~~~~~~~~
+<MAIN_WORKTREE>\out\vcpkg_installed\x64-windows\include\catch2/internal/catch_test_macro_impl.hpp:69:70: note: expanded from macro 'INTERNAL_CATCH_TEST'
+   69 |             catchAssertionHandler.handleExpr( Catch::Decomposer() <= __VA_ARGS__ ); /* NOLINT(bugprone-chained-comparison) */ \
+      |                                                                      ^~~~~~~~~~~
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:278:44: error: the parameter 'x' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors]
+  278 | OracleRational oracle_power(OracleRational x, unsigned p) {
+      |                                            ^
+      |                             const         &
+<PG_WORKTREE>\tests\structure\pg_coefficients_test.cpp:287:11: error: unused function 'operator+' [clang-diagnostic-unused-function]
+  287 | OracleJet operator+(const OracleJet& a, const OracleJet& b) {
+      |           ^~~~~~~~

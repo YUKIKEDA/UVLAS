@@ -1,0 +1,52 @@
+Start testing: Nov 17 21:03 ���� (�W����)
+----------------------------------------------------------
+49/84 Testing: structure.pg_coefficients
+49/84 Test: structure.pg_coefficients
+Command: "<PG_WORKTREE>/out/issue94-build/tests/Release/uvlas_test_structure_pg_coefficients.exe"
+Directory: <PG_WORKTREE>/out/issue94-build/tests
+"structure.pg_coefficients" start time: Nov 17 21:03 ���� (�W����)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2282765113
+===============================================================================
+All tests passed (505720 assertions in 6 test cases)
+
+<end of output>
+Test time =  48.93 sec
+----------------------------------------------------------
+Test Passed.
+"structure.pg_coefficients" end time: Nov 17 21:03 ���� (�W����)
+"structure.pg_coefficients" time elapsed: 00:00:48
+----------------------------------------------------------
+
+50/84 Testing: structure.pg_coefficients_resources
+50/84 Test: structure.pg_coefficients_resources
+Command: "<PG_WORKTREE>/out/issue94-build/tests/Release/uvlas_test_structure_pg_coefficients_resources.exe"
+Directory: <PG_WORKTREE>/out/issue94-build/tests
+"structure.pg_coefficients_resources" start time: Nov 17 21:03 ���� (�W����)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2584712979
+===============================================================================
+All tests passed (67 assertions in 1 test case)
+
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"structure.pg_coefficients_resources" end time: Nov 17 21:03 ���� (�W����)
+"structure.pg_coefficients_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 17 21:03 ���� (�W����)
+
+V-PG =  49.01 sec*proc
+
+negative =  49.01 sec*proc
+
+property =  49.01 sec*proc
+
+unit =  48.93 sec*proc
+
+verification =  49.01 sec*proc
+

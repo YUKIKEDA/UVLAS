@@ -1,0 +1,691 @@
+{
+  "schema": "uvlas.verification/1",
+  "ids": [
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 108,
+  "date": "2026-11-17",
+  "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+  "scope": "n=1/2/4の全原PG辞書、両P7持上げ、R/P別anchorとfull V、C包含、必須30場と3並進のexact構成map。活動rank/独立化/条件付け/物理N/全trace/多角形/PreparedPatchは親Issue17の後続であり未完了。",
+  "provenance": {
+    "clean": true,
+    "uncommitted_changes": false,
+    "base": "912f8d9572bc2064f8ad3a69a250122886d3e440",
+    "source_bytes": "新C++/fixtureはworktreeとGit blobのLF bytes一致。実行時CMakeはsource commitのblobを別artifactとして固定し、後続共有metadata統合と区別する。",
+    "dependencies": "修正済みIssue99の既存vcpkg prefixをread-onlyで使用しmanifest install OFF。Boost1.92.0/Catch2 3.16.1/nlohmann-json3.12.0#3。既存exact/graphの算術・公開APIに変更なし。",
+    "publication": "原rawはoutへ保持。今回の公開派生のみLF化と明示個人path匿名化を行い、redaction.jsonへ元/派生SHAと置換件数を保存。旧証拠/R&Dは変更しない。バイナリは公開しない。 CTestのlocale日時等に非UTF8 byteがあった公開派生は置換文字数をredactionへ記録し、原raw hashと区別する。 新規human JSONとstandalone公開textもLFへ統一した。peerの元ZIPはbyte不変、standalone JSONのLF派生は追加前後hashで識別する。初回診断logとpatchの原文末尾空白は保持し、git diff --checkは原文保持の具体ファイルをwhitespace_exceptionsで名指しして限定除外した。"
+  },
+  "completion_evidence": [
+    {
+      "requirement": "全原列・全セル・両P7族と由来",
+      "evidence": "6独立Fraction fixtureの原列122/246/530、実full列161/320/674と228/451/933、R/P全anchor原ID順、996箇所の全canonical係数とgを許容差0で照合。元零列/重複由来を落とさない。"
+    },
+    {
+      "requirement": "carry・非単位w/skew・膜/director恒等式",
+      "evidence": "全15単項式×全84セル×s/t両族×8曲率を独立有理積分とfirst jetへ照合。初版ではv/p中点値とoracle側膜式を照合していたため、998ae13で製品の実係数からds/dt各6値を直接比較し、実jetによる膜2条件/残膜成分とdirector分子3恒等式を確認した。追加1caseは両構成463681assert、旧fullsuiteへ合成しない。"
+    },
+    {
+      "requirement": "R/P別anchorとfull V、C包含",
+      "evidence": "元s=0のt片側traceからR群→P群で追加し、T_a L_a=I、既存C hatへの包含を全係数で検査。独立fixtureは追加原ID/離れたsセルも確認。clamped辞書や数値rankへ置換しない。"
+    },
+    {
+      "requirement": "必須30場と並進の構成map",
+      "evidence": "global Lk(2s−1)を区間P7へexact変換し、X/Y/f・全j-major24場・法線3場・並進を元R/P/C係数から再構成。独立fixtureと別global積分/手書きliteralを併用し、B/S独立化とは区別する。"
+    },
+    {
+      "requirement": "所有・参照内容・全call資源とFailure",
+      "evidence": "所有snapshotの実内容比較、別graph拒否、入力/旧出力不変、移動元query拒否、並行別workspace、同workspace拒否、事前取消を確認。payload/work/raw/column/map/externalの等号成功と1不足/未知tag/strict未証明を事前拒否。単独監査processでnew失敗site0..9を注入し、失敗値/入力識別保全/lease回復と後続正常prepareを確認。全確保位置の網羅ではない。"
+    },
+    {
+      "requirement": "独立exact基準と変異",
+      "evidence": "独立Fractionのglobal原始関数→CellUV fixture6件と別有理jetを使用。byte同一control200581assert/3filter成功後、t族/carry/director符号/4n/anchor位置/P anchor/必須mapの7変異がcompile/link成功後Catch42で検出。anchorの最初のfilter生存も隠さず保存。"
+    },
+    {
+      "requirement": "API/契約・対象検証・記録",
+      "evidence": "英語Doxygen/重要inline、有限recipe/bit/生存領域の補足、root/General独立レビュー。clean Windows新2CTestはDebug/Release各2/2。Linux/sanitizerは手元未実行。製品3phaseは公開APIによるn4単発観測であり実務性能の資格ではない。"
+    }
+  ],
+  "checks": {
+    "platform": "Windows11 x64 / MSVC19.51.36260.0 / C++23 /fp:strict /W4 /WX / sse2",
+    "debug": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "elapsed_seconds": 181.32
+    },
+    "release": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "elapsed_seconds": 49.02,
+      "normal_cases": 6,
+      "normal_assertions": 505720,
+      "resource_cases": 1,
+      "resource_assertions": 67
+    },
+    "static": {
+      "producer_final_exit": 0,
+      "normal_final_exit": 0,
+      "resource_final_exit": 0,
+      "reference_peer_exit": 0,
+      "note": "producer/normalの初回・中間診断を保持。最後のproducer-final2.log、normal-final.log、resource初回0が最終成功。referenceのpeer tidyはcaps更新前snapshot、capsのみ更新した最終sourceはRelease compile/実行成功。 その後の実jet直接比較補強は998ae13の当該normal TUだけ再tidy0。",
+      "reference_peer_note": "im00_9のcaps更新前snapshot c4e1dc287dce655fefc6d0ef85d56fa0ae83db8056673aa4685bdd0ce8f63でclang-tidy21.1.1 exit0を実行報告から受領。stdoutは68482 warnings generated.のみ、対象診断なし。raw logは未保存であり、全warning0とは主張しない。最終caps/tag変更後はformatとclean D/R compile/runtimeで確認。"
+    },
+    "japanese": "quick lintは術語反復TTR info1と並列技術表low_burstiness warn1を意味維持で保持。root/Generalが契約・公開headerを独立通読。",
+    "scope": "既存exact/graphは非変更のため既存suite/旧変異の再実行はしない。CI待機なし、未実行Linuxを成功としない。",
+    "supplemental_direct_jets": {
+      "source_commit": "998ae1312afb76ccb0910391dce9c6f3331e3283",
+      "debug_cases": 1,
+      "debug_assertions": 463681,
+      "debug_exit": 0,
+      "release_cases": 1,
+      "release_assertions": 463681,
+      "release_exit": 0,
+      "normal_tidy_exit": 0,
+      "scope": "既存jet1caseの補強だけ。全6caseと資源caseの再実行ではない。"
+    }
+  },
+  "preliminary_correction": {
+    "note": "新試験で膜3成分全零を誤期待し656assert失敗。採用式は膜2条件と残1成分であり、s-family f=t²,k=1,s=1/4なら残成分−1/16。製品数式を変えず試験期待のみ訂正し、対象jet1case302401assert成功。その後source固定の対象D/Rが成功。",
+    "uncommitted_preliminary": "最初の6factory Release200494assertとjet controlはdirty予備であり、clean最終成功へ合成しない。"
+  },
+  "measurement": {
+    "artifact": "docs/verification/IM-01/im01-3/n4-stage-observation.json",
+    "scope": "固定Release公開prepareのn4 mixed1call。入力graph/height作成はwholecall外。3phase外の事前plan/配列/clone/報告費用を別表示。",
+    "concurrency": "9/root/他agentの新規heavy build/runを止めた窓。宿主の全process無負荷を保証しない。",
+    "qualification": "累積ResourcePlan、外部limb-payload推定、OS resident/lifetime peakを別々に示す。単発観測は高速化比較、hard RSS保証、R-02/実務性能/物理受入ではない。"
+  },
+  "mutations": {
+    "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+    "control": {
+      "compile_exits": [
+        0,
+        0,
+        0
+      ],
+      "link_exit": 0,
+      "run_exit": 0,
+      "cases": 3,
+      "assertions": 200581,
+      "scope": "controlは全変異が使う3filterの和集合。同条件--abort、数値入力は固定有理数。全6case/505720assertの再実行ではない。"
+    },
+    "variants": [
+      {
+        "name": "omit-t-family",
+        "compile_exits": [
+          0,
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+        "killed": true
+      },
+      {
+        "name": "reset-moment-carry",
+        "compile_exits": [
+          0,
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG flat lifted fields retain full moment carry and physical-plane signs",
+        "killed": true
+      },
+      {
+        "name": "reverse-director-x-sign",
+        "compile_exits": [
+          0,
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG flat lifted fields retain full moment carry and physical-plane signs",
+        "killed": true
+      },
+      {
+        "name": "replace-4n-by-3n",
+        "compile_exits": [
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG complete dictionaries match the independent canonical coefficient fixture",
+        "killed": true
+      },
+      {
+        "name": "anchor-at-each-cell-left",
+        "compile_exits": [
+          0,
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG complete dictionaries match the independent canonical coefficient fixture",
+        "killed": true,
+        "first_attempt": {
+          "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+          "run_exit": 0,
+          "assertions": 62,
+          "test_cases": 1,
+          "log": "anchor-at-each-cell-left/run.log"
+        },
+        "final_attempt_log": "anchor-at-each-cell-left/run-reference.log"
+      },
+      {
+        "name": "omit-p-anchor-family",
+        "compile_exits": [
+          0,
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+        "killed": true
+      },
+      {
+        "name": "omit-required-map",
+        "compile_exits": [
+          0
+        ],
+        "link_exit": 0,
+        "run_exit": 42,
+        "filter": "PG full preparation admits before allocating and owns its graph and exact values",
+        "killed": true
+      }
+    ],
+    "snapshot": "42source/inputがde292 Git blobとbyte一致。header変異はproducer/normal TUを同snapshotで再compileし、private inlineのODR混在を避ける。全8linkmapで元archive producer未抽出。元source/copy/library hashは検査終了まで不変。",
+    "anchor_survival": "最初のpublic property filterはanchor変異を検出せずexit0/62assert。既存独立fixture filterへ同exeを切り替え、追加compile/controlなしでexit42/4463assert中1failure。両rawを保持する。",
+    "archive": "docs/verification/IM-01/im01-3/seven-mutations.zip",
+    "archive_sha256": "656d30b74a9a544046a38e8317cd65b3580b4bd94d7755e53f935e957c931335",
+    "archive_entries": 121,
+    "published_binaries": 0,
+    "privacy": "担当の既存redactorとencoded account除去、各entry前後hash/件数。受領側でも全ZIPentryの実account/host文字列残存0とbinary不在を確認。原rawはoutに保持。",
+    "binding": "source-set.json全体のSHAと、bindingsのworking_snapshot canonical map SHAは別encoding。各変異source→object/library→実exe hashをsource-executable-bindings.jsonへ対応付ける。"
+  },
+  "remaining_gates": "親Issue17の活動rank/独立化、全分割/多角形、保証付き条件付け、物理N/PreparedPatch/全trace/疎chart、実graph R-02と後段物理受入は未完了。",
+  "sources": {
+    "docs/specs/structure/pg-full-dictionary-contract.md": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+    "include/uvlas/structure/pg_graph.hpp": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+    "src/structure/exact_polynomial.cpp": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+    "src/structure/exact_polynomial_detail.hpp": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+    "src/structure/pg_coefficients.cpp": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+    "src/structure/pg_coefficients_algebra.hpp": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+    "src/structure/pg_coefficients_anchor.hpp": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+    "src/structure/pg_coefficients_basis.hpp": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+    "src/structure/pg_coefficients_detail.hpp": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+    "src/structure/pg_coefficients_generate.hpp": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+    "src/structure/pg_coefficients_maps.hpp": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+    "src/structure/pg_coefficients_plan.hpp": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+    "src/structure/pg_graph.cpp": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+    "src/structure/pg_graph_detail.hpp": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+    "tests/structure/fixtures/generate_pg_coefficients.py": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+    "tests/structure/fixtures/pg-coefficients-v1.json": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+    "tests/structure/pg_coefficients_reference_test.cpp": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+    "tests/structure/pg_coefficients_resource_test.cpp": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+    "tests/structure/pg_coefficients_test.cpp": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be"
+  },
+  "execution_source_hashes": {
+    "CMakeLists.txt": "b0fd0eafded987d6bacd99231b360355bf76511c6fd6094642262e52c1df0a32",
+    "docs/conventions.md": "3ccf192ccafaf42ab12023c8478c6ca92807c1b20bd2fc7e8ee607f9d2b3d29b",
+    "docs/roadmap.md": "21eba631d1436015ebcc4efd5cde9cd14e0ec056e9efc1a7162e4da3c72241b1",
+    "docs/specs/structure/pg-full-dictionary-contract.md": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+    "src/structure/pg_coefficients.cpp": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+    "src/structure/pg_coefficients_algebra.hpp": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+    "src/structure/pg_coefficients_anchor.hpp": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+    "src/structure/pg_coefficients_basis.hpp": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+    "src/structure/pg_coefficients_detail.hpp": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+    "src/structure/pg_coefficients_generate.hpp": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+    "src/structure/pg_coefficients_maps.hpp": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+    "src/structure/pg_coefficients_plan.hpp": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+    "tests/CMakeLists.txt": "fab3f5cfe47930ce6362a0d16cc9764587a0aab0ce64dd04d38c1eb89c7aaf2d",
+    "tests/structure/fixtures/generate_pg_coefficients.py": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+    "tests/structure/fixtures/pg-coefficients-v1.json": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+    "tests/structure/pg_coefficients_reference_test.cpp": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+    "tests/structure/pg_coefficients_resource_test.cpp": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+    "tests/structure/pg_coefficients_test.cpp": "078567dac6d841aaca9b4f0e0fc2a5d940189958dd09831f009568b119ae42e9"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/im01-3/build-info-debug.json": "074c8521925747d510875fb9d5ff18e24ea2d1c9a293feb0ed4af63248b67ec9",
+    "docs/verification/IM-01/im01-3/build-info-release.json": "23d4e1cc518d753f5e1011e796823677b8c588338f0c774037e5d3f2050e1bf8",
+    "docs/verification/IM-01/im01-3/comment-source-bridge.json": "20f409b3a8ae002b2d07cae04eddc0bc36cc3ffe1fcbd98d52266733042fbd0d",
+    "docs/verification/IM-01/im01-3/debug-build.log": "c5231e8c034d09e8c69dde552d67caa91cbd4b895a0d9afb1d460d52eece5484",
+    "docs/verification/IM-01/im01-3/debug-tests.log": "c3aa03c6dd02cee1614a5cc668d1166cb4eedb6d4e0d6dc1ad24e9cb6e26e3d5",
+    "docs/verification/IM-01/im01-3/execution-CMakeLists.txt": "b0fd0eafded987d6bacd99231b360355bf76511c6fd6094642262e52c1df0a32",
+    "docs/verification/IM-01/im01-3/execution-tests-CMakeLists.txt": "fab3f5cfe47930ce6362a0d16cc9764587a0aab0ce64dd04d38c1eb89c7aaf2d",
+    "docs/verification/IM-01/im01-3/japanese-lint.json": "90ee14389a2818bbf158e60c3fe7f4110dc73616f4d29fbc91f232f44ae38bd6",
+    "docs/verification/IM-01/im01-3/jet-build-info-debug.json": "f3cd84ca17464769828b2a99bb002629bbe41bde71f40feb518d7da923944362",
+    "docs/verification/IM-01/im01-3/jet-build-info-release.json": "9ce5865952eb4222be0f2e443128b73b8c327fd1927f61313b7959511b0431a2",
+    "docs/verification/IM-01/im01-3/jet-debug-build.log": "856c339e53c46fd56a5a6cc8f4a5d0939b69e36a623ba065924b196665d6b4b1",
+    "docs/verification/IM-01/im01-3/jet-debug-test.log": "2b126ac039eae4eaf636c1e7842a78808b3b1275f41acb74ad9919b7cdb9dd8c",
+    "docs/verification/IM-01/im01-3/jet-normal-tidy.log": "68ca0ee6038d30939f0b883133f03db649c7b7f78532d5ed1d80c59392cf04da",
+    "docs/verification/IM-01/im01-3/jet-release-build.log": "2f2cb8a66f7bbf5451582c33148f20f7c2ccd118f343cbbad949dfaf911e6a70",
+    "docs/verification/IM-01/im01-3/jet-release-test.log": "737d95052ee09ceb998539059795aba990c871c4df3bea2bee2ba761cb93db74",
+    "docs/verification/IM-01/im01-3/jet-tidy-result.json": "b3f5598b4451d698261045722a477d7fe31bc58c01cc1d7ee92b451a5e2248ba",
+    "docs/verification/IM-01/im01-3/jet-validation-results.json": "a6eca4bff0d101ac9f10c9e546c90af1e71dc22300ce8ebe765655b595da60c4",
+    "docs/verification/IM-01/im01-3/jet-validation-runner.py": "528ec3b72c9900b4cd5325412c5de46f271159a994bebd79d38f6bd6b34c0747",
+    "docs/verification/IM-01/im01-3/mutation-summary.json": "9cac1f8dbc94f255920cd996cd6bbeaa0526b72c3ab7906e1e87f6edae037783",
+    "docs/verification/IM-01/im01-3/n4-build-probe.py": "88344cacb4f448371ec39a64a9c986548d23a73ba5b23ad6fd94fcd88c4a18aa",
+    "docs/verification/IM-01/im01-3/n4-compile-command.txt": "7b1ee4e98def372dacb530bc0e32b7d6c72cdf9aeecbc5d05107b3faf3764fd6",
+    "docs/verification/IM-01/im01-3/n4-compile.log": "6e992b7ea5890c545457b20eb4bdd5d0424437cf5aefbc7b8de08721f4bbc33c",
+    "docs/verification/IM-01/im01-3/n4-link-command.json": "572c29161e62f03419f7828adb8f23b8df7cda43ccc13cb510d4d65779a41f7f",
+    "docs/verification/IM-01/im01-3/n4-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-01/im01-3/n4-probe.cpp": "6ce58a088af7df027a6df3a09e367b414a6c3cb462a0c72274f41b80236f220e",
+    "docs/verification/IM-01/im01-3/n4-stage-execution.json": "a49ef4f7b22ee926ca9250281ae930acf93ec1f877b36c23359df69bfb267f16",
+    "docs/verification/IM-01/im01-3/n4-stage-observation.json": "ace04b1cc3ee8bfd2b018109bad32503f540ae0a1b0f884363b4a619c2fc0035",
+    "docs/verification/IM-01/im01-3/numeric-test-rule-addendum.md": "a8c53e12ad896dd16010d741df61b20b565d666612a5de4bbcf4fe8be2076f52",
+    "docs/verification/IM-01/im01-3/preliminary-membrane-corrected.log": "90fa0b6f9737678d24dac67cab021a4e97751f701d62a69dc9b8d966461ab41d",
+    "docs/verification/IM-01/im01-3/preliminary-membrane-expectation-failed.log": "cfb60c51d550ba6cc19707d5f2235ac8c9e192191d24d4e612b5379bf71a6646",
+    "docs/verification/IM-01/im01-3/preliminary-six-factories.log": "936c9387c9ecfdbae8bc43c0daa5c63d71053fd6dc584f59a49162f81c60a42d",
+    "docs/verification/IM-01/im01-3/redaction-record.json": "4c32db8721370bd1ed33049461a964ad4e618adb5dc1e5f7a7ad6b51f3f8856e",
+    "docs/verification/IM-01/im01-3/redaction.json": "abc9e51d7ac4f3a6d3fa6495605278310459d160de8282a8f4c992b4000b9420",
+    "docs/verification/IM-01/im01-3/release-build.log": "66fdff70f3f2dd57da6243c6cbea8c74b31ccd5642610a8159f1a11cd5318fca",
+    "docs/verification/IM-01/im01-3/release-catch.log": "053d3fce5f620af9a25965c70928e44efd1213e2bf8709fb7cdf5598b479c9e0",
+    "docs/verification/IM-01/im01-3/release-tests.log": "0653a49cab86aa90444449f3d329fb4ef6cca10e2fbe716399c40c4458a9ce0d",
+    "docs/verification/IM-01/im01-3/seven-mutations.zip": "656d30b74a9a544046a38e8317cd65b3580b4bd94d7755e53f935e957c931335",
+    "docs/verification/IM-01/im01-3/source-executable-bindings.json": "cc6650df5f4175a42e93943c53eaf4d3831fd070e16feb20b69493636446b8de",
+    "docs/verification/IM-01/im01-3/static-summary.json": "ff4003a104ebf9f205713c3ef3db4ea4d0bec34b6cbf1f1bc53022f7e8c027b6",
+    "docs/verification/IM-01/im01-3/test-strengthening-bridge.json": "d0f9fff0c036cb2c4bf9d18fc0a550c62af1e27abe79ab594ce0e6a85619ae48",
+    "docs/verification/IM-01/im01-3/test-strengthening.diff": "6ca24c240a0f1a978742358899dfb666bd1f7bb6ee5e2c1d8ccb266873b475e4",
+    "docs/verification/IM-01/im01-3/tidy-final-runner.py": "9d7b9896a501d4df430a382031b2daca81361aeee678475a5d08a60b8a43c7ee",
+    "docs/verification/IM-01/im01-3/tidy-normal-final.log": "7face4a29592911686e5e1933aa9cbd3ba0c4b52e93e9058739ab79dbb0ae1bb",
+    "docs/verification/IM-01/im01-3/tidy-normal-initial.log": "902795c2cbff62656501060e6109527ce8149cd49063fefb1c2975c2f506d23a",
+    "docs/verification/IM-01/im01-3/tidy-producer-final.log": "32845c32d13b7e6569faf81a983b630fd3635cb437754e82a3592a241ff106b8",
+    "docs/verification/IM-01/im01-3/tidy-producer-initial.log": "fc9e22e35d15e20cc6ccad58d6125c56869c68e49c27ea732fa543289555720a",
+    "docs/verification/IM-01/im01-3/tidy-producer-intermediate.log": "39bc0b3c1164b35a3b034070c6745ca2caffca0616d056ffa59bd73e48009b22",
+    "docs/verification/IM-01/im01-3/tidy-resource-final.log": "3314bc5f1c98ef754ab8f3e32adf0a3a4f279f28c019e7044f534a1aa0f3b68f",
+    "docs/verification/IM-01/im01-3/validation-results.json": "0b7384ee1a8c8b29307613a07a094e682077267705f86eeb8e0766cad6a071ea",
+    "docs/verification/IM-01/im01-3/validation-runner.py": "5c226dda600b0df511dc41047ac14fe00b1e2e008d5135632c07374e4e2839e4"
+  },
+  "id": "im01-3-pg-full-dictionary-verification",
+  "source_references": [
+    {
+      "id": "im01-3-source-docs-specs-structure-pg-full-dictionary-contract-md",
+      "sha256": "d784f710b2c233e49fbab714467a2595c6af40e032b0af21256b4f209e48e465",
+      "hint": "docs/specs/structure/pg-full-dictionary-contract.md"
+    },
+    {
+      "id": "im01-3-source-include-uvlas-structure-exact_polynomial-hpp",
+      "sha256": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+      "hint": "include/uvlas/structure/exact_polynomial.hpp"
+    },
+    {
+      "id": "im01-3-source-include-uvlas-structure-pg_coefficients-hpp",
+      "sha256": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+      "hint": "include/uvlas/structure/pg_coefficients.hpp"
+    },
+    {
+      "id": "im01-3-source-include-uvlas-structure-pg_graph-hpp",
+      "sha256": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+      "hint": "include/uvlas/structure/pg_graph.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-exact_polynomial-cpp",
+      "sha256": "dda9fd5d178637207d15a8bed4e876e486fa3b43c7ab988937fdf2be33794ab1",
+      "hint": "src/structure/exact_polynomial.cpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-exact_polynomial_detail-hpp",
+      "sha256": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+      "hint": "src/structure/exact_polynomial_detail.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients-cpp",
+      "sha256": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+      "hint": "src/structure/pg_coefficients.cpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_algebra-hpp",
+      "sha256": "852bb0a0d5d29e16f9d07a27bd531b2b0c831ca4422deef3a9f54303758b3209",
+      "hint": "src/structure/pg_coefficients_algebra.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_anchor-hpp",
+      "sha256": "17cde20bfff7c0cb04f2562410c71bcf1c08cedbd6d93bb12ed37f55d62838c7",
+      "hint": "src/structure/pg_coefficients_anchor.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_basis-hpp",
+      "sha256": "77345b448252571156f957fdc17498083988dcc89d662625c039cd0f26ee7da2",
+      "hint": "src/structure/pg_coefficients_basis.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_detail-hpp",
+      "sha256": "fa59a656d2985df65ca26ad3b3316a2662169b128c1e7c0a03ac261ef857b01a",
+      "hint": "src/structure/pg_coefficients_detail.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_generate-hpp",
+      "sha256": "e9f50eb488e9ecf91884896a917da63e27d029e00710978a956c8606f0c02949",
+      "hint": "src/structure/pg_coefficients_generate.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_maps-hpp",
+      "sha256": "0d9f4b2aa0d72effcbb92577806f595daa8520ba24d318700888a71ca883f8b7",
+      "hint": "src/structure/pg_coefficients_maps.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_coefficients_plan-hpp",
+      "sha256": "307961ba5c89fb02974c4a7ae5ff3e633cc2c4afc74adff3bc13ed601842a890",
+      "hint": "src/structure/pg_coefficients_plan.hpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_graph-cpp",
+      "sha256": "dd4f1209f1b13b58df99e9bab5fa6d14f2ff67c5dc6e7a6fe9b993ad3587642e",
+      "hint": "src/structure/pg_graph.cpp"
+    },
+    {
+      "id": "im01-3-source-src-structure-pg_graph_detail-hpp",
+      "sha256": "6bec2c119487ef5459045c9c735a78004921099e885bc0d5f1b50a822a16bb54",
+      "hint": "src/structure/pg_graph_detail.hpp"
+    },
+    {
+      "id": "im01-3-source-tests-structure-fixtures-generate_pg_coefficients-py",
+      "sha256": "d8c4e159a8de4c982a3c07b3389e724f954cc6b39fb9ec40d8f6eccefc46208e",
+      "hint": "tests/structure/fixtures/generate_pg_coefficients.py"
+    },
+    {
+      "id": "im01-3-source-tests-structure-fixtures-pg-coefficients-v1-json",
+      "sha256": "1d291d43ca60796b6a662a35252bc19a3393562f6da226356acebc7a65ceef1b",
+      "hint": "tests/structure/fixtures/pg-coefficients-v1.json"
+    },
+    {
+      "id": "im01-3-source-tests-structure-pg_coefficients_reference_test-cpp",
+      "sha256": "d23013e3c93476f1593efdd4b8611497d496757ba7f0a36e1e548669155ebcf0",
+      "hint": "tests/structure/pg_coefficients_reference_test.cpp"
+    },
+    {
+      "id": "im01-3-source-tests-structure-pg_coefficients_resource_test-cpp",
+      "sha256": "f33bc80435fb0f49e43490917b1e7e553632075a53229a1a66697967650ea768",
+      "hint": "tests/structure/pg_coefficients_resource_test.cpp"
+    },
+    {
+      "id": "im01-3-source-tests-structure-pg_coefficients_test-cpp",
+      "sha256": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be",
+      "hint": "tests/structure/pg_coefficients_test.cpp"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-build-info-debug-json",
+      "sha256": "074c8521925747d510875fb9d5ff18e24ea2d1c9a293feb0ed4af63248b67ec9",
+      "hint": "docs/verification/IM-01/im01-3/build-info-debug.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-build-info-release-json",
+      "sha256": "23d4e1cc518d753f5e1011e796823677b8c588338f0c774037e5d3f2050e1bf8",
+      "hint": "docs/verification/IM-01/im01-3/build-info-release.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-comment-source-bridge-json",
+      "sha256": "20f409b3a8ae002b2d07cae04eddc0bc36cc3ffe1fcbd98d52266733042fbd0d",
+      "hint": "docs/verification/IM-01/im01-3/comment-source-bridge.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-debug-build-log",
+      "sha256": "c5231e8c034d09e8c69dde552d67caa91cbd4b895a0d9afb1d460d52eece5484",
+      "hint": "docs/verification/IM-01/im01-3/debug-build.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-debug-tests-log",
+      "sha256": "c3aa03c6dd02cee1614a5cc668d1166cb4eedb6d4e0d6dc1ad24e9cb6e26e3d5",
+      "hint": "docs/verification/IM-01/im01-3/debug-tests.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-execution-CMakeLists-txt",
+      "sha256": "b0fd0eafded987d6bacd99231b360355bf76511c6fd6094642262e52c1df0a32",
+      "hint": "docs/verification/IM-01/im01-3/execution-CMakeLists.txt"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-execution-tests-CMakeLists-txt",
+      "sha256": "fab3f5cfe47930ce6362a0d16cc9764587a0aab0ce64dd04d38c1eb89c7aaf2d",
+      "hint": "docs/verification/IM-01/im01-3/execution-tests-CMakeLists.txt"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-japanese-lint-json",
+      "sha256": "90ee14389a2818bbf158e60c3fe7f4110dc73616f4d29fbc91f232f44ae38bd6",
+      "hint": "docs/verification/IM-01/im01-3/japanese-lint.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-build-info-debug-json",
+      "sha256": "f3cd84ca17464769828b2a99bb002629bbe41bde71f40feb518d7da923944362",
+      "hint": "docs/verification/IM-01/im01-3/jet-build-info-debug.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-build-info-release-json",
+      "sha256": "9ce5865952eb4222be0f2e443128b73b8c327fd1927f61313b7959511b0431a2",
+      "hint": "docs/verification/IM-01/im01-3/jet-build-info-release.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-debug-build-log",
+      "sha256": "856c339e53c46fd56a5a6cc8f4a5d0939b69e36a623ba065924b196665d6b4b1",
+      "hint": "docs/verification/IM-01/im01-3/jet-debug-build.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-debug-test-log",
+      "sha256": "2b126ac039eae4eaf636c1e7842a78808b3b1275f41acb74ad9919b7cdb9dd8c",
+      "hint": "docs/verification/IM-01/im01-3/jet-debug-test.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-normal-tidy-log",
+      "sha256": "68ca0ee6038d30939f0b883133f03db649c7b7f78532d5ed1d80c59392cf04da",
+      "hint": "docs/verification/IM-01/im01-3/jet-normal-tidy.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-release-build-log",
+      "sha256": "2f2cb8a66f7bbf5451582c33148f20f7c2ccd118f343cbbad949dfaf911e6a70",
+      "hint": "docs/verification/IM-01/im01-3/jet-release-build.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-release-test-log",
+      "sha256": "737d95052ee09ceb998539059795aba990c871c4df3bea2bee2ba761cb93db74",
+      "hint": "docs/verification/IM-01/im01-3/jet-release-test.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-tidy-result-json",
+      "sha256": "b3f5598b4451d698261045722a477d7fe31bc58c01cc1d7ee92b451a5e2248ba",
+      "hint": "docs/verification/IM-01/im01-3/jet-tidy-result.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-validation-results-json",
+      "sha256": "a6eca4bff0d101ac9f10c9e546c90af1e71dc22300ce8ebe765655b595da60c4",
+      "hint": "docs/verification/IM-01/im01-3/jet-validation-results.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-jet-validation-runner-py",
+      "sha256": "528ec3b72c9900b4cd5325412c5de46f271159a994bebd79d38f6bd6b34c0747",
+      "hint": "docs/verification/IM-01/im01-3/jet-validation-runner.py"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-mutation-summary-json",
+      "sha256": "9cac1f8dbc94f255920cd996cd6bbeaa0526b72c3ab7906e1e87f6edae037783",
+      "hint": "docs/verification/IM-01/im01-3/mutation-summary.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-build-probe-py",
+      "sha256": "88344cacb4f448371ec39a64a9c986548d23a73ba5b23ad6fd94fcd88c4a18aa",
+      "hint": "docs/verification/IM-01/im01-3/n4-build-probe.py"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-compile-command-txt",
+      "sha256": "7b1ee4e98def372dacb530bc0e32b7d6c72cdf9aeecbc5d05107b3faf3764fd6",
+      "hint": "docs/verification/IM-01/im01-3/n4-compile-command.txt"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-compile-log",
+      "sha256": "6e992b7ea5890c545457b20eb4bdd5d0424437cf5aefbc7b8de08721f4bbc33c",
+      "hint": "docs/verification/IM-01/im01-3/n4-compile.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-link-command-json",
+      "sha256": "572c29161e62f03419f7828adb8f23b8df7cda43ccc13cb510d4d65779a41f7f",
+      "hint": "docs/verification/IM-01/im01-3/n4-link-command.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-link-log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-01/im01-3/n4-link.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-probe-cpp",
+      "sha256": "6ce58a088af7df027a6df3a09e367b414a6c3cb462a0c72274f41b80236f220e",
+      "hint": "docs/verification/IM-01/im01-3/n4-probe.cpp"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-stage-execution-json",
+      "sha256": "a49ef4f7b22ee926ca9250281ae930acf93ec1f877b36c23359df69bfb267f16",
+      "hint": "docs/verification/IM-01/im01-3/n4-stage-execution.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-n4-stage-observation-json",
+      "sha256": "ace04b1cc3ee8bfd2b018109bad32503f540ae0a1b0f884363b4a619c2fc0035",
+      "hint": "docs/verification/IM-01/im01-3/n4-stage-observation.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-numeric-test-rule-addendum-md",
+      "sha256": "a8c53e12ad896dd16010d741df61b20b565d666612a5de4bbcf4fe8be2076f52",
+      "hint": "docs/verification/IM-01/im01-3/numeric-test-rule-addendum.md"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-preliminary-membrane-corrected-log",
+      "sha256": "90fa0b6f9737678d24dac67cab021a4e97751f701d62a69dc9b8d966461ab41d",
+      "hint": "docs/verification/IM-01/im01-3/preliminary-membrane-corrected.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-preliminary-membrane-expectation-failed-log",
+      "sha256": "cfb60c51d550ba6cc19707d5f2235ac8c9e192191d24d4e612b5379bf71a6646",
+      "hint": "docs/verification/IM-01/im01-3/preliminary-membrane-expectation-failed.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-preliminary-six-factories-log",
+      "sha256": "936c9387c9ecfdbae8bc43c0daa5c63d71053fd6dc584f59a49162f81c60a42d",
+      "hint": "docs/verification/IM-01/im01-3/preliminary-six-factories.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-redaction-record-json",
+      "sha256": "4c32db8721370bd1ed33049461a964ad4e618adb5dc1e5f7a7ad6b51f3f8856e",
+      "hint": "docs/verification/IM-01/im01-3/redaction-record.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-redaction-json",
+      "sha256": "abc9e51d7ac4f3a6d3fa6495605278310459d160de8282a8f4c992b4000b9420",
+      "hint": "docs/verification/IM-01/im01-3/redaction.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-release-build-log",
+      "sha256": "66fdff70f3f2dd57da6243c6cbea8c74b31ccd5642610a8159f1a11cd5318fca",
+      "hint": "docs/verification/IM-01/im01-3/release-build.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-release-catch-log",
+      "sha256": "053d3fce5f620af9a25965c70928e44efd1213e2bf8709fb7cdf5598b479c9e0",
+      "hint": "docs/verification/IM-01/im01-3/release-catch.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-release-tests-log",
+      "sha256": "0653a49cab86aa90444449f3d329fb4ef6cca10e2fbe716399c40c4458a9ce0d",
+      "hint": "docs/verification/IM-01/im01-3/release-tests.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-seven-mutations-zip",
+      "sha256": "656d30b74a9a544046a38e8317cd65b3580b4bd94d7755e53f935e957c931335",
+      "hint": "docs/verification/IM-01/im01-3/seven-mutations.zip"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-source-executable-bindings-json",
+      "sha256": "cc6650df5f4175a42e93943c53eaf4d3831fd070e16feb20b69493636446b8de",
+      "hint": "docs/verification/IM-01/im01-3/source-executable-bindings.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-static-summary-json",
+      "sha256": "ff4003a104ebf9f205713c3ef3db4ea4d0bec34b6cbf1f1bc53022f7e8c027b6",
+      "hint": "docs/verification/IM-01/im01-3/static-summary.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-test-strengthening-bridge-json",
+      "sha256": "d0f9fff0c036cb2c4bf9d18fc0a550c62af1e27abe79ab594ce0e6a85619ae48",
+      "hint": "docs/verification/IM-01/im01-3/test-strengthening-bridge.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-test-strengthening-diff",
+      "sha256": "6ca24c240a0f1a978742358899dfb666bd1f7bb6ee5e2c1d8ccb266873b475e4",
+      "hint": "docs/verification/IM-01/im01-3/test-strengthening.diff"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-final-runner-py",
+      "sha256": "9d7b9896a501d4df430a382031b2daca81361aeee678475a5d08a60b8a43c7ee",
+      "hint": "docs/verification/IM-01/im01-3/tidy-final-runner.py"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-normal-final-log",
+      "sha256": "7face4a29592911686e5e1933aa9cbd3ba0c4b52e93e9058739ab79dbb0ae1bb",
+      "hint": "docs/verification/IM-01/im01-3/tidy-normal-final.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-normal-initial-log",
+      "sha256": "902795c2cbff62656501060e6109527ce8149cd49063fefb1c2975c2f506d23a",
+      "hint": "docs/verification/IM-01/im01-3/tidy-normal-initial.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-producer-final-log",
+      "sha256": "32845c32d13b7e6569faf81a983b630fd3635cb437754e82a3592a241ff106b8",
+      "hint": "docs/verification/IM-01/im01-3/tidy-producer-final.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-producer-initial-log",
+      "sha256": "fc9e22e35d15e20cc6ccad58d6125c56869c68e49c27ea732fa543289555720a",
+      "hint": "docs/verification/IM-01/im01-3/tidy-producer-initial.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-producer-intermediate-log",
+      "sha256": "39bc0b3c1164b35a3b034070c6745ca2caffca0616d056ffa59bd73e48009b22",
+      "hint": "docs/verification/IM-01/im01-3/tidy-producer-intermediate.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-tidy-resource-final-log",
+      "sha256": "3314bc5f1c98ef754ab8f3e32adf0a3a4f279f28c019e7044f534a1aa0f3b68f",
+      "hint": "docs/verification/IM-01/im01-3/tidy-resource-final.log"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-validation-results-json",
+      "sha256": "0b7384ee1a8c8b29307613a07a094e682077267705f86eeb8e0766cad6a071ea",
+      "hint": "docs/verification/IM-01/im01-3/validation-results.json"
+    },
+    {
+      "id": "im01-3-artifact-docs-verification-IM-01-im01-3-validation-runner-py",
+      "sha256": "5c226dda600b0df511dc41047ac14fe00b1e2e008d5135632c07374e4e2839e4",
+      "hint": "docs/verification/IM-01/im01-3/validation-runner.py"
+    }
+  ],
+  "comment_only_source_bridge": {
+    "artifact": "docs/verification/IM-01/im01-3/comment-source-bridge.json",
+    "note": "旧de292→中間2コメント版のexact置換を保存。その後の実jet直接比較補強と最終testSHAは別test-strengthening-bridgeで追跡する。旧実行sourceのhashを新しい成功sourceへ差し替えない。"
+  },
+  "test_strengthening": {
+    "source_commit": "998ae1312afb76ccb0910391dce9c6f3331e3283",
+    "artifact": "docs/verification/IM-01/im01-3/test-strengthening-bridge.json",
+    "note": "元fullsuiteと変異のexecution_source_hashesはde292のまま。現在testSHAは実jet直接比較を補強した998ae13版で、追加1caseだけclean D/R各463681assert/1case＋当該TU tidy0。その他の新製品14sourceはbyte不変。"
+  },
+  "record_correction": "numeric-tests規約へ、製品の実値/実微分を独立oracleへ照合してから不変量を評価し、oracle自身の残差だけを製品検証と数えない教訓を限定追記。同じPRの実装/精度/物理範囲は変えない。",
+  "whitespace_exceptions": {
+    "files": [
+      "docs/verification/IM-01/im01-3/execution-CMakeLists.txt",
+      "docs/verification/IM-01/im01-3/jet-debug-test.log",
+      "docs/verification/IM-01/im01-3/jet-release-test.log",
+      "docs/verification/IM-01/im01-3/numeric-test-rule-addendum.md",
+      "docs/verification/IM-01/im01-3/preliminary-membrane-corrected.log",
+      "docs/verification/IM-01/im01-3/preliminary-membrane-expectation-failed.log",
+      "docs/verification/IM-01/im01-3/preliminary-six-factories.log",
+      "docs/verification/IM-01/im01-3/release-catch.log",
+      "docs/verification/IM-01/im01-3/tidy-normal-initial.log",
+      "docs/verification/IM-01/im01-3/tidy-producer-initial.log"
+    ],
+    "reason": "compiler提案行末、Catch原出力・実行版CMake blob・規約抜粋の末尾空行を原文保持。通常コード/文書と新規human JSONは除外しない。"
+  }
+}

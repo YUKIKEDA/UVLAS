@@ -1,0 +1,192 @@
+{
+  "source_set_encoding": "UTF-8 JSON map of repository-relative paths to lowercase file SHA256, sorted keys, separators comma/colon, no newline",
+  "base_source_set": "source-set.json working_snapshot; a mutant replaces exactly changed_path",
+  "all_snapshot_files_verified": true,
+  "executed_object_files_verified": true,
+  "variants": [
+    {
+      "name": "control",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "648ed4fc92d948b4b43a918e14f5f728be94dc9b95289dd4681e38ed7220c7bc",
+      "changed_path": null,
+      "changed_source_sha256": null,
+      "objects": {
+        "producer": "6af5b234f9d470a8b649d9ecd6b084d07e1fde00ba0f2d17c4c48863bcd19ffb",
+        "normal": "b90eaca7c81e5b064492aa1dce329b463213fa934212b223c9f149c3ab606f30",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "bcd1ac67e24ed32ad7aced208f5fa2f3fbafaedb870a2c2b040ab722871dbded",
+      "map_sha256": "b6ae456b28a6f2ccc788ee34935e2a7dfe32fc1b31ee1831e48f69b82a6e760f",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "omit-t-family",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "610b8991c481fc5b1051d0a82dca822fb5d097a84bc76fd2040991efe744b598",
+      "changed_path": "src/structure/pg_coefficients_generate.hpp",
+      "changed_source_sha256": "0a1647686d93a8f4fe77f6ff581a30942e87853f286f9158733a4b2d44a53dc8",
+      "objects": {
+        "producer": "c8d2c41d9ba73722306c45d6e4b3888773481a615e0690d884d106c0e85328ed",
+        "normal": "fad4fbe87d32335b6d9d79d37e10172c4ef5646f95266027b0e646eb1208a1ed",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "0a04865f7249b3d96f961a3e3470445a8e7f5b7bf52934d4aa1dab92a1420b3d",
+      "map_sha256": "6cc4075cb0d8b6c9e0e1b216c5a96b2929898444f54c67eb545bbf05033c87e6",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "reset-moment-carry",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "b4e6a00070481f50a845dcc58b33eb9cd0db036e4ba58dc243c02a3fc77366a0",
+      "changed_path": "src/structure/pg_coefficients_algebra.hpp",
+      "changed_source_sha256": "0fb15e4ac6beab51fdd05411fa96224bdba106415f0716f90234fe3e60bda188",
+      "objects": {
+        "producer": "34d2b878f53a6d90382c8acc96dc809786f07c8b76875f512fdc76eee1697fd1",
+        "normal": "eaf4a37ce88bf3ca7c96a5cf2f597368793c5fc76d426addd49f8dd86b1f3794",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "a716ded1ca3756893019384c754fb7de2a9efc133e8363b1ed97c6b970e495e3",
+      "map_sha256": "5ba0a14797f741744070e348bbf8dc0a56493954424b80e66dd0757e314a9ff2",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "reverse-director-x-sign",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "e3b36b2a59902176edddd9259a9bde006eb287a0beafca78997c1c7f3990a3fe",
+      "changed_path": "src/structure/pg_coefficients_algebra.hpp",
+      "changed_source_sha256": "cac0af8d7e2af3a9ba3a20f8e10da0d0c27525c896c79cc8b8b3230428f5638e",
+      "objects": {
+        "producer": "028a335287588a93315d12a5a6da6291669fc7184ad1472af22a4516a2537a00",
+        "normal": "f069e52f5bf69f8664b14644d2f5fb753e883aeb68a51e0b95c694cf0f15866d",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "a7e82112fd895b00b59fd731b70ddbe3ba3bd328989fe1585835255977228696",
+      "map_sha256": "8fa6d175795e72872cbdc3f66a49f5420cb378dbe8c4a1774c7eda6e523214ca",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "replace-4n-by-3n",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "63ce326c78069c08c5bae06225d14eaf670c9a36d8e0d1224a0e0bdadba9bef0",
+      "changed_path": "src/structure/pg_coefficients.cpp",
+      "changed_source_sha256": "e61686ef58e8ed414b91e5a290edc131f6b4ec60d7ff027a66b9f665f63d1417",
+      "objects": {
+        "producer": "80afdfbf9a24a9c32ae3feae153fd17798c69cae6c31d1416b7f3b1177adb1d9",
+        "normal": "b90eaca7c81e5b064492aa1dce329b463213fa934212b223c9f149c3ab606f30",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "ee9470455e4a0cfb849cbc2ee2825e5518528de744077a9cf565110b6d74bb52",
+      "map_sha256": "55a02e121a474c264881cacfd975bddc89e005440de5d58bc189989da7c8270d",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "anchor-at-each-cell-left",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "67fb1102a62271376c699168e33530e82c6036fc3f562f2a32ff147191d62645",
+      "changed_path": "src/structure/pg_coefficients_anchor.hpp",
+      "changed_source_sha256": "fe1f04475fe1fb81d079d7c4b318a48661cdda77b452ed0e916a56b098cc5dea",
+      "objects": {
+        "producer": "d6467e579a52562ebce5e81dd563a46317f6b7461091620aaf1f6c5ff52c031d",
+        "normal": "a659cacd75ba8c67693c6db9a514d103d0f79cc8fa60971d16f533d93bc8ac84",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "4911b763fc4bd26eafd2ac7f3f26ea9236aaa6b766e60df2cd15410a63d7e1c4",
+      "map_sha256": "c8401c4e17db2b460f5985b659ea4c1ef1c9d15f34f2221ededa3d958bfd29e4",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "omit-p-anchor-family",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "6991b2555dcce81b99f7c6f1560deea04f734ce663c730445bfb6d4e3e3f5f4c",
+      "changed_path": "src/structure/pg_coefficients_anchor.hpp",
+      "changed_source_sha256": "aa20310628c2523e1e05dbc52eea37b117f8edb8470da366ae43dd609279d1c6",
+      "objects": {
+        "producer": "9f7641bb5a80763599bd46e942a2d111a05f42868b53832f302d183b15c77ae4",
+        "normal": "05d8b4ed4b3943349e584551946617c6290472302b66104a559fb9476b234f1b",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "ba3898c92f5cd9c8ee8f711376c0738f59d89b93336b60abbbcda21c87ee6c5d",
+      "map_sha256": "b5b65a3184556207a0d4e482a64f783eb552cfa69665675349523ac19f42ea6f",
+      "archive_producer_extractions": 0
+    },
+    {
+      "name": "omit-required-map",
+      "original_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+      "source_set_sha256": "d4754d2508c4714e8f7c32f6946511e10425caba5bf85c0e968f59e3a7b2dd8c",
+      "changed_path": "src/structure/pg_coefficients.cpp",
+      "changed_source_sha256": "30d5b04b3469367a0033cdccdc14728c1fb45e3fbb4216e42264f2375c187ba0",
+      "objects": {
+        "producer": "f761b2d60e06cd28c594fa9a7df603f95936beb91d30436614c78dff836bcdc0",
+        "normal": "b90eaca7c81e5b064492aa1dce329b463213fa934212b223c9f149c3ab606f30",
+        "reference": "1d9b8e4c112fde5581439e05cc8d87fd51590f8275dd24f49fd72eddb98c671f"
+      },
+      "libraries": {
+        "uvlas_structure.lib": "f08c900877bcc2b32c127696477ae9e5a860ceb742c62f56d8d7fae64497809a",
+        "uvlas_core.lib": "b312c525b67f90c25d2f990693b99a67b85adbaff2f23d4c0bdb4c674afe5514",
+        "Catch2Main.lib": "bdca3a718b2b9213de839e2e4e68bd5f303762f40be7f746830010cca2747739",
+        "Catch2.lib": "2b1397fd59f585f86a0d636f3d3a75373ed7d0bd560b5fc3ad24bdc3d584a579",
+        "boost_container-vc145-mt-x64-1_92.lib": "45b7400ad1ef4fc8d4a769f0eede49ebc380b7ac84341864c5999478edd813e5",
+        "boost_random-vc145-mt-x64-1_92.lib": "4c05f01255d7859e820c75f0135cb34d972e168d25e5300528c60f878e19f265"
+      },
+      "executable_sha256": "964f02f0943ca8fcdc88098e202ae53b00362a4f1d8aff74ec53a56117a6a551",
+      "map_sha256": "8aaa39c639c8ce0d8b8dae3ebdb5f4d9961a138aef8ddd6bff9c6e9295e72a8b",
+      "archive_producer_extractions": 0
+    }
+  ]
+}
