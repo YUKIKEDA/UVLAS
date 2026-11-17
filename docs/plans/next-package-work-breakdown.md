@@ -26,6 +26,8 @@ PR #89〜#91はmain `0f201a39dfb849115f90c559fec67f13e75c7645`へ統合済み。
 
 3件の実装は互いの成果物を必要としない。開始条件を独立に審査し、それぞれ別branch/worktree、別ビルド先で進める。PGと空力のexact数値資源を、JSONの外部parser計画へ流用しない。
 
+入力文書の開始審査で、MSVC Debugの固定JSON依存が割当失敗時にterminateし得ることを独立processで確認した。[依存補修の判断](../adr/0007-json-sax-allocation-exceptions.md)をIssue #98、正式portの補修・検証を #99で扱う。IM06-2の文書コードは補修依存とforecastの検証後に開始する。PGと空力はこのgateに依存しない。
+
 共通CMake・conventionsは統合担当が各branchへ追加する。製品本体と独立試験の実装を並列に進め、提出時のロードマップ・追跡表だけを順に統合する。所有者の製品判断が新たに必要な変更がなければ、操作ごとの確認待ちは挟まない。各子は親Issueへ残る段階と未認定の状態を明記する。
 
 ## IM-01：exact係数から全trace・疎chartへつなぐ
