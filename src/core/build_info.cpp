@@ -10,6 +10,12 @@
 
 #include <format>
 
+// An unpatched prefix is still identifiable for historical/diagnostic builds.
+// Input-document consumers and the regression require repair revision one.
+#ifndef UVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR
+#define UVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR 0
+#endif
+
 // The widest instruction set the compiler may use for this build. It is part
 // of the platform key: raising it is a change of numerics (QA-07).
 #if defined(__AVX512F__)
@@ -55,7 +61,8 @@ std::string build_info_json() {
                        "    \"spectra\": \"{}.{}.{}\",\n"
                        "    \"boost\": \"{}.{}.{}\",\n"
                        "    \"nlohmann_json\": \"{}.{}.{}\"\n"
-                       "  }}\n"
+                       "  }},\n"
+                       "  \"dependency_repairs\": {{\"nlohmann_json_sax_allocation\": {}}}\n"
                        "}}\n",
                        info.version, info.commit, info.uncommitted_changes, info.compiler,
                        info.platform, info.configuration, info.floating_point, info.instruction_set,
@@ -63,7 +70,8 @@ std::string build_info_json() {
                        EIGEN_PATCH_VERSION, SPECTRA_MAJOR_VERSION, SPECTRA_MINOR_VERSION,
                        SPECTRA_PATCH_VERSION, BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000,
                        BOOST_VERSION % 100, NLOHMANN_JSON_VERSION_MAJOR,
-                       NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH);
+                       NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH,
+                       UVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR);
 }
 
 } // namespace uvlas

@@ -32,7 +32,7 @@ struct BuildInfo {
 /// Return binary provenance by value without allocation; views borrow static storage.
 [[nodiscard]] BuildInfo build_info() noexcept;
 
-/// Return owned JSON containing provenance and numerical dependency versions.
+/// Return owned JSON containing provenance, dependency versions and source-repair revisions.
 /// @throws std::bad_alloc If serialization cannot allocate memory.
 /// Allocation exceptions propagate to the caller; catch them if invoking this
 /// diagnostic function from an exception-free application boundary.
