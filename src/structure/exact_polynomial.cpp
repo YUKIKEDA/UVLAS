@@ -101,10 +101,10 @@ void check_axis(ExactAxis axis) {
     if (axis != ExactAxis::First && axis != ExactAxis::Second)
         stop(core::FailureCode::InvalidInput);
 }
-enum class Scratch : std::uint8_t { Rational, Normalize, Compare, Copy };
+enum class Scratch : std::uint8_t { RationalOperation, Normalize, Compare, Copy };
 ExactPreparationInfo admit(const ExactLimits& limits, std::uint64_t work, std::uint64_t raw,
                            std::uint64_t borrowed, std::uint64_t slots = 7,
-                           Scratch scratch = Scratch::Rational) {
+                           Scratch scratch = Scratch::RationalOperation) {
     if (work > limits.maximum_work_bits || raw > limits.maximum_raw_terms)
         stop(core::FailureCode::ResourceExceeded);
     if (std::holds_alternative<ExactRequireProvenBound>(limits.external_memory))
@@ -754,8 +754,10 @@ core::Result<PolynomialValue> differentiate_polynomial(const PolynomialValue& va
             if (d >= order)
                 ++count;
         }
-        const auto growth =
-            count == 0 ? 0 : times(static_cast<std::uint64_t>(order), std::bit_width(degree));
+        // bit_width of uint64_t is an int in [0,64]; this conversion is exact.
+        const auto growth = count == 0 ? 0
+                                       : times(static_cast<std::uint64_t>(order),
+                                               static_cast<std::uint64_t>(std::bit_width(degree)));
         const auto info = poly_plan(limits, merge_bound(count, plus(initial, growth)), count,
                                     retained_bytes(terms));
         auto data = raw(count, plan);
@@ -802,8 +804,10 @@ core::Result<PolynomialValue> integrate_polynomial(const PolynomialValue& value,
             degree = std::max(degree, d);
         }
         const auto count = times(2, terms.size());
+        // degree is unsigned, so bit_width is nonnegative and at most 64.
         const auto coefficient =
-            plus(plus(initial, std::bit_width(degree)), times(degree, value_bits(point)));
+            plus(plus(initial, static_cast<std::uint64_t>(std::bit_width(degree))),
+                 times(degree, value_bits(point)));
         const auto info = poly_plan(limits, merge_bound(count, coefficient), count,
                                     plus(retained_bytes(terms), retained_bytes(point)));
         auto data = raw(count, plan);
