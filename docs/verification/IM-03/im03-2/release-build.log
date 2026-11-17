@@ -1,0 +1,42 @@
+[0/2] Re-checking globbed directories...
+[1/31] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue95-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue95-build/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\checked_dimensions.cpp.obj
+[3/31] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\error_certificate.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[4/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\error_certificate.cpp.obj
+[5/31] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\checked_dimensions.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[6/31] Building CXX object tests\CMakeFiles\uvlas_test_aero_exact_triangle_allocations.dir\Release\support\allocation_audit.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[7/31] Building CXX object CMakeFiles\uvlas_aero.dir\Release\src\aero\exact_triangle_predicates.cpp.obj
+[8/31] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Release\src\aero\exact_triangle_predicates.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[9/31] Building CXX object tests\CMakeFiles\uvlas_test_aero_exact_triangle_allocations.dir\Release\aero\exact_triangle_allocations_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[10/31] Building CXX object tests\CMakeFiles\uvlas_test_aero_exact_triangle_resources.dir\Release\aero\exact_triangle_resource_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[11/31] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\state.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[12/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\state.cpp.obj
+[13/31] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[14/31] Building CXX object tests\CMakeFiles\uvlas_test_aero_geometry_snapshot_resources.dir\Release\aero\geometry_snapshot_resources_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[15/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[16/31] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\instrumentation.cpp.obj
+[17/31] Linking CXX static library Release\uvlas_core.lib
+[18/31] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\instrumentation.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[19/31] Linking CXX static library Release\uvlas_core_audit.lib
+[20/31] Building CXX object tests\CMakeFiles\uvlas_test_aero_exact_triangle_predicates.dir\Release\aero\exact_triangle_predicates_test.cpp.obj
+[21/31] Building CXX object tests\CMakeFiles\uvlas_test_aero_geometry_snapshot.dir\Release\aero\geometry_snapshot_test.cpp.obj
+[22/31] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Release\src\aero\geometry_snapshot.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[23/31] Linking CXX static library Release\uvlas_aero_audit.lib
+[24/31] Linking CXX executable tests\Release\uvlas_test_aero_exact_triangle_resources.exe
+[25/31] Linking CXX executable tests\Release\uvlas_test_aero_exact_triangle_allocations.exe
+[26/31] Linking CXX executable tests\Release\uvlas_test_aero_geometry_snapshot_resources.exe
+[27/31] Building CXX object CMakeFiles\uvlas_aero.dir\Release\src\aero\geometry_snapshot.cpp.obj
+[28/31] Linking CXX static library Release\uvlas_aero.lib
+[29/31] Linking CXX executable tests\Release\uvlas_test_aero_exact_triangle_predicates.exe
+[30/31] Linking CXX executable tests\Release\uvlas_test_aero_geometry_snapshot.exe

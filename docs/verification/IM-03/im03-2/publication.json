@@ -1,0 +1,105 @@
+{
+  "schema": "uvlas.redacted-artifacts/1",
+  "reason": "公開用copyの個人worktreeパス伏字とLF化。原rawは不変。",
+  "entries": [
+    {
+      "id": "debug-build.log",
+      "original_sha256": "7c6a65a81af83552e4bba8d5cf04986f391616750e9ec7c26af8af411b9abd2b",
+      "published_sha256": "c49fc4150195156002f358a8b83d3a225c21abc2c1a10dab5d1f8eb13f76962c",
+      "redactions": 4,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "debug-ctest.log",
+      "original_sha256": "089ee6a590d5dc156b5aad1381355925e3aa3d3deff6b7e219a3ee0fcfeb8986",
+      "published_sha256": "8730a3d88b6082ca5620b47c431c8c670f2464e71f117154ce2a188c41301073",
+      "redactions": 2,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "release-build.log",
+      "original_sha256": "3a885e033c8cfd6b88a1f39ad1980a2144f7b7c99f7c7daa52dbdee6d09522e1",
+      "published_sha256": "2e313d20aaefe4ddeecc4a74c90f2917b89fc7604ebdb0211b11b70d9b7e5589",
+      "redactions": 4,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "release-ctest.log",
+      "original_sha256": "9f600c7fa102a29f42232cda5afa58c0f14f00c4290dc14e6a4d7a6b415344b7",
+      "published_sha256": "28e37252592d9de771296b58f330cf1393f121c1865c901d29af04ec64e9d5a6",
+      "redactions": 2,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "release-raw.log",
+      "original_sha256": "314a9e3bdb0464675036e58b109d4299c35f5051370cb369c55582848467ae1e",
+      "published_sha256": "7972f9a3a5e1b3949f63ea9943d599be21ec5db8d223fbb6f46f545836a55297",
+      "redactions": 10,
+      "line_endings": "LF",
+      "original_encoding": "cp932",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "tidy-initial.log",
+      "original_sha256": "4fa24958f2c4afa442f154dc1921f0ab4881dfb90c3e78d40924edd15b2adf78",
+      "published_sha256": "ca03abd8a10cf7cbe188b9786c5987c417b13e347f9c7360b9da2fd7f8971950",
+      "redactions": 16,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "tidy-details.log",
+      "original_sha256": "378458620e57ea01b1d966dded4dc64a2ebdd57cf2ca5bbdbd589b5a1400b3b3",
+      "published_sha256": "fb88e60545d5a66e32a50a440350e3373b06b00d38d3417ccf659ed44db40c2f",
+      "redactions": 2,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "tidy-regular.log",
+      "original_sha256": "da9cbd124adc16f8b2ba3049dc318c97a6416adc6dccd88b9c4363ebd7e7516d",
+      "published_sha256": "c7fce2a5cf86451dec14c27522b881a536400738e345528bbd9b303f88d42f5a",
+      "redactions": 0,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "japanese-lint.json",
+      "original_sha256": "ab35df8e392356bcb74fd8a08d3fa285ffdfb2096784aecd8d0e908e1f08cd9f",
+      "published_sha256": "85345ef465f69b9028cc651b1fe11794f04fec58c519d9b43ddd5810090cab3e",
+      "redactions": 0,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "git-revision.hpp",
+      "original_sha256": "a90725f088a7a5e7fd64a771efff770833838bb8beeff6db6d7700876820d37e",
+      "published_sha256": "a306abc5eba2039460c72382b5590962eb88d3aaf743bc7f310c6fc1972dcd6a",
+      "redactions": 0,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    },
+    {
+      "id": "build-config.hpp",
+      "original_sha256": "a61c3582e8e0cf0774b34d47d505049ff882926b4918b7ea8ed4b7202237f160",
+      "published_sha256": "e36c58cbddb7adc53ed5c0be17729339f39d8e1dbb8a79aa855bba8e67f47214",
+      "redactions": 0,
+      "line_endings": "LF",
+      "original_encoding": "utf-8",
+      "published_encoding": "utf-8"
+    }
+  ]
+}

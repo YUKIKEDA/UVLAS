@@ -1,0 +1,23 @@
+Internal ctest changing into directory: <workspace>/out/issue95-build
+Test project <workspace>/out/issue95-build
+    Start 19: aero.exact_triangle_predicates
+1/5 Test #19: aero.exact_triangle_predicates .....   Passed    0.36 sec
+    Start 20: aero.exact_triangle_allocations
+2/5 Test #20: aero.exact_triangle_allocations ....   Passed    0.04 sec
+    Start 21: aero.exact_triangle_resources
+3/5 Test #21: aero.exact_triangle_resources ......   Passed    0.04 sec
+    Start 22: aero.geometry_snapshot
+4/5 Test #22: aero.geometry_snapshot .............   Passed    0.06 sec
+    Start 23: aero.geometry_snapshot_resources
+5/5 Test #23: aero.geometry_snapshot_resources ...   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+V-AERO          =   0.46 sec*proc (3 tests)
+negative        =   0.55 sec*proc (5 tests)
+property        =   0.55 sec*proc (5 tests)
+unit            =   0.42 sec*proc (2 tests)
+verification    =   0.55 sec*proc (5 tests)
+
+Total Test time (real) =   0.56 sec
