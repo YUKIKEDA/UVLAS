@@ -89,7 +89,7 @@
 | EIG-12 | [eigen-extraction-contract.md:192](../specs/foundation/eigen-extraction-contract.md) | 25 | 3 | 0 |
 | EIG-13 | [eigen-extraction-contract.md:215](../specs/foundation/eigen-extraction-contract.md) | 18 | 4 | 0 |
 | EIG-14 | [eigen-extraction-contract.md:235](../specs/foundation/eigen-extraction-contract.md) | 0 | 3 | 0 |
-| IO4-01 | [io-execution-adoption-specification.md:5](../specs/foundation/io-execution-adoption-specification.md) | 5 | 2 | 0 |
+| IO4-01 | [io-execution-adoption-specification.md:5](../specs/foundation/io-execution-adoption-specification.md) | 17 | 3 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 4 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 0 | 0 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 0 | 0 | 0 |
@@ -119,13 +119,13 @@
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 14 | 4 | 0 |
-| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 72 | 15 | 4 |
-| N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 41 | 19 | 2 |
+| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 77 | 16 | 4 |
+| N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 46 | 20 | 2 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 104 | 17 | 0 |
 | N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 115 | 19 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
-| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 55 | 20 | 1 |
+| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 67 | 21 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 43 | 20 | 1 |
 | N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 11 | 7 | 0 |
 | QA-01 | [quality-plan.md:13](../quality/quality-plan.md) | 0 | 0 | 0 |

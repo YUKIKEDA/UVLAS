@@ -1,0 +1,30 @@
+Start testing: Nov 17 12:46 東京 (標準時)
+----------------------------------------------------------
+4/77 Testing: io.input_document_resources
+4/77 Test: io.input_document_resources
+Command: "C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/tests/Debug/uvlas_test_io_input_document_resources.exe"
+Directory: C:/Users/ACCOUNT/.codex/worktrees/IO_WORKTREE/UVLAS/out/issue93-build/tests
+"io.input_document_resources" start time: Nov 17 12:46 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 4151565347
+input-document actual C++new fault sites=22
+===============================================================================
+All tests passed (385 assertions in 3 test cases)
+
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"io.input_document_resources" end time: Nov 17 12:46 東京 (標準時)
+"io.input_document_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 17 12:46 東京 (標準時)
+
+negative =   0.03 sec*proc
+
+property =   0.03 sec*proc
+
+verification =   0.03 sec*proc
+

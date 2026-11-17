@@ -1,0 +1,250 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-2-owned-input-document",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-03",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 93,
+  "date": "2026-11-17",
+  "source_commit": "dbe8a0381c974cb0b9e05c0b718b6f4541d357cd",
+  "dependency_source_commit": "b11535dfb94f71b0e947e08e8d369a9df1a097cc",
+  "scope": "元bytes/SHA-256と全値kind・順序・raw decimalを所有する文書kernel。root envelopeだけを確認し、nested物理schemaや有効caseを認定しない。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "SourceId全域、独立SHA既知値、全8kind、入力順・nested直系edge、decoded NUL/UTF8、native整数とraw decimalを厳密比較。view/ordinalの非偽造・rvalue借用禁止・moveを静的/動的検査。"
+    },
+    {
+      "condition": 2,
+      "evidence": "固定修正版strict SAXの全消費、BOM/rawNUL、UTF8/escape/surrogate、comments/末尾、int64/uint64/2^53±1/大整数、underflow元token、overflow Nonfiniteを手書きliteralで検査。既存strict ID/indexもactual nodeから直接呼ぶ。"
+    },
+    {
+      "condition": 3,
+      "evidence": "7quotaの等号/1不足/零、Index境界、checked所有payload、外部forecastの等号/1不足、未知mode、証明不在strict拒否を検査。専用factoryのsource/ABI/model根拠を所有し、見積をobservedと呼ばない。"
+    },
+    {
+      "condition": 4,
+      "evidence": "core Result/guardと所有noalloc診断、schema→unknown→missing、decoded unknown辞書順のevent、診断reset/details/EOF、旧文書/元入力/累積Plan保持を検査。CRT fallbackはtyped private分類器への対照であり、実CRT malloc注入ではない。"
+    },
+    {
+      "condition": 5,
+      "evidence": "通常9caseの独立literal期待値、SHA既知値に許容差0で照合。全必須key、任意rootkeyの全8組、Unicode byte quota・非正規化、別owner並行・source破棄後保持・nested順を含む。"
+    },
+    {
+      "condition": 6,
+      "evidence": "専用processで実Cpp new全箇所のbad_allocと標準/非標準例外を注入。隔離control成功、5変異compile/link0→assert exit42、38入力hash前後不変、全6mapで元document archive member未抽出。"
+    },
+    {
+      "condition": 7,
+      "evidence": "公開API Doxygen/理由inline、資源補足、固定版/source hash、対象D/R・format/3TU tidyを記録。統合担当がtrace matrix/checkを実行し208ID/32tests/34records/0問題、IM06-2 Done行と冒頭進捗を同期。未変更scalar/数値/物理/Python全suiteは反復していない。"
+    }
+  ],
+  "final_verification": {
+    "environment": "Windows 11 x64 / MSVC19.51.36260 / STL145,202604 / iterator debug2(Debug),0(Release) / C++23 preview / fp:strict / WX",
+    "source_state": "dbe8a03 clean。対象buildで生成git_revision.hppは同commit/dirty0。追加の既存CLI targetだけを同じcoreからbuildし、実binary --build-infoで同commit/uncommitted_changes:false/repair1を確認した。試験exe自体の自己出力ではない。",
+    "debug": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "execution": "通常と資源を個別に各1回実行。",
+      "normal_cases": 9,
+      "normal_assertions": null,
+      "resource_cases": 3,
+      "resource_assertions": 385,
+      "cpp_new_fault_sites": 22,
+      "normal_log": "通常CTestのツール出力で1/1成功を確認した。通常のraw stdoutは保存しなかったのでassert件数は報告しない。資源rawは別保存。"
+    },
+    "release": {
+      "ctest_passed": 2,
+      "ctest_total": 2,
+      "normal_cases": 9,
+      "normal_assertions": 476,
+      "resource_cases": 3,
+      "resource_assertions": 321,
+      "cpp_new_fault_sites": 18
+    },
+    "build_correction": "初回Debug資源linkは古いNinjaのallocation_audit.cpp重複で失敗。現行CMakeから明示再configure後にlink・実行成功。製品sourceは変更していない。",
+    "static": "clang-format21.1.2対象5file check成功。clang-tidy21.1.1新規3TU exit0。system header由来の生成警告は抑制されており、全warning数0とは呼ばない。日本語lintはTTR info1、error/warningなし。",
+    "linux": "ローカル未実行。PR101の実環境JSONでGNU14/libstdc++20240908/ABI1/x64/C++23/debug macro不在と5header hashを取得。公式Ubuntu同版debの差分2件を独立照合し、GNU追補51ba424で受入とsource証拠を更新した。本入力文書のLinux試験成功は未確認。",
+    "allocation_scope": "実Cpp newで観測した呼出しの全番号を注入。CRT内部mallocの実注入やOS RSS/hard上限の証明はしていない。",
+    "trace": "rootが通常merge後にtrace matrix/checkを実行、208ID/32tests/34records/0問題。C++試験の追加実行結果ではなく追跡metadataの検査。",
+    "review": "rootがAPI/全bodyを独立通読。別担当がdbe8a03のAPI/body/detail・通常/資源test・補足7fcaaa2c・旧recordを独立通読し未解決の具体的製品欠陥なし。rootは新record/PR草稿と匿名化privacy、GNU追補source/実CI対応/Windows前処理bridgeも独立通読した。rootが共有統合後のCMake保持とtrace・roadmapを確認。rootが最終追補後の記録と7DoDを審査し、既知の未確認範囲を除いて未解決指摘なし。GNU/peer/trace/統合configureの確認は完了した。",
+    "integration": "rootが専用out/issue93-integrationでCMake configure/generate成功とtargethelpの3module新6target登録を確認した。追加build/testは実行していない。PG担当がrootのroadmap/IO conventions更新を独立再読し、追加指摘なし。"
+  },
+  "mutations": {
+    "source_commit": "dbe8a03",
+    "source_sha256": "a531442c1cf20226dd9ed0ec7a7bd83b071e1c1486093e85dda753a1f7f17b05",
+    "source_tree_modified": false,
+    "results": [
+      {
+        "name": "control",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 0,
+        "killed": false,
+        "compile_seconds": 4.453000000008615,
+        "link_seconds": 0.10999999998603016,
+        "run_seconds": 0.046999999991385266,
+        "archive_producer_matches": 0,
+        "own_symbols": {
+          "read_input_document": 49
+        },
+        "mutated_source_sha256": "a531442c1cf20226dd9ed0ec7a7bd83b071e1c1486093e85dda753a1f7f17b05",
+        "input_count": 38,
+        "input_mismatches": 0
+      },
+      {
+        "name": "duplicate_ignored",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "killed": true,
+        "compile_seconds": 4.547000000020489,
+        "link_seconds": 0.125,
+        "run_seconds": 0.031000000017229468,
+        "archive_producer_matches": 0,
+        "own_symbols": {
+          "read_input_document": 49
+        },
+        "mutated_source_sha256": "13405f91cdfcbfee9e56902e271476f85b9b880c65efbbda751b25872a3dc84a",
+        "input_count": 38,
+        "input_mismatches": 0
+      },
+      {
+        "name": "decimal_token_lost",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "killed": true,
+        "compile_seconds": 4.48399999999674,
+        "link_seconds": 0.10899999999674037,
+        "run_seconds": 0.030999999988125637,
+        "archive_producer_matches": 0,
+        "own_symbols": {
+          "read_input_document": 49
+        },
+        "mutated_source_sha256": "3deb7ce97b35f1d7b329bc4fea6efdfe2c0f99cd310861533ac6e780a99e79f9",
+        "input_count": 38,
+        "input_mismatches": 0
+      },
+      {
+        "name": "source_hash_truncated",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "killed": true,
+        "compile_seconds": 4.437000000005355,
+        "link_seconds": 0.10999999998603016,
+        "run_seconds": 0.046999999991385266,
+        "archive_producer_matches": 0,
+        "own_symbols": {
+          "read_input_document": 49
+        },
+        "mutated_source_sha256": "17e4ae88ef1d2acf7c3d65d0b93c3de3a2d72ee8c13fd49324e8478e46a315e9",
+        "input_count": 38,
+        "input_mismatches": 0
+      },
+      {
+        "name": "utf8_quota_weakened",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "killed": true,
+        "compile_seconds": 4.485000000015134,
+        "link_seconds": 0.10899999999674037,
+        "run_seconds": 0.030999999988125637,
+        "archive_producer_matches": 0,
+        "own_symbols": {
+          "read_input_document": 49
+        },
+        "mutated_source_sha256": "112d85d6ed8e5d715a98fdd78bd6300a6c07a3e78566bd9adcb58e159c9fc399",
+        "input_count": 38,
+        "input_mismatches": 0
+      },
+      {
+        "name": "unknown_key_input_order",
+        "compile_exit": 0,
+        "link_exit": 0,
+        "run_exit": 42,
+        "killed": true,
+        "compile_seconds": 4.546999999991385,
+        "link_seconds": 0.10999999998603016,
+        "run_seconds": 0.03200000000651926,
+        "archive_producer_matches": 0,
+        "own_symbols": {
+          "read_input_document": 49
+        },
+        "mutated_source_sha256": "010cbbf01994b8061981c6ef2efc5d0742a29955e07f8869d29b364a32a6315f",
+        "input_count": 38,
+        "input_mismatches": 0
+      }
+    ]
+  },
+  "evidence_scope": "公開log/ZIPはLF化・個人accountとworktree表記を匿名化した派生text。元raw/source/library/object/exeはprivate outに不変保持。元/派生hashと置換数をprovenanceへ保存。",
+  "not_claimed": [
+    "全nested schema/SI/参照解決/ValidatedCase/Model/prepare/runの資格。",
+    "mesh/CLI/Python/checkpoint/runtime/distributionと親22の完了。",
+    "本入力文書のLinux実行、汎用hard allocator bound、物理数値認定・実務性能。"
+  ],
+  "sources": {
+    "include/uvlas/io/input_document.hpp": "a924f78c4e11e70938d073f9fc9de44a1d498cbf4a1be088cbcbd2d32f74a5f9",
+    "src/io/input_document.cpp": "6a86e1db9428315dd1c5d414368a5cb70e0a0184ff661995d100f59631d16106",
+    "src/io/input_document_detail.hpp": "55b63d08bd328924816b51b8cead0f153e6d25e4a8e9bedf2a5590f2880c6507",
+    "tests/io/input_document_test.cpp": "4db36fd8e5d5e848f27dbe2fe7f8d38053eb6e79b3c139b141e21d2b3a5d0154",
+    "tests/io/input_document_resource_test.cpp": "34b3c890ed3e11cad15ab2b8d189a231ee6957d7eaa360d146af15797cdf6343",
+    "CMakeLists.txt": "9e023a2457629a1225e8e2574161dadbc028bd9649b5c5eeb816a93983134d87",
+    "tests/CMakeLists.txt": "97a7172c9c491a391fb0e1f597cd83cb1a1a0fcdb954f0a64ff81a759792c551",
+    "docs/conventions.md": "f56bbb46412051f5547c0e5905a9d259d85416dde68245d5c9c07cb1fe102b62",
+    "docs/specs/foundation/input-document-resource-contract.md": "9615957baa0684138220fcd213fd9023056df4ddec041750f4537fa62b0f20fe",
+    "docs/specs/foundation/input-document-contract.md": "7cfae85238c69a3d7bbcdd487a920a8c0ea1a28fc4cfeb9e58efe30798ecf0cb"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-2/log-provenance.json": "ed4aad255f931dfb203c7a0f1eaa8ddc8ba97b23cc0d3c3f85bc183723c4eb8d",
+    "docs/verification/IM-06/im06-2/mutation-summary.json": "c375ebe8337e9bd588f78d301fd7d67fe0a0a1831c70e6942a7cece032bf4a3f",
+    "docs/verification/IM-06/im06-2/mutations.zip": "2de4150b948019ed220530ecb7a629a9be528575874c55e8c0e8a61149a73012",
+    "docs/verification/IM-06/im06-2/safe-debug-resource.log": "44f11b10388c07610c8d00386d37d5bcd6af7736bb9e572718bcf89361989d2b",
+    "docs/verification/IM-06/im06-2/safe-japanese.log": "2c25b63efa072a2c13913c8aa87db75e580fb8066c9ec240f9cdfdf721d97c85",
+    "docs/verification/IM-06/im06-2/safe-release-build.log": "35334d1ab2723347c73617caa5ae9e6d0d0f84a93c0052e046f44fc82b4280df",
+    "docs/verification/IM-06/im06-2/safe-release-test.log": "6a587bbc87ca4329a7e3590a4e26e7b7ace89ae0994e7bcd2b3156ba998a2b26",
+    "docs/verification/IM-06/im06-2/safe-tidy-normal.log": "b5d35e2804f695b3f1d889cbea234c674ed322406ae1fb5f0cbb882e77997340",
+    "docs/verification/IM-06/im06-2/safe-tidy-resource.log": "a1a7d810c7e04a18740c293014fcd55d423e546661f94fae7fdbfb8c1b1fff99",
+    "docs/verification/IM-06/im06-2/safe-tidy-source.log": "b1434a6daa0323f1ad3b8ee1873818407afd7181348a8a1578b6b7204b59e85f",
+    "docs/verification/IM-06/im06-2/build-info.json": "9f59287fc85148d40b95337a5748a55ff922e711485550df9e63b3c5d2cdbcfa",
+    "docs/verification/IM-06/im06-2/linux-model-environment.json": "6c27feb2cab2d5d6406d18ac60697d50d0c5b33c7a1cc452f0b58283fc98f72e",
+    "docs/verification/IM-06/im06-2/gnu-bitvector-source.diff": "63dfa95c63f52bf62d4a5118f9cb4cce8fe8286b343dc9e1e5fb7db4ba6161f7",
+    "docs/verification/IM-06/im06-2/gnu-model-review.json": "f8a73dfad2c582996155612547e8b2d80339d1ef75effd0eef55d5bf2cbd62f3",
+    "docs/verification/IM-06/im06-2/windows-preprocessing-bridge.json": "0d3c4000f8a32b4ae351d40b3126d8bd61567edd2f73a595416db0848ce6d69e"
+  },
+  "source_commit_scope": "source_commitとD/R実行・5変異はdbe8a03の凍結snapshotを示す。sourcesはGNU追補51ba424の現行2fileを含む。旧producer/補足hashはsource_followup.executed_snapshot_hashesに保持し、旧実行を新GNU条件へ付替えない。",
+  "source_followup": {
+    "commit": "51ba424",
+    "executed_snapshot_hashes": {
+      "src/io/input_document.cpp": "a531442c1cf20226dd9ed0ec7a7bd83b071e1c1486093e85dda753a1f7f17b05",
+      "docs/specs/foundation/input-document-resource-contract.md": "7fcaaa2c130255766ab9d4c209813bc692ad881370b241a077134cec8f3c73ed"
+    },
+    "purpose": "実Ubuntu GNU20240908の受入とrevision別BitVector source hashだけを追補。forecast式/model revisionは不変。",
+    "environment_job": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44008552697/job/133789790410",
+    "environment_commit": "77f690414088ae2006442a4e289bb776d22cd27d",
+    "source_review": "公式Ubuntu同版debのstl_bvectorは実CI SHAと一致。一次sourceとの差はdefault ctorのrequires guardとallocator変換の明示化の2件。SAXの標準allocator、word切上げ、layout、成長・allocate/deallocateの式は変わらない。",
+    "windows_bridge": "D/RのMSVC前処理rawはdirective由来4空行分だけ増えた。完全な空行だけ除去後は残る全byteが一致。raw/比較後hashと各exit0を別artifactに保持。Windows数値試験/変異を再実行していない。",
+    "static": "GNU追補sourceのformat check成功、補足の日本語lintはTTR info1だけ。Windows前処理token不変のため3TU tidyは反復しない。",
+    "linux_execution": "入力文書製品経路のLinux/GCC/Sanitizer試験は未実行・未確認。環境識別JSONは試験成功ではない。",
+    "root_review": "rootが実5header hashとconstructor2差、成長式不変、revision別source hashとWindows D/R空行以外byte一致を独立確認した。",
+    "executed_shared_hashes": {
+      "CMakeLists.txt": "462d1324867ae50bcb7269edf1ffdc38da487b039d4b640241253ea8b2d434e3",
+      "tests/CMakeLists.txt": "304167b343c7be9e8b7974c10d91c4a8137e7a2f5685009585d06344fca79ba0",
+      "docs/conventions.md": "7cff8ac79c2b7d18bc57e5b361309fb1cd6fc8d3e44d92a9415e34d4bc1dc5f2"
+    },
+    "shared_integration": "rootがPG head8fdf5e8（Aero102/JSON101を含む）を通常mergeし、共有CMakeのIOsource/依存/2試験登録が保持されたことを通読した。共有fileの現在hashはsources、dbe8実行時はexecuted_shared_hashesへ分けた。"
+  }
+}

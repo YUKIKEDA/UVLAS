@@ -1,0 +1,99 @@
+{
+  "file": "docs\\specs\\foundation\\input-document-resource-contract.md",
+  "stats": {
+    "total_findings": 1,
+    "by_category": {
+      "low_lexical_diversity_ttr": 1
+    },
+    "genre": "tech",
+    "experimental": false,
+    "total_sentences": 150,
+    "nominal_ending_count": 11,
+    "nominal_ending_ratio": 0.07333333333333333,
+    "total_paragraphs": 38,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      6,
+      4,
+      4,
+      5,
+      5,
+      3,
+      4,
+      2,
+      5,
+      4,
+      4,
+      3,
+      3,
+      5,
+      2,
+      4,
+      2,
+      5,
+      3,
+      5,
+      9,
+      4,
+      3,
+      5,
+      4,
+      4,
+      4,
+      3,
+      3,
+      4,
+      4,
+      4,
+      4,
+      4,
+      2,
+      4,
+      4,
+      3
+    ],
+    "paragraph_sentence_count_cv": 0.31804961178337504,
+    "rhythm": {
+      "mora_mean": 68.42,
+      "mora_stdev": 53.593689927080035,
+      "burstiness": -0.12151349640995798,
+      "length_autocorrelation_lag1": -0.1153216416908894
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "名詞/名詞/助詞/名詞",
+      "lead_pos_4gram_ratio": 0.14864864864864866
+    },
+    "lexical_diversity": {
+      "ttr": 0.34894991922455576,
+      "mtld": 85.47568867321456,
+      "content_token_count": 1857,
+      "doc_char_count": 7858,
+      "skipped_too_short": false
+    },
+    "structural": {
+      "bold_span_count": 1,
+      "bold_per_1000_chars": 0.08652015919709292,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 108,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 36,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 3,
+      "category": "low_lexical_diversity_ttr",
+      "excerpt": "TTR=0.349 (内容語 1857 語中 648 種類)",
+      "severity": "info",
+      "detail": "TTR(Type-Token Ratio)が閾値0.45未満。同じ語彙の使い回しが多い疑い",
+      "related_lines": null
+    }
+  ]
+}
