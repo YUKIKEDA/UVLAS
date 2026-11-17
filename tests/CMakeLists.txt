@@ -41,6 +41,19 @@ uvlas_add_test(io.input_scalar_allocations
 uvlas_enable_allocation_audit(uvlas_test_io_input_scalar_allocations)
 uvlas_require_audited_dependencies(uvlas_test_io_input_scalar_allocations)
 
+uvlas_add_test(io.input_document
+    LABELS unit property negative verification
+    SOURCES io/input_document_test.cpp
+    LIBS uvlas_io Threads::Threads)
+target_include_directories(uvlas_test_io_input_document PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_add_test(io.input_document_resources
+    LABELS property negative verification
+    SOURCES io/input_document_resource_test.cpp
+    LIBS uvlas_io_audit uvlas::eigen)
+target_include_directories(uvlas_test_io_input_document_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_enable_allocation_audit(uvlas_test_io_input_document_resources)
+uvlas_require_audited_dependencies(uvlas_test_io_input_document_resources)
+
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
     add_test(NAME cli.${case}
         COMMAND "${CMAKE_COMMAND}"

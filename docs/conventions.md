@@ -45,7 +45,7 @@
 | `structure` | PG参照準備用のexact有理数・二変数多項式、材料、梁、接続、荷重、回復 | IM-01、IM-02。[exact代数の資源契約](specs/structure/pg-exact-algebra-resource-contract.md)に従う準備処理を `exact_polynomial.hpp` が公開する。PG基底・求積・物理系の完成を表さない |
 | `aero` | [有限三角形の厳密述語](specs/aero/exact-triangle-predicates-contract.md)を準備部品として実装。渦核、後流、荷重、TE所有は後続の子作業 | IM-03 |
 | `coupling` | 初期化、強連成、確定、安定性と探索 | IM-04、IM-05 |
-| `io` | 復号済みASCII IDとnative整数の厳格変換。ケース、外部格子、結果、checkpointは後続 | IM06-1の[厳格scalar契約](specs/foundation/strict-input-scalars-contract.md)と [input_scalar.hpp](../include/uvlas/io/input_scalar.hpp)。文書parserや物理Modelは生成しない |
+| `io` | 復号済みASCII IDとnative整数の厳格変換、元byte列とSHA-256・木・raw tokenを所有する入力文書。ケースのnested schema・物理Model、外部格子、結果、checkpointは後続 | IM06-1の[厳格scalar契約](specs/foundation/strict-input-scalars-contract.md)と [input_scalar.hpp](../include/uvlas/io/input_scalar.hpp)、IM06-2の[入力文書・資源契約](specs/foundation/input-document-resource-contract.md)と [input_document.hpp](../include/uvlas/io/input_document.hpp)。文書全体を検査してroot envelopeを確認するが、物理Modelは生成しない |
 | `python` | 任意機能のCPython拡張。所有する数値保持と状態protocol、NumPy境界 | IM00-10の[Python境界契約](specs/foundation/python-binding-contract.md) |
 | `app` | CLI | 現在は `--help` と `--version`。解析コマンドはIM-06 |
 
