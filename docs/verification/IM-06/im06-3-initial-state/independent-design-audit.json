@@ -1,0 +1,347 @@
+{
+  "schema": "uvlas.initial-physical-design-audit/1",
+  "id": "im06-3-initial-physical-independent-oracle",
+  "examples_sha256": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+  "scope": "Exact input-field design witnesses for four flat/basic/frame cases only; no product schema validator, arbitrary curved PG rank/conditioning, retained q/v error bounds, J1 or coupled initialization qualification.",
+  "counterexample": {
+    "same_point": [
+      "0/1",
+      "0/1",
+      "1/100"
+    ],
+    "root_value_and_slope_zero": true,
+    "l2_difference_squared": "1/2400000",
+    "membership": "Both are global flat basic R tensor polynomials, per-axis degree <=2."
+  },
+  "positive_cases": [
+    {
+      "id": "flat_clamped_global",
+      "input_field_checks_passed": true,
+      "points": [
+        {
+          "kind": "displacements",
+          "computed": [
+            "0/1",
+            "0/1",
+            "1/100"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        },
+        {
+          "kind": "velocities",
+          "computed": [
+            "0/1",
+            "0/1",
+            "1/50"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        }
+      ]
+    },
+    {
+      "id": "flat_full_thickness",
+      "input_field_checks_passed": true,
+      "points": [
+        {
+          "kind": "displacements",
+          "computed": [
+            "0/1",
+            "0/1",
+            "9/1600"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        },
+        {
+          "kind": "displacements",
+          "computed": [
+            "0/1",
+            "0/1",
+            "-7/1600"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        },
+        {
+          "kind": "velocities",
+          "computed": [
+            "0/1",
+            "0/1",
+            "9/800"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        },
+        {
+          "kind": "velocities",
+          "computed": [
+            "0/1",
+            "0/1",
+            "-7/800"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        }
+      ]
+    },
+    {
+      "id": "flat_half_cells",
+      "input_field_checks_passed": true,
+      "points": [
+        {
+          "kind": "displacements",
+          "computed": [
+            "0/1",
+            "0/1",
+            "1/100"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        },
+        {
+          "kind": "velocities",
+          "computed": [
+            "0/1",
+            "0/1",
+            "1/50"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        }
+      ]
+    },
+    {
+      "id": "beam_rigid_nonzero",
+      "input_field_checks_passed": true,
+      "points": [
+        {
+          "kind": "displacements",
+          "computed": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        },
+        {
+          "kind": "velocities",
+          "computed": [
+            "0/1",
+            "0/1",
+            "1/1"
+          ],
+          "residual": [
+            "0/1",
+            "0/1",
+            "0/1"
+          ],
+          "scope": "exact input field only; retained-state evaluation bounds are not computed"
+        }
+      ]
+    }
+  ],
+  "negative_cases": [
+    {
+      "id": "point_only_underdetermined",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "complete physical state collections required",
+      "rejected": true
+    },
+    {
+      "id": "missing_shell_state",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "entity coverage or duplicate state",
+      "rejected": true
+    },
+    {
+      "id": "duplicate_shell_state",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "entity coverage or duplicate state",
+      "rejected": true
+    },
+    {
+      "id": "missing_velocity_field",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "complete shell state required",
+      "rejected": true
+    },
+    {
+      "id": "missing_director_numerator",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "complete r/p/c required",
+      "rejected": true
+    },
+    {
+      "id": "nonpositive_denominator",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "positive rational denominator",
+      "rejected": true
+    },
+    {
+      "id": "degree_over_limit",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "degree envelope",
+      "rejected": true
+    },
+    {
+      "id": "nonmember_c_squared",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "C is outside the bilinear hat space",
+      "rejected": true
+    },
+    {
+      "id": "missing_active_cell",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "active half-cell coverage",
+      "rejected": true
+    },
+    {
+      "id": "duplicate_cell",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "duplicate half-cell",
+      "rejected": true
+    },
+    {
+      "id": "discontinuous_cell_field",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "discontinuous field trace",
+      "rejected": true
+    },
+    {
+      "id": "point_value_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "point value contradicts complete input field",
+      "rejected": true
+    },
+    {
+      "id": "negative_point_tolerance",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "negative point tolerance",
+      "rejected": true
+    },
+    {
+      "id": "missing_side_t",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "shell side_s/side_t required",
+      "rejected": true
+    },
+    {
+      "id": "outward_side_at_s1",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "chart side does not select a domain half-cell",
+      "rejected": true
+    },
+    {
+      "id": "unknown_point_target",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "point target reference",
+      "rejected": true
+    },
+    {
+      "id": "support_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "full-thickness support contradiction",
+      "rejected": true
+    },
+    {
+      "id": "missing_beam_endpoint",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "two complete beam endpoints required",
+      "rejected": true
+    },
+    {
+      "id": "missing_rigid_state",
+      "stage": "schema",
+      "failure": "InvalidInput",
+      "reason": "entity coverage or duplicate state",
+      "rejected": true
+    },
+    {
+      "id": "non_so3_tip",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "rotation is not orthogonal",
+      "rejected": true
+    },
+    {
+      "id": "rigid_attachment_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "rigid attachment contradiction",
+      "rejected": true
+    },
+    {
+      "id": "body_world_velocity_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput",
+      "reason": "point value contradicts complete input field",
+      "rejected": true
+    }
+  ],
+  "global_half_cell_polynomial_identity": true,
+  "all_thickness_p_and_c_nonzero": true,
+  "millimetre_unit_covariance": true,
+  "body_world_velocity_identity": true,
+  "root_case_schema_structure_checked": true,
+  "root_case_physical_initialization_qualified": false,
+  "positive_count": 4,
+  "negative_count": 22,
+  "passed": true
+}
