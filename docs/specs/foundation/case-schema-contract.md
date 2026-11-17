@@ -4,7 +4,7 @@
 
 ## CS-01 対象と検証段階
 
-`InputDocument` は構文、元のバイト列、値のkind、root envelopeを所有する。全schemaはその後の処理であり、物理kernelの完成を待たず定義する。根拠は[作業分解のIM06](../../plans/next-package-work-breakdown.md#im06入出力実行再開)と[入力文書契約](input-document-contract.md)である。
+`InputDocument` は構文、元のバイト列、値のkind、root envelopeを所有する。全schemaはその後の処理であり、物理kernelの完成を待たず定義する。根拠は[作業分解のIM06](../../plans/next-package-work-breakdown.md)と[入力文書契約](input-document-contract.md)である。
 
 | 段階 | 入力→所有する成功型 | 成功が保証すること | ここでは保証しないこと |
 |---|---|---|---|
