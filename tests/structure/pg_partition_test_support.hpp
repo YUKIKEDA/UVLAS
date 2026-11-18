@@ -72,6 +72,8 @@ struct Fixture {
         return {r(s), r(t)};
     }
     [[nodiscard]] PgPartitionRequest request() const {
+        if (!graph)
+            throw std::runtime_error("Partition fixture graph is absent");
         return {*graph, domain, {thickness, triangles, heights}, layers, names, refinements};
     }
 };

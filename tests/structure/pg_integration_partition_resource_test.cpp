@@ -332,8 +332,12 @@ TEST_CASE("PG partition rejects allocator reentry and cancellation without alter
     entry_hook = nullptr;
     reentry = nullptr;
     REQUIRE(result);
-    REQUIRE(context.rejected.has_value());
-    CHECK(*context.rejected == core::FailureCode::InvalidInput);
+    if (!context.rejected) {
+        FAIL("Allocator reentry must record its rejected failure");
+        return;
+    }
+    const auto reentry_failure = *context.rejected;
+    CHECK(reentry_failure == core::FailureCode::InvalidInput);
     CHECK(nested.allocated_bytes() == 0);
     const auto id = take(result->identity());
     // MSVC request_stop() is nonconst; libstdc++ exposes a const overload.

@@ -83,10 +83,14 @@ void check_topology(const PgIntegrationPartition& result, const std::array<Oracl
         }
         CHECK(edge.external == (edge.left.has_value() != edge.right.has_value()));
         CHECK(edge.external == domain);
-        if (edge.left)
-            CHECK(static_cast<std::size_t>(*edge.left) < pieces.size());
-        if (edge.right)
-            CHECK(static_cast<std::size_t>(*edge.right) < pieces.size());
+        if (edge.left) {
+            const auto left_piece = *edge.left;
+            CHECK(static_cast<std::size_t>(left_piece) < pieces.size());
+        }
+        if (edge.right) {
+            const auto right_piece = *edge.right;
+            CHECK(static_cast<std::size_t>(right_piece) < pieces.size());
+        }
         if (edge.external) {
             ++external;
             const auto& a = vertices[static_cast<std::size_t>(edge.vertices[0])];
@@ -492,10 +496,14 @@ TEST_CASE(
     right.join();
     const auto& a = parallel[0];
     const auto& b = parallel[1];
-    REQUIRE(a.has_value());
-    REQUIRE(b.has_value());
-    CHECK(*a == original_id);
-    CHECK(*b == original_id);
+    if (!a || !b) {
+        FAIL("Both independent preparations must return an identity");
+        return;
+    }
+    const auto left_id = *a;
+    const auto right_id = *b;
+    CHECK(left_id == original_id);
+    CHECK(right_id == original_id);
     CHECK(payloads[0] == original_payload);
     CHECK(payloads[1] == original_payload);
     CHECK(mathematical_payload(original) == original_payload);

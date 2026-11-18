@@ -180,6 +180,14 @@ struct PgPartitionTopology {
             const auto& edge = d.edges.values()[i];
             if (!edge.external)
                 continue;
+            // Resolve ownership here; the producer's invariant is not a local presence check.
+            const auto adjacent_piece = [&]() {
+                if (edge.left)
+                    return *edge.left;
+                if (edge.right)
+                    return *edge.right;
+                partition_fail(core::FailureCode::GeometryInvalid);
+            }();
             for (std::size_t layer = 0; layer < d.layers.size(); ++layer)
                 g.append(d.lateral, d.lateral_count) = {static_cast<core::Index>(i),
                                                         static_cast<core::Index>(layer),
@@ -194,8 +202,7 @@ struct PgPartitionTopology {
                     const auto forward = op.point_order(g.original(original.endpoints[0]),
                                                         g.original(original.endpoints[1])) < 0;
                     g.append(d.traces, d.trace_count) = {static_cast<core::Index>(i), source,
-                                                         edge.left ? *edge.left : *edge.right,
-                                                         forward};
+                                                         adjacent_piece, forward};
                 }
         }
         for (std::size_t i = 0; i < d.sources.size(); ++i) {
