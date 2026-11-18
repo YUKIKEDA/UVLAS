@@ -1,0 +1,79 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-p1-start-review",
+  "ids": [
+    "UI-D01",
+    "UI-D02",
+    "UI-D03",
+    "UI-D04",
+    "UI-D05",
+    "UI-D06",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 119,
+  "date": "2026-11-18",
+  "source_commit": "c2ff946b68c160f8a5b2322f86aeafe2f73d9f0c",
+  "base_commit": "c93e2731f13f72b833a844b0032a066657dc79ff",
+  "claimed_state": "独立レビュー済みのP1実装開始契約。製品P1実装・数値認定・性能・実務受入は未実施。",
+  "verification": {
+    "independent_review": "rootが式/13列/低語/級数剰余/資源DAG/独立参照/日本語を通読し、5指摘の訂正後に採用可。",
+    "scope": "固定Gauss12の丸め包含と連続面積分の離散誤差を区別。source/type/script未実装gateを設計証人で代替しない。",
+    "scalar_design_witness": "Windows/Python3.12.8/stdlib、source commit固定後に12例成功。製品実行ではない。",
+    "trace": "rootがmanifest追加後matrix/checkを実行。208定義ID/試験34/記録42/0問題。"
+  },
+  "sources": {
+    "docs/specs/aero/p1-induction-kernel-contract.md": "b177098e77eefa0e57ac15bb0365f166064f01c670a9d79c7a03f50b703e72c9",
+    "docs/verification/IM-03/p1-arithmetic-design-witness.py": "a39a276eded8f13960683ef70486ed835f3ceeb384a95ecdceb0707fb9b09db9",
+    "docs/specs/aero/uvlm-induction-adopted-specification.md": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+    "docs/specs/aero/local-geometry-packet-contract.md": "662eb892eef9295312ee54b1de3c2bd911f553f44d855740722874589e368c1c",
+    "rd/aero/kernel/records/uvlm-induction-adoption-protocol.md": "7472c8818f97586b2ca3eeef3f4cb92a1606dfb18e62acac87c50b07003bbcfb"
+  },
+  "source_references": [
+    {
+      "id": "p1-start-source-p1-induction-kernel-contract",
+      "sha256": "b177098e77eefa0e57ac15bb0365f166064f01c670a9d79c7a03f50b703e72c9",
+      "hint": "docs/specs/aero/p1-induction-kernel-contract.md"
+    },
+    {
+      "id": "p1-start-source-p1-arithmetic-design-witness",
+      "sha256": "a39a276eded8f13960683ef70486ed835f3ceeb384a95ecdceb0707fb9b09db9",
+      "hint": "docs/verification/IM-03/p1-arithmetic-design-witness.py"
+    },
+    {
+      "id": "p1-start-source-uvlm-induction-adopted-specification",
+      "sha256": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+      "hint": "docs/specs/aero/uvlm-induction-adopted-specification.md"
+    },
+    {
+      "id": "p1-start-source-local-geometry-packet-contract",
+      "sha256": "662eb892eef9295312ee54b1de3c2bd911f553f44d855740722874589e368c1c",
+      "hint": "docs/specs/aero/local-geometry-packet-contract.md"
+    },
+    {
+      "id": "p1-start-source-uvlm-induction-adoption-protocol",
+      "sha256": "7472c8818f97586b2ca3eeef3f4cb92a1606dfb18e62acac87c50b07003bbcfb",
+      "hint": "rd/aero/kernel/records/uvlm-induction-adoption-protocol.md"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/im03-p1-start-review.md": "e41b7371798a90a7e3a719fd696e9151e841316df3e5352b8beb9890c5a7284b",
+    "docs/verification/IM-03/p1-arithmetic-design-witness.json": "2077d256c6481c6b3afef5dea4b5c4aecc02e38d4dc78288d5e000137ee5af76"
+  },
+  "artifact_references": [
+    {
+      "id": "p1-start-artifact-im03-p1-start-review",
+      "sha256": "e41b7371798a90a7e3a719fd696e9151e841316df3e5352b8beb9890c5a7284b",
+      "hint": "docs/verification/IM-03/im03-p1-start-review.md"
+    },
+    {
+      "id": "p1-start-artifact-p1-arithmetic-design-witness",
+      "sha256": "2077d256c6481c6b3afef5dea4b5c4aecc02e38d4dc78288d5e000137ee5af76",
+      "hint": "docs/verification/IM-03/p1-arithmetic-design-witness.json"
+    }
+  ]
+}
