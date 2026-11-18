@@ -560,6 +560,21 @@ target_include_directories(uvlas_test_aero_p1_induction_resources PRIVATE "${PRO
 uvlas_enable_allocation_audit(uvlas_test_aero_p1_induction_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_p1_induction_resources)
 
+uvlas_add_test(aero.global_geometry
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/global_geometry_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_global_geometry PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_global_geometry PRIVATE
+    UVLAS_GLOBAL_GEOMETRY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/global-geometry-reference-v1.json")
+uvlas_add_test(aero.global_geometry_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/global_geometry_resources_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_global_geometry_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_global_geometry_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_global_geometry_resources)
+
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
     SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp
