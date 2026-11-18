@@ -1,0 +1,26 @@
+Filters: "P1 all 126*"
+Randomness seeded to: 2157503702
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+p1.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+P1 all 126 components agree with independent area and ambient complex step
+-------------------------------------------------------------------------------
+${ROOT}/tests/aero/p1_area_reference_test.cpp(191)
+...............................................................................
+
+${ROOT}/tests/aero/p1_area_reference_test.cpp(59): FAILED:
+  CHECK( (error <= Real{"1e-10"} || error <= Real{"1e-8"} * abs(expected)) )
+with expansion:
+  false
+with messages:
+  flat-core-0.02-face
+  basis 0 axis 2
+  variable 12
+
+===============================================================================
+test cases:   1 |   0 passed | 1 failed
+assertions: 427 | 426 passed | 1 failed
+

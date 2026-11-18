@@ -1,0 +1,112 @@
+[
+  {
+    "link_exit": 0,
+    "name": "control",
+    "filter": "[UI-D02]",
+    "compile_exit": 0,
+    "test_exit": 0,
+    "mutated_file": "p1_induction.cpp",
+    "mutated_sha256": "d61981f8af2a6f54b13828d93a3876ac9db8ccaa529ba210bacc3da5fb2e9b74",
+    "test_log": "mutations/control/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "low-word",
+    "filter": "P1 huge common*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_induction.cpp",
+    "mutated_sha256": "e8f87e941d7ed743ae727f0ed1dbbcdaa08ec30f5ac49d72ccd130e838b1682d",
+    "test_log": "mutations/low-word/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "sheet",
+    "filter": "P1 all 126*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_program_private.hpp",
+    "mutated_sha256": "763a789e3b6c0bad30bd38ba2fef0282dd97fc2c2c835a3df42bc507db9f8137",
+    "test_log": "mutations/sheet/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "radius-seed",
+    "filter": "P1 all 126*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_program_private.hpp",
+    "mutated_sha256": "041da02bb7bba5b0616e4a667c8fdd9d00f4986b7c5e1e7b43415e66915a9a13",
+    "test_log": "mutations/radius-seed/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "exterior-normal",
+    "filter": "P1 all 126*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_program_private.hpp",
+    "mutated_sha256": "76cd7eede502df42725bb159f7cbabd6485fbc2dd2919d3c97fc8e5d28a2ab0b",
+    "test_log": "mutations/exterior-normal/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "boundary-sign",
+    "filter": "P1 all 126*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_program_private.hpp",
+    "mutated_sha256": "b3d5c97246df11620aaba38899cfc2d333a346b3a10c1bafb113346b2d8bb61c",
+    "test_log": "mutations/boundary-sign/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "far-qualification",
+    "filter": "P1 far qualification rejects*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_induction.cpp",
+    "mutated_sha256": "b34509884d4389c33ce32c0e153b1b3a58dabba9a64a66f6aaf3e6bf50ce2fa9",
+    "test_log": "mutations/far-qualification/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "half-width",
+    "filter": "P1 exact qualification*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_induction.cpp",
+    "mutated_sha256": "b602a376534f35963cc3cf8f9d8f467dc6c5fd029887c3bfb9f5636fadb07b05",
+    "test_log": "mutations/half-width/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "self-zero",
+    "filter": "P1 all 126*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_induction.cpp",
+    "mutated_sha256": "b598bf8e923b0a1c548f57f3788d6c0449123123bb718b8ed1209ae00d1ff400",
+    "test_log": "mutations/self-zero/test.log"
+  },
+  {
+    "link_exit": 0,
+    "name": "abs-differential",
+    "filter": "P1 all 126*",
+    "compile_exit": 0,
+    "test_exit": 42,
+    "mutated_file": "p1_program_private.hpp",
+    "mutated_sha256": "47f7e3065996ae31de93a264d1123fdf57778e974fec6023076ab87bbd1bb3a2",
+    "test_log": "mutations/abs-differential/test.log"
+  },
+  {
+    "name": "scale-differential",
+    "test_exit": 42,
+    "compile_exit": 0,
+    "link_exit": 0,
+    "filter": "P1 huge common*",
+    "mutated_file": "p1_program_private.hpp",
+    "mutated_sha256": "9b39715b156e0d59f201a6bf095aa394fc5aa88e38e7f2db7e389894338b09b4",
+    "test_log": "mutations/scale-differential/test.log"
+  }
+]

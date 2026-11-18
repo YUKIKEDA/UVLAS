@@ -1,0 +1,8 @@
+[1/4] Processing file ${ROOT}/src/aero/p1_induction.cpp.
+62742 warnings generated.
+[2/4] Processing file ${ROOT}/tests/aero/p1_induction_test.cpp.
+132458 warnings generated.
+[3/4] Processing file ${ROOT}/tests/aero/p1_induction_resources_test.cpp.
+195012 warnings generated.
+[4/4] Processing file ${ROOT}/tests/aero/p1_area_reference_test.cpp.
+264597 warnings generated.

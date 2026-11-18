@@ -1,0 +1,17 @@
+Internal ctest changing into directory: ${ROOT}/out/issue127-build
+Test project ${ROOT}/out/issue127-build
+    Start 86: aero.p1_induction
+1/2 Test #86: aero.p1_induction ................   Passed   28.23 sec
+    Start 87: aero.p1_induction_resources
+2/2 Test #87: aero.p1_induction_resources ......   Passed    4.08 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-AERO          =  32.32 sec*proc (2 tests)
+negative        =  32.32 sec*proc (2 tests)
+property        =  32.32 sec*proc (2 tests)
+unit            =  28.23 sec*proc (1 test)
+verification    =  32.32 sec*proc (2 tests)
+
+Total Test time (real) =  32.33 sec
