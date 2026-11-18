@@ -1,0 +1,27 @@
+{
+  "schema": "uvlas.test-strengthening-bridge/1",
+  "id": "im01-3-direct-product-jets-bridge",
+  "original_fullsuite_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+  "strengthened_test_commit": "998ae1312afb76ccb0910391dce9c6f3331e3283",
+  "path": "tests/structure/pg_coefficients_test.cpp",
+  "original_sha256": "078567dac6d841aaca9b4f0e0fc2a5d940189958dd09831f009568b119ae42e9",
+  "comment_only_intermediate_sha256": "7c17e87a5080b7e2e7bddb7c60974b1d365c612298b629c6e70324e5c6ec6037",
+  "strengthened_sha256": "c9382912bc5538e570933f53a8089f32013b5b6a4f9bc4c0927646aca17376be",
+  "diff_artifact": "test-strengthening.diff",
+  "scope": "製品vの実(1,0)/(0,1)係数×4nを独立oracleのds/dt各6値へ直接比較し、実jetで膜/director残差を評価。fx/fyの中点値も独立値へ照合。製品source/fixture/resource/旧6factoryは変更しない。",
+  "debug": {
+    "cases": 1,
+    "assertions": 463681,
+    "run_exit": 0,
+    "clean_build_info": true
+  },
+  "release": {
+    "cases": 1,
+    "assertions": 463681,
+    "run_exit": 0,
+    "clean_build_info": true
+  },
+  "tidy_exit": 0,
+  "reuse": "旧de292のfullsuite505720/67、7mutants、単発n4はその履歴のまま有効。追加1caseだけD/Rを実行し、他の既通過対象を繰り返さない。",
+  "review": "rootとGeneralが新helper/実jet→物理tx,ty/膜式をread-onlyで独立通読し、未解決の重大指摘なし。"
+}

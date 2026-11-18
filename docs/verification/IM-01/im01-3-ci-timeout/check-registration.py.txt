@@ -1,0 +1,65 @@
+from pathlib import Path
+import hashlib
+import json
+import re
+import subprocess
+import sys
+
+root = Path(sys.argv[1]).resolve()
+out = root / 'out/pr113-ci-timeout'
+out.mkdir(exist_ok=True)
+source = (root / 'tests/CMakeLists.txt').read_bytes()
+match = re.search(rb'uvlas_add_test\(structure\.pg_coefficients\s+TIMEOUT\s+(\d+)', source)
+assert match
+default = int(match[1])
+guard = b'if(UVLAS_SANITIZERS AND NOT MSVC)\n    set_tests_properties(structure.pg_coefficients PROPERTIES TIMEOUT 900)\nendif()\n'
+assert source.count(guard) == 1
+probe = out / 'probe-source'
+probe.mkdir(exist_ok=True)
+(probe / 'guard.cmake').write_bytes(guard)
+(probe / 'CMakeLists.txt').write_text('''cmake_minimum_required(VERSION 3.25)
+project(PgTimeoutRegistration LANGUAGES NONE)
+enable_testing()
+# These variables model the guard inputs; no compiler or instrumented binary is used.
+set(MSVC ${PROBE_MSVC})
+set(UVLAS_SANITIZERS "${PROBE_SANITIZERS}")
+add_test(NAME structure.pg_coefficients COMMAND "${CMAKE_COMMAND}" -E true)
+add_test(NAME structure.pg_coefficients_resources COMMAND "${CMAKE_COMMAND}" -E true)
+set_tests_properties(structure.pg_coefficients PROPERTIES TIMEOUT '''+str(default)+''')
+set_tests_properties(structure.pg_coefficients_resources PROPERTIES TIMEOUT 60)
+include("${CMAKE_CURRENT_LIST_DIR}/guard.cmake")
+''', encoding='utf-8', newline='\n')
+rows = []
+for generator in ['Ninja', 'Ninja Multi-Config']:
+    for msvc in [False, True]:
+        for sanitized in [False, True]:
+            name = f'{generator.replace(" ", "-")}-{int(msvc)}-{int(sanitized)}'
+            build = out / name
+            command = ['cmake', '-S', str(probe), '-B', str(build), '-G', generator,
+                       '-DPROBE_MSVC='+('TRUE' if msvc else 'FALSE'),
+                       '-DPROBE_SANITIZERS='+('address,undefined' if sanitized else '')]
+            if generator == 'Ninja':
+                command += ['-DCMAKE_BUILD_TYPE=Debug']
+            run = subprocess.run(command, capture_output=True)
+            (out / (name+'-configure.log')).write_bytes(run.stdout+run.stderr)
+            assert run.returncode == 0, run.stderr.decode()
+            for config in (['Debug'] if generator == 'Ninja' else ['Debug', 'Release']):
+                run = subprocess.run(['ctest', '--test-dir', str(build), '-C', config,
+                                      '--show-only=json-v1'], capture_output=True, check=True)
+                tests = json.loads(run.stdout)['tests']
+                observed = {t['name']: next(p['value'] for p in t['properties'] if p['name']=='TIMEOUT')
+                            for t in tests}
+                expected = 900 if sanitized and not msvc else 300
+                assert observed == {'structure.pg_coefficients': expected,
+                                    'structure.pg_coefficients_resources': 60}, observed
+                rows.append({'generator':generator, 'configuration':config, 'msvc_input':msvc,
+                             'sanitizers_input':sanitized, 'timeouts':observed})
+report = {'schema':'uvlas.timeout-registration-check/1',
+          'scope':'Compiler-free guard input probes and CTest registration only; no Linux compiler or sanitizer execution.',
+          'cmake_sha256':hashlib.sha256(source).hexdigest(),
+          'extracted_guard_sha256':hashlib.sha256(guard).hexdigest(),
+          'configurations':rows, 'passed':True}
+target = out / 'registration-probes.json'
+assert not target.exists()
+target.write_bytes((json.dumps(report, indent=2)+'\n').encode())
+print(json.dumps({'registration_views':len(rows), 'passed':True, 'sanitizer_execution':False}))

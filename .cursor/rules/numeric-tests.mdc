@@ -25,6 +25,16 @@ alwaysApply: true
 - 数値処理・数値試験の変更は、影響する試験をWindowsとLinuxの両方で走らせる。無関係な試験を含めて毎回全体を走らせる指示ではない。検証の範囲と再実行は `workflow` に従う。
 - 図の一致ではなく、元の数値を比べる。
 
+不変量の残差には、製品から得た値と微分を使う。2026-11-17のIssue #108では、当初の膜残差をoracleの一次微分だけで評価していた。製品の係数から得た一次微分を独立oracleへ直接照合し、その実際の微分で膜残差を検査するよう補強した。oracle自身の残差だけを製品の不変量検証と数えない。
+
+```cpp
+// BAD: only checking the oracle's own invariant
+CHECK(membrane(reference_jet) == 0);
+// GOOD: compare independently, then check the actual product output
+CHECK(actual_jet == reference_jet);
+CHECK(membrane(actual_jet) == 0);
+```
+
 隔離変異のcontrol sourceは元のbytesをそのまま複製し、元SHAとの一致を確認する。text読取り・書出しによる改行正規化を、rawが同一であることの代用にしない。Issue #86ではWindowsのrunnerがLFをCRLFへ変えたため、旧snapshotを保持したままbyte複製の新controlと変異を実行し直した。変異ごとの変更箇所以外も含め、入力hashと実際にlinkしたproducerを照合する。
 
 ```cpp

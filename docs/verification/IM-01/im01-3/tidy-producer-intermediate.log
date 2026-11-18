@@ -1,0 +1,9 @@
+62471 warnings and 1 error generated.
+Error while processing <PG_WORKTREE>\src\structure\pg_coefficients.cpp.
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:179:33: error: non-constant-expression cannot be narrowed from type 'core::Index' (aka 'long long') to 'std::uint64_t' (aka 'unsigned long long') in initializer list [clang-diagnostic-c++11-narrowing]
+  179 |                     {op.limits, static_cast<core::Index>(forecast.cells), limits.cancellation},
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:179:33: note: insert an explicit cast to silence this issue
+  179 |                     {op.limits, static_cast<core::Index>(forecast.cells), limits.cancellation},
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                 static_cast<uint64_t>(                  )

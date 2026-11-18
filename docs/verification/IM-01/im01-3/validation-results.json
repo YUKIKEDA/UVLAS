@@ -1,0 +1,98 @@
+[
+  {
+    "configuration": "Debug",
+    "step": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "<PG_WORKTREE>\\out\\issue94-build",
+      "--config",
+      "Debug",
+      "--target",
+      "uvlas_test_structure_pg_coefficients",
+      "uvlas_test_structure_pg_coefficients_resources",
+      "uvlas_cli",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "seconds": 14.12069582939148,
+    "log": "<PG_WORKTREE>\\out\\issue108-contract\\clean-debug-build.log"
+  },
+  {
+    "configuration": "Debug",
+    "step": "tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "<PG_WORKTREE>\\out\\issue94-build",
+      "-C",
+      "Debug",
+      "--output-on-failure",
+      "-R",
+      "^structure\\.pg_coefficients(_resources)?$"
+    ],
+    "exit_code": 0,
+    "seconds": 181.35964798927307,
+    "log": "<PG_WORKTREE>\\out\\issue108-contract\\clean-debug-tests.log"
+  },
+  {
+    "configuration": "Debug",
+    "step": "build-info",
+    "command": [
+      "<PG_WORKTREE>\\out\\issue94-build\\Debug\\uvlas.exe",
+      "--build-info"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0428614616394043,
+    "log": "<PG_WORKTREE>\\out\\issue108-contract\\clean-debug-build-info.log"
+  },
+  {
+    "configuration": "Release",
+    "step": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "<PG_WORKTREE>\\out\\issue94-build",
+      "--config",
+      "Release",
+      "--target",
+      "uvlas_test_structure_pg_coefficients",
+      "uvlas_test_structure_pg_coefficients_resources",
+      "uvlas_cli",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "seconds": 24.163227796554565,
+    "log": "<PG_WORKTREE>\\out\\issue108-contract\\clean-release-build.log"
+  },
+  {
+    "configuration": "Release",
+    "step": "tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "<PG_WORKTREE>\\out\\issue94-build",
+      "-C",
+      "Release",
+      "--output-on-failure",
+      "-R",
+      "^structure\\.pg_coefficients(_resources)?$"
+    ],
+    "exit_code": 0,
+    "seconds": 49.09129858016968,
+    "log": "<PG_WORKTREE>\\out\\issue108-contract\\clean-release-tests.log"
+  },
+  {
+    "configuration": "Release",
+    "step": "build-info",
+    "command": [
+      "<PG_WORKTREE>\\out\\issue94-build\\Release\\uvlas.exe",
+      "--build-info"
+    ],
+    "exit_code": 0,
+    "seconds": 0.04509234428405762,
+    "log": "<PG_WORKTREE>\\out\\issue108-contract\\clean-release-build-info.log"
+  }
+]

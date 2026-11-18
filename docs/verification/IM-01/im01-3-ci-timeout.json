@@ -1,0 +1,107 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-3-ci-sanitizer-timeout",
+  "ids": [
+    "SH-D03",
+    "SH-D05",
+    "SH-D07"
+  ],
+  "package": "IM-01",
+  "issue": 108,
+  "pull_request": 113,
+  "date": "2026-11-17",
+  "source_commit": "ab8f0e87214cb09d355e0e80be5ff20ef274084a",
+  "failed_head": "e7fc7b662fa358c536151f6a067fd09718baf284",
+  "cause": "Linux ASan/UBSanのstructure.pg_coefficientsが300.13秒でCTest timeout。83/84は成功、当該試験は完了していない。",
+  "correction": "実際のsanitizer flagと同じUVLAS_SANITIZERS AND NOT MSVC条件で当該試験の有限上限を900秒とする。通常300秒、resource60秒を維持。900は実測性能ではなく実行予算。",
+  "checks": {
+    "registration_guard": "compiler-free CMake guard入力4条件×single/multi、12登録viewで期待300/900/resource60。dummy test登録だけでLinux compiler/ASan実行はない。",
+    "actual_normal_registration": "既存MSVC Ninja Multi-Configをinstall OFFで再構成。Debug/Releaseで実PG2targetsのTIMEOUT300/60を確認。試験実行なし。",
+    "source_preservation": "旧PG manifestの21sourceがbyte一致、数値式・許容差・fixture・Catch testの内容は不変。CMake追加5行だけを確認。",
+    "independent_review": "別担当がcompiler flag条件と修正を通読。aggregate timeoutに限定したコメントへ訂正し、逆置換とhashで登録検査版からのコメント差分だけと確認。日本語規則の独立読みも追加指摘なし。",
+    "japanese": "testing.mdcのquick lintはlow_burstiness warn1。技術条件と既存規則の並列構造を保持。専用rawは保存していない。",
+    "prior_ci": "旧head e7fc7b6はWindows D237.50s/R39.67s、Linux D94.44s/R22.12sで当該試験成功。新headのsanitizer完走は未確認。",
+    "not_repeated": "製品・検証内容が不変のため既存D/R・旧変異・数値全suiteは再実行しない。CI完了待機なし。",
+    "integrity": {
+      "files": 11,
+      "manifests": 1,
+      "errors": 0
+    },
+    "trace": {
+      "defined": 208,
+      "with_tests": 34,
+      "with_records": 41,
+      "problems": 0
+    }
+  },
+  "claimed_state": "CTest上限の構成修正。新しいsanitizer成功、数値資格、性能資格は主張しない。",
+  "historical_evidence": "旧PG記録と統合記録は旧headの固定証拠。旧統合記録のtests/CMakeLists.txt live hintは新treeでは古くなるため、現treeへの再帰hash合格とは扱わない。登録probeのCMake全体hashはコメント訂正前、条件本体は同一でcomment-bridgeを参照。",
+  "sources": {
+    "tests/CMakeLists.txt": "646ee9b68f3a0b37da7775a302dace5ec06c8832663077a56ec8f6c35f8d53e6",
+    ".cursor/rules/testing.mdc": "1522234d0a1960a4aed8529f6b9d4816cded54e3ebd30f812b898b519f6c23a4"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/im01-3-ci-timeout/check-registration.py.txt": "6052c08044fdeadaf9ab8c816e70089622c9222be835a5b2af11ea430dac7f4e",
+    "docs/verification/IM-01/im01-3-ci-timeout/ci-excerpts.json": "c643beb2341ab482a3085fea47edfba7f390423505040eb2235a04296f23c861",
+    "docs/verification/IM-01/im01-3-ci-timeout/comment-bridge.json": "9dd7bbd9ce10c27ba451270f1aab780f145b7334992ba733440bfaecdceab4cb",
+    "docs/verification/IM-01/im01-3-ci-timeout/guard.cmake": "d503b04de885125fdcfded55251dee50357a54f8d3a2ca2378689c8ef67c3ca2",
+    "docs/verification/IM-01/im01-3-ci-timeout/normal-registration-and-source.json": "d94fb7f645332c282e98c4630709903ac60633278adc2e739d722a1b2f9387e2",
+    "docs/verification/IM-01/im01-3-ci-timeout/registration-probes.json": "2ade8a2bf79eab0520b17ca460d7f318eada6fe75573154ccaf510f0c4ac8dc7",
+    "docs/verification/IM-01/im01-3.json": "1df57b36a6ccada638773cb007348776e3828a62d7c022191f26922af4ebb021",
+    "docs/verification/IM-01/im01-3-integration.json": "e2452bea684cbbddb93ca80859b408fd9ad735699d346000a4fa4a2c84c5f7f7"
+  },
+  "source_references": [
+    {
+      "id": "im01-3-timeout-source-tests-CMakeLists-txt",
+      "sha256": "646ee9b68f3a0b37da7775a302dace5ec06c8832663077a56ec8f6c35f8d53e6",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "im01-3-timeout-source--cursor-rules-testing-mdc",
+      "sha256": "1522234d0a1960a4aed8529f6b9d4816cded54e3ebd30f812b898b519f6c23a4",
+      "hint": ".cursor/rules/testing.mdc"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-ci-timeout-check-registration-py-txt",
+      "sha256": "6052c08044fdeadaf9ab8c816e70089622c9222be835a5b2af11ea430dac7f4e",
+      "hint": "docs/verification/IM-01/im01-3-ci-timeout/check-registration.py.txt"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-ci-timeout-ci-excerpts-json",
+      "sha256": "c643beb2341ab482a3085fea47edfba7f390423505040eb2235a04296f23c861",
+      "hint": "docs/verification/IM-01/im01-3-ci-timeout/ci-excerpts.json"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-ci-timeout-comment-bridge-json",
+      "sha256": "9dd7bbd9ce10c27ba451270f1aab780f145b7334992ba733440bfaecdceab4cb",
+      "hint": "docs/verification/IM-01/im01-3-ci-timeout/comment-bridge.json"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-ci-timeout-guard-cmake",
+      "sha256": "d503b04de885125fdcfded55251dee50357a54f8d3a2ca2378689c8ef67c3ca2",
+      "hint": "docs/verification/IM-01/im01-3-ci-timeout/guard.cmake"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-ci-timeout-normal-registration-and-source-json",
+      "sha256": "d94fb7f645332c282e98c4630709903ac60633278adc2e739d722a1b2f9387e2",
+      "hint": "docs/verification/IM-01/im01-3-ci-timeout/normal-registration-and-source.json"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-ci-timeout-registration-probes-json",
+      "sha256": "2ade8a2bf79eab0520b17ca460d7f318eada6fe75573154ccaf510f0c4ac8dc7",
+      "hint": "docs/verification/IM-01/im01-3-ci-timeout/registration-probes.json"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-json",
+      "sha256": "1df57b36a6ccada638773cb007348776e3828a62d7c022191f26922af4ebb021",
+      "hint": "docs/verification/IM-01/im01-3.json"
+    },
+    {
+      "id": "im01-3-timeout-artifact-docs-verification-IM-01-im01-3-integration-json",
+      "sha256": "e2452bea684cbbddb93ca80859b408fd9ad735699d346000a4fa4a2c84c5f7f7",
+      "hint": "docs/verification/IM-01/im01-3-integration.json"
+    }
+  ]
+}

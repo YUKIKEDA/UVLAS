@@ -1,0 +1,69 @@
+{
+  "id": "im01-3-timeout-ci-excerpts",
+  "head": "e7fc7b662fa358c536151f6a067fd09718baf284",
+  "jobs": [
+    {
+      "id": "im01-3-timeout-ci-sanitize",
+      "job_id": 134054637854,
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44087746445/job/134054637854",
+      "raw_sha256": "6ebb197206b527c0e2d854457d0e379bf4a16e34624ad0594519a50e5924d6f0",
+      "excerpt": [
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:03:28.2875221Z       Start 50: structure.pg_coefficients",
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:08:28.4194504Z 50/84 Test #50: structure.pg_coefficients ..............***Timeout 300.13 sec",
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:08:28.4196497Z       Start 51: structure.pg_coefficients_resources",
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:08:28.7669827Z 51/84 Test #51: structure.pg_coefficients_resources ....   Passed    0.35 sec",
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:08:52.6323084Z 99% tests passed, 1 tests failed out of 84",
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:08:52.6328174Z Total Test time (real) = 344.68 sec",
+        "build and test (linux, gcc 14, linux-sanitize)\tConfigure, build, test\t2026-11-17T13:08:52.6329133Z \t 50 - structure.pg_coefficients (Timeout)               V-PG negative property unit verification"
+      ]
+    },
+    {
+      "id": "im01-3-timeout-ci-linux-debug",
+      "job_id": 134054637523,
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44087746445/job/134054637523",
+      "raw_sha256": "6b854f4745bc7cd5b136b5ae9cc01fcd42c1e171abb8de6257696227b75ac959",
+      "excerpt": [
+        "build and test (linux, gcc 14, linux-debug)\tConfigure, build, test\t2026-11-17T13:01:12.7806138Z       Start 50: structure.pg_coefficients",
+        "build and test (linux, gcc 14, linux-debug)\tConfigure, build, test\t2026-11-17T13:02:47.2250619Z 50/84 Test #50: structure.pg_coefficients ..............   Passed   94.44 sec",
+        "build and test (linux, gcc 14, linux-debug)\tConfigure, build, test\t2026-11-17T13:02:47.2251135Z       Start 51: structure.pg_coefficients_resources",
+        "build and test (linux, gcc 14, linux-debug)\tConfigure, build, test\t2026-11-17T13:02:47.3051296Z 51/84 Test #51: structure.pg_coefficients_resources ....   Passed    0.08 sec",
+        "build and test (linux, gcc 14, linux-debug)\tConfigure, build, test\t2026-11-17T13:02:58.3881629Z 100% tests passed, 0 tests failed out of 84",
+        "build and test (linux, gcc 14, linux-debug)\tConfigure, build, test\t2026-11-17T13:02:58.3890814Z Total Test time (real) = 115.51 sec"
+      ]
+    },
+    {
+      "id": "im01-3-timeout-ci-linux-release",
+      "job_id": 134054637579,
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44087746445/job/134054637579",
+      "raw_sha256": "7f6deb737e9df3a75a1c073e5a3ff0982a374309e301f9be9880986cdbf9d8b5",
+      "excerpt": [
+        "build and test (linux, gcc 14, linux-release)\tUNKNOWN STEP\t2026-11-17T13:04:20.9383217Z       Start 51: structure.pg_coefficients",
+        "build and test (linux, gcc 14, linux-release)\tUNKNOWN STEP\t2026-11-17T13:04:43.0559932Z 51/85 Test #51: structure.pg_coefficients ..............   Passed   22.12 sec",
+        "build and test (linux, gcc 14, linux-release)\tUNKNOWN STEP\t2026-11-17T13:04:43.0564204Z       Start 52: structure.pg_coefficients_resources",
+        "build and test (linux, gcc 14, linux-release)\tUNKNOWN STEP\t2026-11-17T13:04:43.0688046Z 52/85 Test #52: structure.pg_coefficients_resources ....   Passed    0.01 sec",
+        "build and test (linux, gcc 14, linux-release)\tUNKNOWN STEP\t2026-11-17T13:04:52.6930521Z 100% tests passed, 0 tests failed out of 85",
+        "build and test (linux, gcc 14, linux-release)\tUNKNOWN STEP\t2026-11-17T13:04:52.6933981Z Total Test time (real) = 186.40 sec"
+      ]
+    },
+    {
+      "id": "im01-3-timeout-ci-windows",
+      "job_id": 134054637531,
+      "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44087746445/job/134054637531",
+      "raw_sha256": "c287114ed645ca5d52e031e1f28d685ed0abdf4c59d8f7a17d2bee784643ae76",
+      "excerpt": [
+        "build and test (windows, msvc)\tTest Debug\t2026-11-17T13:06:15.5226709Z       Start 50: structure.pg_coefficients",
+        "build and test (windows, msvc)\tTest Debug\t2026-11-17T13:10:13.0186810Z 50/85 Test #50: structure.pg_coefficients ..............   Passed  237.50 sec",
+        "build and test (windows, msvc)\tTest Debug\t2026-11-17T13:10:13.0193456Z       Start 51: structure.pg_coefficients_resources",
+        "build and test (windows, msvc)\tTest Debug\t2026-11-17T13:10:13.1772713Z 51/85 Test #51: structure.pg_coefficients_resources ....   Passed    0.16 sec",
+        "build and test (windows, msvc)\tTest Debug\t2026-11-17T13:10:42.2269146Z 100% tests passed out of 85",
+        "build and test (windows, msvc)\tTest Debug\t2026-11-17T13:10:42.2275638Z Total Test time (real) = 350.84 sec",
+        "build and test (windows, msvc)\tTest Release\t2026-11-17T13:31:57.5515493Z       Start 51: structure.pg_coefficients",
+        "build and test (windows, msvc)\tTest Release\t2026-11-17T13:32:37.2207826Z 51/86 Test #51: structure.pg_coefficients ..............   Passed   39.67 sec",
+        "build and test (windows, msvc)\tTest Release\t2026-11-17T13:32:37.2213380Z       Start 52: structure.pg_coefficients_resources",
+        "build and test (windows, msvc)\tTest Release\t2026-11-17T13:32:37.2552371Z 52/86 Test #52: structure.pg_coefficients_resources ....   Passed    0.03 sec",
+        "build and test (windows, msvc)\tTest Release\t2026-11-17T13:32:59.4809177Z 100% tests passed out of 86",
+        "build and test (windows, msvc)\tTest Release\t2026-11-17T13:32:59.4813752Z Total Test time (real) = 746.34 sec"
+      ]
+    }
+  ]
+}

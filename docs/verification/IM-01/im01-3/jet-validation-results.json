@@ -1,0 +1,84 @@
+[
+  {
+    "configuration": "Debug",
+    "kind": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "<PG_WORKTREE>\\out\\issue94-build",
+      "--config",
+      "Debug",
+      "--target",
+      "uvlas_test_structure_pg_coefficients",
+      "uvlas_cli",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "seconds": 3.9665639400482178,
+    "log": "<PG_WORKTREE>\\out\\issue108-evidence\\jet-debug-build.log"
+  },
+  {
+    "configuration": "Debug",
+    "kind": "jet",
+    "command": [
+      "<PG_WORKTREE>\\out\\issue94-build\\tests\\Debug\\uvlas_test_structure_pg_coefficients.exe",
+      "PG all quartic*"
+    ],
+    "exit_code": 0,
+    "seconds": 59.927560567855835,
+    "log": "<PG_WORKTREE>\\out\\issue108-evidence\\jet-debug-jet.log"
+  },
+  {
+    "configuration": "Debug",
+    "kind": "build-info",
+    "command": [
+      "<PG_WORKTREE>\\out\\issue94-build\\Debug\\uvlas.exe",
+      "--build-info"
+    ],
+    "exit_code": 0,
+    "seconds": 0.04255318641662598,
+    "log": "<PG_WORKTREE>\\out\\issue108-evidence\\jet-debug-build-info.log"
+  },
+  {
+    "configuration": "Release",
+    "kind": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "<PG_WORKTREE>\\out\\issue94-build",
+      "--config",
+      "Release",
+      "--target",
+      "uvlas_test_structure_pg_coefficients",
+      "uvlas_cli",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "seconds": 7.877032995223999,
+    "log": "<PG_WORKTREE>\\out\\issue108-evidence\\jet-release-build.log"
+  },
+  {
+    "configuration": "Release",
+    "kind": "jet",
+    "command": [
+      "<PG_WORKTREE>\\out\\issue94-build\\tests\\Release\\uvlas_test_structure_pg_coefficients.exe",
+      "PG all quartic*"
+    ],
+    "exit_code": 0,
+    "seconds": 6.627641916275024,
+    "log": "<PG_WORKTREE>\\out\\issue108-evidence\\jet-release-jet.log"
+  },
+  {
+    "configuration": "Release",
+    "kind": "build-info",
+    "command": [
+      "<PG_WORKTREE>\\out\\issue94-build\\Release\\uvlas.exe",
+      "--build-info"
+    ],
+    "exit_code": 0,
+    "seconds": 0.03659224510192871,
+    "log": "<PG_WORKTREE>\\out\\issue108-evidence\\jet-release-build-info.log"
+  }
+]

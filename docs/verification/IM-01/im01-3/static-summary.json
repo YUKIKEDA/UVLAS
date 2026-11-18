@@ -1,0 +1,33 @@
+{
+  "schema": "uvlas.static-inspection-summary/1",
+  "id": "im01-3-static-inspection-summary",
+  "source_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+  "records": [
+    {
+      "source": "src/structure/pg_coefficients.cpp",
+      "exit_code": 0,
+      "log": "tidy-producer-final.log",
+      "evidence": "実行toolのexit0と保存stdout。初回/中間は別logへ保持。"
+    },
+    {
+      "source": "tests/structure/pg_coefficients_test.cpp",
+      "exit_code": 0,
+      "log": "tidy-normal-final.log",
+      "evidence": "実行toolのexit0と保存stdout。"
+    },
+    {
+      "source": "tests/structure/pg_coefficients_resource_test.cpp",
+      "exit_code": 0,
+      "log": "tidy-resource-final.log",
+      "evidence": "初回検査でexit0、以後source不変。"
+    },
+    {
+      "source": "tests/structure/pg_coefficients_reference_test.cpp",
+      "exit_code": 0,
+      "raw_saved": false,
+      "snapshot_sha256": "c4e1dc287dce655fefc6d0ef85d56fa0ae83db8056673aa4685bdd0ce8f63",
+      "evidence": "独立担当im00_9の実行報告。最終caps/tag変更前、stdout68482 warnings generated.、対象診断なし。全warning0ではない。"
+    }
+  ],
+  "note": "clang-tidy21.1.1、単一Debug entry DB。外部headerの集約warningとプロジェクト対象診断を区別する。新しい検査の再実行/再構成ではない。"
+}

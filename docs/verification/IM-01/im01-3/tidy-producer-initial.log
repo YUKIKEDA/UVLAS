@@ -1,0 +1,66 @@
+62489 warnings and 2 errors generated.
+Error while processing <PG_WORKTREE>\src\structure\pg_coefficients.cpp.
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:48:53: error: std::move of the variable 'info' of the trivially-copyable type 'PgCoefficientPreparation' has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+   48 |     return PgCoefficientDictionary{std::move(data), std::move(info)};
+      |                                                     ^~~~~~~~~~    ~
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:53:37: error: std::move of the variable 'info' of the trivially-copyable type 'PgCoefficientPreparation' has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+   53 |     : data_(std::move(data)), info_(std::move(info)) {}
+      |                                     ^~~~~~~~~~    ~
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:181:64: error: narrowing conversion from 'std::uint64_t' (aka 'unsigned long long') to signed type 'Index' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions,-warnings-as-errors]
+  181 |                     pg_take(plan.allocate<PgCoefficientSource>(forecast.full_columns, operation));
+      |                                                                ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:183:56: error: narrowing conversion from 'std::uint64_t' (aka 'unsigned long long') to signed type 'Index' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions,-warnings-as-errors]
+  183 |                     plan.allocate<PgCoefficientRecord>(forecast.record_capacity, operation));
+      |                                                        ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:184:66: error: narrowing conversion from 'std::uint64_t' (aka 'unsigned long long') to signed type 'Index' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions,-warnings-as-errors]
+  184 |                 data.denominator = pg_take(plan.allocate<PgPoly>(forecast.cells, operation));
+      |                                                                  ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:186:63: error: narrowing conversion from 'std::uint64_t' (aka 'unsigned long long') to signed type 'Index' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions,-warnings-as-errors]
+  186 |                     pg_take(plan.allocate<PgRequiredMapEntry>(forecast.map_capacity, operation));
+      |                                                               ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:188:62: error: narrowing conversion from 'std::uint64_t' (aka 'unsigned long long') to signed type 'Index' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions,-warnings-as-errors]
+  188 |                     pg_take(plan.allocate<PgAnchorCMapEntry>(forecast.c_map_capacity, operation));
+      |                                                              ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:189:67: error: missing field 'cells' initializer [clang-diagnostic-missing-field-initializers]
+  189 |                 PgCoefficientGeneration generated{data, op, limits};
+      |                                                                   ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:199:61: error: missing field 'ell' initializer [clang-diagnostic-missing-field-initializers]
+  199 |                 PgCoefficientCompletion completion{generated};
+      |                                                             ^
+<PG_WORKTREE>\src\structure\pg_coefficients.cpp:255:71: error: std::move of the variable 'info' of the trivially-copyable type 'PgCoefficientPreparation' has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+  255 |                 return PgCoefficientFactory::make(std::move(storage), std::move(info));
+      |                                                                       ^~~~~~~~~~    ~
+<PG_WORKTREE>\src\structure\pg_coefficients_generate.hpp:70:5: error: function 'key' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+   70 |     std::uint64_t key(const PgCoefficientRecord& entry) const noexcept {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_generate.hpp:83:5: error: function 'get' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+   83 |     const PgPoly& get(core::Index column, PgCellIndex cell,
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_maps.hpp:17:12: error: returning a constant reference parameter may cause use-after-free when the parameter is constructed from a temporary [bugprone-return-const-ref-from-parameter,-warnings-as-errors]
+   17 |     return zero;
+      |            ^~~~
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:118:5: error: function 'value_bits' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  118 |     std::uint64_t value_bits(const PgBudgetPolynomial& value) const {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:134:5: error: function 'external_owner' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  134 |     std::uint64_t external_owner(const PgBudgetPolynomial& value) const {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:138:5: error: function 'generic_scratch' should be marked [[nodiscard]] [modernize-use-nodiscard,-warnings-as-errors]
+  138 |     std::uint64_t generic_scratch(std::uint64_t work, std::uint64_t raw) const {
+      |     ^
+      |     [[nodiscard]] 
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:830:78: error: performing an implicit widening conversion to type 'std::uint64_t' (aka 'unsigned long long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result,-warnings-as-errors]
+  830 |         9 + 4 * cells, pg_add(4 * nodes + 2 * axis * (3 * n + 7) + 8 * axis, 4 * 19 + 80 * axis));
+      |                                                                              ^
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:830:78: note: make conversion explicit to silence this warning
+  830 |         9 + 4 * cells, pg_add(4 * nodes + 2 * axis * (3 * n + 7) + 8 * axis, 4 * 19 + 80 * axis));
+      |                                                                              ^~~~~~
+      |                                                                              static_cast<std::uint64_t>( )
+<PG_WORKTREE>\src\structure\pg_coefficients_plan.hpp:830:78: note: perform multiplication in a wider type
+  830 |         9 + 4 * cells, pg_add(4 * nodes + 2 * axis * (3 * n + 7) + 8 * axis, 4 * 19 + 80 * axis));
+      |                                                                              ^
+      |                                                                              static_cast<long long>( )

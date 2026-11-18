@@ -1,0 +1,13 @@
+{
+  "schema": "uvlas.comment-only-source-bridge/1",
+  "id": "im01-3-stop-source-api-comment-bridge",
+  "execution_commit": "de292e7e8afc1206c5a0cd6f22cfc34c66d6dfd6",
+  "path": "tests/structure/pg_coefficients_test.cpp",
+  "executed_sha256": "078567dac6d841aaca9b4f0e0fc2a5d940189958dd09831f009568b119ae42e9",
+  "current_sha256": "7c17e87a5080b7e2e7bddb7c60974b1d365c612298b629c6e70324e5c6ec6037",
+  "before": "    std::stop_source stop;\n",
+  "after": "    // MSVC 14.51 request_stop is non-const; libstdc++ declares it const.\n    // NOLINTNEXTLINE(misc-const-correctness): preserve the portable non-const handle.\n    std::stop_source stop;\n",
+  "only_this_replacement": true,
+  "reason": "既存PR90/既存cpp規約に従い、MSVCとlibstdc++のrequest_stop const性の差を理由とする限定宣言コメントを追加。C++実行token/数値式/検査期待/容量は同一。固定変異完了後に追加したためde292の実行/変異source hashは保持する。",
+  "verification": "差分はこの2コメント行だけ。format確認、数値試験/変異/計測の再実行なし。"
+}

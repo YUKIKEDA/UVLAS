@@ -1,0 +1,372 @@
+{
+  "schema": "uvlas.evidence-redaction/1",
+  "note": "原rawはoutへ保持。公開派生のみLF化と個人path匿名化。バイナリ非公開。",
+  "entries": [
+    {
+      "raw_label": "out/issue108-contract/clean-debug-build.log",
+      "published": "docs/verification/IM-01/im01-3/debug-build.log",
+      "raw_sha256": "1f76e86e1eef8bbf766855aaf26d73260f315263da9c203bf652aca9a005f42d",
+      "published_sha256": "c5231e8c034d09e8c69dde552d67caa91cbd4b895a0d9afb1d460d52eece5484",
+      "replacements": 4,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-debug-tests.log",
+      "published": "docs/verification/IM-01/im01-3/debug-tests.log",
+      "raw_sha256": "9dcb5bc994973bc3be53be35635461438802eefff28a06f65e5a33c2e41497e3",
+      "published_sha256": "c3aa03c6dd02cee1614a5cc668d1166cb4eedb6d4e0d6dc1ad24e9cb6e26e3d5",
+      "replacements": 2,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-debug-build-info.log",
+      "published": "docs/verification/IM-01/im01-3/build-info-debug.json",
+      "raw_sha256": "3777bc07621ecbfa99912ee6ae8c78f604d74c89f81324c14aad8e6693ae8e52",
+      "published_sha256": "074c8521925747d510875fb9d5ff18e24ea2d1c9a293feb0ed4af63248b67ec9",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-release-build.log",
+      "published": "docs/verification/IM-01/im01-3/release-build.log",
+      "raw_sha256": "8c0ea1cb4d255448336e5c2d4048f5edfd05434519841692726891bf6546c821",
+      "published_sha256": "66fdff70f3f2dd57da6243c6cbea8c74b31ccd5642610a8159f1a11cd5318fca",
+      "replacements": 4,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-release-tests.log",
+      "published": "docs/verification/IM-01/im01-3/release-tests.log",
+      "raw_sha256": "eda30d6ae2eceb55f2f2bed5ad67387bead7569ed7478cfb07b5c98d30c1d2e8",
+      "published_sha256": "0653a49cab86aa90444449f3d329fb4ef6cca10e2fbe716399c40c4458a9ce0d",
+      "replacements": 2,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-release-build-info.log",
+      "published": "docs/verification/IM-01/im01-3/build-info-release.json",
+      "raw_sha256": "1416fd155f058a1d27dc65cafed31115dc195ea99d276c3df157817c052f1a18",
+      "published_sha256": "23d4e1cc518d753f5e1011e796823677b8c588338f0c774037e5d3f2050e1bf8",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-release-catch.log",
+      "published": "docs/verification/IM-01/im01-3/release-catch.log",
+      "raw_sha256": "aa834ee24936952221e0de3c1a383f9abaad48009dc19b0f0ba5994a1cffbf38",
+      "published_sha256": "053d3fce5f620af9a25965c70928e44efd1213e2bf8709fb7cdf5598b479c9e0",
+      "replacements": 4,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 54
+    },
+    {
+      "raw_label": "out/issue108-contract/clean-validation-results.json",
+      "published": "docs/verification/IM-01/im01-3/validation-results.json",
+      "raw_sha256": "f71bcc82ee290625a2cd591f63981f580fe57fa4293c260dc5c881cf958f3772",
+      "published_sha256": "0b7384ee1a8c8b29307613a07a094e682077267705f86eeb8e0766cad6a071ea",
+      "replacements": 12,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/final-validation.py",
+      "published": "docs/verification/IM-01/im01-3/validation-runner.py",
+      "raw_sha256": "76418874881e0e26e58847130199b8f0bf0d8b30a5baf51974c929e73600c2aa",
+      "published_sha256": "5c226dda600b0df511dc41047ac14fe00b1e2e008d5135632c07374e4e2839e4",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/pg_coefficients-final2.log",
+      "published": "docs/verification/IM-01/im01-3/tidy-producer-final.log",
+      "raw_sha256": "ac267546e3cb7236520d5968aa1a6b8e48d7caeaac498a567bf94a57fb2685f5",
+      "published_sha256": "32845c32d13b7e6569faf81a983b630fd3635cb437754e82a3592a241ff106b8",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/pg_coefficients_test-final.log",
+      "published": "docs/verification/IM-01/im01-3/tidy-normal-final.log",
+      "raw_sha256": "15838075e0fcf4343279ae0535fabdf55ee3e829acd828f7d351e3fe5b1e7411",
+      "published_sha256": "7face4a29592911686e5e1933aa9cbd3ba0c4b52e93e9058739ab79dbb0ae1bb",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/pg_coefficients_resource_test.log",
+      "published": "docs/verification/IM-01/im01-3/tidy-resource-final.log",
+      "raw_sha256": "e9cfad5c7b05fc6f1b3e819e1414d6777e54d88ad85c835bec36a0f40faa8ff1",
+      "published_sha256": "3314bc5f1c98ef754ab8f3e32adf0a3a4f279f28c019e7044f534a1aa0f3b68f",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/pg_coefficients.log",
+      "published": "docs/verification/IM-01/im01-3/tidy-producer-initial.log",
+      "raw_sha256": "ec3cfd2678640b491b4babb641a5621d684c7eb1c5c199779c97a4a580dce4b5",
+      "published_sha256": "fc9e22e35d15e20cc6ccad58d6125c56869c68e49c27ea732fa543289555720a",
+      "replacements": 20,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/pg_coefficients-final.log",
+      "published": "docs/verification/IM-01/im01-3/tidy-producer-intermediate.log",
+      "raw_sha256": "efffece52f3cc723f389ad116f3bbd2c58a8c3f0830e87895566feb1ce9bfd11",
+      "published_sha256": "39bc0b3c1164b35a3b034070c6745ca2caffca0616d056ffa59bd73e48009b22",
+      "replacements": 3,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/pg_coefficients_test.log",
+      "published": "docs/verification/IM-01/im01-3/tidy-normal-initial.log",
+      "raw_sha256": "f50c16102dc072af4917661c5636793403e6c8dc199b59f3b50d90436934d9d2",
+      "published_sha256": "902795c2cbff62656501060e6109527ce8149cd49063fefb1c2975c2f506d23a",
+      "replacements": 24,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-tidy/run-final.py",
+      "published": "docs/verification/IM-01/im01-3/tidy-final-runner.py",
+      "raw_sha256": "9d7b9896a501d4df430a382031b2daca81361aeee678475a5d08a60b8a43c7ee",
+      "published_sha256": "9d7b9896a501d4df430a382031b2daca81361aeee678475a5d08a60b8a43c7ee",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/reference-run.log",
+      "published": "docs/verification/IM-01/im01-3/preliminary-six-factories.log",
+      "raw_sha256": "92a6ea5bf431f8e7af9dea347698e2f74346d5a7b077885303045e10e5ced33b",
+      "published_sha256": "936c9387c9ecfdbae8bc43c0daa5c63d71053fd6dc584f59a49162f81c60a42d",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/normal-membrane-allzero-failed.log",
+      "published": "docs/verification/IM-01/im01-3/preliminary-membrane-expectation-failed.log",
+      "raw_sha256": "a74bc40445704b89b56736a5507ee477edd02f29d7e69156d611d99ec275fbd1",
+      "published_sha256": "cfb60c51d550ba6cc19707d5f2235ac8c9e192191d24d4e612b5379bf71a6646",
+      "replacements": 657,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/normal-jet-corrected.log",
+      "published": "docs/verification/IM-01/im01-3/preliminary-membrane-corrected.log",
+      "raw_sha256": "fa4367be3dd6d9c6aa4d864f829a4c8a5ace9a2fad049fbd9642dc0cbd0bd125",
+      "published_sha256": "90fa0b6f9737678d24dac67cab021a4e97751f701d62a69dc9b8d966461ab41d",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/public-n4-measure.cpp",
+      "published": "docs/verification/IM-01/im01-3/n4-probe.cpp",
+      "raw_sha256": "6ce58a088af7df027a6df3a09e367b414a6c3cb462a0c72274f41b80236f220e",
+      "published_sha256": "6ce58a088af7df027a6df3a09e367b414a6c3cb462a0c72274f41b80236f220e",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/build-measure.py",
+      "published": "docs/verification/IM-01/im01-3/n4-build-probe.py",
+      "raw_sha256": "8c87c3d499af090c230fbbc1c1e2787317367a19f100e55e568827b6247b63a3",
+      "published_sha256": "88344cacb4f448371ec39a64a9c986548d23a73ba5b23ad6fd94fcd88c4a18aa",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/measure-compile.log",
+      "published": "docs/verification/IM-01/im01-3/n4-compile.log",
+      "raw_sha256": "78f237f3e5a2da27bac30c206ce0f69c897f47da69b7731ede3393b41f2d7fc7",
+      "published_sha256": "6e992b7ea5890c545457b20eb4bdd5d0424437cf5aefbc7b8de08721f4bbc33c",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/measure-link.log",
+      "published": "docs/verification/IM-01/im01-3/n4-link.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/measure-compile-command.txt",
+      "published": "docs/verification/IM-01/im01-3/n4-compile-command.txt",
+      "raw_sha256": "5deb8d7e8e6557652a905ed8a870ab8b06a20ba465d53a7cc55abfe9bd5f7851",
+      "published_sha256": "7b1ee4e98def372dacb530bc0e32b7d6c72cdf9aeecbc5d05107b3faf3764fd6",
+      "replacements": 6,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/measure-link-command.json",
+      "published": "docs/verification/IM-01/im01-3/n4-link-command.json",
+      "raw_sha256": "ee72a35a7504b8d69007eb41faa13e32b3efa71fd1c9b4337e6dc40b364f316f",
+      "published_sha256": "572c29161e62f03419f7828adb8f23b8df7cda43ccc13cb510d4d65779a41f7f",
+      "replacements": 8,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/n4-stage-observation.json",
+      "published": "docs/verification/IM-01/im01-3/n4-stage-observation.json",
+      "raw_sha256": "5445d8e0b47e706908d5fb8ae0c36a8f896a00abb13cb11db5919d1abdb971cd",
+      "published_sha256": "ace04b1cc3ee8bfd2b018109bad32503f540ae0a1b0f884363b4a619c2fc0035",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/n4-stage-execution.json",
+      "published": "docs/verification/IM-01/im01-3/n4-stage-execution.json",
+      "raw_sha256": "a1f4a6e0dde83f7cc9e9d3526679b594d3aa88e7f3de6cc9b0cfda469da65987",
+      "published_sha256": "a49ef4f7b22ee926ca9250281ae930acf93ec1f877b36c23359df69bfb267f16",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-contract/japanese-lint-final.json",
+      "published": "docs/verification/IM-01/im01-3/japanese-lint.json",
+      "raw_sha256": "3808b9ef1041c84b38f4226a2f99c757a51366939e326505120a2d83c79df199",
+      "published_sha256": "90ee14389a2818bbf158e60c3fe7f4110dc73616f4d29fbc91f232f44ae38bd6",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 105
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-debug-build.log",
+      "published": "docs/verification/IM-01/im01-3/jet-debug-build.log",
+      "raw_sha256": "4b7ffa1249267c6021441828ed9b932293291c3ca71b0db691d4848f6d41815e",
+      "published_sha256": "856c339e53c46fd56a5a6cc8f4a5d0939b69e36a623ba065924b196665d6b4b1",
+      "replacements": 4,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-debug-jet.log",
+      "published": "docs/verification/IM-01/im01-3/jet-debug-test.log",
+      "raw_sha256": "488a9cb96d817e0ccf523b56ac6d32ac9672f2e5ab265c5b5ddbf22c09d134ca",
+      "published_sha256": "2b126ac039eae4eaf636c1e7842a78808b3b1275f41acb74ad9919b7cdb9dd8c",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-debug-build-info.log",
+      "published": "docs/verification/IM-01/im01-3/jet-build-info-debug.json",
+      "raw_sha256": "1eb20485a93a6d14fc3741dea48c32b1250765d478d6ace2a024706be4ae450d",
+      "published_sha256": "f3cd84ca17464769828b2a99bb002629bbe41bde71f40feb518d7da923944362",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-release-build.log",
+      "published": "docs/verification/IM-01/im01-3/jet-release-build.log",
+      "raw_sha256": "ec9779b9c7ca60d8d12d1b6c390688f5da56802bf9a6024fd66119f707931184",
+      "published_sha256": "2f2cb8a66f7bbf5451582c33148f20f7c2ccd118f343cbbad949dfaf911e6a70",
+      "replacements": 4,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-release-jet.log",
+      "published": "docs/verification/IM-01/im01-3/jet-release-test.log",
+      "raw_sha256": "ef4419d749640f20e3641daecda74c1dbb0a299186883768c51c4e97510c6887",
+      "published_sha256": "737d95052ee09ceb998539059795aba990c871c4df3bea2bee2ba761cb93db74",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-release-build-info.log",
+      "published": "docs/verification/IM-01/im01-3/jet-build-info-release.json",
+      "raw_sha256": "fe580382e9d818800ada8c00ccb7ad3e7229f5d33018055282ab5ba8c632f1bb",
+      "published_sha256": "9ce5865952eb4222be0f2e443128b73b8c327fd1927f61313b7959511b0431a2",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-normal-tidy.log",
+      "published": "docs/verification/IM-01/im01-3/jet-normal-tidy.log",
+      "raw_sha256": "a3e542ba5345179cdc0e323cd636f62fea5143143ab16e4f0604611d45d13988",
+      "published_sha256": "68ca0ee6038d30939f0b883133f03db649c7b7f78532d5ed1d80c59392cf04da",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-tidy-result.json",
+      "published": "docs/verification/IM-01/im01-3/jet-tidy-result.json",
+      "raw_sha256": "b3f5598b4451d698261045722a477d7fe31bc58c01cc1d7ee92b451a5e2248ba",
+      "published_sha256": "b3f5598b4451d698261045722a477d7fe31bc58c01cc1d7ee92b451a5e2248ba",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/jet-validation-results.json",
+      "published": "docs/verification/IM-01/im01-3/jet-validation-results.json",
+      "raw_sha256": "7bbf2ac0f9109ab68e10f3ae107d655c2837025ccd34d878dc89bba4ee3bcc20",
+      "published_sha256": "a6eca4bff0d101ac9f10c9e546c90af1e71dc22300ce8ebe765655b595da60c4",
+      "replacements": 12,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-evidence/validate-strengthening.py",
+      "published": "docs/verification/IM-01/im01-3/jet-validation-runner.py",
+      "raw_sha256": "07f22f088dff2333f83743db6c2fe76e4f2a6aa0dd07b9b83c41350ca572d86c",
+      "published_sha256": "528ec3b72c9900b4cd5325412c5de46f271159a994bebd79d38f6bd6b34c0747",
+      "replacements": 0,
+      "transform": "UTF-8復号（非UTF8 byteは置換文字）・LF化・明示個人path匿名化。数値欄とexitは変更せず、原raw hashを保持。",
+      "decode_replacements": 0
+    },
+    {
+      "raw_label": "out/issue108-mutations/public/mutation-summary.json",
+      "published": "docs/verification/IM-01/im01-3/mutation-summary.json",
+      "raw_sha256": "9cac1f8dbc94f255920cd996cd6bbeaa0526b72c3ab7906e1e87f6edae037783",
+      "published_sha256": "9cac1f8dbc94f255920cd996cd6bbeaa0526b72c3ab7906e1e87f6edae037783",
+      "replacements": 0,
+      "transform": "担当が匿名化した元JSONのbyteを原ZIP内/私有outに保持し、standalone公開派生だけCRLFからLFへ正規化。内容と数値は不変。"
+    },
+    {
+      "raw_label": "out/issue108-mutations/public/redaction-record.json",
+      "published": "docs/verification/IM-01/im01-3/redaction-record.json",
+      "raw_sha256": "4c32db8721370bd1ed33049461a964ad4e618adb5dc1e5f7a7ad6b51f3f8856e",
+      "published_sha256": "4c32db8721370bd1ed33049461a964ad4e618adb5dc1e5f7a7ad6b51f3f8856e",
+      "replacements": 0,
+      "transform": "担当が匿名化した元JSONのbyteを原ZIP内/私有outに保持し、standalone公開派生だけCRLFからLFへ正規化。内容と数値は不変。"
+    },
+    {
+      "raw_label": "out/issue108-mutations/public/source-executable-bindings.json",
+      "published": "docs/verification/IM-01/im01-3/source-executable-bindings.json",
+      "raw_sha256": "cc6650df5f4175a42e93943c53eaf4d3831fd070e16feb20b69493636446b8de",
+      "published_sha256": "cc6650df5f4175a42e93943c53eaf4d3831fd070e16feb20b69493636446b8de",
+      "replacements": 0,
+      "transform": "担当が匿名化した元JSONのbyteを原ZIP内/私有outに保持し、standalone公開派生だけCRLFからLFへ正規化。内容と数値は不変。"
+    }
+  ]
+}
