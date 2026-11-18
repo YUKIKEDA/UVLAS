@@ -17,7 +17,7 @@ inline std::uint64_t checked_product(std::uint64_t left, std::uint64_t right) {
 }
 enum class Opcode : std::uint8_t {
     Input,
-    Integer,
+    IntegerConstant,
     Pi,
     Add,
     Subtract,
@@ -39,7 +39,7 @@ inline constexpr std::uint64_t atan_point_steps = 1 + atan_half_steps + 2;
 inline constexpr std::uint64_t atan_two_steps = 4 * atan_point_steps;
 static_assert(log_one_plus_steps + 14 == 809 && atan_two_steps + 55 == 3695);
 struct Node {
-    Opcode op = Opcode::Integer;
+    Opcode op = Opcode::IntegerConstant;
     std::size_t left = 0, right = 0;
     std::int64_t value = 0;
 };
@@ -85,7 +85,7 @@ struct Program {
         return emit(Opcode::Input, n);
     }
     Expression constant(std::int64_t n) {
-        return emit(Opcode::Integer, 0, 0, n);
+        return emit(Opcode::IntegerConstant, 0, 0, n);
     }
     Expression pi() {
         return emit(Opcode::Pi);
@@ -279,7 +279,7 @@ inline void evaluate_node(const Node& node, const std::span<Jet> values, std::si
                           const std::array<Interval, 16>& inputs, int seed_power,
                           const Interval& pi, const Interval& ln2, Work& work) {
     auto& out = values[index].components;
-    if (node.op == Opcode::Input || node.op == Opcode::Integer || node.op == Opcode::Pi) {
+    if (node.op == Opcode::Input || node.op == Opcode::IntegerConstant || node.op == Opcode::Pi) {
         out.fill(integer(0));
         out[0] = node.op == Opcode::Input ? inputs[node.left]
                                           : (node.op == Opcode::Pi ? pi : integer(node.value));
