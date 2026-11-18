@@ -236,7 +236,7 @@ TEST_CASE("Global workspace blocks allocation-time reentry before charging the n
 }
 TEST_CASE("Cancellation from the final metadata allocator cannot publish a topology",
           "[UW-D07][N4-03][N4-09]") {
-    Setup setup;
+    const Setup setup;
     core::ResourcePlan plan{memory_budget};
     std::stop_source stop;
     final_stop = &stop;

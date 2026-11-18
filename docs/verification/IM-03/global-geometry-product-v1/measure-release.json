@@ -1,0 +1,274 @@
+{"topology":{
+  "build": {
+    "commit": "9491a3ebaf2c789eab50fa8e35a15ec9b0aee65e",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Release",
+    "dependencies": {
+      "boost": "1.92.0",
+      "eigen": "5.0.1",
+      "nlohmann_json": "3.12.0",
+      "spectra": "1.2.0"
+    },
+    "dependency_repairs": {
+      "nlohmann_json_sax_allocation": 1
+    },
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform": "Windows AMD64",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "schema": "uvlas.build-info/1",
+    "uncommitted_changes": false,
+    "version": "0.1.0-dev"
+  },
+  "case_id": "global-topology-small",
+  "machine": {
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "label": "windows-msvc-local",
+    "logical_processors": 16,
+    "physical_memory_bytes": 51343966208
+  },
+  "memory": {
+    "payload_limit_bytes": 67108864,
+    "peak_resident_bytes": 6119424,
+    "planned_payload_bytes": 14624,
+    "resident_bytes": 6119424
+  },
+  "schema": "uvlas.measurement/1",
+  "settings": {
+    "CSR_terms": 5,
+    "DOFs": 1,
+    "TE_edges": 2,
+    "facets": 2,
+    "physical_owners": 4,
+    "points": 5,
+    "samples": 16,
+    "word_planes": 1,
+    "workers": 1
+  },
+  "stages": [
+    {
+      "calls": 16,
+      "elapsed_nanoseconds": 232200,
+      "stage": "preparation"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "structure"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "aerodynamics"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "linear_solve"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "nonlinear_solve"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "time_step"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "flutter_search"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "checkpoint"
+    }
+  ],
+  "threads": 1,
+  "timing_enabled": true
+},"contact":{
+  "build": {
+    "commit": "9491a3ebaf2c789eab50fa8e35a15ec9b0aee65e",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Release",
+    "dependencies": {
+      "boost": "1.92.0",
+      "eigen": "5.0.1",
+      "nlohmann_json": "3.12.0",
+      "spectra": "1.2.0"
+    },
+    "dependency_repairs": {
+      "nlohmann_json_sax_allocation": 1
+    },
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform": "Windows AMD64",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "schema": "uvlas.build-info/1",
+    "uncommitted_changes": false,
+    "version": "0.1.0-dev"
+  },
+  "case_id": "global-contact-small",
+  "machine": {
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "label": "windows-msvc-local",
+    "logical_processors": 16,
+    "physical_memory_bytes": 51343966208
+  },
+  "memory": {
+    "payload_limit_bytes": 67108864,
+    "peak_resident_bytes": 6119424,
+    "planned_payload_bytes": 11264,
+    "resident_bytes": 6119424
+  },
+  "schema": "uvlas.measurement/1",
+  "settings": {
+    "CSR_terms": 5,
+    "DOFs": 1,
+    "TE_edges": 2,
+    "facets": 2,
+    "physical_owners": 4,
+    "points": 5,
+    "samples": 16,
+    "word_planes": 1,
+    "workers": 1
+  },
+  "stages": [
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "preparation"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "structure"
+    },
+    {
+      "calls": 16,
+      "elapsed_nanoseconds": 634500,
+      "stage": "aerodynamics"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "linear_solve"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "nonlinear_solve"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "time_step"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "flutter_search"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "checkpoint"
+    }
+  ],
+  "threads": 1,
+  "timing_enabled": true
+},"kinematics":{
+  "build": {
+    "commit": "9491a3ebaf2c789eab50fa8e35a15ec9b0aee65e",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Release",
+    "dependencies": {
+      "boost": "1.92.0",
+      "eigen": "5.0.1",
+      "nlohmann_json": "3.12.0",
+      "spectra": "1.2.0"
+    },
+    "dependency_repairs": {
+      "nlohmann_json_sax_allocation": 1
+    },
+    "floating_point": "/fp:strict",
+    "instruction_set": "sse2",
+    "platform": "Windows AMD64",
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "schema": "uvlas.build-info/1",
+    "uncommitted_changes": false,
+    "version": "0.1.0-dev"
+  },
+  "case_id": "global-alias-small",
+  "machine": {
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "label": "windows-msvc-local",
+    "logical_processors": 16,
+    "physical_memory_bytes": 51343966208
+  },
+  "memory": {
+    "payload_limit_bytes": 67108864,
+    "peak_resident_bytes": 6119424,
+    "planned_payload_bytes": 32256,
+    "resident_bytes": 6119424
+  },
+  "schema": "uvlas.measurement/1",
+  "settings": {
+    "CSR_terms": 5,
+    "DOFs": 1,
+    "TE_edges": 2,
+    "facets": 2,
+    "physical_owners": 4,
+    "points": 5,
+    "samples": 16,
+    "word_planes": 1,
+    "workers": 1
+  },
+  "stages": [
+    {
+      "calls": 16,
+      "elapsed_nanoseconds": 308500,
+      "stage": "preparation"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "structure"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "aerodynamics"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "linear_solve"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "nonlinear_solve"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "time_step"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "flutter_search"
+    },
+    {
+      "calls": 0,
+      "elapsed_nanoseconds": 0,
+      "stage": "checkpoint"
+    }
+  ],
+  "threads": 1,
+  "timing_enabled": true
+},"work_plans":[{"payload":914,"reserved":31429164,"executed":13411431,"candidates":0,"metadata_forecast":48,"traversal_reserved":0,"traversal_executed":0},{"payload":704,"reserved":4203422364,"executed":90406969,"candidates":1,"metadata_forecast":0,"traversal_reserved":2580540,"traversal_executed":417816},{"payload":2016,"reserved":86621225,"executed":9457769,"candidates":0,"metadata_forecast":0,"traversal_reserved":0,"traversal_executed":0}]}
