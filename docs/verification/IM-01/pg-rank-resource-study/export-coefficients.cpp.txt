@@ -1,0 +1,106 @@
+#include "exact_polynomial_detail.hpp"
+
+#include <uvlas/structure/pg_coefficients.hpp>
+
+#include <array>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+namespace {
+using namespace uvlas;
+using namespace uvlas::structure;
+
+template <class T> T take(core::Result<T> result) {
+    if (!result) {
+        throw std::runtime_error("Preparation failure " +
+                                 std::to_string(static_cast<unsigned>(result.error().code)));
+    }
+    return std::move(*result);
+}
+
+void rational(std::ostream& out, const ExactRational& value) {
+    const auto& canonical = detail::ExactFactory::value(value).backend();
+    out << canonical.num().str(0, std::ios_base::dec) << ' '
+        << canonical.denom().str(0, std::ios_base::dec);
+}
+} // namespace
+
+int main(int argc, char** argv) {
+    try {
+        if (argc != 4) {
+            return 2;
+        }
+        const int n = std::stoi(argv[1]);
+        const std::string shape = argv[2];
+        if ((n != 1 && n != 2 && n != 4) || (shape != "flat" && shape != "quartic")) {
+            return 2;
+        }
+        std::ofstream out(argv[3], std::ios::binary);
+        if (!out) {
+            return 3;
+        }
+        constexpr auto gib = std::uint64_t{1024} * 1024 * 1024;
+        const ExactLimits exact{64, 1000, 4096, 32, 32, 65536, 2000000,
+                                ExactEstimateAdmission{16 * gib}, ExactTimingMode::Disabled};
+        const PgCoefficientLimits limits{exact, 1000, 20000000, 2000, {}};
+        core::ResourcePlan input{48 * gib};
+        const auto number = [&](int p, int q) {
+            return take(ExactRational::from_integer_pair(std::to_string(p), std::to_string(q),
+                                                        exact, input));
+        };
+        const auto x0 = number(2, 7), width = number(4, 5), skew = number(3, 20);
+        std::array<ExactRational, 15> coefficients;
+        std::vector<ExactInputTerm> terms;
+        if (shape == "quartic") {
+            for (int i = 0; i <= 4; ++i) {
+                for (int j = 0; j <= 4 - i; ++j) {
+                    auto& coefficient = coefficients[terms.size()];
+                    coefficient = number(i + 2 * j + 1, i + j + 1);
+                    terms.push_back({{i, j}, coefficient});
+                }
+            }
+        }
+        const auto height = take(ExactChartPolynomial::make(terms, exact, input));
+        const auto graph = take(PgGraph::prepare(
+            {x0, width, skew, height, n, PgGraphConvention::Version1}, {exact, 64, {}}, input));
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        const auto dict = take(PgCoefficientDictionary::prepare(graph, limits, workspace, input));
+        const auto columns = take(dict.columns());
+        out << "header " << n << ' ' << take(dict.original_columns()) << ' ' << columns.size()
+            << ' ' << input.allocated_bytes() << ' ' << dict.preparation().arithmetic.estimated_external_payload_bytes << '\n';
+        for (std::size_t ordinal = 0; ordinal < columns.size(); ++ordinal) {
+            const auto& item = columns[ordinal];
+            out << "column " << ordinal << ' ' << static_cast<unsigned>(item.kind) << ' '
+                << item.original.value << '\n';
+        }
+        for (const auto& record : take(dict.records())) {
+            for (const auto& term : record.polynomial.terms()) {
+                out << "coefficient " << record.column.value << ' '
+                    << static_cast<unsigned>(record.field) << ' ' << record.cell.first << ' '
+                    << record.cell.second << ' ' << term.powers.first << ' ' << term.powers.second
+                    << ' ';
+                rational(out, term.coefficient);
+                out << '\n';
+            }
+        }
+        for (const auto& entry : take(dict.required_map())) {
+            out << "required " << static_cast<unsigned>(entry.target) << ' ' << entry.source.value
+                << ' ';
+            rational(out, entry.coefficient);
+            out << '\n';
+        }
+        for (const auto& entry : take(dict.anchor_c_map())) {
+            out << "anchor " << entry.source.value << ' ' << entry.target.value << ' ';
+            rational(out, entry.coefficient);
+            out << '\n';
+        }
+        out.flush();
+        return out ? 0 : 3;
+    } catch (const std::exception& ex) {
+        std::cerr << ex.what() << '\n';
+        return 1;
+    }
+}
