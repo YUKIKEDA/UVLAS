@@ -1,0 +1,9 @@
+{
+  "old_header_sha256": "dc92248b6fbbc7ef83989a0b155f4337afeb99e71be8ec29fd5a8ef7ddb58546",
+  "header_sha256": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+  "generator_sha256": "f744959aaf571298134f1f9e59b31a16c60f0e775fea369da4028400f210674f",
+  "formatter": "clang-format 21.1.2, repository .clang-format",
+  "json_literals_preserved": 206,
+  "separate_output_bytes_equal": true,
+  "correction": "ExpectedStage underlying uint8_t and cstdint include; no literal changed"
+}

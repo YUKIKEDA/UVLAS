@@ -1,0 +1,23 @@
+Filters: "All expression consumers*"
+Randomness seeded to: 393296605
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+schema-mutation.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+All expression consumers require their own domain even for constant outputs
+-------------------------------------------------------------------------------
+${ROOT}/tests/io/case_schema_cross_test.cpp(148)
+...............................................................................
+
+${ROOT}/tests/io/case_schema_cross_test.cpp(63): FAILED:
+  CHECK( result.has_value() == accepted )
+with expansion:
+  true == false
+with message:
+  1/0
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 7 | 6 passed | 1 failed

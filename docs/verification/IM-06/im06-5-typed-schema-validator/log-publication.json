@@ -1,0 +1,214 @@
+{
+  "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+  "entries": {
+    "windows-debug-normal.log": {
+      "raw_sha256": "b71d2f3e9fae6bd158b36b8fc8a1f44a1cd642ad6a62fd4f071f5217743022da",
+      "published_sha256": "081d947bcc2abb3bc437f241291687554172762f9d171a7b16629e67a329c540",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-debug-resources.log": {
+      "raw_sha256": "a4768533089458492159343c3ddfaeeb577f5376b0bf2ab3e7d4a6887fda3542",
+      "published_sha256": "1b965eaa6e4f30742674032ebe0c7beed027b370b913fae66f1b05100d5bd176",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-debug-input.log": {
+      "raw_sha256": "0cc38f5db01c54bcf7007517f7c637b32b6aec50b4014452162bc210b36c3c5f",
+      "published_sha256": "9c6e98fa7aefee6cd9aee731c11377d5dca4a2505625e8eaeebfece95de7e3e9",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-debug-input-resources.log": {
+      "raw_sha256": "11e74721344c1e0c574b0ea571402ff2d4ce2ff4d4cdab307fc2b6505dd8d122",
+      "published_sha256": "9ff9758452f52ef0b40949275ec80ab8054791f9d97fab5ca2fa352cacd22358",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-debug-build.log": {
+      "raw_sha256": "221562da01e1cfee0e9a98cacd1bdebfd00a70f4269212e0b2f53a1e3bd5d79d",
+      "published_sha256": "cd37986e5570698b45862c466fddee16e2536178c912a72fc0259218dfcb868f",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-release-normal.log": {
+      "raw_sha256": "10d7775a5a8f82446939bcca5b693bd0dc096a01e4b7edf91381524e7c44712e",
+      "published_sha256": "81fc362547ca99e151f24371b2ff461aa12c3fce7bcf2c2a19fecb390ebb5ef5",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-release-resources.log": {
+      "raw_sha256": "bb97370a2fe325938e0f2a4b2eb6a87f6bc154b4567464df51e1059b5c0bfb0b",
+      "published_sha256": "3190f0f8f10e74c16d4212c5c3d379cbbde4eab31f37e6c8af980df4fc1ed711",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-release-input.log": {
+      "raw_sha256": "d38cee94e79bb2939f7e2f98db5af26f0a5b3b1c452c2b9a5f48941ee926ec1b",
+      "published_sha256": "1c0837982a837f937bd31606061721617401edcf528314bc17635132f927f10e",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-release-input-resources.log": {
+      "raw_sha256": "e9e22d57b0bbc8ba3c9bd249aea0ba60aa4a52e421ab84be8f404b817f78063d",
+      "published_sha256": "14ae6540cc33d8984036dff7f80b13155395ab82647ae2c015a078963388ea7b",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "windows-release-build.log": {
+      "raw_sha256": "76c6ffcaa08c755c23514c887be84ffeb4601735066027e18ee2804ed6877519",
+      "published_sha256": "72bd2bfca70c1ec39cb9305d2b5eccf839910a4e6febc839686551564ca36040",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "build-info.json": {
+      "raw_sha256": "04a0da2abd916c3c118df6269a5d0a2a7c43dfd189bc27f7791b91b032c539b7",
+      "published_sha256": "8803f7bb5e7ba9b7dc5c7c9e7bc93aa11ee8606d36c8b63e8a1173c9d3ea6a31",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-author.log": {
+      "raw_sha256": "0875cd4eb5e325c6626b9c7a7662cadcf117a835cedc9898352a5e77eeffc6e2",
+      "published_sha256": "97ca1264d877e48be02e367e760d715224f62cfb237b8e7787199aa30a1a4c57",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-dictionary.log": {
+      "raw_sha256": "5bfed59b6ac604183f5198873d0023507fe26e7f1f3aeeff7c4a808bebf722fa",
+      "published_sha256": "d31a0cae1d06ecd7250eb0890293ca15d896bc02d27bcf0b0ed5b250ede8e0bf",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-cross-resource.log": {
+      "raw_sha256": "d90d794f14933f411538c7f8b7ea5a1976026e2fe98ce7557903f160b85d5ad7",
+      "published_sha256": "6b65fc052a66bc1ce3e9146e39956616e18df115b9af0d8db51873b6bb71c2a8",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-intrinsic.log": {
+      "raw_sha256": "dae71d285c6579bce6b499d7e1ffaf69865443cc46d9606f21a2454ccf1846df",
+      "published_sha256": "676dfdc6a61092a837c68fdc32032ec67c2316ca62d0911b9d479b3869080386",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-fragments.log": {
+      "raw_sha256": "cf2864f4f771be7409ccb2e6607bd81022d751e6535d9b9e45803e9893687c88",
+      "published_sha256": "8d5b4cd38633cb79ae68767e31f8496f15c0944e3b3fffdf94802abc902bb992",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-inventory.log": {
+      "raw_sha256": "d10a3dd286f638a4c36be9bb969ed11bd834791ef193c21f3c0d49665bacca22",
+      "published_sha256": "65c97177352316a6e75455ed5d1b3145b70659fef57ae8b5b95c51f9463774d1",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "corpus-publication.json": {
+      "raw_sha256": "31d7045a20a70ca40ae0e4ca2c1ee9219a2428e58c1aadbac63e7f8a8c752c27",
+      "published_sha256": "9246b3a011a495a21aa5f7c1eed9b94bf0be4ea7f889ec5fc63bb02aada35b6a",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; assertion and failure text retained; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    },
+    "tidy-focused-final.log": {
+      "raw_sha256": "d6168a19ddcdc4b7591093386cc42768e7cb19b438e5fab911558c9760eaf0de",
+      "published_sha256": "50fb8ac20901fe25b13b429189c4fb2a0e170a9911c7c257be4166ffefa39600",
+      "changes": "UTF-8 BOM/path-separator/local-prefix normalization only; LF line endings and trailing line whitespace/blank EOF lines normalized"
+    }
+  },
+  "publication_whitespace_normalization": {
+    "docs/verification/IM-06/im06-5-typed-schema-validator/build-info.json": {
+      "before": "04a0da2abd916c3c118df6269a5d0a2a7c43dfd189bc27f7791b91b032c539b7",
+      "after": "8803f7bb5e7ba9b7dc5c7c9e7bc93aa11ee8606d36c8b63e8a1173c9d3ea6a31"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/corpus-publication.json": {
+      "before": "31d7045a20a70ca40ae0e4ca2c1ee9219a2428e58c1aadbac63e7f8a8c752c27",
+      "after": "9246b3a011a495a21aa5f7c1eed9b94bf0be4ea7f889ec5fc63bb02aada35b6a"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-author.log": {
+      "before": "d909ae13dc475659aee1f374a654ab0c65047d13525b2938a0ef378099dd2c05",
+      "after": "97ca1264d877e48be02e367e760d715224f62cfb237b8e7787199aa30a1a4c57"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-cross-resource.log": {
+      "before": "f9a50a70d7d906b11bb5ae2a6c89871cf8a21b8c9c913b9a324b31075e861ca2",
+      "after": "6b65fc052a66bc1ce3e9146e39956616e18df115b9af0d8db51873b6bb71c2a8"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-dictionary.log": {
+      "before": "5bfed59b6ac604183f5198873d0023507fe26e7f1f3aeeff7c4a808bebf722fa",
+      "after": "d31a0cae1d06ecd7250eb0890293ca15d896bc02d27bcf0b0ed5b250ede8e0bf"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-focused-final.log": {
+      "before": "22261706cd89e762f1bccf6a8b260127c84e9e4b6ed31c4763d51b654ff589aa",
+      "after": "50fb8ac20901fe25b13b429189c4fb2a0e170a9911c7c257be4166ffefa39600"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-fragments.log": {
+      "before": "cf2864f4f771be7409ccb2e6607bd81022d751e6535d9b9e45803e9893687c88",
+      "after": "8d5b4cd38633cb79ae68767e31f8496f15c0944e3b3fffdf94802abc902bb992"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-intrinsic.log": {
+      "before": "dae71d285c6579bce6b499d7e1ffaf69865443cc46d9606f21a2454ccf1846df",
+      "after": "676dfdc6a61092a837c68fdc32032ec67c2316ca62d0911b9d479b3869080386"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-inventory.log": {
+      "before": "d10a3dd286f638a4c36be9bb969ed11bd834791ef193c21f3c0d49665bacca22",
+      "after": "65c97177352316a6e75455ed5d1b3145b70659fef57ae8b5b95c51f9463774d1"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-build.log": {
+      "before": "cadbd3bebbd0c6d0ba72a1ff9a09d2c86b0e4f58e5976287ce02b182802b8069",
+      "after": "cd37986e5570698b45862c466fddee16e2536178c912a72fc0259218dfcb868f"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-input-resources.log": {
+      "before": "11e74721344c1e0c574b0ea571402ff2d4ce2ff4d4cdab307fc2b6505dd8d122",
+      "after": "9ff9758452f52ef0b40949275ec80ab8054791f9d97fab5ca2fa352cacd22358"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-input.log": {
+      "before": "0cc38f5db01c54bcf7007517f7c637b32b6aec50b4014452162bc210b36c3c5f",
+      "after": "9c6e98fa7aefee6cd9aee731c11377d5dca4a2505625e8eaeebfece95de7e3e9"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-normal.log": {
+      "before": "b71d2f3e9fae6bd158b36b8fc8a1f44a1cd642ad6a62fd4f071f5217743022da",
+      "after": "081d947bcc2abb3bc437f241291687554172762f9d171a7b16629e67a329c540"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-resources.log": {
+      "before": "a4768533089458492159343c3ddfaeeb577f5376b0bf2ab3e7d4a6887fda3542",
+      "after": "1b965eaa6e4f30742674032ebe0c7beed027b370b913fae66f1b05100d5bd176"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-build.log": {
+      "before": "3dad6fae5fbf5314564c52daf9fbac247047a6a2b5710ed7361194ed70fdb3e0",
+      "after": "72bd2bfca70c1ec39cb9305d2b5eccf839910a4e6febc839686551564ca36040"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-input-resources.log": {
+      "before": "e9e22d57b0bbc8ba3c9bd249aea0ba60aa4a52e421ab84be8f404b817f78063d",
+      "after": "14ae6540cc33d8984036dff7f80b13155395ab82647ae2c015a078963388ea7b"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-input.log": {
+      "before": "d38cee94e79bb2939f7e2f98db5af26f0a5b3b1c452c2b9a5f48941ee926ec1b",
+      "after": "1c0837982a837f937bd31606061721617401edcf528314bc17635132f927f10e"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-normal.log": {
+      "before": "10d7775a5a8f82446939bcca5b693bd0dc096a01e4b7edf91381524e7c44712e",
+      "after": "81fc362547ca99e151f24371b2ff461aa12c3fce7bcf2c2a19fecb390ebb5ef5"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-resources.log": {
+      "before": "bb97370a2fe325938e0f2a4b2eb6a87f6bc154b4567464df51e1059b5c0bfb0b",
+      "after": "3190f0f8f10e74c16d4212c5c3d379cbbde4eab31f37e6c8af980df4fc1ed711"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/test.log": {
+      "before": "6750be91b5f87e02b00289df9f9a9f5a47ce96f3fbc8b92b34c238f2b6100635",
+      "after": "a54249795dea55e06c207838939d21244ddcda5671fa6bd6e10e11ff970aef7a"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/test.log": {
+      "before": "60d669abaea861192a718042882fd8d966cdcd26b75b9c9d144084faf0bc3692",
+      "after": "6a7bf501e78bc8c77d27c676b27ab870ba51a8bb6ca6243a9a728d768e75f7e2"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/test.log": {
+      "before": "18cb840448059b70f94cac8c3563a78f3ec70ae47f7876640f7c03ed88e9d452",
+      "after": "dbfa4bc4ebda000707b78e550b1d75c34b8ba8409fbaa3f92e09b27d39036865"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/test.log": {
+      "before": "ade977f414df9f5a15a5feebea3be7608c2fdb601cf3e7b948f2ea3696c62851",
+      "after": "0b47c00ae92bf61cb4311391178aeb976b3ed3edd5dd4c07e6f61c80a64974c9"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/test.log": {
+      "before": "bdc545a14c0be198af57dbd3330f7561b4c95ec1a0f24397ec8bf44a459fd38c",
+      "after": "75ffd289e8aa779c4e15145b7504d3f9d6710d56403f22b0ac43365184951b87"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/test.log": {
+      "before": "4dec534b77d356ddd9a5ccd84198eb7f6cf85a1dfa954b4e41a7072b492a394c",
+      "after": "d0aaf860283b3b451dbfd3fc51fb74e7848f3cb9e2c0679bc65a13a0d5824edc"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/test.log": {
+      "before": "8e4a5f24bb5f154bc3badcbbc695daaa59113992b1ccf8e252299bce3c969377",
+      "after": "21b375e0941409e577ae9508d14c31c5b30cc04b5195ff9ec6670d0397203c46"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/test.log": {
+      "before": "80860fd1cfd675e0a1138992ff6ef0fd347c00353f8bc95bc1bee63a3c55a68f",
+      "after": "3ca98b3c4edcac14fd17b477389823f3fe5f74386663da16147aba584284e6bb"
+    },
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/test.log": {
+      "before": "0031f49e5f94c2f538b766e0eb0da7c236b626e9e81d14aa45344d5c12d240dc",
+      "after": "258df92a299861ab06ac213a1ddf455a7a71ea6ffb701264705eed0f29ebe116"
+    }
+  }
+}

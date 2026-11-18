@@ -1,0 +1,21 @@
+Filters: "Exact decimal intervals retain*"
+Randomness seeded to: 3478125614
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+schema-mutation.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Exact decimal intervals retain a positive step beyond binary64 resolution
+-------------------------------------------------------------------------------
+${ROOT}/tests/io/case_schema_test.cpp(204)
+...............................................................................
+
+${ROOT}/tests/io/case_schema_test.cpp(211): FAILED:
+  REQUIRE( result.has_value() )
+with expansion:
+  false
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 1 | 1 failed

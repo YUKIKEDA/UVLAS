@@ -1,0 +1,23 @@
+Filters: "Static observations reject*"
+Randomness seeded to: 3249164420
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+schema-mutation.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Static observations reject history windows and retain singleton controls
+-------------------------------------------------------------------------------
+${ROOT}/tests/io/case_schema_cross_test.cpp(160)
+...............................................................................
+
+${ROOT}/tests/io/case_schema_cross_test.cpp(63): FAILED:
+  CHECK( result.has_value() == accepted )
+with expansion:
+  true == false
+with message:
+  history
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 7 | 6 passed | 1 failed
