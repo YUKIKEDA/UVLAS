@@ -5,9 +5,9 @@
 #include <span>
 
 namespace uvlas::io::detail::si {
-enum class Opcode : std::uint8_t { Input, Integer, Add, Subtract, Multiply, Divide };
+enum class Opcode : std::uint8_t { Input, IntegerValue, Add, Subtract, Multiply, Divide };
 struct Instruction {
-    Opcode op = Opcode::Integer;
+    Opcode op = Opcode::IntegerValue;
     std::size_t left = 0, right = 0;
     std::int64_t value = 0;
 };
@@ -23,14 +23,14 @@ struct Builder {
         if (!nodes.empty())
             nodes[count] = {op, left, right, value};
         // One dispatch visit; arithmetic opcodes also charge the interval primitive.
-        work += op == Opcode::Input || op == Opcode::Integer ? 1 : 2;
+        work += op == Opcode::Input || op == Opcode::IntegerValue ? 1 : 2;
         return {count++};
     }
     constexpr Symbol input(std::size_t index) {
         return emit(Opcode::Input, index);
     }
     constexpr Symbol integer(std::int64_t value) {
-        return emit(Opcode::Integer, 0, 0, value);
+        return emit(Opcode::IntegerValue, 0, 0, value);
     }
     constexpr Symbol add(Symbol a, Symbol b) {
         return emit(Opcode::Add, a.index, b.index);
@@ -110,7 +110,7 @@ std::array<Interval, 2> execute(const StaticProgram<N>& program, std::span<const
         case Opcode::Input:
             output = inputs[op.left];
             break;
-        case Opcode::Integer:
+        case Opcode::IntegerValue:
             output = integer(op.value);
             break;
         case Opcode::Add:
