@@ -271,16 +271,9 @@ TEST_CASE("Flutter requires a step-map eigenproblem while preserving both valid 
     require_cross(static_case, true);
 }
 
-TEST_CASE("A missing structural scale identifies the scales array",
-          "[verification][negative][IO4-01]") {
-    auto value = root();
+namespace {
+void check_missing_scale(const JsonToken& value) {
     io::SchemaDiagnostic diagnostic;
-    REQUIRE(validate_cross(value, &diagnostic));
-
-    auto& scales = value.field("numerics").field("scales").elements;
-    const auto removed = std::erase_if(
-        scales, [](const auto& scale) { return scale.field("field").text() == "shell_position"; });
-    REQUIRE(removed == 1);
     const auto invalid = validate_cross(value, &diagnostic);
     REQUIRE_FALSE(invalid);
     CHECK(invalid.error().code == core::FailureCode::InvalidInput);
@@ -291,6 +284,47 @@ TEST_CASE("A missing structural scale identifies the scales array",
     const auto without_diagnostic = validate_cross(value, nullptr);
     REQUIRE_FALSE(without_diagnostic);
     CHECK(without_diagnostic.error().code == invalid.error().code);
+}
+} // namespace
+
+TEST_CASE("A missing structural scale identifies the scales array",
+          "[verification][negative][IO4-01]") {
+    auto value = root();
+    REQUIRE(validate_cross(value, nullptr));
+
+    auto& scales = value.field("numerics").field("scales").elements;
+    const auto removed = std::erase_if(
+        scales, [](const auto& scale) { return scale.field("field").text() == "shell_position"; });
+    REQUIRE(removed == 1);
+    check_missing_scale(value);
+}
+
+TEST_CASE("Each missing explicit layout scale identifies the scales array",
+          "[verification][negative][IO4-01]") {
+    auto control = root();
+    REQUIRE_FALSE(control.field("observations").elements.empty());
+    auto& scales = control.field("numerics").field("scales").elements;
+    const auto removed = std::erase_if(scales, [](const auto& scale) {
+        return scale.field("kind").text() == "physical_layout_policy";
+    });
+    REQUIRE(removed == 1);
+    for (const auto field : {"newton_correction", "constraint"}) {
+        auto layout = fragment("Scale.explicit_layout");
+        layout.set("field", string(field));
+        layout.set("targets", array());
+        scales.push_back(std::move(layout));
+    }
+    REQUIRE(validate_cross(control, nullptr));
+
+    for (const auto missing : {"newton_correction", "constraint"}) {
+        CAPTURE(missing);
+        auto value = control;
+        auto& entries = value.field("numerics").field("scales").elements;
+        REQUIRE(std::erase_if(entries, [missing](const auto& scale) {
+                    return scale.field("field").text() == missing;
+                }) == 1);
+        check_missing_scale(value);
+    }
 }
 
 TEST_CASE("Canonical text traversal preserves non-ASCII bytes and embedded zero",
