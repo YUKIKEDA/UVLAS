@@ -1,4 +1,5 @@
 #include "si_case_detail.hpp"
+#include "si_rational_plan.hpp"
 
 #include <charconv>
 
@@ -275,6 +276,11 @@ core::Result<ExactRational> materialize_rational(const SiRecipeView& recipe,
             if (recipe.pi_power)
                 return std::unexpected(core::Failure{core::FailureCode::PrecisionUnsupported,
                                                      core::Operation::PrepareModel});
+            try {
+                detail::rational_plan::admit(recipe, limits, plan);
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            }
             core::Result<ExactRational> result = ExactRational{};
             if (const auto* decimal = std::get_if<SiDecimalView>(&recipe.value))
                 result = decimal_rational(*decimal, limits, plan);
@@ -290,21 +296,11 @@ core::Result<ExactRational> materialize_rational(const SiRecipeView& recipe,
             }
             if (!result)
                 return std::unexpected(result.error());
-            constexpr std::array<std::string_view, 6> lengths{"1",    "0.001",  "0.01",
-                                                              "1000", "0.0254", "0.3048"};
-            constexpr std::array<std::string_view, 4> masses{"1", "0.001", "1000", "0.45359237"};
-            constexpr std::array<std::string_view, 3> times{"1", "0.001", "60"};
-            const auto l = static_cast<std::size_t>(recipe.units.length),
-                       m = static_cast<std::size_t>(recipe.units.mass),
-                       t = static_cast<std::size_t>(recipe.units.time);
-            if (l >= lengths.size() || m >= masses.size() || t >= times.size())
-                return std::unexpected(
-                    core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
-            const std::array factors{lengths[l], masses[m], times[t]};
+            const auto factors = detail::si_rational_units(recipe.units);
             for (std::size_t i = 0; i < 3; ++i) {
                 if (!recipe.dimensions.exponents[i])
                     continue;
-                auto base = ExactRational::from_decimal(factors[i], limits, plan);
+                auto base = ExactRational::from_decimal(factors[i].token, limits, plan);
                 if (!base)
                     return std::unexpected(base.error());
                 auto power =

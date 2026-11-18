@@ -576,3 +576,102 @@ TEST_CASE("SI exact dyadic fallback propagates its arithmetic admission and allo
     CHECK(short_external.error().code == core::FailureCode::ResourceExceeded);
     CHECK(serialize(old) == unchanged);
 }
+
+TEST_CASE("Direct SI rational admission does not charge a declined call",
+          "[negative][verification][IO4-01][N4-02]") {
+    constexpr SiUnits native{SiLengthUnit::Metre, SiMassUnit::Kilogram, SiTimeUnit::Second,
+                             SiAngleUnit::Radian};
+    constexpr SchemaDimension length{{1, 0, 0, 0}};
+    const SiRecipeView recipe{SiDecimalView{1, "1", 100}, "1e100", native, length, 0};
+    const auto configured_limits = limits(generous());
+    const auto& generous_exact = configured_limits.exact();
+    const auto refuse = [](const SiRecipeView& candidate, const structure::ExactLimits& configured,
+                           std::uint64_t plan_bytes) {
+        core::ResourcePlan plan{plan_bytes};
+        const auto result = [&] {
+            const FaultScope observe{-2};
+            return materialize_rational(candidate, configured, plan);
+        }();
+        const auto allocations = attempts.load(std::memory_order_relaxed);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == core::FailureCode::ResourceExceeded);
+        CHECK(allocations == 0);
+        CHECK(plan.allocated_bytes() == 0);
+        CHECK(plan.remaining_bytes() == plan_bytes);
+    };
+
+    // The independent exact integer 10^100 has 333 bits. The backend admits
+    // 4*(digits+scale)+1=405 work bits rounded to a word plus two guard limbs.
+    for (const auto value_bits : {64U, 332U}) {
+        INFO(value_bits);
+        auto too_small = generous_exact;
+        too_small.maximum_value_bits = value_bits;
+        refuse(recipe, too_small, budget);
+    }
+    core::ResourcePlan oracle_plan{budget};
+    const auto expected =
+        take(structure::ExactRational::from_decimal("1e100", generous_exact, oracle_plan));
+    REQUIRE(expected.numerator_bits() == 333);
+    REQUIRE(expected.preparation().algebraic_work_bits == 405);
+    const auto guarded_bits = expected.preparation().planned_work_bits;
+    REQUIRE((guarded_bits == 480 || guarded_bits == 576));
+
+    auto work_short = generous_exact;
+    work_short.maximum_work_bits = guarded_bits - 1;
+    refuse(recipe, work_short, budget);
+    auto token_short = generous_exact;
+    token_short.maximum_input_characters = 4;
+    refuse(recipe, token_short, budget);
+    auto external_short = generous_exact;
+    external_short.external_memory = structure::ExactEstimateAdmission{0};
+    refuse(recipe, external_short, budget);
+
+    auto exact_boundary = generous_exact;
+    exact_boundary.maximum_value_bits = 333;
+    exact_boundary.maximum_work_bits = guarded_bits;
+    core::ResourcePlan observed{budget};
+    const auto control = take(materialize_rational(recipe, exact_boundary, observed));
+    CHECK(control == expected);
+    const auto payload = observed.allocated_bytes();
+    REQUIRE(payload > 0);
+    refuse(recipe, exact_boundary, payload - 1);
+    core::ResourcePlan exact_bytes{payload};
+    CHECK(take(materialize_rational(recipe, exact_boundary, exact_bytes)) == expected);
+    CHECK(exact_bytes.remaining_bytes() == 0);
+
+    // Conservative estimates of decimal work do not replace a value-bit check.
+    const SiRecipeView one{SiDecimalView{1, "1", 0}, "1", native, length, 0};
+    auto one_bit = generous_exact;
+    one_bit.maximum_value_bits = 1;
+    core::ResourcePlan one_plan{budget};
+    const auto identity = take(materialize_rational(one, one_bit, one_plan));
+    CHECK(identity.sign() == 1);
+    CHECK(identity.numerator_bits() == 1);
+    CHECK(identity.denominator_bits() == 1);
+
+    // 1/g requires the unit denominator and the final numerator, both 1000.
+    // The source itself fits even at one bit, so this exercises a later stage.
+    auto mass_units = native;
+    mass_units.mass = SiMassUnit::Gram;
+    const SiRecipeView inverse_gram{SiDecimalView{1, "1", 0}, "1", mass_units,
+                                    SchemaDimension{{0, -1, 0, 0}}, 0};
+    auto unit_boundary = generous_exact;
+    unit_boundary.maximum_value_bits = 9;
+    refuse(inverse_gram, unit_boundary, budget);
+    unit_boundary.maximum_value_bits = 10;
+    core::ResourcePlan unit_plan{budget};
+    const auto inverse_expected =
+        take(structure::ExactRational::from_decimal("1000", generous_exact, oracle_plan));
+    CHECK(take(materialize_rational(inverse_gram, unit_boundary, unit_plan)) == inverse_expected);
+
+    // An ambiguous value boundary outside the documented fixed witness is
+    // declined without allocating; ordinary sufficient envelopes still succeed.
+    const SiRecipeView wide{SiDecimalView{1, "1", 400}, "1e400", native, length, 0};
+    auto tight_wide = generous_exact;
+    tight_wide.maximum_value_bits = 1329;
+    refuse(wide, tight_wide, budget);
+    core::ResourcePlan wide_plan{budget};
+    const auto wide_value = take(materialize_rational(wide, generous_exact, wide_plan));
+    CHECK(wide_value.numerator_bits() == 1329);
+    CHECK(wide_value.denominator_bits() == 1);
+}

@@ -2,6 +2,7 @@
 
 #include "../structure/exact_polynomial_detail.hpp"
 #include "si_case_detail.hpp"
+#include "si_rational_plan.hpp"
 
 #include <bit>
 
@@ -54,7 +55,8 @@ struct SiConversionFrame {
 };
 inline constexpr std::uint64_t si_fixed_stack_bytes =
     sizeof(SiConversionFrame) + sizeof(SiSequenceFrame) +
-    std::max(sizeof(SiIntervalPrimitiveFrame), sizeof(SiCenterFrame));
+    std::max(sizeof(SiIntervalPrimitiveFrame), sizeof(SiCenterFrame)) +
+    rational_plan::certificate_stack_bytes;
 inline constexpr std::uint64_t si_token_work =
     si::power_work_bound(std::numeric_limits<std::uint64_t>::max()) + 2;
 inline constexpr std::uint64_t si_center_work =
@@ -119,11 +121,11 @@ inline SiExactLeafPlan si_exact_leaf_plan(SiContext& c, const SiRecipeView& reci
         storages = c.add(storages, operations);
     }
     bits = bounded_add(bits, 2);
-    // At most four Euclidean reductions per rational operation. Each has at most
-    // twice the operand bit length in divisions; fixed surrounding work is explicit.
-    const auto rational_cost = c.add(c.multiply(bits, 8), 20);
+    // Four backend reductions plus the optional fixed certificate and admission walk.
+    // Each Euclidean chain has at most twice the operand bit length in divisions.
+    const auto rational_cost = c.add(c.multiply(bits, 16), 128);
     const auto work = c.add(c.multiply(storages, rational_cost),
-                            c.add(c.multiply(characters, 4), c.add(2ULL * (3 * 64 + 1), 24)));
+                            c.add(c.multiply(characters, 8), c.add(2ULL * (3 * 64 + 1), 24)));
     const auto cumulative =
         c.add(characters, c.multiply(storages, sizeof(structure::detail::RationalStorage)));
     // The nested exact chain retains at most eight RationalStorage leaves. A

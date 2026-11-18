@@ -358,6 +358,8 @@ private:
                                                       core::ResourcePlan&, SiDiagnostic*) noexcept;
 /// Materialize only rational recipes under explicit exact/working caps.
 /// Nonzero pi powers return PrecisionUnsupported; exact zero always denotes 0/1.
+/// All storage and backend envelopes are admitted before allocation. Tight caps use an
+/// allocation-free 1024-bit exact witness; larger unproved boundaries return ResourceExceeded.
 [[nodiscard]] core::Result<structure::ExactRational>
 materialize_rational(const SiRecipeView&, const structure::ExactLimits&,
                      core::ResourcePlan&) noexcept;
