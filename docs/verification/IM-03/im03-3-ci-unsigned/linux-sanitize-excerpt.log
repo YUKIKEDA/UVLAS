@@ -1,0 +1,26 @@
+2026-11-17T11:36:23.8837389Z 
+2026-11-17T11:36:23.8837755Z HEAD is now at 5503668 Merge 8c9e739aa4ccdf181f633985557c437a73d1a480 into 870926d1af73bd9a3d01db45618e873067f1ed0a
+2026-11-17T11:36:23.8850795Z ##[endgroup]
+2026-11-17T11:36:23.8853309Z [command]/usr/bin/git log -1 --format=%H
+2026-11-17T11:36:23.8884901Z 5503668b58c648870559238d6eacf944c01bf7ea
+2026-11-17T11:36:23.9138561Z ##[group]Run actions/checkout@v7
+2026-11-17T11:36:23.9138734Z with:
+2026-11-17T11:36:23.9138877Z   repository: microsoft/vcpkg
+2026-11-17T11:36:23.9139032Z   path: out/vcpkg
+2026-11-17T11:36:34.1587903Z ##[endgroup]
+2026-11-17T11:36:34.1640635Z [command]/usr/bin/git log -1 --format=%H
+2026-11-17T11:36:34.1678504Z 0df93a05b9de080129e653ec4776d7e14a1b2e4f
+2026-11-17T11:36:34.2330492Z ##[group]Run actions/cache@v6
+2026-11-17T11:36:34.2330637Z with:
+2026-11-17T11:36:34.2330747Z   path: out/vcpkg-cache
+2026-11-17T11:36:34.2330962Z   key: vcpkg-Linux-08f657536288606e7c1dd3e365bbfc2c82a615f499fd427c9ef96bde113e110f
+2026-11-17T11:40:09.2969494Z [94/218] Building CXX object tests/CMakeFiles/uvlas_test_aero_local_geometry_packet_resources.dir/aero/local_geometry_packet_resources_test.cpp.o
+2026-11-17T11:40:09.2971064Z FAILED: [code=1] tests/CMakeFiles/uvlas_test_aero_local_geometry_packet_resources.dir/aero/local_geometry_packet_resources_test.cpp.o 
+2026-11-17T11:40:09.2975430Z /usr/bin/g++-14 -DEIGEN_RUNTIME_NO_MALLOC -I/home/runner/work/UVLAS/UVLAS/src -I/home/runner/work/UVLAS/UVLAS/include -isystem /home/runner/work/UVLAS/UVLAS/out/vcpkg_installed/x64-linux/include -g -std=c++23 -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -ffp-contract=off -fno-fast-math -Werror -fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all -UNDEBUG -MD -MT tests/CMakeFiles/uvlas_test_aero_local_geometry_packet_resources.dir/aero/local_geometry_packet_resources_test.cpp.o -MF tests/CMakeFiles/uvlas_test_aero_local_geometry_packet_resources.dir/aero/local_geometry_packet_resources_test.cpp.o.d -o tests/CMakeFiles/uvlas_test_aero_local_geometry_packet_resources.dir/aero/local_geometry_packet_resources_test.cpp.o -c /home/runner/work/UVLAS/UVLAS/tests/aero/local_geometry_packet_resources_test.cpp
+2026-11-17T11:40:09.2978759Z /home/runner/work/UVLAS/UVLAS/tests/aero/local_geometry_packet_resources_test.cpp: In function ‘void CATCH2_INTERNAL_TEST_7()’:
+2026-11-17T11:40:09.2983955Z /home/runner/work/UVLAS/UVLAS/tests/aero/local_geometry_packet_resources_test.cpp:306:43: error: conversion to ‘uint64_t’ {aka ‘long unsigned int’} from ‘int’ may change the sign of the result [-Werror=sign-conversion]
+2026-11-17T11:40:09.2995293Z   306 |     for (const std::uint64_t cap : {16, 17}) {
+2026-11-17T11:40:09.3024157Z       |                                           ^
+2026-11-17T11:40:09.3024839Z cc1plus: all warnings being treated as errors
+2026-11-17T11:40:09.8033970Z [95/218] Building CXX object tests/CMakeFiles/uvlas_test_core_resource_plan.dir/core/resource_plan_test.cpp.o
+2026-11-17T11:40:10.4920540Z [96/218] Building CXX object tests/CMakeFiles/uvlas_test_aero_geometry_snapshot.dir/aero/geometry_snapshot_test.cpp.o

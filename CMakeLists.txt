@@ -76,8 +76,9 @@ if(UVLAS_BUILD_PYTHON)
     add_subdirectory(src/python)
 endif()
 
-# Internal exact geometry preparation; does not expose a qualified physical packet.
-set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp)
+# Internal geometry preparation and local qualification; no global or kernel acceptance.
+set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp
+    src/aero/local_geometry_packet.cpp)
 add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})
 uvlas_configure_target(uvlas_aero)
 target_include_directories(uvlas_aero PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

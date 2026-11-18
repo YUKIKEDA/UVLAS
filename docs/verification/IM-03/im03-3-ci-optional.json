@@ -1,0 +1,134 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-3-ci-optional-array-guard",
+  "ids": [
+    "UI-D06",
+    "N4-02",
+    "N4-03"
+  ],
+  "package": "IM-03",
+  "issue": 109,
+  "pull_request": 112,
+  "date": "2026-11-17",
+  "source_commit": "c88bfbda38560913718a822400cfe936206b8e9d",
+  "failed_ci": {
+    "run_id": 44081121170,
+    "head": "fc7fb993201b482f18c6ea9a95ab29421564c6fb",
+    "job_id": 134031760109,
+    "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44081121170/job/134031760109",
+    "checkout_merge": "969be432386acd4ec404fb00aacd6985dbc3701c",
+    "numerical_tests_passed": 82,
+    "numerical_tests_selected": 82,
+    "tidy_errors": 3,
+    "cause": "join後のREQUIRE(packets[i])から、Linux解析器が後続の添字optional参照の存在を証明できなかった。"
+  },
+  "correction": "left/rightの名前付きconst参照を、同じ明示ifで検査する。不在ならFAIL_CHECKしてreturnし、以後は検査済みの同じ参照だけを消費する。警告抑制・架空値・sleepを足さない。",
+  "similar_findings": "通常TUのoptional配列全参照を確認。書込みはworker内emplace、読取り3箇所をこのguardへ接続。既存timing optionalは既に明示ifで検査済み。製品のoptional取得は現在Linux tidyに他診断なし。",
+  "verification": {
+    "Windows": "cleanc88bfb sourceの通常TUをDebug/Release構築、変更した独立workspace1caseだけ各9assert成功。",
+    "static": "対象TU clang-tidy21.1.1 exit0、clang-format21.1.2 exit0。",
+    "prior_Linux": "元fc7 headのLinux Debugは全82/82 CTest成功後tidy3件で失敗。他jobのSUCCESSは同run-summaryの旧head状態で、今回fixの成功へ読み替えない。",
+    "new_Linux": "修正後Linux/GCC14 tidyは未確認。追加CI待機しない。",
+    "review": "rootが参照/guard/同じ値の消費とcpp限定事例を独立通読し、意味・失敗検出・日本語に未解決指摘なし。",
+    "not_repeated": "製品5source、旧28+追補18artifactは不変。全体suite、旧4CTest D/R、6変異、工程計測は再実行しない。",
+    "trace": "matrix/check実行済み。208定義ID、試験あり33、記録あり40、0問題。新guard後のtest行番号と追補リンクを同期。",
+    "integrity": "新追補checker14files/1manifest/0errors。rootが本文・歴史境界・対象結果を独立通読し重大不一致なし。"
+  },
+  "historical_source_references": [
+    {
+      "id": "im03-3-ci-optional-old-test",
+      "historical_commit": "fc7fb993201b482f18c6ea9a95ab29421564c6fb",
+      "hint": "tests/aero/local_geometry_packet_test.cpp",
+      "sha256": "cf0b8e93178ad88583a76d264e5a4fbf0453b7e71c798203deed0d002a1253dd"
+    }
+  ],
+  "historical_evidence": "Test control flow only; no numerical producer/value/threshold/workspace ownership changes. Old manifests are frozen historical evidence; their obsolete TU/rule live hints are not claimed to match this current tree.",
+  "claimed_state": "optional存在確認の静的解析上の明示化。新しい数値・物理・性能認定は主張しない。",
+  "sources": {
+    "tests/aero/local_geometry_packet_test.cpp": "22b88f053efbc18262b6aaf8624ef1092d431b0d6db276e0e8263589a0ca6609",
+    ".cursor/rules/cpp.mdc": "c3754810a0a4b7dbc152af375be67d9829b0d3ca8143833aaf118be0d0716fcd"
+  },
+  "source_references": [
+    {
+      "id": "im03-3-ci-optional-source-tests-aero-local_geometry_packet_test-cpp",
+      "sha256": "22b88f053efbc18262b6aaf8624ef1092d431b0d6db276e0e8263589a0ca6609",
+      "hint": "tests/aero/local_geometry_packet_test.cpp"
+    },
+    {
+      "id": "im03-3-ci-optional-source--cursor-rules-cpp-mdc",
+      "sha256": "c3754810a0a4b7dbc152af375be67d9829b0d3ca8143833aaf118be0d0716fcd",
+      "hint": ".cursor/rules/cpp.mdc"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/im03-3-ci-optional/debug-build.log": "93a6211855a6737b2250724c0472429108bbf397bb95a385f444453d805df339",
+    "docs/verification/IM-03/im03-3-ci-optional/debug-test.log": "1ee3a2d18e201bccfbffb4460dbc102ccf611fdfbf84d31c0ec0cc2ea65aa2b4",
+    "docs/verification/IM-03/im03-3-ci-optional/linux-debug-excerpt.log": "73b835738fad1c32eec961f56fc6a03f0055b8adc6cdfdf08577c21be7804d91",
+    "docs/verification/IM-03/im03-3-ci-optional/release-build.log": "f4a37b8a4b3092ac6b77e1b953e73a7e383df7ad6ec2365575aa475b87d9deaa",
+    "docs/verification/IM-03/im03-3-ci-optional/release-test.log": "4bddb50d60eaba444c7c1f4087a27b7b12ce809c97998047b90269b61118e624",
+    "docs/verification/IM-03/im03-3-ci-optional/run-summary.json": "d3451f352d588b5047e639fe216dbcf51d6292e35f0f9c71d1d807091cdc2faa",
+    "docs/verification/IM-03/im03-3-ci-optional/source-delta.json": "a592bb70859d3fd3bfdf927d358e086b6627a1729fa4e91f848f90995c3fda0c",
+    "docs/verification/IM-03/im03-3-ci-optional/text-provenance.json": "86afc57f2c4b290519c220b0c1954cab3a80ec773bf026c05253fd59fe1052cb",
+    "docs/verification/IM-03/im03-3-ci-optional/tidy.log": "c3a3a31f097be86cacb0178264fb9062cefe5f46bc44301d10904519fe529eee",
+    "docs/verification/IM-03/im03-3.json": "82fb4591017df5beaec15537721f9e12cf27a4152cb417aacc981b5cfc469e87",
+    "docs/verification/IM-03/im03-3-ci-unsigned.json": "d2d3e57142efb43b857eb254aa50fbf388f2c086c8c6bb423d5f7a820850ba89"
+  },
+  "artifact_references": [
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-debug-build-log",
+      "sha256": "93a6211855a6737b2250724c0472429108bbf397bb95a385f444453d805df339",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/debug-build.log"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-debug-test-log",
+      "sha256": "1ee3a2d18e201bccfbffb4460dbc102ccf611fdfbf84d31c0ec0cc2ea65aa2b4",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/debug-test.log"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-linux-debug-excerpt-log",
+      "sha256": "73b835738fad1c32eec961f56fc6a03f0055b8adc6cdfdf08577c21be7804d91",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/linux-debug-excerpt.log"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-release-build-log",
+      "sha256": "f4a37b8a4b3092ac6b77e1b953e73a7e383df7ad6ec2365575aa475b87d9deaa",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/release-build.log"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-release-test-log",
+      "sha256": "4bddb50d60eaba444c7c1f4087a27b7b12ce809c97998047b90269b61118e624",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/release-test.log"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-run-summary-json",
+      "sha256": "d3451f352d588b5047e639fe216dbcf51d6292e35f0f9c71d1d807091cdc2faa",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/run-summary.json"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-source-delta-json",
+      "sha256": "a592bb70859d3fd3bfdf927d358e086b6627a1729fa4e91f848f90995c3fda0c",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/source-delta.json"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-text-provenance-json",
+      "sha256": "86afc57f2c4b290519c220b0c1954cab3a80ec773bf026c05253fd59fe1052cb",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/text-provenance.json"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-optional-tidy-log",
+      "sha256": "c3a3a31f097be86cacb0178264fb9062cefe5f46bc44301d10904519fe529eee",
+      "hint": "docs/verification/IM-03/im03-3-ci-optional/tidy.log"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-json",
+      "sha256": "82fb4591017df5beaec15537721f9e12cf27a4152cb417aacc981b5cfc469e87",
+      "hint": "docs/verification/IM-03/im03-3.json"
+    },
+    {
+      "id": "im03-3-ci-optional-artifact-docs-verification-IM-03-im03-3-ci-unsigned-json",
+      "sha256": "d2d3e57142efb43b857eb254aa50fbf388f2c086c8c6bb423d5f7a820850ba89",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned.json"
+    }
+  ],
+  "pending": []
+}

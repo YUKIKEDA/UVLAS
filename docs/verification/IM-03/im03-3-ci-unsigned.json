@@ -1,0 +1,208 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-3-ci-unsigned-initializer",
+  "ids": [
+    "UI-D06",
+    "N4-02",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 109,
+  "pull_request": 112,
+  "date": "2026-11-17",
+  "source_commit": "fa74876c01263858b6794c64e5c7ed69b920b735",
+  "failed_ci": {
+    "run_id": 44075488055,
+    "head": "8c9e739aa4ccdf181f633985557c437a73d1a480",
+    "jobs": [
+      {
+        "configuration": "debug",
+        "job_id": 134012393018,
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44075488055/job/134012393018",
+        "head": "8c9e739aa4ccdf181f633985557c437a73d1a480",
+        "checkout_merge": "5503668b58c648870559238d6eacf944c01bf7ea",
+        "raw_private_sha256": "9db83ed68f0e2dac569684875487e84e5390e431dda10eb3ef59d3e2a9a8a8fb",
+        "excerpt_sha256": "61cd5625e5ec607d552f43796b411c585f529ced3097642928fe0e73d840e546",
+        "result": "compile failure; CTest not reached",
+        "error_count": 1,
+        "cause": "uint64_t loop variable receives initializer_list<int> values16/17 with -Werror=sign-conversion"
+      },
+      {
+        "configuration": "release",
+        "job_id": 134012393021,
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44075488055/job/134012393021",
+        "head": "8c9e739aa4ccdf181f633985557c437a73d1a480",
+        "checkout_merge": "5503668b58c648870559238d6eacf944c01bf7ea",
+        "raw_private_sha256": "5587c4ec003db4c392d56508d0260de9f3d5e4114c3029c4862a3d0c65688921",
+        "excerpt_sha256": "e2491e816528c6fe9fa0cb50cef41e2a22babc3e68242baaa9cd67250064d301",
+        "result": "compile failure; CTest not reached",
+        "error_count": 1,
+        "cause": "uint64_t loop variable receives initializer_list<int> values16/17 with -Werror=sign-conversion"
+      },
+      {
+        "configuration": "sanitize",
+        "job_id": 134012392961,
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44075488055/job/134012392961",
+        "head": "8c9e739aa4ccdf181f633985557c437a73d1a480",
+        "checkout_merge": "5503668b58c648870559238d6eacf944c01bf7ea",
+        "raw_private_sha256": "1f9fea54f765136675e2b7ee63033f813bf92acc94ac646e02c080cee5796d45",
+        "excerpt_sha256": "135612eb20a98dd50893ac9540117d308fbba3003fd55e4166b45aedb9769dcc",
+        "result": "compile failure; CTest not reached",
+        "error_count": 1,
+        "cause": "uint64_t loop variable receives initializer_list<int> values16/17 with -Werror=sign-conversion"
+      }
+    ]
+  },
+  "correction": "型付きloop変数だけではinitializer_list<int>からの符号変換を防げないため、16/17の値を両方std::uint64_tで構築する。製品数学・状態・包絡・予算値は不変。",
+  "similar_findings": "src/include/testsの明示unsigned range-forを全検索。もう一つのsize_t例は既にtyped initializer、int64_tへのint拡大は符号維持。同じ不備は他にない。PG側もrootが確認。",
+  "verification": {
+    "Windows": "sourcefa74876のresource TUをDebug/Release構築成功、変更したcumulative cap境界だけ各10assert/1case成功。",
+    "static": "対象resource TU clang-tidy21.1.1 exit0、clang-format21.1.2 exit0。",
+    "gcc11_probe": "既存WSL GCC11 scalar snippetで旧形compile1（同じ-Wsign-conversion）→型付き形compile0。GCC14/C++23製品targetの成功ではない。",
+    "Linux_GCC14": "元CI3構成は修正前compile失敗、修正後Linuxの結果は未確認。追加CI完了を待たない。",
+    "review": "rootが1行fixture変更とcpp限定教訓を独立通読し、型/意味/日本語に未解決指摘なし。",
+    "not_repeated": "製品producer5files byte不変。旧4CTest D/R、旧6変異、工程計測、A0/他module/全suiteは再実行しない。",
+    "trace": "matrix/check実行済み。208定義ID、試験あり33、記録あり40、0問題。既存IDへの追補でID件数は不変。",
+    "integrity": "新追補checker21files/1manifest/0errors、rootが本文/CI失敗/実行範囲/旧証拠扱いを独立通読し重大不一致なし。",
+    "artifact_whitespace": "原native出力の末尾空行を保持する。派生*.logとgcc11-version.txtだけをwhitespace diffcheck対象から除外し、raw/hashは変更しない。"
+  },
+  "historical_evidence": "The old record is frozen source6ad evidence; its old TU live hint no longer matches this current tree. This is NOT a recursive integrity pass of the old manifest against the fixed tree.",
+  "historical_source_references": [
+    {
+      "id": "im03-3-ci-old-resource-tu",
+      "historical_commit": "6ad95bbea93eb0d70514a1d8f9d7ef4e7b96b8f3",
+      "hint": "tests/aero/local_geometry_packet_resources_test.cpp",
+      "sha256": "18f4c1b7423d469bd079fac96e948f849e70ae5f25e3a38a21f8d0ed3c1be758"
+    }
+  ],
+  "claimed_state": "unsigned fixtureのcompile portability修正。新しい数値/物理認定は主張しない。",
+  "sources": {
+    "tests/aero/local_geometry_packet_resources_test.cpp": "4df550602d4800f490d62c04195c0be04f696c98d77cab604997aea0e87c5ff7",
+    ".cursor/rules/cpp.mdc": "01cdd325a9d21560a82b040c17f07f94dcf2788aa14eedc44adbb9a32a86e54f"
+  },
+  "source_references": [
+    {
+      "id": "im03-3-ci-source-tests-aero-local_geometry_packet_resources_test-cpp",
+      "sha256": "4df550602d4800f490d62c04195c0be04f696c98d77cab604997aea0e87c5ff7",
+      "hint": "tests/aero/local_geometry_packet_resources_test.cpp"
+    },
+    {
+      "id": "im03-3-ci-source--cursor-rules-cpp-mdc",
+      "sha256": "01cdd325a9d21560a82b040c17f07f94dcf2788aa14eedc44adbb9a32a86e54f",
+      "hint": ".cursor/rules/cpp.mdc"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/im03-3-ci-unsigned/after.cpp": "1d0bec498426c55d2b88802effa19564386636b3c462c309a9a7e5c3bbc7f568",
+    "docs/verification/IM-03/im03-3-ci-unsigned/before.cpp": "4cbe82ccb28b84ece6865f228d0cb89fb522bacc0895a464e6984b4ad1075000",
+    "docs/verification/IM-03/im03-3-ci-unsigned/debug-build.log": "907640c48fc3a9b06f967d7af708c73721dfb79d41e58a54fcf4f547cd8917c6",
+    "docs/verification/IM-03/im03-3-ci-unsigned/debug-test.log": "7b9ce7a6b1abc8e173eade5df9b1dc62f36426624eb4f52e6f3ee8500c2aa30d",
+    "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-after.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-before.log": "dbe8fe0c9e9049167b78bd61ccf8a50ba06c2a63cd15f9259612238eed0c983e",
+    "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-result.json": "ed1235e5078abf4b465e609cc4ee24bd4a4823a3ef2aebdaa435aa0dc78ad65e",
+    "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-version.txt": "9eaf9b7f4b11c2e84e2478c2ceb0e4f48f4ba88565bcfc832b3bce49847dda6d",
+    "docs/verification/IM-03/im03-3-ci-unsigned/linux-debug-excerpt.log": "61cd5625e5ec607d552f43796b411c585f529ced3097642928fe0e73d840e546",
+    "docs/verification/IM-03/im03-3-ci-unsigned/linux-release-excerpt.log": "e2491e816528c6fe9fa0cb50cef41e2a22babc3e68242baaa9cd67250064d301",
+    "docs/verification/IM-03/im03-3-ci-unsigned/linux-sanitize-excerpt.log": "135612eb20a98dd50893ac9540117d308fbba3003fd55e4166b45aedb9769dcc",
+    "docs/verification/IM-03/im03-3-ci-unsigned/release-build.log": "fe8f1a188f50108dd6e889625211ad47055bfac6ddcc2914435834b5eab92b19",
+    "docs/verification/IM-03/im03-3-ci-unsigned/release-test.log": "5048ea5f8f51d12e8a6d9183d23c9a3c6608553abf3ef05b69cb485844e84bd8",
+    "docs/verification/IM-03/im03-3-ci-unsigned/run-source.json": "a3aef09cfc5090126ee9091df9624c1fd17d4ceca0b8e33b0c88bb40d62ce9bc",
+    "docs/verification/IM-03/im03-3-ci-unsigned/source-delta.json": "2bf39c8b668b117a77a00f7affae8ea469d002e7be47280b55c8cd0ccdab37fb",
+    "docs/verification/IM-03/im03-3-ci-unsigned/text-provenance.json": "635e53da084ed7615607725e8ad9fa990ec7a5eed29a27fa436a6c653225d6c5",
+    "docs/verification/IM-03/im03-3-ci-unsigned/tidy.log": "a82dda0df1cb23f11453f2a53e07c82b92e8029a289337dc21b37cff0b61bfd6",
+    "docs/verification/IM-03/im03-3.json": "82fb4591017df5beaec15537721f9e12cf27a4152cb417aacc981b5cfc469e87"
+  },
+  "artifact_references": [
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-after-cpp",
+      "sha256": "1d0bec498426c55d2b88802effa19564386636b3c462c309a9a7e5c3bbc7f568",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/after.cpp"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-before-cpp",
+      "sha256": "4cbe82ccb28b84ece6865f228d0cb89fb522bacc0895a464e6984b4ad1075000",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/before.cpp"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-debug-build-log",
+      "sha256": "907640c48fc3a9b06f967d7af708c73721dfb79d41e58a54fcf4f547cd8917c6",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/debug-build.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-debug-test-log",
+      "sha256": "7b9ce7a6b1abc8e173eade5df9b1dc62f36426624eb4f52e6f3ee8500c2aa30d",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/debug-test.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-gcc11-after-log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-after.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-gcc11-before-log",
+      "sha256": "dbe8fe0c9e9049167b78bd61ccf8a50ba06c2a63cd15f9259612238eed0c983e",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-before.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-gcc11-result-json",
+      "sha256": "ed1235e5078abf4b465e609cc4ee24bd4a4823a3ef2aebdaa435aa0dc78ad65e",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-result.json"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-gcc11-version-txt",
+      "sha256": "9eaf9b7f4b11c2e84e2478c2ceb0e4f48f4ba88565bcfc832b3bce49847dda6d",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/gcc11-version.txt"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-linux-debug-excerpt-log",
+      "sha256": "61cd5625e5ec607d552f43796b411c585f529ced3097642928fe0e73d840e546",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/linux-debug-excerpt.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-linux-release-excerpt-log",
+      "sha256": "e2491e816528c6fe9fa0cb50cef41e2a22babc3e68242baaa9cd67250064d301",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/linux-release-excerpt.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-linux-sanitize-excerpt-log",
+      "sha256": "135612eb20a98dd50893ac9540117d308fbba3003fd55e4166b45aedb9769dcc",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/linux-sanitize-excerpt.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-release-build-log",
+      "sha256": "fe8f1a188f50108dd6e889625211ad47055bfac6ddcc2914435834b5eab92b19",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/release-build.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-release-test-log",
+      "sha256": "5048ea5f8f51d12e8a6d9183d23c9a3c6608553abf3ef05b69cb485844e84bd8",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/release-test.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-run-source-json",
+      "sha256": "a3aef09cfc5090126ee9091df9624c1fd17d4ceca0b8e33b0c88bb40d62ce9bc",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/run-source.json"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-source-delta-json",
+      "sha256": "2bf39c8b668b117a77a00f7affae8ea469d002e7be47280b55c8cd0ccdab37fb",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/source-delta.json"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-text-provenance-json",
+      "sha256": "635e53da084ed7615607725e8ad9fa990ec7a5eed29a27fa436a6c653225d6c5",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/text-provenance.json"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-ci-unsigned-tidy-log",
+      "sha256": "a82dda0df1cb23f11453f2a53e07c82b92e8029a289337dc21b37cff0b61bfd6",
+      "hint": "docs/verification/IM-03/im03-3-ci-unsigned/tidy.log"
+    },
+    {
+      "id": "im03-3-ci-artifact-docs-verification-IM-03-im03-3-json",
+      "sha256": "82fb4591017df5beaec15537721f9e12cf27a4152cb417aacc981b5cfc469e87",
+      "hint": "docs/verification/IM-03/im03-3.json"
+    }
+  ],
+  "pending": []
+}

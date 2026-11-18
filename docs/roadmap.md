@@ -109,6 +109,7 @@ flowchart LR
 
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
+| IM03-3 | Feat | 空力局所幾何の包絡と所有する適格packet | #109 | Done |
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 
 ## 残リスクと止める位置
