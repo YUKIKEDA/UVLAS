@@ -310,4 +310,3 @@ L165 Linux (出現1回, 説明手掛かり: なし)
     近傍: を検出成功に数えない。
 
 本契約と限定oracleの独立レビュー後、SI変換パッケージを実装開始できる。製品source、全所有/資源/故障/変異、対象D/R・Linux sanitizer・静的検査を経て初めて実装適合を判定する。SI入力誤差のQoI伝播、外部snapshot/import、prepare、CLI、全物理受入は
-
