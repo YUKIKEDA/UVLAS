@@ -10,7 +10,7 @@
   "source_commit": "27fcc1115569f3f86a2f1c73025e5a0d359f887a",
   "initial_source_commit": "5eaaeed16771ed630463348343f1433cad696efc",
   "base_commit": "89c3923c0d0648910ad700390f7d04d77eec8e40",
-  "source_commit_scope": "27fcc11のclean sourceでWindows対象SI3本をDebug/Release実行。5eaaeedの旧schema回帰と6変異は別に記録。後続は実行記録とtraceだけ。",
+  "source_commit_scope": "製品は27fcc11のclean sourceでWindows対象SI3本D/Rを実行。c1709c5は5root1caseと記録/traceだけの追補で、src/include/CMakeのbyte不変を照合し、追加caseのみ同clean sourceでD/R実行。5eaaeedの旧schema回帰と6変異は別記録。以後はmetadataだけ。",
   "claimed_state": {
     "implementation_conforms": true,
     "numerical_qualification": false,
@@ -22,7 +22,7 @@
   "definition_of_done": [
     {
       "condition": 1,
-      "evidence": "191record/806fieldの独立FD inventoryを基に数値roleを網羅。144fragment(142正常/2拒否)と修正gmsh派生、全単位・混合行列・完全物理初期4例、負例13schema拒否/9SI通過、式constant/domain/time・元exact順序とnative整数保持。"
+      "evidence": "凍結5rootすべての公開SI入口と元typed全payload一致をD/Rで検証。191record/806fieldの独立FD inventoryを基に数値roleを網羅。144fragment(142正常/2拒否)と修正gmsh派生、全単位・混合行列・完全物理初期4例、負例13schema拒否/9SI通過、式constant/domain/time・元exact順序とnative整数保持。"
     },
     {
       "condition": 2,
@@ -129,7 +129,31 @@
       "independent_review": "rootが内容・日本語と失敗訂正/規約、P1が変異記録を通読。変異review.mdにはlow_burstiness警告1件を残す。",
       "retained_finding": "nominal_ending info1（体言止め0件）。技術条件と動作を述語まで明記する文書であり、統計のために体言止めへ変更しない。変異review.mdのlow_burstiness警告1とは別件。"
     },
-    "not_run": "無関係suite・全体CI再実行・Linuxローカル実行・実務性能試験。CI待機なし。"
+    "not_run": "無関係suite・全体CI再実行・Linuxローカル実行・実務性能試験。CI待機なし。",
+    "all_five_roots": {
+      "source_commit": "c1709c55344b317fd631acda4688fa1defc75c17",
+      "debug": {
+        "exit": 0,
+        "cases": 1,
+        "assertions": 6,
+        "seed": 12345,
+        "clean_build_info": true
+      },
+      "release": {
+        "exit": 0,
+        "cases": 1,
+        "assertions": 6,
+        "seed": 12345,
+        "clean_build_info": true
+      },
+      "product_bytes_equal_to_main_verification_source": true
+    },
+    "trace": {
+      "defined_ids": 208,
+      "ids_with_tests": 36,
+      "ids_with_records": 44,
+      "problems": 0
+    }
   },
   "log_representation": "公開ログは個人workspace prefixを<workspace>へ置換、CRLF/末尾空白/空EOFをLFへ正規化。CTest詳細はCP932をUTF-8へ変換。生stdoutのbyte同一は主張しない。",
   "references": [
@@ -394,7 +418,14 @@
     "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_exact.log": "b60d1030fd1280d29d9a96f27ae842a773b985c4a8540fb1016541b239c40bc3",
     "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_exact_center.log": "93af5dbb3764383e0142ad270591d484e009e4085a33e18c7052a82b14591644",
     "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_quantity.log": "b60d1030fd1280d29d9a96f27ae842a773b985c4a8540fb1016541b239c40bc3",
-    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-tidy.log": "c9623083b320ea8b5f0f8ee37d35a3eaf3355889902248e928f694e9c468a7c2"
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-tidy.log": "c9623083b320ea8b5f0f8ee37d35a3eaf3355889902248e928f694e9c468a7c2",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-debug-build-info.json": "423058f42c5622999357861e463197c260d9f6d3badf8eeb93cecf2af75315c7",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-debug-build.log": "9e96694b40ac7f149e268441095ff8a5f2be3a5c555f751554bf61114da06756",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-debug.log": "cdc31f885e3ef4d4498bde744eddc6184eed0546895c81352be175cbe2cd305c",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-release-build-info.json": "2e717d973964e0f5022d96a1c39030a17a2f3178aee38d53fa7ad2ecc6a6efe9",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-release-build.log": "0ecf224762644d3524c47d7e8320c0c30787acb952fd3bde3693a4dde30a6032",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-release.log": "cdc31f885e3ef4d4498bde744eddc6184eed0546895c81352be175cbe2cd305c"
   },
-  "test_extension": "最終DoD照合で凍結5rootを公開入口へ列挙する1caseを追加。製品sourceは27fcc11から不変。追加caseだけのD/R結果は別ログで追補し、既存成功系列は繰返さない。"
+  "test_extension": "凍結5rootの公開入口＋既存独立snapshotだけを1case追補。新派生/数値期待/許容差は追加せず、新caseだけD/R実行し既存成功系列を繰返さない。",
+  "test_source_commit": "c1709c55344b317fd631acda4688fa1defc75c17"
 }
