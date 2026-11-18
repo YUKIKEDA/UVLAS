@@ -246,15 +246,20 @@ TEST_CASE("Canonical case traversal observes values beyond counts and ignores ob
 
 TEST_CASE("Flutter requires a step-map eigenproblem while preserving both valid backends",
           "[verification][negative][IO4-01]") {
-    const auto full = root("coupled_flutter");
+    const auto flutter = root("coupled_flutter");
+    const auto& requirements = flutter.field("numerics").field("eigen").field("requirements");
+    auto full = flutter;
+    auto spectrum = fragment("EigenPolicy.full");
+    spectrum.set("requirements", requirements);
+    full.field("numerics").set("eigen", std::move(spectrum));
     require_cross(full, true);
-    const auto& requirements = full.field("numerics").field("eigen").field("requirements");
-    auto arnoldi = full;
+
+    auto arnoldi = flutter;
     auto iterative = fragment("EigenPolicy.arnoldi");
     iterative.set("requirements", requirements);
     arnoldi.field("numerics").set("eigen", std::move(iterative));
     require_cross(arnoldi, true);
-    auto generalized = full;
+    auto generalized = flutter;
     auto structural = fragment("EigenPolicy.generalized");
     structural.set("requirements", requirements);
     generalized.field("numerics").set("eigen", std::move(structural));
