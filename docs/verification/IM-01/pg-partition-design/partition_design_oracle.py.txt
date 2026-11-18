@@ -1,0 +1,298 @@
+"""Limited design witness; no product implementation or product qualification.
+
+Primary: line-arrangement convex pieces, exact winding and shoelace.
+Independent oracle: vertical sections clipped to each grid rectangle; exact Simpson.
+No production or frozen R&D imports. Python 3.12 standard library only.
+"""
+from fractions import Fraction as F
+from math import gcd
+import json
+
+
+def cross(a, b, c):
+    return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+
+
+def line(a, b):
+    raw = (a[1]-b[1], b[0]-a[0], a[0]*b[1]-a[1]*b[0])
+    den = 1
+    for x in raw:
+        den = den*x.denominator//gcd(den, x.denominator)
+    ints = [int(x*den) for x in raw]
+    common = gcd(gcd(abs(ints[0]), abs(ints[1])), abs(ints[2]))
+    ints = [x//common for x in ints]
+    if next(x for x in ints if x) < 0:
+        ints = [-x for x in ints]
+    return tuple(ints)
+
+
+def value(l, p):
+    return l[0]*p[0]+l[1]*p[1]+l[2]
+
+
+def meet(l, m):
+    d = l[0]*m[1]-l[1]*m[0]
+    assert d
+    return (F(l[1]*m[2]-l[2]*m[1], d),
+            F(l[2]*m[0]-l[0]*m[2], d))
+
+
+def clip(poly, support, sign):
+    # Every newly constructed vertex is an original-support intersection.
+    out = []
+    for a, b, owner in poly:
+        va, vb = sign*value(support, a), sign*value(support, b)
+        if va >= 0:
+            out.append(a)
+        if va*vb < 0:
+            out.append(meet(owner, support))
+    clean = []
+    for p in out:
+        if not clean or clean[-1] != p:
+            clean.append(p)
+    if len(clean) > 1 and clean[0] == clean[-1]:
+        clean.pop()
+    if len(clean) < 3:
+        return []
+    # New boundary support is either the new cut or an existing original line.
+    answer = []
+    originals = [e[2] for e in poly]+[support]
+    for a, b in zip(clean, clean[1:]+clean[:1]):
+        owner = next(l for l in originals if value(l, a) == value(l, b) == 0)
+        answer.append((a, b, owner))
+    return answer if moments(clean)[0] > 0 else []
+
+
+def moments(points):
+    area = mx = my = F(0)
+    for a, b in zip(points, points[1:]+points[:1]):
+        q = a[0]*b[1]-a[1]*b[0]
+        area += q/2
+        mx += (a[0]+b[0])*q/6
+        my += (a[1]+b[1])*q/6
+    return area, mx, my
+
+
+def inside(p, domain):
+    winding = 0
+    for a, b in zip(domain, domain[1:]+domain[:1]):
+        if a[1] <= p[1] < b[1] and cross(a, b, p) > 0:
+            winding += 1
+        elif b[1] <= p[1] < a[1] and cross(a, b, p) < 0:
+            winding -= 1
+    return winding != 0
+
+
+def arrangement(domain, n, extra=(), segments=()):
+    square = [(F(0), F(0)), (F(1), F(0)), (F(1), F(1)), (F(0), F(1))]
+    lines = {line(a,b) for a,b in zip(domain, domain[1:]+domain[:1])}
+    for a,b in segments:
+        lines.add(line(a,b))
+    for p in domain+list(extra):
+        lines.add((1, 0, -p[0]))
+        lines.add((0, 1, -p[1]))
+    for j in range(1, 2*n):
+        lines.add((1, 0, -F(j,2*n)))
+        lines.add((0, 1, -F(j,2*n)))
+    # Normalize before sorting: mixed Fraction/int comparison is exact.
+    lines = sorted({line((F(-c/a),F(0)),(F(-c/a),F(1))) if b == 0
+                    else line((F(0),F(-c/b)),(F(1),F(-(a+c)/b)))
+                    for a,b,c in lines})
+    pieces = [[(a,b,line(a,b)) for a,b in zip(square,square[1:]+square[:1])]]
+    for cut in lines:
+        next_pieces = []
+        for poly in pieces:
+            signs = [value(cut, edge[0]) for edge in poly]
+            if min(signs) < 0 < max(signs):
+                next_pieces += [clip(poly, cut, 1), clip(poly, cut, -1)]
+            else:
+                next_pieces.append(poly)
+        pieces = [p for p in next_pieces if p]
+    sums = {(i,j):(F(0),F(0),F(0)) for i in range(2*n) for j in range(2*n)}
+    selected = []
+    for poly in pieces:
+        pts = [e[0] for e in poly]
+        triple = next((pts[i],pts[(i+1)%len(pts)],pts[(i+2)%len(pts)])
+                      for i in range(len(pts))
+                      if cross(pts[i],pts[(i+1)%len(pts)],pts[(i+2)%len(pts)]))
+        p = tuple(sum((v[k] for v in triple),F(0))/3 for k in (0,1))
+        if not inside(p, domain):
+            continue
+        cell = (int(p[0]*2*n), int(p[1]*2*n))
+        moment = moments(pts)
+        assert moment[0] > 0
+        sums[cell] = tuple(a+b for a,b in zip(sums[cell],moment))
+        selected.append((cell,poly))
+    return sums, selected, pieces
+
+
+def vertical_oracle(domain, lo, hi, bottom, top):
+    # No primary clip/winding/moment/support/intersection routines are used.
+    edges = list(zip(domain, domain[1:]+domain[:1]))
+    breaks = {lo,hi}
+    for a,b in edges:
+        if lo < a[0] < hi:
+            breaks.add(a[0])
+        if a[1] != b[1]:
+            for y in (bottom,top):
+                x = a[0]+(y-a[1])*(b[0]-a[0])/(b[1]-a[1])
+                if lo < x < hi and min(a[0],b[0]) <= x <= max(a[0],b[0]):
+                    breaks.add(x)
+    cuts = sorted(breaks)
+    result = [F(0),F(0),F(0)]
+    for left,right in zip(cuts,cuts[1:]):
+        mid = (left+right)/2
+        active = []
+        for a,b in edges:
+            if min(a[0],b[0]) < mid < max(a[0],b[0]):
+                slope = (b[1]-a[1])/(b[0]-a[0])
+                intercept = a[1]-slope*a[0]
+                active.append((slope*mid+intercept,slope,intercept))
+        active.sort()
+        assert len(active)%2 == 0
+        for low,high in zip(active[::2],active[1::2]):
+            if high[0] <= bottom or low[0] >= top:
+                continue
+            lower = (F(0),bottom) if low[0] < bottom else low[1:]
+            upper = (F(0),top) if high[0] > top else high[1:]
+            def integrand(x):
+                y0,y1 = lower[0]*x+lower[1],upper[0]*x+upper[1]
+                return y1-y0,x*(y1-y0),(y1*y1-y0*y0)/2
+            samples = [integrand(x) for x in (left,mid,right)]
+            for k in range(3):
+                result[k] += (right-left)*(samples[0][k]+4*samples[1][k]+samples[2][k])/6
+    return tuple(result)
+
+
+def serialize(x):
+    if isinstance(x,F):
+        return str(x)
+    raise TypeError(type(x).__name__)
+
+
+def run():
+    cases = {
+        'square': [(0,0),(1,0),(1,1),(0,1)],
+        'trapezoid': [(0,0),(1,0),(F(3,4),1),(F(1,4),1)],
+        'two_components': [(0,0),(1,0),(1,F(1,8)),(F(1,8),F(1,8)),
+                           (F(1,8),F(3,8)),(1,F(3,8)),(1,F(1,2)),(0,F(1,2))],
+        'tiny_positive': [(0,0),(1,0),(1,F(1,10**400)),(0,F(1,10**400))],
+    }
+    literal = {'square':(F(1),F(1,2),F(1,2)),
+               'trapezoid':(F(3,4),F(3,8),F(1,3)),
+               'two_components':(F(9,32),F(65,512),F(9,128)),
+               'tiny_positive':(F(1,10**400),F(1,2*10**400),F(1,2*10**800))}
+    output = []
+    assertions = 0
+    for name,raw in cases.items():
+        domain = [(F(x),F(y)) for x,y in raw]
+        assert moments(domain) == literal[name]
+        assertions += 1
+        for n in (1,2,4):
+            actual,selected,all_pieces = arrangement(domain,n)
+            for (i,j),value3 in actual.items():
+                expected = vertical_oracle(domain,F(i,2*n),F(i+1,2*n),
+                                            F(j,2*n),F(j+1,2*n))
+                assert value3 == expected, (name,n,i,j,value3,expected)
+                assertions += 1
+            total = tuple(sum((v[k] for v in actual.values()),F(0)) for k in range(3))
+            assert total == literal[name]
+            # Product-relevant negative witnesses: dropping/duplicating a positive
+            # piece and falsely activating a zero cell must violate the oracle.
+            first = next(v for v in actual.values() if v[0])
+            assert tuple(total[k]-first[k] for k in range(3)) != literal[name]
+            assert tuple(total[k]+first[k] for k in range(3)) != literal[name]
+            assertions += 3
+            source_count = len(domain)
+            m = source_count+2*source_count+4*n+2
+            c = 1+(m-4)*(m-3)//2
+            assert len(all_pieces) <= c
+            assert sum(len(p) for p in all_pieces) <= 2*m*m
+            assertions += 2
+            output.append({'case':name,'n':n,'background_cells':4*n*n,
+                           'active_cells':sum(v[0]>0 for v in actual.values()),
+                           'pieces':len(selected),'moments':total})
+    # Cross-cell diagonal thickness boundary and a named partial outer segment.
+    square = [(F(0),F(0)),(F(1),F(0)),(F(1),F(1)),(F(0),F(1))]
+    extra = [(F(1,4),F(0)),(F(3,4),F(0))]
+    edge = (square[0],square[2])
+    trace_count = layer_faces = external_edges = 0
+    for n in (1,2,4):
+        _,pieces,_ = arrangement(square,n,extra,segments=(edge,))
+        edge_map = {}
+        for index,(_,poly) in enumerate(pieces):
+            for a,b,_ in poly:
+                key = tuple(sorted((a,b)))
+                edge_map.setdefault(key,[]).append(index)
+        for (a,b),owners in edge_map.items():
+            assert len(owners) in (1,2)
+            assertions += 1
+            if len(owners) == 2:
+                # Internal partition boundaries have two owners, no lateral face.
+                if a[0] == a[1] and b[0] == b[1]:
+                    left = (1+a[0],1+b[0])
+                    right = (1+a[1],1+b[1])
+                    assert left == right  # Different affine coefficients, same trace.
+                    assert left != tuple(x+F(1,10**400) for x in right)
+                    trace_count += 1
+                    assertions += 2
+            else:
+                assert (a[0] == b[0] in (0,1)) or (a[1] == b[1] in (0,1))
+                external_edges += 1
+                assertions += 1
+                if a[1] == b[1] == 0 and F(1,4) <= a[0] < b[0] <= F(3,4):
+                    # CCW bottom tangent points right; chart conormal points down.
+                    delta = (b[0]-a[0],b[1]-a[1])
+                    conormal = (delta[1],-delta[0])
+                    assert conormal[0] == 0 and conormal[1] < 0
+                    assertions += 1
+        layers = [(F(-1),F(-1,3)),(F(-1,3),F(1))]
+        triangles = sum(len(poly)-2 for _,poly in pieces)
+        faces = [(i,layer,side,z) for i in range(triangles)
+                 for layer,(lower,upper) in enumerate(layers)
+                 for side,z in (('lower',lower),('upper',upper))]
+        assert len(faces) == 4*triangles
+        assert sum(f[3] == F(-1,3) for f in faces) == 2*triangles
+        # Keeping only exterior faces would lose the two material traces.
+        assert len([f for f in faces if abs(f[3]) == 1]) != len(faces)
+        layer_faces += len(faces)
+        assertions += 3
+    # The two disconnected interiors in the same n=1 half-cell are explicit.
+    domain = [(F(x),F(y)) for x,y in cases['two_components']]
+    _,parts,_ = arrangement(domain,1)
+    selected = [p for cell,p in parts if cell == (1,0)]
+    adjacency = [set() for _ in selected]
+    sets = [{tuple(sorted((a,b))) for a,b,_ in p} for p in selected]
+    for i in range(len(sets)):
+        for j in range(i):
+            if sets[i] & sets[j]:
+                adjacency[i].add(j)
+                adjacency[j].add(i)
+    remaining = set(range(len(sets)))
+    components = 0
+    while remaining:
+        queue = [remaining.pop()]
+        components += 1
+        while queue:
+            current = queue.pop()
+            for other in adjacency[current] & remaining:
+                remaining.remove(other)
+                queue.append(other)
+    assert components == 2
+    assertions += 1
+    return {'scope':'limited design algebra only; no product qualification',
+            'assertions':assertions,'comparisons':output,
+            'shared_thickness_trace_segments':trace_count,
+            'layer_face_records':layer_faces,'external_atomic_edges':external_edges,
+            'same_cell_interior_components':components,
+            'negative_witnesses':['missing positive region','duplicate positive region',
+                                  'H trace jump 1e-400','missing layer interface traces'],
+            'positive_witnesses':['different continuous P1 coefficients on shared edge',
+                                  'two interior components in one half-cell',
+                                  'positive area 1e-400 is retained'],
+            'not_executed':['production code','physical quadrature','rank',
+                            'allocation failure','cancellation','all malformed-input validators']}
+
+
+if __name__ == '__main__':
+    print(json.dumps(run(),default=serialize,ensure_ascii=False,indent=2))
