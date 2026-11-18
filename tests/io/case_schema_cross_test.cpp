@@ -284,10 +284,10 @@ TEST_CASE("A missing structural scale identifies the scales array",
     const auto invalid = validate_cross(value, &diagnostic);
     REQUIRE_FALSE(invalid);
     CHECK(invalid.error().code == core::FailureCode::InvalidInput);
-    REQUIRE(diagnostic.detail());
-    CHECK(diagnostic.detail()->reason == io::SchemaReason::InvalidValue);
-    REQUIRE(diagnostic.path());
-    CHECK(*diagnostic.path() == "/numerics/scales");
+    const auto detail = diagnostic.detail();
+    const bool matching_reason = detail && detail->reason == io::SchemaReason::InvalidValue;
+    CHECK(matching_reason);
+    CHECK(diagnostic.path() == std::string_view{"/numerics/scales"});
     const auto without_diagnostic = validate_cross(value, nullptr);
     REQUIRE_FALSE(without_diagnostic);
     CHECK(without_diagnostic.error().code == invalid.error().code);
