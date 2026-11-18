@@ -268,6 +268,8 @@ TEST_CASE("P1 owns original geometry and survives failures moves and workspace r
     failure(
         evaluate_p1_basis(local, {core::Precision::TwoWord, 1e-10, 1e-10}, strict, **kernel, setup),
         core::FailureCode::Unsupported);
+    // MSVC request_stop() is non-const; libstdc++ declares it const.
+    // NOLINTNEXTLINE(misc-const-correctness)
     std::stop_source cancellation;
     cancellation.request_stop();
     failure(evaluate_p1_basis(local, {core::Precision::TwoWord, 1e-10, 1e-10}, p1_limits(),

@@ -530,6 +530,11 @@ target_compile_definitions(uvlas_test_aero_p1_induction PRIVATE
     UVLAS_P1_GAUSS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-gauss-legendre-v1.json"
     UVLAS_P1_AREA_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-area-reference-v1.json"
     UVLAS_P1_AREA_PRECISE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-area-precision-v1.json")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    # The full 13-column interval/independent-reference suite exceeded 60 s under
+    # ASan/UBSan in PR129. This runner limit does not alter numerical or performance acceptance.
+    set_tests_properties(aero.p1_induction PROPERTIES TIMEOUT 300)
+endif()
 uvlas_add_test(aero.p1_induction_resources
     LABELS property negative verification V-AERO
     SOURCES aero/p1_induction_resources_test.cpp
