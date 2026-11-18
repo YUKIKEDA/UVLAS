@@ -1,0 +1,54 @@
+{
+  "baseline": {
+    "compiler_msc_full_ver": 195136260,
+    "domain_vertices": 8,
+    "failure": "ResourceExceeded",
+    "layers": 2,
+    "n": 4,
+    "named_segments": 1,
+    "plan_allocated_on_failure": 0,
+    "refinements": 1,
+    "samples": [],
+    "scope": "real n=4 product preparation; not practical solver performance acceptance",
+    "thickness_triangles": 2,
+    "threads": 1
+  },
+  "candidate": {
+    "compiler_msc_full_ver": 195136260,
+    "domain_vertices": 8,
+    "layers": 2,
+    "n": 4,
+    "named_segments": 1,
+    "refinements": 1,
+    "samples": [
+      {
+        "allocated_payload_bytes": 30025495,
+        "edges": 83,
+        "external_forecast_bytes": 19978141584,
+        "horizontal_faces": 228,
+        "inner": 0,
+        "input_ns": 207700,
+        "intersections_ns": 471800,
+        "lateral_faces": 94,
+        "numeric_operations": 178891,
+        "outer": 0,
+        "owned_payload_forecast_bytes": 14655586727,
+        "pieces": 31,
+        "planar_ns": 31309900,
+        "process_lifetime_peak_bytes": 28237824,
+        "resident_after_bytes": 27049984,
+        "resident_before_bytes": 5029888,
+        "topology_visits": 37664,
+        "traces_ns": 2868400,
+        "triangles": 57,
+        "value_bits": 13,
+        "vertices": 135,
+        "volumes": 114,
+        "whole_ns": 39617400
+      }
+    ],
+    "scope": "real n=4 product preparation; not practical solver performance acceptance",
+    "thickness_triangles": 2,
+    "threads": 1
+  }
+}
