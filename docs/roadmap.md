@@ -110,6 +110,10 @@ flowchart LR
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
 | IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | Done |
+| IM01-4 | Feat | PG多角形と全積分分割 | #125 | Done |
+| IM01-5 | Design | PG局所独立化のexact rank・全再構成・包含契約 | #133 | In progress |
+| IM01-6 | Design | PG領域分割の資源予測と48GiB依存 | #136 | In progress |
+| IM01-7 | Design | PG局所rankの資源受入方式 | #140 | Todo |
 | IM03-3 | Feat | 空力局所幾何の包絡と所有する適格packet | #109 | Done |
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 

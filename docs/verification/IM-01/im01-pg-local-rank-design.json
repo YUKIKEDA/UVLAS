@@ -1,0 +1,27 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-local-rank-design",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 133,
+  "date": "2026-11-18",
+  "source_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
+  "claimed_state": "限定数学手順・全再構成と資源方式の不採用判断。製品rank実装開始・数値認定・実務受入ではない。",
+  "checks": {
+    "matrix_cases": 9,
+    "semantic_mutants_detected": 6,
+    "tolerance": 0,
+    "resource_m_lower": 1089,
+    "resource_owned_lower_64B": 389117786112,
+    "independent_replay": "別担当・別worktreeで出力byte一致"
+  },
+  "remaining": "IM01-5/#133は未完。分割資源IM01-6/#136、rank資源IM01-7/#140後に製品開始審査。",
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "bbad14e48907a384b0b74274bd075efdacf1152cabb79778dabc7f3ebea6b738",
+    "docs/verification/IM-01/pg-local-rank-design/rank_design_oracle.py.txt": "81e09ecfa0feb0d7e0243e7217c367e4873725094c77b2f86f52d77ab6ab0260",
+    "docs/verification/IM-01/pg-local-rank-design/design-result.json": "dfc246aa7383717dc1bba91c27f860f132e01e0f372835200acd608b6b6f1d7b",
+    "docs/verification/IM-01/pg-local-rank-design/verification.md": "37fab34fab31692e111a907d518f400188916a545f7ea2cbd8904260cf5d78e6"
+  }
+}
