@@ -1,0 +1,202 @@
+{
+  "scope": "Limited matrix recipe and semantic sensitivity only; no product rank, full PG basis or practical acceptance",
+  "cases": [
+    {
+      "m": 28,
+      "F": 12,
+      "N": 53,
+      "rank": 8,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        40,
+        42
+      ],
+      "observed_integer_bits": 8048,
+      "scale_mutation_detected": true,
+      "n": 1,
+      "region": "full"
+    },
+    {
+      "m": 14,
+      "F": 12,
+      "N": 53,
+      "rank": 7,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        42
+      ],
+      "observed_integer_bits": 5363,
+      "scale_mutation_detected": true,
+      "n": 1,
+      "region": "away_anchor"
+    },
+    {
+      "m": 14,
+      "F": 12,
+      "N": 53,
+      "rank": 7,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        42
+      ],
+      "observed_integer_bits": 6702,
+      "scale_mutation_detected": true,
+      "n": 1,
+      "region": "anchor_strip"
+    },
+    {
+      "m": 112,
+      "F": 12,
+      "N": 53,
+      "rank": 8,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        40,
+        42
+      ],
+      "observed_integer_bits": 8090,
+      "scale_mutation_detected": true,
+      "n": 2,
+      "region": "full"
+    },
+    {
+      "m": 84,
+      "F": 12,
+      "N": 53,
+      "rank": 7,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        42
+      ],
+      "observed_integer_bits": 5397,
+      "scale_mutation_detected": true,
+      "n": 2,
+      "region": "away_anchor"
+    },
+    {
+      "m": 28,
+      "F": 12,
+      "N": 53,
+      "rank": 7,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        42
+      ],
+      "observed_integer_bits": 6730,
+      "scale_mutation_detected": true,
+      "n": 2,
+      "region": "anchor_strip"
+    },
+    {
+      "m": 448,
+      "F": 12,
+      "N": 53,
+      "rank": 8,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        40,
+        42
+      ],
+      "observed_integer_bits": 8130,
+      "scale_mutation_detected": true,
+      "n": 4,
+      "region": "full"
+    },
+    {
+      "m": 392,
+      "F": 12,
+      "N": 53,
+      "rank": 7,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        42
+      ],
+      "observed_integer_bits": 5427,
+      "scale_mutation_detected": true,
+      "n": 4,
+      "region": "away_anchor"
+    },
+    {
+      "m": 56,
+      "F": 12,
+      "N": 53,
+      "rank": 7,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        36,
+        37,
+        42
+      ],
+      "observed_integer_bits": 6758,
+      "scale_mutation_detected": true,
+      "n": 4,
+      "region": "anchor_strip"
+    }
+  ],
+  "mutations": {
+    "tiny_drop": true,
+    "C_omit": true,
+    "mandatory_order": true,
+    "inactive_rows": true,
+    "anchor_quotient": true,
+    "scale_restore": true
+  },
+  "real_n4_lower_bound": {
+    "stored_terms": 1017024,
+    "g_terms_upper": 1792,
+    "m_lower": 1089,
+    "F": 933,
+    "F0": 530,
+    "N": 1496,
+    "R": 933,
+    "bareiss_opcode_term_lower": 6079965408,
+    "RationalStorage_bytes_condition": 64,
+    "cumulative_owned_lower": 389117786112,
+    "cap_48_GiB": 51539607552,
+    "rejected": true
+  },
+  "producer_sha256": "81e09ecfa0feb0d7e0243e7217c367e4873725094c77b2f86f52d77ab6ab0260"
+}

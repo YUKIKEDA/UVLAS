@@ -1,0 +1,34 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-local-rank-design",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 133,
+  "date": "2026-11-18",
+  "source_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
+  "claimed_state": "限定数学手順・全再構成と資源方式の不採用判断。製品rank実装開始・数値認定・実務受入ではない。",
+  "checks": {
+    "matrix_cases": 9,
+    "semantic_mutants_detected": 8,
+    "tolerance": 0,
+    "resource_m_lower": 1089,
+    "resource_owned_lower_64B": 389117786112,
+    "independent_replay": "別担当・別worktreeで修正版出力byte一致: 7e63ae0872fc220a6284fb0cc3d2416f371ded18b82742d49de9f22601c9cd7e",
+    "background_anchor_exact_checks": 1008
+  },
+  "remaining": "IM01-5/#133は未完。分割資源IM01-6/#136、rank資源IM01-7/#140後に製品開始審査。",
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-local-rank-design/rank_design_oracle.py.txt": "166ecffd120a2e96951822e06c696450726a9bd5b3e477b776ea49cd82c395f3",
+    "docs/verification/IM-01/pg-local-rank-design/design-result-v2.json": "7e63ae0872fc220a6284fb0cc3d2416f371ded18b82742d49de9f22601c9cd7e",
+    "docs/verification/IM-01/pg-local-rank-design/review-141-correction.md": "2102f50d71f7b9af1a0b8cdb98729525c86a4a3b515ed1e022c3036e3aa40c28"
+  },
+  "correction": "review-141-correction.mdが旧6変異で未検出だったJ核所属を訂正する。旧bytesはreview-141-originalへ保存。",
+  "artifacts": {
+    "docs/verification/IM-01/pg-local-rank-design/review-141-original/design-result.json": "dfc246aa7383717dc1bba91c27f860f132e01e0f372835200acd608b6b6f1d7b",
+    "docs/verification/IM-01/pg-local-rank-design/review-141-original/manifest.json.txt": "63fbb4a81fb0b7c8707aea1a18cf2d3a77d102b8c754403b998ed57de6c14ff5",
+    "docs/verification/IM-01/pg-local-rank-design/review-141-original/rank_design_oracle.py.txt": "81e09ecfa0feb0d7e0243e7217c367e4873725094c77b2f86f52d77ab6ab0260"
+  }
+}

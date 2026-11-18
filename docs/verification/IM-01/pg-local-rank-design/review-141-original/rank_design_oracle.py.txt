@@ -1,0 +1,278 @@
+"""Limited matrix oracle for the rank recipe; never a product PG qualification."""
+from __future__ import annotations
+
+from fractions import Fraction as Q
+from hashlib import sha256
+import json
+from pathlib import Path
+import sys
+
+Matrix = list[list[Q]]
+
+
+def ensure(condition: bool, message: str) -> None:
+    if not condition:
+        raise ValueError(message)
+
+
+def transpose(a):
+    return list(map(list, zip(*a, strict=True))) if a else []
+
+
+def matmul(a, b):
+    cols = transpose(b)
+    return [[sum((x * y for x, y in zip(row, col, strict=True)), Q())
+             for col in cols] for row in a]
+
+
+def subcolumns(a, indices):
+    return [[row[j] for j in indices] for row in a]
+
+
+def rank(a):
+    if not a:
+        return 0
+    rows = [row[:] for row in a]
+    pivot = 0
+    for col in range(len(rows[0])):
+        found = next((i for i in range(pivot, len(rows)) if rows[i][col]), None)
+        if found is None:
+            continue
+        rows[pivot], rows[found] = rows[found], rows[pivot]
+        scale = rows[pivot][col]
+        rows[pivot] = [x / scale for x in rows[pivot]]
+        for i in range(pivot + 1, len(rows)):
+            scale = rows[i][col]
+            rows[i] = [x - scale * y
+                       for x, y in zip(rows[i], rows[pivot], strict=True)]
+        pivot += 1
+        if pivot == len(rows):
+            break
+    return pivot
+
+
+def oracle(c, selectable):
+    chosen = []
+    for col in range(selectable):
+        if rank(subcolumns(c, chosen + [col])) > len(chosen):
+            chosen.append(col)
+    for col in range(selectable, len(c[0])):
+        ensure(rank(subcolumns(c, chosen + [col])) == len(chosen),
+               "Oracle kernel candidate escaped the source span")
+    r = len(chosen)
+    if r == 0:
+        return chosen, []
+    augmented = [b + full for b, full in zip(subcolumns(c, chosen), c, strict=True)]
+    for col in range(r):
+        pivot = next(i for i in range(col, len(augmented)) if augmented[i][col])
+        augmented[col], augmented[pivot] = augmented[pivot], augmented[col]
+        scale = augmented[col][col]
+        augmented[col] = [x / scale for x in augmented[col]]
+        for row in range(len(augmented)):
+            if row == col:
+                continue
+            scale = augmented[row][col]
+            augmented[row] = [x - scale * y
+                              for x, y in zip(augmented[row], augmented[col], strict=True)]
+    ensure(all(not x for row in augmented[r:] for x in row), "Oracle reconstruction")
+    return chosen, [row[r:] for row in augmented[:r]]
+
+
+def integer_recipe(a, maps, selectable):
+    c = matmul(a, maps)
+    m, f, n = len(a), len(a[0]), len(maps[0])
+    d = [1] * m
+    e = [1] * n
+    for i, row in enumerate(a):
+        for value in row:
+            d[i] *= value.denominator
+    for j, col in enumerate(transpose(maps)):
+        for value in col:
+            e[j] *= value.denominator
+    scaled_a = [[int(x * d[i]) for x in row] for i, row in enumerate(a)]
+    scaled_maps = [[int(x * e[j]) for j, x in enumerate(row)] for row in maps]
+    original = [[sum(x * y for x, y in zip(row, col, strict=True))
+                 for col in transpose(scaled_maps)] for row in scaled_a]
+    observed = 1
+
+    def seen(value):
+        nonlocal observed
+        observed = max(observed, abs(value).bit_length())
+        return value
+
+    def divide(x, y):
+        ensure(y != 0, "Zero exact divisor")
+        q, rem = divmod(x, y)
+        ensure(rem == 0, "Nonintegral Bareiss/Cramer division")
+        return seen(q)
+
+    pivots, selected, vectors, upper, states = [], [], [], [], []
+    for j in range(n):
+        v = [row[j] for row in original]
+        rhs = []
+        for i, pivot in enumerate(pivots):
+            alpha = v[pivot]
+            rhs.append(alpha)
+            old = 1 if i == 0 else vectors[i - 1][pivots[i - 1]]
+            for row in range(m):
+                if row in pivots[:i + 1]:
+                    continue
+                first = seen(vectors[i][pivot] * v[row])
+                second = seen(alpha * vectors[i][row])
+                v[row] = divide(seen(first - second), old)
+            v[pivot] = 0
+        found = next((row for row in range(m)
+                      if row not in pivots and v[row]), None)
+        if found is not None:
+            ensure(j < selectable, "Kernel candidate must not select a new basis")
+            for i, row in enumerate(upper):
+                row.append(rhs[i])
+            upper.append([0] * len(selected) + [v[found]])
+            vectors.append(v)
+            pivots.append(found)
+            selected.append(j)
+            states.append(("basis", len(selected) - 1))
+        else:
+            r = len(selected)
+            den = upper[-1][-1] if r else 1
+            numerators = [0] * r
+            for i in reversed(range(r)):
+                summation = seen(sum(seen(upper[i][k] * numerators[k])
+                                    for k in range(i + 1, r)))
+                numerators[i] = divide(seen(den * rhs[i] - summation), upper[i][i])
+            states.append(("dependent", numerators, den))
+    r = len(selected)
+    den = upper[-1][-1] if r else 1
+    coords = [[0] * n for _ in range(r)]
+    for j, state in enumerate(states):
+        if state[0] == "basis":
+            coords[state[1]][j] = den
+        else:
+            for i, value in enumerate(state[1]):
+                coords[i][j] = divide(seen(value * den), state[2])
+    selected_integer = subcolumns(original, selected)
+    ensure(matmul(selected_integer, coords) ==
+           [[den * x for x in row] for row in original], "All integer reconstruction")
+    basis = subcolumns(c, selected)
+    public = [[Q(e[selected[k]] * coords[k][j], e[j] * den) for j in range(n)]
+              for k in range(r)]
+    ensure(matmul(basis, public) == c, "Scale-restored full rational reconstruction")
+    reference_selected, reference_coords = oracle(c, selectable)
+    ensure(selected == reference_selected, "Mandatory-first selected columns")
+    ensure(public == reference_coords, "Independent row-Gauss coordinates")
+    # A missing column scale must be detectable, rather than counted as another answer.
+    bad = [[Q(coords[k][j], den) for j in range(n)] for k in range(r)]
+    scale_mutation = matmul(basis, bad) != c
+    return {"m": m, "F": f, "N": n, "rank": r, "selected": selected,
+            "observed_integer_bits": observed, "scale_mutation_detected": scale_mutation}
+
+
+def polynomial_fixture(n, region):
+    side = 2 * n
+    f, f0 = 12, 8
+    rows, keys = [], []
+    tiny = Q(1, 10 ** 400)
+    for field, powers in (("R", range(3)), ("P", range(2)), ("C", range(2))):
+        for cs in range(side):
+            for ct in range(side):
+                if region == "away_anchor" and cs == 0:
+                    continue
+                if region == "anchor_strip" and cs != 0:
+                    continue
+                center, step = Q(2 * cs + 1, 4 * n), Q(1, 4 * n)
+                for power in powers:
+                    row = [Q()] * f
+                    if field == "R":
+                        row[0] = Q(power == 0)
+                        row[1] = (center, step, Q())[power]
+                        row[5] = tiny * (center * center, 2 * center * step,
+                                         step * step)[power]
+                        row[6] = 2 * row[0]
+                        row[7] = (Q(1, 4), Q(-1, 2), Q(1, 4))[power] if cs == 0 else Q()
+                        row[8] = row[0] - row[1]
+                        row[10] = 2 * row[8]
+                        row[11] = row[8]
+                    elif field == "P":
+                        row[2] = Q(power == 0)
+                        row[9] = (1 - center, -step)[power]
+                    else:
+                        row[3] = Q(power == 0)
+                        row[4] = (center, step)[power]
+                    rows.append(row)
+                    keys.append((field, cs, ct, power))
+    g = [[Q()] * 33 for _ in range(f)]
+    for target in range(33):
+        raw = (0, 1, 2, 5, 6)[target % 5]
+        g[raw][target] = Q(1, 2 + target % 3)
+    identity = [[Q(i == j) for j in range(f)] for i in range(f)]
+    kernel = [[Q()] * f0 for _ in range(f)]
+    for source in range(f0):
+        kernel[source][source] = 1
+    kernel[8][0] = -1
+    kernel[9][2] = -1
+    kernel[3][3] = -1
+    kernel[4][3] = 1
+    kernel[10][6] = -1
+    kernel[11][7] = -1
+    maps = [left + middle + right
+            for left, middle, right in zip(g, identity, kernel, strict=True)]
+    return rows, maps, keys
+
+
+def main():
+    output = Path(sys.argv[1])
+    ensure(not output.exists(), "Never overwrite evidence")
+    cases = []
+    mutation = {"tiny_drop": False, "C_omit": False, "mandatory_order": False,
+                "inactive_rows": False, "anchor_quotient": False, "scale_restore": False}
+    for n in (1, 2, 4):
+        for region in ("full", "away_anchor", "anchor_strip"):
+            a, maps, keys = polynomial_fixture(n, region)
+            before = repr((a, maps))
+            result = integer_recipe(a, maps, 33 + len(a[0]))
+            ensure(repr((a, maps)) == before, "Inputs changed")
+            result.update(n=n, region=region)
+            cases.append(result)
+            mutation["scale_restore"] |= result["scale_mutation_detected"]
+            c = matmul(a, maps)
+            tiny_cut = [[Q() if abs(x) < Q(1, 10 ** 100) else x for x in row] for row in a]
+            mutation["tiny_drop"] |= rank(tiny_cut) != result["rank"]
+            without_c = [row for row, key in zip(a, keys, strict=True) if key[0] != "C"]
+            mutation["C_omit"] |= rank(without_c) != result["rank"]
+            raw_first = list(range(33, 33 + len(a[0]))) + list(range(33))
+            candidate = oracle(subcolumns(c, raw_first), len(raw_first))[0]
+            chosen_in_original = [raw_first[i] for i in candidate]
+            mutation["mandatory_order"] |= chosen_in_original != result["selected"]
+            if region == "away_anchor":
+                full, _, full_keys = polynomial_fixture(n, "full")
+                anchor = sum(row[7] * (-1) ** key[3]
+                             for row, key in zip(full, full_keys, strict=True)
+                             if key[:3] == ("R", 0, 0))
+                mutation["anchor_quotient"] |= all(row[7] == 0 for row in a) and anchor == 1
+                mutation["inactive_rows"] |= rank(full) != result["rank"]
+    ensure(all(mutation.values()), "At least one semantic mutant survived")
+    # Real product-data lower bound, distinct from these hand polynomial matrices.
+    stored, g_upper, f, f0 = 1017024, 28 * 64, 933, 530
+    m_lower = (stored - g_upper + f - 1) // f
+    n, r = 33 + f + f0, f
+    opcodes = 4 * n * m_lower * r
+    lower = opcodes * 64
+    ensure((m_lower, opcodes, lower) == (1089, 6079965408, 389117786112),
+           "Published n4 rejection arithmetic")
+    result = {"scope": "Limited matrix recipe and semantic sensitivity only; no product rank, full PG basis or practical acceptance",
+              "cases": cases, "mutations": mutation,
+              "real_n4_lower_bound": {"stored_terms": stored, "g_terms_upper": g_upper,
+                                     "m_lower": m_lower, "F": f, "F0": f0, "N": n, "R": r,
+                                     "bareiss_opcode_term_lower": opcodes,
+                                     "RationalStorage_bytes_condition": 64,
+                                     "cumulative_owned_lower": lower,
+                                     "cap_48_GiB": 48 * 1024 ** 3,
+                                     "rejected": lower > 48 * 1024 ** 3},
+              "producer_sha256": sha256(Path(__file__).read_bytes()).hexdigest()}
+    output.write_bytes((json.dumps(result, indent=2) + "\n").encode("utf-8"))
+    print(json.dumps({"cases": len(cases), "all_mutations_detected": all(mutation.values()),
+                      "m_lower": m_lower, "owned_lower": lower}))
+
+
+if __name__ == "__main__":
+    main()
