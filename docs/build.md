@@ -35,6 +35,8 @@
 
 Presetのジェネレータは Ninja Multi-Config で、コンパイラは環境の `cl` を使う（[ADR 0002](adr/0002-ninja-presets-with-the-msvc-environment.md)）。コマンドは [tools/dev/msvc.ps1](../tools/dev/msvc.ps1) を通して、MSVCの環境の中で実行する。このスクリプトは、Visual Studioの環境が自分の同梱版へ書き換える `VCPKG_ROOT` を、呼出し前の値へ戻す。
 
+Windowsの製品CIでは、入力パーサーの確保量モデルを認定したMSVC 14.51（STL 145、202604）を使う。[CIの選択スクリプト](../tools/dev/ci-msvc.ps1)でコンパイラとSTL版をビルド前に照合し、製品とvcpkgに同じVisual Studioを指定する。runnerの既定が14.52へ切り替わった際は、入力パーサーが未認定の環境を拒否する分岐でMSVCの到達不能コード警告が発生した。認定済みの版がrunnerに無い場合は、固定したVisual Studio Build Toolsの配布物を使う。
+
 ```powershell
 pwsh tools/dev/msvc.ps1 cmake --preset windows-msvc
 pwsh tools/dev/msvc.ps1 cmake --build --preset windows-debug
