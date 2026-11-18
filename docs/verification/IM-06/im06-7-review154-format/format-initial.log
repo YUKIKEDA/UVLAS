@@ -1,0 +1,3 @@
+include/uvlas/io/case_schema.hpp:14:2: error: code should be clang-formatted [-Wclang-format-violations]
+}
+ ^
