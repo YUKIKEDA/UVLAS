@@ -252,7 +252,7 @@ inline ScalarWords restore(const ParameterStorage& w) {
     const auto& v = std::get<std::array<double, 2>>(w);
     return DoubleWord{v[0], v[1]};
 }
-inline ExactInteger coordinate(const GeometryData& g, std::uint64_t p, std::size_t k,
+inline ExactInteger coordinate(const GeometryData& g, core::Index p, std::size_t k,
                                Configuration config, Run& r) {
     const auto i = static_cast<std::size_t>(p) * 3 + k;
     const auto high =

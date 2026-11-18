@@ -12,7 +12,7 @@ struct RationalPoint {
 };
 /// Fixed original-point ordinals for the six closed bounds; no giant integers per node.
 struct Node {
-    std::array<std::uint64_t, 6> extrema{};
+    std::array<core::Index, 6> extrema{};
     std::uint64_t left = 0, right = 0, count = 0, facet = 0;
 };
 struct NodePair {
