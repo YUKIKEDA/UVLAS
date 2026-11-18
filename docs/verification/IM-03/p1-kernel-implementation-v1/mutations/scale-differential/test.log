@@ -1,0 +1,22 @@
+Filters: "P1 huge common*"
+Randomness seeded to: 3814054117
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+p1.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+P1 huge common origins preserve low words and scaled derivatives
+-------------------------------------------------------------------------------
+${ROOT}/tests/aero/p1_induction_test.cpp(266)
+...............................................................................
+
+${ROOT}/tests/aero/p1_induction_test.cpp(305): FAILED:
+  CHECK( abs(derivative - exact_center(take(baseline.derivative(k, a, j)).get())) < Real{"1e-28"} )
+with expansion:
+  1.48047 < 1e-28
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 9 | 8 passed | 1 failed
+

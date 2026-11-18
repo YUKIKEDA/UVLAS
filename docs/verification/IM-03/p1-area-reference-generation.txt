@@ -1,0 +1,51 @@
+flat-ideal-near-0.01 40 19235.278
+flat-ideal-near-0.01 64 0.0061974406
+flat-ideal-near-0.01 96 9.1922111e-13
+completed flat-ideal-near-0.01 15.52 seconds
+flat-ideal-near-0.001 40 3340128.4
+flat-ideal-near-0.001 64 1.0816931
+flat-ideal-near-0.001 96 1.5484388e-10
+completed flat-ideal-near-0.001 14.34 seconds
+flat-ideal-near-1e-05 40 3.3676818e+10
+flat-ideal-near-1e-05 64 10962.377
+flat-ideal-near-1e-05 96 1.5754969e-6
+completed flat-ideal-near-1e-05 14.66 seconds
+flat-core-0.02-face 40 38.471295
+flat-core-0.02-face 64 1.043768e-5
+completed flat-core-0.02-face 7.99 seconds
+flat-core-0.08-face 40 17.244885
+flat-core-0.08-face 64 4.9983658e-6
+completed flat-core-0.08-face 7.69 seconds
+flat-core-08-edge 40 1.7817227
+flat-core-08-edge 64 1.1211218e-7
+completed flat-core-08-edge 4.59 seconds
+flat-core-08-vertex 40 1.0408058e-8
+completed flat-core-08-vertex 1.25 seconds
+skew-core-08-free 40 0.085434838
+skew-core-08-free 64 7.5744229e-10
+completed skew-core-08-free 11.25 seconds
+skew-core-02-face 40 12966.782
+skew-core-02-face 64 0.077233957
+skew-core-02-face 96 5.2201721e-9
+completed skew-core-02-face 16.74 seconds
+flat-far-core-08 40 7.1154032e-58
+completed flat-far-core-08 5.46 seconds
+flat-ideal-coplanar-exterior 40 8.6896232e-41
+completed flat-ideal-coplanar-exterior 4.3 seconds
+flat-ideal-line-extension 40 6.8569658e-33
+completed flat-ideal-line-extension 4.29 seconds
+skew-ideal-free 40 0.1476139
+skew-ideal-free 64 1.7637025e-9
+completed skew-ideal-free 10.61 seconds
+nonplanar-quad-child-0-core-0 40 9.9409898e-8
+completed nonplanar-quad-child-0-core-0 5.75 seconds
+nonplanar-quad-child-0-core-0.02 40 9.79855e-8
+completed nonplanar-quad-child-0-core-0.02 5.93 seconds
+nonplanar-quad-child-0-core-0.08 40 7.899433e-8
+completed nonplanar-quad-child-0-core-0.08 5.91 seconds
+nonplanar-quad-child-1-core-0 40 1.1015242e-7
+completed nonplanar-quad-child-1-core-0 5.73 seconds
+nonplanar-quad-child-1-core-0.02 40 1.0857759e-7
+completed nonplanar-quad-child-1-core-0.02 5.81 seconds
+nonplanar-quad-child-1-core-0.08 40 8.7575234e-8
+completed nonplanar-quad-child-1-core-0.08 5.91 seconds

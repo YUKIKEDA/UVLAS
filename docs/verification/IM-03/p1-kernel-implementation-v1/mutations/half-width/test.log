@@ -1,0 +1,22 @@
+Filters: "P1 exact qualification*"
+Randomness seeded to: 169388318
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+p1.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+P1 exact qualification compares full width including physical derivative scale
+-------------------------------------------------------------------------------
+${ROOT}/tests/aero/p1_induction_test.cpp(411)
+...............................................................................
+
+${ROOT}/tests/aero/p1_induction_test.cpp(415): FAILED:
+  CHECK_FALSE( arithmetic::full_width_at_most(.25, 0, .25, unit, false, product, scratch) )
+with expansion:
+  !true
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 1 | 1 failed
+

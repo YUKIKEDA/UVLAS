@@ -1,0 +1,175 @@
+{
+  "before": {
+    "0": {
+      "samples": 9,
+      "phase_ms": {
+        "total": {
+          "min": 220.1937,
+          "median": 226.731,
+          "max": 236.2644
+        },
+        "planning": {
+          "min": 138.8585,
+          "median": 143.745,
+          "max": 150.5895
+        },
+        "input": {
+          "min": 0.0551,
+          "median": 0.0592,
+          "max": 0.1005
+        },
+        "constants": {
+          "min": 7.0109,
+          "median": 7.7901,
+          "max": 11.1058
+        },
+        "near": {
+          "min": 73.1485,
+          "median": 74.5873,
+          "max": 80.5357
+        },
+        "far": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "qualification": {
+          "min": 0.932,
+          "median": 0.9664,
+          "max": 1.523
+        }
+      }
+    },
+    "1": {
+      "samples": 9,
+      "phase_ms": {
+        "total": {
+          "min": 1977.8231,
+          "median": 2025.8929,
+          "max": 2087.0828
+        },
+        "planning": {
+          "min": 138.1282,
+          "median": 142.7148,
+          "max": 164.3489
+        },
+        "input": {
+          "min": 0.0558,
+          "median": 0.0583,
+          "max": 0.0625
+        },
+        "constants": {
+          "min": 14.6228,
+          "median": 15.1258,
+          "max": 21.8798
+        },
+        "near": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "far": {
+          "min": 1727.0766,
+          "median": 1767.8129,
+          "max": 1843.7826
+        },
+        "qualification": {
+          "min": 35.3298,
+          "median": 37.8829,
+          "max": 50.4561
+        }
+      }
+    }
+  },
+  "after": {
+    "0": {
+      "samples": 9,
+      "phase_ms": {
+        "total": {
+          "min": 82.9989,
+          "median": 83.9404,
+          "max": 90.2748
+        },
+        "planning": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "input": {
+          "min": 0.0418,
+          "median": 0.0455,
+          "max": 0.0532
+        },
+        "constants": {
+          "min": 7.0662,
+          "median": 7.2792,
+          "max": 11.5322
+        },
+        "near": {
+          "min": 73.3666,
+          "median": 75.5139,
+          "max": 80.8684
+        },
+        "far": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "qualification": {
+          "min": 0.9461,
+          "median": 0.9796,
+          "max": 2.6888
+        }
+      }
+    },
+    "1": {
+      "samples": 9,
+      "phase_ms": {
+        "total": {
+          "min": 1890.0086,
+          "median": 1907.7752,
+          "max": 1957.1567
+        },
+        "planning": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "input": {
+          "min": 0.0386,
+          "median": 0.045,
+          "max": 0.0497
+        },
+        "constants": {
+          "min": 14.9978,
+          "median": 15.8606,
+          "max": 26.3476
+        },
+        "near": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "far": {
+          "min": 1788.4159,
+          "median": 1804.4777,
+          "max": 1854.9383
+        },
+        "qualification": {
+          "min": 35.3597,
+          "median": 37.7673,
+          "max": 40.8537
+        }
+      }
+    }
+  },
+  "comparison": {
+    "evaluations": 18,
+    "all_126_centers_radii_exponents_steps_bit_equal": true,
+    "build": "MSVC 19.51 Debug /Od /MDd /fp:strict",
+    "affinity": "lowest permitted logical processor; process affinity fixed",
+    "case0": "T(0,0,0;3,0,0;0,4,0), radius .25, query(.75,1,2)",
+    "case1": "same triangle/radius, query(.75,1,30)",
+    "scope": "historical instrumented fixed snapshots; not Release solver or product-scale acceptance"
+  }
+}
