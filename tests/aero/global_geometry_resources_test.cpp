@@ -201,6 +201,14 @@ struct Reentry {
     bool unchanged = false;
 };
 constinit Reentry* reentry = nullptr;
+constinit std::stop_source* final_stop = nullptr;
+constinit unsigned final_allocations = 0;
+void cancel_final_allocation() {
+    if (--final_allocations == 0)
+        final_stop->request_stop();
+    else
+        allocation_callback = cancel_final_allocation;
+}
 void attempt_reentry() {
     const auto before = reentry->plan->allocated_bytes();
     const auto result =
@@ -225,6 +233,25 @@ TEST_CASE("Global workspace blocks allocation-time reentry before charging the n
     REQUIRE(result);
     CHECK(state.rejected);
     CHECK(state.unchanged);
+}
+TEST_CASE("Cancellation from the final metadata allocator cannot publish a topology",
+          "[UW-D07][N4-03][N4-09]") {
+    Setup setup;
+    core::ResourcePlan plan{memory_budget};
+    std::stop_source stop;
+    final_stop = &stop;
+    final_allocations = 6;
+    allocation_callback = cancel_final_allocation;
+    const auto result = s::build_global_topology(setup.geometry, setup.input(), global_limits(),
+                                                 *setup.workspace, plan, stop.get_token());
+    allocation_callback = nullptr;
+    final_stop = nullptr;
+    CHECK(stop.stop_requested());
+    REQUIRE_FALSE(result);
+    CHECK(result.error().origin.cause.code == core::FailureCode::Cancelled);
+    core::ResourcePlan recovery{memory_budget};
+    CHECK(s::build_global_topology(setup.geometry, setup.input(), global_limits(), *setup.workspace,
+                                   recovery));
 }
 TEST_CASE("Global workspace allocation faults preserve all supplied diagnostics",
           "[N4-02][N4-03][N4-09]") {

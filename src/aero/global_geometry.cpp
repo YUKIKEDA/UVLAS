@@ -307,6 +307,9 @@ GlobalResult<GlobalTopology> GlobalEngine::build(const OwnedGeometry& source,
         build_tree(data, run);
         data.plan = {plan.allocated_bytes() - before, run.reserved, run.used, 0, meta};
         auto owner = std::make_shared<GlobalTopologyOwner>(std::move(payload));
+        // The final allocator can request cancellation or reenter user code.
+        // Observe that boundary before publishing an owning qualification.
+        run.step(0);
         std::shared_ptr<const GlobalTopologyData> shared{owner, &owner->payload.values()[0]};
         return GlobalTopology{std::move(shared), context};
     });
