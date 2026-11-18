@@ -6,6 +6,10 @@ globs: "**/*.cpp,**/*.hpp"
 
 # C++
 
+列挙子を追加するときは同じ名前空間の型や定数と照合する。PR #129では `Opcode::Integer` が整数型 `Integer` と衝突し、GCC 14の `-Wshadow` で停止した。列挙子には用途が分かる名前を付ける。
+
+再帰するfixture型も標準ライブラリの完全型要件に従う。PR #130では `vector<pair<string, JsonToken>>` がClangとlibstdc++の組合せで型が揃う前に実体化された。メンバーを前方宣言した別の構造体にし、その定義後にコンストラクタ・デストラクタと要素を使う関数を定義する。
+
 型は `types`、I/Fの約束は `api-contract`、数値は `numerics`、速さは `performance` に従う。ここは書き方である。
 
 ## 安全
