@@ -88,6 +88,11 @@ struct ExactScratch {
     std::uint64_t stride = 0;
 };
 struct SchemaData;
+struct SchemaTokenLimit {
+    std::uint64_t node;
+    std::uint64_t bytes;
+    FieldType type;
+};
 struct SchemaContext {
     const InputDocumentData* input;
     std::array<std::uint64_t, static_cast<std::size_t>(SchemaQuota::Count)> limits;
@@ -111,6 +116,7 @@ struct SchemaContext {
     std::optional<std::int64_t> arithmetic_low;
     std::optional<std::int64_t> arithmetic_high;
     bool planning_overflow = false;
+    std::optional<SchemaTokenLimit> forecast_token_excess;
     std::uint64_t planned_owned = 0;
     std::uint64_t planned_scratch = 0;
     std::uint64_t planned_cumulative = 0;

@@ -153,10 +153,6 @@ DecimalRange schema_decimal(SchemaContext& context, std::uint64_t node, std::str
             negative = token[at++] == '-';
         if (at == token.size())
             context.reject(SchemaReason::InvalidValue);
-        const auto exponent_digits = static_cast<std::uint64_t>(token.size() - at);
-        if (exponent_digits > context.limits[qi(SchemaQuota::ExactDigits)])
-            context.reject(SchemaReason::QuotaExceeded, core::FailureCode::ResourceExceeded,
-                           SchemaQuota::ExactDigits, exponent_digits);
         std::uint64_t absolute = 0;
         while (at < token.size()) {
             context.work();

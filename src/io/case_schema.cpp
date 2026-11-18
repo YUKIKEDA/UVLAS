@@ -580,11 +580,6 @@ void forecast_decimal(SchemaContext& c, std::string_view token) {
         bool negative = false;
         if (at < token.size() && (token[at] == '+' || token[at] == '-'))
             negative = token[at++] == '-';
-        if (static_cast<std::uint64_t>(token.size() - at) >
-            c.limits[qi(SchemaQuota::ExactDigits)]) {
-            c.planning_overflow = true;
-            return;
-        }
         std::uint64_t magnitude = 0;
         while (at < token.size()) {
             c.work();
@@ -625,9 +620,17 @@ void forecast_decimal(SchemaContext& c, std::string_view token) {
     c.arithmetic_low = c.arithmetic_low ? std::min(*c.arithmetic_low, exponent) : exponent;
     c.arithmetic_high = c.arithmetic_high ? std::max(*c.arithmetic_high, upper) : upper;
 }
-void count_numeric_forecast(SchemaContext& c, std::uint64_t node) {
+void count_numeric_forecast(SchemaContext& c, std::uint64_t node, FieldType type) {
     if (node_kind(*c.input, node) == InputNodeKind::DecimalNumber) {
-        forecast_decimal(c, node_text(*c.input, node));
+        const auto token = node_text(*c.input, node);
+        if (token.size() > c.limits[qi(SchemaQuota::DecimalTokenBytes)]) {
+            // Finish the complete key/kind/shape pass before reporting this limit.
+            if (!c.forecast_token_excess)
+                c.forecast_token_excess =
+                    SchemaTokenLimit{node, static_cast<std::uint64_t>(token.size()), type};
+            return;
+        }
+        forecast_decimal(c, token);
         return;
     }
     std::array<char, 32> buffer{};
@@ -740,7 +743,7 @@ void shape_pass(SchemaContext& context, core::PlannedBuffer<SchemaBootstrap>& st
                  actual == InputNodeKind::UnsignedInteger ||
                  actual == InputNodeKind::DecimalNumber) &&
                 (type.kind == FieldKind::Number || type.kind == FieldKind::ExactQuantity))
-                count_numeric_forecast(context, frame.node);
+                count_numeric_forecast(context, frame.node, frame.type);
         }
         if ((actual == InputNodeKind::Object || actual == InputNodeKind::Array) &&
             frame.depth > context.limits[qi(SchemaQuota::InputDepth)])
@@ -1118,6 +1121,15 @@ detail::validate_schema_payload(const InputDocument& input, SchemaPayloadRequest
                 SchemaData counted;
                 context.output = &counted;
                 shape_pass(context, stack, true);
+                if (context.forecast_token_excess) {
+                    const auto excess = *context.forecast_token_excess;
+                    context.current = excess.node;
+                    context.expected_type = excess.type;
+                    context.expected_variant.reset();
+                    context.expected_field.reset();
+                    context.reject(SchemaReason::QuotaExceeded, core::FailureCode::ResourceExceeded,
+                                   SchemaQuota::DecimalTokenBytes, excess.bytes);
+                }
                 const auto counted_records = counted.record_counts;
                 std::uint64_t h = context.multiply(context.rational_digits, 2);
                 if (context.arithmetic_low && context.arithmetic_high)

@@ -4,7 +4,7 @@ Issue [#126](https://github.com/YUKIKEDA/UVLAS/issues/126)、IO4-01、既存IM06
 
 `validate_case_schema` は、所有する入力文書から、全fieldを検査した不変の `SchemaCase` を作る。191種類のnamed record、閉じたvariantとtag、型付き参照、exactなNumber/Rational、次元メタデータを保持する。元のsource bytes、木、配列索引、正規digitsも所有する。公開fieldは同じownerに結び付き、利用者が作ったordinalを別caseへ渡して読める経路を設けない。
 
-検査は、全treeのkey・kind・shape、exact scalar、参照と相互条件、typed record構築の順に行う。後方の未知keyは前方の値不正より先に拒否する。配列は所有する平坦な索引とoffset/countで読み、一つの要素へのアクセスで先頭からedgeをたどらない。payloadとscratchの全call計画、累積課金、work、桁数と指数の上限を検査し、処理前にworkを課金する。
+検査は、全treeのkey・kind・shape、exact scalar、参照と相互条件、typed record構築の順に行う。後方の未知keyは前方の値不正より先に拒否する。配列は所有する平坦な索引とoffset/countで読み、一つの要素へのアクセスで先頭からedgeをたどらない。payloadとscratchの全call計画、累積課金、work、桁数と指数の上限を検査し、処理前にworkを課金する。字句長はDecimalTokenBytes、仮数と一時演算の桁数はExactDigits、指数値はExponentMagnitudeで個別に制限する。
 
 ## 正本の例を製品へ接続する
 

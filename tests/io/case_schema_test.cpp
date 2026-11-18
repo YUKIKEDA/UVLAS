@@ -218,26 +218,57 @@ TEST_CASE("Exact decimal intervals retain a positive step beyond binary64 resolu
     CHECK(record.step.number().digits == "1");
     CHECK(record.step.number().exponent10 == -25);
 }
-TEST_CASE("Raw exponent digit quotas are checked before exponent accumulation",
+TEST_CASE("Raw decimal token limits preserve leading-zero exponents and structural priority",
           "[verification][negative][IO4-01]") {
     using namespace uvlas;
     core::ResourcePlan equal_plan{64ULL * 1024 * 1024};
     io::SchemaDiagnostic diagnostic;
-    const auto equal = scoped_payload(
-        "1e0001", "Number", with_quota(io::SchemaQuota::ExactDigits, 4), equal_plan, &diagnostic);
-    CHECK(equal.has_value());
-    core::ResourcePlan short_plan{64ULL * 1024 * 1024};
-    const auto short_result = scoped_payload(
-        "1e00001", "Number", with_quota(io::SchemaQuota::ExactDigits, 4), short_plan, &diagnostic);
-    REQUIRE_FALSE(short_result.has_value());
-    CHECK(short_result.error().code == core::FailureCode::ResourceExceeded);
+    const auto leading_zero =
+        scoped_payload("1e00000001", "Number", with_quota(io::SchemaQuota::ExactDigits, 4),
+                       equal_plan, &diagnostic);
+    CHECK(leading_zero.has_value());
+    struct Control {
+        std::string_view value, type;
+    };
+    const std::array controls{
+        Control{"1e00001", "Number"},
+        Control{R"({"start":1e00001,"end":2e00001,"step":1e00001,"restart":"initial"})",
+                "TimeInterval"},
+    };
+    for (const auto& control : controls) {
+        INFO(control.type);
+        core::ResourcePlan token_plan{64ULL * 1024 * 1024};
+        const auto accepted = scoped_payload(control.value, control.type,
+                                             with_quota(io::SchemaQuota::DecimalTokenBytes, 7),
+                                             token_plan, &diagnostic);
+        CHECK(accepted.has_value());
+        core::ResourcePlan short_plan{64ULL * 1024 * 1024};
+        const auto rejected = scoped_payload(control.value, control.type,
+                                             with_quota(io::SchemaQuota::DecimalTokenBytes, 6),
+                                             short_plan, &diagnostic);
+        REQUIRE_FALSE(rejected.has_value());
+        CHECK(rejected.error().code == core::FailureCode::ResourceExceeded);
+        const auto detail = diagnostic.detail();
+        if (!detail) {
+            FAIL_CHECK("Token rejection needs fixed detail");
+            continue;
+        }
+        CHECK(detail->quota == io::SchemaQuota::DecimalTokenBytes);
+        CHECK(detail->required == 7);
+    }
+    core::ResourcePlan priority_plan{64ULL * 1024 * 1024};
+    constexpr auto unknown =
+        R"([{"start":1e00001,"end":2e00001,"step":1e00001,"restart":"initial"},{"start":0,"end":1,"step":1,"restart":"initial","unknown":0}])";
+    const auto priority = scoped_payload(unknown, "List<TimeInterval>",
+                                         with_quota(io::SchemaQuota::DecimalTokenBytes, 6),
+                                         priority_plan, &diagnostic);
+    CHECK_FALSE(priority.has_value());
     const auto detail = diagnostic.detail();
     if (!detail) {
-        FAIL("Exponent digit rejection needs fixed detail");
+        FAIL("Structural rejection needs fixed detail");
         return;
     }
-    CHECK(detail->quota == io::SchemaQuota::ExactDigits);
-    CHECK(detail->required == 5);
+    CHECK(detail->reason == io::SchemaReason::UnknownField);
 }
 TEST_CASE("Every structural error is selected before exact physical value checks",
           "[verification][negative][IO4-01]") {
