@@ -1,3 +1,4 @@
+#include "case_schema_snapshot.hpp"
 #include "case_schema_test_adapter.hpp"
 
 #include <boost/multiprecision/cpp_int.hpp>
@@ -412,4 +413,22 @@ TEST_CASE("SI host requests reject missing duplicate dimensions and invalid sign
     }
     const auto control = io::make_si_request(catalog, correct, limits, plan, &diag);
     CHECK(control.has_value());
+}
+
+TEST_CASE(
+    "All five frozen roots preserve their complete typed payload through public SI conversion",
+    "[IO4-01][verification][property]") {
+    std::uint64_t count = 0;
+    for (const auto& example : test::case_schema_corpus::roots) {
+        INFO(example.name);
+        const auto source = parse(example.json);
+        const auto original = checked(source);
+        const auto expected = test::schema_snapshot::serialize(take(original.root()));
+        const auto converted_case = converted(source);
+        const auto owned = take(converted_case.source_case());
+        const auto actual = test::schema_snapshot::serialize(take(owned.get().root()));
+        CHECK(actual == expected);
+        ++count;
+    }
+    CHECK(count == 5);
 }

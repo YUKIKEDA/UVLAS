@@ -1,0 +1,74 @@
+Reading inline script metadata from `.agents\skills\natural-japanese\scripts\lint.py`
+{
+  "file": "docs\\verification\\IM-06\\im06-7-si-case-conversion.md",
+  "stats": {
+    "total_findings": 1,
+    "by_category": {
+      "nominal_ending": 1
+    },
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 48,
+    "nominal_ending_count": 0,
+    "nominal_ending_ratio": 0.0,
+    "total_paragraphs": 12,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      3,
+      5,
+      4,
+      5,
+      4,
+      7,
+      3,
+      4,
+      3,
+      3,
+      4,
+      3
+    ],
+    "paragraph_sentence_count_cv": 0.28867513459481287,
+    "rhythm": {
+      "mora_mean": 59.770833333333336,
+      "mora_stdev": 45.71753838487175,
+      "burstiness": -0.13322127092835084,
+      "length_autocorrelation_lag1": -0.061923896332128546
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "����/����/����/����",
+      "lead_pos_4gram_ratio": 0.19148936170212766
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 598,
+      "doc_char_count": 2133,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 17,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 12,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 33,
+      "category": "nominal_ending",
+      "excerpt": "�̌��~��0���i�S48���A��2133���j",
+      "severity": "info",
+      "detail": "���̕����ɂ͑̌��~�߂�1���Ȃ��B������x�̒����̕����ł��̏C���Z�@���F���Ȃ̂�AI���͂ɓ����I�i�R�[�p�X����: essay�W�������Ől��60% vs AI 0%���̌��~�߂��g�p�j�B�l�ԓI�ȏC���̌��@�̋^��",
+      "related_lines": null
+    }
+  ]
+}
