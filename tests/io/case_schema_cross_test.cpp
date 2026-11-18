@@ -243,3 +243,35 @@ TEST_CASE("Canonical case traversal observes values beyond counts and ignores ob
     CHECK(a_bytes == c_bytes);
     CHECK(a->source_identity()->digest != c->source_identity()->digest);
 }
+
+TEST_CASE("Flutter requires a step-map eigenproblem while preserving both valid backends",
+          "[verification][negative][IO4-01]") {
+    const auto full = root("coupled_flutter");
+    require_cross(full, true);
+    const auto& requirements = full.field("numerics").field("eigen").field("requirements");
+    auto arnoldi = full;
+    auto iterative = fragment("EigenPolicy.arnoldi");
+    iterative.set("requirements", requirements);
+    arnoldi.field("numerics").set("eigen", std::move(iterative));
+    require_cross(arnoldi, true);
+    auto generalized = full;
+    auto structural = fragment("EigenPolicy.generalized");
+    structural.set("requirements", requirements);
+    generalized.field("numerics").set("eigen", std::move(structural));
+    require_cross(generalized, false);
+    // The generalized policy remains valid for a structural-mode request outside flutter.
+    auto static_case = root();
+    static_case.field("numerics").set("eigen", fragment("EigenPolicy.generalized"));
+    require_cross(static_case, true);
+}
+
+TEST_CASE("Canonical text traversal preserves non-ASCII bytes and embedded zero",
+          "[verification][property][IO4-01]") {
+    const std::string text{"\xC3\xA9\xE3\x81\x82\0", 6};
+    uvlas::test::schema_snapshot::Bytes actual;
+    uvlas::test::schema_snapshot::text(actual, text);
+    // Eight little-endian length bytes followed by the original UTF-8 bytes and zero.
+    const uvlas::test::schema_snapshot::Bytes expected{6, 0,    0,    0,    0,    0,    0,
+                                                       0, 0xC3, 0xA9, 0xE3, 0x81, 0x82, 0};
+    CHECK(actual == expected);
+}

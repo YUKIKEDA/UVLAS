@@ -1890,6 +1890,9 @@ void root_checks(SemanticCheck& check) {
     if (kind == "flutter") {
         const auto eigen = check.field(numerics, "eigen");
         check.require(check.tag(eigen) != "none");
+        // Flutter growth comes from the coupled step map, not the structural K/M pencil.
+        c.current = eigen;
+        check.require(check.tag(eigen, "target") == "step_map");
         const auto requirements = check.field(eigen, "requirements");
         check.require(std::get<bool>(
             check.d.nodes

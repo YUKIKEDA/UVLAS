@@ -1,6 +1,6 @@
 // Generated public traversal; no product value is used as an oracle.
 // Interface SHA-256: cbd38a49b742828fdfdafcfd1c50f172cdaa9144ad4ca9c30f041c729e8171a6
-// Generator SHA-256: b616a84769dce057a4374dea3b87c4b4dd85bb2a9c302e3791985b97ef7785a8
+// Generator SHA-256: 64780ef13564cd37ed97305f664f1e00ae92775bbedd33ee9170fa65ef0be527
 #pragma once
 #include <bit>
 #include <cstdint>
@@ -19,8 +19,8 @@ inline void integer(Bytes& out, std::uint64_t value) {
 }
 inline void text(Bytes& out, std::string_view value) {
     integer(out, value.size());
-    for (const unsigned char c : value)
-        out.push_back(c);
+    for (const char c : value)
+        out.push_back(static_cast<std::uint8_t>(c));
 }
 inline void append(Bytes& out, const io::SchemaNumberView& value) {
     integer(out, static_cast<std::uint64_t>(value.sign));

@@ -26,7 +26,7 @@ inline void integer(Bytes& out, std::uint64_t value) {
 }
 inline void text(Bytes& out, std::string_view value) {
     integer(out, value.size());
-    for (const unsigned char c : value) out.push_back(c);
+    for (const char c : value) out.push_back(static_cast<std::uint8_t>(c));
 }
 inline void append(Bytes& out, const io::SchemaNumberView& value) {
     integer(out, static_cast<std::uint64_t>(value.sign));
