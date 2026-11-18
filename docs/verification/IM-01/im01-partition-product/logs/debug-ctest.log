@@ -1,0 +1,49 @@
+Internal ctest changing into directory: <repo>/out/build/issue125
+UpdateCTestConfiguration  from :<repo>/out/build/issue125/DartConfiguration.tcl
+Parse Config file:<repo>/out/build/issue125/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/out/build/issue125/DartConfiguration.tcl
+Parse Config file:<repo>/out/build/issue125/DartConfiguration.tcl
+Test project <repo>/out/build/issue125
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 86
+    Start 86: structure.pg_integration_partition
+
+86: Test command: <repo>\out\build\issue125\tests\Debug\uvlas_test_structure_pg_integration_partition.exe
+86: Working Directory: <repo>/out/build/issue125/tests
+86: Test timeout computed to be: 60
+86: Randomness seeded to: 2788233880
+86: ===============================================================================
+86: All tests passed (30533 assertions in 7 test cases)
+86: 
+1/2 Test #86: structure.pg_integration_partition .............   Passed    3.42 sec
+test 87
+    Start 87: structure.pg_integration_partition_resources
+
+87: Test command: <repo>\out\build\issue125\tests\Debug\uvlas_test_structure_pg_integration_partition_resources.exe
+87: Working Directory: <repo>/out/build/issue125/tests
+87: Test timeout computed to be: 60
+87: Randomness seeded to: 2950300661
+87: ===============================================================================
+87: All tests passed (169 assertions in 5 test cases)
+87: 
+2/2 Test #87: structure.pg_integration_partition_resources ...   Passed    0.10 sec
+
+The following tests passed:
+	structure.pg_integration_partition
+	structure.pg_integration_partition_resources
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-PG            =   3.52 sec*proc (2 tests)
+negative        =   3.52 sec*proc (2 tests)
+property        =   3.52 sec*proc (2 tests)
+unit            =   3.42 sec*proc (1 test)
+verification    =   3.52 sec*proc (2 tests)
+
+Total Test time (real) =   3.53 sec

@@ -1,0 +1,126 @@
+"""Isolated Windows mutation driver; uses a fixed commit and actual target commands."""
+from __future__ import annotations
+import argparse
+import ctypes
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tarfile
+
+def sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+def argv(command: str) -> list[str]:
+    count=ctypes.c_int()
+    shell=ctypes.windll.shell32
+    shell.CommandLineToArgvW.argtypes=[ctypes.c_wchar_p,ctypes.POINTER(ctypes.c_int)]
+    shell.CommandLineToArgvW.restype=ctypes.POINTER(ctypes.c_wchar_p)
+    items=shell.CommandLineToArgvW(command,ctypes.byref(count))
+    if not items:
+        raise OSError("CommandLineToArgvW failed")
+    try:
+        return [items[i] for i in range(count.value)]
+    finally:
+        ctypes.windll.kernel32.LocalFree(items)
+
+def norm(text: str) -> str:
+    return text.replace("\\","/").lower()
+
+def run(command: list[str],cwd: Path,log: Path,timeout: int,env: dict[str,str]) -> int:
+    completed=subprocess.run(command,cwd=cwd,env=env,capture_output=True,timeout=timeout,check=False)
+    log.write_bytes(completed.stdout+completed.stderr)
+    return completed.returncode
+
+def main() -> None:
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--root",type=Path,required=True)
+    parser.add_argument("--build",type=Path,required=True)
+    parser.add_argument("--commit",required=True)
+    parser.add_argument("--output",type=Path,required=True)
+    args=parser.parse_args()
+    root=args.root.resolve();build=args.build.resolve();out=args.output.resolve()
+    out.mkdir(parents=True,exist_ok=False)
+    control=out/"control";control.mkdir()
+    archive=subprocess.check_output(["git","archive",args.commit,"include","src/structure"],cwd=root)
+    with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
+        bundle.extractall(control,filter="data")
+    baseline={p.relative_to(control).as_posix():sha(p.read_bytes()) for p in control.rglob("*") if p.is_file()}
+    for name,digest in baseline.items():
+        if sha((root/name).read_bytes())!=digest:
+            raise RuntimeError("Working source differs from fixed commit: "+name)
+    db=json.loads((build/"compile_commands.json").read_text(encoding="utf-8"))
+    env=os.environ.copy()
+    entries=[x for x in db if x["file"].replace("\\","/").endswith("/src/structure/pg_integration_partition.cpp") and "Debug" in x["output"]]
+    mutation_defs=[("control",None,None,None,"resource")]
+    results=[]
+    for name,header,before,after,kind in mutation_defs:
+        case=out/name
+        if case!=control:
+            shutil.copytree(control,case,ignore=shutil.ignore_patterns("*.obj","*.pdb","*.exe","*.lib","*.log","*.exp","*.ilk"))
+        if header is not None:
+            target=case/"src/structure"/header
+            data=target.read_bytes()
+            old=before.encode();new=after.encode()
+            if data.count(old)!=1:
+                raise RuntimeError(f"{name}: expected exactly one mutation occurrence")
+            target.write_bytes(data.replace(old,new,1))
+        audit=kind=="resource"
+        entry=next(x for x in entries if ("audit" in x["output"])==audit)
+        compile_args=argv(entry["command"])
+        object_path=case/"mutated.obj"
+        for i,arg in enumerate(compile_args):
+            if norm(arg)==norm(entry["file"]):
+                compile_args[i]=str(case/"src/structure/pg_integration_partition.cpp")
+            elif norm(arg)==norm("-I"+str(root/"include")):
+                compile_args[i]="-I"+str(case/"include")
+            elif arg.lower().startswith("/fo"):
+                compile_args[i]="/Fo"+str(object_path)
+            elif arg.lower().startswith("/fd"):
+                compile_args[i]="/Fd"+str(case/"compile.pdb")
+        target="uvlas_test_structure_pg_integration_partition"+("_resources" if audit else "")
+        commands=subprocess.check_output(["ninja","-C",str(build),"-t","commands",target],cwd=root,text=True)
+        linkline=next(x for x in reversed(commands.splitlines()) if "vs_link_exe" in x)
+        linkargs=argv(linkline.split(" -- ",1)[1].split(" && ",1)[0])
+        executable=case/"test.exe"
+        for i,arg in enumerate(linkargs):
+            if arg.lower().startswith("/out:"):linkargs[i]="/out:"+str(executable)
+            elif arg.lower().startswith("/implib:"):linkargs[i]="/implib:"+str(case/"test.lib")
+            elif arg.lower().startswith("/pdb:"):linkargs[i]="/pdb:"+str(case/"test.pdb")
+            elif arg.upper()=="/INCREMENTAL":linkargs[i]="/INCREMENTAL:NO"
+            elif arg.lower().endswith(".obj") or (arg.lower().endswith(".lib") and not Path(arg).is_absolute()):
+                original=build/arg
+                if not original.is_file():
+                    if arg.lower().endswith(".obj"):
+                        raise FileNotFoundError(original)
+                    continue  # Windows system libraries resolve through the fixed LIB environment.
+                copied=case/("base-"+original.name)
+                if not copied.exists():shutil.copyfile(original,copied)
+                linkargs[i]=str(copied)
+        linkargs.insert(2,str(object_path))
+        linkargs.append("/MANIFEST:EMBED")
+        # Actual prefix DLL directory comes from the fixed target's link arguments.
+        catch_lib=next(Path(x) for x in linkargs if "manual-link" in x and "Catch2" in x)
+        prefix=catch_lib.parents[2]
+        env["PATH"]=str(prefix/"bin")+os.pathsep+os.environ.get("PATH","")
+        cc=run(compile_args,build,case/"compile.log",120,env)
+        lk=run(linkargs,build,case/"link.log",60,env) if cc==0 else None
+        test=run([str(executable),"--reporter","compact","--rng-seed","12345"],build,case/"test.log",60,env) if lk==0 else None
+        test_text=(case/"test.log").read_text(encoding="utf-8",errors="replace") if test is not None else ""
+        valid_run="test case" in test_text.lower()
+        passed=cc==0 and lk==0 and valid_run and (test==0 if name=="control" else test!=0)
+        results.append({"case":name,"target":kind,"compile_exit":cc,"link_exit":lk,"test_exit":test,
+                        "test_executed":valid_run,"expected_outcome":passed,
+                        "changed_file":header,"before":before,"after":after,
+                        "linked_object_sha256":sha(object_path.read_bytes()) if object_path.exists() else None})
+        print(json.dumps(results[-1]),flush=True)
+        if not passed:
+            raise RuntimeError(f"Mutation/control did not meet expected result: {name}")
+    report={"source_commit":args.commit,"control_source_hashes":baseline,"results":results,
+            "scope":"Source-identical isolated control plus semantic mutations; compile/link failures are not detections."}
+    (out/"mutation-result.json").write_bytes((json.dumps(report,indent=2)+"\n").encode())
+if __name__=="__main__":
+    main()

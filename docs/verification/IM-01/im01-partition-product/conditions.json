@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-18",
+  "os": "Windows 11 x64",
+  "cpu": "13th Gen Intel Core i5-13400F",
+  "logical_processors": 16,
+  "physical_memory_bytes": 51343966208,
+  "compiler": "MSVC 19.51.36260.0",
+  "language": "C++23",
+  "floating_point": "/fp:strict",
+  "instruction_set": "sse2",
+  "source_commit": "6369a0b1227bf31db246f00f982a98bc7e2eff64",
+  "configuration": "Release",
+  "workers": 1,
+  "outer": 3,
+  "inner": 3,
+  "external_memory_admission_bytes": 1152921504606846976,
+  "resource_plan_limit_bytes": 1152921504606846976,
+  "benchmark_scope": "単独製品prepare、fixture setup/結果JSON/OS samplingは計測外。quiescent実務性能認定ではない。",
+  "rss_scope": "OS process lifetime peak。call単独peakでなく、ResourcePlan累積payloadとも異なる。"
+}
