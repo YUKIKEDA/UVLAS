@@ -83,12 +83,13 @@
     "docs/specs/foundation/io-execution-adoption-specification.md": "df926d9f6726a62af313e534e04c6a9b9aa4b838f7fa252567f3a50519039123"
   },
   "artifacts": {
-    "docs/verification/IM-06/im06-6-si-design/design-audit.json": "8c267bcebe67fc8bbf1c2b9b7ad5c4426576ef3f223a6c0aab70dc4f4afa583c",
+    "docs/verification/IM-06/im06-6-si-design/design-audit.json": "a5de9b002c6bd92e4fb6d2edf6defce9dd81a0ab6f04c1dce17efd645b66d11e",
     "docs/verification/IM-06/im06-6-si-design/design-oracle.py": "4a62266ed85cc1b4c9ce12786a0f84472c35bddbd312dbcba919ecd24a268a45",
     "docs/verification/IM-06/im06-6-si-design/independent-review.json": "ba87ce1cdea1800bc97fc791638596af8c84b929d9d4446357c4d88e2d52d593",
-    "docs/verification/IM-06/im06-6-si-design/japanese-lint.json": "189c3e9ef196e2d89578e82b3be1cc8133a69d22b99ff0ead7923af5ce7888f2",
-    "docs/verification/IM-06/im06-6-si-design/japanese-outline.txt": "ef3d2f96a3a4d10f6c4aeee3d9780d04dcac8e79eeadc3803587bd6b7d2017b9",
-    "docs/verification/IM-06/im06-6-si-design/japanese-terms.txt": "f90a0b79ac637a310c0596dd34bde34807130d357f23bf8abaccbb2a0c220150",
-    "docs/verification/IM-06/im06-6-si-design/preservation.json": "c2d8a18ce1866375eb5f46e4066c793c4d91b90314e3a3c8969920cef0b3feb6"
+    "docs/verification/IM-06/im06-6-si-design/japanese-lint.json": "83807afe692803a03bb35c316c8a420d6280b54b1bd53c1b8650cf3766795c7f",
+    "docs/verification/IM-06/im06-6-si-design/japanese-outline.txt": "2475a6ebddc00b9ebfab15be96d2eee3fbb557e960080f94491cf1eca14d91cd",
+    "docs/verification/IM-06/im06-6-si-design/japanese-terms.txt": "9adc0870456ecea85b74c1fdbdc8dbc1b6a73e3b616cb40790fda4cdc4c511eb",
+    "docs/verification/IM-06/im06-6-si-design/preservation.json": "63a13cd24399d584ee5bf77da739d34d4a482e03e4508f405604f01408b49874",
+    "docs/verification/IM-06/im06-6-si-design/newline-provenance.json": "1d79b99bf86345234f2d4c9b4132a2c2beec43b39cc024e1540c97c5989e27f4"
   }
 }
