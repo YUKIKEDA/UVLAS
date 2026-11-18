@@ -278,9 +278,8 @@ TEST_CASE("A missing structural scale identifies the scales array",
     REQUIRE(validate_cross(value, &diagnostic));
 
     auto& scales = value.field("numerics").field("scales").elements;
-    const auto removed = std::erase_if(scales, [](const auto& scale) {
-        return scale.field("field").text() == "shell_position";
-    });
+    const auto removed = std::erase_if(
+        scales, [](const auto& scale) { return scale.field("field").text() == "shell_position"; });
     REQUIRE(removed == 1);
     const auto invalid = validate_cross(value, &diagnostic);
     REQUIRE_FALSE(invalid);
