@@ -1,0 +1,140 @@
+{
+  "outline": [
+    {
+      "line": 1,
+      "kind": "heading",
+      "level": 1,
+      "text": "全schemaの設計検査と実装への引継ぎ"
+    },
+    {
+      "line": 3,
+      "kind": "lead",
+      "level": null,
+      "text": "本書はIssue #110の設計審査表である。"
+    },
+    {
+      "line": 5,
+      "kind": "heading",
+      "level": 2,
+      "text": "DC-01 各variantの最小例"
+    },
+    {
+      "line": 7,
+      "kind": "lead",
+      "level": null,
+      "text": "fragment名の `Type.tag` は辞書の対応variantである。"
+    },
+    {
+      "line": 32,
+      "kind": "heading",
+      "level": 3,
+      "text": "限定式の単位と微分を独立照合する"
+    },
+    {
+      "line": 44,
+      "kind": "lead",
+      "level": null,
+      "text": "式例は採用能力の説明であり、製品の式評価/自動微分/区間演算を実行済みではない。"
+    },
+    {
+      "line": 46,
+      "kind": "heading",
+      "level": 3,
+      "text": "root全体の適用条件"
+    },
+    {
+      "line": 56,
+      "kind": "lead",
+      "level": null,
+      "text": "これらは字句と相互条件を具体化する例であり、合成設定の物理精度・容量を保証しない。"
+    },
+    {
+      "line": 58,
+      "kind": "heading",
+      "level": 2,
+      "text": "DC-02 全系列に適用する負例"
+    },
+    {
+      "line": 60,
+      "kind": "lead",
+      "level": null,
+      "text": "各変異は正常fragmentの**1条件だけ**を変更する。"
+    },
+    {
+      "line": 87,
+      "kind": "lead",
+      "level": null,
+      "text": "NaN/Infinityは元文書が構文時点で拒否する。"
+    },
+    {
+      "line": 89,
+      "kind": "heading",
+      "level": 2,
+      "text": "DC-03 採用仕様の漏れを調べる"
+    },
+    {
+      "line": 105,
+      "kind": "heading",
+      "level": 2,
+      "text": "DC-04 状態と引継ぎ"
+    },
+    {
+      "line": 107,
+      "kind": "lead",
+      "level": null,
+      "text": "Issue #110は設計であり、schema実装/数値合格/物理受入の報告ではない。"
+    },
+    {
+      "line": 109,
+      "kind": "lead",
+      "level": null,
+      "text": "次の実装Issueでは、辞書全variantの正常/負例を実際のtyped validatorへ接続する。"
+    }
+  ],
+  "heading_stats": {
+    "total_headings": 7,
+    "level_distribution": {
+      "1": 1,
+      "2": 4,
+      "3": 2
+    },
+    "by_level": {
+      "1": {
+        "count": 1,
+        "length_mean": 20.0,
+        "length_cv": 0.0,
+        "nominal_ending_ratio": 1.0,
+        "dominant_pos_signature_ratio": 1.0,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      },
+      "2": {
+        "count": 4,
+        "length_mean": 15.75,
+        "length_cv": 0.145,
+        "nominal_ending_ratio": 0.5,
+        "dominant_pos_signature_ratio": 0.25,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      },
+      "3": {
+        "count": 2,
+        "length_mean": 13.5,
+        "length_cv": 0.185,
+        "nominal_ending_ratio": 0.5,
+        "dominant_pos_signature_ratio": 0.5,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      }
+    },
+    "overall": {
+      "count": 7,
+      "length_mean": 15.71,
+      "length_cv": 0.189,
+      "nominal_ending_ratio": 0.571,
+      "dominant_pos_signature_ratio": 0.143,
+      "template_hits": [],
+      "structural_pattern_ratio": 0.0
+    }
+  }
+}

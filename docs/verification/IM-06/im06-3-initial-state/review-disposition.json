@@ -1,0 +1,10 @@
+{
+  "id": "im06-3-initial-state-review-disposition",
+  "review_head": "870926d1af73bd9a3d01db45618e873067f1ed0a",
+  "review_url": "https://github.com/YUKIKEDA/UVLAS/pull/111#discussion_r4599962790",
+  "owner_decision": "A：完全な物理場・状態を明示（推奨）",
+  "contract_sha256": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+  "independent_review": "rootと別担当が完全場・一意係数写像・全厚さ/単位・body/world/Jr・精度/拘束を通読。追加で判明したPointCheckの片側をInitialPointの各軸へ明確化し、非零摂動後のIVP文を訂正後、別担当が再読し追加指摘なし。入口とspec-checks教訓も別担当が通読。",
+  "japanese": "新契約の専門語反復にTTR info1。意味を保つため保持。他3文書は0 findings。",
+  "scope_limit": "実装済みtyped validator、一般曲面PGの全rank/条件付け/保持状態誤差/J1初期化を検証したものではない。旧4schemaと旧証拠のbytesを保持する。"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "im06-3-initial-state-metadata-snapshot",
+  "source_commit": "cb45e4ab4c10c21b1f054034780e882b1ee4b569",
+  "sources": [
+    {
+      "id": "initial-state-metadata--cursor-rules-spec-checks-mdc",
+      "sha256": "560fdbb867bba669665ab17753ef47673fe2e84d49e3419725c8a063c0aabcf4",
+      "hint": ".cursor/rules/spec-checks.mdc",
+      "historical_commit": "cb45e4ab4c10c21b1f054034780e882b1ee4b569"
+    },
+    {
+      "id": "initial-state-metadata-docs-conventions-md",
+      "sha256": "49e88596d97433f5756fc807a0b2b38b08cb84fa4fdf176d52207d32da4de64a",
+      "hint": "docs/conventions.md",
+      "historical_commit": "cb45e4ab4c10c21b1f054034780e882b1ee4b569"
+    },
+    {
+      "id": "initial-state-metadata-docs-engineering-README-md",
+      "sha256": "f68cb6aa08667a0e108a3ebbe10e1725427d03fc89c4bbaf327484e39bee0583",
+      "hint": "docs/engineering/README.md",
+      "historical_commit": "cb45e4ab4c10c21b1f054034780e882b1ee4b569"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "private_paths_detected": false,
+  "checks": [
+    {
+      "file": "author-design-audit.py.txt",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "author-design-audit.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "json-newline-normalization.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-contract-lint.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-contract-outline.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-contract-terms.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 4
+    },
+    {
+      "file": "case-schema-fields-lint.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-fields-outline.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-fields-terms.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-design-cases-lint.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-design-cases-outline.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    },
+    {
+      "file": "case-schema-design-cases-terms.json",
+      "private_path_matches": 0,
+      "legacy_public_url_false_positives": 0
+    }
+  ],
+  "note": "redact.pyのdrive規則が公開GitHub URLの末尾sを誤検出した箇所だけを識別し、正当な原URLを保持。toolは変更していない。"
+}
