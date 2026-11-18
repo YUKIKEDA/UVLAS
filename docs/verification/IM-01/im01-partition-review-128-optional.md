@@ -23,4 +23,16 @@ ctest --test-dir out/build/issue125 -C Debug -R '^structure.pg_integration_parti
 
 clang-tidy 21.1.1は、Debugの重複を除いた既存専用DBで製品・正常試験・資源試験の3翻訳単位を検査し、exit 0、利用者コードの指摘0。変更4ファイルのclang-format 21.1.2とdiffの空白検査も通過した。
 
-この記録をcommitする時点では、修正後のLinux CIは未実行。レビューが求めるLinux静的jobの完走はpush後に追跡し、対象commitとjob結果を同じPRの返信へ残す。既存の数値認定・実務受入の範囲は広げない。
+最初の修正commit（ef60053）時点では、修正後のLinux CIは未実行だった。レビューが求めるLinux静的jobの完走はpush後に追跡し、対象commitとjob結果を同じPRの返信へ残す。既存の数値認定・実務受入の範囲は広げない。
+
+## 旧証拠との対応
+
+旧headの必要なsourceとartifactをgit archiveで別directoryへ展開し、元のmanifestをそこで照合した。75ファイル・2 JSON、整合検査のエラー0を確認した。現在のtreeへ旧manifestを直接適用すると、今回訂正した4 sourceのhashは一致しない。これは元sourceに結び付く旧記録を保持した結果であり、旧hashを現在値へ差し替えない。[source bridge](im01-partition-product/optional-guard-bridge.json)に4 sourceのbefore/after、現在の全source hash、保持した旧artifactのhashと対象検証を記録した。
+
+## Linux再検証と第2修正
+
+ef60053の[Linux Debug job](https://github.com/YUKIKEDA/UVLAS/actions/runs/44249168147/job/134615450703)はclang-tidyで失敗した。旧7診断のうち5件は消えたが、正常試験が辺メンバーを再参照する2箇所が残った。Windowsの静的検査だけで完了とはしなかった。
+
+第2修正のsourceは81e9f609f9f8cf1af04b03b0c371860b3349ad04。左右のoptional自体をif初期化でconstの局所値へコピーし、value_orへcore::Index{-1}を渡して範囲を比較する。-1は必ずpiece範囲外なので有効なpieceを捏造せず、存在する値の比較は維持する。対象2箇所のoperator*は除去した。
+
+変更した正常試験だけを再検証し、Windows Debugは1/1成功、3.43秒、Releaseは1/1成功、0.44秒。正常側は引き続き7ケース・30,531 assertions。変更した正常TUだけのclang-tidy 21.1.1もexit 0。製品・資源試験のsourceは最初の修正から変えておらず、それらのWindows試験と静的検査は重複して走らせていない。第2修正後のLinux jobはpush後に完走まで追跡する。
