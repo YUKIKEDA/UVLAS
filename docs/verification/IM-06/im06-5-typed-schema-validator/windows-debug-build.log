@@ -1,0 +1,18 @@
+[0/2] Re-checking globbed directories...
+[1/18] C:/WINDOWS/system32/cmd.exe /C "cd /D ${SOURCE}/out/issue126-build && "C:/Program Files/CMake/bin/cmake.exe" -DSOURCE_DIR=${SOURCE} -DOUTPUT=${SOURCE}/out/issue126-build/generated/uvlas/git_revision.hpp -P ${SOURCE}/cmake/GitRevision.cmake"
+[2/18] Building CXX object CMakeFiles/uvlas_io_audit.dir/Debug/src/io/case_schema.cpp.obj
+[3/18] Building CXX object CMakeFiles/uvlas_io_audit.dir/Debug/src/io/input_document.cpp.obj
+[4/18] Building CXX object CMakeFiles/uvlas_core_audit.dir/Debug/src/core/build_info.cpp.obj
+[5/18] Building CXX object CMakeFiles/uvlas_core.dir/Debug/src/core/build_info.cpp.obj
+[6/18] Linking CXX static library Debug/uvlas_core_audit.lib
+[7/18] Linking CXX static library Debug/uvlas_core.lib
+[8/18] Building CXX object CMakeFiles/uvlas_io_audit.dir/Debug/src/io/case_schema_exact.cpp.obj
+[9/18] Building CXX object tests/CMakeFiles/uvlas_test_io_input_document_resources.dir/Debug/io/input_document_resource_test.cpp.obj
+[10/18] Building CXX object tests/CMakeFiles/uvlas_test_io_input_document.dir/Debug/io/input_document_test.cpp.obj
+[11/18] Linking CXX executable tests/Debug/uvlas_test_io_case_schema.exe
+[12/18] Linking CXX executable tests/Debug/uvlas_test_io_input_document.exe
+[13/18] Building CXX object tests/CMakeFiles/uvlas_test_io_case_schema_resources.dir/Debug/io/case_schema_resource_test.cpp.obj
+[14/18] Building CXX object CMakeFiles/uvlas_io_audit.dir/Debug/src/io/case_schema_dictionary.cpp.obj
+[15/18] Linking CXX static library Debug/uvlas_io_audit.lib
+[16/18] Linking CXX executable tests/Debug/uvlas_test_io_case_schema_resources.exe
+[17/18] Linking CXX executable tests/Debug/uvlas_test_io_input_document_resources.exe

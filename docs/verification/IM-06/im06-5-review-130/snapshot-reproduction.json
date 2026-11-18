@@ -1,0 +1,11 @@
+{
+  "named_records": 191,
+  "members": 806,
+  "outputs_identical": true,
+  "published_header_sha256": "0737379415d03c4c890dbb3f8253a6c4b866a86c17f125936e5c0648645f07f1",
+  "generator_sha256": "64780ef13564cd37ed97305f664f1e00ae92775bbedd33ee9170fa65ef0be527",
+  "public_interface_sha256": "cbd38a49b742828fdfdafcfd1c50f172cdaa9144ad4ca9c30f041c729e8171a6",
+  "formatter": "clang-format 21.1.2",
+  "non_ascii_oracle_hex": "0600000000000000c3a9e3818200",
+  "oracle_scope": "Eight explicit little-endian length bytes, UTF-8 e-acute and Japanese a, then NUL; compared directly to text() output."
+}

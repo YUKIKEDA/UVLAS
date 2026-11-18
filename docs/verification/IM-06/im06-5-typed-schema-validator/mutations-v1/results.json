@@ -1,0 +1,271 @@
+{
+  "schema": "uvlas.isolated-mutations/1",
+  "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+  "scope": "One fixed copied shared validator; five frozen normal test objects and copied io/core libraries. Public Case and private payload lowering share the mutated production kernel. No production source edit, fixture overwrite, CI wait or sanitizer claim.",
+  "control": "Both shared C++ translation units recompiled, linked to the five fixed test objects, full IO4-01 control passes before mutations.",
+  "mutation_interpretation": {
+    "unknown-key-guard": "Direct unknown-key guard and unsafe descriptor traversal are skipped. Typed-node qualification remains a safe backstop; the phase/reason regression must still detect loss of the required UnknownField result. This is not claimed as successful acceptance of an unknown field.",
+    "exact-tail-16": "Comparison ignores significand digits after the sixteenth. A valid positive one-step decimal interval collapses to equality and is incorrectly rejected.",
+    "shape-plan-omitted": "The planning shape pass is suppressed. Existing count/qualification backstops remain; valid frozen cases must detect omission. This does not claim a fully implemented reordering of all semantic phases.",
+    "reference-phase-omitted": "The actual reference-resolution phase is skipped, preserving safe value failures downstream. Valid frozen cases detect unresolved references.",
+    "consumer-reference-domain": "ReferenceField expression admits other well-formed domains with correct constant dimensions.",
+    "consumer-time-domain": "TimeSeries expression admits other well-formed domains with correct constant dimensions.",
+    "consumer-current-domain": "Load expression admits other well-formed domains with correct constant dimensions.",
+    "static-window-omitted": "Static analysis no longer rejects non-singleton observation windows."
+  },
+  "results": [
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "[IO4-01]",
+      "test_exit": 0,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "control",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "Every structural error*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "02970b9957eedcbc9e2c19f8db28ea2042e6c749146043d188e42049c9c8b99b"
+      },
+      "name": "unknown-key-guard",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "context.reject(SchemaReason::UnknownField);",
+          "After": "member = entry.next; continue;"
+        },
+        {
+          "Before": "return candidate.name == key;\n                    });",
+          "After": "return candidate.name == key;\n                    });\n                if (field == selected.fields.end()) continue;"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "Exact decimal intervals retain*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "98c5a5bde237eb1a66cbfe35668ca44724c93905348d65b12cf9dba6819834dd",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "exact-tail-16",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "i < std::max(left.size(), right.size())",
+          "After": "i < std::min(std::max(left.size(), right.size()), std::size_t{16})"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "All five frozen root designs*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "1167be57a9d1b66e28a97d8e3f73b2a79a205531c711a177c07107237214b5f0"
+      },
+      "name": "shape-plan-omitted",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "shape_pass(context, stack, true);",
+          "After": "if (context.whole_case && context.case_registry) shape_pass(context, stack, true);"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "All five frozen root designs*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "6c0fda1600785367b6ebb5924f06d55ece2505133c8cd62665fd091bf9648410",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "reference-phase-omitted",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "resolve_references(check);",
+          "After": "if (context.whole_case && context.case_registry) resolve_references(check);"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "All expression consumers*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "666e2f8565537ed5e48f49d62104bcf69bee18394bcbc01a678f29f4273e6155",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "consumer-reference-domain",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "check.require(domain_kind == \"reference\", SchemaReason::InvalidExpression);",
+          "After": "check.require(!domain_kind.empty(), SchemaReason::InvalidExpression);"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "All expression consumers*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "57c6cfc3d8e089bc5cab7af76dbfdfe29d7f42b4ca61242528638b1c66f8e548",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "consumer-time-domain",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "check.require(domain_kind == \"time\", SchemaReason::InvalidExpression);",
+          "After": "check.require(!domain_kind.empty(), SchemaReason::InvalidExpression);"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "All expression consumers*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "b0af5b7d9d0d1a66cb7afd23e6be415e9b616ed6d51a13d3f4166ab10d23eab8",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "consumer-current-domain",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "check.require(domain_kind == \"current_position_time\",",
+          "After": "check.require(!domain_kind.empty(),"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/test.log"
+    },
+    {
+      "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "filter": "Static observations reject*",
+      "test_exit": 42,
+      "mutated_hashes": {
+        "case_schema_exact.cpp": "1a876b3e112346fb2665d8c4e37dc13645be2e109116c447c3b23549b329e7c1",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "name": "static-window-omitted",
+      "original_hashes": {
+        "case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+        "case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7"
+      },
+      "link_exit": 0,
+      "edits": [
+        {
+          "Before": "if (check.tag(analysis) == \"static\") {",
+          "After": "if (check.tag(analysis) == \"disabled_static_window\") {"
+        }
+      ],
+      "compile_exit": 0,
+      "test_artifact": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/test.log"
+    }
+  ],
+  "all_checks_pass": true,
+  "supplied_binaries_sha256": {
+    "case_schema_cross_test.cpp.obj": "62d81dd2afb808bf558f196f0cfff736921258cdc0abdfd6739a4dc0bccab3b1",
+    "case_schema_fragments_test.cpp.obj": "6e22109ad6bd71a0aa2d8b9fe0b185112ee7ad7db02e4f0b84a4c4b288111e65",
+    "case_schema_intrinsic_test.cpp.obj": "4c9ef9b00a26e21548af48ae55823866244297fe3406fadacca0cefd1e4c1718",
+    "case_schema_inventory_test.cpp.obj": "1c45d0deb149a5d4db241eabbccdc15e52ae3938546a4195465c5e22d1ed295a",
+    "case_schema_test.cpp.obj": "ca7ccd3552f1fdeddb74686ab110e7966fd5a95adaabf1b941a2ace00bd22876",
+    "uvlas_core.lib": "2823d489d89b815e90b4664ed88b4d22db7c955e182704da5558f750d8c32dd6",
+    "uvlas_io.lib": "fcfa50769b53cbd695f91f3b0004a344c86fb3b3d404d05fef4e20668ed408da"
+  },
+  "sources": {
+    "src/io/case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7",
+    "src/io/case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/run-isolated.ps1": "b28581ee681ae5244a55e0d553ffb4cd08e126e5de9646d246d8db788dc286f8"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/case_schema.cpp.compile.log": "6aea198c4959a31b3b5df8aeab1878abe568aad4eb7a51b5504c6f4c59144b8e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/test.log": "0b47c00ae92bf61cb4311391178aeb976b3ed3edd5dd4c07e6f61c80a64974c9",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/case_schema.cpp.compile.log": "6aea198c4959a31b3b5df8aeab1878abe568aad4eb7a51b5504c6f4c59144b8e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/test.log": "258df92a299861ab06ac213a1ddf455a7a71ea6ffb701264705eed0f29ebe116",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/test.log": "75ffd289e8aa779c4e15145b7504d3f9d6710d56403f22b0ac43365184951b87",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/case_schema.cpp.compile.log": "6aea198c4959a31b3b5df8aeab1878abe568aad4eb7a51b5504c6f4c59144b8e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/test.log": "21b375e0941409e577ae9508d14c31c5b30cc04b5195ff9ec6670d0397203c46",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/test.log": "d0aaf860283b3b451dbfd3fc51fb74e7848f3cb9e2c0679bc65a13a0d5824edc",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/test.log": "6a7bf501e78bc8c77d27c676b27ab870ba51a8bb6ca6243a9a728d768e75f7e2",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/test.log": "dbfa4bc4ebda000707b78e550b1d75c34b8ba8409fbaa3f92e09b27d39036865",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/test.log": "a54249795dea55e06c207838939d21244ddcda5671fa6bd6e10e11ff970aef7a",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/test.log": "3ca98b3c4edcac14fd17b477389823f3fe5f74386663da16147aba584284e6bb"
+  },
+  "normalization": "Raw logs retained under ignored out. Published logs only normalize path separators and replace local workspace/dependency prefixes. Assertion messages and exit classifications are preserved. Publication additionally normalizes LF line endings, trailing line whitespace and blank lines at EOF; raw logs remain in ignored out.",
+  "acceptance": "Mutation sensitivity and source-byte integrity only, not scientific or practical certification."
+}

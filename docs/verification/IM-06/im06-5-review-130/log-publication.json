@@ -1,0 +1,83 @@
+{
+  "source_commit": "e3d4dfed63c8fc2cc2632cca0a8a52d831d539b5",
+  "entries": {
+    "windows-debug-normal.log": {
+      "raw_sha256": "9cfabd979b7ce7d79c7fa3845957fe37323157f0b18f65f9c27bf7e6ee435706",
+      "published_sha256": "b3a803933f20d86c9c3fcf7df3b62abed5894768a04645ab8b7d0d10094be158",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "windows-debug-resources.log": {
+      "raw_sha256": "d7553952018c22ca3af50fb19e28521fe9439fce5e81059025a94478de3f2757",
+      "published_sha256": "5ccb62d526b3af8d2171688618becfd515f1e4597cc3c5776d2dc1633d8ea318",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "windows-release-normal.log": {
+      "raw_sha256": "ee53ab1d855921405352fa65284989d47120e38be0566102d8a7b007f24086e4",
+      "published_sha256": "7f3ab23dec2a03389d0dd7d3148e97726f3aee803fba7cc941b1f8aa2ce916d0",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "windows-release-resources.log": {
+      "raw_sha256": "3705415c52052b9970ae15f8e82b9ffccccc8789e3d4276d828a44aaef09b225",
+      "published_sha256": "0bbbf19244241bc938fa8f487c23cd9f9e6b62e57ba20bbf0f6ba423ec379f68",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "build-info.json": {
+      "raw_sha256": "9f973897206dcea398589578d3d89f25a6e3ab4be904cd517262740ef487808a",
+      "published_sha256": "a020e1d097b6874d15ed4d8111242d3fb6881157d27052416b2ea2c37ae03f70",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "tidy-exact.log": {
+      "raw_sha256": "711e1a9ceec5c6bd20decbaf6201c20391c8db2eafcd0c9556d359f9805929f6",
+      "published_sha256": "f45e017475d83adb80f1418e9dffc464f583f376f2720f127e9eafd371f7d560",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "tidy-tests.log": {
+      "raw_sha256": "4ec60f7db2ba1d90de4f5db832d043d1bf159f484c8ec0cb60ba41dde858309d",
+      "published_sha256": "c492fe5d555c4a718db74241941abfe85a15cbaeb88fd45be84d70e14c0ed7da",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "historical-source-check.json": {
+      "raw_sha256": "ed8cec98feccc360b974c012e71710b4b1fe81c1f1d4343c7528f07125ae3aaa",
+      "published_sha256": "ed8cec98feccc360b974c012e71710b4b1fe81c1f1d4343c7528f07125ae3aaa",
+      "excerpt": false,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "linux-release-excerpt.log": {
+      "raw_sha256": "e3b8a1fd79e902d96a40dce11e1019cdba673ff9ce65a495bd5f2c9a595f5323",
+      "published_sha256": "923799ece7adb2c3e33540c20ab451100470a969000668f8a3f1797c65ec967c",
+      "excerpt": true,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "linux-sanitize-excerpt.log": {
+      "raw_sha256": "2cf9982dc0533492cccc6ae7f8eb37badb60874a356e8cd6e11dc9d8f878cd1d",
+      "published_sha256": "973ddcb83ffaa5ae49891ae95c02351cef6f798ab9493562b5e9936aa253b126",
+      "excerpt": true,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "original-linux-debug-error-excerpt.log": {
+      "raw_sha256": "fdfca80f844f2c3f6d4228fba1a1c6c82b5e4fe576f6d1d3df03a7dac09050af",
+      "published_sha256": "a0559a5ae05ab089c6b68dcc5358fa71ac0b954097fd22392bfa6f735a7296c3",
+      "excerpt": true,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "original-linux-release-error-excerpt.log": {
+      "raw_sha256": "41d21a3551c45df213f393bc36dc90145e74dde2a83d8a41448beea085fe4140",
+      "published_sha256": "84a91c75578ce5926d8ff6c5b0ad6f5d3edfdc079552c180192b0888e0af73fa",
+      "excerpt": true,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    },
+    "original-linux-sanitize-error-excerpt.log": {
+      "raw_sha256": "076df83e20009190363393b4d53f54e4f76935e0f568463a458c2326b4c50927",
+      "published_sha256": "5c17f1f2a265b6da8285b20c8c3485bdce11be5b0d16302b53e7079a15b7dd83",
+      "excerpt": true,
+      "normalization": "ANSI/BOM removed, LF and trailing line whitespace normalized, local paths replaced; verdict/diagnostic text unchanged"
+    }
+  }
+}

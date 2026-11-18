@@ -1,0 +1,131 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-5-review-130",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "date": "2026-11-18",
+  "pull_request": 130,
+  "reviewed_head": "8e3a6797667746059b6cb34267bbe8685338d806",
+  "source_commit": "e3d4dfed63c8fc2cc2632cca0a8a52d831d539b5",
+  "scope": "PR130のflutter固有値targetとsnapshot文字byteの2指摘を訂正する加算記録。旧記録は旧source_commitの証拠として保持する。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "practical_acceptance": false
+  },
+  "corrections": [
+    {
+      "comment": "https://github.com/YUKIKEDA/UVLAS/pull/130#discussion_r4609701765",
+      "before": "flutterでgeneralized/structural_modesを誤受理できた。",
+      "after": "none拒否に続けてstep_mapを必須にし、不適合な組合せはInvalidInput。full/arnoldiを受理し、staticのgeneralizedも維持。",
+      "regression": "正当flutter全文脈のrequirementsとcoverageを保持して固有値policyだけを交換する独立正常/負対照。"
+    },
+    {
+      "comment": "https://github.com/YUKIKEDA/UVLAS/pull/130#discussion_r4609701776",
+      "before": "charのrange-forからunsigned charへの暗黙変換でGCC14の3構成がコンパイル失敗。",
+      "after": "producerでcharを受けてuint8_tへ明示変換し、headerを再生成。",
+      "regression": "非ASCII UTF-8とNULを手書き14byte期待と厳密比較。別出力2個と公開headerがbyte一致。"
+    }
+  ],
+  "checks": {
+    "windows_debug": {
+      "normal_cases": 31,
+      "normal_assertions": 14649,
+      "resource_cases": 6,
+      "resource_assertions": 7124,
+      "exit": 0
+    },
+    "windows_release": {
+      "normal_cases": 31,
+      "normal_assertions": 14649,
+      "resource_cases": 6,
+      "resource_assertions": 7124,
+      "exit": 0
+    },
+    "new_focused_regressions": {
+      "cases": 2,
+      "assertions": 9,
+      "exit": 0
+    },
+    "static": {
+      "translation_units": 3,
+      "tool": "clang-tidy 21.1.1",
+      "user_source_diagnostics": 0,
+      "exit": 0
+    },
+    "linux": [
+      {
+        "configuration": "build and test (linux, gcc 14, linux-sanitize)",
+        "job_id": 134614601859,
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44248917875/job/134614601859",
+        "build_and_test": "success",
+        "job_status": "completed",
+        "job_conclusion": "success",
+        "clang_tidy": "skipped"
+      },
+      {
+        "configuration": "build and test (linux, gcc 14, linux-debug)",
+        "job_id": 134614601948,
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44248917875/job/134614601948",
+        "build_and_test": "success",
+        "job_status": "in_progress",
+        "job_conclusion": "",
+        "clang_tidy": "in_progress"
+      },
+      {
+        "configuration": "build and test (linux, gcc 14, linux-release)",
+        "job_id": 134614601957,
+        "url": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44248917875/job/134614601957",
+        "build_and_test": "success",
+        "job_status": "completed",
+        "job_conclusion": "success",
+        "clang_tidy": "skipped"
+      }
+    ],
+    "clean_build_info": {
+      "commit": "e3d4dfed63c8fc2cc2632cca0a8a52d831d539b5",
+      "uncommitted_changes": false
+    },
+    "original_evidence": {
+      "source_refs_recovered_from_git": 37,
+      "artifacts_unchanged": 52,
+      "manifest_unchanged": true
+    }
+  },
+  "ci_scope": "Linux3構成のbuild/test段階はすべてsuccess。snapshot通常/資源試験を含む。Release/sanitizerのjobはsuccess。Linux Debugのrepo全体clang-tidyとworkflow全体は採取時点で継続中であり、完走成功とは主張しない。",
+  "source_commit_scope": "修正source e3d4dfeでWindows D/Rを実行し、同headのLinux結果を確認。後続metadataだけの差分をsource実行へ付替えない。",
+  "independent_review": "rootが4file差分、none guard/step_map限定、full/arnoldi/staticの正常対照と非ASCII/NULの独立期待を通読し、指摘なし。",
+  "limits": [
+    "SI/物理prepare/最終状態/CLI validate/ソルバー数値認定/実務受入は引き続き本schema検証の対象外。",
+    "旧記録のsource参照は旧commitから復元して照合する。変更後のlive sourceに旧SHAの一致を要求しない。",
+    "Linux Debugのclang-tidyとworkflow全体の完了を、試験段階の成功から推定しない。"
+  ],
+  "sources": {
+    "src/io/case_schema_exact.cpp": "d4bb1acfe499330ff2654204ca44d98c8f4d2d9c91dc2ff58edb332fed88e45f",
+    "docs/verification/IM-06/schema-snapshot-generator.py": "64780ef13564cd37ed97305f664f1e00ae92775bbedd33ee9170fa65ef0be527",
+    "tests/io/case_schema_cross_test.cpp": "d68c3d60d578a83f205b0642a6e0a5237480b514560fb43d67962624b98cb2c8",
+    "tests/io/case_schema_snapshot.hpp": "0737379415d03c4c890dbb3f8253a6c4b866a86c17f125936e5c0648645f07f1",
+    "include/uvlas/io/case_schema_records.hpp": "cbd38a49b742828fdfdafcfd1c50f172cdaa9144ad4ca9c30f041c729e8171a6"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-5-review-130/build-info.json": "a020e1d097b6874d15ed4d8111242d3fb6881157d27052416b2ea2c37ae03f70",
+    "docs/verification/IM-06/im06-5-review-130/ci-source-state.json": "83847133a69ad28b24c7aacb0fd6606e9d1a53dec68dfd823abbdf2a83bd7c24",
+    "docs/verification/IM-06/im06-5-review-130/historical-source-check.json": "ed8cec98feccc360b974c012e71710b4b1fe81c1f1d4343c7528f07125ae3aaa",
+    "docs/verification/IM-06/im06-5-review-130/linux-release-excerpt.log": "923799ece7adb2c3e33540c20ab451100470a969000668f8a3f1797c65ec967c",
+    "docs/verification/IM-06/im06-5-review-130/linux-sanitize-excerpt.log": "973ddcb83ffaa5ae49891ae95c02351cef6f798ab9493562b5e9936aa253b126",
+    "docs/verification/IM-06/im06-5-review-130/log-publication.json": "f051e10ea7d36c66d73e6f4f0a01d8485fc820d717644b5062f7415d72a04c76",
+    "docs/verification/IM-06/im06-5-review-130/original-linux-debug-error-excerpt.log": "a0559a5ae05ab089c6b68dcc5358fa71ac0b954097fd22392bfa6f735a7296c3",
+    "docs/verification/IM-06/im06-5-review-130/original-linux-release-error-excerpt.log": "84a91c75578ce5926d8ff6c5b0ad6f5d3edfdc079552c180192b0888e0af73fa",
+    "docs/verification/IM-06/im06-5-review-130/original-linux-sanitize-error-excerpt.log": "5c17f1f2a265b6da8285b20c8c3485bdce11be5b0d16302b53e7079a15b7dd83",
+    "docs/verification/IM-06/im06-5-review-130/snapshot-reproduction.json": "72e8bb56003d56882711cc8b4ab0105b612c276c2d550d77498bc416e02a4dd1",
+    "docs/verification/IM-06/im06-5-review-130/tidy-exact.log": "f45e017475d83adb80f1418e9dffc464f583f376f2720f127e9eafd371f7d560",
+    "docs/verification/IM-06/im06-5-review-130/tidy-tests.log": "c492fe5d555c4a718db74241941abfe85a15cbaeb88fd45be84d70e14c0ed7da",
+    "docs/verification/IM-06/im06-5-review-130/windows-debug-normal.log": "b3a803933f20d86c9c3fcf7df3b62abed5894768a04645ab8b7d0d10094be158",
+    "docs/verification/IM-06/im06-5-review-130/windows-debug-resources.log": "5ccb62d526b3af8d2171688618becfd515f1e4597cc3c5776d2dc1633d8ea318",
+    "docs/verification/IM-06/im06-5-review-130/windows-release-normal.log": "7f3ab23dec2a03389d0dd7d3148e97726f3aee803fba7cc941b1f8aa2ce916d0",
+    "docs/verification/IM-06/im06-5-review-130/windows-release-resources.log": "0bbbf19244241bc938fa8f487c23cd9f9e6b62e57ba20bbf0f6ba423ec379f68",
+    "docs/verification/IM-06/im06-5-typed-schema-validator.json": "48524d53e489f081a9c64c409fd9de7d2f0c8f36c08f90054441f2c4cff5a30e"
+  }
+}

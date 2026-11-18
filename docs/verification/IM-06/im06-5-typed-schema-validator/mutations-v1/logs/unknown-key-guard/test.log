@@ -1,0 +1,21 @@
+Filters: "Every structural error*"
+Randomness seeded to: 4113069465
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+schema-mutation.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Every structural error is selected before exact physical value checks
+-------------------------------------------------------------------------------
+${ROOT}/tests/io/case_schema_test.cpp(274)
+...............................................................................
+
+${ROOT}/tests/io/case_schema_test.cpp(310): FAILED:
+  CHECK( detail->reason == reason )
+with expansion:
+  2 == 1
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 2 | 1 passed | 1 failed

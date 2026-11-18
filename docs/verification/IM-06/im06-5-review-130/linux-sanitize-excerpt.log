@@ -1,0 +1,7 @@
+2026-11-18T06:08:09.5169229Z -- The CXX compiler identification is GNU 14.2.0
+2026-11-18T06:20:19.1632436Z       Start 85: io.case_schema
+2026-11-18T06:21:07.9707078Z 85/86 Test #85: io.case_schema .........................   Passed   48.81 sec
+2026-11-18T06:21:07.9707907Z       Start 86: io.case_schema_resources
+2026-11-18T06:21:55.7001756Z 86/86 Test #86: io.case_schema_resources ...............   Passed   47.73 sec
+2026-11-18T06:21:55.7009627Z 100% tests passed, 0 tests failed out of 86
+2026-11-18T06:21:55.7012423Z Total Test time (real) = 487.60 sec

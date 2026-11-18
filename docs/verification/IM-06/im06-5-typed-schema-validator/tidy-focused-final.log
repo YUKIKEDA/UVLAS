@@ -1,0 +1,6 @@
+[1/3] Processing file ${SOURCE}/tests/io/case_schema_cross_test.cpp.
+66866 warnings generated.
+[2/3] Processing file ${SOURCE}/tests/io/case_schema_resource_test.cpp.
+130071 warnings generated.
+[3/3] Processing file ${SOURCE}/tests/io/case_schema_intrinsic_test.cpp.
+196918 warnings generated.

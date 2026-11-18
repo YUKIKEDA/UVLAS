@@ -1,0 +1,21 @@
+Filters: "All five frozen root designs*"
+Randomness seeded to: 1775739570
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+schema-mutation.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+All five frozen root designs reach the typed product validator
+-------------------------------------------------------------------------------
+${ROOT}/tests/io/case_schema_test.cpp(455)
+...............................................................................
+
+${ROOT}/tests/io/case_schema_test.cpp(493): FAILED:
+explicitly with messages:
+  coupled_transient
+  Frozen root must pass the complete typed schema
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 1 | 1 failed

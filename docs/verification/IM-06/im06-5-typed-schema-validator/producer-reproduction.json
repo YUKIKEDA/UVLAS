@@ -1,0 +1,31 @@
+{
+  "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+  "checks": [
+    {
+      "published": "tests/io/case_schema_snapshot.hpp",
+      "separate_output": "case_schema_snapshot_v5.hpp",
+      "sha256": "f0ecb1ed10f5c705ab9ddf910342998da3bccc7060830f734b8fa973b828b196",
+      "byte_equal": true
+    },
+    {
+      "published": "tests/io/case_schema_snapshot.hpp",
+      "separate_output": "case_schema_snapshot_reproduced_v5.hpp",
+      "sha256": "f0ecb1ed10f5c705ab9ddf910342998da3bccc7060830f734b8fa973b828b196",
+      "byte_equal": true
+    },
+    {
+      "published": "tests/io/case_schema_expected_fields.hpp",
+      "separate_output": "case_schema_expected_fields_reproduced.hpp",
+      "sha256": "1777fb14066f18586a9f8df11db5c5b6a91166af368d9696826d326678840285",
+      "byte_equal": true
+    },
+    {
+      "published": "docs/verification/IM-06/schema-field-inventory-v1.json",
+      "separate_output": "schema-field-inventory-reproduced-v3.json",
+      "sha256": "9ebbb572cf2f1cd7c65ed4eeea5e8ba83fac915b7fd9219d1f0a55f8b7305c49",
+      "byte_equal": true
+    }
+  ],
+  "formatter": "clang-format 21.1.2; JSON is compared without formatting",
+  "scope": "Snapshot/field-inventory producers independently regenerated in a separate output directory; this verifies interface inventory and publication reproducibility, not numerical expected values."
+}

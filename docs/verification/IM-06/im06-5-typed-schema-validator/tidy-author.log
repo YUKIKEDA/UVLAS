@@ -1,0 +1,6 @@
+[1/3] Processing file ${SOURCE}/src/io/case_schema.cpp.
+50295 warnings generated.
+[2/3] Processing file ${SOURCE}/src/io/case_schema_exact.cpp.
+100595 warnings generated.
+[3/3] Processing file ${SOURCE}/tests/io/case_schema_test.cpp.
+167875 warnings generated.

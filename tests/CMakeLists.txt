@@ -559,3 +559,16 @@ uvlas_add_test(aero.p1_induction_resources
 target_include_directories(uvlas_test_aero_p1_induction_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_p1_induction_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_p1_induction_resources)
+
+uvlas_add_test(io.case_schema
+    LABELS unit property negative verification
+    SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp
+    LIBS uvlas_io nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_io_case_schema PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_add_test(io.case_schema_resources
+    LABELS property negative verification
+    SOURCES io/case_schema_resource_test.cpp
+    LIBS uvlas_io_audit Threads::Threads)
+target_include_directories(uvlas_test_io_case_schema_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_enable_allocation_audit(uvlas_test_io_case_schema_resources)
+uvlas_require_audited_dependencies(uvlas_test_io_case_schema_resources)

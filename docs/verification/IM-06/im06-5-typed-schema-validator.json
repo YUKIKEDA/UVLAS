@@ -1,0 +1,265 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-5-typed-schema-validator",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 126,
+  "date": "2026-11-18",
+  "source_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+  "base_commit": "46331c960de5d021e9df9820a8bdaa0d0c38e4f9",
+  "source_commit_scope": "製品・test・共有CMake・producerを含む固定source。Windows Debug/Releaseはこのclean sourceでbuildし、Release build-infoのuncommitted_changes=falseを確認。以後のcommitは実行記録と追跡だけ。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "scope": "InputDocumentから所有する全typed SchemaCaseへのschema検査。SI/式値・微分/外部mesh/活動幾何/SO3/拘束/最終q,v/CLI validateは後続。Linux/GCC/sanitizer実行とCI成功は未確認。",
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "独立spec inventory191record/806memberのkey/型/optional完全一致、全閉variant/tag158集合、ID/参照/相互条件/DAG/次元/domain shape。"
+    },
+    {
+      "condition": 2,
+      "evidence": "exact digits/exponent/Rational交差積/整数時間商、全23host quotaと19case min、全call P/S/admission/work、全実new故障、入力・旧結果全payload・diagnostic fallback・独立並列。非標準例外翻訳は既存guard_entryを使用し、replacement newへ任意例外を注入しない。同plan/slotの共有・再入禁止はcallerの前提条件であり、runtime再入guardの拒否を試験したとは主張しない。"
+    },
+    {
+      "condition": 3,
+      "evidence": "144fragment/5rootと初期4正常/22負例を製品kernelへ接続。schema13拒否/prepare9通過、失効旧physical拒否、gmsh原例の衝突拒否とsource3派生正常。非零R/P/C/halfcell/全frame/PointCheck両側。"
+    },
+    {
+      "condition": 4,
+      "evidence": "独立数値/次元・全record/member・全tag系列、所有/故障/並列、Windows対象4target D/R、全変更TU静的解析、control+8隔離変異を実検出。LinuxはCIへ。"
+    },
+    {
+      "condition": 5,
+      "evidence": "利用者向け英語API doc、主要inline、既存7契約/examples byte一致、新manifest/producer/ログとtrace同期。"
+    }
+  ],
+  "checks": {
+    "windows": {
+      "debug": {
+        "normal": {
+          "exit": 0,
+          "cases": 29,
+          "assertions": 14640
+        },
+        "resources": {
+          "exit": 0,
+          "cases": 6,
+          "assertions": 7127
+        },
+        "input": {
+          "exit": 0,
+          "cases": 10,
+          "assertions": 636
+        },
+        "input-resources": {
+          "exit": 0,
+          "cases": 4,
+          "assertions": 499
+        }
+      },
+      "release": {
+        "normal": {
+          "exit": 0,
+          "cases": 29,
+          "assertions": 14640
+        },
+        "resources": {
+          "exit": 0,
+          "cases": 6,
+          "assertions": 7127
+        },
+        "input": {
+          "exit": 0,
+          "cases": 10,
+          "assertions": 636
+        },
+        "input-resources": {
+          "exit": 0,
+          "cases": 4,
+          "assertions": 435
+        }
+      }
+    },
+    "build_info": {
+      "schema": "uvlas.build-info/1",
+      "version": "0.1.0-dev",
+      "commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+      "uncommitted_changes": false,
+      "compiler": "MSVC 19.51.36260.0",
+      "platform": "Windows AMD64",
+      "configuration": "Release",
+      "floating_point": "/fp:strict",
+      "instruction_set": "sse2",
+      "platform_key": "windows-x64-msvc19.51-sse2",
+      "dependencies": {
+        "eigen": "5.0.1",
+        "spectra": "1.2.0",
+        "boost": "1.92.0",
+        "nlohmann_json": "3.12.0"
+      },
+      "dependency_repairs": {
+        "nlohmann_json_sax_allocation": 1
+      }
+    },
+    "static": {
+      "tool": "clang-tidy 21.1.1",
+      "author_translation_units": 4,
+      "focused_test_translation_units": 5,
+      "exit": 0,
+      "user_source_diagnostics": 0,
+      "note": "third-party warnings are suppressed by the repository header filter; static logs are separate from execution/CI.",
+      "final_focused_log": "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-focused-final.log",
+      "final_focused_translation_units": [
+        "case_schema_cross_test.cpp",
+        "case_schema_resource_test.cpp",
+        "case_schema_intrinsic_test.cpp"
+      ]
+    },
+    "format": {
+      "tool": "clang-format 21.1.2",
+      "exit": 0
+    },
+    "design_examples": {
+      "fragments": 144,
+      "roots": 5,
+      "physical_positive": 4,
+      "physical_negative_schema": 13,
+      "physical_negative_prepare": 9,
+      "json_literals_preserved": 206
+    },
+    "typed_inventory": {
+      "records": 191,
+      "members": 806,
+      "independent_tag_sets": 158
+    },
+    "mutations": {
+      "control_cases": 29,
+      "control_assertions": 14640,
+      "compile_and_link_successful_mutants": 8,
+      "caught_assertion_failures": 8,
+      "crashes_counted": 0,
+      "results": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/results.json"
+    },
+    "source_documents_preserved": 7,
+    "producer_reproduction": {
+      "snapshot_outputs": 2,
+      "field_inventory_json_and_header": true,
+      "all_bytes_equal": true
+    },
+    "japanese": {
+      "independent_readthrough": "root",
+      "final_lint_exit": 0,
+      "remaining_warning": "low_burstiness statistical warning; retained after content review"
+    }
+  },
+  "independence": "field/type/optional期待はFD/初期追補/CSのみ、tag集合は独立手書き宣言。payload visitorは191/806のinterface走査を生成し保持性を検査するだけで数値oracleにはしない。境界値・比較・schema/prepare stage・物理次元は独立に指定する。",
+  "review": "root: FD08-12/型/所有/資源/phase・日本語。PG: FD01-07、191/806独立inventory/158tag/visitor。P1: scoped owner/path/workと隔離変異。指摘反映後の対象D/Rはsource_commitへ固定。",
+  "limits": [
+    "入力文書resource試験の実new故障点はDebug22/Release18であり、構成ごとの全実点を走査するためassertion数が異なる。",
+    "任意例外は既存core.guard_entryの責務であり、任意例外を投げるreplacement newによる試験成功を主張しない。",
+    "前提条件に反する同plan/slotの共有・再入をサポートしない。",
+    "Linux/GCC/sanitizer/CI完走、物理prepare、実務受入は未認定。"
+  ],
+  "sources": {
+    "CMakeLists.txt": "75c7207b9d23db653e9a6043646f010b4608ee1ec0bdfb79beac8760e3373fb6",
+    "docs/conventions.md": "8f19c9045f72045f08d0bc1a4532c883470bc8551e352b2f466c0154118d61e0",
+    "docs/roadmap.md": "be59e767edb5259b275fd9df42cb234682bc3ba063d149ca444d88c8bd4280a1",
+    "docs/verification/IM-06/im06-5-typed-schema-validator.md": "8cc6856032f55d51c1271131c40dae893b48f35805193f2652f8a032a22275c6",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/run-isolated.ps1": "b28581ee681ae5244a55e0d553ffb4cd08e126e5de9646d246d8db788dc286f8",
+    "docs/verification/IM-06/schema-corpus-generator.py": "f744959aaf571298134f1f9e59b31a16c60f0e775fea369da4028400f210674f",
+    "docs/verification/IM-06/schema-field-inventory-generator.py": "d232bf76dbde5a4476f0f266ffa0d51fe06b5f9f5e07768be9d462793b48100e",
+    "docs/verification/IM-06/schema-snapshot-generator.py": "b616a84769dce057a4374dea3b87c4b4dd85bb2a9c302e3791985b97ef7785a8",
+    "include/uvlas/io/case_schema.hpp": "be1b56aedd01fb98aaee2fa92606f27fdf83150a173402794746a7bb0b38d9af",
+    "include/uvlas/io/case_schema_records.hpp": "cbd38a49b742828fdfdafcfd1c50f172cdaa9144ad4ca9c30f041c729e8171a6",
+    "include/uvlas/io/input_document.hpp": "6b9efc70fc258e8cfd92a3ca29d6eaf2c3a79419a330b35315ad6951dca1a264",
+    "src/io/case_schema.cpp": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7",
+    "src/io/case_schema_detail.hpp": "cf7d68f5052505285bac199304870892d0e8ae73e63d501a7b464f72c40a6250",
+    "src/io/case_schema_dictionary.cpp": "9070ed43d7ceccce57d7882c9442d1159a9652627fc88a720f4c4c61904b041d",
+    "src/io/case_schema_exact.cpp": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+    "src/io/case_schema_payload.hpp": "6be967d3e85f4a52b61804a23d5c1c6cc01b47dbe4200d310c98383e66797867",
+    "src/io/case_schema_storage.hpp": "411fe4ecf3c93649724ca6de45a776d5f2f255568d17ca9ba1a7d693c0cbef60",
+    "src/io/input_document_detail.hpp": "8d65abd460cb07904532ca1019e655ab6e8844a896b9fa4949c105f482f478da",
+    "tests/CMakeLists.txt": "8f92496a1a7f6a3200459285aa93554d1adf75106f2b0638806da270dfa22f75",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "tests/io/case_schema_cross_test.cpp": "82d98375b400c700dec13e00f40002d1cf48be4f48559cf699adc15cc624cd75",
+    "tests/io/case_schema_expected_fields.hpp": "1777fb14066f18586a9f8df11db5c5b6a91166af368d9696826d326678840285",
+    "tests/io/case_schema_expected_tags.hpp": "e76dec822f2b8b51340da11c6fddd0d18e2a66ab8ee9f1f3c7a394047127d367",
+    "tests/io/case_schema_fragments_test.cpp": "368e3fb9e008c07e307fdbadab1a1768b1ac40339a6a7316facfc084b59af40d",
+    "tests/io/case_schema_intrinsic_test.cpp": "9005901550a23bf93346c902118eca55a16059c5d37d9d390108b888f79df0d3",
+    "tests/io/case_schema_inventory_test.cpp": "a4f89ced3eb7ed059b86920e9281822af879736044b37412f06f01ad5f69d59b",
+    "tests/io/case_schema_resource_test.cpp": "85b40cf9e5e1e8616d4fe527b808d61558aa145b39742bcc5031d79584a70506",
+    "tests/io/case_schema_snapshot.hpp": "f0ecb1ed10f5c705ab9ddf910342998da3bccc7060830f734b8fa973b828b196",
+    "tests/io/case_schema_test.cpp": "2eb3936d68dd68b6b4ebee2e5bf5fd656452ecd8decf9a2ec6f2f9df4d2415c0",
+    "tests/io/case_schema_test_adapter.hpp": "adc91d964d9f385120055f9c8f8fb608d84f436278bb667cc5d04c2a9c2e9c78"
+  },
+  "immutable": {
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-design-cases.md": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "docs/specs/foundation/case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "docs/specs/foundation/case-initial-physical-state-examples.json": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+    "docs/specs/foundation/typed-case-schema-implementation-contract.md": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-5-typed-schema-validator/build-info.json": "8803f7bb5e7ba9b7dc5c7c9e7bc93aa11ee8606d36c8b63e8a1173c9d3ea6a31",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/corpus-publication.json": "9246b3a011a495a21aa5f7c1eed9b94bf0be4ea7f889ec5fc63bb02aada35b6a",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/log-publication.json": "08be3e59af6572e9a58052e6a068d8e1c2608289a5072e085d56b317450d7cf8",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-current-domain/test.log": "a54249795dea55e06c207838939d21244ddcda5671fa6bd6e10e11ff970aef7a",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-reference-domain/test.log": "6a7bf501e78bc8c77d27c676b27ab870ba51a8bb6ca6243a9a728d768e75f7e2",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/consumer-time-domain/test.log": "dbfa4bc4ebda000707b78e550b1d75c34b8ba8409fbaa3f92e09b27d39036865",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/case_schema.cpp.compile.log": "6aea198c4959a31b3b5df8aeab1878abe568aad4eb7a51b5504c6f4c59144b8e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/control/test.log": "0b47c00ae92bf61cb4311391178aeb976b3ed3edd5dd4c07e6f61c80a64974c9",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/exact-tail-16/test.log": "75ffd289e8aa779c4e15145b7504d3f9d6710d56403f22b0ac43365184951b87",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/reference-phase-omitted/test.log": "d0aaf860283b3b451dbfd3fc51fb74e7848f3cb9e2c0679bc65a13a0d5824edc",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/case_schema.cpp.compile.log": "6aea198c4959a31b3b5df8aeab1878abe568aad4eb7a51b5504c6f4c59144b8e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/shape-plan-omitted/test.log": "21b375e0941409e577ae9508d14c31c5b30cc04b5195ff9ec6670d0397203c46",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/case_schema_exact.cpp.compile.log": "19941e9a8b68eaafd053508ee365fb43d275552100ce9962cdcdeff4ddd5b027",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/static-window-omitted/test.log": "3ca98b3c4edcac14fd17b477389823f3fe5f74386663da16147aba584284e6bb",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/case_schema.cpp.compile.log": "6aea198c4959a31b3b5df8aeab1878abe568aad4eb7a51b5504c6f4c59144b8e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/logs/unknown-key-guard/test.log": "258df92a299861ab06ac213a1ddf455a7a71ea6ffb701264705eed0f29ebe116",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/results.json": "73aac2894aa1ecbcda7ec6322764c20b54d3738b5e8e0e3730d709028b4e2ea4",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-author.log": "97ca1264d877e48be02e367e760d715224f62cfb237b8e7787199aa30a1a4c57",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-cross-resource.log": "6b65fc052a66bc1ce3e9146e39956616e18df115b9af0d8db51873b6bb71c2a8",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-dictionary.log": "d31a0cae1d06ecd7250eb0890293ca15d896bc02d27bcf0b0ed5b250ede8e0bf",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-fragments.log": "8d5b4cd38633cb79ae68767e31f8496f15c0944e3b3fffdf94802abc902bb992",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-intrinsic.log": "676dfdc6a61092a837c68fdc32032ec67c2316ca62d0911b9d479b3869080386",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-inventory.log": "65c97177352316a6e75455ed5d1b3145b70659fef57ae8b5b95c51f9463774d1",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-build.log": "cd37986e5570698b45862c466fddee16e2536178c912a72fc0259218dfcb868f",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-input-resources.log": "9ff9758452f52ef0b40949275ec80ab8054791f9d97fab5ca2fa352cacd22358",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-input.log": "9c6e98fa7aefee6cd9aee731c11377d5dca4a2505625e8eaeebfece95de7e3e9",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-normal.log": "081d947bcc2abb3bc437f241291687554172762f9d171a7b16629e67a329c540",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-debug-resources.log": "1b965eaa6e4f30742674032ebe0c7beed027b370b913fae66f1b05100d5bd176",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-build.log": "72bd2bfca70c1ec39cb9305d2b5eccf839910a4e6febc839686551564ca36040",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-input-resources.log": "14ae6540cc33d8984036dff7f80b13155395ab82647ae2c015a078963388ea7b",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-input.log": "1c0837982a837f937bd31606061721617401edcf528314bc17635132f927f10e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-normal.log": "81fc362547ca99e151f24371b2ff461aa12c3fce7bcf2c2a19fecb390ebb5ef5",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/windows-release-resources.log": "3190f0f8f10e74c16d4212c5c3d379cbbde4eab31f37e6c8af980df4fc1ed711",
+    "docs/verification/IM-06/schema-field-inventory-v1.json": "9ebbb572cf2f1cd7c65ed4eeea5e8ba83fac915b7fd9219d1f0a55f8b7305c49",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/producer-reproduction.json": "6d8d51b26e6c6f4b1bf32ca7ce6d36609a4f755abe53d8a6363eb8f6e2ab4c1a",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/japanese-final.log": "d3b98076839a357c94c734221855066098c8a4d4e911dd4da4c04f78541aa05e",
+    "docs/verification/IM-06/im06-5-typed-schema-validator/tidy-focused-final.log": "50fb8ac20901fe25b13b429189c4fb2a0e170a9911c7c257be4166ffefa39600"
+  }
+}

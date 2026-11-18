@@ -299,6 +299,16 @@ private:
 /// One immutable borrow of an owned source, tree root and admitted parser model.
 /// Envelope success qualifies neither nested schema nor a physical model.
 struct InputDocumentView {
+    /// Bind an existing immutable source, tree and admitted parser model explicitly.
+    /// The document owner must outlive every borrowed byte, node and model reference.
+    InputDocumentView(SourceIdentity source_identity, std::span<const std::byte> bytes,
+                      InputNodeView root_node, ParserAllocationPolicy allocation_policy,
+                      const ParserMemoryPlan& memory_model) noexcept
+        : identity(source_identity),
+          source_bytes(bytes),
+          root(root_node),
+          policy(allocation_policy),
+          parser_memory(memory_model) {}
     SourceIdentity identity;                 ///< Owned copy of source ID, length and digest.
     std::span<const std::byte> source_bytes; ///< Borrow of exact original bytes.
     InputNodeView root;                    ///< Root object; nested physical schemas are unchecked.

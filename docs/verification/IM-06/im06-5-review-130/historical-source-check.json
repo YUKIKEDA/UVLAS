@@ -1,0 +1,195 @@
+{
+  "original_execution_commit": "d81411a160ac6e365546da11eef6082dd11798f3",
+  "original_review_head": "8e3a6797667746059b6cb34267bbe8685338d806",
+  "original_manifest_unchanged": true,
+  "original_manifest_sha256": "48524d53e489f081a9c64c409fd9de7d2f0c8f36c08f90054441f2c4cff5a30e",
+  "original_artifacts_unchanged": 52,
+  "source_references_verified_from_git": [
+    {
+      "path": "CMakeLists.txt",
+      "source_commit_sha256": "75c7207b9d23db653e9a6043646f010b4608ee1ec0bdfb79beac8760e3373fb6",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/conventions.md",
+      "source_commit_sha256": "8f19c9045f72045f08d0bc1a4532c883470bc8551e352b2f466c0154118d61e0",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/roadmap.md",
+      "source_commit_sha256": "be59e767edb5259b275fd9df42cb234682bc3ba063d149ca444d88c8bd4280a1",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/verification/IM-06/im06-5-typed-schema-validator.md",
+      "source_commit_sha256": "8cc6856032f55d51c1271131c40dae893b48f35805193f2652f8a032a22275c6",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/verification/IM-06/im06-5-typed-schema-validator/mutations-v1/run-isolated.ps1",
+      "source_commit_sha256": "b28581ee681ae5244a55e0d553ffb4cd08e126e5de9646d246d8db788dc286f8",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/verification/IM-06/schema-corpus-generator.py",
+      "source_commit_sha256": "f744959aaf571298134f1f9e59b31a16c60f0e775fea369da4028400f210674f",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/verification/IM-06/schema-field-inventory-generator.py",
+      "source_commit_sha256": "d232bf76dbde5a4476f0f266ffa0d51fe06b5f9f5e07768be9d462793b48100e",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/verification/IM-06/schema-snapshot-generator.py",
+      "source_commit_sha256": "b616a84769dce057a4374dea3b87c4b4dd85bb2a9c302e3791985b97ef7785a8",
+      "unchanged_in_current_tree": false
+    },
+    {
+      "path": "include/uvlas/io/case_schema.hpp",
+      "source_commit_sha256": "be1b56aedd01fb98aaee2fa92606f27fdf83150a173402794746a7bb0b38d9af",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "include/uvlas/io/case_schema_records.hpp",
+      "source_commit_sha256": "cbd38a49b742828fdfdafcfd1c50f172cdaa9144ad4ca9c30f041c729e8171a6",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "include/uvlas/io/input_document.hpp",
+      "source_commit_sha256": "6b9efc70fc258e8cfd92a3ca29d6eaf2c3a79419a330b35315ad6951dca1a264",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "src/io/case_schema.cpp",
+      "source_commit_sha256": "2ca8bde484e708ec84824c530525f17d82e0ff097c864ac3683865f1bf8600d7",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "src/io/case_schema_detail.hpp",
+      "source_commit_sha256": "cf7d68f5052505285bac199304870892d0e8ae73e63d501a7b464f72c40a6250",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "src/io/case_schema_dictionary.cpp",
+      "source_commit_sha256": "9070ed43d7ceccce57d7882c9442d1159a9652627fc88a720f4c4c61904b041d",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "src/io/case_schema_exact.cpp",
+      "source_commit_sha256": "b22ae17322bfc6899d6afbe165a6b9cee56f1ff543ce03176a0e94122dce7303",
+      "unchanged_in_current_tree": false
+    },
+    {
+      "path": "src/io/case_schema_payload.hpp",
+      "source_commit_sha256": "6be967d3e85f4a52b61804a23d5c1c6cc01b47dbe4200d310c98383e66797867",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "src/io/case_schema_storage.hpp",
+      "source_commit_sha256": "411fe4ecf3c93649724ca6de45a776d5f2f255568d17ca9ba1a7d693c0cbef60",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "src/io/input_document_detail.hpp",
+      "source_commit_sha256": "8d65abd460cb07904532ca1019e655ab6e8844a896b9fa4949c105f482f478da",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "source_commit_sha256": "8f92496a1a7f6a3200459285aa93554d1adf75106f2b0638806da270dfa22f75",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_corpus.hpp",
+      "source_commit_sha256": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_cross_test.cpp",
+      "source_commit_sha256": "82d98375b400c700dec13e00f40002d1cf48be4f48559cf699adc15cc624cd75",
+      "unchanged_in_current_tree": false
+    },
+    {
+      "path": "tests/io/case_schema_expected_fields.hpp",
+      "source_commit_sha256": "1777fb14066f18586a9f8df11db5c5b6a91166af368d9696826d326678840285",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_expected_tags.hpp",
+      "source_commit_sha256": "e76dec822f2b8b51340da11c6fddd0d18e2a66ab8ee9f1f3c7a394047127d367",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_fragments_test.cpp",
+      "source_commit_sha256": "368e3fb9e008c07e307fdbadab1a1768b1ac40339a6a7316facfc084b59af40d",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_intrinsic_test.cpp",
+      "source_commit_sha256": "9005901550a23bf93346c902118eca55a16059c5d37d9d390108b888f79df0d3",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_inventory_test.cpp",
+      "source_commit_sha256": "a4f89ced3eb7ed059b86920e9281822af879736044b37412f06f01ad5f69d59b",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_resource_test.cpp",
+      "source_commit_sha256": "85b40cf9e5e1e8616d4fe527b808d61558aa145b39742bcc5031d79584a70506",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_snapshot.hpp",
+      "source_commit_sha256": "f0ecb1ed10f5c705ab9ddf910342998da3bccc7060830f734b8fa973b828b196",
+      "unchanged_in_current_tree": false
+    },
+    {
+      "path": "tests/io/case_schema_test.cpp",
+      "source_commit_sha256": "2eb3936d68dd68b6b4ebee2e5bf5fd656452ecd8decf9a2ec6f2f9df4d2415c0",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "tests/io/case_schema_test_adapter.hpp",
+      "source_commit_sha256": "adc91d964d9f385120055f9c8f8fb608d84f436278bb667cc5d04c2a9c2e9c78",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/case-schema-contract.md",
+      "source_commit_sha256": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/case-schema-fields.md",
+      "source_commit_sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/case-schema-design-cases.md",
+      "source_commit_sha256": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/case-schema-examples.json",
+      "source_commit_sha256": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/case-initial-physical-state-contract.md",
+      "source_commit_sha256": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/case-initial-physical-state-examples.json",
+      "source_commit_sha256": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+      "unchanged_in_current_tree": true
+    },
+    {
+      "path": "docs/specs/foundation/typed-case-schema-implementation-contract.md",
+      "source_commit_sha256": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50",
+      "unchanged_in_current_tree": true
+    }
+  ],
+  "scope": "Old sources are qualified by the original execution commit, not by live files changed by the review fix."
+}
