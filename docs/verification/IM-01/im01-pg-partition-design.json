@@ -1,0 +1,103 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-partition-design",
+  "ids": [
+    "SH-D07",
+    "SH-D03",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 117,
+  "date": "2026-11-18",
+  "source_commit": "bcd4acffd9b16a0d113c5855dc300ee111690561",
+  "claimed_state": "設計契約の独立レビューと限定exact設計照合。製品適合・数値認定・実務受入は主張しない。",
+  "checks": {
+    "design_assertions": 734,
+    "regions": 4,
+    "n": [
+      1,
+      2,
+      4
+    ],
+    "cell_moment_comparisons": 336,
+    "tolerance": "exact Fraction equality, absolute/relative tolerance 0",
+    "oracle_independence": "支持線共通細分/非零winding/shoelaceと、別の垂直断面/区間exact Simpson。R&D/製品importなし。",
+    "same_cell_components": 2,
+    "thickness_shared_segments": 16,
+    "layer_face_records": 720,
+    "negative_witnesses": [
+      "missing positive region",
+      "duplicate positive region",
+      "H trace jump 1e-400",
+      "missing layer interface traces"
+    ],
+    "scope": "負例は限定設計witness。製品の失敗code/原状態不変/資源拒否を実行したという主張ではない。",
+    "rd_tree_check": "python -B -X utf8 tools/rd/check_tree.py: exit 0",
+    "old_sources": "追加契約と新記録だけ。旧4仕様/R&Dをbyte保持。",
+    "skipped": "製品C++/CMake/依存を変更しないため既存D/R・全suite・性能実行を省略。",
+    "trace": {
+      "defined": 208,
+      "with_tests": 34,
+      "with_records": 41,
+      "problems": 0
+    }
+  },
+  "remaining": "同じIM01-0で製品交差判定器を実装/独立検証し、多角形rank・条件付け・PreparedPatch・物理求積へ渡す。物理M/KはIM02-0。",
+  "source_references": [
+    {
+      "id": "pg-partition-source-0",
+      "sha256": "ecb1dd5d0819fa73a74fe4521cd33b1bc9b618b6df597debfe628c2fd45a90d0",
+      "hint": "docs/specs/structure/pg-integration-partition-contract.md"
+    },
+    {
+      "id": "pg-partition-source-1",
+      "sha256": "a0b2f1d12e50e4ca907954e2b7f7b580d519759152cfcebf41bc31087f875efe",
+      "hint": "docs/specs/structure/pg-coefficient-contract.md"
+    },
+    {
+      "id": "pg-partition-source-2",
+      "sha256": "d40c432a1a147d16d65e0bff9d3c4a530303dcad41e19aa7d36f04d5779068fa",
+      "hint": "docs/specs/structure/pg-graph-cell-contract.md"
+    },
+    {
+      "id": "pg-partition-source-3",
+      "sha256": "a91db105cc00dc46cf95519277ab1896afcd87a360e2d5fc1f295bcdd0212c5a",
+      "hint": "docs/specs/structure/pg-exact-algebra-resource-contract.md"
+    },
+    {
+      "id": "pg-partition-source-4",
+      "sha256": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+      "hint": "docs/specs/structure/main-shell-adopted-specification.md"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "pg-partition-artifact-0",
+      "sha256": "175d5f3f6355b23b8b0d1d310b80cdbf57957df6513902917f72bc998f978292",
+      "hint": "docs/verification/IM-01/pg-partition-design/partition_design_oracle.py.txt"
+    },
+    {
+      "id": "pg-partition-artifact-1",
+      "sha256": "117625b5a806b872299505fc7796f569eb6ca77bafa4ce688cd0493c38d27d69",
+      "hint": "docs/verification/IM-01/pg-partition-design/design-result.json"
+    },
+    {
+      "id": "pg-partition-artifact-2",
+      "sha256": "7a8357d03809ecd5ffd9e20000c43d975fbc40a79c9a055c032d26074b91cf2b",
+      "hint": "docs/verification/IM-01/pg-partition-design/review-disposition.json"
+    }
+  ],
+  "sources": {
+    "docs/specs/structure/pg-integration-partition-contract.md": "ecb1dd5d0819fa73a74fe4521cd33b1bc9b618b6df597debfe628c2fd45a90d0",
+    "docs/specs/structure/pg-coefficient-contract.md": "a0b2f1d12e50e4ca907954e2b7f7b580d519759152cfcebf41bc31087f875efe",
+    "docs/specs/structure/pg-graph-cell-contract.md": "d40c432a1a147d16d65e0bff9d3c4a530303dcad41e19aa7d36f04d5779068fa",
+    "docs/specs/structure/pg-exact-algebra-resource-contract.md": "a91db105cc00dc46cf95519277ab1896afcd87a360e2d5fc1f295bcdd0212c5a",
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-partition-design/partition_design_oracle.py.txt": "175d5f3f6355b23b8b0d1d310b80cdbf57957df6513902917f72bc998f978292",
+    "docs/verification/IM-01/pg-partition-design/design-result.json": "117625b5a806b872299505fc7796f569eb6ca77bafa4ce688cd0493c38d27d69",
+    "docs/verification/IM-01/pg-partition-design/review-disposition.json": "7a8357d03809ecd5ffd9e20000c43d975fbc40a79c9a055c032d26074b91cf2b"
+  }
+}
