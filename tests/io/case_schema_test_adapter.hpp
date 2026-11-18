@@ -16,67 +16,94 @@ namespace uvlas::test::schema_adapter {
 
 // This fixture editor treats every scalar as its original wire token. In particular,
 // no JSON number is parsed as double or reserialized through a binary value.
+struct JsonMember;
 struct JsonToken {
     enum class Kind : unsigned char { Scalar, Object, Array };
     Kind kind = Kind::Scalar;
     std::string scalar;
-    std::vector<std::pair<std::string, JsonToken>> members;
+    std::vector<JsonMember> members;
     std::vector<JsonToken> elements;
 
-    JsonToken& field(std::string_view key) {
-        for (auto& [name, value] : members)
-            if (name == key)
-                return value;
-        throw std::runtime_error("Missing fixture field: " + std::string{key});
-    }
-    [[nodiscard]] const JsonToken& field(std::string_view key) const {
-        for (const auto& [name, value] : members)
-            if (name == key)
-                return value;
-        throw std::runtime_error("Missing fixture field: " + std::string{key});
-    }
-    [[nodiscard]] bool contains(std::string_view key) const {
-        return std::ranges::any_of(members,
-                                   [&](const auto& member) { return member.first == key; });
-    }
-    void set(std::string key, JsonToken value) {
-        for (auto& [name, old] : members)
-            if (name == key) {
-                old = std::move(value);
-                return;
-            }
-        members.emplace_back(std::move(key), std::move(value));
-    }
-    void erase(std::string_view key) {
-        std::erase_if(members, [&](const auto& member) { return member.first == key; });
-    }
-    [[nodiscard]] std::string text() const {
-        return nlohmann::json::parse(scalar).get<std::string>();
-    }
-    [[nodiscard]] std::string wire() const {
-        if (kind == Kind::Scalar)
-            return scalar;
-        std::string result = kind == Kind::Object ? "{" : "[";
-        bool first = true;
-        if (kind == Kind::Object) {
-            for (const auto& [key, value] : members) {
-                if (!first)
-                    result += ',';
-                first = false;
-                result += nlohmann::json(key).dump() + ":" + value.wire();
-            }
-        } else {
-            for (const auto& value : elements) {
-                if (!first)
-                    result += ',';
-                first = false;
-                result += value.wire();
-            }
-        }
-        result += kind == Kind::Object ? '}' : ']';
-        return result;
-    }
+    JsonToken();
+    JsonToken(const JsonToken&);
+    JsonToken(JsonToken&&) noexcept;
+    JsonToken& operator=(const JsonToken&);
+    JsonToken& operator=(JsonToken&&) noexcept;
+    ~JsonToken();
+    JsonToken& field(std::string_view);
+    [[nodiscard]] const JsonToken& field(std::string_view) const;
+    [[nodiscard]] bool contains(std::string_view) const;
+    void set(std::string, JsonToken);
+    void erase(std::string_view);
+    [[nodiscard]] std::string text() const;
+    [[nodiscard]] std::string wire() const;
 };
+// vector supports an incomplete element; pair<string, JsonToken> does not defer
+// every trait instantiation until JsonToken is complete on Clang/libstdc++.
+struct JsonMember {
+    std::string first;
+    JsonToken second;
+    JsonMember(std::string key, JsonToken value) noexcept
+        : first(std::move(key)), second(std::move(value)) {}
+};
+inline JsonToken::JsonToken() = default;
+inline JsonToken::JsonToken(const JsonToken&) = default;
+inline JsonToken::JsonToken(JsonToken&&) noexcept = default;
+inline JsonToken& JsonToken::operator=(const JsonToken&) = default;
+inline JsonToken& JsonToken::operator=(JsonToken&&) noexcept = default;
+inline JsonToken::~JsonToken() = default;
+inline JsonToken& JsonToken::field(std::string_view key) {
+    for (auto& [name, value] : members)
+        if (name == key)
+            return value;
+    throw std::runtime_error("Missing fixture field: " + std::string{key});
+}
+inline const JsonToken& JsonToken::field(std::string_view key) const {
+    for (const auto& [name, value] : members)
+        if (name == key)
+            return value;
+    throw std::runtime_error("Missing fixture field: " + std::string{key});
+}
+inline bool JsonToken::contains(std::string_view key) const {
+    return std::ranges::any_of(members, [&](const auto& member) { return member.first == key; });
+}
+inline void JsonToken::set(std::string key, JsonToken value) {
+    for (auto& [name, old] : members)
+        if (name == key) {
+            old = std::move(value);
+            return;
+        }
+    members.emplace_back(std::move(key), std::move(value));
+}
+inline void JsonToken::erase(std::string_view key) {
+    std::erase_if(members, [&](const auto& member) { return member.first == key; });
+}
+inline std::string JsonToken::text() const {
+    return nlohmann::json::parse(scalar).get<std::string>();
+}
+inline std::string JsonToken::wire() const {
+    if (kind == Kind::Scalar)
+        return scalar;
+    std::string result = kind == Kind::Object ? "{" : "[";
+    bool first = true;
+    if (kind == Kind::Object) {
+        for (const auto& [key, value] : members) {
+            if (!first)
+                result += ',';
+            first = false;
+            result += nlohmann::json(key).dump() + ":" + value.wire();
+        }
+    } else {
+        for (const auto& value : elements) {
+            if (!first)
+                result += ',';
+            first = false;
+            result += value.wire();
+        }
+    }
+    result += kind == Kind::Object ? '}' : ']';
+    return result;
+}
 
 class TokenReader {
 public:

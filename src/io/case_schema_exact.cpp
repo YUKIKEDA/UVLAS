@@ -601,7 +601,7 @@ void resolve_references(SemanticCheck& check) {
                     if (!check.same_scalar(check.field(*first, key),
                                            check.field(*typed.parent, key)))
                         c.reject(SchemaReason::DuplicateIdentifier);
-                typed.reference_node = *first;
+                typed.reference_node = first;
                 repeated_source = true;
                 break;
             }
@@ -683,7 +683,7 @@ void resolve_references(SemanticCheck& check) {
             owner.nodes.values()[static_cast<std::size_t>(entries[low].node)].parent;
         if (!definition)
             c.reject(SchemaReason::MissingReference);
-        owner.nodes.values()[static_cast<std::size_t>(reference.node)].reference_node = *definition;
+        owner.nodes.values()[static_cast<std::size_t>(reference.node)].reference_node = definition;
         const auto parent = owner.nodes.values()[static_cast<std::size_t>(reference.node)].parent;
         if (parent && check.record(*parent).family == "Target" && check.tag(*parent) == "rigid")
             check.require(check.tag(*definition) == "rigid");

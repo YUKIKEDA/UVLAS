@@ -1037,10 +1037,14 @@ core::Result<schema::Case> SchemaCase::root() const& noexcept {
     return detail::RecordAccess<detail::FieldType::T389>::read(&data_.values()[0], 0);
 }
 core::Result<SourceIdentity> SchemaCase::source_identity() const noexcept {
-    if (data_.size() == 0 || !data_.values()[0].snapshot.values()[0].identity)
+    if (data_.size() == 0)
         return std::unexpected(
             core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
-    return *data_.values()[0].snapshot.values()[0].identity;
+    const auto& source = data_.values()[0].snapshot.values()[0].identity;
+    if (!source)
+        return std::unexpected(
+            core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+    return *source;
 }
 core::Result<SchemaIdentity> SchemaCase::identity() const noexcept {
     const auto source = source_identity();
