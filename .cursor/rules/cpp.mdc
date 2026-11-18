@@ -24,7 +24,7 @@ globs: "**/*.cpp,**/*.hpp"
 
 ## 書き方
 
-- 整形は `.clang-format`（`just format-check`）、静的検査は `.clang-tidy`（`just lint`）。どちらもゲート。検査を黙らせる `NOLINT` には、理由を同じ行に書く。整形の差分だけのcommitを、他の変更に混ぜない。
+- 整形は `.clang-format`（`just format-check`）、静的検査は `.clang-tidy`（`just lint`）。どちらもゲート。 整形する集合はPR差分の全C++パスから決め、新規ファイルの名前patternだけで絞らない。2026-11-19、PR #154では変更した既存公開headerが対象から漏れ、namespace終端コメントだけでCIが停止した。検査を黙らせる `NOLINT` には、理由を同じ行に書く。整形の差分だけのcommitを、他の変更に混ぜない。
 - 警告はエラー。`#pragma warning(disable)` や `-Wno-…` を、ビルドを通すために足さない。原因を直すか、その警告がこのリポジトリに合わないなら、理由をコメントに書いて `cmake/ProjectOptions.cmake` を変えるPRにする。
 - 型は `PascalCase`、関数と変数は `snake_case`、定数は `snake_case`、マクロは `UVLAS_` で始める。名前空間は `uvlas::<module>`。
 - コンストラクタの引数名はメンバー名と重ねず、enumの列挙子も周囲の型名を隠さない。2026-11-16のIssue #70では同名引数、2026-11-17のPR #91では `Rational` 列挙子がMSVCで通ってもGCC 14の `-Werror=shadow` で失敗した。名前だけを変え、初期化する値と順序を保つ。

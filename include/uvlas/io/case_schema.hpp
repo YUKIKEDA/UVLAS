@@ -11,7 +11,7 @@ namespace uvlas::io {
 namespace detail {
 struct SchemaContext;
 struct SiFactory;
-}
+} // namespace detail
 
 /// Logical limits are independent; zero permits none of the corresponding item.
 /// These ordinals are an in-process API and must not be persisted.
