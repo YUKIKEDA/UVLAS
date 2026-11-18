@@ -40,3 +40,8 @@ docs/verification/IM-01/im01-partition-product/run_resource_control.py.txt -whit
 # New exact JSON records were produced on Windows; keep their CRLF bytes.
 docs/verification/IM-03/global-geometry-te-start-v1/result.json whitespace=cr-at-eol
 docs/verification/IM-03/global-geometry-te-start.json whitespace=cr-at-eol
+
+# Preserve captured Windows CRLF in this new evidence set; inspect real trailing spaces.
+docs/verification/IM-01/im01-incidence-product/logs/* whitespace=cr-at-eol
+# Catch2 prints a final empty line; retain it only in the five captured test streams.
+docs/verification/IM-01/im01-incidence-product/logs/*-test.log whitespace=cr-at-eol,-blank-at-eof

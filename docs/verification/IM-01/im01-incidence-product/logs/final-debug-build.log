@@ -1,0 +1,10 @@
+[0/2] Re-checking globbed directories...
+[1/10] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\out\build\issue125 && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=C:/Users/yuuuu/.codex/worktrees/uvlas-im01-contract/UVLAS -DOUTPUT=C:/Users/yuuuu/.codex/worktrees/uvlas-im01-contract/UVLAS/out/build/issue125/generated/uvlas/git_revision.hpp -P C:/Users/yuuuu/.codex/worktrees/uvlas-im01-contract/UVLAS/cmake/GitRevision.cmake"
+[2/10] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[3/10] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[4/10] Linking CXX static library Debug\uvlas_core_audit.lib
+[5/10] Linking CXX static library Debug\uvlas_core.lib
+[6/10] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_integration_partition_resources.dir\Debug\structure\pg_integration_partition_resource_test.cpp.obj
+[7/10] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_integration_partition.dir\Debug\structure\pg_integration_partition_test.cpp.obj
+[8/10] Linking CXX executable tests\Debug\uvlas_test_structure_pg_integration_partition_resources.exe
+[9/10] Linking CXX executable tests\Debug\uvlas_test_structure_pg_integration_partition.exe

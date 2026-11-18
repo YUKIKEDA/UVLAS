@@ -1,0 +1,70 @@
+"""Fixed-source MSVC comparison/mutation runner. No current source is modified."""
+from __future__ import annotations
+import argparse,hashlib,io,json,os,runpy,subprocess,tarfile
+from pathlib import Path
+
+def main():
+    ap=argparse.ArgumentParser();ap.add_argument('--root',type=Path,required=True);ap.add_argument('--build',type=Path,required=True);ap.add_argument('--output',type=Path,required=True);ap.add_argument('--commit',required=True);a=ap.parse_args()
+    root=a.root.resolve();build=a.build.resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
+    parser=runpy.run_path(str(root/'docs/verification/IM-01/im01-partition-product/run_mutations_v2.py.txt'))
+    argv=parser['argv'];norm=parser['norm'];env=os.environ.copy()
+    db=json.loads((build/'compile_commands.json').read_text(encoding='utf-8'))
+    product=next(x for x in db if norm(x['file']).endswith('/src/structure/pg_integration_partition.cpp') and 'Release' in x['output'] and 'audit' not in x['output'])
+    test=next(x for x in db if norm(x['file']).endswith('/tests/structure/pg_integration_partition_test.cpp') and 'Release' in x['output'])
+    commands=subprocess.check_output(['ninja','-C',str(build),'-f','build-Release.ninja','-t','commands','uvlas_test_structure_pg_integration_partition'],text=True)
+    link=argv(next(x for x in reversed(commands.splitlines()) if 'vs_link_exe' in x).split(' -- ',1)[1].split(' && ',1)[0])
+    def run(args,label,timeout=120):
+        r=subprocess.run(args,cwd=build,env=env,capture_output=True,timeout=timeout)
+        (out/(label+'.log')).write_bytes(r.stdout+r.stderr);return r
+    def compile(entry,source,obj,copy=None):
+        args=argv(entry['command'])
+        for i,v in enumerate(args):
+            if norm(v)==norm(entry['file']):args[i]=str(source)
+            elif v.lower().startswith('/fo'):args[i]='/Fo'+str(obj)
+            elif v.lower().startswith('/fd'):args[i]='/Fd'+str(obj.with_suffix('.pdb'))
+            elif copy is not None:args[i]=v.replace(str(root).replace('\\','/'),str(copy).replace('\\','/')).replace(str(root),str(copy))
+        args+=['-I'+str(root/'tests/structure')]
+        r=run(args,obj.stem+'-compile');assert r.returncode==0,(obj,r.returncode)
+    def image(main_obj,prod_obj,name):
+        args=link[:];exe=out/(name+'.exe')
+        for i,v in enumerate(args):
+            if v.lower().endswith('.obj'):args[i]=str(main_obj)
+            elif v.lower().startswith('/out:'):args[i]='/out:'+str(exe)
+            elif v.lower().startswith('/implib:'):args[i]='/implib:'+str(out/(name+'.lib'))
+            elif v.lower().startswith('/pdb:'):args[i]='/pdb:'+str(out/(name+'.pdb'))
+            elif v.upper()=='/INCREMENTAL':args[i]='/INCREMENTAL:NO'
+        args += [str(prod_obj),'/MANIFEST:EMBED']
+        r=run(args,name+'-link');assert r.returncode==0,(name,r.returncode);return exe
+    probe=out/'probe.obj';compile(test,root/'docs/verification/IM-01/im01-incidence-product/comparison-producer.cpp.txt',probe)
+    test_obj=build/test['output']
+    prefix=next(v[len('-external:I'):] for v in argv(test['command']) if v.startswith('-external:I') and 'installed' in v)
+    env['PATH']=str(Path(prefix).parent/'bin')+os.pathsep+env.get('PATH','')
+    mutations=[('control',None,None),('zero-edge','if (sa * sb < 0)','if (sa * sb <= 0)'),('clip-capacity','o.clip_vertex_capacity = mul(2, mul(m, m))','o.clip_vertex_capacity = m'),('candidate-scan','mul(11, mul(v, pairs))','std::uint64_t{0}'),('atom-sort','mul(mul(2, u), partition_log(m))','std::uint64_t{0}')]
+    results={'fixed_commit':a.commit,'baseline_commit':'89c3923c0d0648910ad700390f7d04d77eec8e40','mutations':[]}
+    snapshots={}
+    for name,old,new in [('baseline',None,None)]+mutations:
+        copy=out/name;copy.mkdir()
+        commit=results['baseline_commit'] if name=='baseline' else a.commit
+        blob=subprocess.check_output(['git','archive',commit,'include','src/structure'],cwd=root)
+        with tarfile.open(fileobj=io.BytesIO(blob)) as tar:tar.extractall(copy,filter='data')
+        if old:
+            file=copy/'src/structure'/('pg_partition_geometry.hpp' if name=='zero-edge' else 'pg_partition_plan.hpp')
+            text=file.read_text(encoding='utf-8');assert text.count(old)==1,(name,text.count(old));file.write_text(text.replace(old,new),encoding='utf-8',newline='\n')
+        obj=out/(name+'.obj');compile(product,copy/'src/structure/pg_integration_partition.cpp',obj,copy)
+        if name in ('baseline','control'):
+            exe=image(probe,obj,name+'-probe')
+            for label,args in [('48GiB',[]),('high',['high'])]:
+                r=run([str(exe)]+args,name+'-'+label);assert r.returncode==0
+                value=json.loads(r.stdout);(out/(name+'-'+label+'.json')).write_bytes(r.stdout)
+                if label=='48GiB' and name=='baseline':assert value['failure']=='ResourceExceeded' and value['allocated']==0
+                else:assert 'snapshot' in value
+                if label=='high':snapshots[name]=value['snapshot']
+        if name!='baseline':
+            exe=image(test_obj,obj,name+'-normal');r=run([str(exe)],name+'-test')
+            assert (r.returncode==0)==(name=='control'),(name,r.returncode)
+            results['mutations'].append({'name':name,'compile_exit':0,'link_exit':0,'test_exit':r.returncode})
+    assert snapshots['baseline']==snapshots['control'],'Exact owned snapshot changed'
+    results['exact_owned_snapshot_equal']=True
+    results['snapshot_sha256']=hashlib.sha256(json.dumps(snapshots['control'],separators=(',',':')).encode()).hexdigest()
+    (out/'results.json').write_text(json.dumps(results,indent=2)+'\n',encoding='utf-8',newline='\n');print(json.dumps(results))
+if __name__=='__main__':main()
