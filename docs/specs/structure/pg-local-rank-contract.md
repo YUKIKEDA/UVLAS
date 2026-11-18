@@ -33,7 +33,7 @@ Aは活動係数行×full V列。Tは選ばれた候補の元辞書座標、S/W/
 
 ### 全背景anchorと活動商空間を混同しない
 
-全背景の $$ T_aL_a=I $$ と $$ \ker(T_a|_V)=(I-L_aT_a)S_0 $$ は元辞書の恒等式である。全t half-cellのs=0係数traceで $$ T_a A_{\rm full}J=0 $$ を検査し、Jが元列−anchor持上げであることを由来・C mapと照合する。これにより元の核のDへの制限が $$ A J=B Z $$ で包含される。
+全背景の $$ T_aL_a=I $$ と $$ \ker(T_a|_V)=(I-L_aT_a)S_0 $$ は元辞書の恒等式である。全field・全t half-cell・全J列のs=0係数traceで $$ T_a A_{\rm full}J=0 $$ を検査し、Jが元列−anchor持上げであることを由来・C mapと照合する。これにより元の核のDへの制限が $$ A J=B Z $$ で包含される。
 
 D外だけに支えを持つ列は活動rankで消えても、全背景のanchor traceでは非零となり得る。したがって、全背景T_aが活動商空間へ降りることや、Zが物理支持の完全な核であることは主張しない。Dがs=0へ届かない例を負対照にする。
 
@@ -160,12 +160,12 @@ native配列は元入力witness、行key M₀、候補origin N、source provenan
 限定probeはFractionの通常有理Gaussを独立oracleとし、整数化/消去/尺度復元は別実装で照合する。手書きliteralも置く。製品から期待rankを生成しない。旧R&Dの浮動QRによる列選択を本優先順のoracleにしない。
 
 - 全n=1/2/4、全活動cell、R/P/C、非単位分母・異なる行/列scale、必須33→原列順、重複/非零極小/不活動列を検査する。
-- A=BS、AG=BW、AJ=BZ、B=ATと全公開mapの尺度を許容差0で照合する。旧元rank値やpassedを製品合格へ転記しない。
+- A=BS、AG=BW、AJ=BZ、B=ATと全公開mapの尺度を許容差0で照合する。AJ=BZだけではJのanchor核への所属を保証しない。原列の背景anchor値を手書き期待と照合し、全背景の全field・全t half-cell・全J列でtrace零を別に検査する。持上げの減算では同じraw成分への寄与も加算し、単位成分を−1へ上書きしない。旧元rank値やpassedを製品合格へ転記しない。
 - s=0へ届かないD、零面積接触、正面積の微小片、同寸法別graph/D、全cellの欠落/重複/追加を含める。
-- 必須場順入替え、列scale復元省略、C field省略、小係数切捨て、不活動行混入、anchorを活動商traceとみなす誤りを限定変異として検出する。
+- 必須場順入替え、列scale復元省略、C field省略、小係数切捨て、不活動行混入、anchorを活動商traceとみなす誤り、旧C単位成分の誤上書き、持上げ減算の符号反転を限定変異として検出する。
 - 製品本体ではmoved owner、旧結果不変、全quotaの十分/equal/一つ不足、overflow、bad_alloc、取消、再入、別Workspace並列・timingのcanonical byte一致も必要。
 
-独立レビューは式/実API、全call表、bitと同時slot、独立oracle、正常/負対照を照合する。限定probe成功だけで製品rank本体や実務性能を完了にしない。今回の限定oracleは手書き多項式行列9例で、全PG辞書や製品APIを実行しない。数学手順・尺度復元・anchor反例・6種の誤りの感度だけを確認する。上記の製品系列は後続DoDであり未実行。数学契約が閉じても、7節の資源不採用により製品rank実装の開始条件は満たさない。
+独立レビューは式/実API、全call表、bitと同時slot、独立oracle、正常/負対照を照合する。限定probe成功だけで製品rank本体や実務性能を完了にしない。今回の限定oracleは手書き多項式行列9例で、全PG辞書や製品APIを実行しない。数学手順・尺度復元・anchor反例・8種の誤りの感度だけを確認する。上記の製品系列は後続DoDであり未実行。数学契約が閉じても、7節の資源不採用により製品rank実装の開始条件は満たさない。
 
 ## 7. 二つの資源障害と開始ゲート
 

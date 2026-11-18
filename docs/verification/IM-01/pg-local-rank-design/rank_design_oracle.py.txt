@@ -210,7 +210,7 @@ def polynomial_fixture(n, region):
         kernel[source][source] = 1
     kernel[8][0] = -1
     kernel[9][2] = -1
-    kernel[3][3] = -1
+    kernel[3][3] = 0  # C1 - (C1 - Cs) = Cs; do not overwrite +1 with -1.
     kernel[4][3] = 1
     kernel[10][6] = -1
     kernel[11][7] = -1
@@ -219,19 +219,82 @@ def polynomial_fixture(n, region):
     return rows, maps, keys
 
 
+def background_anchor_trace(full, keys, maps, side):
+    # The fixture has s-polynomial coefficients and only t^0 coefficients.
+    # At the background anchor cs=0, local u=-1. Inspect every field/t cell/J.
+    f, f0 = len(full[0]), 8
+    traces = []
+    for field in ("R", "P", "C"):
+        for ct in range(side):
+            raw_trace = [sum((row[col] * Q(-1) ** key[3]
+                              for row, key in zip(full, keys, strict=True)
+                              if key[:3] == (field, 0, ct)), Q())
+                         for col in range(f)]
+            for source in range(f0):
+                value = sum((raw_trace[col] * maps[col][33 + f + source]
+                             for col in range(f)), Q())
+                traces.append((field, ct, source, value))
+    return traces
+
+
+def check_anchor_kernel(full, keys, maps, side):
+    traces = background_anchor_trace(full, keys, maps, side)
+    ensure(len(traces) == 3 * side * 8, "Complete background anchor inventory")
+    ensure(all(value == 0 for _, _, _, value in traces),
+           "A source-minus-lift J column has nonzero background anchor trace")
+    return len(traces)
+
+
 def main():
     output = Path(sys.argv[1])
     ensure(not output.exists(), "Never overwrite evidence")
     cases = []
     mutation = {"tiny_drop": False, "C_omit": False, "mandatory_order": False,
-                "inactive_rows": False, "anchor_quotient": False, "scale_restore": False}
+                "inactive_rows": False, "anchor_quotient": False, "scale_restore": False,
+                "anchor_lift_sign": False, "legacy_C_kernel": False}
     for n in (1, 2, 4):
         for region in ("full", "away_anchor", "anchor_strip"):
             a, maps, keys = polynomial_fixture(n, region)
+            full, _, full_keys = polynomial_fixture(n, "full")
+            result_trace_checks = check_anchor_kernel(full, full_keys, maps, 2 * n)
+            # Independent literals for all source anchor values, before subtraction.
+            expected_raw = {"R": [1, 0, 0, 0, 0, 0, 2, 1],
+                            "P": [0, 0, 1, 0, 0, 0, 0, 0],
+                            "C": [0, 0, 0, 1, 0, 0, 0, 0]}
+            for field, expected in expected_raw.items():
+                for ct in range(2 * n):
+                    for source, literal in enumerate(expected):
+                        value = sum((row[source] * Q(-1) ** key[3]
+                                     for row, key in zip(full, full_keys, strict=True)
+                                     if key[:3] == (field, 0, ct)), Q())
+                        ensure(value == literal, "Hand-written original anchor literal")
+            legacy = [row[:] for row in maps]
+            legacy[3][33 + len(a[0]) + 3] = -1
+            legacy_trace = background_anchor_trace(full, full_keys, legacy, 2 * n)
+            ensure(all(value == -1 for field, _, source, value in legacy_trace
+                       if field == "C" and source == 3), "Legacy C failure literal")
+            mutation["legacy_C_kernel"] |= any(x[3] for x in legacy_trace)
+            # Flip subtraction to addition, J_bad = 2 I - J, on every source.
+            sign = [row[:] for row in maps]
+            for col in range(len(a[0])):
+                for source in range(8):
+                    sign[col][33 + len(a[0]) + source] = (
+                        2 * Q(col == source) - maps[col][33 + len(a[0]) + source])
+            sign_trace = background_anchor_trace(full, full_keys, sign, 2 * n)
+            ensure(all(value == 2 * expected_raw[field][source]
+                       for field, _, source, value in sign_trace), "Sign mutation literals")
+            mutation["anchor_lift_sign"] |= any(x[3] for x in sign_trace)
+            for bad in (legacy, sign):
+                try:
+                    check_anchor_kernel(full, full_keys, bad, 2 * n)
+                except ValueError:
+                    pass
+                else:
+                    raise ValueError("Nonzero background anchor mutant survived")
             before = repr((a, maps))
             result = integer_recipe(a, maps, 33 + len(a[0]))
             ensure(repr((a, maps)) == before, "Inputs changed")
-            result.update(n=n, region=region)
+            result.update(n=n, region=region, background_anchor_exact_checks=result_trace_checks)
             cases.append(result)
             mutation["scale_restore"] |= result["scale_mutation_detected"]
             c = matmul(a, maps)
