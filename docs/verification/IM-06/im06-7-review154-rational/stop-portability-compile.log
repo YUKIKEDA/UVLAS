@@ -1,0 +1,3 @@
+[0/2] Re-checking globbed directories...
+[1/3] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue148-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue148-build/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/3] Building CXX object tests\CMakeFiles\uvlas_test_io_si_case_resources.dir\Debug\io\si_case_resource_test.cpp.obj

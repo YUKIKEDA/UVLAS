@@ -1,0 +1,148 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-7-review154-rational",
+  "ids": [
+    "IO4-01",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 148,
+  "pr": 154,
+  "date": "2026-11-19",
+  "review_thread": 4616484044,
+  "review_comment_commit": "3eedbf26bf7f5236800e3564adfa5b3d1faba7e7",
+  "base_commit": "86479e0e9e3235bfcd00ef63470c84ea5d631f46",
+  "source_commit": "4ff65ef90aac3328d1bcc541118686919bc94899",
+  "post_test_comment_commit": "7258248444aca70247c3596178e8907cb7efc05f",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "scope": "公開materialize_rationalを単独で呼ぶ場合も、全leaf/単位冪/中間のbit・backend guard・外部live容量と累積Planを確保前に認定する。値や物理系の認定ではない。",
+  "checks": {
+    "baseline": {
+      "valid_failure_witness": "1e100 m/value bits64および332で各4 global new/5B課金を実検出。",
+      "old_probe_extra_failure_not_counted": "当初probeはwork575を固定したがMSVCの32bit limbでは有効だった。旧logのこの失敗は製品欠陥の検出へ数えず、最終fixtureは既存backendからguard480/576を取得する形へ訂正。"
+    },
+    "zero_allocation_rejections": [
+      "1e100/value64",
+      "1e100/value332",
+      "1e100/backend実guard−1",
+      "canonical token上限4",
+      "external estimate0",
+      "全成功owned payload−1",
+      "Gram逆冪/source1/unit value cap9",
+      "固定証明を超える1e400/value1329の未認定境界"
+    ],
+    "exact_positive_boundaries": [
+      "1e100/value333＋backend guardちょうど",
+      "全成功owned payloadちょうど",
+      "1m/value_bits1",
+      "Gram逆冪/value_bits10=1000",
+      "1e400/十分な保守上界で1329bit成功"
+    ],
+    "preflight": "共有exact_rational_admissionは既存entry/admit(work,0,borrowed,6)を使用。source/両rational成分/seed/逆数/各積・二乗/最後の積を同じgraphで計画。分母parseの分子、単位中の元結果、seedのbase、square中の冪結果のlive bytesも計上。",
+    "bounded_certificate": "通常は保守上界、cap境界が未認定ならallocatorなしchecked1024bitで約分・単位冪を証明。証明不能境界はResourceExceededとする判定限界をAPIへ明記。1024を全APIの値上限にしない。",
+    "cumulative_plan": "canonical文字の合計＋全非零RationalStorage個数×sizeofを既存Plan.remaining_bytesへ照合してから、最初のbufferへ進む。成功後の料金を返却しない既存契約は維持。",
+    "converter_forecast": "追加のadmission/certificateのopaque workと名前付きframeをS/Wへ計上。certificate_stack_bytesはC++値payloadの保守的容量でありprocess stack/RSS実測ではない。",
+    "windows": {
+      "debug": {
+        "normal": {
+          "exit": 0,
+          "cases": 18,
+          "assertions": 39040
+        },
+        "resources": {
+          "exit": 0,
+          "cases": 6,
+          "assertions": 3940
+        },
+        "clean_build_info": true
+      },
+      "release": {
+        "normal": {
+          "exit": 0,
+          "cases": 18,
+          "assertions": 39040
+        },
+        "resources": {
+          "exit": 0,
+          "cases": 6,
+          "assertions": 3940
+        },
+        "clean_build_info": true
+      }
+    },
+    "static": {
+      "clang_tidy": "21.1.1",
+      "exit": 0,
+      "scope": "si_exact.cpp/new planner、si_case_catalog.cpp/new S-W、structure helper、final resource TU",
+      "extra_diagnostics": [
+        "range-loop-construct",
+        "sign-compare",
+        "sign-conversion",
+        "shadow"
+      ],
+      "format": "21.1.2 --dry-run --Werror、全変更C++26パスexit0"
+    },
+    "post_test_change": "std::stop_sourceの2行コメントと限定NOLINTだけ。実MSVCヘッダーのrequest_stop非constを確認。全文一意置換＋src/include byte不変を機械照合し、最終test TUのみcompile/static0、数値経路は再実行しない。",
+    "independent_review": "rootが行程、全live bytes、共有admit、固定整数約分、PlanとS/W、API判定限界、加算mdを独立通読し採用可。",
+    "japanese": {
+      "lint_exit": 0,
+      "retained_finding": "low_burstiness warn1。技術条件・行程の説明を具体的に維持し、統計のための文末調整は行わない。"
+    },
+    "not_run": "無関係のschema/interval/structure全suite、Linuxローカル実行、新headのCI待機。共有admitの既存数値実装は変更せず、新wrapperだけを追加。",
+    "pre_push_old_ci_observation": {
+      "job": 134913587855,
+      "status": "in_progress",
+      "conclusion": null,
+      "failed_steps_observed": 0,
+      "action": "指定の旧head jobをpush前に一度だけ確認。継続中なので待たずに提出。"
+    }
+  },
+  "log_representation": "公開logはworkspace prefix置換、LF/末尾空白/空EOF正規化。CTest詳細はCP932→UTF8。raw stdoutのbyte同一は主張しない。",
+  "prior_evidence": [
+    {
+      "id": "im06-7-si-case-conversion",
+      "sha256": "afe2cc71a70d726864bca7b946330445ab802e05dc82e2d5a23dd59d8a988910",
+      "hint": "docs/verification/IM-06/im06-7-si-case-conversion.json"
+    },
+    {
+      "id": "im06-7-review154-format",
+      "sha256": "c5ac8926ca92b5970c63b32f240ae94d9c5a90ec680c18f328775f70fea5215a",
+      "hint": "docs/verification/IM-06/im06-7-review154-format.json"
+    }
+  ],
+  "sources": {
+    ".cursor/rules/api-contract.mdc": "39a36c5476a87a706dfe0c2ad9a7b52db42a0f2e90ad7d20b7f5dc50378060b8",
+    "include/uvlas/io/si_case.hpp": "6ed8563e7f522ee312ea38f1eeb95ecf3b78c331c4105cd66570eb7537110479",
+    "src/io/si_case_plan.hpp": "3d7f44ab02f344f7e3878ebcaabcf7b73d8d562848e8f97a9f78e99b68caccac",
+    "src/io/si_exact.cpp": "eb15f4c3d10c8510703539689c17b6a35050f32f2166bb7ea23b51dd484e2c04",
+    "src/io/si_rational_plan.hpp": "bf45ea73fc076cc767b6084dbc8d08f731919c5ecbbaf05274fc65c615831a75",
+    "src/structure/exact_polynomial.cpp": "bcb9bc521ddbef820b94286065ae5807fe55c51439984ca281c471c159706017",
+    "src/structure/exact_polynomial_detail.hpp": "3082f7fd784c4d29c1f69c055666b8852ea77c0464d6f5b66dcfded06cedd6ec",
+    "tests/io/si_case_resource_test.cpp": "7d873792e59fc12bb567600e1b429e3f84c4c343f22aff7b01386fe76976b512",
+    "docs/verification/IM-06/im06-7-review154-rational.md": "cf989fd38d325d826dbe667c43063a4bbab18fcdde11344b38dfbf55bc142200"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-7-review154-rational/backend-tidy.log": "3cca710a7d3d2669982263a04f3b6724eed55d9b01cdac8d4ee648f3eea62d1c",
+    "docs/verification/IM-06/im06-7-review154-rational/baseline-failure.log": "ac43271fdd473f3be9026e48e9a976710969892b54ce317a5c1c39cd7f615fdf",
+    "docs/verification/IM-06/im06-7-review154-rational/catalog-tidy.log": "155e5cacd5b78fe4166edf6afca28767c5bc226ba7a2a43894c59104d1c8d6b9",
+    "docs/verification/IM-06/im06-7-review154-rational/debug-build-info.json": "ffdf06f94bc0d62556a1601bbb0ab848921bcab09976e5b20ea55d2ea55f2c9b",
+    "docs/verification/IM-06/im06-7-review154-rational/debug-build.log": "dcd09357f835e4b32358df951b3ed956c9f18e23b4885e924323e3e8a468eabd",
+    "docs/verification/IM-06/im06-7-review154-rational/debug-ctest.log": "df9dcde15909354b3d7c6aeb51087f72fe8aef734d42a9e964b7e42a7a915c68",
+    "docs/verification/IM-06/im06-7-review154-rational/debug-detail.log": "318ab79c84800b38a2920d6b987369e47a2de34d1531897dc541efeaf105e835",
+    "docs/verification/IM-06/im06-7-review154-rational/exact-tidy.log": "53ae19613594c04dfd7c58752510e152d8aec063f9b20944fb9914b43a60acce",
+    "docs/verification/IM-06/im06-7-review154-rational/format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-7-review154-rational/japanese.log": "745c714853566dc8f6456b624ecfcec275a759cc05b6da90f4b44e5c25ba4724",
+    "docs/verification/IM-06/im06-7-review154-rational/release-build-info.json": "74922c0b7fc60a577a1d50aacbc4a951d0f4c74642ed3f97b667b8a006d0c6b8",
+    "docs/verification/IM-06/im06-7-review154-rational/release-build.log": "ea4c2aaf81fb6398d40f6e91b55b639d29c574a0d63498eaaa6b1d444e632b02",
+    "docs/verification/IM-06/im06-7-review154-rational/release-ctest.log": "2c805e5d1be3a8002c405f6a1cd7edbeb347d1521158155429f67c4846648696",
+    "docs/verification/IM-06/im06-7-review154-rational/release-detail.log": "d64b11031d9d83fe5daf00e5001ad737b95d3546a9de154ee4ff506a7a557c65",
+    "docs/verification/IM-06/im06-7-review154-rational/resource-tidy.log": "23a74f966392d1a840c103ee0e93b9ed4fd6ea85bcd8b537e14095301f038726",
+    "docs/verification/IM-06/im06-7-review154-rational/stop-portability-compile.log": "8338d9cbd233845e1d10b70381b55a527661341f9e9b5dceb86494621c8d4b19"
+  }
+}

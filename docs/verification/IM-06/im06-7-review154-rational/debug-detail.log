@@ -1,0 +1,49 @@
+Start testing: Nov 19 01:01 東京 (標準時)
+----------------------------------------------------------
+93/94 Testing: io.si_case
+93/94 Test: io.si_case
+Command: "<workspace>/out/issue148-build/tests/Debug/uvlas_test_io_si_case.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_case" start time: Nov 19 01:01 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2290376445
+===============================================================================
+All tests passed (39040 assertions in 18 test cases)
+
+<end of output>
+Test time =  10.57 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_case" end time: Nov 19 01:01 東京 (標準時)
+"io.si_case" time elapsed: 00:00:10
+----------------------------------------------------------
+
+94/94 Testing: io.si_case_resources
+94/94 Test: io.si_case_resources
+Command: "<workspace>/out/issue148-build/tests/Debug/uvlas_test_io_si_case_resources.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_case_resources" start time: Nov 19 01:01 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2312961631
+===============================================================================
+All tests passed (3940 assertions in 6 test cases)
+
+<end of output>
+Test time =   4.00 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_case_resources" end time: Nov 19 01:01 東京 (標準時)
+"io.si_case_resources" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Nov 19 01:01 東京 (標準時)
+
+negative =  14.57 sec*proc
+
+property =  14.57 sec*proc
+
+unit =  10.57 sec*proc
+
+verification =  14.57 sec*proc
