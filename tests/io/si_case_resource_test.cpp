@@ -342,7 +342,7 @@ void fail_allocations(const Call& call, const CheckParent& check_parent) {
         CHECK(failed.error().operation == core::Operation::PrepareModel);
         CHECK(plan.allocated_bytes() >= before);
         paid_prefix = paid_prefix || plan.allocated_bytes() > before;
-        check_parent();
+        check_parent(diagnostic);
     }
     CHECK(paid_prefix);
     REQUIRE(call(admitted, plan, &diagnostic));
@@ -360,7 +360,7 @@ TEST_CASE("SI owns prior results through every observed allocation failure",
     const auto request = take(make_si_request(catalog, rows, admitted, plan, nullptr));
     const auto old = take(convert_case_to_si(schema, catalog, request, admitted, plan, nullptr));
     const auto unchanged = serialize(old);
-    const auto compare = [&] { CHECK(serialize(old) == unchanged); };
+    const auto compare = [&](const SiDiagnostic&) { CHECK(serialize(old) == unchanged); };
     fail_allocations(
         [&](const SiLimits& value, core::ResourcePlan& usage, SiDiagnostic* diagnostic) {
             return make_si_catalog(schema, value, usage, diagnostic);
@@ -504,17 +504,18 @@ TEST_CASE("SI exact dyadic fallback propagates its arithmetic admission and allo
     const auto catalog = take(make_si_catalog(schema, admitted, plan, nullptr));
     const auto ordinary_rows = requirements(catalog);
     auto exact_rows = ordinary_rows;
-    std::size_t marked = 0;
+    std::optional<SiQuantityKey> exact_key;
     for (std::uint64_t i = 0; i < take(catalog.size()); ++i) {
         const auto entry = take(catalog.entry(i));
         if (entry.field == "reference_length") {
             auto& row = exact_rows[static_cast<std::size_t>(i)];
             row.absolute = SiDecimalInput{"0"};
             row.relative = SiDecimalInput{"0"};
-            ++marked;
+            REQUIRE_FALSE(exact_key);
+            exact_key = entry.key;
         }
     }
-    REQUIRE(marked == 1);
+    REQUIRE(exact_key);
     const auto ordinary = take(make_si_request(catalog, ordinary_rows, admitted, plan, nullptr));
     const auto exact_request = take(make_si_request(catalog, exact_rows, admitted, plan, nullptr));
     const auto allocation_count = [&](const SiRequest& request) {
@@ -531,11 +532,34 @@ TEST_CASE("SI exact dyadic fallback propagates its arithmetic admission and allo
     const auto old =
         take(convert_case_to_si(schema, catalog, exact_request, admitted, plan, nullptr));
     const auto unchanged = serialize(old);
+    const auto has_token = [](const SiExactInput& value, std::string_view expected) {
+        const auto* decimal = std::get_if<SiDecimalInput>(&value);
+        return decimal && decimal->token == expected;
+    };
+    std::size_t diagnosed_exact_allocations = 0;
     fail_allocations(
         [&](const SiLimits& resource, core::ResourcePlan& usage, SiDiagnostic* diagnostic) {
             return convert_case_to_si(schema, catalog, exact_request, resource, usage, diagnostic);
         },
-        [&] { CHECK(serialize(old) == unchanged); });
+        [&](const SiDiagnostic& diagnostic) {
+            CHECK(serialize(old) == unchanged);
+            const auto detail = diagnostic.detail();
+            if (detail && detail->key == exact_key) {
+                ++diagnosed_exact_allocations;
+                const bool complete = detail->request_state == SiRequestState::Complete;
+                CHECK(complete);
+                if (const auto wanted = diagnostic.requirement()) {
+                    const bool scale_matches = has_token(wanted->scale.value, "1");
+                    const bool absolute_matches = has_token(wanted->absolute, "0");
+                    const bool relative_matches = has_token(wanted->relative, "0");
+                    CHECK(scale_matches);
+                    CHECK(absolute_matches);
+                    CHECK(relative_matches);
+                } else
+                    FAIL_CHECK("The arithmetic failure lost the original precision requirement");
+            }
+        });
+    CHECK(diagnosed_exact_allocations > 0);
 
     auto small_exact = admitted.exact();
     small_exact.maximum_value_bits = 1;

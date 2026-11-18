@@ -474,8 +474,9 @@ core::Result<SiCase> convert_case_to_si(const SchemaCase& input, const SiCatalog
             const auto recipe = detail::si_recipe(*c.snapshot, c.nodes, source->digits.values(),
                                                   entry.node, result.units);
             c.dimensions = recipe.dimensions;
-            const auto& wanted = result.requirements.values()[static_cast<std::size_t>(row)];
-            c.requirement = detail::si_requirement_view(wanted, result.request_text.values());
+            const auto& wanted = requirements->rows.values()[static_cast<std::size_t>(row)];
+            // The outer exception handler captures diagnostics after the partial result is gone.
+            c.requirement = detail::si_requirement_view(wanted, requirements->text.values());
             if (wanted.source_node != entry.node || !(wanted.dimensions == recipe.dimensions))
                 c.reject(SiReason::IdentityMismatch);
             result.converted.values()[static_cast<std::size_t>(row)] =

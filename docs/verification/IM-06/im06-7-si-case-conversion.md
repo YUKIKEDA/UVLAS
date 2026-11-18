@@ -25,3 +25,9 @@ catalogは診断の元source/keyを保持するため、入力snapshot、typed n
 独立な有理期待、πの交代級数剰余、IEEE bitの有理復元を使い、全単位、混合行列、非零初期場、式constantとdomainを照合する。所有と故障試験のsnapshotは全typed source、全数量、要求、包絡、ledgerと費用を含む。contextとsnapshotの生成器は数値期待値を生成しない。
 
 ここで得るのは入力変換の資格である。活動幾何、外部格子import、拘束、SO(3)、最終q/v、式の値と微分、QoIへの誤差伝播は後続prepareの責務として残る。CLIの一律許容差や暗黙投影を追加せず、物理ソルバーの数値認定・実験妥当性・実務受入を主張しない。
+
+## 固定source検証で見つけた診断寿命の訂正
+
+初回のWindows Debug/Releaseで、exact有理化の確保故障を注入すると診断作成中にSIGSEGVが発生した。変換loopの診断Contextが構築中の出力文字列を借り、部分出力の破棄後に外側のcatchがその字句を読んでいた。入力requestの所有文字列から借りる形へ訂正し、故障時に捕捉した要求のkey・字句を元要求と照合する回帰を追加した。旧版の失敗と訂正版の結果は実行記録で区別する。
+
+初回Debug CTestでは、Releaseの同時ビルド中に既存schemaと新SI正常系列が60秒のrunner上限へ達した。競合を外した同じbinaryの直接実行で両系列は完走した。数値入力・許容差・runner上限を変更せず、失敗ログも保存する。

@@ -1,0 +1,106 @@
+Start testing: Nov 18 23:52 東京 (標準時)
+----------------------------------------------------------
+91/95 Testing: io.case_schema
+91/95 Test: io.case_schema
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_case_schema.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.case_schema" start time: Nov 18 23:52 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 130734765
+===============================================================================
+All tests passed (13186 assertions in 31 test cases)
+
+<end of output>
+Test time =   1.97 sec
+----------------------------------------------------------
+Test Passed.
+"io.case_schema" end time: Nov 18 23:52 東京 (標準時)
+"io.case_schema" time elapsed: 00:00:01
+----------------------------------------------------------
+
+93/95 Testing: io.si_interval
+93/95 Test: io.si_interval
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_si_interval.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_interval" start time: Nov 18 23:52 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 1773238761
+===============================================================================
+All tests passed (55 assertions in 4 test cases)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_interval" end time: Nov 18 23:52 東京 (標準時)
+"io.si_interval" time elapsed: 00:00:00
+----------------------------------------------------------
+
+94/95 Testing: io.si_case
+94/95 Test: io.si_case
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_si_case.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_case" start time: Nov 18 23:52 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 2894759774
+===============================================================================
+All tests passed (39034 assertions in 17 test cases)
+
+<end of output>
+Test time =   1.06 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_case" end time: Nov 18 23:52 東京 (標準時)
+"io.si_case" time elapsed: 00:00:01
+----------------------------------------------------------
+
+95/95 Testing: io.si_case_resources
+95/95 Test: io.si_case_resources
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_si_case_resources.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_case_resources" start time: Nov 18 23:52 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 4116407556
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_io_si_case_resources.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+SI exact dyadic fallback propagates its arithmetic admission and allocation
+failures
+-------------------------------------------------------------------------------
+<workspace>\tests\io\si_case_resource_test.cpp(495)
+...............................................................................
+
+<workspace>\tests\io\si_case_resource_test.cpp(538): FAILED:
+  {Unknown expression after the reported line}
+due to a fatal error condition:
+  77
+  SIGSEGV - Segmentation violation signal
+
+===============================================================================
+test cases:    3 |    2 passed | 1 failed
+assertions: 2325 | 2324 passed | 1 failed
+
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Failed.
+"io.si_case_resources" end time: Nov 18 23:52 東京 (標準時)
+"io.si_case_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 18 23:52 東京 (標準時)
+
+negative =   3.49 sec*proc
+
+property =   3.49 sec*proc
+
+unit =   3.09 sec*proc
+
+verification =   3.49 sec*proc
