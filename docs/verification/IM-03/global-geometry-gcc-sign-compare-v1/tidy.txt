@@ -1,0 +1,8 @@
+[1/4] Processing file <repo>\src\aero\global_geometry.cpp.
+19 warnings generated.
+[2/4] Processing file <repo>\src\aero\global_bvh.cpp.
+38 warnings generated.
+[3/4] Processing file <repo>\src\aero\global_intersections.cpp.
+57 warnings generated.
+[4/4] Processing file <repo>\src\aero\alias_kinematics.cpp.
+76 warnings generated.

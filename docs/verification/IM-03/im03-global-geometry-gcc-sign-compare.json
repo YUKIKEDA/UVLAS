@@ -1,0 +1,22 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-global-geometry-gcc-sign-compare-v1",
+  "ids": [
+    "N4-02",
+    "N4-03"
+  ],
+  "package": "IM-03",
+  "date": "2026-11-19",
+  "base_commit": "82de6ad6ad4e73ced21778337cd09c900e47fea8",
+  "sources": {
+    "src/aero/alias_kinematics.cpp": "4079140f98eb8076a6b13a1cfb1487830fc147c1e3553a7850fa40d40a590474",
+    "tests/aero/global_geometry_test.cpp": "b1006493c99626f9a0c1ebaca0d73b89018c6f2aad6ba6b4c1eb7518a9505128",
+    "tests/aero/global_geometry_resources_test.cpp": "91d6b5fa8ca01b587559eeab97e1e5a8330f8a13c3763dcb2232f79f124f316e"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/global-geometry-gcc-sign-compare-v1/build.txt": "b59448f6ad4296bafbb1b9a8c1a29991fcc3113f2b8f1626375ccaf2727eb9e7",
+    "docs/verification/IM-03/global-geometry-gcc-sign-compare-v1/review.md": "9d80174af8112af99750fdb65f661a5e8f83d36d0a9782ff3998dc75d6ab864b",
+    "docs/verification/IM-03/global-geometry-gcc-sign-compare-v1/tests.txt": "0d46010f80c2eef865cf8101d28d21f926ec93dfa2764c9d47b76b374458495b",
+    "docs/verification/IM-03/global-geometry-gcc-sign-compare-v1/tidy.txt": "ab1a1ffdf1a5880c7b268c866574db62d5cdf27bd38a0a9c38601083db57fa5b"
+  }
+}

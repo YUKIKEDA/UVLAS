@@ -58,8 +58,8 @@ void copy_assertion(const ExactVelocityInput& input, PackedExact& output, AliasK
         if (input.sign != 0 || input.first_limb != 0)
             reject(core::FailureCode::InvalidInput);
     } else if ((input.sign != -1 && input.sign != 1) || input.first_limb >= 256 ||
-               input.limbs.size() > 256 - input.first_limb || input.limbs.front() == 0 ||
-               input.limbs.back() == 0)
+               input.limbs.size() > std::size_t{256} - input.first_limb ||
+               input.limbs.front() == 0 || input.limbs.back() == 0)
         reject(core::FailureCode::InvalidInput);
     output = {cursor, input.first_limb, static_cast<std::uint16_t>(input.limbs.size()), input.sign};
     for (const auto limb : input.limbs) {
