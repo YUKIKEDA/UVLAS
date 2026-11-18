@@ -60,6 +60,7 @@
     }
   ],
   "product_code_unchanged": true,
-  "oracle_reproduction_sha256": "8c267bcebe67fc8bbf1c2b9b7ad5c4426576ef3f223a6c0aab70dc4f4afa583c",
-  "reproduction_bytes_equal": true
+  "oracle_reproduction_sha256": "a5de9b002c6bd92e4fb6d2edf6defce9dd81a0ab6f04c1dce17efd645b66d11e",
+  "reproduction_bytes_equal": true,
+  "oracle_output_newline": "LF fixed explicitly by Path.write_text(newline=LF); producer source e7f065176908a540914d2f56dc2fcf757ce29fd2"
 }

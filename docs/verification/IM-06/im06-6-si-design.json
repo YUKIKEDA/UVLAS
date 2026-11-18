@@ -7,7 +7,7 @@
   "package": "IM-06",
   "issue": 135,
   "date": "2026-11-18",
-  "source_commit": "350eac4954dcdd8134360df2eb579c823860020f",
+  "source_commit": "e7f065176908a540914d2f56dc2fcf757ce29fd2",
   "base_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
   "claimed_state": {
     "design_contract_reviewed": true,
@@ -84,12 +84,13 @@
   },
   "artifacts": {
     "docs/verification/IM-06/im06-6-si-design/design-audit.json": "a5de9b002c6bd92e4fb6d2edf6defce9dd81a0ab6f04c1dce17efd645b66d11e",
-    "docs/verification/IM-06/im06-6-si-design/design-oracle.py": "4a62266ed85cc1b4c9ce12786a0f84472c35bddbd312dbcba919ecd24a268a45",
+    "docs/verification/IM-06/im06-6-si-design/design-oracle.py": "92ac7b664c3a32ab9ca28c5820890630d08f5a6c5420b16c542d1aaa38417b1c",
     "docs/verification/IM-06/im06-6-si-design/independent-review.json": "ba87ce1cdea1800bc97fc791638596af8c84b929d9d4446357c4d88e2d52d593",
     "docs/verification/IM-06/im06-6-si-design/japanese-lint.json": "83807afe692803a03bb35c316c8a420d6280b54b1bd53c1b8650cf3766795c7f",
     "docs/verification/IM-06/im06-6-si-design/japanese-outline.txt": "2475a6ebddc00b9ebfab15be96d2eee3fbb557e960080f94491cf1eca14d91cd",
     "docs/verification/IM-06/im06-6-si-design/japanese-terms.txt": "9adc0870456ecea85b74c1fdbdc8dbc1b6a73e3b616cb40790fda4cdc4c511eb",
-    "docs/verification/IM-06/im06-6-si-design/preservation.json": "63a13cd24399d584ee5bf77da739d34d4a482e03e4508f405604f01408b49874",
+    "docs/verification/IM-06/im06-6-si-design/preservation.json": "3b129186e11b65a023d199b98eeed080251d229a27f7d246cff91bdd0f381b14",
     "docs/verification/IM-06/im06-6-si-design/newline-provenance.json": "1d79b99bf86345234f2d4c9b4132a2c2beec43b39cc024e1540c97c5989e27f4"
-  }
+  },
+  "contract_source_commit": "350eac4954dcdd8134360df2eb579c823860020f"
 }
