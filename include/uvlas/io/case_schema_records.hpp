@@ -9,6 +9,7 @@
 #include <variant>
 
 namespace uvlas::io {
+class SiCase;
 namespace detail {
 struct SchemaData;
 struct SchemaFactory;
@@ -1558,6 +1559,7 @@ public:
 
 private:
     friend struct detail::SchemaFactory;
+    friend class uvlas::io::SiCase;
     template <detail::FieldType>
     friend class Field;
     Field(const detail::SchemaData* owner, std::uint64_t node) noexcept

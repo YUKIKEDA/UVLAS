@@ -281,6 +281,8 @@ std::uint64_t SchemaContext::multiply(std::uint64_t left, std::uint64_t right) {
     return left * right;
 }
 void SchemaContext::work(std::uint64_t amount) {
+    if (cancellation.stop_requested())
+        throw core::Failure{core::FailureCode::Cancelled, core::Operation::PrepareModel};
     const auto index = qi(SchemaQuota::Work);
     if (amount > limits[index] - used[index])
         reject(SchemaReason::QuotaExceeded, core::FailureCode::ResourceExceeded, SchemaQuota::Work,

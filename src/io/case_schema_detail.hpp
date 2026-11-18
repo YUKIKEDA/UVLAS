@@ -7,6 +7,7 @@
 #include <limits>
 #include <optional>
 #include <span>
+#include <stop_token>
 #include <string_view>
 #include <uvlas/io/case_schema.hpp>
 
@@ -126,6 +127,7 @@ struct SchemaContext {
     SchemaDimension payload_dimensions{{0, 0, 0, 0}};
     bool whole_case = true;
     bool case_registry = false;
+    std::stop_token cancellation;
     SchemaContext(const InputDocumentData*, SchemaLimits, core::ResourcePlan&, SchemaDiagnostic*);
     void work(std::uint64_t amount = 1);
     void charge(SchemaQuota, std::uint64_t amount);

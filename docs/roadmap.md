@@ -120,6 +120,7 @@ flowchart LR
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 | IM06-4 | Feat | 全caseの所有typed schemaとexact値・参照・資源検査 | #126 | Done |
 | IM06-5 | Design | SI変換・入力精度・所有と変換予算の開始契約 | #135 | Done |
+| IM06-6 | Feat | 所有SI入力・元exact値と成分別精度変換 | #148 | In progress |
 
 ## 残リスクと止める位置
 
