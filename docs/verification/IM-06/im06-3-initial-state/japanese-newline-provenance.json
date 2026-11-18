@@ -1,0 +1,33 @@
+{
+  "id": "initial-state-japanese-newline-provenance",
+  "derivatives": [
+    {
+      "id": "initial-state-lf-japanese-contract",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-contract.json",
+      "raw_sha256": "b163fa044cded816665c360f07d0748ced12fa1bf5a610b62b96feb0383817a4",
+      "public_sha256": "bd421d3238966950c6255aaa323f4420d18c29080f5fad26744b5a907433b121",
+      "transformation": "CRLF to LF only; JSON values unchanged; raw retained under out/pr111-initial-review"
+    },
+    {
+      "id": "initial-state-lf-japanese-conventions",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-conventions.json",
+      "raw_sha256": "100bea1f40fac2174a86cc6180673d1566551cf3394e0156a72e167a858b8a98",
+      "public_sha256": "bd54068dc30fbcc57cf0881b7b04590e697ac285068e2abce8a1747e93b03ccb",
+      "transformation": "CRLF to LF only; JSON values unchanged; raw retained under out/pr111-initial-review"
+    },
+    {
+      "id": "initial-state-lf-japanese-entry",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-entry.json",
+      "raw_sha256": "7662fd63ef6fead2a07dc09b0a8aacd8471e18efade1b507b7eeea8dac34479f",
+      "public_sha256": "1c084d46933c4c807a99bdb57f2f204df86577022a5cf844eab4e5ddc3e5b4ca",
+      "transformation": "CRLF to LF only; JSON values unchanged; raw retained under out/pr111-initial-review"
+    },
+    {
+      "id": "initial-state-lf-japanese-rule",
+      "hint": "docs/verification/IM-06/im06-3-initial-state/japanese-rule.json",
+      "raw_sha256": "0cff0218b933cdd77c346637a09ea4d563e484df3eda1da4225ee857f8fb1fd0",
+      "public_sha256": "db6e915bb8b6b02e1451fe5acf9a6cc49d5933952812b0a781e2ecda165a1f60",
+      "transformation": "CRLF to LF only; JSON values unchanged; raw retained under out/pr111-initial-review"
+    }
+  ]
+}
