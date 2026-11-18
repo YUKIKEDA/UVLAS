@@ -111,6 +111,8 @@ flowchart LR
 |---|---|---|---|---|
 | IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | Done |
 | IM03-3 | Feat | 空力局所幾何の包絡と所有する適格packet | #109 | Done |
+| IM03-4 | Feat | 局所P1誘導核と全13変数微分 | #127 | Done |
+| IM03-5 | Design | 大域幾何と後縁所有の開始契約 | #134 | In progress |
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 
 ## 残リスクと止める位置
