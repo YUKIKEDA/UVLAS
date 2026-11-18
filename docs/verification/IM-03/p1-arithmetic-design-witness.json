@@ -1,0 +1,68 @@
+{
+  "id": "p1-arithmetic-design-witness-v1",
+  "scope": "scalar design identities and remainder bounds, not product P1 qualification",
+  "python": "3.12.8",
+  "platform": "Windows",
+  "source": {
+    "id": "p1-arithmetic-design-witness-source-v1",
+    "sha256": "a39a276eded8f13960683ef70486ed835f3ceeb384a95ecdceb0707fb9b09db9",
+    "hint": "p1-arithmetic-design-witness.py"
+  },
+  "cases": [
+    {
+      "case": "sqrt-1",
+      "bounded": true,
+      "exact": true
+    },
+    {
+      "case": "sqrt-2",
+      "bounded": true,
+      "exact": false
+    },
+    {
+      "case": "sqrt-3",
+      "bounded": true,
+      "exact": false
+    },
+    {
+      "case": "sqrt-1/3",
+      "bounded": true,
+      "exact": false
+    },
+    {
+      "case": "sqrt-7/5",
+      "bounded": true,
+      "exact": false
+    },
+    {
+      "case": "log-transform-1/3",
+      "overlaps_independent_oracle_interval": true
+    },
+    {
+      "case": "log-transform-1/7",
+      "overlaps_independent_oracle_interval": true
+    },
+    {
+      "case": "log-transform-1/100",
+      "overlaps_independent_oracle_interval": true
+    },
+    {
+      "case": "log-transform-1/1152921504606846976",
+      "overlaps_independent_oracle_interval": true
+    },
+    {
+      "case": "atan-half-angle-identity",
+      "bounded": true,
+      "missing_factor_detected": true
+    },
+    {
+      "case": "atan-one-versus-machin",
+      "bounded": true
+    },
+    {
+      "case": "uniform-series-remainders",
+      "bounded": true
+    }
+  ],
+  "passed": true
+}
