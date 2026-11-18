@@ -1,0 +1,82 @@
+#include "pg_partition_test_support.hpp"
+
+#include <nlohmann/json.hpp>
+
+#include <iostream>
+#include <uvlas/core/instrumentation.hpp>
+
+int main() {
+    using namespace partition_test;
+    Fixture input{4};
+    input.domain.clear();
+    for (const auto point : std::array<std::array<int, 2>, 8>{
+             {{0, 0}, {8, 0}, {8, 1}, {1, 1}, {1, 3}, {8, 3}, {8, 4}, {0, 4}}})
+        input.domain.push_back(
+            {input.r(std::to_string(point[0]), "8"), input.r(std::to_string(point[1]), "8")});
+    input.heights[1] = input.r("2");
+    input.heights[2] = input.r("2");
+    input.heights[3] = input.r("2");
+    input.named.push_back({input.r("1", "4"), input.r("0")});
+    input.named.push_back({input.r("3", "4"), input.r("0")});
+    input.names.push_back({"partial", input.named});
+    const PgPartitionPoint cut_a{input.r("1", "10"), input.r("4", "5")};
+    const PgPartitionPoint cut_b{input.r("9", "10"), input.r("1", "5")};
+    input.refinements.push_back({23, 4, cut_a, cut_b});
+    auto configuration = limits();
+    configuration.algebra.timing = ExactTimingMode::Enabled;
+    nlohmann::json result;
+    result["scope"] = "real n=4 product preparation; not practical solver performance acceptance";
+    result["compiler_msc_full_ver"] = _MSC_FULL_VER;
+    result["threads"] = 1;
+    result["n"] = 4;
+    result["domain_vertices"] = 8;
+    result["thickness_triangles"] = 2;
+    result["layers"] = 2;
+    result["named_segments"] = 1;
+    result["refinements"] = 1;
+    result["samples"] = nlohmann::json::array();
+    for (int outer = 0; outer < 1; ++outer)
+        for (int inner = 0; inner < 1; ++inner) {
+            core::ResourcePlan plan{48ULL * 1024ULL * 1024ULL * 1024ULL};
+            core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+            const auto before = take(core::sample_process_memory(core::Operation::PrepareModel));
+            auto result_value = PgIntegrationPartition::prepare(input.request(), configuration, workspace, plan);
+            if (!result_value) {
+                result["failure"] = result_value.error().code == core::FailureCode::ResourceExceeded ? "ResourceExceeded" : "unexpected";
+                result["plan_allocated_on_failure"] = plan.allocated_bytes();
+                std::cout << result.dump(2) << '\n';
+                return 0;
+            }
+            const auto prepared = take(std::move(result_value));
+            const auto after = take(core::sample_process_memory(core::Operation::PrepareModel));
+            const auto& report = prepared.preparation();
+            if (!report.timings)
+                return 2;
+            const auto& timing = *report.timings;
+            result["samples"].push_back(
+                {{"outer", outer},
+                 {"inner", inner},
+                 {"whole_ns", timing.whole.elapsed_nanoseconds},
+                 {"input_ns", timing.input.elapsed_nanoseconds},
+                 {"intersections_ns", timing.intersections.elapsed_nanoseconds},
+                 {"planar_ns", timing.planar.elapsed_nanoseconds},
+                 {"traces_ns", timing.traces.elapsed_nanoseconds},
+                 {"owned_payload_forecast_bytes", report.owned_payload_bytes},
+                 {"allocated_payload_bytes", report.allocated_owned_payload_bytes},
+                 {"external_forecast_bytes", report.estimated_external_bytes},
+                 {"numeric_operations", report.observed_numeric_operations},
+                 {"topology_visits", report.observed_topology_visits},
+                 {"value_bits", report.observed_value_bits},
+                 {"vertices", take(prepared.vertices()).size()},
+                 {"pieces", take(prepared.pieces()).size()},
+                 {"triangles", take(prepared.triangles()).size()},
+                 {"edges", take(prepared.edges()).size()},
+                 {"volumes", take(prepared.volumes()).size()},
+                 {"horizontal_faces", take(prepared.horizontal_faces()).size()},
+                 {"lateral_faces", take(prepared.lateral_faces()).size()},
+                 {"resident_before_bytes", before.resident_bytes},
+                 {"resident_after_bytes", after.resident_bytes},
+                 {"process_lifetime_peak_bytes", after.peak_resident_bytes}});
+        }
+    std::cout << result.dump(2) << '\n';
+}

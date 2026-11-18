@@ -1,0 +1,93 @@
+from collections import Counter
+from fractions import Fraction as Q
+from itertools import combinations
+from random import Random
+
+Point = tuple[Q, Q]
+Line = tuple[int, int, int]
+SQUARE = tuple((Q(x), Q(y)) for x, y in ((0, 0), (1, 0), (1, 1), (0, 1)))
+SIDES = ((1, 0, 0), (1, 0, -1), (0, 1, 0), (0, 1, -1))
+
+
+def value(line: Line, p: Point) -> Q:
+    a, b, c = line
+    return a * p[0] + b * p[1] + c
+
+
+def clip(poly: tuple[Point, ...], line: Line, sign: int) -> tuple[Point, ...]:
+    vertices = []
+    for p, q in zip(poly, (*poly[1:], poly[0])):
+        vp, vq = sign * value(line, p), sign * value(line, q)
+        if vp >= 0:
+            vertices.append(p)
+        if vp * vq < 0:
+            vertices.append(tuple((vp * y - vq * x) / (vp - vq) for x, y in zip(p, q)))
+    return tuple(vertices)
+
+
+def crossing(left: Line, right: Line) -> Point | None:
+    a, b, c = left
+    d, e, f = right
+    determinant = a * e - b * d
+    if determinant == 0:
+        return None
+    p = (Q(b * f - c * e, determinant), Q(c * d - a * f, determinant))
+    return p if all(0 <= k <= 1 for k in p) else None
+
+
+def audit(polys: list[tuple[Point, ...]], lines: tuple[Line, ...]) -> int:
+    points = {p for a, b in combinations(lines, 2) if (p := crossing(a, b)) is not None}
+    atoms = Counter()
+    occurrences = 0
+    for poly in polys:
+        assert len(poly) >= 3
+        pairs = tuple(zip(poly, (*poly[1:], poly[0])))
+        assert sum(a[0] * b[1] - a[1] * b[0] for a, b in pairs) > 0
+        for a, b in pairs:
+            assert a != b
+            occurrences += 1
+            low, high = sorted((a, b))
+            support = next(line for line in lines if value(line, a) == value(line, b) == 0)
+            noded = sorted(p for p in points if low <= p <= high and value(support, p) == 0)
+            assert len(noded) >= 2 and noded[0] == low and noded[-1] == high
+            atoms.update(zip(noded, noded[1:]))
+    assert max(atoms.values()) <= 2
+    assert occurrences <= sum(atoms.values()) <= 2 * len(lines) ** 2
+    return occurrences
+
+
+def run(sequences: list[tuple[Line, ...]]) -> None:
+    stages = max_occurrences = 0
+    for sequence in sequences:
+        polys = [SQUARE]
+        for index, line in enumerate(sequence):
+            pieces = []
+            for poly in polys:
+                values = tuple(value(line, p) for p in poly)
+                if min(values) < 0 < max(values):
+                    pieces.extend((clip(poly, line, 1), clip(poly, line, -1)))
+                else:
+                    pieces.append(poly)
+            polys = pieces
+            occurrences = audit(polys, (*SIDES, *sequence[: index + 1]))
+            max_occurrences = max(max_occurrences, occurrences)
+            stages += 1
+    print(f"{len(sequences)} inputs, {stages} clipping stages, {max_occurrences} max incidences")
+
+
+if __name__ == "__main__":
+    rng = Random(136)
+    challenging = (
+        ((1, 0, 0), (2, 0, -1), (4, 0, -1), (4, 0, -3)),
+        ((1, -1, 0), (1, 1, -1), (2, 0, -1), (0, 2, -1)),
+        ((1, 1, 0), (1, 1, -2), (1, -1, 1), (1, -1, -1), (1, -1, 0)),
+        ((1, 1, -1), (-1, -1, 1), (2, 2, -2), (0, 1, 0)),
+    )
+    sequences = list(challenging)
+    for _ in range(40):
+        sequence = []
+        for _ in range(7):
+            a, b = rng.sample(range(-3, 4), 2)
+            sequence.append((a, b, rng.randint(-4, 4)))
+        sequences.append(tuple(sequence))
+    run(sequences)

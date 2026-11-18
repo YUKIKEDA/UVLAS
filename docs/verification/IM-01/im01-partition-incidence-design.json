@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-partition-incidence-design",
+  "ids": [
+    "SH-D07"
+  ],
+  "package": "IM-01",
+  "issue": 136,
+  "date": "2026-11-18",
+  "source_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
+  "claimed_state": "各clip段の上界と限定候補の開始審査。製品sourceは未変更。R-02実務適合は後続。",
+  "checks": {
+    "incidence": "Windows/Python 3.12.8; Fraction 44 inputs, 297 clipping stages, maximum 31 incidences",
+    "cap_control": "MSVC 195136260, Release, one thread, x64; fixed PG translation unit per control and candidate, same previously built supporting library and fixture; 48 GiB Plan; baseline ResourceExceeded, 0 B charged, candidate success",
+    "focused": "Latest normal target recompiled from source_commit, linked with isolated candidate TU, Catch2 --reporter compact --rng-seed 12345; 7 cases, 30531 assertions",
+    "not_run": "product resource-test target, Debug/Linux, product mutations, simultaneous full-process practical profile, timing comparison"
+  },
+  "replay": {
+    "oracle": "python -B docs/verification/IM-01/im01-partition-incidence-design/incidence-oracle.py.txt",
+    "candidate": "Extract src/structure from source_commit into separate directories. Apply isolated-candidate.diff.txt only in the candidate. Compile each pg_integration_partition.cpp with Release CMake compile arguments, copied normal-test include root and independent object/PDB outputs. Compile cap-producer.cpp.txt with the Release normal target's arguments and tests/structure include directory. Link the producer in place of the normal test object and put the chosen PG object before the existing product archive. Use the same Release dependencies and run both executables. For Catch2 use the normal test TU of source_commit and the candidate PG object.",
+    "historical_comparison": "The frozen measurement uses commit 6369a0b1227bf31db246f00f982a98bc7e2eff64 and a larger test-only ResourcePlan; the two 48 GiB probe builds use the same current source_commit before the isolated candidate patch."
+  },
+  "sources": {
+    "docs/specs/structure/pg-integration-partition-contract.md": "ecb1dd5d0819fa73a74fe4521cd33b1bc9b618b6df597debfe628c2fd45a90d0",
+    "docs/verification/IM-01/im01-partition-product/logs/measurement.json": "8d24126140f9c32b50574065b6040f363a66f3444d6f8c635d2e4bdd039229ec",
+    "src/structure/pg_partition_plan.hpp": "f8551c0c0cdbb7ca8a4bd62c5dc9e9f703835af9ffb5cda75ae2c57bb512b6ab",
+    "src/structure/pg_partition_geometry.hpp": "32c20cf44a185257d9c3c3a4af897f049207070c2dde195037274540d52a3b9a",
+    "tests/structure/pg_integration_partition_test.cpp": "15281bafbc7d6d9defa27ef7532d690ba2a1f0a2d81726e09992cd468f14e289",
+    "tests/structure/fixtures/pg-partition-v1.json": "4ae2ad5f0e9daf09ab1c7d1e2571fe6e04cb64609117e8da0bdb48575a5758cf"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-partition-incidence-budget-contract.md": "618b51877909d1fc628e56ab980073b71d0260e79d58389051d710d855ad31ac",
+    "docs/verification/IM-01/im01-partition-incidence-design/candidate-test.log": "31994721e5785d9598b6a78bdcb2ef66eddb9c7620261f0c297c59d6c6db1097",
+    "docs/verification/IM-01/im01-partition-incidence-design/cap-producer.cpp.txt": "639c8a2ef8e2e6fb21e4b3a715cf1e7a492709b0ad1ccc0ac4a98928e17f2033",
+    "docs/verification/IM-01/im01-partition-incidence-design/cap-results.json": "aebd02e3f0b1c8bb2b4a22113603268dd56a6f87b2a20c6a942fd95116556099",
+    "docs/verification/IM-01/im01-partition-incidence-design/incidence-oracle.py.txt": "d8b13d897a35995c7dc6788cdff2d278427abb2398f5f8f4486275551881f394",
+    "docs/verification/IM-01/im01-partition-incidence-design/isolated-candidate.diff.txt": "adac16d8cf800d389244ee6a27ffa33e8d4728443a00cfe9617b490f4f9f04d7"
+  }
+}
