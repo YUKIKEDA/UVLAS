@@ -1,0 +1,33 @@
+{
+  "reviewer": "root agent; independent of author",
+  "scope": "追加契約の技術・日本語通読。製品コード/数値認定のレビューではない。",
+  "disposition": "採用可。RefinementSegments入力、局所Htrace、chart conormal、文字列payloadを補足して開始契約の穴を解消した。",
+  "findings": [
+    {
+      "finding": "追加区切りの入力欄欠落",
+      "correction": "RefinementSegmentsの型/由来/範囲/zero長/identity/quotaを明記"
+    },
+    {
+      "finding": "連続P1厚さの異なるaffine係数を誤拒否する",
+      "correction": "実共有原子segment両端のH値比較へ修正。T-junction/部分共辺を共通細分"
+    },
+    {
+      "finding": "側面法線のchart/物理を区別",
+      "correction": "未正規化chart conormal(Δt,−Δs,0)。物理法線/線長は後続"
+    },
+    {
+      "finding": "操作128の導出不足",
+      "correction": "opcode内訳と入力件数のRへ置換。元support交点・全累積storage・同時slotを分離"
+    },
+    {
+      "finding": "文字列の所有/確保が未計上",
+      "correction": "TextPayload byte配列、上限、コピーwork、canonical streamの名前/区切りID版を追記"
+    }
+  ],
+  "japanese": {
+    "mode": "quick",
+    "lint": "info low_lexical_diversity_ttr 1、その他0",
+    "decision": "幾何・所有・資源の専門語を同じ意味で繰り返す必要があり、TTRの語彙置換は行わない。rootも本文を通読済み。"
+  },
+  "limits": "実製品の交差判定器・物理求積・rank・確保失敗・取消の試験は後続IM01-0/IM02-0。"
+}

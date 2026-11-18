@@ -1,0 +1,189 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-4-typed-schema-design",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 118,
+  "date": "2026-11-18",
+  "source_commit": "7809d1437ca9e8593d5bb367350db9b8d87e860e",
+  "base_commit": "c93e2731f13f72b833a844b0032a066657dc79ff",
+  "claimed_state": {
+    "design_contract_reviewed": true,
+    "implementation_conforms": false,
+    "numerical_qualification": false,
+    "practical_acceptance": false
+  },
+  "scope": "CS05/FD01-12と完全物理初期場のtyped所有・全検査dispatch・exact比較・全呼出し資源・失敗診断の実装開始契約。製品validator未実装。",
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "全180辞書object行+追補11行inventory、named record/閉じたvariant/型別arena/17 namespace/全FD検査表。"
+    },
+    {
+      "condition": 2,
+      "evidence": "Number正規形/virtual-zero比較、mixed Rational交差積、primitive配列を含むP/S・累積buffer容量式、temporary桁数H、work前課金、診断確保fallback。"
+    },
+    {
+      "condition": 3,
+      "evidence": "全R/P/C・変位/速度・全halfcell・両端frame・body角速度・PointCheckの両片側。活動領域/所属/最終状態はprepareへ境界を維持。"
+    },
+    {
+      "condition": 4,
+      "evidence": "144fragment/5rootと4正常/22負例の製品接続を定義。22件の独立手書きstage期待はschema13/prepare9。rootが独立技術/日本語レビューし3指摘を反映。"
+    },
+    {
+      "condition": 5,
+      "evidence": "旧6採用資料のbase/current全bytes一致、製品source/CMake不変。設計成功と製品合格を区別。"
+    }
+  ],
+  "checks": {
+    "bounded_design": {
+      "field_rows": 180,
+      "supplement_object_rows": 11,
+      "sections": 12,
+      "fragments": 144,
+      "root_examples": 5,
+      "initial_cases": 4,
+      "negative_stage_metadata": {
+        "schema": 13,
+        "prepare": 9
+      },
+      "decimal_pairs": 14,
+      "symbolic_exponent_pairs": 3,
+      "mixed_rational_pairs": 3,
+      "checked_count_boundaries": 3,
+      "float_round_trip_mutation_witnesses": 6,
+      "negative_inputs_product_execution": false
+    },
+    "reproduction": "別directoryへ出力してbounded-design-audit.jsonの全bytes一致。原記録を上書きしない。",
+    "old_sources_preserved": 6,
+    "japanese": {
+      "lint_exit": 0,
+      "outline_exit": 0,
+      "terms_exit": 0,
+      "retained_finding": "low_lexical_diversity_ttr info1。同一型・資源用語を繰り返す技術契約であり、用語の置換による意味の揺れを避けて維持。",
+      "independent_review": "rootが内容・構成・日本語を通読。"
+    },
+    "not_run": "C++/数値/既存全体CIはsource/build/数値入力不変のため再実行しない。製品validator/SI/式評価・微分/snapshot/prepare/CLI合格は主張しない。",
+    "trace": {
+      "defined": 208,
+      "with_tests": 34,
+      "with_records": 41,
+      "problems": 0,
+      "reviewer": "root"
+    },
+    "integrity": {
+      "files": 16,
+      "manifests": 3,
+      "errors": 0,
+      "scope": "recorded bytes only"
+    }
+  },
+  "commands": [
+    "python -B -X utf8 docs/verification/IM-06/im06-4-typed-schema-design/bounded-design-audit.py.txt --fields docs/specs/foundation/case-schema-fields.md --initial-contract docs/specs/foundation/case-initial-physical-state-contract.md --examples docs/specs/foundation/case-schema-examples.json --initial-examples docs/specs/foundation/case-initial-physical-state-examples.json --output <new result path>",
+    "uv run --offline --python 3.12 --script .agents/skills/natural-japanese/scripts/<lint|outline|terms>.py --json docs/specs/foundation/typed-case-schema-implementation-contract.md",
+    "git diff --cached --check"
+  ],
+  "environment": "Windows/PowerShell、CPython3.12.8、言語tool uv inline-script。コンパイラ不使用。",
+  "remaining": "全schema製品validatorと全系列試験、SI/式評価・微分/snapshot/prepare/CLIは既存IM06-0、活動PG/初期連成検査は既存IM01-0/IM04-0。親Issue22全体は未完了。",
+  "sources": {
+    "docs/specs/foundation/typed-case-schema-implementation-contract.md": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50",
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-design-cases.md": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "docs/specs/foundation/case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "docs/specs/foundation/case-initial-physical-state-examples.json": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-4-typed-schema-design/bounded-design-audit.json": "d5d8beeded9d99683d495428716e028035245d413d90aa159907d631aad274c3",
+    "docs/verification/IM-06/im06-4-typed-schema-design/bounded-design-audit.py.txt": "0d4f9d6b2ae9d45e9af38c9ffd24732ba7b1ed0718138b5eeae121718966d6b5",
+    "docs/verification/IM-06/im06-4-typed-schema-design/independent-review.json": "d2715c176190bb51ca4c72cd0116881a2324f896d1ca499ee9ac56e300ca0b42",
+    "docs/verification/IM-06/im06-4-typed-schema-design/japanese-lint.json": "3ab79ba129f0f0e3ec2e4f4c8bafe0a66ff3cdbd5be423ff5e2520ce36caff8d",
+    "docs/verification/IM-06/im06-4-typed-schema-design/japanese-newline-provenance.json": "1059a2a819ace8b02ab7133de93a1a4bfe6d4e64661d1b1a2c2b59b1b0c9b176",
+    "docs/verification/IM-06/im06-4-typed-schema-design/japanese-outline.json": "5bcd8d087718b8974660f890f07e110cb84f6d899e7c138e8847077668589028",
+    "docs/verification/IM-06/im06-4-typed-schema-design/japanese-terms.json": "4c5478dcd7d353abed0ba1bd290ed9928d135bf5446fa783d073c2c530780d17",
+    "docs/verification/IM-06/im06-4-typed-schema-design/preservation-check.json": "32c6698d120dbb229419a840e6fed7af964e0b3e84f936cd42a6354ed5bf7474"
+  },
+  "source_references": [
+    {
+      "id": "typed-schema-source-typed-case-schema-implementation-contract-md",
+      "sha256": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50",
+      "hint": "docs/specs/foundation/typed-case-schema-implementation-contract.md"
+    },
+    {
+      "id": "typed-schema-source-case-schema-contract-md",
+      "sha256": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+      "hint": "docs/specs/foundation/case-schema-contract.md"
+    },
+    {
+      "id": "typed-schema-source-case-schema-fields-md",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+      "hint": "docs/specs/foundation/case-schema-fields.md"
+    },
+    {
+      "id": "typed-schema-source-case-schema-design-cases-md",
+      "sha256": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+      "hint": "docs/specs/foundation/case-schema-design-cases.md"
+    },
+    {
+      "id": "typed-schema-source-case-schema-examples-json",
+      "sha256": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+      "hint": "docs/specs/foundation/case-schema-examples.json"
+    },
+    {
+      "id": "typed-schema-source-case-initial-physical-state-contract-md",
+      "sha256": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+      "hint": "docs/specs/foundation/case-initial-physical-state-contract.md"
+    },
+    {
+      "id": "typed-schema-source-case-initial-physical-state-examples-json",
+      "sha256": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+      "hint": "docs/specs/foundation/case-initial-physical-state-examples.json"
+    }
+  ],
+  "artifact_references": [
+    {
+      "id": "typed-schema-artifact-bounded-design-audit-json",
+      "sha256": "d5d8beeded9d99683d495428716e028035245d413d90aa159907d631aad274c3",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/bounded-design-audit.json"
+    },
+    {
+      "id": "typed-schema-artifact-bounded-design-audit-py-txt",
+      "sha256": "0d4f9d6b2ae9d45e9af38c9ffd24732ba7b1ed0718138b5eeae121718966d6b5",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/bounded-design-audit.py.txt"
+    },
+    {
+      "id": "typed-schema-artifact-independent-review-json",
+      "sha256": "d2715c176190bb51ca4c72cd0116881a2324f896d1ca499ee9ac56e300ca0b42",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/independent-review.json"
+    },
+    {
+      "id": "typed-schema-artifact-japanese-lint-json",
+      "sha256": "3ab79ba129f0f0e3ec2e4f4c8bafe0a66ff3cdbd5be423ff5e2520ce36caff8d",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/japanese-lint.json"
+    },
+    {
+      "id": "typed-schema-artifact-japanese-newline-provenance-json",
+      "sha256": "1059a2a819ace8b02ab7133de93a1a4bfe6d4e64661d1b1a2c2b59b1b0c9b176",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/japanese-newline-provenance.json"
+    },
+    {
+      "id": "typed-schema-artifact-japanese-outline-json",
+      "sha256": "5bcd8d087718b8974660f890f07e110cb84f6d899e7c138e8847077668589028",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/japanese-outline.json"
+    },
+    {
+      "id": "typed-schema-artifact-japanese-terms-json",
+      "sha256": "4c5478dcd7d353abed0ba1bd290ed9928d135bf5446fa783d073c2c530780d17",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/japanese-terms.json"
+    },
+    {
+      "id": "typed-schema-artifact-preservation-check-json",
+      "sha256": "32c6698d120dbb229419a840e6fed7af964e0b3e84f936cd42a6354ed5bf7474",
+      "hint": "docs/verification/IM-06/im06-4-typed-schema-design/preservation-check.json"
+    }
+  ]
+}

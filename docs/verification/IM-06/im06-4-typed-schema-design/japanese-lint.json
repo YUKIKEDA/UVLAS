@@ -1,0 +1,90 @@
+{
+  "file": "docs\\specs\\foundation\\typed-case-schema-implementation-contract.md",
+  "stats": {
+    "total_findings": 1,
+    "by_category": {
+      "low_lexical_diversity_ttr": 1
+    },
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 167,
+    "nominal_ending_count": 6,
+    "nominal_ending_ratio": 0.03592814371257485,
+    "total_paragraphs": 29,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      6,
+      3,
+      6,
+      6,
+      5,
+      4,
+      6,
+      5,
+      5,
+      7,
+      7,
+      5,
+      8,
+      10,
+      6,
+      9,
+      4,
+      5,
+      7,
+      5,
+      6,
+      6,
+      5,
+      9,
+      6,
+      4,
+      5,
+      3,
+      4
+    ],
+    "paragraph_sentence_count_cv": 0.29077390520189184,
+    "rhythm": {
+      "mora_mean": 69.76047904191617,
+      "mora_stdev": 60.97346134993548,
+      "burstiness": -0.06721297977895546,
+      "length_autocorrelation_lag1": -0.07739077353690364
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "名詞/名詞/助詞/名詞",
+      "lead_pos_4gram_ratio": 0.1497005988023952
+    },
+    "lexical_diversity": {
+      "ttr": 0.39078751857355126,
+      "mtld": 156.0702200960464,
+      "content_token_count": 2019,
+      "doc_char_count": 8296,
+      "skipped_too_short": false
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 93,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 2,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 29,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 3,
+      "category": "low_lexical_diversity_ttr",
+      "excerpt": "TTR=0.391 (内容語 2019 語中 789 種類)",
+      "severity": "info",
+      "detail": "TTR(Type-Token Ratio)が閾値0.45未満。同じ語彙の使い回しが多い疑い",
+      "related_lines": null
+    }
+  ]
+}

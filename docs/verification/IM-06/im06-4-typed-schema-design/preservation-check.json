@@ -1,0 +1,37 @@
+{
+  "id": "typed-schema-six-frozen-sources",
+  "base_commit": "c93e2731f13f72b833a844b0032a066657dc79ff",
+  "byte_identical": 6,
+  "sources": [
+    {
+      "id": "preserved-case-schema-contract",
+      "sha256": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+      "hint": "docs/specs/foundation/case-schema-contract.md"
+    },
+    {
+      "id": "preserved-case-schema-fields",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+      "hint": "docs/specs/foundation/case-schema-fields.md"
+    },
+    {
+      "id": "preserved-case-schema-design-cases",
+      "sha256": "e557d5f20a6dfe1bb7b44b719ec9cffe5d21045fd747f24a425f02940bb4d7ed",
+      "hint": "docs/specs/foundation/case-schema-design-cases.md"
+    },
+    {
+      "id": "preserved-case-schema-examples",
+      "sha256": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+      "hint": "docs/specs/foundation/case-schema-examples.json"
+    },
+    {
+      "id": "preserved-case-initial-physical-state-contract",
+      "sha256": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+      "hint": "docs/specs/foundation/case-initial-physical-state-contract.md"
+    },
+    {
+      "id": "preserved-case-initial-physical-state-examples",
+      "sha256": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+      "hint": "docs/specs/foundation/case-initial-physical-state-examples.json"
+    }
+  ]
+}

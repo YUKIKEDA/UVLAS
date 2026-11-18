@@ -1,0 +1,256 @@
+{
+  "outline": [
+    {
+      "line": 1,
+      "kind": "heading",
+      "level": 1,
+      "text": "全schema validatorの所有型・資源・開始契約"
+    },
+    {
+      "line": 3,
+      "kind": "lead",
+      "level": null,
+      "text": "2026-11-18。"
+    },
+    {
+      "line": 5,
+      "kind": "lead",
+      "level": null,
+      "text": "初回は所有型から失敗までを通読し、実装時は検査表と製品試験表を参照する。"
+    },
+    {
+      "line": 7,
+      "kind": "heading",
+      "level": 2,
+      "text": "所有する型を固定する"
+    },
+    {
+      "line": 9,
+      "kind": "lead",
+      "level": null,
+      "text": "入口はCS-05の `validate_case_schema(const InputDocument&, SchemaLimits, ResourcePlan&, SchemaDiagnostic*) noexcept -> core::Result<SchemaCase>` とする。"
+    },
+    {
+      "line": 11,
+      "kind": "lead",
+      "level": null,
+      "text": "`SchemaCase`は非公開factoryだけが構築できるmove-only不変型である。"
+    },
+    {
+      "line": 26,
+      "kind": "lead",
+      "level": null,
+      "text": "辞書の全object行にnamed recordを作る。"
+    },
+    {
+      "line": 28,
+      "kind": "lead",
+      "level": null,
+      "text": "beam stiffness/viscosityやsupportの混合行列は、FD-04/05の一般化ひずみ・座標から各(i,j)次元を決める。"
+    },
+    {
+      "line": 30,
+      "kind": "lead",
+      "level": null,
+      "text": "全17 namespaceはCS-04どおりで、Layer/Loadは部材内部も全域登録する。"
+    },
+    {
+      "line": 32,
+      "kind": "heading",
+      "level": 2,
+      "text": "十進値と有理数を丸めず比較する"
+    },
+    {
+      "line": 34,
+      "kind": "lead",
+      "level": null,
+      "text": "Numberの正規形は符号、先頭/末尾zeroを除いたdigit列c、十進指数eとする。"
+    },
+    {
+      "line": 36,
+      "kind": "lead",
+      "level": null,
+      "text": "非零の絶対値はまず `digits(c)+e` をsigned checkedで比較し、同値なら左右のdigit列を右側virtual zeroで補って辞書順比較する。"
+    },
+    {
+      "line": 38,
+      "kind": "lead",
+      "level": null,
+      "text": "予算合計・時刻幅・刻みの整数商など算術が必要な場合は、符号付き10進digit配列で加減乗算・長除法を行う。"
+    },
+    {
+      "line": 40,
+      "kind": "heading",
+      "level": 2,
+      "text": "全辞書を同じ検査段階へ写す"
+    },
+    {
+      "line": 42,
+      "kind": "lead",
+      "level": null,
+      "text": "CS-04の段階順を維持する。"
+    },
+    {
+      "line": 59,
+      "kind": "lead",
+      "level": null,
+      "text": "参照の循環禁止は、入力が表す材料/座標継承・source依存、Mass.replace、誤差群代表へ適用する。"
+    },
+    {
+      "line": 61,
+      "kind": "lead",
+      "level": null,
+      "text": "DAGの深さはconstant/variableを1、他を1+最大operand深さとする。"
+    },
+    {
+      "line": 63,
+      "kind": "lead",
+      "level": null,
+      "text": "完全初期場は全Shell/Beam/rigid Massを各1回含み、R/P/Cと変位/速度を必須とする。"
+    },
+    {
+      "line": 65,
+      "kind": "heading",
+      "level": 2,
+      "text": "全呼出しの資源を先に数える"
+    },
+    {
+      "line": 67,
+      "kind": "lead",
+      "level": null,
+      "text": "SchemaLimitsの全項目は明示uint64で、0は零上限である。"
+    },
+    {
+      "line": 77,
+      "kind": "lead",
+      "level": null,
+      "text": "走査前に、文書所有dataの実node/member/edge/text件数を内部helperで取得し、最初のstackはN+1枠としてchecked計画する（深さを知るための未計上stackを作らない）。"
+    },
+    {
+      "line": 79,
+      "kind": "lead",
+      "level": null,
+      "text": "容量式を次表で固定する。"
+    },
+    {
+      "line": 92,
+      "kind": "lead",
+      "level": null,
+      "text": "Pは上3行の総和、Sは後5行の総和とする。"
+    },
+    {
+      "line": 94,
+      "kind": "lead",
+      "level": null,
+      "text": "Hは行うexact演算の全候補から、値を計算する前に決める。"
+    },
+    {
+      "line": 96,
+      "kind": "lead",
+      "level": null,
+      "text": "累積ResourcePlanはscratchの破棄・再利用で返金しないため、計画には「累積確保 P+各scratch buffer確保の総和」と「最大同時生存 P+S」の両方を記録する。"
+    },
+    {
+      "line": 98,
+      "kind": "lead",
+      "level": null,
+      "text": "workは処理前に1単位を課金する。"
+    },
+    {
+      "line": 100,
+      "kind": "lead",
+      "level": null,
+      "text": "allocator metadata/array cookie/プロセス基礎メモリは既存ResourcePlanのpayload保証外である。"
+    },
+    {
+      "line": 102,
+      "kind": "heading",
+      "level": 2,
+      "text": "確保失敗でも診断を所有する"
+    },
+    {
+      "line": 104,
+      "kind": "lead",
+      "level": null,
+      "text": "SchemaDiagnosticはreason enum、SourceIdentity、optional元node ordinal、期待type/field/variant enum、actual kind、optional typed ID、quota/limit/required/workと、所有JSON Pointerを持つ。"
+    },
+    {
+      "line": 106,
+      "kind": "lead",
+      "level": null,
+      "text": "呼出し先頭でslotをresetする。"
+    },
+    {
+      "line": 116,
+      "kind": "lead",
+      "level": null,
+      "text": "最外側をguard_entryで囲み、内側Failureは詳細を保持する。"
+    },
+    {
+      "line": 118,
+      "kind": "heading",
+      "level": 2,
+      "text": "製品の全系列試験へ接続する"
+    },
+    {
+      "line": 120,
+      "kind": "lead",
+      "level": null,
+      "text": "[旧設計例](case-schema-examples.json)144fragmentと5root、[初期場設計例](case-initial-physical-state-examples.json)4正常/22負例を、元hashとJSON Pointerで固定する。"
+    },
+    {
+      "line": 122,
+      "kind": "lead",
+      "level": null,
+      "text": "旧 `Perturbation.physical` fragmentと旧PointValue経路だけはsupersededの拒否例である。"
+    },
+    {
+      "line": 132,
+      "kind": "lead",
+      "level": null,
+      "text": "全製品試験はIO4-01をタグに持つ。"
+    },
+    {
+      "line": 134,
+      "kind": "lead",
+      "level": null,
+      "text": "開始審査では本書とFD全行の対応、所有コピーの計画、全例の適用段階、診断fallback、exact/workの境界を独立レビューする。"
+    }
+  ],
+  "heading_stats": {
+    "total_headings": 7,
+    "level_distribution": {
+      "1": 1,
+      "2": 6
+    },
+    "by_level": {
+      "1": {
+        "count": 1,
+        "length_mean": 29.0,
+        "length_cv": 0.0,
+        "nominal_ending_ratio": 1.0,
+        "dominant_pos_signature_ratio": 1.0,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      },
+      "2": {
+        "count": 6,
+        "length_mean": 12.83,
+        "length_cv": 0.114,
+        "nominal_ending_ratio": 0.0,
+        "dominant_pos_signature_ratio": 0.333,
+        "template_hits": [],
+        "structural_pattern_ratio": 0.0
+      }
+    },
+    "overall": {
+      "count": 7,
+      "length_mean": 15.14,
+      "length_cv": 0.384,
+      "nominal_ending_ratio": 0.143,
+      "dominant_pos_signature_ratio": 0.286,
+      "template_hits": [],
+      "structural_pattern_ratio": 0.0
+    }
+  }
+}

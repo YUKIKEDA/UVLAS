@@ -1,0 +1,767 @@
+{
+  "terms": [
+    {
+      "term": "Issue",
+      "first_line": 3,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "# 全schema validatorの所有型・資源・開始契約\n\n2026-11-18。Issue [#118](https://github.com/YUKIKEDA/UVLAS/issues/118)、IO4-01、既存IM06-0の「全schema」を"
+    },
+    {
+      "term": "IO4",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "・資源・開始契約\n\n2026-11-18。Issue [#118](https://github.com/YUKIKEDA/UVLAS/issues/118)、IO4-01、既存IM06-0の「全schema」を実装する担当者向けの追加契約である。[全schema契約](case-schema-contract.md)CS-"
+    },
+    {
+      "term": "IO",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "・資源・開始契約\n\n2026-11-18。Issue [#118](https://github.com/YUKIKEDA/UVLAS/issues/118)、IO4-01、既存IM06-0の「全schema」を実装する担当者向けの追加契約である。[全schema契約](case-schema-contract.md)CS"
+    },
+    {
+      "term": "IM06",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "2026-11-18。Issue [#118](https://github.com/YUKIKEDA/UVLAS/issues/118)、IO4-01、既存IM06-0の「全schema」を実装する担当者向けの追加契約である。[全schema契約](case-schema-contract.md)CS-05の内部表現・比較"
+    },
+    {
+      "term": "IM",
+      "first_line": 3,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "2026-11-18。Issue [#118](https://github.com/YUKIKEDA/UVLAS/issues/118)、IO4-01、既存IM06-0の「全schema」を実装する担当者向けの追加契約である。[全schema契約](case-schema-contract.md)CS-05の内部表現・"
+    },
+    {
+      "term": "CS",
+      "first_line": 3,
+      "count": 7,
+      "has_gloss_hint": false,
+      "context": "IO4-01、既存IM06-0の「全schema」を実装する担当者向けの追加契約である。[全schema契約](case-schema-contract.md)CS-05の内部表現・比較・資源・診断を具体化する。入力の全keyと物理的意味は[FD-01〜12](case-schema-fields.md)、初期摂動は[完全"
+    },
+    {
+      "term": "FD",
+      "first_line": 3,
+      "count": 17,
+      "has_gloss_hint": false,
+      "context": "ある。[全schema契約](case-schema-contract.md)CS-05の内部表現・比較・資源・診断を具体化する。入力の全keyと物理的意味は[FD-01〜12](case-schema-fields.md)、初期摂動は[完全物理場追補](case-initial-physical-state-contra"
+    },
+    {
+      "term": "SI",
+      "first_line": 5,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "書は実装開始の設計審査対象であり、製品validatorの合格報告ではない。\n\n初回は所有型から失敗までを通読し、実装時は検査表と製品試験表を参照する。式評価、SI変換、snapshot、importer、prepare、run/resumeとCLI公開は既存IM06-0の依存段階である。schema成功だけでCLI `v"
+    },
+    {
+      "term": "CLI",
+      "first_line": 5,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "は所有型から失敗までを通読し、実装時は検査表と製品試験表を参照する。式評価、SI変換、snapshot、importer、prepare、run/resumeとCLI公開は既存IM06-0の依存段階である。schema成功だけでCLI `validate` の成功を返さない。\n\n## 所有する型を固定する\n\n入口はCS-05"
+    },
+    {
+      "term": "Model",
+      "first_line": 9,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "ase>` とする。diagnosticのnullは補助診断不要を表す。nullでも同じ検査・失敗分類を保つ。操作は既存 `Operation::PrepareModel`、親Model/Trialは存在せずoptional空。入力・plan・diagnosticの重なり、同一plan/slotの同時使用と再入を禁止する。異なる"
+    },
+    {
+      "term": "Trial",
+      "first_line": 9,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "nosticのnullは補助診断不要を表す。nullでも同じ検査・失敗分類を保つ。操作は既存 `Operation::PrepareModel`、親Model/Trialは存在せずoptional空。入力・plan・diagnosticの重なり、同一plan/slotの同時使用と再入を禁止する。異なる所有者の独立呼出しは並列実行"
+    },
+    {
+      "term": "InputDocument",
+      "first_line": 11,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "と再入を禁止する。異なる所有者の独立呼出しは並列実行できる。\n\n`SchemaCase`は非公開factoryだけが構築できるmove-only不変型である。元InputDocumentを深く複製した所有snapshot、root payload、型別arena、ID索引、解決参照、出典表と資源内訳を持つ。元文書や呼出しworkspaceを破棄"
+    },
+    {
+      "term": "ID",
+      "first_line": 11,
+      "count": 14,
+      "has_gloss_hint": false,
+      "context": "oryだけが構築できるmove-only不変型である。元InputDocumentを深く複製した所有snapshot、root payload、型別arena、ID索引、解決参照、出典表と資源内訳を持つ。元文書や呼出しworkspaceを破棄しても結果は存続する。snapshotは元bytes・SourceIdentity"
+    },
+    {
+      "term": "SourceIdentity",
+      "first_line": 11,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "oad、型別arena、ID索引、解決参照、出典表と資源内訳を持つ。元文書や呼出しworkspaceを破棄しても結果は存続する。snapshotは元bytes・SourceIdentity・node/member順・全decoded text・元decimal tokenを保持し、再parse/再serializeで作り直さない。成功前に複製へ全"
+    },
+    {
+      "term": "Constant",
+      "first_line": 26,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "。元member pathは出典表から再構成 |\n\n辞書の全object行にnamed recordを作る。例えば `TimeSeries<N,Dims>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`Ex"
+    },
+    {
+      "term": "Polynomial",
+      "first_line": 26,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "pathは出典表から再構成 |\n\n辞書の全object行にnamed recordを作る。例えば `TimeSeries<N,Dims>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はCo"
+    },
+    {
+      "term": "Pchip",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "構成 |\n\n辞書の全object行にnamed recordを作る。例えば `TimeSeries<N,Dims>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant"
+    },
+    {
+      "term": "Expression",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "辞書の全object行にnamed recordを作る。例えば `TimeSeries<N,Dims>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/A"
+    },
+    {
+      "term": "GlobalPolynomial",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "`TimeSeries<N,Dims>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/Int"
+    },
+    {
+      "term": "HalfCells",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "s>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/"
+    },
+    {
+      "term": "Variable",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`Refer"
+    },
+    {
+      "term": "Add",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "n、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`Reference"
+    },
+    {
+      "term": "Subtract",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力"
+    },
+    {
+      "term": "Multiply",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ield<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを"
+    },
+    {
+      "term": "Divide",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeS"
+    },
+    {
+      "term": "Negate",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "Polynomial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は"
+    },
+    {
+      "term": "IntegerPower",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ial/HalfCells、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は成分ごとの次元配列を型引数"
+    },
+    {
+      "term": "Sin",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "、`ExprNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は成分ごとの次元配列を型引数または不"
+    },
+    {
+      "term": "Cos",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "prNode` はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は成分ごとの次元配列を型引数または不変des"
+    },
+    {
+      "term": "Exp",
+      "first_line": 26,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "辞書の全object行にnamed recordを作る。例えば `TimeSeries<N,Dims>` はConstant/Polynomial/Pchip/Expression、`FullShellField<D>` はGlobalPolynomial/HalfCells、`ExprNode` はConstant/Var"
+    },
+    {
+      "term": "Log",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "はConstant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は成分ごとの次元配列を型引数または不変descriptorで"
+    },
+    {
+      "term": "Sqrt",
+      "first_line": 26,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "stant/Variable/Add/Subtract/Multiply/Divide/Negate/IntegerPower/Sin/Cos/Exp/Log/Sqrtを持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は成分ごとの次元配列を型引数または不変descriptorで持つ。一般"
+    },
+    {
+      "term": "JSON",
+      "first_line": 26,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "を持つ。`ReferenceField`は出力次元Dと成分数Nを、`TimeSeries`は成分ごとの次元配列を型引数または不変descriptorで持つ。一般JSON node、string→任意値辞書、未検証nodeを返す公開経路は設けない。内部descriptorを使う場合も全fieldの型・shape・variantと"
+    },
+    {
+      "term": "vector",
+      "first_line": 28,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "FD-04/05の一般化ひずみ・座標から各(i,j)次元を決める。観測はFD-09の全行を用い、first_pk=9、reaction=6、stress他=6、vector=3、mode=1の長さと成分順を別descriptorへ固定する。interface=bothでもnを倍にしない。層入力のMandelと観測テンソル成分を同じ"
+    },
+    {
+      "term": "Mandel",
+      "first_line": 28,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "6、stress他=6、vector=3、mode=1の長さと成分順を別descriptorへ固定する。interface=bothでもnを倍にしない。層入力のMandelと観測テンソル成分を同じenumにしない。\n\n全17 namespaceはCS-04どおりで、Layer/Loadは部材内部も全域登録する。順序付きの `IdE"
+    },
+    {
+      "term": "テンソル",
+      "first_line": 28,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "=6、vector=3、mode=1の長さと成分順を別descriptorへ固定する。interface=bothでもnを倍にしない。層入力のMandelと観測テンソル成分を同じenumにしない。\n\n全17 namespaceはCS-04どおりで、Layer/Loadは部材内部も全域登録する。順序付きの `IdEntry<T>"
+    },
+    {
+      "term": "Layer",
+      "first_line": 30,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "nterface=bothでもnを倍にしない。層入力のMandelと観測テンソル成分を同じenumにしない。\n\n全17 namespaceはCS-04どおりで、Layer/Loadは部材内部も全域登録する。順序付きの `IdEntry<T>{id,row,source_node}` を別索引へコピーし、非再帰heapsortでi"
+    },
+    {
+      "term": "Load",
+      "first_line": 30,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "ce=bothでもnを倍にしない。層入力のMandelと観測テンソル成分を同じenumにしない。\n\n全17 namespaceはCS-04どおりで、Layer/Loadは部材内部も全域登録する。順序付きの `IdEntry<T>{id,row,source_node}` を別索引へコピーし、非再帰heapsortでid、同値な"
+    },
+    {
+      "term": "コピー",
+      "first_line": 30,
+      "count": 6,
+      "has_gloss_hint": false,
+      "context": "ceはCS-04どおりで、Layer/Loadは部材内部も全域登録する。順序付きの `IdEntry<T>{id,row,source_node}` を別索引へコピーし、非再帰heapsortでid、同値なら元node順に整列する。探索は二分探索、同namespaceの重複は元走査で後に現れる定義を報告する。ID=0、UIN"
+    },
+    {
+      "term": "UINT64",
+      "first_line": 30,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "コピーし、非再帰heapsortでid、同値なら元node順に整列する。探索は二分探索、同namespaceの重複は元走査で後に現れる定義を報告する。ID=0、UINT64_MAX、先頭zeroを許し、別namespaceの同値を許す。Sourceだけは同じid/path/hash/roleの反復宣言を同一行へ写し、別定義を拒否す"
+    },
+    {
+      "term": "UINT",
+      "first_line": 30,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "コピーし、非再帰heapsortでid、同値なら元node順に整列する。探索は二分探索、同namespaceの重複は元走査で後に現れる定義を報告する。ID=0、UINT64_MAX、先頭zeroを許し、別namespaceの同値を許す。Sourceだけは同じid/path/hash/roleの反復宣言を同一行へ写し、別定義を拒"
+    },
+    {
+      "term": "MAX",
+      "first_line": 30,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "帰heapsortでid、同値なら元node順に整列する。探索は二分探索、同namespaceの重複は元走査で後に現れる定義を報告する。ID=0、UINT64_MAX、先頭zeroを許し、別namespaceの同値を許す。Sourceだけは同じid/path/hash/roleの反復宣言を同一行へ写し、別定義を拒否する。元p"
+    },
+    {
+      "term": "Source",
+      "first_line": 30,
+      "count": 11,
+      "has_gloss_hint": false,
+      "context": "は二分探索、同namespaceの重複は元走査で後に現れる定義を報告する。ID=0、UINT64_MAX、先頭zeroを許し、別namespaceの同値を許す。Sourceだけは同じid/path/hash/roleの反復宣言を同一行へ写し、別定義を拒否する。元payloadの入力順をsortで変更しない。\n\n## 十進値と有理数"
+    },
+    {
+      "term": "Number",
+      "first_line": 34,
+      "count": 8,
+      "has_gloss_hint": false,
+      "context": "th/hash/roleの反復宣言を同一行へ写し、別定義を拒否する。元payloadの入力順をsortで変更しない。\n\n## 十進値と有理数を丸めず比較する\n\nNumberの正規形は符号、先頭/末尾zeroを除いたdigit列c、十進指数eとする。零はsign=0、c=0、e=0。小数点以下桁数の減算と末尾zero除去をcheck"
+    },
+    {
+      "term": "ResourceExceeded",
+      "first_line": 36,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "0000000000000000000000001>1、1e0=1.0をexactに判定する。順序逆転は負符号で行う。指数字句を読む前に最大桁数を検査し、超過をResourceExceededにする。\n\n予算合計・時刻幅・刻みの整数商など算術が必要な場合は、符号付き10進digit配列で加減乗算・長除法を行う。shiftで生じる全桁数を先にcheck"
+    },
+    {
+      "term": "Decimal",
+      "first_line": 38,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "に余裕がある場合だけゼロ領域を具体化する。商を丸めず、(end−start)/stepの剰余が零かを検査する。有理数の比較は符号と分子×相手分母の交差積で行う。DecimalとRationalの混在は有限decimalのexact分子/分母へ写して同じ検査を使う。不要なgcdを要求しない。資源不足は未比較であり、不適合や等値を推測し"
+    },
+    {
+      "term": "Rational",
+      "first_line": 38,
+      "count": 7,
+      "has_gloss_hint": false,
+      "context": "だけゼロ領域を具体化する。商を丸めず、(end−start)/stepの剰余が零かを検査する。有理数の比較は符号と分子×相手分母の交差積で行う。DecimalとRationalの混在は有限decimalのexact分子/分母へ写して同じ検査を使う。不要なgcdを要求しない。資源不足は未比較であり、不適合や等値を推測しない。\n\n## 全"
+    },
+    {
+      "term": "元順",
+      "first_line": 42,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "は未比較であり、不適合や等値を推測しない。\n\n## 全辞書を同じ検査段階へ写す\n\nCS-04の段階順を維持する。段階2ではrootからmember/arrayの元順に全treeのkey・kind・shape・variant・構造quotaを検査し、その全体が成功してから段階3のexact値/範囲/順序/排他へ進む。前方の値"
+    },
+    {
+      "term": "InvalidInput",
+      "first_line": 42,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "eyの同順位は辞書のkey列順とする。ID登録・解決後に相互条件を評価し、同段階の最初の元nodeを失敗位置にする。既知variantへ他枝keyを混ぜる場合はInvalidInput、未対応tag/schemaはUnsupported。数値検査を先に行って未知keyを見逃さない。\n\n| 辞書 | 必ず実装するschema検査 | 後続へ渡す"
+    },
+    {
+      "term": "Unsupported",
+      "first_line": 42,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "に相互条件を評価し、同段階の最初の元nodeを失敗位置にする。既知variantへ他枝keyを混ぜる場合はInvalidInput、未対応tag/schemaはUnsupported。数値検査を先に行って未知keyを見逃さない。\n\n| 辞書 | 必ず実装するschema検査 | 後続へ渡す未認定量 |\n|---|---|---|\n| FD-"
+    },
+    {
+      "term": "Mass",
+      "first_line": 59,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "形状/順序/event/変数、全次元伝播 | 式値/微分/区間包絡、定義域正則性・物理被覆 |\n\n参照の循環禁止は、入力が表す材料/座標継承・source依存、Mass.replace、誤差群代表へ適用する。現在のcaseに継承keyがなければ架空の辺を作らない。物理Joint、相互Continuity/AeroSharing"
+    },
+    {
+      "term": "Joint",
+      "first_line": 59,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "禁止は、入力が表す材料/座標継承・source依存、Mass.replace、誤差群代表へ適用する。現在のcaseに継承keyがなければ架空の辺を作らない。物理Joint、相互Continuity/AeroSharingの閉路を一般DAG検査で消さない。正当な共有の相互参照と禁止継承を別edge enumへ分類する。禁止グラフは"
+    },
+    {
+      "term": "Continuity",
+      "first_line": 59,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "す材料/座標継承・source依存、Mass.replace、誤差群代表へ適用する。現在のcaseに継承keyがなければ架空の辺を作らない。物理Joint、相互Continuity/AeroSharingの閉路を一般DAG検査で消さない。正当な共有の相互参照と禁止継承を別edge enumへ分類する。禁止グラフは元node順の三色非再帰D"
+    },
+    {
+      "term": "AeroSharing",
+      "first_line": 59,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "urce依存、Mass.replace、誤差群代表へ適用する。現在のcaseに継承keyがなければ架空の辺を作らない。物理Joint、相互Continuity/AeroSharingの閉路を一般DAG検査で消さない。正当な共有の相互参照と禁止継承を別edge enumへ分類する。禁止グラフは元node順の三色非再帰DFSで全頂点を検査する。"
+    },
+    {
+      "term": "DAG",
+      "first_line": 59,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "ce、誤差群代表へ適用する。現在のcaseに継承keyがなければ架空の辺を作らない。物理Joint、相互Continuity/AeroSharingの閉路を一般DAG検査で消さない。正当な共有の相互参照と禁止継承を別edge enumへ分類する。禁止グラフは元node順の三色非再帰DFSで全頂点を検査する。\n\nDAGの深さは"
+    },
+    {
+      "term": "グラフ",
+      "first_line": 59,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "oint、相互Continuity/AeroSharingの閉路を一般DAG検査で消さない。正当な共有の相互参照と禁止継承を別edge enumへ分類する。禁止グラフは元node順の三色非再帰DFSで全頂点を検査する。\n\nDAGの深さはconstant/variableを1、他を1+最大operand深さとする。binary"
+    },
+    {
+      "term": "DFS",
+      "first_line": 59,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "y/AeroSharingの閉路を一般DAG検査で消さない。正当な共有の相互参照と禁止継承を別edge enumへ分類する。禁止グラフは元node順の三色非再帰DFSで全頂点を検査する。\n\nDAGの深さはconstant/variableを1、他を1+最大operand深さとする。binaryの同じoperandはedge2"
+    },
+    {
+      "term": "INT32",
+      "first_line": 61,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ngle入力→無次元、exp/logは無次元→無次元。全中間の指数をcheckedで検査する。integer_power exponentはint32、abs(INT32_MIN)もunsignedで計算する。出力次元はconsumerの全成分と一致させる。domainの型・下上限・eventはschemaで検査するが、log("
+    },
+    {
+      "term": "INT",
+      "first_line": 61,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "ngle入力→無次元、exp/logは無次元→無次元。全中間の指数をcheckedで検査する。integer_power exponentはint32、abs(INT32_MIN)もunsignedで計算する。出力次元はconsumerの全成分と一致させる。domainの型・下上限・eventはschemaで検査するが、lo"
+    },
+    {
+      "term": "MIN",
+      "first_line": 61,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "→無次元、exp/logは無次元→無次元。全中間の指数をcheckedで検査する。integer_power exponentはint32、abs(INT32_MIN)もunsignedで計算する。出力次元はconsumerの全成分と一致させる。domainの型・下上限・eventはschemaで検査するが、log(−1)な"
+    },
+    {
+      "term": "Shell",
+      "first_line": 63,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "限・eventはschemaで検査するが、log(−1)など値の成立はprepareが区間包絡から拒否し、schema成功を評価資格にしない。\n\n完全初期場は全Shell/Beam/rigid Massを各1回含み、R/P/Cと変位/速度を必須とする。VectorTermのpowers相異、R/P/C総次数13/21/2、全Ex"
+    },
+    {
+      "term": "Beam",
+      "first_line": 63,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "tはschemaで検査するが、log(−1)など値の成立はprepareが区間包絡から拒否し、schema成功を評価資格にしない。\n\n完全初期場は全Shell/Beam/rigid Massを各1回含み、R/P/Cと変位/速度を必須とする。VectorTermのpowers相異、R/P/C総次数13/21/2、全ExactQu"
+    },
+    {
+      "term": "VectorTerm",
+      "first_line": 63,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "絡から拒否し、schema成功を評価資格にしない。\n\n完全初期場は全Shell/Beam/rigid Massを各1回含み、R/P/Cと変位/速度を必須とする。VectorTermのpowers相異、R/P/C総次数13/21/2、全ExactQuantity、halfcellの重複/2成分indexを検査する。内部PGを直接参照できる場"
+    },
+    {
+      "term": "ExactQuantity",
+      "first_line": 63,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "ll/Beam/rigid Massを各1回含み、R/P/Cと変位/速度を必須とする。VectorTermのpowers相異、R/P/C総次数13/21/2、全ExactQuantity、halfcellの重複/2成分indexを検査する。内部PGを直接参照できる場合は各index<2nも検査し、外部から実幾何が定まる場合は後続検査義務を保持す"
+    },
+    {
+      "term": "PG",
+      "first_line": 63,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "。VectorTermのpowers相異、R/P/C総次数13/21/2、全ExactQuantity、halfcellの重複/2成分indexを検査する。内部PGを直接参照できる場合は各index<2nも検査し、外部から実幾何が定まる場合は後続検査義務を保持する。正面積の全活動halfcell被覆・Cの区分双一次への所属"
+    },
+    {
+      "term": "beam",
+      "first_line": 63,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "、外部から実幾何が定まる場合は後続検査義務を保持する。正面積の全活動halfcell被覆・Cの区分双一次への所属・全共有後の独立係数はprepareで確認する。beam/rigidは両端/全frameとbody角速度を保持する。PointCheckはshellだけside_s/side_tを必須、s/t∈[0,1]とζ∈[−1"
+    },
+    {
+      "term": "PointCheck",
+      "first_line": 63,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "halfcell被覆・Cの区分双一次への所属・全共有後の独立係数はprepareで確認する。beam/rigidは両端/全frameとbody角速度を保持する。PointCheckはshellだけside_s/side_tを必須、s/t∈[0,1]とζ∈[−1,1]、beamのunused2成分exact零、全tolerance≥0を検査"
+    },
+    {
+      "term": "MaterialPoint",
+      "first_line": 63,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "理整合と最終q/vはprepareであり、schemaで平均・補間・補完しない。同配列内の重複点はtargetと全exact座標・片側tagの同値で検査する。旧MaterialPointの他consumerをInitialPointへ置き換えない。Sourceのpath/hash/role一致やNumberの値同値から元SourceIdenti"
+    },
+    {
+      "term": "InitialPoint",
+      "first_line": 63,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "emaで平均・補間・補完しない。同配列内の重複点はtargetと全exact座標・片側tagの同値で検査する。旧MaterialPointの他consumerをInitialPointへ置き換えない。Sourceのpath/hash/role一致やNumberの値同値から元SourceIdentityの同一性を推定しない。\n\n## 全呼出しの"
+    },
+    {
+      "term": "SchemaLimits",
+      "first_line": 67,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "urceのpath/hash/role一致やNumberの値同値から元SourceIdentityの同一性を推定しない。\n\n## 全呼出しの資源を先に数える\n\nSchemaLimitsの全項目は明示uint64で、0は零上限である。CS-05/FD-11のquota全てに加え、ホスト専用に `maximum_scratch_bytes, ma"
+    },
+    {
+      "term": "uint",
+      "first_line": 67,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "一致やNumberの値同値から元SourceIdentityの同一性を推定しない。\n\n## 全呼出しの資源を先に数える\n\nSchemaLimitsの全項目は明示uint64で、0は零上限である。CS-05/FD-11のquota全てに加え、ホスト専用に `maximum_scratch_bytes, maximum_work,"
+    },
+    {
+      "term": "ホスト",
+      "first_line": 67,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "。\n\n## 全呼出しの資源を先に数える\n\nSchemaLimitsの全項目は明示uint64で、0は零上限である。CS-05/FD-11のquota全てに加え、ホスト専用に `maximum_scratch_bytes, maximum_work, maximum_exact_digits, maximum_exponent"
+    },
+    {
+      "term": "Count",
+      "first_line": 67,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "へ新keyは足さない。入力宣言で上限を広げず、既存quotaはホストとcaseのmin、追加4項目はホスト値を使う。元文書の7quotaも再照合する。巨大な宣言Countを使って配列を確保せず、実配列長とchecked照合する。\n\n| 計数 | 単位と課金対象 |\n|---|---|\n| entities | CS-04のIDを"
+    },
+    {
+      "term": "edge",
+      "first_line": 77,
+      "count": 10,
+      "has_gloss_hint": false,
+      "context": "、最長JSON PointerのUTF-8 byte数。末尾NULは所有する場合だけ1byte加算 |\n\n走査前に、文書所有dataの実node/member/edge/text件数を内部helperで取得し、最初のstackはN+1枠としてchecked計画する（深さを知るための未計上stackを作らない）。Nをホスト上限へ"
+    },
+    {
+      "term": "サイズ",
+      "first_line": 77,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "めの未計上stackを作らない）。Nをホスト上限へ照合してから確保し、case側のquotaを読んだ後はminで再照合する。計画用の走査もworkを消費する。全サイズを数えた後、payload Pと同時scratch Sを計画し `P≤maximum_typed_bytes`、`S≤maximum_scratch_bytes"
+    },
+    {
+      "term": "ResourcePlan",
+      "first_line": 77,
+      "count": 8,
+      "has_gloss_hint": false,
+      "context": "、payload Pと同時scratch Sを計画し `P≤maximum_typed_bytes`、`S≤maximum_scratch_bytes`、およびResourcePlanの残容量を照合する。Pは元source/treeの深いコピーも含む。各PlannedBufferの `count*sizeof(T)` をABIごとに積み上げ、"
+    },
+    {
+      "term": "PlannedBuffer",
+      "first_line": 77,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "es`、`S≤maximum_scratch_bytes`、およびResourcePlanの残容量を照合する。Pは元source/treeの深いコピーも含む。各PlannedBufferの `count*sizeof(T)` をABIごとに積み上げ、alignmentを必要とするbyte arenaはchecked align_upを加える。索"
+    },
+    {
+      "term": "ABI",
+      "first_line": 77,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "esourcePlanの残容量を照合する。Pは元source/treeの深いコピーも含む。各PlannedBufferの `count*sizeof(T)` をABIごとに積み上げ、alignmentを必要とするbyte arenaはchecked align_upを加える。索引/DFS/重複項sort/decimal比較・"
+    },
+    {
+      "term": "Boost",
+      "first_line": 77,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "rt/decimal比較・算術/出典path構築の同時領域をSに含む。実装は再利用する固定scratch buffer群を一度確保し、検査中にvector成長やBoostの隠れた確保を行わない。桁算術は計画済みbase10 byte配列を使う。\n\n容量式を次表で固定する。Bはsource bytes、Nは全node、Mは全mem"
+    },
+    {
+      "term": "base",
+      "first_line": 77,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "同時領域をSに含む。実装は再利用する固定scratch buffer群を一度確保し、検査中にvector成長やBoostの隠れた確保を行わない。桁算術は計画済みbase10 byte配列を使う。\n\n容量式を次表で固定する。Bはsource bytes、Nは全node、Mは全member、Aはarray edge、Tは元text"
+    },
+    {
+      "term": "Nt",
+      "first_line": 79,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "で固定する。Bはsource bytes、Nは全node、Mは全member、Aはarray edge、Tは元text bytes、Dはcontainer深さ、Ntは型tのarena要素数（named recordのほかList内のNumber/Index/Vec/Rational/row等の全element型を含む）、R"
+    },
+    {
+      "term": "List",
+      "first_line": 79,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "は全member、Aはarray edge、Tは元text bytes、Dはcontainer深さ、Ntは型tのarena要素数（named recordのほかList内のNumber/Index/Vec/Rational/row等の全element型を含む）、RはRef出現数、EはID定義数、Gは全式node数、Jは全禁止g"
+    },
+    {
+      "term": "Index",
+      "first_line": 79,
+      "count": 4,
+      "has_gloss_hint": false,
+      "context": "ray edge、Tは元text bytes、Dはcontainer深さ、Ntは型tのarena要素数（named recordのほかList内のNumber/Index/Vec/Rational/row等の全element型を含む）、RはRef出現数、EはID定義数、Gは全式node数、Jは全禁止graph edge数、Vはそ"
+    },
+    {
+      "term": "Vec",
+      "first_line": 79,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "ge、Tは元text bytes、Dはcontainer深さ、Ntは型tのarena要素数（named recordのほかList内のNumber/Index/Vec/Rational/row等の全element型を含む）、RはRef出現数、EはID定義数、Gは全式node数、Jは全禁止graph edge数、Vはその頂点数"
+    },
+    {
+      "term": "element",
+      "first_line": 79,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "container深さ、Ntは型tのarena要素数（named recordのほかList内のNumber/Index/Vec/Rational/row等の全element型を含む）、RはRef出現数、EはID定義数、Gは全式node数、Jは全禁止graph edge数、Vはその頂点数とする。Lは全nodeの最大JSON Poin"
+    },
+    {
+      "term": "Ref",
+      "first_line": 79,
+      "count": 7,
+      "has_gloss_hint": false,
+      "context": "型tのarena要素数（named recordのほかList内のNumber/Index/Vec/Rational/row等の全element型を含む）、RはRef出現数、EはID定義数、Gは全式node数、Jは全禁止graph edge数、Vはその頂点数とする。Lは全nodeの最大JSON Pointer bytes、C"
+    },
+    {
+      "term": "Pointer",
+      "first_line": 79,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "ment型を含む）、RはRef出現数、EはID定義数、Gは全式node数、Jは全禁止graph edge数、Vはその頂点数とする。Lは全nodeの最大JSON Pointer bytes、Cは正規digits合計、Hは下記exact算術の最大temporary桁数である。いずれも実入力から数え、宣言上限を実件数としない。\n\n| bu"
+    },
+    {
+      "term": "max",
+      "first_line": 92,
+      "count": 9,
+      "has_gloss_hint": false,
+      "context": "行の総和、Sは後5行の総和とする。失敗pathは成功型と同時に返さないが、構築途中payloadと共存し得るため累積要求・同時要求へさらにLを予約する。P/Sをmax_typed/scratchと別に照合し、全体を既存ResourcePlan残容量へ照合する。上のcapacityはupper bound、実際のallocat"
+    },
+    {
+      "term": "OS",
+      "first_line": 92,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "pacityはupper bound、実際のallocate countも記録する。配列のsizeof/alignは実ABIで求め、推定sizeofの固定値を両OSへ流用しない。\n\nHは行うexact演算の全候補から、値を計算する前に決める。digit長a,bの積/交差積はa+b、桁位置を揃えた加減はW+1、k個の非負和は"
+    },
+    {
+      "term": "checked",
+      "first_line": 94,
+      "count": 11,
+      "has_gloss_hint": false,
+      "context": "k個の非負和はW+digits(k)+1、長除法の剰余は除数桁数+1、商は被除数桁数以下を要求する。Wはoperandの最大上端桁位置から最小下端桁位置を引いたchecked幅である。decimal→有理化では分子/分母へ付くzeroを指数から先に数え、交差積のa/bへ含む。比較だけの巨大指数はWを具体化しない。最大要求Hがmaxi"
+    },
+    {
+      "term": "dimension",
+      "first_line": 98,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "する。単位はnode/member/配列要素/edgeの訪問、比較するtext/digit1byte、桁の加減乗除の一つのdigit演算、sortの比較/交換、dimension1成分、ゼロ初期化/コピー1byteである。反復と全呼出しの合計をchecked加算し、上限に達した次の作用を行わずResourceExceededを返す。固定"
+    },
+    {
+      "term": "RSS",
+      "first_line": 98,
+      "count": 3,
+      "has_gloss_hint": true,
+      "context": "作用を行わずResourceExceededを返す。固定descriptor比較の走査も課金し、exact算術や二次の重複照合を無課金にしない。workは時間/RSSの上界とは呼ばない。処理中の経過予算をcoreの物理反復数へ偽装せず補助診断に保持する。\n\nallocator metadata/array cookie/プロ"
+    },
+    {
+      "term": "プロセス",
+      "first_line": 100,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "SSの上界とは呼ばない。処理中の経過予算をcoreの物理反復数へ偽装せず補助診断に保持する。\n\nallocator metadata/array cookie/プロセス基礎メモリは既存ResourcePlanのpayload保証外である。今回のvalidatorは外部parser/動的多倍長を呼ばない。snapshot複製にも"
+    },
+    {
+      "term": "メモリ",
+      "first_line": 100,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "は呼ばない。処理中の経過予算をcoreの物理反復数へ偽装せず補助診断に保持する。\n\nallocator metadata/array cookie/プロセス基礎メモリは既存ResourcePlanのpayload保証外である。今回のvalidatorは外部parser/動的多倍長を呼ばない。snapshot複製にもPlann"
+    },
+    {
+      "term": "SchemaDiagnostic",
+      "first_line": 104,
+      "count": 2,
+      "has_gloss_hint": false,
+      "context": "d加算/乗算/align/符号変換が表現不能ならResourceExceededで、飽和値や0を必要量として報告しない。\n\n## 確保失敗でも診断を所有する\n\nSchemaDiagnosticはreason enum、SourceIdentity、optional元node ordinal、期待type/field/variant enum、actu"
+    },
+    {
+      "term": "Unavailable",
+      "first_line": 104,
+      "count": 3,
+      "has_gloss_hint": false,
+      "context": "quired/workと、所有JSON Pointerを持つ。CS-05の「所有path」を保ちつつ、確保前に失敗できるようpathは `Complete | Unavailable` の状態を必須とする。Unavailableは理由 `NotBuilt | PathQuota | Allocation` を持ち、短く切ったpathを完全と"
+    },
+    {
+      "term": "DiagnosticPath",
+      "first_line": 106,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "ota/確保不足なら元の失敗code/reasonを保ちpathをUnavailableとする。元の原因が診断不足だけの場合はResourceExceeded/DiagnosticPathである。slot省略時もpath quotaは計画で検査し、成功/失敗が変わらないようにする。可変pathを持つ診断の所有コピーには明示ResourcePlan"
+    },
+    {
+      "term": "Failure",
+      "first_line": 116,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "標準例外 | 既存guard_entryのInvalidInput / UnexpectedException |\n\n最外側をguard_entryで囲み、内側Failureは詳細を保持する。例外変換後に診断がなければ固定fallbackだけを設定する。成功時slotは空。失敗時は部分SchemaCaseを返さず、入力、以前のSch"
+    },
+    {
+      "term": "SchemaCase",
+      "first_line": 116,
+      "count": 5,
+      "has_gloss_hint": false,
+      "context": "guard_entryで囲み、内側Failureは詳細を保持する。例外変換後に診断がなければ固定fallbackだけを設定する。成功時slotは空。失敗時は部分SchemaCaseを返さず、入力、以前のSchemaCase、Model/Accepted/Trialを変更しない。自身の失敗予約だけを戻し、過去に成功したResourcePla"
+    },
+    {
+      "term": "Accepted",
+      "first_line": 116,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "に診断がなければ固定fallbackだけを設定する。成功時slotは空。失敗時は部分SchemaCaseを返さず、入力、以前のSchemaCase、Model/Accepted/Trialを変更しない。自身の失敗予約だけを戻し、過去に成功したResourcePlan計上は残す。ファイルを開かず、GIL/callback/外部コードを呼"
+    },
+    {
+      "term": "ファイル",
+      "first_line": 116,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "、以前のSchemaCase、Model/Accepted/Trialを変更しない。自身の失敗予約だけを戻し、過去に成功したResourcePlan計上は残す。ファイルを開かず、GIL/callback/外部コードを呼ばない。\n\n## 製品の全系列試験へ接続する\n\n[旧設計例](case-schema-examples.jso"
+    },
+    {
+      "term": "GIL",
+      "first_line": 116,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "aCase、Model/Accepted/Trialを変更しない。自身の失敗予約だけを戻し、過去に成功したResourcePlan計上は残す。ファイルを開かず、GIL/callback/外部コードを呼ばない。\n\n## 製品の全系列試験へ接続する\n\n[旧設計例](case-schema-examples.json)144fra"
+    },
+    {
+      "term": "コード",
+      "first_line": 116,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "epted/Trialを変更しない。自身の失敗予約だけを戻し、過去に成功したResourcePlan計上は残す。ファイルを開かず、GIL/callback/外部コードを呼ばない。\n\n## 製品の全系列試験へ接続する\n\n[旧設計例](case-schema-examples.json)144fragmentと5root、[初期"
+    },
+    {
+      "term": "API",
+      "first_line": 120,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "は実validatorの同じ内部型入口へ独立registry/consumer contextを渡す試験adapterを使い、全rootを無理に合成しない。公開APIに未検証fragment入口は増やさない。期待は手書き型/shape/値/参照で、製品から再生成しない。\n\n旧 `Perturbation.physical`"
+    },
+    {
+      "term": "PointValue",
+      "first_line": 122,
+      "count": 1,
+      "has_gloss_hint": false,
+      "context": "nt入口は増やさない。期待は手書き型/shape/値/参照で、製品から再生成しない。\n\n旧 `Perturbation.physical` fragmentと旧PointValue経路だけはsupersededの拒否例である。旧rootにその旧型がある場合は元rootを負例として残し、全初期場追補を適用した新rootを別fixtureとし"
+    },
+    {
+      "term": "SO",
+      "first_line": 122,
+      "count": 8,
+      "has_gloss_hint": true,
+      "context": "合は元rootを負例として残し、全初期場追補を適用した新rootを別fixtureとして検査する。黙って旧入力を修復しない。4正常のschema成功は活動空間/SO(3)/非貫通の成功を意味しない。22負例は個別にschema拒否・prepare拒否・精度等の未解決へ分類し、prepare専用反例がschemaを通ることも"
+    },
+    {
+      "term": "oracle",
+      "first_line": 132,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "|\n\n全製品試験はIO4-01をタグに持つ。実装の変更をcompile/linkできる隔離変異と正常controlを走らせた場合だけ検出と数える。本設計の限定oracleは辞書inventoryとexact字句比較・段階分類の独立照合に限り、全製品validator/式評価/物理準備を実行したとはしない。\n\n開始審査では本書とF"
+    },
+    {
+      "term": "FD全行",
+      "first_line": 134,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "eは辞書inventoryとexact字句比較・段階分類の独立照合に限り、全製品validator/式評価/物理準備を実行したとはしない。\n\n開始審査では本書とFD全行の対応、所有コピーの計画、全例の適用段階、診断fallback、exact/workの境界を独立レビューする。未解決のtyped variantや資源経路があれ"
+    },
+    {
+      "term": "レビュー",
+      "first_line": 134,
+      "count": 1,
+      "has_gloss_hint": true,
+      "context": "価/物理準備を実行したとはしない。\n\n開始審査では本書とFD全行の対応、所有コピーの計画、全例の適用段階、診断fallback、exact/workの境界を独立レビューする。未解決のtyped variantや資源経路があれば、そのvalidator本体を開始可能としない。設計採用、実装適合、数値認定、実務受入を別に記録する。"
+    }
+  ]
+}
