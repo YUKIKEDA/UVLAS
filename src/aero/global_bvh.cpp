@@ -141,7 +141,10 @@ std::uint64_t pair_stack(std::uint64_t f) {
     return plus(1, times(4, log_height(f)));
 }
 void build_tree(GlobalTopologyData& data, Run& r) {
-    const auto& g = *GlobalEngine::source(*data.geometry);
+    const auto& owner = data.geometry;
+    if (!owner)
+        reject(core::FailureCode::InvalidInput);
+    const auto& g = *GlobalEngine::source(*owner);
     const auto f = g.facets.size();
     for (std::size_t i = 0; i < f; ++i) {
         data.order.values()[i] = i;

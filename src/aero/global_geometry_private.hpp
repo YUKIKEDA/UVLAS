@@ -47,7 +47,7 @@ constexpr std::uint64_t pair_products =
 constexpr std::uint64_t narrow_cost = pair_products * (multiply_cost + 8 * simple_cost) +
                                       (18 + 9 * 6) * (2 * decode_cost + simple_cost);
 struct Abort {
-    core::FailureCode code;
+    core::FailureCode code = core::FailureCode::InvalidInput;
     std::optional<GeometryProblem> problem;
     std::optional<FacetId> other;
     std::optional<core::DofId> dof;

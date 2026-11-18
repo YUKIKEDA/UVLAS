@@ -1,0 +1,28 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-global-geometry-linux-review-v1",
+  "ids": [
+    "N4-02",
+    "N4-03"
+  ],
+  "package": "IM-03",
+  "date": "2026-11-19",
+  "base_commit": "0597204420ec324e70badfb00ced1b11f215d397",
+  "sources": {
+    "src/aero/global_geometry.cpp": "9e1ddea82499d0e8b2b3a97a5f28ab6a3e4e2f17c0b6997a33c0948a49f32ca8",
+    "src/aero/global_bvh.cpp": "2dcf63ac28d476b04a4e82c62a3b03bb1c025c93e05dd1b42507b9f612bcae71",
+    "src/aero/alias_kinematics.cpp": "743a0e8877994fcceef1dc9031a97a78413c51806dc7fab64b9f15248fd08666",
+    "src/aero/global_geometry_private.hpp": "c27e08de1fdcccb4517545fd72dad65565e180160fc3ac55163d47d89957217f",
+    "tests/aero/global_geometry_test.cpp": "1ff4bcd8261a80a247d4980b8e27cce98fc3b22dc26c2ec6e01fc642071925d8"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/global-geometry-linux-review-v1/build-before-stop-adjustment.txt": "cbcc49cb2c2fa88d8091147aea553ca3c68a80233b5c1fd6707967498b157683",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/build.txt": "3054522cd890b3b9f872eda4d5eb950cbcb6e1ee8cda62916d70ef3b56971c8a",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/historical-linux-tests.txt": "72450661875272cc14ac026bc916eedf15e721107099de5359f54e807673ab40",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/review.md": "5e4b210d1da0e9d81dc4a5a45deaf5d979e50a7cdc4eea8c34bfde2fb9b4d777",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/tests.txt": "6ee50088df005e224f8e20a7a3f2f959c8252e6589412970e52705cc2e10be3f",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/tidy-before-stop-adjustment.txt": "190459e9df074bf3a5271bf8c5b2d608bee9d97e4b534bdd388945f205c59472",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/tidy-resources.txt": "e24e4aa37cf5a0670505ac68f000e3d3782ce32e0cc3ab9679fe72418a5ae226",
+    "docs/verification/IM-03/global-geometry-linux-review-v1/tidy-test.txt": "2e637c4259893789a4317f1f5a3054c60e8f8179e700b4be31676488005913bc"
+  }
+}

@@ -327,7 +327,10 @@ GlobalEngine::check(const GlobalTopology& topology, const OwnedGeometry& source,
         if (!source.data_ || !topology.data_)
             reject(core::FailureCode::InvalidInput);
         const auto& g = *source.data_;
-        const auto& reference = *GlobalEngine::source(*topology.data_->geometry);
+        const auto& owner = topology.data_->geometry;
+        if (!owner)
+            reject(core::FailureCode::InvalidInput);
+        const auto& reference = *GlobalEngine::source(*owner);
         const auto f = g.facets.size(), n = topology.data_->nodes.size();
         Run run{limits, context, workspace.scratch_.values()[0], stop};
         const auto model_count =
@@ -399,9 +402,10 @@ GlobalResult<MaterialReleaseKey> GlobalTopology::release_key(PointId p,
                                                              ReleaseEpoch epoch) const noexcept {
     if (!data_)
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
-    // Sealed topology emplaces this owner before publication.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    auto canonical = data_->geometry->owner(p);
+    const auto& owner = data_->geometry;
+    if (!owner)
+        return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
+    auto canonical = owner->owner(p);
     if (!canonical)
         return std::unexpected(GlobalGeometryFailure{canonical.error(), {}});
     const auto values =
@@ -414,7 +418,10 @@ GlobalResult<std::reference_wrapper<const OwnedGeometry>>
 GlobalTopology::geometry() const& noexcept {
     if (!data_)
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
-    return std::cref(*data_->geometry);
+    const auto& owner = data_->geometry;
+    if (!owner)
+        return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
+    return std::cref(*owner);
 }
 GlobalResult<GlobalWorkPlan> GlobalTopology::work_plan() const noexcept {
     if (!data_)
@@ -434,7 +441,10 @@ GlobalResult<std::reference_wrapper<const OwnedGeometry>>
 GlobalContactState::geometry() const& noexcept {
     if (!active())
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
-    return std::cref(*data_.values()[0].geometry);
+    const auto& owner = data_.values()[0].geometry;
+    if (!owner)
+        return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
+    return std::cref(*owner);
 }
 GlobalResult<GlobalWorkPlan> GlobalContactState::work_plan() const noexcept {
     if (!active())

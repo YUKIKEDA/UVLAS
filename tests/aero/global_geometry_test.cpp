@@ -121,8 +121,9 @@ TEST_CASE("Physical aliases compare all columns time terms and exact velocity as
     CHECK(s::check_alias_kinematics(geometry, fixture.input(), limits(), *w, plan));
     const std::array<std::uint32_t, 1> wrong{1};
     for (std::size_t k = 0; k < 3; ++k) {
-        fixture.points.back().velocity = assertions;
-        (*fixture.points.back().velocity)[k] = {1, 0, wrong};
+        auto inconsistent = assertions;
+        inconsistent[k] = {1, 0, wrong};
+        fixture.points.back().velocity = inconsistent;
         CHECK_FALSE(s::check_alias_kinematics(geometry, fixture.input(), limits(), *w, plan));
     }
     fixture.points.back().velocity.reset();
@@ -279,6 +280,8 @@ TEST_CASE(
     auto wrong = s::check_global_geometry(topology, changed, limits(), *w, plan);
     REQUIRE_FALSE(wrong);
     CHECK(wrong.error().origin.cause.code == core::FailureCode::InvalidInput);
+    // MSVC request_stop() is non-const; libstdc++ declares it const.
+    // NOLINTNEXTLINE(misc-const-correctness)
     std::stop_source stop;
     stop.request_stop();
     core::ResourcePlan unused{budget};

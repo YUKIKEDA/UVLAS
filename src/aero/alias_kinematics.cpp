@@ -312,7 +312,10 @@ GlobalResult<ExactVelocityView> AliasKinematicsState::velocity(PointId id,
     if (!active() || k >= 3)
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_, id));
     const auto& data = data_.values()[0];
-    const auto& g = *GlobalEngine::source(*data.geometry);
+    const auto& owner = data.geometry;
+    if (!owner)
+        return std::unexpected(failure(core::FailureCode::InvalidInput, context_, id));
+    const auto& g = *GlobalEngine::source(*owner);
     const auto table = g.point_lookup.values();
     const auto found =
         std::lower_bound(table.begin(), table.end(), id.value(),
@@ -327,7 +330,10 @@ GlobalResult<std::reference_wrapper<const OwnedGeometry>>
 AliasKinematicsState::geometry() const& noexcept {
     if (!active())
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
-    return std::cref(*data_.values()[0].geometry);
+    const auto& owner = data_.values()[0].geometry;
+    if (!owner)
+        return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
+    return std::cref(*owner);
 }
 GlobalResult<GlobalWorkPlan> AliasKinematicsState::work_plan() const noexcept {
     if (!active())
