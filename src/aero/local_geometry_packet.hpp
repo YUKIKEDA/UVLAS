@@ -44,6 +44,7 @@ public:
 
 private:
     friend class LocalBounds;
+    friend class P1Engine;
     ScaledEnclosure(ScalarWords words, double error, int scale) noexcept
         : center_(words), radius_(error), exponent_(scale) {}
     ScalarWords center_;

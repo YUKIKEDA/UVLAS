@@ -1,0 +1,4 @@
+flat-ideal-near-1e-05 160 9.9732338e-20
+flat-ideal-near-1e-05 256 2.947873e-46
+skew-core-02-face 160 3.4365842e-19
+skew-core-02-face 256 3.7808509e-39
