@@ -1,0 +1,9 @@
+[1/3] Processing file <repo>\src\structure\pg_integration_partition.cpp.
+62698 warnings generated.
+[2/3] Processing file <repo>\tests\structure\pg_integration_partition_test.cpp.
+131810 warnings generated.
+[3/3] Processing file <repo>\tests\structure\pg_integration_partition_resource_test.cpp.
+194346 warnings generated.
+<repo>\src\structure\pg_integration_partition.cpp:9:19: error: std::move of the variable 'info' of the trivially-copyable type 'PgPartitionPlan' has no effect; remove std::move() [performance-move-const-arg,-warnings-as-errors]
+    9 |     value.info_ = std::move(info);
+      |                   ^~~~~~~~~~    ~

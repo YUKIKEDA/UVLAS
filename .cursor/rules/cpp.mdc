@@ -83,7 +83,7 @@ CHECK(EIGEN_WORLD_VERSION == 5);
 CHECK(EIGEN_MAJOR_VERSION == 5);
 ```
 
-試験のoptional参照も、通常の制御フローで存在を確認する。Catch2のREQUIREで実行時の失敗を止めても、そのマクロから解析器が後続の存在を証明するとは限らない。2026-11-15、PR #46の版固定試験はWindowsのclang-tidyを通過したが、Linuxのbugprone-unchecked-optional-accessで失敗した（Issue #47）。片方の構成で診断が出ないことを、他方でも解析できる根拠にしない。
+試験のoptional参照も、通常の制御フローで存在を確認する。Catch2のREQUIREで実行時の失敗を止めても、そのマクロから解析器が後続の存在を証明するとは限らない。2026-11-15、PR #46の版固定試験はWindowsのclang-tidyを通過したが、Linuxのbugprone-unchecked-optional-accessで失敗した（Issue #47）。片方の構成で診断が出ないことを、他方でも解析できる根拠にしない。 2026-11-18、PR #128では、外周の左右どちらかがあるという生成側の不変条件と、Catch2のマクロ内での逆参照がLinuxだけで未検査と診断された。別のoptionalが空であることから片方の存在を推定せず、使用箇所で両方を分岐する。存在を検査していても逆参照をマクロの式へ残さず、通常の制御フローで値を取得してから比較する。 同PRのLinux再検証では、辺のメンバーを確認後に再参照する2箇所が残った。optional自体をif初期化で局所コピーし、試験の範囲比較では必ず範囲外となる値をvalue_orへ渡せば、operator*を使わずに有効な値の比較を維持できる。製品の未指定値を有効な既定値で補う用途へは広げない。
 
 ```cpp
 // BAD: a test assertion alone may not prove the subsequent access to the analyzer.

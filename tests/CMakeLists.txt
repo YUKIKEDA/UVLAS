@@ -521,6 +521,45 @@ add_test(NAME qa.eigen_arnoldi
 set_tests_properties(qa.eigen_arnoldi PROPERTIES TIMEOUT 30 LABELS "verification")
 
 
+uvlas_add_test(structure.pg_integration_partition
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_integration_partition_test.cpp
+    LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_integration_partition
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_integration_partition PRIVATE
+    UVLAS_PG_PARTITION_FIXTURE="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-partition-v1.json")
+uvlas_add_test(structure.pg_integration_partition_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_integration_partition_resource_test.cpp
+    LIBS uvlas_structure_audit)
+target_include_directories(uvlas_test_structure_pg_integration_partition_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_integration_partition_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_integration_partition_resources)
+
+uvlas_add_test(aero.p1_induction
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_p1_induction PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_p1_induction PRIVATE
+    UVLAS_P1_GAUSS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-gauss-legendre-v1.json"
+    UVLAS_P1_AREA_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-area-reference-v1.json"
+    UVLAS_P1_AREA_PRECISE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-area-precision-v1.json")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    # The full 13-column interval/independent-reference suite exceeded 60 s under
+    # ASan/UBSan in PR129. This runner limit does not alter numerical or performance acceptance.
+    set_tests_properties(aero.p1_induction PROPERTIES TIMEOUT 300)
+endif()
+uvlas_add_test(aero.p1_induction_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/p1_induction_resources_test.cpp
+    LIBS uvlas_aero_audit Boost::headers)
+target_include_directories(uvlas_test_aero_p1_induction_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_p1_induction_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_p1_induction_resources)
+
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
     SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp

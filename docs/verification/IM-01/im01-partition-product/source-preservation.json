@@ -1,0 +1,17 @@
+{
+  "source_commit": "6369a0b1227bf31db246f00f982a98bc7e2eff64",
+  "numeric_source_files": 16,
+  "current_numeric_and_fixture_bytes_equal_commit": false,
+  "fixture_sha256": "4ae2ad5f0e9daf09ab1c7d1e2571fe6e04cb64609117e8da0bdb48575a5758cf",
+  "generator_correction": {
+    "old_sha256": "59b672cb8eda9c57c711e8530d08de7aee4ec95c88b3696109165bed58965169",
+    "current_sha256": "a4ea3c7263bc290f006652c7468d221eef719790311fc3d5a2b4d833e8a880f5",
+    "changes": "Ruff import/pairwise/strict zip/loop capture/formatを修正。別directory再生成fixtureはbyte一致。",
+    "requires_solver_rerun": false
+  },
+  "old_adopted_specs": "旧仕様/R&Dは変更なし。新製品/新記録と入口/追跡だけ。",
+  "current_numeric_tokens_and_fixture_equal_commit": true,
+  "byte_identical_files": 15,
+  "comment_bridge_files": 1,
+  "comment_bridge": "constness-comment-bridge.json。std::stop_sourceの既知cross-platform constnessのコメントだけ。"
+}

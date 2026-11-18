@@ -1,0 +1,21 @@
+Filters: "P1 huge common*"
+Randomness seeded to: 836675824
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+p1.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+P1 huge common origins preserve low words and scaled derivatives
+-------------------------------------------------------------------------------
+${ROOT}/tests/aero/p1_induction_test.cpp(266)
+...............................................................................
+
+${ROOT}/tests/aero/geometry_snapshot_fixture.hpp(40): FAILED:
+explicitly with message:
+  Unexpected aero failure 11
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 4 | 3 passed | 1 failed
+

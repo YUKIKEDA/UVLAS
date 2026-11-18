@@ -1,0 +1,6 @@
+RNG seed: 12345
+<repo>\tests\structure\pg_integration_partition_test.cpp(262): failed: take(changed.identity()) != before for: {?} != {?}
+test cases:     7 |     6 passed | 1 failed
+assertions: 30533 | 30532 passed | 1 failed
+
+

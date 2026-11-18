@@ -1,0 +1,22 @@
+Filters: "P1 far qualification rejects*"
+Randomness seeded to: 2233100438
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+p1.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+P1 far qualification rejects unresolved values in every basis and ambient
+column
+-------------------------------------------------------------------------------
+${ROOT}/tests/aero/p1_induction_test.cpp(437)
+...............................................................................
+
+${ROOT}/tests/aero/p1_induction_test.cpp(446): FAILED:
+  CHECK_THROWS_AS( arithmetic::qualify_far(low, high, unit, 0, work), arithmetic::ArithmeticFailure )
+because no exception was thrown where one was expected:
+
+===============================================================================
+test cases: 1 | 1 failed
+assertions: 1 | 1 failed
+
