@@ -435,3 +435,47 @@ TEST_CASE("PG partition contains an external Boost allocation failure after owne
     const auto lease = workspace.acquire();
     CHECK(lease);
 }
+
+TEST_CASE("PG n4 incidence plan admits equality and rejects each resource one below",
+          "[SH-D07][N4-02][N4-08][negative][property]") {
+    Fixture f{4};
+    incidence_fixture(f);
+    const auto forecast = take(PgIntegrationPartition::plan(f.request(), limits()));
+    const auto bounded = exact_caps(limits(), forecast, f.layers.size());
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan equal{forecast.owned_payload_bytes};
+    const auto accepted = PgIntegrationPartition::prepare(f.request(), bounded, workspace, equal);
+    REQUIRE(accepted);
+    const auto old = take(accepted->identity());
+    for (const auto member : {&PgPartitionLimits::maximum_numeric_operations,
+                              &PgPartitionLimits::maximum_topology_visits}) {
+        auto below = bounded;
+        --(below.*member);
+        core::ResourcePlan plan{cap};
+        const auto result = [&] {
+            const FaultScope fault{0};
+            return PgIntegrationPartition::prepare(f.request(), below, workspace, plan);
+        }();
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == core::FailureCode::ResourceExceeded);
+        CHECK(attempts.load(std::memory_order_relaxed) == 0);
+        CHECK(plan.allocated_bytes() == 0);
+        CHECK(take(accepted->identity()) == old);
+    }
+    for (const auto external : {false, true}) {
+        auto below = bounded;
+        if (external)
+            below.algebra.external_memory =
+                ExactEstimateAdmission{forecast.estimated_external_bytes - 1};
+        core::ResourcePlan plan{external ? cap : forecast.owned_payload_bytes - 1};
+        const auto result = [&] {
+            const FaultScope fault{0};
+            return PgIntegrationPartition::prepare(f.request(), below, workspace, plan);
+        }();
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == core::FailureCode::ResourceExceeded);
+        CHECK(attempts.load(std::memory_order_relaxed) == 0);
+        CHECK(plan.allocated_bytes() == 0);
+        CHECK(take(accepted->identity()) == old);
+    }
+}

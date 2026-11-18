@@ -1,4 +1,5 @@
 #include "exact_polynomial_detail.hpp"
+#include "pg_partition_snapshot.hpp"
 #include "pg_partition_test_support.hpp"
 
 #include <boost/multiprecision/cpp_int.hpp>
@@ -111,48 +112,7 @@ void check_topology(const PgIntegrationPartition& result, const std::array<Oracl
         CHECK(unique.emplace(face.edge, face.layer).second);
     }
 }
-/// Serialize the actual mathematical result, excluding padding, clocks and resource forecasts.
-[[nodiscard]] std::string mathematical_payload(const PgIntegrationPartition& result) {
-    Json out = Json::array();
-    const auto value = [](const ExactRational& x) {
-        const auto& raw = detail::ExactFactory::value(x).backend();
-        return Json::array(
-            {raw.num().str(0, std::ios_base::dec), raw.denom().str(0, std::ios_base::dec)});
-    };
-    for (const auto& x : take(result.vertices()))
-        out.push_back(Json::array({"vertex", value(x.s), value(x.t)}));
-    for (const auto& x : take(result.activity_map()))
-        out.push_back(Json::array(
-            {"cell", x.cell.first, x.cell.second, value(x.area), x.components, x.active}));
-    for (const auto& x : take(result.pieces()))
-        out.push_back(
-            Json::array({"piece", x.cell.first, x.cell.second, x.component, x.thickness_triangle,
-                         x.first_vertex, x.vertex_count, value(x.area)}));
-    for (const auto x : take(result.piece_vertex_indices()))
-        out.push_back(Json::array({"index", x}));
-    for (const auto& x : take(result.edges()))
-        out.push_back(Json::array(
-            {"edge", x.vertices[0], x.vertices[1], x.left ? Json{*x.left} : Json{},
-             x.right ? Json{*x.right} : Json{}, x.first_source, x.source_count, x.external}));
-    for (const auto x : take(result.edge_source_indices()))
-        out.push_back(Json::array({"source-index", x}));
-    for (const auto& x : take(result.triangles()))
-        out.push_back(Json::array({"triangle", x.piece, x.vertices[0], x.vertices[1], x.vertices[2],
-                                   value(x.twice_area)}));
-    for (const auto& x : take(result.volumes()))
-        out.push_back(Json::array({"volume", x.triangle, x.layer}));
-    for (const auto& x : take(result.horizontal_faces()))
-        out.push_back(
-            Json::array({"horizontal", x.triangle, x.layer, static_cast<unsigned>(x.side)}));
-    for (const auto& x : take(result.lateral_faces()))
-        out.push_back(Json::array({"lateral", x.edge, x.layer, x.canonical_direction}));
-    for (const auto& x : take(result.edge_traces()))
-        out.push_back(Json::array({"trace", x.edge, x.source, x.piece, x.canonical_direction}));
-    for (const auto& x : take(result.contacts()))
-        out.push_back(Json::array(
-            {"contact", x.cell.first, x.cell.second, x.source, x.vertices[0], x.vertices[1]}));
-    return out.dump();
-}
+
 template <class T>
 concept RvalueVertices = requires(const T&& value) { std::move(value).vertices(); };
 static_assert(!RvalueVertices<PgIntegrationPartition>);
@@ -266,7 +226,8 @@ TEST_CASE("PG partition preserves continuous different-gradient thickness and pa
             const auto stale = result.validate_for(f.request());
             REQUIRE_FALSE(stale);
             CHECK(stale.error().code == core::FailureCode::StaleGeneration);
-            CHECK(mathematical_payload(changed) == mathematical_payload(result));
+            CHECK(mathematical_payload(changed, false) == mathematical_payload(result, false));
+            CHECK(mathematical_payload(changed) != mathematical_payload(result));
             f.refinements[0].version = 7;
         }
         for (const auto& edge : edges)
@@ -540,4 +501,33 @@ TEST_CASE("PG preparation timing preserves the full mathematical payload",
     CHECK(take(measured.identity()) == take(unmeasured.identity()));
     CHECK(measured.preparation().observed_numeric_operations ==
           unmeasured.preparation().observed_numeric_operations);
+}
+
+TEST_CASE("PG incidence plan uses every adopted clipping and sorting term",
+          "[SH-D07][N4-02][N4-08][property]") {
+    Fixture f{4};
+    incidence_fixture(f);
+    const auto forecast = take(PgIntegrationPartition::plan(f.request(), limits()));
+    // Independent integer substitution of the adopted contract: I=40,N=S=16,
+    // M=66,C=1954,P=2145,U=8712,K=64,T=L=2,Nb=1,text=7.
+    CHECK(forecast.clip_vertex_capacity == 8712);
+    CHECK(forecast.numeric_operations == 228633355);
+    CHECK(forecast.topology_visits == 184228797);
+    constexpr auto practical = 48ULL * 1024ULL * 1024ULL * 1024ULL;
+    CHECK(forecast.owned_payload_bytes < practical);
+    core::ResourcePlan plan{practical};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const auto result =
+        take(PgIntegrationPartition::prepare(f.request(), limits(), workspace, plan));
+    CHECK(result.preparation().allocated_owned_payload_bytes <= forecast.owned_payload_bytes);
+    CHECK(result.preparation().observed_numeric_operations == 178891);
+    CHECK(result.preparation().observed_topology_visits == 37664);
+    CHECK(take(result.vertices()).size() == 135);
+    CHECK(take(result.pieces()).size() == 31);
+    CHECK(take(result.edges()).size() == 83);
+    CHECK(take(result.triangles()).size() == 57);
+    CHECK(result.validate_for(f.request()));
+    for (const auto& edge : take(result.edges())) {
+        CHECK(edge.vertices[0] != edge.vertices[1]);
+    }
 }
