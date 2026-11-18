@@ -251,7 +251,7 @@ void check_accounting(const Call& call) {
     CHECK(report.scratch_bytes <= report.planned_scratch_bytes);
     CHECK(report.cumulative_bytes <= report.admission_bytes);
     CHECK(report.work <= report.planned_work);
-    for (const auto [quota, required] :
+    for (const auto& [quota, required] :
          std::array{std::pair{SiQuota::OwnedBytes, report.planned_owned_bytes},
                     std::pair{SiQuota::ScratchBytes, report.planned_scratch_bytes},
                     std::pair{SiQuota::CumulativeBytes, report.admission_bytes},
