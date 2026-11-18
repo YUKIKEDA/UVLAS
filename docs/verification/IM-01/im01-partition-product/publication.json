@@ -1,0 +1,374 @@
+{
+  "scope": "公開用派生だけ伏字/UTF-8 LF化。原本は再計算/上書きしない。",
+  "files": [
+    {
+      "id": "pg-partition-log-debug-build.log",
+      "source_sha256": "aa02fc49b49562a4681a115c0c0447f8dc5c8730e0d5d55eb66ae8da9802453b",
+      "public_sha256": "6ff193401ae51d7389786458a5a44146141238f1a3dd3bc13ef58d81a3d247f5",
+      "source_encoding": "utf-8",
+      "redactions": 4,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/debug-build.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-debug-ctest.log",
+      "source_sha256": "77d8771b23d0058bc5256a79aa831e0edf8bb1e8196005840445edb1cb09500d",
+      "public_sha256": "3ed070fa33da87d4f54d4d56f9b850dab995479b324808fa1dcb737f2a81cebb",
+      "source_encoding": "utf-8",
+      "redactions": 10,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/debug-ctest.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-release-build.log",
+      "source_sha256": "80601fe750e2d46f53b43a2af2d2f24610983d52814d0496693ef33f78ae592b",
+      "public_sha256": "07723b7cb3baa812a37a89ba20a4835599ebaff4a0b1251118c815fd73f73994",
+      "source_encoding": "utf-8",
+      "redactions": 4,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/release-build.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-release-ctest.log",
+      "source_sha256": "aaf279844b0fcba8050065b905456f105ac31ad91ada58ba04a819f489f37b19",
+      "public_sha256": "9f6972e9fedb1afb175f5cfb50f19d4263b2691de0827d6b64e796fa8e134a07",
+      "source_encoding": "utf-8",
+      "redactions": 10,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/release-ctest.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-tidy-product-final.log",
+      "source_sha256": "9cabdf48f028861a4a66231f155ac0f5089ccfa4b7e4d686c82107870aca7893",
+      "public_sha256": "5a4a335fc1164102ed16f4fa6f1aa1a804446382e644569704ed9bfe4f505b11",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/tidy-product-final.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-tidy-tests-and-corrected-product-history.log",
+      "source_sha256": "d1b469bd60b19abd8290f4b47c948fbbf9a076580f5447456fda1c4ec0e0bfd0",
+      "public_sha256": "c39538b206824489401298bd4a9bde4e140b69dc0134654c4e25469df0b77943",
+      "source_encoding": "utf-8",
+      "redactions": 4,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/tidy-tests-and-corrected-product-history.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutations.json",
+      "source_sha256": "0fdf230bcd7784db6fb75bd15e4b7bf9c551ebe2cdf3b6c4bf1827b78f1a6a0e",
+      "public_sha256": "0fdf230bcd7784db6fb75bd15e4b7bf9c551ebe2cdf3b6c4bf1827b78f1a6a0e",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutations.json",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-resource-control.json",
+      "source_sha256": "9a2f3baad97761a960aa8aa35c0cf517b397bd08aae30877df0afd4aad44dd8c",
+      "public_sha256": "9a2f3baad97761a960aa8aa35c0cf517b397bd08aae30877df0afd4aad44dd8c",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/resource-control.json",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-measurement.json",
+      "source_sha256": "8d24126140f9c32b50574065b6040f363a66f3444d6f8c635d2e4bdd039229ec",
+      "public_sha256": "8d24126140f9c32b50574065b6040f363a66f3444d6f8c635d2e4bdd039229ec",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/measurement.json",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-build-info.json",
+      "source_sha256": "04fdee74c05a5f7e3ec34c4fd6b4e74ecc075ef358d055fad65588abdccda0fd",
+      "public_sha256": "d294cb2d127c1a39a30c1e682dfe117d36b025c87f1fa327dfd1cef8e92cb33f",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/build-info.json",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-control-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-control-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-control-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-control-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-control-test.log",
+      "source_sha256": "289a2e7b99f1d4f6ae7c1f75a6ba95f2dcfa9510d46f532108e98fc8afd60a01",
+      "public_sha256": "4dea80246d6cdd5559a769725134f7c375cc1bbd29b2d40db8209edc4e0f24f4",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-control-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-activity-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-activity-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-activity-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-activity-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-activity-test.log",
+      "source_sha256": "52ac131174ffbb00aaf9070d811f4ca9a3f3687ba8a3222acba1c38abdd730c8",
+      "public_sha256": "02595cfad91d2d73445d7bcc3ae30d46c7632f9c846e2d151fe24fe5369eac65",
+      "source_encoding": "utf-8",
+      "redactions": 418,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-activity-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-H-trace-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-H-trace-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-H-trace-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-H-trace-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-H-trace-test.log",
+      "source_sha256": "d7af23aec925dec2bbadacfc854c7db4a79597eb5f93e55c145309ca750f36eb",
+      "public_sha256": "e4fea1fcaff736f8e84631a1720b1ad553b69c4e2b54b5c2c005f0ce432fd492",
+      "source_encoding": "utf-8",
+      "redactions": 1,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-H-trace-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-external-face-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-external-face-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-external-face-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-external-face-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-external-face-test.log",
+      "source_sha256": "b4e05aa69e3a6af6a394cdfa2f59c0f5021c268ca8fe396e43da3d8a9e97fe3c",
+      "public_sha256": "4cd250703695bb103373679702c48094740ee940582e8cce528c089b1088b05f",
+      "source_encoding": "utf-8",
+      "redactions": 1516,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-external-face-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-layer-side-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-layer-side-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-layer-side-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-layer-side-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-layer-side-test.log",
+      "source_sha256": "cab6cde11a8cfddec53e4fbc282b3750175f0d6007e11b5c1374d8965ea5b047",
+      "public_sha256": "e4a56dad1b38c1e64d05dab78f978fd5b8c6b5e936b9f93b0a9f98bd0130e2c2",
+      "source_encoding": "utf-8",
+      "redactions": 1700,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-layer-side-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-tiny-positive-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-tiny-positive-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-tiny-positive-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-tiny-positive-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-tiny-positive-test.log",
+      "source_sha256": "d57c2d6de14e2e428690c1e1b2da154b861790a85695dcb587f149ec9be00ad7",
+      "public_sha256": "9531aa10d11551af7dc4bef789c2aaab9c73f541573f4902974a7d7f82edf3cc",
+      "source_encoding": "utf-8",
+      "redactions": 1,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-tiny-positive-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-refinement-version-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-refinement-version-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-refinement-version-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-refinement-version-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-refinement-version-test.log",
+      "source_sha256": "5e5170bf355972a4cdb7a7c8ffb5fcd558b46e60bc3cefe9b22718f89542d70e",
+      "public_sha256": "48a8558312c378ef3c61f61d665213562ae8726623cf4434bc51cf8b53e03d0f",
+      "source_encoding": "utf-8",
+      "redactions": 1,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-refinement-version-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-quota-admission-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-quota-admission-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-quota-admission-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-quota-admission-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-mutation-quota-admission-test.log",
+      "source_sha256": "205d42f6661a588db46d9632d640186fc29f6905b6880fbf604eea477695bc66",
+      "public_sha256": "78bab60d09aee5f489bcf70beb044773366edc692c2c04d8fb78f66f933ca198",
+      "source_encoding": "utf-8",
+      "redactions": 10,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/mutation-quota-admission-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-resource-control-compile.log",
+      "source_sha256": "b13fb08e13c295d80505b043cef0d012fee6fdbd23728c13544e5ca9a7087a54",
+      "public_sha256": "6b0f736b544e3da09cecb5c3e72b10ac798a80ac3dedbf7cc6c9ec1b602fe016",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/resource-control-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-resource-control-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/resource-control-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-resource-control-test.log",
+      "source_sha256": "093503614700e673be4763f7c65f824f432fb61aafb17bb83497fbb5ba0a95e7",
+      "public_sha256": "8066d8c693314ae4a28ca4e810087771ff68c6e8bb335cdc4ca08f4d3399b01c",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/resource-control-test.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-measurement-measure-compile.log",
+      "source_sha256": "5608bd283760b3f36d04b21052fefe2dd88c2509aef0e207ca9fd25a9039c473",
+      "public_sha256": "150655b519e2b62d98f6451e710ab63e1e2468a5fe83ba9d626b0ce6b2a23e57",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/measurement-measure-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-measurement-measure-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/measurement-measure-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-measurement-uvlas-compile.log",
+      "source_sha256": "575e4fbfea2f0a5585007e9ca04c8b598db0d0638ec5e389f6eaba1268211913",
+      "public_sha256": "27c0c432c7c15811ff86c2e0027e899140f13e8ebd0fe9560cc8c006642ea54a",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/measurement-uvlas-compile.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    },
+    {
+      "id": "pg-partition-log-measurement-uvlas-link.log",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_encoding": "utf-8",
+      "redactions": 0,
+      "hint": "docs/verification/IM-01/im01-partition-product/logs/measurement-uvlas-link.log",
+      "newline": "public UTF-8 LF; original bytes retained in isolated out directory"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+[0/2] Re-checking globbed directories...
+[1/28] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\build\issue125 && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/build/issue125/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/28] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\checked_dimensions.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[3/28] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\error_certificate.cpp.obj
+[4/28] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\checked_dimensions.cpp.obj
+[5/28] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\error_certificate.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[6/28] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_integration_partition_resources.dir\Release\structure\pg_integration_partition_resource_test.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[7/28] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\state.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[8/28] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\state.cpp.obj
+[9/28] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\build_info.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[10/28] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\build_info.cpp.obj
+[11/28] Building CXX object CMakeFiles\uvlas_structure_audit.dir\Release\src\structure\exact_polynomial.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[12/28] Building CXX object CMakeFiles\uvlas_structure.dir\Release\src\structure\exact_polynomial.cpp.obj
+[13/28] Building CXX object CMakeFiles\uvlas_core.dir\Release\src\core\instrumentation.cpp.obj
+[14/28] Building CXX object CMakeFiles\uvlas_core_audit.dir\Release\src\core\instrumentation.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[15/28] Linking CXX static library Release\uvlas_core.lib
+[16/28] Linking CXX static library Release\uvlas_core_audit.lib
+[17/28] Building CXX object CMakeFiles\uvlas_structure.dir\Release\src\structure\pg_graph.cpp.obj
+[18/28] Building CXX object CMakeFiles\uvlas_structure.dir\Release\src\structure\pg_coefficients.cpp.obj
+[19/28] Building CXX object CMakeFiles\uvlas_structure_audit.dir\Release\src\structure\pg_graph.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[20/28] Building CXX object tests\CMakeFiles\uvlas_test_structure_pg_integration_partition.dir\Release\structure\pg_integration_partition_test.cpp.obj
+[21/28] Building CXX object CMakeFiles\uvlas_structure_audit.dir\Release\src\structure\pg_coefficients.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[22/28] Building CXX object CMakeFiles\uvlas_structure_audit.dir\Release\src\structure\pg_integration_partition.cpp.obj
+cl : Command line warning D9025 : overriding '/DNDEBUG' with '/UNDEBUG'
+[23/28] Linking CXX static library Release\uvlas_structure_audit.lib
+[24/28] Building CXX object CMakeFiles\uvlas_structure.dir\Release\src\structure\pg_integration_partition.cpp.obj
+[25/28] Linking CXX static library Release\uvlas_structure.lib
+[26/28] Linking CXX executable tests\Release\uvlas_test_structure_pg_integration_partition_resources.exe
+[27/28] Linking CXX executable tests\Release\uvlas_test_structure_pg_integration_partition.exe

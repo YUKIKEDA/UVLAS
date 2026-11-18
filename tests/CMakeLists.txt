@@ -519,3 +519,21 @@ add_test(NAME qa.eigen_arnoldi
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/qa/results.py" check
         --case eigen-arnoldi --run "$<TARGET_FILE:uvlas_eigen_arnoldi_canary>")
 set_tests_properties(qa.eigen_arnoldi PROPERTIES TIMEOUT 30 LABELS "verification")
+
+
+uvlas_add_test(structure.pg_integration_partition
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_integration_partition_test.cpp
+    LIBS uvlas_structure Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_integration_partition
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_integration_partition PRIVATE
+    UVLAS_PG_PARTITION_FIXTURE="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-partition-v1.json")
+uvlas_add_test(structure.pg_integration_partition_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_integration_partition_resource_test.cpp
+    LIBS uvlas_structure_audit)
+target_include_directories(uvlas_test_structure_pg_integration_partition_resources
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_integration_partition_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_integration_partition_resources)

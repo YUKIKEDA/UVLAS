@@ -32,3 +32,7 @@ tests/numerics/fixtures/j1-pg-free-history-24-v1/source/** -text
 
 # Preserve the imported baseline port's usage text verbatim.
 cmake/vcpkg-ports/nlohmann-json/usage -text
+
+# Preserve the exact whitespace of this frozen execution evidence.
+docs/verification/IM-01/im01-partition-product/logs/** -whitespace
+docs/verification/IM-01/im01-partition-product/run_resource_control.py.txt -whitespace

@@ -1,0 +1,7 @@
+{
+  "v1": "system検索psapi.libをbuild内実ファイルとして扱いFileNotFoundError、compile前に停止。数値/control/変異成功へ数えない。",
+  "v2": "system検索名を維持し、存在するproduct lib/objectだけ隔離コピー。normal controlと7変異のcompile/link成功、正常/拒否の期待を実行。",
+  "resource_control": "audit compile/link経路について別のbyte同一controlを追加し成功。",
+  "measurement": "元Release libraryと同じmain.cppのCLIを直接link。--build-info source commit/uncommitted=falseを実際に照合。",
+  "static_history": "3TU解析で試験TUは0診断、製品のtrivial-copy moveだけを修正。影響製品TUだけ再解析exit0。過去失敗ログを最終成功へ付け替えない。"
+}

@@ -1,0 +1,82 @@
+"""Compile the fixed measurement producer and source-identical CLI against Release libraries."""
+from __future__ import annotations
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import runpy
+import subprocess
+
+def main() -> None:
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--root",type=Path,required=True)
+    parser.add_argument("--build",type=Path,required=True)
+    parser.add_argument("--output",type=Path,required=True)
+    args=parser.parse_args()
+    root=args.root.resolve();build=args.build.resolve();output=args.output.resolve()
+    output.mkdir(parents=True,exist_ok=False)
+    # Versioned harness is the same checked Windows argument parser as mutation control.
+    parser_module=runpy.run_path(str(root/"docs/verification/IM-01/im01-partition-product/run_mutations_v2.py.txt"))
+    parse=parser_module["argv"];norm=parser_module["norm"]
+    db=json.loads((build/"compile_commands.json").read_text(encoding="utf-8"))
+    env=os.environ.copy()
+    def build_one(source: Path,original_suffix: str,target: str,image: str) -> Path:
+        entry=next(x for x in db if norm(x["file"]).endswith(original_suffix) and "Release" in x["output"] and "audit" not in x["output"])
+        compile_args=parse(entry["command"])
+        obj=output/(image+".obj")
+        for i,arg in enumerate(compile_args):
+            if norm(arg)==norm(entry["file"]):compile_args[i]=str(source)
+            elif arg.lower().startswith("/fo"):compile_args[i]="/Fo"+str(obj)
+            elif arg.lower().startswith("/fd"):compile_args[i]="/Fd"+str(output/(image+"-compile.pdb"))
+        compile_args.append("-I"+str(root/"tests/structure"))
+        completed=subprocess.run(compile_args,cwd=build,env=env,capture_output=True,timeout=120,check=False)
+        (output/(image+"-compile.log")).write_bytes(completed.stdout+completed.stderr)
+        if completed.returncode:raise RuntimeError("Measurement/CLI compile failed: "+image)
+        commands=subprocess.check_output(["ninja","-C",str(build),"-f","build-Release.ninja","-t","commands",target],cwd=root,text=True)
+        command=next(x for x in reversed(commands.splitlines()) if "vs_link_exe" in x)
+        link_args=parse(command.split(" -- ",1)[1].split(" && ",1)[0])
+        executable=output/(image+".exe")
+        for i,arg in enumerate(link_args):
+            if arg.lower().endswith(".obj"):link_args[i]=str(obj)
+            elif arg.lower().startswith("/out:"):link_args[i]="/out:"+str(executable)
+            elif arg.lower().startswith("/implib:"):link_args[i]="/implib:"+str(output/(image+".lib"))
+            elif arg.lower().startswith("/pdb:"):link_args[i]="/pdb:"+str(output/(image+".pdb"))
+            elif arg.upper()=="/INCREMENTAL":link_args[i]="/INCREMENTAL:NO"
+        link_args.append("/MANIFEST:EMBED")
+        result=subprocess.run(link_args,cwd=build,env=env,capture_output=True,timeout=60,check=False)
+        (output/(image+"-link.log")).write_bytes(result.stdout+result.stderr)
+        if result.returncode:raise RuntimeError("Measurement/CLI link failed: "+image)
+        return executable
+    producer=root/"docs/verification/IM-01/im01-partition-product/measure.cpp.txt"
+    measure=build_one(producer,"/tests/structure/pg_integration_partition_test.cpp","uvlas_test_structure_pg_integration_partition","measure")
+    cli_source=root/"src/app/main.cpp"
+    fixed=subprocess.check_output(["git","show","6369a0b1227bf31db246f00f982a98bc7e2eff64:src/app/main.cpp"],cwd=root)
+    assert cli_source.read_bytes()==fixed
+    cli=build_one(cli_source,"/src/app/main.cpp","uvlas_cli","uvlas")
+    prefix=next(Path(x) for x in parse(next(x["command"] for x in db if norm(x["file"]).endswith("/tests/structure/pg_integration_partition_test.cpp") and "Release" in x["output"])) if "installed" in x and x.lower().startswith("-external:i"))
+    # Product dependencies are read-only; supply the existing Release DLL directory.
+    dll=root.parent.parent/"uvlas-im00-9/UVLAS/out/issue99-vcpkg-installed/x64-windows/bin"
+    # Prefer the exact prefix extracted from compiler arguments, removing only the flag.
+    include_token=str(prefix)
+    include_path=Path(include_token[len("-external:I"):])
+    dll=include_path.parent/"bin"
+    env["PATH"]=str(dll)+os.pathsep+os.environ.get("PATH","")
+    metadata=subprocess.check_output([str(cli),"--build-info"],cwd=build,env=env,timeout=15)
+    build_info=json.loads(metadata)
+    assert build_info["commit"]=="6369a0b1227bf31db246f00f982a98bc7e2eff64"
+    assert build_info["uncommitted_changes"] is False
+    (output/"build-info.json").write_bytes(metadata)
+    result=subprocess.check_output([str(measure)],cwd=build,env=env,timeout=60)
+    data=json.loads(result)
+    assert len(data["samples"])==9
+    data["build_info"]=build_info
+    data["producer_sha256"]=hashlib.sha256(producer.read_bytes()).hexdigest()
+    (output/"measurement.json").write_bytes((json.dumps(data,indent=2)+"\n").encode())
+    print(json.dumps({"samples":len(data["samples"]),"min_whole_ns":min(x["whole_ns"] for x in data["samples"]),
+                      "max_whole_ns":max(x["whole_ns"] for x in data["samples"]),
+                      "allocated_payload_bytes":data["samples"][0]["allocated_payload_bytes"],
+                      "owned_payload_forecast_bytes":data["samples"][0]["owned_payload_forecast_bytes"],
+                      "external_forecast_bytes":data["samples"][0]["external_forecast_bytes"]},indent=2))
+if __name__=="__main__":
+    main()
