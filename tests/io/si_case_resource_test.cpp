@@ -420,6 +420,8 @@ TEST_CASE("SI cancellation and zero diagnostic capacity preserve their original 
     const auto request = take(make_si_request(catalog, rows, admitted, plan, nullptr));
     const auto old = take(convert_case_to_si(schema, catalog, request, admitted, plan, nullptr));
     const auto unchanged = serialize(old);
+    // MSVC 14.51 request_stop() is non-const; libstdc++ declares it const.
+    // NOLINTNEXTLINE(misc-const-correctness): preserve the portable non-const handle.
     std::stop_source stop;
     REQUIRE(stop.request_stop());
     const auto stopped = limits(generous(), stop.get_token());
