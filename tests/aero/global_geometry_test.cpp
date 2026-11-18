@@ -191,7 +191,7 @@ TEST_CASE("Reversed edge aliases preserve canonical incidence and do not legaliz
           "[UW-D04][UW-D07][UW-D08][UI-D03]") {
     test_global_geometry::PairFixture fixture{reference_case("coplanar-edge")};
     // Raw alias IDs ascend while their physical owners descend.
-    for (const auto link :
+    for (const auto& link :
          std::array<std::pair<std::uint64_t, std::uint64_t>, 2>{{{20, 2}, {30, 1}}}) {
         const auto found =
             std::find(fixture.points.begin(), fixture.points.end(), s::PointId{link.second});
@@ -248,10 +248,10 @@ TEST_CASE(
         take(s::build_global_topology(geometry, fixture.topology(), limits(), *w, plan));
     const auto original = take(s::check_global_geometry(topology, geometry, limits(), *w, plan));
     const auto expected = take(original.work_plan());
-    for (const auto workers : {1, 2, 4}) {
+    for (const auto workers : std::array<std::size_t, 3>{1, 2, 4}) {
         std::vector<std::future<s::GlobalWorkPlan>> tasks;
         tasks.reserve(workers);
-        for (int i = 0; i < workers; ++i)
+        for (std::size_t i = 0; i < workers; ++i)
             tasks.push_back(std::async(std::launch::async, [&] {
                 core::ResourcePlan memory{budget};
                 auto own =
@@ -299,7 +299,7 @@ TEST_CASE("Global contacts match the independent feasible-polytope literals unde
     auto old = test_geometry::workspace(work_memory);
     auto w = workspace(work_memory);
     for (const auto& record : reference.at("cases")) {
-        for (const auto setting : std::array<std::pair<int, bool>, 4>{
+        for (const auto& setting : std::array<std::pair<int, bool>, 4>{
                  {{0, false}, {-900, false}, {900, false}, {0, true}}}) {
             std::array<std::size_t, 3> pa{0, 1, 2};
             do {

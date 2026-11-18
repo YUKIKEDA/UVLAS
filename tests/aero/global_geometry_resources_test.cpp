@@ -393,7 +393,7 @@ TEST_CASE("Fixed dense integer products have no hidden heap arena", "[UW-D07][N4
     auto prepared = memory.allocate<s::GlobalScratch>(1, core::Operation::EvaluateAero);
     REQUIRE(prepared);
     auto scratch = std::move(*prepared); // Prepared test-only primitive arena.
-    for (const auto widths : std::array<std::pair<unsigned, unsigned>, 4>{
+    for (const auto& widths : std::array<std::pair<unsigned, unsigned>, 4>{
              {{3200, 3200}, {6400, 6400}, {19000, 9000}, {16000, 16000}}}) {
         s::ExactInteger left = (s::ExactInteger{1} << widths.first) - 1,
                         right = (s::ExactInteger{1} << widths.second) - 1;
