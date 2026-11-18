@@ -1,0 +1,221 @@
+{
+  "tolerance": "0 (Fraction exact)",
+  "geometry_checks": 1332,
+  "cases": [
+    {
+      "case": "disjoint",
+      "vertices": [],
+      "accepted": true
+    },
+    {
+      "case": "transverse",
+      "vertices": [
+        [
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "1",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "point",
+      "vertices": [
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": true
+    },
+    {
+      "case": "point-excess",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "1",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "edge",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": true
+    },
+    {
+      "case": "unclaimed-edge",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "coplanar-edge",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": true
+    },
+    {
+      "case": "overlap",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "1",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "containment",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "1",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "collinear",
+      "vertices": [
+        [
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "duplicate",
+      "vertices": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "2",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0"
+        ]
+      ],
+      "accepted": false
+    },
+    {
+      "case": "low-gap",
+      "vertices": [],
+      "accepted": true
+    }
+  ],
+  "T": [
+    [
+      1,
+      0
+    ],
+    [
+      0,
+      1
+    ]
+  ],
+  "release_owners": [
+    [
+      2,
+      7
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      5,
+      7
+    ]
+  ],
+  "multi_band_velocity": "2582249878086908589655919172003011874329705792829223512830660963478691881007116736591737694442740353638896954765582794753/2582249878086908589655919172003011874329705792829223512830659356540647622016841194629645353280137831435903171972747493376",
+  "negative_controls": {
+    "open-aabb": true,
+    "shared-point-skip": true,
+    "isolated-endpoints-only": true,
+    "T-sign": true,
+    "alias-basis": true,
+    "internal-TE-face-choice": true,
+    "ignored-J-column": true,
+    "ignored-epoch": true
+  }
+}
