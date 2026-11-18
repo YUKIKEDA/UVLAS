@@ -127,7 +127,9 @@ def main() -> None:
         "product_tests_executed": False,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n"
+    )
     print("20 unit controls, 4 angle recipes, 7 budget boundaries; Machin/order/ledger: passed")
 
 
