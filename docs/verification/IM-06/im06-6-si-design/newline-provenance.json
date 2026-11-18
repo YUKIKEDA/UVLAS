@@ -1,0 +1,37 @@
+{
+  "schema": "uvlas.si-design-newline-correction/1",
+  "reason": "The first metadata commit preserved PowerShell CRLF under docs -text. The staged whitespace check reported trailing CR, but the shell continued. Only this PR new metadata was normalized; old evidence and source commit remain unchanged.",
+  "files": [
+    {
+      "path": "docs/verification/IM-06/im06-6-si-design/design-audit.json",
+      "before_sha256": "8c267bcebe67fc8bbf1c2b9b7ad5c4426576ef3f223a6c0aab70dc4f4afa583c",
+      "after_sha256": "a5de9b002c6bd92e4fb6d2edf6defce9dd81a0ab6f04c1dce17efd645b66d11e",
+      "change": "CRLF to LF only; contents and numerical tokens preserved"
+    },
+    {
+      "path": "docs/verification/IM-06/im06-6-si-design/japanese-lint.json",
+      "before_sha256": "189c3e9ef196e2d89578e82b3be1cc8133a69d22b99ff0ead7923af5ce7888f2",
+      "after_sha256": "83807afe692803a03bb35c316c8a420d6280b54b1bd53c1b8650cf3766795c7f",
+      "change": "CRLF to LF only; contents and numerical tokens preserved"
+    },
+    {
+      "path": "docs/verification/IM-06/im06-6-si-design/japanese-outline.txt",
+      "before_sha256": "ef3d2f96a3a4d10f6c4aeee3d9780d04dcac8e79eeadc3803587bd6b7d2017b9",
+      "after_sha256": "2475a6ebddc00b9ebfab15be96d2eee3fbb557e960080f94491cf1eca14d91cd",
+      "change": "CRLF to LF only; contents and numerical tokens preserved"
+    },
+    {
+      "path": "docs/verification/IM-06/im06-6-si-design/japanese-terms.txt",
+      "before_sha256": "f90a0b79ac637a310c0596dd34bde34807130d357f23bf8abaccbb2a0c220150",
+      "after_sha256": "9adc0870456ecea85b74c1fdbdc8dbc1b6a73e3b616cb40790fda4cdc4c511eb",
+      "change": "CRLF to LF only; contents and numerical tokens preserved"
+    },
+    {
+      "path": "docs/verification/IM-06/im06-6-si-design/preservation.json",
+      "before_sha256": "c2d8a18ce1866375eb5f46e4066c793c4d91b90314e3a3c8969920cef0b3feb6",
+      "after_sha256": "63a13cd24399d584ee5bf77da739d34d4a482e03e4508f405604f01408b49874",
+      "change": "CRLF to LF only; contents and numerical tokens preserved"
+    }
+  ],
+  "manifest_normalized_and_rehashed": true
+}

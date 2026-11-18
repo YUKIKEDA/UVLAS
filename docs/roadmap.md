@@ -112,6 +112,8 @@ flowchart LR
 | IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | Done |
 | IM03-3 | Feat | 空力局所幾何の包絡と所有する適格packet | #109 | Done |
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
+| IM06-4 | Feat | 全caseの所有typed schemaとexact値・参照・資源検査 | #126 | Done |
+| IM06-5 | Design | SI変換・入力精度・所有と変換予算の開始契約 | #135 | Done |
 
 ## 残リスクと止める位置
 

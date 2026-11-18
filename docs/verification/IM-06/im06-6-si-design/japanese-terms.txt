@@ -1,0 +1,312 @@
+=== terms: docs\specs\foundation\si-precision-conversion-contract.md ===
+has_gloss_hint は「説明済みと判定した」印ではなく、初出近傍に説明マーカーが見つかったという機械的なヒントに過ぎない。要確認は人間/AIの判断に委ねる。
+
+L1 SI (出現21回, 説明手掛かり: なし)
+    近傍: # SI変換と入力精度の実装開始契約
+
+2026-11-18。Issue #135、IO4-01、IM06-0。採用済みの[case契約](case-schema-co
+
+L3 Issue (出現1回, 説明手掛かり: なし)
+    近傍: # SI変換と入力精度の実装開始契約
+
+2026-11-18。Issue #135、IO4-01、IM06-0。採用済みの[case契約](case-schema-contract.md)、[全field](case-schema-
+
+L3 IO4 (出現1回, 説明手掛かり: なし)
+    近傍: # SI変換と入力精度の実装開始契約
+
+2026-11-18。Issue #135、IO4-01、IM06-0。採用済みの[case契約](case-schema-contract.md)、[全field](case-schema-fields.md
+
+L3 IO (出現1回, 説明手掛かり: なし)
+    近傍: # SI変換と入力精度の実装開始契約
+
+2026-11-18。Issue #135、IO4-01、IM06-0。採用済みの[case契約](case-schema-contract.md)、[全field](case-schema-fields.m
+
+L3 IM06 (出現3回, 説明手掛かり: なし)
+    近傍: # SI変換と入力精度の実装開始契約
+
+2026-11-18。Issue #135、IO4-01、IM06-0。採用済みの[case契約](case-schema-contract.md)、[全field](case-schema-fields.md)、[初期物理場
+
+L3 IM (出現3回, 説明手掛かり: なし)
+    近傍: # SI変換と入力精度の実装開始契約
+
+2026-11-18。Issue #135、IO4-01、IM06-0。採用済みの[case契約](case-schema-contract.md)、[全field](case-schema-fields.md)、[初期物
+
+L3 JSON (出現5回, 説明手掛かり: なし)
+    近傍: t.md)、[typed schema](typed-case-schema-implementation-contract.md)を補う。旧資料のbytesとJSON形式は変えない。
+
+## 1. SI変換の成功が保証する範囲
+
+`SchemaCase → SiCase` は、元のexact値、全成分の次元・単位・軸の意味を
+
+L7 ID (出現1回, 説明手掛かり: なし)
+    近傍: 値、全成分の次元・単位・軸の意味を保持してSI表現と変換誤差を所有する工程である。全191 record・806 memberの既存variantを対象にする。ID、個数、index、opcode、真偽値、文字列は物理量として換算しない。`Rational`は分子・分母を合わせた一つの値として扱う。
+
+成功は入力変換だけの
+
+L9 SO (出現6回, 説明手掛かり: あり)
+    近傍: 量として換算しない。`Rational`は分子・分母を合わせた一つの値として扱う。
+
+成功は入力変換だけの資格である。外部fileの読取り、式の数値評価・微分、SO(3)、材料SPD、活動領域、初期物理場の補完、最終q/v、物理残差、QoIへの誤差伝播はprepare以降の資格に残す。既存の12誤差群や`projectio
+
+L9 SPD (出現1回, 説明手掛かり: なし)
+    近傍: い。`Rational`は分子・分母を合わせた一つの値として扱う。
+
+成功は入力変換だけの資格である。外部fileの読取り、式の数値評価・微分、SO(3)、材料SPD、活動領域、初期物理場の補完、最終q/v、物理残差、QoIへの誤差伝播はprepare以降の資格に残す。既存の12誤差群や`projection_absolut
+
+L9 QoI (出現6回, 説明手掛かり: なし)
+    近傍: て扱う。
+
+成功は入力変換だけの資格である。外部fileの読取り、式の数値評価・微分、SO(3)、材料SPD、活動領域、初期物理場の補完、最終q/v、物理残差、QoIへの誤差伝播はprepare以降の資格に残す。既存の12誤差群や`projection_absolute/relative`をSI変換の許容差として流用しない。
+
+L9 CLI (出現3回, 説明手掛かり: なし)
+    近傍: への誤差伝播はprepare以降の資格に残す。既存の12誤差群や`projection_absolute/relative`をSI変換の許容差として流用しない。CLIとJSONへ新しい指定項目を足さない。
+
+```mermaid
+flowchart LR
+  S[所有SchemaCase] --> C[変換対象catalog
+
+L25 FD (出現3回, 説明手掛かり: なし)
+    近傍: 6-0の後続であり、host要求を作れない状態で解析成功を返してはならない。
+
+## 2. 元値と単位倍率をexactな式で保持する
+
+元値を $$ x $$、FD-01の次元を $$ d=(l,m,t,a) $$ とする。SIの真値は
+
+$$
+y=xU(d),\qquad U(d)=u_L^l u_M^m u_T^t c
+
+L39 Number (出現1回, 説明手掛かり: なし)
+    近傍: 0000 |
+| s, ms, min | 1, 1/1000, 60 |
+| rad, deg | 1, π/180 |
+
+`SiExactRecipe`は元Numberの符号・全桁・10進指数、または元Rationalの両整数、root単位の型別enum、次元、πの整数冪を所有する。元の字面と正規数値を別に保持する。`-0`の
+
+L39 Rational (出現5回, 説明手掛かり: なし)
+    近傍: , 1/1000, 60 |
+| rad, deg | 1, π/180 |
+
+`SiExactRecipe`は元Numberの符号・全桁・10進指数、または元Rationalの両整数、root単位の型別enum、次元、πの整数冪を所有する。元の字面と正規数値を別に保持する。`-0`の字面も失わない。次元は既存のint16、π冪の絶対
+
+L39 DAG (出現1回, 説明手掛かり: なし)
+    近傍: um、次元、πの整数冪を所有する。元の字面と正規数値を別に保持する。`-0`の字面も失わない。次元は既存のint16、π冪の絶対値は安全な符号拡張後に求める。式DAGの`integer_power`はint32のopcodeであり、SI工程で実行したり単位冪へ流用したりしない。
+
+有限10進数は数学的には有理数だが、その巨大
+
+L63 ge (出現15回, 説明手掛かり: なし)
+    近傍: の順序で元の区間を潰さない。
+
+## 3. 許容差はSI尺度で無次元化して明示する
+
+各変換対象に、同じ次元の正のSI尺度 $$ s $$、無次元の $$ a\ge0,r\ge0 $$ をexact Decimal/Rationalで要求する。変換された中心を $$ c $$、真値包含から証明した上界を $$ E\ge|y
+
+L63 Decimal (出現1回, 説明手掛かり: なし)
+    近傍: . 許容差はSI尺度で無次元化して明示する
+
+各変換対象に、同じ次元の正のSI尺度 $$ s $$、無次元の $$ a\ge0,r\ge0 $$ をexact Decimal/Rationalで要求する。変換された中心を $$ c $$、真値包含から証明した上界を $$ E\ge|y-c| $$ とすると、受理条件は
+
+$$
+E\l
+
+L79 ループ (出現1回, 説明手掛かり: なし)
+    近傍: 全桁を順に取り込む256bit区間の`10*v+digit`で評価する。10進指数・有理分母・unit冪は二乗反復法で区間倍率へ変換する。指数の絶対値に比例するループや`10^e`の巨大整数を作らない。exponent/int64または固定仮数の表現能力を超えたら`PrecisionUnresolved`とし、零・無限大の成
+
+L81 Machin (出現2回, 説明手掛かり: なし)
+    近傍: `PrecisionUnresolved`とし、零・無限大の成功にしない。256bitは内部の固定演算精度であり、任意に厳しい要求への成功保証ではない。
+
+πはMachin式 $$ 16\arctan(1/5)-4\arctan(1/239) $$ を使う。それぞれ交代級数128項と次項剰余の有理上界を外向き区間で評価する。項数、
+
+L81 ライブラリ (出現1回, 説明手掛かり: あり)
+    近傍: 1/5)-4\arctan(1/239) $$ を使う。それぞれ交代級数128項と次項剰余の有理上界を外向き区間で評価する。項数、演算順、丸め規則を固定し、標準ライブラリのπやatanのULP保証へ依存しない。call内に一度だけ計算し、可変global cacheを持たない。元exact値とπ因子のrecipeは近似区間とは別
+
+L81 ULP (出現1回, 説明手掛かり: あり)
+    近傍: (1/239) $$ を使う。それぞれ交代級数128項と次項剰余の有理上界を外向き区間で評価する。項数、演算順、丸め規則を固定し、標準ライブラリのπやatanのULP保証へ依存しない。call内に一度だけ計算し、可変global cacheを持たない。元exact値とπ因子のrecipeは近似区間とは別に残す。
+
+出力は`S
+
+L91 hi (出現7回, 説明手掛かり: なし)
+    近傍: ,q=0。tiny/hugeな有限入力を扱うためqを常にconsumerへ渡し、既存の指数なし`PrecisionBuffer`へ暗黙変換しない。
+
+区間中点のhiをnearest-even、exactな残差のloをnearest-evenで選び、元区間の両端からの距離を上向きにρへ包む。丸めは整数のguard/round
+
+L91 FP (出現1回, 説明手掛かり: なし)
+    近傍: ctな残差のloをnearest-evenで選び、元区間の両端からの距離を上向きにρへ包む。丸めは整数のguard/round/stickyとbit構築で行い、FP丸めmodeやFTZへ依存しない。中心が±2へ丸められたらqを1増やし、h/ℓ/ρを1/2倍する。丸め後の非零中心が絶対値1未満ならqを1減らして2倍する。いず
+
+L91 FTZ (出現1回, 説明手掛かり: なし)
+    近傍: nearest-evenで選び、元区間の両端からの距離を上向きにρへ包む。丸めは整数のguard/round/stickyとbit構築で行い、FP丸めmodeやFTZへ依存しない。中心が±2へ丸められたらqを1増やし、h/ℓ/ρを1/2倍する。丸め後の非零中心が絶対値1未満ならqを1減らして2倍する。いずれもqをchecke
+
+L97 コメント (出現1回, 説明手掛かり: なし)
+    近傍: できなければ失敗する。消費先の範囲不足も暗黙underflowで吸収しない。
+
+## 5. 所有I/Fと検査順
+
+以下は実装を拘束する型と責務である。利用者向けコメントは、単位、所有、失敗と使い方を英語で説明する。
+
+| 型・処理 | 契約 |
+|---|---|
+| `SiCatalog`／`make_si_catalog(
+
+L110 SchemaCase (出現7回, 説明手掛かり: なし)
+    近傍: e親からviewを作れない |
+| `materialize_rational` | 2節の限定されたexact出力。SI浮動中心からの再有理化ではない |
+
+SchemaCaseの所有複製は既存保持構造をprivateにclone/rebindする。再parse、再schema検査、元入力からのlazy読取りはしない。SiCaseは元s
+
+L110 SiCase (出現7回, 説明手掛かり: なし)
+    近傍: chemaCaseの所有複製は既存保持構造をprivateにclone/rebindする。再parse、再schema検査、元入力からのlazy読取りはしない。SiCaseは元schema snapshot、変換配列、source-node→SI行の平坦index、要求、ledger、解決済み既定値を所有する。公開成功型に未変換値
+
+L110 API (出現2回, 説明手掛かり: なし)
+    近傍: I行の平坦index、要求、ledger、解決済み既定値を所有する。公開成功型に未変換値や汎用bagを入れない。source_caseは元単位であることを型名とAPI文書に示す。
+
+検査順は移動元/identity/host要求→checked全call計画→予約→元値取込みと単位包絡→一語/二語選択と全許容幅→所有返却。c
+
+L118 InputQuotas (出現1回, 説明手掛かり: なし)
+    近傍: 値、π/単位冪、計画payload P、scratch S、累積owned bytes、work、diagnostic path bytesを個別に制限する。元InputQuotasは維持し、SI用host capをJSONの19項へ混ぜない。64bitの件数・積・和・offsetとhost size_tへの変換は全てcheckedである。
+
+L120 Pclone (出現2回, 説明手掛かり: なし)
+    近傍: setとhost size_tへの変換は全てcheckedである。
+
+N=元node数、K=論理数量数、C=要求に保持する文字bytes、D=最大木深さとする。Pcloneは元SchemaCase cloneの実buffer容量と全element型の実sizeofを積み上げた量である。SIの容量表は以下で固定する。
+
+| owne
+
+L120 element (出現1回, 説明手掛かり: なし)
+    近傍: =元node数、K=論理数量数、C=要求に保持する文字bytes、D=最大木深さとする。Pcloneは元SchemaCase cloneの実buffer容量と全element型の実sizeofを積み上げた量である。SIの容量表は以下で固定する。
+
+| owned buffer | 容量 |
+|---|---|
+| cloneとown
+
+L130 CatalogStorage (出現1回, 説明手掛かり: なし)
+    近傍: etadata) + sizeof(SiResolvedDefaults)。可変provenanceはclone内だけ |
+
+catalogのPはsizeof(CatalogStorage)+K×sizeof(CatalogEntry)+元exact文字bytes、requestのPはsizeof(RequestStorage)+K×sizeof
+
+L130 CatalogEntry (出現1回, 説明手掛かり: なし)
+    近傍: vedDefaults)。可変provenanceはclone内だけ |
+
+catalogのPはsizeof(CatalogStorage)+K×sizeof(CatalogEntry)+元exact文字bytes、requestのPはsizeof(RequestStorage)+K×sizeof(RequirementRecord)+Cであ
+
+L130 RequestStorage (出現1回, 説明手掛かり: なし)
+    近傍: のPはsizeof(CatalogStorage)+K×sizeof(CatalogEntry)+元exact文字bytes、requestのPはsizeof(RequestStorage)+K×sizeof(RequirementRecord)+Cである。3callのowned費用をResourcePlanの累積へ一度ずつ課金する。同じaren
+
+L130 RequirementRecord (出現2回, 説明手掛かり: なし)
+    近傍: +K×sizeof(CatalogEntry)+元exact文字bytes、requestのPはsizeof(RequestStorage)+K×sizeof(RequirementRecord)+Cである。3callのowned費用をResourcePlanの累積へ一度ずつ課金する。同じarena共有sliceを重複計上せず、実際に複製するbuffe
+
+L130 ResourcePlan (出現2回, 説明手掛かり: なし)
+    近傍: requestのPはsizeof(RequestStorage)+K×sizeof(RequirementRecord)+Cである。3callのowned費用をResourcePlanの累積へ一度ずつ課金する。同じarena共有sliceを重複計上せず、実際に複製するbufferは両方計上する。control block/allocator
+
+L132 mul (出現2回, 説明手掛かり: なし)
+    近傍: k/allocator overheadをpayload保証と混同しない。
+
+scratchは命令列方式で数える。primitiveを整数仮数丸め、端点add/mul/div、区間add/mul/div、十進1桁取込み、冪1bit、π1項、出力丸め、許容幅比較の順で非再帰のSSAへ展開し、1命令の全結果を1slotとして保持
+
+L132 SSA (出現1回, 説明手掛かり: なし)
+    近傍: primitiveを整数仮数丸め、端点add/mul/div、区間add/mul/div、十進1桁取込み、冪1bit、π1項、出力丸め、許容幅比較の順で非再帰のSSAへ展開し、1命令の全結果を1slotとして保持する。条件分岐は全枝の最大、繰返しは入力/累積slotを残して同じbody slotへ戻す。bodyを指数値回数で
+
+L135 FixedInteger (出現1回, 説明手掛かり: なし)
+    近傍: 算出する。製品は同じ定義をcounting型で展開し、式版と計画identityを検査する。
+
+$$
+S=I\,\mathrm{sizeof}(\mathrm{FixedInteger1024})+
+B\,\mathrm{sizeof}(\mathrm{Bound256})+
+J\,\mathrm{sizeof}(\mathrm{Interv
+
+L136 Bound (出現2回, 説明手掛かり: なし)
+    近傍: $$
+S=I\,\mathrm{sizeof}(\mathrm{FixedInteger1024})+
+B\,\mathrm{sizeof}(\mathrm{Bound256})+
+J\,\mathrm{sizeof}(\mathrm{Interval256})+
+D\,\mathrm{sizeof}(\mathrm{Walk
+
+L137 Interval (出現1回, 説明手掛かり: なし)
+    近傍: nteger1024})+
+B\,\mathrm{sizeof}(\mathrm{Bound256})+
+J\,\mathrm{sizeof}(\mathrm{Interval256})+
+D\,\mathrm{sizeof}(\mathrm{WalkFrame})+
+L_{path}+\mathrm{sizeof}(\mathrm{
+
+L138 WalkFrame (出現1回, 説明手掛かり: なし)
+    近傍: ound256})+
+J\,\mathrm{sizeof}(\mathrm{Interval256})+
+D\,\mathrm{sizeof}(\mathrm{WalkFrame})+
+L_{path}+\mathrm{sizeof}(\mathrm{SiScratchHeader}).
+$$
+
+整数backendの自動temporar
+
+L139 SiScratchHeader (出現1回, 説明手掛かり: なし)
+    近傍: 256})+
+D\,\mathrm{sizeof}(\mathrm{WalkFrame})+
+L_{path}+\mathrm{sizeof}(\mathrm{SiScratchHeader}).
+$$
+
+整数backendの自動temporaryもprimitiveのslot内訳へ含め、呼出し先をsource監査して上限を記録する。根拠のない固定
+
+L142 Lpath (出現1回, 説明手掛かり: なし)
+    近傍: ない固定slot数や「必要に応じ確保」でSを置換しない。π計算、巨大指数、decimal stream、誤差比較で共有するscratchは同時最大だけ計上する。Lpathは元keyのJSON Pointer escape後の最長path bytesで、先にchecked走査して求める。clone、index、各配列・文字、wal
+
+L142 Pointer (出現1回, 説明手掛かり: なし)
+    近傍: 確保」でSを置換しない。π計算、巨大指数、decimal stream、誤差比較で共有するscratchは同時最大だけ計上する。Lpathは元keyのJSON Pointer escape後の最長path bytesで、先にchecked走査して求める。clone、index、各配列・文字、walkと診断領域は別々の明示buffer
+
+L144 B (出現7回, 説明手掛かり: なし)
+    近傍: ackend内部を二重課金しない。十進C桁にはC回のbody、冪にはabs指数のbit数（int64で最大64、int16で最大16）、πは2×128項と剰余、B64/TWの両試行と要求比較を含めた命令costを全call admissionへ足す。各node、桁、冪bit、級数項、bit候補の処理前にworkと取消を検
+
+L144 TW (出現1回, 説明手掛かり: なし)
+    近傍: nd内部を二重課金しない。十進C桁にはC回のbody、冪にはabs指数のbit数（int64で最大64、int16で最大16）、πは2×128項と剰余、B64/TWの両試行と要求比較を含めた命令costを全call admissionへ足す。各node、桁、冪bit、級数項、bit候補の処理前にworkと取消を検査する。予
+
+L144 RSS (出現1回, 説明手掛かり: あり)
+    近傍: issionへ足す。各node、桁、冪bit、級数項、bit候補の処理前にworkと取消を検査する。予定Wと実W、P/Sと実容量をreportへ残す。予測時間やRSSの証明とは扱わない。
+
+外部・allocator費用はEstimateAdmissionとRequireProvenBoundを分ける。後者はclone/con
+
+L146 EstimateAdmission (出現1回, 説明手掛かり: あり)
+    近傍: 候補の処理前にworkと取消を検査する。予定Wと実W、P/Sと実容量をreportへ残す。予測時間やRSSの証明とは扱わない。
+
+外部・allocator費用はEstimateAdmissionとRequireProvenBoundを分ける。後者はclone/control/backendを含む上界の証明がない環境で`Unsupported`。bad_
+
+L146 RequireProvenBound (出現1回, 説明手掛かり: あり)
+    近傍: る。予定Wと実W、P/Sと実容量をreportへ残す。予測時間やRSSの証明とは扱わない。
+
+外部・allocator費用はEstimateAdmissionとRequireProvenBoundを分ける。後者はclone/control/backendを含む上界の証明がない環境で`Unsupported`。bad_allocやchecked容量超過は`
+
+L152 oracle (出現2回, 説明手掛かり: なし)
+    近傍: る。slotなしでも同じ元failureを返す。失敗した自身の予約だけを戻し、planの累積費用を巻き戻さない。
+
+## 7. 実装へ渡す検証と開始判定
+
+設計oracleはstdlibのFractionだけで単位倍率、Machin剰余、正尺度判定と近接exact端点を検査する。製品の256bit kernelやAPIを呼ばず、製
+
+L152 Fraction (出現2回, 説明手掛かり: なし)
+    近傍: ailureを返す。失敗した自身の予約だけを戻し、planの累積費用を巻き戻さない。
+
+## 7. 実装へ渡す検証と開始判定
+
+設計oracleはstdlibのFractionだけで単位倍率、Machin剰余、正尺度判定と近接exact端点を検査する。製品の256bit kernelやAPIを呼ばず、製品合格数へ転記しない。
+
+| 製
+
+L163 イベント (出現1回, 説明手掛かり: なし)
+    近傍: ない |
+
+隔離controlがcompile/link/試験成功した後、単位逆転、degを有理化、角度をκへ付与、末尾桁消去、半径除去、相対許容幅の上端使用、イベント結合、foreign ordinal受理、入力誤差二重課金、work前検査除去を各々入れ、compile/link成功後の試験失敗で検出する。クラッシュやcom
+
+L163 クラッシュ (出現1回, 説明手掛かり: なし)
+    近傍: 上端使用、イベント結合、foreign ordinal受理、入力誤差二重課金、work前検査除去を各々入れ、compile/link成功後の試験失敗で検出する。クラッシュやcompile失敗を検出成功に数えない。
+
+本契約と限定oracleの独立レビュー後、SI変換パッケージを実装開始できる。製品source、全所有/資源/故障
+
+L165 レビュー (出現1回, 説明手掛かり: なし)
+    近傍: 前検査除去を各々入れ、compile/link成功後の試験失敗で検出する。クラッシュやcompile失敗を検出成功に数えない。
+
+本契約と限定oracleの独立レビュー後、SI変換パッケージを実装開始できる。製品source、全所有/資源/故障/変異、対象D/R・Linux sanitizer・静的検査を経て初めて実装適合を判
+
+L165 パッケージ (出現1回, 説明手掛かり: なし)
+    近傍: 、compile/link成功後の試験失敗で検出する。クラッシュやcompile失敗を検出成功に数えない。
+
+本契約と限定oracleの独立レビュー後、SI変換パッケージを実装開始できる。製品source、全所有/資源/故障/変異、対象D/R・Linux sanitizer・静的検査を経て初めて実装適合を判定する。SI入力誤差の
+
+L165 Linux (出現1回, 説明手掛かり: なし)
+    近傍: を検出成功に数えない。
+
+本契約と限定oracleの独立レビュー後、SI変換パッケージを実装開始できる。製品source、全所有/資源/故障/変異、対象D/R・Linux sanitizer・静的検査を経て初めて実装適合を判定する。SI入力誤差のQoI伝播、外部snapshot/import、prepare、CLI、全物理受入は

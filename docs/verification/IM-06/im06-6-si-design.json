@@ -1,0 +1,96 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-6-si-design",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 135,
+  "date": "2026-11-18",
+  "source_commit": "e7f065176908a540914d2f56dc2fcf757ce29fd2",
+  "base_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
+  "claimed_state": {
+    "design_contract_reviewed": true,
+    "implementation_conforms": false,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "performance_qualification": false,
+    "practical_acceptance": false
+  },
+  "scope": "所有SchemaCaseからSIへの開始契約。元exact値、degのπ包含、成分・軸、必須host要求、入力誤差ledger、全call所有・資源・失敗。製品SI converterは未実装。",
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "2/5節で全単位exact倍率・π冪、全consumerの次元/基底、式constant/domain/variable、元順序と構造的不在を固定。"
+    },
+    {
+      "condition": 2,
+      "evidence": "5節でcatalog/key/request/result/view/有理化、所有clone、identity、foreign field拒否、寿命・失敗を固定。"
+    },
+    {
+      "condition": 3,
+      "evidence": "3/4節でE<=a*s+r*abs(y)、下端比較、B64/TW、Machin128項と剰余、cap付きexact dyadic零幅、正規化と入力一回課金を固定。"
+    },
+    {
+      "condition": 4,
+      "evidence": "6節で全明示cap、P/S buffer/SSA-counting式、work前課金、診断fallback、故障保証。再入はcaller preconditionでありruntime guard認定ではない。"
+    },
+    {
+      "condition": 5,
+      "evidence": "Fraction限定oracle20単位/4角度/7予算と近接exact順序・ledger、別出力byte一致、旧8資料保全、rootの独立技術/日本語/数学oracle通読。traceとPR提出は本記録と同じ差分で完了する。"
+    }
+  ],
+  "checks": {
+    "design_oracle": {
+      "unit_controls": 20,
+      "angle_recipes": 4,
+      "budget_boundaries": 7,
+      "machin_terms_each": 128,
+      "machin_remainder_width_below": "2^-580",
+      "near_exact_order": true,
+      "ledger": true,
+      "negative_witnesses": 6,
+      "product_mutations_executed": false
+    },
+    "reproduction_bytes_equal": true,
+    "preserved_old_sources": 8,
+    "japanese": {
+      "lint_exit": 0,
+      "outline_exit": 0,
+      "terms_exit": 0,
+      "retained_finding": "low_lexical_diversity_ttr info1。同じ型・単位・精度・資源の用語を同じ意味で維持するため残す。",
+      "independent_review": "rootが内容・構成・日本語とFraction oracleを独立通読。4指摘を反映。"
+    },
+    "not_run": "C++/既存数値suite/全体CIは製品source・build・数値入力不変のため再実行しない。256bit kernel・所有API・資源/故障/変異・D/R/Linuxの製品検証は未実行。"
+  },
+  "commands": [
+    "python -B -X utf8 docs/verification/IM-06/im06-6-si-design/design-oracle.py --output <new output path>",
+    "uv run --offline --python 3.12 --script .agents/skills/natural-japanese/scripts/<lint|outline|terms>.py <new spec>",
+    "git diff --exit-code 3af7b8e -- include src tests CMakeLists.txt cmake .github/workflows",
+    "git hash-object <old file> == git rev-parse 3af7b8e:<old file>"
+  ],
+  "environment": "Windows 11 / PowerShell 7 / CPython 3.12.8 / Fraction stdlib。コンパイラと製品APIは使用しない。",
+  "remaining": "SI製品実装と全系列検証、QoIへの入力誤差伝播、snapshot/import/prepare/CLIは既存IM06-0。親22と物理実務受入は未完了。",
+  "sources": {
+    "docs/specs/foundation/si-precision-conversion-contract.md": "b15d01590c82e106210ea9f1078bcb24c097a7a1a050c5972a34de8aaf315879",
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "docs/specs/foundation/case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "docs/specs/foundation/case-initial-physical-state-examples.json": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+    "docs/specs/foundation/typed-case-schema-implementation-contract.md": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50",
+    "docs/specs/foundation/precision-contract.md": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+    "docs/specs/foundation/io-execution-adoption-specification.md": "df926d9f6726a62af313e534e04c6a9b9aa4b838f7fa252567f3a50519039123"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-6-si-design/design-audit.json": "a5de9b002c6bd92e4fb6d2edf6defce9dd81a0ab6f04c1dce17efd645b66d11e",
+    "docs/verification/IM-06/im06-6-si-design/design-oracle.py": "92ac7b664c3a32ab9ca28c5820890630d08f5a6c5420b16c542d1aaa38417b1c",
+    "docs/verification/IM-06/im06-6-si-design/independent-review.json": "ba87ce1cdea1800bc97fc791638596af8c84b929d9d4446357c4d88e2d52d593",
+    "docs/verification/IM-06/im06-6-si-design/japanese-lint.json": "83807afe692803a03bb35c316c8a420d6280b54b1bd53c1b8650cf3766795c7f",
+    "docs/verification/IM-06/im06-6-si-design/japanese-outline.txt": "2475a6ebddc00b9ebfab15be96d2eee3fbb557e960080f94491cf1eca14d91cd",
+    "docs/verification/IM-06/im06-6-si-design/japanese-terms.txt": "6526b1ca5969d830adff79bb6fcb30c2ba1e297aaf302dfb00b536cb39577a7d",
+    "docs/verification/IM-06/im06-6-si-design/preservation.json": "3b129186e11b65a023d199b98eeed080251d229a27f7d246cff91bdd0f381b14",
+    "docs/verification/IM-06/im06-6-si-design/newline-provenance.json": "1d79b99bf86345234f2d4c9b4132a2c2beec43b39cc024e1540c97c5989e27f4"
+  },
+  "contract_source_commit": "350eac4954dcdd8134360df2eb579c823860020f"
+}
