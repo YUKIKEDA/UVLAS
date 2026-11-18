@@ -355,11 +355,16 @@ void dictionary_series(const FragmentInput& control, io::detail::FieldType field
                 array_value.elements.pop_back();
             expect_fragment(changed, false);
         }
-        REQUIRE(type.element);
+        const auto element = type.element;
+        if (!element) {
+            FAIL("Array field is missing its declared element type");
+            return;
+        }
+        const auto element_type = element.value();
         for (std::size_t index = 0; index < value.elements.size(); ++index) {
             auto child_path = path;
             child_path.emplace_back(index);
-            dictionary_series(control, *type.element, value.elements[index], child_path, components,
+            dictionary_series(control, element_type, value.elements[index], child_path, components,
                               counts);
         }
         return;
@@ -368,10 +373,12 @@ void dictionary_series(const FragmentInput& control, io::detail::FieldType field
         return;
     const auto records = io::detail::schema_records();
     const auto selected = std::ranges::find_if(records, [&](const auto& record) {
-        return record.family == type.family &&
-               (record.selector.empty() ||
-                (selected_tag(value, record.selector).has_value() &&
-                 alternative(record.alternatives, *selected_tag(value, record.selector))));
+        if (record.family != type.family)
+            return false;
+        if (record.selector.empty())
+            return true;
+        const auto tag = selected_tag(value, record.selector);
+        return tag.has_value() && alternative(record.alternatives, tag.value());
     });
     REQUIRE(selected != records.end());
     if (counts.records.insert(std::string{selected->name}).second) {
