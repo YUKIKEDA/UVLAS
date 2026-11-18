@@ -9,11 +9,14 @@ bool same_words(ScalarWords a, ScalarWords b) noexcept {
     if (a.index() != b.index())
         return false;
     const auto bits = [](double x) { return std::bit_cast<std::uint64_t>(x); };
-    if (const auto* single = std::get_if<SingleWord>(&a))
-        return bits(single->value) == bits(std::get<SingleWord>(b).value);
-    const auto& left = std::get<DoubleWord>(a);
-    const auto& right = std::get<DoubleWord>(b);
-    return bits(left.high) == bits(right.high) && bits(left.low) == bits(right.low);
+    if (const auto* single = std::get_if<SingleWord>(&a)) {
+        const auto* other = std::get_if<SingleWord>(&b);
+        return other != nullptr && bits(single->value) == bits(other->value);
+    }
+    const auto* left = std::get_if<DoubleWord>(&a);
+    const auto* right = std::get_if<DoubleWord>(&b);
+    return left != nullptr && right != nullptr && bits(left->high) == bits(right->high) &&
+           bits(left->low) == bits(right->low);
 }
 std::uint64_t height(std::uint64_t n) {
     std::uint64_t h = 0;
