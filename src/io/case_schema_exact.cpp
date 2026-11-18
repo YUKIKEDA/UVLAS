@@ -1760,7 +1760,11 @@ void scale_checks(SemanticCheck& check, std::uint64_t scales) {
                 scale_targets(check, candidate, target_kind, target_id))
                 found = true;
         }
-        check.require(found);
+        if (!found) {
+            // The required entry is absent, so diagnose its containing array.
+            check.c.current = scales;
+            check.c.reject(SchemaReason::InvalidValue);
+        }
     };
     for (auto collection : {"shells", "beams", "masses"}) {
         const auto entities = check.model_list(collection);

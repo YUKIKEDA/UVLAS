@@ -3,6 +3,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -27,7 +28,7 @@ io::SchemaLimits cross_limits() {
     return io::SchemaLimits{values};
 }
 core::Result<io::SchemaCase> validate_cross(const JsonToken& value,
-                                            io::SchemaDiagnostic& diagnostic) {
+                                            io::SchemaDiagnostic* diagnostic) {
     const auto wire = value.wire();
     const io::InputLimits syntax{
         1000000,
@@ -47,11 +48,11 @@ core::Result<io::SchemaCase> validate_cross(const JsonToken& value,
         return std::unexpected(document.error());
     core::ResourcePlan plan{64ULL * 1024 * 1024};
     // The returned case and diagnostic must outlive this source, wire, and both plans.
-    return io::validate_case_schema(*document, cross_limits(), plan, &diagnostic);
+    return io::validate_case_schema(*document, cross_limits(), plan, diagnostic);
 }
 void require_cross(const JsonToken& value, bool accepted) {
     io::SchemaDiagnostic diagnostic;
-    const auto result = validate_cross(value, diagnostic);
+    const auto result = validate_cross(value, &diagnostic);
     const auto detail = diagnostic.detail();
     if (detail) {
         INFO("reason " << static_cast<unsigned>(detail->reason));
@@ -186,7 +187,7 @@ TEST_CASE("Mixed physical scales retain length and angle dimensions before SI co
         .field("position")
         .set("values", parse("[1,2,3]"));
     io::SchemaDiagnostic diagnostic;
-    const auto checked_shell = validate_cross(shell, diagnostic);
+    const auto checked_shell = validate_cross(shell, &diagnostic);
     REQUIRE(checked_shell);
     check_constraint_dimensions(*checked_shell, false);
     bool exercised_orientation = false;
@@ -201,7 +202,7 @@ TEST_CASE("Mixed physical scales retain length and angle dimensions before SI co
             value.field("numerics").field("scales").elements.back().field("constraint");
         constraint.field("position").set("values", parse("[1,2,3]"));
         constraint.field("orientation").set("values", parse("[1,2,3]"));
-        const auto checked = validate_cross(value, diagnostic);
+        const auto checked = validate_cross(value, &diagnostic);
         REQUIRE(checked);
         check_constraint_dimensions(*checked, true);
         exercised_orientation = true;
@@ -223,9 +224,9 @@ TEST_CASE("Canonical case traversal observes values beyond counts and ignores ob
     auto reordered = original;
     std::reverse(reordered.members.begin(), reordered.members.end());
     io::SchemaDiagnostic diagnostic;
-    const auto a = validate_cross(original, diagnostic);
-    const auto b = validate_cross(changed, diagnostic);
-    const auto c = validate_cross(reordered, diagnostic);
+    const auto a = validate_cross(original, &diagnostic);
+    const auto b = validate_cross(changed, &diagnostic);
+    const auto c = validate_cross(reordered, &diagnostic);
     REQUIRE(a);
     REQUIRE(b);
     REQUIRE(c);
@@ -268,6 +269,29 @@ TEST_CASE("Flutter requires a step-map eigenproblem while preserving both valid 
     auto static_case = root();
     static_case.field("numerics").set("eigen", fragment("EigenPolicy.generalized"));
     require_cross(static_case, true);
+}
+
+TEST_CASE("A missing structural scale identifies the scales array",
+          "[verification][negative][IO4-01]") {
+    auto value = root();
+    io::SchemaDiagnostic diagnostic;
+    REQUIRE(validate_cross(value, &diagnostic));
+
+    auto& scales = value.field("numerics").field("scales").elements;
+    const auto removed = std::erase_if(scales, [](const auto& scale) {
+        return scale.field("field").text() == "shell_position";
+    });
+    REQUIRE(removed == 1);
+    const auto invalid = validate_cross(value, &diagnostic);
+    REQUIRE_FALSE(invalid);
+    CHECK(invalid.error().code == core::FailureCode::InvalidInput);
+    REQUIRE(diagnostic.detail());
+    CHECK(diagnostic.detail()->reason == io::SchemaReason::InvalidValue);
+    REQUIRE(diagnostic.path());
+    CHECK(*diagnostic.path() == "/numerics/scales");
+    const auto without_diagnostic = validate_cross(value, nullptr);
+    REQUIRE_FALSE(without_diagnostic);
+    CHECK(without_diagnostic.error().code == invalid.error().code);
 }
 
 TEST_CASE("Canonical text traversal preserves non-ASCII bytes and embedded zero",
