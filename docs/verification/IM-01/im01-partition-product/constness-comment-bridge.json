@@ -1,0 +1,10 @@
+{
+  "source_commit": "6369a0b1227bf31db246f00f982a98bc7e2eff64",
+  "id": "pg-partition-stop-source-constness-comment",
+  "hint": "tests/structure/pg_integration_partition_resource_test.cpp",
+  "old_sha256": "45836f6dd94d7dacf2567252762d056310cca57891ff12c81149eddf027da50c",
+  "current_sha256": "b6c146af658b7581432370c39f810716f5843b65af17264e5afec7b9e03c94df",
+  "proof": "2 comment行を各1回逆置換するとepoch sourceにbyte一致。数値token/IDタグ/実行手順不変。",
+  "reason": "MSVC request_stopは非const、libstdc++ではconst。既存cpp規約に従い宣言行のみ限定診断除外。",
+  "rerun": "数値D/R/変異を再実行しない。コメント以外のbytesと前回結果を維持。"
+}

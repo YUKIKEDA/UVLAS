@@ -4,7 +4,7 @@
 
 **今**：IM01-0・IM03-0・IM06-0（子作業の開始審査と実装）
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通数値基盤と凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。PGのexact代数・有理グラフ・全half-cellに加え、全原辞書・anchor補完・必須場mapを実装した。空力は厳密局所述語・所有幾何・query位置式・局所包絡と接触資格を実装した。入出力は厳格scalar・所有入力文書と全schemaの設計契約が揃った。schema validator・SI変換・実行接続は後続である。次は既存の[作業分解](plans/next-package-work-breakdown.md)に従い、PGの多角形と全積分分割、空力の共有・四辺形の全作用と大域幾何、入力schemaの検証・変換を進める。所有者の未決定だけをGrillし、内部の通常実装選択は担当が決める。局所P1誘導核を実装した。大域幾何・循環・荷重・後流と物理全体系は未実装。経緯は[実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は[開始審査](plans/implementation-start-review.md)が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通数値基盤と凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。PGのexact代数・有理グラフ・全half-cellに加え、全原辞書・anchor補完・必須場mapを実装した。多角形・区分一次厚さと全積分分割も実装した。空力は厳密局所述語・所有幾何・query位置式・局所包絡・接触資格と局所P1誘導核を実装した。入出力は厳格scalar・所有入力文書と全schemaの設計契約が揃った。schema validator・SI変換・実行接続は後続である。次は既存の[作業分解](plans/next-package-work-breakdown.md)に従い、PGの活動空間rank・参照幾何・係数条件付けと求積、空力の共有・四辺形の全作用と大域幾何、入力schemaの検証・変換を進める。所有者の未決定だけをGrillし、内部の通常実装選択は担当が決める。大域幾何・循環・荷重・後流と物理全体系は未実装。経緯は[実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は[開始審査](plans/implementation-start-review.md)が根拠。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 

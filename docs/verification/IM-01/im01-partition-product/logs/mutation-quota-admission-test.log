@@ -1,0 +1,15 @@
+RNG seed: 12345
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+<repo>\tests\structure\pg_integration_partition_resource_test.cpp(236): failed: attempts.load(std::memory_order_relaxed) == 0 for: 1 == 0
+test cases:   5 |   4 passed |  1 failed
+assertions: 169 | 159 passed | 10 failed
+
+

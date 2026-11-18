@@ -1,0 +1,6 @@
+RNG seed: 12345
+<repo>\tests\structure\pg_integration_partition_test.cpp(222): failed: unexpected exception with message: 'Unexpected partition failure 2'; expression was: {Unknown expression after the reported line}
+test cases:     7 |     6 passed | 1 failed
+assertions: 28389 | 28388 passed | 1 failed
+
+
