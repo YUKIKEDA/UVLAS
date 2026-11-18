@@ -1,0 +1,45 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-global-geometry-te-start",
+  "ids": [
+    "UW-D04",
+    "UW-D07",
+    "UW-D08",
+    "UI-D01",
+    "UI-D03",
+    "UI-D05",
+    "UI-D06",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 134,
+  "date": "2026-11-18",
+  "source_commit": "7a6932b8261be6384612697e626bbcba7ded2222",
+  "base_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
+  "claimed_state": "独立レビュー済みの大域接触・alias運動学・TE所有の開始契約。製品実装・性能・実務受入は未実施。",
+  "verification": {
+    "platform": "Windows 11 / CPython 3.12.8 / stdlib Fraction",
+    "geometry_checks": 1332,
+    "negative_controls": 8,
+    "exact_tolerance": "0",
+    "reproduction_sha256": "93dafc2a66b7990b0b651680d586e2b797c7ff6ddd91ac49a20acdecdaee9f98",
+    "independent_review": "rootが式/正規基底/TE/資格/整数容量/速度保持/資源計画を通読し、修正後に設計採用可。",
+    "scope": "設計oracleのみ。全製品gateはspec7節とreview記録に明示。"
+  },
+  "sources": {
+    "docs/specs/aero/global-geometry-te-contract.md": "3034332fd8512d804cce7f37b97e5bce3d123beeccc9e52553b47944f3b5dd90",
+    "docs/verification/IM-03/global-geometry-te-start-v1/oracle.py": "854c1c13c02e1f15d53c08e57818328d5769fc9daf6dd1c1e9d827e16cde3f69",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/aero/owned-geometry-query-contract.md": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3",
+    "docs/specs/aero/local-geometry-contract.md": "83c92b8cbae773eff487aab005717ab7514cfbf038df6db99cb27bb6aa00f52f"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/global-geometry-te-start-v1/result.json": "93dafc2a66b7990b0b651680d586e2b797c7ff6ddd91ac49a20acdecdaee9f98",
+    "docs/verification/IM-03/global-geometry-te-start-v1/review.md": "47a50376c98a9be76be57226faa206fdcb923baec3d13dfd9cb25121cb204ae2"
+  }
+}

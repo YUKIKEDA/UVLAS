@@ -12,7 +12,7 @@
 | ユーザー決定の履歴 | [開始時の決定](../requirements/project-start.md)。C++23、両OS、CLI／Python、Nastran限定＋Gmsh、再開、配布、Apache-2.0等 |
 | 精度・実験証拠の基準 | [受入精度](../requirements/acceptance-criteria.md)。各出力量の基準と数値誤差の合計予算。新規Ruleで勝手に緩めない |
 | 構造採用 | [構造統合](../specs/structure/structural-adopted-specification.md)、[主シェル](../specs/structure/main-shell-adopted-specification.md)、[梁](../specs/structure/beam-adopted-specification.md)。履歴のQ9／MMS等を既定へ戻さない |
-| 空力採用 | [UVLM統合](../specs/aero/uvlm-integrated-specification.md)。有限核・観測・W-P1・全荷重・共有／TE所有・誤差認定 |
+| 空力採用 | [UVLM統合](../specs/aero/uvlm-integrated-specification.md)。有限核・観測・W-P1・全荷重・共有／TE所有・誤差認定。大域の接触・alias・TE所有は[開始契約](../specs/aero/global-geometry-te-contract.md)と[二回走査・逆aliasの補正](../specs/aero/global-geometry-te-review-addendum.md)を適用 |
 | 時間・強連成・安定性 | [J1統合](../specs/coupled/coupled-adopted-specification.md)。輸送別初期微分と受理後荷重は[最終追加規約](../specs/coupled/j1-initialization-output-derivative-addendum.md)を優先 |
 | 型・数値・失敗 | [N4](../specs/foundation/numerical-foundation-adoption-specification.md)、[IO4](../specs/foundation/io-execution-adoption-specification.md)。N4-07の具体的な処理契約には[固有抽出の追加規約](../specs/foundation/eigen-extraction-contract.md)を適用する。旧案の密全域nullspaceやBDF1 accessorを流用しない |
 | SI入力変換 | [SI変換と入力精度](../specs/foundation/si-precision-conversion-contract.md)。元exact値、degのπ包絡、成分別単位、必須host要求、所有・資源と入力誤差のledger。prepareやQoI認定とは区別する |

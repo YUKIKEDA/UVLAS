@@ -1,0 +1,90 @@
+{
+  "work": [
+    {
+      "case": "zero-candidates",
+      "equal": {
+        "success": true,
+        "passes": 2,
+        "reserved": 431,
+        "candidates": 0,
+        "counts_per_pass": {
+          "cmp": 8,
+          "decode": 32,
+          "push": 4,
+          "pop": 4,
+          "visit": 4
+        },
+        "traversal_reserved": 420,
+        "required_traversal_reservation": 420
+      },
+      "one_short": {
+        "success": false,
+        "passes": 1,
+        "reserved": 431
+      },
+      "missing_second_detected": true
+    },
+    {
+      "case": "six-candidates",
+      "equal": {
+        "success": true,
+        "passes": 2,
+        "reserved": 2013,
+        "candidates": 6,
+        "counts_per_pass": {
+          "cmp": 72,
+          "decode": 288,
+          "push": 16,
+          "pop": 16,
+          "visit": 16
+        },
+        "traversal_reserved": 1960,
+        "required_traversal_reservation": 1960
+      },
+      "one_short": {
+        "success": false,
+        "passes": 1,
+        "reserved": 2013
+      },
+      "missing_second_detected": true
+    }
+  ],
+  "point_owners": {
+    "2": 2,
+    "3": 3,
+    "20": 2,
+    "30": 3
+  },
+  "edges": {
+    "100": {
+      "owner": 100,
+      "endpoints": [
+        2,
+        3
+      ]
+    },
+    "200": {
+      "owner": 100,
+      "endpoints": [
+        30,
+        20
+      ]
+    }
+  },
+  "alias": {
+    "geometric_incidence": [
+      1,
+      -1
+    ],
+    "sum": 0,
+    "wake_induction": 1,
+    "T": 1,
+    "without_basis": {
+      "incidence": -1,
+      "sum": -2,
+      "T": -1
+    }
+  },
+  "tolerance": "0",
+  "negative_controls": 3
+}

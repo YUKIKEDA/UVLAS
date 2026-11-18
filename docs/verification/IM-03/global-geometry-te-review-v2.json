@@ -1,0 +1,43 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-global-geometry-te-review-v2",
+  "ids": [
+    "UW-D07",
+    "UI-D03",
+    "N4-02",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 134,
+  "date": "2026-11-18",
+  "source_commit": "cab91713466a26042fa838679a27df223b4213db",
+  "reviewed_head": "efda52362a41054e63f44ec027b5a06da2421502",
+  "review_comments": [
+    4613632076,
+    4613632090
+  ],
+  "claimed_state": "二回BVH走査の資源計画・実端点による逆aliasの限定設計検証。製品実装ではない。",
+  "verification": {
+    "platform": "Windows 11 / CPython3.12.8 / stdlib",
+    "work_cases": 2,
+    "candidate_counts": [
+      0,
+      6
+    ],
+    "equal_and_one_short": "passed",
+    "alias_literal": "incidences +1/-1, sum 0, T +1",
+    "without_basis": "incidence -1, sum -2, T -1",
+    "negative_controls": 3,
+    "reproduction_sha256": "8c8f73ea084a0bf7ffcc8d4c30c34b7578f9044d6c1d5696f798f548b98ab61d",
+    "independent_review": "rootが追加規約とoracleを通読し採用可。"
+  },
+  "sources": {
+    "docs/specs/aero/global-geometry-te-review-addendum.md": "558cf7ced2010150dadb8b19a3fe1af0293739a1c82296796a2045f161c2057b",
+    "docs/verification/IM-03/global-geometry-te-review-v2/oracle.py": "cebecbff97c535e60c8d773631c0e66382dab4f9147ae4efa01be3580961ebd0",
+    "docs/verification/IM-03/global-geometry-te-start.json": "6cf71cd910c478a35a4213f923813e927dd986e38207ac78204bf8bb496da2bf"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/global-geometry-te-review-v2/review.md": "4ee2b5aedfad0a06573e8ac94a7a7bcf4bf03acd192f25bbc5fa1ce4e4231c7b",
+    "docs/verification/IM-03/global-geometry-te-review-v2/result.json": "8c8f73ea084a0bf7ffcc8d4c30c34b7578f9044d6c1d5696f798f548b98ab61d"
+  }
+}
