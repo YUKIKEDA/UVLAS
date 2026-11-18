@@ -83,13 +83,12 @@ void check_topology(const PgIntegrationPartition& result, const std::array<Oracl
         }
         CHECK(edge.external == (edge.left.has_value() != edge.right.has_value()));
         CHECK(edge.external == domain);
-        if (edge.left) {
-            const auto left_piece = *edge.left;
-            CHECK(static_cast<std::size_t>(left_piece) < pieces.size());
+        // A missing side uses an invalid index, never a fabricated valid piece.
+        if (const auto left_piece = edge.left; left_piece.has_value()) {
+            CHECK(static_cast<std::size_t>(left_piece.value_or(core::Index{-1})) < pieces.size());
         }
-        if (edge.right) {
-            const auto right_piece = *edge.right;
-            CHECK(static_cast<std::size_t>(right_piece) < pieces.size());
+        if (const auto right_piece = edge.right; right_piece.has_value()) {
+            CHECK(static_cast<std::size_t>(right_piece.value_or(core::Index{-1})) < pieces.size());
         }
         if (edge.external) {
             ++external;
