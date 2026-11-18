@@ -73,6 +73,15 @@ struct InputDocumentData {
 };
 // Only these factories can bind a node ordinal/view to actual owned storage.
 struct InputDocumentFactory {
+    static const InputDocumentData* storage(const InputDocument& document) noexcept {
+        return document.data_.size() ? &document.data_.values()[0] : nullptr;
+    }
+    static const InputDocumentData* storage(const InputNodeView& node) noexcept {
+        return node.owner_;
+    }
+    static core::Index position(const InputNodeView& node) noexcept {
+        return node.node_;
+    }
     static InputNodeOrdinal ordinal(core::Index value) noexcept;
     static InputNodeView node(const InputDocumentData*, core::Index) noexcept;
     static InputArrayView array(const InputDocumentData*, core::Index) noexcept;

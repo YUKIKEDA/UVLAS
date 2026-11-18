@@ -104,7 +104,8 @@ uvlas_configure_target(uvlas_eigen_full_canary)
 target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 
 # Strict input scalars share the core value and failure contracts.
-set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp)
+set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
+    src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES})
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

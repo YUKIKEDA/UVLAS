@@ -1,0 +1,4421 @@
+{
+  "sources": {
+    "case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee"
+  },
+  "records": {
+    "Case": [
+      {
+        "name": "schema",
+        "optional": false,
+        "spelling": "Tag{uvlas.case/1}"
+      },
+      {
+        "name": "units",
+        "optional": false,
+        "spelling": "Units"
+      },
+      {
+        "name": "model",
+        "optional": false,
+        "spelling": "Model"
+      },
+      {
+        "name": "flow",
+        "optional": false,
+        "spelling": "Flow"
+      },
+      {
+        "name": "analysis",
+        "optional": false,
+        "spelling": "Analysis"
+      },
+      {
+        "name": "observations",
+        "optional": false,
+        "spelling": "List<Observation>"
+      },
+      {
+        "name": "numerics",
+        "optional": false,
+        "spelling": "Numerics"
+      },
+      {
+        "name": "resources",
+        "optional": false,
+        "spelling": "Resources"
+      },
+      {
+        "name": "output",
+        "optional": false,
+        "spelling": "Output"
+      },
+      {
+        "name": "initial",
+        "optional": true,
+        "spelling": "Initial"
+      },
+      {
+        "name": "restart",
+        "optional": true,
+        "spelling": "Restart"
+      },
+      {
+        "name": "provenance",
+        "optional": true,
+        "spelling": "Provenance"
+      }
+    ],
+    "Units": [
+      {
+        "name": "length",
+        "optional": false,
+        "spelling": "Tag{m,mm,cm,km,in,ft}"
+      },
+      {
+        "name": "mass",
+        "optional": false,
+        "spelling": "Tag{kg,g,t,lbm}"
+      },
+      {
+        "name": "time",
+        "optional": false,
+        "spelling": "Tag{s,ms,min}"
+      },
+      {
+        "name": "angle",
+        "optional": false,
+        "spelling": "Tag{rad,deg}"
+      }
+    ],
+    "Model": [
+      {
+        "name": "geometry",
+        "optional": false,
+        "spelling": "List<Geometry>"
+      },
+      {
+        "name": "materials",
+        "optional": false,
+        "spelling": "List<Material>"
+      },
+      {
+        "name": "shells",
+        "optional": false,
+        "spelling": "List<Shell>"
+      },
+      {
+        "name": "beams",
+        "optional": false,
+        "spelling": "List<Beam>"
+      },
+      {
+        "name": "joints",
+        "optional": false,
+        "spelling": "List<Joint>"
+      },
+      {
+        "name": "supports",
+        "optional": false,
+        "spelling": "List<Support>"
+      },
+      {
+        "name": "masses",
+        "optional": false,
+        "spelling": "List<Mass>"
+      },
+      {
+        "name": "aero_surfaces",
+        "optional": false,
+        "spelling": "List<AeroSurface>"
+      }
+    ],
+    "Provenance": [
+      {
+        "name": "description",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "references",
+        "optional": false,
+        "spelling": "List<Text>"
+      },
+      {
+        "name": "assumptions",
+        "optional": false,
+        "spelling": "List<Text>"
+      }
+    ],
+    "Frame": [
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "rotation",
+        "optional": false,
+        "spelling": "Mat<Number,3,3>"
+      }
+    ],
+    "Target": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{shell,beam,rigid}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "\u5bfe\u5fdcRef<Shell/Beam/Mass>"
+      }
+    ],
+    "MaterialPoint": [
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Target"
+      },
+      {
+        "name": "coordinates",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "side",
+        "optional": false,
+        "spelling": "Tag{interior,lower,upper}"
+      }
+    ],
+    "Region": [
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Target"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{volume,face,edge,point}"
+      },
+      {
+        "name": "geometry",
+        "optional": false,
+        "spelling": "Ref<Geometry>"
+      },
+      {
+        "name": "boundary",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "side",
+        "optional": false,
+        "spelling": "Tag{interior,lower,upper}"
+      }
+    ],
+    "PolyTerm": [
+      {
+        "name": "powers",
+        "optional": false,
+        "spelling": "Vec<Count,k>"
+      },
+      {
+        "name": "coefficient",
+        "optional": false,
+        "spelling": "Q<d>"
+      }
+    ],
+    "ReferenceFieldConstant": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{constant}"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Vec<Q<d>,n>"
+      }
+    ],
+    "ReferenceFieldPolynomial": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{polynomial}"
+      },
+      {
+        "name": "coordinates",
+        "optional": false,
+        "spelling": "Tag{chart,material,world_reference}"
+      },
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "lengths",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "components",
+        "optional": false,
+        "spelling": "Vec<List<PolyTerm<d,3>>,n>"
+      },
+      {
+        "name": "error",
+        "optional": false,
+        "spelling": "Vec<Q<d>,n>"
+      }
+    ],
+    "TimeSeriesConstant": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{constant}"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Vec<Number,n>"
+      }
+    ],
+    "TimeSeriesPolynomial": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{polynomial}"
+      },
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "scale",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "coefficients",
+        "optional": false,
+        "spelling": "List<Vec<Number,n>>"
+      },
+      {
+        "name": "domain",
+        "optional": false,
+        "spelling": "Vec<Q<T>,2>"
+      }
+    ],
+    "TimeSeriesPchip": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{pchip}"
+      },
+      {
+        "name": "times",
+        "optional": false,
+        "spelling": "List<Q<T>>"
+      },
+      {
+        "name": "values",
+        "optional": false,
+        "spelling": "List<Vec<Number,n>>"
+      },
+      {
+        "name": "outside",
+        "optional": false,
+        "spelling": "Outside"
+      }
+    ],
+    "OutsideRejectHold": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{reject,hold}"
+      }
+    ],
+    "OutsidePeriodic": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{periodic}"
+      },
+      {
+        "name": "period",
+        "optional": false,
+        "spelling": "Q<T>"
+      }
+    ],
+    "Motion": [
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Frame"
+      },
+      {
+        "name": "translation",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      },
+      {
+        "name": "rotation_vector",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      },
+      {
+        "name": "events",
+        "optional": false,
+        "spelling": "List<Q<T>>"
+      }
+    ],
+    "AxisProjected": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{projected}"
+      },
+      {
+        "name": "direction",
+        "optional": false,
+        "spelling": "ReferenceField<1,3>"
+      },
+      {
+        "name": "angle",
+        "optional": false,
+        "spelling": "ReferenceField<angle,1>"
+      }
+    ],
+    "AxisExplicit": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{explicit}"
+      },
+      {
+        "name": "columns",
+        "optional": false,
+        "spelling": "ReferenceField<1,9>"
+      }
+    ],
+    "GeometryPg": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{pg}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Geometry>"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Frame"
+      },
+      {
+        "name": "reference_length",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "x0",
+        "optional": false,
+        "spelling": "Rational"
+      },
+      {
+        "name": "width",
+        "optional": false,
+        "spelling": "Rational"
+      },
+      {
+        "name": "skew",
+        "optional": false,
+        "spelling": "Rational"
+      },
+      {
+        "name": "degree",
+        "optional": false,
+        "spelling": "Vec<Count,2>"
+      },
+      {
+        "name": "coefficients",
+        "optional": false,
+        "spelling": "List<PgTerm>"
+      },
+      {
+        "name": "domain",
+        "optional": false,
+        "spelling": "List<Vec<Rational,2>>"
+      },
+      {
+        "name": "thickness",
+        "optional": false,
+        "spelling": "Thickness"
+      },
+      {
+        "name": "n",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "convention",
+        "optional": false,
+        "spelling": "Tag{pg-graph-v1}"
+      },
+      {
+        "name": "boundaries",
+        "optional": false,
+        "spelling": "List<Boundary>"
+      },
+      {
+        "name": "continuity",
+        "optional": false,
+        "spelling": "List<Continuity>"
+      }
+    ],
+    "PgTerm": [
+      {
+        "name": "powers",
+        "optional": false,
+        "spelling": "Vec<Count,2>"
+      },
+      {
+        "name": "coefficient",
+        "optional": false,
+        "spelling": "Rational"
+      }
+    ],
+    "Thickness": [
+      {
+        "name": "vertices",
+        "optional": false,
+        "spelling": "List<Vec<Rational,2>>"
+      },
+      {
+        "name": "triangles",
+        "optional": false,
+        "spelling": "List<Vec<Index,3>>"
+      },
+      {
+        "name": "values",
+        "optional": false,
+        "spelling": "List<Q<L>>"
+      }
+    ],
+    "Boundary": [
+      {
+        "name": "name",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "vertices",
+        "optional": false,
+        "spelling": "List<Vec<Rational,2>>"
+      }
+    ],
+    "Continuity": [
+      {
+        "name": "other",
+        "optional": false,
+        "spelling": "Ref<Geometry>"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{smooth,fold}"
+      },
+      {
+        "name": "own_boundary",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "other_boundary",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "orientation",
+        "optional": false,
+        "spelling": "Tag{same,reversed}"
+      }
+    ],
+    "GeometrySurfaceGraph": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{surface_graph}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Geometry>"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Frame"
+      },
+      {
+        "name": "reference_length",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "x0",
+        "optional": false,
+        "spelling": "Rational"
+      },
+      {
+        "name": "width",
+        "optional": false,
+        "spelling": "Rational"
+      },
+      {
+        "name": "skew",
+        "optional": false,
+        "spelling": "Rational"
+      },
+      {
+        "name": "degree",
+        "optional": false,
+        "spelling": "Vec<Count,2>"
+      },
+      {
+        "name": "coefficients",
+        "optional": false,
+        "spelling": "List<PgTerm>"
+      },
+      {
+        "name": "domain",
+        "optional": false,
+        "spelling": "List<Vec<Rational,2>>"
+      },
+      {
+        "name": "boundaries",
+        "optional": false,
+        "spelling": "List<Boundary>"
+      },
+      {
+        "name": "continuity",
+        "optional": false,
+        "spelling": "List<Continuity>"
+      }
+    ],
+    "GeometryNastran": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{nastran}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Geometry>"
+      },
+      {
+        "name": "deck",
+        "optional": false,
+        "spelling": "FileRef<nastran-deck>"
+      },
+      {
+        "name": "sidecar",
+        "optional": false,
+        "spelling": "FileRef<nastran-sidecar>"
+      },
+      {
+        "name": "dialect",
+        "optional": false,
+        "spelling": "Tag{msc-2022.1}"
+      },
+      {
+        "name": "mode",
+        "optional": false,
+        "spelling": "Tag{structural-extraction}"
+      },
+      {
+        "name": "excluded_cards",
+        "optional": false,
+        "spelling": "List<Text>"
+      }
+    ],
+    "GeometryGmsh": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{gmsh}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Geometry>"
+      },
+      {
+        "name": "mesh",
+        "optional": false,
+        "spelling": "FileRef<gmsh-msh4.1-ascii>"
+      },
+      {
+        "name": "sidecar",
+        "optional": false,
+        "spelling": "FileRef<gmsh-sidecar>"
+      },
+      {
+        "name": "reference",
+        "optional": false,
+        "spelling": "ReferenceGeometry"
+      }
+    ],
+    "ReferenceGeometrySupplied": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{supplied}"
+      },
+      {
+        "name": "file",
+        "optional": false,
+        "spelling": "FileRef<reference-geometry>"
+      }
+    ],
+    "ReferenceGeometryFit": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{fit}"
+      },
+      {
+        "name": "degree",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "distance_budget",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "normal_budget",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "conversion_observations",
+        "optional": false,
+        "spelling": "List<Ref<Observation>>"
+      }
+    ],
+    "MaterialIsotropic": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{isotropic}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Material>"
+      },
+      {
+        "name": "young",
+        "optional": false,
+        "spelling": "Q<pressure>"
+      },
+      {
+        "name": "poisson",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "provenance",
+        "optional": false,
+        "spelling": "Provenance"
+      },
+      {
+        "name": "applicability",
+        "optional": false,
+        "spelling": "Applicability"
+      }
+    ],
+    "MaterialOrthotropic": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{orthotropic3d}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Material>"
+      },
+      {
+        "name": "young",
+        "optional": false,
+        "spelling": "Vec<Q<pressure>,3>"
+      },
+      {
+        "name": "shear",
+        "optional": false,
+        "spelling": "Vec<Q<pressure>,3>"
+      },
+      {
+        "name": "poisson",
+        "optional": false,
+        "spelling": "Vec<Q<1>,3>"
+      },
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "provenance",
+        "optional": false,
+        "spelling": "Provenance"
+      },
+      {
+        "name": "applicability",
+        "optional": false,
+        "spelling": "Applicability"
+      }
+    ],
+    "MaterialEffective": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{effective3d}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Material>"
+      },
+      {
+        "name": "stiffness",
+        "optional": false,
+        "spelling": "Mat<Q<pressure>,6,6>"
+      },
+      {
+        "name": "components",
+        "optional": false,
+        "spelling": "Tag{mandel,engineering}"
+      },
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "provenance",
+        "optional": false,
+        "spelling": "Provenance"
+      },
+      {
+        "name": "applicability",
+        "optional": false,
+        "spelling": "Applicability"
+      }
+    ],
+    "ApplicabilityUnevaluated": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{unevaluated}"
+      }
+    ],
+    "ApplicabilityDeclared": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{declared}"
+      },
+      {
+        "name": "strain_lower",
+        "optional": false,
+        "spelling": "Vec<Number,6>"
+      },
+      {
+        "name": "strain_upper",
+        "optional": false,
+        "spelling": "Vec<Number,6>"
+      },
+      {
+        "name": "reference",
+        "optional": false,
+        "spelling": "Text"
+      }
+    ],
+    "Layer": [
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Layer>"
+      },
+      {
+        "name": "interval",
+        "optional": false,
+        "spelling": "Vec<Rational,2>"
+      },
+      {
+        "name": "material",
+        "optional": false,
+        "spelling": "Ref<Material>"
+      },
+      {
+        "name": "axis",
+        "optional": false,
+        "spelling": "Axis"
+      },
+      {
+        "name": "initial_green",
+        "optional": false,
+        "spelling": "ReferenceField<1,6>"
+      },
+      {
+        "name": "viscosity",
+        "optional": false,
+        "spelling": "Mat<Q<pressure*T>,6,6>"
+      }
+    ],
+    "Shell": [
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Shell>"
+      },
+      {
+        "name": "geometry",
+        "optional": false,
+        "spelling": "Ref<Geometry>"
+      },
+      {
+        "name": "layers",
+        "optional": false,
+        "spelling": "List<Layer>"
+      },
+      {
+        "name": "damping_components",
+        "optional": false,
+        "spelling": "Tag{mandel,engineering}"
+      },
+      {
+        "name": "loads",
+        "optional": false,
+        "spelling": "List<Load>"
+      }
+    ],
+    "Beam": [
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Beam>"
+      },
+      {
+        "name": "nodes",
+        "optional": false,
+        "spelling": "Vec<Frame,2>"
+      },
+      {
+        "name": "coordinate",
+        "optional": false,
+        "spelling": "BeamCoordinate"
+      },
+      {
+        "name": "section",
+        "optional": false,
+        "spelling": "Section"
+      },
+      {
+        "name": "initial_strain",
+        "optional": false,
+        "spelling": "Vec<Number,6>"
+      },
+      {
+        "name": "residual_energy",
+        "optional": false,
+        "spelling": "Q<energy/L>"
+      },
+      {
+        "name": "viscosity",
+        "optional": false,
+        "spelling": "Mat<Number,6,6>"
+      },
+      {
+        "name": "loads",
+        "optional": false,
+        "spelling": "List<Load>"
+      }
+    ],
+    "BeamCoordinateArclength": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{arclength}"
+      },
+      {
+        "name": "length",
+        "optional": false,
+        "spelling": "Q<L>"
+      }
+    ],
+    "BeamCoordinateScaled": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{scaled}"
+      },
+      {
+        "name": "length",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "arc_scale",
+        "optional": false,
+        "spelling": "Q<1>"
+      }
+    ],
+    "SectionMatrix": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{matrix}"
+      },
+      {
+        "name": "stiffness",
+        "optional": false,
+        "spelling": "Mat<Number,6,6>"
+      },
+      {
+        "name": "line_density",
+        "optional": false,
+        "spelling": "Q<M/L>"
+      },
+      {
+        "name": "center",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "inertia",
+        "optional": false,
+        "spelling": "Mat<Q<M*L>,3,3>"
+      },
+      {
+        "name": "envelope",
+        "optional": false,
+        "spelling": "Vec<Q<L>,2>"
+      },
+      {
+        "name": "warping",
+        "optional": false,
+        "spelling": "Tag{free}"
+      },
+      {
+        "name": "recovery",
+        "optional": false,
+        "spelling": "Tag{unavailable}"
+      },
+      {
+        "name": "source",
+        "optional": false,
+        "spelling": "Text"
+      }
+    ],
+    "SectionCircle": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{circle}"
+      },
+      {
+        "name": "radius",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "young",
+        "optional": false,
+        "spelling": "Q<pressure>"
+      },
+      {
+        "name": "poisson",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "effective_shear",
+        "optional": false,
+        "spelling": "Vec<Q<L\u00b2>,2>"
+      },
+      {
+        "name": "warping",
+        "optional": false,
+        "spelling": "Tag{free}"
+      }
+    ],
+    "SectionRectangle": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{rectangle}"
+      },
+      {
+        "name": "sides",
+        "optional": false,
+        "spelling": "Vec<Q<L>,2>"
+      },
+      {
+        "name": "young",
+        "optional": false,
+        "spelling": "Q<pressure>"
+      },
+      {
+        "name": "poisson",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "effective_shear",
+        "optional": false,
+        "spelling": "Vec<Q<L\u00b2>,2>"
+      },
+      {
+        "name": "torsion",
+        "optional": false,
+        "spelling": "Q<L\u2074>"
+      },
+      {
+        "name": "warping",
+        "optional": false,
+        "spelling": "Tag{free}"
+      }
+    ],
+    "JointAdhesive": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{adhesive}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Joint>"
+      },
+      {
+        "name": "first",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "second",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "mapping",
+        "optional": false,
+        "spelling": "List<TraceMap>"
+      },
+      {
+        "name": "split_at_attachment",
+        "optional": false,
+        "spelling": "Bool"
+      }
+    ],
+    "TraceMap": [
+      {
+        "name": "first_cell",
+        "optional": false,
+        "spelling": "Vec<Index,2>"
+      },
+      {
+        "name": "second_cell",
+        "optional": false,
+        "spelling": "Vec<Index,2>"
+      },
+      {
+        "name": "domain",
+        "optional": false,
+        "spelling": "List<Vec<Rational,2>>"
+      },
+      {
+        "name": "first",
+        "optional": false,
+        "spelling": "Vec<List<MapTerm>,3>"
+      },
+      {
+        "name": "second",
+        "optional": false,
+        "spelling": "Vec<List<MapTerm>,3>"
+      },
+      {
+        "name": "orientation",
+        "optional": false,
+        "spelling": "Tag{same,reversed}"
+      }
+    ],
+    "MapTerm": [
+      {
+        "name": "powers",
+        "optional": false,
+        "spelling": "Vec<Count,2>"
+      },
+      {
+        "name": "coefficient",
+        "optional": false,
+        "spelling": "Rational"
+      }
+    ],
+    "JointRigidAttachment": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{rigid_attachment}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Joint>"
+      },
+      {
+        "name": "attached",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Target"
+      },
+      {
+        "name": "offset",
+        "optional": false,
+        "spelling": "Frame"
+      }
+    ],
+    "JointWeld": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{weld}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Joint>"
+      },
+      {
+        "name": "first",
+        "optional": false,
+        "spelling": "Target"
+      },
+      {
+        "name": "second",
+        "optional": false,
+        "spelling": "Target"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "Frame"
+      }
+    ],
+    "SupportConstraint": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{constraint}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Support>"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "components",
+        "optional": false,
+        "spelling": "List<Index>"
+      },
+      {
+        "name": "motion",
+        "optional": false,
+        "spelling": "Motion"
+      }
+    ],
+    "SupportTraceConstraint": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{trace_constraint}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Support>"
+      },
+      {
+        "name": "region",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "components",
+        "optional": false,
+        "spelling": "List<Index>"
+      },
+      {
+        "name": "motion",
+        "optional": false,
+        "spelling": "Motion"
+      }
+    ],
+    "SupportElastic": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{elastic}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Support>"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "reference",
+        "optional": false,
+        "spelling": "Motion"
+      },
+      {
+        "name": "stiffness",
+        "optional": false,
+        "spelling": "Mat<Number,6,6>"
+      },
+      {
+        "name": "damping",
+        "optional": false,
+        "spelling": "Mat<Number,6,6>"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Frame"
+      }
+    ],
+    "MassParticle": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{particle}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Mass>"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "mass",
+        "optional": false,
+        "spelling": "Q<M>"
+      },
+      {
+        "name": "ledger",
+        "optional": false,
+        "spelling": "Ledger"
+      }
+    ],
+    "MassRigid": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{rigid}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Mass>"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "mass",
+        "optional": false,
+        "spelling": "Q<M>"
+      },
+      {
+        "name": "center",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "inertia",
+        "optional": false,
+        "spelling": "Mat<Q<M*L\u00b2>,3,3>"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Frame"
+      },
+      {
+        "name": "ledger",
+        "optional": false,
+        "spelling": "Ledger"
+      }
+    ],
+    "LedgerAdd": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{add}"
+      },
+      {
+        "name": "source",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "owner",
+        "optional": false,
+        "spelling": "Target"
+      }
+    ],
+    "LedgerReplace": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{replace}"
+      },
+      {
+        "name": "source",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "owner",
+        "optional": false,
+        "spelling": "Target"
+      },
+      {
+        "name": "replaced",
+        "optional": false,
+        "spelling": "List<Ref<Mass>>"
+      }
+    ],
+    "LoadPointForce": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{point_force}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Tag{world,body}"
+      },
+      {
+        "name": "series",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      }
+    ],
+    "LoadCouple": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{couple}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Tag{world,body}"
+      },
+      {
+        "name": "series",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      }
+    ],
+    "LoadGravity": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{gravity}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "acceleration",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      }
+    ],
+    "LoadTraction": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{traction}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "region",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "area",
+        "optional": false,
+        "spelling": "Tag{reference,current}"
+      },
+      {
+        "name": "frame",
+        "optional": false,
+        "spelling": "Tag{world,body}"
+      },
+      {
+        "name": "spatial",
+        "optional": false,
+        "spelling": "ReferenceField<pressure,3>"
+      },
+      {
+        "name": "multiplier",
+        "optional": false,
+        "spelling": "TimeSeries<1>"
+      }
+    ],
+    "LoadPressure": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{pressure}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "region",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "spatial",
+        "optional": false,
+        "spelling": "ReferenceField<pressure,1>"
+      },
+      {
+        "name": "multiplier",
+        "optional": false,
+        "spelling": "TimeSeries<1>"
+      }
+    ],
+    "LoadBody": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{body_force}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "region",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "spatial",
+        "optional": false,
+        "spelling": "ReferenceField<force/L\u00b3,3>"
+      },
+      {
+        "name": "multiplier",
+        "optional": false,
+        "spelling": "TimeSeries<1>"
+      }
+    ],
+    "AeroSurface": [
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<AeroSurface>"
+      },
+      {
+        "name": "geometry",
+        "optional": false,
+        "spelling": "Ref<Geometry>"
+      },
+      {
+        "name": "attachment",
+        "optional": false,
+        "spelling": "AeroAttachment"
+      },
+      {
+        "name": "chord",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "span",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "leading",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "trailing",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "orientation",
+        "optional": false,
+        "spelling": "Tag{positive,reversed}"
+      },
+      {
+        "name": "sharing",
+        "optional": false,
+        "spelling": "List<AeroSharing>"
+      }
+    ],
+    "AeroAttachmentFixed": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{fixed_reference}"
+      }
+    ],
+    "AeroAttachmentPrescribed": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{prescribed_motion}"
+      },
+      {
+        "name": "motion",
+        "optional": false,
+        "spelling": "Motion"
+      }
+    ],
+    "AeroAttachmentStructural": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{structural}"
+      },
+      {
+        "name": "host",
+        "optional": false,
+        "spelling": "Ref<Shell>"
+      }
+    ],
+    "AeroSharing": [
+      {
+        "name": "other",
+        "optional": false,
+        "spelling": "Ref<AeroSurface>"
+      },
+      {
+        "name": "own_boundary",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "other_boundary",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "orientation",
+        "optional": false,
+        "spelling": "Tag{same,reversed}"
+      }
+    ],
+    "FlowNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "FlowKnown": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{known}"
+      },
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "uniform",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      },
+      {
+        "name": "gust",
+        "optional": false,
+        "spelling": "Gust"
+      },
+      {
+        "name": "reference",
+        "optional": false,
+        "spelling": "FlowReference"
+      },
+      {
+        "name": "events",
+        "optional": false,
+        "spelling": "List<Q<T>>"
+      }
+    ],
+    "GustNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "GustSine": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{sine}"
+      },
+      {
+        "name": "amplitude",
+        "optional": false,
+        "spelling": "TimeSeries<1>"
+      },
+      {
+        "name": "direction",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "wavevector",
+        "optional": false,
+        "spelling": "Vec<Q<angle/L>,3>"
+      },
+      {
+        "name": "angular_frequency",
+        "optional": false,
+        "spelling": "Q<angle/T>"
+      },
+      {
+        "name": "phase",
+        "optional": false,
+        "spelling": "Q<angle>"
+      },
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "time_origin",
+        "optional": false,
+        "spelling": "Q<T>"
+      }
+    ],
+    "FlowReference": [
+      {
+        "name": "density",
+        "optional": false,
+        "spelling": "Q<M/L\u00b3>"
+      },
+      {
+        "name": "speed",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "area",
+        "optional": false,
+        "spelling": "Q<L\u00b2>"
+      },
+      {
+        "name": "chord",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "span",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "moment_origin",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      }
+    ],
+    "WakeNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "WakeActive": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{active}"
+      },
+      {
+        "name": "convection",
+        "optional": false,
+        "spelling": "Convection"
+      },
+      {
+        "name": "retention",
+        "optional": false,
+        "spelling": "Retention"
+      },
+      {
+        "name": "core_radius",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "model",
+        "optional": false,
+        "spelling": "Tag{wp1-stream-p0-span}"
+      },
+      {
+        "name": "mapping",
+        "optional": false,
+        "spelling": "Tag{dual-quarter-v1}"
+      }
+    ],
+    "ConvectionFree": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{free}"
+      }
+    ],
+    "ConvectionPrescribed": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{prescribed}"
+      },
+      {
+        "name": "velocity",
+        "optional": false,
+        "spelling": "TimeSeries<3>"
+      }
+    ],
+    "RetentionAll": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{all}"
+      }
+    ],
+    "RetentionWindow": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{closed_window}"
+      },
+      {
+        "name": "duration",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "distance",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "error_budget",
+        "optional": false,
+        "spelling": "Q<1>"
+      }
+    ],
+    "AnalysisStatic": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{static}"
+      },
+      {
+        "name": "physics",
+        "optional": false,
+        "spelling": "Tag{aerodynamic,structural,coupled}"
+      },
+      {
+        "name": "branch",
+        "optional": false,
+        "spelling": "Branch"
+      },
+      {
+        "name": "speed",
+        "optional": false,
+        "spelling": "AnalysisSpeed"
+      },
+      {
+        "name": "wake",
+        "optional": false,
+        "spelling": "Wake"
+      },
+      {
+        "name": "loads",
+        "optional": false,
+        "spelling": "List<Load>"
+      }
+    ],
+    "AnalysisTransient": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{transient}"
+      },
+      {
+        "name": "physics",
+        "optional": false,
+        "spelling": "Tag{aerodynamic,structural,coupled}"
+      },
+      {
+        "name": "branch",
+        "optional": false,
+        "spelling": "Branch"
+      },
+      {
+        "name": "intervals",
+        "optional": false,
+        "spelling": "List<TimeInterval>"
+      },
+      {
+        "name": "wake",
+        "optional": false,
+        "spelling": "Wake"
+      },
+      {
+        "name": "loads",
+        "optional": false,
+        "spelling": "List<Load>"
+      }
+    ],
+    "AnalysisFlutter": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{flutter}"
+      },
+      {
+        "name": "physics",
+        "optional": false,
+        "spelling": "Tag{coupled}"
+      },
+      {
+        "name": "branches",
+        "optional": false,
+        "spelling": "List<Branch>"
+      },
+      {
+        "name": "intervals",
+        "optional": false,
+        "spelling": "List<SpeedInterval>"
+      },
+      {
+        "name": "step",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "wake",
+        "optional": false,
+        "spelling": "Wake"
+      },
+      {
+        "name": "search",
+        "optional": false,
+        "spelling": "Search"
+      },
+      {
+        "name": "loads",
+        "optional": false,
+        "spelling": "List<Load>"
+      }
+    ],
+    "AnalysisSpeedNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "AnalysisSpeedValue": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{value}"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      }
+    ],
+    "Branch": [
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Branch>"
+      },
+      {
+        "name": "seed",
+        "optional": false,
+        "spelling": "BranchSeed"
+      },
+      {
+        "name": "continuation",
+        "optional": false,
+        "spelling": "Continuation"
+      }
+    ],
+    "BranchSeedReference": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{reference}"
+      }
+    ],
+    "BranchSeedPrepared": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{prepared}"
+      },
+      {
+        "name": "history",
+        "optional": false,
+        "spelling": "FileRef<preparation-history>"
+      }
+    ],
+    "ContinuationFixed": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{fixed}"
+      }
+    ],
+    "ContinuationSweep": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{sweep}"
+      },
+      {
+        "name": "initial_increment",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "minimum_increment",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "maximum_increment",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "arclength",
+        "optional": false,
+        "spelling": "ArcLength"
+      },
+      {
+        "name": "maximum_points",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "maximum_retries",
+        "optional": false,
+        "spelling": "Count"
+      }
+    ],
+    "ArcLength": [
+      {
+        "name": "state_scales",
+        "optional": false,
+        "spelling": "List<Scale>"
+      },
+      {
+        "name": "speed_scale",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "orientation",
+        "optional": false,
+        "spelling": "Tag{previous_tangent}"
+      },
+      {
+        "name": "enable_at_limit",
+        "optional": false,
+        "spelling": "Bool"
+      }
+    ],
+    "TimeInterval": [
+      {
+        "name": "start",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "end",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "step",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "restart",
+        "optional": false,
+        "spelling": "Tag{initial,event,step_change,chart_change}"
+      }
+    ],
+    "SpeedInterval": [
+      {
+        "name": "lower",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "upper",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      }
+    ],
+    "Search": [
+      {
+        "name": "queue",
+        "optional": false,
+        "spelling": "Tag{lowest_interval_first}"
+      },
+      {
+        "name": "speed_absolute",
+        "optional": false,
+        "spelling": "Q<L/T>"
+      },
+      {
+        "name": "speed_relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "growth_budget",
+        "optional": false,
+        "spelling": "Q<1/T>"
+      },
+      {
+        "name": "mode_association",
+        "optional": false,
+        "spelling": "Association"
+      },
+      {
+        "name": "maximum_points",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "maximum_retries",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "coverage",
+        "optional": false,
+        "spelling": "Coverage"
+      }
+    ],
+    "Association": [
+      {
+        "name": "physical_observations",
+        "optional": false,
+        "spelling": "List<Ref<Observation>>"
+      },
+      {
+        "name": "mac_minimum",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "subspace_angle_maximum",
+        "optional": false,
+        "spelling": "Q<angle>"
+      },
+      {
+        "name": "eigenvalue_absolute",
+        "optional": false,
+        "spelling": "Q<1/T>"
+      },
+      {
+        "name": "eigenvalue_relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      }
+    ],
+    "Coverage": [
+      {
+        "name": "branches",
+        "optional": false,
+        "spelling": "List<Ref<Branch>>"
+      },
+      {
+        "name": "mode_observations",
+        "optional": false,
+        "spelling": "List<Ref<Observation>>"
+      },
+      {
+        "name": "require_physical",
+        "optional": false,
+        "spelling": "Bool"
+      }
+    ],
+    "InitialEquilibrium": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{equilibrium}"
+      },
+      {
+        "name": "branch",
+        "optional": false,
+        "spelling": "Ref<Branch>"
+      },
+      {
+        "name": "perturbation",
+        "optional": false,
+        "spelling": "Perturbation"
+      }
+    ],
+    "InitialCold": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{cold_start}"
+      },
+      {
+        "name": "state",
+        "optional": false,
+        "spelling": "InitialState"
+      },
+      {
+        "name": "circulation",
+        "optional": false,
+        "spelling": "List<Q<L\u00b2/T>>"
+      },
+      {
+        "name": "wake",
+        "optional": false,
+        "spelling": "InitialWake"
+      }
+    ],
+    "InitialPrepared": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{prepared_history}"
+      },
+      {
+        "name": "file",
+        "optional": false,
+        "spelling": "FileRef<initial-history>"
+      }
+    ],
+    "PerturbationNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "PerturbationPhysical": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{physical}"
+      },
+      {
+        "name": "shells",
+        "optional": false,
+        "spelling": "List<ShellPhysicalState>"
+      },
+      {
+        "name": "beams",
+        "optional": false,
+        "spelling": "List<BeamState>"
+      },
+      {
+        "name": "rigids",
+        "optional": false,
+        "spelling": "List<RigidState>"
+      },
+      {
+        "name": "displacements",
+        "optional": false,
+        "spelling": "List<PointCheck>"
+      },
+      {
+        "name": "velocities",
+        "optional": false,
+        "spelling": "List<PointCheck>"
+      }
+    ],
+    "InitialState": [
+      {
+        "name": "shells",
+        "optional": false,
+        "spelling": "List<CoefficientState>"
+      },
+      {
+        "name": "beams",
+        "optional": false,
+        "spelling": "List<BeamState>"
+      },
+      {
+        "name": "rigids",
+        "optional": false,
+        "spelling": "List<RigidState>"
+      }
+    ],
+    "CoefficientState": [
+      {
+        "name": "shell",
+        "optional": false,
+        "spelling": "Ref<Shell>"
+      },
+      {
+        "name": "reference",
+        "optional": false,
+        "spelling": "Digest"
+      },
+      {
+        "name": "representation",
+        "optional": false,
+        "spelling": "Tag{absolute,reference_increment}"
+      },
+      {
+        "name": "position",
+        "optional": false,
+        "spelling": "Planes"
+      },
+      {
+        "name": "velocity",
+        "optional": false,
+        "spelling": "Planes"
+      }
+    ],
+    "PlanesBinary64": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{binary64}"
+      },
+      {
+        "name": "high",
+        "optional": false,
+        "spelling": "List<Number>"
+      }
+    ],
+    "PlanesTwoWord": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{two_word}"
+      },
+      {
+        "name": "high",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "low",
+        "optional": false,
+        "spelling": "List<Number>"
+      }
+    ],
+    "BeamState": [
+      {
+        "name": "beam",
+        "optional": false,
+        "spelling": "Ref<Beam>"
+      },
+      {
+        "name": "nodes",
+        "optional": false,
+        "spelling": "Vec<FrameStatePayload,2>"
+      }
+    ],
+    "RigidState": [
+      {
+        "name": "rigid",
+        "optional": false,
+        "spelling": "Ref<Mass>"
+      },
+      {
+        "name": "state",
+        "optional": false,
+        "spelling": "FrameStatePayload"
+      }
+    ],
+    "FrameStatePayload": [
+      {
+        "name": "position",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "rotation",
+        "optional": false,
+        "spelling": "Mat<Number,3,3>"
+      },
+      {
+        "name": "linear_velocity",
+        "optional": false,
+        "spelling": "Vec<Q<L/T>,3>"
+      },
+      {
+        "name": "angular_velocity",
+        "optional": false,
+        "spelling": "Vec<Q<angle/T>,3>"
+      }
+    ],
+    "InitialWake": [
+      {
+        "name": "surfaces",
+        "optional": false,
+        "spelling": "List<SurfaceWake>"
+      }
+    ],
+    "SurfaceWake": [
+      {
+        "name": "surface",
+        "optional": false,
+        "spelling": "Ref<AeroSurface>"
+      },
+      {
+        "name": "rows",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "points",
+        "optional": false,
+        "spelling": "List<Vec<Q<L>,3>>"
+      },
+      {
+        "name": "coefficients",
+        "optional": false,
+        "spelling": "List<Q<L\u00b2/T>>"
+      },
+      {
+        "name": "row_ids",
+        "optional": false,
+        "spelling": "List<Id<WakeRow>>"
+      },
+      {
+        "name": "point_ids",
+        "optional": false,
+        "spelling": "List<Id<WakePoint>>"
+      },
+      {
+        "name": "band_ids",
+        "optional": false,
+        "spelling": "List<Id<WakeBand>>"
+      },
+      {
+        "name": "birth_times",
+        "optional": false,
+        "spelling": "List<Q<T>>"
+      }
+    ],
+    "Restart": [
+      {
+        "name": "directory",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "manifest_sha256",
+        "optional": false,
+        "spelling": "Digest"
+      },
+      {
+        "name": "compatibility",
+        "optional": false,
+        "spelling": "Tag{same_environment_bitwise,qualified_cross_environment}"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "List<ObservationBudget>"
+      }
+    ],
+    "ObservationPoint": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{point}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Observation>"
+      },
+      {
+        "name": "point",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "quantity",
+        "optional": false,
+        "spelling": "Tag{position,displacement,velocity,acceleration,force}"
+      },
+      {
+        "name": "basis",
+        "optional": false,
+        "spelling": "Basis"
+      },
+      {
+        "name": "comparison",
+        "optional": false,
+        "spelling": "Comparison"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "ObservationBudget"
+      }
+    ],
+    "ObservationStress": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{stress}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Observation>"
+      },
+      {
+        "name": "point",
+        "optional": false,
+        "spelling": "MaterialPoint"
+      },
+      {
+        "name": "layer",
+        "optional": false,
+        "spelling": "Ref<Layer>"
+      },
+      {
+        "name": "interface",
+        "optional": false,
+        "spelling": "Tag{interior,lower,upper,both}"
+      },
+      {
+        "name": "measure",
+        "optional": false,
+        "spelling": "Tag{green,second_pk,first_pk,cauchy}"
+      },
+      {
+        "name": "contribution",
+        "optional": false,
+        "spelling": "Tag{elastic,viscous,total}"
+      },
+      {
+        "name": "basis",
+        "optional": false,
+        "spelling": "Basis"
+      },
+      {
+        "name": "comparison",
+        "optional": false,
+        "spelling": "Comparison"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "ObservationBudget"
+      }
+    ],
+    "ObservationSection": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{section}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Observation>"
+      },
+      {
+        "name": "region",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "basis",
+        "optional": false,
+        "spelling": "Basis"
+      },
+      {
+        "name": "quantity",
+        "optional": false,
+        "spelling": "Tag{force,moment}"
+      },
+      {
+        "name": "comparison",
+        "optional": false,
+        "spelling": "Comparison"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "ObservationBudget"
+      }
+    ],
+    "ObservationReaction": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{reaction}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Observation>"
+      },
+      {
+        "name": "support",
+        "optional": false,
+        "spelling": "Ref<Support>"
+      },
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "basis",
+        "optional": false,
+        "spelling": "Basis"
+      },
+      {
+        "name": "comparison",
+        "optional": false,
+        "spelling": "Comparison"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "ObservationBudget"
+      }
+    ],
+    "ObservationAero": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{aero}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Observation>"
+      },
+      {
+        "name": "surfaces",
+        "optional": false,
+        "spelling": "List<Ref<AeroSurface>>"
+      },
+      {
+        "name": "origin",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "basis",
+        "optional": false,
+        "spelling": "Basis"
+      },
+      {
+        "name": "quantity",
+        "optional": false,
+        "spelling": "Tag{force,moment,coefficient}"
+      },
+      {
+        "name": "comparison",
+        "optional": false,
+        "spelling": "Comparison"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "ObservationBudget"
+      }
+    ],
+    "ObservationMode": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{mode}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Observation>"
+      },
+      {
+        "name": "targets",
+        "optional": false,
+        "spelling": "List<Target>"
+      },
+      {
+        "name": "points",
+        "optional": false,
+        "spelling": "List<MaterialPoint>"
+      },
+      {
+        "name": "basis",
+        "optional": false,
+        "spelling": "Basis"
+      },
+      {
+        "name": "quantity",
+        "optional": false,
+        "spelling": "Tag{frequency,growth,subspace}"
+      },
+      {
+        "name": "comparison",
+        "optional": false,
+        "spelling": "Comparison"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "ObservationBudget"
+      }
+    ],
+    "BasisWorldMaterial": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{world,reference_material,current_material}"
+      }
+    ],
+    "BasisExplicit": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{explicit}"
+      },
+      {
+        "name": "rotation",
+        "optional": false,
+        "spelling": "Mat<Number,3,3>"
+      }
+    ],
+    "Comparison": [
+      {
+        "name": "window",
+        "optional": false,
+        "spelling": "Vec<Q<T>,2>"
+      },
+      {
+        "name": "statistic",
+        "optional": false,
+        "spelling": "Tag{instantaneous,history,peak,rms}"
+      },
+      {
+        "name": "side",
+        "optional": false,
+        "spelling": "Tag{left,right,both}"
+      },
+      {
+        "name": "reference",
+        "optional": false,
+        "spelling": "ComparisonReference"
+      }
+    ],
+    "ComparisonReferenceNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "ComparisonReferenceFile": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{file}"
+      },
+      {
+        "name": "source",
+        "optional": false,
+        "spelling": "FileRef<observation-reference>"
+      },
+      {
+        "name": "columns",
+        "optional": false,
+        "spelling": "List<Text>"
+      },
+      {
+        "name": "uncertainty",
+        "optional": false,
+        "spelling": "List<Number>"
+      }
+    ],
+    "ObservationBudget": [
+      {
+        "name": "absolute",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "scale",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "groups",
+        "optional": false,
+        "spelling": "List<ErrorGroup>"
+      }
+    ],
+    "ErrorGroupNotApplicable": [
+      {
+        "name": "status",
+        "optional": false,
+        "spelling": "Tag{not_applicable}"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}"
+      },
+      {
+        "name": "reason",
+        "optional": false,
+        "spelling": "Text"
+      }
+    ],
+    "ErrorGroupCoveredBy": [
+      {
+        "name": "status",
+        "optional": false,
+        "spelling": "Tag{covered_by}"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}"
+      },
+      {
+        "name": "representative",
+        "optional": false,
+        "spelling": "Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}"
+      }
+    ],
+    "ErrorGroupRequired": [
+      {
+        "name": "status",
+        "optional": false,
+        "spelling": "Tag{required}"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}"
+      },
+      {
+        "name": "covers",
+        "optional": false,
+        "spelling": "List<Tag{\u540c\u3058\u96c6\u5408}>"
+      },
+      {
+        "name": "absolute",
+        "optional": false,
+        "spelling": "List<Number>"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "List<Number>"
+      }
+    ],
+    "Numerics": [
+      {
+        "name": "patch",
+        "optional": false,
+        "spelling": "PatchPolicy"
+      },
+      {
+        "name": "quadrature",
+        "optional": false,
+        "spelling": "Quadrature"
+      },
+      {
+        "name": "linear",
+        "optional": false,
+        "spelling": "LinearPolicy"
+      },
+      {
+        "name": "newton",
+        "optional": false,
+        "spelling": "NewtonPolicy"
+      },
+      {
+        "name": "precision",
+        "optional": false,
+        "spelling": "PrecisionPolicy"
+      },
+      {
+        "name": "eigen",
+        "optional": false,
+        "spelling": "EigenPolicy"
+      },
+      {
+        "name": "wake_rows",
+        "optional": false,
+        "spelling": "WakeCapacity"
+      },
+      {
+        "name": "scales",
+        "optional": false,
+        "spelling": "List<Scale>"
+      },
+      {
+        "name": "error_groups",
+        "optional": false,
+        "spelling": "List<ErrorGroup>"
+      }
+    ],
+    "WakeCapacityNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "WakeCapacityLimited": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{limited}"
+      },
+      {
+        "name": "maximum_rows",
+        "optional": false,
+        "spelling": "PositiveCount"
+      }
+    ],
+    "PatchPolicyNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "PatchPolicyActive": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{active}"
+      },
+      {
+        "name": "maximum_degree",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_partition",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "geometry_error",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "trace_error",
+        "optional": false,
+        "spelling": "Q<L>"
+      },
+      {
+        "name": "rank",
+        "optional": false,
+        "spelling": "Tag{exact_no_drop}"
+      }
+    ],
+    "Quadrature": [
+      {
+        "name": "structure",
+        "optional": false,
+        "spelling": "StructuralQuadrature"
+      },
+      {
+        "name": "aero",
+        "optional": false,
+        "spelling": "AeroQuadrature"
+      }
+    ],
+    "StructuralQuadratureNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "StructuralQuadratureActive": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{active}"
+      },
+      {
+        "name": "surface_degree",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "thickness_points",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "independent_surface_degree",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "independent_thickness_points",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "absolute",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "maximum_subdivisions",
+        "optional": false,
+        "spelling": "Count"
+      }
+    ],
+    "AeroQuadratureNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "AeroQuadratureActive": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{wp1_induction_v1}"
+      },
+      {
+        "name": "absolute",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      }
+    ],
+    "ScaleUniformComponents": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{uniform_components}"
+      },
+      {
+        "name": "field",
+        "optional": false,
+        "spelling": "Tag{shell_position,beam_translation,beam_rotation,rigid_translation,rigid_rotation,structural_velocity,structural_angular_velocity,circulation,wake_position,wake_strength,constraint,force_balance,moment_balance,aero_residual,transport_residual,newton_correction,arclength_state}"
+      },
+      {
+        "name": "targets",
+        "optional": false,
+        "spelling": "List<Target>"
+      },
+      {
+        "name": "values",
+        "optional": false,
+        "spelling": "List<Number>"
+      }
+    ],
+    "ScalePhysicalLayoutPolicy": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{physical_layout_policy}"
+      },
+      {
+        "name": "field",
+        "optional": false,
+        "spelling": "Tag{mixed_blocks}"
+      },
+      {
+        "name": "constraint",
+        "optional": false,
+        "spelling": "ConstraintScalePolicy"
+      }
+    ],
+    "ConstraintScalePolicyNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "ConstraintScalePolicyPhysical": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{physical}"
+      },
+      {
+        "name": "position",
+        "optional": false,
+        "spelling": "ComponentScale3"
+      },
+      {
+        "name": "orientation",
+        "optional": false,
+        "spelling": "ComponentScale3"
+      },
+      {
+        "name": "multiplier_work_scale",
+        "optional": false,
+        "spelling": "Q<energy>"
+      },
+      {
+        "name": "reaction_force",
+        "optional": false,
+        "spelling": "Vec<Q<force>,3>"
+      },
+      {
+        "name": "reaction_moment",
+        "optional": false,
+        "spelling": "Vec<Q<force*L>,3>"
+      }
+    ],
+    "ComponentScale3None": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "ComponentScale3Values": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{values}"
+      },
+      {
+        "name": "values",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      }
+    ],
+    "ScaleExplicitLayout": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{explicit_layout}"
+      },
+      {
+        "name": "field",
+        "optional": false,
+        "spelling": "Tag{shell_position,beam_translation,beam_rotation,rigid_translation,rigid_rotation,structural_velocity,structural_angular_velocity,circulation,wake_position,wake_strength,constraint,force_balance,moment_balance,aero_residual,transport_residual,newton_correction,arclength_state}"
+      },
+      {
+        "name": "targets",
+        "optional": false,
+        "spelling": "List<Target>"
+      },
+      {
+        "name": "layout",
+        "optional": false,
+        "spelling": "Digest"
+      },
+      {
+        "name": "dimensions",
+        "optional": false,
+        "spelling": "List<Vec<signed-native-integer,4>>"
+      },
+      {
+        "name": "values",
+        "optional": false,
+        "spelling": "List<Number>"
+      }
+    ],
+    "LinearPolicyDirect": [
+      {
+        "name": "backend",
+        "optional": false,
+        "spelling": "Tag{dense_lu,sparse_lu,sparse_llt}"
+      },
+      {
+        "name": "accuracy",
+        "optional": false,
+        "spelling": "LinearAccuracy"
+      },
+      {
+        "name": "maximum_refinements",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "backend_memory",
+        "optional": false,
+        "spelling": "BackendMemory"
+      }
+    ],
+    "LinearPolicyGmres": [
+      {
+        "name": "backend",
+        "optional": false,
+        "spelling": "Tag{gmres}"
+      },
+      {
+        "name": "accuracy",
+        "optional": false,
+        "spelling": "LinearAccuracy"
+      },
+      {
+        "name": "maximum_iterations",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "restart",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "maximum_applications",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_adjoint",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_preconditioner",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_true_residual_checks",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "backend_memory",
+        "optional": false,
+        "spelling": "BackendMemory"
+      }
+    ],
+    "LinearAccuracy": [
+      {
+        "name": "absolute",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "backward",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "norm",
+        "optional": false,
+        "spelling": "Tag{infinity,l2}"
+      }
+    ],
+    "NewtonPolicy": [
+      {
+        "name": "maximum_iterations",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "maximum_line_searches",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "absolute",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "correction",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "minimum_step",
+        "optional": false,
+        "spelling": "Q<1>"
+      }
+    ],
+    "PrecisionPolicy": [
+      {
+        "name": "input",
+        "optional": false,
+        "spelling": "Tag{preserve}"
+      },
+      {
+        "name": "retained",
+        "optional": false,
+        "spelling": "Tag{adaptive_binary64_two_word}"
+      },
+      {
+        "name": "returned",
+        "optional": false,
+        "spelling": "Tag{retained,binary64_projection}"
+      },
+      {
+        "name": "projection_absolute",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "projection_relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      }
+    ],
+    "BackendMemory": [
+      {
+        "name": "admission",
+        "optional": false,
+        "spelling": "Tag{estimate,require_proven_bound}"
+      },
+      {
+        "name": "maximum_bytes",
+        "optional": false,
+        "spelling": "Count"
+      }
+    ],
+    "EigenPolicyNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{none}"
+      }
+    ],
+    "EigenPolicyFull": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{full}"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Tag{step_map}"
+      },
+      {
+        "name": "eigenvalue_scale",
+        "optional": false,
+        "spelling": "Number"
+      },
+      {
+        "name": "packet",
+        "optional": false,
+        "spelling": "Tag{spectrum,pairs,subspace}"
+      },
+      {
+        "name": "requirements",
+        "optional": false,
+        "spelling": "EigenRequirements"
+      },
+      {
+        "name": "limits",
+        "optional": false,
+        "spelling": "EigenLimits"
+      }
+    ],
+    "EigenPolicyGeneralized": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{generalized}"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Tag{structural_modes}"
+      },
+      {
+        "name": "eigenvalue_scale",
+        "optional": false,
+        "spelling": "Q<1/T\u00b2>"
+      },
+      {
+        "name": "requirements",
+        "optional": false,
+        "spelling": "EigenRequirements"
+      },
+      {
+        "name": "limits",
+        "optional": false,
+        "spelling": "EigenLimits"
+      }
+    ],
+    "EigenPolicyArnoldi": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{arnoldi}"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Tag{step_map}"
+      },
+      {
+        "name": "eigenvalue_scale",
+        "optional": false,
+        "spelling": "Number"
+      },
+      {
+        "name": "packet",
+        "optional": false,
+        "spelling": "Tag{pairs,subspace}"
+      },
+      {
+        "name": "selector",
+        "optional": false,
+        "spelling": "EigenSelector"
+      },
+      {
+        "name": "nev",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "ncv",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "seed",
+        "optional": false,
+        "spelling": "ArnoldiSeed"
+      },
+      {
+        "name": "backend_tolerance",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "requirements",
+        "optional": false,
+        "spelling": "EigenRequirements"
+      },
+      {
+        "name": "limits",
+        "optional": false,
+        "spelling": "EigenLimits"
+      }
+    ],
+    "Complex": [
+      {
+        "name": "real",
+        "optional": false,
+        "spelling": "Number"
+      },
+      {
+        "name": "imaginary",
+        "optional": false,
+        "spelling": "Number"
+      }
+    ],
+    "ArnoldiSeedUniform": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{uniform_nonzero}"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Complex"
+      }
+    ],
+    "ArnoldiSeedExplicit": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{explicit_layout}"
+      },
+      {
+        "name": "layout",
+        "optional": false,
+        "spelling": "Digest"
+      },
+      {
+        "name": "values",
+        "optional": false,
+        "spelling": "List<Complex>"
+      }
+    ],
+    "EigenSelectorLargest": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{largest_magnitude}"
+      }
+    ],
+    "EigenSelectorShift": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{shift_invert}"
+      },
+      {
+        "name": "shift",
+        "optional": false,
+        "spelling": "Complex"
+      }
+    ],
+    "EigenRequirements": [
+      {
+        "name": "residual",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "residual_observation",
+        "optional": false,
+        "spelling": "Ref<Observation>"
+      },
+      {
+        "name": "normalization",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "normalization_observation",
+        "optional": false,
+        "spelling": "Ref<Observation>"
+      },
+      {
+        "name": "orthogonality",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "orthogonality_observation",
+        "optional": false,
+        "spelling": "Ref<Observation>"
+      },
+      {
+        "name": "backward",
+        "optional": false,
+        "spelling": "Backward"
+      },
+      {
+        "name": "association_absolute",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "association_relative",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "left",
+        "optional": false,
+        "spelling": "Bool"
+      },
+      {
+        "name": "clusters",
+        "optional": false,
+        "spelling": "List<EigenCluster>"
+      },
+      {
+        "name": "physical_coverage",
+        "optional": false,
+        "spelling": "Bool"
+      }
+    ],
+    "BackwardNone": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{not_requested}"
+      }
+    ],
+    "BackwardRequired": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{required}"
+      },
+      {
+        "name": "budget",
+        "optional": false,
+        "spelling": "Q<1>"
+      },
+      {
+        "name": "observation",
+        "optional": false,
+        "spelling": "Ref<Observation>"
+      }
+    ],
+    "EigenCluster": [
+      {
+        "name": "members",
+        "optional": false,
+        "spelling": "List<Index>"
+      },
+      {
+        "name": "expected_dimension",
+        "optional": false,
+        "spelling": "PositiveCount"
+      }
+    ],
+    "EigenLimits": [
+      {
+        "name": "maximum_order",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_results",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_ncv",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_backend_iterations",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_attempts",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_forward",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_adjoint",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_inverse",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "backend_memory",
+        "optional": false,
+        "spelling": "BackendMemory"
+      }
+    ],
+    "Resources": [
+      {
+        "name": "profile",
+        "optional": false,
+        "spelling": "Tag{24gib,48gib,custom}"
+      },
+      {
+        "name": "threads",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "maximum_memory_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_wall_seconds",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "maximum_steps",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_total_iterations",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "checkpoint_temporary_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "input",
+        "optional": false,
+        "spelling": "InputQuotas"
+      }
+    ],
+    "InputQuotas": [
+      {
+        "name": "maximum_source_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_depth",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_nodes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_members",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_decoded_string_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_decimal_token_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_total_text_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_typed_bytes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_entities",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_references",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_scalars",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_polynomial_terms",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_table_samples",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_expression_nodes",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_expression_edges",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_expression_depth",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_expression_power",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_expression_points",
+        "optional": false,
+        "spelling": "Count"
+      },
+      {
+        "name": "maximum_diagnostic_path_bytes",
+        "optional": false,
+        "spelling": "Count"
+      }
+    ],
+    "Output": [
+      {
+        "name": "directory",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "observations",
+        "optional": false,
+        "spelling": "OutputCadence"
+      },
+      {
+        "name": "visualization",
+        "optional": false,
+        "spelling": "Visualization"
+      },
+      {
+        "name": "checkpoint",
+        "optional": false,
+        "spelling": "CheckpointOutput"
+      },
+      {
+        "name": "overwrite",
+        "optional": false,
+        "spelling": "Tag{reject_existing}"
+      },
+      {
+        "name": "resume",
+        "optional": false,
+        "spelling": "Tag{explicit_only}"
+      }
+    ],
+    "OutputCadence": [
+      {
+        "name": "every_steps",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "observations",
+        "optional": false,
+        "spelling": "List<Ref<Observation>>"
+      }
+    ],
+    "Visualization": [
+      {
+        "name": "enabled",
+        "optional": false,
+        "spelling": "Bool"
+      },
+      {
+        "name": "every_steps",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "layers",
+        "optional": false,
+        "spelling": "List<Ref<Layer>>"
+      },
+      {
+        "name": "interfaces",
+        "optional": false,
+        "spelling": "Tag{both}"
+      },
+      {
+        "name": "reference_geometry",
+        "optional": false,
+        "spelling": "Bool"
+      },
+      {
+        "name": "current_geometry",
+        "optional": false,
+        "spelling": "Bool"
+      }
+    ],
+    "CheckpointOutputOff": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{off}"
+      }
+    ],
+    "CheckpointOutputOn": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{on}"
+      },
+      {
+        "name": "every_steps",
+        "optional": false,
+        "spelling": "PositiveCount"
+      },
+      {
+        "name": "directory",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "retain",
+        "optional": false,
+        "spelling": "PositiveCount"
+      }
+    ],
+    "ReferenceFieldExpression": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{expression}"
+      },
+      {
+        "name": "expression",
+        "optional": false,
+        "spelling": "Expression<n>"
+      },
+      {
+        "name": "error",
+        "optional": false,
+        "spelling": "Vec<Q<d>,n>"
+      }
+    ],
+    "TimeSeriesExpression": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{expression}"
+      },
+      {
+        "name": "expression",
+        "optional": false,
+        "spelling": "Expression<n>"
+      }
+    ],
+    "LoadCurrentExpression": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{current_pressure}"
+      },
+      {
+        "name": "id",
+        "optional": false,
+        "spelling": "Id<Load>"
+      },
+      {
+        "name": "region",
+        "optional": false,
+        "spelling": "Region"
+      },
+      {
+        "name": "expression",
+        "optional": false,
+        "spelling": "Expression<1>"
+      }
+    ],
+    "Expression": [
+      {
+        "name": "domain",
+        "optional": false,
+        "spelling": "ExpressionDomain"
+      },
+      {
+        "name": "nodes",
+        "optional": false,
+        "spelling": "List<ExprNode>"
+      },
+      {
+        "name": "outputs",
+        "optional": false,
+        "spelling": "Vec<Index,n>"
+      }
+    ],
+    "ExpressionDomainReference": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{reference}"
+      },
+      {
+        "name": "coordinates",
+        "optional": false,
+        "spelling": "Tag{chart,material,world_reference}"
+      },
+      {
+        "name": "lower",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "upper",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      }
+    ],
+    "ExpressionDomainTime": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{time}"
+      },
+      {
+        "name": "lower",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "upper",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "events",
+        "optional": false,
+        "spelling": "List<Q<T>>"
+      }
+    ],
+    "ExpressionDomainCurrentPositionTime": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{current_position_time}"
+      },
+      {
+        "name": "position_lower",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "position_upper",
+        "optional": false,
+        "spelling": "Vec<Q<L>,3>"
+      },
+      {
+        "name": "time_lower",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "time_upper",
+        "optional": false,
+        "spelling": "Q<T>"
+      },
+      {
+        "name": "events",
+        "optional": false,
+        "spelling": "List<Q<T>>"
+      }
+    ],
+    "ExprNodeConstant": [
+      {
+        "name": "op",
+        "optional": false,
+        "spelling": "Tag{constant}"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Number"
+      },
+      {
+        "name": "dimensions",
+        "optional": false,
+        "spelling": "Vec<signed-native-integer,4>"
+      }
+    ],
+    "ExprNodeVariable": [
+      {
+        "name": "op",
+        "optional": false,
+        "spelling": "Tag{variable}"
+      },
+      {
+        "name": "axis",
+        "optional": false,
+        "spelling": "Index"
+      }
+    ],
+    "ExprNodeBinary": [
+      {
+        "name": "op",
+        "optional": false,
+        "spelling": "Tag{add,subtract,multiply,divide}"
+      },
+      {
+        "name": "first",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "second",
+        "optional": false,
+        "spelling": "Index"
+      }
+    ],
+    "ExprNodeNegate": [
+      {
+        "name": "op",
+        "optional": false,
+        "spelling": "Tag{negate}"
+      },
+      {
+        "name": "operand",
+        "optional": false,
+        "spelling": "Index"
+      }
+    ],
+    "ExprNodePower": [
+      {
+        "name": "op",
+        "optional": false,
+        "spelling": "Tag{integer_power}"
+      },
+      {
+        "name": "operand",
+        "optional": false,
+        "spelling": "Index"
+      },
+      {
+        "name": "exponent",
+        "optional": false,
+        "spelling": "signed-native-integer"
+      }
+    ],
+    "ExprNodeAnalytic": [
+      {
+        "name": "op",
+        "optional": false,
+        "spelling": "Tag{sin,cos,exp,log,sqrt}"
+      },
+      {
+        "name": "operand",
+        "optional": false,
+        "spelling": "Index"
+      }
+    ],
+    "ShellPhysicalState": [
+      {
+        "name": "shell",
+        "optional": false,
+        "spelling": "Ref<Shell>"
+      },
+      {
+        "name": "displacement",
+        "optional": false,
+        "spelling": "FullShellField"
+      },
+      {
+        "name": "velocity",
+        "optional": false,
+        "spelling": "FullShellField"
+      }
+    ],
+    "FullShellFieldGlobalPolynomial": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{global_polynomial}"
+      },
+      {
+        "name": "r",
+        "optional": false,
+        "spelling": "VectorPolynomial"
+      },
+      {
+        "name": "p",
+        "optional": false,
+        "spelling": "VectorPolynomial"
+      },
+      {
+        "name": "c",
+        "optional": false,
+        "spelling": "VectorPolynomial"
+      }
+    ],
+    "FullShellFieldHalfCells": [
+      {
+        "name": "kind",
+        "optional": false,
+        "spelling": "Tag{half_cells}"
+      },
+      {
+        "name": "cells",
+        "optional": false,
+        "spelling": "List<CellField>"
+      }
+    ],
+    "CellField": [
+      {
+        "name": "cell",
+        "optional": false,
+        "spelling": "Vec<Index,2>"
+      },
+      {
+        "name": "r",
+        "optional": false,
+        "spelling": "VectorPolynomial"
+      },
+      {
+        "name": "p",
+        "optional": false,
+        "spelling": "VectorPolynomial"
+      },
+      {
+        "name": "c",
+        "optional": false,
+        "spelling": "VectorPolynomial"
+      }
+    ],
+    "VectorPolynomial": [
+      {
+        "name": "terms",
+        "optional": false,
+        "spelling": "List<VectorTerm>"
+      }
+    ],
+    "VectorTerm": [
+      {
+        "name": "powers",
+        "optional": false,
+        "spelling": "Vec<Count,2>"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Vec<ExactQuantity,3>"
+      }
+    ],
+    "PointCheck": [
+      {
+        "name": "point",
+        "optional": false,
+        "spelling": "InitialPoint"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "tolerance",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      }
+    ],
+    "InitialPointShell": [
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Target{kind=shell}"
+      },
+      {
+        "name": "coordinates",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      },
+      {
+        "name": "side_s",
+        "optional": false,
+        "spelling": "Tag{interior,lower,upper}"
+      },
+      {
+        "name": "side_t",
+        "optional": false,
+        "spelling": "Tag{interior,lower,upper}"
+      }
+    ],
+    "InitialPointBeam": [
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Target{kind=beam}"
+      },
+      {
+        "name": "coordinates",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      }
+    ],
+    "InitialPointRigid": [
+      {
+        "name": "target",
+        "optional": false,
+        "spelling": "Target{kind=rigid}"
+      },
+      {
+        "name": "coordinates",
+        "optional": false,
+        "spelling": "Vec<Number,3>"
+      }
+    ],
+    "Rational": [
+      {
+        "name": "numerator",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "denominator",
+        "optional": false,
+        "spelling": "Text"
+      }
+    ],
+    "FileReference": [
+      {
+        "name": "source_id",
+        "optional": false,
+        "spelling": "Id<Source>"
+      },
+      {
+        "name": "path",
+        "optional": false,
+        "spelling": "Text"
+      },
+      {
+        "name": "sha256",
+        "optional": false,
+        "spelling": "Digest"
+      },
+      {
+        "name": "role",
+        "optional": false,
+        "spelling": "Tag{\u6307\u5b9arole}"
+      }
+    ]
+  }
+}
