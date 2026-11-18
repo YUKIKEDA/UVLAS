@@ -1,0 +1,24 @@
+{
+  "schema": "uvlas.design-review/1",
+  "reviewer": "root agent, independent of the contract author",
+  "date": "2026-11-18",
+  "scope": [
+    "SI exact recipes and unit/component semantics",
+    "normalized absolute/relative host requirements and QoI boundary",
+    "owning interfaces, source identity, whole-call resources and failure",
+    "Japanese readability and document structure",
+    "independent Fraction design oracle"
+  ],
+  "findings_resolved": [
+    "Inline LaTeX spacing follows the owner's rendering convention.",
+    "Capped exact rational reduction proves zero-width dyadic conversions, including 0.1 km and 500 mm; 1.20 in remains non-dyadic.",
+    "Center rounding across the normalization boundary rescales the exponent and outward radius with checked arithmetic.",
+    "The quotient shift applies to the entire significand; large alignment gaps use signed adjacent-grid expansion."
+  ],
+  "decision": "SI conversion implementation may start after this design PR is merged.",
+  "not_verified": [
+    "No C++ SI converter, 256-bit interval kernel or product failure-injection tests were executed.",
+    "The mathematical oracle does not certify product implementation, QoI uncertainty propagation, numerical qualification or practical acceptance."
+  ],
+  "japanese_lint_decision": "One low_lexical_diversity_ttr info finding is retained because exact, unit, precision, ownership and resource terms must keep the same meanings."
+}

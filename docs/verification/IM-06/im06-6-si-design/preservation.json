@@ -1,0 +1,65 @@
+{
+  "schema": "uvlas.si-design-preservation/1",
+  "base_commit": "3af7b8ea793ddebee18d15603824c27072e131ab",
+  "checked": [
+    {
+      "path": "docs/specs/foundation/case-schema-contract.md",
+      "base_git_blob": "eb0779e7c430bb6c0cefe97b7efc9fdd429eb672",
+      "current_git_blob": "eb0779e7c430bb6c0cefe97b7efc9fdd429eb672",
+      "sha256": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/case-schema-fields.md",
+      "base_git_blob": "7f842e73a85492b8ddc0c00c03feb8506f4887b8",
+      "current_git_blob": "7f842e73a85492b8ddc0c00c03feb8506f4887b8",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/case-schema-examples.json",
+      "base_git_blob": "75e0beb170673e55d33ab781013a54a71aa91c34",
+      "current_git_blob": "75e0beb170673e55d33ab781013a54a71aa91c34",
+      "sha256": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/case-initial-physical-state-contract.md",
+      "base_git_blob": "ef0c66234f5fd96809cdd68f0b8de1a84bfcc6a6",
+      "current_git_blob": "ef0c66234f5fd96809cdd68f0b8de1a84bfcc6a6",
+      "sha256": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/case-initial-physical-state-examples.json",
+      "base_git_blob": "ea97235e6878b1a6aaa6e615582c1de0ae1740d4",
+      "current_git_blob": "ea97235e6878b1a6aaa6e615582c1de0ae1740d4",
+      "sha256": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/typed-case-schema-implementation-contract.md",
+      "base_git_blob": "770c2e1bcee167f35e1f70e62971f7a8ea635a3c",
+      "current_git_blob": "770c2e1bcee167f35e1f70e62971f7a8ea635a3c",
+      "sha256": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/precision-contract.md",
+      "base_git_blob": "605f9e2e3264b205e8850b4a8e623214cbd7ad94",
+      "current_git_blob": "605f9e2e3264b205e8850b4a8e623214cbd7ad94",
+      "sha256": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+      "bytes_equal": true
+    },
+    {
+      "path": "docs/specs/foundation/io-execution-adoption-specification.md",
+      "base_git_blob": "cd5b92dcee85bd05100d7fceda8b714190311016",
+      "current_git_blob": "cd5b92dcee85bd05100d7fceda8b714190311016",
+      "sha256": "df926d9f6726a62af313e534e04c6a9b9aa4b838f7fa252567f3a50519039123",
+      "bytes_equal": true
+    }
+  ],
+  "product_code_unchanged": true,
+  "oracle_reproduction_sha256": "8c267bcebe67fc8bbf1c2b9b7ad5c4426576ef3f223a6c0aab70dc4f4afa583c",
+  "reproduction_bytes_equal": true
+}
