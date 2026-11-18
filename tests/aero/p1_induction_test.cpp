@@ -126,6 +126,35 @@ TEST_CASE("Product Gauss brackets match independently isolated exact Sturm roots
     check(arithmetic::gauss_8);
     check(arithmetic::gauss_12);
 }
+TEST_CASE("P1 primitive dyadic boundaries retain subgrid logarithms and quadrant limits",
+          "[UI-D06][N4-06][verification]") {
+    arithmetic::Work work{0, UINT64_C(10000000), {}};
+    const auto zero = arithmetic::integer(0), one = arithmetic::integer(1);
+    const auto pi = arithmetic::pi_constant(work);
+    const auto ln2 =
+        arithmetic::logarithm_series(arithmetic::divide(one, arithmetic::integer(3), work), work);
+    contains(arithmetic::square_root(zero, work), Real{0});
+    contains(arithmetic::square_root(arithmetic::integer(4), work), Real{2});
+    for (const int power : {-9000, -1074, -256, 0, 256, 9000}) {
+        const auto dyadic = arithmetic::scale(one, power);
+        const Real reference = boost::multiprecision::ldexp(Real{1}, power);
+        contains(arithmetic::square_root(dyadic, work), sqrt(reference));
+        contains(arithmetic::log_one_plus(dyadic, ln2, work),
+                 boost::multiprecision::log1p(reference));
+        contains(arithmetic::atan_two(one, dyadic, pi, work),
+                 boost::multiprecision::atan2(Real{1}, reference));
+        contains(arithmetic::atan_two(one, arithmetic::negate(dyadic, work), pi, work),
+                 boost::multiprecision::atan2(Real{1}, -reference));
+    }
+    contains(arithmetic::atan_two(one, zero, pi, work), boost::multiprecision::acos(Real{-1}) / 2);
+    for (const double x : {std::nextafter(1., 0.), 1., std::nextafter(1., 2.),
+                           std::nextafter(3., 0.), 3., std::nextafter(3., 4.)}) {
+        ExactInteger decoded;
+        local_decode(x, decoded);
+        contains(arithmetic::log_one_plus(arithmetic::exact(decoded, -1074), ln2, work),
+                 boost::multiprecision::log1p(Real{x}));
+    }
+}
 TEST_CASE("P1 complete basis and derivative owner evaluates all branches",
           "[UI-D01][UI-D02][UI-D03][UI-D04][UI-D06][N4-02][verification]") {
     core::ResourcePlan plan{128ULL * 1024 * 1024};
