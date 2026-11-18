@@ -1,0 +1,161 @@
+"""Bounded design audit only; not the product schema validator. Stdlib only."""
+from __future__ import annotations
+
+import argparse
+from fractions import Fraction
+import hashlib
+import json
+from pathlib import Path
+import re
+
+
+SCHEMA_NEGATIVE = {
+    "point_only_underdetermined", "missing_shell_state", "duplicate_shell_state",
+    "missing_velocity_field", "missing_director_numerator", "nonpositive_denominator",
+    "degree_over_limit", "duplicate_cell", "negative_point_tolerance", "missing_side_t",
+    "unknown_point_target", "missing_beam_endpoint", "missing_rigid_state",
+}
+PREPARE_NEGATIVE = {
+    "nonmember_c_squared", "missing_active_cell", "discontinuous_cell_field",
+    "point_value_contradiction", "outward_side_at_s1", "support_contradiction",
+    "non_so3_tip", "rigid_attachment_contradiction", "body_world_velocity_contradiction",
+}
+DECIMAL_CASES = [
+    ("0", "-0.0", 0), ("1e-400", "0", 1), ("-1e-400", "0", -1),
+    ("1.000000000000000000000000000001", "1", 1), ("1e0", "1.0", 0),
+    ("10e-2", "0.1", 0), ("999", "1e3", -1), ("-999", "-1000", 1),
+    ("18446744073709551615", "18446744073709551616", -1),
+    ("-9223372036854775808", "-9223372036854775807", -1),
+    ("1.0001e-1000", "1e-1000", 1), ("0.000100", "1e-4", 0),
+    ("9.99e300", "1e301", -1), ("-0.0001", "-0.00010", 0),
+]
+
+
+def canonical(token: str) -> tuple[int, str, int]:
+    match = re.fullmatch(r"(-?)([0-9]+)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?", token)
+    assert match is not None
+    sign, integer, fraction, exponent = match.groups()
+    fraction = fraction or ""
+    digits = (integer + fraction).lstrip("0")
+    if not digits:
+        return 0, "0", 0
+    power = int(exponent or "0") - len(fraction)
+    count = len(digits) - len(digits.rstrip("0"))
+    return (-1 if sign else 1), digits.rstrip("0"), power + count
+
+
+def compare(left: str, right: str) -> int:
+    ls, lc, le = canonical(left)
+    rs, rc, rexp = canonical(right)
+    if ls != rs:
+        return (ls > rs) - (ls < rs)
+    if ls == 0:
+        return 0
+    la, ra = len(lc) + le, len(rc) + rexp
+    if la != ra:
+        return ls * ((la > ra) - (la < ra))
+    for index in range(max(len(lc), len(rc))):
+        ld = lc[index] if index < len(lc) else "0"
+        rd = rc[index] if index < len(rc) else "0"
+        if ld != rd:
+            return ls * ((ld > rd) - (ld < rd))
+    return 0
+
+
+def inventory(text: str) -> list[dict[str, object]]:
+    section = ""
+    records = []
+    for line in text.splitlines():
+        if line.startswith("## FD-"):
+            section = line[3:].split()[0]
+        columns = [column.strip() for column in line.split("|")]
+        if len(columns) != 5 or not columns[1] or ":" not in columns[2]:
+            continue
+        if columns[1] == "型":
+            continue
+        fields = re.findall(r"(?:^|, )([a-z][a-z0-9_]*)(\??):", columns[2])
+        assert fields, line
+        records.append({"section": section, "type": columns[1],
+                        "fields": [{"key": key, "optional": bool(optional)}
+                                   for key, optional in fields],
+                        "declaration": columns[2], "conditions": columns[3]})
+    assert records
+    return records
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fields", type=Path, required=True)
+    parser.add_argument("--initial-contract", type=Path, required=True)
+    parser.add_argument("--examples", type=Path, required=True)
+    parser.add_argument("--initial-examples", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    paths = [args.fields, args.initial_contract, args.examples, args.initial_examples]
+    hashes = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    records = inventory(args.fields.read_text(encoding="utf-8"))
+    supplement = inventory(args.initial_contract.read_text(encoding="utf-8"))
+    assert {row["section"] for row in records} == {f"FD-{i:02}" for i in range(1, 13)}
+    examples = json.loads(args.examples.read_bytes(), parse_float=str)
+    initial = json.loads(args.initial_examples.read_bytes(), parse_float=str)
+    assert len(examples["fragments"]) == 144
+    assert len(examples["schema_examples"]) == 5
+    assert len(initial["cases"]) == 4
+    negative = initial["negative_cases"]
+    assert {case["id"] for case in negative} == SCHEMA_NEGATIVE | PREPARE_NEGATIVE
+    for case in negative:
+        expected = "schema" if case["id"] in SCHEMA_NEGATIVE else "prepare"
+        assert case["expected_stage"] == expected
+        assert case["expected_failure"] == "InvalidInput"
+    for left, right, expected in DECIMAL_CASES:
+        actual = compare(left, right)
+        independent = (Fraction(left) > Fraction(right)) - (Fraction(left) < Fraction(right))
+        assert actual == expected == independent
+    symbolic = [("1e1000000000", "9e999999999", 1),
+                ("1e-1000000000", "0", 1),
+                ("-1e1000000000", "-9e999999999", -1)]
+    for left, right, expected in symbolic:
+        assert compare(left, right) == expected
+    # A float round-trip mutation compiles/runs but loses these exact witnesses.
+    witnesses = []
+    for left, right, expected in DECIMAL_CASES:
+        mutated = (float(left) > float(right)) - (float(left) < float(right))
+        if mutated != expected:
+            witnesses.append([left, right])
+    assert len(witnesses) >= 3
+    rational_cases = [("1e-2", "1", "100", 0),
+                      ("0.010000000000000000000000000001", "1", "100", 1),
+                      ("-0.5", "-1", "2", 0)]
+    for decimal, numerator, denominator, expected in rational_cases:
+        delta = Fraction(decimal) - Fraction(int(numerator), int(denominator))
+        assert (delta > 0) - (delta < 0) == expected
+    # Checked count arithmetic boundary, no memory allocation at enormous dimensions.
+    limit = 2**64 - 1
+    checked_cases = [(limit, 0, True), (limit, 1, False), (limit - 1, 1, True)]
+    for current, request, accepted in checked_cases:
+        assert (request <= limit - current) is accepted
+    result = {
+        "scope": "bounded design inventory/exact-comparison/stage metadata only; no product validation",
+        "source_hashes": hashes, "field_rows": len(records),
+        "supplement_rows": len(supplement), "sections": 12,
+        "fragments": 144, "root_examples": 5, "initial_cases": 4,
+        "initial_negative_schema": len(SCHEMA_NEGATIVE),
+        "initial_negative_prepare": len(PREPARE_NEGATIVE),
+        "decimal_cases": len(DECIMAL_CASES), "symbolic_exponent_cases": len(symbolic),
+        "mixed_rational_cases": len(rational_cases), "checked_count_cases": len(checked_cases),
+        "float_round_trip_mutation_witnesses": witnesses,
+        "negative_stages": [{"id": case["id"], "stage": case["expected_stage"],
+                             "failure": case["expected_failure"]} for case in negative],
+        "field_inventory": records, "supplement_inventory": supplement,
+        "not_claimed": ["product schema validation", "all negative inputs executed",
+                        "SI conversion", "expression evaluation or differentiation",
+                        "physical prepare", "numerical qualification"],
+    }
+    args.output.write_bytes((json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode())
+    print(json.dumps({key: value for key, value in result.items()
+                      if key not in {"field_inventory", "supplement_inventory", "negative_stages"}},
+                     ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

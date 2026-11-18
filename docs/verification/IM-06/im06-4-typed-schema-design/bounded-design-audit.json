@@ -1,0 +1,4919 @@
+{
+  "scope": "bounded design inventory/exact-comparison/stage metadata only; no product validation",
+  "source_hashes": {
+    "case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "case-initial-physical-state-examples.json": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546"
+  },
+  "field_rows": 180,
+  "supplement_rows": 11,
+  "sections": 12,
+  "fragments": 144,
+  "root_examples": 5,
+  "initial_cases": 4,
+  "initial_negative_schema": 13,
+  "initial_negative_prepare": 9,
+  "decimal_cases": 14,
+  "symbolic_exponent_cases": 3,
+  "mixed_rational_cases": 3,
+  "checked_count_cases": 3,
+  "float_round_trip_mutation_witnesses": [
+    [
+      "1e-400",
+      "0"
+    ],
+    [
+      "-1e-400",
+      "0"
+    ],
+    [
+      "1.000000000000000000000000000001",
+      "1"
+    ],
+    [
+      "18446744073709551615",
+      "18446744073709551616"
+    ],
+    [
+      "-9223372036854775808",
+      "-9223372036854775807"
+    ],
+    [
+      "1.0001e-1000",
+      "1e-1000"
+    ]
+  ],
+  "negative_stages": [
+    {
+      "id": "point_only_underdetermined",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_shell_state",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "duplicate_shell_state",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_velocity_field",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_director_numerator",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "nonpositive_denominator",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "degree_over_limit",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "nonmember_c_squared",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_active_cell",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "duplicate_cell",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "discontinuous_cell_field",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "point_value_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "negative_point_tolerance",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_side_t",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "outward_side_at_s1",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "unknown_point_target",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "support_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_beam_endpoint",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "missing_rigid_state",
+      "stage": "schema",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "non_so3_tip",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "rigid_attachment_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    },
+    {
+      "id": "body_world_velocity_contradiction",
+      "stage": "prepare",
+      "failure": "InvalidInput"
+    }
+  ],
+  "field_inventory": [
+    {
+      "section": "FD-01",
+      "type": "Case",
+      "fields": [
+        {
+          "key": "schema",
+          "optional": false
+        },
+        {
+          "key": "units",
+          "optional": false
+        },
+        {
+          "key": "model",
+          "optional": false
+        },
+        {
+          "key": "flow",
+          "optional": false
+        },
+        {
+          "key": "analysis",
+          "optional": false
+        },
+        {
+          "key": "observations",
+          "optional": false
+        },
+        {
+          "key": "numerics",
+          "optional": false
+        },
+        {
+          "key": "resources",
+          "optional": false
+        },
+        {
+          "key": "output",
+          "optional": false
+        },
+        {
+          "key": "initial",
+          "optional": true
+        },
+        {
+          "key": "restart",
+          "optional": true
+        },
+        {
+          "key": "provenance",
+          "optional": true
+        }
+      ],
+      "declaration": "schema:Tag{uvlas.case/1}, units:Units, model:Model, flow:Flow, analysis:Analysis, observations:List<Observation>, numerics:Numerics, resources:Resources, output:Output, initial?:Initial, restart?:Restart, provenance?:Provenance",
+      "conditions": "observationsは空可。初期/再開の相互条件はFD-08。provenance省略は補足空"
+    },
+    {
+      "section": "FD-01",
+      "type": "Units",
+      "fields": [
+        {
+          "key": "length",
+          "optional": false
+        },
+        {
+          "key": "mass",
+          "optional": false
+        },
+        {
+          "key": "time",
+          "optional": false
+        },
+        {
+          "key": "angle",
+          "optional": false
+        }
+      ],
+      "declaration": "length:Tag{m,mm,cm,km,in,ft}, mass:Tag{kg,g,t,lbm}, time:Tag{s,ms,min}, angle:Tag{rad,deg}",
+      "conditions": "tは1000kg、lbmは0.45359237kg、inは0.0254m、ftは0.3048m。degはπ/180radであり有理数と偽らない。SI段階が変換誤差を認定"
+    },
+    {
+      "section": "FD-01",
+      "type": "Model",
+      "fields": [
+        {
+          "key": "geometry",
+          "optional": false
+        },
+        {
+          "key": "materials",
+          "optional": false
+        },
+        {
+          "key": "shells",
+          "optional": false
+        },
+        {
+          "key": "beams",
+          "optional": false
+        },
+        {
+          "key": "joints",
+          "optional": false
+        },
+        {
+          "key": "supports",
+          "optional": false
+        },
+        {
+          "key": "masses",
+          "optional": false
+        },
+        {
+          "key": "aero_surfaces",
+          "optional": false
+        }
+      ],
+      "declaration": "geometry:List<Geometry>, materials:List<Material>, shells:List<Shell>, beams:List<Beam>, joints:List<Joint>, supports:List<Support>, masses:List<Mass>, aero_surfaces:List<AeroSurface>",
+      "conditions": "全8配列を明示。各空可。analysisが消費する物理部分が空なら相互条件で拒否"
+    },
+    {
+      "section": "FD-01",
+      "type": "Provenance",
+      "fields": [
+        {
+          "key": "description",
+          "optional": false
+        },
+        {
+          "key": "references",
+          "optional": false
+        },
+        {
+          "key": "assumptions",
+          "optional": false
+        }
+      ],
+      "declaration": "description:Text, references:List<Text>, assumptions:List<Text>",
+      "conditions": "全リスト空可。来歴補足であり原bytes/hashを置換しない"
+    },
+    {
+      "section": "FD-02",
+      "type": "Frame",
+      "fields": [
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "rotation",
+          "optional": false
+        }
+      ],
+      "declaration": "origin:Vec<Q<L>,3>, rotation:Mat<Number,3,3>",
+      "conditions": "行列列が局所軸の世界成分。右手直交の認定はprepare"
+    },
+    {
+      "section": "FD-02",
+      "type": "Target",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{shell,beam,rigid}, id:対応Ref<Shell/Beam/Mass>",
+      "conditions": "rigidはMass.kind=rigidだけ"
+    },
+    {
+      "section": "FD-02",
+      "type": "MaterialPoint",
+      "fields": [
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "coordinates",
+          "optional": false
+        },
+        {
+          "key": "side",
+          "optional": false
+        }
+      ],
+      "declaration": "target:Target, coordinates:Vec<Number,3>, side:Tag{interior,lower,upper}",
+      "conditions": "shellは(s,t,ζ)、beamは(s,0,0)、rigidは物体座標の長さ。unused成分の零をexact検査。shellのζ/実厚さ変換は準備版を使用"
+    },
+    {
+      "section": "FD-02",
+      "type": "Region",
+      "fields": [
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "geometry",
+          "optional": false
+        },
+        {
+          "key": "boundary",
+          "optional": false
+        },
+        {
+          "key": "side",
+          "optional": false
+        }
+      ],
+      "declaration": "target:Target, kind:Tag{volume,face,edge,point}, geometry:Ref<Geometry>, boundary:Index, side:Tag{interior,lower,upper}",
+      "conditions": "pointはboundary=0。面/辺は幾何に定義したindex。未知index/target種別不整合拒否"
+    },
+    {
+      "section": "FD-02",
+      "type": "PolyTerm<d,k>",
+      "fields": [
+        {
+          "key": "powers",
+          "optional": false
+        },
+        {
+          "key": "coefficient",
+          "optional": false
+        }
+      ],
+      "declaration": "powers:Vec<Count,k>, coefficient:Q<d>",
+      "conditions": "座標を指定した無次元変数に正規化してから評価。同一powersの重複を拒否"
+    },
+    {
+      "section": "FD-02",
+      "type": "ReferenceField<d,n> constant",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{constant}, value:Vec<Q<d>,n>",
+      "conditions": "成分順は使用箇所が指定"
+    },
+    {
+      "section": "FD-02",
+      "type": "ReferenceField<d,n> polynomial",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "coordinates",
+          "optional": false
+        },
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "lengths",
+          "optional": false
+        },
+        {
+          "key": "components",
+          "optional": false
+        },
+        {
+          "key": "error",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{polynomial}, coordinates:Tag{chart,material,world_reference}, origin:Vec<Number,3>, lengths:Vec<Number,3>, components:Vec<List<PolyTerm<d,3>>,n>, error:Vec<Q<d>,n>",
+      "conditions": "chartのorigin/lengthsは無次元、material/world_referenceはL。各length>0、error≥0。変数u=(座標−origin)/lengths。空termは厳密零。近似誤差を保持し、軸の直交性はprepare"
+    },
+    {
+      "section": "FD-02",
+      "type": "TimeSeries<n> constant",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{constant}, value:Vec<Number,n>",
+      "conditions": "使用側が各成分の次元を付ける"
+    },
+    {
+      "section": "FD-02",
+      "type": "TimeSeries<n> polynomial",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "scale",
+          "optional": false
+        },
+        {
+          "key": "coefficients",
+          "optional": false
+        },
+        {
+          "key": "domain",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{polynomial}, origin:Q<T>, scale:Q<T>, coefficients:List<Vec<Number,n>>, domain:Vec<Q<T>,2>",
+      "conditions": "scale>0、coefficients1以上、昇冪順。domain下端<上端、範囲外拒否"
+    },
+    {
+      "section": "FD-02",
+      "type": "TimeSeries<n> pchip",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "times",
+          "optional": false
+        },
+        {
+          "key": "values",
+          "optional": false
+        },
+        {
+          "key": "outside",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{pchip}, times:List<Q<T>>, values:List<Vec<Number,n>>, outside:Outside",
+      "conditions": "同じ長さ2以上、時刻厳密増加。AE-07の同じ補間係数をprepareで生成"
+    },
+    {
+      "section": "FD-02",
+      "type": "Outside reject/hold",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{reject,hold}",
+      "conditions": "明示されたholdは端値保持"
+    },
+    {
+      "section": "FD-02",
+      "type": "Outside periodic",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "period",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{periodic}, period:Q<T>",
+      "conditions": "period>0、時刻幅と一致。値/一階微分の周期整合はprepare"
+    },
+    {
+      "section": "FD-02",
+      "type": "Motion",
+      "fields": [
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "translation",
+          "optional": false
+        },
+        {
+          "key": "rotation_vector",
+          "optional": false
+        },
+        {
+          "key": "events",
+          "optional": false
+        }
+      ],
+      "declaration": "origin:Frame, translation:TimeSeries<3>, rotation_vector:TimeSeries<3>, events:List<Q<T>>",
+      "conditions": "並進L、回転angle。基準姿勢から同じSO(3)写像で位置/速度/加速度を生成。events厳密増加、空可。Log/区分C2適格性はprepare"
+    },
+    {
+      "section": "FD-02",
+      "type": "Axis projected",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "direction",
+          "optional": false
+        },
+        {
+          "key": "angle",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{projected}, direction:ReferenceField<1,3>, angle:ReferenceField<angle,1>",
+      "conditions": "法線射影と回転はMAT-D05。零/平行/退化をprepareで拒否"
+    },
+    {
+      "section": "FD-02",
+      "type": "Axis explicit",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "columns",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{explicit}, columns:ReferenceField<1,9>",
+      "conditions": "row-major3×3の行列成分。SO(3)/連続性はprepare"
+    },
+    {
+      "section": "FD-03",
+      "type": "Geometry pg",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "reference_length",
+          "optional": false
+        },
+        {
+          "key": "x0",
+          "optional": false
+        },
+        {
+          "key": "width",
+          "optional": false
+        },
+        {
+          "key": "skew",
+          "optional": false
+        },
+        {
+          "key": "degree",
+          "optional": false
+        },
+        {
+          "key": "coefficients",
+          "optional": false
+        },
+        {
+          "key": "domain",
+          "optional": false
+        },
+        {
+          "key": "thickness",
+          "optional": false
+        },
+        {
+          "key": "n",
+          "optional": false
+        },
+        {
+          "key": "convention",
+          "optional": false
+        },
+        {
+          "key": "boundaries",
+          "optional": false
+        },
+        {
+          "key": "continuity",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{pg}, id:Id<Geometry>, frame:Frame, reference_length:Q<L>, x0:Rational, width:Rational, skew:Rational, degree:Vec<Count,2>, coefficients:List<PgTerm>, domain:List<Vec<Rational,2>>, thickness:Thickness, n:Count, convention:Tag{pg-graph-v1}, boundaries:List<Boundary>, continuity:List<Continuity>",
+      "conditions": "reference_length/width>0、総次数≤4。domain3頂点以上、反復終点なし。両方向共通n∈{1,2,4}、anchorはs=0で固定"
+    },
+    {
+      "section": "FD-03",
+      "type": "PgTerm",
+      "fields": [
+        {
+          "key": "powers",
+          "optional": false
+        },
+        {
+          "key": "coefficient",
+          "optional": false
+        }
+      ],
+      "declaration": "powers:Vec<Count,2>, coefficient:Rational",
+      "conditions": "重複powers拒否、宣言degree内。係数は無次元graph、frame/lengthで寸法化。零term可"
+    },
+    {
+      "section": "FD-03",
+      "type": "Thickness",
+      "fields": [
+        {
+          "key": "vertices",
+          "optional": false
+        },
+        {
+          "key": "triangles",
+          "optional": false
+        },
+        {
+          "key": "values",
+          "optional": false
+        }
+      ],
+      "declaration": "vertices:List<Vec<Rational,2>>, triangles:List<Vec<Index,3>>, values:List<Q<L>>",
+      "conditions": "verticesとvalues同数、3点以上。区分一次全厚、全values>0、index範囲内・三角形3index相異。幾何の被覆/正則性はprepare"
+    },
+    {
+      "section": "FD-03",
+      "type": "Boundary",
+      "fields": [
+        {
+          "key": "name",
+          "optional": false
+        },
+        {
+          "key": "vertices",
+          "optional": false
+        }
+      ],
+      "declaration": "name:Text, vertices:List<Vec<Rational,2>>",
+      "conditions": "2点以上。順序付き境界。name一意"
+    },
+    {
+      "section": "FD-03",
+      "type": "Continuity",
+      "fields": [
+        {
+          "key": "other",
+          "optional": false
+        },
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "own_boundary",
+          "optional": false
+        },
+        {
+          "key": "other_boundary",
+          "optional": false
+        },
+        {
+          "key": "orientation",
+          "optional": false
+        }
+      ],
+      "declaration": "other:Ref<Geometry>, kind:Tag{smooth,fold}, own_boundary:Index, other_boundary:Index, orientation:Tag{same,reversed}",
+      "conditions": "自分自身への参照拒否。smoothは位置/法線/全厚の共通物理graphをprepareで検査"
+    },
+    {
+      "section": "FD-03",
+      "type": "Geometry surface_graph",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "reference_length",
+          "optional": false
+        },
+        {
+          "key": "x0",
+          "optional": false
+        },
+        {
+          "key": "width",
+          "optional": false
+        },
+        {
+          "key": "skew",
+          "optional": false
+        },
+        {
+          "key": "degree",
+          "optional": false
+        },
+        {
+          "key": "coefficients",
+          "optional": false
+        },
+        {
+          "key": "domain",
+          "optional": false
+        },
+        {
+          "key": "boundaries",
+          "optional": false
+        },
+        {
+          "key": "continuity",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{surface_graph}, id:Id<Geometry>, frame:Frame, reference_length:Q<L>, x0:Rational, width:Rational, skew:Rational, degree:Vec<Count,2>, coefficients:List<PgTerm>, domain:List<Vec<Rational,2>>, boundaries:List<Boundary>, continuity:List<Continuity>",
+      "conditions": "空力単体の薄い参照面。PGと同じ中央graph式、構造厚さ/n/基底/剛性/質量を要求しない。reference_length/width>0、総次数≤4"
+    },
+    {
+      "section": "FD-03",
+      "type": "Geometry nastran",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "deck",
+          "optional": false
+        },
+        {
+          "key": "sidecar",
+          "optional": false
+        },
+        {
+          "key": "dialect",
+          "optional": false
+        },
+        {
+          "key": "mode",
+          "optional": false
+        },
+        {
+          "key": "excluded_cards",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{nastran}, id:Id<Geometry>, deck:FileRef<nastran-deck>, sidecar:FileRef<nastran-sidecar>, dialect:Tag{msc-2022.1}, mode:Tag{structural-extraction}, excluded_cards:List<Text>",
+      "conditions": "IO4-03のallowlistだけ。未知剛性/質量/拘束cardを追加できない。sidecar単位必須"
+    },
+    {
+      "section": "FD-03",
+      "type": "Geometry gmsh",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "mesh",
+          "optional": false
+        },
+        {
+          "key": "sidecar",
+          "optional": false
+        },
+        {
+          "key": "reference",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{gmsh}, id:Id<Geometry>, mesh:FileRef<gmsh-msh4.1-ascii>, sidecar:FileRef<gmsh-sidecar>, reference:ReferenceGeometry",
+      "conditions": "同じexternal sourceをPG DOFと解釈しない"
+    },
+    {
+      "section": "FD-03",
+      "type": "ReferenceGeometry supplied",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "file",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{supplied}, file:FileRef<reference-geometry>",
+      "conditions": "参照graph/部材/共有面と適合するsidecar"
+    },
+    {
+      "section": "FD-03",
+      "type": "ReferenceGeometry fit",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "degree",
+          "optional": false
+        },
+        {
+          "key": "distance_budget",
+          "optional": false
+        },
+        {
+          "key": "normal_budget",
+          "optional": false
+        },
+        {
+          "key": "conversion_observations",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{fit}, degree:Count, distance_budget:Q<L>, normal_budget:Q<1>, conversion_observations:List<Ref<Observation>>",
+      "conditions": "degree≤4、予算>0、観測1以上。有限点から未観測曲率を認定しない"
+    },
+    {
+      "section": "FD-04",
+      "type": "Material isotropic",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "young",
+          "optional": false
+        },
+        {
+          "key": "poisson",
+          "optional": false
+        },
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "provenance",
+          "optional": false
+        },
+        {
+          "key": "applicability",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{isotropic}, id:Id<Material>, young:Q<pressure>, poisson:Q<1>, density:Q<M/L³>, provenance:Provenance, applicability:Applicability",
+      "conditions": "E>0、−1<ν<1/2、ρ>0"
+    },
+    {
+      "section": "FD-04",
+      "type": "Material orthotropic",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "young",
+          "optional": false
+        },
+        {
+          "key": "shear",
+          "optional": false
+        },
+        {
+          "key": "poisson",
+          "optional": false
+        },
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "provenance",
+          "optional": false
+        },
+        {
+          "key": "applicability",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{orthotropic3d}, id:Id<Material>, young:Vec<Q<pressure>,3>, shear:Vec<Q<pressure>,3>, poisson:Vec<Q<1>,3>, density:Q<M/L³>, provenance:Provenance, applicability:Applicability",
+      "conditions": "E1/E2/E3、G23/G13/G12、ν12/ν13/ν23。正E/G/ρ、相反性compliance/SPDはprepare"
+    },
+    {
+      "section": "FD-04",
+      "type": "Material effective",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "stiffness",
+          "optional": false
+        },
+        {
+          "key": "components",
+          "optional": false
+        },
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "provenance",
+          "optional": false
+        },
+        {
+          "key": "applicability",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{effective3d}, id:Id<Material>, stiffness:Mat<Q<pressure>,6,6>, components:Tag{mandel,engineering}, density:Q<M/L³>, provenance:Provenance, applicability:Applicability",
+      "conditions": "xx/yy/zz/yz/xz/xy順、engineeringのせん断倍率を変換。SPD/対称化記録はprepare"
+    },
+    {
+      "section": "FD-04",
+      "type": "Applicability unevaluated",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{unevaluated}",
+      "conditions": "数値適格/実材料受入を混同しない"
+    },
+    {
+      "section": "FD-04",
+      "type": "Applicability declared",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "strain_lower",
+          "optional": false
+        },
+        {
+          "key": "strain_upper",
+          "optional": false
+        },
+        {
+          "key": "reference",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{declared}, strain_lower:Vec<Number,6>, strain_upper:Vec<Number,6>, reference:Text",
+      "conditions": "成分ごとlower≤upper。用途の受入状態は別台帳"
+    },
+    {
+      "section": "FD-04",
+      "type": "Layer",
+      "fields": [
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "interval",
+          "optional": false
+        },
+        {
+          "key": "material",
+          "optional": false
+        },
+        {
+          "key": "axis",
+          "optional": false
+        },
+        {
+          "key": "initial_green",
+          "optional": false
+        },
+        {
+          "key": "viscosity",
+          "optional": false
+        }
+      ],
+      "declaration": "id:Id<Layer>, interval:Vec<Rational,2>, material:Ref<Material>, axis:Axis, initial_green:ReferenceField<1,6>, viscosity:Mat<Q<pressure*T>,6,6>",
+      "conditions": "intervalは正規化ζ∈[−1,1]で下端<上端。層順で全厚を隙間/重複なしにexact被覆。粘性0を明示可。PSDはprepare"
+    },
+    {
+      "section": "FD-04",
+      "type": "Shell",
+      "fields": [
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "geometry",
+          "optional": false
+        },
+        {
+          "key": "layers",
+          "optional": false
+        },
+        {
+          "key": "damping_components",
+          "optional": false
+        },
+        {
+          "key": "loads",
+          "optional": false
+        }
+      ],
+      "declaration": "id:Id<Shell>, geometry:Ref<Geometry>, layers:List<Layer>, damping_components:Tag{mandel,engineering}, loads:List<Load>",
+      "conditions": "layers1以上、loads空可。E0はGreen、Mandel順。normal-Schur/任意ABDの入力へ切替不可"
+    },
+    {
+      "section": "FD-04",
+      "type": "Beam",
+      "fields": [
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "nodes",
+          "optional": false
+        },
+        {
+          "key": "coordinate",
+          "optional": false
+        },
+        {
+          "key": "section",
+          "optional": false
+        },
+        {
+          "key": "initial_strain",
+          "optional": false
+        },
+        {
+          "key": "residual_energy",
+          "optional": false
+        },
+        {
+          "key": "viscosity",
+          "optional": false
+        },
+        {
+          "key": "loads",
+          "optional": false
+        }
+      ],
+      "declaration": "id:Id<Beam>, nodes:Vec<Frame,2>, coordinate:BeamCoordinate, section:Section, initial_strain:Vec<Number,6>, residual_energy:Q<energy/L>, viscosity:Mat<Number,6,6>, loads:List<Load>",
+      "conditions": "2節点SE(3)、ひずみ順Γx/Γy/Γz/κx/κy/κz。後3成分1/L。粘性混合単位はK6×T。loads空可"
+    },
+    {
+      "section": "FD-04",
+      "type": "BeamCoordinate arclength",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "length",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{arclength}, length:Q<L>",
+      "conditions": "length>0。弦長から推測しない"
+    },
+    {
+      "section": "FD-04",
+      "type": "BeamCoordinate scaled",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "length",
+          "optional": false
+        },
+        {
+          "key": "arc_scale",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{scaled}, length:Q<L>, arc_scale:Q<1>",
+      "conditions": "length/scale>0。BM仕様のK/m/初期twist変換"
+    },
+    {
+      "section": "FD-04",
+      "type": "Section matrix",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "stiffness",
+          "optional": false
+        },
+        {
+          "key": "line_density",
+          "optional": false
+        },
+        {
+          "key": "center",
+          "optional": false
+        },
+        {
+          "key": "inertia",
+          "optional": false
+        },
+        {
+          "key": "envelope",
+          "optional": false
+        },
+        {
+          "key": "warping",
+          "optional": false
+        },
+        {
+          "key": "recovery",
+          "optional": false
+        },
+        {
+          "key": "source",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{matrix}, stiffness:Mat<Number,6,6>, line_density:Q<M/L>, center:Vec<Q<L>,3>, inertia:Mat<Q<M*L>,3,3>, envelope:Vec<Q<L>,2>, warping:Tag{free}, recovery:Tag{unavailable}, source:Text",
+      "conditions": "K6のΓ/κ混合単位。重心慣性/線密度を混同しない。剛性対称SPD/慣性物理条件はprepare"
+    },
+    {
+      "section": "FD-04",
+      "type": "Section circle",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "radius",
+          "optional": false
+        },
+        {
+          "key": "young",
+          "optional": false
+        },
+        {
+          "key": "poisson",
+          "optional": false
+        },
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "effective_shear",
+          "optional": false
+        },
+        {
+          "key": "warping",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{circle}, radius:Q<L>, young:Q<pressure>, poisson:Q<1>, density:Q<M/L³>, effective_shear:Vec<Q<L²>,2>, warping:Tag{free}",
+      "conditions": "全正、ν範囲。せん断面積を既定化しない"
+    },
+    {
+      "section": "FD-04",
+      "type": "Section rectangle",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "sides",
+          "optional": false
+        },
+        {
+          "key": "young",
+          "optional": false
+        },
+        {
+          "key": "poisson",
+          "optional": false
+        },
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "effective_shear",
+          "optional": false
+        },
+        {
+          "key": "torsion",
+          "optional": false
+        },
+        {
+          "key": "warping",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{rectangle}, sides:Vec<Q<L>,2>, young:Q<pressure>, poisson:Q<1>, density:Q<M/L³>, effective_shear:Vec<Q<L²>,2>, torsion:Q<L⁴>, warping:Tag{free}",
+      "conditions": "JをIy+Izで補完しない"
+    },
+    {
+      "section": "FD-05",
+      "type": "Joint adhesive",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "first",
+          "optional": false
+        },
+        {
+          "key": "second",
+          "optional": false
+        },
+        {
+          "key": "mapping",
+          "optional": false
+        },
+        {
+          "key": "split_at_attachment",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{adhesive}, id:Id<Joint>, first:Region, second:Region, mapping:List<TraceMap>, split_at_attachment:Bool",
+      "conditions": "全位置traceの対応、mapping1以上。少数collocation代用の許可ではない"
+    },
+    {
+      "section": "FD-05",
+      "type": "TraceMap",
+      "fields": [
+        {
+          "key": "first_cell",
+          "optional": false
+        },
+        {
+          "key": "second_cell",
+          "optional": false
+        },
+        {
+          "key": "domain",
+          "optional": false
+        },
+        {
+          "key": "first",
+          "optional": false
+        },
+        {
+          "key": "second",
+          "optional": false
+        },
+        {
+          "key": "orientation",
+          "optional": false
+        }
+      ],
+      "declaration": "first_cell:Vec<Index,2>, second_cell:Vec<Index,2>, domain:List<Vec<Rational,2>>, first:Vec<List<MapTerm>,3>, second:Vec<List<MapTerm>,3>, orientation:Tag{same,reversed}",
+      "conditions": "共通η=(η1,η2)のdomainは3頂点以上の多角形。両写像は(s,t,ζ)全成分を持つ。domain被覆/物理一致はprepare"
+    },
+    {
+      "section": "FD-05",
+      "type": "MapTerm",
+      "fields": [
+        {
+          "key": "powers",
+          "optional": false
+        },
+        {
+          "key": "coefficient",
+          "optional": false
+        }
+      ],
+      "declaration": "powers:Vec<Count,2>, coefficient:Rational",
+      "conditions": "ξ_a(η)、ξ_b(η)の多項式係数。重複powers拒否。全domainのpullbackを使用し、点一致だけで全trace資格としない"
+    },
+    {
+      "section": "FD-05",
+      "type": "Joint rigid_attachment",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "attached",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "offset",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{rigid_attachment}, id:Id<Joint>, attached:Region, frame:Target, offset:Frame",
+      "conditions": "明示した有限範囲だけ剛体化"
+    },
+    {
+      "section": "FD-05",
+      "type": "Joint weld",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "first",
+          "optional": false
+        },
+        {
+          "key": "second",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{weld}, id:Id<Joint>, first:Target, second:Target, relative:Frame",
+      "conditions": "SE(3)閉路整合はprepare"
+    },
+    {
+      "section": "FD-05",
+      "type": "Support constraint",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "components",
+          "optional": false
+        },
+        {
+          "key": "motion",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{constraint}, id:Id<Support>, target:MaterialPoint, components:List<Index>, motion:Motion",
+      "conditions": "componentsは0..5、相異、1以上。回転を持たない点の回転指定拒否"
+    },
+    {
+      "section": "FD-05",
+      "type": "Support trace_constraint",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "region",
+          "optional": false
+        },
+        {
+          "key": "components",
+          "optional": false
+        },
+        {
+          "key": "motion",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{trace_constraint}, id:Id<Support>, region:Region, components:List<Index>, motion:Motion",
+      "conditions": "componentsは0..2の並進全位置成分、相異/1以上。領域全体の位置traceを指定参照運動へ拘束し、少数pointで置換しない"
+    },
+    {
+      "section": "FD-05",
+      "type": "Support elastic",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "reference",
+          "optional": false
+        },
+        {
+          "key": "stiffness",
+          "optional": false
+        },
+        {
+          "key": "damping",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{elastic}, id:Id<Support>, target:MaterialPoint, reference:Motion, stiffness:Mat<Number,6,6>, damping:Mat<Number,6,6>, frame:Frame",
+      "conditions": "相対並進/回転順、混合単位。対称PSD/仕事はprepare"
+    },
+    {
+      "section": "FD-05",
+      "type": "Mass particle",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "mass",
+          "optional": false
+        },
+        {
+          "key": "ledger",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{particle}, id:Id<Mass>, target:MaterialPoint, mass:Q<M>, ledger:Ledger",
+      "conditions": "mass>0、回転慣性を創作しない"
+    },
+    {
+      "section": "FD-05",
+      "type": "Mass rigid",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "mass",
+          "optional": false
+        },
+        {
+          "key": "center",
+          "optional": false
+        },
+        {
+          "key": "inertia",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "ledger",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{rigid}, id:Id<Mass>, target:MaterialPoint, mass:Q<M>, center:Vec<Q<L>,3>, inertia:Mat<Q<M*L²>,3,3>, frame:Frame, ledger:Ledger",
+      "conditions": "mass>0、重心慣性。SPDと三角不等式はprepare"
+    },
+    {
+      "section": "FD-05",
+      "type": "Ledger add",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "source",
+          "optional": false
+        },
+        {
+          "key": "owner",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{add}, source:Text, owner:Target",
+      "conditions": "同一source/所有領域の二重計上はprepareで拒否"
+    },
+    {
+      "section": "FD-05",
+      "type": "Ledger replace",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "source",
+          "optional": false
+        },
+        {
+          "key": "owner",
+          "optional": false
+        },
+        {
+          "key": "replaced",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{replace}, source:Text, owner:Target, replaced:List<Ref<Mass>>",
+      "conditions": "replaced1以上、自己/重複/循環参照拒否。分布質量置換には対象領域を別sourceと一緒に記録"
+    },
+    {
+      "section": "FD-05",
+      "type": "Load point_force",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "series",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{point_force}, id:Id<Load>, target:MaterialPoint, frame:Tag{world,body}, series:TimeSeries<3>",
+      "conditions": "各成分force。偏心点/姿勢から全接線"
+    },
+    {
+      "section": "FD-05",
+      "type": "Load couple",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "series",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{couple}, id:Id<Load>, target:MaterialPoint, frame:Tag{world,body}, series:TimeSeries<3>",
+      "conditions": "各成分force*L。回転のあるtargetのみ"
+    },
+    {
+      "section": "FD-05",
+      "type": "Load gravity",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "acceleration",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{gravity}, id:Id<Load>, acceleration:TimeSeries<3>",
+      "conditions": "各成分L/T²。同じ質量台帳を消費"
+    },
+    {
+      "section": "FD-05",
+      "type": "Load traction",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "region",
+          "optional": false
+        },
+        {
+          "key": "area",
+          "optional": false
+        },
+        {
+          "key": "frame",
+          "optional": false
+        },
+        {
+          "key": "spatial",
+          "optional": false
+        },
+        {
+          "key": "multiplier",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{traction}, id:Id<Load>, region:Region, area:Tag{reference,current}, frame:Tag{world,body}, spatial:ReferenceField<pressure,3>, multiplier:TimeSeries<1>",
+      "conditions": "multiplier無次元。面/向きをregionに保持。current areaの接線を省かない"
+    },
+    {
+      "section": "FD-05",
+      "type": "Load pressure",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "region",
+          "optional": false
+        },
+        {
+          "key": "spatial",
+          "optional": false
+        },
+        {
+          "key": "multiplier",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{pressure}, id:Id<Load>, region:Region, spatial:ReferenceField<pressure,1>, multiplier:TimeSeries<1>",
+      "conditions": "正圧は指定向きの圧縮側。current法線/面積をcoupling核から計算"
+    },
+    {
+      "section": "FD-05",
+      "type": "Load body",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "region",
+          "optional": false
+        },
+        {
+          "key": "spatial",
+          "optional": false
+        },
+        {
+          "key": "multiplier",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{body_force}, id:Id<Load>, region:Region, spatial:ReferenceField<force/L³,3>, multiplier:TimeSeries<1>",
+      "conditions": "参照体積測度"
+    },
+    {
+      "section": "FD-06",
+      "type": "AeroSurface",
+      "fields": [
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "geometry",
+          "optional": false
+        },
+        {
+          "key": "attachment",
+          "optional": false
+        },
+        {
+          "key": "chord",
+          "optional": false
+        },
+        {
+          "key": "span",
+          "optional": false
+        },
+        {
+          "key": "leading",
+          "optional": false
+        },
+        {
+          "key": "trailing",
+          "optional": false
+        },
+        {
+          "key": "orientation",
+          "optional": false
+        },
+        {
+          "key": "sharing",
+          "optional": false
+        }
+      ],
+      "declaration": "id:Id<AeroSurface>, geometry:Ref<Geometry>, attachment:AeroAttachment, chord:List<Number>, span:List<Number>, leading:Index, trailing:Index, orientation:Tag{positive,reversed}, sharing:List<AeroSharing>",
+      "conditions": "chord/span各2以上で厳密増加、後縁の物理index範囲検査。quarter/three-quarterを別入力で変更不可"
+    },
+    {
+      "section": "FD-06",
+      "type": "AeroAttachment fixed",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{fixed_reference}",
+      "conditions": "geometryの不変参照位置を使う。架空シェル不要"
+    },
+    {
+      "section": "FD-06",
+      "type": "AeroAttachment prescribed",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "motion",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{prescribed_motion}, motion:Motion",
+      "conditions": "参照geometryに同じSE(3)運動を作用。別の構造支持速度を加算しない"
+    },
+    {
+      "section": "FD-06",
+      "type": "AeroAttachment structural",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "host",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{structural}, host:Ref<Shell>",
+      "conditions": "同じ固定物質写像のq/vから位置/面速度。motionの重畳keyは禁止"
+    },
+    {
+      "section": "FD-06",
+      "type": "AeroSharing",
+      "fields": [
+        {
+          "key": "other",
+          "optional": false
+        },
+        {
+          "key": "own_boundary",
+          "optional": false
+        },
+        {
+          "key": "other_boundary",
+          "optional": false
+        },
+        {
+          "key": "orientation",
+          "optional": false
+        }
+      ],
+      "declaration": "other:Ref<AeroSurface>, own_boundary:Index, other_boundary:Index, orientation:Tag{same,reversed}",
+      "conditions": "ID共有と近接を区別。incident適格性はprepare"
+    },
+    {
+      "section": "FD-06",
+      "type": "Flow none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "aero_surfacesが空の場合だけ。架空ρ/Uを必須にしない"
+    },
+    {
+      "section": "FD-06",
+      "type": "Flow known",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "uniform",
+          "optional": false
+        },
+        {
+          "key": "gust",
+          "optional": false
+        },
+        {
+          "key": "reference",
+          "optional": false
+        },
+        {
+          "key": "events",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{known}, density:Q<M/L³>, uniform:TimeSeries<3>, gust:Gust, reference:FlowReference, events:List<Q<T>>",
+      "conditions": "density>0、uniformはL/T。events厳密増加、空可"
+    },
+    {
+      "section": "FD-06",
+      "type": "Gust none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "意図した突風無し"
+    },
+    {
+      "section": "FD-06",
+      "type": "Gust sine",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "amplitude",
+          "optional": false
+        },
+        {
+          "key": "direction",
+          "optional": false
+        },
+        {
+          "key": "wavevector",
+          "optional": false
+        },
+        {
+          "key": "angular_frequency",
+          "optional": false
+        },
+        {
+          "key": "phase",
+          "optional": false
+        },
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "time_origin",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{sine}, amplitude:TimeSeries<1>, direction:Vec<Number,3>, wavevector:Vec<Q<angle/L>,3>, angular_frequency:Q<angle/T>, phase:Q<angle>, origin:Vec<Q<L>,3>, time_origin:Q<T>",
+      "conditions": "amplitude L/T、direction無次元。wavevectorは角度/長さ、angular_frequencyは角度/時刻（Hzではない）。phaseと共にradへ変換して同じsine式を評価。e·k=0/方向正規化はprepare"
+    },
+    {
+      "section": "FD-06",
+      "type": "FlowReference",
+      "fields": [
+        {
+          "key": "density",
+          "optional": false
+        },
+        {
+          "key": "speed",
+          "optional": false
+        },
+        {
+          "key": "area",
+          "optional": false
+        },
+        {
+          "key": "chord",
+          "optional": false
+        },
+        {
+          "key": "span",
+          "optional": false
+        },
+        {
+          "key": "moment_origin",
+          "optional": false
+        }
+      ],
+      "declaration": "density:Q<M/L³>, speed:Q<L/T>, area:Q<L²>, chord:Q<L>, span:Q<L>, moment_origin:Vec<Q<L>,3>",
+      "conditions": "ρ*>0、U*≥0、他正。U*=0の係数Unavailableを保持"
+    },
+    {
+      "section": "FD-06",
+      "type": "Wake none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "aero_surfacesが空の場合だけ"
+    },
+    {
+      "section": "FD-06",
+      "type": "Wake active",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "convection",
+          "optional": false
+        },
+        {
+          "key": "retention",
+          "optional": false
+        },
+        {
+          "key": "core_radius",
+          "optional": false
+        },
+        {
+          "key": "model",
+          "optional": false
+        },
+        {
+          "key": "mapping",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{active}, convection:Convection, retention:Retention, core_radius:Q<L>, model:Tag{wp1-stream-p0-span}, mapping:Tag{dual-quarter-v1}",
+      "conditions": "core_radius>0。全束縛/全後流で共通。理想核の別経路を自動選択しない"
+    },
+    {
+      "section": "FD-06",
+      "type": "Convection free",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{free}",
+      "conditions": "全相互誘導+既知流れ"
+    },
+    {
+      "section": "FD-06",
+      "type": "Convection prescribed",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "velocity",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{prescribed}, velocity:TimeSeries<3>",
+      "conditions": "L/T、指定移流であることを明示"
+    },
+    {
+      "section": "FD-06",
+      "type": "Retention all",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{all}",
+      "conditions": "全物理履歴を保持、資源上限で停止"
+    },
+    {
+      "section": "FD-06",
+      "type": "Retention window",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "duration",
+          "optional": false
+        },
+        {
+          "key": "distance",
+          "optional": false
+        },
+        {
+          "key": "error_budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{closed_window}, duration:Q<T>, distance:Q<L>, error_budget:Q<1>",
+      "conditions": "duration/distance>0、error>0。閉端/退役台帳と誤差認定を後続で保持"
+    },
+    {
+      "section": "FD-07",
+      "type": "Analysis static",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "physics",
+          "optional": false
+        },
+        {
+          "key": "branch",
+          "optional": false
+        },
+        {
+          "key": "speed",
+          "optional": false
+        },
+        {
+          "key": "wake",
+          "optional": false
+        },
+        {
+          "key": "loads",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{static}, physics:Tag{aerodynamic,structural,coupled}, branch:Branch, speed:AnalysisSpeed, wake:Wake, loads:List<Load>",
+      "conditions": "speed≥0、loads空可。同じ自由/指定定常後流を含む残差"
+    },
+    {
+      "section": "FD-07",
+      "type": "Analysis transient",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "physics",
+          "optional": false
+        },
+        {
+          "key": "branch",
+          "optional": false
+        },
+        {
+          "key": "intervals",
+          "optional": false
+        },
+        {
+          "key": "wake",
+          "optional": false
+        },
+        {
+          "key": "loads",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{transient}, physics:Tag{aerodynamic,structural,coupled}, branch:Branch, intervals:List<TimeInterval>, wake:Wake, loads:List<Load>",
+      "conditions": "intervals1以上、loads空可。隣接時刻をexact照合、イベントを跨がない"
+    },
+    {
+      "section": "FD-07",
+      "type": "Analysis flutter",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "physics",
+          "optional": false
+        },
+        {
+          "key": "branches",
+          "optional": false
+        },
+        {
+          "key": "intervals",
+          "optional": false
+        },
+        {
+          "key": "step",
+          "optional": false
+        },
+        {
+          "key": "wake",
+          "optional": false
+        },
+        {
+          "key": "search",
+          "optional": false
+        },
+        {
+          "key": "loads",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{flutter}, physics:Tag{coupled}, branches:List<Branch>, intervals:List<SpeedInterval>, step:Q<T>, wake:Wake, search:Search, loads:List<Load>",
+      "conditions": "branches/速度区間各1以上、step>0。全状態Pの安定性/coverageを後続認定"
+    },
+    {
+      "section": "FD-07",
+      "type": "AnalysisSpeed none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "physics=structuralだけ"
+    },
+    {
+      "section": "FD-07",
+      "type": "AnalysisSpeed value",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{value}, value:Q<L/T>",
+      "conditions": "value≥0、aerodynamic/coupledだけ"
+    },
+    {
+      "section": "FD-07",
+      "type": "Branch",
+      "fields": [
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "seed",
+          "optional": false
+        },
+        {
+          "key": "continuation",
+          "optional": false
+        }
+      ],
+      "declaration": "id:Id<Branch>, seed:BranchSeed, continuation:Continuation",
+      "conditions": "枝IDは周波数sort番号ではない"
+    },
+    {
+      "section": "FD-07",
+      "type": "BranchSeed reference",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{reference}",
+      "conditions": "未荷重参照を推定に使い、整合平衡の成功とはしない"
+    },
+    {
+      "section": "FD-07",
+      "type": "BranchSeed prepared",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "history",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{prepared}, history:FileRef<preparation-history>",
+      "conditions": "実際の構造/後流/入力履歴を保持"
+    },
+    {
+      "section": "FD-07",
+      "type": "Continuation fixed",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{fixed}",
+      "conditions": "速度継続を要求しない単点/過渡のseed"
+    },
+    {
+      "section": "FD-07",
+      "type": "Continuation sweep",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "initial_increment",
+          "optional": false
+        },
+        {
+          "key": "minimum_increment",
+          "optional": false
+        },
+        {
+          "key": "maximum_increment",
+          "optional": false
+        },
+        {
+          "key": "arclength",
+          "optional": false
+        },
+        {
+          "key": "maximum_points",
+          "optional": false
+        },
+        {
+          "key": "maximum_retries",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{sweep}, initial_increment:Q<L/T>, minimum_increment:Q<L/T>, maximum_increment:Q<L/T>, arclength:ArcLength, maximum_points:PositiveCount, maximum_retries:Count",
+      "conditions": "0<min≤initial≤max。失敗を擬似逆で隠さない"
+    },
+    {
+      "section": "FD-07",
+      "type": "ArcLength",
+      "fields": [
+        {
+          "key": "state_scales",
+          "optional": false
+        },
+        {
+          "key": "speed_scale",
+          "optional": false
+        },
+        {
+          "key": "orientation",
+          "optional": false
+        },
+        {
+          "key": "enable_at_limit",
+          "optional": false
+        }
+      ],
+      "declaration": "state_scales:List<Scale>, speed_scale:Q<L/T>, orientation:Tag{previous_tangent}, enable_at_limit:Bool",
+      "conditions": "全代表尺度正。列順/単位は対象layoutと照合"
+    },
+    {
+      "section": "FD-07",
+      "type": "TimeInterval",
+      "fields": [
+        {
+          "key": "start",
+          "optional": false
+        },
+        {
+          "key": "end",
+          "optional": false
+        },
+        {
+          "key": "step",
+          "optional": false
+        },
+        {
+          "key": "restart",
+          "optional": false
+        }
+      ],
+      "declaration": "start:Q<T>, end:Q<T>, step:Q<T>, restart:Tag{initial,event,step_change,chart_change}",
+      "conditions": "start<end、step>0、(end−start)/stepが整数。一般可変刻みBDF2を含めない"
+    },
+    {
+      "section": "FD-07",
+      "type": "SpeedInterval",
+      "fields": [
+        {
+          "key": "lower",
+          "optional": false
+        },
+        {
+          "key": "upper",
+          "optional": false
+        }
+      ],
+      "declaration": "lower:Q<L/T>, upper:Q<L/T>",
+      "conditions": "0≤lower<upper、重複/隙間の扱いをsearch対象域としてexact保持"
+    },
+    {
+      "section": "FD-07",
+      "type": "Search",
+      "fields": [
+        {
+          "key": "queue",
+          "optional": false
+        },
+        {
+          "key": "speed_absolute",
+          "optional": false
+        },
+        {
+          "key": "speed_relative",
+          "optional": false
+        },
+        {
+          "key": "growth_budget",
+          "optional": false
+        },
+        {
+          "key": "mode_association",
+          "optional": false
+        },
+        {
+          "key": "maximum_points",
+          "optional": false
+        },
+        {
+          "key": "maximum_retries",
+          "optional": false
+        },
+        {
+          "key": "coverage",
+          "optional": false
+        }
+      ],
+      "declaration": "queue:Tag{lowest_interval_first}, speed_absolute:Q<L/T>, speed_relative:Q<1>, growth_budget:Q<1/T>, mode_association:Association, maximum_points:PositiveCount, maximum_retries:Count, coverage:Coverage",
+      "conditions": "許容差/予算≥0、速度尺度は別に正。完了点/未処理queueを後続で原子保存"
+    },
+    {
+      "section": "FD-07",
+      "type": "Association",
+      "fields": [
+        {
+          "key": "physical_observations",
+          "optional": false
+        },
+        {
+          "key": "mac_minimum",
+          "optional": false
+        },
+        {
+          "key": "subspace_angle_maximum",
+          "optional": false
+        },
+        {
+          "key": "eigenvalue_absolute",
+          "optional": false
+        },
+        {
+          "key": "eigenvalue_relative",
+          "optional": false
+        }
+      ],
+      "declaration": "physical_observations:List<Ref<Observation>>, mac_minimum:Q<1>, subspace_angle_maximum:Q<angle>, eigenvalue_absolute:Q<1/T>, eigenvalue_relative:Q<1>",
+      "conditions": "観測1以上。0≤MAC≤1、他≥0。近接根を周波数sortで同定しない"
+    },
+    {
+      "section": "FD-07",
+      "type": "Coverage",
+      "fields": [
+        {
+          "key": "branches",
+          "optional": false
+        },
+        {
+          "key": "mode_observations",
+          "optional": false
+        },
+        {
+          "key": "require_physical",
+          "optional": false
+        }
+      ],
+      "declaration": "branches:List<Ref<Branch>>, mode_observations:List<Ref<Observation>>, require_physical:Bool",
+      "conditions": "各1以上。flutterのcaseではtrue必須。代数抽出の成功でphysical資格を作らない"
+    },
+    {
+      "section": "FD-08",
+      "type": "Initial equilibrium",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "branch",
+          "optional": false
+        },
+        {
+          "key": "perturbation",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{equilibrium}, branch:Ref<Branch>, perturbation:Perturbation",
+      "conditions": "同じ支持/流れ/荷重/後流の平衡から整合加速度等を作る"
+    },
+    {
+      "section": "FD-08",
+      "type": "Initial cold",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "state",
+          "optional": false
+        },
+        {
+          "key": "circulation",
+          "optional": false
+        },
+        {
+          "key": "wake",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{cold_start}, state:InitialState, circulation:List<Q<L²/T>>, wake:InitialWake",
+      "conditions": "明示した冷始動。欠けた物理過去を零埋めしない"
+    },
+    {
+      "section": "FD-08",
+      "type": "Initial prepared",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "file",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{prepared_history}, file:FileRef<initial-history>",
+      "conditions": "実履歴と算法履歴の区別を内部状態validatorが検査"
+    },
+    {
+      "section": "FD-08",
+      "type": "Perturbation none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "摂動無し"
+    },
+    {
+      "section": "FD-08",
+      "type": "Perturbation physical",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "displacements",
+          "optional": false
+        },
+        {
+          "key": "velocities",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{physical}, displacements:List<PointValue>, velocities:List<PointValue>",
+      "conditions": "各空可。同じ物理観測/位置場へ写し、係数番号を推測しない"
+    },
+    {
+      "section": "FD-08",
+      "type": "PointValue",
+      "fields": [
+        {
+          "key": "point",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        }
+      ],
+      "declaration": "point:MaterialPoint, value:Vec<Number,3>",
+      "conditions": "displacementはL、velocityはL/T。重複point拒否"
+    },
+    {
+      "section": "FD-08",
+      "type": "InitialState",
+      "fields": [
+        {
+          "key": "shells",
+          "optional": false
+        },
+        {
+          "key": "beams",
+          "optional": false
+        },
+        {
+          "key": "rigids",
+          "optional": false
+        }
+      ],
+      "declaration": "shells:List<CoefficientState>, beams:List<BeamState>, rigids:List<RigidState>",
+      "conditions": "各空可、対象modelの全必要entityを一度ずつ含む。欠落は参照値で補わない"
+    },
+    {
+      "section": "FD-08",
+      "type": "CoefficientState",
+      "fields": [
+        {
+          "key": "shell",
+          "optional": false
+        },
+        {
+          "key": "reference",
+          "optional": false
+        },
+        {
+          "key": "representation",
+          "optional": false
+        },
+        {
+          "key": "position",
+          "optional": false
+        },
+        {
+          "key": "velocity",
+          "optional": false
+        }
+      ],
+      "declaration": "shell:Ref<Shell>, reference:Digest, representation:Tag{absolute,reference_increment}, position:Planes, velocity:Planes",
+      "conditions": "position L、velocity L/T。同じ準備基底n_s×3とのshapeはprepare後に照合"
+    },
+    {
+      "section": "FD-08",
+      "type": "Planes binary64",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "high",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{binary64}, high:List<Number>",
+      "conditions": "decimalをまだ丸めない。返却要求とは別の入力表現"
+    },
+    {
+      "section": "FD-08",
+      "type": "Planes two_word",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "high",
+          "optional": false
+        },
+        {
+          "key": "low",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{two_word}, high:List<Number>, low:List<Number>",
+      "conditions": "同じ長さ。hi/loを先に加算しない"
+    },
+    {
+      "section": "FD-08",
+      "type": "BeamState",
+      "fields": [
+        {
+          "key": "beam",
+          "optional": false
+        },
+        {
+          "key": "nodes",
+          "optional": false
+        }
+      ],
+      "declaration": "beam:Ref<Beam>, nodes:Vec<FrameStatePayload,2>",
+      "conditions": "model Beam.nodesと同じ順序で両端を保持。beam重複/欠落拒否"
+    },
+    {
+      "section": "FD-08",
+      "type": "RigidState",
+      "fields": [
+        {
+          "key": "rigid",
+          "optional": false
+        },
+        {
+          "key": "state",
+          "optional": false
+        }
+      ],
+      "declaration": "rigid:Ref<Mass>, state:FrameStatePayload",
+      "conditions": "rigidはkind=rigidのMassのみ。重複/欠落拒否"
+    },
+    {
+      "section": "FD-08",
+      "type": "FrameStatePayload",
+      "fields": [
+        {
+          "key": "position",
+          "optional": false
+        },
+        {
+          "key": "rotation",
+          "optional": false
+        },
+        {
+          "key": "linear_velocity",
+          "optional": false
+        },
+        {
+          "key": "angular_velocity",
+          "optional": false
+        }
+      ],
+      "declaration": "position:Vec<Q<L>,3>, rotation:Mat<Number,3,3>, linear_velocity:Vec<Q<L/T>,3>, angular_velocity:Vec<Q<angle/T>,3>",
+      "conditions": "角速度はroot angle/timeからrad/sへ変換。回転行列は無次元でangle倍率を掛けない。SO(3)とチャートはprepare"
+    },
+    {
+      "section": "FD-08",
+      "type": "InitialWake",
+      "fields": [
+        {
+          "key": "surfaces",
+          "optional": false
+        }
+      ],
+      "declaration": "surfaces:List<SurfaceWake>",
+      "conditions": "各面を一度ずつ。冷始動の空wakeは行数0として明示"
+    },
+    {
+      "section": "FD-08",
+      "type": "SurfaceWake",
+      "fields": [
+        {
+          "key": "surface",
+          "optional": false
+        },
+        {
+          "key": "rows",
+          "optional": false
+        },
+        {
+          "key": "points",
+          "optional": false
+        },
+        {
+          "key": "coefficients",
+          "optional": false
+        },
+        {
+          "key": "row_ids",
+          "optional": false
+        },
+        {
+          "key": "point_ids",
+          "optional": false
+        },
+        {
+          "key": "band_ids",
+          "optional": false
+        },
+        {
+          "key": "birth_times",
+          "optional": false
+        }
+      ],
+      "declaration": "surface:Ref<AeroSurface>, rows:Count, points:List<Vec<Q<L>,3>>, coefficients:List<Q<L²/T>>, row_ids:List<Id<WakeRow>>, point_ids:List<Id<WakePoint>>, band_ids:List<Id<WakeBand>>, birth_times:List<Q<T>>",
+      "conditions": "pointsはrows*(N+1)、coefficientsはrows*N、row_ids/birth_timesはrows、point_idsはpoints長、band_idsはN。N=span.size−1。全積をchecked照合。行/点/帯のIDは別namespace。重複物質ID/未来のbirth拒否。付着IDと放出IDは別"
+    },
+    {
+      "section": "FD-08",
+      "type": "Restart",
+      "fields": [
+        {
+          "key": "directory",
+          "optional": false
+        },
+        {
+          "key": "manifest_sha256",
+          "optional": false
+        },
+        {
+          "key": "compatibility",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "directory:Text, manifest_sha256:Digest, compatibility:Tag{same_environment_bitwise,qualified_cross_environment}, budget:List<ObservationBudget>",
+      "conditions": "directory非空/NUL不可。same_environmentはbudget空、crossは1以上。未知の互換性を正常にしない"
+    },
+    {
+      "section": "FD-09",
+      "type": "Observation point",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "point",
+          "optional": false
+        },
+        {
+          "key": "quantity",
+          "optional": false
+        },
+        {
+          "key": "basis",
+          "optional": false
+        },
+        {
+          "key": "comparison",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{point}, id:Id<Observation>, point:MaterialPoint, quantity:Tag{position,displacement,velocity,acceleration,force}, basis:Basis, comparison:Comparison, budget:ObservationBudget",
+      "conditions": "quantityと基底/単位を一致させる"
+    },
+    {
+      "section": "FD-09",
+      "type": "Observation stress",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "point",
+          "optional": false
+        },
+        {
+          "key": "layer",
+          "optional": false
+        },
+        {
+          "key": "interface",
+          "optional": false
+        },
+        {
+          "key": "measure",
+          "optional": false
+        },
+        {
+          "key": "contribution",
+          "optional": false
+        },
+        {
+          "key": "basis",
+          "optional": false
+        },
+        {
+          "key": "comparison",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{stress}, id:Id<Observation>, point:MaterialPoint, layer:Ref<Layer>, interface:Tag{interior,lower,upper,both}, measure:Tag{green,second_pk,first_pk,cauchy}, contribution:Tag{elastic,viscous,total}, basis:Basis, comparison:Comparison, budget:ObservationBudget",
+      "conditions": "layerのownerとpoint.shell一致。measure=greenはcontribution=totalだけを許可し、elastic/viscousを拒否。界面両側を平均しない"
+    },
+    {
+      "section": "FD-09",
+      "type": "Observation section",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "region",
+          "optional": false
+        },
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "basis",
+          "optional": false
+        },
+        {
+          "key": "quantity",
+          "optional": false
+        },
+        {
+          "key": "comparison",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{section}, id:Id<Observation>, region:Region, origin:Vec<Q<L>,3>, basis:Basis, quantity:Tag{force,moment}, comparison:Comparison, budget:ObservationBudget",
+      "conditions": "物理切断面の向きと基準点を保持"
+    },
+    {
+      "section": "FD-09",
+      "type": "Observation reaction",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "support",
+          "optional": false
+        },
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "basis",
+          "optional": false
+        },
+        {
+          "key": "comparison",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{reaction}, id:Id<Observation>, support:Ref<Support>, origin:Vec<Q<L>,3>, basis:Basis, comparison:Comparison, budget:ObservationBudget",
+      "conditions": "物理共役量。従属乗数の一意性を主張しない"
+    },
+    {
+      "section": "FD-09",
+      "type": "Observation aero",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "surfaces",
+          "optional": false
+        },
+        {
+          "key": "origin",
+          "optional": false
+        },
+        {
+          "key": "basis",
+          "optional": false
+        },
+        {
+          "key": "quantity",
+          "optional": false
+        },
+        {
+          "key": "comparison",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{aero}, id:Id<Observation>, surfaces:List<Ref<AeroSurface>>, origin:Vec<Q<L>,3>, basis:Basis, quantity:Tag{force,moment,coefficient}, comparison:Comparison, budget:ObservationBudget",
+      "conditions": "surfaces1以上/重複拒否。係数にFlowReferenceを使用"
+    },
+    {
+      "section": "FD-09",
+      "type": "Observation mode",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "targets",
+          "optional": false
+        },
+        {
+          "key": "points",
+          "optional": false
+        },
+        {
+          "key": "basis",
+          "optional": false
+        },
+        {
+          "key": "quantity",
+          "optional": false
+        },
+        {
+          "key": "comparison",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{mode}, id:Id<Observation>, targets:List<Target>, points:List<MaterialPoint>, basis:Basis, quantity:Tag{frequency,growth,subspace}, comparison:Comparison, budget:ObservationBudget",
+      "conditions": "targets/points各1以上。固有vector係数番号を物理IDにしない"
+    },
+    {
+      "section": "FD-09",
+      "type": "Basis world/material",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{world,reference_material,current_material}",
+      "conditions": "materialは所有layerがある観測だけ"
+    },
+    {
+      "section": "FD-09",
+      "type": "Basis explicit",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "rotation",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{explicit}, rotation:Mat<Number,3,3>",
+      "conditions": "SO(3)認定はprepare"
+    },
+    {
+      "section": "FD-09",
+      "type": "Comparison",
+      "fields": [
+        {
+          "key": "window",
+          "optional": false
+        },
+        {
+          "key": "statistic",
+          "optional": false
+        },
+        {
+          "key": "side",
+          "optional": false
+        },
+        {
+          "key": "reference",
+          "optional": false
+        }
+      ],
+      "declaration": "window:Vec<Q<T>,2>, statistic:Tag{instantaneous,history,peak,rms}, side:Tag{left,right,both}, reference:ComparisonReference",
+      "conditions": "下端≤上端。instantaneousは同値、他は正幅。不連続の左右を保つ"
+    },
+    {
+      "section": "FD-09",
+      "type": "ComparisonReference none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "比較参照未設定、観測を受入済みとしない"
+    },
+    {
+      "section": "FD-09",
+      "type": "ComparisonReference file",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "source",
+          "optional": false
+        },
+        {
+          "key": "columns",
+          "optional": false
+        },
+        {
+          "key": "uncertainty",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{file}, source:FileRef<observation-reference>, columns:List<Text>, uncertainty:List<Number>",
+      "conditions": "columns1以上、uncertainty同数かつ≥0。基底/単位/条件の照合は受入段階"
+    },
+    {
+      "section": "FD-09",
+      "type": "ObservationBudget",
+      "fields": [
+        {
+          "key": "absolute",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        },
+        {
+          "key": "scale",
+          "optional": false
+        },
+        {
+          "key": "groups",
+          "optional": false
+        }
+      ],
+      "declaration": "absolute:List<Number>, relative:List<Number>, scale:List<Number>, groups:List<ErrorGroup>",
+      "conditions": "3配列は直後の「観測の成分形状」に定めるnと完全一致。absolute/relative≥0、scale>0。absolute/scaleの次元は各観測成分、relativeは無次元。固定製品予算より緩くしない"
+    },
+    {
+      "section": "FD-09",
+      "type": "ErrorGroup not_applicable",
+      "fields": [
+        {
+          "key": "status",
+          "optional": false
+        },
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "reason",
+          "optional": false
+        }
+      ],
+      "declaration": "status:Tag{not_applicable}, kind:Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}, reason:Text",
+      "conditions": "reason非空。適用しない物理/解析条件を明示、必須群を無効化するスイッチではない"
+    },
+    {
+      "section": "FD-09",
+      "type": "ErrorGroup covered_by",
+      "fields": [
+        {
+          "key": "status",
+          "optional": false
+        },
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "representative",
+          "optional": false
+        }
+      ],
+      "declaration": "status:Tag{covered_by}, kind:Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}, representative:Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}",
+      "conditions": "この群は物理的に適用し、直接指定したrequired代表群が結合評価/予算計上を所有する。自己参照/covered_byの連鎖を拒否"
+    },
+    {
+      "section": "FD-09",
+      "type": "ErrorGroup required",
+      "fields": [
+        {
+          "key": "status",
+          "optional": false
+        },
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "covers",
+          "optional": false
+        },
+        {
+          "key": "absolute",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        }
+      ],
+      "declaration": "status:Tag{required}, kind:Tag{geometry,structure_grid,aero_grid,time_wake_age,wake_length,core,quadrature,algebra,newton,eigen_range,search_width,load_mapping}, covers:List<Tag{同じ集合}>, absolute:List<Number>, relative:List<Number>",
+      "conditions": "covers1以上かつ自分を含む。budgetの成分長一致/非負。二重計上・別caseの値を流用しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "Numerics",
+      "fields": [
+        {
+          "key": "patch",
+          "optional": false
+        },
+        {
+          "key": "quadrature",
+          "optional": false
+        },
+        {
+          "key": "linear",
+          "optional": false
+        },
+        {
+          "key": "newton",
+          "optional": false
+        },
+        {
+          "key": "precision",
+          "optional": false
+        },
+        {
+          "key": "eigen",
+          "optional": false
+        },
+        {
+          "key": "wake_rows",
+          "optional": false
+        },
+        {
+          "key": "scales",
+          "optional": false
+        },
+        {
+          "key": "error_groups",
+          "optional": false
+        }
+      ],
+      "declaration": "patch:PatchPolicy, quadrature:Quadrature, linear:LinearPolicy, newton:NewtonPolicy, precision:PrecisionPolicy, eigen:EigenPolicy, wake_rows:WakeCapacity, scales:List<Scale>, error_groups:List<ErrorGroup>",
+      "conditions": "scales/error_groups各1以上。Rはwake_rowsで資源停止し、古いwakeを黙って削除しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "WakeCapacity none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "aero_surfaces空だけ"
+    },
+    {
+      "section": "FD-10",
+      "type": "WakeCapacity limited",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "maximum_rows",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{limited}, maximum_rows:PositiveCount",
+      "conditions": "全/窓とも実使用上限。到達時停止"
+    },
+    {
+      "section": "FD-10",
+      "type": "PatchPolicy none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "shells空だけ。aeroのみの幾何をPG構造基底にしない"
+    },
+    {
+      "section": "FD-10",
+      "type": "PatchPolicy active",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "maximum_degree",
+          "optional": false
+        },
+        {
+          "key": "maximum_partition",
+          "optional": false
+        },
+        {
+          "key": "geometry_error",
+          "optional": false
+        },
+        {
+          "key": "trace_error",
+          "optional": false
+        },
+        {
+          "key": "rank",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{active}, maximum_degree:Count, maximum_partition:PositiveCount, geometry_error:Q<L>, trace_error:Q<L>, rank:Tag{exact_no_drop}",
+      "conditions": "degree≤4、partitionは採用範囲、誤差>0。小方向削除の許可を置かない"
+    },
+    {
+      "section": "FD-10",
+      "type": "Quadrature",
+      "fields": [
+        {
+          "key": "structure",
+          "optional": false
+        },
+        {
+          "key": "aero",
+          "optional": false
+        }
+      ],
+      "declaration": "structure:StructuralQuadrature, aero:AeroQuadrature",
+      "conditions": "structure=noneはshells/beams空、aero=noneはaero_surfaces空の場合のみ"
+    },
+    {
+      "section": "FD-10",
+      "type": "StructuralQuadrature none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "構造積分を消費しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "StructuralQuadrature active",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "surface_degree",
+          "optional": false
+        },
+        {
+          "key": "thickness_points",
+          "optional": false
+        },
+        {
+          "key": "independent_surface_degree",
+          "optional": false
+        },
+        {
+          "key": "independent_thickness_points",
+          "optional": false
+        },
+        {
+          "key": "absolute",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        },
+        {
+          "key": "maximum_subdivisions",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{active}, surface_degree:PositiveCount, thickness_points:PositiveCount, independent_surface_degree:PositiveCount, independent_thickness_points:PositiveCount, absolute:Q<1>, relative:Q<1>, maximum_subdivisions:Count",
+      "conditions": "独立次数を主次数より大きくする。層/領域/背景cell分割を省かない。予算≥0"
+    },
+    {
+      "section": "FD-10",
+      "type": "AeroQuadrature none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "空力積分を消費しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "AeroQuadrature active",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "absolute",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{wp1_induction_v1}, absolute:Q<1>, relative:Q<1>",
+      "conditions": "予算≥0。近接解析式/遠方12対8/距離4の採用評価法を保つ"
+    },
+    {
+      "section": "FD-10",
+      "type": "Scale uniform_components",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "field",
+          "optional": false
+        },
+        {
+          "key": "targets",
+          "optional": false
+        },
+        {
+          "key": "values",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{uniform_components}, field:Tag{shell_position,beam_translation,beam_rotation,rigid_translation,rigid_rotation,structural_velocity,structural_angular_velocity,circulation,wake_position,wake_strength,constraint,force_balance,moment_balance,aero_residual,transport_residual,newton_correction,arclength_state}, targets:List<Target>, values:List<Number>",
+      "conditions": "下表で許可する物理成分の正尺度。対象の全対応DOFへ明示政策として展開し、係数数を利用者に推測させない"
+    },
+    {
+      "section": "FD-10",
+      "type": "Scale physical_layout_policy",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "field",
+          "optional": false
+        },
+        {
+          "key": "constraint",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{physical_layout_policy}, field:Tag{mixed_blocks}, constraint:ConstraintScalePolicy",
+      "conditions": "全caseで高々1件。拘束/乗数/Newton/弧長を物理primary尺度から構成する初回政策。実layoutの推測を要求しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "ConstraintScalePolicy none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "jointsとconstraint/trace_constraint支持が空、内部constraint/乗数block無し。弾性/減衰支持だけならnone可"
+    },
+    {
+      "section": "FD-10",
+      "type": "ConstraintScalePolicy physical",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "position",
+          "optional": false
+        },
+        {
+          "key": "orientation",
+          "optional": false
+        },
+        {
+          "key": "multiplier_work_scale",
+          "optional": false
+        },
+        {
+          "key": "reaction_force",
+          "optional": false
+        },
+        {
+          "key": "reaction_moment",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{physical}, position:ComponentScale3, orientation:ComponentScale3, multiplier_work_scale:Q<energy>, reaction_force:Vec<Q<force>,3>, reaction_moment:Vec<Q<force*L>,3>",
+      "conditions": "必要なposition/orientationを下の条件で明示、work/force/moment尺度は全正。元反力を内部乗数の尺度で代用しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "ComponentScale3 none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "対応する物理拘束成分を持たないときだけ"
+    },
+    {
+      "section": "FD-10",
+      "type": "ComponentScale3 values",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "values",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{values}, values:Vec<Number,3>",
+      "conditions": "全正。positionはL、orientationはangle。xyzまたは右局所回転xyz順"
+    },
+    {
+      "section": "FD-10",
+      "type": "Scale explicit_layout",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "field",
+          "optional": false
+        },
+        {
+          "key": "targets",
+          "optional": false
+        },
+        {
+          "key": "layout",
+          "optional": false
+        },
+        {
+          "key": "dimensions",
+          "optional": false
+        },
+        {
+          "key": "values",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{explicit_layout}, field:Tag{shell_position,beam_translation,beam_rotation,rigid_translation,rigid_rotation,structural_velocity,structural_angular_velocity,circulation,wake_position,wake_strength,constraint,force_balance,moment_balance,aero_residual,transport_residual,newton_correction,arclength_state}, targets:List<Target>, layout:Digest, dimensions:List<Vec<signed-native-integer,4>>, values:List<Number>",
+      "conditions": "同じ準備済layoutの全列順。両配列は同長、values全正、dimension指数int16範囲。digest/内容/列数の不一致を拒否"
+    },
+    {
+      "section": "FD-10",
+      "type": "LinearPolicy direct",
+      "fields": [
+        {
+          "key": "backend",
+          "optional": false
+        },
+        {
+          "key": "accuracy",
+          "optional": false
+        },
+        {
+          "key": "maximum_refinements",
+          "optional": false
+        },
+        {
+          "key": "backend_memory",
+          "optional": false
+        }
+      ],
+      "declaration": "backend:Tag{dense_lu,sparse_lu,sparse_llt}, accuracy:LinearAccuracy, maximum_refinements:Count, backend_memory:BackendMemory",
+      "conditions": "refinemement≤5。LLTのSPD資格、元残差/制約/反力を省かない"
+    },
+    {
+      "section": "FD-10",
+      "type": "LinearPolicy gmres",
+      "fields": [
+        {
+          "key": "backend",
+          "optional": false
+        },
+        {
+          "key": "accuracy",
+          "optional": false
+        },
+        {
+          "key": "maximum_iterations",
+          "optional": false
+        },
+        {
+          "key": "restart",
+          "optional": false
+        },
+        {
+          "key": "maximum_applications",
+          "optional": false
+        },
+        {
+          "key": "maximum_adjoint",
+          "optional": false
+        },
+        {
+          "key": "maximum_preconditioner",
+          "optional": false
+        },
+        {
+          "key": "maximum_true_residual_checks",
+          "optional": false
+        },
+        {
+          "key": "backend_memory",
+          "optional": false
+        }
+      ],
+      "declaration": "backend:Tag{gmres}, accuracy:LinearAccuracy, maximum_iterations:PositiveCount, restart:PositiveCount, maximum_applications:Count, maximum_adjoint:Count, maximum_preconditioner:Count, maximum_true_residual_checks:Count, backend_memory:BackendMemory",
+      "conditions": "restartとmaxiterの実n条件はprepare。認定用作用も課金"
+    },
+    {
+      "section": "FD-10",
+      "type": "LinearAccuracy",
+      "fields": [
+        {
+          "key": "absolute",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        },
+        {
+          "key": "backward",
+          "optional": false
+        },
+        {
+          "key": "norm",
+          "optional": false
+        }
+      ],
+      "declaration": "absolute:Q<1>, relative:Q<1>, backward:Q<1>, norm:Tag{infinity,l2}",
+      "conditions": "各予算≥0。元残差と成分別後退誤差を別判定"
+    },
+    {
+      "section": "FD-10",
+      "type": "NewtonPolicy",
+      "fields": [
+        {
+          "key": "maximum_iterations",
+          "optional": false
+        },
+        {
+          "key": "maximum_line_searches",
+          "optional": false
+        },
+        {
+          "key": "absolute",
+          "optional": false
+        },
+        {
+          "key": "relative",
+          "optional": false
+        },
+        {
+          "key": "correction",
+          "optional": false
+        },
+        {
+          "key": "minimum_step",
+          "optional": false
+        }
+      ],
+      "declaration": "maximum_iterations:PositiveCount, maximum_line_searches:PositiveCount, absolute:Q<1>, relative:Q<1>, correction:Q<1>, minimum_step:Q<1>",
+      "conditions": "予算≥0、0<minimum_step≤1。元残差の未達を補正normだけで受理しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "PrecisionPolicy",
+      "fields": [
+        {
+          "key": "input",
+          "optional": false
+        },
+        {
+          "key": "retained",
+          "optional": false
+        },
+        {
+          "key": "returned",
+          "optional": false
+        },
+        {
+          "key": "projection_absolute",
+          "optional": false
+        },
+        {
+          "key": "projection_relative",
+          "optional": false
+        }
+      ],
+      "declaration": "input:Tag{preserve}, retained:Tag{adaptive_binary64_two_word}, returned:Tag{retained,binary64_projection}, projection_absolute:Q<1>, projection_relative:Q<1>",
+      "conditions": "予算≥0。明示投影は実投影値を再資格。低位破棄不可"
+    },
+    {
+      "section": "FD-10",
+      "type": "BackendMemory",
+      "fields": [
+        {
+          "key": "admission",
+          "optional": false
+        },
+        {
+          "key": "maximum_bytes",
+          "optional": false
+        }
+      ],
+      "declaration": "admission:Tag{estimate,require_proven_bound}, maximum_bytes:Count",
+      "conditions": "同じbackendの実際のadmissionへ渡す。推定をmalloc/RSSの上限と呼ばない"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenPolicy none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{none}",
+      "conditions": "flutterでは拒否"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenPolicy full",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "eigenvalue_scale",
+          "optional": false
+        },
+        {
+          "key": "packet",
+          "optional": false
+        },
+        {
+          "key": "requirements",
+          "optional": false
+        },
+        {
+          "key": "limits",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{full}, target:Tag{step_map}, eigenvalue_scale:Number, packet:Tag{spectrum,pairs,subspace}, requirements:EigenRequirements, limits:EigenLimits",
+      "conditions": "完全Schur/pair/要求clusterを既存製品入口へ"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenPolicy generalized",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "eigenvalue_scale",
+          "optional": false
+        },
+        {
+          "key": "requirements",
+          "optional": false
+        },
+        {
+          "key": "limits",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{generalized}, target:Tag{structural_modes}, eigenvalue_scale:Q<1/T²>, requirements:EigenRequirements, limits:EigenLimits",
+      "conditions": "K/M対称性とM正定値を原系で認定、負λを削除しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenPolicy arnoldi",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "eigenvalue_scale",
+          "optional": false
+        },
+        {
+          "key": "packet",
+          "optional": false
+        },
+        {
+          "key": "selector",
+          "optional": false
+        },
+        {
+          "key": "nev",
+          "optional": false
+        },
+        {
+          "key": "ncv",
+          "optional": false
+        },
+        {
+          "key": "seed",
+          "optional": false
+        },
+        {
+          "key": "backend_tolerance",
+          "optional": false
+        },
+        {
+          "key": "requirements",
+          "optional": false
+        },
+        {
+          "key": "limits",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{arnoldi}, target:Tag{step_map}, eigenvalue_scale:Number, packet:Tag{pairs,subspace}, selector:EigenSelector, nev:PositiveCount, ncv:PositiveCount, seed:ArnoldiSeed, backend_tolerance:Q<1>, requirements:EigenRequirements, limits:EigenLimits",
+      "conditions": "eigenvalue_scale>0、backend_tolerance>0。1≤nev≤n−2、nev+2≤ncv≤nは実n判明後prepareで検査。24/64を小nへclipしない。seedは明示非零"
+    },
+    {
+      "section": "FD-10",
+      "type": "Complex",
+      "fields": [
+        {
+          "key": "real",
+          "optional": false
+        },
+        {
+          "key": "imaginary",
+          "optional": false
+        }
+      ],
+      "declaration": "real:Number, imaginary:Number",
+      "conditions": "実入力でもJSON boolean/arrayの再解釈なし"
+    },
+    {
+      "section": "FD-10",
+      "type": "ArnoldiSeed uniform",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{uniform_nonzero}, value:Complex",
+      "conditions": "value≠0。実n全列へ同じ値を明示展開。nをcaseで推測しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "ArnoldiSeed explicit",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "layout",
+          "optional": false
+        },
+        {
+          "key": "values",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{explicit_layout}, layout:Digest, values:List<Complex>",
+      "conditions": "同じ準備済layoutの全n列、少なくとも1値非零。全列/内容を照合"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenSelector largest",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{largest_magnitude}",
+      "conditions": "元作用の固有値絶対値"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenSelector shift",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "shift",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{shift_invert}, shift:Complex",
+      "conditions": "step mapの無次元λ。sλも正の無次元。shifted残差だけで認定しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenRequirements",
+      "fields": [
+        {
+          "key": "residual",
+          "optional": false
+        },
+        {
+          "key": "residual_observation",
+          "optional": false
+        },
+        {
+          "key": "normalization",
+          "optional": false
+        },
+        {
+          "key": "normalization_observation",
+          "optional": false
+        },
+        {
+          "key": "orthogonality",
+          "optional": false
+        },
+        {
+          "key": "orthogonality_observation",
+          "optional": false
+        },
+        {
+          "key": "backward",
+          "optional": false
+        },
+        {
+          "key": "association_absolute",
+          "optional": false
+        },
+        {
+          "key": "association_relative",
+          "optional": false
+        },
+        {
+          "key": "left",
+          "optional": false
+        },
+        {
+          "key": "clusters",
+          "optional": false
+        },
+        {
+          "key": "physical_coverage",
+          "optional": false
+        }
+      ],
+      "declaration": "residual:Q<1>, residual_observation:Ref<Observation>, normalization:Q<1>, normalization_observation:Ref<Observation>, orthogonality:Q<1>, orthogonality_observation:Ref<Observation>, backward:Backward, association_absolute:Q<1>, association_relative:Q<1>, left:Bool, clusters:List<EigenCluster>, physical_coverage:Bool",
+      "conditions": "各予算≥0。Gram<1、実A共役対、左右別空間/associationは採用契約。clusters空可。flutterではphysical_coverage=true必須"
+    },
+    {
+      "section": "FD-10",
+      "type": "Backward none",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{not_requested}",
+      "conditions": "成分別βの省略を原残差省略と混同しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "Backward required",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "budget",
+          "optional": false
+        },
+        {
+          "key": "observation",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{required}, budget:Q<1>, observation:Ref<Observation>",
+      "conditions": "budget≥0。微小tailを閾値で消さない"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenCluster",
+      "fields": [
+        {
+          "key": "members",
+          "optional": false
+        },
+        {
+          "key": "expected_dimension",
+          "optional": false
+        }
+      ],
+      "declaration": "members:List<Index>, expected_dimension:PositiveCount",
+      "conditions": "members相異/1以上、dimension一致。完全packet順とのassociationは後続抽出契約で照合。全Qを一部clusterの資格へ転用しない"
+    },
+    {
+      "section": "FD-10",
+      "type": "EigenLimits",
+      "fields": [
+        {
+          "key": "maximum_order",
+          "optional": false
+        },
+        {
+          "key": "maximum_results",
+          "optional": false
+        },
+        {
+          "key": "maximum_ncv",
+          "optional": false
+        },
+        {
+          "key": "maximum_backend_iterations",
+          "optional": false
+        },
+        {
+          "key": "maximum_attempts",
+          "optional": false
+        },
+        {
+          "key": "maximum_forward",
+          "optional": false
+        },
+        {
+          "key": "maximum_adjoint",
+          "optional": false
+        },
+        {
+          "key": "maximum_inverse",
+          "optional": false
+        },
+        {
+          "key": "backend_memory",
+          "optional": false
+        }
+      ],
+      "declaration": "maximum_order:Count, maximum_results:Count, maximum_ncv:Count, maximum_backend_iterations:Count, maximum_attempts:Count, maximum_forward:Count, maximum_adjoint:Count, maximum_inverse:Count, backend_memory:BackendMemory",
+      "conditions": "全呼出し課金、枠超過前に止める。n/nev+1/複素対scratchのchecked計上"
+    },
+    {
+      "section": "FD-11",
+      "type": "Resources",
+      "fields": [
+        {
+          "key": "profile",
+          "optional": false
+        },
+        {
+          "key": "threads",
+          "optional": false
+        },
+        {
+          "key": "maximum_memory_bytes",
+          "optional": false
+        },
+        {
+          "key": "maximum_wall_seconds",
+          "optional": false
+        },
+        {
+          "key": "maximum_steps",
+          "optional": false
+        },
+        {
+          "key": "maximum_total_iterations",
+          "optional": false
+        },
+        {
+          "key": "checkpoint_temporary_bytes",
+          "optional": false
+        },
+        {
+          "key": "input",
+          "optional": false
+        }
+      ],
+      "declaration": "profile:Tag{24gib,48gib,custom}, threads:PositiveCount, maximum_memory_bytes:Count, maximum_wall_seconds:Q<T>, maximum_steps:Count, maximum_total_iterations:Count, checkpoint_temporary_bytes:Count, input:InputQuotas",
+      "conditions": "wall>0。profile名だけで実RSS適合と認定しない"
+    },
+    {
+      "section": "FD-11",
+      "type": "InputQuotas",
+      "fields": [
+        {
+          "key": "maximum_source_bytes",
+          "optional": false
+        },
+        {
+          "key": "maximum_depth",
+          "optional": false
+        },
+        {
+          "key": "maximum_nodes",
+          "optional": false
+        },
+        {
+          "key": "maximum_members",
+          "optional": false
+        },
+        {
+          "key": "maximum_decoded_string_bytes",
+          "optional": false
+        },
+        {
+          "key": "maximum_decimal_token_bytes",
+          "optional": false
+        },
+        {
+          "key": "maximum_total_text_bytes",
+          "optional": false
+        },
+        {
+          "key": "maximum_typed_bytes",
+          "optional": false
+        },
+        {
+          "key": "maximum_entities",
+          "optional": false
+        },
+        {
+          "key": "maximum_references",
+          "optional": false
+        },
+        {
+          "key": "maximum_scalars",
+          "optional": false
+        },
+        {
+          "key": "maximum_polynomial_terms",
+          "optional": false
+        },
+        {
+          "key": "maximum_table_samples",
+          "optional": false
+        },
+        {
+          "key": "maximum_expression_nodes",
+          "optional": false
+        },
+        {
+          "key": "maximum_expression_edges",
+          "optional": false
+        },
+        {
+          "key": "maximum_expression_depth",
+          "optional": false
+        },
+        {
+          "key": "maximum_expression_power",
+          "optional": false
+        },
+        {
+          "key": "maximum_expression_points",
+          "optional": false
+        },
+        {
+          "key": "maximum_diagnostic_path_bytes",
+          "optional": false
+        }
+      ],
+      "declaration": "maximum_source_bytes:Count, maximum_depth:Count, maximum_nodes:Count, maximum_members:Count, maximum_decoded_string_bytes:Count, maximum_decimal_token_bytes:Count, maximum_total_text_bytes:Count, maximum_typed_bytes:Count, maximum_entities:Count, maximum_references:Count, maximum_scalars:Count, maximum_polynomial_terms:Count, maximum_table_samples:Count, maximum_expression_nodes:Count, maximum_expression_edges:Count, maximum_expression_depth:Count, maximum_expression_power:Count, maximum_expression_points:Count, maximum_diagnostic_path_bytes:Count",
+      "conditions": "原文書入口のlimitsと同じ値で再照合。文書に書いたquotaをparse前のホスト上限の代用にしない。実上限は両者のmin"
+    },
+    {
+      "section": "FD-11",
+      "type": "Output",
+      "fields": [
+        {
+          "key": "directory",
+          "optional": false
+        },
+        {
+          "key": "observations",
+          "optional": false
+        },
+        {
+          "key": "visualization",
+          "optional": false
+        },
+        {
+          "key": "checkpoint",
+          "optional": false
+        },
+        {
+          "key": "overwrite",
+          "optional": false
+        },
+        {
+          "key": "resume",
+          "optional": false
+        }
+      ],
+      "declaration": "directory:Text, observations:OutputCadence, visualization:Visualization, checkpoint:CheckpointOutput, overwrite:Tag{reject_existing}, resume:Tag{explicit_only}",
+      "conditions": "directory非空/NUL不可。勝手な上書き/暗黙resumeなし"
+    },
+    {
+      "section": "FD-11",
+      "type": "OutputCadence",
+      "fields": [
+        {
+          "key": "every_steps",
+          "optional": false
+        },
+        {
+          "key": "observations",
+          "optional": false
+        }
+      ],
+      "declaration": "every_steps:PositiveCount, observations:List<Ref<Observation>>",
+      "conditions": "観測空可、重複拒否。確定境界で出力"
+    },
+    {
+      "section": "FD-11",
+      "type": "Visualization",
+      "fields": [
+        {
+          "key": "enabled",
+          "optional": false
+        },
+        {
+          "key": "every_steps",
+          "optional": false
+        },
+        {
+          "key": "layers",
+          "optional": false
+        },
+        {
+          "key": "interfaces",
+          "optional": false
+        },
+        {
+          "key": "reference_geometry",
+          "optional": false
+        },
+        {
+          "key": "current_geometry",
+          "optional": false
+        }
+      ],
+      "declaration": "enabled:Bool, every_steps:PositiveCount, layers:List<Ref<Layer>>, interfaces:Tag{both}, reference_geometry:Bool, current_geometry:Bool",
+      "conditions": "layers空可。未認定応力を0で埋めない。標本格子とPG DOFを区別"
+    },
+    {
+      "section": "FD-11",
+      "type": "CheckpointOutput off",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{off}",
+      "conditions": "保存しないことを明示"
+    },
+    {
+      "section": "FD-11",
+      "type": "CheckpointOutput on",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "every_steps",
+          "optional": false
+        },
+        {
+          "key": "directory",
+          "optional": false
+        },
+        {
+          "key": "retain",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{on}, every_steps:PositiveCount, directory:Text, retain:PositiveCount",
+      "conditions": "unique temporary→flush/close/hash→manifest last→同FSrename。確定dir上書き不可。retainで現確定や利用中親を削除しない"
+    },
+    {
+      "section": "FD-12",
+      "type": "ReferenceField<d,n> expression",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "expression",
+          "optional": false
+        },
+        {
+          "key": "error",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{expression}, expression:Expression<n>, error:Vec<Q<d>,n>",
+      "conditions": "domainはreferenceだけ、出力次元全てd。error≥0。材料値/軸/E0を試行状態から再生成しない"
+    },
+    {
+      "section": "FD-12",
+      "type": "TimeSeries<n> expression",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "expression",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{expression}, expression:Expression<n>",
+      "conditions": "domainはtimeだけ。出力次元は使用側の成分型"
+    },
+    {
+      "section": "FD-12",
+      "type": "Load current_expression",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "id",
+          "optional": false
+        },
+        {
+          "key": "region",
+          "optional": false
+        },
+        {
+          "key": "expression",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{current_pressure}, id:Id<Load>, region:Region, expression:Expression<1>",
+      "conditions": "domainはcurrent_position_time、出力pressure。正圧の符号はpressureと同じ。x微分を点写像へ鎖則で引き戻す"
+    },
+    {
+      "section": "FD-12",
+      "type": "Expression<n>",
+      "fields": [
+        {
+          "key": "domain",
+          "optional": false
+        },
+        {
+          "key": "nodes",
+          "optional": false
+        },
+        {
+          "key": "outputs",
+          "optional": false
+        }
+      ],
+      "declaration": "domain:ExpressionDomain, nodes:List<ExprNode>, outputs:Vec<Index,n>",
+      "conditions": "nodes1以上、index=配列位置。各operand indexは自分より小さく、全出力index範囲内。未使用node拒否。循環/任意名前参照なし"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExpressionDomain reference",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "coordinates",
+          "optional": false
+        },
+        {
+          "key": "lower",
+          "optional": false
+        },
+        {
+          "key": "upper",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{reference}, coordinates:Tag{chart,material,world_reference}, lower:Vec<Number,3>, upper:Vec<Number,3>",
+      "conditions": "chartは(s,t,ζ)無次元、他はL。lower≤upper、物理領域の被覆はprepare"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExpressionDomain time",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "lower",
+          "optional": false
+        },
+        {
+          "key": "upper",
+          "optional": false
+        },
+        {
+          "key": "events",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{time}, lower:Q<T>, upper:Q<T>, events:List<Q<T>>",
+      "conditions": "lower<upper、events厳密増加/範囲内。各イベント左右を別区間に分ける"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExpressionDomain current_position_time",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "position_lower",
+          "optional": false
+        },
+        {
+          "key": "position_upper",
+          "optional": false
+        },
+        {
+          "key": "time_lower",
+          "optional": false
+        },
+        {
+          "key": "time_upper",
+          "optional": false
+        },
+        {
+          "key": "events",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{current_position_time}, position_lower:Vec<Q<L>,3>, position_upper:Vec<Q<L>,3>, time_lower:Q<T>, time_upper:Q<T>, events:List<Q<T>>",
+      "conditions": "各lower<upper。任意q配列/v/solver内部状態を端末にしない"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExprNode constant",
+      "fields": [
+        {
+          "key": "op",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        },
+        {
+          "key": "dimensions",
+          "optional": false
+        }
+      ],
+      "declaration": "op:Tag{constant}, value:Number, dimensions:Vec<signed-native-integer,4>",
+      "conditions": "SI前のroot単位で解釈。dimension各指数はint16範囲、演算による和もchecked"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExprNode variable",
+      "fields": [
+        {
+          "key": "op",
+          "optional": false
+        },
+        {
+          "key": "axis",
+          "optional": false
+        }
+      ],
+      "declaration": "op:Tag{variable}, axis:Index",
+      "conditions": "reference0..2、time0、current_position_time0..3（x/y/z/t）。単位はdomainで定義した固定座標の物理単位"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExprNode binary",
+      "fields": [
+        {
+          "key": "op",
+          "optional": false
+        },
+        {
+          "key": "first",
+          "optional": false
+        },
+        {
+          "key": "second",
+          "optional": false
+        }
+      ],
+      "declaration": "op:Tag{add,subtract,multiply,divide}, first:Index, second:Index",
+      "conditions": "add/subtractは同次元、multiply/divideは指数和/差"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExprNode negate",
+      "fields": [
+        {
+          "key": "op",
+          "optional": false
+        },
+        {
+          "key": "operand",
+          "optional": false
+        }
+      ],
+      "declaration": "op:Tag{negate}, operand:Index",
+      "conditions": "同次元"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExprNode power",
+      "fields": [
+        {
+          "key": "op",
+          "optional": false
+        },
+        {
+          "key": "operand",
+          "optional": false
+        },
+        {
+          "key": "exponent",
+          "optional": false
+        }
+      ],
+      "declaration": "op:Tag{integer_power}, operand:Index, exponent:signed-native-integer",
+      "conditions": "exponentはint32範囲。指数0は無次元1、負冪は零を含む定義域を拒否"
+    },
+    {
+      "section": "FD-12",
+      "type": "ExprNode analytic",
+      "fields": [
+        {
+          "key": "op",
+          "optional": false
+        },
+        {
+          "key": "operand",
+          "optional": false
+        }
+      ],
+      "declaration": "op:Tag{sin,cos,exp,log,sqrt}, operand:Index",
+      "conditions": "sin/cosはangle（SI radへ変換）、exp/logは無次元、sqrtは全次元指数偶数"
+    }
+  ],
+  "supplement_inventory": [
+    {
+      "section": "",
+      "type": "Perturbation physical",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "shells",
+          "optional": false
+        },
+        {
+          "key": "beams",
+          "optional": false
+        },
+        {
+          "key": "rigids",
+          "optional": false
+        },
+        {
+          "key": "displacements",
+          "optional": false
+        },
+        {
+          "key": "velocities",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{physical}, shells:List<ShellPhysicalState>, beams:List<BeamState>, rigids:List<RigidState>, displacements:List<PointCheck>, velocities:List<PointCheck>",
+      "conditions": "3種の状態集合で対象modelを完全被覆する。点確認の2配列は空可"
+    },
+    {
+      "section": "",
+      "type": "ShellPhysicalState",
+      "fields": [
+        {
+          "key": "shell",
+          "optional": false
+        },
+        {
+          "key": "displacement",
+          "optional": false
+        },
+        {
+          "key": "velocity",
+          "optional": false
+        }
+      ],
+      "declaration": "shell:Ref<Shell>, displacement:FullShellField, velocity:FullShellField",
+      "conditions": "両方とも同じ平衡からの増分。前者L、後者L/T。零場も明示する"
+    },
+    {
+      "section": "",
+      "type": "FullShellField global_polynomial",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "r",
+          "optional": false
+        },
+        {
+          "key": "p",
+          "optional": false
+        },
+        {
+          "key": "c",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{global_polynomial}, r:VectorPolynomial, p:VectorPolynomial, c:VectorPolynomial",
+      "conditions": "無次元chart座標(s,t)の多項式。3場を省略しない"
+    },
+    {
+      "section": "",
+      "type": "FullShellField half_cells",
+      "fields": [
+        {
+          "key": "kind",
+          "optional": false
+        },
+        {
+          "key": "cells",
+          "optional": false
+        }
+      ],
+      "declaration": "kind:Tag{half_cells}, cells:List<CellField>",
+      "conditions": "正面積の活動half-cellを各1回だけ被覆する"
+    },
+    {
+      "section": "",
+      "type": "CellField",
+      "fields": [
+        {
+          "key": "cell",
+          "optional": false
+        },
+        {
+          "key": "r",
+          "optional": false
+        },
+        {
+          "key": "p",
+          "optional": false
+        },
+        {
+          "key": "c",
+          "optional": false
+        }
+      ],
+      "declaration": "cell:Vec<Index,2>, r:VectorPolynomial, p:VectorPolynomial, c:VectorPolynomial",
+      "conditions": "cell=(c_s,c_t)の局所(u,v)係数。3場を省略しない"
+    },
+    {
+      "section": "",
+      "type": "VectorPolynomial",
+      "fields": [
+        {
+          "key": "terms",
+          "optional": false
+        }
+      ],
+      "declaration": "terms:List<VectorTerm>",
+      "conditions": "空termsはexact零。元の項順を保持し、同じpowersの重複を拒否する"
+    },
+    {
+      "section": "",
+      "type": "VectorTerm",
+      "fields": [
+        {
+          "key": "powers",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        }
+      ],
+      "declaration": "powers:Vec<Count,2>, value:Vec<ExactQuantity,3>",
+      "conditions": "valueは世界Cartesianのx/y/z順。係数ごとに使用側のLまたはL/Tを持つ"
+    },
+    {
+      "section": "",
+      "type": "PointCheck",
+      "fields": [
+        {
+          "key": "point",
+          "optional": false
+        },
+        {
+          "key": "value",
+          "optional": false
+        },
+        {
+          "key": "tolerance",
+          "optional": false
+        }
+      ],
+      "declaration": "point:InitialPoint, value:Vec<Number,3>, tolerance:Vec<Number,3>",
+      "conditions": "value/toleranceはdisplacementsでL、velocitiesでL/T。各tolerance≥0、同じ配列内の重複pointを拒否する"
+    },
+    {
+      "section": "",
+      "type": "InitialPoint shell",
+      "fields": [
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "coordinates",
+          "optional": false
+        },
+        {
+          "key": "side_s",
+          "optional": false
+        },
+        {
+          "key": "side_t",
+          "optional": false
+        }
+      ],
+      "declaration": "target:Target{kind=shell}, coordinates:Vec<Number,3>, side_s:Tag{interior,lower,upper}, side_t:Tag{interior,lower,upper}",
+      "conditions": "coordinates=(s,t,ζ)、全て無次元。s/tは[0,1]、ζは[−1,1]。両片側tag必須"
+    },
+    {
+      "section": "",
+      "type": "InitialPoint beam",
+      "fields": [
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "coordinates",
+          "optional": false
+        }
+      ],
+      "declaration": "target:Target{kind=beam}, coordinates:Vec<Number,3>",
+      "conditions": "先頭は梁の参照物質座標s[L]、後2成分はexact零。区間内への所属はprepareで検査"
+    },
+    {
+      "section": "",
+      "type": "InitialPoint rigid",
+      "fields": [
+        {
+          "key": "target",
+          "optional": false
+        },
+        {
+          "key": "coordinates",
+          "optional": false
+        }
+      ],
+      "declaration": "target:Target{kind=rigid}, coordinates:Vec<Number,3>",
+      "conditions": "3成分とも剛体の物体座標[L]。対象はMass.kind=rigidのみ"
+    }
+  ],
+  "not_claimed": [
+    "product schema validation",
+    "all negative inputs executed",
+    "SI conversion",
+    "expression evaluation or differentiation",
+    "physical prepare",
+    "numerical qualification"
+  ]
+}

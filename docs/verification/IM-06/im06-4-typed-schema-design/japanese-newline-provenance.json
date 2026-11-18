@@ -1,0 +1,26 @@
+{
+  "id": "typed-schema-language-newline-provenance",
+  "derivatives": [
+    {
+      "id": "typed-schema-japanese-lint",
+      "transformation": "stdout CRLF to LF; JSON values identical",
+      "raw_sha256": "b1155b6cc170a0c2b6c38c29afb7fcaeb5c1dcd84f1dc78df14a76f734abad91",
+      "public_sha256": "3ab79ba129f0f0e3ec2e4f4c8bafe0a66ff3cdbd5be423ff5e2520ce36caff8d",
+      "hint": "japanese-lint.json"
+    },
+    {
+      "id": "typed-schema-japanese-outline",
+      "transformation": "stdout CRLF to LF; JSON values identical",
+      "raw_sha256": "4d042cc120bc1505111d60ad64b278b4d0aa73a39173a0e798f910c552dc2456",
+      "public_sha256": "5bcd8d087718b8974660f890f07e110cb84f6d899e7c138e8847077668589028",
+      "hint": "japanese-outline.json"
+    },
+    {
+      "id": "typed-schema-japanese-terms",
+      "transformation": "stdout CRLF to LF; JSON values identical",
+      "raw_sha256": "025a9fb22ba4f141aafb4b8c00ee74753257e0cd2af7eccee6769ec6396607de",
+      "public_sha256": "4c5478dcd7d353abed0ba1bd290ed9928d135bf5446fa783d073c2c530780d17",
+      "hint": "japanese-terms.json"
+    }
+  ]
+}
