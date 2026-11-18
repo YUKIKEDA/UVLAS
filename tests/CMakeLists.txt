@@ -572,3 +572,8 @@ uvlas_add_test(io.case_schema_resources
 target_include_directories(uvlas_test_io_case_schema_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 uvlas_enable_allocation_audit(uvlas_test_io_case_schema_resources)
 uvlas_require_audited_dependencies(uvlas_test_io_case_schema_resources)
+if(UVLAS_SANITIZERS AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Both full schema suites reached the default 60 s on GCC 14 with
+    # ASan/UBSan. Give these runners a separate, bounded test time.
+    set_tests_properties(io.case_schema io.case_schema_resources PROPERTIES TIMEOUT 300)
+endif()
