@@ -1,0 +1,14 @@
+[1/4] Processing file C:\Users\yuuuu\.codex\worktrees\uvlas-im03-contract\UVLAS\src\aero\pchip_rational_slots.cpp.
+48148 warnings generated.
+[2/4] Processing file C:\Users\yuuuu\.codex\worktrees\uvlas-im03-contract\UVLAS\src\aero\pchip_slot_integer.cpp.
+96294 warnings generated.
+[3/4] Processing file C:\Users\yuuuu\.codex\worktrees\uvlas-im03-contract\UVLAS\tests\aero\pchip_rational_slots_test.cpp.
+161405 warnings generated.
+[4/4] Processing file C:\Users\yuuuu\.codex\worktrees\uvlas-im03-contract\UVLAS\tests\aero\pchip_rational_slots_resources_test.cpp.
+215706 warnings generated.
+C:\Users\yuuuu\.codex\worktrees\uvlas-im03-contract\UVLAS\tests\aero\pchip_rational_slots_test.cpp:227:13: error: 'workspace' used after it was moved [bugprone-use-after-move,-warnings-as-errors]
+  227 |             workspace
+      |             ^
+C:\Users\yuuuu\.codex\worktrees\uvlas-im03-contract\UVLAS\tests\aero\pchip_rational_slots_test.cpp:225:19: note: move occurred here
+  225 |         relocated.emplace(std::move(workspace));
+      |                   ^

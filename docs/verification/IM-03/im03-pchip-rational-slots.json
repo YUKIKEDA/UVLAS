@@ -1,0 +1,56 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-rational-slots-v1",
+  "ids": [
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 166,
+  "date": "2026-11-19",
+  "source_commit": "b9d751a726322314a25ab67465b85a88ef4295e1",
+  "claimed_state": "Private variable-width rational slot runtime only; no PCHIP curve/jet or finite projection qualification.",
+  "verification": {
+    "debug_normal": "9 cases / 1352 assertions",
+    "debug_resource": "5 cases / 68 assertions",
+    "release_normal": "9 cases / 1352 assertions",
+    "release_resource": "5 cases / 68 assertions",
+    "reference": "Independent cpp_int/cpp_rational and literal primitive cost; tolerance 0",
+    "allocation": "All3 workspace faults; prepared arithmetic/refusal/cancel zero C++ new calls; C heap not dynamically audited",
+    "parallel": "Independent Workspace1/2/4 callers; encoded limbs/sign/work/slots/payload equal",
+    "mutations": "Independent final integer source copy: control1215 pass; floor1055/21 fail; carry160/4 fail; compile/link0 and Catch0/42/42",
+    "static": "Changed4TU clang-tidy21.1.1 including sign-compare/conversion/range-loop; final normal TU repeated after required opcode test",
+    "japanese": "uv run natural-japanese quick lint0 findings; independent review completed",
+    "performance": "Single small Release case,10000 repetitions per stage; no comparison or practical performance claim",
+    "linux": "Not locally executed; CI pending, not waited"
+  },
+  "sources": {
+    "CMakeLists.txt": "9c3ad5377a0822a0f2a1133d453d455c1d7f2780cfb3f42c8e5cef53d2bf0476",
+    "tests/CMakeLists.txt": "a5151a6c6ae6ffee134e280347b256bb2e035f92601d2b49ba0ef2a130faaebb",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_rational_slots.hpp": "790982ae1620c7c16d3ded56564b3d2c46eb3458852b92a377520f35bbdd17f8",
+    "src/aero/pchip_slot_private.hpp": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+    "src/aero/pchip_slot_integer.cpp": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+    "tests/aero/pchip_rational_slots_test.cpp": "6295d55306cc0a684c83bc1e35adb23ab94ad985737b112da1404ec855427ab9",
+    "tests/aero/pchip_rational_slots_resources_test.cpp": "c760064d0905719b5c9b51ff7ade0ecdbb266e99e2314fec6cc2a2263f2d0b1c",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-rational-slots-v1/debug-normal.txt": "92d60d8b14abd6b0062aa897a5a4681ca70e98b650c1423e841ae3b79d81b851",
+    "docs/verification/IM-03/pchip-rational-slots-v1/debug-resource.txt": "c355a23663f1a7fa20a892246ad0f8a2e1bd1ae65e8b7fa346166abbfe0cf98c",
+    "docs/verification/IM-03/pchip-rational-slots-v1/measure.cpp": "07dd10b5c93036d1d1d5417892b739fd16f7a41d2641788d8474af6e9fbdbab8",
+    "docs/verification/IM-03/pchip-rational-slots-v1/measure.json": "5f7ee4f1369566d3286a066ca167b8eca54f3da4f1b2cbfd67f92533e532c0ec",
+    "docs/verification/IM-03/pchip-rational-slots-v1/release-normal.txt": "92d60d8b14abd6b0062aa897a5a4681ca70e98b650c1423e841ae3b79d81b851",
+    "docs/verification/IM-03/pchip-rational-slots-v1/release-resource.txt": "c355a23663f1a7fa20a892246ad0f8a2e1bd1ae65e8b7fa346166abbfe0cf98c",
+    "docs/verification/IM-03/pchip-rational-slots-v1/review.md": "23c143845e5ed97e9dae9befcfdf2e73e1dbd5bef7f9ee8499cc85b1970c9248",
+    "docs/verification/IM-03/pchip-rational-slots-v1/run-mutations.ps1": "850a5a1682ecabb619e5247d3f66342e03d81f52c1f144dd157e5045e16c3981",
+    "docs/verification/IM-03/pchip-rational-slots-v1/tidy-final.txt": "cf6ec005816ed6fa49151a77fc5dadb320390e48bf0f1ec0e520d72372f4425b",
+    "docs/verification/IM-03/pchip-rational-slots-v1/tidy-opcost-final.txt": "9238a54b02df4bd118d782c145b80a0245027ff173885252eaa9c4f3a0bd9ffc"
+  }
+}
