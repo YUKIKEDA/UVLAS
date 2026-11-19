@@ -34,7 +34,12 @@
     "docs/verification/IM-01/pg-fixed-discovery/control-correction.json": "c345634120eabc61f58ab0db3f94658373ba4956e5db631a9c917243f952c491",
     "docs/verification/IM-01/pg-fixed-discovery/fixed-discovery.cpp.txt": "3404018de6b45603e51078ac5cf70719f9546ce24892033bbec9f82ebd27e9bf",
     "docs/verification/IM-01/pg-fixed-discovery/results.json": "a3068f0bd1760c3634ecc72e9da9c3a8447204e76b56a077f15eda6ec8ab1aab",
-    "docs/verification/IM-01/pg-fixed-discovery/run-discovery.py.txt": "318406edea8e743d47b8ad30d4460a06009a7165a4392faaa8e323e27efeb8f0",
-    "docs/verification/IM-01/pg-fixed-discovery/verification.md": "73201537dddb38974ba667797defa8680b0cac888880155fa454f3288bc1a3ea"
+    "docs/verification/IM-01/pg-fixed-discovery/verification.md": "73201537dddb38974ba667797defa8680b0cac888880155fa454f3288bc1a3ea",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-original-runner.py.txt": "318406edea8e743d47b8ad30d4460a06009a7165a4392faaa8e323e27efeb8f0"
+  },
+  "artifact_reference_adjustment": {
+    "review_head": "d832d3ecc72015905cbfa8df7d8419a3f658459c",
+    "original_manifest_copy": "docs/verification/IM-01/pg-fixed-discovery/review-186-original-manifest.json.txt",
+    "reason": "Only the runner citation is rebound to the retained byte-identical original; numeric hashes remain unchanged."
   }
 }

@@ -15,6 +15,15 @@ def require(value,message):
     if not value:raise RuntimeError(message)
 
 
+def validate_controls(control):
+    """Require the corrected rank-loss observation, including JSON integer types."""
+    require(isinstance(control,dict),'controls must be an object')
+    for field,expected in [('bad_prime_rational_rank',2),('bad_prime_modular_rank',1)]:
+        value=control.get(field)
+        require(type(value) is int and value==expected,f'controls require integer {field}={expected}')
+    require(control.get('bad_prime_rank_loss_rejected') is True,'rank-loss rejection must be true')
+
+
 def publish(output,result):
     payload=json.dumps(result,indent=2)+'\n';temporary=None
     try:
@@ -36,6 +45,7 @@ def main():
     study=json.loads(args.study.read_text(encoding='utf-8'))['cases']
     index=json.loads(args.certificate_index.read_text(encoding='utf-8'))['certificates'];exe=args.discovery.resolve()
     control=json.loads(subprocess.run([str(exe),'--controls'],capture_output=True,check=True,timeout=30).stdout)
+    validate_controls(control)
     primitive=json.loads(subprocess.run([str(exe),'--primitives'],capture_output=True,check=True,timeout=30).stdout)
     require({x['prime'] for x in primitive}==set(PRIMES) and len(primitive)==4,'primitive prime roster')
     for x in primitive:

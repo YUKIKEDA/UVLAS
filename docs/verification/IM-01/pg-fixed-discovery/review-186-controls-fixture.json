@@ -1,0 +1,48 @@
+{
+  "legacy": {
+    "returncode": 0,
+    "executable_sha256": "f37d10bfc7454ce29b2809e35ec1b763c8ced0edd6458fd980991628e0590885",
+    "stdout_sha256": "c3cde7929fcae55bf249e0ba9d902245f273f06f1e31aba69395f6b65182d161",
+    "controls": {
+      "literal_rank": 2,
+      "tiny_exponent": -400,
+      "payload_equal_one_short": true,
+      "words_equal_one_short": true,
+      "visits_equal_one_short": true,
+      "rank_cap_rejected": true,
+      "bad_denominator_rejected": true,
+      "bad_prime_rank_loss_rejected": true,
+      "new_kernel_column_rejected": true,
+      "reference_tamper_rejected": true,
+      "dimension_overflow_rejected": true,
+      "same_input_after_failure": true,
+      "heap_attempts": 0,
+      "words": 3160,
+      "visits": 757
+    }
+  },
+  "corrected": {
+    "returncode": 0,
+    "executable_sha256": "f5a007fc5d4057f695d46bd472491b80f277d87ac87e26c98d30b1519ef8649b",
+    "stdout_sha256": "13406f12a0d2c2462f07e7a9209a3052f7bae2163885e829f028054b1ad66a2f",
+    "controls": {
+      "literal_rank": 2,
+      "tiny_exponent": -400,
+      "payload_equal_one_short": true,
+      "words_equal_one_short": true,
+      "visits_equal_one_short": true,
+      "rank_cap_rejected": true,
+      "bad_denominator_rejected": true,
+      "bad_prime_rational_rank": 2,
+      "bad_prime_modular_rank": 1,
+      "bad_prime_rank_loss_rejected": true,
+      "new_kernel_column_rejected": true,
+      "reference_tamper_rejected": true,
+      "dimension_overflow_rejected": true,
+      "same_input_after_failure": true,
+      "heap_attempts": 0,
+      "words": 3160,
+      "visits": 757
+    }
+  }
+}
