@@ -25,7 +25,7 @@ SourceForecast source_forecast(SiContext& c, const InputDocumentData& source,
         const auto kind = node_kind(source, n);
         std::uint64_t level = kind == InputNodeKind::Array || kind == InputNodeKind::Object ? 1 : 0,
                       path = 0, ancestor = n;
-        while (nodes[static_cast<std::size_t>(ancestor)].parent) {
+        while (const auto parent = nodes[static_cast<std::size_t>(ancestor)].parent) {
             c.work.step();
             const auto& info = nodes[static_cast<std::size_t>(ancestor)];
             level = c.add(level, 1);
@@ -46,7 +46,7 @@ SourceForecast source_forecast(SiContext& c, const InputDocumentData& source,
                     index /= 10;
                 } while (index);
             }
-            ancestor = *info.parent;
+            ancestor = *parent;
         }
         result.depth = std::max(result.depth, level);
         result.path = std::max(result.path, path);
@@ -214,9 +214,12 @@ core::Result<SiRequest> make_si_request(const SiCatalog& catalog,
                 limits.exact().external_memory))
             c.reject(SiReason::UnsupportedMemory, core::FailureCode::Unsupported);
         const auto* source = detail::SiFactory::storage(catalog);
-        if (!source || !source->identity)
+        if (!source)
             c.reject(SiReason::InvalidOwner);
-        c.source = source->identity->source;
+        const auto& source_identity = source->identity;
+        if (!source_identity)
+            c.reject(SiReason::InvalidOwner);
+        c.source = source_identity->source;
         c.snapshot = &source->snapshot.values()[0];
         c.nodes = source->nodes.values();
         const auto counts = detail::source_forecast(c, *c.snapshot, c.nodes);
@@ -229,7 +232,7 @@ core::Result<SiRequest> make_si_request(const SiCatalog& catalog,
             c.key = row.key;
             c.requirement = SiRequirementView{row.scale, row.absolute, row.relative};
             const auto previous_text = text;
-            if (!detail::same_identity(row.key.source(), *source->identity))
+            if (!detail::same_identity(row.key.source(), *source_identity))
                 c.reject(SiReason::IdentityMismatch);
             if (!detail::SiFactory::owns_key(*source, row.key))
                 c.reject(SiReason::IdentityMismatch);
@@ -300,7 +303,7 @@ core::Result<SiRequest> make_si_request(const SiCatalog& catalog,
         std::ranges::fill(index.values(), std::numeric_limits<std::uint64_t>::max());
         auto output = c.allocate<detail::SiRequestData>(1);
         auto& result = output.values()[0];
-        result.identity = source->identity;
+        result.identity = source_identity;
         result.key_owner = source->key_owner;
         result.rows = c.allocate<detail::SiRequirementStorage>(rows.size());
         result.text = c.allocate<char>(text);
@@ -321,7 +324,7 @@ core::Result<SiRequest> make_si_request(const SiCatalog& catalog,
             const auto target = index.values()[static_cast<std::size_t>(node)];
             if (target >= source->entries.size())
                 c.reject(SiReason::DuplicateRequirement);
-            const auto entry = detail::si_catalog_entry(*source, target);
+            const auto entry = detail::si_catalog_entry(*source, *source_identity, target);
             if (!(row.key == entry.key))
                 c.reject(SiReason::IdentityMismatch);
             c.dimensions = entry.recipe.dimensions;
@@ -470,7 +473,7 @@ core::Result<SiCase> convert_case_to_si(const SchemaCase& input, const SiCatalog
             c.work.step();
             const auto& entry = result.entries.values()[static_cast<std::size_t>(row)];
             c.current = entry.node;
-            c.key = detail::si_catalog_entry(*inventory, row).key;
+            c.key = detail::si_catalog_entry(*inventory, *identity, row).key;
             const auto recipe = detail::si_recipe(*c.snapshot, c.nodes, source->digits.values(),
                                                   entry.node, result.units);
             c.dimensions = recipe.dimensions;

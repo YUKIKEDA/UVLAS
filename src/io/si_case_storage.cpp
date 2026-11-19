@@ -106,14 +106,12 @@ bool si_numeric_node(const SchemaNode& value) noexcept {
 }
 SiEntryStorage si_entry(SiContext& c, std::span<const SchemaNode> nodes, std::uint64_t node) {
     std::uint64_t child = node;
-    while (nodes[static_cast<std::size_t>(child)].parent) {
+    while (const auto parent = nodes[static_cast<std::size_t>(child)].parent) {
         c.work.step();
         const auto& info = nodes[static_cast<std::size_t>(child)];
-        const auto parent = *info.parent;
-        const auto& owner = nodes[static_cast<std::size_t>(parent)];
-        if (info.parent_member) {
-            const auto& source =
-                c.snapshot->members.values()[static_cast<std::size_t>(*info.parent_member)];
+        const auto& owner = nodes[static_cast<std::size_t>(*parent)];
+        if (const auto member = info.parent_member) {
+            const auto& source = c.snapshot->members.values()[static_cast<std::size_t>(*member)];
             const std::string_view key{c.snapshot->text.values().data() + source.key.offset,
                                        source.key.size};
             const auto& record = schema_records()[owner.record_kind];
@@ -122,12 +120,12 @@ SiEntryStorage si_entry(SiContext& c, std::span<const SchemaNode> nodes, std::ui
                 if (record.fields[f].name == key) {
                     if (f > std::numeric_limits<std::uint16_t>::max())
                         c.reject(SiReason::InvalidOwner);
-                    return {node, parent, owner.record_kind, static_cast<std::uint16_t>(f)};
+                    return {node, *parent, owner.record_kind, static_cast<std::uint16_t>(f)};
                 }
             }
             c.reject(SiReason::InvalidOwner);
         }
-        child = parent;
+        child = *parent;
     }
     c.reject(SiReason::InvalidOwner);
 }
@@ -148,11 +146,12 @@ SiRecipeView si_recipe(const InputDocumentData& snapshot, std::span<const Schema
     return {value, node_text(snapshot, node), units, n.dimensions,
             units.angle == SiAngleUnit::Degree ? n.dimensions.exponents[3] : std::int16_t{0}};
 }
-SiCatalogEntry si_catalog_entry(const SiCatalogData& owner, std::uint64_t row) {
+SiCatalogEntry si_catalog_entry(const SiCatalogData& owner, const SchemaIdentity& identity,
+                                std::uint64_t row) {
     const auto& entry = owner.entries.values()[static_cast<std::size_t>(row)];
     const auto& node = owner.nodes.values()[static_cast<std::size_t>(entry.node)];
     const auto& record = schema_records()[entry.record];
-    return {SiFactory::key(owner.key_owner, *owner.identity, entry.node,
+    return {SiFactory::key(owner.key_owner, identity, entry.node,
                            static_cast<std::uint16_t>(node.type), entry.record),
             si_recipe(owner.snapshot.values()[0], owner.nodes.values(), owner.digits.values(),
                       entry.node, owner.units),

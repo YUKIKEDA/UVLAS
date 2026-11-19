@@ -29,9 +29,13 @@ core::Result<std::uint64_t> SiCatalog::size() const noexcept {
     return data_.values()[0].entries.size();
 }
 core::Result<SiCatalogEntry> SiCatalog::entry(std::uint64_t row) const& noexcept {
-    if (!data_.size() || row >= data_.values()[0].entries.size())
+    if (!data_.size())
         return std::unexpected(invalid_owner());
-    return detail::si_catalog_entry(data_.values()[0], row);
+    const auto& owner = data_.values()[0];
+    const auto& identity = owner.identity;
+    if (!identity || row >= owner.entries.size())
+        return std::unexpected(invalid_owner());
+    return detail::si_catalog_entry(owner, *identity, row);
 }
 core::Result<SiMemoryReport> SiCatalog::memory_report() const noexcept {
     if (!data_.size())
@@ -52,9 +56,12 @@ SiCase::SiCase(SiCase&&) noexcept = default;
 SiCase& SiCase::operator=(SiCase&&) noexcept = default;
 SiCase::~SiCase() = default;
 core::Result<std::reference_wrapper<const SchemaCase>> SiCase::source_case() const& noexcept {
-    if (!data_.size() || !data_.values()[0].source)
+    if (!data_.size())
         return std::unexpected(invalid_owner());
-    return std::cref(*data_.values()[0].source);
+    const auto& source = data_.values()[0].source;
+    if (!source)
+        return std::unexpected(invalid_owner());
+    return std::cref(*source);
 }
 core::Result<SiResolvedDefaults> SiCase::defaults() const noexcept {
     if (!data_.size())
@@ -68,18 +75,19 @@ core::Result<SiMemoryReport> SiCase::memory_report() const noexcept {
 }
 core::Result<SiQuantityView> SiCase::quantity_impl(const detail::SchemaData* owner,
                                                    std::uint64_t node) const noexcept {
-    if (!data_.size() || !data_.values()[0].source)
+    if (!data_.size())
         return std::unexpected(invalid_owner());
     const auto& data = data_.values()[0];
-    if (!data.source.has_value())
+    const auto& source = data.source;
+    if (!source)
         return std::unexpected(invalid_owner());
-    if (owner != detail::SiFactory::storage(*data.source) || node >= data.node_to_row.size())
+    if (owner != detail::SiFactory::storage(*source) || node >= data.node_to_row.size())
         return std::unexpected(invalid_owner());
     const auto row = data.node_to_row.values()[static_cast<std::size_t>(node)];
     if (row >= data.entries.size())
         return std::unexpected(invalid_owner());
     const auto& entry = data.entries.values()[static_cast<std::size_t>(row)];
-    const auto identity = data.source->identity();
+    const auto identity = source->identity();
     if (!identity)
         return std::unexpected(identity.error());
     return SiQuantityView{
@@ -280,12 +288,14 @@ void SiContext::finish() {
         bool complete = false;
         capture_requirement(*this, *destination, fixed);
         try {
-            if (snapshot && current && *current < nodes.size()) {
-                std::uint64_t count = 0, node = *current;
-                while (nodes[static_cast<std::size_t>(node)].parent) {
+            const auto path_node = current;
+            if (snapshot && path_node && *path_node < nodes.size()) {
+                const auto leaf = *path_node;
+                std::uint64_t count = 0, node = leaf;
+                while (const auto parent = nodes[static_cast<std::size_t>(node)].parent) {
                     work.step();
                     count = add(count, segment_bytes(*this, nodes[static_cast<std::size_t>(node)]));
-                    node = *nodes[static_cast<std::size_t>(node)].parent;
+                    node = *parent;
                 }
                 if (count > limit(SiQuota::DiagnosticPathBytes))
                     fixed.path_state = SchemaPathState::PathQuota;
@@ -302,11 +312,11 @@ void SiContext::finish() {
                         fixed.path_state = SchemaPathState::Allocation;
                     else {
                         std::uint64_t offset = count;
-                        node = *current;
-                        while (nodes[static_cast<std::size_t>(node)].parent) {
+                        node = leaf;
+                        while (const auto parent = nodes[static_cast<std::size_t>(node)].parent) {
                             const auto& info = nodes[static_cast<std::size_t>(node)];
-                            if (info.parent_member) {
-                                const auto text = key_text(*snapshot, *info.parent_member);
+                            if (const auto member = info.parent_member) {
+                                const auto text = key_text(*snapshot, *member);
                                 for (std::size_t i = text.size(); i > 0; --i) {
                                     work.step();
                                     const char ch = text[i - 1];
@@ -316,16 +326,17 @@ void SiContext::finish() {
                                     } else
                                         path->values()[--offset] = ch;
                                 }
-                            } else {
-                                auto value = *info.parent_array_index;
+                            } else if (const auto index = info.parent_array_index) {
+                                auto value = *index;
                                 do {
                                     work.step();
                                     path->values()[--offset] = static_cast<char>('0' + value % 10);
                                     value /= 10;
                                 } while (value);
-                            }
+                            } else
+                                throw invalid_owner();
                             path->values()[--offset] = '/';
-                            node = *info.parent;
+                            node = *parent;
                         }
                         fixed.path_state = SchemaPathState::Complete;
                         fixed.work = work.used;

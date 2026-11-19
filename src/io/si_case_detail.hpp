@@ -178,7 +178,8 @@ void si_clone_snapshot(SiContext&, const InputDocumentData&, InputDocumentData&)
 [[nodiscard]] SiEntryStorage si_entry(SiContext&, std::span<const SchemaNode>, std::uint64_t);
 [[nodiscard]] SiRecipeView si_recipe(const InputDocumentData&, std::span<const SchemaNode>,
                                      std::span<const char>, std::uint64_t, SiUnits);
-[[nodiscard]] SiCatalogEntry si_catalog_entry(const SiCatalogData&, std::uint64_t);
+[[nodiscard]] SiCatalogEntry si_catalog_entry(const SiCatalogData&, const SchemaIdentity&,
+                                              std::uint64_t);
 [[nodiscard]] si::Interval si_exact_interval(SiContext&, const SiExactInput&);
 [[nodiscard]] si::Interval si_unit_interval(SiContext&, const SiRecipeView&,
                                             const si::Interval& pi);
