@@ -119,6 +119,8 @@ if(WIN32)
     # Native OS allocations are outside the instrumented numerical libraries.
     target_sources(uvlas_io PRIVATE src/io/windows_reference_root.cpp)
     target_link_libraries(uvlas_io PRIVATE ntdll)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp)
 endif()
 
 add_executable(uvlas_cli src/app/main.cpp)

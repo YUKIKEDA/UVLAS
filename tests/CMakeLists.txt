@@ -78,6 +78,12 @@ if(WIN32)
         SOURCES io/windows_reference_root_test.cpp
         LIBS uvlas_io)
     target_include_directories(uvlas_test_io_windows_reference_root PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    uvlas_add_test(io.linux_reference_root
+        LABELS unit property negative verification
+        SOURCES io/linux_reference_root_test.cpp
+        LIBS uvlas_io)
+    target_include_directories(uvlas_test_io_linux_reference_root PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 endif()
 
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
