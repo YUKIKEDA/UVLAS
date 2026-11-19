@@ -52,13 +52,13 @@ $$
 
 ## 3. 範囲・side・C1要求を区別する
 
-入力は `Reject`、`Hold`、`Periodic(period)` のclosed variantであり、政策はidentityへ含める。内区間はexact比較で選ぶ。内部節点で値/一階微分はC1の共通値とする。二階微分の要求には`Left`か`Right`が必須で、左右を平均しない。区間内部のside指定は値を変えない。
+入力は `Reject`、`Hold`、`Periodic(period)` のclosed variantであり、政策はidentityへ含める。内区間はexact比較で選ぶ。内部節点で値/一階微分はC1の共通値とする。内部節点の二階微分は左右のexact値が一致する場合に限り`Automatic`を許す。一致しなければ`Left`か`Right`を明示し、未指定はInvalidInputとする。左右を平均しない。区間内部のside指定は値を変えない。
 
 | 政策 | 範囲と境界の意味 |
 |---|---|
 | Reject | 閉区間[t0,tlast]だけを受理。両端は唯一存在する内側値/微分。範囲外はInvalidInput |
-| Hold | 外側は端値、外側の一階/二階微分は0。端点ではsideを要求し内側/外側を選ぶ。値は連続でも、端傾き非零ならC1資格を持たない |
-| Periodic | period=tlast−t0>0をexact要求。全成分の端値と端傾きをexact照合してから受理。全有理時刻に対しq=floor((t−t0)/period)、tbar=t−q periodを[t0,tlast)へ入れる。負時刻を切捨て除算で扱わない。seamで値/一階微分は共通値、二階はsideで選ぶ |
+| Hold | 外側は端値、外側の一階/二階微分は0。端点で必要導関数の内外値が不一致ならsideを要求し、一致時はAutomaticを許す。値は連続でも、端傾き非零ならC1資格を持たない |
+| Periodic | periodの明示を必須とし、省略や節点幅からの暗黙推定を拒否する。period=tlast−t0>0をexact要求。全成分の端値と端傾きをexact照合してから受理。全有理時刻に対しq=floor((t−t0)/period)、tbar=t−q periodを[t0,tlast)へ入れる。負時刻を切捨て除算で扱わない。seamで値/一階微分は共通値、二階は左右不一致時だけsideを要求し、一致時はAutomaticを許す |
 
 Hold端点の`Automatic`は、要求する全導関数が内外でexact一致する場合だけ受理する。たとえば値だけなら可、一階までなら端傾き0が必要、二階までなら対応する内側二階も0が必要である。Periodic seamにも二階の同じ規則を適用する。内部節点の二階Automaticは左右一致時だけ受理する。side不足はUnsupportedや任意側選択にせずInvalidInputで返す。
 
@@ -68,11 +68,24 @@ eventsは呼出し側が入力したexact時刻列で、厳密増加・重複な
 
 ## 4. 入出力・所有・同一性
 
-準備の論理入力は `samples{times[n],values[n,m],dimensions[m]}, outside, events, demand{interval,C1}, limits, workspace, ResourcePlan, diagnostic context`。borrowは同期copy完了まで不変であることを要求する。返却は不変の節点、元値、実係数、政策/期間、要求区間、events、式版を所有する。lvalue限定readonly getterだけを公開し、move元は不活性とする。入力/Workspace/Plan破棄後にも結果は有効である。
+準備の論理入力は `samples{times[n],values[n,m],dimensions[m]}, outside, events, demand{interval,C1}, input_stamp, limits, workspace, ResourcePlan, diagnostic context`。borrowは同期copy完了まで不変であることを要求する。返却は不変の節点、元値、実係数、政策/期間、要求区間、events、式版を所有する。lvalue限定readonly getterだけを公開し、move元は不活性とする。入力/Workspace/Plan破棄後にも結果は有効である。
 
-評価は `curve, exact_time, derivative_order{0,1,2}, side, limits, workspace, ResourcePlan, context` を受け、component順にvalue/dt/必要時dttをcanonical有理数で所有する。親curveを共有保持し、選択区間・正規化時刻・元query時刻・side・式版も保持する。未要求のdttを零で偽装しない。成功型をbinary64へ暗黙変換しない。有限精度consumerは別の明示投影で誤差を認定するまで使えない。
+評価は `curve, expected_preparation_input, exact_time, derivative_order{0,1,2}, side, limits, workspace, ResourcePlan, context` を受け、component順にvalue/dt/必要時dttをcanonical有理数で所有する。親curveを共有保持し、選択区間・正規化時刻・元query時刻・side・式版も保持する。未要求のdttを零で偽装しない。成功型をbinary64へ暗黙変換しない。有限精度consumerは別の明示投影で誤差を認定するまで使えない。
 
 identityは元exact節点/値・成分次元・式版・係数・outside/period・要求区間/eventsの実内容から作る。再開時はこれらを全て保持し、coefficientsだけを同じと見なさない。hashやポインタ一致だけを認定の代用にせず、restoreはcanonical性・shape・再計算した係数/境界C1を照合する。異なる節点/政策/成分順/式版/入力世代のcache再利用を拒否する。実checkpoint容器はIM06-0の後続である。
+
+### 準備入力のissuer・世代と保存復元
+
+[既存の内容と世代の規約](../foundation/state-contract.md)では、同じ内容fingerprintでも世代が違えば流用しない。PCHIPの準備も、入力を所有する呼出側から`PchipInputStamp{issuer_id,input_generation}`を明示的に受け取る。両欄は別のstrong tagを持つuint64値で、0も有効値である。issuerは当該準備入力の発行元を区別する安定した名前空間の識別値、generationはその名前空間内で入力を更新するたびに進む世代である。内容hash、アドレス、現在時刻や標本時刻から生成しない。既存Model::createと同様、これらを供給・管理する責任は準備hostにあり、現存しないissuer serviceを部品の内部で仮定しない。root入力schemaに利用者向けkeyを追加する意味ではない。
+
+準備hostは同じissuer名前空間で世代を別入力へ再利用せず、更新時はcheckedに進め、overflowをResourceExceededとする。同じ準備入力の再試行は同じstampを保持できる。保存/再開後の発行元と次世代もhostが一意に管理し、保存snapshotから無検査にissuerを新設したり、旧世代を再発行したりしない。
+
+stampは不変の`PchipPreparationInput`が元exact節点/値・次元・outside/period・要求区間/events・式版と一体で所有する。係数準備はこの入力を受け、結果とjetはそのstampを保持する。identityはこのstampを実内容fingerprintと別欄で保持する。2つのuint64欄の保持/コピー/照合もowner header・全call計画へ数える。
+
+評価・cache再利用の`expected_preparation_input`は、呼出側の現在の準備入力から独立に渡し、curve自身から暗黙に取り出して代用しない。そのexpected stampと元入力実内容の両方を照合する。stampと内容が両方一致する場合だけ再利用でき、入力世代やissuerだけが異なる場合もStaleGenerationとする。同stampでも内容が違えばStaleGenerationで拒否する。query時刻・side・微分要求・式版の照合も省かない。
+
+照合は各queryで全配列を走査することを必須にしない。同じ不変準備入力の所有handleを共有しており、既に認定した同じowner/stampであることを確認できる場合は、その所有同一性を使える。裸の配列アドレスや再利用され得るポインタ値だけでは判定しない。別所有のcopyにはexact実内容比較を行う。その比較を一度だけ行って再利用する実装では、両方の不変ownerとstampを保持する等値証拠を作り、その同じowner対のみに適用する。入力更新は新しい不変ownerとなるため、古い証拠を新世代へ流用できない。等値証拠の保持・比較費用も全call計画へ計上する。これは同一入力の透過的判定であり、世代や入力を無断変更する経路ではない。
+保存はstampと元入力実内容、係数をまとめて保持する。restoreは保存値とは独立に呼出側からexpected準備入力を受け、まずissuer/世代/元入力の一致を確かめ、次にcanonical性・shape・係数再計算・境界C1を検査する。不一致はStaleGeneration、破損した形状/係数はInvalidInputとする。保存データへ現在stampを付け直して一致させない。同内容・同stampの別所有copyは復元できるが、同内容・別世代は復元できない。実checkpoint容器の実装は引き続きIM06-0の後続である。
 
 ## 5. exact演算を全call計画へ落とす
 
