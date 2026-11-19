@@ -72,6 +72,14 @@ target_include_directories(uvlas_test_io_reference_file_snapshot PRIVATE "${PROJ
 uvlas_enable_allocation_audit(uvlas_test_io_reference_file_snapshot)
 uvlas_require_audited_dependencies(uvlas_test_io_reference_file_snapshot)
 
+if(WIN32)
+    uvlas_add_test(io.windows_reference_root
+        LABELS unit property negative verification
+        SOURCES io/windows_reference_root_test.cpp
+        LIBS uvlas_io)
+    target_include_directories(uvlas_test_io_windows_reference_root PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+endif()
+
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
     add_test(NAME cli.${case}
         COMMAND "${CMAKE_COMMAND}"
