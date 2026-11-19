@@ -64,7 +64,7 @@ Hold端点の`Automatic`は、要求する全導関数が内外でexact一致す
 
 準備入力は用途の要求区間 `[a,b]` と必要連続性 `C1` を持つ。Rejectなら要求区間が定義域内であることを確認する。Holdの要求区間が端点を跨ぐか端点を含む場合、必要な端傾きが0でなければC1要求を拒否する。端点を含まない片側だけの要求区間はその区間で検査する。Periodicはseamを含めてC1を検査する。有限区間の端で片側だけを要求するRejectと、両側を定義するHoldを混同しない。
 
-eventsは呼出し側が入力したexact時刻列で、範囲内・厳密増加・重複なしを検査して保持する。このPCHIPは内部節点でC1のため、各節点を速度不連続eventへ自動昇格しない。イベント宣言だけでHoldのC1欠如を消せない。C2支持運動は、この部品の片側二階情報と節点集合を受けて別の準備gateで判定する。分割イベントのqueueやBDF2履歴再構成はここで行わない。
+eventsは呼出し側が入力したexact時刻列で、厳密増加・重複なしを検査して保持する。要求区間外の宣言も失わず、実イベント選択は後続の入力接続が行う。このPCHIPは内部節点でC1のため、各節点を速度不連続eventへ自動昇格しない。イベント宣言だけでHoldのC1欠如を消せない。C2支持運動は、この部品の片側二階情報と節点集合を受けて別の準備gateで判定する。分割イベントのqueueやBDF2履歴再構成はここで行わない。
 
 ## 4. 入出力・所有・同一性
 
@@ -76,7 +76,7 @@ identityは元exact節点/値・成分次元・式版・係数・outside/period�
 
 ## 5. exact演算を全call計画へ落とす
 
-有理値は符号、分子/正分母の32bit limb列を持つ。入力語の先行走査はborrow不変の条件で固定整数のbit長/shape/canonical性・内容hashを読み、巨大整数・snapshot・DAGをまだ確保しない。入力値capと中間値capを別に持つ。個数/bit幅/limb/byte/work/添字の加算・乗算は全てcheckedにし、0を無制限としない。
+有理値は符号、分子/正分母の32bit limb列を持つ。入力語の先行走査はborrow不変の条件で固定整数のbit長/shape/符号・最上位語/内容hashを読み、巨大整数・snapshot・DAGをまだ確保しない。分子/分母のGCD=1という数学的canonical性は、この先行走査で計算しない。全call admissionとsnapshot copy後にGCDで検査し、非canonical入力をInvalidInputで拒否する。その全入力record分のnormalization費用Nとscratchも外側計画へ加える。入力値capと中間値capを別に持つ。個数/bit幅/limb/byte/work/添字の加算・乗算は全てcheckedにし、0を無制限としない。
 
 式は2節の各primitiveへ非再帰SSAで展開する。counting型と数値型は同じ式定義を使い、値分岐は全枝最大、成分/区間の繰返しは個数と最大bodyで数える。比較を含む全node/中間bit幅/同時生存slot/結果容量/累積確保を確定し、admission後に初めてWorkspace/結果を確保する。`vector`でDAGを先生成して後から課金しない。
 
@@ -102,7 +102,7 @@ identityは元exact節点/値・成分次元・式版・係数・outside/period�
 
 ## 6. 検査順・失敗・実装gate
 
-入口は `lease→borrow不変下のclosed variant/shape/bit/canonical検査→cancel→非確保count/全call admission→確保とsnapshot copy→課金付き演算→C1/境界検査→所有結果` の順である。範囲外/side不足/節点順序/不一致はInvalidInput、未知の政策はUnsupported、非有限語adapterはNonfinite、bit/byte/work不足はResourceExceeded、取消はCancelled、必要精度の未達はPrecisionUnresolved。operationはEvaluateAero。失敗は元のcause/details、既知context/成分/節点を値保持し、inner Failureを一般分類へ潰さない。
+入口は `lease→borrow不変下のclosed variant/shape/bit/整数語表現検査→cancel→非確保count/全call admission→確保とsnapshot copy→課金付きcanonical検査/演算→C1/境界検査→所有結果` の順である。範囲外/side不足/節点順序/不一致はInvalidInput、未知の政策はUnsupported、非有限語adapterはNonfinite、bit/byte/work不足はResourceExceeded、取消はCancelled、必要精度の未達はPrecisionUnresolved。operationはEvaluateAero。失敗は元のcause/details、既知context/成分/節点を値保持し、inner Failureを一般分類へ潰さない。
 
 Workspaceの同時使用はInvalidInputで拒否し、失敗後leaseを解放する。入力・親curve・古い結果・前の計画は不変。取消は最後の所有header確保後にも再検査する。独立Workspaceの1/2/4threadはcanonical結果・選択side・計画/実workが一致する。callbackや利用者コードは実行しない。
 

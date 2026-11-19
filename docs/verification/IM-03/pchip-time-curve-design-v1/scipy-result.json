@@ -1,0 +1,9 @@
+{
+  "scipy_version": "1.16.2",
+  "scipy_cubic_sha256": "92aaf2475e2cf3a01d72b790eaf793fd9a92c66c8530290dc4c6d126dfa3f395",
+  "normal_fixtures": 11,
+  "compared_values": 121,
+  "maximum_scaled_error": 5.828670879282072e-16,
+  "fixed_secondary_threshold": 1e-12,
+  "not_product_error_budget": true
+}

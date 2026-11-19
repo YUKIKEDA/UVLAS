@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-time-curve-design-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 158,
+  "date": "2026-11-19",
+  "witness_source_commit": "5b700f3",
+  "claimed_state": "PCHIP係数準備とexact時刻jetの限定実装開始審査。製品・有限UVLM投影・全KnownFlow・数値認定・実務受入は未完。",
+  "verification": {
+    "exact_equalities": 165,
+    "scalar_fixtures": 12,
+    "negative_cases": 10,
+    "meaning_mutations": 7,
+    "gcd_small_integer_pairs": 16129,
+    "secondary_scipy": "1.16.2",
+    "secondary_numpy": "2.5.5",
+    "secondary_values": 121,
+    "secondary_scaled_error": 5.828670879282072E-16,
+    "secondary_threshold": 1E-12,
+    "primary_reproduced_sha256": "e09f1fe0ba8e322e0c52527d90abe1cf675990dcba183a01a702ebef72792a5a",
+    "secondary_reproduced_sha256": "74831fb7e55b18e0efa1a7f20cbb4cb963f5388e5ce96b4f7490cf3450dac5d2",
+    "independent_review": "root inspected scope/resources/report and separately regenerated primary bytes",
+    "static_checks": "Ruff check/format and explicitly included strict Pyright: both new producers",
+    "not_executed": "C++ implementation, VM slot/work equality, allocation faults, product D/R/Linux/parallel/performance",
+    "environment": "CPython3.12.8 Windows11; scipy comparison uses separate pinned uv environment"
+  },
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "291cd168ffd03bf7353522eaf3bf226039b73c2fc9f3974526aaa52f8d30aafa",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/si-precision-conversion-contract.md": "b15d01590c82e106210ea9f1078bcb24c097a7a1a050c5972a34de8aaf315879",
+    "docs/plans/next-package-work-breakdown.md": "d14bb2fdc6344f38f294e5ea9ab27ed8a0e883d5992fd092d97e2faaf37320a8",
+    "rd/aero/wake-loads/experiments/uvlm_known_input.py": "58b9cd39e8d44555414ad85657d65d0a0b20944ce6c84d6d4c1848d871f0b9d1",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/witness.py": "889f740782562dc6455f6b8632538556db4fa17350a9a9a4f8b6f779f1c975c0",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/scipy_check.py": "4e7665dad5b7f3f53b4aaf1c055276539db2fc7335ae1a131ca2bd9dfa06499e"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-time-curve-design-v1/result.json": "e09f1fe0ba8e322e0c52527d90abe1cf675990dcba183a01a702ebef72792a5a",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/scipy-result.json": "74831fb7e55b18e0efa1a7f20cbb4cb963f5388e5ce96b4f7490cf3450dac5d2",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/review.md": "47802081bdf70bcf658bdc4a3dd5009939d8ef790be103cc0fd208121a6c0001",
+    "rd/aero/wake-loads/records/uvlm-known-input-result.json": "0be05e3acc438da14fa3a9a2c3f64ff9820afb580c5815cd61c670eb2ce17ba5"
+  }
+}
