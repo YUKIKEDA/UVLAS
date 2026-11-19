@@ -1,0 +1,44 @@
+{
+  "scope": "人工の宣言・ファイル実体・元bytesに対する開始審査用の固定期待。role固有のファイル構文は検査しない。",
+  "roles": [
+    "nastran-deck",
+    "nastran-sidecar",
+    "gmsh-msh4.1-ascii",
+    "gmsh-sidecar",
+    "reference-geometry",
+    "preparation-history",
+    "initial-history",
+    "observation-reference"
+  ],
+  "paths": [
+    {"declared": "tables/./load.csv", "normalized": "tables/load.csv"},
+    {"declared": "tables\\old/../load.csv", "normalized": "tables/load.csv"},
+    {"declared": "資料//荷重.csv", "normalized": "資料/荷重.csv"},
+    {"declared": "tables/../../load.csv", "failure": "EscapeRoot"},
+    {"declared": "/tables/load.csv", "failure": "RootedPath"},
+    {"declared": "C:load.csv", "failure": "RootedPath"},
+    {"declared": "\\\\host\\share\\load.csv", "failure": "RootedPath"},
+    {"declared": "tables/load.csv:other", "failure": "StreamPath"},
+    {"declared": "tables/", "failure": "MissingFile"},
+    {"declared": ".", "failure": "MissingFile"},
+    {"declared": "tables/a\u0000.csv", "failure": "InvalidPath"}
+  ],
+  "sources": [
+    {"id": 10, "file_identity": 101, "path": "mesh/input", "bytes_hex": "616263", "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"},
+    {"id": 20, "file_identity": 102, "path": "mesh/side", "bytes_hex": "", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+    {"id": 30, "file_identity": 103, "path": "logs/ref", "bytes_hex": "616263", "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}
+  ],
+  "graph": {
+    "root_order": [10, 30],
+    "edges": [[10, 20], [10, 30], [30, 20]],
+    "first_visits": [10, 20, 30],
+    "completed_dependency_first": [20, 30, 10],
+    "payload_bytes": 6,
+    "mutations": [
+      {"change": "add_edge", "edge": [30, 10], "failure": "Cycle", "cycle": [10, 30, 10]},
+      {"change": "alias_file_identity", "source": 30, "file_identity": 101, "failure": "DuplicateFile"},
+      {"change": "replace_bytes", "source": 10, "bytes_hex": "616264", "failure": "DigestMismatch"},
+      {"change": "remove_file", "source": 20, "failure": "MissingFile"}
+    ]
+  }
+}
