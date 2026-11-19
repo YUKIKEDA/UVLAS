@@ -1,0 +1,21 @@
+{
+  "schema": "uvlas.pg-fixed-batch-publication-review/1",
+  "historical_review_head": "be2735c50990d9c2807a1f75565e7a59f75d42bb",
+  "verification": {
+    "selected": "Integer zero is required for both lift-only metrics.",
+    "dependent": "Positive integer coordinate width <= 8192 and events <= batch events.",
+    "total": "Summed column lift events must not exceed the batch event count.",
+    "normal_and_optimized": "Byte-identical results from 60 captured-transport cases per mode.",
+    "prior_runner_control": "The same probe failed on the frozen runner at missing-width.",
+    "capture": "The 383-column numeric result is retained unchanged."
+  },
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch/publication-probe.py.txt": "856edd56224ea6dd94a8c0f56ccf559901b1128ac270d69b7de68df7316c5f9c",
+    "docs/verification/IM-01/pg-rank-fixed-batch/results.json": "b71e0bd9d5ec59a3c6c56ee4a68f6b55f1953068474720124c7b272681922228"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch/publication-review-result.json": "ca4377d4a1a0b33647e0b5679032168abf4bdc2729a9edb5113d717f08b019a0",
+    "docs/verification/IM-01/pg-rank-fixed-batch.json": "f2aaf899ec9f97c3920d07eb903656b4b62a55f78573ceb1f8580e3bf7be7804"
+  }
+}

@@ -1,0 +1,147 @@
+"""Run the fixed n1 quartic/full batch and publish only complete exact proof."""
+import argparse
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import subprocess
+import tempfile
+from fractions import Fraction
+from pathlib import Path
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def integer(value, expected, name):
+    require(type(value) is int and value == expected, f'{name}: expected int {expected}')
+
+
+def validate_controls(control):
+    require(isinstance(control, dict), 'controls object')
+    require(control.get('schema') == 'uvlas.fixed-batch-controls/1', 'controls version')
+    for key, value in {'hand_rows':3,'hand_columns':3,'hand_rank':2,'hand_row_checks':9,
+                       'hand_coordinate_checks':6,'hand_events':83,'heap_attempts':0}.items():
+        integer(control.get(key), value, key)
+    require(control.get('hand_coordinates') == ['-3/7','5/11'], 'independent hand coordinates')
+    require(control.get('third_row') == '37/7', 'nonpivot literal')
+    for key in ('nonpivot_square_success_then_full_rejection','coordinate_mutation_rejected',
+                'future_basis_rejected','reference_mismatch_rejected','payload_equal_one_short',
+                'bits_equal_one_short','digits_zero_rejected','events_equal_one_short',
+                'same_scratch_after_failure'):
+        require(control.get(key) is True, f'{key}: expected true')
+    a,b,c,d,u,v=154,77,77,231,-31,72
+    det=a*d-b*c
+    exact=[Fraction(u*d-b*v,det), Fraction(a*v-u*c,det)]
+    require(exact == [Fraction(-3,7),Fraction(5,11)], 'independent Cramer')
+    require(11*exact[0]+22*exact[1] == Fraction(37,7), 'independent third row')
+
+
+def validate_lift_metrics(column, event_limit):
+    # A selected column uses a direct unit coordinate; its lift report remains empty.
+    for key, limit in (('maximum_coordinate_bits', 8192), ('defined_lift_events', event_limit)):
+        value = column.get(key)
+        if column['selected']:
+            integer(value, 0, key)
+        else:
+            require(type(value) is int and 0 < value <= limit, f'{key}: expected int in [1, {limit}]')
+
+
+def validate_result(result, first=False, selected_columns=None):
+    require(isinstance(result,dict), 'result object')
+    for key,value in {'status':0,'rows':1252,'candidates':383,'rank':183,'heap_attempts':0,
+                      'failed_column':4294967295,'selected':0 if first else 183,
+                      'dependent':1 if first else 200,'proof_rows':1252 if first else 479516,
+                      'coordinate_checks':183 if first else 70089}.items():
+        integer(result.get(key),value,key)
+    for key,limit in [('payload_bytes',48*1024**3),('defined_events',2_000_000_000),('integer_bits',1536)]:
+        value=result.get(key)
+        require(type(value) is int and 0 < value <= limit, f'{key} limit')
+    columns=result.get('columns')
+    require(isinstance(columns,list) and len(columns)==383, 'all column roster')
+    if first:
+        active=[x for x in columns if x.get('proof_rows')]
+        require(len(active)==1 and active[0].get('selected') is False,'one dependent probe')
+        integer(active[0].get('lift_status'),0,'probe lift status')
+        integer(active[0].get('proof_rows'),1252,'probe all rows')
+        integer(active[0].get('coordinate_checks'),183,'probe all coordinates')
+        validate_lift_metrics(active[0], result['defined_events'])
+        if selected_columns is not None:
+            integer(active[0].get('candidate'),next(j for j in range(383) if j not in selected_columns),'first dependent')
+    else:
+        for j,column in enumerate(columns):
+            integer(column.get('candidate'),j,'candidate order')
+            integer(column.get('lift_status'),0,'lift status')
+            integer(column.get('proof_rows'),1252,'column row completeness')
+            integer(column.get('coordinate_checks'),183,'column coordinate completeness')
+            require(type(column.get('selected')) is bool,'selection kind')
+            if selected_columns is not None:
+                require(column['selected'] is (j in selected_columns),'certificate selection roster')
+            validate_lift_metrics(column, result['defined_events'])
+            require(type(column.get('proof_products')) is int and column['proof_products'] >= 0,'column products kind')
+            digits=column.get('digits')
+            require(type(digits) is int and digits in ([0] if column['selected'] else [1,2,4,8,16,32,64,128]),'digits schedule')
+            width=column.get('proof_bound_bits')
+            require(type(width) is int and 0 < width <=8192,'proof intermediate width')
+        integer(sum(x['selected'] for x in columns),183,'selected roster')
+        integer(sum(x['proof_products'] for x in columns),result['proof_products'],'all products')
+        require(sum(x['defined_lift_events'] for x in columns) <= result['defined_events'],
+                'column lift events exceed the batch total')
+
+
+def publish(output, result):
+    encoded=json.dumps(result,indent=2)+'\n';temporary=None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',newline='\n',delete=False,
+                                        dir=output.parent,prefix=f'.{output.name}.',suffix='.tmp') as stream:
+            temporary=Path(stream.name);stream.write(encoded);stream.flush();os.fsync(stream.fileno())
+        os.replace(temporary,output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def invoke(executable, *args):
+    run=subprocess.run([str(executable),*map(str,args)],capture_output=True,check=True,timeout=60)
+    return json.loads(run.stdout)
+
+
+def main(argv=None):
+    p=argparse.ArgumentParser(description=__doc__)
+    for name in ['inputs','certificates','batch','capacity-producer','study','certificate-index','output']:
+        p.add_argument('--'+name,type=Path,required=True)
+    args=p.parse_args(argv)
+    loader=importlib.machinery.SourceFileLoader('capacity_v2',str(args.capacity_producer))
+    spec=importlib.util.spec_from_loader(loader.name,loader)
+    capacity=importlib.util.module_from_spec(spec);loader.exec_module(capacity)
+    study=json.loads(args.study.read_text(encoding='utf-8'))['cases']
+    source=args.inputs/'1-quartic.txt'
+    capacity.verify_input(source,1,'quartic','full',study)
+    index=json.loads(args.certificate_index.read_text(encoding='utf-8'))['certificates']
+    entries=[x for x in index if (x['n'],x['shape'],x['domain'],x['row_order'])==(1,'quartic','full','sparse')]
+    require(len(entries)==1,'certificate selection must be unique')
+    expected=entries[0];certificate=args.certificates/expected['file']
+    require(certificate.stat().st_size==expected['bytes'],'certificate byte count')
+    require(hashlib.sha256(certificate.read_bytes()).hexdigest()==expected['sha256'],'certificate SHA')
+    require(hashlib.sha256(source.read_bytes()).hexdigest()==expected['input_sha256'],'coefficient identity')
+    lines=certificate.read_text(encoding='ascii').splitlines()
+    header=lines[0].split()
+    require(header==['certificate','1','1252','228','383','183'],'frozen certificate header')
+    selected_columns={int(line.split()[2]) for line in lines[1:184]}
+    require(len(selected_columns)==183,'independent selected roster')
+    executable=args.batch.resolve()
+    controls=invoke(executable,'--controls');validate_controls(controls)
+    probe=invoke(executable,source,certificate,'first');validate_result(probe,True,selected_columns)
+    result=invoke(executable,source,certificate,'all');validate_result(result,False,selected_columns)
+    publish(args.output,{'schema':'uvlas.pg-fixed-batch/1','input_sha256':expected['input_sha256'],
+                        'certificate_sha256':expected['sha256'],'certificate_bytes':expected['bytes'],
+                        'binary_sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),
+                        'controls':controls,'first_probe':{k:v for k,v in probe.items() if k!='columns'},
+                        'result':result})
+
+
+if __name__=='__main__':
+    main()

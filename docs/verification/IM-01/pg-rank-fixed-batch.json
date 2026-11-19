@@ -1,0 +1,40 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-batch",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 193,
+  "parent_issue": 140,
+  "source_commit": "f6cf2f9a5e4222d1077a2486e10db1dc0a5033ad",
+  "date": "2026-11-19",
+  "claimed_state": "n1四次fullの有限体選択基底から全383候補の固定領域有理復元と全1252活動行exact証明、独立70089座標一致、new0。全準備・一般入力・製品開始は未認定。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "limb_bits": 32,
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-lift.json": "c08c23bf07f16c8a84db9ff2975b2ea38dd1d37152c861d79ea8a0f9cff8779b",
+    "docs/verification/IM-01/pg-fixed-discovery.json": "e26684b6af870315931abe27526ef532f76035085c827161a93b14ee6d186623",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/publication-optimized-result.json": "7fffb679efc3c7fdb6702b2306b31fdcdf478b39add9a494b47b57a2882ceb7b",
+    "docs/verification/IM-01/pg-rank-fixed-batch/publication-probe.py.txt": "79a99ff390e11645b896f2c0ba43a47dfad721b94e560468e77a7d4c52e6f29e",
+    "docs/verification/IM-01/pg-rank-fixed-batch/publication-result.json": "7fffb679efc3c7fdb6702b2306b31fdcdf478b39add9a494b47b57a2882ceb7b",
+    "docs/verification/IM-01/pg-rank-fixed-batch/results.json": "b71e0bd9d5ec59a3c6c56ee4a68f6b55f1953068474720124c7b272681922228",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "299448e344af7ded4dea183839e443a55cf958ec64c029ec8d9c864efb43932f",
+    "docs/verification/IM-01/pg-rank-fixed-batch/verification.md": "047a5f933c114ec90a0ab8491bbbbcd5ef67289821302c0b6daf5d555648fb95"
+  }
+}
