@@ -1,4 +1,4 @@
-#include "aero/pchip_coefficients.hpp"
+#include "aero/pchip_interval_jet.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -344,4 +344,184 @@ TEST_CASE("Private PCHIP canonical mathematical rejection performs only planned 
     CHECK(memory.allocated_bytes() == plan.payload_bytes());
     CHECK(fixture.y[1].numerator[0] == 2);
     CHECK(fixture.y[1].denominator[0] == 4);
+}
+
+namespace {
+
+constexpr std::array<std::uint32_t, 1> half_numerator{1};
+constexpr std::array<std::uint32_t, 1> half_denominator{2};
+constexpr p::IntervalRequest midpoint{
+    0, {1, half_numerator, half_denominator}, p::JetOrder::Second};
+constexpr std::int64_t interval_allocations = 7;
+
+p::CoefficientBlock prepare_interval_source() {
+    const Fixture fixture;
+    p::CoefficientWorkspace workspace;
+    c::ResourcePlan memory{UINT64_MAX};
+    return take(p::prepare_coefficients(fixture.view(), workspace, limits(), memory));
+}
+
+void check_midpoint_unchanged(const p::IntervalValues& value) {
+    // With samples 0,1,4 and unit spacing, the first Hermite cubic is
+    // (3*u^2-u^3)/2. At u=1/2 its value and first two derivatives are exact.
+    const std::array orders{p::JetOrder::Value, p::JetOrder::First, p::JetOrder::Second};
+    constexpr std::array<std::uint32_t, 3> numerators{5, 9, 3};
+    constexpr std::array<std::uint32_t, 3> denominators{16, 8, 2};
+    for (std::size_t i = 0; i < orders.size(); ++i) {
+        CAPTURE(i);
+        const auto rational = take(value.derivative(0, orders[i]));
+        CHECK(rational.sign == 1);
+        REQUIRE(rational.numerator.size() == 1);
+        REQUIRE(rational.denominator.size() == 1);
+        CHECK(rational.numerator.front() == numerators[i]);
+        CHECK(rational.denominator.front() == denominators[i]);
+    }
+}
+
+struct IntervalReentry {
+    const p::CoefficientBlock* source = nullptr;
+    p::IntervalWorkspace* workspace = nullptr;
+    c::ResourcePlan* memory = nullptr;
+    std::optional<c::Failure> failure{};
+};
+
+constinit IntervalReentry* pending_interval_reentry = nullptr;
+
+void try_interval_reentry() {
+    const auto refused = p::evaluate_interval(*pending_interval_reentry->source, midpoint,
+                                              *pending_interval_reentry->workspace, limits(),
+                                              *pending_interval_reentry->memory);
+    if (!refused)
+        pending_interval_reentry->failure = refused.error();
+}
+
+} // namespace
+
+TEST_CASE("Private PCHIP interval evaluation admits every allocation and preserves prior values",
+          "[AE-07][N4-02][N4-03][N4-08][negative]") {
+    const auto source = prepare_interval_source();
+    const auto forecast = [&] {
+        const FaultScope audit{0};
+        return p::forecast_interval(source, midpoint, limits());
+    }();
+    REQUIRE(forecast);
+    CHECK(attempts.load() == 0);
+    auto exact = limits();
+    exact.input_bits = 3; // Second derivative imports the fixed integer 6.
+    exact.work_bits = forecast->arithmetic().integer_bits();
+    exact.steps = forecast->reserved_steps();
+    exact.slots = forecast->arithmetic().slots();
+    const auto exact_forecast = take(p::forecast_interval(source, midpoint, exact));
+    CHECK(exact_forecast.payload_bytes() == forecast->payload_bytes());
+
+    p::IntervalWorkspace workspace;
+    c::ResourcePlan initial{forecast->payload_bytes()};
+    const auto old = [&] {
+        const FaultScope audit{INT64_MAX};
+        return p::evaluate_interval(source, midpoint, workspace, exact, initial);
+    }();
+    REQUIRE(old);
+    CHECK(attempts.load() == static_cast<std::uint64_t>(interval_allocations));
+    CHECK(initial.allocated_bytes() == forecast->payload_bytes());
+    CHECK(old->used_steps() <= exact.steps);
+    CHECK(old->used_slots() <= exact.slots);
+    check_midpoint_unchanged(*old);
+
+    std::uint64_t prior_payload = 0;
+    const auto context = details();
+    for (std::int64_t fault = 0; fault < interval_allocations; ++fault) {
+        CAPTURE(fault);
+        c::ResourcePlan memory{forecast->payload_bytes()};
+        const auto rejected = [&] {
+            const FaultScope audit{fault};
+            return p::evaluate_interval(source, midpoint, workspace, exact, memory, {}, context);
+        }();
+        REQUIRE_FALSE(rejected);
+        const auto& failure = rejected.error();
+        CHECK(failure.code == c::FailureCode::ResourceExceeded);
+        CHECK(failure.details.model == context.model);
+        CHECK(failure.details.parent == context.parent);
+        CHECK(failure.details.trial == context.trial);
+        CHECK(failure.details.component == context.component);
+        CHECK(failure.details.problem == context.problem);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(fault + 1));
+        if (fault == 0)
+            CHECK(memory.allocated_bytes() == 0);
+        else
+            CHECK(memory.allocated_bytes() > prior_payload);
+        CHECK(memory.allocated_bytes() < forecast->payload_bytes());
+        prior_payload = memory.allocated_bytes();
+        check_midpoint_unchanged(*old);
+    }
+
+    c::ResourcePlan insufficient{forecast->payload_bytes() - 1};
+    const auto short_bytes = [&] {
+        const FaultScope audit{0};
+        return p::evaluate_interval(source, midpoint, workspace, exact, insufficient);
+    }();
+    REQUIRE_FALSE(short_bytes);
+    CHECK(short_bytes.error().code == c::FailureCode::ResourceExceeded);
+    CHECK(attempts.load() == 0);
+    CHECK(insufficient.allocated_bytes() == 0);
+
+    std::array short_caps{exact, exact, exact, exact};
+    --short_caps[0].input_bits;
+    --short_caps[1].work_bits;
+    --short_caps[2].steps;
+    --short_caps[3].slots;
+    for (std::size_t i = 0; i < short_caps.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{forecast->payload_bytes()};
+        const auto rejected = [&] {
+            const FaultScope audit{0};
+            return p::evaluate_interval(source, midpoint, workspace, short_caps[i], memory);
+        }();
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+    }
+    c::ResourcePlan final_memory{forecast->payload_bytes()};
+    const auto recovered =
+        take(p::evaluate_interval(source, midpoint, workspace, exact, final_memory));
+    check_midpoint_unchanged(recovered);
+}
+
+TEST_CASE("Private PCHIP interval evaluation cancels at final allocation and rejects reentry",
+          "[AE-07][N4-02][N4-03][N4-08][negative]") {
+    const auto source = prepare_interval_source();
+    const auto plan = take(p::forecast_interval(source, midpoint, limits()));
+    p::IntervalWorkspace workspace;
+    c::ResourcePlan memory{plan.payload_bytes() * 3};
+    std::stop_source stop;
+    cancel_source = &stop;
+    until_cancel = static_cast<unsigned>(interval_allocations);
+    allocation_callback = cancel_last;
+    const auto cancelled = p::evaluate_interval(source, midpoint, workspace, limits(), memory,
+                                                stop.get_token(), details());
+    allocation_callback = nullptr;
+    cancel_source = nullptr;
+    REQUIRE_FALSE(cancelled);
+    CHECK(stop.stop_requested());
+    CHECK(cancelled.error().code == c::FailureCode::Cancelled);
+    CHECK(cancelled.error().details == details());
+    CHECK(memory.allocated_bytes() == plan.payload_bytes());
+
+    IntervalReentry context{&source, &workspace, &memory, {}};
+    pending_interval_reentry = &context;
+    allocation_callback = try_interval_reentry;
+    const auto outer = p::evaluate_interval(source, midpoint, workspace, limits(), memory);
+    allocation_callback = nullptr;
+    pending_interval_reentry = nullptr;
+    REQUIRE(outer);
+    if (context.failure) {
+        CHECK(context.failure->code == c::FailureCode::InvalidInput);
+    } else {
+        FAIL("The shared interval workspace accepted a nested call");
+    }
+    CHECK(memory.allocated_bytes() == plan.payload_bytes() * 2);
+    check_midpoint_unchanged(*outer);
+    const auto next = take(p::evaluate_interval(source, midpoint, workspace, limits(), memory));
+    CHECK(memory.allocated_bytes() == plan.payload_bytes() * 3);
+    check_midpoint_unchanged(next);
 }
