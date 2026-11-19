@@ -1,0 +1,528 @@
+{
+  "schema": "uvlas.discovery-controls-gate-review186/1",
+  "optimization": 0,
+  "legacy_reproduction": [
+    {
+      "scenario": "legacy_actual_controls",
+      "existing_output": false,
+      "raised": null,
+      "published_cases": 48,
+      "initial_state_preserved": false,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 1,
+        "numerical": 12
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "legacy_actual_controls",
+      "existing_output": true,
+      "raised": null,
+      "published_cases": 48,
+      "initial_state_preserved": false,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 1,
+        "numerical": 12
+      },
+      "temporary_files": 0
+    }
+  ],
+  "corrected": [
+    {
+      "scenario": "correct",
+      "existing_output": false,
+      "raised": null,
+      "published_cases": 48,
+      "initial_state_preserved": false,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 1,
+        "numerical": 12
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "legacy_missing_both",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_missing",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_wrong",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_float",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_bool",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_string",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_null",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_missing",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_wrong",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_float",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_bool",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_string",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_null",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_false",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_integer",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_null",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_missing",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "nonobject",
+      "existing_output": false,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "correct",
+      "existing_output": true,
+      "raised": null,
+      "published_cases": 48,
+      "initial_state_preserved": false,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 1,
+        "numerical": 12
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "legacy_missing_both",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_missing",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_wrong",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_float",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_bool",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_string",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_rational_rank_null",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_missing",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_wrong",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_float",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_bool",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_string",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "bad_prime_modular_rank_null",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_false",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_integer",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_null",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "rejection_flag_missing",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    },
+    {
+      "scenario": "nonobject",
+      "existing_output": true,
+      "raised": "RuntimeError",
+      "published_cases": null,
+      "initial_state_preserved": true,
+      "transport_calls": {
+        "controls": 1,
+        "primitives": 0,
+        "numerical": 0
+      },
+      "temporary_files": 0
+    }
+  ]
+}

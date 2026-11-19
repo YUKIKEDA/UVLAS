@@ -1,0 +1,757 @@
+#include "../pg-rank-fixed-lift/allocation-profile.hpp.txt"
+
+namespace discovery {
+using Exact = bounded::Int<1536>;
+using Coordinate = bounded::Int<2048>;
+struct Term {
+    std::uint32_t row;
+    Exact n, d;
+};
+struct Ref {
+    std::uint32_t basis;
+    Coordinate n, d;
+};
+struct Pair {
+    std::uint32_t index, value;
+};
+std::uint64_t add(std::uint64_t a, std::uint64_t b) {
+    if (b > UINT64_MAX - a)
+        throw std::overflow_error("plan sum");
+    return a + b;
+}
+std::uint64_t mul(std::uint64_t a, std::uint64_t b) {
+    if (b && a > UINT64_MAX / b)
+        throw std::overflow_error("plan product");
+    return a * b;
+}
+template <class T>
+std::uint64_t width(const T& v) {
+    if (v == 0)
+        return 0;
+    T p = v;
+    if (p < 0)
+        p = -p;
+    return 1 + boost::multiprecision::msb(p);
+}
+template <class T>
+std::uint64_t subwords(const T& v) {
+    return v.backend().size() *
+           (std::numeric_limits<boost::multiprecision::limb_type>::digits / 32);
+}
+struct Data {
+    std::uint32_t rows{}, columns{}, full{}, selectable{}, rank_cap{};
+    std::vector<std::uint64_t> offsets, ref_offsets;
+    std::vector<Term> terms;
+    std::vector<Ref> reference;
+    std::vector<std::uint32_t> selected;
+};
+Data prepare(const Input& input, const Matrix& matrix, const char* certificate) {
+    Data d;
+    d.rows = matrix.rows;
+    d.columns = static_cast<std::uint32_t>(matrix.columns.size());
+    d.full = input.full;
+    d.selectable = 33 + d.full;
+    d.rank_cap = std::min(d.rows, d.full);
+    d.offsets.push_back(0);
+    for (const auto& column : matrix.columns) {
+        for (const auto& [row, q] : column) {
+            if (width(numerator(q)) > 1536 || width(denominator(q)) > 1536)
+                throw std::runtime_error("fixed input bit cap");
+            d.terms.push_back(
+                {static_cast<std::uint32_t>(row), Exact{numerator(q)}, Exact{denominator(q)}});
+        }
+        d.offsets.push_back(d.terms.size());
+    }
+    std::ifstream source(certificate);
+    std::string tag, ntext, dtext;
+    int n, m, f, count, r;
+    if (!(source >> tag >> n >> m >> f >> count >> r) || tag != "certificate" || n != input.n ||
+        m != matrix.rows || f != input.full || count != static_cast<int>(d.columns) || r < 0 ||
+        static_cast<unsigned>(r) > d.rank_cap)
+        throw std::runtime_error("exact reference identity");
+    for (int k = 0; k < r; ++k) {
+        int index, col, row;
+        if (!(source >> tag >> index >> col >> row) || tag != "basis" || index != k || col < 0 ||
+            static_cast<unsigned>(col) >= d.selectable)
+            throw std::runtime_error("exact basis shape");
+        d.selected.push_back(col);
+    }
+    d.ref_offsets.push_back(0);
+    for (std::uint32_t j = 0; j < d.columns; ++j) {
+        std::uint32_t col, terms;
+        if (!(source >> tag >> col >> terms) || tag != "column" || col != j ||
+            terms > d.selected.size())
+            throw std::runtime_error("exact coordinate shape");
+        std::uint32_t previous = 0;
+        bool first = true;
+        for (std::uint32_t k = 0; k < terms; ++k) {
+            std::uint32_t basis;
+            if (!(source >> basis >> ntext >> dtext) || basis >= d.selected.size() ||
+                (!first && basis <= previous))
+                throw std::runtime_error("exact coordinate order");
+            first = false;
+            previous = basis;
+            Ref q{basis, Coordinate{ntext}, Coordinate{dtext}};
+            if (q.n == 0 || q.d <= 0)
+                throw std::runtime_error("exact coordinate sign");
+            d.reference.push_back(std::move(q));
+        }
+        d.ref_offsets.push_back(d.reference.size());
+    }
+    if (source >> tag)
+        throw std::runtime_error("extra reference record");
+    return d;
+}
+struct Oracle {
+    std::vector<std::uint32_t> selected, pivots;
+    std::vector<std::uint64_t> lower_offsets, upper_offsets;
+    std::vector<Pair> lower, upper;
+};
+template <std::uint64_t P>
+Oracle shadow(const Matrix& m, std::uint32_t selectable) {
+    const auto e = eliminate<Mod<P>>(m, selectable, 200000000, Mod<P>::parse, true);
+    if (!e.complete)
+        throw std::runtime_error("dynamic oracle incomplete");
+    Oracle o;
+    o.selected.assign(e.selected.begin(), e.selected.end());
+    o.pivots.assign(e.pivot_rows.begin(), e.pivot_rows.end());
+    o.lower_offsets.push_back(0);
+    o.upper_offsets.push_back(0);
+    for (std::size_t k = 0; k < e.selected.size(); ++k) {
+        for (const auto& [i, q] : e.pivot_lower[k])
+            o.lower.push_back({static_cast<std::uint32_t>(i), static_cast<std::uint32_t>(q.value)});
+        o.lower_offsets.push_back(o.lower.size());
+        for (const auto& [i, q] : e.pivot_upper[k])
+            o.upper.push_back({static_cast<std::uint32_t>(i), static_cast<std::uint32_t>(q.value)});
+        o.upper_offsets.push_back(o.upper.size());
+    }
+    return o;
+}
+struct Shape {
+    std::uint64_t reduced, triangle, lower, coordinates;
+};
+Shape shape(const Data& d) {
+    const auto r = d.rank_cap;
+    return {mul(d.rows, r), mul(r, std::uint64_t{r} + 1) / 2,
+            r ? mul(r, std::uint64_t{r} - 1) / 2 : 0, mul(d.columns, r)};
+}
+struct Scratch {
+    std::vector<std::uint32_t> work, rhs, inverse, selected, pivots, coordinates;
+    std::vector<Pair> reduced, upper, lower;
+    std::vector<std::uint64_t> reduced_offsets, upper_offsets, lower_offsets;
+    std::vector<std::int32_t> pivot_map;
+    std::uint32_t rank{};
+    std::uint64_t reduced_count{}, upper_count{}, lower_count{};
+    explicit Scratch(const Data& d)
+        : work(d.rows),
+          rhs(d.rank_cap),
+          inverse(d.rank_cap),
+          selected(d.rank_cap),
+          pivots(d.rank_cap),
+          coordinates(shape(d).coordinates),
+          reduced(shape(d).reduced),
+          upper(shape(d).triangle),
+          lower(shape(d).lower),
+          reduced_offsets(d.rank_cap + 1),
+          upper_offsets(d.rank_cap + 1),
+          lower_offsets(d.rank_cap + 1),
+          pivot_map(d.rows) {}
+};
+std::uint64_t inputs(const Data& d, const Oracle& o) {
+    auto b = std::uint64_t{sizeof(Data) + sizeof(Oracle)};
+    const auto charge = [&](auto const& v) {
+        b = add(b, mul(v.capacity(),
+                       sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(d.offsets);
+    charge(d.ref_offsets);
+    charge(d.terms);
+    charge(d.reference);
+    charge(d.selected);
+    charge(o.selected);
+    charge(o.pivots);
+    charge(o.lower_offsets);
+    charge(o.upper_offsets);
+    charge(o.lower);
+    charge(o.upper);
+    return b;
+}
+std::uint64_t plan(const Data& d, const Oracle& o) {
+    const auto s = shape(d);
+    auto b = add(inputs(d, o), sizeof(Scratch));
+    b = add(b, mul(d.rows, sizeof(std::uint32_t) + sizeof(std::int32_t)));
+    b = add(b, mul(d.rank_cap, 4 * sizeof(std::uint32_t)));
+    b = add(b, mul(s.coordinates, sizeof(std::uint32_t)));
+    b = add(b, mul(add(add(s.reduced, s.triangle), s.lower), sizeof(Pair)));
+    return add(b, mul(3 * (std::uint64_t{d.rank_cap} + 1), sizeof(std::uint64_t)));
+}
+std::uint64_t payload(const Data& d, const Oracle& o, const Scratch& s) {
+    auto b = add(inputs(d, o), sizeof(Scratch));
+    const auto charge = [&](auto const& v) {
+        b = add(b, mul(v.capacity(),
+                       sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(s.work);
+    charge(s.rhs);
+    charge(s.inverse);
+    charge(s.selected);
+    charge(s.pivots);
+    charge(s.coordinates);
+    charge(s.reduced);
+    charge(s.upper);
+    charge(s.lower);
+    charge(s.reduced_offsets);
+    charge(s.upper_offsets);
+    charge(s.lower_offsets);
+    charge(s.pivot_map);
+    return b;
+}
+struct Forecast {
+    std::uint64_t words, visits, limbs;
+};
+Forecast forecast(const Data& d) {
+    const std::uint64_t n = d.columns, m = d.rows, r = d.rank_cap, i = d.terms.size(),
+                        e = d.reference.size();
+    std::uint64_t limbs = 0;
+    for (const auto& q : d.terms)
+        limbs = add(limbs, add(subwords(q.n), subwords(q.d)));
+    for (const auto& q : d.reference)
+        limbs = add(limbs, add(subwords(q.n), subwords(q.d)));
+    const auto tri = r ? mul(r, r - 1) / 2 : 0;
+    auto words = add(mul(5, limbs), mul(2, add(i, e)));
+    words = add(words, mul(186, add(add(i, e), r)));
+    words = add(words, mul(2, add(i, e)));
+    words = add(words, mul(4, add(mul(mul(n, m), r), mul(n, tri))));
+    words = add(words, mul(2, add(mul(m, r), mul(n, r))));
+    // One charge per logical loop iteration or explicitly filled array element.
+    auto visits = add(mul(n, r), mul(3, r + 1));
+    visits = add(visits, add(mul(n, m), mul(n, r)));
+    visits = add(visits, n);
+    visits = add(visits, add(i, mul(2, limbs)));
+    visits = add(visits, mul(31, add(add(i, e), r)));
+    visits = add(visits, add(mul(n, r), mul(mul(n, m), r)));
+    visits = add(visits, mul(n, m));
+    visits = add(visits, add(mul(m, r), tri));
+    visits = add(visits, add(mul(n, r), mul(n, tri)));
+    visits = add(visits, add(add(m, 2 * r), mul(m, r)));
+    visits = add(visits, add(mul(n, r), e));
+    visits = add(visits, add(mul(r, r), add(mul(4, r), 2)));
+    return {words, visits, limbs};
+}
+enum class Status {
+    Success,
+    PayloadExceeded,
+    WordExceeded,
+    VisitExceeded,
+    RankExceeded,
+    BadDenominator,
+    NewKernelColumn,
+    ReferenceMismatch,
+    OracleMismatch,
+    HeapAttempt,
+    Incomplete
+};
+struct Limits {
+    std::uint64_t payload, words, visits;
+    std::uint32_t rank;
+};
+struct Report {
+    Status status{Status::Incomplete};
+    std::uint64_t words{}, visits{}, updates{}, reconstruction_updates{}, coordinate_checks{},
+        factor_checks{}, limb_reads{}, heap{};
+};
+struct Ledger {
+    Report& r;
+    const Limits& cap;
+    bool words(std::uint64_t n) {
+        if (n > cap.words - r.words) {
+            r.status = Status::WordExceeded;
+            return false;
+        }
+        r.words += n;
+        return true;
+    }
+    bool visit(std::uint64_t n = 1) {
+        if (n > cap.visits - r.visits) {
+            r.status = Status::VisitExceeded;
+            return false;
+        }
+        r.visits += n;
+        return true;
+    }
+};
+template <std::uint64_t P>
+bool product(std::uint32_t a, std::uint32_t b, std::uint32_t& out, Ledger& l) {
+    if (!l.words(2))
+        return false;
+    out = static_cast<std::uint32_t>(std::uint64_t{a} * b % P);
+    return true;
+}
+template <std::uint64_t P>
+bool subtract(std::uint32_t a, std::uint32_t b, std::uint32_t& out, Ledger& l) {
+    if (!l.words(2))
+        return false;
+    out = static_cast<std::uint32_t>(a >= b ? a - b : a + P - b);
+    return true;
+}
+template <std::uint64_t P>
+bool inverse(std::uint32_t n, std::uint32_t& out, Ledger& l) {
+    if (!n) {
+        l.r.status = Status::BadDenominator;
+        return false;
+    }
+    std::uint32_t value = 1, base = n;
+    for (std::uint64_t exponent = P - 2; exponent; exponent >>= 1) {
+        if (!l.visit() || !l.words(2))
+            return false;
+        if ((exponent & 1) && !product<P>(value, base, value, l))
+            return false;
+        if (!product<P>(base, base, base, l))
+            return false;
+    }
+    out = value;
+    return true;
+}
+template <std::uint64_t P, class T>
+bool reduce(const T& input, std::uint32_t& out, Ledger& l) {
+    constexpr auto bits = std::numeric_limits<boost::multiprecision::limb_type>::digits;
+    static_assert(bits == 32 || bits == 64);
+    std::uint64_t value = 0;
+    for (auto i = input.backend().size(); i-- > 0;) {
+        if (!l.visit())
+            return false;
+        const auto limb = input.backend().limbs()[i];
+        for (unsigned part = bits / 32; part-- > 0;) {
+            if (!l.visit() || !l.words(5))
+                return false;
+            const auto word = static_cast<std::uint32_t>((limb >> (32 * part)) & 0xffffffffU);
+            value = ((value << 32) | word) % P;
+            ++l.r.limb_reads;
+        }
+    }
+    if (input.backend().sign() && value) {
+        if (!l.words(1))
+            return false;
+        value = P - value;
+    }
+    out = static_cast<std::uint32_t>(value);
+    return true;
+}
+template <std::uint64_t P, class T>
+bool rational(const T& n, const T& d, std::uint32_t& out, Ledger& l) {
+    std::uint32_t a, b, reciprocal;
+    return reduce<P>(n, a, l) && reduce<P>(d, b, l) && inverse<P>(b, reciprocal, l) &&
+           product<P>(a, reciprocal, out, l);
+}
+template <std::uint64_t P>
+Report run(const Data& d, const Oracle& oracle, Scratch& s, const Limits& cap) {
+    Report r;
+    if (payload(d, oracle, s) > cap.payload) {
+        r.status = Status::PayloadExceeded;
+        return r;
+    }
+    Ledger ledger{r, cap};
+    bounded::heap_attempts = 0;
+    bounded::watched = true;
+    try {
+        const auto body = [&]() {
+            s.rank = 0;
+            s.reduced_count = 0;
+            s.upper_count = 0;
+            s.lower_count = 0;
+            if (!ledger.visit(s.coordinates.size()))
+                return;
+            std::fill(s.coordinates.begin(), s.coordinates.end(), 0);
+            if (!ledger.visit(s.reduced_offsets.size() + s.upper_offsets.size() +
+                              s.lower_offsets.size()))
+                return;
+            std::fill(s.reduced_offsets.begin(), s.reduced_offsets.end(), 0);
+            std::fill(s.upper_offsets.begin(), s.upper_offsets.end(), 0);
+            std::fill(s.lower_offsets.begin(), s.lower_offsets.end(), 0);
+            for (std::uint32_t j = 0; j < d.columns; ++j) {
+                if (!ledger.visit() || !ledger.visit(d.rows))
+                    return;
+                std::fill(s.work.begin(), s.work.end(), 0);
+                if (!ledger.visit(s.rank))
+                    return;
+                std::fill_n(s.rhs.begin(), s.rank, 0);
+                for (auto pos = d.offsets[j]; pos < d.offsets[j + 1]; ++pos) {
+                    if (!ledger.visit())
+                        return;
+                    const auto& q = d.terms[pos];
+                    std::uint32_t value;
+                    if (!rational<P>(q.n, q.d, value, ledger))
+                        return;
+                    s.work[q.row] = value;
+                }
+                for (std::uint32_t k = 0; k < s.rank; ++k) {
+                    if (!ledger.visit())
+                        return;
+                    const auto factor = s.work[s.pivots[k]];
+                    s.rhs[k] = factor;
+                    if (!factor)
+                        continue;
+                    for (auto pos = s.reduced_offsets[k]; pos < s.reduced_offsets[k + 1]; ++pos) {
+                        if (!ledger.visit())
+                            return;
+                        const auto& q = s.reduced[pos];
+                        std::uint32_t term;
+                        if (!product<P>(factor, q.value, term, ledger) ||
+                            !subtract<P>(s.work[q.index], term, s.work[q.index], ledger))
+                            return;
+                        ++r.updates;
+                    }
+                }
+                std::uint32_t pivot = 0;
+                for (; pivot < d.rows; ++pivot) {
+                    if (!ledger.visit())
+                        return;
+                    if (s.work[pivot])
+                        break;
+                }
+                if (pivot < d.rows) {
+                    if (j >= d.selectable) {
+                        r.status = Status::NewKernelColumn;
+                        return;
+                    }
+                    if (s.rank >= d.rank_cap || s.rank >= cap.rank) {
+                        r.status = Status::RankExceeded;
+                        return;
+                    }
+                    const auto k = s.rank;
+                    const auto diagonal = s.work[pivot];
+                    if (!inverse<P>(diagonal, s.inverse[k], ledger))
+                        return;
+                    s.selected[k] = j;
+                    s.pivots[k] = pivot;
+                    for (std::uint32_t row = 0; row < d.rows; ++row) {
+                        if (!ledger.visit())
+                            return;
+                        if (s.work[row]) {
+                            std::uint32_t value;
+                            if (!product<P>(s.work[row], s.inverse[k], value, ledger))
+                                return;
+                            s.reduced[s.reduced_count++] = {row, value};
+                        }
+                    }
+                    s.reduced_offsets[k + 1] = s.reduced_count;
+                    for (std::uint32_t i = 0; i < k; ++i) {
+                        if (!ledger.visit())
+                            return;
+                        if (s.rhs[i])
+                            s.upper[s.upper_count++] = {i, s.rhs[i]};
+                    }
+                    s.upper[s.upper_count++] = {k, diagonal};
+                    s.upper_offsets[k + 1] = s.upper_count;
+                    s.coordinates[std::uint64_t{j} * d.rank_cap + k] = 1;
+                    ++s.rank;
+                } else {
+                    for (std::uint32_t k = s.rank; k-- > 0;) {
+                        if (!ledger.visit())
+                            return;
+                        if (!s.rhs[k])
+                            continue;
+                        std::uint32_t value;
+                        if (!product<P>(s.rhs[k], s.inverse[k], value, ledger))
+                            return;
+                        s.coordinates[std::uint64_t{j} * d.rank_cap + k] = value;
+                        for (auto pos = s.upper_offsets[k]; pos + 1 < s.upper_offsets[k + 1];
+                             ++pos) {
+                            if (!ledger.visit())
+                                return;
+                            const auto& q = s.upper[pos];
+                            std::uint32_t term;
+                            if (!product<P>(value, q.value, term, ledger) ||
+                                !subtract<P>(s.rhs[q.index], term, s.rhs[q.index], ledger))
+                                return;
+                            ++r.reconstruction_updates;
+                        }
+                    }
+                }
+            }
+            if (!ledger.visit(d.rows))
+                return;
+            std::fill(s.pivot_map.begin(), s.pivot_map.end(), -1);
+            for (std::uint32_t k = 0; k < s.rank; ++k) {
+                if (!ledger.visit())
+                    return;
+                s.pivot_map[s.pivots[k]] = k;
+            }
+            for (std::uint32_t k = 0; k < s.rank; ++k) {
+                if (!ledger.visit())
+                    return;
+                for (auto pos = s.reduced_offsets[k]; pos < s.reduced_offsets[k + 1]; ++pos) {
+                    if (!ledger.visit())
+                        return;
+                    const auto& q = s.reduced[pos];
+                    const auto mapped = s.pivot_map[q.index];
+                    if (mapped > static_cast<std::int32_t>(k))
+                        s.lower[s.lower_count++] = {static_cast<std::uint32_t>(mapped), q.value};
+                }
+                s.lower_offsets[k + 1] = s.lower_count;
+            }
+            if (s.rank != d.selected.size() || s.rank != oracle.selected.size()) {
+                r.status = Status::ReferenceMismatch;
+                return;
+            }
+            for (std::uint32_t j = 0; j < d.columns; ++j) {
+                auto pos = d.ref_offsets[j];
+                for (std::uint32_t k = 0; k < s.rank; ++k) {
+                    if (!ledger.visit())
+                        return;
+                    std::uint32_t expected = 0;
+                    if (pos < d.ref_offsets[j + 1] && d.reference[pos].basis == k) {
+                        if (!ledger.visit())
+                            return;
+                        const auto& q = d.reference[pos++];
+                        if (!rational<P>(q.n, q.d, expected, ledger))
+                            return;
+                    }
+                    if (s.coordinates[std::uint64_t{j} * d.rank_cap + k] != expected) {
+                        r.status = Status::ReferenceMismatch;
+                        return;
+                    }
+                    ++r.coordinate_checks;
+                }
+            }
+            for (std::uint32_t k = 0; k < s.rank; ++k) {
+                if (!ledger.visit(2))
+                    return;
+                if (s.selected[k] != d.selected[k] || s.selected[k] != oracle.selected[k] ||
+                    s.pivots[k] != oracle.pivots[k]) {
+                    r.status = Status::OracleMismatch;
+                    return;
+                }
+            }
+            if (s.lower_count != oracle.lower.size() || s.upper_count != oracle.upper.size()) {
+                r.status = Status::OracleMismatch;
+                return;
+            }
+            for (std::uint32_t k = 0; k <= s.rank; ++k) {
+                if (!ledger.visit(2))
+                    return;
+                if (s.lower_offsets[k] != oracle.lower_offsets[k] ||
+                    s.upper_offsets[k] != oracle.upper_offsets[k]) {
+                    r.status = Status::OracleMismatch;
+                    return;
+                }
+            }
+            for (std::uint64_t k = 0; k < s.lower_count; ++k) {
+                if (!ledger.visit())
+                    return;
+                if (s.lower[k].index != oracle.lower[k].index ||
+                    s.lower[k].value != oracle.lower[k].value) {
+                    r.status = Status::OracleMismatch;
+                    return;
+                }
+                ++r.factor_checks;
+            }
+            for (std::uint64_t k = 0; k < s.upper_count; ++k) {
+                if (!ledger.visit())
+                    return;
+                if (s.upper[k].index != oracle.upper[k].index ||
+                    s.upper[k].value != oracle.upper[k].value) {
+                    r.status = Status::OracleMismatch;
+                    return;
+                }
+                ++r.factor_checks;
+            }
+            r.status = Status::Success;
+        };
+        body();
+    } catch (...) {
+        r.status = Status::HeapAttempt;
+    }
+    bounded::watched = false;
+    r.heap = bounded::heap_attempts.load();
+    if (r.heap)
+        r.status = Status::HeapAttempt;
+    return r;
+}
+Data hand() {
+    Data d;
+    d.rows = 2;
+    d.columns = 5;
+    d.full = 3;
+    d.selectable = 3;
+    d.rank_cap = 2;
+    Exact denominator = 1;
+    for (int k = 0; k < 400; ++k)
+        denominator *= 10;
+    d.offsets = {0, 1, 2, 3, 4, 6};
+    d.terms = {{0, 1, 1}, {0, 2, 1}, {1, 1, 1}, {0, 1, denominator}, {0, -1, 1}, {1, 3, 1}};
+    d.selected = {0, 2};
+    d.ref_offsets = {0, 1, 2, 3, 4, 6};
+    d.reference = {{0, 1, 1},  {0, 2, 1}, {1, 1, 1}, {0, 1, Coordinate{denominator}},
+                   {0, -1, 1}, {1, 3, 1}};
+    return d;
+}
+Oracle hand_oracle() {
+    return {{0, 2}, {0, 1}, {0, 0, 0}, {0, 1, 2}, {}, {{0, 1}, {1, 1}}};
+}
+void controls() {
+    auto d = hand();
+    const auto o = hand_oracle();
+    Scratch s(d);
+    const auto bytes = payload(d, o, s);
+    if (bytes != plan(d, o))
+        throw std::runtime_error("hand plan mismatch");
+    const auto good = run<p1>(d, o, s, {bytes, 10000000, 10000000, 2});
+    if (good.status != Status::Success || good.heap)
+        throw std::runtime_error("hand discovery");
+    const auto expect = [&](const Data& x, const Limits& cap, Status status) {
+        Scratch next(x);
+        const auto r = run<p1>(x, o, next, cap);
+        if (r.status != status || r.heap)
+            throw std::runtime_error("negative differs");
+    };
+    expect(d, {bytes - 1, 10000000, 10000000, 2}, Status::PayloadExceeded);
+    expect(d, {bytes, good.words - 1, 10000000, 2}, Status::WordExceeded);
+    expect(d, {bytes, 10000000, good.visits - 1, 2}, Status::VisitExceeded);
+    expect(d, {bytes, 10000000, 10000000, 1}, Status::RankExceeded);
+    auto bad = d;
+    bad.terms[0].d = p1;
+    expect(bad, {payload(bad, o, s), 10000000, 10000000, 2}, Status::BadDenominator);
+    bad = d;
+    for (auto& term : bad.terms)
+        if (term.row == 0)
+            term.n *= p1;
+    Scratch rank_loss(bad);
+    const auto rejected_rank = run<p1>(bad, o, rank_loss,
+                                       {payload(bad, o, rank_loss), 10000000, 10000000, 2});
+    if (rejected_rank.status != Status::ReferenceMismatch || rank_loss.rank != 1 ||
+        rejected_rank.heap)
+        throw std::runtime_error("bad prime did not lose rank");
+    bad = d;
+    bad.selectable = 2;
+    expect(bad, {payload(bad, o, s), 10000000, 10000000, 2}, Status::NewKernelColumn);
+    bad = d;
+    bad.reference.back().n = 4;
+    expect(bad, {payload(bad, o, s), 10000000, 10000000, 2}, Status::ReferenceMismatch);
+    const auto repeat = run<p1>(d, o, s, {bytes, good.words, good.visits, 2});
+    if (repeat.status != Status::Success || repeat.words != good.words ||
+        repeat.visits != good.visits || repeat.heap)
+        throw std::runtime_error("replay or exact budget");
+    const auto f = forecast(d);
+    if (good.words > f.words || good.visits > f.visits)
+        throw std::runtime_error("structural forecast too small");
+    bool rejected = false;
+    try {
+        Data huge;
+        huge.rows = UINT32_MAX;
+        huge.columns = UINT32_MAX;
+        huge.rank_cap = UINT32_MAX;
+        (void)plan(huge, o);
+    } catch (const std::overflow_error&) {
+        rejected = true;
+    }
+    if (!rejected)
+        throw std::runtime_error("dimension overflow accepted");
+    std::cout
+        << "{\"literal_rank\":2,\"tiny_exponent\":-400,\"payload_equal_one_short\":true,\"words_"
+           "equal_one_short\":true,\"visits_equal_one_short\":true,\"rank_cap_rejected\":true,"
+           "\"bad_denominator_rejected\":true,\"bad_prime_rational_rank\":2,\"bad_prime_modular_rank\":1,\"bad_prime_rank_loss_rejected\":true,\"new_kernel_"
+           "column_rejected\":true,\"reference_tamper_rejected\":true,\"dimension_overflow_"
+           "rejected\":true,\"same_input_after_failure\":true,\"heap_attempts\":0,\"words\":"
+        << good.words << ",\"visits\":" << good.visits << "}\n";
+}
+template <std::uint64_t P>
+void primitives() {
+    Exact tiny_den = 1;
+    for (int k = 0; k < 400; ++k)
+        tiny_den *= 10;
+    Report report;
+    Limits limits{0, 1000000, 1000000, 0};
+    Ledger ledger{report, limits};
+    std::uint32_t negative, tiny, extreme, difference, inv;
+    bounded::heap_attempts = 0;
+    bounded::watched = true;
+    const bool ok = rational<P>(Exact{-3}, Exact{7}, negative, ledger) &&
+                    rational<P>(Exact{1}, tiny_den, tiny, ledger) &&
+                    product<P>(P - 1, P - 1, extreme, ledger) &&
+                    subtract<P>(0, 1, difference, ledger) && inverse<P>(7, inv, ledger);
+    bounded::watched = false;
+    if (!ok || bounded::heap_attempts != 0)
+        throw std::runtime_error("primitive heap or budget");
+    std::cout << "{\"prime\":" << P << ",\"negative_three_sevenths\":" << negative
+              << ",\"tiny_1e400\":" << tiny << ",\"extreme_product\":" << extreme
+              << ",\"zero_minus_one\":" << difference << ",\"inverse_seven\":" << inv
+              << ",\"heap_attempts\":0}";
+}
+template <std::uint64_t P>
+bool execute(const Data& d, const Matrix& matrix) {
+    const auto oracle = shadow<P>(matrix, d.selectable);
+    const auto before = plan(d, oracle);
+    if (before > 51539607552ULL)
+        throw std::runtime_error("discovery payload admission");
+    Scratch scratch(d);
+    const auto bytes = payload(d, oracle, scratch);
+    if (bytes != before)
+        throw std::runtime_error("scratch forecast differs");
+    const auto f = forecast(d);
+    const auto start = std::chrono::steady_clock::now();
+    const auto r = run<P>(d, oracle, scratch, {bytes, 5000000000ULL, 3000000000ULL, d.rank_cap});
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             std::chrono::steady_clock::now() - start)
+                             .count();
+    if (r.words > f.words || r.visits > f.visits)
+        throw std::runtime_error("structural forecast exceeded");
+    std::cout << "{\"prime\":" << P << ",\"status\":" << static_cast<int>(r.status)
+              << ",\"rows\":" << d.rows << ",\"columns\":" << d.columns
+              << ",\"rank\":" << scratch.rank << ",\"payload_bytes\":" << bytes
+              << ",\"word_charge\":" << r.words << ",\"visits\":" << r.visits
+              << ",\"word_structural_upper\":" << f.words
+              << ",\"visit_structural_upper\":" << f.visits << ",\"limb_subwords\":" << f.limbs
+              << ",\"actual_limb_reads\":" << r.limb_reads
+              << ",\"elimination_updates\":" << r.updates
+              << ",\"reconstruction_updates\":" << r.reconstruction_updates
+              << ",\"coordinate_checks\":" << r.coordinate_checks
+              << ",\"factor_checks\":" << r.factor_checks << ",\"heap_attempts\":" << r.heap
+              << ",\"discovery_ms\":" << elapsed
+              << ",\"process_peak_bytes\":" << peak_resident_bytes() << "}";
+    return r.status == Status::Success;
+}
+} // namespace discovery
+int main(int argc, char** argv) try {
+    using namespace discovery;
+    if (argc == 2 && std::string(argv[1]) == "--controls") {
+        controls();
+        return 0;
+    }
+    if (argc == 2 && std::string(argv[1]) == "--primitives") {
+        std::cout << '[';
+        primitives<p1>();
+        std::cout << ',';
+        primitives<p2>();
+        std::cout << ',';
+        primitives<p3>();
+        std::cout << ',';
+        primitives<p4>();
+        std::cout << "]\n";
+        return 0;
+    }
+    if (argc != 4)
+        return 2;
+    if (!prime<p1>() || !prime<p2>() || !prime<p3>() || !prime<p4>())
+        return 2;
+    const std::string domain = argv[2];
+    if (domain != "full" && domain != "cut")
+        return 2;
+    std::ifstream source(argv[1]);
+    const auto input = read(source);
+    const auto matrix = active_matrix(input, domain == "cut", true);
+    const auto data = prepare(input, matrix, argv[3]);
+    std::cout << '[';
+    bool success = execute<p1>(data, matrix);
+    std::cout << ',';
+    success = execute<p2>(data, matrix) && success;
+    std::cout << ',';
+    success = execute<p3>(data, matrix) && success;
+    std::cout << ',';
+    success = execute<p4>(data, matrix) && success;
+    std::cout << "]\n";
+    return success ? 0 : 3;
+} catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return 1;
+}
