@@ -136,7 +136,11 @@ def main() -> None:
         raise SystemExit("Refusing to overwrite an existing fixture")
     result = generate(source_path.read_bytes())
     encoded = (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    output_path.write_bytes(encoded)
+    try:
+        with output_path.open("xb") as stream:
+            stream.write(encoded)
+    except FileExistsError as error:
+        raise SystemExit("Refusing to overwrite an existing fixture") from error
     print(json.dumps({"output_sha256": hashlib.sha256(encoded).hexdigest(), "bytes": len(encoded)}))
 
 

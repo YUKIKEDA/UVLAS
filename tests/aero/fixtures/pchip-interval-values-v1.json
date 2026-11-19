@@ -3,7 +3,7 @@
   "source_path": "tests/aero/fixtures/pchip-coefficients-v1.json",
   "source_sha256": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
   "producer_path": "docs/verification/IM-03/pchip-interval-evaluation-v1/reference.py",
-  "producer_sha256": "3b3327cf9198a1b3c51de9ab430a52fe76da53f2fa744078315251d47036d3ba",
+  "producer_sha256": "13f1d3ad09b784e64990eff9c85744febd849cbc7a3ca31fab787e92dbd026b7",
   "method": "Fraction endpoint data and independent factored cubic Hermite basis",
   "independent_closed_form_checks": 9,
   "source_count": 60,
