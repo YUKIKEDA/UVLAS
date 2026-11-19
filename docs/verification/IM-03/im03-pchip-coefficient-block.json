@@ -1,0 +1,215 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-coefficient-block-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 176,
+  "date": "2026-11-19",
+  "source_commit": "ba3e8159c641030dad6ef4ee3a58fc906b742b55",
+  "mutation_source_commit": "b16c908f9ea177952f615f462bbc876f20dfebcf",
+  "mutation_cpp_sha256": "843e4d5fa5b2d6f6dd8bf48aa66fa3d7a6718d92f4cd2bd80f55e46de07f83fb",
+  "claimed_state": "Private complete mathematical PCHIP coefficient preparation only; no CurveReady/jet/KnownFlow qualification.",
+  "verification": {
+    "scope": "Counts are primitive visits, not CPU instructions; small-case timing/RSS only; Linux/sanitizer delegated to CI without waiting",
+    "debug_resources": "4 cases / 112 assertions",
+    "allocation": "7 planned allocations, all7 faults; no additional C++ new in prepared arithmetic or routine rejection; C heap not dynamically audited",
+    "debug_normal": "6 cases / 2145 assertions",
+    "independent_review": "API, numerical expressions, branch cover, independent fixture regeneration, Japanese report reviewed",
+    "mutations": "control2078 pass; cubic342 and endpoint330 assertion failures; compile/link0 and Catch0/42/42; independent tool observation",
+    "reference": "60 fixtures / 96 source Hermite conditions; tolerance 0; independent regeneration bytes identical",
+    "parallel": "1/2/4 callers encoded canonical words and work/slot/payload equal",
+    "static": "Changed3TU clang-tidy21.1.1 passed; after scan-usage correction product TU rechecked; Ruff and strict explicitly included Pyright passed",
+    "release_resources": "4 cases / 112 assertions",
+    "japanese": "quick lint0 findings",
+    "release_normal": "6 cases / 2145 assertions"
+  },
+  "source_records": [
+    {
+      "sha256": "76ec46d1be2bb74c71a0659e7b0e859466c67b187d735edbdcbb439e881c8cbc",
+      "hint": "CMakeLists.txt",
+      "id": "pchip-coefficient-source-00"
+    },
+    {
+      "sha256": "54457a78aa38fb16031cb052d46a89e2daefc06e49f5d1084c8ab3a5bcd73819",
+      "hint": "tests/CMakeLists.txt",
+      "id": "pchip-coefficient-source-01"
+    },
+    {
+      "sha256": "9dc15ba490cc2839e37afb6dee66cd2144daabfa48741dbca3337b58656ea131",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "id": "pchip-coefficient-source-02"
+    },
+    {
+      "sha256": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5",
+      "hint": "src/aero/pchip_coefficients.hpp",
+      "id": "pchip-coefficient-source-03"
+    },
+    {
+      "sha256": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0",
+      "hint": "src/aero/pchip_rational_slots.hpp",
+      "id": "pchip-coefficient-source-04"
+    },
+    {
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "id": "pchip-coefficient-source-05"
+    },
+    {
+      "sha256": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+      "hint": "src/aero/pchip_slot_integer.cpp",
+      "id": "pchip-coefficient-source-06"
+    },
+    {
+      "sha256": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+      "hint": "src/aero/pchip_slot_private.hpp",
+      "id": "pchip-coefficient-source-07"
+    },
+    {
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "hint": "include/uvlas/core/resource_plan.hpp",
+      "id": "pchip-coefficient-source-08"
+    },
+    {
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "hint": "include/uvlas/core/checked_dimensions.hpp",
+      "id": "pchip-coefficient-source-09"
+    },
+    {
+      "sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "hint": "include/uvlas/core/failure.hpp",
+      "id": "pchip-coefficient-source-10"
+    },
+    {
+      "sha256": "75591aa8f87ca4ebd99bebcdee5e5fdf27f34da0719e67a4dd3896d69787cd62",
+      "hint": "tests/aero/pchip_coefficients_test.cpp",
+      "id": "pchip-coefficient-source-11"
+    },
+    {
+      "sha256": "03203ac5bf587398877d039cdf768d2ed3d22ad4ff9be6d04ef5a5a3f137d30e",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "id": "pchip-coefficient-source-12"
+    },
+    {
+      "sha256": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+      "hint": "tests/aero/fixtures/pchip-coefficients-v1.json",
+      "id": "pchip-coefficient-source-13"
+    },
+    {
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "id": "pchip-coefficient-source-14"
+    },
+    {
+      "sha256": "cd0b46c0954177ffc9fe8d6821c918878e442ebdc2917fee06a5124d2a996434",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/reference.py",
+      "id": "pchip-coefficient-source-15"
+    },
+    {
+      "sha256": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f",
+      "hint": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "id": "pchip-coefficient-source-16"
+    }
+  ],
+  "artifact_records": [
+    {
+      "sha256": "48ebfaba4d22ef9586ab00d81dffde65326e9e7625bfe9b4696a6da4b4239ab7",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/debug-normal.txt",
+      "id": "pchip-coefficient-debug-normal.txt"
+    },
+    {
+      "sha256": "23aee10fced9f4d2405ed60b7df4649c4e14ab87584c280d0f7d269dabc60256",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/debug-resources.txt",
+      "id": "pchip-coefficient-debug-resources.txt"
+    },
+    {
+      "sha256": "9742efb8e7d4fb654443e025441f5044b61d6ef87b3195c96e7165e1e7658b77",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/initial-final-tidy.txt",
+      "id": "pchip-coefficient-initial-final-tidy.txt"
+    },
+    {
+      "sha256": "f3e384c2a9d124bac39ecd8a1c4e8ee3377329e3829ae7029335ae9aeb8806e2",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/measure.cpp",
+      "id": "pchip-coefficient-measure.cpp"
+    },
+    {
+      "sha256": "c1fe3767f438bf43231a503b18ff683efc22aa0fa896f96c1861b1dcede7d327",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/measure.json",
+      "id": "pchip-coefficient-measure.json"
+    },
+    {
+      "sha256": "53e3e3c51fe2a356b4e4941fb7324bfb00f640b69bf999532b23f8a41bddac4b",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/publication.json",
+      "id": "pchip-coefficient-publication.json"
+    },
+    {
+      "sha256": "48ebfaba4d22ef9586ab00d81dffde65326e9e7625bfe9b4696a6da4b4239ab7",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/release-normal.txt",
+      "id": "pchip-coefficient-release-normal.txt"
+    },
+    {
+      "sha256": "23aee10fced9f4d2405ed60b7df4649c4e14ab87584c280d0f7d269dabc60256",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/release-resources.txt",
+      "id": "pchip-coefficient-release-resources.txt"
+    },
+    {
+      "sha256": "32c1dc5cb31e0307b6f4a655abad177b7f68ab489b03bac3f2ba36cb77b2904d",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/review.md",
+      "id": "pchip-coefficient-review.md"
+    },
+    {
+      "sha256": "5a3a30fa8d8e9eede6877e657dc57e724e73f833df25d86b5e31aafb5a843180",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/run-mutations.ps1",
+      "id": "pchip-coefficient-run-mutations.ps1"
+    },
+    {
+      "sha256": "dbf76d5056a7c9aabd886b3375f2c64dc147e63544f3619885c8e17ea342a1cc",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/usage-tidy.txt",
+      "id": "pchip-coefficient-usage-tidy.txt"
+    },
+    {
+      "sha256": "497287324f6084d162a41aa98bfad9993adb91287fb78e6e5467adef9a2e22c5",
+      "hint": "docs/verification/IM-03/pchip-time-curve-design-v2/result.json",
+      "id": "pchip-time-curve-design-v2-result"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "76ec46d1be2bb74c71a0659e7b0e859466c67b187d735edbdcbb439e881c8cbc",
+    "tests/CMakeLists.txt": "54457a78aa38fb16031cb052d46a89e2daefc06e49f5d1084c8ab3a5bcd73819",
+    "src/aero/pchip_coefficients.cpp": "9dc15ba490cc2839e37afb6dee66cd2144daabfa48741dbca3337b58656ea131",
+    "src/aero/pchip_coefficients.hpp": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5",
+    "src/aero/pchip_rational_slots.hpp": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_slot_integer.cpp": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+    "src/aero/pchip_slot_private.hpp": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "tests/aero/pchip_coefficients_test.cpp": "75591aa8f87ca4ebd99bebcdee5e5fdf27f34da0719e67a4dd3896d69787cd62",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "03203ac5bf587398877d039cdf768d2ed3d22ad4ff9be6d04ef5a5a3f137d30e",
+    "tests/aero/fixtures/pchip-coefficients-v1.json": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/reference.py": "cd0b46c0954177ffc9fe8d6821c918878e442ebdc2917fee06a5124d2a996434",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-coefficient-block-v1/debug-normal.txt": "48ebfaba4d22ef9586ab00d81dffde65326e9e7625bfe9b4696a6da4b4239ab7",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/debug-resources.txt": "23aee10fced9f4d2405ed60b7df4649c4e14ab87584c280d0f7d269dabc60256",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/initial-final-tidy.txt": "9742efb8e7d4fb654443e025441f5044b61d6ef87b3195c96e7165e1e7658b77",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/measure.cpp": "f3e384c2a9d124bac39ecd8a1c4e8ee3377329e3829ae7029335ae9aeb8806e2",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/measure.json": "c1fe3767f438bf43231a503b18ff683efc22aa0fa896f96c1861b1dcede7d327",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/publication.json": "53e3e3c51fe2a356b4e4941fb7324bfb00f640b69bf999532b23f8a41bddac4b",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/release-normal.txt": "48ebfaba4d22ef9586ab00d81dffde65326e9e7625bfe9b4696a6da4b4239ab7",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/release-resources.txt": "23aee10fced9f4d2405ed60b7df4649c4e14ab87584c280d0f7d269dabc60256",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/review.md": "32c1dc5cb31e0307b6f4a655abad177b7f68ab489b03bac3f2ba36cb77b2904d",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/run-mutations.ps1": "5a3a30fa8d8e9eede6877e657dc57e724e73f833df25d86b5e31aafb5a843180",
+    "docs/verification/IM-03/pchip-coefficient-block-v1/usage-tidy.txt": "dbf76d5056a7c9aabd886b3375f2c64dc147e63544f3619885c8e17ea342a1cc",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/result.json": "497287324f6084d162a41aa98bfad9993adb91287fb78e6e5467adef9a2e22c5"
+  }
+}

@@ -1,0 +1,6 @@
+[1/3] Processing file <repo>\src\aero\pchip_coefficients.cpp.
+48155 warnings generated.
+[2/3] Processing file <repo>\tests\aero\pchip_coefficients_test.cpp.
+119263 warnings generated.
+[3/3] Processing file <repo>\tests\aero\pchip_coefficients_resources_test.cpp.
+173557 warnings generated.

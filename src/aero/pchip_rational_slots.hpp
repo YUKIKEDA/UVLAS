@@ -102,6 +102,8 @@ public:
     [[nodiscard]] core::Result<void> compare(BitBound, BitBound) noexcept;
     /// Count mathematical floor, including the negative noninteger correction.
     [[nodiscard]] core::Result<BitBound> floor(BitBound) noexcept;
+    /// Cover an alternative with identical caps by opcode/bit maxima; no branch is executed.
+    [[nodiscard]] core::Result<void> cover_alternative(const Counter&) noexcept;
     /// Complete checked bit/slot/byte/work admission; no memory is acquired.
     [[nodiscard]] core::Result<RationalPlan> finish() const noexcept;
 

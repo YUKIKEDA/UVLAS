@@ -605,6 +605,20 @@ uvlas_add_test(aero.pchip_rational_slots_resources
 target_include_directories(uvlas_test_aero_pchip_rational_slots_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_pchip_rational_slots_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_pchip_rational_slots_resources)
+uvlas_add_test(aero.pchip_coefficients
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_coefficients_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_pchip_coefficients PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_pchip_coefficients PRIVATE
+    UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json")
+uvlas_add_test(aero.pchip_coefficients_resources
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_coefficients_resources_test.cpp
+    LIBS uvlas_aero_audit)
+target_include_directories(uvlas_test_aero_pchip_coefficients_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_pchip_coefficients_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_pchip_coefficients_resources)
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
