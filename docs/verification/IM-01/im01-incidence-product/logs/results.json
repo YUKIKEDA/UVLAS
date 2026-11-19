@@ -1,0 +1,38 @@
+{
+  "fixed_commit": "6049a768a458abe935c9d9bad7bf3a09a084d7f2",
+  "baseline_commit": "89c3923c0d0648910ad700390f7d04d77eec8e40",
+  "mutations": [
+    {
+      "name": "control",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "test_exit": 0
+    },
+    {
+      "name": "zero-edge",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "test_exit": 42
+    },
+    {
+      "name": "clip-capacity",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "test_exit": 42
+    },
+    {
+      "name": "candidate-scan",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "test_exit": 42
+    },
+    {
+      "name": "atom-sort",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "test_exit": 42
+    }
+  ],
+  "exact_owned_snapshot_equal": true,
+  "snapshot_sha256": "5ed39b823027928161d6dca3a747c55af6fa0f50ed356c83364aca631a70dfc4"
+}

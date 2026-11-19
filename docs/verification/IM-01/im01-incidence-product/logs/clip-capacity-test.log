@@ -1,0 +1,73 @@
+Randomness seeded to: 1343550259
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+clip-capacity-normal.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+PG partition preserves continuous different-gradient thickness and partial
+named traces
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(191)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(191): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 12
+
+-------------------------------------------------------------------------------
+PG partition uses one common split at thickness T-junctions and material
+interfaces
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(266)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(266): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 12
+
+-------------------------------------------------------------------------------
+PG incidence plan uses every adopted clipping and sorting term
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(507)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(513): FAILED:
+  CHECK( forecast.clip_vertex_capacity == 8712 )
+with expansion:
+  66 == 8712 (0x2208)
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(514): FAILED:
+  CHECK( forecast.numeric_operations == 228633355 )
+with expansion:
+  13771609 (0xd22359)
+  ==
+  228633355 (0xda0ab0b)
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(515): FAILED:
+  CHECK( forecast.topology_visits == 184228797 )
+with expansion:
+  163953927 (0x9c5bd07)
+  ==
+  184228797 (0xafb1bbd)
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(517): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Unexpected partition failure 12
+
+-------------------------------------------------------------------------------
+PG integration partition matches independent all-cell moments and full topology
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(124)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(185): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Unexpected partition failure 12
+
+===============================================================================
+test cases:   8 |   4 passed | 4 failed
+assertions: 504 | 497 passed | 7 failed
+

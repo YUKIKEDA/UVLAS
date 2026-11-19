@@ -1,0 +1,25 @@
+#include "pg_partition_snapshot.hpp"
+#include <iostream>
+int main(int argc, char**) {
+    using namespace partition_test;
+    Fixture f{4};
+    incidence_fixture(f);
+    const auto budget = argc == 1 ? 48ULL * 1024ULL * 1024ULL * 1024ULL : cap;
+    core::ResourcePlan plan{budget};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const auto forecast = take(PgIntegrationPartition::plan(f.request(), limits()));
+    nlohmann::json out{{"forecast", forecast.owned_payload_bytes},
+                       {"external", forecast.estimated_external_bytes},
+                       {"numeric_forecast", forecast.numeric_operations},
+                       {"topology_forecast", forecast.topology_visits}};
+    auto result = PgIntegrationPartition::prepare(f.request(), limits(), workspace, plan);
+    out["allocated"] = plan.allocated_bytes();
+    if (!result) {
+        out["failure"] = result.error().code == core::FailureCode::ResourceExceeded ? "ResourceExceeded" : "unexpected";
+    } else {
+        out["snapshot"] = nlohmann::json::parse(mathematical_payload(*result));
+        out["numeric_actual"] = result->preparation().observed_numeric_operations;
+        out["topology_actual"] = result->preparation().observed_topology_visits;
+    }
+    std::cout << out.dump(2) << '\n';
+}

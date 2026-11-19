@@ -1,0 +1,85 @@
+Randomness seeded to: 3212470835
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zero-edge-normal.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+PG integration partition matches independent all-cell moments and full topology
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(124)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(128): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+-------------------------------------------------------------------------------
+PG preparation timing preserves the full mathematical payload
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(481)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(481): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+-------------------------------------------------------------------------------
+PG partition ownership content identity and workspace parallelism survive
+caller destruction
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(417)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(417): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+-------------------------------------------------------------------------------
+PG partition returns exact closed-cell zero contacts without activating them
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(288)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(288): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+-------------------------------------------------------------------------------
+PG partition uses one common split at thickness T-junctions and material
+interfaces
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(266)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(266): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+-------------------------------------------------------------------------------
+PG partition preserves continuous different-gradient thickness and partial
+named traces
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(191)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(191): FAILED:
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+-------------------------------------------------------------------------------
+PG incidence plan uses every adopted clipping and sorting term
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(507)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(517): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Unexpected partition failure 2
+
+===============================================================================
+test cases:  8 |  1 passed | 7 failed
+assertions: 45 | 38 passed | 7 failed
+
