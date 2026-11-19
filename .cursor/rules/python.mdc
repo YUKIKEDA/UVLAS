@@ -22,3 +22,10 @@ globs: "tools/**/*.py"
 BAD   extend-exclude = ["rd"]      tools/rd も検査から外れる
 GOOD  extend-exclude = ["./rd"]    根の rd だけが外れる
 ```
+
+新規出力だけを許す生成器では、開始時の`exists()`だけで上書き禁止を保証しない。生成後に`Path.open("xb")`などで排他的に作成し、生成中に他の処理が完成させた出力も保持する。2026-11-19、PR #187のfixture生成器は、存在確認と`write_bytes()`の間に作られたファイルを上書きした。生成直後に先行出力を置く負対照で、拒否と元bytesの保持を検査する。完成結果の置換を認めるrunnerの原子的更新とは区別する（`evidence`）。
+
+```text
+BAD   existsで未作成を確認 → fixture生成 → write_bytesで既存ファイルも開く
+GOOD  fixture生成 → 排他的作成で書き込む。途中で出力が現れたら保持して拒否する
+```
