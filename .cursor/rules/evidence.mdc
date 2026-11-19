@@ -6,6 +6,13 @@ alwaysApply: true
 # 証拠
 
 - 採否に使ったsource／input／result／reportは書き換えない。訂正は新しい版、追加規約、新しい結果で行う（SE-11）。
+- 一つの完成済み検証結果を上書きするランナーは、全対象の合格を確認してから、隣接tempを閉じて一度だけ原子的に置き換える。失敗時は既存のbyteを保ち、出力がなければ部分結果も作らない。これは完成結果の公開規則であり、別の進捗ログの形式は変えない。2026-11-19、PR #169では2件目の失敗で旧12件結果が1件JSONへ置換された。公開条件は `python -O` で消えるassertに頼らず、通常・最適化の両方で故障とtempの片付けを検査する。
+
+```text
+BAD   1件成功するたび、完成済みの検証結果ファイルへ途中結果を上書きする
+GOOD  全件を検査し、隣接tempの書込・flush・close後に1回置換する。失敗時は旧結果を保つ
+```
+
 - `rd/` はR&Dの記録。内容を直さない。置き場所を変えるとき、ファイルを削除するときは、[relocation_plan.py](../../tools/rd/relocation_plan.py) を直して `python tools/rd/reorganize.py reissue` を実行する。手で `git mv` や削除をしない。リンクとハッシュの再発行が抜ける。
 - R&D時点の状態は、ベースラインのcommit（`tools/rd/relocation_plan.py` の `BASELINE`）に、元のパスのまま残っている。内容は、伏せ字にした箇所とリポジトリに入れなかったファイルを除き、当時のバイトのままである（`rd/redaction-record.json`）。
 - 現在のツリーは「ベースライン＋再配置ツール」とバイト一致する。確かめるコマンド：`python tools/rd/reorganize.py verify --rev HEAD`。手で維持するページは `relocation_plan.py` の `MAINTAINED` に挙げ、比較から外す。

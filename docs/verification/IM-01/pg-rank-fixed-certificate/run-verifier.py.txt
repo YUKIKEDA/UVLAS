@@ -4,8 +4,30 @@ import hashlib
 import importlib.machinery
 import importlib.util
 import json
+import os
 import subprocess
+import tempfile
 from pathlib import Path
+
+
+def publish_result(output, result):
+    """Replace the result once, after a complete run; failures preserve prior bytes."""
+    payload = json.dumps(result, indent=2) + '\n'
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode='w', encoding='utf-8', newline='\n', delete=False,
+            dir=output.parent, prefix=f'.{output.name}.', suffix='.tmp',
+        ) as stream:
+            temporary = Path(stream.name)
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        # The file is closed before replacement, including on Windows.
+        os.replace(temporary, output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def main():
@@ -34,12 +56,17 @@ def main():
                 if run.returncode:
                     raise RuntimeError((n,shape,domain,run.returncode,run.stdout.decode(),run.stderr.decode()))
                 entry=json.loads(run.stdout)
-                assert entry['status']==0 and entry['heap_attempts']==0
-                assert entry['rank']==expected['mod_rank'] and entry['rows']==expected['rows'] and entry['candidates']==expected['candidates']
+                if entry['status']!=0 or entry['heap_attempts']!=0:
+                    raise RuntimeError((n,shape,domain,'certificate status or heap validation failed'))
+                if (entry['rank']!=expected['mod_rank'] or entry['rows']!=expected['rows']
+                        or entry['candidates']!=expected['candidates']):
+                    raise RuntimeError((n,shape,domain,'certificate dimensions or rank differ'))
                 entry.update(n=n,shape=shape,domain=domain,input_sha256=capacity.digest(source),certificate_sha256=hashlib.sha256(cert.read_bytes()).hexdigest())
                 cases.append(entry)
-                args.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8',newline='\n')
                 print(n,shape,domain,entry['rank'],'heap',entry['heap_attempts'],'bits',entry['maximum_observed_bits'],'ms',entry['verification_ms'],flush=True)
+    if len(cases)!=12:
+        raise RuntimeError('publication requires all twelve verified cases')
+    publish_result(args.output, result)
 
 
 if __name__=='__main__':main()

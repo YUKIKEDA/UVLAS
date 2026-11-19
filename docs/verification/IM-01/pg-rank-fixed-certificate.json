@@ -47,7 +47,12 @@
     "docs/verification/IM-01/pg-rank-fixed-certificate/generate-certificates.py.txt": "c464fadac091e079a823e02145c56a947eeea2a0f5e031b48ecb6bc4d7c23138",
     "docs/verification/IM-01/pg-rank-fixed-certificate/regeneration-control.json": "c90acf2b40ffd079422b9ebb0f4efcb85c49d669f10b8998507884c0cfa37676",
     "docs/verification/IM-01/pg-rank-fixed-certificate/results.json": "984a09d1dcc027fb3a70003cd285ff960dc9ddf6e7a0732152c3ddc6d7c7193f",
-    "docs/verification/IM-01/pg-rank-fixed-certificate/run-verifier.py.txt": "07f67bb625d62faeed5dee3250520d1d714ce33e6db8787bd2c477a206c350ff",
-    "docs/verification/IM-01/pg-rank-fixed-certificate/verification.md": "fbd6b567065c7d090bb8cebcb843c6fd3b68631224105af9e28d6b3732780315"
+    "docs/verification/IM-01/pg-rank-fixed-certificate/verification.md": "fbd6b567065c7d090bb8cebcb843c6fd3b68631224105af9e28d6b3732780315",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-original-runner.py.txt": "07f67bb625d62faeed5dee3250520d1d714ce33e6db8787bd2c477a206c350ff"
+  },
+  "artifact_reference_adjustment": {
+    "review_head": "a97961a3ce88da05c942e64c417570380ff07867",
+    "original_manifest_copy": "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-original-manifest.json.txt",
+    "reason": "Only the original runner citation moves to its byte-identical retained copy; numerical records and recorded hashes are unchanged."
   }
 }
