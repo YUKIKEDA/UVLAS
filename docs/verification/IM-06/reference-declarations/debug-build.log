@@ -1,0 +1,16 @@
+[0/2] Re-checking globbed directories...
+[1/16] C:\WINDOWS\system32\cmd.exe /C "cd /D <worktree>\out\issue167-build-v2 && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<worktree> -DOUTPUT=<worktree>/out/issue167-build-v2/generated/uvlas/git_revision.hpp -P <worktree>/cmake/GitRevision.cmake"
+[2/16] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\reference_declarations.cpp.obj
+[3/16] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\reference_declarations.cpp.obj
+[4/16] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[5/16] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[6/16] Building CXX object CMakeFiles\uvlas_cli.dir\Debug\src\app\main.cpp.obj
+[7/16] Linking CXX static library Debug\uvlas_core_audit.lib
+[8/16] Linking CXX static library Debug\uvlas_core.lib
+[9/16] Linking CXX static library Debug\uvlas_io_audit.lib
+[10/16] Linking CXX static library Debug\uvlas_io.lib
+[11/16] Linking CXX executable Debug\uvlas.exe
+[12/16] Building CXX object tests\CMakeFiles\uvlas_test_io_reference_declarations.dir\Debug\io\reference_declarations_test.cpp.obj
+[13/16] Linking CXX executable tests\Debug\uvlas_test_io_reference_declarations.exe
+[14/16] Building CXX object tests\CMakeFiles\uvlas_test_io_reference_declarations_resources.dir\Debug\io\reference_declarations_resource_test.cpp.obj
+[15/16] Linking CXX executable tests\Debug\uvlas_test_io_reference_declarations_resources.exe

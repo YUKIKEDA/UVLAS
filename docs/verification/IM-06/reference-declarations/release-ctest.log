@@ -1,0 +1,48 @@
+Internal ctest changing into directory: <worktree>/out/issue167-build-v2
+UpdateCTestConfiguration  from :<worktree>/out/issue167-build-v2/DartConfiguration.tcl
+Parse Config file:<worktree>/out/issue167-build-v2/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<worktree>/out/issue167-build-v2/DartConfiguration.tcl
+Parse Config file:<worktree>/out/issue167-build-v2/DartConfiguration.tcl
+Test project <worktree>/out/issue167-build-v2
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 95
+    Start 95: io.reference_declarations
+
+95: Test command: <worktree>\out\issue167-build-v2\tests\Release\uvlas_test_io_reference_declarations.exe
+95: Working Directory: <worktree>/out/issue167-build-v2/tests
+95: Test timeout computed to be: 60
+95: Randomness seeded to: 168500230
+95: ===============================================================================
+95: All tests passed (966 assertions in 5 test cases)
+95:
+1/2 Test #95: io.reference_declarations .............   Passed    0.06 sec
+test 96
+    Start 96: io.reference_declarations_resources
+
+96: Test command: <worktree>\out\issue167-build-v2\tests\Release\uvlas_test_io_reference_declarations_resources.exe
+96: Working Directory: <worktree>/out/issue167-build-v2/tests
+96: Test timeout computed to be: 60
+96: Randomness seeded to: 3977957544
+96: ===============================================================================
+96: All tests passed (136 assertions in 5 test cases)
+96:
+2/2 Test #96: io.reference_declarations_resources ...   Passed    0.06 sec
+
+The following tests passed:
+	io.reference_declarations
+	io.reference_declarations_resources
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+negative        =   0.12 sec*proc (2 tests)
+property        =   0.12 sec*proc (2 tests)
+unit            =   0.06 sec*proc (1 test)
+verification    =   0.12 sec*proc (2 tests)
+
+Total Test time (real) =   0.13 sec

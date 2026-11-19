@@ -1,0 +1,54 @@
+{
+  "schema": "uvlas.independent-review/1",
+  "source_commit": "9d69e15d4e1b07b60aab5f9615edca9625813fbb",
+  "source_cpp": "src/io/reference_declarations.cpp",
+  "source_sha256": "caa46ce9a9181cadb2fae0bd02d92ca5b9f23df128f2c4252fc3a91cb710c495",
+  "record_origin": "Independent parent-agent tool output; temporary objects and raw logs were removed by that reviewer, so this is a transcribed result rather than a retained raw stream.",
+  "platform": "Windows 11 / MSVC 19.51 / Debug",
+  "procedure": [
+    "Copy the fixed product cpp into an isolated directory and compile under /MDd /Od /EHsc /std:c++23preview /permissive- /utf-8 /W4 /WX with original includes.",
+    "Link the replacement object before the same normal test object and uvlas_io, uvlas_structure, uvlas_core and Catch2 Debug libraries; do not edit the worktree or original objects.",
+    "Select All eight declarations retain dictionary order and owned original provenance, run the no-change control before the semantic mutants."
+  ],
+  "results": [
+    {
+      "variant": "control",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "catch_exit": 0,
+      "passed_assertions": 702
+    },
+    {
+      "variant": "skip the GmshMesh occurrence before totals and emit in walk",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "catch_exit": 42,
+      "failed_assertions": 1,
+      "detected_by": "handwritten declaration count"
+    },
+    {
+      "variant": "xor every decoded digest byte with 1U in capture",
+      "compile_exit": 0,
+      "link_exit": 0,
+      "catch_exit": 42,
+      "failed_assertions": 512,
+      "detected_by": "2 independent all-role columns x 8 roles x 32 digest bytes"
+    }
+  ],
+  "notes": [
+    "No crash or compile failure is counted as detection.",
+    "Product cpp bytes match the final source commit. Later normal-only node/ID checks and static-only test corrections do not change the mutant cpp."
+  ],
+  "independent_read": [
+    "Internal ownership and all-call forecast reviewed; no blocking finding remains.",
+    "The initial synthetic current-node diagnostic was corrected to absent node/path for global admission, allocation and entry cancellation.",
+    "Handwritten role/pointer inventory, independent InputDocument traversal and new-family audit scopes reviewed.",
+    "Japanese documentation read independently; relative link corrected."
+  ],
+  "japanese_lint": {
+    "findings": 1,
+    "category": "nominal_ending",
+    "severity": "info",
+    "decision": "Keep full sentences: this is a technical procedure with explicit ownership and failure statements."
+  }
+}

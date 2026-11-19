@@ -1,0 +1,139 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-declarations",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 167,
+  "date": "2026-11-19",
+  "source_commit": "9d69e15d4e1b07b60aab5f9615edca9625813fbb",
+  "base_commit": "10b19d55f8d6769de1b36e7d0d9ade1afd120848",
+  "scope": "Owned internal extraction of every validated case FileRef in dictionary-field / array order; no normalization, File/Memory origin, OS acquisition, content hashing, dependency closure, parser/import or physical preparation success.",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "All eight role/ID/path/digest/pointer columns are handwritten; every original node is found independently through a separately parsed public InputDocument. Repeated IDs and source spellings remain distinct occurrences."
+    },
+    {
+      "condition": 2,
+      "evidence": "Internal src/io API only. Parent/InputDocument/Plan destruction, result/diagnostic move and moved-from rejection, zero declarations, checked indexes, complete source and old-result snapshots."
+    },
+    {
+      "condition": 3,
+      "evidence": "All 9 success-affecting quota equal/-1 boundaries and DiagnosticBytes=0; P/S/C/W full-call preflight, Plan equal/-1, all 3 observed C++ new fault points, no refund, source payload preservation, diagnostic original reason/node under path allocation or cumulative cap failure, entry/final-allocation cancellation, 2 independent concurrent calls."
+    },
+    {
+      "condition": 4,
+      "evidence": "All-role transient, empty case, repeated ID, reversed JSON keys, swapped array order, independent complete FileRef type inventory, ID 0 / UINT64_MAX, 2 isolated semantic mutations detected after no-change control."
+    },
+    {
+      "condition": 5,
+      "evidence": "Windows Debug/Release scoped build and tests; 6 changed C++ paths format clean; 3 added translation units clang-tidy clean including extra portability warnings; independent implementation/Japanese read; manifest/hash and IO4-01 trace. Linux assigned to CI, not preclaimed and not awaited."
+    }
+  ],
+  "verification": {
+    "environment": "Windows 11 AMD64 / MSVC 19.51.36260.0 / /fp:strict / sse2 / Ninja Multi-Config; clang-format21.1.2 and clang-tidy21.1.1",
+    "debug": {
+      "ctest_passed": 2,
+      "normal": {
+        "cases": 5,
+        "assertions": 966
+      },
+      "resources": {
+        "cases": 5,
+        "assertions": 136
+      },
+      "clean_build_info": true,
+      "direct_rng_seed": 12345
+    },
+    "release": {
+      "ctest_passed": 2,
+      "normal": {
+        "cases": 5,
+        "assertions": 966
+      },
+      "resources": {
+        "cases": 5,
+        "assertions": 136
+      },
+      "clean_build_info": true
+    },
+    "format": {
+      "paths": 6,
+      "exit": 0
+    },
+    "static": {
+      "translation_units": 3,
+      "exit": 0,
+      "user_diagnostics": 0,
+      "extra_warnings": [
+        "range-loop-construct",
+        "sign-compare",
+        "sign-conversion",
+        "shadow"
+      ]
+    },
+    "commands": [
+      "cmake --build out/issue167-build-v2 --config <Debug|Release> --target uvlas_test_io_reference_declarations uvlas_test_io_reference_declarations_resources uvlas_cli -j 4",
+      "ctest --test-dir out/issue167-build-v2 -C <Debug|Release> -R ^io.reference_declarations --output-on-failure (Release used -V)",
+      "uvlas.exe --build-info",
+      "uvx --offline clang-format@21.1.2 --dry-run --Werror <six changed C++ paths>",
+      "tools/dev/msvc.ps1 uvx --offline clang-tidy@21.1.1 -p out/issue167-tidy <three added TUs> --extra-arg=-Wrange-loop-construct --extra-arg=-Wsign-compare --extra-arg=-Wsign-conversion --extra-arg=-Wshadow"
+    ],
+    "scope_notes": [
+      "Debug direct runs collected Catch counts after the successful CTest run; Release used detailed CTest once.",
+      "Static checks were performed on the same product/test bytes before source commit.",
+      "No unchanged numerical suite rerun.",
+      "Linux not executed locally.",
+      "C++ new audit is not an observation of all C heap or exception ABI allocations.",
+      "Scratch is a fixed automatic value-payload envelope, not process stack or RSS measurement."
+    ]
+  },
+  "corrections": [
+    "Independent review removed synthetic current-node provenance for entry cancellation and global admission/allocation failures.",
+    "Initial test compile used equality absent from SchemaIdentity; tests now compare its actual fields.",
+    "Static-only nodiscard, explicit optional initialization and guarded test access corrected before fixed source."
+  ],
+  "deviations": [],
+  "sources": {
+    "CMakeLists.txt": "b578742079d0134d1500af1bb772c0a04fa21f71bcd34451b53816a0e2d5f3bd",
+    "tests/CMakeLists.txt": "c9aa0495b11eb8c63e4250225888bd8aeb45875c1477dc2f6375a957ba45593d",
+    "include/uvlas/io/case_schema.hpp": "c1b3698240c5b4cbcb22ad7c38826d88818d0e0883b04ad11fc1f7c07bf22c50",
+    "src/io/reference_declarations.hpp": "5085bee1e0e9a35e1e5d51bf79569d30d0d39fa08c039c9913aa706c2918d767",
+    "src/io/reference_declarations.cpp": "caa46ce9a9181cadb2fae0bd02d92ca5b9f23df128f2c4252fc3a91cb710c495",
+    "tests/io/reference_declarations_fixture.hpp": "896a96d5f3e515ff21de94f2ad3c716e819dcc26a8eda620a906543475042397",
+    "tests/io/reference_declarations_test.cpp": "d4fdb47e74eb3cf3ff17c60ba828bd925a55cd1ae81fd8c6ef74e78ba51b723b",
+    "tests/io/reference_declarations_resource_test.cpp": "24ec60f49bb302f2ecd378090e37dd35e2d16efcb226225de352b7d1a13d2e3b",
+    "docs/verification/IM-06/reference-declarations.md": "c5ee1f131093b2201da261c3fd885c613a95d00fcfa66d6c9589f1c730631564"
+  },
+  "immutable": {
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab",
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "tests/io/case_schema_snapshot.hpp": "0737379415d03c4c890dbb3f8253a6c4b866a86c17f125936e5c0648645f07f1",
+    "tests/io/case_schema_test_adapter.hpp": "c57c9d59174bf117c8ec81e4b1a380f79d9a9efbe8060ce10333ae97fc09401c"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-declarations/debug-build-info.json": "ddc53c8bd4a97ee1104bc998b01fcb118a653da9fd46b564b7b0dbfbfb47bb82",
+    "docs/verification/IM-06/reference-declarations/debug-build.log": "a3ca9ff1a7aad0c3053802e59f923196c42d78249696873de0ef8abd9eb27cd9",
+    "docs/verification/IM-06/reference-declarations/debug-ctest.log": "6860029eb60c95b213be438d673c7588ba16f5c7b7b085c034b7d91137428b92",
+    "docs/verification/IM-06/reference-declarations/debug-normal.log": "99d02d70d18d99d0bf529d75f3e9ee67812328ef55668cba63a26151c6096cec",
+    "docs/verification/IM-06/reference-declarations/debug-resources.log": "a23ab0fb795b9308f0b634024c62b8dcfc76a67479d8446e53321290d8abef6f",
+    "docs/verification/IM-06/reference-declarations/final.log": "428fea4249936602ce9eeedd64f51d69864e0b127f00f27af2bbeb1b94c4dcfe",
+    "docs/verification/IM-06/reference-declarations/independent-review.json": "8a78723b09e4f1e5d812c465906319d64395fe93f67315adffc473175617459f",
+    "docs/verification/IM-06/reference-declarations/japanese-final.json": "e610438e79255388775a858ea5838e561e628504a678e7c3c3e7233c3c536102",
+    "docs/verification/IM-06/reference-declarations/release-build-info.json": "6dda77f03c81d8f88adbf9fac5c9a7627be542258cb87064da127c11f1e37b7a",
+    "docs/verification/IM-06/reference-declarations/release-build.log": "6eaf9decdf2a9545d6d8dd07fff714e92814d5f8af8e145be7be8b06f3e16974",
+    "docs/verification/IM-06/reference-declarations/release-ctest.log": "bbdfa40e82b67d3f669536dd8a6b06abcf8d461ccfc6d25219caa92794b8f252"
+  },
+  "all_checks_pass": true
+}

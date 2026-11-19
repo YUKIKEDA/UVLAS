@@ -1,0 +1,84 @@
+Reading inline script metadata from `.agents\skills\natural-japanese\scripts\lint.py`
+{
+  "file": "docs\\verification\\IM-06\\reference-declarations.md",
+  "stats": {
+    "total_findings": 2,
+    "by_category": {
+      "low_burstiness": 1,
+      "nominal_ending": 1
+    },
+    "genre": null,
+    "experimental": false,
+    "total_sentences": 53,
+    "nominal_ending_count": 0,
+    "nominal_ending_ratio": 0.0,
+    "total_paragraphs": 13,
+    "paragraph_lead_conjunction_count": 0,
+    "paragraph_lead_conjunction_ratio": 0.0,
+    "paragraph_sentence_counts": [
+      4,
+      4,
+      4,
+      4,
+      3,
+      4,
+      6,
+      4,
+      5,
+      4,
+      3,
+      4,
+      4
+    ],
+    "paragraph_sentence_count_cv": 0.1789968486887762,
+    "rhythm": {
+      "mora_mean": 61.62264150943396,
+      "mora_stdev": 37.55711445056205,
+      "burstiness": -0.24264555630262596,
+      "length_autocorrelation_lag1": 0.17586764869192484
+    },
+    "ngram": {
+      "lead_pos_4gram_top": "名詞/名詞/助詞/名詞",
+      "lead_pos_4gram_ratio": 0.1509433962264151
+    },
+    "lexical_diversity": {
+      "ttr": null,
+      "mtld": null,
+      "content_token_count": 619,
+      "doc_char_count": 2461,
+      "skipped_too_short": true
+    },
+    "structural": {
+      "bold_span_count": 0,
+      "bold_per_1000_chars": 0.0,
+      "bullet_line_count": 0,
+      "non_blank_line_count": 17,
+      "boilerplate_heading_count": 0,
+      "numbered_phase_hit_count": 0,
+      "emoji_symbol_count": 0,
+      "emoji_symbol_per_1000_chars": 0.0
+    },
+    "low_specificity": {
+      "paragraphs_evaluated": 13,
+      "paragraphs_fired": 0
+    }
+  },
+  "findings": [
+    {
+      "line": 3,
+      "category": "low_burstiness",
+      "excerpt": "burstiness=-0.243 (モーラ近似長 平均=61.6, 標準偏差=37.6)",
+      "severity": "warn",
+      "detail": "burstiness が閾値(-0.24)未満。文の長短のメリハリが乏しく機械的なリズムの疑い",
+      "related_lines": null
+    },
+    {
+      "line": 33,
+      "category": "nominal_ending",
+      "excerpt": "体言止め0件（全53文、約2461字）",
+      "severity": "info",
+      "detail": "この文書には体言止めが1つもない。ある程度の長さの文書でこの修辞技法が皆無なのはAI文章に特徴的（コーパス実測: essayジャンルで人間60% vs AI 0%が体言止めを使用）。人間的な修辞の欠如の疑い",
+      "related_lines": null
+    }
+  ]
+}
