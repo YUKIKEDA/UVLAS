@@ -100,7 +100,8 @@ TEST_CASE("Private PCHIP domain matches independent rational classification",
           "[AE-07][N4-02][N4-03][N4-06][verification]") {
     std::ifstream stream{UVLAS_PCHIP_COEFFICIENT_REFERENCE};
     REQUIRE(stream.good());
-    for (const auto& record : nlohmann::json::parse(stream).at("cases")) {
+    const auto reference = nlohmann::json::parse(stream);
+    for (const auto& record : reference.at("cases")) {
         std::vector<Rat> times, values;
         for (const auto& v : record.at("times"))
             times.emplace_back(v.get<std::string>());
