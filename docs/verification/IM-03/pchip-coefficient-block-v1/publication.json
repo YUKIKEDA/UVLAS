@@ -1,0 +1,69 @@
+{
+  "schema": "uvlas.evidence-publication/1",
+  "records": [
+    {
+      "id": "pchip-coefficient-debug-normal.txt",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/debug-normal.txt",
+      "original_sha256": "76ae27ac53d595701d49c7c9256d0b3d4f8e889665d140866bd7c26cbfc03c65",
+      "published_sha256": "48ebfaba4d22ef9586ab00d81dffde65326e9e7625bfe9b4696a6da4b4239ab7",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-debug-resources.txt",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/debug-resources.txt",
+      "original_sha256": "def7ae29486d78d9ff6d22c6f0451bbf6abd94f73ac126c0f5b60f035ebe903a",
+      "published_sha256": "23aee10fced9f4d2405ed60b7df4649c4e14ab87584c280d0f7d269dabc60256",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-release-normal.txt",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/release-normal.txt",
+      "original_sha256": "76ae27ac53d595701d49c7c9256d0b3d4f8e889665d140866bd7c26cbfc03c65",
+      "published_sha256": "48ebfaba4d22ef9586ab00d81dffde65326e9e7625bfe9b4696a6da4b4239ab7",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-release-resources.txt",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/release-resources.txt",
+      "original_sha256": "def7ae29486d78d9ff6d22c6f0451bbf6abd94f73ac126c0f5b60f035ebe903a",
+      "published_sha256": "23aee10fced9f4d2405ed60b7df4649c4e14ab87584c280d0f7d269dabc60256",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-initial-final-tidy.txt",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/initial-final-tidy.txt",
+      "original_sha256": "9eca8a5ea226d49b7cc69e2f20b805af731ee537aba5e5d90483d07b772005b9",
+      "published_sha256": "9742efb8e7d4fb654443e025441f5044b61d6ef87b3195c96e7165e1e7658b77",
+      "path_replacements": 3,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-usage-tidy.txt",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/usage-tidy.txt",
+      "original_sha256": "78d5fb1a7c6fddec412742881edb3d4911ced85ce2e6d59065d7e1ab16d85e74",
+      "published_sha256": "dbf76d5056a7c9aabd886b3375f2c64dc147e63544f3619885c8e17ea342a1cc",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-measure.cpp",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/measure.cpp",
+      "original_sha256": "f3e384c2a9d124bac39ecd8a1c4e8ee3377329e3829ae7029335ae9aeb8806e2",
+      "published_sha256": "f3e384c2a9d124bac39ecd8a1c4e8ee3377329e3829ae7029335ae9aeb8806e2",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    },
+    {
+      "id": "pchip-coefficient-measure.json",
+      "hint": "docs/verification/IM-03/pchip-coefficient-block-v1/measure.json",
+      "original_sha256": "33c709bca100759e460662081b86fef7bfeff46ea855e8bf3900187fb84150dc",
+      "published_sha256": "c1fe3767f438bf43231a503b18ff683efc22aa0fa896f96c1861b1dcede7d327",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF, terminal blank lines removed"
+    }
+  ]
+}

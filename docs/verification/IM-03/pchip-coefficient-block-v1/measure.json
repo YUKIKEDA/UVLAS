@@ -1,0 +1,37 @@
+{
+"repeats":1000,
+"count_total_ns":4764700,
+"prepare_destroy_total_ns":15639200,
+"payload_bytes":7928,
+"reserved_steps":17216718,
+"actual_steps":3035,
+"reserved_slots":128,
+"actual_slots":123,
+"bits":75,
+"words":3,
+"resident_before":4345856,
+"resident_after_count":4354048,
+"resident_after":4354048,
+"lifetime_peak_after":4354048,
+"sink":17219753000,
+"build_info":{
+  "schema": "uvlas.build-info/1",
+  "version": "0.1.0-dev",
+  "commit": "ba3e8159c641030dad6ef4ee3a58fc906b742b55",
+  "uncommitted_changes": false,
+  "compiler": "MSVC 19.51.36260.0",
+  "platform": "Windows AMD64",
+  "configuration": "Release",
+  "floating_point": "/fp:strict",
+  "instruction_set": "sse2",
+  "platform_key": "windows-x64-msvc19.51-sse2",
+  "dependencies": {
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "nlohmann_json": "3.12.0"
+  },
+  "dependency_repairs": {"nlohmann_json_sax_allocation": 1}
+}
+
+}
