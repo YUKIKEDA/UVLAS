@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-time-curve-design-v2",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 158,
+  "review_pr": 161,
+  "date": "2026-11-19",
+  "source_commit": "01bee092c64cb0feea638d86d2e8e7d6cd68842c",
+  "review_head": "affe9c69979c68d8fa28a921cb2aefebc4863059",
+  "supersedes": "im03-pchip-time-curve-design-v1",
+  "claimed_state": "Reviewed start contract and limited design witness only; product implementation remains unperformed.",
+  "verification": {
+    "exact_equalities": 165,
+    "policy_rejections": 11,
+    "review_protocol_rejections": 7,
+    "meaning_mutations": 10,
+    "gcd_small_pairs": 16129,
+    "period_normal": "explicit3; t4 gives1",
+    "d2_auto_normal": "interior left/right0 -> allowed",
+    "d2_auto_negative": "interior left0/right4 -> InvalidInput",
+    "generation": "same content other generation/issuer and same stamp other contents rejected for cache and restore",
+    "primary_sha256": "497287324f6084d162a41aa98bfad9993adb91287fb78e6e5467adef9a2e22c5",
+    "independent_review": "root re-executed v2 in another directory; identical result and SHA256",
+    "secondary": "reused v1 SciPy 11 fixtures/121 values; scalar_fixtures exact equal and secondary producer unchanged",
+    "static": "Ruff check/format and explicitly included strict Pyright succeeded",
+    "japanese": "quick lint low_burstiness warning1 retained for fixed-case comparison",
+    "not_executed": "C++ host issuer implementation, checkpoint container, allocator/parallel/VM/numerical certification"
+  },
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/specs/foundation/state-contract.md": "2013a2c5cb1584db5332ab78c324993ec46907827241edf9c0a11e811f750c46",
+    "include/uvlas/core/state.hpp": "b99030c94bae9ecda40d0653d76d4a7bc06600ac755ce21306df4a2ff5f19c28",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/scipy_check.py": "4e7665dad5b7f3f53b4aaf1c055276539db2fc7335ae1a131ca2bd9dfa06499e"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-time-curve-design-v2/result.json": "497287324f6084d162a41aa98bfad9993adb91287fb78e6e5467adef9a2e22c5",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/review.md": "5ad6e326c970225a869e2609b9171571025def9a73caa7f089fd7cc9b8e5b64f",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/result.json": "e09f1fe0ba8e322e0c52527d90abe1cf675990dcba183a01a702ebef72792a5a",
+    "docs/verification/IM-03/pchip-time-curve-design-v1/scipy-result.json": "74831fb7e55b18e0efa1a7f20cbb4cb963f5388e5ce96b4f7490cf3450dac5d2",
+    "docs/verification/IM-03/im03-pchip-time-curve-design.json": "0bf7345f0362c5322bf6d9fb4746070894022394858b792eeecd34c216b85331"
+  }
+}
