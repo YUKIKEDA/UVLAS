@@ -7,11 +7,11 @@
 | 処理 | 論理I/Fと保証 |
 |---|---|
 | 参照を採る | `SchemaCase` の採用辞書のフィールド順と各配列の添字順で、元の `SourceId`、復号済みpath、宣言digest、role、元文書上のnodeと位置を取得する。JSONのキー出現順、実ファイルの列挙順、SI数量の並びを使わない |
-| 参照を収集する | 読取り専用の根ディレクトリ能力、参照列、上限、資源計画、取消、任意の診断slotを受け取る。adapterは初期化後の根のハンドルに対して開き、利用者callbackを数値反復に残さない |
+| 参照を収集する | `ReferenceInput`、上限、資源計画、取消、任意の診断slotを受け取る。`ReferenceInput` は検査済み `SchemaCase` と、取得経路を表す `File` または `Memory` を組にして所有する。adapterは保持した根のハンドルに対して開き、利用者callbackを数値反復に残さない |
 | 成功を公開する | `ReferencedCase` は親 `SchemaIdentity`、宣言元の位置、元と正規化後のpath、role、元bytesとdigest、依存辺を所有する。入力、読み手、Planを破棄しても内容は保持する。公開の借用viewは親結果の寿命まで有効 |
 | 準備で消費する | `SiCase` と `ReferencedCase` の `SchemaIdentity` を比較してから、`(SourceId, role)` でsnapshotを得る。消費者は収集時に読んだ配列だけを読む。検査後にpathを開き直さない |
 
-論理入口は `resolve_references(const SchemaCase&, const ReadRoot*, SnapshotLimits, ResourcePlan&, std::stop_token, SnapshotDiagnostic*) -> Result<ReferencedCase>` とする。SI変換済みの場合も `SiCase::source_case()` を渡して同じ表を使う。CLIの入力検証は、参照整合のためにSI変換用の許容誤差を要求しない。上限と取消は値として受け取り、根は外部参照の宣言がある場合に必須とする。
+論理入口は `resolve_references(const ReferenceInput&, SnapshotLimits, ResourcePlan&, std::stop_token, SnapshotDiagnostic*) -> Result<ReferencedCase>` とする。外部参照の収集とSI変換は同じ `ReferenceInput` の `SchemaCase` から始める。SI変換後に参照を収集する場合も元の `ReferenceInput` を渡す。`SiCase::source_case()` 単独からファイル由来の情報を復元できない。CLIの入力検証は、参照整合のためにSI変換用の許容誤差を要求しない。
 
 初期参照の採取対象は次の8役割とする。列挙器の生成・検証は辞書と同じ入力を使い、現行辞書の全 `FileRef` の型と実際の到達経路を独立に照合する。
 
@@ -28,7 +28,9 @@
 
 ## パスと実体
 
-ファイルから読む場合は、manifestを最初に開いたディレクトリを根とする。このときmanifest自身の実体IDも保持する。メモリから渡されたmanifestが外部参照を宣言する場合、呼出し側は基準となる根を明示する。参照がゼロなら根は不要である。アンカーには文字列の絶対パスの再解決を使わない。
+`File` は取得処理だけが生成する。取得処理は根となる親の `ReadRoot` からmanifestを開き、そのハンドルから元bytesと実体ID（Linuxはdevice/inode、Windowsはvolume/file ID）を取得する。取得の前後でID、長さ、変更指標を照合する。その元bytesから検査済み `SchemaCase` を作り、同じ `ReadRoot`、実体ID、manifestハンドルと組にして解決器へ渡す。呼出し側が別の `SchemaCase`、根、IDを組み合わせる入口は設けない。`File` の寿命中は元ハンドルを保持し、解決中にファイルIDが別の実体に再利用されるのを防ぐ。パスを再度開いてIDを取得しない。安定したIDを取得できない環境は `Unsupported`、manifestの読取り失敗または取得中改変は `InvalidInput` とする。
+
+`Memory` は呼出し側のbytesから作る。外部参照がある場合は呼出し側が基準となる `ReadRoot` を指定する。参照がゼロなら根を省略できる。`Memory` はmanifestの実体IDを持たない。`SourceIdentity` の呼出側ID、長さ、digestは両経路とも元bytesの識別に使う。外部ファイルとの実体照合には、開いたハンドルから得たIDだけを使う。
 
 正規化ではUTF-8の元表記を保持したまま、相対パスの `/` と `\` を区切りとして扱う。`.` を除き、`..` では正規化済み成分を一つ戻す。空スタックから戻る場合は脱出、結果が空または末尾が区切りの場合はファイル指定の欠落とする。NUL、絶対パス、ドライブ相対、UNC、Windowsのストリーム指定を拒否する。余分な空成分は除く。大小文字、Unicode正規形、空白は意味を変える変換を行わない。Windowsで同一視される名前を黙って別名扱いせず、開いた実体のIDで確認する。
 
@@ -43,7 +45,7 @@
 
 ## 重複と依存
 
-同じSourceIdの再宣言は、元のpath・digest・roleが同じ場合に一つの保存先を使う。宣言の出典と依存辺は保持する。異なるSourceIdが同一の通常ファイルID（Linuxのdevice/inode、Windowsのvolume/file ID）を指した場合は重複として拒否する。内容が同じ別ファイルは、両方の出典・宣言が正しければ許可する。root manifest自身を参照した場合は循環として扱う。
+同じSourceIdの再宣言は、元のpath・digest・roleが同じ場合に一つの保存先を使う。宣言の出典と依存辺は保持する。各参照先を開いて実体IDを得た直後、`File` ではそのIDをmanifest自身のIDと比較する。一致すればパス名や宣言digestにかかわらず、その宣言位置を指す `Cycle` を返す。`Memory` ではこの比較を行わない。次に、異なるSourceIdが同一の通常ファイルIDを指した場合は重複として拒否する。内容が同じ別ファイルは、両方の出典・宣言が正しければ許可する。
 
 宣言の辺は **消費するsource → 依存するsource** とする。初出順に、未訪問・処理中・完了の3状態で反復DFSを行う。処理中点への辺はcycleとして拒否し、完了点への参照を共有する。完了順は依存先が先になる。各頂点と宣言辺を一度処理し、DFSは明示stackを使う。診断には最初の不一致または循環を指す元source、role、宣言位置、必要ならcycle列を保存する。
 
@@ -59,9 +61,9 @@ P=\operatorname{bytes}(N\text{ source records})+
 \operatorname{bytes}(N+2\text{ adjacency offsets})+T+L.
 $$
 
-$$ P $$ は完成物の容量である。オフセットはmanifestを表す仮想頂点、固有sourceの各頂点、末尾の番兵を含む。成長時の旧新buffer、lookup、明示stack、hash状態、OSハンドル、診断を別に見積もる。子宣言は検査済みbytesを読んだ後に初めて分かるため、段階入場とする。辺・頂点・pathの追加で生じる確保はその追加前、ファイルのbytesは同一ハンドルから長さを得た時点で容量を検査する。一時的に旧新領域が同時に必要なら両方が入ることを確かめる。明示DFSの生存frame数はグラフ深さ、Windowsの生存ハンドル数は根1・途中成分数・最終1で制限する。読取りは所有するbytesへ直接行い、別の全ファイル複製を確保しない。宣言処理／比較、path文字走査、読取り・hashそれぞれのbyte数と最後の余剰読取り検査をworkに計上する。allocator・OS管理領域は別の費用として扱う。
+$$ P $$ は完成物の容量である。オフセットはmanifestを表す仮想頂点、固有sourceの各頂点、末尾の番兵を含む。成長時の旧新buffer、lookup、明示stack、hash状態、OSハンドル、診断を別に見積もる。子宣言は検査済みbytesを読んだ後に初めて分かるため、段階入場とする。辺・頂点・pathの追加で生じる確保はその追加前、ファイルのbytesは同一ハンドルから長さを得た時点で容量を検査する。一時的に旧新領域が同時に必要なら両方が入ることを確かめる。明示DFSの生存frame数はグラフ深さで制限する。解決中のWindowsの生存ハンドル数は根1・`File` のmanifest 1・途中成分数・最終1で制限する。読取りは所有するbytesへ直接行い、別の全ファイル複製を確保しない。宣言処理／比較、path文字走査、読取り・hashそれぞれのbyte数と最後の余剰読取り検査をworkに計上する。allocator・OS管理領域は別の費用として扱う。
 
-最初に親と制限、root宣言を検査し、その後は宣言順でパス・実体・容量・読取り／変更・digest・子宣言／循環の順に失敗を確定する。取消は開始時・I/Oの前後・公開直前で検査する。失敗は同じ原因を診断slotなしでも返す。診断の容量不足は診断の詳細だけを省き、元の拒否理由を置き換えない。成功済みのPlan課金と、解放する未公開payloadは区別する。
+最初に親と制限、root宣言を検査する。その後は宣言順でパス、実体（manifest自身と重複を含む）、容量、読取りと変更、digest、子宣言とDFSの循環の順に失敗を確定する。取消は開始時・I/Oの前後・公開直前で検査する。失敗は同じ原因を診断slotなしでも返す。診断の容量不足は診断の詳細だけを省き、元の拒否理由を置き換えない。成功済みのPlan課金と、解放する未公開payloadは区別する。
 
 失敗のoperationは `PrepareModel` とする。path違反、読取り不能、重複、循環、取得中改変、digest不一致は `InvalidInput` とし、詳細の理由を分ける。上限と確保失敗は `ResourceExceeded`、根相対の安全な解決またはroleの検証方式を提供できない場合は `Unsupported`、取消は `Cancelled`、準備時に別の親世代へ接続した場合は `StaleGeneration` を返す。診断は宣言元の位置、拒否した成分、判明した実体・長さ、quotaと必要量を所有し、実測できない値は省く。
 
@@ -73,6 +75,7 @@ $$ P $$ は完成物の容量である。オフセットはmanifestを表す仮�
 |---|---|
 | 入力の結線 | 8役割を全部持つ正常例と参照ゼロの例。辞書から手で転記したSourceId・role・位置と厳密一致 |
 | 所有と照合 | [元bytesとグラフの例](../../verification/IM-06/reference-snapshot-design-cases.json)。digestは独立SHA-256、元ファイルと根を破棄した後も全payload一致。異なるSchemaIdentity・roleの借用は拒否 |
+| manifestの実体 | [固定例と照合手順](../../verification/IM-06/reference-snapshot-manifest-origin.md) のとおり、`File` の元名とハードリンクは `Cycle`、同じbytesの別実体は成功。`Memory` に同じbytesと根を渡した場合、ハードリンクは通常の外部参照として成功。両経路とも呼出側ID・長さ・digestを同じ値に固定し、実体照合の有無だけを変える |
 | 同名・別名・循環 | 明示グラフ、hardlink、二つのpathの同一実体、同じ内容の別実体、root manifestへの辺を両OSで照合。親から子の順、完了順、循環の宣言位置は手書きの列と厳密一致 |
 | パスと取得 | root内での`.`・`..`、root外、絶対・ドライブ相対・UNC・stream、symlink/junction、途中の親の改名、短いread、EOF前の改変、長さ不変の別bytes。制御したadapterまたは別プロセスで変更時点を固定し、時間の偶然に頼らず拒否理由を照合 |
 | 資源と故障 | 各上限ちょうどと1不足、整数overflow、確保点ごとの故障、診断予算ゼロ、最後の確保中の取消。旧snapshotの全payloadと読み手のハンドル数を確認 |
