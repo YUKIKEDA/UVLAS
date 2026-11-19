@@ -252,20 +252,14 @@ struct Meter {
     std::uint64_t cap = 0, used = 0;
     const std::stop_token& stop;
     core::FailureDetails details;
-    std::optional<core::Failure> error;
-    bool visit(std::uint64_t n = 1) {
-        if (error)
-            return false;
-        if (stop.stop_requested()) {
-            error = failure(core::FailureCode::Cancelled, details);
-            return false;
-        }
-        if (n > cap - used) {
-            error = failure(core::FailureCode::ResourceExceeded, details);
-            return false;
-        }
+    // Every failed visit terminates this call; carry its exact cause with the result.
+    core::Result<void> visit(std::uint64_t n = 1) {
+        if (stop.stop_requested())
+            return std::unexpected(failure(core::FailureCode::Cancelled, details));
+        if (n > cap - used)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         used += n;
-        return true;
+        return {};
     }
 };
 struct Builder {
@@ -285,11 +279,11 @@ struct Builder {
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         if (plan.n_ < 2 || plan.m_ == 0 || nm != samples.values.size())
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
-        Meter scan{limits.steps, 0, stop, details, {}};
+        Meter scan{limits.steps, 0, stop, details};
         Machine machine{samples, Counter{limits, details}, nullptr, {}, {}};
         for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
-            if (!scan.visit())
-                return std::unexpected(*scan.error);
+            if (const auto visited = scan.visit(); !visited)
+                return std::unexpected(visited.error());
             const auto v = i < plan.n_ ? samples.times[static_cast<std::size_t>(i)]
                                        : samples.values[static_cast<std::size_t>(i - plan.n_)];
             // Check limb counts before multiplying them into a bit index or scanning any words.
@@ -316,16 +310,16 @@ struct Builder {
                 return std::unexpected(result.error());
         }
         for (std::uint64_t i = 1; i < plan.n_; ++i) {
-            if (!scan.visit())
-                return std::unexpected(*scan.error);
+            if (const auto visited = scan.visit(); !visited)
+                return std::unexpected(visited.error());
             machine.compare(machine.time(i - 1), machine.time(i));
             if (machine.error)
                 return std::unexpected(supplement(*machine.error, details));
         }
         for (std::uint64_t i = 0; i < plan.n_ - 1; ++i)
             for (std::uint64_t c = 0; c < plan.m_; ++c) {
-                if (!scan.visit())
-                    return std::unexpected(*scan.error);
+                if (const auto visited = scan.visit(); !visited)
+                    return std::unexpected(visited.error());
                 interval(machine, i, c);
                 if (machine.error)
                     return std::unexpected(supplement(*machine.error, details));
@@ -362,24 +356,25 @@ struct Builder {
                 owner.limbs.values().subspan(start + static_cast<std::size_t>(owner.w),
                                              static_cast<std::size_t>(r.denominator))};
     }
-    static bool copy(Owner& owner, std::uint64_t i, RationalView value, Meter& meter) {
-        if (!meter.visit())
-            return false;
+    static core::Result<void> copy(Owner& owner, std::uint64_t i, RationalView value,
+                                   Meter& meter) {
+        if (const auto visited = meter.visit(); !visited)
+            return std::unexpected(visited.error());
         auto& record = owner.records.values()[static_cast<std::size_t>(i)];
         record = {value.numerator.size(), value.denominator.size(), value.sign};
         auto words = owner.limbs.values().subspan(static_cast<std::size_t>(2 * i * owner.w),
                                                   static_cast<std::size_t>(2 * owner.w));
         for (std::size_t j = 0; j < value.numerator.size(); ++j) {
-            if (!meter.visit())
-                return false;
+            if (const auto visited = meter.visit(); !visited)
+                return std::unexpected(visited.error());
             words[j] = value.numerator[j];
         }
         for (std::size_t j = 0; j < value.denominator.size(); ++j) {
-            if (!meter.visit())
-                return false;
+            if (const auto visited = meter.visit(); !visited)
+                return std::unexpected(visited.error());
             words[static_cast<std::size_t>(owner.w) + j] = value.denominator[j];
         }
-        return true;
+        return {};
     }
     static core::Result<CoefficientBlock> prepare(SampleGrid samples,
                                                   CoefficientWorkspace& workspace,
@@ -426,21 +421,21 @@ struct Builder {
         owner.details = details;
         owner.records = std::move(*records);
         owner.limbs = std::move(*limbs);
-        Meter meter{plan.outer_, plan.preflight_, stop, details, {}};
+        Meter meter{plan.outer_, plan.preflight_, stop, details};
         // Snapshot every original exact word before canonical GCD checks and numerical work.
         for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
             const auto v = i < plan.n_ ? samples.times[static_cast<std::size_t>(i)]
                                        : samples.values[static_cast<std::size_t>(i - plan.n_)];
-            if (!copy(owner, i, v, meter))
-                return std::unexpected(*meter.error);
+            if (const auto copied = copy(owner, i, v, meter); !copied)
+                return std::unexpected(copied.error());
         }
         auto lease_arithmetic = arithmetic->begin(stop, details);
         if (!lease_arithmetic)
             return std::unexpected(lease_arithmetic.error());
         auto& session = *lease_arithmetic;
         for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
-            if (!meter.visit())
-                return std::unexpected(*meter.error);
+            if (const auto visited = meter.visit(); !visited)
+                return std::unexpected(visited.error());
             auto value = session.input(view(owner, i));
             if (!value)
                 return std::unexpected(value.error());
@@ -448,8 +443,8 @@ struct Builder {
         }
         Machine machine{samples, Counter{limits, details}, &session, handles->values(), {}};
         for (std::uint64_t i = 1; i < plan.n_; ++i) {
-            if (!meter.visit())
-                return std::unexpected(*meter.error);
+            if (const auto visited = meter.visit(); !visited)
+                return std::unexpected(visited.error());
             const auto order = machine.compare(machine.time(i - 1), machine.time(i));
             if (machine.error)
                 return std::unexpected(supplement(*machine.error, details));
@@ -458,26 +453,29 @@ struct Builder {
         }
         for (std::uint64_t i = 0; i < plan.n_ - 1; ++i)
             for (std::uint64_t c = 0; c < plan.m_; ++c) {
-                if (!meter.visit())
-                    return std::unexpected(*meter.error);
+                if (const auto visited = meter.visit(); !visited)
+                    return std::unexpected(visited.error());
                 const auto values = interval(machine, i, c);
                 if (machine.error)
                     return std::unexpected(supplement(*machine.error, details));
                 for (std::size_t p = 0; p < 4; ++p) {
-                    if (!values[p].slot)
+                    const auto& slot = values[p].slot;
+                    if (!slot)
                         return std::unexpected(failure(core::FailureCode::InvalidInput, details));
-                    const auto value = session.view(*values[p].slot);
+                    const auto value = session.view(*slot);
                     if (!value)
                         return std::unexpected(value.error());
-                    if (!copy(owner, plan.inputs_ + (i * plan.m_ + c) * 4 + p, *value, meter))
-                        return std::unexpected(*meter.error);
+                    if (const auto copied =
+                            copy(owner, plan.inputs_ + (i * plan.m_ + c) * 4 + p, *value, meter);
+                        !copied)
+                        return std::unexpected(copied.error());
                 }
             }
         const auto used = session.usage();
         if (!used)
             return std::unexpected(used.error());
-        if (!meter.visit(0))
-            return std::unexpected(*meter.error);
+        if (const auto visited = meter.visit(0); !visited)
+            return std::unexpected(visited.error());
         owner.work = used->steps + meter.used;
         owner.slots = used->slots;
         return CoefficientBlock{std::move(*header)};

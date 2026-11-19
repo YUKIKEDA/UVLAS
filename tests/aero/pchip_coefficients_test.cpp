@@ -198,6 +198,7 @@ TEST_CASE("Private PCHIP coefficient preparation rejects malformed grids and kee
     CHECK(invalid.error().code == uvlas::core::FailureCode::InvalidInput);
     CHECK_FALSE(owner.time(3));
     CHECK_FALSE(owner.value(0, 1));
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() is non-const.
     std::stop_source stop;
     stop.request_stop();
     const auto cancelled =
