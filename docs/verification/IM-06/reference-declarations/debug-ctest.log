@@ -1,0 +1,16 @@
+Internal ctest changing into directory: <worktree>/out/issue167-build-v2
+Test project <worktree>/out/issue167-build-v2
+    Start 94: io.reference_declarations
+1/2 Test #94: io.reference_declarations .............   Passed    0.19 sec
+    Start 95: io.reference_declarations_resources
+2/2 Test #95: io.reference_declarations_resources ...   Passed    0.19 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+negative        =   0.39 sec*proc (2 tests)
+property        =   0.39 sec*proc (2 tests)
+unit            =   0.19 sec*proc (1 test)
+verification    =   0.39 sec*proc (2 tests)
+
+Total Test time (real) =   0.40 sec
