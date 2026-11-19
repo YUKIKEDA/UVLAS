@@ -45,11 +45,10 @@ std::optional<ReferenceFileView> ReferenceFileSnapshot::view() const& noexcept {
     return ReferenceFileView{bytes_.values(), digest_, *stable_info};
 }
 
-core::Result<ReferenceFileSnapshot>
-read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_digest,
-                    ReferenceFileLimits limits, core::ResourcePlan& plan,
-                    const std::stop_token& stop,
-                    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
+core::Result<ReferenceFileSnapshot> ReferenceFileSnapshot::read_from_handle(
+    ReferenceFileReader& reader, const SourceDigest* declared_digest, ReferenceFileLimits limits,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
     if (diagnostic != nullptr) {
         diagnostic->reset();
     }
@@ -187,10 +186,26 @@ read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_di
     if (stop.stop_requested()) {
         return cancelled();
     }
-    if (digest != declared_digest) {
+    if (declared_digest != nullptr && digest != *declared_digest) {
         return reject(ReferenceFileFailure::DigestMismatch);
     }
     return ReferenceFileSnapshot{std::move(*storage), digest, *before};
+}
+
+core::Result<ReferenceFileSnapshot>
+read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_digest,
+                    ReferenceFileLimits limits, core::ResourcePlan& plan,
+                    const std::stop_token& stop,
+                    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
+    return ReferenceFileSnapshot::read_from_handle(reader, &declared_digest, limits, plan, stop,
+                                                   diagnostic);
+}
+
+core::Result<ReferenceFileSnapshot>
+read_manifest_file(ReferenceFileReader& reader, ReferenceFileLimits limits,
+                   core::ResourcePlan& plan, const std::stop_token& stop,
+                   std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
+    return ReferenceFileSnapshot::read_from_handle(reader, nullptr, limits, plan, stop, diagnostic);
 }
 
 } // namespace uvlas::io::detail

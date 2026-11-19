@@ -90,7 +90,8 @@ struct ReferenceFileView {
     ReferenceFileInfo file_info;
 };
 
-// Owns the exact verified payload. Views borrow the owner until it is moved or destroyed.
+// Owns the exact payload read from a stable handle and the SHA-256 of those bytes.
+// Views borrow the owner until it is moved or destroyed.
 class ReferenceFileSnapshot {
 public:
     ReferenceFileSnapshot(ReferenceFileSnapshot&& other) noexcept;
@@ -106,6 +107,14 @@ private:
     read_reference_file(ReferenceFileReader&, const SourceDigest&, ReferenceFileLimits,
                         core::ResourcePlan&, const std::stop_token&,
                         std::optional<ReferenceFileDiagnostic>*) noexcept;
+    friend core::Result<ReferenceFileSnapshot>
+    read_manifest_file(ReferenceFileReader&, ReferenceFileLimits, core::ResourcePlan&,
+                       const std::stop_token&, std::optional<ReferenceFileDiagnostic>*) noexcept;
+
+    [[nodiscard]] static core::Result<ReferenceFileSnapshot>
+    read_from_handle(ReferenceFileReader&, const SourceDigest* declared_digest, ReferenceFileLimits,
+                     core::ResourcePlan&, const std::stop_token&,
+                     std::optional<ReferenceFileDiagnostic>*) noexcept;
 
     ReferenceFileSnapshot(core::PlannedBuffer<std::byte> payload, SourceDigest verified_digest,
                           ReferenceFileInfo verified_info) noexcept;
@@ -122,5 +131,14 @@ read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_di
                     ReferenceFileLimits limits, core::ResourcePlan& plan,
                     const std::stop_token& stop,
                     std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept;
+
+// Reads the manifest itself, which has no enclosing declaration to supply an expected digest.
+// The same length, identity, modification, cancellation and resource checks apply. The result
+// owns the original bytes, their computed digest and the observed file identity. The caller
+// keeps the reader's handle alive separately when the manifest identity must stay pinned.
+[[nodiscard]] core::Result<ReferenceFileSnapshot>
+read_manifest_file(ReferenceFileReader& reader, ReferenceFileLimits limits,
+                   core::ResourcePlan& plan, const std::stop_token& stop,
+                   std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept;
 
 } // namespace uvlas::io::detail
