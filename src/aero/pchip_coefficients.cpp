@@ -330,6 +330,7 @@ struct Builder {
                 if (machine.error)
                     return std::unexpected(supplement(*machine.error, details));
             }
+        plan.preflight_ = scan.used;
         const auto arithmetic = machine.counter.finish();
         if (!arithmetic)
             return std::unexpected(arithmetic.error());
@@ -350,7 +351,7 @@ struct Builder {
         plan.payload_ = checked.add(
             plan.arithmetic_.payload_bytes(),
             checked.add(handles, checked.add(sizeof(Owner), checked.add(record_bytes, limbs))));
-        if (!checked.ok || plan.work_ > limits.steps)
+        if (!checked.ok || plan.work_ > limits.steps || plan.preflight_ > plan.outer_)
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         return plan;
     }
@@ -425,7 +426,7 @@ struct Builder {
         owner.details = details;
         owner.records = std::move(*records);
         owner.limbs = std::move(*limbs);
-        Meter meter{plan.outer_, 0, stop, details, {}};
+        Meter meter{plan.outer_, plan.preflight_, stop, details, {}};
         // Snapshot every original exact word before canonical GCD checks and numerical work.
         for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
             const auto v = i < plan.n_ ? samples.times[static_cast<std::size_t>(i)]

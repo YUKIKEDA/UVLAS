@@ -36,7 +36,7 @@ private:
     friend struct coefficient_detail::Builder;
     RationalPlan arithmetic_;
     std::uint64_t n_ = 0, m_ = 0, inputs_ = 0, records_ = 0, payload_ = 0, work_ = 0, outer_ = 0,
-                  limbs_ = 0;
+                  limbs_ = 0, preflight_ = 0;
 };
 /// Exclusive call lease. Preparation allocates its entire planned arena once before arithmetic.
 /// Destroy only after the synchronous call returns; distinct workspaces may run concurrently.
