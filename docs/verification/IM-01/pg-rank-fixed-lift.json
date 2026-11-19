@@ -1,0 +1,42 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-lift",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 175,
+  "parent_issue": 140,
+  "source_commit": "14e376a470dd00ff5cdc9504ffe493fc13ed7978",
+  "date": "2026-11-19",
+  "claimed_state": "実n4最悪幅2列の固定領域p-adic持上げと有理復元。独立全座標一致、新規new0、127桁schedule拒否。全候補/全準備/全call資源/製品開始は未認定。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "limb_bits": 32,
+    "karatsuba_cutoff": 1048576,
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/export-coefficients.cpp.txt": "0454d901e122e631f33caa628710add4d277fb92cf54d62caac0ae863da748c5",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/result-v2.json": "d1ca719d7677601e5f7e86f857c0ecb44301c5f0daa5d1582bd7c4e84d1c76af",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/fixed-verifier.cpp.txt": "337dc335745d73f9320fbb4ee37d45b6ae8573519834deb605fb15bdd2df6981",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/results.json": "984a09d1dcc027fb3a70003cd285ff960dc9ddf6e7a0732152c3ddc6d7c7193f",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "docs/verification/IM-01/pg-rank-fixed-lift/fixed-lift.cpp.txt": "0396e82864ff9e1efc66e5679831f089157587b751edd1f7b7dc9a28ffcbc4a6",
+    "docs/verification/IM-01/pg-rank-fixed-lift/results.json": "4b4680e9ebd9574d8319af94e0044db98c4afcdda67f031126cbc75efa6f1851",
+    "docs/verification/IM-01/pg-rank-fixed-lift/run-lift.py.txt": "9607c8bf93d7f6a0940a6b052380e042c9d811fc4d570c84bed55359109fe3d9",
+    "docs/verification/IM-01/pg-rank-fixed-lift/verification.md": "f24c8b3100161c20163a84555d639b3607a2c934e70aaa3b427efaaf21d09eb5"
+  }
+}
