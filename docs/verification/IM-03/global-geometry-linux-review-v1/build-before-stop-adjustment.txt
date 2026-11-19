@@ -1,0 +1,26 @@
+[0/2] Re-checking globbed directories...
+[1/20] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\issue147-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/issue147-build/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/20] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Debug\src\aero\global_bvh.cpp.obj
+[3/20] Building CXX object CMakeFiles\uvlas_aero.dir\Debug\src\aero\global_bvh.cpp.obj
+[4/20] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Debug\src\aero\global_intersections.cpp.obj
+[5/20] Building CXX object CMakeFiles\uvlas_aero.dir\Debug\src\aero\global_intersections.cpp.obj
+[6/20] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Debug\src\aero\alias_kinematics.cpp.obj
+[7/20] Building CXX object CMakeFiles\uvlas_aero.dir\Debug\src\aero\alias_kinematics.cpp.obj
+[8/20] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Debug\src\aero\global_geometry.cpp.obj
+[9/20] Building CXX object CMakeFiles\uvlas_aero.dir\Debug\src\aero\global_geometry.cpp.obj
+[10/20] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[11/20] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[12/20] Linking CXX static library Debug\uvlas_core.lib
+[13/20] Linking CXX static library Debug\uvlas_core_audit.lib
+[14/20] Linking CXX static library Debug\uvlas_aero.lib
+[15/20] Building CXX object tests\CMakeFiles\uvlas_test_aero_global_geometry_resources.dir\Debug\aero\global_geometry_resources_test.cpp.obj
+[16/20] Linking CXX static library Debug\uvlas_aero_audit.lib
+[17/20] Building CXX object tests\CMakeFiles\uvlas_test_aero_global_geometry.dir\Debug\aero\global_geometry_test.cpp.obj
+FAILED: [code=2] tests/CMakeFiles/uvlas_test_aero_global_geometry.dir/Debug/aero/global_geometry_test.cpp.obj
+C:\PROGRA~1\MICROS~3\18\COMMUN~1\VC\Tools\MSVC\1451~1.362\bin\Hostx64\x64\cl.exe  /nologo /TP -DBOOST_CONTAINER_DYN_LINK -DBOOST_CONTAINER_NO_LIB -DBOOST_RANDOM_DYN_LINK -DBOOST_RANDOM_NO_LIB -DNOMINMAX -DUVLAS_GLOBAL_GEOMETRY_FIXTURE=\"<repo>/tests/aero/fixtures/global-geometry-reference-v1.json\" -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -DWIN32_LEAN_AND_MEAN -DCMAKE_INTDIR=\"Debug\" -I<repo>\src -I<repo>\include -external:IC:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\out\issue99-vcpkg-installed\x64-windows\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 /std:c++23preview -MDd -Zi /W4 /permissive- /utf-8 /Zc:__cplusplus /fp:strict /WX /showIncludes /Fotests\CMakeFiles\uvlas_test_aero_global_geometry.dir\Debug\aero\global_geometry_test.cpp.obj /Fdtests\CMakeFiles\uvlas_test_aero_global_geometry.dir\Debug\ /FS -c <repo>\tests\aero\global_geometry_test.cpp
+<repo>\tests\aero\global_geometry_test.cpp(284): error C2662: 'bool std::stop_source::request_stop(void) noexcept': cannot convert 'this' pointer from 'const std::stop_source' to 'std::stop_source &'
+<repo>\tests\aero\global_geometry_test.cpp(284): note: Conversion loses qualifiers
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\stop_token(232): note: see declaration of 'std::stop_source::request_stop'
+<repo>\tests\aero\global_geometry_test.cpp(284): note: while trying to match the argument list '()'
+[18/20] Linking CXX executable tests\Debug\uvlas_test_aero_global_geometry_resources.exe
+ninja: build stopped: subcommand failed.

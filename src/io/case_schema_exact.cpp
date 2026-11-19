@@ -1749,6 +1749,13 @@ void scale_checks(SemanticCheck& check, std::uint64_t scales) {
     check.require(!physical || !explicit_mixed);
     const auto analysis = check.field(0, "analysis");
     const auto analysis_kind = check.tag(analysis);
+    const auto require_present = [&](bool present) {
+        if (!present) {
+            // The required entry is absent, so diagnose its containing array.
+            check.c.current = scales;
+            check.c.reject(SchemaReason::InvalidValue);
+        }
+    };
     const auto require_scale = [&](std::string_view field, std::string_view target_kind,
                                    std::uint64_t target_id) {
         bool found = false;
@@ -1760,7 +1767,7 @@ void scale_checks(SemanticCheck& check, std::uint64_t scales) {
                 scale_targets(check, candidate, target_kind, target_id))
                 found = true;
         }
-        check.require(found);
+        require_present(found);
     };
     for (auto collection : {"shells", "beams", "masses"}) {
         const auto entities = check.model_list(collection);
@@ -1839,7 +1846,7 @@ void scale_checks(SemanticCheck& check, std::uint64_t scales) {
             correction = correction || field == "newton_correction";
             constraint = constraint || field == "constraint";
         }
-        check.require(correction && constraint);
+        require_present(correction && constraint);
     }
 }
 void root_checks(SemanticCheck& check) {

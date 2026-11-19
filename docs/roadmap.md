@@ -112,11 +112,11 @@ flowchart LR
 | IM01-3 | Feat | PG全原辞書とanchor補完・必須場map | #108 | Done |
 | IM01-4 | Feat | PG多角形と全積分分割 | #125 | Done |
 | IM01-5 | Design | PG局所独立化のexact rank・全再構成・包含契約 | #133 | In progress |
-| IM01-6 | Design | PG領域分割の資源予測と48GiB依存 | #136 | In progress |
+| IM01-6 | Design | PG領域分割の資源予測と48GiB依存 | #136 | Done |
 | IM01-7 | Design | PG局所rankの資源受入方式 | #140 | Todo |
 | IM03-3 | Feat | 空力局所幾何の包絡と所有する適格packet | #109 | Done |
 | IM03-4 | Feat | 局所P1誘導核と全13変数微分 | #127 | Done |
-| IM03-5 | Design | 大域幾何と後縁所有の開始契約 | #134 | In progress |
+| IM03-5 | Design | 大域幾何と後縁所有の開始契約 | #134 | Done |
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 | IM06-4 | Feat | 全caseの所有typed schemaとexact値・参照・資源検査 | #126 | Done |
 | IM06-5 | Design | SI変換・入力精度・所有と変換予算の開始契約 | #135 | Done |

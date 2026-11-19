@@ -124,7 +124,8 @@ inline PgPartitionBudget partition_budget(const PgPartitionRequest& request,
         add(add(o.segments, mul(2, o.input_points)), 4 * static_cast<std::uint64_t>(graph.n) - 2);
     const auto m = o.line_capacity = add(r, 4);
     const auto c = o.piece_capacity = add(1, mul(r, add(r, 1)) / 2);
-    const auto v = o.clip_vertex_capacity = mul(c, m);
+    // Atomized boundary incidence bounds every intermediate convex clipping stage.
+    const auto v = o.clip_vertex_capacity = mul(2, mul(m, m));
     const auto pairs = o.intersection_capacity = mul(m, m - 1) / 2;
     const auto u = o.edge_capacity = mul(2, mul(m, m));
     partition_cap(m, limits.maximum_lines);
@@ -157,12 +158,13 @@ inline PgPartitionBudget partition_budget(const PgPartitionRequest& request,
     // The source points are homogenized per source edge instead of cached: 6
     // products supplement the contract's 17 source-line opcodes. Pair admission
     // includes four closed-square comparisons. Both clipped half-polygons
-    // recompute endpoint signs; budget 20 rather than 5 calls per original edge.
+    // recompute endpoint signs. Budget all M classification passes, up to r
+    // two-sided clips, and the initial four supporting-line searches.
     // Contact tests consume both endpoints, hence eight coordinate comparisons.
     auto numeric = add(add(p.original_scalars, 18), add(mul(3, o.input_points), mul(3, m)));
     for (const auto term :
          {mul(23, o.segments), mul(27, pairs), mul(52, mul(o.segments, o.segments)),
-          mul(20, mul(r, v)), mul(7, mul(c, m)), mul(6, c),
+          add(add(mul(4, mul(m, v)), mul(16, mul(r, v))), mul(32, m)), mul(7, mul(c, m)), mul(6, c),
           mul(c, add(add(mul(10, o.segments), mul(24, p.triangles)), mul(4, p.cells))), mul(4, u),
           mul(4, o.input_points), mul(4, c), mul(3, p.cells), mul(3, p.layers), std::uint64_t{8},
           mul(11, mul(v, pairs)), mul(146, u), mul(22, mul(u, add(o.segments, p.named_segments))),
@@ -184,7 +186,9 @@ inline PgPartitionBudget partition_budget(const PgPartitionRequest& request,
     topology = add(topology, mul(p.cells, p.provenance_capacity));
     for (const auto term : {mul(o.segments, o.segments),
                             pairs,
-                            mul(r, add(mul(3, v), mul(3, c))),
+                            mul(m, add(mul(3, v), mul(3, c))),
+                            mul(4, add(pairs, m)),
+                            mul(mul(2, u), partition_log(m)),
                             mul(c, m),
                             mul(c, add(add(o.segments, p.triangles), p.cells)),
                             mul(v, pairs),

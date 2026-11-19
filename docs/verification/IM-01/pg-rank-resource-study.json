@@ -1,0 +1,26 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-resource-study",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 140,
+  "source_commit": "89c3923c0d0648910ad700390f7d04d77eec8e40",
+  "date": "2026-11-18",
+  "claimed_state": "資源候補の実係数比較・12件の厳密な再構成。製品局所rankの実装開始は別途資源設計と検証に依存。",
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/im01-3/n4-stage-observation.json": "ace04b1cc3ee8bfd2b018109bad32503f540ae0a1b0f884363b4a619c2fc0035",
+    "src/structure/pg_coefficients.cpp": "aeb50467363cfb7af722fc2ff03e53e2cc23531d9dbce564d1008015b01be162",
+    "src/structure/exact_polynomial_detail.hpp": "71024f387828558e3694b83023889fa9ce8a63c00bbc1bc1680461fbae570a76",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-resource-study/export-coefficients.cpp.txt": "0454d901e122e631f33caa628710add4d277fb92cf54d62caac0ae863da748c5",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-resource-study/run-study.py.txt": "98c801b3970b1b3e9216eace4de6d08856c3c2c06fe7dc4827a573c06ad38a6e",
+    "docs/verification/IM-01/pg-rank-resource-study/verification.md": "327fe10a7da11afaabcda76f01ad75c271ca3d139aa241408181fabf1086c1cf"
+  }
+}

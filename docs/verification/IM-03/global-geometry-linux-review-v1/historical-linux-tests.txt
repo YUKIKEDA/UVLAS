@@ -1,0 +1,21 @@
+Historical head 0597204420ec324e70badfb00ced1b11f215d397; run 44335012542
+debug
+2026-11-18T15:30:56.6584101Z 89/92 Test #89: aero.global_geometry ...........................   Passed    0.72 sec
+2026-11-18T15:30:56.6682657Z 90/92 Test #90: aero.global_geometry_resources .................   Passed    0.01 sec
+2026-11-18T15:31:17.7879952Z 100% tests passed, 0 tests failed out of 92
+2026-11-18T16:00:47.3533809Z /home/runner/work/UVLAS/UVLAS/src/aero/alias_kinematics.cpp:315:44: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-18T16:00:47.3536383Z /home/runner/work/UVLAS/UVLAS/src/aero/alias_kinematics.cpp:330:23: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-18T16:00:47.3537922Z /home/runner/work/UVLAS/UVLAS/src/aero/global_bvh.cpp:144:44: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-18T16:00:47.3539478Z /home/runner/work/UVLAS/UVLAS/src/aero/global_geometry.cpp:417:23: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-18T16:00:47.3541084Z /home/runner/work/UVLAS/UVLAS/src/aero/global_geometry.cpp:437:23: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-18T16:00:47.3542997Z /home/runner/work/UVLAS/UVLAS/src/aero/global_geometry_private.hpp:49:8: error: constructor does not initialize these fields: code [cppcoreguidelines-pro-type-member-init,-warnings-as-errors]
+2026-11-18T16:00:47.3544405Z /home/runner/work/UVLAS/UVLAS/tests/aero/global_geometry_test.cpp:125:11: error: unchecked access to optional value [bugprone-unchecked-optional-access,-warnings-as-errors]
+2026-11-18T16:00:47.3546119Z /home/runner/work/UVLAS/UVLAS/tests/aero/global_geometry_test.cpp:282:5: error: variable 'stop' of type 'std::stop_source' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+release
+2026-11-18T15:39:22.6296587Z 90/93 Test #90: aero.global_geometry ...........................   Passed    0.17 sec
+2026-11-18T15:39:22.6331398Z 91/93 Test #91: aero.global_geometry_resources .................   Passed    0.00 sec
+2026-11-18T15:39:24.5803475Z 100% tests passed, 0 tests failed out of 93
+sanitize
+2026-11-18T15:38:27.2566985Z 89/92 Test #89: aero.global_geometry ...........................   Passed    3.23 sec
+2026-11-18T15:38:27.3130245Z 90/92 Test #90: aero.global_geometry_resources .................   Passed    0.06 sec
+2026-11-18T15:40:02.6146867Z 100% tests passed, 0 tests failed out of 92

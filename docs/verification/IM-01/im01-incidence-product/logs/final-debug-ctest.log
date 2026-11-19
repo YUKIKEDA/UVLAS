@@ -1,0 +1,17 @@
+Internal ctest changing into directory: C:/Users/yuuuu/.codex/worktrees/uvlas-im01-contract/UVLAS/out/build/issue125
+Test project C:/Users/yuuuu/.codex/worktrees/uvlas-im01-contract/UVLAS/out/build/issue125
+    Start 86: structure.pg_integration_partition
+1/2 Test #86: structure.pg_integration_partition .............   Passed    4.65 sec
+    Start 87: structure.pg_integration_partition_resources
+2/2 Test #87: structure.pg_integration_partition_resources ...   Passed    0.47 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-PG            =   5.12 sec*proc (2 tests)
+negative        =   5.12 sec*proc (2 tests)
+property        =   5.12 sec*proc (2 tests)
+unit            =   4.65 sec*proc (1 test)
+verification    =   5.12 sec*proc (2 tests)
+
+Total Test time (real) =   5.14 sec

@@ -275,6 +275,7 @@ public:
 private:
     friend class GeometryEngine;
     friend class P1Engine;
+    friend class GlobalEngine;
     explicit OwnedGeometry(std::shared_ptr<const GeometryData> data, GeometryContext stamp) noexcept
         : data_(std::move(data)), context_(stamp) {}
     std::shared_ptr<const GeometryData> data_;

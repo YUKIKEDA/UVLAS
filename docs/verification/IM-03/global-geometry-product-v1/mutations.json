@@ -1,0 +1,141 @@
+{
+  "source_git_blobs": {
+    "include/uvlas/io/case_schema.hpp": "78084c0fa0cee76355d1f08f5b36d9bcdcc42135",
+    "src/aero/geometry_snapshot.hpp": "138eda087deaddce3495e98519982c749cfb278a",
+    "include/uvlas/core/checked_dimensions.hpp": "47e50532d7e96ce8a9251d2b39827b7472f7fc41",
+    "include/uvlas/structure/pg_coefficients.hpp": "96f0e3b25a7e8d9b588812d4270bfda45796420b",
+    "include/uvlas/numerics/dense_solve.hpp": "65dd2e8dc5b5524f4b038f1067d7b11d4db7efa2",
+    "src/aero/exact_triangle_predicates.cpp": "2b073a96035d469d2d1b3d208a9e64f114a5e312",
+    "src/aero/global_geometry.hpp": "0874371300a114816e905ef4cbb798391f75233c",
+    "include/uvlas/numerics/eigen_metrics.hpp": "4eff67b85eb5f9a1816aa4cce9d2e1dbce00b3b6",
+    "include/uvlas/numerics/eigen_action.hpp": "172e4655a90309e5a6a20d0045e741e65a86d87d",
+    "src/aero/local_geometry_input_private.hpp": "79c37acd5c63322fad5feb07c92f5643c40ef886",
+    "src/aero/geometry_snapshot_storage.hpp": "73e420c61876fbc2f5a825b244feb9c4e9b0f089",
+    "include/uvlas/io/input_scalar.hpp": "39392b83eb3a0d37a328f461bc60ba9bf4b4f741",
+    "src/aero/global_geometry.cpp": "1868b3119a6633a7e6adc46fdd21a3da46d904b2",
+    "include/uvlas/core/identifier.hpp": "35346c2ac3ab8aed562c7a5d8c54fb83bbfebaf4",
+    "include/uvlas/numerics/eigen_generalized.hpp": "17b243c441cccc62abc4a4af5e601dd898ffe2a9",
+    "src/aero/local_geometry_bounds_private.hpp": "6a7ec8b36309a16b5e8a4f59f12cc1916d0a831b",
+    "src/aero/p1_qualification_private.hpp": "4a10d6f9da760326b47ca8f17d3a296644a873c6",
+    "src/aero/p1_induction.hpp": "2e4e847554873577d6518f8c6e96414febeca40a",
+    "src/aero/geometry_snapshot.cpp": "5186dfaa9e3c18e2dd2588c24335e80d3a78fd89",
+    "include/uvlas/structure/pg_integration_partition.hpp": "683396b95063317262e2bc03a70fbb7d71b0f8ea",
+    "include/uvlas/numerics/eigen_arnoldi.hpp": "bf5cfdb4d03e99b66774d2202dd4f3e0938e4440",
+    "src/aero/global_geometry_private.hpp": "97029980ecb1af9ffc1570f0d0c66c539fea06dc",
+    "include/uvlas/core/error_certificate.hpp": "ebac214000b7af71778b5e146df778a58eeda350",
+    "include/uvlas/structure/pg_graph.hpp": "ef430150320a7fb7118b4a11f4d0c850e5baa335",
+    "src/aero/alias_kinematics.cpp": "953ea48150404241149586f72da35ea8ce01222a",
+    "src/aero/global_intersections.cpp": "fca0aac099d4ab41bb72d0d62dc4d9b383498cf3",
+    "include/uvlas/core/build_info.hpp": "e84227259bf0764290bd3ebb3fa89806babddecb",
+    "src/aero/global_geometry_storage.hpp": "e6880229e4281e5802211df7896d4626e42b52b1",
+    "include/uvlas/core/failure.hpp": "551013a886125b07fa42f4197dedfd7ee25fba5a",
+    "include/uvlas/structure/exact_polynomial.hpp": "d9113fa405842ccce320728020cd51a00ca219f6",
+    "include/uvlas/numerics/gmres_solve.hpp": "ae8459df5b48bce9c86d3071fe3ab090994c78a0",
+    "src/aero/exact_triangle_predicates.hpp": "3cc76a9a943adca9502415d41f128b31717d1293",
+    "include/uvlas/numerics/linear_solve.hpp": "324fd8e90fabb5da00829b3d9d2b0bc9f698721f",
+    "tests/aero/global_kinematics_fixture.hpp": "8ce7b455e86976654da2c9fd6b708ba7dbde22fe",
+    "include/uvlas/core/instrumentation.hpp": "77df8f64f80a7aeb38653eb43aceae0f2dff58f0",
+    "include/uvlas/io/input_document.hpp": "99c055ca2a7d7479f161e539887fc2490787fe62",
+    "tests/aero/global_geometry_fixture.hpp": "b933178035eae98872d1f8a7b34acbf49dde1ecd",
+    "src/aero/global_bvh.cpp": "a509ed820eb32388d262dc3677d027a5bb90d39e",
+    "src/aero/p1_induction.cpp": "aa950ebd2c7fe20728908f9b30c5e0e52499d546",
+    "include/uvlas/numerics/eigen_full.hpp": "785a00169334672dfade3f9b81d3e8c32320e534",
+    "tests/aero/global_geometry_test.cpp": "be56bd0b67e7600f4f16785a5adc7d98cebe3923",
+    "src/aero/exact_triangle_private.hpp": "6017731e2104ce27a01480adf0068907c5eceb37",
+    "include/uvlas/io/case_schema_records.hpp": "8ab9937de45b1a8ab303604d75ba2458051d726d",
+    "include/uvlas/numerics/precision.hpp": "e5170d8090fa282c7948f93951f05e56c267b7c8",
+    "src/aero/local_geometry_packet.cpp": "6f692ed3db10c9a2c5e25a15f517bac3de529080",
+    "include/uvlas/numerics/backend_memory.hpp": "071963a203fc40e8e108548333c6973ae8c48832",
+    "include/uvlas/numerics/sparse_solve.hpp": "80009341969fae9c7a0db42ce00bc88318ce3bb2",
+    "include/uvlas/numerics/eigen_common.hpp": "228049ef4a2efe09ced8d369f9bd9fceedc37506",
+    "src/aero/p1_interval_private.hpp": "4aa6d7070776ce5f0d8764d7e5b262085ddcf5a3",
+    "include/uvlas/core/state.hpp": "25936fca6f7e3b1900819533fa6302369b291b65",
+    "src/aero/p1_exact_product_private.hpp": "c22e716b2c200f1e2de53afcb8fb54255de45ece",
+    "include/uvlas/numerics/storage.hpp": "ac92f8dd4008bc6e335334624464f12cc0ac77c6",
+    "include/uvlas/core/resource_plan.hpp": "cc0ec1d468f91f0377f34dd92999a1c81f59dbe1",
+    "src/aero/p1_quadrature_private.hpp": "57ac73d77019809bdd48f7d75261e4d0359c4e8f",
+    "src/aero/p1_gauss_private.hpp": "59c075d8484c6d22258df948d5c5187caeef2332",
+    "src/aero/p1_program_private.hpp": "f2cc2345ab534197f017431e796eabf1c2ead1a2",
+    "src/aero/local_geometry_packet.hpp": "2bcadf8eaa27b76083626cbf0fef46e7c4f08417"
+  },
+  "cases": [
+    {
+      "name": "control",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 0,
+      "link_exit": 0
+    },
+    {
+      "name": "second-pass",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "alias-basis",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "TE-sign",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "internal-TE",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "shared-point-skip",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "open-box",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "full-J",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "explicit-time",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "velocity-assertion",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    },
+    {
+      "name": "epoch",
+      "filter": "[UW-D07]",
+      "compile_exit": 0,
+      "test_exit": 42,
+      "link_exit": 0
+    }
+  ],
+  "source_commit": "16d46c631f157e2bf2e775e660315b89894c98b4"
+}

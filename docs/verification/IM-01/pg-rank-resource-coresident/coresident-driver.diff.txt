@@ -1,0 +1,43 @@
+--- a/export-coefficients.cpp
++++ b/export-coefficients.cpp
+@@ -1,0 +2,3 @@
++#include "pg_partition_test_support.hpp"
++
++int rank_comparison_main(int, char**);
+@@ -70,0 +74,26 @@
++        const auto dictionary_charge = input.allocated_bytes();
++        partition_test::Fixture fixture(n);
++        partition_test::incidence_fixture(fixture);
++        const PgPartitionRequest request{graph, fixture.domain,
++             {fixture.thickness, fixture.triangles, fixture.heights}, fixture.layers,
++             fixture.names, fixture.refinements};
++        const auto partition_limits = partition_test::limits();
++        const auto prepared = take(PgIntegrationPartition::prepare(request, partition_limits,
++                                                                  workspace, input));
++        const int step = 4 / n;
++        std::uint64_t active_cells = 0;
++        for (const auto& cell : take(prepared.activity_map())) {
++            const auto s = step * cell.cell.first, t = step * cell.cell.second;
++            const bool independent = (t < 1 && t + step > 0) || (t < 4 && t + step > 3) ||
++                                     (s < 1 && t < 3 && t + step > 1);
++            if (independent != cell.active)
++                throw std::runtime_error("independent activity mismatch");
++            active_cells += cell.active ? 1 : 0;
++        }
++        std::cerr << "dictionary_charge=" << dictionary_charge
++                  << " partition_forecast=" << prepared.preparation().owned_payload_bytes
++                  << " partition_external=" << prepared.preparation().estimated_external_bytes
++                  << " partition_actual=" << input.allocated_bytes() - dictionary_charge
++                  << " combined_charges=" << input.allocated_bytes()
++                  << " remaining=" << input.remaining_bytes()
++                  << " active_cells=" << active_cells << '\n';
+@@ -100,2 +129,7 @@
+-        out.flush();
+-        return out ? 0 : 3;
++        out.close();
++        if (!out) return 3;
++        char cut[] = "cut", sparse[] = "sparse";
++        char* rank_argv[]{argv[0], argv[3], cut, sparse};
++        const auto code = rank_comparison_main(4, rank_argv);
++        if (!prepared.validate_for(request)) return 4;
++        return code;

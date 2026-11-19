@@ -1,0 +1,20 @@
+[1/6] Processing file <repo>\src\aero\global_geometry.cpp.
+59735 warnings generated.
+[2/6] Processing file <repo>\src\aero\global_bvh.cpp.
+119462 warnings generated.
+[3/6] Processing file <repo>\src\aero\global_intersections.cpp.
+179223 warnings generated.
+[4/6] Processing file <repo>\src\aero\alias_kinematics.cpp.
+238975 warnings generated.
+[5/6] Processing file <repo>\tests\aero\global_geometry_test.cpp.
+310092 warnings and 1 error generated.
+Error while processing <repo>\tests\aero\global_geometry_test.cpp.
+[6/6] Processing file <repo>\tests\aero\global_geometry_resources_test.cpp.
+372854 warnings and 1 error generated.
+Error while processing <repo>\tests\aero\global_geometry_resources_test.cpp.
+<repo>\tests\aero\global_geometry_test.cpp:283:38: error: 'this' argument to member function 'request_stop' has type 'const std::stop_source', but function is not marked const [clang-diagnostic-error]
+  283 |     // MSVC request_stop() is non-const; libstdc++ declares it const.
+      |                                      ^~~
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\stop_token:232:10: note: 'request_stop' declared here
+  232 |     bool request_stop() noexcept {
+      |          ^
