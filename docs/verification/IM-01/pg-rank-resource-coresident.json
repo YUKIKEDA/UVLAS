@@ -1,0 +1,23 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-resource-coresident",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 140,
+  "source_commit": "89c3923c0d0648910ad700390f7d04d77eec8e40",
+  "partition_commit": "6049a768a458abe935c9d9bad7bf3a09a084d7f2",
+  "date": "2026-11-18",
+  "claimed_state": "代表四次面で辞書、製品分割、rank試作を保持した実行と測定。rank製品の資源契約や実務受入は対象外。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-resource-study/export-coefficients.cpp.txt": "0454d901e122e631f33caa628710add4d277fb92cf54d62caac0ae863da748c5",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/specs/structure/pg-partition-incidence-budget-contract.md": "618b51877909d1fc628e56ab980073b71d0260e79d58389051d710d855ad31ac"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-resource-coresident/coresident-driver.diff.txt": "5589753a086f5f3673dc71343f7d91883186abd60b19e321dea9dd9647cf348d",
+    "docs/verification/IM-01/pg-rank-resource-coresident/result.json": "4dc20931870a9d0c3014394131c91f5ae6d403b80f8442d71ee32d6512cbc833",
+    "docs/verification/IM-01/pg-rank-resource-coresident/verification.md": "f4649b76ba05e1f98a2b153380f4e08a066d96376dfa4578147305aaf9528c18"
+  }
+}
