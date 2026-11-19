@@ -134,7 +134,13 @@ struct Context {
                                        std::optional<std::uint64_t> after = {}) {
         const auto kind = node_kind(input(), parent);
         if (kind == InputNodeKind::Array) {
-            const auto index = after ? add(*node(*after).parent_array_index, 1) : 0;
+            std::uint64_t index = 0;
+            if (after) {
+                const auto previous_index = node(*after).parent_array_index;
+                if (!previous_index)
+                    fail(DeclarationReason::InvalidOwner, core::FailureCode::InvalidInput);
+                index = add(*previous_index, 1);
+            }
             if (index < array_size(input(), parent)) {
                 step();
                 return source->array_elements
@@ -143,14 +149,19 @@ struct Context {
         } else if (kind == InputNodeKind::Object) {
             const auto& fields = schema_records()[node(parent).record_kind].fields;
             bool ready = !after;
+            std::string_view previous_name;
+            if (after) {
+                const auto previous_member = node(*after).parent_member;
+                if (!previous_member)
+                    fail(DeclarationReason::InvalidOwner, core::FailureCode::InvalidInput);
+                previous_name =
+                    text(input().members.values()[static_cast<std::size_t>(*previous_member)].key);
+            }
             for (const auto& f : fields) {
                 step();
                 if (!ready) {
-                    const auto member = *node(*after).parent_member;
-                    const auto name =
-                        text(input().members.values()[static_cast<std::size_t>(member)].key);
-                    step(add(name.size(), f.name.size()));
-                    if (name == f.name)
+                    step(add(previous_name.size(), f.name.size()));
+                    if (previous_name == f.name)
                         ready = true;
                     continue;
                 }
@@ -164,14 +175,17 @@ struct Context {
                           std::uint64_t capacity = 0) {
         std::uint64_t size = 0;
         auto cursor = capacity;
-        for (auto i = original; node(i).parent; i = *node(i).parent) {
-            step();
+        auto i = original;
+        for (;;) {
             const auto& n = node(i);
+            const auto parent = n.parent;
+            if (!parent)
+                break;
+            step();
             std::array<char, 20> digits{};
             std::string_view part;
-            if (n.parent_member)
-                part =
-                    text(input().members.values()[static_cast<std::size_t>(*n.parent_member)].key);
+            if (const auto member = n.parent_member)
+                part = text(input().members.values()[static_cast<std::size_t>(*member)].key);
             else {
                 const auto value = n.parent_array_index;
                 if (!value)
@@ -200,6 +214,7 @@ struct Context {
                         output[at++] = ch == '~' ? '0' : '1';
                 }
             }
+            i = *parent;
         }
         if (output && cursor != 0)
             fail(DeclarationReason::InvalidOwner, core::FailureCode::InvalidInput);
@@ -290,14 +305,14 @@ Totals walk(Context& c, Emit emit) {
                 continue;
             }
         for (;;) {
-            if (!c.node(current).parent)
+            const auto parent = c.node(current).parent;
+            if (!parent)
                 return total;
-            const auto parent = *c.node(current).parent;
-            if (auto next = c.child(parent, current)) {
+            if (auto next = c.child(*parent, current)) {
                 current = *next;
                 break;
             }
-            current = parent;
+            current = *parent;
             --depth;
             c.step();
         }
@@ -325,8 +340,10 @@ void diagnose(Context& c, DeclarationDiagnostic* slot) noexcept {
                                       SchemaPathState::NotBuilt};
     core::PlannedBuffer<char> path;
     try {
-        if (c.identity && c.current) {
-            const auto n = c.pointer(*c.current);
+        const auto current = c.current;
+        if (c.identity && current) {
+            const auto ordinal = *current;
+            const auto n = c.pointer(ordinal);
             const auto spent = c.plan.allocated_bytes() - c.start;
             if (n <= c.cap(DeclarationQuota::DiagnosticBytes) &&
                 spent <= c.cap(DeclarationQuota::CumulativeBytes) &&
@@ -340,7 +357,7 @@ void diagnose(Context& c, DeclarationDiagnostic* slot) noexcept {
                 if (p) {
                     path = std::move(*p);
                     if (n)
-                        c.pointer(*c.current, path.values().data(), n);
+                        c.pointer(ordinal, path.values().data(), n);
                     fixed.path_state = SchemaPathState::Complete;
                 }
             }
@@ -391,9 +408,12 @@ DeclaredReferences::DeclaredReferences(DeclaredReferences&&) noexcept = default;
 DeclaredReferences& DeclaredReferences::operator=(DeclaredReferences&&) noexcept = default;
 DeclaredReferences::~DeclaredReferences() = default;
 core::Result<SchemaIdentity> DeclaredReferences::identity() const noexcept {
-    if (!data_.size() || !data_.values()[0].identity)
+    if (!data_.size())
         return std::unexpected(invalid());
-    return *data_.values()[0].identity;
+    const auto identity = data_.values()[0].identity;
+    if (!identity)
+        return std::unexpected(invalid());
+    return *identity;
 }
 core::Result<std::uint64_t> DeclaredReferences::size() const noexcept {
     if (!data_.size())
