@@ -113,7 +113,7 @@ struct Machine {
                 error = failure(core::FailureCode::InvalidInput, details);
                 return {};
             }
-            return {{}, *slot};
+            return {{}, slot};
         }
         const auto value = input(source, query, i);
         if (!value) {
