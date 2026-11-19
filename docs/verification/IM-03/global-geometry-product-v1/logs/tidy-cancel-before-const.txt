@@ -1,0 +1,32 @@
+[1/2] Processing file <repo>\src\aero\global_geometry.cpp.
+59736 warnings generated.
+[2/2] Processing file <repo>\tests\aero\global_geometry_resources_test.cpp.
+122499 warnings generated.
+<repo>\src\aero\global_geometry.cpp:8:6: error: an exception may be thrown in function 'same_words' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+    8 | bool same_words(ScalarWords a, ScalarWords b) noexcept {
+      |      ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\exception:431:5: note: frame #0: unhandled exception of type 'std::bad_variant_access' may be thrown in function '_Throw_bad_variant_access' here
+  431 |     _THROW(bad_variant_access{});
+      |     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\yvals.h:484:21: note: expanded from macro '_THROW'
+  484 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\variant:1174:5: note: frame #1: function 'get<1ULL, uvlas::aero::detail::SingleWord, uvlas::aero::detail::DoubleWord>' calls function '_Throw_bad_variant_access' here
+ 1174 |     _STD _Throw_bad_variant_access();
+      |     ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\yvals_core.h:1906:17: note: expanded from macro '_STD'
+ 1906 | #define _STD    ::std::
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\variant:1212:16: note: frame #2: function 'get<uvlas::aero::detail::DoubleWord, uvlas::aero::detail::SingleWord, uvlas::aero::detail::DoubleWord>' calls function 'get<1ULL, uvlas::aero::detail::SingleWord, uvlas::aero::detail::DoubleWord>' here
+ 1212 |         return _STD get<_Idx>(_Var);
+      |                ^
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\yvals_core.h:1906:17: note: expanded from macro '_STD'
+ 1906 | #define _STD    ::std::
+      |                 ^
+<repo>\src\aero\global_geometry.cpp:14:24: note: frame #3: function 'same_words' calls function 'get<uvlas::aero::detail::DoubleWord, uvlas::aero::detail::SingleWord, uvlas::aero::detail::DoubleWord>' here
+   14 |     const auto& left = std::get<DoubleWord>(a);
+      |                        ^
+<repo>\tests\aero\global_geometry_resources_test.cpp:239:5: error: variable 'setup' of type 'Setup' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+  239 |     Setup setup;
+      |     ^
+      |           const

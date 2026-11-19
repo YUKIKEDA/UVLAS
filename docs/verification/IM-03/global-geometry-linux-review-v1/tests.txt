@@ -1,0 +1,17 @@
+Internal ctest changing into directory: <repo>/out/issue147-build
+Test project <repo>/out/issue147-build
+    Start 90: aero.global_geometry
+1/2 Test #90: aero.global_geometry .............   Passed    1.26 sec
+    Start 91: aero.global_geometry_resources
+2/2 Test #91: aero.global_geometry_resources ...   Passed    0.06 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+V-AERO          =   1.32 sec*proc (2 tests)
+negative        =   1.32 sec*proc (2 tests)
+property        =   1.32 sec*proc (2 tests)
+unit            =   1.26 sec*proc (1 test)
+verification    =   1.32 sec*proc (2 tests)
+
+Total Test time (real) =   1.33 sec

@@ -1,0 +1,48 @@
+[1/3] Processing file <repo>\src\aero\global_geometry.cpp.
+19 warnings and 3 errors generated.
+Error while processing <repo>\src\aero\global_geometry.cpp.
+[2/3] Processing file <repo>\src\aero\global_bvh.cpp.
+38 warnings and 8 errors generated.
+Error while processing <repo>\src\aero\global_bvh.cpp.
+[3/3] Processing file <repo>\src\aero\global_intersections.cpp.
+57 warnings and 12 errors generated.
+Error while processing <repo>\src\aero\global_intersections.cpp.
+<repo>\src\aero\global_bvh.cpp:17:31: error: implicit conversion changes signedness: 'const long long' to 'unsigned long long' [clang-diagnostic-sign-conversion]
+   17 |         node.extrema[2 * k] = face.points[0];
+      |                             ~ ^~~~~~~~~~~~~~
+<repo>\src\aero\global_bvh.cpp:18:35: error: implicit conversion changes signedness: 'const long long' to 'unsigned long long' [clang-diagnostic-sign-conversion]
+   18 |         node.extrema[2 * k + 1] = face.points[0];
+      |                                 ~ ^~~~~~~~~~~~~~
+<repo>\src\aero\global_bvh.cpp:20:36: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+   20 |             auto x = coordinate(g, face.points[j], k, config, r);
+      |                      ~~~~~~~~~~    ^~~~~~~~~~~~~~
+<repo>\src\aero\global_bvh.cpp:24:39: error: implicit conversion changes signedness: 'const long long' to 'unsigned long long' [clang-diagnostic-sign-conversion]
+   24 |                 node.extrema[2 * k] = face.points[j];
+      |                                     ~ ^~~~~~~~~~~~~~
+<repo>\src\aero\global_bvh.cpp:26:43: error: implicit conversion changes signedness: 'const long long' to 'unsigned long long' [clang-diagnostic-sign-conversion]
+   26 |                 node.extrema[2 * k + 1] = face.points[j];
+      |                                         ~ ^~~~~~~~~~~~~~
+<repo>\src\aero\global_geometry.cpp:31:34: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+   31 |             a[k] = coordinate(g, face.points[0], k, config, r);
+      |                    ~~~~~~~~~~    ^~~~~~~~~~~~~~
+<repo>\src\aero\global_geometry.cpp:32:34: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+   32 |             b[k] = coordinate(g, face.points[1], k, config, r);
+      |                    ~~~~~~~~~~    ^~~~~~~~~~~~~~
+<repo>\src\aero\global_geometry.cpp:33:34: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+   33 |             c[k] = coordinate(g, face.points[2], k, config, r);
+      |                    ~~~~~~~~~~    ^~~~~~~~~~~~~~
+<repo>\src\aero\global_intersections.cpp:169:37: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+  169 |             a[k][d] = coordinate(g, fa.points[k], d, Configuration::Current, r);
+      |                       ~~~~~~~~~~    ^~~~~~~~~~~~
+<repo>\src\aero\global_intersections.cpp:170:37: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+  170 |             b[k][d] = coordinate(g, fb.points[k], d, Configuration::Current, r);
+      |                       ~~~~~~~~~~    ^~~~~~~~~~~~
+<repo>\src\aero\global_intersections.cpp:271:38: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+  271 |                 p[d] = coordinate(g, edge.points[0], d, Configuration::Current, r);
+      |                        ~~~~~~~~~~    ^~~~~~~~~~~~~~
+<repo>\src\aero\global_intersections.cpp:272:38: error: implicit conversion changes signedness: 'const long long' to 'std::uint64_t' (aka 'unsigned long long') [clang-diagnostic-sign-conversion]
+  272 |                 q[d] = coordinate(g, edge.points[1], d, Configuration::Current, r);
+      |                        ~~~~~~~~~~    ^~~~~~~~~~~~~~
+Suppressed 57 warnings (57 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Found compiler error(s).

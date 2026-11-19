@@ -1,0 +1,14 @@
+[0/2] Re-checking globbed directories...
+[1/14] C:\WINDOWS\system32\cmd.exe /C "cd /D <repo>\out\issue147-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<repo> -DOUTPUT=<repo>/out/issue147-build/generated/uvlas/git_revision.hpp -P <repo>/cmake/GitRevision.cmake"
+[2/14] Building CXX object CMakeFiles\uvlas_aero_audit.dir\Debug\src\aero\alias_kinematics.cpp.obj
+[3/14] Building CXX object CMakeFiles\uvlas_aero.dir\Debug\src\aero\alias_kinematics.cpp.obj
+[4/14] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[5/14] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[6/14] Linking CXX static library Debug\uvlas_core_audit.lib
+[7/14] Linking CXX static library Debug\uvlas_core.lib
+[8/14] Linking CXX static library Debug\uvlas_aero_audit.lib
+[9/14] Building CXX object tests\CMakeFiles\uvlas_test_aero_global_geometry_resources.dir\Debug\aero\global_geometry_resources_test.cpp.obj
+[10/14] Linking CXX static library Debug\uvlas_aero.lib
+[11/14] Linking CXX executable tests\Debug\uvlas_test_aero_global_geometry_resources.exe
+[12/14] Building CXX object tests\CMakeFiles\uvlas_test_aero_global_geometry.dir\Debug\aero\global_geometry_test.cpp.obj
+[13/14] Linking CXX executable tests\Debug\uvlas_test_aero_global_geometry.exe

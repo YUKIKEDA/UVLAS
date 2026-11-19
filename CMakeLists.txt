@@ -79,7 +79,9 @@ endif()
 
 # Internal geometry preparation and local qualification; no global or kernel acceptance.
 set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp
-    src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp)
+    src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp
+    src/aero/global_geometry.cpp src/aero/global_bvh.cpp src/aero/global_intersections.cpp
+    src/aero/alias_kinematics.cpp)
 add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})
 uvlas_configure_target(uvlas_aero)
 target_include_directories(uvlas_aero PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

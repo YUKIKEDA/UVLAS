@@ -1,0 +1,4 @@
+[1/2] Processing file <repo>\tests\aero\global_geometry_test.cpp.
+71117 warnings generated.
+[2/2] Processing file <repo>\tests\aero\global_geometry_resources_test.cpp.
+133879 warnings generated.

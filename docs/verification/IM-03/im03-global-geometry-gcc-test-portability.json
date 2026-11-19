@@ -1,0 +1,21 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-global-geometry-gcc-test-portability-v1",
+  "ids": [
+    "N4-02",
+    "N4-03"
+  ],
+  "package": "IM-03",
+  "date": "2026-11-19",
+  "base_commit": "c94025aacbc6a187733b92e28677527d6741b581",
+  "sources": {
+    "tests/aero/global_geometry_test.cpp": "37479753013d2dc351701d1e750b735fa26b05981369e9c551c9e33fab83dba4",
+    "tests/aero/global_geometry_resources_test.cpp": "087b0e50e2f005a0b5c9e56caffc9ba8fab04463990dd6a730bcb2c86fa6a9b0"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/global-geometry-gcc-test-portability-v1/build.txt": "39a484ed308e3b53ca9312eb607af2280078621933195a6467321d2d56db78eb",
+    "docs/verification/IM-03/global-geometry-gcc-test-portability-v1/review.md": "5a0b5d7e088a169926ae6d1527ae076f55ce55eda10a80c06084eaec685c4c7d",
+    "docs/verification/IM-03/global-geometry-gcc-test-portability-v1/tests.txt": "d7390a5a526d8a039799522bcce36d2b5485d55d8c2d7750b65a40fce876acc3",
+    "docs/verification/IM-03/global-geometry-gcc-test-portability-v1/tidy.txt": "f7f7cd9ff32599042b8834d2af408c86983c6591f638752b256979b5b08dba41"
+  }
+}
