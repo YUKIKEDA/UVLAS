@@ -1,0 +1,17 @@
+{
+  "repeats":10000,
+  "count_total_ns":1637700,
+  "allocate_destroy_total_ns":1630500,
+  "evaluate_total_ns":5034000,
+  "bits":8,
+  "words":1,
+  "slots":4,
+  "payload_bytes":792,
+  "reserved_steps":3028,
+  "actual_steps":229,
+  "resident_before":4804608,
+  "resident_held":4853760,
+  "resident_after":4861952,
+  "lifetime_peak_after":4861952,
+  "sink":40490000
+}
