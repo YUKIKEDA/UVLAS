@@ -276,7 +276,8 @@ TEST_CASE("Private PCHIP cancellation stops the operation without changing previ
 TEST_CASE("Private PCHIP zero division quota errors and foreign handles fail by value",
           "[N4-08][negative]") {
     p::Counter count{limits()};
-    const auto a = take(count.integer(1)), b = take(count.integer(0));
+    const auto a = take(count.integer(1));
+    take(count.integer(0));
     take(count.binary(p::RationalOp::Divide, a, {1, 1}));
     const auto plan = take(count.finish());
     uvlas::core::ResourcePlan memory{plan.payload_bytes() * 2};
