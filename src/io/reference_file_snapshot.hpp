@@ -67,6 +67,12 @@ struct ReferenceFileQuota {
 };
 
 struct ReferenceFileDiagnostic {
+    ReferenceFileDiagnostic(ReferenceFileFailure failure, std::uint64_t offset,
+                            std::optional<ReferenceFileInfo> initial = {},
+                            std::optional<ReferenceFileInfo> final = {},
+                            std::optional<ReferenceFileQuota> limit = {}) noexcept
+        : reason(failure), bytes_read(offset), before(initial), after(final), quota(limit) {}
+
     ReferenceFileFailure reason;
     std::uint64_t bytes_read; // Payload bytes read before failure, excluding the one-byte probe.
     std::optional<ReferenceFileInfo> before{};
@@ -75,6 +81,10 @@ struct ReferenceFileDiagnostic {
 };
 
 struct ReferenceFileView {
+    ReferenceFileView(std::span<const std::byte> payload, SourceDigest verified_digest,
+                      ReferenceFileInfo verified_info) noexcept
+        : bytes(payload), digest(verified_digest), file_info(verified_info) {}
+
     std::span<const std::byte> bytes;
     SourceDigest digest;
     ReferenceFileInfo file_info;
