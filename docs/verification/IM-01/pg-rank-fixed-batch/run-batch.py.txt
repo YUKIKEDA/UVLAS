@@ -40,6 +40,16 @@ def validate_controls(control):
     require(11*exact[0]+22*exact[1] == Fraction(37,7), 'independent third row')
 
 
+def validate_lift_metrics(column, event_limit):
+    # A selected column uses a direct unit coordinate; its lift report remains empty.
+    for key, limit in (('maximum_coordinate_bits', 8192), ('defined_lift_events', event_limit)):
+        value = column.get(key)
+        if column['selected']:
+            integer(value, 0, key)
+        else:
+            require(type(value) is int and 0 < value <= limit, f'{key}: expected int in [1, {limit}]')
+
+
 def validate_result(result, first=False, selected_columns=None):
     require(isinstance(result,dict), 'result object')
     for key,value in {'status':0,'rows':1252,'candidates':383,'rank':183,'heap_attempts':0,
@@ -58,6 +68,7 @@ def validate_result(result, first=False, selected_columns=None):
         integer(active[0].get('lift_status'),0,'probe lift status')
         integer(active[0].get('proof_rows'),1252,'probe all rows')
         integer(active[0].get('coordinate_checks'),183,'probe all coordinates')
+        validate_lift_metrics(active[0], result['defined_events'])
         if selected_columns is not None:
             integer(active[0].get('candidate'),next(j for j in range(383) if j not in selected_columns),'first dependent')
     else:
@@ -69,6 +80,7 @@ def validate_result(result, first=False, selected_columns=None):
             require(type(column.get('selected')) is bool,'selection kind')
             if selected_columns is not None:
                 require(column['selected'] is (j in selected_columns),'certificate selection roster')
+            validate_lift_metrics(column, result['defined_events'])
             require(type(column.get('proof_products')) is int and column['proof_products'] >= 0,'column products kind')
             digits=column.get('digits')
             require(type(digits) is int and digits in ([0] if column['selected'] else [1,2,4,8,16,32,64,128]),'digits schedule')
@@ -76,6 +88,8 @@ def validate_result(result, first=False, selected_columns=None):
             require(type(width) is int and 0 < width <=8192,'proof intermediate width')
         integer(sum(x['selected'] for x in columns),183,'selected roster')
         integer(sum(x['proof_products'] for x in columns),result['proof_products'],'all products')
+        require(sum(x['defined_lift_events'] for x in columns) <= result['defined_events'],
+                'column lift events exceed the batch total')
 
 
 def publish(output, result):

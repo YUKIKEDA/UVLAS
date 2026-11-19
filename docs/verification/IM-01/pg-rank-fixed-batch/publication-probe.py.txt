@@ -27,16 +27,32 @@ def main():
     selected={c['candidate'] for c in capture['result']['columns'] if c['selected']}
     first_index=next(j for j in range(383) if j not in selected)
     first['columns'][first_index]=copy.deepcopy(capture['result']['columns'][first_index])
+    missing_metrics = {
+        'missing-width': 'maximum_coordinate_bits',
+        'missing-lift-events': 'defined_lift_events',
+    }
+    invalid_metrics = {
+        'selected-width': (True, 'maximum_coordinate_bits', 1),
+        'selected-lift-events': (True, 'defined_lift_events', 1),
+        'selected-bool-width': (True, 'maximum_coordinate_bits', False),
+        'dependent-float-events': (False, 'defined_lift_events', 1.0),
+        'dependent-zero-width': (False, 'maximum_coordinate_bits', 0),
+        'dependent-over-width': (False, 'maximum_coordinate_bits', 8193),
+        'dependent-zero-events': (False, 'defined_lift_events', 0),
+    }
     scenarios=['valid','controls-old','control-rank-float','control-flag-int','nonpivot-false',
                'nonzero-status','heap-attempt','incomplete-columns','missing-row','missing-coordinate',
                'duplicate-column','wrong-selection','digits-float','failed-column','payload-over',
-               'timeout','replacement-error','swapped-input']
+               'timeout','replacement-error','swapped-input',
+               *missing_metrics, *invalid_metrics, 'dependent-over-events',
+               'over-sum-lift-events', 'first-missing-lift-events']
     outcomes=[]
     with tempfile.TemporaryDirectory() as temporary:
         directory=Path(temporary)
         for present in [False,True]:
             for name in scenarios:
                 controls=copy.deepcopy(capture['controls']);all_result=copy.deepcopy(capture['result'])
+                first_result = first
                 if name=='controls-old':controls.pop('hand_rank')
                 elif name=='control-rank-float':controls['hand_rank']=2.0
                 elif name=='control-flag-int':controls['same_scratch_after_failure']=1
@@ -54,6 +70,20 @@ def main():
                 elif name=='digits-float':all_result['columns'][-1]['digits']=1.0
                 elif name=='failed-column':all_result['failed_column']=382
                 elif name=='payload-over':all_result['payload_bytes']=48*1024**3+1
+                elif name in missing_metrics:
+                    for column in all_result['columns']:
+                        del column[missing_metrics[name]]
+                elif name in invalid_metrics:
+                    selection, key, value = invalid_metrics[name]
+                    column = next(c for c in all_result['columns'] if c['selected'] is selection)
+                    column[key] = value
+                elif name == 'dependent-over-events':
+                    all_result['columns'][first_index]['defined_lift_events'] = all_result['defined_events'] + 1
+                elif name == 'over-sum-lift-events':
+                    all_result['columns'][first_index]['defined_lift_events'] = all_result['defined_events']
+                elif name == 'first-missing-lift-events':
+                    first_result = copy.deepcopy(first)
+                    del first_result['columns'][first_index]['defined_lift_events']
                 output=directory/'result.json';output.unlink(missing_ok=True)
                 if present:output.write_bytes(b'prior completed result\n')
                 calls=[]
@@ -61,7 +91,7 @@ def main():
                     calls.append(str(values[-1]))
                     if name=='timeout' and values[-1]=='all':raise TimeoutError('injected timeout')
                     if values==('--controls',):return controls
-                    return first if values[-1]=='first' else all_result
+                    return first_result if values[-1]=='first' else all_result
                 runner.invoke=invoke
                 old_replace=runner.os.replace
                 def fail_replace(*unused):raise OSError('injected replacement failure')
@@ -89,6 +119,8 @@ def main():
                 if name.startswith('control') or name=='nonpivot-false':
                     runner.require(calls==['--controls'],'controls rejected before numeric transport')
                 if name=='swapped-input':runner.require(not calls,'identity rejected before transport')
+                if name=='first-missing-lift-events':
+                    runner.require(calls==['--controls','first'],'incomplete first probe rejected before batch')
                 outcomes.append({'scenario':name,'previous_output':present,'accepted':accepted,'transport_calls':len(calls)})
     args.output.write_text(json.dumps({'schema':'uvlas.fixed-batch-publication-probe/1','numeric_transport':'captured-result stub',
                                       'cases':outcomes},indent=2)+'\n',encoding='utf-8',newline='\n')
