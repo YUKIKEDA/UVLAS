@@ -276,9 +276,11 @@ TEST_CASE("Private PCHIP cancellation stops the operation without changing previ
 TEST_CASE("Private PCHIP zero division quota errors and foreign handles fail by value",
           "[N4-08][negative]") {
     p::Counter count{limits()};
-    const auto a = take(count.integer(1));
-    take(count.integer(0));
-    take(count.binary(p::RationalOp::Divide, a, {1, 1}));
+    const auto a = take(count.integer(1)), b = take(count.integer(0));
+    CHECK(b.numerator == 0);
+    CHECK(b.denominator == 1);
+    const auto division_bound = take(count.binary(p::RationalOp::Divide, a, b));
+    CHECK(division_bound.denominator == 1);
     const auto plan = take(count.finish());
     uvlas::core::ResourcePlan memory{plan.payload_bytes() * 2};
     auto one = take(p::Workspace::create(plan, memory)),
@@ -287,10 +289,17 @@ TEST_CASE("Private PCHIP zero division quota errors and foreign handles fail by 
         auto session = take(one.begin());
         const auto av = take(session.integer(1)), bv = take(session.integer(0));
         const auto unchanged = take(session.view(av));
+        const auto unchanged_zero = take(session.view(bv));
         const auto failure = session.binary(p::RationalOp::Divide, av, bv);
         REQUIRE_FALSE(failure);
         CHECK(failure.error().code == uvlas::core::FailureCode::InvalidInput);
+        CHECK(unchanged.sign == 1);
         CHECK(unchanged.numerator[0] == 1);
+        CHECK(unchanged.denominator[0] == 1);
+        CHECK(unchanged_zero.sign == 0);
+        CHECK(unchanged_zero.numerator.empty());
+        CHECK(unchanged_zero.denominator[0] == 1);
+        CHECK(take(session.usage()).steps <= plan.reserved_steps());
     }
     {
         auto s = take(one.begin()), t = take(two.begin());
