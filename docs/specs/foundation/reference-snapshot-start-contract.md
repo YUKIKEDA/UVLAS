@@ -35,7 +35,7 @@
 正規化後の解決では根のハンドルを使い、途中の成分をディレクトリ、最後の成分を通常ファイルとして扱う。途中も含めてリンク・reparse pointを拒否する。現在の作業ディレクトリ、文字列前方一致、事前のcanonical path文字列だけでは根への所属を認定しない。
 
 - Linuxの実装候補は根のdirfdを使う `openat2` の `RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS`。通常ファイルであることをハンドルの属性で確認してから内容を読む。検査中に親が移動できる状況で、成分ごとの `openat` だけを同等と見なさない。[Linuxの解決規約](https://man7.org/linux/man-pages/man2/openat2.2.html)
-- Windowsの実装候補は `NtCreateFile` の `RootDirectory` に検査済みの親を渡し、一成分ずつ `FILE_OPEN_REPARSE_POINT` で開き、得たハンドルの属性でreparse pointを拒否する。途中の親ハンドルも保持し、rename/deleteを許可しない共有条件で開く。対象のWindows版・ファイルシステム上でこの条件と拒否例を確認する。[相対openとファイルオプション](https://learn.microsoft.com/windows/win32/api/winternl/nf-winternl-ntcreatefile)
+- Windowsの実装候補は `NtCreateFile` の `RootDirectory` に検査済みの親を渡し、一成分ずつ `FILE_OPEN_REPARSE_POINT` で開き、得たハンドルの属性でreparse pointを拒否する。根と途中ディレクトリは `FILE_LIST_DIRECTORY` を含む権限と、rename/deleteを許可しない共有条件で開いて保持する。属性確認だけのハンドルではrenameが通ることをNTFS上で確認した。検査例と再現手順は [Windowsの最小対照](../../verification/IM-06/reference-snapshot-windows-probe.md) を参照する。[相対openとファイルオプション](https://learn.microsoft.com/windows/win32/api/winternl/nf-winternl-ntcreatefile) [アクセス権と共有条件](https://learn.microsoft.com/windows/win32/api/fileapi/nf-fileapi-createfilew)
 
 上記と同等の検査を実機で成立させられない環境では値として失敗する。配布対象の最低OS版はREL-1が決める。パス解決後は同じ最終ハンドルを読取りに使い、成功・失敗のどちらでも一時ハンドルを解放する。
 
