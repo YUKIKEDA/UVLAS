@@ -54,6 +54,16 @@ target_include_directories(uvlas_test_io_input_document_resources PRIVATE "${PRO
 uvlas_enable_allocation_audit(uvlas_test_io_input_document_resources)
 uvlas_require_audited_dependencies(uvlas_test_io_input_document_resources)
 
+uvlas_add_test(io.reference_path
+    LABELS unit property negative verification
+    SOURCES io/reference_path_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_io_audit uvlas::eigen nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_io_reference_path PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+target_compile_definitions(uvlas_test_io_reference_path PRIVATE
+    UVLAS_REFERENCE_PATH_FIXTURE="${PROJECT_SOURCE_DIR}/docs/verification/IM-06/reference-snapshot-design-cases.json")
+uvlas_enable_allocation_audit(uvlas_test_io_reference_path)
+uvlas_require_audited_dependencies(uvlas_test_io_reference_path)
+
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
     add_test(NAME cli.${case}
         COMMAND "${CMAKE_COMMAND}"
