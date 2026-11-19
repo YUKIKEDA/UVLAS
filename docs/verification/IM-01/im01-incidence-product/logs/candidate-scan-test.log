@@ -1,0 +1,23 @@
+Randomness seeded to: 622578466
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+candidate-scan-normal.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+PG incidence plan uses every adopted clipping and sorting term
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(507)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im01-contract\UVLAS\tests\structure\pg_integration_partition_test.cpp(514): FAILED:
+  CHECK( forecast.numeric_operations == 228633355 )
+with expansion:
+  23073715 (0x16013b3)
+  ==
+  228633355 (0xda0ab0b)
+
+===============================================================================
+test cases:     8 |     7 passed | 1 failed
+assertions: 30627 | 30626 passed | 1 failed
+

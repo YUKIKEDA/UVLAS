@@ -1,0 +1,84 @@
+"""Rebuild the six exact coefficient inputs and run the isolated rank experiments."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+from time import monotonic
+
+
+def probe(executable, matrix, domain, order):
+    started = monotonic()
+    run = subprocess.run(
+        [str(executable), str(matrix), domain, order],
+        capture_output=True,
+        check=True,
+        timeout=420,
+    )
+    result = json.loads(run.stdout)
+    result["whole_ms"] = round((monotonic() - started) * 1000)
+    return result
+
+
+def controls(executable, directory):
+    first_prime = 2_147_483_647
+    outcomes = []
+    for name, scale, divisor, expect in (
+        ("retained_tiny", 1, 10**400, True),
+        ("first_prime_loses_independent_column", first_prime, 1, False),
+    ):
+        # The active row is off the anchor and the second column is twice the first.
+        matrix = directory / f"{name}.txt"
+        matrix.write_text(
+            "header 1 2 2 0 0\n"
+            "column 0 0 0\ncolumn 1 0 0\n"
+            f"coefficient 0 0 1 0 0 0 {scale} {divisor}\n"
+            f"coefficient 1 0 1 0 0 0 {2 * scale} {divisor}\n",
+            encoding="ascii",
+            newline="\n",
+        )
+        result = probe(executable, matrix, "full", "sparse")
+        assert result["direct_exact_complete"] and result["direct_exact_selected"] == 1
+        assert bool(result["certificate_complete"]) == expect
+        outcomes.append({"control": name, **result})
+    return outcomes
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--exporter", required=True, type=Path)
+    parser.add_argument("--probe", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--controls-only", action="store_true")
+    args = parser.parse_args()
+    exporter, executable = args.exporter.resolve(), args.probe.resolve()
+    with tempfile.TemporaryDirectory(prefix="pg-rank-study-", dir=args.output.parent) as temp:
+        directory = Path(temp)
+        results = controls(executable, directory)
+        if not args.controls_only:
+            for grid in (1, 2, 4):
+                for shape in ("flat", "quartic"):
+                    matrix = directory / f"{grid}-{shape}.txt"
+                    subprocess.run(
+                        [str(exporter), str(grid), shape, str(matrix)],
+                        check=True,
+                        timeout=180,
+                    )
+                    with matrix.open("rb") as stream:
+                        digest = hashlib.file_digest(stream, "sha256").hexdigest()
+                    orders = ("sparse", "canonical") if (grid, shape) == (4, "quartic") else ("sparse",)
+                    for order in orders:
+                        for domain in ("full", "cut"):
+                            result = probe(executable, matrix, domain, order)
+                            results.append(
+                                {"input_sha256": digest, "shape": shape, "domain": domain,
+                                 "row_order": order, **result}
+                            )
+        with args.output.open("x", encoding="utf-8", newline="\n") as out:
+            out.write(json.dumps(results, indent=2) + "\n")
+
+
+if __name__ == "__main__":
+    main()

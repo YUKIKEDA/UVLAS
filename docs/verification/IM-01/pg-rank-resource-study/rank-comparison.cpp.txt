@@ -1,0 +1,719 @@
+#include <boost/multiprecision/cpp_int.hpp>
+
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <psapi.h>
+#endif
+
+namespace {
+using Integer = boost::multiprecision::cpp_int;
+using Q = boost::multiprecision::cpp_rational;
+constexpr std::uint64_t p1 = 2147483647, p2 = 2147483629, p3 = 2147483587, p4 = 2147483579;
+
+template <std::uint64_t P> struct Mod {
+    std::uint64_t value{};
+    explicit Mod(std::uint64_t x = 0) : value(x) {}
+    static Mod parse(const Q& q) {
+        const auto reduce = [](const Integer& x) {
+            const Integer r = x % P;
+            return Mod{static_cast<std::uint64_t>(r < 0 ? Integer(r + P) : r)};
+        };
+        return reduce(numerator(q)) / reduce(denominator(q));
+    }
+    friend bool operator==(Mod, Mod) = default;
+    friend Mod operator*(Mod x, Mod y) { return Mod{(x.value * y.value) % P}; }
+    Mod& operator+=(Mod y) {
+        value += y.value;
+        if (value >= P) {
+            value -= P;
+        }
+        return *this;
+    }
+    Mod& operator-=(Mod y) {
+        value = value >= y.value ? value - y.value : value + P - y.value;
+        return *this;
+    }
+    friend Mod operator/(Mod x, Mod y) {
+        if (y == Mod{}) {
+            throw std::runtime_error("non-invertible denominator");
+        }
+        Mod inverse{1};
+        for (std::uint64_t exponent = P - 2; exponent; exponent >>= 1) {
+            if (exponent & 1) {
+                inverse = inverse * y;
+            }
+            y = y * y;
+        }
+        return x * inverse;
+    }
+};
+
+using Row = std::tuple<int, int, int, int, int>;
+template <class T> using Sparse = std::vector<std::pair<int, T>>;
+struct Input {
+    int n{}, originals{}, full{};
+    std::uint64_t prior_owned{}, prior_external{};
+    std::vector<std::vector<std::pair<Row, Q>>> dictionary;
+    std::vector<Sparse<Q>> maps;
+};
+
+Input read(std::istream& source) {
+    Input x;
+    std::string kind, a, b;
+    if (!(source >> kind >> x.n >> x.originals >> x.full >> x.prior_owned >> x.prior_external) ||
+        kind != "header") {
+        throw std::runtime_error("bad matrix header");
+    }
+    x.dictionary.resize(x.full);
+    x.maps.resize(33 + x.full + x.originals);
+    for (int i = 0; i < x.full; ++i) {
+        x.maps[33 + i].emplace_back(i, 1);
+        if (i < x.originals) {
+            x.maps[33 + x.full + i].emplace_back(i, 1);
+        }
+    }
+    const auto ratio = [&](const std::string& first, const std::string& second) {
+        Q out{Integer{first}};
+        out /= Integer{second};
+        return out;
+    };
+    while (source >> kind) {
+        int i, j;
+        if (kind == "column") {
+            int previous;
+            source >> i >> j >> previous;
+            if (j == 6 || j == 7) {
+                x.maps[33 + x.full + previous].emplace_back(i, -1);
+            }
+        } else if (kind == "coefficient") {
+            int s, t, u, v;
+            source >> i >> j >> s >> t >> u >> v >> a >> b;
+            x.dictionary[i].emplace_back(Row{j, s, t, u, v}, ratio(a, b));
+        } else if (kind == "required" || kind == "anchor") {
+            source >> i >> j >> a >> b;
+            if (kind == "required") {
+                x.maps[i].emplace_back(j, ratio(a, b));
+            } else {
+                x.maps[33 + x.full + i].emplace_back(j, -ratio(a, b));
+            }
+        } else {
+            throw std::runtime_error("unknown matrix record");
+        }
+        if (!source) {
+            throw std::runtime_error("truncated matrix");
+        }
+    }
+    return x;
+}
+
+bool active(const Row& row, int n, bool cut) {
+    if (!cut) {
+        return true;
+    }
+    const int step = 4 / n;
+    const int a = step * std::get<1>(row), b = step * std::get<2>(row);
+    // U is the union of three closed rectangles in eighths. Require positive area.
+    return (b < 1 && b + step > 0) || (b < 4 && b + step > 3) ||
+           (a < 1 && b < 3 && b + step > 1);
+}
+
+struct Matrix {
+    int rows{};
+    std::uint64_t raw_entries{};
+    std::vector<Sparse<Q>> columns;
+};
+
+std::uint64_t verify_anchor(const Input& input) {
+    using Key = std::tuple<int, int, int>;
+    std::vector<std::map<Key, Q>> traces(input.full);
+    for (int j = 0; j < input.full; ++j) {
+        for (const auto& [key, q] : input.dictionary[j]) {
+            const auto& [field, s, t, u, v] = key;
+            if (s == 0) {
+                traces[j][Key{field, t, v}] += (u % 2 == 0 ? q : -q);
+            }
+        }
+    }
+    std::uint64_t checked = 0;
+    for (int j = 33 + input.full; j < static_cast<int>(input.maps.size()); ++j) {
+        std::map<Key, Q> difference;
+        for (const auto& [index, weight] : input.maps[j]) {
+            for (const auto& [key, q] : traces[index]) {
+                difference[key] += q * weight;
+            }
+        }
+        for (int field = 0; field < 3; ++field) {
+            for (int t = 0; t < 2 * input.n; ++t) {
+                const int max_power = field == 0 ? 13 : (field == 1 ? 21 : 2);
+                for (int power = 0; power <= max_power; ++power) {
+                    const auto found = difference.find(Key{field, t, power});
+                    if (found != difference.end() && found->second != 0) {
+                        throw std::runtime_error("nonzero full-background anchor trace");
+                    }
+                    ++checked;
+                }
+            }
+        }
+    }
+    return checked;
+}
+
+std::uint64_t peak_resident_bytes() {
+#ifdef _WIN32
+    PROCESS_MEMORY_COUNTERS counters{};
+    if (K32GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters))) {
+        return counters.PeakWorkingSetSize;
+    }
+#endif
+    return 0;
+}
+
+Matrix active_matrix(const Input& in, bool cut, bool sparse_first) {
+    std::map<Row, int> keys;
+    for (const auto& c : in.dictionary) {
+        for (const auto& [key, value] : c) {
+            if (active(key, in.n, cut)) {
+                ++keys[key];
+            }
+        }
+    }
+    Matrix matrix;
+    std::vector<std::pair<Row, int>> by_population(keys.begin(), keys.end());
+    if (sparse_first) {
+        std::stable_sort(by_population.begin(), by_population.end(),
+                         [](const auto& a, const auto& b) { return a.second < b.second; });
+    }
+    for (const auto& [key, population] : by_population) {
+        keys[key] = matrix.rows++;
+    }
+    std::vector<Sparse<Q>> originals(in.full);
+    for (int j = 0; j < in.full; ++j) {
+        for (const auto& [key, value] : in.dictionary[j]) {
+            if (const auto found = keys.find(key); found != keys.end()) {
+                originals[j].emplace_back(found->second, value);
+                ++matrix.raw_entries;
+            }
+        }
+    }
+    std::vector<Q> work(matrix.rows);
+    matrix.columns.resize(in.maps.size());
+    for (std::size_t j = 0; j < in.maps.size(); ++j) {
+        if (j >= 33 && j < 33 + originals.size()) {
+            matrix.columns[j] = originals[j - 33];
+            continue;
+        }
+        for (const auto& [k, coefficient] : in.maps[j]) {
+            for (const auto& [row, value] : originals[k]) {
+                work[row] += value * coefficient;
+            }
+        }
+        for (int row = 0; row < matrix.rows; ++row) {
+            if (work[row] != 0) {
+                matrix.columns[j].emplace_back(row, std::move(work[row]));
+                work[row] = 0;
+            }
+        }
+    }
+    return matrix;
+}
+
+template <class T> struct Elimination {
+    std::vector<int> selected;
+    std::vector<int> pivot_rows;
+    std::vector<Sparse<T>> pivot_lower, pivot_upper;
+    std::vector<std::optional<Sparse<T>>> coordinates;
+    std::uint64_t updates{}, stored{};
+    bool complete{};
+};
+
+template <class T, class Convert>
+Elimination<T> eliminate(const Matrix& matrix, int selectable, std::uint64_t cap, Convert convert,
+                         bool retain_factors = false) {
+    Elimination<T> out;
+    std::vector<int> pivots;
+    std::vector<Sparse<T>> reduced, upper;
+    std::vector<T> work(matrix.rows), rhs;
+    out.coordinates.resize(matrix.columns.size());
+    for (int j = 0; j < static_cast<int>(matrix.columns.size()); ++j) {
+        std::fill(work.begin(), work.end(), T{});
+        for (const auto& [row, q] : matrix.columns[j]) {
+            work[row] = convert(q);
+        }
+        rhs.assign(pivots.size(), T{});
+        for (std::size_t k = 0; k < pivots.size(); ++k) {
+            const T factor = work[pivots[k]];
+            rhs[k] = factor;
+            if (factor == T{}) {
+                continue;
+            }
+            if (reduced[k].size() > cap - out.updates) {
+                return out;
+            }
+            out.updates += reduced[k].size();
+            for (const auto& [row, value] : reduced[k]) {
+                work[row] -= factor * value;
+            }
+        }
+        const auto first = std::find_if(work.begin(), work.end(), [](const T& q) { return q != T{}; });
+        if (first != work.end()) {
+            if (j >= selectable) {
+                return out;
+            }
+            const T diagonal = *first;
+            pivots.push_back(static_cast<int>(first - work.begin()));
+            out.selected.push_back(j);
+            Sparse<T> column, transform;
+            for (int row = 0; row < matrix.rows; ++row) {
+                if (work[row] != T{}) {
+                    column.emplace_back(row, work[row] / diagonal);
+                }
+            }
+            for (int i = 0; i < static_cast<int>(rhs.size()); ++i) {
+                if (rhs[i] != T{}) {
+                    transform.emplace_back(i, rhs[i]);
+                }
+            }
+            transform.emplace_back(static_cast<int>(rhs.size()), diagonal);
+            out.stored += column.size() + transform.size();
+            reduced.push_back(std::move(column));
+            upper.push_back(std::move(transform));
+            continue;
+        }
+        Sparse<T> coordinate;
+        for (int k = static_cast<int>(rhs.size()) - 1; k >= 0; --k) {
+            if (rhs[k] == T{}) {
+                continue;
+            }
+            const T coordinate_k = rhs[k] / upper[k].back().second;
+            coordinate.emplace_back(k, coordinate_k);
+            if (upper[k].size() - 1 > cap - out.updates) {
+                return out;
+            }
+            out.updates += upper[k].size() - 1;
+            for (std::size_t i = 0; i + 1 < upper[k].size(); ++i) {
+                rhs[upper[k][i].first] -= coordinate_k * upper[k][i].second;
+            }
+        }
+        out.coordinates[j] = std::move(coordinate);
+    }
+    out.complete = true;
+    if (retain_factors) {
+        std::vector<int> row_to_pivot(matrix.rows, -1);
+        for (int k = 0; k < static_cast<int>(pivots.size()); ++k) {
+            row_to_pivot[pivots[k]] = k;
+        }
+        out.pivot_lower.resize(pivots.size());
+        for (int k = 0; k < static_cast<int>(pivots.size()); ++k) {
+            for (const auto& [row, coefficient] : reduced[k]) {
+                const auto pos = row_to_pivot[row];
+                if (pos > k) {
+                    out.pivot_lower[k].emplace_back(pos, coefficient);
+                }
+            }
+        }
+        out.pivot_rows = std::move(pivots);
+        out.pivot_upper = std::move(upper);
+    }
+    return out;
+}
+
+template <std::uint64_t P> bool prime() {
+    for (std::uint64_t k = 2; k * k <= P; ++k) {
+        if (P % k == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::optional<Q> reconstruct(const std::array<std::uint64_t, 4>& residues) {
+    static const Integer modulus = Integer(p1) * p2 * p3 * p4;
+    static const Integer half = modulus / 2;
+    static const Integer bound = boost::multiprecision::sqrt(half);
+    static const std::array<std::uint64_t, 4> primes{p1, p2, p3, p4};
+    static const std::array<std::uint64_t, 4> inv{
+        1, (Mod<p2>{1} / Mod<p2>{p1 % p2}).value,
+        (Mod<p3>{1} / Mod<p3>{(p1 * p2) % p3}).value,
+        (Mod<p4>{1} / Mod<p4>{(((p1 * p2) % p4) * p3) % p4}).value};
+    Integer value = 0;
+    Integer period = 1;
+    for (std::size_t i = 0; i < primes.size(); ++i) {
+        const auto p = primes[i];
+        const auto low = static_cast<std::uint64_t>(value % p);
+        const auto digit = ((residues[i] + p - low) * inv[i]) % p;
+        value += period * digit;
+        period *= p;
+    }
+    Integer r0 = modulus, r1 = value, t0 = 0, t1 = 1;
+    while (r1 > bound) {
+        const Integer q = r0 / r1;
+        Integer next = r0 % r1;
+        r0 = std::move(r1);
+        r1 = std::move(next);
+        next = t0 - q * t1;
+        t0 = std::move(t1);
+        t1 = std::move(next);
+    }
+    if (t1 == 0 || t1 > bound || t1 < -bound) {
+        return std::nullopt;
+    }
+    if (t1 < 0) {
+        r1 = -r1;
+        t1 = -t1;
+    }
+    const Q q = Q(r1) / t1;
+    if (Mod<p1>::parse(q).value != residues[0] || Mod<p2>::parse(q).value != residues[1] ||
+        Mod<p3>::parse(q).value != residues[2] || Mod<p4>::parse(q).value != residues[3]) {
+        return std::nullopt;
+    }
+    return q;
+}
+
+struct Lift {
+    bool complete{};
+    int digits{};
+    std::uint64_t products{}, certificate_products{}, coordinate_bits{};
+};
+
+Lift lift_one(const Matrix&, const Elimination<Mod<p1>>&, int);
+
+struct Proof {
+    bool complete{};
+    int first_failure{-1};
+    const char* failure_reason{"rank or prefix differs"};
+    std::uint64_t reconstructed{}, coefficient_products{};
+    std::uint64_t lifted_columns{}, lift_products{};
+    int maximum_lift_digits{}, stopped_column{-1};
+    std::uint64_t maximum_lift_coordinate_bits{};
+};
+
+Proof certify(const Matrix& m, const Elimination<Mod<p1>>& first,
+              const Elimination<Mod<p2>>& second, const Elimination<Mod<p3>>& third,
+              const Elimination<Mod<p4>>& fourth, bool use_lifting) {
+    Proof proof;
+    if (!first.complete || !second.complete || !third.complete || !fourth.complete ||
+        first.selected != second.selected || first.selected != third.selected ||
+        first.selected != fourth.selected) {
+        return proof;
+    }
+    std::vector<Q> work(m.rows);
+    for (std::size_t j = 0; j < m.columns.size(); ++j) {
+        if (!first.coordinates[j]) {
+            continue;
+        }
+        std::map<int, std::array<std::uint64_t, 4>> combined;
+        const auto append = [&](const auto& case_data, int limb) {
+            for (const auto& [index, value] : *case_data.coordinates[j]) {
+                combined[index][limb] = value.value;
+            }
+        };
+        append(first, 0);
+        append(second, 1);
+        append(third, 2);
+        append(fourth, 3);
+        std::fill(work.begin(), work.end(), Q{});
+        for (const auto& [row, value] : m.columns[j]) {
+            work[row] = value;
+        }
+        const char* rejection = nullptr;
+        for (const auto& [k, residues] : combined) {
+            if (first.selected[k] >= static_cast<int>(j)) {
+                rejection = "prefix";
+                break;
+            }
+            const auto coefficient = reconstruct(residues);
+            if (!coefficient) {
+                rejection = "rational reconstruction";
+                break;
+            }
+            ++proof.reconstructed;
+            for (const auto& [row, value] : m.columns[first.selected[k]]) {
+                work[row] -= value * *coefficient;
+                ++proof.coefficient_products;
+            }
+        }
+        if (!rejection &&
+            std::any_of(work.begin(), work.end(), [](const Q& value) { return value != 0; })) {
+            rejection = "exact residual";
+        }
+        if (rejection) {
+            if (proof.first_failure < 0) {
+                proof.first_failure = static_cast<int>(j);
+                proof.failure_reason = rejection;
+            }
+            Lift lifted;
+            if (use_lifting) {
+                try {
+                    lifted = lift_one(m, first, static_cast<int>(j));
+                } catch (const std::exception& error) {
+                    throw std::runtime_error("lifting candidate " + std::to_string(j) + ": " +
+                                             error.what());
+                }
+            }
+            proof.lift_products += lifted.products;
+            proof.coefficient_products += lifted.certificate_products;
+            proof.maximum_lift_digits = std::max(proof.maximum_lift_digits, lifted.digits);
+            proof.maximum_lift_coordinate_bits =
+                std::max(proof.maximum_lift_coordinate_bits, lifted.coordinate_bits);
+            if (!lifted.complete) {
+                proof.stopped_column = static_cast<int>(j);
+                return proof;
+            }
+            ++proof.lifted_columns;
+        }
+    }
+    proof.complete = true;
+    if (proof.first_failure < 0) {
+        proof.failure_reason = "none";
+    }
+    return proof;
+}
+
+std::uint64_t coordinate_bits(const Elimination<Q>& output) {
+    std::uint64_t maximum = 0;
+    for (const auto& column : output.coordinates) {
+        if (!column) {
+            continue;
+        }
+        for (const auto& [index, q] : *column) {
+            const Integer n = boost::multiprecision::abs(numerator(q));
+            const Integer d = denominator(q);
+            if (n != 0) {
+                maximum = std::max(maximum,
+                                   std::uint64_t{1} + boost::multiprecision::msb(n));
+            }
+            maximum = std::max(maximum, std::uint64_t{1} + boost::multiprecision::msb(d));
+        }
+    }
+    return maximum;
+}
+
+Integer gcd(Integer x, Integer y) {
+    while (y != 0) {
+        Integer next = x % y;
+        x = std::move(y);
+        y = std::move(next);
+    }
+    return x;
+}
+
+std::optional<Q> reconstruct_lifted(const Integer& residue, const Integer& modulus,
+                                    const Integer& bound) {
+    Integer r0 = modulus, r1 = residue, t0 = 0, t1 = 1;
+    while (r1 > bound) {
+        const Integer quotient = r0 / r1;
+        Integer next = r0 % r1;
+        r0 = std::move(r1);
+        r1 = std::move(next);
+        next = t0 - quotient * t1;
+        t0 = std::move(t1);
+        t1 = std::move(next);
+    }
+    if (t1 == 0 || t1 > bound || t1 < -bound || (r1 - t1 * residue) % modulus != 0) {
+        return std::nullopt;
+    }
+    if (t1 < 0) {
+        r1 = -r1;
+        t1 = -t1;
+    }
+    return Q(r1) / t1;
+}
+
+Lift lift_one(const Matrix& matrix, const Elimination<Mod<p1>>& factor, int j) {
+    Lift lift;
+    if (j < 0 || !factor.complete) {
+        return lift;
+    }
+    const auto size = factor.selected.size();
+    std::vector<int> row_to_pivot(matrix.rows, -1);
+    for (std::size_t k = 0; k < size; ++k) {
+        row_to_pivot[factor.pivot_rows[k]] = static_cast<int>(k);
+    }
+    std::vector<Sparse<Q>> row_values(size);
+    const auto collect = [&](const auto& column, int col) {
+        for (const auto& [row, q] : column) {
+            if (const auto k = row_to_pivot[row]; k != -1) {
+                row_values[k].emplace_back(col, q);
+            }
+        }
+    };
+    for (std::size_t k = 0; k < size; ++k) {
+        collect(matrix.columns[factor.selected[k]], static_cast<int>(k));
+    }
+    collect(matrix.columns[j], -1);
+    std::vector<Sparse<Integer>> integer_rows(size);
+    std::vector<Integer> current(size), residue(size);
+    for (std::size_t row = 0; row < size; ++row) {
+        Integer scale = 1;
+        for (const auto& [col, q] : row_values[row]) {
+            const Integer d = denominator(q);
+            scale = (scale / gcd(scale, d)) * d;
+        }
+        if (scale % p1 == 0) {
+            throw std::runtime_error("row scale not invertible");
+        }
+        for (const auto& [col, q] : row_values[row]) {
+            Integer value = numerator(q) * (scale / denominator(q));
+            if (col < 0) {
+                current[row] = std::move(value);
+            } else {
+                integer_rows[row].emplace_back(col, std::move(value));
+            }
+        }
+        // The retained factor is for the rational matrix. Store the row-scale inverse
+        // so each integer residual is converted back to its rational-row residue.
+        row_values[row].clear();
+        row_values[row].emplace_back(-1, Q{1} / scale);
+    }
+    std::vector<Mod<p1>> scale_inverse(size), rhs(size), solution(size), inverse_diag(size);
+    for (std::size_t k = 0; k < size; ++k) {
+        scale_inverse[k] = Mod<p1>::parse(row_values[k][0].second);
+        inverse_diag[k] = Mod<p1>{1} / factor.pivot_upper[k].back().second;
+    }
+    Integer modulus = 1;
+    std::vector<Q> remaining(matrix.rows);
+    for (int digits = 1; digits <= 128; ++digits) {
+        for (std::size_t k = 0; k < size; ++k) {
+            rhs[k] = scale_inverse[k] * Mod<p1>::parse(Q{current[k]});
+        }
+        for (std::size_t k = 0; k < size; ++k) {
+            for (const auto& [row, value] : factor.pivot_lower[k]) {
+                rhs[row] -= rhs[k] * value;
+            }
+        }
+        for (std::size_t k = size; k-- > 0;) {
+            solution[k] = rhs[k] * inverse_diag[k];
+            for (std::size_t i = 0; i + 1 < factor.pivot_upper[k].size(); ++i) {
+                const auto& [row, value] = factor.pivot_upper[k][i];
+                rhs[row] -= solution[k] * value;
+            }
+            residue[k] += modulus * solution[k].value;
+        }
+        modulus *= p1;
+        for (std::size_t row = 0; row < size; ++row) {
+            for (const auto& [col, value] : integer_rows[row]) {
+                if (solution[col].value != 0) {
+                    current[row] -= value * solution[col].value;
+                    ++lift.products;
+                }
+            }
+            if (current[row] % p1 != 0) {
+                throw std::runtime_error("p-adic residual is not exactly divisible");
+            }
+            current[row] /= p1;
+        }
+        lift.digits = digits;
+        if ((digits & (digits - 1)) != 0) {
+            continue;
+        }
+        const Integer half = modulus / 2;
+        const Integer bound = boost::multiprecision::sqrt(half);
+        std::vector<Q> reconstructed;
+        for (std::size_t k = 0; k < size; ++k) {
+            const auto q = reconstruct_lifted(residue[k], modulus, bound);
+            if (!q || (*q != 0 && factor.selected[k] >= j)) {
+                break;
+            }
+            reconstructed.push_back(*q);
+        }
+        if (reconstructed.size() != size) {
+            continue;
+        }
+        std::fill(remaining.begin(), remaining.end(), Q{});
+        for (const auto& [row, q] : matrix.columns[j]) {
+            remaining[row] = q;
+        }
+        for (std::size_t k = 0; k < size; ++k) {
+            if (reconstructed[k] != 0) {
+                for (const auto& [row, q] : matrix.columns[factor.selected[k]]) {
+                    remaining[row] -= q * reconstructed[k];
+                    ++lift.certificate_products;
+                }
+            }
+        }
+        if (std::all_of(remaining.begin(), remaining.end(), [](const Q& q) { return q == 0; })) {
+            lift.complete = true;
+            Elimination<Q> one;
+            one.coordinates.emplace_back(Sparse<Q>{});
+            for (std::size_t k = 0; k < size; ++k) {
+                one.coordinates[0]->emplace_back(static_cast<int>(k), std::move(reconstructed[k]));
+            }
+            lift.coordinate_bits = coordinate_bits(one);
+            break;
+        }
+    }
+    return lift;
+}
+} // namespace
+
+int main(int argc, char** argv) try {
+    if (argc != 4 || !prime<p1>() || !prime<p2>() || !prime<p3>() || !prime<p4>()) {
+        return 2;
+    }
+    const std::string shape = argv[2], order = argv[3];
+    if ((shape != "cut" && shape != "full") || (order != "canonical" && order != "sparse")) {
+        return 2;
+    }
+    const bool cut = shape == "cut";
+    std::ifstream stream(argv[1]);
+    const auto input = read(stream);
+    const auto anchor_checks = verify_anchor(input);
+    const auto matrix = active_matrix(input, cut, order == "sparse");
+    const auto a = eliminate<Mod<p1>>(matrix, 33 + input.full, 200'000'000, Mod<p1>::parse, true);
+    Proof proof;
+    if (a.complete) {
+        const auto b = eliminate<Mod<p2>>(matrix, 33 + input.full, 200'000'000, Mod<p2>::parse);
+        const auto c = eliminate<Mod<p3>>(matrix, 33 + input.full, 200'000'000, Mod<p3>::parse);
+        const auto d = eliminate<Mod<p4>>(matrix, 33 + input.full, 200'000'000, Mod<p4>::parse);
+        proof = certify(matrix, a, b, c, d, order == "sparse");
+    }
+    std::cout << "{\"grid\":" << input.n << ",\"rows\":" << matrix.rows
+              << ",\"columns\":" << input.full << ",\"candidates\":" << input.maps.size()
+              << ",\"raw_nonzeros\":" << matrix.raw_entries
+              << ",\"anchor_exact_checks\":" << anchor_checks
+              << ",\"prior_owned_bytes\":" << input.prior_owned
+              << ",\"prior_external_forecast\":" << input.prior_external
+              << ",\"mod_complete\":" << a.complete << ",\"mod_rank\":" << a.selected.size()
+              << ",\"mod_updates\":" << a.updates << ",\"mod_stored\":" << a.stored
+              << ",\"certificate_complete\":" << proof.complete
+              << ",\"certificate_failure_column\":" << proof.first_failure
+              << ",\"certificate_failure_reason\":\"" << proof.failure_reason << "\""
+              << ",\"certificate_stopped_column\":" << proof.stopped_column
+              << ",\"lifted_columns\":" << proof.lifted_columns
+              << ",\"lift_products\":" << proof.lift_products
+              << ",\"maximum_lift_digits\":" << proof.maximum_lift_digits
+              << ",\"maximum_lift_coordinate_bits\":" << proof.maximum_lift_coordinate_bits
+              << ",\"certificate_products\":" << proof.coefficient_products
+              << ",\"reconstructed_nonzeros\":" << proof.reconstructed << std::flush;
+    // Same matrix and prefix policy, without rational reconstruction. Use reused vector
+    // slots, with a smaller explicit work cap because each update uses multiword gcd.
+    const auto exact = eliminate<Q>(matrix, 33 + input.full, 2'000'000, [](const Q& q) { return q; });
+    std::cout << ",\"direct_exact_complete\":" << exact.complete
+              << ",\"direct_exact_selected\":" << exact.selected.size()
+              << ",\"direct_exact_updates\":" << exact.updates
+              << ",\"direct_exact_stored\":" << exact.stored
+              << ",\"direct_recovered_coordinate_bits\":" << coordinate_bits(exact)
+              << ",\"selected_matches_direct\":" << (a.selected == exact.selected)
+              << ",\"process_lifetime_peak_bytes\":" << peak_resident_bytes()
+              << "}\n";
+    return 0;
+} catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+}

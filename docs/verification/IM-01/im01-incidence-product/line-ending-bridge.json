@@ -1,0 +1,20 @@
+{
+  "scope": "New producer source publication only. Compiled product/tests and all raw outputs remain unchanged.",
+  "transform": "replace CRLF by LF; inverse positions are final newline only for these two files",
+  "files": [
+    {
+      "path": "docs/verification/IM-01/im01-incidence-product/comparison-producer.cpp.txt",
+      "captured_sha256": "2225f5c1b15294f8dbe92e5109db7194be7a350b96ff93cc28aabc29642db65e",
+      "published_sha256": "174563db04a5eb5dadfb92f4b40cce96f1352168cf147898e7383d13ff038ef8",
+      "CRLF_to_LF_count": 1,
+      "other_bytes_unchanged": true
+    },
+    {
+      "path": "docs/verification/IM-01/im01-incidence-product/run-fixed-comparison.py.txt",
+      "captured_sha256": "a691a0413ee86699b9c93ac284830748e46a5fb159c02dc4a11e9e7424f92fa2",
+      "published_sha256": "ef87c757db5c8f3a29e0c54b89451c7506efc6f248c6789d36c60374cecf2661",
+      "CRLF_to_LF_count": 1,
+      "other_bytes_unchanged": true
+    }
+  ]
+}

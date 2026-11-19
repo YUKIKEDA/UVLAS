@@ -1,0 +1,8 @@
+{
+  "allocated": 0,
+  "external": 19978141584,
+  "failure": "ResourceExceeded",
+  "forecast": 205783717415,
+  "numeric_forecast": 3214950271,
+  "topology_forecast": 464517909
+}

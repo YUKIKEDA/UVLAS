@@ -39,7 +39,7 @@ T take(core::Result<T> value) {
 struct Fixture {
     core::ResourcePlan input_plan{cap};
     std::optional<PgGraph> graph;
-    std::vector<PgPartitionPoint> domain, thickness, named;
+    std::vector<PgPartitionPoint> domain, thickness, named, cut_points;
     std::vector<ExactRational> heights;
     std::vector<std::array<core::Index, 3>> triangles;
     std::array<ExactRational, 3> zeta;
@@ -77,4 +77,20 @@ struct Fixture {
         return {*graph, domain, {thickness, triangles, heights}, layers, names, refinements};
     }
 };
+/// Published incidence input; f owns every borrowed endpoint.
+inline void incidence_fixture(Fixture& f) {
+    f.domain.clear();
+    for (const auto p : std::array<std::array<int, 2>, 8>{
+             {{0, 0}, {8, 0}, {8, 1}, {1, 1}, {1, 3}, {8, 3}, {8, 4}, {0, 4}}})
+        f.domain.push_back({f.r(std::to_string(p[0]), "8"), f.r(std::to_string(p[1]), "8")});
+    for (std::size_t i = 1; i < f.heights.size(); ++i)
+        f.heights[i] = f.r("2");
+    f.named.push_back({f.r("1", "4"), f.r("0")});
+    f.named.push_back({f.r("3", "4"), f.r("0")});
+    f.names.push_back({"partial", f.named});
+    f.cut_points.push_back({f.r("1", "10"), f.r("4", "5")});
+    f.cut_points.push_back({f.r("9", "10"), f.r("1", "5")});
+    f.refinements.push_back({23, 4, f.cut_points[0], f.cut_points[1]});
+}
+
 } // namespace partition_test
