@@ -28,7 +28,7 @@
 
 ## パスと実体
 
-`File` は取得処理だけが生成する。取得処理は根となる親の `ReadRoot` からmanifestを開き、そのハンドルから元bytesと実体ID（Linuxはdevice/inode、Windowsはvolume/file ID）を取得する。取得の前後でID、長さ、変更指標を照合する。その元bytesから検査済み `SchemaCase` を作り、同じ `ReadRoot`、実体ID、manifestハンドルと組にして解決器へ渡す。呼出し側が別の `SchemaCase`、根、IDを組み合わせる入口は設けない。`File` の寿命中は元ハンドルを保持し、解決中にファイルIDが別の実体に再利用されるのを防ぐ。パスを再度開いてIDを取得しない。安定したIDを取得できない環境は `Unsupported`、manifestの読取り失敗または取得中改変は `InvalidInput` とする。
+`File` は取得処理だけが生成する。外部参照の根にはmanifestを含む直上のディレクトリを使う。取得処理はその `ReadRoot` からmanifestをファイル名一成分で開き、同じハンドルから元bytesと実体ID（Linuxはdevice/inode、Windowsはvolume/file ID）を取得する。読取りの前後でID、長さ、変更指標を照合する。その元bytesから検査済み `SchemaCase` を作り、同じ `ReadRoot`、実体ID、manifestハンドルと組にして解決器へ渡す。呼出し側が別の `SchemaCase`、根、IDを組み合わせる入口は設けない。`File` の寿命中は元ハンドルを保持し、解決中にファイルIDが別の実体に再利用されるのを防ぐ。パスを再度開いてIDを取得しない。安定したIDを取得できない環境は `Unsupported`、manifestの読取り失敗または取得中改変は `InvalidInput` とする。
 
 `Memory` は呼出し側のbytesから作る。外部参照がある場合は呼出し側が基準となる `ReadRoot` を指定する。参照がゼロなら根を省略できる。`Memory` はmanifestの実体IDを持たない。`SourceIdentity` の呼出側ID、長さ、digestは両経路とも元bytesの識別に使う。外部ファイルとの実体照合には、開いたハンドルから得たIDだけを使う。
 
@@ -75,7 +75,7 @@ $$ P $$ は完成物の容量である。オフセットはmanifestを表す仮�
 |---|---|
 | 入力の結線 | 8役割を全部持つ正常例と参照ゼロの例。辞書から手で転記したSourceId・role・位置と厳密一致 |
 | 所有と照合 | [元bytesとグラフの例](../../verification/IM-06/reference-snapshot-design-cases.json)。digestは独立SHA-256、元ファイルと根を破棄した後も全payload一致。異なるSchemaIdentity・roleの借用は拒否 |
-| manifestの実体 | [固定例と照合手順](../../verification/IM-06/reference-snapshot-manifest-origin.md) のとおり、`File` の元名とハードリンクは `Cycle`、同じbytesの別実体は成功。`Memory` に同じbytesと根を渡した場合、ハードリンクは通常の外部参照として成功。両経路とも呼出側ID・長さ・digestを同じ値に固定し、実体照合の有無だけを変える |
+| manifestの実体 | [固定例と照合手順](../../verification/IM-06/reference-snapshot-manifest-origin.md) のとおり、`File` の元名とハードリンクは `Cycle`、同じbytesの別実体は成功。`Memory` に同じbytesと根を渡した場合、ハードリンクは通常の外部参照として成功。呼出側ID・長さ・digestは共通とする。別の例で、上位と直上のディレクトリに同名ファイルを置き、直上を根に選ぶことを確認する |
 | 同名・別名・循環 | 明示グラフ、hardlink、二つのpathの同一実体、同じ内容の別実体、root manifestへの辺を両OSで照合。親から子の順、完了順、循環の宣言位置は手書きの列と厳密一致 |
 | パスと取得 | root内での`.`・`..`、root外、絶対・ドライブ相対・UNC・stream、symlink/junction、途中の親の改名、短いread、EOF前の改変、長さ不変の別bytes。制御したadapterまたは別プロセスで変更時点を固定し、時間の偶然に頼らず拒否理由を照合 |
 | 資源と故障 | 各上限ちょうどと1不足、整数overflow、確保点ごとの故障、診断予算ゼロ、最後の確保中の取消。旧snapshotの全payloadと読み手のハンドル数を確認 |
