@@ -166,3 +166,13 @@ for (const std::uint64_t cap : {16, 17}) { use(cap); }
 // GOOD: the fixture values already have the required unsigned type.
 for (const std::uint64_t cap : {std::uint64_t{16}, std::uint64_t{17}}) { use(cap); }
 ```
+
+失敗をboolと別のoptional記録に分ける補助I/Fでは、boolの成功・失敗だけを記録の存在証明にしない。元の失敗理由が必要な処理は`Result<T>`で返し、呼出側はその同じResultから元のcode・detailsを伝播する。2026-11-19、PR #179のLinux clang-tidyでは、係数slotとMeterのboolと別optionalをたどる10参照が拒否された。Resultへ移した後は、その経路だけに使っていた失敗cacheも取り除いた。個々のoptionalの取得には、上記の同じ値をguardする規則を使う。
+
+```cpp
+// BAD: a Boolean does not prove that a separate cached failure is present.
+if (!meter.visit()) { return std::unexpected(*meter.failure()); }
+// GOOD: propagate the actual failure from the same checked Result.
+const auto visited = meter.visit();
+if (!visited) { return std::unexpected(visited.error()); }
+```
