@@ -107,11 +107,13 @@ target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 
 # Strict input scalars share the core value and failure contracts.
 set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
-    src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp)
+    src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
+    src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
+    src/io/si_exact_center.cpp src/io/si_quantity.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES})
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_io PUBLIC uvlas_core PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
+target_link_libraries(uvlas_io PUBLIC uvlas_core uvlas_structure PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
 
 add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)
@@ -148,7 +150,7 @@ if(BUILD_TESTING)
     uvlas_configure_target(uvlas_io_audit)
     uvlas_enable_allocation_audit(uvlas_io_audit)
     target_include_directories(uvlas_io_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_io_audit PUBLIC uvlas_core_audit PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
+    target_link_libraries(uvlas_io_audit PUBLIC uvlas_core_audit uvlas_structure_audit PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
     uvlas_require_audited_dependencies(uvlas_io_audit)
     add_library(uvlas_numerics_audit STATIC ${UVLAS_NUMERICS_SOURCES})
     uvlas_configure_target(uvlas_numerics_audit)

@@ -1,0 +1,18 @@
+Internal ctest changing into directory: <workspace>/out/issue148-build
+Test project <workspace>/out/issue148-build
+    Start 93: io.si_interval
+1/3 Test #93: io.si_interval ...................   Passed    0.04 sec
+    Start 94: io.si_case
+2/3 Test #94: io.si_case .......................   Passed    1.05 sec
+    Start 95: io.si_case_resources
+3/3 Test #95: io.si_case_resources .............   Passed    0.54 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+negative        =   1.63 sec*proc (3 tests)
+property        =   1.63 sec*proc (3 tests)
+unit            =   1.09 sec*proc (2 tests)
+verification    =   1.63 sec*proc (3 tests)
+
+Total Test time (real) =   1.64 sec

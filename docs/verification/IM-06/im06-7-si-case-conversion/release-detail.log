@@ -1,0 +1,68 @@
+Start testing: Nov 19 00:01 東京 (標準時)
+----------------------------------------------------------
+93/95 Testing: io.si_interval
+93/95 Test: io.si_interval
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_si_interval.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_interval" start time: Nov 19 00:01 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 422857242
+===============================================================================
+All tests passed (55 assertions in 4 test cases)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_interval" end time: Nov 19 00:01 東京 (標準時)
+"io.si_interval" time elapsed: 00:00:00
+----------------------------------------------------------
+
+94/95 Testing: io.si_case
+94/95 Test: io.si_case
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_si_case.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_case" start time: Nov 19 00:01 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 3341266296
+===============================================================================
+All tests passed (39034 assertions in 17 test cases)
+
+<end of output>
+Test time =   1.05 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_case" end time: Nov 19 00:01 東京 (標準時)
+"io.si_case" time elapsed: 00:00:01
+----------------------------------------------------------
+
+95/95 Testing: io.si_case_resources
+95/95 Test: io.si_case_resources
+Command: "<workspace>/out/issue148-build/tests/Release/uvlas_test_io_si_case_resources.exe"
+Directory: <workspace>/out/issue148-build/tests
+"io.si_case_resources" start time: Nov 19 00:01 東京 (標準時)
+Output:
+----------------------------------------------------------
+Randomness seeded to: 3685241554
+===============================================================================
+All tests passed (3880 assertions in 5 test cases)
+
+<end of output>
+Test time =   0.54 sec
+----------------------------------------------------------
+Test Passed.
+"io.si_case_resources" end time: Nov 19 00:01 東京 (標準時)
+"io.si_case_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 19 00:01 東京 (標準時)
+
+negative =   1.63 sec*proc
+
+property =   1.63 sec*proc
+
+unit =   1.09 sec*proc
+
+verification =   1.63 sec*proc

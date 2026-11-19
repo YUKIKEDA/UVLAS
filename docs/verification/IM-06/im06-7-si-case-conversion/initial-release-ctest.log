@@ -1,0 +1,48 @@
+Internal ctest changing into directory: <workspace>/out/issue148-build
+Test project <workspace>/out/issue148-build
+    Start 91: io.case_schema
+1/4 Test #91: io.case_schema ...................   Passed    1.97 sec
+    Start 93: io.si_interval
+2/4 Test #93: io.si_interval ...................   Passed    0.06 sec
+    Start 94: io.si_case
+3/4 Test #94: io.si_case .......................   Passed    1.06 sec
+    Start 95: io.si_case_resources
+4/4 Test #95: io.si_case_resources .............***Exception: SegFault  0.41 sec
+Randomness seeded to: 4116407556
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_io_si_case_resources.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+SI exact dyadic fallback propagates its arithmetic admission and allocation
+failures
+-------------------------------------------------------------------------------
+<workspace>\tests\io\si_case_resource_test.cpp(495)
+...............................................................................
+
+<workspace>\tests\io\si_case_resource_test.cpp(538): FAILED:
+  {Unknown expression after the reported line}
+due to a fatal error condition:
+  77
+  SIGSEGV - Segmentation violation signal
+
+===============================================================================
+test cases:    3 |    2 passed | 1 failed
+assertions: 2325 | 2324 passed | 1 failed
+
+
+
+75% tests passed, 1 tests failed out of 4
+
+Label Time Summary:
+negative        =   3.49 sec*proc (4 tests)
+property        =   3.49 sec*proc (4 tests)
+unit            =   3.09 sec*proc (3 tests)
+verification    =   3.49 sec*proc (4 tests)
+
+Total Test time (real) =   3.51 sec
+
+The following tests FAILED:
+	 95 - io.si_case_resources (SEGFAULT)
+Errors while running CTest

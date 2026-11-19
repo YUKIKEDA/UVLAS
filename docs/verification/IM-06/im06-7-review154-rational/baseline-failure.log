@@ -1,0 +1,15 @@
+Filters: "Direct SI rational admission*"
+RNG seed: 12345
+<workspace>/tests/io/si_case_resource_test.cpp(597): failed: allocations == 0 for: 4 == 0 with 1 message: '64'
+<workspace>/tests/io/si_case_resource_test.cpp(598): failed: plan.allocated_bytes() == 0 for: 5 == 0 with 1 message: '64'
+<workspace>/tests/io/si_case_resource_test.cpp(599): failed: plan.remaining_bytes() == plan_bytes for: 1125899906842619 (0x3fffffffffffb)
+==
+1125899906842624 (0x4000000000000) with 1 message: '64'
+<workspace>/tests/io/si_case_resource_test.cpp(597): failed: allocations == 0 for: 4 == 0 with 1 message: '332'
+<workspace>/tests/io/si_case_resource_test.cpp(598): failed: plan.allocated_bytes() == 0 for: 5 == 0 with 1 message: '332'
+<workspace>/tests/io/si_case_resource_test.cpp(599): failed: plan.remaining_bytes() == plan_bytes for: 1125899906842619 (0x3fffffffffffb)
+==
+1125899906842624 (0x4000000000000) with 1 message: '332'
+<workspace>/tests/io/si_case_resource_test.cpp(595): failed: !(result) for: !{?}
+test cases:  1 | 1 failed
+assertions: 11 | 4 passed | 7 failed

@@ -1,0 +1,24 @@
+{
+  "schema": "uvlas.fixture-generation/1",
+  "purpose": "Syntax/reference contexts only; no numerical expectations are generated.",
+  "source_commit": "89c3923c0d0648910ad700390f7d04d77eec8e40",
+  "commands": [
+    "python -B -X utf8 tests/io/fixtures/generate_si_fragment_context.py.txt --output <new-output>",
+    "clang-format 21.1.2 -i <new-output>"
+  ],
+  "separate_output_byte_identical": true,
+  "files": [
+    {
+      "path": "tests/io/case_schema_fragments_test.cpp",
+      "sha256": "1f4821dfaa3e75cf9e9ec2aa776e6028cf820cd0843147905249a2d86153379e"
+    },
+    {
+      "path": "tests/io/fixtures/generate_si_fragment_context.py.txt",
+      "sha256": "c32fd7d9d73bc7391cf108cc4e709927fc37c5b0938aa31facdcd58e9e819ab3"
+    },
+    {
+      "path": "tests\\io\\si_case_fragment_context.hpp",
+      "sha256": "929c12dcaac43c95eb211e8f916145b8f5fd2c344b0bb14b05dd71654c25ad35"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+"""Reproduce syntax/reference contexts; no SI numerical expectations are generated."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+from pathlib import Path
+
+
+def main() -> None:
+    root = Path(__file__).resolve().parents[3]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source", type=Path, default=root / "tests/io/case_schema_fragments_test.cpp")
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    original = args.source.read_bytes()
+    text = original.decode("utf-8").replace("\r\n", "\n")
+    start = "struct FragmentInput {"
+    end = "io::SchemaLimits fragment_limits() {"
+    if text.count(start) != 1 or text.count(end) != 1:
+        raise ValueError("Context extraction anchors must occur exactly once")
+    body = text[text.index(start):text.index(end)]
+    for declaration in ("std::string_view family(", "void remove_identifier(",
+                        "void branch_id(", "FragmentInput input_for("):
+        if body.count(declaration) != 1:
+            raise ValueError(f"Expected one declaration: {declaration}")
+        body = body.replace(declaration, "inline " + declaration)
+    content = (
+        "#pragma once\n"
+        "// Generated syntax/reference contexts, not numerical expected values.\n"
+        f"// Source SHA256: {hashlib.sha256(original).hexdigest()}\n"
+        '#include "case_schema_test_adapter.hpp"\n'
+        "#include <algorithm>\n#include <string>\n#include <string_view>\n#include <utility>\n"
+        "namespace uvlas::test::si_fragment_adapter {\n"
+        "using namespace uvlas;\nusing namespace uvlas::test::schema_adapter;\n"
+        + body + "} // namespace uvlas::test::si_fragment_adapter\n"
+    )
+    if args.output.exists():
+        raise FileExistsError(args.output)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(content, encoding="utf-8", newline="\n")
+
+
+if __name__ == "__main__":
+    main()

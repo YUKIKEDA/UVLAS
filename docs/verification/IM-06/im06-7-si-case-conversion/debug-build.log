@@ -1,0 +1,28 @@
+[0/2] Re-checking globbed directories...
+[1/28] C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\out\issue148-build && "C:\Program Files\CMake\bin\cmake.exe" -DSOURCE_DIR=<workspace> -DOUTPUT=<workspace>/out/issue148-build/generated/uvlas/git_revision.hpp -P <workspace>/cmake/GitRevision.cmake"
+[2/28] Building CXX object CMakeFiles\uvlas_cli.dir\Debug\src\app\main.cpp.obj
+[3/28] Building CXX object CMakeFiles\uvlas_core.dir\Debug\src\core\build_info.cpp.obj
+[4/28] Building CXX object tests\CMakeFiles\uvlas_test_io_si_interval.dir\Debug\io\si_case_interval_test.cpp.obj
+[5/28] Building CXX object CMakeFiles\uvlas_core_audit.dir\Debug\src\core\build_info.cpp.obj
+[6/28] Linking CXX static library Debug\uvlas_core.lib
+[7/28] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\si_quantity.cpp.obj
+[8/28] Linking CXX static library Debug\uvlas_core_audit.lib
+[9/28] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\si_quantity.cpp.obj
+[10/28] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\si_exact.cpp.obj
+[11/28] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\si_exact.cpp.obj
+[12/28] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\si_case.cpp.obj
+[13/28] Linking CXX executable tests\Debug\uvlas_test_io_si_interval.exe
+[14/28] Linking CXX executable Debug\uvlas.exe
+[15/28] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\si_case.cpp.obj
+[16/28] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\si_exact_center.cpp.obj
+[17/28] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\si_exact_center.cpp.obj
+[18/28] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\si_case_catalog.cpp.obj
+[19/28] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\si_case_catalog.cpp.obj
+[20/28] Building CXX object CMakeFiles\uvlas_io_audit.dir\Debug\src\io\si_case_storage.cpp.obj
+[21/28] Linking CXX static library Debug\uvlas_io_audit.lib
+[22/28] Building CXX object CMakeFiles\uvlas_io.dir\Debug\src\io\si_case_storage.cpp.obj
+[23/28] Linking CXX static library Debug\uvlas_io.lib
+[24/28] Building CXX object tests\CMakeFiles\uvlas_test_io_si_case.dir\Debug\io\si_case_fragments_test.cpp.obj
+[25/28] Linking CXX executable tests\Debug\uvlas_test_io_si_case.exe
+[26/28] Building CXX object tests\CMakeFiles\uvlas_test_io_si_case_resources.dir\Debug\io\si_case_resource_test.cpp.obj
+[27/28] Linking CXX executable tests\Debug\uvlas_test_io_si_case_resources.exe

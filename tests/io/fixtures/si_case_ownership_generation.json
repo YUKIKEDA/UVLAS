@@ -1,0 +1,14 @@
+{
+  "scope": "Public SI payload preservation traversal; no expected numerical answers are generated.",
+  "base": "tests/io/case_schema_snapshot.hpp",
+  "base_sha256": "0737379415d03c4c890dbb3f8253a6c4b866a86c17f125936e5c0648645f07f1",
+  "generator": "tests/io/fixtures/generate_si_case_ownership.py.txt",
+  "generator_sha256": "ed20716ec7bfc94d3aa6f90cea2bec1fd440686f87d1974cae14cf36fb1a9db9",
+  "output": "tests/io/si_case_ownership_snapshot.hpp",
+  "output_sha256": "07ed871d9dd1277f787580ecf33eb8612acd17c26811855e24eaa1f65ebfc0fe",
+  "command": "python -B -X utf8 tests/io/fixtures/generate_si_case_ownership.py.txt --base tests/io/case_schema_snapshot.hpp --output <new-path>",
+  "format": "clang-format 21.1.2 -i <new-path>",
+  "independent_destination_replay_byte_equal": true,
+  "base_retained_unchanged": true,
+  "additional_preserved_payload": "SiRequirementView exact scale/absolute/relative tokens and scale dimensions"
+}

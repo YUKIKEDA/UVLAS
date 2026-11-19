@@ -1,0 +1,431 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-7-si-case-conversion",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 148,
+  "date": "2026-11-19",
+  "source_commit": "27fcc1115569f3f86a2f1c73025e5a0d359f887a",
+  "initial_source_commit": "5eaaeed16771ed630463348343f1433cad696efc",
+  "base_commit": "89c3923c0d0648910ad700390f7d04d77eec8e40",
+  "source_commit_scope": "製品は27fcc11のclean sourceでWindows対象SI3本D/Rを実行。c1709c5は5root1caseと記録/traceだけの追補で、src/include/CMakeのbyte不変を照合し、追加caseのみ同clean sourceでD/R実行。5eaaeedの旧schema回帰と6変異は別記録。以後はmetadataだけ。",
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "scope": "全typed数量から明示host要求を満たす所有SI入力への変換。物理prepare、式の評価/微分、外部import、QoI誤差伝播、CLI接続、全体ソルバー認定は未実装。LinuxはCIへ渡し、成功は未主張。",
+  "definition_of_done": [
+    {
+      "condition": 1,
+      "evidence": "凍結5rootすべての公開SI入口と元typed全payload一致をD/Rで検証。191record/806fieldの独立FD inventoryを基に数値roleを網羅。144fragment(142正常/2拒否)と修正gmsh派生、全単位・混合行列・完全物理初期4例、負例13schema拒否/9SI通過、式constant/domain/time・元exact順序とnative整数保持。"
+    },
+    {
+      "condition": 2,
+      "evidence": "catalog固有世代token、全所有clone/rebind、異owner field/key拒否、元caller/Plan破棄とmove、全source/数量/要求/包絡/ledger/default/reportのsnapshot。利用者向け英語public API doc。"
+    },
+    {
+      "condition": 3,
+      "evidence": "256bit外向き区間/checked1024bit、Machin128項＋剰余、B64/TWと下端予算、dyadic零幅exact、有理化cap、IEEE tie/subnormal/carry、疎な1000/1074bit低位保持と1100bit拒否。独立有理期待・160項π剰余・IEEE bit復元。"
+    },
+    {
+      "condition": 4,
+      "evidence": "全15host quota、P/S/work/admissionと等号/1不足、Plan無返金、取消、全factory確保故障、exact葉追加故障、診断元要求/元原因/0cap、独立2呼出しの全payload一致。RequireProvenBound3factory拒否。同一Plan/slot再入禁止はcaller前提でありruntime guard認定ではない。"
+    },
+    {
+      "condition": 5,
+      "evidence": "Windows SI3本のD/R全成功、旧schemaD/R回帰、変更TUのclang-tidy0、format、独立生成の別出力一致、control後の6意味変異実検出、初回失敗保存と訂正/規約追補、旧spec/rd/corpus保全、独立レビューとtrace。Linux CIは待たない。"
+    }
+  ],
+  "checks": {
+    "windows": {
+      "debug": {
+        "interval": {
+          "exit": 0,
+          "cases": 4,
+          "assertions": 55
+        },
+        "normal": {
+          "exit": 0,
+          "cases": 17,
+          "assertions": 39034
+        },
+        "resources": {
+          "exit": 0,
+          "cases": 5,
+          "assertions": 3880
+        },
+        "clean_build_info": true
+      },
+      "release": {
+        "interval": {
+          "exit": 0,
+          "cases": 4,
+          "assertions": 55
+        },
+        "normal": {
+          "exit": 0,
+          "cases": 17,
+          "assertions": 39034
+        },
+        "resources": {
+          "exit": 0,
+          "cases": 5,
+          "assertions": 3880
+        },
+        "clean_build_info": true
+      }
+    },
+    "old_schema_regression": {
+      "source_commit": "5eaaeed16771ed630463348343f1433cad696efc",
+      "debug_direct": {
+        "exit": 0,
+        "cases": 31,
+        "assertions": 13186,
+        "seed": 12345
+      },
+      "release_ctest_exit": 0,
+      "not_repeated_after_diagnostic_fix": "後続製品差分はSIの診断借用とopcode名だけ。schema本体はbyte不変。"
+    },
+    "initial_failures": {
+      "debug_ctest": "旧schemaとSI正常系列が60秒timeout。Release同時buildを外した同binaryの直接実行で成功、SI単独10.555秒。runner上限/数値許容は変更なし。",
+      "debug_and_release_resources": "exact確保故障77でSIGSEGV。部分出力破棄後の要求字句借用を入力request所有へ訂正し、元key/1,0,0字句の全該当故障回帰で成功。"
+    },
+    "static": {
+      "clang_tidy": "21.1.1",
+      "repository_diagnostics": 0,
+      "coverage": "SI製品6cpp＋変更case_schema.cpp、interval/units/ownership/fields/fragments/resource全6testTU。catalog/resourceは寿命修正後の最終検査。",
+      "format": "21.1.2",
+      "audit_graph": "product/audit別のstructure/core依存、Boost::headersのみで不透明compiled Boost依存の混在を拒否したまま。",
+      "limited_portability_diagnostics": "Windows clang frontendでSI12TUに-Wsign-compare/-Wsign-conversion/-Wshadowを限定追加し全exit0。Linux/GCC成功への読み替えはしない。"
+    },
+    "mutations": {
+      "source_commit": "5eaaeed16771ed630463348343f1433cad696efc",
+      "control_normal": {
+        "cases": 17,
+        "assertions": 39034
+      },
+      "control_interval": {
+        "cases": 4,
+        "assertions": 55
+      },
+      "semantic_mutations_detected": 6,
+      "all_compile_link_exit": 0,
+      "all_mutant_catch_exit": 42,
+      "survived_redundant_single_guard": true,
+      "scope_after_fix": "27fcc11までの製品差分はopcode名と診断要求の借用元だけを機械照合。後続資源故障の成功を変異記録へ読み替えない。"
+    },
+    "reproduction": {
+      "context_separate_destination_byte_equal": true,
+      "ownership_snapshot_separate_destination_byte_equal": true,
+      "numerical_expected_values_generated": false
+    },
+    "japanese": {
+      "lint_findings": 1,
+      "independent_review": "rootが内容・日本語と失敗訂正/規約、P1が変異記録を通読。変異review.mdにはlow_burstiness警告1件を残す。",
+      "retained_finding": "nominal_ending info1（体言止め0件）。技術条件と動作を述語まで明記する文書であり、統計のために体言止めへ変更しない。変異review.mdのlow_burstiness警告1とは別件。"
+    },
+    "not_run": "無関係suite・全体CI再実行・Linuxローカル実行・実務性能試験。CI待機なし。",
+    "all_five_roots": {
+      "source_commit": "c1709c55344b317fd631acda4688fa1defc75c17",
+      "debug": {
+        "exit": 0,
+        "cases": 1,
+        "assertions": 6,
+        "seed": 12345,
+        "clean_build_info": true
+      },
+      "release": {
+        "exit": 0,
+        "cases": 1,
+        "assertions": 6,
+        "seed": 12345,
+        "clean_build_info": true
+      },
+      "product_bytes_equal_to_main_verification_source": true
+    },
+    "trace": {
+      "defined_ids": 208,
+      "ids_with_tests": 36,
+      "ids_with_records": 44,
+      "problems": 0
+    }
+  },
+  "log_representation": "公開ログは個人workspace prefixを<workspace>へ置換、CRLF/末尾空白/空EOFをLFへ正規化。CTest詳細はCP932をUTF-8へ変換。生stdoutのbyte同一は主張しない。",
+  "references": [
+    {
+      "id": "si-implementation-0",
+      "sha256": "04e07e6c96f114dee2b7fec0f755cfa7b4851b7bc3bf454cebecec28bd60060f",
+      "hint": ".cursor/rules/api-contract.mdc"
+    },
+    {
+      "id": "si-implementation-1",
+      "sha256": "46f242b54ee5755b4e60b7549146b8cbfcb1e9c95d852edb2cf18df6415c8cee",
+      "hint": "CMakeLists.txt"
+    },
+    {
+      "id": "si-implementation-2",
+      "sha256": "fe597eb30041c17686fac964ce263438b1e3c74138fe1e0187e16476110080bc",
+      "hint": "docs/conventions.md"
+    },
+    {
+      "id": "si-implementation-3",
+      "sha256": "4ea1d9ccce251eb4dfdc9d514b710eeba82ec801552da3acc74661ce4ecd0cb0",
+      "hint": "docs/roadmap.md"
+    },
+    {
+      "id": "si-implementation-4",
+      "sha256": "0c5c3806986682de4ec0b82a6096c73272e543ce72d7e859d64db6861076c784",
+      "hint": "docs/verification/IM-06/im06-7-si-case-conversion.md"
+    },
+    {
+      "id": "si-implementation-5",
+      "sha256": "25c40f5b8e825fe7a5b33d2e0e6362dde15a2cebac4e887ba4b089c8b6586790",
+      "hint": "include/uvlas/io/case_schema.hpp"
+    },
+    {
+      "id": "si-implementation-6",
+      "sha256": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8",
+      "hint": "include/uvlas/io/case_schema_records.hpp"
+    },
+    {
+      "id": "si-implementation-7",
+      "sha256": "e3a5d4e52acdd1e92a97a15086eda8d6902c543751441256970716ea01f83251",
+      "hint": "include/uvlas/io/si_case.hpp"
+    },
+    {
+      "id": "si-implementation-8",
+      "sha256": "aef2dcb31ca20b7fece43571caca1b6a3f009ff308afe9835d3551c55d3be529",
+      "hint": "src/io/case_schema.cpp"
+    },
+    {
+      "id": "si-implementation-9",
+      "sha256": "f77076c55c53ff6392086fd9f9caf1451d48236c59b89f19a35c6aa35ae35a26",
+      "hint": "src/io/case_schema_detail.hpp"
+    },
+    {
+      "id": "si-implementation-10",
+      "sha256": "ab9b7b5badff64346c2b8ad1652a4ebe6981b0bdd12f160cf4d7f6246e7f9d2c",
+      "hint": "src/io/si_case.cpp"
+    },
+    {
+      "id": "si-implementation-11",
+      "sha256": "869518f08d07e84d4b59075fa36545501980657cebaf4db00c941dcdabd8694e",
+      "hint": "src/io/si_case_catalog.cpp"
+    },
+    {
+      "id": "si-implementation-12",
+      "sha256": "70721f273fe5c510085936964e58bbb7959d5b7b1bf39f95521b14920df7b200",
+      "hint": "src/io/si_case_detail.hpp"
+    },
+    {
+      "id": "si-implementation-13",
+      "sha256": "94e2c3b94af157637a073668e4d414917539a356d9ccec9c8ab03de0ce790e28",
+      "hint": "src/io/si_case_plan.hpp"
+    },
+    {
+      "id": "si-implementation-14",
+      "sha256": "5063664821b716a0d4d825016973ac919786551220d100a8f41e66370c7a6834",
+      "hint": "src/io/si_case_storage.cpp"
+    },
+    {
+      "id": "si-implementation-15",
+      "sha256": "4f2fa3c2708ddf7d7c3243ba7f2cd7a7d9d98b95b2441ab419b3d21626f30829",
+      "hint": "src/io/si_exact.cpp"
+    },
+    {
+      "id": "si-implementation-16",
+      "sha256": "452defb140d6d269d1856a2d474ead7c3f373154905fa06d5735a92b8615d433",
+      "hint": "src/io/si_exact_center.cpp"
+    },
+    {
+      "id": "si-implementation-17",
+      "sha256": "106ebaff243acde6aa03f31bee9135bade49cffd828aac1d9ccb8c317213d52c",
+      "hint": "src/io/si_interval.hpp"
+    },
+    {
+      "id": "si-implementation-18",
+      "sha256": "a7c8c43c34796dfc1fae8d3cdcf9889a72ca238599dccd015bbab7ca7881a98d",
+      "hint": "src/io/si_program.hpp"
+    },
+    {
+      "id": "si-implementation-19",
+      "sha256": "8bf3154ffae2b53fa191be6aced6984414c5adda139045b4a035f7d50aa2f554",
+      "hint": "src/io/si_quantity.cpp"
+    },
+    {
+      "id": "si-implementation-20",
+      "sha256": "9687424854e6974508846c5caa1c366c83163bed1c3a9a172a5b66336305b83f",
+      "hint": "tests/CMakeLists.txt"
+    },
+    {
+      "id": "si-implementation-21",
+      "sha256": "ed20716ec7bfc94d3aa6f90cea2bec1fd440686f87d1974cae14cf36fb1a9db9",
+      "hint": "tests/io/fixtures/generate_si_case_ownership.py.txt"
+    },
+    {
+      "id": "si-implementation-22",
+      "sha256": "c32fd7d9d73bc7391cf108cc4e709927fc37c5b0938aa31facdcd58e9e819ab3",
+      "hint": "tests/io/fixtures/generate_si_fragment_context.py.txt"
+    },
+    {
+      "id": "si-implementation-23",
+      "sha256": "61d306526266cb9753473e3ed7f930759cfb62cfdfb8099386493957400e8420",
+      "hint": "tests/io/fixtures/si_case_ownership_generation.json"
+    },
+    {
+      "id": "si-implementation-24",
+      "sha256": "873866b9a85f0ef0afa5b9acce023b1d27effe1582cf0bc9333da2d479346ce4",
+      "hint": "tests/io/fixtures/si_fragment_context_generation.json"
+    },
+    {
+      "id": "si-implementation-25",
+      "sha256": "6cbd032cf0fe633eef0ef53d9b8adc1f85c6227973531a626f73802e7d9e86a3",
+      "hint": "tests/io/si_case_fields_test.cpp"
+    },
+    {
+      "id": "si-implementation-26",
+      "sha256": "929c12dcaac43c95eb211e8f916145b8f5fd2c344b0bb14b05dd71654c25ad35",
+      "hint": "tests/io/si_case_fragment_context.hpp"
+    },
+    {
+      "id": "si-implementation-27",
+      "sha256": "bbf4f866a67659592f6eb3aca18b0c5059915846a2a536221c9e360c3c633cfa",
+      "hint": "tests/io/si_case_fragments_test.cpp"
+    },
+    {
+      "id": "si-implementation-28",
+      "sha256": "ddf4e6f9d899cc7ebe29f872fc3028e119807f1aa31f9fcecd5de2a4d4842f80",
+      "hint": "tests/io/si_case_interval_test.cpp"
+    },
+    {
+      "id": "si-implementation-29",
+      "sha256": "07ed871d9dd1277f787580ecf33eb8612acd17c26811855e24eaa1f65ebfc0fe",
+      "hint": "tests/io/si_case_ownership_snapshot.hpp"
+    },
+    {
+      "id": "si-implementation-30",
+      "sha256": "f26bff2f2a5bf35850499cf4c1150d436ed44131da91537767dc590cb0a040f2",
+      "hint": "tests/io/si_case_ownership_test.cpp"
+    },
+    {
+      "id": "si-implementation-31",
+      "sha256": "37a4daa5a61f9023d816201fa8825a2c731b13ab19d851d471e442f64c8b1bac",
+      "hint": "tests/io/si_case_resource_test.cpp"
+    },
+    {
+      "id": "si-implementation-32",
+      "sha256": "df4738ddedb069288cb9f0e88d8ae6f8c7cad3350e4fe12908b63d2640a1cb2c",
+      "hint": "tests/io/si_case_units_test.cpp"
+    }
+  ],
+  "sources": {
+    ".cursor/rules/api-contract.mdc": "04e07e6c96f114dee2b7fec0f755cfa7b4851b7bc3bf454cebecec28bd60060f",
+    "CMakeLists.txt": "46f242b54ee5755b4e60b7549146b8cbfcb1e9c95d852edb2cf18df6415c8cee",
+    "docs/conventions.md": "fe597eb30041c17686fac964ce263438b1e3c74138fe1e0187e16476110080bc",
+    "docs/roadmap.md": "4ea1d9ccce251eb4dfdc9d514b710eeba82ec801552da3acc74661ce4ecd0cb0",
+    "docs/verification/IM-06/im06-7-si-case-conversion.md": "0c5c3806986682de4ec0b82a6096c73272e543ce72d7e859d64db6861076c784",
+    "include/uvlas/io/case_schema.hpp": "25c40f5b8e825fe7a5b33d2e0e6362dde15a2cebac4e887ba4b089c8b6586790",
+    "include/uvlas/io/case_schema_records.hpp": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8",
+    "include/uvlas/io/si_case.hpp": "e3a5d4e52acdd1e92a97a15086eda8d6902c543751441256970716ea01f83251",
+    "src/io/case_schema.cpp": "aef2dcb31ca20b7fece43571caca1b6a3f009ff308afe9835d3551c55d3be529",
+    "src/io/case_schema_detail.hpp": "f77076c55c53ff6392086fd9f9caf1451d48236c59b89f19a35c6aa35ae35a26",
+    "src/io/si_case.cpp": "ab9b7b5badff64346c2b8ad1652a4ebe6981b0bdd12f160cf4d7f6246e7f9d2c",
+    "src/io/si_case_catalog.cpp": "869518f08d07e84d4b59075fa36545501980657cebaf4db00c941dcdabd8694e",
+    "src/io/si_case_detail.hpp": "70721f273fe5c510085936964e58bbb7959d5b7b1bf39f95521b14920df7b200",
+    "src/io/si_case_plan.hpp": "94e2c3b94af157637a073668e4d414917539a356d9ccec9c8ab03de0ce790e28",
+    "src/io/si_case_storage.cpp": "5063664821b716a0d4d825016973ac919786551220d100a8f41e66370c7a6834",
+    "src/io/si_exact.cpp": "4f2fa3c2708ddf7d7c3243ba7f2cd7a7d9d98b95b2441ab419b3d21626f30829",
+    "src/io/si_exact_center.cpp": "452defb140d6d269d1856a2d474ead7c3f373154905fa06d5735a92b8615d433",
+    "src/io/si_interval.hpp": "106ebaff243acde6aa03f31bee9135bade49cffd828aac1d9ccb8c317213d52c",
+    "src/io/si_program.hpp": "a7c8c43c34796dfc1fae8d3cdcf9889a72ca238599dccd015bbab7ca7881a98d",
+    "src/io/si_quantity.cpp": "8bf3154ffae2b53fa191be6aced6984414c5adda139045b4a035f7d50aa2f554",
+    "tests/CMakeLists.txt": "9687424854e6974508846c5caa1c366c83163bed1c3a9a172a5b66336305b83f",
+    "tests/io/fixtures/generate_si_case_ownership.py.txt": "ed20716ec7bfc94d3aa6f90cea2bec1fd440686f87d1974cae14cf36fb1a9db9",
+    "tests/io/fixtures/generate_si_fragment_context.py.txt": "c32fd7d9d73bc7391cf108cc4e709927fc37c5b0938aa31facdcd58e9e819ab3",
+    "tests/io/fixtures/si_case_ownership_generation.json": "61d306526266cb9753473e3ed7f930759cfb62cfdfb8099386493957400e8420",
+    "tests/io/fixtures/si_fragment_context_generation.json": "873866b9a85f0ef0afa5b9acce023b1d27effe1582cf0bc9333da2d479346ce4",
+    "tests/io/si_case_fields_test.cpp": "6cbd032cf0fe633eef0ef53d9b8adc1f85c6227973531a626f73802e7d9e86a3",
+    "tests/io/si_case_fragment_context.hpp": "929c12dcaac43c95eb211e8f916145b8f5fd2c344b0bb14b05dd71654c25ad35",
+    "tests/io/si_case_fragments_test.cpp": "bbf4f866a67659592f6eb3aca18b0c5059915846a2a536221c9e360c3c633cfa",
+    "tests/io/si_case_interval_test.cpp": "ddf4e6f9d899cc7ebe29f872fc3028e119807f1aa31f9fcecd5de2a4d4842f80",
+    "tests/io/si_case_ownership_snapshot.hpp": "07ed871d9dd1277f787580ecf33eb8612acd17c26811855e24eaa1f65ebfc0fe",
+    "tests/io/si_case_ownership_test.cpp": "f26bff2f2a5bf35850499cf4c1150d436ed44131da91537767dc590cb0a040f2",
+    "tests/io/si_case_resource_test.cpp": "37a4daa5a61f9023d816201fa8825a2c731b13ab19d851d471e442f64c8b1bac",
+    "tests/io/si_case_units_test.cpp": "df4738ddedb069288cb9f0e88d8ae6f8c7cad3350e4fe12908b63d2640a1cb2c"
+  },
+  "immutable": {
+    "docs/specs/foundation/si-precision-conversion-contract.md": "b15d01590c82e106210ea9f1078bcb24c097a7a1a050c5972a34de8aaf315879",
+    "docs/specs/foundation/case-schema-contract.md": "938cd77fa33902f2a558b3b1eb52bdc90f172f2324c3817fe8438a6a508d43ee",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "docs/specs/foundation/case-initial-physical-state-contract.md": "93f29370353ac23ebe48e106c949b2e7f3caa5f7ddb17a37cb17c841ca46d99c",
+    "docs/specs/foundation/case-initial-physical-state-examples.json": "8c2e0c0a8b7bc8bc7c9e6ba1164ddb2a7455e71bf591b9cd3000081644dc9546",
+    "docs/specs/foundation/typed-case-schema-implementation-contract.md": "3023ff71f9d1d305cf1eace3e9654c71ad88587c01ca0c084ab08de0205ead50",
+    "docs/specs/foundation/precision-contract.md": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+    "docs/specs/foundation/io-execution-adoption-specification.md": "df926d9f6726a62af313e534e04c6a9b9aa4b838f7fa252567f3a50519039123"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-7-si-case-conversion/case_schema-tidy.log": "81f2ca72bb9db0e8f875225585666e0d9da1707ae23dfac2899f90898cb22b2c",
+    "docs/verification/IM-06/im06-7-si-case-conversion/catalog-tidy-final.log": "e534f53cffdc2bf1bd3d0a9e6088ee6e8a3fc62c73af15d0cae05b3008b9ceac",
+    "docs/verification/IM-06/im06-7-si-case-conversion/debug-build-info.json": "62d53b6b863d25cb8f07188f8106dc0b407cd13dda1fb6d9beebc7d648bff536",
+    "docs/verification/IM-06/im06-7-si-case-conversion/debug-build.log": "d6628b95f428589e1acf79cea69cb8f25a2f3f7220e0bcb9e69b7bc2687bc5a5",
+    "docs/verification/IM-06/im06-7-si-case-conversion/debug-ctest.log": "339966ed27791762e4a9c182ec59aa6ba6976845f52405484ba45231fce68287",
+    "docs/verification/IM-06/im06-7-si-case-conversion/debug-detail.log": "886f9b1a03c1d4488de6eb15f6bcab8450321a31b1f24a924d4d27fa575f951a",
+    "docs/verification/IM-06/im06-7-si-case-conversion/fields-tidy.log": "4b334ffb0c64bdfe5daf31988d340f6c2a7dbfee8356aa6f9f11071cdac14ae5",
+    "docs/verification/IM-06/im06-7-si-case-conversion/fragments-tidy.log": "8e8354d3e4f87b57c7f0157a64950212ccfe90740c661be619b792c7079113f1",
+    "docs/verification/IM-06/im06-7-si-case-conversion/initial-debug-ctest.log": "8096ddfc5636a3a22f123735a6058abd6242828e1709275cf63cae548e7044f0",
+    "docs/verification/IM-06/im06-7-si-case-conversion/initial-release-build-info.json": "39b34014f9c14bbf1680908698974ae26bad9f171d1208d43ba9e3fded6f323a",
+    "docs/verification/IM-06/im06-7-si-case-conversion/initial-release-ctest-detail.log": "e1fc0cd162f70f10aa92fa3b11a835f75a49d349642b8cbd56af378df48e22f6",
+    "docs/verification/IM-06/im06-7-si-case-conversion/initial-release-ctest.log": "1666c045a411e2aae420a768eb436347a3d0178323ab1195457ae77db098e9e2",
+    "docs/verification/IM-06/im06-7-si-case-conversion/interval-tidy.log": "e82844a7140d2f1e0afa09c6ce830d6d49f11c51a5daead80a16c9a9addf61c1",
+    "docs/verification/IM-06/im06-7-si-case-conversion/japanese-final.log": "5a42a9921cb4df61d56a045c920bacb103d9a7a87574b6df4fc849ab11de1dfa",
+    "docs/verification/IM-06/im06-7-si-case-conversion/japanese.log": "c9ad4384e77ccf9f1677e4475b468bc07aa893142dbaedad2ebcb42d895436c4",
+    "docs/verification/IM-06/im06-7-si-case-conversion/mutations/logs-and-mutants.zip": "50ed3e6e9539df639f6f9decdb8fef7751ed427faa6e08226ed0c9236c581ce2",
+    "docs/verification/IM-06/im06-7-si-case-conversion/mutations/review.md": "88ace1ca7193089a8a127b8da37d4937507790a0d471a1edfa11934660013f3b",
+    "docs/verification/IM-06/im06-7-si-case-conversion/mutations/run-isolated.ps1": "7d1367ebf91d5679e5bf9c0161826d2079e61b5d9b2fb85b532290d5c43e7325",
+    "docs/verification/IM-06/im06-7-si-case-conversion/mutations/summary.json": "7e64ee28a928ee99df6dadc8966076d48f83425cb1c31fe3aff3d9cc54846d7a",
+    "docs/verification/IM-06/im06-7-si-case-conversion/mutations/supply-sha256.json": "a6e8846600cda6ee6417c4259d68450e8da1b75ea00bb69e950a68c4b93e5690",
+    "docs/verification/IM-06/im06-7-si-case-conversion/normal-debug-direct.log": "c8646a176b8d5dbf9b79dbe40f607151639734a931571c66174235970e9120f0",
+    "docs/verification/IM-06/im06-7-si-case-conversion/normal-debug-duration.txt": "003d6743e886dd30a520e563028778ebbee03680d3ba5a96e424014af9a74c51",
+    "docs/verification/IM-06/im06-7-si-case-conversion/ownership-tidy.log": "b74523a39a92c17fc5c15b4983e70a4b655c7a95027f951368e0227e65e18721",
+    "docs/verification/IM-06/im06-7-si-case-conversion/release-build-info.json": "99cff8dcbed95a6d3ec9ee30bd75b86c842bd141ee0414ff64557fbb71db8282",
+    "docs/verification/IM-06/im06-7-si-case-conversion/release-build.log": "c1a8a49a59a2c5ef153976aee9d06c93562ad920e5ab53c4cc29523b8531c68a",
+    "docs/verification/IM-06/im06-7-si-case-conversion/release-ctest.log": "8af9b9a2dd9a1821c16b4ef8ead87a634c9359a270920a0bdfdf54b2447d11d0",
+    "docs/verification/IM-06/im06-7-si-case-conversion/release-detail.log": "b0635bb680795cbf22bcdfcb5d59eb74c0fa58d0c766ca58293f75eda3d05273",
+    "docs/verification/IM-06/im06-7-si-case-conversion/resource-tidy-final.log": "7603d950d4626ad4d18c3b8081185d9b10fe5e50d1d9fddc19d32bec3ee6ba89",
+    "docs/verification/IM-06/im06-7-si-case-conversion/schema-debug-direct.log": "7b7b9d34140c3c4c16720eb2729b8405f5e94d9dea4ac5356a70ff7d022803d6",
+    "docs/verification/IM-06/im06-7-si-case-conversion/si-case-tidy.log": "c195f9f00038cb0bf64c41a2ff5f8ac97e2334f1988deba25cb8ebc00d20d2e4",
+    "docs/verification/IM-06/im06-7-si-case-conversion/si_exact-tidy.log": "9376f21f9991a3fccc462e6ab090edf1d64a33d901867a6403991b7d319725dc",
+    "docs/verification/IM-06/im06-7-si-case-conversion/si_exact_center-tidy.log": "8968b6c748d5b2993a219aa7c3668e64aebf289e58dfe0ec4d301d48d37d07d7",
+    "docs/verification/IM-06/im06-7-si-case-conversion/si_quantity-tidy.log": "6fb3e0794b4814e7eecb0ed987fb9e25b757f5fa6adf7177cbedf4b2907b5a92",
+    "docs/verification/IM-06/im06-7-si-case-conversion/storage-tidy-final.log": "6fb3e0794b4814e7eecb0ed987fb9e25b757f5fa6adf7177cbedf4b2907b5a92",
+    "docs/verification/IM-06/im06-7-si-case-conversion/units-tidy.log": "ada98bba2e2733191fd5c26f04de474bac8960258a53e08926fde7d101221608",
+    "docs/verification/IM-06/im06-7-si-case-conversion/japanese-final-utf8.log": "1e211c559a1133e2bee559294d091a9dd2125926e1b4569a5e0220b46b791a4d",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case.log": "52af26e2a298a7f2835e2e2bfcf079203b291c56e0becc48fafd16ee111d90c0",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_catalog.log": "611079b53f1e2720e387002bf60a2a1bdecb49a7e454d7543994b51225a07861",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_fields_test.log": "75116125e0bb28e56e5b180fd5744ded9ef1e0792ea5babc4b38faccd69a350f",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_fragments_test.log": "e8d1fbf7eb0c7e8aa244779f6348401ffb4e5f7290ca3ec6499378fc7e8382b8",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_interval_test.log": "df4d38595bc9f8a891e67e8902a726c01cdf27c13fd0c9fa2a2592e473793c23",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_ownership_test.log": "502c28ab9d04f54ef7f162515b3598adc80a19eedeee967e55101e37652d0dfa",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_resource_test.log": "7b8b965232fd86d930cf0d9a47f19c701140c7ee1b125892e4373834f003639f",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_storage.log": "b60d1030fd1280d29d9a96f27ae842a773b985c4a8540fb1016541b239c40bc3",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_case_units_test.log": "75116125e0bb28e56e5b180fd5744ded9ef1e0792ea5babc4b38faccd69a350f",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_exact.log": "b60d1030fd1280d29d9a96f27ae842a773b985c4a8540fb1016541b239c40bc3",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_exact_center.log": "93af5dbb3764383e0142ad270591d484e009e4085a33e18c7052a82b14591644",
+    "docs/verification/IM-06/im06-7-si-case-conversion/portability/si_quantity.log": "b60d1030fd1280d29d9a96f27ae842a773b985c4a8540fb1016541b239c40bc3",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-tidy.log": "c9623083b320ea8b5f0f8ee37d35a3eaf3355889902248e928f694e9c468a7c2",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-debug-build-info.json": "423058f42c5622999357861e463197c260d9f6d3badf8eeb93cecf2af75315c7",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-debug-build.log": "9e96694b40ac7f149e268441095ff8a5f2be3a5c555f751554bf61114da06756",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-debug.log": "cdc31f885e3ef4d4498bde744eddc6184eed0546895c81352be175cbe2cd305c",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-release-build-info.json": "2e717d973964e0f5022d96a1c39030a17a2f3178aee38d53fa7ad2ecc6a6efe9",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-release-build.log": "0ecf224762644d3524c47d7e8320c0c30787acb952fd3bde3693a4dde30a6032",
+    "docs/verification/IM-06/im06-7-si-case-conversion/five-roots-release.log": "cdc31f885e3ef4d4498bde744eddc6184eed0546895c81352be175cbe2cd305c"
+  },
+  "test_extension": "凍結5rootの公開入口＋既存独立snapshotだけを1case追補。新派生/数値期待/許容差は追加せず、新caseだけD/R実行し既存成功系列を繰返さない。",
+  "test_source_commit": "c1709c55344b317fd631acda4688fa1defc75c17"
+}

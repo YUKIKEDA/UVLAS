@@ -14,6 +14,10 @@ using Rational =
                                   boost::multiprecision::et_off>;
 /// Payload layout used by callers that preflight cumulative exact-algebra arrays.
 [[nodiscard]] std::size_t exact_polynomial_raw_term_bytes() noexcept;
+/// Check the existing rational-operation storage envelope without materializing any operands.
+[[nodiscard]] core::Result<ExactPreparationInfo>
+exact_rational_admission(const ExactLimits&, std::uint64_t work_bits,
+                         std::uint64_t borrowed_bytes) noexcept;
 struct RationalStorage {
     Rational value;
 };

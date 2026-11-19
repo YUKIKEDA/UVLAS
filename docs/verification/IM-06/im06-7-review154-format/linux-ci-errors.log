@@ -1,0 +1,12 @@
+job 134903760132: 3 template diagnostics at one source location
+2026-11-18T15:23:14.4770393Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+2026-11-18T15:23:14.5030745Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+2026-11-18T15:23:14.5119999Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+job 134903760162: 3 template diagnostics at one source location
+2026-11-18T15:24:19.6816946Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+2026-11-18T15:24:19.7055993Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+2026-11-18T15:24:19.7295994Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+job 134903760230: 3 template diagnostics at one source location
+2026-11-18T15:25:37.5575946Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+2026-11-18T15:25:37.5583866Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]
+2026-11-18T15:25:37.5591018Z /home/runner/work/UVLAS/UVLAS/tests/io/si_case_resource_test.cpp:254:21: error: loop variable ‘<structured bindings>’ creates a copy from type ‘const std::pair<uvlas::io::SiQuota, long unsigned int>’ [-Werror=range-loop-construct]

@@ -1,0 +1,9 @@
+{
+  "si_case_fields_test.cpp.obj": "5ff7cf214e73a93b02a12dc6fecc8b18846fdc23b0ed5b71c47ce28133dbb79c",
+  "si_case_fragments_test.cpp.obj": "544e9f4fea4b9409f2fd448eb1f7507b2c04f2fc68bf7e3a13d69a49872690c0",
+  "si_case_ownership_test.cpp.obj": "dd5b5e17071190184629fa8102a3ddd87256836961b9a308f8527c4e45728260",
+  "si_case_units_test.cpp.obj": "68641e98b67f0f1c2a293990e313ad185a3ba7f0cecd3f0219718db432e51032",
+  "uvlas_core.lib": "15338c328e962a8aa54ce14ab46363275048d07dffa33fbc264ffbc84fecca3b",
+  "uvlas_io.lib": "974fac3c77a830c458aa3bfb714ca9cfab6db73ac399de233a7b9b4ea25c443a",
+  "uvlas_structure.lib": "b96a99ec0a2e8b01819795173b8236d8ec5fc397c505bf3c58e49fe91b32edf3"
+}

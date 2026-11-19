@@ -96,6 +96,7 @@ target_link_libraries(uvlas_json_allocation_probe PRIVATE nlohmann_json::nlohman
 if(MSVC)
     target_compile_options(uvlas_json_allocation_probe PRIVATE /Zc:nrvo-)
 endif()
+
 add_test(NAME toolchain.json_allocation_exceptions
     COMMAND "${Python3_EXECUTABLE}" -m tools.qa.json_allocation_probe_test
         --probe "$<TARGET_FILE:uvlas_json_allocation_probe>")
@@ -592,3 +593,23 @@ if(UVLAS_SANITIZERS AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # ASan/UBSan. Give these runners a separate, bounded test time.
     set_tests_properties(io.case_schema io.case_schema_resources PROPERTIES TIMEOUT 300)
 endif()
+
+uvlas_add_test(io.si_interval
+    LABELS unit property negative verification
+    SOURCES io/si_case_interval_test.cpp
+    LIBS uvlas_core Boost::headers)
+target_include_directories(uvlas_test_io_si_interval PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(io.si_case
+    LABELS unit property negative verification
+    SOURCES io/si_case_units_test.cpp io/si_case_ownership_test.cpp io/si_case_fragments_test.cpp io/si_case_fields_test.cpp
+    LIBS uvlas_io Boost::headers)
+target_include_directories(uvlas_test_io_si_case PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(io.si_case_resources
+    LABELS property negative verification
+    SOURCES io/si_case_resource_test.cpp
+    LIBS uvlas_io_audit Threads::Threads Boost::headers)
+target_include_directories(uvlas_test_io_si_case_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_enable_allocation_audit(uvlas_test_io_si_case_resources)
+uvlas_require_audited_dependencies(uvlas_test_io_si_case_resources)

@@ -1,0 +1,142 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-7-review154-format",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 148,
+  "pr": 154,
+  "date": "2026-11-19",
+  "source_commit": "a554e66a83938821994b44ff35413c245ce0c249",
+  "reviewed_head": "3eedbf26bf7f5236800e3564adfa5b3d1faba7e7",
+  "claimed_state": {
+    "formatting_verified": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "scope": "PR154の23変更C++パスの書式と、Linux全3構成で失敗した資源試験の構造化束縛を訂正。製品はnamespace終端コメント1個だけが変わり、試験は不変pairのコピーをconst参照へ変える。数値結果や新headのCI成功を主張しない。",
+  "checks": {
+    "ci_failure": {
+      "run": 44333453366,
+      "job": 134903760840,
+      "step": "Formatting",
+      "path": "include/uvlas/io/case_schema.hpp",
+      "line": 14
+    },
+    "initial_dry_run_exit": 1,
+    "final_dry_run_exit": 0,
+    "cpp_paths": [
+      "include/uvlas/io/case_schema.hpp",
+      "include/uvlas/io/case_schema_records.hpp",
+      "include/uvlas/io/si_case.hpp",
+      "src/io/case_schema.cpp",
+      "src/io/case_schema_detail.hpp",
+      "src/io/si_case.cpp",
+      "src/io/si_case_catalog.cpp",
+      "src/io/si_case_detail.hpp",
+      "src/io/si_case_plan.hpp",
+      "src/io/si_case_storage.cpp",
+      "src/io/si_exact.cpp",
+      "src/io/si_exact_center.cpp",
+      "src/io/si_interval.hpp",
+      "src/io/si_program.hpp",
+      "src/io/si_quantity.cpp",
+      "tests/io/si_case_fields_test.cpp",
+      "tests/io/si_case_fragment_context.hpp",
+      "tests/io/si_case_fragments_test.cpp",
+      "tests/io/si_case_interval_test.cpp",
+      "tests/io/si_case_ownership_snapshot.hpp",
+      "tests/io/si_case_ownership_test.cpp",
+      "tests/io/si_case_resource_test.cpp",
+      "tests/io/si_case_units_test.cpp"
+    ],
+    "command": "uvx --offline clang-format@21.1.2 --dry-run --Werror <23 paths>",
+    "generated_outputs_unchanged": true,
+    "regeneration_required": false,
+    "numerical_tests_repeated": false,
+    "reason_no_retest": "製品の差分はnamespace終端コメント1個。資源試験の差分は不変arrayのpairを値からconst参照で束縛する1個の&だけで、両方を全文の一意置換で照合。既存cpp規約どおり、同型検索・当該TUコンパイル/静的検査だけを行い、数値経路は再実行しない。",
+    "ended_jobs_observed_individually": [
+      {
+        "id": 134903675400,
+        "conclusion": "success"
+      },
+      {
+        "id": 134903759923,
+        "conclusion": "success"
+      },
+      {
+        "id": 134903760036,
+        "conclusion": "success"
+      },
+      {
+        "id": 134903760131,
+        "conclusion": "success"
+      },
+      {
+        "id": 134903760840,
+        "conclusion": "failure"
+      },
+      {
+        "id": 134903760132,
+        "conclusion": "failure"
+      },
+      {
+        "id": 134903760162,
+        "conclusion": "failure"
+      },
+      {
+        "id": 134903760230,
+        "conclusion": "failure"
+      }
+    ],
+    "not_claimed": "push後のCI成功。Windowsの共通環境問題はrootが別担当し、この記録へ成功を混ぜない。新CIは待たない。",
+    "linux_compile_failure": {
+      "jobs": [
+        134903760132,
+        134903760162,
+        134903760230
+      ],
+      "path": "tests/io/si_case_resource_test.cpp",
+      "line": 254,
+      "diagnostics_per_job": 3,
+      "unique_source_findings": 1,
+      "flag": "-Werror=range-loop-construct"
+    },
+    "same_pattern_search": {
+      "scope": "src/io and tests/io, si*.cpp/si*.hpp",
+      "original_occurrences": 1,
+      "remaining_value_bindings": 0
+    },
+    "affected_msvc_debug_translation_unit_compile_exit": 0,
+    "affected_clang_tidy_exit": 0,
+    "extra_compiler_flags": [
+      "-Wrange-loop-construct",
+      "-Werror=range-loop-construct"
+    ],
+    "single_test_source_reference_only_transformation_verified": true,
+    "comment_only_product_header_transformation_verified": true
+  },
+  "correction": "既存headerも含め、PR差分から全C++パスを列挙して整形する規約をcpp.mdcへ追補。",
+  "prior_evidence": {
+    "id": "im06-7-si-case-conversion",
+    "sha256": "afe2cc71a70d726864bca7b946330445ab802e05dc82e2d5a23dd59d8a988910",
+    "hint": "docs/verification/IM-06/im06-7-si-case-conversion.json",
+    "meaning": "旧sourceで得た成功/失敗/訂正/変異の履歴。comment-only修正で書き換えず、現在のsource hashとの同一視をしない。"
+  },
+  "sources": {
+    "include/uvlas/io/case_schema.hpp": "844f43274a0a9711036a42d92ea2ab69b9ca0d66e9599f14b25e7663024503a0",
+    ".cursor/rules/cpp.mdc": "38d4f2636e3cccc00ba9bbe17ca4b921c918ce35ad5d1729434deff37790707b",
+    "tests/io/si_case_resource_test.cpp": "ec291ed7ad78ce3331abf6ceda5342b5267562204d7096d9af57ebbb1662ef31"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/im06-7-review154-format/format-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-7-review154-format/format-initial.log": "a078f22851491539df73ce5059741357cfacf6aaa56619c19329e9f8b48a4440",
+    "docs/verification/IM-06/im06-7-review154-format/linux-ci-errors.log": "aae604d6fd4184c44f653b413501e827805843786d2c8b14003e42fb1471e1c3",
+    "docs/verification/IM-06/im06-7-review154-format/range-search.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/IM-06/im06-7-review154-format/resource-compile.log": "8338d9cbd233845e1d10b70381b55a527661341f9e9b5dceb86494621c8d4b19",
+    "docs/verification/IM-06/im06-7-review154-format/resource-tidy.log": "7603d950d4626ad4d18c3b8081185d9b10fe5e50d1d9fddc19d32bec3ee6ba89"
+  }
+}

@@ -1,0 +1,33 @@
+# 所有SI入力と精度変換の実装範囲
+
+`SiCatalog`、`SiRequest`、`SiCase`を実装する。入力のexact値と成分別次元を保持し、呼出し側が明示した許容幅を満たすSI包絡だけを返す。根拠となる採用契約は[SI変換と入力精度](../../specs/foundation/si-precision-conversion-contract.md)、固定sourceと検証結果は[実行記録](im06-7-si-case-conversion.json)にまとめる。
+
+## 利用者が指定するもの
+
+catalogは全論理数量のkeyと元単位のexact値を列挙する。ID、index、count、式の整数opcodeは変換しない。利用者は各keyへ、SIの正尺度と次元、無次元の絶対係数・相対係数を一度ずつ指定する。省略、重複、異なるcatalogのkey、次元不一致は値として失敗する。各要求の元十進字句または有理数の両整数字句は結果が所有する。
+
+入力の丸め誤差は、一つの元数量につき一つのledger起点へ記録する。式のconstantは宣言された出力次元で換算する。domainはchartが無次元、material/world/current位置が長さ、timeが時間であり、式DAG自体は評価しない。式の評価変数を後段でSI入力する際に、元単位の変換をもう一度行ってはならない。
+
+## 数値と資源の境界
+
+固定1024bit整数を使う256bit外向き区間から、縮尺付きbinary64、次いで二語を構成する。許容幅の判定は要求式の下端を使う。零幅要求では既存exact有理代数へ一度だけ進み、二進exact値を証明できる場合に限って零半径を返す。非零のdegree値を有限有理数として扱わない。二語で表せない低位成分も、零幅要求のまま切り捨てない。
+
+catalogは診断の元source/keyを保持するため、入力snapshot、typed node、正規化exact文字、数量indexを所有する。長いJSON Pointerを数量ごとに複製せず、失敗時に親情報から構築する。catalogのPは、このsnapshotと各bufferの実容量を加えた値である。requestと変換結果が別に保持する配列・文字も、それぞれ一度だけ課金する。
+
+一連のSSA命令定義を数値実行とwork予測で共有する。十進桁、冪のbit、πの項、出力丸めの処理を、実行前の上限へ含める。既存exact backendの内部命令数は実測値として数えず、operand bit長から保守的に課金する。成功したexact所有確保の累積量はResourcePlanの差額を使い、同時scratchとは区別する。自動temporaryは名前付きframeと固定backendのsource監査で積み上げる。allocatorの管理領域やprocess RSSの上界は認定しない。RequireProvenBoundは三つのfactoryでUnsupportedとなる。
+
+同じPlan・診断slotの共有や再入を避けることはcallerの前提条件である。独立呼出しの並列実行、失敗後の入力・旧結果全payloadの保持、成功した確保の無返金を試験する。再入のruntime検出を実装したとは主張しない。
+
+## 検証の接続と未実装の領域
+
+凍結144fragmentの元字句を保持したcontextを使い、全191record・806fieldの数値leafを製品と同じscalar変換へ渡す。このprivate入口は公開SiCaseの成功資格を作らない。元の失効physical例とsource衝突例は拒否し、衝突を明示修正した派生例を別に試験する。完全物理初期場4例と負例22件は、schemaで拒否する13件とSI段階を通過する9件の境界を維持する。
+
+独立な有理期待、πの交代級数剰余、IEEE bitの有理復元を使い、全単位、混合行列、非零初期場、式constantとdomainを照合する。所有と故障試験のsnapshotは全typed source、全数量、要求、包絡、ledgerと費用を含む。contextとsnapshotの生成器は数値期待値を生成しない。
+
+ここで得るのは入力変換の資格である。活動幾何、外部格子import、拘束、SO(3)、最終q/v、式の値と微分、QoIへの誤差伝播は後続prepareの責務として残る。CLIの一律許容差や暗黙投影を追加せず、物理ソルバーの数値認定・実験妥当性・実務受入を主張しない。
+
+## 固定source検証で見つけた診断寿命の訂正
+
+初回のWindows Debug/Releaseで、exact有理化の確保故障を注入すると診断作成中にSIGSEGVが発生した。変換loopの診断Contextが構築中の出力文字列を借り、部分出力の破棄後に外側のcatchがその字句を読んでいた。入力requestの所有文字列から借りる形へ訂正し、故障時に捕捉した要求のkey・字句を元要求と照合する回帰を追加した。旧版の失敗と訂正版の結果は実行記録で区別する。
+
+初回Debug CTestでは、Releaseの同時ビルド中に既存schemaと新SI正常系列が60秒のrunner上限へ達した。競合を外した同じbinaryの直接実行で両系列は完走した。数値入力・許容差・runner上限を変更せず、失敗ログも保存する。

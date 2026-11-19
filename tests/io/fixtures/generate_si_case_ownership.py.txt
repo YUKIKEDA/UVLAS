@@ -1,0 +1,146 @@
+"""Derive the SI preservation traversal from the frozen public schema visitor.
+
+No expected numerical value or product private storage is consulted.
+Run to a new path, format with clang-format 21.1.2, then compare bytes.
+"""
+from __future__ import annotations
+import argparse
+import hashlib
+from pathlib import Path
+
+EXPECTED_BASE = '0737379415d03c4c890dbb3f8253a6c4b866a86c17f125936e5c0648645f07f1'
+STATE = r'''struct Bytes : std::vector<std::uint8_t> {
+    explicit Bytes(const io::SiCase& value) : owner(value) {}
+    const io::SiCase& owner;
+    std::vector<io::SiQuantityKey> keys;
+};
+struct Snapshot {
+    std::vector<std::uint8_t> bytes;
+    std::vector<io::SiQuantityKey> keys;
+    bool operator==(const Snapshot&) const = default;
+};
+'''
+QUANTITY = r'''    if constexpr (kind == io::detail::FieldKind::Number ||
+                  kind == io::detail::FieldKind::ExactQuantity ||
+                  Type == io::detail::FieldType::T62) {
+        const auto quantity = out.owner.quantity(value);
+        if (!quantity)
+            throw std::runtime_error("Owned SI quantity lookup failed during snapshot");
+        out.keys.push_back(quantity->key);
+        integer(out, quantity->ledger_origin);
+        integer(out, static_cast<std::uint64_t>(quantity->recipe.pi_power));
+        for (const auto e : quantity->recipe.dimensions.exponents)
+            integer(out, static_cast<std::uint64_t>(e));
+        const auto units = quantity->recipe.units;
+        integer(out, static_cast<std::uint64_t>(units.length));
+        integer(out, static_cast<std::uint64_t>(units.mass));
+        integer(out, static_cast<std::uint64_t>(units.time));
+        integer(out, static_cast<std::uint64_t>(units.angle));
+        text(out, quantity->recipe.original);
+        integer(out, quantity->recipe.value.index());
+        const auto decimal = [&](const io::SiDecimalView& x) {
+            integer(out, static_cast<std::uint64_t>(x.sign));
+            text(out, x.digits);
+            integer(out, static_cast<std::uint64_t>(x.exponent10));
+        };
+        std::visit(
+            [&](const auto& original) {
+                using Original = std::decay_t<decltype(original)>;
+                if constexpr (std::is_same_v<Original, io::SiDecimalView>)
+                    decimal(original);
+                else {
+                    decimal(original.numerator);
+                    decimal(original.denominator);
+                }
+            },
+            quantity->recipe.value);
+        const auto request_exact = [&](const io::SiExactInput& input) {
+            integer(out, input.index());
+            std::visit(
+                [&](const auto& x) {
+                    using X = std::decay_t<decltype(x)>;
+                    if constexpr (std::is_same_v<X, io::SiDecimalInput>)
+                        text(out, x.token);
+                    else {
+                        text(out, x.numerator);
+                        text(out, x.denominator);
+                    }
+                },
+                input);
+        };
+        request_exact(quantity->requirement.scale.value);
+        for (const auto e : quantity->requirement.scale.dimensions.exponents)
+            integer(out, static_cast<std::uint64_t>(e));
+        request_exact(quantity->requirement.absolute);
+        request_exact(quantity->requirement.relative);
+        integer(out, quantity->enclosure.index());
+        std::visit(
+            [&](const auto& x) {
+                using X = std::decay_t<decltype(x)>;
+                if constexpr (std::is_same_v<X, io::ScaledBinary64>)
+                    integer(out, std::bit_cast<std::uint64_t>(x.center));
+                else {
+                    integer(out, std::bit_cast<std::uint64_t>(x.high));
+                    integer(out, std::bit_cast<std::uint64_t>(x.low));
+                }
+                integer(out, std::bit_cast<std::uint64_t>(x.radius));
+                integer(out, static_cast<std::uint64_t>(x.exponent2));
+            },
+            quantity->enclosure);
+    }'''
+SERIALIZE = r'''inline Snapshot serialize(const io::SiCase& value) {
+    const auto source = value.source_case();
+    if (!source)
+        throw std::runtime_error("SI owner lost its source case");
+    const auto root = source->get().root();
+    if (!root)
+        throw std::runtime_error("SI source lost its root");
+    Bytes out{value};
+    const auto original = uvlas::test::schema_snapshot::serialize(*root);
+    out.insert(out.end(), original.begin(), original.end());
+    append(out, *root);
+    const auto defaults = value.defaults();
+    const auto memory = value.memory_report();
+    if (!defaults || !memory)
+        throw std::runtime_error("SI owner lost public metadata");
+    integer(out, defaults->provenance_missing ? 1U : 0U);
+    integer(out, defaults->initial_missing ? 1U : 0U);
+    integer(out, defaults->restart_missing ? 1U : 0U);
+    for (const auto count :
+         {memory->owned_bytes, memory->scratch_bytes, memory->cumulative_bytes, memory->work,
+          memory->planned_owned_bytes, memory->planned_scratch_bytes, memory->planned_work,
+          memory->admission_bytes})
+        integer(out, count);
+    return {std::move(static_cast<std::vector<std::uint8_t>&>(out)), std::move(out.keys)};
+}
+'''
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    raw = args.base.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != EXPECTED_BASE:
+        raise ValueError("The base public traversal changed; review its complete interface first")
+    if args.output.exists():
+        raise FileExistsError(args.output)
+    text = raw.decode("utf-8")
+    text = text.replace("namespace uvlas::test::schema_snapshot", "namespace uvlas::test::si_ownership_snapshot")
+    text = text.replace("#include <uvlas/io/case_schema.hpp>", "#include <uvlas/io/case_schema.hpp>\n#include <uvlas/io/si_case.hpp>\n#include \"case_schema_snapshot.hpp\"")
+    text = text.replace("#include <vector>", "#include <vector>\n#include <type_traits>\n#include <utility>")
+    text = text.replace("using Bytes = std::vector<std::uint8_t>;\n", STATE)
+    original = "    if constexpr (kind == io::detail::FieldKind::Number)\n        append(out, value.number());"
+    if text.count(original) != 1:
+        raise ValueError("Unrecognized numeric dispatch")
+    text = text.replace(original, QUANTITY)
+    start = text.index("inline Bytes serialize(")
+    end = text.rindex("} // namespace")
+    text = text[:start] + SERIALIZE + text[end:]
+    prefix = "// Derived test-only public traversal from case_schema_snapshot.hpp SHA-256 " + EXPECTED_BASE + ".\n"
+    prefix += "// Expected numbers are never generated; this snapshots every exposed SI value for preservation.\n"
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(prefix + text, encoding="utf-8", newline="\n")
+
+if __name__ == "__main__":
+    main()
