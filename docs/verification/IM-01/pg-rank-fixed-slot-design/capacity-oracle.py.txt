@@ -1,0 +1,249 @@
+"""Reproduce fixed-slot capacity census from frozen exact coefficient exports.
+
+This is a design oracle, not a heap-free rank implementation. No numeric threshold.
+"""
+import argparse
+import hashlib
+import json
+import math
+from collections import defaultdict
+from fractions import Fraction
+from pathlib import Path
+
+U64 = (1 << 64) - 1
+SLOT_BYTES = 32  # proposed four-u64 descriptor, not measured C++ sizeof
+P = 2147483647
+DIGITS = 128
+
+
+def checked(n):
+    if not 0 <= n <= U64:
+        raise OverflowError("uint64 capacity overflow")
+    return n
+
+
+def ceil_log(n):
+    return max(0, (n - 1).bit_length())
+
+
+def limbs(bits):
+    return checked(checked(bits) + 31) // 32
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def read(path):
+    rows = {}
+    maps = defaultdict(list)
+    with path.open(encoding="ascii") as f:
+        h = f.readline().split()
+        assert h[0] == "header" and len(h) == 6
+        n, f0, full, owned, external = map(int, h[1:])
+        count = 33 + full + f0
+        for j in range(full):
+            maps[33 + j].append((j, 1, 1))
+            if j < f0:
+                maps[33 + full + j].append((j, 1, 1))
+        for line in f:
+            v = line.split()
+            if v[0] == "coefficient":
+                j, field, s, t, u, w, num, den = map(int, v[1:])
+                assert den > 0 and num != 0 and math.gcd(num, den) == 1
+                key = (field, s, t, u, w)
+                a = rows.setdefault(key, [1, 1, 0, 0])
+                a[0] = math.lcm(a[0], den)
+                a[1] += den.bit_length()  # product-denominator bound, before LCM
+                a[2] = max(a[2], abs(num).bit_length())
+                a[3] += 1
+            elif v[0] == "column":
+                j, kind, original = map(int, v[1:])
+                if kind in (6, 7):
+                    maps[33 + full + original].append((j, -1, 1))
+            elif v[0] in ("required", "anchor"):
+                target, source, num, den = map(int, v[1:])
+                assert den > 0
+                maps[target if v[0] == "required" else 33 + full + target].append(
+                    (source, num if v[0] == "required" else -num, den))
+            else:
+                raise AssertionError(v[0])
+    assert all(0 <= j < count for j in maps)
+    return n, f0, full, count, owned, external, rows, maps
+
+
+def active(key, n):
+    _, s, t, _, _ = key
+    h = 4 // n
+    a, b = h * s, h * t
+    return ((b < 1 and b + h > 0) or (b < 4 and b + h > 3)
+            or (a < 1 and b < 3 and b + h > 1))
+
+
+def measure(path, domain, old):
+    n, f0, full, count, owned, external, all_rows, maps = read(path)
+    sha = digest(path)
+    candidates = [x for x in old if x.get("grid") == n and x.get("input_sha256") == sha
+                  and x.get("domain") == domain and x.get("row_order") == "sparse"]
+    assert len(candidates) == 1, "coefficient bytes differ from frozen study"
+    prior = candidates[0]
+    rows = {k: a for k, a in all_rows.items() if domain == "full" or active(k, n)}
+    m, rank_cap = len(rows), min(len(rows), full)
+    assert m == prior["rows"] and sum(a[3] for a in rows.values()) == prior["raw_nonzeros"]
+    scales = []
+    map_widths = []
+    map_pre = []
+    map_terms = []
+    for j in range(count):
+        entries = maps[j]
+        e = math.lcm(*(den for _, _, den in entries)) if entries else 1
+        c = max((abs(num * (e // den)).bit_length() for _, num, den in entries), default=0)
+        scales.append(e)
+        map_widths.append(c)
+        map_pre.append(1 + sum(den.bit_length() for _, _, den in entries))
+        map_terms.append(len(entries))
+    row_pre = [a[1] for a in rows.values()]
+    row_width = [a[0].bit_length() + a[2] + 1 for a in rows.values()]
+    map_sum = sum(limbs(c + ceil_log(max(1, k)) + b + 1)
+                  for b in row_width for c, k in zip(map_widths, map_terms))
+    wmax = max(row_width) + max(map_widths) + ceil_log(max(1, max(map_terms))) + 1
+    basis_bits = max(wmax, max(a[0].bit_length() for a in rows.values())
+                     + max(e.bit_length() for e in scales) + 1)
+    # h bounds recovered numerator and positive denominator, since q < p^128 < 2^(31*128).
+    h = 31 * DIGITS // 2
+    out_h = h + max(e.bit_length() for e in scales) + 1
+    # |b| and each |M| < 2^wmax, S <= R*2^wmax, and |current| <= max(|b|,S).
+    lift_h = wmax + ceil_log(max(1, rank_cap)) + 1
+    product_h = lift_h + 31 + 1
+    # D is product of <= R positive denominators, no LCM tightness assumed.
+    proof_h = wmax + (rank_cap + 1) * h + ceil_log(rank_cap + 1) + 2
+    # Explicit proposed live-frame inventory; primitive call graph still needs implementation audit.
+    frames = {"proof_denominator": rank_cap * h + 1,
+              "proof_quotient": rank_cap * h + 1,
+              "proof_scaled_numerator": (rank_cap + 1) * h + 1,
+              "proof_term": proof_h, "proof_sum": proof_h, "proof_rhs": proof_h,
+              "gcd_left": proof_h, "gcd_right": proof_h,
+              "division_quotient": 2 * proof_h + 2,
+              "division_remainder": 2 * proof_h + 2,
+              "product": 2 * proof_h + 2, "sum": 2 * proof_h + 2,
+              "lift_modulus": 31 * DIGITS + 1, "recovery_a": 31 * DIGITS + 1,
+              "recovery_b": 31 * DIGITS + 1, "recovery_u": 2 * 31 * DIGITS + 2,
+              "recovery_v": 2 * 31 * DIGITS + 2}
+    # Stage one persists until return: cumulative Plan charges do not refund it.
+    phase1 = (SLOT_BYTES * (m + count) +
+              4 * sum(limbs(x) for x in row_pre + map_pre) +
+              8 * (SLOT_BYTES + 4 * limbs(2 * max(row_pre + map_pre) + 2)))
+    components = {
+        "preflight_lcm_and_workspace": phase1,
+        "integer_candidates": m * count * SLOT_BYTES + 4 * map_sum,
+        "modular_reduced_lower_upper": 4 * (m * rank_cap + 3 * rank_cap * rank_cap),
+        "prefix_coordinates": rank_cap * count * (2 * SLOT_BYTES + 8 * limbs(out_h)),
+        "retained_basis_values": m * rank_cap * (2 * SLOT_BYTES + 8 * limbs(basis_bits)),
+        "pivot_integer_copy": rank_cap * rank_cap * (SLOT_BYTES + 4 * limbs(wmax)),
+        "lift_residue_and_rhs": rank_cap * (2 * SLOT_BYTES + 4 * limbs(31 * DIGITS + 1)
+                                               + 4 * limbs(product_h)),
+        "named_scratch_frames": sum(SLOT_BYTES + 4 * limbs(b) for b in frames.values()),
+        # Row keys 5u64, permutations/counters, map entries(source u64 + slot pair), result provenance.
+        "native_indices_and_maps": (40 * m + 8 * (6 * m + 12 * count + 12 * rank_cap)
+                                     + sum(map_terms) * (8 + 2 * SLOT_BYTES
+                                       + 8 * limbs(max(map_widths) + max(e.bit_length() for e in scales) + 1))),
+    }
+    proposed_bytes = checked(sum(checked(x) for x in components.values()))
+    result = dict(n=n, domain=domain, input_sha256=sha, m=m, F=full, F0=f0, N=count,
+                  R=rank_cap, nnz=prior["raw_nonzeros"], row_product_bits_max=max(row_pre),
+                  row_lcm_bits_max=max(a[0].bit_length() for a in rows.values()),
+                  integer_M_bits_max=wmax, recovered_bits=h, unscaled_coordinate_bits=out_h,
+                  proof_scratch_bits=proof_h, lift_rhs_bits=lift_h,
+                  lift_product_bits=product_h, components=components,
+                  proposed_payload_bytes=proposed_bytes,
+                  admission_status="not_certified: primitive call graph and heap-free execution unverified")
+    return result
+
+
+def controls():
+    # Mathematical capacity checks, independent of a future limb implementation.
+    checks = 0
+    for a in (0, 1, -1, 1 << 31, -(1 << 95), 10**400):
+        for b in (1, 3, (1 << 32) - 1, 10**100):
+            d = math.lcm(b, 7)
+            value = a * (d // b)
+            assert abs(value).bit_length() <= d.bit_length() + abs(a).bit_length() + 1
+            assert Fraction(value, d) == Fraction(a, b)
+            checks += 1
+    # Exhaustive small p-adic current bound: subtraction/division cannot grow |current| beyond L.
+    for p in (3, 5, 7):
+        for coeff in (-9, -1, 0, 1, 9):
+            bound = max(1, abs(coeff))
+            for current in range(-bound, bound + 1):
+                for z in range(p):
+                    numerator = current - coeff * z
+                    assert abs(numerator) <= p * bound
+                    if numerator % p == 0:
+                        assert abs(numerator // p) <= bound
+                    checks += 1
+    # Hand proof: a common denominator need not fit the per-coordinate capacity.
+    nums, dens = [2, -3, 5], [3, 5, 7]
+    D = math.prod(dens)
+    weights = [1, 2, 3]
+    integer_proof = sum(a * n * (D // d) for a, n, d in zip(weights, nums, dens))
+    assert Fraction(integer_proof, D) == sum(Fraction(a*n, d) for a, n, d in zip(weights, nums, dens))
+    rejected = []
+    for name, condition in (
+        ("tiny_nonzero_is_zero", Fraction(1, 10**400) == 0),
+        ("omit_column_scale", Fraction(6, 5) == Fraction(6, 5) * Fraction(7, 3)),
+        ("common_denominator_as_single_denominator", D <= max(dens)),
+        ("drop_lift_product_prime_bits", (P - 1).bit_length() <= 1),
+    ):
+        assert not condition, name
+        rejected.append(name)
+    overflow_rejected = False
+    try:
+        checked(U64 + 1)
+    except OverflowError:
+        overflow_rejected = True
+    assert overflow_rejected
+    try:
+        limbs(U64)
+    except OverflowError:
+        pass
+    else:
+        raise AssertionError("limb rounding overflow was accepted")
+    # Quota comparison logic only: not the unimplemented C++ Plan API.
+    assert not (checked(100) > 100) and checked(100) > 99
+    return {"capacity_identities": checks, "incorrect_assumptions_rejected": rejected,
+            "uint64_overflow_rejected": True, "literal_payload_equal_and_one_short": True}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--inputs", type=Path, required=True)
+    parser.add_argument("--study", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    old = json.loads(args.study.read_text(encoding="utf-8"))["cases"]
+    cases = []
+    for n in (1, 2, 4):
+        for shape in ("flat", "quartic"):
+            path = args.inputs / f"{n}-{shape}.txt"
+            for domain in ("full", "cut"):
+                result = measure(path, domain, old)
+                result["shape"] = shape
+                cases.append(result)
+    # Prior same-process experiment is U-cut only; do not generalize its preparation to full.
+    cut = next(x for x in cases if x["n"] == 4 and x["shape"] == "quartic" and x["domain"] == "cut")
+    prior_owned, dict_external, part_external = 4543283759, 11747038224, 19978141584
+    total = checked(prior_owned + dict_external + part_external + cut["proposed_payload_bytes"])
+    result = {"schema": "uvlas.pg-rank-fixed-slot-design/1", "limb_bits": 32,
+              "proposed_slot_bytes": SLOT_BYTES, "maximum_lift_digits": DIGITS,
+              "controls": controls(), "cases": cases,
+              "coresident_cut_candidate": {"prior_owned_bytes": prior_owned,
+               "dictionary_external_estimate": dict_external,
+               "partition_external_estimate": part_external, "proposed_rank_payload": cut["proposed_payload_bytes"],
+               "sum_known_components": total, "cap": 48 * 1024**3,
+               "known_components_below_cap": total <= 48 * 1024**3,
+               "qualified": False, "reason": "Unimplemented call graph, allocator/control blocks and full bounded run remain"}}
+    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
+if __name__ == "__main__":
+    main()

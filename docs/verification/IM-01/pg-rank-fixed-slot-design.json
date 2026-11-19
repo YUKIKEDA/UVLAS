@@ -1,0 +1,26 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-slot-design",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 140,
+  "source_commit": "326b1b1929d5c6cfe6940d5574bd261b9c2eff98",
+  "date": "2026-11-19",
+  "claimed_state": "二段容量計画の設計照合。固定arenaでの全call実行・製品rank開始・48GiB実務受入は未認定。",
+  "cached_exporter_library_source": "6049a768a458abe935c9d9bad7bf3a09a084d7f2",
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-resource-study/export-coefficients.cpp.txt": "0454d901e122e631f33caa628710add4d277fb92cf54d62caac0ae863da748c5",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-resource-study/verification.md": "327fe10a7da11afaabcda76f01ad75c271ca3d139aa241408181fabf1086c1cf",
+    "docs/verification/IM-01/pg-rank-resource-coresident/result.json": "4dc20931870a9d0c3014394131c91f5ae6d403b80f8442d71ee32d6512cbc833",
+    "docs/verification/IM-01/pg-rank-resource-coresident/verification.md": "f4649b76ba05e1f98a2b153380f4e08a066d96376dfa4578147305aaf9528c18"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle.py.txt": "24be3eaa5b13cc57a4217b709fc66c8972c0869864b41e3a07deec54c227aca3",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/result.json": "db0550d7635e609ebf49beaead2e07d955c9ef2bceb636527ab7794980fe948f",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/verification.md": "f741487a646a731ba7b2a80f4e84ffea7aa911b0dd3abe3dadf9c172665b2abb"
+  }
+}

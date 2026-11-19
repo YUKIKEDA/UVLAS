@@ -1,0 +1,24 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-slot-identity-review-160",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 140,
+  "source_commit": "0f5c431d6d494b3907a08d9faa5d60728b73e302",
+  "date": "2026-11-19",
+  "claimed_state": "PR160の入力識別訂正。正常12容量値は不変、交換14・参照不成立2の拒否。製品rank開始は未認定。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-slot-design.json": "4efcdbda55b421002fb848dbf1d71663f8d3b3980d3f992d63ba0ea8d5791edf",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle.py.txt": "24be3eaa5b13cc57a4217b709fc66c8972c0869864b41e3a07deec54c227aca3",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/result.json": "db0550d7635e609ebf49beaead2e07d955c9ef2bceb636527ab7794980fe948f",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/verification.md": "f741487a646a731ba7b2a80f4e84ffea7aa911b0dd3abe3dadf9c172665b2abb",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/result-v2.json": "d1ca719d7677601e5f7e86f857c0ecb44301c5f0daa5d1582bd7c4e84d1c76af",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/review-160-correction.md": "c037a7b56c61dab7d90b296a68fdef720edb08a9a244eddb135908a25108256d"
+  }
+}
