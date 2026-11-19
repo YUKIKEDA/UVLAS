@@ -64,6 +64,14 @@ target_compile_definitions(uvlas_test_io_reference_path PRIVATE
 uvlas_enable_allocation_audit(uvlas_test_io_reference_path)
 uvlas_require_audited_dependencies(uvlas_test_io_reference_path)
 
+uvlas_add_test(io.reference_file_snapshot
+    LABELS unit property negative verification
+    SOURCES io/reference_file_snapshot_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_io_audit uvlas::eigen)
+target_include_directories(uvlas_test_io_reference_file_snapshot PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_enable_allocation_audit(uvlas_test_io_reference_file_snapshot)
+uvlas_require_audited_dependencies(uvlas_test_io_reference_file_snapshot)
+
 foreach(case IN ITEMS version help missing-option unknown-option extra-option)
     add_test(NAME cli.${case}
         COMMAND "${CMAKE_COMMAND}"
