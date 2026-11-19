@@ -1,0 +1,71 @@
+"""Run fixed modular discovery on the frozen twelve cases and four adopted primes."""
+import argparse
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import subprocess
+import tempfile
+from pathlib import Path
+
+PRIMES=(2147483647,2147483629,2147483587,2147483579)
+
+def require(value,message):
+    if not value:raise RuntimeError(message)
+
+
+def publish(output,result):
+    payload=json.dumps(result,indent=2)+'\n';temporary=None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',newline='\n',delete=False,dir=output.parent,prefix=f'.{output.name}.',suffix='.tmp') as stream:
+            temporary=Path(stream.name);stream.write(payload);stream.flush();os.fsync(stream.fileno())
+        os.replace(temporary,output)
+    finally:
+        if temporary is not None:temporary.unlink(missing_ok=True)
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--inputs',type=Path,required=True);p.add_argument('--certificates',type=Path,required=True)
+    p.add_argument('--discovery',type=Path,required=True);p.add_argument('--capacity-producer',type=Path,required=True)
+    p.add_argument('--study',type=Path,required=True);p.add_argument('--certificate-index',type=Path,required=True)
+    p.add_argument('--output',type=Path,required=True);args=p.parse_args()
+    loader=importlib.machinery.SourceFileLoader('capacity_v2',str(args.capacity_producer))
+    spec=importlib.util.spec_from_loader(loader.name,loader);capacity=importlib.util.module_from_spec(spec);loader.exec_module(capacity)
+    study=json.loads(args.study.read_text(encoding='utf-8'))['cases']
+    index=json.loads(args.certificate_index.read_text(encoding='utf-8'))['certificates'];exe=args.discovery.resolve()
+    control=json.loads(subprocess.run([str(exe),'--controls'],capture_output=True,check=True,timeout=30).stdout)
+    primitive=json.loads(subprocess.run([str(exe),'--primitives'],capture_output=True,check=True,timeout=30).stdout)
+    require({x['prime'] for x in primitive}==set(PRIMES) and len(primitive)==4,'primitive prime roster')
+    for x in primitive:
+        q=x['prime'];require(x['negative_three_sevenths']==(-3*pow(7,-1,q))%q,'signed rational primitive')
+        require(x['tiny_1e400']==pow(pow(10,400,q),-1,q),'tiny exact primitive')
+        require(x['inverse_seven']==pow(7,-1,q) and x['extreme_product']==1 and x['zero_minus_one']==q-1 and x['heap_attempts']==0,'native overflow/sign primitive')
+    result={'schema':'uvlas.pg-fixed-discovery/1','controls':control,'independent_python_primitives':primitive,'cases':[]}
+    roster=set()
+    for n in (1,2,4):
+        for shape in ('flat','quartic'):
+            source=args.inputs/f'{n}-{shape}.txt'
+            for domain in ('full','cut'):
+                expected=capacity.verify_input(source,n,shape,domain,study)
+                matches=[x for x in index if (x['n'],x['shape'],x['domain'],x['row_order'])==(n,shape,domain,'sparse')]
+                require(len(matches)==1,'certificate identity must be unique');reference=matches[0]
+                certificate=args.certificates/reference['file']
+                require(hashlib.sha256(certificate.read_bytes()).hexdigest()==reference['sha256'] and certificate.stat().st_size==reference['bytes'],'certificate bytes differ')
+                run=subprocess.run([str(exe),str(source),domain,str(certificate)],capture_output=True,timeout=300)
+                if run.returncode:raise RuntimeError((n,shape,domain,run.returncode,run.stdout.decode(),run.stderr.decode()))
+                entries=json.loads(run.stdout);require(len(entries)==4 and {x['prime'] for x in entries}==set(PRIMES),'case prime roster')
+                for row in entries:
+                    require(row['status']==0 and row['heap_attempts']==0,'discovery not accepted')
+                    require(row['rows']==expected['rows'] and row['columns']==expected['candidates'] and row['rank']==expected['mod_rank'],'case dimensions/rank differ')
+                    require(row['word_charge']<=row['word_structural_upper'] and row['visits']<=row['visit_structural_upper'],'forecast exceeded')
+                    key=(n,shape,domain,row['prime']);require(key not in roster,'duplicate case');roster.add(key)
+                    row.update(n=n,shape=shape,domain=domain,input_sha256=capacity.digest(source),certificate_sha256=reference['sha256'])
+                    result['cases'].append(row)
+                print(n,shape,domain,'four primes accepted; heap0; max_ms',max(x['discovery_ms'] for x in entries),flush=True)
+    require(len(roster)==48,'incomplete experiment roster')
+    publish(args.output,result)
+
+
+if __name__=='__main__':main()

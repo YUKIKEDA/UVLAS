@@ -1,0 +1,25 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-discovery-controls-gate-review-186",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 183,
+  "source_commit": "d832d3ecc72015905cbfa8df7d8419a3f658459c",
+  "date": "2026-11-19",
+  "claimed_state": "現runnerのrank2/1・JSON型・拒否flagによる公開前検査。通常/-O各38軽量系列、旧形式は既存出力保持。48数値生成の再実行ではない。",
+  "sources": {
+    "docs/verification/IM-01/pg-fixed-discovery.json": "e26684b6af870315931abe27526ef532f76035085c827161a93b14ee6d186623"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-fixed-discovery/run-discovery.py.txt": "64d644d1e0461173738eb7e1f34cd7fe5d16c7811d163320263f756e62ef5592",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-controls-fixture.json": "53560c76c40528b55862dadddcc3bd2d6390a0b61d09a11eb22285c919603de5",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-controls-gate-probe.py.txt": "cb40088ef1cf07de0230eada04f13272d47aac6bd126e9c3cebd7f213dda536b",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-controls-gate-result.json": "3b524a7c64f4671b843133ef910600b13b1650ca1d33cbbeb7e36c3d104aa7d8",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-controls-gate-optimized-result.json": "45a96e2176d3d205695d6427888d93dad038b4cda5cc7b35afde8d2aa52d4237",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-correction.md": "dcaf8899463ca6f41bcae35cb1343640484cd9e43a30e57066ff49190f40efe9",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-original-manifest.json.txt": "d78c08364d1b21a94926d14b46864a747bacb8a24ea4a6af5fd4dfe3ffd0a9ea",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-original-runner.py.txt": "318406edea8e743d47b8ad30d4460a06009a7165a4392faaa8e323e27efeb8f0"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-fixed-discovery",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 183,
+  "parent_issue": 140,
+  "source_commit": "d0342441ab3339dfcdc64691188121511001e9f2",
+  "date": "2026-11-19",
+  "claimed_state": "4素数×12実ケースの固定領域discovery。全剰余座標/因子を独立参照へ照合し全new0。全候補有理復元/全準備/製品開始は未認定。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "limb_bits": 32,
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/export-coefficients.cpp.txt": "0454d901e122e631f33caa628710add4d277fb92cf54d62caac0ae863da748c5",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/results.json": "984a09d1dcc027fb3a70003cd285ff960dc9ddf6e7a0732152c3ddc6d7c7193f",
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-fixed-discovery/control-correction.json": "c345634120eabc61f58ab0db3f94658373ba4956e5db631a9c917243f952c491",
+    "docs/verification/IM-01/pg-fixed-discovery/fixed-discovery.cpp.txt": "3404018de6b45603e51078ac5cf70719f9546ce24892033bbec9f82ebd27e9bf",
+    "docs/verification/IM-01/pg-fixed-discovery/results.json": "a3068f0bd1760c3634ecc72e9da9c3a8447204e76b56a077f15eda6ec8ab1aab",
+    "docs/verification/IM-01/pg-fixed-discovery/verification.md": "73201537dddb38974ba667797defa8680b0cac888880155fa454f3288bc1a3ea",
+    "docs/verification/IM-01/pg-fixed-discovery/review-186-original-runner.py.txt": "318406edea8e743d47b8ad30d4460a06009a7165a4392faaa8e323e27efeb8f0"
+  },
+  "artifact_reference_adjustment": {
+    "review_head": "d832d3ecc72015905cbfa8df7d8419a3f658459c",
+    "original_manifest_copy": "docs/verification/IM-01/pg-fixed-discovery/review-186-original-manifest.json.txt",
+    "reason": "Only the runner citation is rebound to the retained byte-identical original; numeric hashes remain unchanged."
+  }
+}

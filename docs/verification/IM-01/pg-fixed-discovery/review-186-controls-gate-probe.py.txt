@@ -1,0 +1,95 @@
+"""Exercise the controls publication gate, with numerical transport stubbed."""
+import argparse
+from contextlib import redirect_stdout
+from copy import deepcopy
+import hashlib
+import importlib.machinery
+import importlib.util
+import io
+import json
+import sys
+import tempfile
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+
+def require(value,message):
+    if not value:raise RuntimeError(message)
+
+
+def load(path,name):
+    loader=importlib.machinery.SourceFileLoader(name,str(path));spec=importlib.util.spec_from_loader(loader.name,loader)
+    module=importlib.util.module_from_spec(spec);loader.exec_module(module);return module
+
+
+def exercise(module,directory,control,existing,label):
+    output=directory/'result.json';previous=b'previous complete result bytes\n'
+    if existing:output.write_bytes(previous)
+    elif output.exists():output.unlink()
+    capacity=directory/'capacity.py'
+    capacity.write_text("def verify_input(*args): return {'rows':3,'candidates':4,'mod_rank':2}\ndef digest(path): return 'transport-only'\n",encoding='utf-8')
+    study=directory/'study.json';study.write_text('{"cases":[]}',encoding='utf-8')
+    entries=[]
+    for n in (1,2,4):
+        for shape in ('flat','quartic'):
+            for domain in ('full','cut'):
+                cert=directory/f'{n}-{shape}-{domain}.cert';cert.write_bytes(b'numerical transport is stubbed\n')
+                entries.append({'n':n,'shape':shape,'domain':domain,'row_order':'sparse','file':cert.name,'bytes':cert.stat().st_size,'sha256':hashlib.sha256(cert.read_bytes()).hexdigest()})
+    index=directory/'index.json';index.write_text(json.dumps({'certificates':entries}),encoding='utf-8')
+    counts={'controls':0,'primitives':0,'numerical':0}
+    def transport(argv,**kwargs):
+        if argv[-1]=='--controls':counts['controls']+=1;return SimpleNamespace(returncode=0,stdout=json.dumps(control).encode(),stderr=b'')
+        if argv[-1]=='--primitives':
+            counts['primitives']+=1
+            values=[{'prime':p,'negative_three_sevenths':(-3*pow(7,-1,p))%p,'tiny_1e400':pow(pow(10,400,p),-1,p),'inverse_seven':pow(7,-1,p),'extreme_product':1,'zero_minus_one':p-1,'heap_attempts':0} for p in module.PRIMES]
+            return SimpleNamespace(returncode=0,stdout=json.dumps(values).encode(),stderr=b'')
+        counts['numerical']+=1
+        values=[{'prime':p,'status':0,'heap_attempts':0,'rows':3,'columns':4,'rank':2,'word_charge':1,'word_structural_upper':2,'visits':1,'visit_structural_upper':2,'discovery_ms':0} for p in module.PRIMES]
+        return SimpleNamespace(returncode=0,stdout=json.dumps(values).encode(),stderr=b'')
+    args=['runner','--inputs',str(directory),'--certificates',str(directory),'--discovery',str(directory/'stub-discovery'),'--capacity-producer',str(capacity),'--study',str(study),'--certificate-index',str(index),'--output',str(output)]
+    error=None
+    with patch.object(sys,'argv',args),patch.object(module.subprocess,'run',side_effect=transport),redirect_stdout(io.StringIO()):
+        try:module.main()
+        except (RuntimeError,KeyError,TypeError,AttributeError) as exc:error=type(exc).__name__
+    data=output.read_bytes() if output.exists() else None
+    published=len(json.loads(data)['cases']) if data is not None and data!=previous else None
+    return {'scenario':label,'existing_output':existing,'raised':error,'published_cases':published,
+            'initial_state_preserved':data==previous if existing else data is None,
+            'transport_calls':counts,'temporary_files':len(list(directory.glob('.result.json.*.tmp')))}
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--legacy',type=Path,required=True);p.add_argument('--runner',type=Path,required=True)
+    p.add_argument('--fixture',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--legacy-only',action='store_true');args=p.parse_args()
+    fixture=json.loads(args.fixture.read_text(encoding='utf-8'));old=fixture['legacy']['controls'];good=fixture['corrected']['controls']
+    legacy=load(args.legacy,'legacy_gate');result={'schema':'uvlas.discovery-controls-gate-review186/1','optimization':sys.flags.optimize,'legacy_reproduction':[],'corrected':[]}
+    with tempfile.TemporaryDirectory(prefix='review186-') as temp:
+        directory=Path(temp)
+        for existing in (False,True):
+            row=exercise(legacy,directory,old,existing,'legacy_actual_controls')
+            require(row['raised'] is None and row['published_cases']==48 and not row['initial_state_preserved'],'legacy acceptance not reproduced')
+            result['legacy_reproduction'].append(row)
+        if not args.legacy_only:
+            runner=load(args.runner,'current_gate');scenarios=[('correct',good),('legacy_missing_both',old)]
+            for field,expected in [('bad_prime_rational_rank',2),('bad_prime_modular_rank',1)]:
+                missing=deepcopy(good);missing.pop(field);scenarios.append((field+'_missing',missing))
+                for kind,value in [('wrong',expected+1),('float',float(expected)),('bool',True),('string',str(expected)),('null',None)]:
+                    bad=deepcopy(good);bad[field]=value;scenarios.append((field+'_'+kind,bad))
+            for kind,value in [('false',False),('integer',1),('null',None)]:
+                bad=deepcopy(good);bad['bad_prime_rank_loss_rejected']=value;scenarios.append(('rejection_flag_'+kind,bad))
+            bad=deepcopy(good);bad.pop('bad_prime_rank_loss_rejected');scenarios.append(('rejection_flag_missing',bad))
+            scenarios.append(('nonobject',[]))
+            for existing in (False,True):
+                for label,control in scenarios:
+                    row=exercise(runner,directory,control,existing,label)
+                    if label=='correct':require(row['raised'] is None and row['published_cases']==48 and row['transport_calls']['numerical']==12,'correct control not published')
+                    else:require(row['raised'] is not None and row['initial_state_preserved'] and row['transport_calls']['primitives']==0 and row['transport_calls']['numerical']==0,'invalid control reached computation or publication')
+                    require(row['temporary_files']==0,'temporary output leaked');result['corrected'].append(row)
+    args.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8',newline='\n')
+    print('legacy reproductions',len(result['legacy_reproduction']),'corrected cases',len(result['corrected']),'optimization',sys.flags.optimize)
+
+
+if __name__=='__main__':main()

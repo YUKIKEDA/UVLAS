@@ -1,0 +1,16 @@
+{
+  "schema": "uvlas.pg-discovery-control-correction/1",
+  "normal_case_count": 48,
+  "normal_case_values_sha256": "048c7b1f457347b1107af37756db94524c581b1e5c77ce8c70a4b1c0108d0b7a",
+  "normal_source_region_sha256": "9915e8e27fa3134d0ce1411d7fd2edfc2b7dddcff4822b6a013eacea8c631556",
+  "old_control_defect": "Scaling only column0 changes priority but the full finite-field rank remains2.",
+  "corrected_control": "Scale every row0 numerator by p1; rational rank2 and finite-field rank1; reject before qualification.",
+  "independent_python": {
+    "prime": 2147483647,
+    "nonzero_rational_minor": "2147483647",
+    "rational_rank": 2,
+    "modular_rank": 1
+  },
+  "only_controls_reexecuted_after_correction": true,
+  "normal_source_outside_controls_lf_byte_identical": true
+}

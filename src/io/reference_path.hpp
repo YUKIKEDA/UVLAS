@@ -28,6 +28,9 @@ enum class ReferencePathReason : std::uint8_t {
 };
 
 struct ReferencePathDiagnostic {
+    ReferencePathDiagnostic(ReferencePathReason failure, std::optional<std::size_t> offset) noexcept
+        : reason(failure), input_offset(offset) {}
+
     ReferencePathReason reason;
     std::optional<std::size_t> input_offset;
 };
