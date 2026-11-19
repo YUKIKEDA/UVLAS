@@ -1,0 +1,595 @@
+#define BOOST_MP_KARATSUBA_CUTOFF 1048576
+#define main unused_original_comparison_main
+#include "../pg-rank-resource-study/rank-comparison.cpp.txt"
+#undef main
+#include <atomic>
+#include <bit>
+#include <cstdlib>
+#include <new>
+#include <numeric>
+#ifdef _WIN32
+#include <malloc.h>
+#endif
+
+namespace bounded {
+using namespace boost::multiprecision;
+template <unsigned Bits>
+using Int = number<cpp_int_backend<Bits, Bits, signed_magnitude, checked, void>, et_off>;
+template <unsigned Bits>
+using Rat =
+    number<rational_adaptor<cpp_int_backend<Bits, Bits, signed_magnitude, checked, void>>, et_off>;
+using Small = Int<1536>;
+using Coordinate = Int<2048>;
+using Wide = Rat<8192>;
+constinit std::atomic<bool> watched{false};
+constinit std::atomic<std::uint64_t> heap_attempts{0};
+void* allocate(std::size_t n) {
+    if (watched.load(std::memory_order_relaxed)) {
+        heap_attempts.fetch_add(1, std::memory_order_relaxed);
+        throw std::bad_alloc{};
+    }
+    if (void* p = std::malloc(n ? n : 1))
+        return p;
+    throw std::bad_alloc{};
+}
+void* allocate_aligned(std::size_t n, std::size_t align) {
+    if (watched.load(std::memory_order_relaxed)) {
+        heap_attempts.fetch_add(1, std::memory_order_relaxed);
+        throw std::bad_alloc{};
+    }
+#ifdef _WIN32
+    if (void* p = _aligned_malloc(n ? n : 1, align))
+        return p;
+#else
+    if (void* p = std::aligned_alloc(align, ((n + align - 1) / align) * align))
+        return p;
+#endif
+    throw std::bad_alloc{};
+}
+void release_aligned(void* p) {
+#ifdef _WIN32
+    _aligned_free(p);
+#else
+    std::free(p);
+#endif
+}
+} // namespace bounded
+void* operator new(std::size_t n) {
+    return bounded::allocate(n);
+}
+void* operator new[](std::size_t n) {
+    return bounded::allocate(n);
+}
+void operator delete(void* p) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p) noexcept {
+    std::free(p);
+}
+void operator delete(void* p, std::size_t) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p, std::size_t) noexcept {
+    std::free(p);
+}
+void* operator new(std::size_t n, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate(n);
+    } catch (...) {
+        return nullptr;
+    }
+}
+void* operator new[](std::size_t n, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate(n);
+    } catch (...) {
+        return nullptr;
+    }
+}
+void operator delete(void* p, const std::nothrow_t&) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p, const std::nothrow_t&) noexcept {
+    std::free(p);
+}
+void* operator new(std::size_t n, std::align_val_t a) {
+    return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+}
+void* operator new[](std::size_t n, std::align_val_t a) {
+    return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+}
+void operator delete(void* p, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete[](void* p, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete(void* p, std::size_t, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete[](void* p, std::size_t, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void* operator new(std::size_t n, std::align_val_t a, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+    } catch (...) {
+        return nullptr;
+    }
+}
+void* operator new[](std::size_t n, std::align_val_t a, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+    } catch (...) {
+        return nullptr;
+    }
+}
+void operator delete(void* p, std::align_val_t, const std::nothrow_t&) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete[](void* p, std::align_val_t, const std::nothrow_t&) noexcept {
+    bounded::release_aligned(p);
+}
+
+namespace bounded {
+std::uint64_t add(std::uint64_t a, std::uint64_t b) {
+    if (b > UINT64_MAX - a)
+        throw std::overflow_error("payload sum");
+    return a + b;
+}
+std::uint64_t mul(std::uint64_t a, std::uint64_t b) {
+    if (b && a > UINT64_MAX / b)
+        throw std::overflow_error("payload product");
+    return a * b;
+}
+template <class T>
+std::uint64_t bits(const T& value) {
+    if (value == 0)
+        return 0;
+    T positive = value;
+    if (positive < 0)
+        positive = -positive;
+    return 1 + msb(positive);
+}
+struct Term {
+    std::uint32_t row;
+    Small n, d;
+};
+struct Coeff {
+    std::uint32_t basis;
+    Coordinate n, d;
+};
+struct Data {
+    int n{}, rows{}, full{}, columns{};
+    std::vector<std::uint64_t> offsets, coordinate_offsets;
+    std::vector<Term> values;
+    std::vector<Coeff> coordinates;
+    std::vector<std::uint32_t> selected, claimed_pivots;
+    std::uint64_t rational_expression_bound{};
+};
+std::uint64_t expression_bound(const Data& d) {
+    // Exact metadata prepass, outside the audited certificate-consumption interval.
+    std::vector<Integer> row_denominators(d.rows, Integer{1});
+    std::uint64_t max_n = 0, max_d = 0, bound = 0;
+    for (const auto& q : d.values) {
+        const Integer den{q.d};
+        auto& row = row_denominators[q.row];
+        row = (row / gcd(row, den)) * den;
+        max_n = std::max(max_n, bits(q.n));
+    }
+    for (const auto& den : row_denominators)
+        max_d = std::max(max_d, bits(den));
+    for (int j = 0; j < d.columns; ++j) {
+        Integer common = 1;
+        std::uint64_t numerator_bits = 0;
+        for (auto p = d.coordinate_offsets[j]; p < d.coordinate_offsets[j + 1]; ++p) {
+            const Integer den{d.coordinates[p].d};
+            common = (common / gcd(common, den)) * den;
+            numerator_bits = std::max(numerator_bits, bits(d.coordinates[p].n));
+        }
+        const auto terms = d.coordinate_offsets[j + 1] - d.coordinate_offsets[j];
+        const auto sum_bits = terms ? std::bit_width(terms) : 0;
+        bound = std::max(bound, max_n + numerator_bits + 2 * (max_d + bits(common)) + sum_bits + 4);
+    }
+    return bound;
+}
+Data prepare(const Input& input, const Matrix& matrix, const char* certificate) {
+    Data data;
+    data.n = input.n;
+    data.rows = matrix.rows;
+    data.full = input.full;
+    data.columns = static_cast<int>(matrix.columns.size());
+    data.offsets.push_back(0);
+    for (const auto& column : matrix.columns) {
+        for (const auto& [row, q] : column) {
+            if (bits(numerator(q)) > 1536 || bits(denominator(q)) > 1536)
+                throw std::runtime_error("input coefficient bit cap");
+            data.values.push_back(
+                {static_cast<std::uint32_t>(row), Small{numerator(q)}, Small{denominator(q)}});
+        }
+        data.offsets.push_back(data.values.size());
+    }
+    std::ifstream stream(certificate);
+    std::string label;
+    int n, m, f, count, r;
+    if (!(stream >> label >> n >> m >> f >> count >> r) || label != "certificate" || n != data.n ||
+        m != data.rows || f != data.full || count != data.columns || r < 0 || r > std::min(m, f))
+        throw std::runtime_error("certificate identity or rank cap");
+    for (int k = 0; k < r; ++k) {
+        int index, j, row;
+        if (!(stream >> label >> index >> j >> row) || label != "basis" || index != k || j < 0 ||
+            j >= 33 + data.full || row < 0 || row >= data.rows)
+            throw std::runtime_error("certificate basis shape");
+        data.selected.push_back(static_cast<std::uint32_t>(j));
+        data.claimed_pivots.push_back(static_cast<std::uint32_t>(row));
+    }
+    data.coordinate_offsets.push_back(0);
+    for (int j = 0; j < data.columns; ++j) {
+        int col, kcount;
+        if (!(stream >> label >> col >> kcount) || label != "column" || col != j || kcount < 0 ||
+            kcount > r)
+            throw std::runtime_error("coordinate column shape");
+        for (int k = 0; k < kcount; ++k) {
+            Coeff c;
+            if (!(stream >> c.basis >> c.n >> c.d) || c.basis >= static_cast<unsigned>(r) ||
+                c.n == 0 || c.d <= 0)
+                throw std::runtime_error("coordinate value or bit cap");
+            data.coordinates.push_back(std::move(c));
+        }
+        data.coordinate_offsets.push_back(data.coordinates.size());
+    }
+    if (stream >> label)
+        throw std::runtime_error("extra certificate record");
+    // Capacity is part of the observed allocation, including any adapter over-reservation.
+    data.rational_expression_bound = expression_bound(data);
+    return data;
+}
+struct Scratch {
+    std::vector<Wide> residual;
+    std::vector<std::uint32_t> work, reduced_rows, reduced_values, pivots;
+    std::vector<std::uint64_t> reduced_offsets;
+    Wide scalar{}, product{}, value{};
+    explicit Scratch(const Data& d)
+        : residual(d.rows),
+          work(d.rows),
+          reduced_rows(mul(d.rows, d.selected.size())),
+          reduced_values(reduced_rows.size()),
+          pivots(d.selected.size()),
+          reduced_offsets(d.selected.size() + 1) {}
+};
+std::uint64_t payload(const Data& d, const Scratch& s) {
+    std::uint64_t total = sizeof(Data) + sizeof(Scratch);
+    const auto charge = [&](auto const& v) {
+        total = add(total, mul(v.capacity(),
+                               sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(d.offsets);
+    charge(d.coordinate_offsets);
+    charge(d.values);
+    charge(d.coordinates);
+    charge(d.selected);
+    charge(d.claimed_pivots);
+    charge(s.residual);
+    charge(s.work);
+    charge(s.reduced_rows);
+    charge(s.reduced_values);
+    charge(s.pivots);
+    charge(s.reduced_offsets);
+    return total;
+}
+std::uint64_t planned_payload(const Data& d) {
+    std::uint64_t total = sizeof(Data) + sizeof(Scratch);
+    const auto charge = [&](auto const& v) {
+        total = add(total, mul(v.capacity(),
+                               sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(d.offsets);
+    charge(d.coordinate_offsets);
+    charge(d.values);
+    charge(d.coordinates);
+    charge(d.selected);
+    charge(d.claimed_pivots);
+    total = add(total, mul(d.rows, sizeof(Wide) + sizeof(std::uint32_t)));
+    total = add(total, mul(mul(d.rows, d.selected.size()), 2 * sizeof(std::uint32_t)));
+    total = add(total, mul(d.selected.size(), sizeof(std::uint32_t)));
+    return add(total, mul(d.selected.size() + 1, sizeof(std::uint64_t)));
+}
+enum class Status {
+    Success,
+    PayloadExceeded,
+    BitExceeded,
+    WorkExceeded,
+    InvalidCertificate,
+    DependentBasis,
+    NonzeroResidual,
+    HeapAttempt,
+    ArithmeticFailure
+};
+struct Report {
+    Status status{Status::Success};
+    std::uint64_t work{}, modular_updates{}, proof_products{}, zero_checks{}, maximum_bits{},
+        heap{};
+    int failed_column{-1};
+};
+struct Limits {
+    std::uint64_t payload, work, bits;
+};
+bool charge(Report& r, const Limits& cap, std::uint64_t n = 1) {
+    if (n > cap.work - r.work) {
+        r.status = Status::WorkExceeded;
+        return false;
+    }
+    r.work += n;
+    return true;
+}
+void observe(Report& r, const Wide& q) {
+    r.maximum_bits = std::max({r.maximum_bits, bits(numerator(q)), bits(denominator(q))});
+}
+void set(Wide& q, const Small& n, const Small& d) {
+    q = n;
+    q /= d;
+}
+void set(Wide& q, const Coordinate& n, const Coordinate& d) {
+    q = n;
+    q /= d;
+}
+std::uint32_t mod_q(const Term& v) {
+    Small n = v.n % p1;
+    if (n < 0)
+        n += p1;
+    const auto den = static_cast<std::uint64_t>(v.d % p1);
+    if (!den)
+        return UINT32_MAX;
+    return static_cast<std::uint32_t>(
+        (Mod<p1>{static_cast<std::uint64_t>(n)} / Mod<p1>{den}).value);
+}
+Report run(const Data& d, Scratch& s, const Limits& cap) {
+    Report report;
+    if (payload(d, s) > cap.payload) {
+        report.status = Status::PayloadExceeded;
+        return report;
+    }
+    if (cap.bits < 8192 || d.rational_expression_bound > 8192) {
+        report.status = Status::BitExceeded;
+        return report;
+    }
+    heap_attempts = 0;
+    watched = true;
+    try {
+        const auto body = [&]() {
+            const auto rank = d.selected.size();
+            for (std::size_t k = 0; k < rank; ++k) {
+                if (k && d.selected[k] <= d.selected[k - 1]) {
+                    report.status = Status::InvalidCertificate;
+                    return;
+                }
+                std::fill(s.work.begin(), s.work.end(), 0);
+                for (auto p = d.offsets[d.selected[k]]; p < d.offsets[d.selected[k] + 1]; ++p) {
+                    if (!charge(report, cap))
+                        return;
+                    const auto q = mod_q(d.values[p]);
+                    if (q == UINT32_MAX) {
+                        report.status = Status::InvalidCertificate;
+                        return;
+                    }
+                    s.work[d.values[p].row] = q;
+                }
+                for (std::size_t l = 0; l < k; ++l) {
+                    const std::uint64_t factor = s.work[s.pivots[l]];
+                    if (!factor)
+                        continue;
+                    for (auto p = s.reduced_offsets[l]; p < s.reduced_offsets[l + 1]; ++p) {
+                        if (!charge(report, cap))
+                            return;
+                        const auto row = s.reduced_rows[p];
+                        const auto product = factor * s.reduced_values[p] % p1;
+                        s.work[row] = static_cast<std::uint32_t>((s.work[row] + p1 - product) % p1);
+                        ++report.modular_updates;
+                    }
+                }
+                std::size_t pivot = 0;
+                while (pivot < s.work.size() && !s.work[pivot]) {
+                    if (!charge(report, cap))
+                        return;
+                    ++pivot;
+                }
+                if (pivot == s.work.size()) {
+                    report.status = Status::DependentBasis;
+                    return;
+                }
+                if (pivot != d.claimed_pivots[k]) {
+                    report.status = Status::InvalidCertificate;
+                    return;
+                }
+                s.pivots[k] = static_cast<std::uint32_t>(pivot);
+                const auto inv = (Mod<p1>{1} / Mod<p1>{s.work[pivot]}).value;
+                auto next = s.reduced_offsets[k];
+                for (std::size_t row = 0; row < s.work.size(); ++row) {
+                    if (!charge(report, cap))
+                        return;
+                    if (s.work[row]) {
+                        s.reduced_rows[next] = static_cast<std::uint32_t>(row);
+                        s.reduced_values[next] = static_cast<std::uint32_t>(s.work[row] * inv % p1);
+                        ++next;
+                    }
+                }
+                s.reduced_offsets[k + 1] = next;
+            }
+            std::size_t selected_index = 0;
+            for (int j = 0; j < d.columns; ++j) {
+                report.failed_column = j;
+                const bool selected =
+                    selected_index < rank && d.selected[selected_index] == static_cast<unsigned>(j);
+                const auto begin = d.coordinate_offsets[j], end = d.coordinate_offsets[j + 1];
+                if (selected && (end - begin != 1 || d.coordinates[begin].basis != selected_index ||
+                                 d.coordinates[begin].n != 1 || d.coordinates[begin].d != 1)) {
+                    report.status = Status::InvalidCertificate;
+                    return;
+                }
+                for (auto p = begin; p < end; ++p) {
+                    if ((p != begin && d.coordinates[p].basis <= d.coordinates[p - 1].basis) ||
+                        (!selected &&
+                         d.selected[d.coordinates[p].basis] >= static_cast<unsigned>(j))) {
+                        report.status = Status::InvalidCertificate;
+                        return;
+                    }
+                }
+                if (selected) {
+                    ++selected_index;
+                    continue;
+                }
+                std::fill(s.residual.begin(), s.residual.end(), Wide{0});
+                for (auto p = d.offsets[j]; p < d.offsets[j + 1]; ++p) {
+                    if (!charge(report, cap))
+                        return;
+                    set(s.residual[d.values[p].row], d.values[p].n, d.values[p].d);
+                }
+                for (auto p = begin; p < end; ++p) {
+                    const auto& c = d.coordinates[p];
+                    set(s.scalar, c.n, c.d);
+                    observe(report, s.scalar);
+                    const auto col = d.selected[c.basis];
+                    for (auto q = d.offsets[col]; q < d.offsets[col + 1]; ++q) {
+                        if (!charge(report, cap, 2))
+                            return;
+                        const auto& t = d.values[q];
+                        set(s.value, t.n, t.d);
+                        s.product = s.value * s.scalar;
+                        observe(report, s.product);
+                        s.residual[t.row] -= s.product;
+                        observe(report, s.residual[t.row]);
+                        ++report.proof_products;
+                    }
+                }
+                for (const auto& q : s.residual) {
+                    if (!charge(report, cap))
+                        return;
+                    ++report.zero_checks;
+                    if (q != 0) {
+                        report.status = Status::NonzeroResidual;
+                        return;
+                    }
+                }
+            }
+            report.failed_column = -1;
+        };
+        body();
+    } catch (const std::bad_alloc&) {
+        report.status = Status::HeapAttempt;
+    } catch (...) {
+        report.status = Status::ArithmeticFailure;
+    }
+    watched = false;
+    report.heap = heap_attempts.load();
+    if (report.heap)
+        report.status = Status::HeapAttempt;
+    return report;
+}
+Data literal() {
+    Data d;
+    d.n = 1;
+    d.rows = 2;
+    d.full = 3;
+    d.columns = 5;
+    Small tiny_den = 1;
+    for (int i = 0; i < 400; ++i)
+        tiny_den *= 10;
+    d.offsets = {0, 1, 2, 3, 4, 6};
+    d.values = {{0, 1, 1}, {0, 2, 1}, {1, 1, 1}, {0, 1, tiny_den}, {0, -1, 1}, {1, 3, 1}};
+    d.selected = {0, 2};
+    d.claimed_pivots = {0, 1};
+    d.coordinate_offsets = {0, 1, 2, 3, 4, 6};
+    d.coordinates = {{0, 1, 1},  {0, 2, 1}, {1, 1, 1}, {0, 1, Coordinate{tiny_den}},
+                     {0, -1, 1}, {1, 3, 1}};
+    d.rational_expression_bound = expression_bound(d);
+    return d;
+}
+void controls() {
+    auto d = literal();
+    Scratch s(d);
+    const auto bytes = payload(d, s);
+    if (bytes != planned_payload(d))
+        throw std::runtime_error("scratch allocation differs from forecast");
+    const auto good = run(d, s, {bytes, 1000000, 8192});
+    if (good.status != Status::Success || good.heap)
+        throw std::runtime_error("literal control failed");
+    const auto expect = [&](const Data& data, Limits limits, Status status) {
+        Scratch workspace(data);
+        const auto r = run(data, workspace, limits);
+        if (r.status != status || r.heap)
+            throw std::runtime_error("negative control differs");
+    };
+    expect(d, {bytes - 1, 1000000, 8192}, Status::PayloadExceeded);
+    expect(d, {bytes, 1000000, 8191}, Status::BitExceeded);
+    expect(d, {bytes, good.work - 1, 8192}, Status::WorkExceeded);
+    auto bad = d;
+    bad.coordinates.back().n = 4;
+    expect(bad, {payload(bad, s), 1000000, 8192}, Status::NonzeroResidual);
+    bad = d;
+    bad.coordinates[1].basis = 1;
+    expect(bad, {payload(bad, s), 1000000, 8192}, Status::InvalidCertificate);
+    bad = d;
+    bad.selected[1] = 1;
+    expect(bad, {payload(bad, s), 1000000, 8192}, Status::DependentBasis);
+    bad = d;
+    bad.coordinates.erase(bad.coordinates.begin() + 3);
+    for (std::size_t i = 4; i < bad.coordinate_offsets.size(); ++i)
+        --bad.coordinate_offsets[i];
+    expect(bad, {payload(bad, s), 1000000, 8192}, Status::NonzeroResidual);
+    const auto repeated = run(d, s, {bytes, good.work, 8192});
+    if (repeated.status != Status::Success || repeated.heap || repeated.work != good.work ||
+        repeated.proof_products != good.proof_products)
+        throw std::runtime_error("old input changed after failure or exact work cap failed");
+    std::cout << "{\"literal_rank\":2,\"tiny_decimal_exponent\":-400,\"payload_equal\":true,"
+                 "\"payload_one_short\":true,\"bits_one_short\":true,\"work_equal\":true,\"work_"
+                 "one_short\":true,\"coordinate_tamper\":true,\"future_basis\":true,\"dependent_"
+                 "minor\":true,\"tiny_omission\":true,\"same_input_after_failures\":true,\"heap_"
+                 "attempts\":0,\"literal_work\":"
+              << good.work << "}\n";
+}
+} // namespace bounded
+int main(int argc, char** argv) try {
+    if (argc == 2 && std::string(argv[1]) == "--controls") {
+        bounded::controls();
+        return 0;
+    }
+    if (argc != 4 || !prime<p1>())
+        return 2;
+    std::ifstream source(argv[1]);
+    const auto input = read(source);
+    const bool cut = std::string(argv[2]) == "cut";
+    if (!cut && std::string(argv[2]) != "full")
+        return 2;
+    const auto anchor = verify_anchor(input);
+    const auto matrix = active_matrix(input, cut, true);
+    auto data = bounded::prepare(input, matrix, argv[3]);
+    const auto planned = bounded::planned_payload(data);
+    if (planned > 51539607552ULL)
+        throw std::runtime_error("verifier 48GiB payload admission");
+    bounded::Scratch scratch(data);
+    const auto bytes = bounded::payload(data, scratch);
+    if (bytes != planned)
+        throw std::runtime_error("scratch allocation differs from forecast");
+    const auto start = std::chrono::steady_clock::now();
+    const auto result = bounded::run(data, scratch, {bytes, 1000000000, 8192});
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             std::chrono::steady_clock::now() - start)
+                             .count();
+    std::cout << "{\"status\":" << static_cast<int>(result.status) << ",\"rows\":" << data.rows
+              << ",\"candidates\":" << data.columns << ",\"rank\":" << data.selected.size()
+              << ",\"fixed_payload_bytes\":" << bytes
+              << ",\"wide_bits_cap\":8192,\"maximum_observed_bits\":" << result.maximum_bits
+              << ",\"verification_work\":" << result.work
+              << ",\"rational_expression_bits_bound\":" << data.rational_expression_bound
+              << ",\"modular_updates\":" << result.modular_updates
+              << ",\"proof_products\":" << result.proof_products
+              << ",\"row_zero_checks\":" << result.zero_checks
+              << ",\"heap_attempts\":" << result.heap
+              << ",\"failed_column\":" << result.failed_column
+              << ",\"anchor_checks_outside_audit\":" << anchor << ",\"verification_ms\":" << elapsed
+              << ",\"process_peak_bytes\":" << peak_resident_bytes() << "}\n";
+    return result.status == bounded::Status::Success ? 0 : 3;
+} catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return 1;
+}

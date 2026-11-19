@@ -1,0 +1,66 @@
+#ifdef VERIFY_SCHOOLBOOK
+#define BOOST_MP_KARATSUBA_CUTOFF 1048576
+#endif
+#include <boost/multiprecision/cpp_int.hpp>
+
+#include <atomic>
+#include <cstdlib>
+#include <iostream>
+#include <new>
+using namespace boost::multiprecision;
+std::atomic<bool> watch = false;
+std::atomic<unsigned long long> calls = 0;
+void* operator new(std::size_t n) {
+    if (watch) {
+        ++calls;
+        throw std::bad_alloc{};
+    }
+    if (auto p = std::malloc(n ? n : 1))
+        return p;
+    throw std::bad_alloc{};
+}
+void* operator new[](std::size_t n) {
+    return ::operator new(n);
+}
+void operator delete(void* p) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p) noexcept {
+    std::free(p);
+}
+void operator delete(void* p, std::size_t) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p, std::size_t) noexcept {
+    std::free(p);
+}
+template <unsigned B>
+using Fixed = number<cpp_int_backend<B, B, signed_magnitude, checked, void>, et_off>;
+int main() {
+    Fixed<8192> a = 1, b = 1, c = 0, r = 0, g = 0;
+    a <<= 1808;
+    b <<= 1720;
+    a += 123;
+    b += 7;
+    bool heap = false;
+    watch = true;
+    try {
+        c = a * b;
+        c /= a;
+        r = a % b;
+        g = gcd(a, b);
+    } catch (const std::bad_alloc&) {
+        heap = true;
+    }
+    watch = false;
+#ifdef VERIFY_SCHOOLBOOK
+    if (heap || calls != 0 || c != b || r != a % b || g == 0)
+        return 1;
+    std::cout << "schoolbook_fixed_backend_heap_calls=0\n";
+#else
+    if (!heap || calls != 1)
+        return 2;
+    std::cout << "default_karatsuba_hidden_allocation_detected=1\n";
+#endif
+    std::cout << "actual_limb_bits=" << std::numeric_limits<limb_type>::digits << "\n";
+}
