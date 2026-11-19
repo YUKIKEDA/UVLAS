@@ -1,0 +1,20 @@
+{
+  "schema": "uvlas.pchip-interval-publication-review/1",
+  "historical_review_head": "eccca17a9be66b97a6cac6592ab09a7182aa0196",
+  "historical_source_commit": "ab210fd589dd9bd8ade5760dd06af50f013e5f2b",
+  "historical_producer_sha256": "3b3327cf9198a1b3c51de9ab430a52fe76da53f2fa744078315251d47036d3ba",
+  "historical_fixture_sha256": "2d08ac65e4485272a82cdc18aa50f591b8daa5d40dce3b80829847f8c23ca563",
+  "verification": {
+    "competing_output": "A file created during generation was preserved byte-for-byte and the second writer was rejected.",
+    "existing_output": "Existing destinations were refused without changes.",
+    "regeneration": "Two fresh outputs were byte-identical. Only producer_sha256 changed relative to the 360-case historical fixture."
+  },
+  "sources": {
+    "tests/aero/fixtures/pchip-coefficients-v1.json": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/reference.py": "13f1d3ad09b784e64990eff9c85744febd849cbc7a3ca31fab787e92dbd026b7"
+  },
+  "artifacts": {
+    "tests/aero/fixtures/pchip-interval-values-v1.json": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694",
+    "docs/verification/IM-03/im03-pchip-interval-evaluation.json": "ccccba8603de80c66d9e0c0820fed5599f9e6bbe6a8ead6702fb88c01eefa770"
+  }
+}

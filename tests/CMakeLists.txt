@@ -627,6 +627,14 @@ uvlas_add_test(aero.pchip_coefficients_resources
 target_include_directories(uvlas_test_aero_pchip_coefficients_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_pchip_coefficients_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_pchip_coefficients_resources)
+uvlas_add_test(aero.pchip_interval
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_interval_jet_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_pchip_interval PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_pchip_interval PRIVATE
+    UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json"
+    UVLAS_PCHIP_INTERVAL_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-interval-values-v1.json")
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification

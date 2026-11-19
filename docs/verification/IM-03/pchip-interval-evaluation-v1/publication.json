@@ -1,0 +1,45 @@
+{
+  "schema": "uvlas.evidence-publication/1",
+  "records": [
+    {
+      "id": "pchip-interval-debug-normal.txt",
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/debug-normal.txt",
+      "original_sha256": "0168d1dd938423022c08349cdba206dcc64880f6760cb4f9e120d49d104f320a",
+      "published_sha256": "dcacabe25d99020a71dea9508844cae52b078be63abae8001af91f6f71ac485a",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF with terminal blank lines removed"
+    },
+    {
+      "id": "pchip-interval-release-normal.txt",
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/release-normal.txt",
+      "original_sha256": "0168d1dd938423022c08349cdba206dcc64880f6760cb4f9e120d49d104f320a",
+      "published_sha256": "dcacabe25d99020a71dea9508844cae52b078be63abae8001af91f6f71ac485a",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF with terminal blank lines removed"
+    },
+    {
+      "id": "pchip-interval-product-normal-tidy.txt",
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/product-normal-tidy.txt",
+      "original_sha256": "44453455e3ae826077e1ef022be19895d1d09b19075680cb509fdf58b460d6c1",
+      "published_sha256": "7d4872e892bbb19ccd46f28af2672e136865657328275853f7453016ed27b48c",
+      "path_replacements": 2,
+      "serialization": "UTF-8/LF with terminal blank lines removed"
+    },
+    {
+      "id": "pchip-interval-measure.cpp",
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/measure.cpp",
+      "original_sha256": "709b536d5ebe1139c5a16588e6ddc5de5273c53636d5d69e4a5bad1a4ba29984",
+      "published_sha256": "709b536d5ebe1139c5a16588e6ddc5de5273c53636d5d69e4a5bad1a4ba29984",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF with terminal blank lines removed"
+    },
+    {
+      "id": "pchip-interval-measure.json",
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/measure.json",
+      "original_sha256": "0dfe1c9d8d9fa6b4525c1d90089ea9cb39c874f7957d7671e302660cba32f407",
+      "published_sha256": "47bb07425a62262ac33bd16cb9b251c88d7e91fccca49fdfeb516d6eecfdbb7b",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF with terminal blank lines removed"
+    }
+  ]
+}

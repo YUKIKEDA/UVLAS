@@ -1,0 +1,35 @@
+{
+  "schema": "uvlas.independent-observation/1",
+  "id": "pchip-interval-resource-and-mutation-v1",
+  "source_commit": "ab210fd589dd9bd8ade5760dd06af50f013e5f2b",
+  "cpp_sha256": "8b37a6dfd7620f3629409693450b18d9e087956b35831c70070d6f935ccb1665",
+  "origin": "Results transcribed from the independent reviewer tool executions; not standalone raw logs",
+  "debug_resource": {
+    "filter": "Private PCHIP interval*",
+    "seed": 185,
+    "cases": 2,
+    "assertions": 272,
+    "exit": 0
+  },
+  "release_resource": {
+    "filter": "Private PCHIP interval*",
+    "seed": 185,
+    "cases": 2,
+    "assertions": 272,
+    "exit": 0
+  },
+  "resource_static": "Windows clang-tidy21.1.1 passed",
+  "mutation": {
+    "change": "Remove 1/h from component result[1]",
+    "compiler": "MSVC Debug",
+    "compile_exit": 0,
+    "link_exit": 0,
+    "filter": "Private PCHIP interval values match independent Hermite time derivatives",
+    "seed": 185,
+    "assertions": 38450,
+    "failed_assertions": 242,
+    "catch_exit": 42,
+    "example": "two_points/base interval0 u0: dt4, exact reference2",
+    "control": "Ordinary unmodified Debug target passed38585 assertions/4cases including this38450-assertion case; no separately linked private control"
+  }
+}
