@@ -1,3 +1,4 @@
+#include "aero/pchip_domain_route.hpp"
 #include "aero/pchip_interval_jet.hpp"
 #include "aero/pchip_knot_locator.hpp"
 
@@ -669,4 +670,150 @@ TEST_CASE("Private PCHIP locator cancels at the last allocation and rejects reen
     const auto next = take(p::locate_time(source, midpoint.time, workspace, limits(), memory));
     CHECK(memory.allocated_bytes() == payload * 3);
     check_midpoint_location(next);
+}
+
+namespace {
+constexpr std::array<std::uint32_t, 1> hold_end_numerator{2};
+constexpr p::RationalView hold_end_query{1, hold_end_numerator, half_numerator};
+constexpr auto hold_policy = p::DomainPolicy::Hold;
+constexpr std::int64_t domain_allocations = 3;
+
+void check_hold_endpoint(const p::DomainRoute& route) {
+    CHECK(route.relation() == p::DomainRelation::AtLast);
+    CHECK(route.has_inside());
+    CHECK(route.has_constant());
+    CHECK(take(route.constant_node()) == 2);
+}
+
+struct DomainReentry {
+    const p::CoefficientBlock* source = nullptr;
+    p::DomainWorkspace* workspace = nullptr;
+    c::ResourcePlan* memory = nullptr;
+    std::optional<c::Failure> failure{};
+};
+constinit DomainReentry* pending_domain_reentry = nullptr;
+
+void try_domain_reentry() {
+    const auto refused = p::route_domain(*pending_domain_reentry->source, hold_end_query,
+                                         hold_policy, *pending_domain_reentry->workspace, limits(),
+                                         *pending_domain_reentry->memory);
+    if (!refused)
+        pending_domain_reentry->failure = refused.error();
+}
+} // namespace
+
+TEST_CASE("Private PCHIP domain route preflights the arena and preserves old candidates",
+          "[AE-07][N4-02][N4-03][N4-08][negative]") {
+    const auto source = prepare_interval_source();
+    const auto forecast = [&] {
+        const FaultScope audit{0};
+        return p::forecast_domain(source, hold_end_query, hold_policy, limits());
+    }();
+    REQUIRE(forecast);
+    CHECK(attempts.load() == 0);
+
+    auto exact = limits();
+    exact.input_bits = 2;
+    exact.work_bits = forecast->arithmetic().integer_bits();
+    exact.steps = forecast->reserved_steps();
+    exact.slots = forecast->arithmetic().slots();
+    const auto payload = forecast->payload_bytes();
+    p::DomainWorkspace workspace;
+    c::ResourcePlan initial{payload};
+    const auto old = [&] {
+        const FaultScope audit{INT64_MAX};
+        return p::route_domain(source, hold_end_query, hold_policy, workspace, exact, initial);
+    }();
+    REQUIRE(old);
+    CHECK(attempts.load() == static_cast<std::uint64_t>(domain_allocations));
+    CHECK(initial.allocated_bytes() == payload);
+    CHECK(old->used_steps() <= exact.steps);
+    CHECK(old->used_slots() == 3);
+    check_hold_endpoint(*old);
+
+    std::uint64_t prior_payload = 0;
+    const auto context = details();
+    for (std::int64_t fault = 0; fault < domain_allocations; ++fault) {
+        CAPTURE(fault);
+        c::ResourcePlan memory{payload};
+        const auto refused = [&] {
+            const FaultScope audit{fault};
+            return p::route_domain(source, hold_end_query, hold_policy, workspace, exact, memory,
+                                   {}, context);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(refused.error().details.model == context.model);
+        CHECK(refused.error().details.component == context.component);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(fault + 1));
+        if (fault == 0)
+            CHECK(memory.allocated_bytes() == 0);
+        else
+            CHECK(memory.allocated_bytes() > prior_payload);
+        CHECK(memory.allocated_bytes() < payload);
+        prior_payload = memory.allocated_bytes();
+        check_hold_endpoint(*old);
+    }
+
+    std::array caps{exact, exact, exact, exact, exact};
+    --caps[0].input_bits;
+    --caps[1].work_bits;
+    --caps[2].steps;
+    --caps[3].slots;
+    for (std::size_t i = 0; i < caps.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{i == 4 ? payload - 1 : payload};
+        const auto refused = [&] {
+            const FaultScope audit{0};
+            return p::route_domain(source, hold_end_query, hold_policy, workspace, caps[i], memory);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+    }
+    c::ResourcePlan retry{payload};
+    check_hold_endpoint(
+        take(p::route_domain(source, hold_end_query, hold_policy, workspace, exact, retry)));
+}
+
+TEST_CASE("Private PCHIP domain route cancels at the last allocation and rejects reentry",
+          "[AE-07][N4-02][N4-03][N4-08][negative]") {
+    const auto source = prepare_interval_source();
+    const auto plan = take(p::forecast_domain(source, hold_end_query, hold_policy, limits()));
+    const auto payload = plan.payload_bytes();
+    p::DomainWorkspace workspace;
+    c::ResourcePlan memory{payload * 3};
+    std::stop_source stop;
+    cancel_source = &stop;
+    until_cancel = static_cast<unsigned>(domain_allocations);
+    allocation_callback = cancel_last;
+    const auto cancelled = p::route_domain(source, hold_end_query, hold_policy, workspace, limits(),
+                                           memory, stop.get_token(), details());
+    allocation_callback = nullptr;
+    cancel_source = nullptr;
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == c::FailureCode::Cancelled);
+    CHECK(cancelled.error().details == details());
+    CHECK(memory.allocated_bytes() == payload);
+
+    DomainReentry context{&source, &workspace, &memory, {}};
+    pending_domain_reentry = &context;
+    allocation_callback = try_domain_reentry;
+    const auto outer =
+        p::route_domain(source, hold_end_query, hold_policy, workspace, limits(), memory);
+    allocation_callback = nullptr;
+    pending_domain_reentry = nullptr;
+    REQUIRE(outer);
+    if (context.failure) {
+        CHECK(context.failure->code == c::FailureCode::InvalidInput);
+    } else {
+        FAIL("The shared domain workspace accepted a nested call");
+    }
+    CHECK(memory.allocated_bytes() == payload * 2);
+    check_hold_endpoint(*outer);
+    const auto next =
+        take(p::route_domain(source, hold_end_query, hold_policy, workspace, limits(), memory));
+    CHECK(memory.allocated_bytes() == payload * 3);
+    check_hold_endpoint(next);
 }
