@@ -1,0 +1,4 @@
+[1/2] Processing file <repo>\src\aero\pchip_interval_jet.cpp.
+41716 warnings generated.
+[2/2] Processing file <repo>\tests\aero\pchip_interval_jet_test.cpp.
+112752 warnings generated.

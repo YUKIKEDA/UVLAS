@@ -1,0 +1,202 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-interval-evaluation-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 185,
+  "date": "2026-11-19",
+  "source_commit": "ab210fd589dd9bd8ade5760dd06af50f013e5f2b",
+  "claimed_state": "Private explicitly selected closed-interval mathematical values only; not ExactPchipJet/CurveReady or physical qualification.",
+  "verification": {
+    "mutation": "Independent copy removed1/h, compile/link0,Catch42,242 failures/38450 assertions; ordinary unmodified target is control, not a separate isolation link",
+    "allocation": "7 planned allocations, all7 faults, no additional C++ new in numeric loops; C heap not dynamically audited",
+    "parallel": "Independent workspaces1/2/4; canonical words/work/slots/payload identical",
+    "static": "Windows clang-tidy21.1.1 product/normal2TU passed; independent reviewer resourceTU passed; producer Ruff0.17.4 and Pyright1.1.408 strict passed",
+    "independent_review": "Fixture generation, resource D/R, numerical ownership/budget body, final Japanese report independently reviewed",
+    "debug_resource": "Independent interval filter2 cases /272 assertions",
+    "release_normal": "4 cases / 38585 assertions",
+    "debug_normal": "4 cases / 38585 assertions",
+    "performance": "Fixed small case1000 calls; source ab210fd/dirtyfalse; no practical performance or allocator/RSS bound claim",
+    "linux": "Deferred to current CI; not waited or claimed passed",
+    "japanese": "quick lint0 findings",
+    "reference": "360 exact queries from60 source curves/120 intervals; all request orders0/1/2; tolerance0; independent Hermite basis",
+    "release_resource": "Independent interval filter2 cases /272 assertions"
+  },
+  "source_records": [
+    {
+      "hint": "CMakeLists.txt",
+      "sha256": "e942d339046f7fbef8431242451afc4976c3d1996e01d426ac678bfe5c223b12",
+      "id": "pchip-interval-source-00"
+    },
+    {
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "f96244cea8cddf4edeb64e8530ed5ed7a8c5c34411a1288fa69f9d20393d729d",
+      "id": "pchip-interval-source-01"
+    },
+    {
+      "hint": "src/aero/pchip_interval_jet.cpp",
+      "sha256": "8b37a6dfd7620f3629409693450b18d9e087956b35831c70070d6f935ccb1665",
+      "id": "pchip-interval-source-02"
+    },
+    {
+      "hint": "src/aero/pchip_interval_jet.hpp",
+      "sha256": "c714637886b92bd8e5350d83b25791fd4060fa59052279a9ec10c1b603d33cfc",
+      "id": "pchip-interval-source-03"
+    },
+    {
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+      "id": "pchip-interval-source-04"
+    },
+    {
+      "hint": "src/aero/pchip_coefficients.hpp",
+      "sha256": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5",
+      "id": "pchip-interval-source-05"
+    },
+    {
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+      "id": "pchip-interval-source-06"
+    },
+    {
+      "hint": "src/aero/pchip_rational_slots.hpp",
+      "sha256": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0",
+      "id": "pchip-interval-source-07"
+    },
+    {
+      "hint": "src/aero/pchip_slot_integer.cpp",
+      "sha256": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+      "id": "pchip-interval-source-08"
+    },
+    {
+      "hint": "src/aero/pchip_slot_private.hpp",
+      "sha256": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+      "id": "pchip-interval-source-09"
+    },
+    {
+      "hint": "include/uvlas/core/resource_plan.hpp",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+      "id": "pchip-interval-source-10"
+    },
+    {
+      "hint": "include/uvlas/core/checked_dimensions.hpp",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+      "id": "pchip-interval-source-11"
+    },
+    {
+      "hint": "include/uvlas/core/failure.hpp",
+      "sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+      "id": "pchip-interval-source-12"
+    },
+    {
+      "hint": "tests/aero/pchip_interval_jet_test.cpp",
+      "sha256": "dc36fab5566a2a08d8fcd8f894a54a79aca82cf8bf3bce6d0eaa4da64cf0b8f8",
+      "id": "pchip-interval-source-13"
+    },
+    {
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "47fe31af806e46347f9b11b1a07f98f0135365cb43a50a5b7124578403119670",
+      "id": "pchip-interval-source-14"
+    },
+    {
+      "hint": "tests/aero/fixtures/pchip-coefficients-v1.json",
+      "sha256": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+      "id": "pchip-interval-source-15"
+    },
+    {
+      "hint": "tests/aero/fixtures/pchip-interval-values-v1.json",
+      "sha256": "2d08ac65e4485272a82cdc18aa50f591b8daa5d40dce3b80829847f8c23ca563",
+      "id": "pchip-interval-source-16"
+    },
+    {
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+      "id": "pchip-interval-source-17"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/reference.py",
+      "sha256": "3b3327cf9198a1b3c51de9ab430a52fe76da53f2fa744078315251d47036d3ba",
+      "id": "pchip-interval-source-18"
+    }
+  ],
+  "artifact_records": [
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/debug-normal.txt",
+      "sha256": "dcacabe25d99020a71dea9508844cae52b078be63abae8001af91f6f71ac485a",
+      "id": "pchip-interval-debug-normal.txt"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/independent-observations.json",
+      "sha256": "28c348a1d7acf6fd5919ab2e18676ad53001ac008ccd930b5c30f148230b430a",
+      "id": "pchip-interval-independent-observations.json"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/measure.cpp",
+      "sha256": "709b536d5ebe1139c5a16588e6ddc5de5273c53636d5d69e4a5bad1a4ba29984",
+      "id": "pchip-interval-measure.cpp"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/measure.json",
+      "sha256": "47bb07425a62262ac33bd16cb9b251c88d7e91fccca49fdfeb516d6eecfdbb7b",
+      "id": "pchip-interval-measure.json"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/product-normal-tidy.txt",
+      "sha256": "7d4872e892bbb19ccd46f28af2672e136865657328275853f7453016ed27b48c",
+      "id": "pchip-interval-product-normal-tidy.txt"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/publication.json",
+      "sha256": "921af25563b4304155ac204a336000e53d379bb20fe61f1af458bb7ddfd64348",
+      "id": "pchip-interval-publication.json"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/release-normal.txt",
+      "sha256": "dcacabe25d99020a71dea9508844cae52b078be63abae8001af91f6f71ac485a",
+      "id": "pchip-interval-release-normal.txt"
+    },
+    {
+      "hint": "docs/verification/IM-03/pchip-interval-evaluation-v1/review.md",
+      "sha256": "4345ad5f7e3b59666fa2dee03c6f0d980173e683e9e93da0bf4c8f7873d447bf",
+      "id": "pchip-interval-review.md"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "e942d339046f7fbef8431242451afc4976c3d1996e01d426ac678bfe5c223b12",
+    "tests/CMakeLists.txt": "f96244cea8cddf4edeb64e8530ed5ed7a8c5c34411a1288fa69f9d20393d729d",
+    "src/aero/pchip_interval_jet.cpp": "8b37a6dfd7620f3629409693450b18d9e087956b35831c70070d6f935ccb1665",
+    "src/aero/pchip_interval_jet.hpp": "c714637886b92bd8e5350d83b25791fd4060fa59052279a9ec10c1b603d33cfc",
+    "src/aero/pchip_coefficients.cpp": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+    "src/aero/pchip_coefficients.hpp": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_rational_slots.hpp": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0",
+    "src/aero/pchip_slot_integer.cpp": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+    "src/aero/pchip_slot_private.hpp": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "tests/aero/pchip_interval_jet_test.cpp": "dc36fab5566a2a08d8fcd8f894a54a79aca82cf8bf3bce6d0eaa4da64cf0b8f8",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "47fe31af806e46347f9b11b1a07f98f0135365cb43a50a5b7124578403119670",
+    "tests/aero/fixtures/pchip-coefficients-v1.json": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+    "tests/aero/fixtures/pchip-interval-values-v1.json": "2d08ac65e4485272a82cdc18aa50f591b8daa5d40dce3b80829847f8c23ca563",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/reference.py": "3b3327cf9198a1b3c51de9ab430a52fe76da53f2fa744078315251d47036d3ba"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/debug-normal.txt": "dcacabe25d99020a71dea9508844cae52b078be63abae8001af91f6f71ac485a",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/independent-observations.json": "28c348a1d7acf6fd5919ab2e18676ad53001ac008ccd930b5c30f148230b430a",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/measure.cpp": "709b536d5ebe1139c5a16588e6ddc5de5273c53636d5d69e4a5bad1a4ba29984",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/measure.json": "47bb07425a62262ac33bd16cb9b251c88d7e91fccca49fdfeb516d6eecfdbb7b",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/product-normal-tidy.txt": "7d4872e892bbb19ccd46f28af2672e136865657328275853f7453016ed27b48c",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/publication.json": "921af25563b4304155ac204a336000e53d379bb20fe61f1af458bb7ddfd64348",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/release-normal.txt": "dcacabe25d99020a71dea9508844cae52b078be63abae8001af91f6f71ac485a",
+    "docs/verification/IM-03/pchip-interval-evaluation-v1/review.md": "4345ad5f7e3b59666fa2dee03c6f0d980173e683e9e93da0bf4c8f7873d447bf"
+  }
+}
