@@ -575,6 +575,18 @@ uvlas_add_test(aero.global_geometry_resources
 target_include_directories(uvlas_test_aero_global_geometry_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_global_geometry_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_global_geometry_resources)
+uvlas_add_test(aero.pchip_rational_slots
+    LABELS "V-AERO;verification;negative"
+    SOURCES aero/pchip_rational_slots_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_pchip_rational_slots PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_add_test(aero.pchip_rational_slots_resources
+    LABELS property negative verification V-AERO
+    SOURCES aero/pchip_rational_slots_resources_test.cpp
+    LIBS uvlas_aero_audit)
+target_include_directories(uvlas_test_aero_pchip_rational_slots_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_pchip_rational_slots_resources)
+uvlas_require_audited_dependencies(uvlas_test_aero_pchip_rational_slots_resources)
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
