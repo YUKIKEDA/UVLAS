@@ -1,0 +1,84 @@
+"""Run the two preselected real worst-width lifts and their 127-digit refusals."""
+import argparse
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import subprocess
+import tempfile
+from fractions import Fraction
+from pathlib import Path
+
+
+def require(value,message):
+    if not value:raise RuntimeError(message)
+
+
+def publish(output,result):
+    encoded=json.dumps(result,indent=2)+'\n';temporary=None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',newline='\n',delete=False,dir=output.parent,prefix=f'.{output.name}.',suffix='.tmp') as stream:
+            temporary=Path(stream.name);stream.write(encoded);stream.flush();os.fsync(stream.fileno())
+        os.replace(temporary,output)
+    finally:
+        if temporary is not None:temporary.unlink(missing_ok=True)
+
+
+def coordinate_census(path,target):
+    lines=iter(path.read_text(encoding='ascii').splitlines())
+    header=next(lines).split();rank=int(header[-1]);columns=int(header[-2])
+    for _ in range(rank):next(lines)
+    largest=0;target_largest=0;target_terms=0
+    for j in range(columns):
+        tag,index,count=next(lines).split();require(tag=='column' and int(index)==j,'certificate column roster')
+        for _ in range(int(count)):
+            k,n,d=map(int,next(lines).split());width=max(abs(n).bit_length(),d.bit_length())
+            largest=max(largest,width)
+            if j==target:target_largest=max(target_largest,width);target_terms+=1
+    return largest,target_largest,target_terms
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--inputs',type=Path,required=True);p.add_argument('--certificates',type=Path,required=True)
+    p.add_argument('--lift',type=Path,required=True);p.add_argument('--capacity-producer',type=Path,required=True)
+    p.add_argument('--study',type=Path,required=True);p.add_argument('--certificate-index',type=Path,required=True)
+    p.add_argument('--output',type=Path,required=True);args=p.parse_args()
+    loader=importlib.machinery.SourceFileLoader('capacity_v2',str(args.capacity_producer))
+    spec=importlib.util.spec_from_loader(loader.name,loader);capacity=importlib.util.module_from_spec(spec);loader.exec_module(capacity)
+    study=json.loads(args.study.read_text(encoding='utf-8'))['cases']
+    certificates=json.loads(args.certificate_index.read_text(encoding='utf-8'))['certificates']
+    exe=args.lift.resolve()
+    control=subprocess.run([str(exe),'--controls'],capture_output=True,check=True,timeout=30)
+    # Independent arithmetic on the hand-defined 2x2 integer system.
+    a,b,c,d=154,77,77,231;u,v=-31,72;det=a*d-b*c
+    hand=[Fraction(u*d-b*v,det),Fraction(a*v-u*c,det)]
+    require(hand==[Fraction(-3,7),Fraction(5,11)],'hand Fraction oracle')
+    require((-3*pow(7,-1,101))%101==14,'independent signed modular literal')
+    result={'schema':'uvlas.pg-fixed-padic-lift/1','controls':json.loads(control.stdout),
+            'independent_hand_fraction':[str(x) for x in hand],'cases':[]}
+    source=args.inputs/'4-quartic.txt'
+    for domain,target,width,rank in [('full',949,1809,774),('cut',933,1461,498)]:
+        capacity.verify_input(source,4,'quartic',domain,study)
+        entries=[x for x in certificates if (x['n'],x['shape'],x['domain'],x['row_order'])==(4,'quartic',domain,'sparse')]
+        require(len(entries)==1,'independent certificate must be unique')
+        expected=entries[0];certificate=args.certificates/expected['file']
+        require(hashlib.sha256(certificate.read_bytes()).hexdigest()==expected['sha256'] and certificate.stat().st_size==expected['bytes'],'certificate bytes differ')
+        largest,target_width,terms=coordinate_census(certificate,target)
+        require(largest==width and target_width==width,'preselected worst-width target differs')
+        for digits in (128,127):
+            run=subprocess.run([str(exe),str(source),domain,str(certificate),str(target),str(digits)],capture_output=True,timeout=300)
+            if run.returncode not in (0,3):raise RuntimeError((domain,digits,run.returncode,run.stdout.decode(),run.stderr.decode()))
+            row=json.loads(run.stdout)
+            if digits==128:require(run.returncode==0 and row['status']==0 and row['digits_completed']==128,'128-digit completion failed')
+            else:require(run.returncode==3 and row['status']==4 and row['digits_completed']==127,'127-digit refusal failed')
+            require(row['heap_attempts']==0 and row['rank']==rank and row['candidate']==target,'fixed lift identity or heap differs')
+            row.update(domain=domain,digits_cap=digits,independent_coordinate_bits=width,target_nonzero_coordinates=terms,
+                       input_sha256=capacity.digest(source),certificate_sha256=expected['sha256'])
+            result['cases'].append(row)
+            print(domain,'candidate',target,'cap',digits,'status',row['status'],'heap',row['heap_attempts'],'ms',row['lift_ms'],flush=True)
+    publish(args.output,result)
+
+
+if __name__=='__main__':main()

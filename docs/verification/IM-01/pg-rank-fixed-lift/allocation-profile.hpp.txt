@@ -1,0 +1,126 @@
+#define BOOST_MP_KARATSUBA_CUTOFF 1048576
+#define main unused_original_comparison_main
+#include "../pg-rank-resource-study/rank-comparison.cpp.txt"
+#undef main
+#include <atomic>
+#include <bit>
+#include <cstdlib>
+#include <new>
+#include <numeric>
+#ifdef _WIN32
+#include <malloc.h>
+#endif
+
+namespace bounded {
+using namespace boost::multiprecision;
+template <unsigned Bits>
+using Int = number<cpp_int_backend<Bits, Bits, signed_magnitude, checked, void>, et_off>;
+constinit std::atomic<bool> watched{false};
+constinit std::atomic<std::uint64_t> heap_attempts{0};
+void* allocate(std::size_t n) {
+    if (watched.load(std::memory_order_relaxed)) {
+        heap_attempts.fetch_add(1, std::memory_order_relaxed);
+        throw std::bad_alloc{};
+    }
+    if (void* p = std::malloc(n ? n : 1))
+        return p;
+    throw std::bad_alloc{};
+}
+void* allocate_aligned(std::size_t n, std::size_t align) {
+    if (watched.load(std::memory_order_relaxed)) {
+        heap_attempts.fetch_add(1, std::memory_order_relaxed);
+        throw std::bad_alloc{};
+    }
+#ifdef _WIN32
+    if (void* p = _aligned_malloc(n ? n : 1, align))
+        return p;
+#else
+    if (void* p = std::aligned_alloc(align, ((n + align - 1) / align) * align))
+        return p;
+#endif
+    throw std::bad_alloc{};
+}
+void release_aligned(void* p) {
+#ifdef _WIN32
+    _aligned_free(p);
+#else
+    std::free(p);
+#endif
+}
+} // namespace bounded
+void* operator new(std::size_t n) {
+    return bounded::allocate(n);
+}
+void* operator new[](std::size_t n) {
+    return bounded::allocate(n);
+}
+void operator delete(void* p) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p) noexcept {
+    std::free(p);
+}
+void operator delete(void* p, std::size_t) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p, std::size_t) noexcept {
+    std::free(p);
+}
+void* operator new(std::size_t n, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate(n);
+    } catch (...) {
+        return nullptr;
+    }
+}
+void* operator new[](std::size_t n, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate(n);
+    } catch (...) {
+        return nullptr;
+    }
+}
+void operator delete(void* p, const std::nothrow_t&) noexcept {
+    std::free(p);
+}
+void operator delete[](void* p, const std::nothrow_t&) noexcept {
+    std::free(p);
+}
+void* operator new(std::size_t n, std::align_val_t a) {
+    return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+}
+void* operator new[](std::size_t n, std::align_val_t a) {
+    return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+}
+void operator delete(void* p, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete[](void* p, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete(void* p, std::size_t, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete[](void* p, std::size_t, std::align_val_t) noexcept {
+    bounded::release_aligned(p);
+}
+void* operator new(std::size_t n, std::align_val_t a, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+    } catch (...) {
+        return nullptr;
+    }
+}
+void* operator new[](std::size_t n, std::align_val_t a, const std::nothrow_t&) noexcept {
+    try {
+        return bounded::allocate_aligned(n, static_cast<std::size_t>(a));
+    } catch (...) {
+        return nullptr;
+    }
+}
+void operator delete(void* p, std::align_val_t, const std::nothrow_t&) noexcept {
+    bounded::release_aligned(p);
+}
+void operator delete[](void* p, std::align_val_t, const std::nothrow_t&) noexcept {
+    bounded::release_aligned(p);
+}

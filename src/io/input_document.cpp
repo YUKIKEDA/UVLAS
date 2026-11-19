@@ -1,6 +1,6 @@
 #include "input_document_detail.hpp"
+#include "source_digest.hpp"
 
-#include <boost/hash2/sha2.hpp>
 #include <nlohmann/json.hpp>
 
 #include <algorithm>
@@ -94,16 +94,6 @@ T take(core::Result<T> value, Context& context) {
         throw Rejection{complete(value.error(), context.details)};
     }
     return std::move(*value);
-}
-SourceDigest digest_bytes(std::span<const char> bytes) noexcept {
-    boost::hash2::sha2_256 hash;
-    if (!bytes.empty())
-        hash.update(bytes.data(), bytes.size());
-    const auto result = hash.result();
-    SourceDigest digest{};
-    for (std::size_t i = 0; i < digest.bytes.size(); ++i)
-        digest.bytes[i] = static_cast<std::byte>(result[i]);
-    return digest;
 }
 consteval SourceDigest fixed_digest(std::string_view text) {
     if (text.size() != 64)
@@ -800,7 +790,7 @@ core::Result<InputDocument> read_input_document(std::span<const std::byte> bytes
                     take(resources.allocate<char>(as_index(n, context), operation), context);
                 for (std::size_t i = 0; i < bytes.size(); ++i)
                     data.source.values()[i] = std::bit_cast<char>(bytes[i]);
-                context.digest = digest_bytes(data.source.values());
+                context.digest = detail::source_digest(std::as_bytes(data.source.values()));
                 data.identity = SourceIdentity{source, n, *context.digest};
                 if (bytes.empty())
                     context.reject(core::FailureCode::InvalidInput,
