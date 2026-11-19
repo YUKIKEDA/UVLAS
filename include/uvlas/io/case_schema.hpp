@@ -11,6 +11,7 @@ namespace uvlas::io {
 namespace detail {
 struct SchemaContext;
 struct SiFactory;
+struct ReferenceDeclarationFactory;
 } // namespace detail
 
 /// Logical limits are independent; zero permits none of the corresponding item.
@@ -216,6 +217,7 @@ private:
     friend struct detail::SchemaFactory;
     explicit SchemaCase(core::PlannedBuffer<detail::SchemaData>) noexcept;
     friend struct detail::SiFactory;
+    friend struct detail::ReferenceDeclarationFactory;
     core::PlannedBuffer<detail::SchemaData> data_;
 };
 
