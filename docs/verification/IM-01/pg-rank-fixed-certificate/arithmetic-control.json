@@ -1,0 +1,15 @@
+{
+  "schema": "uvlas.pg-fixed-arithmetic-control/1",
+  "configurations": [
+    {
+      "mode": "default",
+      "default_karatsuba_hidden_allocation_detected": 1,
+      "actual_limb_bits": 32
+    },
+    {
+      "mode": "schoolbook",
+      "schoolbook_fixed_backend_heap_calls": 0,
+      "actual_limb_bits": 32
+    }
+  ]
+}

@@ -4,7 +4,13 @@
 
 **今**：IM01-0・IM03-0・IM06-0（子作業の開始審査と実装）
 
-目的は、実務で利用できる品質のUVLM–ANCFソルバー。共通数値基盤と凍結参照の製品検証を終えた。[IM-00終了審査](plans/im00-completion-review.md)に、実4096系を含む根拠と後続へ渡す条件を記録した。PGのexact代数・有理グラフ・全half-cellに加え、全原辞書・anchor補完・必須場mapを実装した。多角形・区分一次厚さと全積分分割も実装した。空力は厳密局所述語・所有幾何・query位置式・局所包絡・接触資格と局所P1誘導核を実装した。入出力は厳格scalar・所有入力文書に加え、全caseの型・exact値・参照・式DAGと相互条件を検査する所有schemaを実装した。SI変換・物理準備・実行接続は後続である。次は既存の[作業分解](plans/next-package-work-breakdown.md)に従い、PGの活動空間rank・参照幾何・係数条件付けと求積、空力の共有・四辺形の全作用と大域幾何、入力のSI変換・物理準備への接続を進める。所有者の未決定だけをGrillし、内部の通常実装選択は担当が決める。大域幾何・循環・荷重・後流と物理全体系は未実装。経緯は[実装前の経緯](../rd/planning/preimplementation-history.md)、実装の順序と依存は[開始審査](plans/implementation-start-review.md)が根拠。
+目的は、実務で利用できる品質のUVLM–ANCFソルバー。[IM-00終了審査](plans/im00-completion-review.md)に、共通数値基盤と凍結参照の製品検証を記録した。後続は[作業分解](plans/next-package-work-breakdown.md)に従い、次の3系統を並行して進める。
+
+- **構造（IM-01）**　PGのexact代数、全原辞書・必須場map、多角形・全積分分割を実装済み。活動空間の局所rankと再構成の資源受入を検証する。参照幾何は、揃っている入口から独立に進める。
+- **空力（IM-03）**　局所P1誘導核、大域幾何の適格性検査、後縁の放出所有を実装済み（#153）。次は共有・四辺形の全作用と既知流れ。採用したPCHIP時間入力の契約（#161）を実装につなぐ。循環・荷重・後流は後続で扱う。
+- **入出力（IM-06）**　所有する型付きschemaとSI変換を実装済み（#154）。次は外部参照の取得と検証（契約は#159）、物理準備への接続。参照は照合した元ファイルの内容を外部形式の読取りに引き渡す。
+
+経緯は[実装前の経緯](../rd/planning/preimplementation-history.md)、依存と受入に進む条件は[開始審査](plans/implementation-start-review.md)を参照する。
 
 品質の仕組み（追跡、基準結果、結果の変更管理、来歴、環境の認定）は [品質保証計画](quality/quality-plan.md)、受入ケースの状態は [case-status.md](quality/case-status.md)、要求と決定がどこで試験されているかは [追跡表](quality/traceability.md) にある。
 
@@ -120,7 +126,7 @@ flowchart LR
 | IM06-3 | Design | 全case schemaと段階別検証の契約 | #110 | Done |
 | IM06-4 | Feat | 全caseの所有typed schemaとexact値・参照・資源検査 | #126 | Done |
 | IM06-5 | Design | SI変換・入力精度・所有と変換予算の開始契約 | #135 | Done |
-| IM06-6 | Feat | 所有SI入力・元exact値と成分別精度変換 | #148 | In progress |
+| IM06-6 | Feat | 所有SI入力・元exact値と成分別精度変換 | #148 | Done |
 
 ## 残リスクと止める位置
 

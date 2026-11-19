@@ -1,0 +1,25 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-publication-review-169",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 164,
+  "source_commit": "a97961a3ce88da05c942e64c417570380ff07867",
+  "date": "2026-11-19",
+  "claimed_state": "現行runnerの全12合格後の原子的結果公開。通常/最適化各20公開処理系列。数値rankの再実行・再認定ではない。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-certificate.json": "6cddcd74161cf974b1dc187a6cd7eb42197aec98fd6b6b277c1c3b29c9e85474",
+    ".cursor/rules/evidence.mdc": "80967bcba3c2da2dd6f2efa3cc935a920c5abd06c707611d62f0d78399a5c067"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-certificate/run-verifier.py.txt": "036103e03a20abf51fce6c8c21e1c362ec4ad4bde0c86b8d770ad1301358f119",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-publication-probe.py.txt": "9fefad392055bc077acacfdfdca903eaa229d219f7c09100fdb71ec95047d63e",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-publication-result.json": "72887bfa9bc7f9cdaef22c7c3a404ee705d0cb73e3d99a436dd5d51d45911755",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-publication-optimized-result.json": "92245632ea2b2e2c543365cb791a688061158746fb1cd03d71c18ab677bc7c8e",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-correction.md": "50a68c484f82f277c8bfca58c853ac3e0770554345055c2eaa0f6bbe44199c98",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-original-manifest.json.txt": "d6ba9271c637e7060401081d858f8965bca37d2469fc3ba5819fbfaca131cf74",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-original-runner.py.txt": "07f67bb625d62faeed5dee3250520d1d714ce33e6db8787bd2c477a206c350ff"
+  }
+}
