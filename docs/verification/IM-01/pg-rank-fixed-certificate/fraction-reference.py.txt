@@ -1,0 +1,107 @@
+"""Independent Fraction assembly, priority-rank and all-coordinate replay for n1 flat."""
+import argparse
+import hashlib
+import json
+from collections import defaultdict
+from fractions import Fraction
+from pathlib import Path
+
+
+def source_matrix(path):
+    lines=path.read_text(encoding='ascii').splitlines()
+    kind,n,f0,full,_,_=lines[0].split();assert kind=='header' and int(n)==1
+    f0,full=int(f0),int(full)
+    original=[{} for _ in range(full)]
+    maps=[[] for _ in range(33+full+f0)]
+    for k in range(full):
+        maps[33+k].append((k,Fraction(1)))
+        if k<f0:maps[33+full+k].append((k,Fraction(1)))
+    for line in lines[1:]:
+        v=line.split();tag=v[0];v=list(map(int,v[1:]))
+        if tag=='coefficient':
+            col,field,s,t,a,b,num,den=v
+            key=(field,s,t,a,b);assert key not in original[col]
+            original[col][key]=Fraction(num,den)
+        elif tag=='required':
+            target,col,num,den=v;maps[target].append((col,Fraction(num,den)))
+        elif tag=='anchor':
+            target,col,num,den=v;maps[33+full+target].append((col,-Fraction(num,den)))
+        elif tag=='column':
+            col,kind,previous=v
+            if kind in (6,7):maps[33+full+previous].append((col,-Fraction(1)))
+        else:raise AssertionError(tag)
+    out=[]
+    for terms in maps:
+        col=defaultdict(Fraction)
+        for k,factor in terms:
+            for row,value in original[k].items():col[row]+=factor*value
+        out.append({row:q for row,q in col.items() if q})
+    return full,out
+
+
+def rank_prefix(columns,selectable):
+    basis=[];chosen=[]
+    for j,col in enumerate(columns):
+        work=dict(col)
+        for pivot,b in basis:
+            factor=work.get(pivot,0)
+            if factor:
+                for row,value in b.items():
+                    q=work.get(row,0)-factor*value
+                    if q:work[row]=q
+                    else:work.pop(row,None)
+        if work:
+            assert j<selectable
+            pivot=min(work);factor=work[pivot]
+            basis.append((pivot,{row:q/factor for row,q in work.items()}));chosen.append(j)
+    return chosen
+
+
+def certificate(path):
+    rows=iter(path.read_text(encoding='ascii').splitlines())
+    tag,n,m,f,count,r=next(rows).split();assert tag=='certificate'
+    selected=[]
+    for k in range(int(r)):
+        tag,index,col,pivot=next(rows).split();assert tag=='basis' and int(index)==k
+        selected.append(int(col))
+    coords=[]
+    for j in range(int(count)):
+        tag,col,num=next(rows).split();assert tag=='column' and int(col)==j
+        terms=[]
+        for _ in range(int(num)):
+            k,n,d=map(int,next(rows).split());terms.append((k,Fraction(n,d)))
+        coords.append(terms)
+    return selected,coords
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--input',type=Path,required=True)
+    parser.add_argument('--certificate',type=Path,required=True)
+    parser.add_argument('--output',type=Path,required=True)
+    args=parser.parse_args()
+    full,columns=source_matrix(args.input)
+    actual=rank_prefix(columns,33+full)
+    selected,coordinates=certificate(args.certificate)
+    assert actual==selected
+    products=0
+    for j,col in enumerate(columns):
+        residual=dict(col)
+        for k,factor in coordinates[j]:
+            assert selected[k]<j or (selected[k]==j and coordinates[j]==[(k,Fraction(1))])
+            for row,value in columns[selected[k]].items():
+                q=residual.get(row,0)-factor*value;products+=1
+                if q:residual[row]=q
+                else:residual.pop(row,None)
+        assert not residual
+    # Hand literal used by the C++ bounded controls, including a retained positive 10^-400.
+    tiny=Fraction(1,10**400)
+    literal=[{0:Fraction(1)},{0:Fraction(2)},{1:Fraction(1)},{0:tiny},{0:Fraction(-1),1:Fraction(3)}]
+    assert rank_prefix(literal,3)==[0,2]
+    result={'schema':'uvlas.pg-fixed-certificate-fraction/1','input_sha256':hashlib.sha256(args.input.read_bytes()).hexdigest(),
+            'selected':selected,'rank':len(selected),'all_columns_reconstructed':len(columns),
+            'fraction_products':products,'literal_selected':[0,2],'literal_tiny_nonzero':tiny!=0}
+    args.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+if __name__=='__main__':main()

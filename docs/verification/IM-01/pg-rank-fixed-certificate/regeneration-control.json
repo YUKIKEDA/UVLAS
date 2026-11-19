@@ -1,0 +1,27 @@
+{
+  "schema": "uvlas.pg-rank-certificates/1",
+  "certificates": [
+    {
+      "n": 1,
+      "shape": "flat",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "1-flat-full.cert",
+      "input_sha256": "1c4066ee54a63377955225822375128c32091c9d8e3d7f4650c1bc720ec8b9df",
+      "bytes": 13804,
+      "sha256": "1a30cec7556e0266bb786f13c5e9f1bda3caef0d5578338889532e894bfaa668",
+      "rank": 109
+    },
+    {
+      "n": 4,
+      "shape": "quartic",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "4-quartic-cut.cert",
+      "input_sha256": "f60df0b774db8eb2e4241fbd31c378d8d57d16587fc2aa771d1620a7e38a1ed8",
+      "bytes": 2374364,
+      "sha256": "13c3f1f2cac856d64dc4ad53132f1e38e8a7bd79fac7423d95f7065b0701b73e",
+      "rank": 498
+    }
+  ]
+}

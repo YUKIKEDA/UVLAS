@@ -1,0 +1,72 @@
+"""Run only the fixed-storage verifier; coefficient/certificate generation is outside its audit."""
+import argparse
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import subprocess
+import tempfile
+from pathlib import Path
+
+
+def publish_result(output, result):
+    """Replace the result once, after a complete run; failures preserve prior bytes."""
+    payload = json.dumps(result, indent=2) + '\n'
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode='w', encoding='utf-8', newline='\n', delete=False,
+            dir=output.parent, prefix=f'.{output.name}.', suffix='.tmp',
+        ) as stream:
+            temporary = Path(stream.name)
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        # The file is closed before replacement, including on Windows.
+        os.replace(temporary, output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--inputs',type=Path,required=True)
+    parser.add_argument('--certificates',type=Path,required=True)
+    parser.add_argument('--verifier',type=Path,required=True)
+    parser.add_argument('--capacity-producer',type=Path,required=True)
+    parser.add_argument('--study',type=Path,required=True)
+    parser.add_argument('--output',type=Path,required=True)
+    args=parser.parse_args()
+    loader=importlib.machinery.SourceFileLoader('capacity_v2',str(args.capacity_producer))
+    spec=importlib.util.spec_from_loader(loader.name,loader)
+    capacity=importlib.util.module_from_spec(spec);loader.exec_module(capacity)
+    old=json.loads(args.study.read_text(encoding='utf-8'))['cases']
+    exe=args.verifier.resolve();cases=[]
+    controls=subprocess.run([str(exe),'--controls'],capture_output=True,check=True,timeout=30)
+    result={'schema':'uvlas.pg-fixed-certificate/1','controls':json.loads(controls.stdout),'cases':cases}
+    for n in (1,2,4):
+        for shape in ('flat','quartic'):
+            source=args.inputs/f'{n}-{shape}.txt'
+            for domain in ('full','cut'):
+                expected=capacity.verify_input(source,n,shape,domain,old)
+                cert=args.certificates/f'{n}-{shape}-{domain}.cert'
+                run=subprocess.run([str(exe),str(source),domain,str(cert)],capture_output=True,timeout=300)
+                if run.returncode:
+                    raise RuntimeError((n,shape,domain,run.returncode,run.stdout.decode(),run.stderr.decode()))
+                entry=json.loads(run.stdout)
+                if entry['status']!=0 or entry['heap_attempts']!=0:
+                    raise RuntimeError((n,shape,domain,'certificate status or heap validation failed'))
+                if (entry['rank']!=expected['mod_rank'] or entry['rows']!=expected['rows']
+                        or entry['candidates']!=expected['candidates']):
+                    raise RuntimeError((n,shape,domain,'certificate dimensions or rank differ'))
+                entry.update(n=n,shape=shape,domain=domain,input_sha256=capacity.digest(source),certificate_sha256=hashlib.sha256(cert.read_bytes()).hexdigest())
+                cases.append(entry)
+                print(n,shape,domain,entry['rank'],'heap',entry['heap_attempts'],'bits',entry['maximum_observed_bits'],'ms',entry['verification_ms'],flush=True)
+    if len(cases)!=12:
+        raise RuntimeError('publication requires all twelve verified cases')
+    publish_result(args.output, result)
+
+
+if __name__=='__main__':main()

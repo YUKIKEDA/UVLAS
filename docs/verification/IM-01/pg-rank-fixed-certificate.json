@@ -1,0 +1,58 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-certificate",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 164,
+  "parent_issue": 140,
+  "source_commit": "10b19d55f8d6769de1b36e7d0d9ade1afd120848",
+  "date": "2026-11-19",
+  "claimed_state": "実係数12件の固定領域certificate消費の成立。定義したイベントcapと全new監査。入力展開/discovery/liftの固定化・製品全call資源・実装開始は未認定。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "limb_bits": 32,
+    "karatsuba_cutoff": 1048576,
+    "stack_reservation_bytes": 67108864
+  },
+  "intermediates": {
+    "index": "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json",
+    "retention": "Deterministically regenerated from frozen exact inputs and producer; not a retained opaque binary",
+    "total_bytes": 16115872,
+    "independent_hash_size_checks": 12,
+    "byte_identical_regeneration_controls": 2
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/export-coefficients.cpp.txt": "0454d901e122e631f33caa628710add4d277fb92cf54d62caac0ae863da748c5",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/result-v2.json": "d1ca719d7677601e5f7e86f857c0ecb44301c5f0daa5d1582bd7c4e84d1c76af",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-certificate/arithmetic-control.json": "3b327f75c6531f2de3562a23ebc58a9f8ba853ffc060cef5015691f631212fdd",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-proposal.cpp.txt": "c05057ceea41bdb4fe08ca70b5746486a7252a0cd59da7bb292da6dae1c78406",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/fixed-arithmetic-control.cpp.txt": "1c5e7eac8337ea18c2d56726ac4d7079555ff625a4cd677478338070f1b2fdd8",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/fixed-verifier.cpp.txt": "337dc335745d73f9320fbb4ee37d45b6ae8573519834deb605fb15bdd2df6981",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/fraction-reference.py.txt": "b5ee2a367edfa2215f58b7abab276b4a4cf974b956fcbd83400be789eea09732",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/fraction-result.json": "23f25a27eeda6d0c0e28d9d8cb621f80efad08b859764bcc45539f96c5cff7f5",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/generate-certificates.py.txt": "c464fadac091e079a823e02145c56a947eeea2a0f5e031b48ecb6bc4d7c23138",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/regeneration-control.json": "c90acf2b40ffd079422b9ebb0f4efcb85c49d669f10b8998507884c0cfa37676",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/results.json": "984a09d1dcc027fb3a70003cd285ff960dc9ddf6e7a0732152c3ddc6d7c7193f",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/verification.md": "fbd6b567065c7d090bb8cebcb843c6fd3b68631224105af9e28d6b3732780315",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-original-runner.py.txt": "07f67bb625d62faeed5dee3250520d1d714ce33e6db8787bd2c477a206c350ff"
+  },
+  "artifact_reference_adjustment": {
+    "review_head": "a97961a3ce88da05c942e64c417570380ff07867",
+    "original_manifest_copy": "docs/verification/IM-01/pg-rank-fixed-certificate/review-169-original-manifest.json.txt",
+    "reason": "Only the original runner citation moves to its byte-identical retained copy; numerical records and recorded hashes are unchanged."
+  }
+}

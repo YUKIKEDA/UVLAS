@@ -1,0 +1,52 @@
+"""Regenerate uniquely named certificate intermediates; never overwrite an existing certificate."""
+import argparse
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import subprocess
+from pathlib import Path
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--inputs',type=Path,required=True)
+    p.add_argument('--proposal',type=Path,required=True)
+    p.add_argument('--capacity-producer',type=Path,required=True)
+    p.add_argument('--study',type=Path,required=True)
+    p.add_argument('--output-directory',type=Path,required=True)
+    p.add_argument('--case',action='append',default=[])
+    p.add_argument('--expected-index',type=Path)
+    args=p.parse_args()
+    loader=importlib.machinery.SourceFileLoader('capacity_v2',str(args.capacity_producer))
+    spec=importlib.util.spec_from_loader(loader.name,loader)
+    capacity=importlib.util.module_from_spec(spec);loader.exec_module(capacity)
+    study=json.loads(args.study.read_text(encoding='utf-8'))['cases']
+    expected=json.loads(args.expected_index.read_text(encoding='utf-8'))['certificates'] if args.expected_index else []
+    args.output_directory.mkdir(parents=True,exist_ok=True)
+    results=[]
+    for n in (1,2,4):
+        for shape in ('flat','quartic'):
+            for domain in ('full','cut'):
+                name=f'{n}-{shape}-{domain}'
+                if args.case and name not in args.case:continue
+                source=args.inputs/f'{n}-{shape}.txt'
+                prior=capacity.verify_input(source,n,shape,domain,study)
+                cert=args.output_directory/f'{name}.cert'
+                if cert.exists():raise FileExistsError(cert)
+                run=subprocess.run([str(args.proposal.resolve()),str(source),domain,'sparse',str(cert)],capture_output=True,check=True,timeout=420)
+                proof=json.loads(run.stdout)
+                assert proof['certificate_complete']==1 and proof['mod_rank']==prior['mod_rank']
+                row={'n':n,'shape':shape,'domain':domain,'row_order':'sparse','file':cert.name,
+                     'input_sha256':capacity.digest(source),'bytes':cert.stat().st_size,
+                     'sha256':hashlib.sha256(cert.read_bytes()).hexdigest(),'rank':proof['mod_rank']}
+                if expected:
+                    target=[x for x in expected if (x['n'],x['shape'],x['domain'],x['row_order'])==(n,shape,domain,'sparse')]
+                    assert len(target)==1 and row==target[0],f'non-identical regeneration: {name}'
+                results.append(row)
+                print(name,row['sha256'],flush=True)
+    if not results:raise ValueError('no requested cases selected')
+    (args.output_directory/'certificate-index.json').write_text(json.dumps({'schema':'uvlas.pg-rank-certificates/1','certificates':results},indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+if __name__=='__main__':main()

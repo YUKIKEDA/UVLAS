@@ -1,0 +1,137 @@
+{
+  "schema": "uvlas.pg-rank-certificates/1",
+  "certificates": [
+    {
+      "n": 1,
+      "shape": "flat",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "1-flat-full.cert",
+      "input_sha256": "1c4066ee54a63377955225822375128c32091c9d8e3d7f4650c1bc720ec8b9df",
+      "bytes": 13804,
+      "sha256": "1a30cec7556e0266bb786f13c5e9f1bda3caef0d5578338889532e894bfaa668",
+      "rank": 109
+    },
+    {
+      "n": 1,
+      "shape": "flat",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "1-flat-cut.cert",
+      "input_sha256": "1c4066ee54a63377955225822375128c32091c9d8e3d7f4650c1bc720ec8b9df",
+      "bytes": 12513,
+      "sha256": "a86dcc5e48b2446ebd7d86447c1ad55b8f62e8405fef3001df598aa5fa3a6d39",
+      "rank": 77
+    },
+    {
+      "n": 1,
+      "shape": "quartic",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "1-quartic-full.cert",
+      "input_sha256": "c652c25867aa02e0253f926f997826e8c239cf06ed51aa1929e32854103c3337",
+      "bytes": 413605,
+      "sha256": "a5ed3671ac7b29ecd205333bc574d4dcd131dfe7430148be3282f604a1faea0f",
+      "rank": 183
+    },
+    {
+      "n": 1,
+      "shape": "quartic",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "1-quartic-cut.cert",
+      "input_sha256": "c652c25867aa02e0253f926f997826e8c239cf06ed51aa1929e32854103c3337",
+      "bytes": 79779,
+      "sha256": "4b7ab52f4732f69585e22057ac1adfa46219011e0a47466d6db4b87741d32456",
+      "rank": 128
+    },
+    {
+      "n": 2,
+      "shape": "flat",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "2-flat-full.cert",
+      "input_sha256": "193f1f9b2078dba21196f0759e51a04e9870dfede77a69321163cad26526bac0",
+      "bytes": 36203,
+      "sha256": "2e29d34275c678f93a019edb5ad469cbff980fee374d9fb7d86215bc3563d498",
+      "rank": 224
+    },
+    {
+      "n": 2,
+      "shape": "flat",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "2-flat-cut.cert",
+      "input_sha256": "193f1f9b2078dba21196f0759e51a04e9870dfede77a69321163cad26526bac0",
+      "bytes": 28985,
+      "sha256": "ffa229b3b42268dd9417000ae5107f1912e5adb5b90e21723fd545cd9e69d5ef",
+      "rank": 149
+    },
+    {
+      "n": 2,
+      "shape": "quartic",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "2-quartic-full.cert",
+      "input_sha256": "dcab2e13bdf27437864f9cec7d7774ae5ab760a84b02dc15bf0c115e26bbcb64",
+      "bytes": 2238992,
+      "sha256": "d9d78e84d89fb708bff85a80c8e00e016ce68b8a880868612765462684e9fd37",
+      "rank": 368
+    },
+    {
+      "n": 2,
+      "shape": "quartic",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "2-quartic-cut.cert",
+      "input_sha256": "dcab2e13bdf27437864f9cec7d7774ae5ab760a84b02dc15bf0c115e26bbcb64",
+      "bytes": 438285,
+      "sha256": "16b8467d1f5abc9302eb4a5a912e8ac6b70c7171a78bbdca927965cbbe59d423",
+      "rank": 242
+    },
+    {
+      "n": 4,
+      "shape": "flat",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "4-flat-full.cert",
+      "input_sha256": "f626676d6aa4d61069c4ac79aff86e4dbbfb3a758cddcc29bdee42d7395dba3e",
+      "bytes": 111788,
+      "sha256": "f210f3cdc3f96f0198717492267cdfcc8b8b7905d0d3a7c457f86706de24e821",
+      "rank": 490
+    },
+    {
+      "n": 4,
+      "shape": "flat",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "4-flat-cut.cert",
+      "input_sha256": "f626676d6aa4d61069c4ac79aff86e4dbbfb3a758cddcc29bdee42d7395dba3e",
+      "bytes": 77114,
+      "sha256": "70ad9f14d09f2647836b730ce7f5785ba0fdfab90a5c699aac210ebc2374cc10",
+      "rank": 316
+    },
+    {
+      "n": 4,
+      "shape": "quartic",
+      "domain": "full",
+      "row_order": "sparse",
+      "file": "4-quartic-full.cert",
+      "input_sha256": "f60df0b774db8eb2e4241fbd31c378d8d57d16587fc2aa771d1620a7e38a1ed8",
+      "bytes": 10290440,
+      "sha256": "6e46aebbaa698a4c919d17d4b42781d996c8fb15f782c6c66a6883e63ed9c065",
+      "rank": 774
+    },
+    {
+      "n": 4,
+      "shape": "quartic",
+      "domain": "cut",
+      "row_order": "sparse",
+      "file": "4-quartic-cut.cert",
+      "input_sha256": "f60df0b774db8eb2e4241fbd31c378d8d57d16587fc2aa771d1620a7e38a1ed8",
+      "bytes": 2374364,
+      "sha256": "13c3f1f2cac856d64dc4ad53132f1e38e8a7bd79fac7423d95f7065b0701b73e",
+      "rank": 498
+    }
+  ]
+}

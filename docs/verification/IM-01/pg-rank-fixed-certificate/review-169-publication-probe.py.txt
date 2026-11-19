@@ -1,0 +1,125 @@
+"""Replay runner publication failures with fake numerical transport, never rerun rank."""
+import argparse
+import importlib.machinery
+import importlib.util
+import json
+import os
+import sys
+import tempfile
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+
+def require(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+
+def load(path, name):
+    loader=importlib.machinery.SourceFileLoader(name,str(path))
+    spec=importlib.util.spec_from_loader(loader.name,loader)
+    module=importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
+
+
+def exercise(module, directory, mode, existing):
+    output=directory/'result.json'
+    sentinel=b'previous complete result: preserve these bytes\n'
+    if existing:output.write_bytes(sentinel)
+    elif output.exists():output.unlink()
+    for stale in directory.glob('.result.json.*.tmp'):stale.unlink()
+    capacity=directory/'capacity.py'
+    capacity.write_text("def verify_input(*args): return {'mod_rank':2,'rows':3,'candidates':4}\ndef digest(path): return 'fixed-source-identity'\n",encoding='utf-8')
+    study=directory/'study.json';study.write_text('{"cases":[]}')
+    for n in (1,2,4):
+        for shape in ('flat','quartic'):
+            for domain in ('full','cut'):
+                (directory/f'{n}-{shape}-{domain}.cert').write_bytes(b'fake transport certificate\n')
+    calls=0;replace_calls=0;created=[]
+    real_replace=os.replace
+    def transport(argv, **kwargs):
+        nonlocal calls
+        if argv[-1]=='--controls':return SimpleNamespace(returncode=0,stdout=b'{"test_transport":true}',stderr=b'')
+        calls+=1
+        if mode=='case2_failure' and calls==2:return SimpleNamespace(returncode=3,stdout=b'',stderr=b'broken second proof')
+        entry={'status':0,'heap_attempts':0,'rank':2,'rows':3,'candidates':4,'maximum_observed_bits':7,'verification_ms':0}
+        if calls==2:
+            invalid={'bad_status':('status',1),'heap':('heap_attempts',1),'rank':('rank',9),'rows':('rows',9),'candidates':('candidates',9)}
+            if mode in invalid:
+                key,value=invalid[mode];entry[key]=value
+        return SimpleNamespace(returncode=0,stdout=json.dumps(entry).encode(),stderr=b'')
+    def replacement(source,target):
+        nonlocal replace_calls
+        replace_calls+=1
+        require(Path(source).parent==output.parent,'temp not adjacent')
+        require(len(created)==1 and created[0].closed,'replace attempted before closing temp')
+        require(len(json.loads(Path(source).read_bytes())['cases'])==12,'published partial temp')
+        require((output.read_bytes()==sentinel) if existing else not output.exists(),'output changed before replace')
+        if mode=='replace_failure':raise OSError('injected replacement failure')
+        return real_replace(source,target)
+    cli=['runner','--inputs',str(directory),'--certificates',str(directory),'--verifier',str(directory/'fake-verifier'),'--capacity-producer',str(capacity),'--study',str(study),'--output',str(output)]
+    caught=None
+    with patch.object(sys,'argv',cli),patch.object(module.subprocess,'run',side_effect=transport):
+        if hasattr(module,'publish_result'):
+            real_factory=module.tempfile.NamedTemporaryFile
+            def factory(*args,**kwargs):
+                stream=real_factory(*args,**kwargs);created.append(stream)
+                if mode!='write_failure':return stream
+                class BrokenWrite:
+                    def __enter__(self):stream.__enter__();return self
+                    def __exit__(self,*args):return stream.__exit__(*args)
+                    def __getattr__(self,name):return getattr(stream,name)
+                    def write(self,text):
+                        stream.write(text[:len(text)//2])
+                        raise OSError('injected partial write failure')
+                return BrokenWrite()
+            with patch.object(module.os,'replace',side_effect=replacement),patch.object(module.tempfile,'NamedTemporaryFile',side_effect=factory):
+                if mode=='fsync_failure':
+                    with patch.object(module.os,'fsync',side_effect=OSError('injected flush failure')):
+                        try:module.main()
+                        except (RuntimeError,OSError,AssertionError) as error:caught=type(error).__name__
+                else:
+                    try:module.main()
+                    except (RuntimeError,OSError,AssertionError) as error:caught=type(error).__name__
+        else:
+            try:module.main()
+            except (RuntimeError,OSError,AssertionError) as error:caught=type(error).__name__
+    return {'mode':mode,'existing':existing,'caught':caught,'cases_run':calls,'replace_calls':replace_calls,
+            'output_exists':output.exists(),'prior_bytes_preserved':output.exists() and output.read_bytes()==sentinel,
+            'output_cases':len(json.loads(output.read_bytes())['cases']) if output.exists() and output.read_bytes()!=sentinel else None,
+            'temporary_handles_closed':all(stream.closed for stream in created),
+            'temporary_files':len(list(directory.glob('.result.json.*.tmp')))}
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--legacy',type=Path,required=True);p.add_argument('--runner',type=Path,required=True)
+    p.add_argument('--output',type=Path,required=True);p.add_argument('--legacy-only',action='store_true')
+    args=p.parse_args();legacy=load(args.legacy,'legacy_runner')
+    result={'schema':'uvlas.fixed-runner-publication-review169/1','optimization':sys.flags.optimize,'legacy':[],'corrected':[]}
+    with tempfile.TemporaryDirectory(prefix='review169-') as temp:
+        directory=Path(temp)
+        for existing in (False,True):
+            row=exercise(legacy,directory,'case2_failure',existing)
+            require(row['caught'] is not None and row['output_cases']==1,'legacy defect did not reproduce')
+            result['legacy'].append(row)
+        if not args.legacy_only:
+            runner=load(args.runner,'corrected_runner')
+            for existing in (False,True):
+                for mode in ('success','case2_failure','bad_status','heap','rank','rows','candidates','write_failure','fsync_failure','replace_failure'):
+                    row=exercise(runner,directory,mode,existing)
+                    if mode=='success':
+                        require(row['caught'] is None and row['output_cases']==12 and row['replace_calls']==1,'success not atomically published once')
+                    else:
+                        require(row['caught'] is not None,'failure accepted')
+                        require(row['prior_bytes_preserved'] if existing else not row['output_exists'],'failure changed output')
+                    require(row['temporary_files']==0,'temporary file leaked')
+                    require(row['temporary_handles_closed'],'temporary handle leaked')
+                    result['corrected'].append(row)
+    args.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8',newline='\n')
+    print('legacy reproduction',len(result['legacy']),'corrected publication cases',len(result['corrected']),'optimization',sys.flags.optimize)
+
+
+if __name__=='__main__':main()
