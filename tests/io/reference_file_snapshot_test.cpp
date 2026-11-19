@@ -48,8 +48,7 @@ struct Reader final : ReferenceFileReader {
     [[nodiscard]] core::Result<ReferenceFileInfo> info() noexcept override {
         ++info_calls;
         if (info_calls == failing_info) {
-            return std::unexpected(
-                core::Failure{core::FailureCode::Unsupported, core::Operation::Recover});
+            return std::unexpected(core::Failure{info_failure, core::Operation::Recover});
         }
         return info_calls == 1 ? first : last;
     }
@@ -60,8 +59,7 @@ struct Reader final : ReferenceFileReader {
             cancel_source->request_stop();
         }
         if (read_calls == failing_read) {
-            return std::unexpected(
-                core::Failure{core::FailureCode::InvalidInput, core::Operation::Recover});
+            return std::unexpected(core::Failure{read_failure, core::Operation::Recover});
         }
         if (invalid_count) {
             return out.size() + 1;
@@ -81,6 +79,8 @@ struct Reader final : ReferenceFileReader {
     std::size_t info_calls = 0;
     std::size_t failing_read = 0;
     std::size_t failing_info = 0;
+    core::FailureCode info_failure = core::FailureCode::Unsupported;
+    core::FailureCode read_failure = core::FailureCode::InvalidInput;
     std::size_t cancel_read = 0;
     std::stop_source* cancel_source = nullptr;
     bool invalid_count = false;
@@ -287,4 +287,27 @@ TEST_CASE("Cancellation before and during reference reading cannot publish a pay
     CHECK(pre.error().code == core::FailureCode::Cancelled);
     CHECK(skipped.info_calls == 0);
     CHECK(next.allocated_bytes() == 0);
+
+    const std::stop_source running_source;
+    const auto running_token = running_source.get_token();
+    // Cover both metadata calls, the payload read and the terminal EOF probe.
+    constexpr std::array adapter_cancellations{std::array{1U, 0U}, std::array{2U, 0U},
+                                               std::array{0U, 1U}, std::array{0U, 2U}};
+    for (const auto& [info_call, read_call] : adapter_cancellations) {
+        CAPTURE(info_call, read_call);
+        Reader adapter(binary, binary_info);
+        adapter.failing_info = info_call;
+        adapter.failing_read = read_call;
+        adapter.info_failure = core::FailureCode::Cancelled;
+        adapter.read_failure = core::FailureCode::Cancelled;
+        core::ResourcePlan adapter_plan{4};
+        diag = ReferenceFileDiagnostic{Reason::DigestMismatch, 0};
+        const auto failure =
+            read_reference_file(adapter, binary_hash, limits, adapter_plan, running_token, &diag);
+        REQUIRE_FALSE(failure);
+        CHECK(failure.error().code == core::FailureCode::Cancelled);
+        CHECK(failure.error().operation == core::Operation::PrepareModel);
+        CHECK_FALSE(diag);
+        CHECK_FALSE(running_token.stop_requested());
+    }
 }

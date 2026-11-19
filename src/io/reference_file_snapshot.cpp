@@ -73,7 +73,9 @@ read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_di
         return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, operation});
     };
     const auto adapter_error = [&](ReferenceFileFailure reason, core::Failure failure) noexcept {
-        describe(reason);
+        if (failure.code != core::FailureCode::Cancelled) {
+            describe(reason);
+        }
         failure.operation = operation;
         return std::unexpected(failure);
     };
