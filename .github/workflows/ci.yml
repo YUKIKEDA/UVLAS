@@ -53,6 +53,8 @@ jobs:
       CI_BUILD_TARGETS: ${{ needs.changes.outputs.build_targets }}
     steps:
       - uses: actions/checkout@v7
+      - name: Select qualified MSVC 14.51
+        run: pwsh -NoProfile -File tools/dev/ci-msvc.ps1
       - name: vcpkg at a commit that holds the manifest baseline
         uses: actions/checkout@v7
         with:
