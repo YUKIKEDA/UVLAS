@@ -176,3 +176,10 @@ if (!meter.visit()) { return std::unexpected(*meter.failure()); }
 const auto visited = meter.visit();
 if (!visited) { return std::unexpected(visited.error()); }
 ```
+
+OS専用の翻訳単位は、CMakeの対象から外すだけで他OSの解析も除外できると判断しない。CIが変更したC++ファイルを直接clang-tidyへ渡す場合、そのOSに不要なheaderを読む前から条件付きコンパイルで囲む。2026-11-19、PR #184のWindows参照adapterと試験は、CMakeのWIN32条件に加え、includeより外側を`_WIN32`で囲み、LinuxでOS headerを参照せず解析できることを確認した。非対象OSでの空の翻訳単位の解析を、対象OSのAPIや実機動作の成功とは数えない。
+
+```text
+BAD   CMakeのWIN32条件だけを根拠に、Linuxの差分lintではwindows.hを読まないと考える
+GOOD  差分lintの走査対象を確認し、OS専用includeと本体を同じguard内へ置く
+```

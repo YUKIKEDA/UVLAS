@@ -1,0 +1,366 @@
+{
+  "schema": "uvlas.fixed-batch-publication-probe/1",
+  "numeric_transport": "captured-result stub",
+  "cases": [
+    {
+      "scenario": "valid",
+      "previous_output": false,
+      "accepted": true,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "controls-old",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "control-rank-float",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "control-flag-int",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "nonpivot-false",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "nonzero-status",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "heap-attempt",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "incomplete-columns",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "missing-row",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "missing-coordinate",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "duplicate-column",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "wrong-selection",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "digits-float",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "failed-column",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "payload-over",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "timeout",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "replacement-error",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "swapped-input",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 0
+    },
+    {
+      "scenario": "missing-width",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "missing-lift-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "selected-width",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "selected-lift-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "selected-bool-width",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-float-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-zero-width",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-over-width",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-zero-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-over-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "over-sum-lift-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "first-missing-lift-events",
+      "previous_output": false,
+      "accepted": false,
+      "transport_calls": 2
+    },
+    {
+      "scenario": "valid",
+      "previous_output": true,
+      "accepted": true,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "controls-old",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "control-rank-float",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "control-flag-int",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "nonpivot-false",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 1
+    },
+    {
+      "scenario": "nonzero-status",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "heap-attempt",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "incomplete-columns",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "missing-row",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "missing-coordinate",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "duplicate-column",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "wrong-selection",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "digits-float",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "failed-column",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "payload-over",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "timeout",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "replacement-error",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "swapped-input",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 0
+    },
+    {
+      "scenario": "missing-width",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "missing-lift-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "selected-width",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "selected-lift-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "selected-bool-width",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-float-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-zero-width",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-over-width",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-zero-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "dependent-over-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "over-sum-lift-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 3
+    },
+    {
+      "scenario": "first-missing-lift-events",
+      "previous_output": true,
+      "accepted": false,
+      "transport_calls": 2
+    }
+  ]
+}

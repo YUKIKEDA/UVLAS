@@ -1,0 +1,933 @@
+#include "../pg-rank-fixed-lift/allocation-profile.hpp.txt"
+
+namespace lift_fixed {
+using Small = bounded::Int<512>;
+using Big = bounded::Int<8192>;
+constexpr std::uint64_t prime_value = p1;
+struct Pair {
+    Big n{0}, d{1};
+};
+struct IntegerTerm {
+    std::uint32_t col;
+    Small value;
+};
+struct ModularTerm {
+    std::uint32_t index, value;
+};
+template <class T>
+std::uint64_t bit_length(const T& v) {
+    if (v == 0)
+        return 0;
+    T positive = v;
+    if (positive < 0)
+        positive = -positive;
+    return 1 + boost::multiprecision::msb(positive);
+}
+std::uint64_t plus(std::uint64_t a, std::uint64_t b) {
+    if (b > UINT64_MAX - a)
+        throw std::overflow_error("payload sum");
+    return a + b;
+}
+std::uint64_t times(std::uint64_t a, std::uint64_t b) {
+    if (b && a > UINT64_MAX / b)
+        throw std::overflow_error("payload product");
+    return a * b;
+}
+struct Data {
+    std::uint32_t candidate{};
+    std::vector<std::uint32_t> selected, scale_inverse, diagonal_inverse;
+    std::vector<std::uint64_t> row_offsets, lower_offsets, upper_offsets;
+    std::vector<IntegerTerm> matrix;
+    std::vector<ModularTerm> lower, upper;
+    std::vector<Small> initial, bound;
+    std::vector<Pair> expected;
+    std::uint64_t matrix_bits{}, row_bound_bits{}, product_bound_bits{};
+};
+Data prepare(const Matrix& m, const Elimination<Mod<p1>>& factor, std::uint32_t candidate) {
+    if (!factor.complete || candidate >= m.columns.size() || !factor.coordinates[candidate])
+        throw std::runtime_error("incomplete factor or nondependent target");
+    const auto r = factor.selected.size();
+    Data d;
+    d.candidate = candidate;
+    d.selected.assign(factor.selected.begin(), factor.selected.end());
+    d.initial.resize(r);
+    d.bound.resize(r);
+    d.scale_inverse.resize(r);
+    d.diagonal_inverse.resize(r);
+    d.expected.resize(r);
+    d.row_offsets.push_back(0);
+    d.lower_offsets.push_back(0);
+    d.upper_offsets.push_back(0);
+    std::vector<int> mapping(m.rows, -1);
+    for (std::size_t k = 0; k < r; ++k)
+        mapping[factor.pivot_rows[k]] = static_cast<int>(k);
+    std::vector<Sparse<Q>> rows(r);
+    for (std::size_t k = 0; k < r; ++k)
+        for (const auto& [row, value] : m.columns[factor.selected[k]])
+            if (mapping[row] >= 0)
+                rows[mapping[row]].emplace_back(static_cast<int>(k), value);
+    for (const auto& [row, value] : m.columns[candidate])
+        if (mapping[row] >= 0)
+            rows[mapping[row]].emplace_back(-1, value);
+    for (std::size_t row = 0; row < r; ++row) {
+        Integer scale = 1;
+        for (const auto& [col, q] : rows[row])
+            scale = (scale / gcd(scale, Integer{denominator(q)})) * denominator(q);
+        if (scale % p1 == 0)
+            throw std::runtime_error("noninvertible row scale");
+        d.scale_inverse[row] =
+            static_cast<std::uint32_t>((Mod<p1>{1} / Mod<p1>::parse(Q{scale})).value);
+        Integer sum = 0, rhs = 0;
+        for (const auto& [col, q] : rows[row]) {
+            const Integer value = numerator(q) * (scale / denominator(q));
+            if (col < 0) {
+                rhs = value;
+                continue;
+            }
+            if (value == 0)
+                continue;
+            if (bit_length(value) > 512)
+                throw std::runtime_error("matrix bit admission");
+            d.matrix.push_back({static_cast<std::uint32_t>(col), Small{value}});
+            sum += boost::multiprecision::abs(value);
+            d.matrix_bits = std::max(d.matrix_bits, bit_length(value));
+        }
+        const Integer magnitude = boost::multiprecision::abs(rhs);
+        const Integer bound = std::max(sum, magnitude);
+        const auto bound_bits = bit_length(bound);
+        if (bound_bits + 32 > 512)
+            throw std::runtime_error("current recurrence bit admission");
+        d.initial[row] = Small{rhs};
+        d.bound[row] = Small{bound};
+        d.row_bound_bits = std::max(d.row_bound_bits, bound_bits);
+        d.product_bound_bits = std::max(d.product_bound_bits, bound_bits + 32);
+        d.row_offsets.push_back(d.matrix.size());
+        for (const auto& [index, value] : factor.pivot_lower[row]) {
+            if (index <= static_cast<int>(row))
+                throw std::runtime_error("lower factor shape");
+            d.lower.push_back(
+                {static_cast<std::uint32_t>(index), static_cast<std::uint32_t>(value.value)});
+        }
+        d.lower_offsets.push_back(d.lower.size());
+        if (factor.pivot_upper[row].empty() ||
+            factor.pivot_upper[row].back().first != static_cast<int>(row))
+            throw std::runtime_error("upper diagonal shape");
+        d.diagonal_inverse[row] =
+            static_cast<std::uint32_t>((Mod<p1>{1} / factor.pivot_upper[row].back().second).value);
+        for (std::size_t j = 0; j + 1 < factor.pivot_upper[row].size(); ++j) {
+            const auto& [index, value] = factor.pivot_upper[row][j];
+            if (index >= static_cast<int>(row))
+                throw std::runtime_error("upper factor shape");
+            d.upper.push_back(
+                {static_cast<std::uint32_t>(index), static_cast<std::uint32_t>(value.value)});
+        }
+        d.upper_offsets.push_back(d.upper.size());
+    }
+    return d;
+}
+struct Recovery {
+    Big r0{}, r1{}, t0{}, t1{}, quotient{}, next{}, check{};
+};
+struct Scratch {
+    std::vector<Small> current;
+    std::vector<Big> residue, scaled;
+    std::vector<Pair> recovered;
+    std::vector<std::uint32_t> rhs, solution;
+    Big modulus{1}, half{}, recovery_bound{}, common{1}, g{}, temporary{}, sum{}, term{}, right{};
+    Recovery recovery;
+    explicit Scratch(const Data& d)
+        : current(d.selected.size()),
+          residue(current.size()),
+          scaled(current.size()),
+          recovered(current.size()),
+          rhs(current.size()),
+          solution(current.size()) {}
+};
+std::uint64_t input_payload(const Data& d) {
+    std::uint64_t bytes = sizeof(Data);
+    const auto charge = [&](auto const& v) {
+        bytes =
+            plus(bytes, times(v.capacity(),
+                              sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(d.selected);
+    charge(d.scale_inverse);
+    charge(d.diagonal_inverse);
+    charge(d.row_offsets);
+    charge(d.lower_offsets);
+    charge(d.upper_offsets);
+    charge(d.matrix);
+    charge(d.lower);
+    charge(d.upper);
+    charge(d.initial);
+    charge(d.bound);
+    charge(d.expected);
+    return bytes;
+}
+std::uint64_t plan(const Data& d) {
+    return plus(plus(input_payload(d), sizeof(Scratch)),
+                times(d.selected.size(),
+                      sizeof(Small) + 2 * sizeof(Big) + sizeof(Pair) + 2 * sizeof(std::uint32_t)));
+}
+std::uint64_t payload(const Data& d, const Scratch& s) {
+    auto bytes = plus(input_payload(d), sizeof(Scratch));
+    const auto charge = [&](auto const& v) {
+        bytes =
+            plus(bytes, times(v.capacity(),
+                              sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(s.current);
+    charge(s.residue);
+    charge(s.scaled);
+    charge(s.recovered);
+    charge(s.rhs);
+    charge(s.solution);
+    return bytes;
+}
+enum class Status {
+    Success,
+    PayloadExceeded,
+    BitExceeded,
+    EventExceeded,
+    DigitsExceeded,
+    InvalidFactor,
+    NonDivisible,
+    FutureBasis,
+    ReferenceMismatch,
+    HeapAttempt,
+    ArithmeticFailure,
+    InvariantFailure
+};
+struct Limits {
+    std::uint64_t payload, bits, digits, events;
+};
+struct Report {
+    Status status{Status::DigitsExceeded};
+    std::uint64_t digits{}, events{}, products{}, triangular_updates{}, recovery_attempts{},
+        negative_denominators{}, maximum_current_bits{}, maximum_predivision_bits{},
+        maximum_residue_bits{}, maximum_coordinate_bits{}, heap{};
+};
+bool event(Report& r, const Limits& cap, std::uint64_t count = 1) {
+    if (count > cap.events - r.events) {
+        r.status = Status::EventExceeded;
+        return false;
+    }
+    r.events += count;
+    return true;
+}
+std::uint32_t reduce(const Small& value) {
+    Small remainder = value % p1;
+    if (remainder < 0)
+        remainder += p1;
+    return static_cast<std::uint32_t>(remainder);
+}
+bool reconstruct(const Big& residue, const Big& modulus, const Big& bound, Pair& out, Scratch& s,
+                 Report& r, const Limits& cap) {
+    auto& q = s.recovery;
+    q.r0 = modulus;
+    q.r1 = residue;
+    q.t0 = 0;
+    q.t1 = 1;
+    while (q.r1 > bound) {
+        if (!event(r, cap))
+            return false;
+        q.quotient = q.r0 / q.r1;
+        q.next = q.r0 % q.r1;
+        q.r0 = q.r1;
+        q.r1 = q.next;
+        q.next = q.t0 - q.quotient * q.t1;
+        q.t0 = q.t1;
+        q.t1 = q.next;
+    }
+    if (q.t1 == 0 || q.t1 > bound || q.t1 < -bound)
+        return false;
+    q.check = q.r1 - q.t1 * residue;
+    if (q.check % modulus != 0)
+        return false;
+    if (q.t1 < 0) {
+        q.r1 = -q.r1;
+        q.t1 = -q.t1;
+        ++r.negative_denominators;
+    }
+    q.next = q.r1;
+    if (q.next < 0)
+        q.next = -q.next;
+    s.g = boost::multiprecision::gcd(q.next, q.t1);
+    out.n = q.r1 / s.g;
+    out.d = q.t1 / s.g;
+    if (out.d <= 0)
+        return false;
+    r.maximum_coordinate_bits =
+        std::max({r.maximum_coordinate_bits, bit_length(out.n), bit_length(out.d)});
+    return true;
+}
+bool square_certificate(const Data& d, Scratch& s, Report& r, const Limits& cap) {
+    s.common = 1;
+    std::uint64_t numerator_bits = 0;
+    for (const auto& value : s.recovered) {
+        if (!event(r, cap))
+            return false;
+        if (value.n == 0)
+            continue;
+        s.g = boost::multiprecision::gcd(s.common, value.d);
+        s.temporary = s.common / s.g;
+        if (bit_length(s.temporary) + bit_length(value.d) > 8192) {
+            r.status = Status::BitExceeded;
+            return false;
+        }
+        s.common = s.temporary * value.d;
+        numerator_bits = std::max(numerator_bits, bit_length(value.n));
+    }
+    const auto required = std::max(d.matrix_bits + numerator_bits + bit_length(s.common) +
+                                       std::bit_width(d.selected.size()) + 2,
+                                   d.row_bound_bits + bit_length(s.common) + 1);
+    if (required > 8192) {
+        r.status = Status::BitExceeded;
+        return false;
+    }
+    for (std::size_t k = 0; k < s.recovered.size(); ++k) {
+        if (!event(r, cap))
+            return false;
+        if (s.recovered[k].n == 0)
+            s.scaled[k] = 0;
+        else {
+            s.scaled[k] = s.common / s.recovered[k].d;
+            s.scaled[k] *= s.recovered[k].n;
+        }
+    }
+    for (std::size_t row = 0; row < s.current.size(); ++row) {
+        s.sum = 0;
+        for (auto pos = d.row_offsets[row]; pos < d.row_offsets[row + 1]; ++pos) {
+            if (!event(r, cap, 2))
+                return false;
+            const auto& entry = d.matrix[pos];
+            s.term = s.scaled[entry.col] * entry.value;
+            s.sum += s.term;
+        }
+        s.right = s.common * d.initial[row];
+        if (s.sum != s.right)
+            return false;
+    }
+    return true;
+}
+Report run(const Data& d, Scratch& s, const Limits& cap, bool owns_audit = true) {
+    Report r;
+    if (payload(d, s) > cap.payload) {
+        r.status = Status::PayloadExceeded;
+        return r;
+    }
+    if (cap.bits < 8192 || cap.digits > 128 || d.product_bound_bits > 512) {
+        r.status = Status::BitExceeded;
+        return r;
+    }
+    for (auto inverse : d.diagonal_inverse)
+        if (!inverse) {
+            r.status = Status::InvalidFactor;
+            return r;
+        }
+    for (auto inverse : d.scale_inverse)
+        if (!inverse) {
+            r.status = Status::InvalidFactor;
+            return r;
+        }
+    if (owns_audit) {
+        bounded::heap_attempts = 0;
+        bounded::watched = true;
+    }
+    try {
+        const auto body = [&]() {
+            std::copy(d.initial.begin(), d.initial.end(), s.current.begin());
+            std::fill(s.residue.begin(), s.residue.end(), Big{0});
+            s.modulus = 1;
+            const auto size = s.current.size();
+            for (std::uint64_t digit = 1; digit <= cap.digits; ++digit) {
+                for (std::size_t k = 0; k < size; ++k) {
+                    if (!event(r, cap))
+                        return;
+                    s.rhs[k] = static_cast<std::uint32_t>(std::uint64_t{d.scale_inverse[k]} *
+                                                          reduce(s.current[k]) % p1);
+                }
+                for (std::size_t k = 0; k < size; ++k)
+                    for (auto pos = d.lower_offsets[k]; pos < d.lower_offsets[k + 1]; ++pos) {
+                        if (!event(r, cap))
+                            return;
+                        const auto& entry = d.lower[pos];
+                        const auto term = std::uint64_t{s.rhs[k]} * entry.value % p1;
+                        s.rhs[entry.index] =
+                            static_cast<std::uint32_t>((s.rhs[entry.index] + p1 - term) % p1);
+                        ++r.triangular_updates;
+                    }
+                for (std::size_t k = size; k-- > 0;) {
+                    if (!event(r, cap))
+                        return;
+                    s.solution[k] = static_cast<std::uint32_t>(std::uint64_t{s.rhs[k]} *
+                                                               d.diagonal_inverse[k] % p1);
+                    for (auto pos = d.upper_offsets[k]; pos < d.upper_offsets[k + 1]; ++pos) {
+                        if (!event(r, cap))
+                            return;
+                        const auto& entry = d.upper[pos];
+                        const auto term = std::uint64_t{s.solution[k]} * entry.value % p1;
+                        s.rhs[entry.index] =
+                            static_cast<std::uint32_t>((s.rhs[entry.index] + p1 - term) % p1);
+                        ++r.triangular_updates;
+                    }
+                    s.residue[k] += s.modulus * s.solution[k];
+                    r.maximum_residue_bits =
+                        std::max(r.maximum_residue_bits, bit_length(s.residue[k]));
+                }
+                s.modulus *= p1;
+                for (std::size_t row = 0; row < size; ++row) {
+                    for (auto pos = d.row_offsets[row]; pos < d.row_offsets[row + 1]; ++pos) {
+                        if (!event(r, cap))
+                            return;
+                        const auto& entry = d.matrix[pos];
+                        if (s.solution[entry.col]) {
+                            s.current[row] -= entry.value * s.solution[entry.col];
+                            ++r.products;
+                        }
+                    }
+                    r.maximum_predivision_bits =
+                        std::max(r.maximum_predivision_bits, bit_length(s.current[row]));
+                    if (s.current[row] % p1 != 0) {
+                        r.status = Status::NonDivisible;
+                        return;
+                    }
+                    s.current[row] /= p1;
+                    Small magnitude = s.current[row];
+                    if (magnitude < 0)
+                        magnitude = -magnitude;
+                    if (magnitude > d.bound[row]) {
+                        r.status = Status::InvariantFailure;
+                        return;
+                    }
+                    r.maximum_current_bits =
+                        std::max(r.maximum_current_bits, bit_length(s.current[row]));
+                }
+                r.digits = digit;
+                if ((digit & (digit - 1)) != 0)
+                    continue;
+                ++r.recovery_attempts;
+                s.half = s.modulus / 2;
+                s.recovery_bound = boost::multiprecision::sqrt(s.half);
+                bool complete = true;
+                for (std::size_t k = 0; k < size; ++k) {
+                    if (!reconstruct(s.residue[k], s.modulus, s.recovery_bound, s.recovered[k], s,
+                                     r, cap)) {
+                        complete = false;
+                        break;
+                    }
+                }
+                if (r.status == Status::EventExceeded)
+                    return;
+                if (!complete)
+                    continue;
+                if (!square_certificate(d, s, r, cap)) {
+                    if (r.status == Status::EventExceeded)
+                        return;
+                    if (r.status == Status::BitExceeded) {
+                        if (digit == cap.digits)
+                            return;
+                        r.status = Status::DigitsExceeded;
+                    }
+                    continue;
+                }
+                for (std::size_t k = 0; k < size; ++k) {
+                    if (s.recovered[k].n != 0 && d.selected[k] >= d.candidate) {
+                        r.status = Status::FutureBasis;
+                        return;
+                    }
+                    if (s.recovered[k].n != d.expected[k].n ||
+                        s.recovered[k].d != d.expected[k].d) {
+                        r.status = Status::ReferenceMismatch;
+                        return;
+                    }
+                }
+                r.status = Status::Success;
+                return;
+            }
+        };
+        body();
+    } catch (const std::bad_alloc&) {
+        r.status = Status::HeapAttempt;
+    } catch (...) {
+        r.status = Status::ArithmeticFailure;
+    }
+    if (owns_audit)
+        bounded::watched = false;
+    r.heap = bounded::heap_attempts.load();
+    if (r.heap)
+        r.status = Status::HeapAttempt;
+    return r;
+}
+} // namespace lift_fixed
+
+namespace batch_fixed {
+using namespace lift_fixed;
+using InputInt = bounded::Int<1536>;
+struct Entry {
+    std::uint32_t row;
+    InputInt value;
+};
+struct InputData {
+    std::uint32_t rows{}, columns{}, rank{};
+    std::vector<std::uint64_t> offsets;
+    std::vector<Entry> values;
+    std::vector<Pair> reference;
+    std::vector<std::optional<Data>> targets;
+    std::vector<std::uint32_t> selected;
+    std::uint64_t integer_bits{};
+};
+InputData prepare_input(const Matrix& m, const Elimination<Mod<p1>>& factor,
+                        const char* certificate, int grid, int full, bool first_only) {
+    if (!factor.complete || factor.selected.empty())
+        throw std::runtime_error("incomplete discovery");
+    InputData d;
+    d.rows = static_cast<std::uint32_t>(m.rows);
+    d.columns = static_cast<std::uint32_t>(m.columns.size());
+    d.rank = static_cast<std::uint32_t>(factor.selected.size());
+    d.selected.assign(factor.selected.begin(), factor.selected.end());
+    d.offsets.push_back(0);
+    // This dynamic row-LCM/input expansion remains outside the fixed audit.
+    std::vector<Integer> scales(d.rows, Integer{1});
+    for (const auto& column : m.columns)
+        for (const auto& [row, q] : column) {
+            auto& scale = scales[row];
+            scale = (scale / gcd(scale, Integer{denominator(q)})) * denominator(q);
+        }
+    for (const auto& column : m.columns) {
+        for (const auto& [row, q] : column) {
+            const Integer v = numerator(q) * (scales[row] / denominator(q));
+            const auto bits = bit_length(v);
+            if (bits > 1536)
+                throw std::runtime_error("all-row integer admission");
+            d.integer_bits = std::max(d.integer_bits, bits);
+            d.values.push_back({static_cast<std::uint32_t>(row), InputInt{v}});
+        }
+        d.offsets.push_back(d.values.size());
+    }
+    d.reference.resize(times(d.columns, d.rank));
+    std::ifstream file(certificate);
+    std::string tag;
+    int n, rows, f, columns, r;
+    if (!(file >> tag >> n >> rows >> f >> columns >> r) || tag != "certificate" || n != grid ||
+        rows != m.rows || f != full || columns != d.columns || r != d.rank)
+        throw std::runtime_error("certificate identity");
+    for (std::uint32_t k = 0; k < d.rank; ++k) {
+        int i, col, pivot;
+        if (!(file >> tag >> i >> col >> pivot) || tag != "basis" || i != k ||
+            col != factor.selected[k] || pivot != factor.pivot_rows[k])
+            throw std::runtime_error("certificate basis order");
+    }
+    for (std::uint32_t j = 0; j < d.columns; ++j) {
+        int column, count;
+        if (!(file >> tag >> column >> count) || tag != "column" || column != j || count < 0 ||
+            count > r)
+            throw std::runtime_error("certificate column roster");
+        int previous = -1;
+        for (int t = 0; t < count; ++t) {
+            int k;
+            Big num, den;
+            if (!(file >> k >> num >> den) || k <= previous || k >= r || num == 0 || den <= 0)
+                throw std::runtime_error("certificate coordinate shape");
+            previous = k;
+            d.reference[times(j, d.rank) + k] = {num, den};
+        }
+    }
+    if (file >> tag)
+        throw std::runtime_error("extra certificate data");
+    d.targets.resize(d.columns);
+    bool prepared = false;
+    for (std::uint32_t j = 0; j < d.columns; ++j) {
+        if (!factor.coordinates[j])
+            continue;
+        if (first_only && prepared)
+            continue;
+        auto target = prepare(m, factor, j);
+        std::copy_n(d.reference.begin() + times(j, d.rank), d.rank, target.expected.begin());
+        d.targets[j] = std::move(target);
+        prepared = true;
+    }
+    return d;
+}
+struct FullScratch {
+    std::vector<Big> residual;
+    Big product{}, right{};
+    explicit FullScratch(std::uint32_t rows) : residual(rows) {}
+};
+enum class BatchStatus {
+    Success,
+    LiftFailure,
+    NonzeroResidual,
+    ProofBits,
+    EventExceeded,
+    ReferenceMismatch,
+    HeapAttempt,
+    InvalidColumn,
+    ArithmeticFailure
+};
+struct ColumnResult {
+    std::uint32_t candidate{};
+    bool selected{};
+    Report lift{};
+    std::uint64_t proof_rows{}, proof_products{}, coordinate_checks{}, proof_bound_bits{};
+};
+struct BatchReport {
+    BatchStatus status{BatchStatus::Success};
+    std::uint32_t failed_column{UINT32_MAX};
+    std::uint64_t events{}, heap{}, selected{}, dependent{}, proof_rows{}, proof_products{},
+        coordinates{};
+};
+struct BatchLimits {
+    std::uint64_t payload, bits, digits, events;
+};
+std::uint64_t inputs_payload(const InputData& d) {
+    auto bytes = std::uint64_t{sizeof(InputData)};
+    const auto charge = [&](const auto& v) {
+        bytes =
+            plus(bytes, times(v.capacity(),
+                              sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(d.offsets);
+    charge(d.values);
+    charge(d.reference);
+    charge(d.targets);
+    charge(d.selected);
+    for (const auto& target : d.targets)
+        if (target)
+            bytes = plus(bytes, input_payload(*target) - sizeof(Data));
+    return bytes;
+}
+std::uint64_t planned(const InputData& d, std::size_t reports) {
+    auto bytes =
+        plus(inputs_payload(d), sizeof(Scratch) + sizeof(FullScratch) + sizeof(BatchReport));
+    bytes = plus(bytes, times(d.rank, sizeof(Small) + 2 * sizeof(Big) + sizeof(Pair) +
+                                          2 * sizeof(std::uint32_t)));
+    bytes = plus(bytes, times(d.rows, sizeof(Big)));
+    return plus(bytes,
+                plus(sizeof(std::vector<ColumnResult>), times(reports, sizeof(ColumnResult))));
+}
+std::uint64_t actual(const InputData& d, const Scratch& s, const FullScratch& full,
+                     const std::vector<ColumnResult>& reports) {
+    auto bytes =
+        plus(inputs_payload(d), sizeof(Scratch) + sizeof(FullScratch) + sizeof(BatchReport));
+    const auto charge = [&](const auto& v) {
+        bytes =
+            plus(bytes, times(v.capacity(),
+                              sizeof(typename std::remove_reference_t<decltype(v)>::value_type)));
+    };
+    charge(s.current);
+    charge(s.residue);
+    charge(s.scaled);
+    charge(s.recovered);
+    charge(s.rhs);
+    charge(s.solution);
+    charge(full.residual);
+    charge(reports);
+    return plus(bytes, sizeof(std::vector<ColumnResult>));
+}
+bool charge(BatchReport& report, const BatchLimits& cap, std::uint64_t n = 1) {
+    if (n > cap.events - report.events) {
+        report.status = BatchStatus::EventExceeded;
+        return false;
+    }
+    report.events += n;
+    return true;
+}
+bool full_proof(const InputData& d, std::uint32_t j, Scratch& s, FullScratch& full,
+                ColumnResult& column, BatchReport& report, const BatchLimits& cap) {
+    std::uint64_t scaled_bits = 0;
+    for (const auto& value : s.scaled)
+        scaled_bits = std::max(scaled_bits, bit_length(value));
+    column.proof_bound_bits = std::max(d.integer_bits + scaled_bits + std::bit_width(d.rank) + 2,
+                                       d.integer_bits + bit_length(s.common) + 1);
+    if (column.proof_bound_bits > cap.bits || cap.bits > 8192) {
+        report.status = BatchStatus::ProofBits;
+        return false;
+    }
+    if (!charge(report, cap, d.rows))
+        return false;
+    std::fill(full.residual.begin(), full.residual.end(), Big{0});
+    for (std::uint32_t k = 0; k < d.rank; ++k) {
+        if (!charge(report, cap))
+            return false;
+        if (s.scaled[k] == 0)
+            continue;
+        for (auto pos = d.offsets[d.selected[k]]; pos < d.offsets[d.selected[k] + 1]; ++pos) {
+            if (!charge(report, cap))
+                return false;
+            const auto& term = d.values[pos];
+            full.product = s.scaled[k] * term.value;
+            full.residual[term.row] += full.product;
+            ++column.proof_products;
+        }
+    }
+    for (auto pos = d.offsets[j]; pos < d.offsets[j + 1]; ++pos) {
+        if (!charge(report, cap))
+            return false;
+        const auto& term = d.values[pos];
+        full.right = s.common * term.value;
+        full.residual[term.row] -= full.right;
+        ++column.proof_products;
+    }
+    for (const auto& residual : full.residual) {
+        if (!charge(report, cap))
+            return false;
+        ++column.proof_rows;
+        if (residual != 0) {
+            report.status = BatchStatus::NonzeroResidual;
+            return false;
+        }
+    }
+    return true;
+}
+BatchReport batch(const InputData& d, Scratch& s, FullScratch& full,
+                  std::vector<ColumnResult>& columns, const BatchLimits& cap,
+                  bool first_only = false) {
+    BatchReport report;
+    if (actual(d, s, full, columns) > cap.payload) {
+        report.status = BatchStatus::LiftFailure;
+        return report;
+    }
+    if (columns.size() != d.columns || s.recovered.size() != d.rank ||
+        full.residual.size() != d.rows) {
+        report.status = BatchStatus::InvalidColumn;
+        return report;
+    }
+    bounded::heap_attempts = 0;
+    bounded::watched = true;
+    try {
+        for (std::uint32_t j = 0; j < d.columns; ++j) {
+            auto& column = columns[j];
+            column = {};
+            column.candidate = j;
+            const auto chosen = std::find(d.selected.begin(), d.selected.end(), j);
+            if (first_only && chosen != d.selected.end())
+                continue;
+            if (first_only && !d.targets[j])
+                continue;
+            report.failed_column = j;
+            if (!charge(report, cap))
+                break;
+            if (chosen != d.selected.end()) {
+                if (cap.bits < 8192) {
+                    report.status = BatchStatus::ProofBits;
+                    break;
+                }
+                std::fill(s.recovered.begin(), s.recovered.end(), Pair{});
+                std::fill(s.scaled.begin(), s.scaled.end(), Big{0});
+                const auto k = static_cast<std::size_t>(chosen - d.selected.begin());
+                s.recovered[k] = {Big{1}, Big{1}};
+                s.scaled[k] = 1;
+                s.common = 1;
+                column.selected = true;
+                column.lift.status = Status::Success;
+                ++report.selected;
+            } else {
+                if (!d.targets[j]) {
+                    report.status = BatchStatus::InvalidColumn;
+                    break;
+                }
+                column.lift = run(
+                    *d.targets[j], s,
+                    {payload(*d.targets[j], s), cap.bits, cap.digits, cap.events - report.events},
+                    false);
+                report.events = plus(report.events, column.lift.events);
+                if (column.lift.status != Status::Success) {
+                    report.status = BatchStatus::LiftFailure;
+                    break;
+                }
+                ++report.dependent;
+            }
+            if (!full_proof(d, j, s, full, column, report, cap))
+                break;
+            for (std::uint32_t k = 0; k < d.rank; ++k) {
+                if (!charge(report, cap))
+                    break;
+                const auto& reference = d.reference[times(j, d.rank) + k];
+                ++column.coordinate_checks;
+                if (s.recovered[k].n != reference.n || s.recovered[k].d != reference.d) {
+                    report.status = BatchStatus::ReferenceMismatch;
+                    break;
+                }
+            }
+            if (report.status != BatchStatus::Success)
+                break;
+            report.proof_rows += column.proof_rows;
+            report.proof_products += column.proof_products;
+            report.coordinates += column.coordinate_checks;
+            if (first_only)
+                break;
+        }
+    } catch (const std::bad_alloc&) {
+        report.status = BatchStatus::HeapAttempt;
+    } catch (...) {
+        report.status = BatchStatus::ArithmeticFailure;
+    }
+    bounded::watched = false;
+    report.heap = bounded::heap_attempts.load();
+    if (report.heap)
+        report.status = BatchStatus::HeapAttempt;
+    if (report.status == BatchStatus::Success)
+        report.failed_column = UINT32_MAX;
+    return report;
+}
+void write_result(const InputData& d, const std::vector<ColumnResult>& columns,
+                  const BatchReport& r, std::uint64_t bytes, std::int64_t elapsed) {
+    std::cout << "{\"status\":" << static_cast<int>(r.status) << ",\"rows\":" << d.rows
+              << ",\"candidates\":" << d.columns << ",\"rank\":" << d.rank
+              << ",\"selected\":" << r.selected << ",\"dependent\":" << r.dependent
+              << ",\"proof_rows\":" << r.proof_rows << ",\"proof_products\":" << r.proof_products
+              << ",\"coordinate_checks\":" << r.coordinates << ",\"defined_events\":" << r.events
+              << ",\"heap_attempts\":" << r.heap << ",\"failed_column\":" << r.failed_column
+              << ",\"integer_bits\":" << d.integer_bits << ",\"payload_bytes\":" << bytes
+              << ",\"batch_ms\":" << elapsed << ",\"process_peak_bytes\":" << peak_resident_bytes()
+              << ",\"columns\":[";
+    bool comma = false;
+    for (const auto& c : columns) {
+        if (comma)
+            std::cout << ',';
+        comma = true;
+        std::cout << "{\"candidate\":" << c.candidate
+                  << ",\"selected\":" << (c.selected ? "true" : "false")
+                  << ",\"lift_status\":" << static_cast<int>(c.lift.status)
+                  << ",\"digits\":" << c.lift.digits << ",\"defined_lift_events\":" << c.lift.events
+                  << ",\"maximum_coordinate_bits\":" << c.lift.maximum_coordinate_bits
+                  << ",\"proof_bound_bits\":" << c.proof_bound_bits
+                  << ",\"proof_rows\":" << c.proof_rows
+                  << ",\"proof_products\":" << c.proof_products
+                  << ",\"coordinate_checks\":" << c.coordinate_checks << '}';
+    }
+    std::cout << "]}\n";
+}
+void batch_controls() {
+    Matrix m;
+    m.rows = 3;
+    m.columns = {{{0, Q{154}}, {1, Q{77}}, {2, Q{11}}},
+                 {{0, Q{77}}, {1, Q{231}}, {2, Q{22}}},
+                 {{0, Q{-31}}, {1, Q{72}}, {2, Q{37} / 7}}};
+    const auto factor = eliminate<Mod<p1>>(m, 2, 10000, Mod<p1>::parse, true);
+    InputData d;
+    d.rows = 3;
+    d.columns = 3;
+    d.rank = 2;
+    d.selected = {0, 1};
+    d.offsets = {0, 3, 6, 9};
+    d.values = {{0, InputInt{154}}, {1, InputInt{77}},  {2, InputInt{77}},
+                {0, InputInt{77}},  {1, InputInt{231}}, {2, InputInt{154}},
+                {0, InputInt{-31}}, {1, InputInt{72}},  {2, InputInt{37}}};
+    d.integer_bits = 8;
+    d.reference.resize(6);
+    d.reference[0] = {Big{1}, Big{1}};
+    d.reference[3] = {Big{1}, Big{1}};
+    d.reference[4] = {Big{-3}, Big{7}};
+    d.reference[5] = {Big{5}, Big{11}};
+    d.targets.resize(3);
+    d.targets[2] = prepare(m, factor, 2);
+    d.targets[2]->expected[0] = d.reference[4];
+    d.targets[2]->expected[1] = d.reference[5];
+    Scratch s(*d.targets[2]);
+    FullScratch full(d.rows);
+    std::vector<ColumnResult> columns(d.columns);
+    const auto bytes = actual(d, s, full, columns);
+    if (bytes != planned(d, d.columns))
+        throw std::runtime_error("hand batch payload");
+    const BatchLimits cap{bytes, 8192, 128, 1000000};
+    const auto good = batch(d, s, full, columns, cap);
+    if (good.status != BatchStatus::Success || good.heap || good.selected != 2 ||
+        good.dependent != 1 || good.proof_rows != 9 || good.coordinates != 6)
+        throw std::runtime_error("hand batch normal");
+    const auto expect = [&](const InputData& input, BatchLimits limits, BatchStatus status) {
+        // Copies can reserve differently; the negative admission uses this input's actual bytes.
+        limits.payload = actual(input, s, full, columns) - (limits.payload == bytes - 1 ? 1 : 0);
+        const auto out = batch(input, s, full, columns, limits);
+        if (out.status != status || out.heap)
+            throw std::runtime_error("hand batch negative");
+    };
+    expect(d, {bytes - 1, 8192, 128, 1000000}, BatchStatus::LiftFailure);
+    expect(d, {bytes, 8191, 128, 1000000}, BatchStatus::ProofBits);
+    expect(d, {bytes, 8192, 0, 1000000}, BatchStatus::LiftFailure);
+    expect(d, {bytes, 8192, 128, good.events - 1}, BatchStatus::EventExceeded);
+    auto bad = d;
+    bad.values[8].value += 1;
+    expect(bad, cap, BatchStatus::NonzeroResidual);
+    if (columns[2].lift.status != Status::Success || columns[2].proof_rows != 3)
+        throw std::runtime_error("nonpivot control did not pass square then reject final row");
+    bad = d;
+    bad.targets[2]->selected[0] = 2;
+    expect(bad, cap, BatchStatus::LiftFailure);
+    if (columns[2].lift.status != Status::FutureBasis)
+        throw std::runtime_error("future basis control");
+    bad = d;
+    bad.targets[2]->expected[0].n = -2;
+    expect(bad, cap, BatchStatus::LiftFailure);
+    if (columns[2].lift.status != Status::ReferenceMismatch)
+        throw std::runtime_error("reference control");
+    const auto repeat = batch(d, s, full, columns, {bytes, 8192, 128, good.events});
+    if (repeat.status != BatchStatus::Success || repeat.events != good.events || repeat.heap ||
+        repeat.proof_products != good.proof_products || repeat.coordinates != good.coordinates)
+        throw std::runtime_error("batch repeat or exact event cap");
+    // A generated coordinate mutation is caught by the original, nonpivot rows as well.
+    s.scaled[0] += 1;
+    ColumnResult mutation;
+    BatchReport proof;
+    bounded::heap_attempts = 0;
+    bounded::watched = true;
+    const bool accepted = full_proof(d, 2, s, full, mutation, proof, cap);
+    bounded::watched = false;
+    if (accepted || proof.status != BatchStatus::NonzeroResidual || bounded::heap_attempts != 0)
+        throw std::runtime_error("generated coordinate mutation");
+    std::cout
+        << "{\"schema\":\"uvlas.fixed-batch-controls/1\",\"hand_coordinates\":[\"-3/7\",\"5/11\"],"
+        << "\"third_row\":\"37/7\",\"hand_rows\":3,\"hand_columns\":3,\"hand_rank\":2,"
+        << "\"hand_row_checks\":9,\"hand_coordinate_checks\":6,\"hand_events\":" << good.events
+        << ",\"nonpivot_square_success_then_full_rejection\":true,\"coordinate_mutation_rejected\":"
+           "true,"
+        << "\"future_basis_rejected\":true,\"reference_mismatch_rejected\":true,"
+        << "\"payload_equal_one_short\":true,\"bits_equal_one_short\":true,\"digits_zero_"
+           "rejected\":true,"
+        << "\"events_equal_one_short\":true,\"same_scratch_after_failure\":true,\"heap_attempts\":"
+           "0}\n";
+}
+} // namespace batch_fixed
+int main(int argc, char** argv) try {
+    using namespace batch_fixed;
+    if (argc == 2 && std::string(argv[1]) == "--controls") {
+        batch_controls();
+        return 0;
+    }
+    if (argc != 4)
+        return 2;
+    const bool first = std::string(argv[3]) == "first";
+    if (!first && std::string(argv[3]) != "all")
+        return 2;
+    std::ifstream file(argv[1]);
+    const auto in = read(file);
+    if (in.n != 1)
+        throw std::runtime_error("experiment only admits n1");
+    const auto matrix = active_matrix(in, false, true);
+    const auto factor = eliminate<Mod<p1>>(matrix, 33 + in.full, 200000000, Mod<p1>::parse, true);
+    auto data = prepare_input(matrix, factor, argv[2], in.n, in.full, first);
+    const auto first_target = std::find_if(data.targets.begin(), data.targets.end(),
+                                           [](const auto& x) { return x.has_value(); });
+    if (first_target == data.targets.end())
+        throw std::runtime_error("no dependent candidate");
+    const auto before = planned(data, data.columns);
+    if (before > 51539607552ULL)
+        throw std::runtime_error("batch payload admission");
+    Scratch scratch(**first_target);
+    FullScratch full(data.rows);
+    std::vector<ColumnResult> columns(data.columns);
+    const auto bytes = actual(data, scratch, full, columns);
+    if (before != bytes)
+        throw std::runtime_error("batch payload capacity differs");
+    const auto start = std::chrono::steady_clock::now();
+    const auto result = batch(data, scratch, full, columns, {bytes, 8192, 128, 2000000000}, first);
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             std::chrono::steady_clock::now() - start)
+                             .count();
+    write_result(data, columns, result, bytes, elapsed);
+    return result.status == BatchStatus::Success ? 0 : 3;
+} catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return 1;
+}
