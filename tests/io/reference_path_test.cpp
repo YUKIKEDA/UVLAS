@@ -193,6 +193,7 @@ TEST_CASE("Reference path failure points and lifetime are stable",
         FAIL("Missing escape diagnostic");
     }
 
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() is non-const.
     std::stop_source source;
     REQUIRE(source.request_stop());
     const auto cancelled =
