@@ -1,0 +1,27 @@
+{
+  "schema": "uvlas.independent-observation/1",
+  "id": "pchip-locator-resource-and-mutation-v1",
+  "source_commit": "5ce67fa2b1ed8753aed292a8c7c814c80971b1d7",
+  "cpp_sha256": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631",
+  "origin": "Transcribed independent reviewer tool executions, not standalone raw logs",
+  "resource": {
+    "filter": "Private PCHIP locator*",
+    "seed": 194,
+    "cases": 2,
+    "assertions": 96,
+    "exit": 0,
+    "static": "Windows clang-tidy21.1.1 passed"
+  },
+  "mutation": {
+    "change": "lower_bound order<=0 changed to order<0",
+    "compile_exit": 0,
+    "link_exit": 0,
+    "catch_exit": 42,
+    "assertions": 14,
+    "failed_assertions": 5,
+    "seed": 194,
+    "filter": "Private PCHIP locator matches independent exact linear search",
+    "example": "two_points/base t0 lost exact-knot classification",
+    "control": "Ordinary unmodified Debug target passed6466 assertions/5cases including this case; no independent isolation control"
+  }
+}

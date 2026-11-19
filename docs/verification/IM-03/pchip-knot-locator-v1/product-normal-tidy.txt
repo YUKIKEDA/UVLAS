@@ -1,0 +1,4 @@
+[1/2] Processing file <repo>\src\aero\pchip_knot_locator.cpp.
+48147 warnings generated.
+[2/2] Processing file <repo>\tests\aero\pchip_knot_locator_test.cpp.
+119181 warnings generated.

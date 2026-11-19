@@ -641,6 +641,14 @@ target_include_directories(uvlas_test_aero_pchip_interval PRIVATE "${PROJECT_SOU
 target_compile_definitions(uvlas_test_aero_pchip_interval PRIVATE
     UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json"
     UVLAS_PCHIP_INTERVAL_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-interval-values-v1.json")
+uvlas_add_test(aero.pchip_locator
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_knot_locator_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_pchip_locator PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_pchip_locator PRIVATE
+    UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json"
+    UVLAS_PCHIP_INTERVAL_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-interval-values-v1.json")
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification

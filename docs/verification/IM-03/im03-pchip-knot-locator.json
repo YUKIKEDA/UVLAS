@@ -1,0 +1,189 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-knot-locator-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 194,
+  "date": "2026-11-19",
+  "source_commit": "5ce67fa2b1ed8753aed292a8c7c814c80971b1d7",
+  "claimed_state": "Private exact in-domain knot locator and explicit interval candidates only; no policy, continuity or parent/cache qualification.",
+  "verification": {
+    "debug_normal": "5cases/6466 assertions",
+    "independent_review": "Source/budget/candidates/resource and final Japanese report read independently",
+    "mutation": "Independent <=0 to <0 copy compiled/linked0, Catch42,5 failures/14 assertions; ordinary Debug target is control",
+    "reference": "Existing360 exact queries plus nodes/gaps/powers-of-two; independent cpp_rational linear search; tolerance0",
+    "not_executed": "No old suites, local Release, added benchmark or CI waiting; Linux/Release success not claimed",
+    "connection": "Candidate interval passed to existing IntervalRequest; value1 and dt3/2 agree, dtt0/4 kept distinct",
+    "japanese": "quick lint0 findings",
+    "parallel": "1/2/4 independent workspaces scalar results/counters identical",
+    "allocation": "Prepared rational arena3 allocations; all3faults, cumulative charge, final cancel, reentry/reuse",
+    "debug_resource": "Independent locator filter2cases/96 assertions",
+    "complexity": "O(n) preflight source width scan; binary comparison budget bit_width(n)+3; no whole-call logarithmic-time claim",
+    "static": "Windows clang-tidy21.1.1 product/normal2TU and independent resourceTU passed"
+  },
+  "source_records": [
+    {
+      "id": "pchip-locator-source-00",
+      "hint": "CMakeLists.txt",
+      "sha256": "8fba685875647bba5399b94dd03b3aab57d7c12ff738ad361868af9da6bb0fbf"
+    },
+    {
+      "id": "pchip-locator-source-01",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "e5fded3e93c39afb60e46579154a61e581deb0a41014ff2d2e5a77436ea1aecd"
+    },
+    {
+      "id": "pchip-locator-source-02",
+      "hint": "src/aero/pchip_knot_locator.cpp",
+      "sha256": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631"
+    },
+    {
+      "id": "pchip-locator-source-03",
+      "hint": "src/aero/pchip_knot_locator.hpp",
+      "sha256": "89d994c1812f17fe29edf7de95716fb397daa2a365d8457d13244df214a26a54"
+    },
+    {
+      "id": "pchip-locator-source-04",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682"
+    },
+    {
+      "id": "pchip-locator-source-05",
+      "hint": "src/aero/pchip_coefficients.hpp",
+      "sha256": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5"
+    },
+    {
+      "id": "pchip-locator-source-06",
+      "hint": "src/aero/pchip_interval_jet.cpp",
+      "sha256": "8b37a6dfd7620f3629409693450b18d9e087956b35831c70070d6f935ccb1665"
+    },
+    {
+      "id": "pchip-locator-source-07",
+      "hint": "src/aero/pchip_interval_jet.hpp",
+      "sha256": "c714637886b92bd8e5350d83b25791fd4060fa59052279a9ec10c1b603d33cfc"
+    },
+    {
+      "id": "pchip-locator-source-08",
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7"
+    },
+    {
+      "id": "pchip-locator-source-09",
+      "hint": "src/aero/pchip_rational_slots.hpp",
+      "sha256": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0"
+    },
+    {
+      "id": "pchip-locator-source-10",
+      "hint": "src/aero/pchip_slot_integer.cpp",
+      "sha256": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5"
+    },
+    {
+      "id": "pchip-locator-source-11",
+      "hint": "src/aero/pchip_slot_private.hpp",
+      "sha256": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf"
+    },
+    {
+      "id": "pchip-locator-source-12",
+      "hint": "include/uvlas/core/resource_plan.hpp",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a"
+    },
+    {
+      "id": "pchip-locator-source-13",
+      "hint": "include/uvlas/core/checked_dimensions.hpp",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa"
+    },
+    {
+      "id": "pchip-locator-source-14",
+      "hint": "include/uvlas/core/failure.hpp",
+      "sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38"
+    },
+    {
+      "id": "pchip-locator-source-15",
+      "hint": "tests/aero/pchip_knot_locator_test.cpp",
+      "sha256": "551e18052fcfeb5f648637ee601ae349a13308ed33cdea46721edc6c1c821d99"
+    },
+    {
+      "id": "pchip-locator-source-16",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "91749d85f54c302a9309858e86839e549bea04fd78be5e9e5ed1f86d92026cae"
+    },
+    {
+      "id": "pchip-locator-source-17",
+      "hint": "tests/aero/fixtures/pchip-coefficients-v1.json",
+      "sha256": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8"
+    },
+    {
+      "id": "pchip-locator-source-18",
+      "hint": "tests/aero/fixtures/pchip-interval-values-v1.json",
+      "sha256": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694"
+    },
+    {
+      "id": "pchip-locator-source-19",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "pchip-locator-debug-normal.txt",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/debug-normal.txt",
+      "sha256": "41cce46d2a8654868813cc0d8468eef62d6c4432a1e1eb8bdc0c42ac091e60ef"
+    },
+    {
+      "id": "pchip-locator-independent-observations.json",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/independent-observations.json",
+      "sha256": "d678942177eb89a5eee1a4cf472a8970e65a8c9d04c44228f0f4277369a04751"
+    },
+    {
+      "id": "pchip-locator-product-normal-tidy.txt",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/product-normal-tidy.txt",
+      "sha256": "3323b082a452838878a9d204e82a55b6938f778cfde813b8e8493b4762aaf2bf"
+    },
+    {
+      "id": "pchip-locator-publication.json",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/publication.json",
+      "sha256": "229da4fc12b6e4fd7b29102e0daa2f4d103c7d3d1c75c48e6ad7a38f274a879a"
+    },
+    {
+      "id": "pchip-locator-review.md",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/review.md",
+      "sha256": "894dbb983ad1598ee3447ee5a67d4f4e05969f3b2e11cf102deb3efa0c3bc09b"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "8fba685875647bba5399b94dd03b3aab57d7c12ff738ad361868af9da6bb0fbf",
+    "tests/CMakeLists.txt": "e5fded3e93c39afb60e46579154a61e581deb0a41014ff2d2e5a77436ea1aecd",
+    "src/aero/pchip_knot_locator.cpp": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631",
+    "src/aero/pchip_knot_locator.hpp": "89d994c1812f17fe29edf7de95716fb397daa2a365d8457d13244df214a26a54",
+    "src/aero/pchip_coefficients.cpp": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+    "src/aero/pchip_coefficients.hpp": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5",
+    "src/aero/pchip_interval_jet.cpp": "8b37a6dfd7620f3629409693450b18d9e087956b35831c70070d6f935ccb1665",
+    "src/aero/pchip_interval_jet.hpp": "c714637886b92bd8e5350d83b25791fd4060fa59052279a9ec10c1b603d33cfc",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_rational_slots.hpp": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0",
+    "src/aero/pchip_slot_integer.cpp": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+    "src/aero/pchip_slot_private.hpp": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "tests/aero/pchip_knot_locator_test.cpp": "551e18052fcfeb5f648637ee601ae349a13308ed33cdea46721edc6c1c821d99",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "91749d85f54c302a9309858e86839e549bea04fd78be5e9e5ed1f86d92026cae",
+    "tests/aero/fixtures/pchip-coefficients-v1.json": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+    "tests/aero/fixtures/pchip-interval-values-v1.json": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-knot-locator-v1/debug-normal.txt": "41cce46d2a8654868813cc0d8468eef62d6c4432a1e1eb8bdc0c42ac091e60ef",
+    "docs/verification/IM-03/pchip-knot-locator-v1/independent-observations.json": "d678942177eb89a5eee1a4cf472a8970e65a8c9d04c44228f0f4277369a04751",
+    "docs/verification/IM-03/pchip-knot-locator-v1/product-normal-tidy.txt": "3323b082a452838878a9d204e82a55b6938f778cfde813b8e8493b4762aaf2bf",
+    "docs/verification/IM-03/pchip-knot-locator-v1/publication.json": "229da4fc12b6e4fd7b29102e0daa2f4d103c7d3d1c75c48e6ad7a38f274a879a",
+    "docs/verification/IM-03/pchip-knot-locator-v1/review.md": "894dbb983ad1598ee3447ee5a67d4f4e05969f3b2e11cf102deb3efa0c3bc09b"
+  }
+}

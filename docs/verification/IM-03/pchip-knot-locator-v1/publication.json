@@ -1,0 +1,21 @@
+{
+  "schema": "uvlas.evidence-publication/1",
+  "records": [
+    {
+      "id": "pchip-locator-debug-normal.txt",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/debug-normal.txt",
+      "original_sha256": "f922acf46f9a761a84f7c77e9f79fb633d425bcf0d7a76303c0410a9a1fe26ba",
+      "published_sha256": "41cce46d2a8654868813cc0d8468eef62d6c4432a1e1eb8bdc0c42ac091e60ef",
+      "path_replacements": 0,
+      "serialization": "UTF-8/LF; terminal blank lines removed"
+    },
+    {
+      "id": "pchip-locator-product-normal-tidy.txt",
+      "hint": "docs/verification/IM-03/pchip-knot-locator-v1/product-normal-tidy.txt",
+      "original_sha256": "9f9143c178afb4ff134b6163c49c43fdab786546ed9e2333fd6448812125324f",
+      "published_sha256": "3323b082a452838878a9d204e82a55b6938f778cfde813b8e8493b4762aaf2bf",
+      "path_replacements": 2,
+      "serialization": "UTF-8/LF; terminal blank lines removed"
+    }
+  ]
+}
