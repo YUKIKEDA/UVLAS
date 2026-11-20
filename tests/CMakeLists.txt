@@ -689,6 +689,11 @@ if(UVLAS_SANITIZERS AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set_tests_properties(io.case_schema io.case_schema_resources PROPERTIES TIMEOUT 300)
 endif()
 
+uvlas_add_test(io.reference_root_plan
+    LABELS integration property negative verification
+    SOURCES io/reference_root_plan_test.cpp
+    LIBS uvlas_io nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_io_reference_root_plan PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 uvlas_add_test(io.reference_declarations
     LABELS unit property negative verification
     SOURCES io/reference_declarations_test.cpp

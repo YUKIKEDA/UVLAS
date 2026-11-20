@@ -1,0 +1,53 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-root-plan",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 226,
+  "parent_issue": 22,
+  "date": "2026-11-20",
+  "source_commit": "8c39950563c9a3a9921bb5d38eb30bcd5cc16ae3",
+  "base_commit": "91e48a546542da0e70a25154a7ca76417a21a16e",
+  "scope": "Order-preserving manifest declaration preflight, per-source normalized paths, origin ownership and resource limits",
+  "environment": {
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "os": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "uncommitted_changes": false
+  },
+  "verification": {
+    "ctest_passed": 2,
+    "new_cases": 5,
+    "new_assertions": 189,
+    "allocation_faults_checked": 11,
+    "source_sharing_mutation_exit": 42
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "534f67089f3ba9ce9ba6a9f35daa9d862df1884782d29cdbd2b3ad67aa6ff181",
+    "src/io/reference_root_plan.cpp": "ae5606c5e1bac25649c290533e3e00f62abebb1d27e4e33f607f57bbce83b25b",
+    "src/io/reference_root_plan.hpp": "77fab73a2d344936327ccc913ac2b9d39173c772db324b62c8c0b75ec2230c26",
+    "src/io/reference_declarations.cpp": "d0a403dc859f46160bd82196def441bf7239e35778105da028ef86d3fd3cb1dd",
+    "src/io/reference_path.cpp": "db49b1b22dfe668e6c81d5f125823e8d83e81468c94097b8abc0aef8b07bf520",
+    "src/io/case_schema_exact.cpp": "8b18eefd6c7869a12480784bdf315711d190c398a2ed8d26b3b336b0968d6f78",
+    "tests/CMakeLists.txt": "bc0ff33387f632898d33d95be089522acfd08a207ae3b1c29d3969f03e21268b",
+    "tests/io/reference_root_plan_test.cpp": "a8abf244ab8509a73c05aadbffd93e8a9e942ad7a288354772128401456f2f11",
+    "tests/io/reference_declarations_resource_test.cpp": "6ab1222ec7dd7794a99628f18654e60de8f358399cf1830040e683582369506c",
+    "tests/io/reference_declarations_fixture.hpp": "896a96d5f3e515ff21de94f2ad3c716e819dcc26a8eda620a906543475042397",
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-root-plan.md": "d2a7c0fcee3cee81d91ef29ccc7514988c3998c04eb1561e7ac9f9360101cc82"
+  }
+}

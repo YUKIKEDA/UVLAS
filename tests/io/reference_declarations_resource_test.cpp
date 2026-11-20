@@ -170,6 +170,7 @@ void operator delete[](void* value, std::align_val_t, const std::nothrow_t&) noe
 
 #include "case_schema_snapshot.hpp"
 #include "reference_declarations_fixture.hpp"
+#include "reference_root_plan.hpp"
 
 #include <future>
 #include <stop_token>
@@ -394,4 +395,61 @@ TEST_CASE("Cancellation during the final declaration allocation cannot publish a
     const auto charged = plan.allocated_bytes();
     slot.reset();
     CHECK(plan.allocated_bytes() == charged);
+}
+
+TEST_CASE(
+    "Root reference preflight preserves its input across allocation failures and cancellation",
+    "[IO4-01][N4-02][N4-08][negative]") {
+    const auto source = checked(all_roles());
+    constexpr rd::RootReferenceLimits root_limits{budget, budget, budget, budget,
+                                                  64,     budget, budget};
+    auto declarations = [&] {
+        core::ResourcePlan plan{budget};
+        return take(rd::collect_case_file_references(source, limits(), plan, {}, nullptr));
+    };
+    const auto acquire = [&](rd::DeclaredReferences& input, core::ResourcePlan& plan,
+                             const std::stop_token& stop, rd::RootReferenceDiagnostic* slot) {
+        return rd::prepare_root_references(std::move(input), root_limits, plan, stop, slot);
+    };
+
+    auto seed = declarations();
+    core::ResourcePlan measured{budget};
+    std::optional<core::Result<rd::PreparedRootReferences>> control;
+    {
+        const FaultScope audit{-2};
+        control.emplace(acquire(seed, measured, {}, nullptr));
+    }
+    REQUIRE(control->has_value());
+    const auto count = attempts.load();
+    REQUIRE(count == 11); // Three index allocations and one path for each of eight unique sources.
+    for (std::uint64_t i = 0; i < count; ++i) {
+        auto input = declarations();
+        const auto previous = snapshot(input);
+        core::ResourcePlan plan{budget};
+        std::optional<core::Result<rd::PreparedRootReferences>> output;
+        {
+            const FaultScope fault{static_cast<std::int64_t>(i)};
+            output.emplace(acquire(input, plan, {}, nullptr));
+        }
+        REQUIRE_FALSE(output->has_value());
+        CHECK(output->error().code == core::FailureCode::ResourceExceeded);
+        CHECK(snapshot(input) == previous);
+    }
+
+    auto input = declarations();
+    const auto previous = snapshot(input);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop mutates the stop source.
+    std::stop_source stop;
+    core::ResourcePlan plan{budget};
+    rd::RootReferenceDiagnostic slot;
+    cancel_at_allocation = &stop;
+    cancel_after = static_cast<std::int64_t>(count - 1);
+    auto cancelled = acquire(input, plan, stop.get_token(), &slot);
+    cancel_at_allocation = nullptr;
+    cancel_after = -1;
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+    CHECK_FALSE(slot.detail());
+    CHECK_FALSE(slot.pointer());
+    CHECK(snapshot(input) == previous);
 }
