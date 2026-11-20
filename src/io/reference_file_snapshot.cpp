@@ -48,7 +48,8 @@ std::optional<ReferenceFileView> ReferenceFileSnapshot::view() const& noexcept {
 core::Result<ReferenceFileSnapshot> ReferenceFileSnapshot::read_from_handle(
     ReferenceFileReader& reader, const SourceDigest* declared_digest, ReferenceFileLimits limits,
     core::ResourcePlan& plan, const std::stop_token& stop,
-    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
+    std::optional<ReferenceFileDiagnostic>* diagnostic,
+    const ReferenceFileIdentityChecks& identities) noexcept {
     if (diagnostic != nullptr) {
         diagnostic->reset();
     }
@@ -93,6 +94,37 @@ core::Result<ReferenceFileSnapshot> ReferenceFileSnapshot::read_from_handle(
     if (!before->regular_file) {
         return reject(ReferenceFileFailure::NotRegular);
     }
+
+    // Bound all native-ID comparisons without hiding a mismatch already found. The manifest
+    // precedes the prior sources, and both precede the payload budgets below.
+    const std::uint64_t manifest_comparisons = identities.manifest.has_value() ? 1 : 0;
+    if (manifest_comparisons > identities.maximum_comparisons) {
+        return budget(ReferenceFileFailure::IdentityComparisons, manifest_comparisons,
+                      identities.maximum_comparisons);
+    }
+    if (identities.manifest && before->identity == *identities.manifest) {
+        return reject(ReferenceFileFailure::Cycle);
+    }
+    const auto prior = identities.earlier_distinct_sources;
+    const auto available = identities.maximum_comparisons - manifest_comparisons;
+    const auto admitted = std::min<std::uint64_t>(prior.size(), available);
+    for (const auto& seen : prior.first(static_cast<std::size_t>(admitted))) {
+        if (stop.stop_requested()) {
+            return cancelled();
+        }
+        if (before->identity == seen) {
+            return reject(ReferenceFileFailure::DuplicateFile);
+        }
+    }
+    if (admitted < prior.size()) {
+        // The number of addressable ID records leaves room for the manifest and this probe.
+        return budget(ReferenceFileFailure::IdentityComparisons,
+                      manifest_comparisons + admitted + 1, identities.maximum_comparisons);
+    }
+    if (stop.stop_requested()) {
+        return cancelled();
+    }
+
     const auto length = before->byte_count;
     constexpr auto index_max = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
     constexpr auto host_max = static_cast<std::uint64_t>(std::numeric_limits<std::size_t>::max());
@@ -195,17 +227,18 @@ core::Result<ReferenceFileSnapshot> ReferenceFileSnapshot::read_from_handle(
 core::Result<ReferenceFileSnapshot>
 read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_digest,
                     ReferenceFileLimits limits, core::ResourcePlan& plan,
-                    const std::stop_token& stop,
-                    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
+                    const std::stop_token& stop, std::optional<ReferenceFileDiagnostic>* diagnostic,
+                    const ReferenceFileIdentityChecks& identities) noexcept {
     return ReferenceFileSnapshot::read_from_handle(reader, &declared_digest, limits, plan, stop,
-                                                   diagnostic);
+                                                   diagnostic, identities);
 }
 
 core::Result<ReferenceFileSnapshot>
 read_manifest_file(ReferenceFileReader& reader, ReferenceFileLimits limits,
                    core::ResourcePlan& plan, const std::stop_token& stop,
                    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept {
-    return ReferenceFileSnapshot::read_from_handle(reader, nullptr, limits, plan, stop, diagnostic);
+    return ReferenceFileSnapshot::read_from_handle(reader, nullptr, limits, plan, stop, diagnostic,
+                                                   {});
 }
 
 } // namespace uvlas::io::detail

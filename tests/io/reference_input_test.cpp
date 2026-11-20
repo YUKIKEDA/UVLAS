@@ -1,5 +1,6 @@
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
+#include "reference_root_snapshot.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -355,4 +356,210 @@ TEST_CASE("Both acquisition routes account for their complete allocation on one 
         return rd::ReferenceInput::from_memory(bytes_of(static_case()), source, std::nullopt,
                                                limits(), plan, {}, nullptr);
     });
+}
+
+namespace {
+
+constexpr std::string_view abc_hex =
+    "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
+constexpr std::string_view valid_manifest_hex =
+    "ecfba5a3cdf129b195b7e1504c74c2981852f6ee57617ac320ea14420ffd9a38";
+constexpr rd::RootSnapshotLimits acquisition_limits{{3, 4, 2, 3}, 3, 256};
+constexpr rd::RootReferenceLimits root_limits{
+    fixture::budget, fixture::budget, fixture::budget, fixture::budget, 64, fixture::budget, 0};
+
+void declare_path(fixture::JsonToken& file, std::string_view path, std::string_view hash) {
+    file.set("path", fixture::string(path));
+    file.set("sha256", fixture::string(hash));
+}
+
+fixture::JsonToken manifest_with_reference(std::string_view first, std::string_view digest) {
+    auto model = fixture::all_roles();
+    auto& geometry = model.field("model").field("geometry").elements;
+    declare_path(geometry[0].field("mesh"), first, digest);
+    declare_path(geometry[0].field("sidecar"), "alias.bin", abc_hex);
+    declare_path(geometry[0].field("reference").field("file"), "copy.bin", abc_hex);
+    declare_path(geometry[1].field("sidecar"), "wrong.bin", abc_hex);
+    return model;
+}
+
+rd::PreparedRootReferences prepare(const rd::ReferenceInput& input) {
+    core::ResourcePlan plan{fixture::budget};
+    const auto view = fixture::take(input.view());
+    auto declared = fixture::take(
+        rd::collect_case_file_references(view.schema, fixture::limits(), plan, {}, nullptr));
+    return fixture::take(
+        rd::prepare_root_references(std::move(declared), root_limits, plan, {}, nullptr));
+}
+
+rd::ReferenceInput from_memory(const fs::path& directory, std::string_view wire,
+                               io::SourceId source_id = source) {
+    core::ResourcePlan plan{fixture::budget};
+    auto root = fixture::take(rd::ReadRoot::open(directory, {}));
+    return fixture::take(rd::ReferenceInput::from_memory(bytes_of(wire), source_id, std::move(root),
+                                                         limits(), plan, {}, nullptr));
+}
+
+void check_acquisition_failure(const core::Result<rd::AcquiredRootSnapshot>& outcome,
+                               core::FailureCode expected) {
+    REQUIRE_FALSE(outcome);
+    CHECK(outcome.error().code == expected);
+    CHECK(outcome.error().operation == core::Operation::PrepareModel);
+}
+
+void check_read_reason(const rd::RootSnapshotDiagnostic& diagnostic,
+                       rd::ReferenceFileFailure reason) {
+    CHECK(diagnostic.reason == rd::RootSnapshotFailure::Read);
+    if (const auto& observed = diagnostic.read) {
+        CHECK(observed->reason == reason);
+        CHECK(observed->before.has_value());
+    } else {
+        FAIL("Missing same-handle diagnostic");
+    }
+}
+
+} // namespace
+
+TEST_CASE("File acquisition rejects its manifest and manifest alias before payload admission",
+          "[IO4-01][N4-08][integration][negative]") {
+    constexpr rd::RootSnapshotLimits no_payload{{0, 0, 0, 0}, 1, 256};
+    for (const std::string_view reference : {"manifest.json", "linked.json"}) {
+        CAPTURE(reference);
+        const Tree tree;
+        const auto wire = manifest_with_reference(reference, abc_hex).wire();
+        write_file(tree.root / "manifest.json", wire);
+        fs::create_hard_link(tree.root / "manifest.json", tree.root / "linked.json");
+        core::ResourcePlan creation{fixture::budget};
+        const auto input = fixture::take(rd::ReferenceInput::from_file(
+            tree.root, "manifest.json", source, manifest_limits, limits(), creation, {}, nullptr));
+        const auto prepared = prepare(input);
+        core::ResourcePlan plan{fixture::budget};
+        rd::RootSnapshotDiagnostic diagnostic;
+        const auto acquired =
+            rd::acquire_root_snapshot(input, prepared, 0, {}, no_payload, plan, {}, &diagnostic);
+        check_acquisition_failure(acquired, core::FailureCode::InvalidInput);
+        check_read_reason(diagnostic, rd::ReferenceFileFailure::Cycle);
+        CHECK(diagnostic.pointer() == "/model/geometry/0/mesh");
+        CHECK(fixture::take(prepared.declaration(0)).original.original_path == reference);
+        if (const auto& observed = diagnostic.read) {
+            CHECK(observed->bytes_read == 0);
+        }
+    }
+}
+
+TEST_CASE("Memory acquisition owns the selected bytes and rejects only repeated file identities",
+          "[IO4-01][N4-02][integration][property]") {
+    const auto retained = [] {
+        const Tree tree;
+        write_file(tree.root / "payload.bin", "abc");
+        fs::create_hard_link(tree.root / "payload.bin", tree.root / "alias.bin");
+        write_file(tree.root / "copy.bin", "abc");
+        write_file(tree.root / "wrong.bin", "abd");
+        const auto wire = manifest_with_reference("./payload.bin", abc_hex).wire();
+        const auto input = from_memory(tree.root, wire);
+        const auto prepared = prepare(input);
+        core::ResourcePlan plan{fixture::budget};
+        auto first = fixture::take(rd::acquire_root_snapshot(
+            input, prepared, 0, {}, acquisition_limits, plan, {}, nullptr));
+        CHECK(first.location.source == io::SourceId{300});
+        CHECK(first.location.role == rd::ReferenceRole::GmshMesh);
+        CHECK(first.location.declaration_node ==
+              fixture::take(prepared.declaration(0)).original.declaration_node);
+        const auto original = first.file.view();
+        if (!original) {
+            FAIL("Missing payload");
+        } else {
+            const std::array seen{original->file_info.identity};
+            rd::RootSnapshotDiagnostic diagnostic;
+            const auto duplicate = rd::acquire_root_snapshot(
+                input, prepared, 1, seen, acquisition_limits, plan, {}, &diagnostic);
+            check_acquisition_failure(duplicate, core::FailureCode::InvalidInput);
+            check_read_reason(diagnostic, rd::ReferenceFileFailure::DuplicateFile);
+            CHECK(diagnostic.pointer() == "/model/geometry/0/sidecar");
+            const auto independent = fixture::take(rd::acquire_root_snapshot(
+                input, prepared, 2, seen, acquisition_limits, plan, {}, &diagnostic));
+            CHECK_FALSE(diagnostic.reason);
+            if (const auto other = independent.file.view()) {
+                CHECK(other->file_info.identity != original->file_info.identity);
+                CHECK(std::ranges::equal(other->bytes, original->bytes));
+            } else {
+                FAIL("Missing separate equal-content file");
+            }
+
+            const auto missing = rd::acquire_root_snapshot(
+                input, prepared, 3, seen, acquisition_limits, plan, {}, &diagnostic);
+            check_acquisition_failure(missing, core::FailureCode::InvalidInput);
+            CHECK(diagnostic.reason == rd::RootSnapshotFailure::Open);
+            CHECK(diagnostic.pointer() == "/model/geometry/1/deck");
+
+            auto no_pointer = acquisition_limits;
+            no_pointer.diagnostic_bytes = 0;
+            const auto wrong = rd::acquire_root_snapshot(input, prepared, 4, seen, no_pointer, plan,
+                                                         {}, &diagnostic);
+            check_acquisition_failure(wrong, core::FailureCode::InvalidInput);
+            check_read_reason(diagnostic, rd::ReferenceFileFailure::DigestMismatch);
+            CHECK(diagnostic.pointer().empty());
+            const auto without_slot =
+                rd::acquire_root_snapshot(input, prepared, 4, seen, no_pointer, plan, {}, nullptr);
+            check_acquisition_failure(without_slot, core::FailureCode::InvalidInput);
+
+            const auto spent = plan.allocated_bytes();
+            const auto different = from_memory(tree.root, wire, io::SourceId{20});
+            const auto stale = rd::acquire_root_snapshot(different, prepared, 0, {},
+                                                         acquisition_limits, plan, {}, &diagnostic);
+            check_acquisition_failure(stale, core::FailureCode::StaleGeneration);
+            CHECK(diagnostic.reason == rd::RootSnapshotFailure::StaleParent);
+            const auto invalid = rd::acquire_root_snapshot(
+                input, prepared, 8, {}, acquisition_limits, plan, {}, &diagnostic);
+            check_acquisition_failure(invalid, core::FailureCode::InvalidInput);
+            CHECK(diagnostic.reason == rd::RootSnapshotFailure::InvalidSelection);
+            // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop requires mutable source.
+            std::stop_source stop;
+            REQUIRE(stop.request_stop());
+            const auto cancelled = rd::acquire_root_snapshot(
+                input, prepared, 0, {}, acquisition_limits, plan, stop.get_token(), &diagnostic);
+            check_acquisition_failure(cancelled, core::FailureCode::Cancelled);
+            CHECK_FALSE(diagnostic.reason);
+            CHECK(plan.allocated_bytes() == spent);
+        }
+        // Windows also checks that the file handle is already released while the result lives.
+        REQUIRE(fs::remove(tree.root / "payload.bin"));
+        return first;
+    }();
+    if (const auto observed = retained.file.view()) {
+        CHECK(std::ranges::equal(observed->bytes, bytes_of("abc")));
+        CHECK(observed->digest == abc_digest);
+        CHECK(observed->file_info.byte_count == 3);
+    } else {
+        FAIL("Missing detached file snapshot");
+    }
+    CHECK(retained.pointer() == "/model/geometry/0/mesh");
+}
+
+TEST_CASE("Memory root accepts a hard link to a separate manifest as ordinary file bytes",
+          "[IO4-01][N4-02][integration][property]") {
+    const Tree tree;
+    write_file(tree.root / "other-manifest.json", static_case());
+    fs::create_hard_link(tree.root / "other-manifest.json", tree.root / "manifest-link.bin");
+    const auto wire = manifest_with_reference("manifest-link.bin", valid_manifest_hex).wire();
+    const auto input = from_memory(tree.root, wire);
+    const auto prepared = prepare(input);
+    constexpr rd::RootSnapshotLimits exact{{8611, 8612, 2, 8611}, 0, 0};
+    core::ResourcePlan plan{fixture::budget};
+    const auto snapshot =
+        fixture::take(rd::acquire_root_snapshot(input, prepared, 0, {}, exact, plan, {}, nullptr));
+    if (const auto observed = snapshot.file.view()) {
+        CHECK(std::ranges::equal(observed->bytes, bytes_of(static_case())));
+        CHECK(observed->digest == static_case_digest);
+    } else {
+        FAIL("Expected separately declared manifest bytes");
+    }
+
+    auto too_short = exact;
+    --too_short.file.maximum_read_bytes;
+    rd::RootSnapshotDiagnostic diagnostic;
+    const auto failed =
+        rd::acquire_root_snapshot(input, prepared, 0, {}, too_short, plan, {}, &diagnostic);
+    check_acquisition_failure(failed, core::FailureCode::ResourceExceeded);
+    check_read_reason(diagnostic, rd::ReferenceFileFailure::ReadBytes);
 }
