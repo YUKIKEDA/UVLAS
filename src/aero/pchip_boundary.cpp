@@ -38,9 +38,10 @@ core::Result<BitBound> shape(RationalView value, RationalLimits limits,
         return std::unexpected(failure(core::FailureCode::InvalidInput, details));
     CheckedCount checked;
     const auto bits = [&](std::span<const std::uint32_t> magnitude) {
-        return magnitude.empty() ? std::uint64_t{0}
-                                 : checked.add(checked.mul(magnitude.size() - 1, 32),
-                                               std::bit_width(magnitude.back()));
+        return magnitude.empty()
+                   ? std::uint64_t{0}
+                   : checked.add(checked.mul(magnitude.size() - 1, 32),
+                                 static_cast<std::uint64_t>(std::bit_width(magnitude.back())));
     };
     const BitBound bound{bits(value.numerator), bits(value.denominator)};
     if (!checked.ok || std::max(bound.numerator, bound.denominator) > limits.input_bits)
