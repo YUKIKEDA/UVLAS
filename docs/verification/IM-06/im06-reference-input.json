@@ -1,0 +1,54 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-input",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 215,
+  "parent_issue": 22,
+  "date": "2026-11-20",
+  "source_commit": "d48c15a29edc65fbb637e799ff0f12d924fff289",
+  "base_commit": "bd2fabfbcc9aacd87a61c913b7793b0300953940",
+  "scope": "File and Memory acquisition of a validated SchemaCase with its owned manifest origin or caller-pinned ReadRoot",
+  "environment": {
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "os": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "nlohmann_json": "3.12.0",
+    "nlohmann_json_sax_allocation": 1,
+    "uncommitted_changes": false
+  },
+  "verification": {
+    "ctest_passed": 2,
+    "reference_input_catch_cases": 4,
+    "reference_input_catch_assertions": 138,
+    "missing_root_mutation_exit": 42
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "92764f0a8fbe85b16a7bdb8c8efddc10c9c8b5e94182f186f163ce4f46d362de",
+    "include/uvlas/io/case_schema.hpp": "0395654b61c98caface13ff370853e72a720735bc4580dac267f9bf4ff2e845c",
+    "src/io/linux_reference_root.hpp": "fc4aa1016d56cb54041e9421670c95078a7324ea1023bd953408ce22f0263916",
+    "src/io/reference_input.cpp": "3adead2c59be73f4a4acf3223890c84fbe1f7b4fbb20cc3417dbc15e1792613e",
+    "src/io/reference_input.hpp": "48d000709810809b8402983ddc8d18c727eb2977b18b1f378a154cdc8161d4f5",
+    "src/io/windows_reference_root.hpp": "2b93f13faf97ad3da4f6cabd6b375cd3c1aac557e772cb34fc097fcf1dc1f517",
+    "tests/CMakeLists.txt": "0953895275256fca4cf413f6d18b964c8c8362c3fe036133b020d37da81b2414",
+    "tests/io/reference_input_test.cpp": "dd5a28d4e32192e5120e5346672c02582e040d82fd3777867fa5e57ccc4aad8e",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "tests/io/reference_declarations_fixture.hpp": "896a96d5f3e515ff21de94f2ad3c716e819dcc26a8eda620a906543475042397",
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-input.md": "bb590e13c22dd0d6610a8e0decefab8d5e64e1192b413acbb954fee12e9325b5"
+  }
+}
