@@ -91,4 +91,71 @@ private:
                                                      core::ResourcePlan&,
                                                      const std::stop_token& stop = {},
                                                      core::FailureDetails details = {}) noexcept;
+
+/// Admission for exact reduction by a supplied positive period.
+class PeriodicTimePlan {
+public:
+    [[nodiscard]] std::uint64_t payload_bytes() const noexcept {
+        return payload_;
+    }
+    [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
+        return work_;
+    }
+    [[nodiscard]] const RationalPlan& arithmetic() const& noexcept {
+        return arithmetic_;
+    }
+    [[nodiscard]] const RationalPlan& arithmetic() const&& = delete;
+
+private:
+    friend struct domain_detail::Builder;
+    RationalPlan arithmetic_;
+    std::uint64_t payload_ = 0, work_ = 0, outer_ = 0, preflight_ = 0, limbs_ = 0;
+};
+
+/// Owned canonical physical time in [first,last), independent of the source and workspace.
+class PeriodicTime {
+public:
+    [[nodiscard]] core::Result<RationalView> time() const& noexcept;
+    [[nodiscard]] core::Result<RationalView> time() const&& = delete;
+    /// At a seam, use the source's last time for a left interval and this time for a right
+    /// interval.
+    [[nodiscard]] bool is_seam() const noexcept {
+        return limbs_.size() != 0 && seam_;
+    }
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return used_;
+    }
+
+private:
+    friend struct domain_detail::Builder;
+    PeriodicTime(core::PlannedBuffer<std::uint32_t> limbs, std::size_t numerator,
+                 std::size_t denominator, int sign, bool seam, std::uint64_t used) noexcept
+        : limbs_(std::move(limbs)),
+          numerator_(numerator),
+          denominator_(denominator),
+          sign_(sign),
+          seam_(seam),
+          used_(used) {}
+
+    core::PlannedBuffer<std::uint32_t> limbs_;
+    std::size_t numerator_, denominator_;
+    int sign_;
+    bool seam_;
+    std::uint64_t used_;
+};
+
+/// Require an explicit canonical period; an empty view is rejected as malformed input.
+[[nodiscard]] core::Result<PeriodicTimePlan>
+forecast_periodic_time(const CoefficientBlock&, RationalView query, RationalView period,
+                       RationalLimits, const std::stop_token& stop = {},
+                       core::FailureDetails details = {}) noexcept;
+
+/// Check the period against the exact domain width and reduce the immutable query.
+/// This private operation only handles time; seam value and slope qualification is separate.
+[[nodiscard]] core::Result<PeriodicTime>
+normalize_periodic_time(const CoefficientBlock&, RationalView query, RationalView period,
+                        DomainWorkspace&, RationalLimits, core::ResourcePlan&,
+                        const std::stop_token& stop = {},
+                        core::FailureDetails details = {}) noexcept;
+
 } // namespace uvlas::aero::detail::pchip
