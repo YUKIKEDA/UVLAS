@@ -1,0 +1,277 @@
+// Verify the common pivot row scale on the frozen rank comparison inputs.
+#define main frozen_rank_comparison_main
+#include "rank-comparison.cpp.txt"
+#undef main
+
+#include <string_view>
+
+namespace {
+constexpr unsigned width_cap = 512;
+constexpr unsigned recurrence_padding = 32;
+constexpr int candidate_count = 1496;
+
+template <unsigned Bits>
+using FixedInteger = boost::multiprecision::number<
+    boost::multiprecision::cpp_int_backend<Bits, Bits, boost::multiprecision::signed_magnitude,
+                                            boost::multiprecision::checked, void>,
+    boost::multiprecision::et_off>;
+
+struct IntegerTermLayout {
+    std::uint32_t column;
+    FixedInteger<512> value;
+};
+struct ModularTermLayout {
+    std::uint32_t index, value;
+};
+struct CoordinateLayout {
+    FixedInteger<8192> numerator{0}, denominator{1};
+};
+
+void require(bool condition, const char* diagnostic) {
+    if (!condition) {
+        throw std::runtime_error(diagnostic);
+    }
+}
+
+unsigned magnitude_bits(const Integer& n) {
+    return n == 0 ? 0 : boost::multiprecision::msb(boost::multiprecision::abs(n)) + 1;
+}
+
+Integer divide_exact(const Integer& numerator, const Integer& denominator) {
+    require(denominator > 0 && numerator % denominator == 0, "inexact scale division");
+    return numerator / denominator;
+}
+
+Integer scale_with_denominator(const Integer& scale, const Integer& d, std::uint64_t prime) {
+    require(scale > 0 && d > 0 && d % prime != 0, "nonunit denominator");
+    return (scale / boost::multiprecision::gcd(scale, d)) * d;
+}
+
+Integer scaled_coefficient(const Q& coefficient, const Integer& scale) {
+    return numerator(coefficient) * divide_exact(scale, denominator(coefficient));
+}
+
+bool recurrence_fits(const Integer& bound, unsigned cap) {
+    return magnitude_bits(bound) + recurrence_padding <= cap;
+}
+
+void controls() {
+    // Literal values come from the equation (1/2) x = 3/5, p=7, with a sibling 1/3.
+    const Q basis = Q{1} / 2;
+    const Q target = Q{3} / 5;
+    const Integer basis_scale = scale_with_denominator(1, denominator(basis), 7);
+    const Integer old_scale = scale_with_denominator(basis_scale, denominator(target), 7);
+    const Integer shared_scale = scale_with_denominator(old_scale, 3, 7);
+    require(old_scale == 10 && shared_scale == 30, "literal scales");
+    const Integer ratio = divide_exact(shared_scale, old_scale);
+    require(ratio == 3 && ratio % 7 != 0, "literal unit ratio");
+
+    const Integer old_matrix = scaled_coefficient(basis, old_scale);
+    const Integer shared_matrix = scaled_coefficient(basis, shared_scale);
+    Integer old_rhs = scaled_coefficient(target, old_scale);
+    Integer shared_rhs = scaled_coefficient(target, shared_scale);
+    require(old_matrix == 5 && shared_matrix == 15 && old_rhs == 6 && shared_rhs == 18,
+            "literal matrix and RHS");
+    const std::uint64_t expected_digits[] = {4, 1};
+    const int expected_rhs[] = {-2, -1};
+    for (int k = 0; k < 2; ++k) {
+        const auto digit = [](const Integer& right, const Integer& left) {
+            return (Mod<7>::parse(Q{right}) / Mod<7>::parse(Q{left})).value;
+        };
+        require(digit(old_rhs, old_matrix) == expected_digits[k] &&
+                    digit(shared_rhs, shared_matrix) == expected_digits[k], "literal lift digit");
+        old_rhs = divide_exact(old_rhs - old_matrix * expected_digits[k], 7);
+        shared_rhs = divide_exact(shared_rhs - shared_matrix * expected_digits[k], 7);
+        require(old_rhs == expected_rhs[k] && shared_rhs == 3 * expected_rhs[k],
+                "literal updated RHS");
+    }
+    require(old_matrix * 6 - scaled_coefficient(target, old_scale) * 5 == 0 &&
+                shared_matrix * 6 - scaled_coefficient(target, shared_scale) * 5 == 0,
+            "literal square proof");
+    bool bad_prime_rejected = false;
+    try {
+        static_cast<void>(scale_with_denominator(old_scale, 7, 7));
+    } catch (const std::runtime_error&) {
+        bad_prime_rejected = true;
+    }
+    require(bad_prime_rejected, "bad-prime rejection");
+    const Integer boundary = Integer{1} << (width_cap - recurrence_padding - 1);
+    require(recurrence_fits(boundary, width_cap) && !recurrence_fits(boundary, width_cap - 1) &&
+                !recurrence_fits(boundary * 2, width_cap), "recurrence width boundary");
+    std::cout << "{\"digits\":[4,1],\"old_rhs\":[-2,-1],\"shared_rhs\":[-6,-3],"
+                 "\"unit_ratio\":3,\"bad_prime_rejected\":true,\"width_boundary_checked\":true}\n";
+}
+
+void check_certificate(std::istream& cert, int rows, int rank,
+                       const Elimination<Mod<p1>>& factor) {
+    std::string tag;
+    int grid{}, certificate_rows{}, full{}, candidates{}, certificate_rank{};
+    require(static_cast<bool>(cert >> tag >> grid >> certificate_rows >> full >> candidates >>
+                              certificate_rank) &&
+                tag == "certificate" && grid == 4 && certificate_rows == rows && full == 933 &&
+                candidates == candidate_count && certificate_rank == rank, "certificate header");
+    for (int k = 0; k < rank; ++k) {
+        int index{}, column{}, pivot{};
+        require(static_cast<bool>(cert >> tag >> index >> column >> pivot) && tag == "basis" &&
+                    index == k && column == factor.selected[k] && pivot == factor.pivot_rows[k],
+                "certificate basis or pivot");
+    }
+}
+
+struct PivotCoefficient {
+    int column;
+    const Q* value;
+};
+
+struct Census {
+    std::uint64_t pivot_nonzeros{}, factor_nonzeros{}, row_target_checks{}, ratios_above_one{};
+    unsigned shared_scale_bits{}, max_ratio_bits{}, shared_integer_bits{};
+    unsigned shared_recurrence_bits{}, old_recurrence_bits{};
+};
+
+Census compare_scales(const Matrix& matrix, const Elimination<Mod<p1>>& factor) {
+    const auto rank = factor.selected.size();
+    std::vector<int> pivot_index(matrix.rows, -1);
+    std::vector<unsigned char> is_basis(candidate_count, 0);
+    std::vector<std::vector<PivotCoefficient>> pivot_rows(rank);
+    Census result;
+    for (std::size_t k = 0; k < rank; ++k) {
+        const int col = factor.selected[k];
+        const int row = factor.pivot_rows[k];
+        require(0 <= col && col < candidate_count && is_basis[col] == 0, "selected column roster");
+        require(0 <= row && row < matrix.rows && pivot_index[row] < 0, "pivot row roster");
+        is_basis[col] = 1;
+        pivot_index[row] = static_cast<int>(k);
+        require(!factor.pivot_upper[k].empty(), "factor diagonal missing");
+        result.factor_nonzeros += factor.pivot_lower[k].size() + factor.pivot_upper[k].size() - 1;
+    }
+    for (int j = 0; j < candidate_count; ++j) {
+        for (const auto& [row, coefficient] : matrix.columns[j]) {
+            require(0 <= row && row < matrix.rows, "coefficient row range");
+            if (const int k = pivot_index[row]; k >= 0) {
+                auto& entries = pivot_rows[k];
+                require(coefficient != 0 && (entries.empty() || entries.back().column < j),
+                        "pivot coefficient roster");
+                entries.push_back({j, &coefficient});
+            }
+        }
+    }
+
+    std::vector<const Q*> targets(candidate_count, nullptr);
+    for (const auto& entries : pivot_rows) {
+        Integer basis_scale = 1;
+        Integer shared_scale = 1;
+        std::fill(targets.begin(), targets.end(), nullptr);
+        for (const auto& [column, coefficient] : entries) {
+            shared_scale = scale_with_denominator(shared_scale, denominator(*coefficient), p1);
+            if (is_basis[column]) {
+                basis_scale = scale_with_denominator(basis_scale, denominator(*coefficient), p1);
+                ++result.pivot_nonzeros;
+            } else {
+                targets[column] = coefficient;
+            }
+        }
+        require(shared_scale % p1 != 0, "nonunit shared scale");
+        result.shared_scale_bits = std::max(result.shared_scale_bits, magnitude_bits(shared_scale));
+        Integer basis_sum = 0;
+        Integer shared_sum = 0;
+        for (const auto& [column, coefficient] : entries) {
+            if (is_basis[column]) {
+                const Integer shared_entry = scaled_coefficient(*coefficient, shared_scale);
+                basis_sum += boost::multiprecision::abs(scaled_coefficient(*coefficient, basis_scale));
+                shared_sum += boost::multiprecision::abs(shared_entry);
+                result.shared_integer_bits = std::max(result.shared_integer_bits, magnitude_bits(shared_entry));
+            }
+        }
+        require(basis_sum > 0, "empty pivot basis row");
+        for (int j = 0; j < candidate_count; ++j) {
+            if (is_basis[j]) {
+                continue;
+            }
+            const Q* const target = targets[j];
+            const Integer old_scale = target == nullptr ? basis_scale
+                : scale_with_denominator(basis_scale, denominator(*target), p1);
+            const Integer ratio = divide_exact(shared_scale, old_scale);
+            require(ratio > 0 && ratio % p1 != 0, "nonunit scale ratio");
+            const Integer old_sum = basis_sum * divide_exact(old_scale, basis_scale);
+            const Integer old_rhs = target == nullptr ? Integer{0} : scaled_coefficient(*target, old_scale);
+            const Integer shared_rhs = target == nullptr ? Integer{0}
+                : scaled_coefficient(*target, shared_scale);
+            require(shared_sum == old_sum * ratio && shared_rhs == old_rhs * ratio,
+                    "scaled basis absolute sum or target RHS differs");
+            const Integer old_bound = std::max(old_sum, Integer{boost::multiprecision::abs(old_rhs)});
+            const Integer shared_bound = std::max(shared_sum, Integer{boost::multiprecision::abs(shared_rhs)});
+            require(shared_bound == old_bound * ratio, "scaled current bound differs");
+            if (!recurrence_fits(shared_bound, width_cap)) {
+                throw std::runtime_error("shared recurrence exceeds 512 bits at pivot " +
+                                         std::to_string(&entries - pivot_rows.data()) + ", candidate " +
+                                         std::to_string(j));
+            }
+            result.shared_integer_bits = std::max(result.shared_integer_bits, magnitude_bits(shared_rhs));
+            result.shared_recurrence_bits =
+                std::max(result.shared_recurrence_bits, magnitude_bits(shared_bound) + recurrence_padding);
+            result.old_recurrence_bits =
+                std::max(result.old_recurrence_bits, magnitude_bits(old_bound) + recurrence_padding);
+            result.max_ratio_bits = std::max(result.max_ratio_bits, magnitude_bits(ratio));
+            result.ratios_above_one += ratio > 1;
+            ++result.row_target_checks;
+        }
+    }
+    return result;
+}
+
+void check_case(std::istream& input, std::istream& cert, std::string_view domain) {
+    const bool cut = domain == "cut";
+    require(cut || domain == "full", "expected full or cut domain");
+    const int rows = cut ? 5634 : 20032;
+    const int rank = cut ? 498 : 774;
+    const auto source = read(input);
+    require(source.n == 4 && source.full == 933, "source dimensions");
+    const auto matrix = active_matrix(source, cut, true);
+    require(matrix.rows == rows && matrix.columns.size() == candidate_count, "matrix dimensions");
+    const auto factor = eliminate<Mod<p1>>(matrix, 33 + source.full, 200000000, Mod<p1>::parse, true);
+    require(factor.complete && factor.selected.size() == rank, "factor incomplete or rank differs");
+    check_certificate(cert, rows, rank, factor);
+    const auto result = compare_scales(matrix, factor);
+    const auto dependents = std::uint64_t{candidate_count} - rank;
+    require(result.row_target_checks == dependents * rank, "row/target coverage");
+    const auto shared_bytes = result.pivot_nonzeros * sizeof(IntegerTermLayout) +
+        result.factor_nonzeros * sizeof(ModularTermLayout) + 3 * rank * sizeof(std::uint32_t) +
+        3 * (rank + 1) * sizeof(std::uint64_t);
+    std::cout << "{\"domain\":\"" << domain << "\",\"rows\":" << rows
+              << ",\"candidates\":" << candidate_count << ",\"rank\":" << rank
+              << ",\"dependents\":" << dependents
+              << ",\"row_target_checks\":" << result.row_target_checks
+              << ",\"ratios_above_one\":" << result.ratios_above_one
+              << ",\"max_ratio_bits\":" << result.max_ratio_bits
+              << ",\"shared_scale_bits\":" << result.shared_scale_bits
+              << ",\"shared_integer_bits\":" << result.shared_integer_bits
+              << ",\"old_recurrence_bits\":" << result.old_recurrence_bits
+              << ",\"shared_recurrence_bits\":" << result.shared_recurrence_bits
+              << ",\"pivot_nonzeros\":" << result.pivot_nonzeros
+              << ",\"factor_off_diagonal_nonzeros\":" << result.factor_nonzeros
+              << ",\"integer_term_bytes\":" << sizeof(IntegerTermLayout)
+              << ",\"modular_term_bytes\":" << sizeof(ModularTermLayout)
+              << ",\"coordinate_bytes\":" << sizeof(CoordinateLayout)
+              << ",\"one_shared_block_logical_bytes\":" << shared_bytes
+              << ",\"duplicated_block_logical_bytes\":" << (dependents - 1) * shared_bytes
+              << ",\"copied_reference_logical_bytes\":" << dependents * rank * sizeof(CoordinateLayout)
+              << "}\n";
+}
+} // namespace
+
+int main(int argc, char* argv[]) try {
+    if (argc == 2 && std::string_view{argv[1]} == "--controls") {
+        controls();
+        return 0;
+    }
+    require(argc == 4, "expected coefficient, certificate, and domain");
+    std::ifstream input(argv[1]);
+    std::ifstream certificate(argv[2]);
+    require(input.is_open() && certificate.is_open(), "cannot open input or certificate");
+    check_case(input, certificate, argv[3]);
+    return 0;
+} catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+}

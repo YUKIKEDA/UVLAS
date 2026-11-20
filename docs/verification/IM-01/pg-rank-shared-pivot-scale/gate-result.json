@@ -1,0 +1,19 @@
+{
+  "schema": "uvlas.pg-rank-shared-pivot-scale-gate/1",
+  "publication_checks": 8,
+  "publication_scenarios": [
+    "valid",
+    "cut-failed",
+    "cut-metric-missing",
+    "switched-certificate"
+  ],
+  "old_output_modes": [
+    "absent",
+    "present"
+  ],
+  "runner_alias_checks": 18,
+  "alias_modes": [
+    "direct",
+    "hard link"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-shared-pivot-scale",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 224,
+  "parent_issue": 140,
+  "source_commit": "91e48a546542da0e70a25154a7ca76417a21a16e",
+  "date": "2026-11-20",
+  "claimed_state": "n4四次の全背景とU形切断で共通行尺度の整数関係を全ピボット行と全従属候補で照合した。共通尺度の差の予約幅は全背景157 bit、U形153 bit。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0"
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "699bf1f80bc9351fed420e473b5babb69a8704d9cec1cfebae7e36734f62825b",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/results.json": "4f379082d3c1ade6df1d939743c9be493060b4dbccd6b7199a80a5a39f357a95",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/quartic-result.json": "8ee56271f2464b49489831fdee23218cdced092615a1437912683c0ca9166edb",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/gate-probe.py.txt": "d6265af3dc88f330d08a31b4c5de90194ac95c263b73f680a209f4c71a120556",
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/gate-result.json": "135d776042c57ddd4cfc7115463b6aa0f1d3d97f4ebdc12edd580fb51567e09e",
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/probe.cpp.txt": "d6802a8f7a9cb7043c7659fa6b73a301dbe5806314fe15b05c40e7314258341f",
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/result.json": "4c325e4ee0bc1b23c7601ac456f8699f5475da05f2045baba6c37cd523b5d864",
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/run-census.py.txt": "7acf5fbecbe635dd946825c3d21ebca4de04765335d4a5061af306fe3fc709cf",
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/verification.md": "2e94945238e47cf144e45824b5dc4f48de8a61ab4485bc525ecf107cc8547a83"
+  }
+}

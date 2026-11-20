@@ -1,0 +1,129 @@
+"""Test publication after both domains and guard every explicit read-only path."""
+
+import argparse
+from copy import deepcopy
+import json
+from pathlib import Path
+from runpy import run_path
+from shutil import copyfile
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('root', 'coefficient', 'full-certificate', 'cut-certificate', 'capture'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args()
+    verification = args.root.resolve() / 'docs/verification/IM-01'
+    case = verification / 'pg-rank-shared-pivot-scale'
+    run = run_path(str(case / 'run-census.py.txt'))['main']
+    study = verification / 'pg-rank-resource-study/results.json'
+    index = verification / 'pg-rank-fixed-certificate/certificate-index.json'
+    base_runner = verification / 'pg-rank-fixed-batch/run-batch.py.txt'
+    shared_runner = verification / 'pg-rank-fixed-batch-n4-cut/run-case.py.txt'
+    capacity = verification / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt'
+    original_shared = run_path(str(shared_runner))
+    load = original_shared['load']
+    base = load('test_base', base_runner)
+    capture = json.loads(args.capture.read_bytes())
+    cases = {result['domain']: result for result in capture['cases']}
+    expected_calls = ('--controls', 'full', 'cut')
+    scenarios = (
+        ('valid', None, expected_calls),
+        ('cut-failed', 'injected cut failure', expected_calls),
+        ('cut-metric-missing', 'shared_recurrence_bits range', expected_calls),
+        ('switched-certificate', 'full certificate identity', ()),
+    )
+    inputs = {
+        'coefficient': args.coefficient, 'full-certificate': args.full_certificate,
+        'cut-certificate': args.cut_certificate, 'certificate-index': index, 'study': study,
+        'base-runner': base_runner, 'shared-runner': shared_runner, 'capacity-producer': capacity,
+    }
+
+    with TemporaryDirectory() as scratch:
+        temp = Path(scratch)
+        copies = {key: temp / (key + source.suffix) for key, source in inputs.items()}
+        for key, source in inputs.items():
+            copyfile(source, copies[key])
+        copies['probe'] = temp / 'probe.exe'
+        copies['probe'].write_bytes(b'publication test probe')
+        output = temp / 'result.json'
+        old = b'prior complete result\n'
+        calls = []
+
+        def argv(paths, destination):
+            return [atom for name, path in paths.items() for atom in (f'--{name}', str(path))] + [
+                '--output', str(destination),
+            ]
+
+        def load_module(name, path):
+            return base if name == 'shared_pivot_base' else load(name, path)
+
+        with patch.dict(run.__globals__, run_path=lambda _path: {**original_shared, 'load': load_module}):
+            for present in (False, True):
+                for name, expected, order in scenarios:
+                    output.unlink(missing_ok=True)
+                    if present:
+                        output.write_bytes(old)
+                    calls.clear()
+                    targets = dict(copies)
+                    if name == 'switched-certificate':
+                        targets['full-certificate'] = copies['cut-certificate']
+
+                    def invoke(_binary, *values):
+                        phase = values[-1]
+                        calls.append(phase)
+                        if phase == '--controls':
+                            return capture['controls']
+                        if phase == 'cut' and name == 'cut-failed':
+                            raise RuntimeError('injected cut failure')
+                        result = deepcopy(cases[phase])
+                        if phase == 'cut' and name == 'cut-metric-missing':
+                            del result['shared_recurrence_bits']
+                        return result
+
+                    with patch.object(base, 'invoke', side_effect=invoke):
+                        try:
+                            run(argv(targets, output))
+                        except RuntimeError as error:
+                            base.require(expected is not None and str(error) == expected,
+                                         f'{name}: {error}')
+                            base.require(output.read_bytes() == old if present else not output.exists(),
+                                         f'{name}: output changed')
+                        else:
+                            base.require(expected is None, f'{name}: incorrectly published')
+                            written = json.loads(output.read_bytes())
+                            base.require(written['schema'] == capture['schema']
+                                         and written['cases'] == capture['cases'], 'complete result')
+                    base.require(tuple(calls) == order, f'{name}: probe order')
+                    base.require(not list(temp.glob('.*.tmp')), f'{name}: temporary publication file')
+
+            alias = temp / 'output-alias'
+            with patch.object(base, 'invoke', side_effect=AssertionError('probe invoked for aliased output')):
+                for name, target in copies.items():
+                    original = target.read_bytes()
+                    alias.hardlink_to(target)
+                    for output_path in (target, alias):
+                        try:
+                            run(argv(copies, output_path))
+                        except ValueError as error:
+                            base.require(str(error) == f'--output must be distinct from read-only input: {target}',
+                                         f'{name}: {error}')
+                        else:
+                            raise RuntimeError(f'{name}: accepted aliased output')
+                        base.require(alias.samefile(target) and target.read_bytes() == original
+                                     and not list(temp.glob('.*.tmp')), f'{name}: input changed')
+                    alias.unlink()
+    print(json.dumps({
+        'schema': 'uvlas.pg-rank-shared-pivot-scale-gate/1',
+        'publication_checks': 2 * len(scenarios),
+        'publication_scenarios': [name for name, _, _ in scenarios],
+        'old_output_modes': ['absent', 'present'],
+        'runner_alias_checks': len(copies) * 2,
+        'alias_modes': ['direct', 'hard link'],
+    }, indent=2))
+
+
+if __name__ == '__main__':
+    main()
