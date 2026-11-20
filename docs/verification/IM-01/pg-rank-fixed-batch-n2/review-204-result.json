@@ -1,0 +1,384 @@
+{
+  "schema": "uvlas.review-204/1",
+  "numeric_transport": "captured-result stub",
+  "legacy_collisions": [
+    {
+      "pair": [
+        "base",
+        "output"
+      ],
+      "accepted": true,
+      "existing_file_changed": true
+    },
+    {
+      "pair": [
+        "base",
+        "record"
+      ],
+      "accepted": true,
+      "existing_file_changed": true
+    },
+    {
+      "pair": [
+        "output",
+        "record"
+      ],
+      "accepted": true,
+      "existing_file_changed": true
+    }
+  ],
+  "legacy_empty_record_published": true,
+  "distinct_paths_reproduce": true,
+  "path_collision_controls": [
+    {
+      "pair": [
+        "base",
+        "output"
+      ],
+      "alias": "direct",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "base",
+        "output"
+      ],
+      "alias": "relative",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "base",
+        "output"
+      ],
+      "alias": "hardlink",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "base",
+        "record"
+      ],
+      "alias": "direct",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "base",
+        "record"
+      ],
+      "alias": "relative",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "base",
+        "record"
+      ],
+      "alias": "hardlink",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "output",
+        "record"
+      ],
+      "alias": "direct",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "output",
+        "record"
+      ],
+      "alias": "relative",
+      "all_bytes_preserved": true
+    },
+    {
+      "pair": [
+        "output",
+        "record"
+      ],
+      "alias": "hardlink",
+      "all_bytes_preserved": true
+    }
+  ],
+  "driver_controls": [
+    {
+      "scenario": "valid",
+      "previous_output": false,
+      "accepted": true,
+      "numeric_transport_calls": 3
+    },
+    {
+      "scenario": "empty",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "array",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "null",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "invalid-json",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "schema-missing",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "schema-mismatch",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "schema-type",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "base_sha256-missing",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "base_sha256-mismatch",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "base_sha256-type",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_source_sha256-missing",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_source_sha256-mismatch",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_source_sha256-type",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_bytes-missing",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_bytes-mismatch",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_bytes-type",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "changed_scope-missing",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "changed_scope-mismatch",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "changed_scope-type",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "kernel_bytes_preserved-missing",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "kernel_bytes_preserved-mismatch",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "kernel_bytes_preserved-type",
+      "previous_output": false,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "valid",
+      "previous_output": true,
+      "accepted": true,
+      "numeric_transport_calls": 3
+    },
+    {
+      "scenario": "empty",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "array",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "null",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "invalid-json",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "schema-missing",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "schema-mismatch",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "schema-type",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "base_sha256-missing",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "base_sha256-mismatch",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "base_sha256-type",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_source_sha256-missing",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_source_sha256-mismatch",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_source_sha256-type",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_bytes-missing",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_bytes-mismatch",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "generated_bytes-type",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "changed_scope-missing",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "changed_scope-mismatch",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "changed_scope-type",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "kernel_bytes_preserved-missing",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "kernel_bytes_preserved-mismatch",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    },
+    {
+      "scenario": "kernel_bytes_preserved-type",
+      "previous_output": true,
+      "accepted": false,
+      "numeric_transport_calls": 0
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+"""Derive only the n2 experiment selector from the frozen n1 batch source."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+BASE_SHA256='f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63'
+
+
+def derive(raw):
+    if hashlib.sha256(raw).hexdigest()!=BASE_SHA256:
+        raise ValueError('frozen batch source SHA differs')
+    old=b'    if (in.n != 1)\n        throw std::runtime_error("experiment only admits n1");'
+    new=b'    if (in.n != 2)\n        throw std::runtime_error("experiment only admits n2");'
+    if raw.count(old)!=1:
+        raise ValueError('expected one experiment selector')
+    result=raw.replace(old,new)
+    if result.replace(new,old)!=raw:
+        raise ValueError('kernel byte preservation failed')
+    return result
+
+
+def distinct_paths(*paths):
+    resolved=[p.resolve() for p in paths]
+    for i,left in enumerate(resolved):
+        for right in resolved[i+1:]:
+            if left==right or (left.exists() and right.exists() and left.samefile(right)):
+                raise ValueError('base, output and record must name distinct files')
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--base',type=Path,required=True)
+    p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--record',type=Path,required=True)
+    args=p.parse_args()
+    distinct_paths(args.base,args.output,args.record)
+    raw=args.base.read_bytes();result=derive(raw)
+    args.output.write_bytes(result)
+    args.record.write_text(json.dumps({'schema':'uvlas.fixed-batch-n2-driver/1',
+        'base_sha256':BASE_SHA256,'generated_source_sha256':hashlib.sha256(result).hexdigest(),
+        'generated_bytes':len(result),'changed_scope':'main n guard and diagnostic only',
+        'kernel_bytes_preserved':True},indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+if __name__=='__main__':main()

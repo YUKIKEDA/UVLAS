@@ -123,6 +123,14 @@ TEST_CASE("Linux reference lookup stays anchored after the original root path is
         CHECK(first->identity == linked->identity);
         CHECK_FALSE(first->identity == separate->identity);
         CHECK(first->byte_count == 3);
+        const auto manifest = read_manifest_file(*hard_link, {3, 4, 2, 3}, plan, {}, nullptr);
+        REQUIRE(manifest.has_value());
+        if (const auto view = manifest->view()) {
+            CHECK(view->file_info == *linked);
+            CHECK(view->digest == abc_digest);
+        } else {
+            FAIL("Manifest has no owned view");
+        }
         return read_reference_file(*primary, abc_digest, {3, 4, 2, 3}, plan, {}, nullptr);
     }();
     REQUIRE(snapshot.has_value());

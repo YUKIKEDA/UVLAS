@@ -138,6 +138,15 @@ TEST_CASE("Windows reference file holds the verified bytes and the complete file
         CHECK(file_info->identity == link_info->identity);
         CHECK_FALSE(file_info->identity == duplicate_info->identity);
         CHECK(file_info->byte_count == 3);
+        const auto manifest =
+            uvlas::io::detail::read_manifest_file(*link, {3, 4, 2, 3}, plan, {}, nullptr);
+        REQUIRE(manifest.has_value());
+        if (const auto view = manifest->view()) {
+            CHECK(view->file_info == *link_info);
+            CHECK(view->digest == digest);
+        } else {
+            FAIL("Manifest has no owned view");
+        }
         return read_reference_file(*data, digest, {3, 4, 2, 3}, plan, {}, nullptr);
     }();
     REQUIRE(snapshot.has_value());

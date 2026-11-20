@@ -1,0 +1,8 @@
+{
+  "schema": "uvlas.fixed-batch-n2-driver/1",
+  "base_sha256": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+  "generated_source_sha256": "3516c0253b60e06e73d14c9e3c9633767e11cbb9a8636160df0c6eaab33a32fe",
+  "generated_bytes": 38327,
+  "changed_scope": "main n guard and diagnostic only",
+  "kernel_bytes_preserved": true
+}
