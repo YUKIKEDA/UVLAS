@@ -50,6 +50,9 @@ class LinuxReferenceRoot {
 public:
     [[nodiscard]] static core::Result<LinuxReferenceRoot>
     open(const std::filesystem::path& directory, const std::stop_token& stop) noexcept;
+    [[nodiscard]] bool is_open() const noexcept {
+        return directory_.get() >= 0;
+    }
 
     // The plan pays for the terminated native path. The kernel resolves the whole path at once.
     // A diagnostic gives the native rejection category when one is observed; Linux does not
