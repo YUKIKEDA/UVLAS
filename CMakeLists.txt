@@ -110,7 +110,8 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_path.cpp src/io/reference_file_snapshot.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
-    src/io/si_exact_center.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp)
+    src/io/si_exact_center.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
+    src/io/reference_root_plan.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES} src/io/reference_input.cpp)
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

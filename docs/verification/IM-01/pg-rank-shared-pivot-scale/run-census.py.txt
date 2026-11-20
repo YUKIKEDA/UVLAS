@@ -1,0 +1,118 @@
+"""Verify shared pivot row scaling on frozen full and cut n4 quartic inputs."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from runpy import run_path
+
+
+DOMAINS = {'full': (20032, 774), 'cut': (5634, 498)}
+CANDIDATES = 1496
+PRIME = 2147483647
+WIDTH = 512
+
+
+def digest(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def validate_controls(base, data):
+    base.require(type(data) is dict, 'control result')
+    for key, expected in (
+        ('digits', [4, 1]), ('old_rhs', [-2, -1]), ('shared_rhs', [-6, -3]),
+    ):
+        value = data.get(key)
+        base.require(type(value) is list and all(type(item) is int for item in value)
+                     and value == expected, f'control {key}')
+    base.integer(data.get('unit_ratio'), 3, 'control unit ratio')
+    for key in ('bad_prime_rejected', 'width_boundary_checked'):
+        base.require(data.get(key) is True, f'control {key}')
+
+
+def validate_case(base, case, domain):
+    rows, rank = DOMAINS[domain]
+    dependents = CANDIDATES - rank
+    base.require(type(case) is dict and case.get('domain') == domain, 'result domain')
+    for key, expected in (
+        ('rows', rows), ('candidates', CANDIDATES), ('rank', rank),
+        ('dependents', dependents), ('row_target_checks', rank * dependents),
+    ):
+        base.integer(case.get(key), expected, key)
+    for key, low, high in (
+        ('ratios_above_one', 0, rank * dependents), ('max_ratio_bits', 1, WIDTH),
+        ('shared_scale_bits', 1, WIDTH), ('shared_integer_bits', 1, WIDTH - 32),
+        ('old_recurrence_bits', 33, WIDTH), ('shared_recurrence_bits', 33, WIDTH),
+        ('pivot_nonzeros', rank, rank**2), ('factor_off_diagonal_nonzeros', 1, rank * (rank - 1)),
+        ('integer_term_bytes', 1, 4096), ('modular_term_bytes', 1, 4096),
+        ('coordinate_bytes', 1, 4096),
+    ):
+        value = case.get(key)
+        base.require(type(value) is int and low <= value <= high, f'{key} range')
+    base.require((case['ratios_above_one'] == 0) == (case['max_ratio_bits'] == 1)
+                 and case['max_ratio_bits'] <= case['shared_scale_bits'], 'scale ratio counts')
+    base.require(case['shared_recurrence_bits'] >=
+                 max(case['old_recurrence_bits'], case['shared_integer_bits'] + 32), 'recurrence bound')
+    block = (case['pivot_nonzeros'] * case['integer_term_bytes']
+             + case['factor_off_diagonal_nonzeros'] * case['modular_term_bytes']
+             + 3 * rank * 4 + 3 * (rank + 1) * 8)
+    for key, expected in (
+        ('one_shared_block_logical_bytes', block),
+        ('duplicated_block_logical_bytes', (dependents - 1) * block),
+        ('copied_reference_logical_bytes', dependents * rank * case['coordinate_bytes']),
+    ):
+        base.integer(case.get(key), expected, key)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in (
+        'coefficient', 'full-certificate', 'cut-certificate', 'certificate-index',
+        'probe', 'base-runner', 'shared-runner', 'capacity-producer', 'study', 'output',
+    ):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args(argv)
+    shared = run_path(str(args.shared_runner))
+    shared['reject_output_aliases'](
+        args.output, (path for name, path in vars(args).items() if name != 'output'),
+    )
+    base = shared['load']('shared_pivot_base', args.base_runner)
+    capacity = shared['load']('shared_pivot_capacity', args.capacity_producer)
+    certificates = {'full': args.full_certificate, 'cut': args.cut_certificate}
+    study = json.loads(args.study.read_bytes())['cases']
+    index = json.loads(args.certificate_index.read_bytes())['certificates']
+    records = {}
+    for domain, (rows, rank) in DOMAINS.items():
+        prior = capacity.verify_input(args.coefficient, 4, 'quartic', domain, study)
+        base.require((prior['rows'], prior['columns'], prior['candidates'], prior['mod_rank'])
+                     == (rows, 933, CANDIDATES, rank), f'{domain} study dimensions')
+        matches = [
+            row for row in index
+            if (row['n'], row['shape'], row['domain'], row['row_order']) == (4, 'quartic', domain, 'sparse')
+        ]
+        base.require(len(matches) == 1, f'{domain} certificate selection')
+        record, = matches
+        cert = certificates[domain]
+        base.require(record['rank'] == rank and record['input_sha256'] == prior['input_sha256']
+                     and record['bytes'] == cert.stat().st_size and record['sha256'] == digest(cert),
+                     f'{domain} certificate identity')
+        records[domain] = record
+    probe = args.probe.resolve()
+    controls = base.invoke(probe, '--controls')
+    validate_controls(base, controls)
+    cases = []
+    for domain, cert in certificates.items():
+        case = base.invoke(probe, args.coefficient, cert, domain)
+        validate_case(base, case, domain)
+        cases.append({**case, 'certificate_sha256': records[domain]['sha256']})
+    base.publish(args.output, {
+        'schema': 'uvlas.pg-rank-shared-pivot-scale/1',
+        'n': 4, 'shape': 'quartic', 'row_order': 'sparse', 'prime': PRIME, 'width_cap_bits': WIDTH,
+        'probe_sha256': digest(probe), 'input_sha256': records['full']['input_sha256'],
+        'controls': controls, 'cases': cases,
+    })
+
+
+if __name__ == '__main__':
+    main()
