@@ -17,6 +17,8 @@ alwaysApply: true
 - ゲート `just trace-check` を通す。`docs/quality/traceability.md` は道具が書く。手で直さない。
 - コメントだけの変更でも、`include/`・`src/` 内の仕様IDの追加・削除は追跡表に影響する。`just trace-matrix` で再生成し、`just trace-check` で照合する。C++のトークンが不変という検査で代用しない。
 
+- PRを最新mainへ追従させて追跡表が競合した場合は、試験タグ・検証記録などの入力を統合してから `just trace-matrix` と `just trace-check` を実行する。既存CIの結果を引く場合は、検証済みheadと統合後を比較し、対象の本体・試験・ビルド設定・依存・CI設定を照合する。
+
 2026-11-15、PR #40でAPIコメントに仕様IDを追加した後、追跡表の再生成を省き、CIのTraceabilityが失敗した。
 
 ```text
