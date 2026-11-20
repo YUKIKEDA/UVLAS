@@ -142,7 +142,6 @@ TEST_CASE("File and Memory reference inputs retain one checked case and their ac
 
         const auto view = fixture::take(owned.view());
         REQUIRE(view.root != nullptr);
-        REQUIRE(view.manifest_identity);
         const auto identity = fixture::take(view.schema.identity());
         CHECK(identity.source.source == source);
         CHECK(identity.source.byte_count == static_case().size());
@@ -173,10 +172,14 @@ TEST_CASE("File and Memory reference inputs retain one checked case and their ac
 #endif
 
         core::ResourcePlan plan{fixture::budget};
-        const auto alias_path = fixture::take(
-            rd::normalize_reference_path("another-name.json", {64, 64, 1}, plan, {}, nullptr));
-        auto alias = fixture::take(view.root->open_file(alias_path, plan, {}));
-        CHECK(view.manifest_identity == fixture::take(alias.info()).identity);
+        if (const auto manifest_identity = view.manifest_identity) {
+            const auto alias_path = fixture::take(
+                rd::normalize_reference_path("another-name.json", {64, 64, 1}, plan, {}, nullptr));
+            auto alias = fixture::take(view.root->open_file(alias_path, plan, {}));
+            CHECK(fixture::take(alias.info()).identity == *manifest_identity);
+        } else {
+            FAIL("File input did not retain the manifest identity");
+        }
 
         const auto copy_path =
             fixture::take(rd::normalize_reference_path("copy.bin", {64, 64, 1}, plan, {}, nullptr));
