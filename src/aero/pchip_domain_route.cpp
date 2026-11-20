@@ -6,7 +6,6 @@
 #include <array>
 #include <bit>
 #include <limits>
-#include <optional>
 namespace uvlas::aero::detail::pchip {
 namespace domain_detail {
 using slot_detail::CheckedCount;
@@ -288,16 +287,23 @@ struct Builder {
         const auto inputs = periodic_inputs(source, query, period, details);
         if (!inputs)
             return std::unexpected(inputs.error());
-        std::array<std::optional<Slot>, 4> slots;
-        for (std::size_t i = 0; i < slots.size(); ++i) {
+        const auto import = [&](RationalView value) -> core::Result<Slot> {
             if (const auto visited = meter.visit(); !visited)
                 return std::unexpected(visited.error());
-            const auto imported = session.input((*inputs)[i]);
-            if (!imported)
-                return std::unexpected(imported.error());
-            slots[i] = *imported;
-        }
-        const auto& [time, cycle, first, last] = slots;
+            return session.input(value);
+        };
+        const auto time = import((*inputs)[0]);
+        if (!time)
+            return std::unexpected(time.error());
+        const auto cycle = import((*inputs)[1]);
+        if (!cycle)
+            return std::unexpected(cycle.error());
+        const auto first = import((*inputs)[2]);
+        if (!first)
+            return std::unexpected(first.error());
+        const auto last = import((*inputs)[3]);
+        if (!last)
+            return std::unexpected(last.error());
         const auto width = session.binary(RationalOp::Subtract, *last, *first);
         if (!width)
             return std::unexpected(width.error());
