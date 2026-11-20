@@ -657,6 +657,12 @@ uvlas_add_test(aero.pchip_domain
 target_include_directories(uvlas_test_aero_pchip_domain PRIVATE "${PROJECT_SOURCE_DIR}/src")
 target_compile_definitions(uvlas_test_aero_pchip_domain PRIVATE
     UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json")
+
+uvlas_add_test(aero.pchip_boundary
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_boundary_test.cpp
+    LIBS uvlas_aero Boost::multiprecision Threads::Threads)
+target_include_directories(uvlas_test_aero_pchip_boundary PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
     SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp
