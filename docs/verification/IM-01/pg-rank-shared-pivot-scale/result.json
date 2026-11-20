@@ -1,0 +1,75 @@
+{
+  "schema": "uvlas.pg-rank-shared-pivot-scale/1",
+  "n": 4,
+  "shape": "quartic",
+  "row_order": "sparse",
+  "prime": 2147483647,
+  "width_cap_bits": 512,
+  "probe_sha256": "52fc934cf228af48a36dbf3e4980c09330e39548c2370ac3e6d2d2f0440772b4",
+  "input_sha256": "f60df0b774db8eb2e4241fbd31c378d8d57d16587fc2aa771d1620a7e38a1ed8",
+  "controls": {
+    "digits": [
+      4,
+      1
+    ],
+    "old_rhs": [
+      -2,
+      -1
+    ],
+    "shared_rhs": [
+      -6,
+      -3
+    ],
+    "unit_ratio": 3,
+    "bad_prime_rejected": true,
+    "width_boundary_checked": true
+  },
+  "cases": [
+    {
+      "domain": "full",
+      "rows": 20032,
+      "candidates": 1496,
+      "rank": 774,
+      "dependents": 722,
+      "row_target_checks": 558828,
+      "ratios_above_one": 69712,
+      "max_ratio_bits": 3,
+      "shared_scale_bits": 110,
+      "shared_integer_bits": 122,
+      "old_recurrence_bits": 157,
+      "shared_recurrence_bits": 157,
+      "pivot_nonzeros": 39877,
+      "factor_off_diagonal_nonzeros": 56657,
+      "integer_term_bytes": 80,
+      "modular_term_bytes": 8,
+      "coordinate_bytes": 2064,
+      "one_shared_block_logical_bytes": 3671304,
+      "duplicated_block_logical_bytes": 2647010184,
+      "copied_reference_logical_bytes": 1153420992,
+      "certificate_sha256": "6e46aebbaa698a4c919d17d4b42781d996c8fb15f782c6c66a6883e63ed9c065"
+    },
+    {
+      "domain": "cut",
+      "rows": 5634,
+      "candidates": 1496,
+      "rank": 498,
+      "dependents": 998,
+      "row_target_checks": 497004,
+      "ratios_above_one": 50732,
+      "max_ratio_bits": 3,
+      "shared_scale_bits": 110,
+      "shared_integer_bits": 120,
+      "old_recurrence_bits": 153,
+      "shared_recurrence_bits": 153,
+      "pivot_nonzeros": 21097,
+      "factor_off_diagonal_nonzeros": 28912,
+      "integer_term_bytes": 80,
+      "modular_term_bytes": 8,
+      "coordinate_bytes": 2064,
+      "one_shared_block_logical_bytes": 1937008,
+      "duplicated_block_logical_bytes": 1931196976,
+      "copied_reference_logical_bytes": 1025816256,
+      "certificate_sha256": "13c3f1f2cac856d64dc4ad53132f1e38e8a7bd79fac7423d95f7065b0701b73e"
+    }
+  ]
+}
