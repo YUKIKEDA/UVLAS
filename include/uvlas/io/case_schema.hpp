@@ -12,6 +12,7 @@ namespace detail {
 struct SchemaContext;
 struct SiFactory;
 struct ReferenceDeclarationFactory;
+class ReferenceInput;
 } // namespace detail
 
 /// Logical limits are independent; zero permits none of the corresponding item.
@@ -218,6 +219,7 @@ private:
     explicit SchemaCase(core::PlannedBuffer<detail::SchemaData>) noexcept;
     friend struct detail::SiFactory;
     friend struct detail::ReferenceDeclarationFactory;
+    friend class detail::ReferenceInput;
     core::PlannedBuffer<detail::SchemaData> data_;
 };
 
