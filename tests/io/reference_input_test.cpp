@@ -176,7 +176,7 @@ TEST_CASE("File and Memory reference inputs retain one checked case and their ac
         const auto alias_path = fixture::take(
             rd::normalize_reference_path("another-name.json", {64, 64, 1}, plan, {}, nullptr));
         auto alias = fixture::take(view.root->open_file(alias_path, plan, {}));
-        CHECK(fixture::take(alias.info()).identity == *view.manifest_identity);
+        CHECK(view.manifest_identity == fixture::take(alias.info()).identity);
 
         const auto copy_path =
             fixture::take(rd::normalize_reference_path("copy.bin", {64, 64, 1}, plan, {}, nullptr));
@@ -305,6 +305,7 @@ TEST_CASE("Reference acquisition rejects invalid names, bytes, quota and cancell
         FAIL("File quota rejection did not retain its reason");
     }
 
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() is non-const.
     std::stop_source stopped;
     REQUIRE(stopped.request_stop());
     const auto before = plan.allocated_bytes();
