@@ -66,18 +66,36 @@ def validate_driver(base,record):
         base.require(type(value) is type(expected) and value==expected,f'driver {key} identity')
 
 
+def reject_output_aliases(output, inputs):
+    resolved_output = output.resolve()
+    output_exists = resolved_output.exists()
+    for path in inputs:
+        resolved_input = path.resolve()
+        if resolved_output == resolved_input or (
+            output_exists and resolved_input.exists() and resolved_output.samefile(resolved_input)
+        ):
+            raise ValueError(f'--output must be distinct from read-only input: {path}')
+
+
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['inputs','certificates','batch','base-runner','capacity-producer','study','certificate-index','driver-record','output']:
         p.add_argument('--'+name,type=Path,required=True)
-    args=p.parse_args(argv);base=load('batch_base',args.base_runner);capacity=load('capacity_v2',args.capacity_producer)
+    args=p.parse_args(argv)
+    source=args.inputs/'4-quartic.txt'
+    reject_output_aliases(args.output, (
+        args.driver_record, source, args.certificate_index, args.study,
+        args.batch, args.base_runner, args.capacity_producer,
+    ))
+    base=load('batch_base',args.base_runner);capacity=load('capacity_v2',args.capacity_producer)
     driver=json.loads(args.driver_record.read_text())
     validate_driver(base,driver)
-    source=args.inputs/'4-quartic.txt';study=json.loads(args.study.read_text())['cases']
-    capacity.verify_input(source,4,'quartic','cut',study)
     rows=[r for r in json.loads(args.certificate_index.read_text())['certificates']
           if (r['n'],r['shape'],r['domain'],r['row_order'])==(4,'quartic','cut','sparse')]
     base.require(len(rows)==1,'unique certificate');row=rows[0];certificate=args.certificates/row['file']
+    reject_output_aliases(args.output, (certificate,))
+    study=json.loads(args.study.read_text())['cases']
+    capacity.verify_input(source,4,'quartic','cut',study)
     base.require(certificate.stat().st_size==row['bytes'] and hashlib.sha256(certificate.read_bytes()).hexdigest()==row['sha256'],'certificate identity')
     base.require(hashlib.sha256(source.read_bytes()).hexdigest()==row['input_sha256'],'input identity')
     lines=certificate.read_text().splitlines()
