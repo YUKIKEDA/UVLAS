@@ -1,0 +1,86 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-periodic-time-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-03",
+  "issue": 209,
+  "date": "2026-11-20",
+  "source_commit": "e6407382f197a7ee2a5bffd9b48a8a61ad735732",
+  "claimed_state": "Private exact time reduction by a checked declared period. Seam value and slope qualification, side selection, and public curve generation are outside this component.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Catch2 3.16.1, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filter": "^aero\\.pchip_(domain|coefficients_resources)$",
+    "ctest_each_configuration": "2 passed out of 2",
+    "periodic_filter": "Private PCHIP periodic time*",
+    "catch_seed": 209,
+    "normal_each_configuration": "2 cases, 338 assertions",
+    "resource_each_configuration": "1 case, 59 assertions",
+    "independent_reference": "Boost cpp_int Euclidean remainders, 36 exact queries over three domains, tolerance 0. The seam jet for times (0,1,2,3) and values (0,1,-1,0) has common value 0 and derivative 5/2, with left and right second derivatives +4 and -4.",
+    "invalid_period": "Missing, zero, negative, noncanonical and mismatched by 2^-200",
+    "resource_boundaries": "Preflight without allocation; one-less input, intermediate, steps, slots and byte caps; all four allocation faults; cancellation at the last allocation; retry and old result preserved.",
+    "mutation": "Compile and link both isolated copies with MSVC Debug. In pchip_slot_integer.cpp replace if (in.sign < 0 && r.used() != 0) with if (false). Control Catch 0 with 288 assertions. Truncation Catch 42, first failing negative noninteger query after 8 successful assertions.",
+    "static": "Clang-format 21.1.2 and target clang-tidy 21.1.1, exit 0"
+  },
+  "source_records": [
+    {
+      "id": "pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "pchip_domain_route.cpp",
+      "hint": "src/aero/pchip_domain_route.cpp",
+      "sha256": "052413a00395f10b0c591ad6bed30450e61391493b96ab28bf42e621861c8999"
+    },
+    {
+      "id": "pchip_domain_route.hpp",
+      "hint": "src/aero/pchip_domain_route.hpp",
+      "sha256": "6b4ad68eeb3d66bc00bf27ebdf80de4169c71d764d2c0d419e0d0334a0d4e452"
+    },
+    {
+      "id": "pchip_rational_slots.cpp",
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7"
+    },
+    {
+      "id": "pchip_slot_integer.cpp",
+      "hint": "src/aero/pchip_slot_integer.cpp",
+      "sha256": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5"
+    },
+    {
+      "id": "pchip_domain_route_test.cpp",
+      "hint": "tests/aero/pchip_domain_route_test.cpp",
+      "sha256": "cc196d34f4b2f9fdd98e9e69929af65489ffc98a4f00a9e9cae60693ab4f0cfa"
+    },
+    {
+      "id": "pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "063522b52e68b087d2a8f7f9c735cbb623439116fccf8582a703cf3a47d2e82c"
+    },
+    {
+      "id": "CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "d6c79927e23b4492b7865350d6a2ecb6f832034b79f2e97375757ff1294ec97c"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "src/aero/pchip_domain_route.cpp": "052413a00395f10b0c591ad6bed30450e61391493b96ab28bf42e621861c8999",
+    "src/aero/pchip_domain_route.hpp": "6b4ad68eeb3d66bc00bf27ebdf80de4169c71d764d2c0d419e0d0334a0d4e452",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_slot_integer.cpp": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+    "tests/aero/pchip_domain_route_test.cpp": "cc196d34f4b2f9fdd98e9e69929af65489ffc98a4f00a9e9cae60693ab4f0cfa",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "063522b52e68b087d2a8f7f9c735cbb623439116fccf8582a703cf3a47d2e82c",
+    "tests/CMakeLists.txt": "d6c79927e23b4492b7865350d6a2ecb6f832034b79f2e97375757ff1294ec97c"
+  }
+}

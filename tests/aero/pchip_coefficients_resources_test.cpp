@@ -4,6 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cstddef>
@@ -816,4 +817,95 @@ TEST_CASE("Private PCHIP domain route cancels at the last allocation and rejects
         take(p::route_domain(source, hold_end_query, hold_policy, workspace, limits(), memory));
     CHECK(memory.allocated_bytes() == payload * 3);
     check_hold_endpoint(next);
+}
+
+TEST_CASE("Private PCHIP periodic time admits all four allocations before computing",
+          "[AE-07][N4-02][N4-03][N4-08][negative]") {
+    const auto source = prepare_interval_source();
+    const p::RationalView cycle{1, hold_end_numerator, half_numerator};
+    p::DomainWorkspace workspace;
+    const auto plan = [&] {
+        const FaultScope audit{0};
+        return p::forecast_periodic_time(source, midpoint.time, cycle, limits());
+    }();
+    REQUIRE(plan);
+    CHECK(attempts.load() == 0);
+    auto exact = limits();
+    exact.input_bits = 2;
+    exact.work_bits = plan->arithmetic().integer_bits();
+    exact.steps = plan->reserved_steps();
+    exact.slots = plan->arithmetic().slots();
+    const auto payload = plan->payload_bytes();
+    const auto call = [&](c::ResourcePlan& memory, p::RationalLimits cap,
+                          const std::stop_token& stop = {}) {
+        return p::normalize_periodic_time(source, midpoint.time, cycle, workspace, cap, memory,
+                                          stop, details());
+    };
+    c::ResourcePlan initial{payload};
+    const auto old = [&] {
+        const FaultScope audit{INT64_MAX};
+        return call(initial, exact);
+    }();
+    REQUIRE(old);
+    CHECK(attempts.load() == 4);
+    CHECK(initial.allocated_bytes() == payload);
+
+    std::uint64_t charged = 0;
+    for (std::int64_t fault = 0; fault < 4; ++fault) {
+        CAPTURE(fault);
+        c::ResourcePlan memory{payload};
+        const auto refused = [&] {
+            const FaultScope audit{fault};
+            return call(memory, exact);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(refused.error().details.model == details().model);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(fault + 1));
+        if (fault == 0)
+            CHECK(memory.allocated_bytes() == 0);
+        else
+            CHECK(memory.allocated_bytes() > charged);
+        CHECK(memory.allocated_bytes() < payload);
+        charged = memory.allocated_bytes();
+    }
+    std::array caps{exact, exact, exact, exact, exact};
+    --caps[0].input_bits;
+    --caps[1].work_bits;
+    --caps[2].steps;
+    --caps[3].slots;
+    for (std::size_t i = 0; i < caps.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{i == 4 ? payload - 1 : payload};
+        const auto refused = [&] {
+            const FaultScope audit{0};
+            return call(memory, caps[i]);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+    }
+
+    c::ResourcePlan retried{payload * 2};
+    std::stop_source stop;
+    cancel_source = &stop;
+    until_cancel = 4;
+    allocation_callback = cancel_last;
+    const auto cancelled = call(retried, exact, stop.get_token());
+    allocation_callback = nullptr;
+    cancel_source = nullptr;
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == c::FailureCode::Cancelled);
+    CHECK(retried.allocated_bytes() == payload);
+    const auto again = take(call(retried, exact));
+    CHECK(retried.allocated_bytes() == payload * 2);
+    const auto a = take(old->time());
+    const auto b = take(again.time());
+    CHECK(a.sign == midpoint.time.sign);
+    CHECK(b.sign == a.sign);
+    CHECK(std::ranges::equal(a.numerator, midpoint.time.numerator));
+    CHECK(std::ranges::equal(a.denominator, midpoint.time.denominator));
+    CHECK(std::ranges::equal(b.numerator, a.numerator));
+    CHECK(std::ranges::equal(b.denominator, a.denominator));
 }

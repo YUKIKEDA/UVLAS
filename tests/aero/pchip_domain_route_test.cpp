@@ -6,9 +6,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <nlohmann/json.hpp>
 
+#include <array>
 #include <fstream>
 #include <future>
 #include <map>
+#include <utility>
 #include <vector>
 namespace {
 namespace p = uvlas::aero::detail::pchip;
@@ -207,4 +209,98 @@ TEST_CASE("Private PCHIP domain rejects invalid inputs and preserves scalar",
     const auto inactive = p::forecast_domain(source, input.view(), p::DomainPolicy::Hold, limits());
     REQUIRE_FALSE(inactive);
     CHECK(inactive.error().code == core::FailureCode::InvalidInput);
+}
+
+TEST_CASE("Private PCHIP periodic time agrees with an exact Euclidean remainder",
+          "[AE-07][N4-02][N4-03][N4-06][verification]") {
+    // AE-07 exact comparisons have zero tolerance.
+    const Rat small = Rat{1} / (Big{1} << 100);
+    const Rat large{Big{1} << 120};
+    const std::array<std::pair<Rat, Rat>, 3> domains{
+        std::pair{Rat{-4}, Rat{3}}, std::pair{Rat{0}, Rat{5} / 7}, std::pair{large, small}};
+    const std::array<Rat, 12> offsets{Rat{-1000},      Rat{-2} - small, Rat{-2},
+                                      Rat{-2} + small, Rat{-1} / 3,     Rat{0},
+                                      small,           Rat{1} / 3,      Rat{1} - small,
+                                      Rat{1},          Rat{1} + small,  Rat{100000} + Rat{2} / 3};
+    p::DomainWorkspace workspace;
+    for (const auto& [origin, period] : domains) {
+        const Rat last = origin + period;
+        const auto source = coefficients(
+            {origin, origin + period / 3, origin + 2 * period / 3, last}, {0, 1, -1, 0});
+        const Input cycle{period};
+        for (const auto& ratio : offsets) {
+            CAPTURE(origin, period, ratio);
+            const Big denominator = boost::multiprecision::denominator(ratio);
+            Big remainder = boost::multiprecision::numerator(ratio) % denominator;
+            if (remainder < 0)
+                remainder += denominator;
+            const Rat expected = origin + period * remainder / denominator;
+            const Input query{origin + period * ratio};
+            const auto plan =
+                take(p::forecast_periodic_time(source, query.view(), cycle.view(), limits()));
+            core::ResourcePlan memory{plan.payload_bytes()};
+            const auto actual = take(p::normalize_periodic_time(source, query.view(), cycle.view(),
+                                                                workspace, limits(), memory));
+            CHECK(decoded(take(actual.time())) == expected);
+            CHECK(actual.is_seam() == (remainder == 0));
+            CHECK(actual.used_steps() <= plan.reserved_steps());
+            CHECK(memory.allocated_bytes() == plan.payload_bytes());
+        }
+    }
+}
+
+TEST_CASE("Private PCHIP periodic time keeps exact seam endpoints and rejects a wrong period",
+          "[AE-07][N4-03][N4-06][verification][negative]") {
+    auto source = coefficients({0, 1, 2, 3}, {0, 1, -1, 0});
+    const auto normalize = [&](p::RationalView query, p::RationalView period) {
+        p::DomainWorkspace workspace;
+        core::ResourcePlan memory{UINT64_MAX};
+        return p::normalize_periodic_time(source, query, period, workspace, limits(), memory);
+    };
+    const Input query{Rat{-6}};
+    const Input period{Rat{3}};
+    const auto normalized = take(normalize(query.view(), period.view()));
+    REQUIRE(normalized.is_seam());
+    const auto right = take(normalized.time());
+    const auto left = take(source.time(source.nodes() - 1));
+    p::LocatorWorkspace locator;
+    core::ResourcePlan location_memory{UINT64_MAX};
+    const auto right_location =
+        take(p::locate_time(source, right, locator, limits(), location_memory));
+    const auto left_location =
+        take(p::locate_time(source, left, locator, limits(), location_memory));
+    CHECK(take(right_location.knot_index()) == 0);
+    CHECK(take(left_location.knot_index()) == 3);
+    p::IntervalWorkspace interval_workspace;
+    core::ResourcePlan interval_memory{UINT64_MAX};
+    const auto right_jet = take(p::evaluate_interval(
+        source, {take(right_location.right_interval()), right, p::JetOrder::Second},
+        interval_workspace, limits(), interval_memory));
+    const auto left_jet = take(p::evaluate_interval(
+        source, {take(left_location.left_interval()), left, p::JetOrder::Second},
+        interval_workspace, limits(), interval_memory));
+    CHECK(decoded(take(right_jet.derivative(0, p::JetOrder::Value))) == 0);
+    CHECK(decoded(take(left_jet.derivative(0, p::JetOrder::Value))) == 0);
+    CHECK(decoded(take(right_jet.derivative(0, p::JetOrder::First))) == Rat{5} / 2);
+    CHECK(decoded(take(left_jet.derivative(0, p::JetOrder::First))) == Rat{5} / 2);
+    CHECK(decoded(take(right_jet.derivative(0, p::JetOrder::Second))) == -4);
+    CHECK(decoded(take(left_jet.derivative(0, p::JetOrder::Second))) == 4);
+    const std::array<std::uint32_t, 1> six{6}, two{2};
+    const p::RationalView noncanonical{1, six, two};
+    const Input zero{Rat{0}}, negative{Rat{-3}}, mismatch{Rat{3} + Rat{1} / (Big{1} << 200)};
+    for (const auto invalid :
+         {p::RationalView{}, zero.view(), negative.view(), mismatch.view(), noncanonical}) {
+        const auto refused = normalize(query.view(), invalid);
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == core::FailureCode::InvalidInput);
+    }
+    auto owner = take(normalize(query.view(), period.view()));
+    auto moved = std::move(owner);
+    // An empty owner after a move is an explicit part of the private result contract.
+    // NOLINTBEGIN(bugprone-use-after-move)
+    REQUIRE_FALSE(owner.time());
+    CHECK_FALSE(owner.is_seam());
+    // NOLINTEND(bugprone-use-after-move)
+    source = coefficients({0, 1}, {0, 0});
+    CHECK(decoded(take(moved.time())) == 0);
 }
