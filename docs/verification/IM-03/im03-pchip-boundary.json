@@ -1,0 +1,99 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-boundary-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 216,
+  "date": "2026-11-20",
+  "source_commit": "afddcd2b8c38a8d5f758cc0fa601e2426dc49b8c",
+  "claimed_state": "Private exact validation of the requested C1 domain and Hold/Periodic boundaries. No derivative-side selection, qualified curve identity, restart or physical provider.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filter": "^aero\\.pchip_(boundary|coefficients_resources)$",
+    "ctest_each_configuration": "2 passed out of 2",
+    "catch_seed": 216,
+    "normal_each_configuration": "3 cases, 955 assertions",
+    "resource_each_configuration": "1 case, 71 assertions matching Private PCHIP boundary*",
+    "independent_reference": "Boost cpp_rational comparisons over all 49 ordered/reversed endpoint pairs for each fixture and independent derivatives from endpoint secants; exact tolerance 0. For unequal endpoint widths 1 and 2, the accepted case has physical slopes (2,2) with normalized derivatives (2,4).",
+    "domain_controls": "Closed singleton and ordered intervals, endpoints with neighbors at 2^-200, both Hold endpoints separately and together, constant and nonconstant samples, full components, explicit canonical period including noncanonical/missing/zero/negative or width difference at 2^-200.",
+    "simultaneous_admission": "The nonallocating count covers both Hold endpoint branches. Exact execution inspects one or both slopes only when the closed requested interval contains the corresponding endpoint.",
+    "resource_controls": "Preflight allocates zero times; admitted execution makes exactly three allocations, all subject to fault injection. At-limit, one-less input/work bits, steps, slots and bytes; simultaneous malformed request and pre-stop; valid pre-stop; late stop and allocator reentry. Older result/coefficients survive and retry succeeds. Independent workspaces agree under 1/2/4 threads.",
+    "mutation": "Compiled and linked byte-identical source copies and replaced the second physical slope operand with the first only in the mutation. Control Catch exit 0 (59 assertions); modified Catch exit 42 (11 assertions passed, 1 failed): seam values equal and physical slopes 2 versus 3/2.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on the three changed translation units, exit 0"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "hint": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "sha256": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f"
+    },
+    {
+      "id": "src/aero/pchip_coefficients.cpp",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682"
+    },
+    {
+      "id": "src/aero/pchip_rational_slots.cpp",
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7"
+    },
+    {
+      "id": "src/aero/pchip_boundary.cpp",
+      "hint": "src/aero/pchip_boundary.cpp",
+      "sha256": "2a7c748a5eded80d63bcdc78cbda921dca76cfe6abfbca3261324a53ef1535ea"
+    },
+    {
+      "id": "src/aero/pchip_boundary.hpp",
+      "hint": "src/aero/pchip_boundary.hpp",
+      "sha256": "932647e0bea58f7204aca1639fd2ea8e9b326ea54fbe5312b3a638db12ab1c8b"
+    },
+    {
+      "id": "tests/aero/pchip_boundary_test.cpp",
+      "hint": "tests/aero/pchip_boundary_test.cpp",
+      "sha256": "3e55c5987d19ae1d4c27958a3c7ad4d40661b94cd3090e5bb7a3bad61f05d0a5"
+    },
+    {
+      "id": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "bd2b5a757eedc3aa20b02c92fe05618ac7218c7e6a13a21e23dae1c1760a8323"
+    },
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "630f135b329cdd5b6777bf2b45cecafbcd6448c38b341182e6621fec0d8ddce0"
+    },
+    {
+      "id": "tests/CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "fe8e718cdc8d9e4146aeb90edbdf83a42a2258d638c2ebe0bd0b9af51bcd0ae7"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f",
+    "src/aero/pchip_coefficients.cpp": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_boundary.cpp": "2a7c748a5eded80d63bcdc78cbda921dca76cfe6abfbca3261324a53ef1535ea",
+    "src/aero/pchip_boundary.hpp": "932647e0bea58f7204aca1639fd2ea8e9b326ea54fbe5312b3a638db12ab1c8b",
+    "tests/aero/pchip_boundary_test.cpp": "3e55c5987d19ae1d4c27958a3c7ad4d40661b94cd3090e5bb7a3bad61f05d0a5",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "bd2b5a757eedc3aa20b02c92fe05618ac7218c7e6a13a21e23dae1c1760a8323",
+    "CMakeLists.txt": "630f135b329cdd5b6777bf2b45cecafbcd6448c38b341182e6621fec0d8ddce0",
+    "tests/CMakeLists.txt": "fe8e718cdc8d9e4146aeb90edbdf83a42a2258d638c2ebe0bd0b9af51bcd0ae7"
+  }
+}
