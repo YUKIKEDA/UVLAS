@@ -2,6 +2,7 @@
 #include "aero/pchip_domain_route.hpp"
 #include "aero/pchip_interval_jet.hpp"
 #include "aero/pchip_knot_locator.hpp"
+#include "aero/pchip_preparation_input.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1062,4 +1063,142 @@ TEST_CASE("Private PCHIP boundary admits its entire arena and isolates faults",
         CHECK(value.numerator.empty());
         CHECK(std::ranges::equal(value.denominator, fixture.one));
     }
+}
+
+namespace {
+constexpr p::PchipInputStamp preparation_stamp{p::PchipIssuerId{17}, p::PchipInputGeneration{3}};
+constexpr std::array<uvlas::numerics::SiDimension, 1> preparation_dimensions{
+    {{{1, 0, -1, 0, 0, 0, 0}}}};
+
+struct PreparationReentry {
+    const p::PreparationRequest& request;
+    p::PreparationWorkspace& workspace;
+    c::ResourcePlan& memory;
+    std::optional<c::Failure> failure;
+};
+
+constinit PreparationReentry* pending_preparation = nullptr;
+
+void try_preparation_reentry() {
+    auto& item = *pending_preparation;
+    const auto result = p::make_preparation_input(item.request, item.workspace, limits(),
+                                                  item.memory, {}, details());
+    if (!result)
+        item.failure = result.error();
+}
+} // namespace
+
+TEST_CASE("Private PCHIP preparation input preflights storage and retains old owners",
+          "[AE-07][N4-02][N4-03][N4-08][N4-09][negative]") {
+    const Fixture fixture;
+    const p::PreparationRequest request{fixture.view(),
+                                        preparation_dimensions,
+                                        {fixture.t.front(), fixture.t.back(), p::RejectBoundary{}},
+                                        {},
+                                        preparation_stamp};
+    p::PreparationWorkspace workspace;
+    const auto plan = [&] {
+        const FaultScope audit{0};
+        return p::forecast_preparation_input(request, limits());
+    }();
+    REQUIRE(plan);
+    CHECK(attempts.load() == 0);
+
+    auto exact = limits();
+    exact.input_bits = 3;
+    exact.work_bits = plan->arithmetic().integer_bits();
+    exact.slots = plan->arithmetic().slots();
+    exact.steps = plan->reserved_steps();
+    const auto payload = plan->payload_bytes();
+    constexpr std::int64_t allocations = 7;
+    const auto make = [&](c::ResourcePlan& memory, p::RationalLimits cap,
+                          const std::stop_token& stop = {}) {
+        return p::make_preparation_input(request, workspace, cap, memory, stop, details());
+    };
+    c::ResourcePlan charged{payload};
+    const auto initial = [&] {
+        const FaultScope audit{INT64_MAX};
+        return make(charged, exact);
+    }();
+    REQUIRE(initial);
+    CHECK(attempts.load() == static_cast<std::uint64_t>(allocations));
+    CHECK(charged.allocated_bytes() == payload);
+    CHECK(initial->used_steps() <= exact.steps);
+    const auto before = take(initial->view());
+
+    std::uint64_t previous = 0;
+    for (std::int64_t fault = 0; fault < allocations; ++fault) {
+        CAPTURE(fault);
+        c::ResourcePlan memory{payload};
+        const auto refused = [&] {
+            const FaultScope audit{fault};
+            return make(memory, exact);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(refused.error().details.component == details().component);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(fault + 1));
+        CHECK(memory.allocated_bytes() < payload);
+        if (fault == 0)
+            CHECK(memory.allocated_bytes() == 0);
+        else
+            CHECK(memory.allocated_bytes() > previous);
+        previous = memory.allocated_bytes();
+    }
+
+    std::array caps{exact, exact, exact, exact, exact};
+    --caps[0].input_bits;
+    --caps[1].work_bits;
+    --caps[2].steps;
+    --caps[3].slots;
+    for (std::size_t i = 0; i < caps.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{i == 4 ? payload - 1 : payload};
+        const auto refused = [&] {
+            const FaultScope audit{0};
+            return make(memory, caps[i]);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+    }
+
+    c::ResourcePlan retried{payload * 2};
+    std::stop_source stop;
+    cancel_source = &stop;
+    until_cancel = static_cast<unsigned>(allocations);
+    allocation_callback = cancel_last;
+    const auto cancelled = make(retried, exact, stop.get_token());
+    allocation_callback = nullptr;
+    cancel_source = nullptr;
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == c::FailureCode::Cancelled);
+    CHECK(cancelled.error().details == details());
+    CHECK(retried.allocated_bytes() == payload);
+
+    PreparationReentry context{request, workspace, retried, {}};
+    pending_preparation = &context;
+    allocation_callback = try_preparation_reentry;
+    const auto retry = make(retried, exact);
+    allocation_callback = nullptr;
+    pending_preparation = nullptr;
+    REQUIRE(retry);
+    if (context.failure) {
+        CHECK(context.failure->code == c::FailureCode::InvalidInput);
+        CHECK(context.failure->details == details());
+    } else {
+        FAIL("The preparation workspace accepted reentry");
+    }
+    CHECK(retried.allocated_bytes() == payload * 2);
+    const auto compare = [&] {
+        const FaultScope audit{0};
+        return p::match_preparation_input(*initial, *retry, UINT64_MAX);
+    }();
+    CHECK(compare.has_value());
+    CHECK(attempts.load() == 0);
+    const auto after = take(initial->view());
+    CHECK(before.samples.times.data() == after.samples.times.data());
+    CHECK(before.stamp == after.stamp);
+    CHECK(std::ranges::equal(after.samples.values.back().numerator, fixture.four));
 }

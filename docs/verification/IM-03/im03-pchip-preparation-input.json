@@ -1,0 +1,105 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-preparation-input-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 232,
+  "date": "2026-11-20",
+  "source_commit": "c45ae02daedd15f58ea750c80815123ca10ef993",
+  "claimed_state": "Private owned exact PCHIP preparation input and full stamp/content matching. No qualified curve, restart or physical provider.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filter": "^aero\\.pchip_(preparation_input|coefficients_resources)$",
+    "ctest_each_configuration": "2 passed out of 2",
+    "independent_reference": "Boost cpp_rational exact comparisons with source definitions and ordered fixtures; tolerance 0. Coefficient and boundary checks consume only the owned sample and policy views.",
+    "ownership_and_identity": "Borrow/workspace/plan destruction, moved-from rejection, separately owned equal content, zero-valued strong stamps, issuer/generation mismatch, changed sample time/value, dimension, policy, demand ends and events. Low-word exact differences tested with 2^-200. Keeps outside-demand declared events and does not invent events for knots.",
+    "input_validation": "Strictly increasing canonical time and event sequences, closed demand order, canonical explicit positive period equal to knot width; absent or purely low-word wrong periods rejected. Bad sample shape or noncanonical words are rejected.",
+    "resource_controls": "Forecast makes zero allocation attempts. Seven whole-call allocations, fault injection at each, one-less budgets for bits, work, slots and bytes, last-allocation cancellation, reentry and retry with old owners preserved. Equality makes zero allocations, checks exact/one-less work and agrees under 1/2/4 threads.",
+    "catch_seed": 232,
+    "catch_normal_each_configuration": "3 cases, 114 assertions",
+    "catch_audit_each_configuration": "1 case, 81 assertions matching Private PCHIP preparation input preflights*",
+    "mutation": "Isolated byte-identical control and mutation compiled/linked with MSVC Debug. Mutation replaces whole stamp comparison with issuer-only comparison. Control exit 0 (45 assertions), mutation exit 42 (8 assertions passed, 1 failed for equal content with a different generation).",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on the three changed translation units, exit 0"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "hint": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "sha256": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.cpp",
+      "hint": "src/aero/pchip_preparation_input.cpp",
+      "sha256": "7032d5a3de9fbc5ead552cd8945be878ce85ee32285408b8f68840ad4046c4dd"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.hpp",
+      "hint": "src/aero/pchip_preparation_input.hpp",
+      "sha256": "f5ee95ca703464fa1990ba1deb2cebbedf9c14d5e12d510d69af298be5e64433"
+    },
+    {
+      "id": "src/aero/pchip_coefficients.cpp",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682"
+    },
+    {
+      "id": "src/aero/pchip_rational_slots.cpp",
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7"
+    },
+    {
+      "id": "src/aero/pchip_boundary.cpp",
+      "hint": "src/aero/pchip_boundary.cpp",
+      "sha256": "65cfd2c45a03d5996e83c94611d96d176d31cdd707763a24ac4264fdcbc4065b"
+    },
+    {
+      "id": "tests/aero/pchip_preparation_input_test.cpp",
+      "hint": "tests/aero/pchip_preparation_input_test.cpp",
+      "sha256": "9f34d5a369a4d61f20bda97acadad64c1ab69a469ea727c0828cfa608bf247b2"
+    },
+    {
+      "id": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "79eaeadc7cdbdb68348632d162dc13bc2730752b9306cfd210eb96f83dcfa311"
+    },
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "266a688a6ceefb27348c5062eccb8788bf1a61b8a8e2ea12eb949a164c8538ad"
+    },
+    {
+      "id": "tests/CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "43b766fa6ba7621f6cac673efb50bf834590703bf8bb58c933840fd34185eb8f"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f",
+    "src/aero/pchip_preparation_input.cpp": "7032d5a3de9fbc5ead552cd8945be878ce85ee32285408b8f68840ad4046c4dd",
+    "src/aero/pchip_preparation_input.hpp": "f5ee95ca703464fa1990ba1deb2cebbedf9c14d5e12d510d69af298be5e64433",
+    "src/aero/pchip_coefficients.cpp": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_boundary.cpp": "65cfd2c45a03d5996e83c94611d96d176d31cdd707763a24ac4264fdcbc4065b",
+    "tests/aero/pchip_preparation_input_test.cpp": "9f34d5a369a4d61f20bda97acadad64c1ab69a469ea727c0828cfa608bf247b2",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "79eaeadc7cdbdb68348632d162dc13bc2730752b9306cfd210eb96f83dcfa311",
+    "CMakeLists.txt": "266a688a6ceefb27348c5062eccb8788bf1a61b8a8e2ea12eb949a164c8538ad",
+    "tests/CMakeLists.txt": "43b766fa6ba7621f6cac673efb50bf834590703bf8bb58c933840fd34185eb8f"
+  }
+}
