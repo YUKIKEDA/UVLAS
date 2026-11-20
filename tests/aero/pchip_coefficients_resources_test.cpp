@@ -1,3 +1,4 @@
+#include "aero/pchip_boundary.hpp"
 #include "aero/pchip_domain_route.hpp"
 #include "aero/pchip_interval_jet.hpp"
 #include "aero/pchip_knot_locator.hpp"
@@ -908,4 +909,157 @@ TEST_CASE("Private PCHIP periodic time admits all four allocations before comput
     CHECK(std::ranges::equal(a.denominator, midpoint.time.denominator));
     CHECK(std::ranges::equal(b.numerator, a.numerator));
     CHECK(std::ranges::equal(b.denominator, a.denominator));
+}
+
+namespace {
+struct BoundaryReentry {
+    const p::CoefficientBlock& source;
+    p::BoundaryRequest request;
+    p::BoundaryWorkspace& workspace;
+    c::ResourcePlan& memory;
+    std::optional<c::Failure> failure;
+};
+constinit BoundaryReentry* pending_boundary_reentry = nullptr;
+
+void try_boundary_reentry() {
+    auto& entry = *pending_boundary_reentry;
+    const auto result = p::check_boundary(entry.source, entry.request, entry.workspace, limits(),
+                                          entry.memory, {}, details());
+    if (!result)
+        entry.failure = result.error();
+}
+} // namespace
+
+TEST_CASE("Private PCHIP boundary admits its entire arena and isolates faults",
+          "[AE-07][N4-02][N4-03][N4-08][N4-09][negative]") {
+    Fixture fixture;
+    fixture.y.fill(fixture.y.front());
+    p::CoefficientWorkspace coefficients;
+    c::ResourcePlan source_memory{UINT64_MAX};
+    const auto source =
+        take(p::prepare_coefficients(fixture.view(), coefficients, limits(), source_memory));
+    const p::BoundaryRequest request{fixture.t.front(), fixture.t.back(),
+                                     p::PeriodicBoundary{fixture.t.back()}};
+    const auto plan = [&] {
+        const FaultScope audit{0};
+        return p::forecast_boundary(source, request, limits());
+    }();
+    REQUIRE(plan);
+    CHECK(attempts.load() == 0);
+    auto exact = limits();
+    exact.input_bits = 2;
+    exact.work_bits = plan->arithmetic().integer_bits();
+    exact.steps = plan->reserved_steps();
+    exact.slots = plan->arithmetic().slots();
+    const auto payload = plan->payload_bytes();
+    constexpr std::int64_t allocations = 3;
+
+    p::BoundaryWorkspace workspace;
+    const auto call = [&](c::ResourcePlan& memory, p::RationalLimits cap,
+                          const std::stop_token& stop = {}) {
+        return p::check_boundary(source, request, workspace, cap, memory, stop, details());
+    };
+    c::ResourcePlan initial{payload};
+    const auto result = [&] {
+        const FaultScope audit{INT64_MAX};
+        return call(initial, exact);
+    }();
+    REQUIRE(result);
+    CHECK(attempts.load() == static_cast<std::uint64_t>(allocations));
+    CHECK(initial.allocated_bytes() == payload);
+    CHECK(result->slots == exact.slots);
+    CHECK(result->steps <= exact.steps);
+
+    std::uint64_t previous_charge = 0;
+    for (std::int64_t fault = 0; fault < allocations; ++fault) {
+        CAPTURE(fault);
+        c::ResourcePlan memory{payload};
+        const auto rejected = [&] {
+            const FaultScope audit{fault};
+            return call(memory, exact);
+        }();
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(rejected.error().details.component == details().component);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(fault + 1));
+        CHECK(memory.allocated_bytes() < payload);
+        if (fault == 0)
+            CHECK(memory.allocated_bytes() == 0);
+        else
+            CHECK(memory.allocated_bytes() > previous_charge);
+        previous_charge = memory.allocated_bytes();
+    }
+
+    std::array caps{exact, exact, exact, exact, exact};
+    --caps[0].input_bits;
+    --caps[1].work_bits;
+    --caps[2].steps;
+    --caps[3].slots;
+    for (std::size_t i = 0; i < caps.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{i == 4 ? payload - 1 : payload};
+        const auto rejected = [&] {
+            const FaultScope audit{0};
+            return call(memory, caps[i]);
+        }();
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+    }
+
+    c::ResourcePlan retried{payload * 2};
+    std::stop_source stop;
+    cancel_source = &stop;
+    until_cancel = static_cast<unsigned>(allocations);
+    allocation_callback = cancel_last;
+    const auto cancellation = call(retried, exact, stop.get_token());
+    allocation_callback = nullptr;
+    cancel_source = nullptr;
+    REQUIRE_FALSE(cancellation);
+    CHECK(cancellation.error().code == c::FailureCode::Cancelled);
+    CHECK(cancellation.error().details == details());
+    CHECK(retried.allocated_bytes() == payload);
+
+    auto malformed = request;
+    malformed.end = {};
+    c::ResourcePlan unused{payload};
+    const auto stopped_before_work = [&] {
+        const FaultScope audit{0};
+        return call(unused, exact, stop.get_token());
+    }();
+    REQUIRE_FALSE(stopped_before_work);
+    CHECK(stopped_before_work.error().code == c::FailureCode::Cancelled);
+    CHECK(attempts.load() == 0);
+    const auto malformed_before_stop = [&] {
+        const FaultScope audit{0};
+        return p::check_boundary(source, malformed, workspace, exact, unused, stop.get_token());
+    }();
+    REQUIRE_FALSE(malformed_before_stop);
+    CHECK(malformed_before_stop.error().code == c::FailureCode::InvalidInput);
+    CHECK(attempts.load() == 0);
+    CHECK(unused.allocated_bytes() == 0);
+
+    BoundaryReentry entry{source, request, workspace, retried, {}};
+    pending_boundary_reentry = &entry;
+    allocation_callback = try_boundary_reentry;
+    const auto after_failure = call(retried, exact);
+    allocation_callback = nullptr;
+    pending_boundary_reentry = nullptr;
+    if (entry.failure) {
+        CHECK(entry.failure->code == c::FailureCode::InvalidInput);
+        CHECK(entry.failure->details == details());
+    } else {
+        FAIL("The boundary workspace accepted a nested call");
+    }
+    REQUIRE(after_failure);
+    CHECK(after_failure->slots == result->slots);
+    CHECK(after_failure->steps == result->steps);
+    CHECK(retried.allocated_bytes() == payload * 2);
+    for (std::uint64_t knot = 0; knot < source.nodes(); ++knot) {
+        const auto value = take(source.value(knot, 0));
+        CHECK(value.sign == 0);
+        CHECK(value.numerator.empty());
+        CHECK(std::ranges::equal(value.denominator, fixture.one));
+    }
 }
