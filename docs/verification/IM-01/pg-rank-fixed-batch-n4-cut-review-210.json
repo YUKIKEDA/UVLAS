@@ -1,0 +1,22 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-batch-n4-cut-review-210",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 206,
+  "parent_issue": 140,
+  "source_commit": "d203779ad349a4fa1b26b1867399b1f86aa49b77",
+  "date": "2026-11-20",
+  "claimed_state": "出力先と8入力の衝突24件を通常モードと最適化モードで計算前に拒否。入力のバイト列を保持。既存の全1496候補の列別診断SHA-256を再現。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut.json": "88af06689f32afcd7dfc26264aa5075f20007dee49aa69f3d305aeb1fffe3485",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "699bf1f80bc9351fed420e473b5babb69a8704d9cec1cfebae7e36734f62825b"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/review-210-original-manifest.json.txt": "d0c53f0a5ede2995f7e719f351bd90da51744933e8aaa55654acf602d0577008",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/review-210-probe.py.txt": "3b4194a3f0375def63d8a51614686896af59e37fa805aa6b0c0fb6ef7dd48cb4",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/review-210-correction.md": "5c767249c9663bd033f112244770065fae7b3361b2f826cc84e8bc4916e2c286"
+  }
+}

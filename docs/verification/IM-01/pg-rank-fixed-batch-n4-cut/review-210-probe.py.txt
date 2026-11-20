@@ -1,0 +1,83 @@
+"""Check that the n4 runner rejects output aliases before invoking the batch."""
+
+import argparse
+import json
+from pathlib import Path
+import shutil
+import tempfile
+from unittest.mock import Mock, patch
+from runpy import run_path
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, required=True)
+    root = parser.parse_args().root.resolve()
+    evidence = root / 'docs/verification/IM-01'
+    case_dir = evidence / 'pg-rank-fixed-batch-n4-cut'
+    runner = run_path(str(case_dir / 'run-case.py.txt'))
+    original_load = runner['load']
+    batch = Mock(side_effect=AssertionError('batch invoked for an output collision'))
+
+    def load(name, path):
+        module = original_load(name, path)
+        if name == 'batch_base':
+            module.invoke = batch
+        return module
+
+    fixtures = {
+        'driver-record': case_dir / 'driver.json',
+        'base-runner': evidence / 'pg-rank-fixed-batch/run-batch.py.txt',
+        'capacity-producer': evidence / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt',
+        'study': evidence / 'pg-rank-resource-study/results.json',
+        'certificate-index': evidence / 'pg-rank-fixed-certificate/certificate-index.json',
+        'coefficient': root / 'out/issue140-scratch/4-quartic.txt',
+        'certificate': root / 'out/issue164-fixed-verifier/4-quartic-cut.cert',
+    }
+
+    passed = []
+    with tempfile.TemporaryDirectory() as scratch:
+        directory = Path(scratch)
+        copies = {key: directory / source.name for key, source in fixtures.items()}
+        for key, source in fixtures.items():
+            shutil.copyfile(source, copies[key])
+        copies['batch'] = directory / 'batch.exe'
+        copies['batch'].write_bytes(b'batch sentinel')
+        argv = ['--inputs', str(directory), '--certificates', str(directory)]
+        for key, path in copies.items():
+            if key not in ('coefficient', 'certificate'):
+                argv.extend((f'--{key}', str(path)))
+
+        alternate = directory / 'alternate'
+        alternate.mkdir()
+        link = directory / 'linked-output'
+        run = runner['main']
+        with patch.dict(run.__globals__, load=load):
+            for key, target in copies.items():
+                link.hardlink_to(target)
+                outputs = {
+                    'direct': target,
+                    'alternate path': alternate / '..' / target.name,
+                    'hard link': link,
+                }
+                original = target.read_bytes()
+                for mode, output in outputs.items():
+                    try:
+                        run([*argv, '--output', str(output)])
+                    except ValueError as error:
+                        if str(error) != f'--output must be distinct from read-only input: {target}':
+                            raise
+                    else:
+                        raise AssertionError(f'{key}: accepted {mode}')
+                    batch.assert_not_called()
+                    if target.read_bytes() != original or output.read_bytes() != original:
+                        raise AssertionError(f'{key}: bytes changed through {mode}')
+                    if not link.samefile(target) or list(directory.glob('.*.tmp')):
+                        raise AssertionError(f'{key}: file replaced or temporary file left')
+                    passed.append(f'{key}: {mode}')
+                link.unlink()
+    print(json.dumps({'passed': len(passed), 'collisions': passed, 'batch_calls': batch.call_count}, indent=2))
+
+
+if __name__ == '__main__':
+    main()

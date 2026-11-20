@@ -1,0 +1,114 @@
+"""Validate one n4 quartic/cut fixed batch using the unchanged arithmetic."""
+import argparse
+from collections import Counter
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+from pathlib import Path
+
+
+def load(name,path):
+    loader=importlib.machinery.SourceFileLoader(name,str(path))
+    spec=importlib.util.spec_from_loader(name,loader)
+    module=importlib.util.module_from_spec(spec);loader.exec_module(module)
+    return module
+
+
+def validate(base,result,selected,first=False):
+    require=base.require;integer=base.integer
+    require(isinstance(result,dict),'result object')
+    for key,value in {'status':0,'rows':5634,'candidates':1496,'rank':498,'heap_attempts':0,
+                      'failed_column':4294967295,'selected':0 if first else 498,
+                      'dependent':1 if first else 998,'proof_rows':5634 if first else 8428464,
+                      'coordinate_checks':498 if first else 745008}.items():
+        integer(result.get(key),value,key)
+    for key,limit in [('payload_bytes',48*1024**3),('defined_events',2_000_000_000),('integer_bits',1536)]:
+        v=result.get(key);require(type(v) is int and 0<v<=limit,f'{key} limit')
+    for key,minimum in [('proof_products',0),('batch_ms',0),('process_peak_bytes',1)]:
+        value=result.get(key);require(type(value) is int and minimum<=value<=2**64-1,f'{key} unsigned observation')
+    columns=result.get('columns');require(isinstance(columns,list) and len(columns)==1496,'column roster')
+    active=[c for c in columns if c.get('proof_rows')] if first else columns
+    require(len(active)==(1 if first else 1496),'processed column count')
+    for j,c in enumerate(active):
+        expected=next(k for k in range(1496) if k not in selected) if first else j
+        integer(c.get('candidate'),expected,'candidate order')
+        integer(c.get('lift_status'),0,'lift status')
+        integer(c.get('proof_rows'),5634,'all rows')
+        integer(c.get('coordinate_checks'),498,'all coordinates')
+        require(type(c.get('selected')) is bool and c['selected'] is (expected in selected),'selection bitmap')
+        base.validate_lift_metrics(c,result['defined_events'])
+        digits=c.get('digits');require(type(digits) is int and digits in ([0] if c['selected'] else [1,2,4,8,16,32,64,128]),'digit schedule')
+        width=c.get('proof_bound_bits');require(type(width) is int and 0<width<=8192,'proof width')
+        products=c.get('proof_products');require(type(products) is int and products>=0,'proof products type')
+    require(sum(c['defined_lift_events'] for c in active)<=result['defined_events'],'lift event total')
+    integer(sum(c['proof_products'] for c in active),result['proof_products'],'proof product total')
+
+
+def compact(result):
+    columns=result['columns'];encoded=json.dumps(columns,sort_keys=True,separators=(',',':')).encode()
+    return {**{k:v for k,v in result.items() if k!='columns'},
+            'column_diagnostics_sha256':hashlib.sha256(encoded).hexdigest(),
+            'column_diagnostics_bytes':len(encoded),
+            'selected_columns':[c['candidate'] for c in columns if c['selected']],
+            'lift_digits_histogram':dict(sorted(Counter(c['digits'] for c in columns if not c['selected']).items())),
+            'maximum_coordinate_bits':max(c['maximum_coordinate_bits'] for c in columns),
+            'maximum_proof_bound_bits':max(c['proof_bound_bits'] for c in columns)}
+
+
+EXPECTED_DRIVER={'schema': 'uvlas.fixed-batch-n4-cut-driver/1', 'base_sha256': 'f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63', 'generated_source_sha256': '8076ef27e540d351d5850718c779d2993a52bcd2b0d37caa25f341e78b4f5f26', 'generated_bytes': 38326, 'changed_scope': 'main n guard, diagnostic and cut selector only', 'kernel_bytes_preserved': True}
+
+
+def validate_driver(base,record):
+    base.require(type(record) is dict,'driver record object')
+    for key,expected in EXPECTED_DRIVER.items():
+        value=record.get(key)
+        base.require(type(value) is type(expected) and value==expected,f'driver {key} identity')
+
+
+def reject_output_aliases(output, inputs):
+    resolved_output = output.resolve()
+    output_exists = resolved_output.exists()
+    for path in inputs:
+        resolved_input = path.resolve()
+        if resolved_output == resolved_input or (
+            output_exists and resolved_input.exists() and resolved_output.samefile(resolved_input)
+        ):
+            raise ValueError(f'--output must be distinct from read-only input: {path}')
+
+
+def main(argv=None):
+    p=argparse.ArgumentParser(description=__doc__)
+    for name in ['inputs','certificates','batch','base-runner','capacity-producer','study','certificate-index','driver-record','output']:
+        p.add_argument('--'+name,type=Path,required=True)
+    args=p.parse_args(argv)
+    source=args.inputs/'4-quartic.txt'
+    reject_output_aliases(args.output, (
+        args.driver_record, source, args.certificate_index, args.study,
+        args.batch, args.base_runner, args.capacity_producer,
+    ))
+    base=load('batch_base',args.base_runner);capacity=load('capacity_v2',args.capacity_producer)
+    driver=json.loads(args.driver_record.read_text())
+    validate_driver(base,driver)
+    rows=[r for r in json.loads(args.certificate_index.read_text())['certificates']
+          if (r['n'],r['shape'],r['domain'],r['row_order'])==(4,'quartic','cut','sparse')]
+    base.require(len(rows)==1,'unique certificate');row=rows[0];certificate=args.certificates/row['file']
+    reject_output_aliases(args.output, (certificate,))
+    study=json.loads(args.study.read_text())['cases']
+    capacity.verify_input(source,4,'quartic','cut',study)
+    base.require(certificate.stat().st_size==row['bytes'] and hashlib.sha256(certificate.read_bytes()).hexdigest()==row['sha256'],'certificate identity')
+    base.require(hashlib.sha256(source.read_bytes()).hexdigest()==row['input_sha256'],'input identity')
+    lines=certificate.read_text().splitlines()
+    base.require(lines[0].split()==['certificate','4','5634','933','1496','498'],'certificate header')
+    selected={int(line.split()[2]) for line in lines[1:499]};base.require(len(selected)==498,'basis roster')
+    controls=base.invoke(args.batch.resolve(),'--controls');base.validate_controls(controls)
+    first=base.invoke(args.batch.resolve(),source,certificate,'first');validate(base,first,selected,True)
+    result=base.invoke(args.batch.resolve(),source,certificate,'all');validate(base,result,selected)
+    base.publish(args.output,{'schema':'uvlas.fixed-batch-n4-cut/1','n':4,'shape':'quartic','domain':'cut','row_order':'sparse',
+        'input_sha256':row['input_sha256'],'certificate_sha256':row['sha256'],'certificate_bytes':row['bytes'],
+        'binary_sha256':hashlib.sha256(args.batch.read_bytes()).hexdigest(),
+        'driver':driver,'controls':controls,
+        'first_probe':{k:v for k,v in first.items() if k!='columns'},'result':compact(result)})
+
+
+if __name__=='__main__':main()
