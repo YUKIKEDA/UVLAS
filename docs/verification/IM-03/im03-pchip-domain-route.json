@@ -1,0 +1,202 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-domain-route-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 203,
+  "date": "2026-11-20",
+  "source_commit": "fa5213e3a939e3fa0681eae2aa1d02d49f204aad",
+  "claimed_state": "Private exact Reject/Hold domain relations and inside/constant candidates only; no continuity, jet, periodic or public curve qualification.",
+  "verification": {
+    "debug_normal": "2cases/18783 assertions, seed203",
+    "debug_resource": "2cases/84 assertions, seed203, independently run",
+    "static": "Windows clang-tidy21.1.1 product/normal/resource3TU passed",
+    "reference": "Independent cpp_rational endpoint comparisons and60 existing source cases; tolerance0; exact endpoints and plus/minus2^-400",
+    "mutation": "Endpoint <0 to <=0; copied source compile/link success, Catch42,1failure/15assertions. Ordinary Debug target is control.",
+    "scope": "Targeted Debug only; no old suites, additional benchmark, local Release or CI waiting",
+    "review": "Source/budget and Japanese report independently read; Japanese quick lint0"
+  },
+  "source_records": [
+    {
+      "id": "domain-source-00",
+      "hint": "CMakeLists.txt",
+      "sha256": "b174bbc4ec397fdc6d81d76496a55311c27dd9250b9f45d223e6ec4c7f9e635d"
+    },
+    {
+      "id": "domain-source-01",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "d6c79927e23b4492b7865350d6a2ecb6f832034b79f2e97375757ff1294ec97c"
+    },
+    {
+      "id": "domain-source-02",
+      "hint": "src/aero/pchip_knot_locator.cpp",
+      "sha256": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631"
+    },
+    {
+      "id": "domain-source-03",
+      "hint": "src/aero/pchip_knot_locator.hpp",
+      "sha256": "89d994c1812f17fe29edf7de95716fb397daa2a365d8457d13244df214a26a54"
+    },
+    {
+      "id": "domain-source-04",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682"
+    },
+    {
+      "id": "domain-source-05",
+      "hint": "src/aero/pchip_coefficients.hpp",
+      "sha256": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5"
+    },
+    {
+      "id": "domain-source-06",
+      "hint": "src/aero/pchip_interval_jet.cpp",
+      "sha256": "db7e9da0f4416de6d6f24a85f5e089cbe010bb8329b5822f4a7211e10e6c271a"
+    },
+    {
+      "id": "domain-source-07",
+      "hint": "src/aero/pchip_interval_jet.hpp",
+      "sha256": "c714637886b92bd8e5350d83b25791fd4060fa59052279a9ec10c1b603d33cfc"
+    },
+    {
+      "id": "domain-source-08",
+      "hint": "src/aero/pchip_rational_slots.cpp",
+      "sha256": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7"
+    },
+    {
+      "id": "domain-source-09",
+      "hint": "src/aero/pchip_rational_slots.hpp",
+      "sha256": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0"
+    },
+    {
+      "id": "domain-source-10",
+      "hint": "src/aero/pchip_slot_integer.cpp",
+      "sha256": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5"
+    },
+    {
+      "id": "domain-source-11",
+      "hint": "src/aero/pchip_slot_private.hpp",
+      "sha256": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf"
+    },
+    {
+      "id": "domain-source-12",
+      "hint": "include/uvlas/core/resource_plan.hpp",
+      "sha256": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a"
+    },
+    {
+      "id": "domain-source-13",
+      "hint": "include/uvlas/core/checked_dimensions.hpp",
+      "sha256": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa"
+    },
+    {
+      "id": "domain-source-14",
+      "hint": "include/uvlas/core/failure.hpp",
+      "sha256": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38"
+    },
+    {
+      "id": "domain-source-15",
+      "hint": "tests/aero/pchip_knot_locator_test.cpp",
+      "sha256": "551e18052fcfeb5f648637ee601ae349a13308ed33cdea46721edc6c1c821d99"
+    },
+    {
+      "id": "domain-source-16",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "b51d6a326257ad9e249eb39a480803d0d2b867c3e326dcb82301fbc9a89ab778"
+    },
+    {
+      "id": "domain-source-17",
+      "hint": "tests/aero/fixtures/pchip-coefficients-v1.json",
+      "sha256": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8"
+    },
+    {
+      "id": "domain-source-18",
+      "hint": "tests/aero/fixtures/pchip-interval-values-v1.json",
+      "sha256": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694"
+    },
+    {
+      "id": "domain-source-19",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "domain-source-20",
+      "hint": "src/aero/pchip_domain_route.cpp",
+      "sha256": "f4f442378aa63346cdacca6d6988cbcc312bad38fc8707d5dd83c6a6ce33fd4b"
+    },
+    {
+      "id": "domain-source-21",
+      "hint": "src/aero/pchip_domain_route.hpp",
+      "sha256": "29d29bcc9a37f70d121b5d5000dfbe5a0330ee7900375893b383e8aea3961284"
+    },
+    {
+      "id": "domain-source-22",
+      "hint": "tests/aero/pchip_domain_route_test.cpp",
+      "sha256": "3a98051299fdb3d8ea76176c052e5617053be42a05f31dcddc699ecc2843da19"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "domain-artifact-00",
+      "hint": "docs/verification/IM-03/pchip-domain-route-v1/debug-normal.txt",
+      "sha256": "8f611adaff534ea70e5a8d654735adce252fa2a0d440ace3d2258cfa6ed8caaa"
+    },
+    {
+      "id": "domain-artifact-01",
+      "hint": "docs/verification/IM-03/pchip-domain-route-v1/independent-observations.json",
+      "sha256": "b57d2c47230d3ee417c9114ab650230bf238e8dba7e9bc6a0e8f34e88484c51f"
+    },
+    {
+      "id": "domain-artifact-02",
+      "hint": "docs/verification/IM-03/pchip-domain-route-v1/normal-tidy.txt",
+      "sha256": "dff845b434273a845c44adf02d1e445c0b38772b7e7301316dfea4c2d0322e73"
+    },
+    {
+      "id": "domain-artifact-03",
+      "hint": "docs/verification/IM-03/pchip-domain-route-v1/publication.json",
+      "sha256": "07c22933e0f1403d57b5c290e3853e4b71d95b5d86705ba90efc19441adbd973"
+    },
+    {
+      "id": "domain-artifact-04",
+      "hint": "docs/verification/IM-03/pchip-domain-route-v1/review.md",
+      "sha256": "81b24d6e3d62ee4f6455cbc64457fdcd2a0f1dd9252738d0d6ebda067a7e9c2c"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "b174bbc4ec397fdc6d81d76496a55311c27dd9250b9f45d223e6ec4c7f9e635d",
+    "tests/CMakeLists.txt": "d6c79927e23b4492b7865350d6a2ecb6f832034b79f2e97375757ff1294ec97c",
+    "src/aero/pchip_knot_locator.cpp": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631",
+    "src/aero/pchip_knot_locator.hpp": "89d994c1812f17fe29edf7de95716fb397daa2a365d8457d13244df214a26a54",
+    "src/aero/pchip_coefficients.cpp": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+    "src/aero/pchip_coefficients.hpp": "786e1995060a4a6e7af84e7ceb1fc3cae783c7bfb6bfec371396467ab5264cd5",
+    "src/aero/pchip_interval_jet.cpp": "db7e9da0f4416de6d6f24a85f5e089cbe010bb8329b5822f4a7211e10e6c271a",
+    "src/aero/pchip_interval_jet.hpp": "c714637886b92bd8e5350d83b25791fd4060fa59052279a9ec10c1b603d33cfc",
+    "src/aero/pchip_rational_slots.cpp": "0c423b267285594cab6faf444b43472165841d9b39d2f3dbb421942dcc979dc7",
+    "src/aero/pchip_rational_slots.hpp": "e85c5b214db40b4b0f1e9cfe40f946241fa6745568467eeb5d4b10a34a5d87d0",
+    "src/aero/pchip_slot_integer.cpp": "7ce3807a949b725e003d074ee5fe170a8642856353798eae357e43e2eaa7bbd5",
+    "src/aero/pchip_slot_private.hpp": "a7a83cf8a2fe37fc07d8106cc14ceb60e124475f41683399a9402a029ea2efbf",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/core/checked_dimensions.hpp": "3444e1deb2651bebbb2a665f2a6881cf8ba535d232119181007355dbd5d5c3fa",
+    "include/uvlas/core/failure.hpp": "c2acab7491708ac6f79ebb5c65db9bb1e8765155e044a41596bb6fa34405bc38",
+    "tests/aero/pchip_knot_locator_test.cpp": "551e18052fcfeb5f648637ee601ae349a13308ed33cdea46721edc6c1c821d99",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "b51d6a326257ad9e249eb39a480803d0d2b867c3e326dcb82301fbc9a89ab778",
+    "tests/aero/fixtures/pchip-coefficients-v1.json": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+    "tests/aero/fixtures/pchip-interval-values-v1.json": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "src/aero/pchip_domain_route.cpp": "f4f442378aa63346cdacca6d6988cbcc312bad38fc8707d5dd83c6a6ce33fd4b",
+    "src/aero/pchip_domain_route.hpp": "29d29bcc9a37f70d121b5d5000dfbe5a0330ee7900375893b383e8aea3961284",
+    "tests/aero/pchip_domain_route_test.cpp": "3a98051299fdb3d8ea76176c052e5617053be42a05f31dcddc699ecc2843da19"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/pchip-domain-route-v1/debug-normal.txt": "8f611adaff534ea70e5a8d654735adce252fa2a0d440ace3d2258cfa6ed8caaa",
+    "docs/verification/IM-03/pchip-domain-route-v1/independent-observations.json": "b57d2c47230d3ee417c9114ab650230bf238e8dba7e9bc6a0e8f34e88484c51f",
+    "docs/verification/IM-03/pchip-domain-route-v1/normal-tidy.txt": "dff845b434273a845c44adf02d1e445c0b38772b7e7301316dfea4c2d0322e73",
+    "docs/verification/IM-03/pchip-domain-route-v1/publication.json": "07c22933e0f1403d57b5c290e3853e4b71d95b5d86705ba90efc19441adbd973",
+    "docs/verification/IM-03/pchip-domain-route-v1/review.md": "81b24d6e3d62ee4f6455cbc64457fdcd2a0f1dd9252738d0d6ebda067a7e9c2c"
+  }
+}

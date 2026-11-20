@@ -1,0 +1,16 @@
+[
+  {
+    "hint": "out/issue203/normal.txt",
+    "artifact": "debug-normal.txt",
+    "original_sha256": "432d34249982a8f7b312f368c0b0513529e0af3387565a89fdbe60db033a57a3",
+    "published_sha256": "8f611adaff534ea70e5a8d654735adce252fa2a0d440ace3d2258cfa6ed8caaa",
+    "replacements": 0
+  },
+  {
+    "hint": "out/issue203/tidy-normal.txt",
+    "artifact": "normal-tidy.txt",
+    "original_sha256": "a64cae394bacf492625f22841c9b774aa46f53a8317b28468c0f0efef4da945f",
+    "published_sha256": "dff845b434273a845c44adf02d1e445c0b38772b7e7301316dfea4c2d0322e73",
+    "replacements": 0
+  }
+]

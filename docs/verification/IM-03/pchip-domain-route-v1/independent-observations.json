@@ -1,0 +1,16 @@
+{
+  "kind": "Transcribed independent tool observations; no standalone isolated control or raw log retained",
+  "resource": "Windows Debug seed203, Private PCHIP domain*,2 cases84 assertions; resource TU clang-tidy21.1.1 exit0",
+  "product_static": "Windows clang-tidy21.1.1 product TU exit0 in first two-TU run; normal deliberate inactive-owner negative case needed documented use-after-move annotation, then normal exit0",
+  "mutation": {
+    "source_sha256": "f4f442378aa63346cdacca6d6988cbcc312bad38fc8707d5dd83c6a6ce33fd4b",
+    "change": "single *at_first < 0 to <= 0 in private copy",
+    "compile_link": "MSVC Debug success",
+    "filter": "Private PCHIP domain matches*",
+    "seed": 203,
+    "catch_exit": 42,
+    "assertions": 15,
+    "failures": 1,
+    "observation": "Reject at first endpoint returned InvalidInput; ordinary successful Debug normal target supplies control"
+  }
+}
