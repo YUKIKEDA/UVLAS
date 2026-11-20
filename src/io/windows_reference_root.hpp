@@ -50,6 +50,9 @@ class WindowsReferenceRoot {
 public:
     [[nodiscard]] static core::Result<WindowsReferenceRoot>
     open(const std::filesystem::path& directory, const std::stop_token& stop) noexcept;
+    [[nodiscard]] bool is_open() const noexcept {
+        return directory_ != nullptr;
+    }
 
     // Path components and their count come from normalize_reference_path. Charges the UTF-16
     // scratch and directory owner array to plan before opening descendants. A diagnostic, if
