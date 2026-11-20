@@ -1,0 +1,44 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-batch-n4-cut",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 206,
+  "parent_issue": 140,
+  "source_commit": "36e4b7c188723f02c9d022e4223b6655a14271ca",
+  "date": "2026-11-20",
+  "claimed_state": "n4四次cutの全1496候補/5634活動行の固定領域復元とexact証明、745008座標一致、新規new0。核は旧byte保持。全準備/製品開始は未認定。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "limb_bits": 32,
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt": "1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34",
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/derive-driver.py.txt": "ad801116746ecd6f14cb2073b096b4569e9dabd9e1574c20a5899346b21c9d79",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/driver.json": "78153860d4335089779cf0e1c5d993b3a7994caa682561521b60f5c7192a3bdc",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/gate-optimized-result.json": "9ad5c0d1e8c3d0e27b92b028e3fcd1cc65c05ce1c89e6442c4aa3d2577de22c4",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/gate-probe.py.txt": "4893ca114fde14f429d4ffd9b3c898c443cb9da2fe164dbdbc1ece83dfe5547e",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/gate-result.json": "9ad5c0d1e8c3d0e27b92b028e3fcd1cc65c05ce1c89e6442c4aa3d2577de22c4",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/results.json": "4f379082d3c1ade6df1d939743c9be493060b4dbccd6b7199a80a5a39f357a95",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "f0ad300158eadbe7253dbe254f84a7abada8d24b65133ad18a2c4f31f221d8a3",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/verification.md": "aebe6c1185afdc952d4d5ec49c92a0260d3cc3c67bb1e3f02e2e37a15dba3852"
+  }
+}

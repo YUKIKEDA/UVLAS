@@ -1,0 +1,44 @@
+"""Derive n4/cut selectors only, keeping the frozen batch arithmetic unchanged."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import importlib.machinery
+import importlib.util
+
+
+def load(name,path):
+    loader=importlib.machinery.SourceFileLoader(name,str(path));spec=importlib.util.spec_from_loader(name,loader)
+    module=importlib.util.module_from_spec(spec);loader.exec_module(module);return module
+
+
+def derive(raw):
+    expected='f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63'
+    if hashlib.sha256(raw).hexdigest()!=expected:raise ValueError('frozen source SHA')
+    edits=[(b'if (in.n != 1)',b'if (in.n != 4)'),
+           (b'experiment only admits n1',b'experiment only admits n4'),
+           (b'active_matrix(in, false, true)',b'active_matrix(in, true, true)')]
+    result=raw
+    for old,new in edits:
+        if result.count(old)!=1:raise ValueError('selector must occur once')
+        result=result.replace(old,new)
+    restored=result
+    for old,new in reversed(edits):restored=restored.replace(new,old)
+    if restored!=raw:raise ValueError('kernel bytes changed')
+    return result
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    for name in ['base','shared-producer','output','record']:p.add_argument('--'+name,type=Path,required=True)
+    a=p.parse_args();shared=load('n2_driver',a.shared_producer)
+    shared.distinct_paths(a.base,a.shared_producer,a.output,a.record)
+    raw=a.base.read_bytes();result=derive(raw)
+    a.output.write_bytes(result)
+    a.record.write_text(json.dumps({'schema':'uvlas.fixed-batch-n4-cut-driver/1',
+        'base_sha256':hashlib.sha256(raw).hexdigest(),
+        'generated_source_sha256':hashlib.sha256(result).hexdigest(),'generated_bytes':len(result),
+        'changed_scope':'main n guard, diagnostic and cut selector only','kernel_bytes_preserved':True},indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+if __name__=='__main__':main()

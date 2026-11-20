@@ -1,0 +1,28 @@
+{
+  "schema": "uvlas.n4-cut-gate/1",
+  "transport": "synthetic per-column schema stub with captured totals; not a numeric oracle",
+  "passed": 28,
+  "output_modes": [
+    "absent",
+    "present"
+  ],
+  "scenarios": [
+    "valid",
+    "missing-row",
+    "missing-coordinate",
+    "wrong-selection",
+    "wrong-domain-count",
+    "missing-width",
+    "float-events",
+    "float-products",
+    "bool-peak",
+    "empty-driver",
+    "driver-float-size",
+    "timeout",
+    "replace",
+    "swapped-input"
+  ],
+  "driver_reproduction_sha256": "8076ef27e540d351d5850718c779d2993a52bcd2b0d37caa25f341e78b4f5f26",
+  "unfrozen_source_rejected": true,
+  "producer_input_collisions_rejected": 2
+}

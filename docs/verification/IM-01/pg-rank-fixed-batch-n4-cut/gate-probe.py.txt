@@ -1,0 +1,105 @@
+"""Check n4 selectors and publication using a schema stub, never a numeric oracle."""
+import argparse
+import copy
+import hashlib
+import json
+from pathlib import Path
+import tempfile
+import subprocess
+import sys
+import importlib.machinery
+import importlib.util
+
+
+def load(name,path):
+    loader=importlib.machinery.SourceFileLoader(name,str(path));spec=importlib.util.spec_from_loader(name,loader)
+    module=importlib.util.module_from_spec(spec);loader.exec_module(module);return module
+
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    a=p.parse_args();root=a.root.resolve();folder=root/'docs/verification/IM-01/pg-rank-fixed-batch-n4-cut'
+    case=load('n4_case',folder/'run-case.py.txt');base=load('shared_base',root/'docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt')
+    producer=load('n4_producer',folder/'derive-driver.py.txt');original=(root/'docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt').read_bytes()
+    driver=json.loads((folder/'driver.json').read_text());capture=json.loads((folder/'results.json').read_text())
+    require=base.require
+    require(hashlib.sha256(producer.derive(original)).hexdigest()==driver['generated_source_sha256'],'derived byte reproduction')
+    try:producer.derive(original+b' ')
+    except ValueError:pass
+    else:raise RuntimeError('source mismatch accepted')
+    cert=(root/'out/issue164-fixed-verifier/4-quartic-cut.cert').read_text().splitlines()
+    selected={int(row.split()[2]) for row in cert[1:499]};require(len(selected)==498,'independent basis roster')
+    first_index=next(j for j in range(1496) if j not in selected)
+    def column(j):
+        chosen=j in selected
+        return {'candidate':j,'selected':chosen,'lift_status':0,'digits':0 if chosen else 1,
+                'defined_lift_events':0 if chosen else 1,'maximum_coordinate_bits':0 if chosen else 1,
+                'proof_bound_bits':1,'proof_rows':5634,'proof_products':0,'coordinate_checks':498}
+    # Counts/limits come from the real capture; per-column scalar values here are synthetic shape controls.
+    result={k:v for k,v in capture['result'].items() if k not in ('column_diagnostics_sha256','column_diagnostics_bytes','selected_columns','lift_digits_histogram','maximum_coordinate_bits','maximum_proof_bound_bits')}
+    result['columns']=[column(j) for j in range(1496)];result['columns'][0]['proof_products']=result['proof_products']
+    first={**capture['first_probe'],'columns':[{'proof_rows':0} for _ in range(1496)]}
+    first['columns'][first_index]=column(first_index);first['columns'][first_index]['proof_products']=first['proof_products']
+    scenarios=['valid','missing-row','missing-coordinate','wrong-selection','wrong-domain-count','missing-width',
+               'float-events','float-products','bool-peak','empty-driver','driver-float-size','timeout','replace','swapped-input']
+    passed=0
+    with tempfile.TemporaryDirectory() as temp:
+        d=Path(temp);exe=d/'batch.exe';exe.write_bytes(b'schema transport stub');record=d/'driver.json';output=d/'result.json'
+        original_load=case.load;case.load=lambda name,path:base if name=='batch_base' else original_load(name,path)
+        for present in [False,True]:
+            for name in scenarios:
+                raw=copy.deepcopy(result);metadata=copy.deepcopy(driver)
+                if name=='missing-row':raw['columns'][-1]['proof_rows']-=1
+                elif name=='missing-coordinate':raw['columns'][-1]['coordinate_checks']-=1
+                elif name=='wrong-selection':raw['columns'][0]['selected']=False
+                elif name=='wrong-domain-count':raw['rows']=20032
+                elif name=='missing-width':raw['columns'][first_index].pop('maximum_coordinate_bits')
+                elif name=='float-events':raw['columns'][first_index]['defined_lift_events']=1.0
+                elif name=='float-products':raw['proof_products']=float(raw['proof_products'])
+                elif name=='bool-peak':raw['process_peak_bytes']=True
+                elif name=='empty-driver':metadata={}
+                elif name=='driver-float-size':metadata['generated_bytes']=float(metadata['generated_bytes'])
+                record.write_text(json.dumps(metadata));output.unlink(missing_ok=True)
+                if present:output.write_bytes(b'prior completed result\n')
+                calls=[]
+                def invoke(binary,*values):
+                    calls.append(values[-1])
+                    if values==('--controls',):return capture['controls']
+                    if values[-1]=='first':return copy.deepcopy(first)
+                    if name=='timeout':raise TimeoutError('injected timeout')
+                    return raw
+                base.invoke=invoke;old_replace=base.os.replace
+                def fail(*unused):raise OSError('injected replace failure')
+                if name=='replace':base.os.replace=fail
+                inputs=root/'out/issue140-scratch'
+                if name=='swapped-input':
+                    inputs=d/'inputs';inputs.mkdir(exist_ok=True);(inputs/'4-quartic.txt').write_bytes((root/'out/issue140-scratch/4-flat.txt').read_bytes())
+                argv=['--inputs',str(inputs),'--certificates',str(root/'out/issue164-fixed-verifier'),'--batch',str(exe),
+                      '--base-runner',str(root/'docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt'),
+                      '--capacity-producer',str(root/'docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt'),
+                      '--study',str(root/'docs/verification/IM-01/pg-rank-resource-study/results.json'),
+                      '--certificate-index',str(root/'docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json'),
+                      '--driver-record',str(record),'--output',str(output)]
+                accepted=False
+                try:case.main(argv);accepted=True
+                except (RuntimeError,ValueError,TimeoutError,OSError):pass
+                finally:base.os.replace=old_replace
+                require(accepted==(name=='valid'),name+' outcome')
+                if not accepted:require(output.read_bytes()==b'prior completed result\n' if present else not output.exists(),'output preserved')
+                if name in ('empty-driver','driver-float-size','swapped-input'):require(not calls,'early reject')
+                require(not list(d.glob('.result.json.*.tmp')),'temporary cleanup');passed+=1
+        # Four-way path guard protects the new shared-producer input too; actual derive main, no numeric work.
+        source=d/'base.cpp';source.write_bytes(original);shared=d/'shared.py.txt'
+        shared.write_bytes((root/'docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt').read_bytes())
+        flags=['-O'] if sys.flags.optimize else []
+        for target in [source,shared]:
+            before=target.read_bytes()
+            run=subprocess.run([sys.executable,*flags,'-B',str(folder/'derive-driver.py.txt'),'--base',str(source),
+                '--shared-producer',str(shared),'--output',str(target),'--record',str(d/'metadata.json')],capture_output=True,timeout=10)
+            require(run.returncode!=0 and target.read_bytes()==before,'producer input collision')
+    a.output.write_text(json.dumps({'schema':'uvlas.n4-cut-gate/1','transport':'synthetic per-column schema stub with captured totals; not a numeric oracle',
+        'passed':passed,'output_modes':['absent','present'],'scenarios':scenarios,
+        'driver_reproduction_sha256':driver['generated_source_sha256'],'unfrozen_source_rejected':True,'producer_input_collisions_rejected':2},indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+if __name__=='__main__':main()
