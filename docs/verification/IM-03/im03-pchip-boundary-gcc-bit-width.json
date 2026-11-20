@@ -1,0 +1,23 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-boundary-gcc-bit-width",
+  "ids": [
+    "AE-07",
+    "N4-02"
+  ],
+  "package": "IM-03",
+  "issue": 216,
+  "date": "2026-11-20",
+  "source_commit": "c4eec30411edb73cbe26c1fc2cd6f7a107197102",
+  "original_head": "56c26e8fccf732298f2310e302dd14ba699aca1a",
+  "original_ci": "https://github.com/YUKIKEDA/UVLAS/actions/runs/44656625507",
+  "claimed_state": "Explicit conversion of the nonnegative GCC 14 bit width avoids the implicit signed-to-unsigned conversion. No arithmetic or policy change.",
+  "verification": {
+    "original_gcc14": "linux-debug, linux-release, linux-sanitize compilation rejected pchip_boundary.cpp:43 under -Werror=sign-conversion.",
+    "windows_msvc_debug": "2 tests passed out of 2 (aero.pchip_boundary, aero.pchip_coefficients_resources).",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 for the changed source passed on Windows."
+  },
+  "sources": {
+    "src/aero/pchip_boundary.cpp": "65cfd2c45a03d5996e83c94611d96d176d31cdd707763a24ac4264fdcbc4065b"
+  }
+}
