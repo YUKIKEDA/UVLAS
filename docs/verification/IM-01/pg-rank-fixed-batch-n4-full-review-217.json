@@ -1,0 +1,22 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-batch-n4-full-review-217",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 214,
+  "parent_issue": 140,
+  "source_commit": "a922ab7c928d59fe7fdadbbeeb989da9aaed3e5b",
+  "date": "2026-11-20",
+  "claimed_state": "両形状の係数と証明書について出力先との衝突をバッチ起動前に拒否し、元のバイト列を保持した。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full.json": "fcd019d47ec7dcd4dd2dbef9ea4afc712b129e6815f4257125eb057abd9eedea",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/run-case.py.txt": "0599f9bb7d1be19d7ba5d6300b9c5849f08ed712def880517094d3d701cf265d"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/review-217-original-manifest.json.txt": "76391f19ce234a9013e064fd76bfb2b2744ca92e9633d62bb629f46e469639a9",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/review-217-probe.py.txt": "28dfe34551175df9f42ade78920578f5da65f5aeffa8e7fc9d0ec79502349a0d",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/review-217-correction.md": "e7565c193f45e8ef17224f7026298ae215b81803d4708fd1cd42abec5037511d"
+  }
+}

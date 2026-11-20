@@ -103,23 +103,29 @@ def main(argv=None):
     args = parser.parse_args(argv)
     shared = run_path(str(args.shared_runner))
     reject_aliases = shared['reject_output_aliases']
-    source = args.inputs / f'4-{args.shape}.txt'
+    sources = {shape: args.inputs / f'4-{shape}.txt' for shape in SHAPES}
     reject_aliases(args.output, (
-        source, args.batch, args.base_runner, args.shared_runner, args.capacity_producer,
+        *sources.values(), args.batch, args.base_runner, args.shared_runner, args.capacity_producer,
         args.study, args.certificate_index, args.driver_record,
     ))
     base = shared['load']('fixed_batch_base', args.base_runner)
     capacity = shared['load']('fixed_batch_capacity', args.capacity_producer)
     driver = json.loads(args.driver_record.read_bytes())
     validate_driver(base, driver)
-    rows = [
-        row for row in json.loads(args.certificate_index.read_bytes())['certificates']
-        if (row['n'], row['shape'], row['domain'], row['row_order']) == (4, args.shape, 'full', 'sparse')
-    ]
-    base.require(len(rows) == 1, 'unique certificate')
-    record = rows[0]
-    certificate = args.certificates / record['file']
-    reject_aliases(args.output, (certificate,))
+    index = json.loads(args.certificate_index.read_bytes())['certificates']
+    records = {}
+    for shape in SHAPES:
+        rows = [
+            row for row in index
+            if (row['n'], row['shape'], row['domain'], row['row_order']) == (4, shape, 'full', 'sparse')
+        ]
+        base.require(len(rows) == 1, f'unique certificate for {shape}')
+        records[shape] = rows[0]
+    certificates = {shape: args.certificates / row['file'] for shape, row in records.items()}
+    reject_aliases(args.output, certificates.values())
+    source = sources[args.shape]
+    record = records[args.shape]
+    certificate = certificates[args.shape]
     dimensions = SHAPES[args.shape]
     rank = dimensions[-1]
     study = json.loads(args.study.read_bytes())['cases']
