@@ -1,0 +1,222 @@
+"""Test publication and input protection without invoking the numerical batch."""
+
+import argparse
+from copy import deepcopy
+import json
+from pathlib import Path
+from runpy import run_path
+from shutil import copyfile
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+
+def read_json(path):
+    return json.loads(path.read_bytes())
+
+
+def schema_controls(capture):
+    """Populate per-column fields with synthetic values and the certificate roster."""
+    selected = set(capture['result']['selected_columns'])
+    first = deepcopy(capture['first_probe'])
+    result = {key: capture['result'][key] for key in first}
+    result['columns'] = [
+        {
+            'candidate': j, 'selected': j in selected, 'lift_status': 0,
+            'proof_rows': result['rows'], 'coordinate_checks': result['rank'],
+            'maximum_coordinate_bits': 0 if j in selected else 1,
+            'defined_lift_events': 0 if j in selected else 1,
+            'digits': 0 if j in selected else 1, 'proof_bound_bits': 1, 'proof_products': 0,
+        }
+        for j in range(result['candidates'])
+    ]
+    result['columns'][0]['proof_products'] = result['proof_products']
+    first['columns'] = [{} for _ in result['columns']]
+    first_index = next(j for j in range(first['candidates']) if j not in selected)
+    first['columns'][first_index] = {
+        **result['columns'][first_index], 'proof_products': first['proof_products'],
+    }
+    return first, result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, required=True)
+    parser.add_argument('--coefficient-dir', type=Path, required=True)
+    parser.add_argument('--certificate-dir', type=Path, required=True)
+    parser.add_argument('--capture', type=Path, required=True)
+    args = parser.parse_args()
+    verification = args.root.resolve() / 'docs/verification/IM-01'
+    case = verification / 'pg-rank-fixed-batch-n4-full'
+    runner = run_path(str(case / 'run-case.py.txt'))['main']
+    producer = case / 'derive-driver.py.txt'
+    original = verification / 'pg-rank-fixed-batch/fixed-batch.cpp.txt'
+    shared_producer = verification / 'pg-rank-fixed-batch-n2/derive-driver.py.txt'
+    shared_runner = verification / 'pg-rank-fixed-batch-n4-cut/run-case.py.txt'
+    shared = run_path(str(shared_runner))
+    load = shared['load']
+    shared_base = load('gate_base', verification / 'pg-rank-fixed-batch/run-batch.py.txt')
+    require = shared_base.require
+    source_bytes = original.read_bytes()
+    derive = run_path(str(producer))['derive']
+    require(runner.__globals__['EXPECTED_DRIVER']['generated_bytes'] == len(derive(source_bytes)),
+            'derived driver length')
+    try:
+        derive(source_bytes + b' ')
+    except ValueError:
+        pass
+    else:
+        raise RuntimeError('changed derivation input accepted')
+
+    capture = read_json(args.capture)
+    require(capture['shape'] == 'flat', 'flat transport schema control required')
+    first, all_columns = schema_controls(capture)
+    scenarios = (
+        ('valid', None, ('--controls', 'first', 'all')),
+        ('missing-row', 'column row completeness', ('--controls', 'first', 'all')),
+        ('missing-coordinate', 'column coordinate completeness', ('--controls', 'first', 'all')),
+        ('bad-width', 'proof width', ('--controls', 'first', 'all')),
+        ('bad-status', 'lift status', ('--controls', 'first', 'all')),
+        ('bad-driver', 'driver generated_bytes identity', ()),
+        ('wrong-coefficient', 'coefficient header differs', ()),
+        ('wrong-certificate', 'certificate identity', ()),
+        ('timeout', 'injected timeout', ('--controls', 'first', 'all')),
+        ('replace-failure', 'injected replace failure', ('--controls', 'first', 'all')),
+    )
+    with TemporaryDirectory() as scratch:
+        temp = Path(scratch)
+        inputs = {
+            'coefficient': args.coefficient_dir / '4-flat.txt',
+            'certificate': args.certificate_dir / '4-flat-full.cert',
+            'base-runner': verification / 'pg-rank-fixed-batch/run-batch.py.txt',
+            'shared-runner': shared_runner,
+            'capacity-producer': verification / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt',
+            'study': verification / 'pg-rank-resource-study/results.json',
+            'certificate-index': verification / 'pg-rank-fixed-certificate/certificate-index.json',
+            'driver-record': case / 'driver.json',
+        }
+        copies = {name: temp / path.name for name, path in inputs.items()}
+        # The base and shared runner use separate basenames in the sandbox.
+        copies['shared-runner'] = temp / 'shared-runner.py.txt'
+        for name, source in inputs.items():
+            copyfile(source, copies[name])
+        copies['batch'] = temp / 'batch.exe'
+        copies['batch'].write_bytes(b'schema transport stub')
+        arguments = ['--shape', 'flat', '--inputs', str(temp), '--certificates', str(temp)]
+        for name, path in copies.items():
+            if name not in ('coefficient', 'certificate'):
+                arguments.extend([f'--{name}', str(path)])
+        output = temp / 'result.json'
+        old_result = b'prior completed result\n'
+        calls = []
+
+        def load_module(name, path):
+            return shared_base if name == 'fixed_batch_base' else load(name, path)
+
+        with patch.dict(runner.__globals__, run_path=lambda path: {**shared, 'load': load_module}):
+            for present in (False, True):
+                for name, expected, order in scenarios:
+                    output.unlink(missing_ok=True)
+                    if present:
+                        output.write_bytes(old_result)
+                    calls.clear()
+                    raw = deepcopy(all_columns)
+                    path = None
+                    if name == 'missing-row':
+                        raw['columns'][-1]['proof_rows'] -= 1
+                    elif name == 'missing-coordinate':
+                        raw['columns'][-1]['coordinate_checks'] -= 1
+                    elif name == 'bad-width':
+                        raw['columns'][-1]['proof_bound_bits'] = True
+                    elif name == 'bad-status':
+                        raw['columns'][-1]['lift_status'] = 2
+                    elif name == 'bad-driver':
+                        path = copies['driver-record']
+                        contents = read_json(inputs['driver-record'])
+                        contents['generated_bytes'] = float(contents['generated_bytes'])
+                        path.write_text(json.dumps(contents), encoding='utf-8')
+                    elif name == 'wrong-coefficient':
+                        path = copies['coefficient']
+                        copyfile(args.coefficient_dir / '4-quartic.txt', path)
+                    elif name == 'wrong-certificate':
+                        path = copies['certificate']
+                        copyfile(args.certificate_dir / '4-quartic-full.cert', path)
+
+                    def invoke(_binary, *values):
+                        calls.append(values[-1])
+                        if values == ('--controls',):
+                            return capture['controls']
+                        if values[-1] == 'first':
+                            return first
+                        if name == 'timeout':
+                            raise subprocess.TimeoutExpired('injected timeout', 60)
+                        return raw
+
+                    before = path.read_bytes() if path else b''
+                    shared_base.invoke = invoke
+                    with patch.object(shared_base.os, 'replace', wraps=shared_base.os.replace) as replace:
+                        if name == 'replace-failure':
+                            replace.side_effect = OSError('injected replace failure')
+                        try:
+                            runner([*arguments, '--output', str(output)])
+                        except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
+                            require(expected and expected in str(error), f'{name}: {error}')
+                        else:
+                            require(expected is None, f'{name}: accepted')
+                            require(read_json(output)['schema'] == capture['schema'], 'result schema')
+                        require(replace.call_count == (1 if name in ('valid', 'replace-failure') else 0),
+                                f'{name}: publication attempt')
+                    require(tuple(calls) == order, f'{name}: transport sequence')
+                    if expected:
+                        require(output.read_bytes() == old_result if present else not output.exists(),
+                                f'{name}: output changed')
+                    if path:
+                        require(path.read_bytes() == before, f'{name}: input changed')
+                        key = next(k for k, value in copies.items() if value == path)
+                        copyfile(inputs[key], path)
+                    require(not list(temp.glob('.*.tmp')), f'{name}: temporary publication file')
+
+            def unexpected_transport(*_args):
+                raise RuntimeError('transport invoked with aliased output')
+
+            shared_base.invoke = unexpected_transport
+            alias = temp / 'output-alias'
+            for name, target in copies.items():
+                original_bytes = target.read_bytes()
+                alias.hardlink_to(target)
+                for output_path in (target, alias):
+                    try:
+                        runner([*arguments, '--output', str(output_path)])
+                    except ValueError as error:
+                        require('must be distinct from read-only input' in str(error), f'{name}: {error}')
+                    else:
+                        raise RuntimeError(f'{name}: accepted aliased output')
+                    require(alias.samefile(target) and target.read_bytes() == original_bytes,
+                            f'{name}: replaced input')
+                    require(not list(temp.glob('.*.tmp')), f'{name}: temporary publication file')
+                alias.unlink()
+
+        source_copy = temp / 'batch-original.cpp.txt'
+        source_copy.write_bytes(source_bytes)
+        alias = temp / 'derived.cpp'
+        alias.hardlink_to(source_copy)
+        python_flags = ['-O'] if sys.flags.optimize else []
+        collision = subprocess.run([
+            sys.executable, *python_flags, '-B', producer, '--base', source_copy,
+            '--shared-producer', shared_producer, '--output', alias, '--record', temp / 'rejected.json',
+        ], capture_output=True, timeout=15)
+        require(collision.returncode != 0 and b'distinct files' in collision.stderr
+                and alias.samefile(source_copy) and source_copy.read_bytes() == source_bytes
+                and not (temp / 'rejected.json').exists(), 'derivation input alias')
+    print(json.dumps({
+        'schema': 'uvlas.fixed-batch-n4-full-gate/1',
+        'publication_checks': 2 * len(scenarios), 'old_output_modes': ['absent', 'present'],
+        'publication_scenarios': [name for name, _, _ in scenarios],
+        'runner_alias_checks': 2 * len(copies), 'runner_alias_modes': ['direct', 'hard link'],
+        'derivation_alias_checks': 1, 'modified_derivation_source_rejected': True,
+    }, indent=2))
+
+
+if __name__ == '__main__':
+    main()

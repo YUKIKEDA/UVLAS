@@ -1,0 +1,55 @@
+"""Derive the n4 full-background driver from the frozen n1 batch source."""
+
+import argparse
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+from pathlib import Path
+
+
+BASE_SHA256 = 'f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63'
+OLD_SELECTOR = b'    if (in.n != 1)\n        throw std::runtime_error("experiment only admits n1");'
+NEW_SELECTOR = b'    if (in.n != 4)\n        throw std::runtime_error("experiment only admits n4");'
+
+
+def load(name, path):
+    loader = importlib.machinery.SourceFileLoader(name, str(path))
+    spec = importlib.util.spec_from_loader(name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
+
+
+def derive(raw):
+    if hashlib.sha256(raw).hexdigest() != BASE_SHA256:
+        raise ValueError('frozen batch source SHA differs')
+    if raw.count(OLD_SELECTOR) != 1 or NEW_SELECTOR in raw:
+        raise ValueError('expected one n1 selector and no n4 selector')
+    result = raw.replace(OLD_SELECTOR, NEW_SELECTOR)
+    if result.replace(NEW_SELECTOR, OLD_SELECTOR) != raw:
+        raise ValueError('kernel byte preservation failed')
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('base', 'shared-producer', 'output', 'record'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args()
+    shared = load('fixed_batch_path_guard', args.shared_producer)
+    shared.distinct_paths(args.base, args.shared_producer, args.output, args.record)
+    result = derive(args.base.read_bytes())
+    args.output.write_bytes(result)
+    args.record.write_text(json.dumps({
+        'schema': 'uvlas.fixed-batch-n4-full-driver/1',
+        'base_sha256': BASE_SHA256,
+        'generated_source_sha256': hashlib.sha256(result).hexdigest(),
+        'generated_bytes': len(result),
+        'changed_scope': 'main n guard and diagnostic only',
+        'kernel_bytes_preserved': True,
+    }, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+
+if __name__ == '__main__':
+    main()

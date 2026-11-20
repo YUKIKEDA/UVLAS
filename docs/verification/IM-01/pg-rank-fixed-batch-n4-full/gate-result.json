@@ -1,0 +1,27 @@
+{
+  "schema": "uvlas.fixed-batch-n4-full-gate/1",
+  "publication_checks": 20,
+  "old_output_modes": [
+    "absent",
+    "present"
+  ],
+  "publication_scenarios": [
+    "valid",
+    "missing-row",
+    "missing-coordinate",
+    "bad-width",
+    "bad-status",
+    "bad-driver",
+    "wrong-coefficient",
+    "wrong-certificate",
+    "timeout",
+    "replace-failure"
+  ],
+  "runner_alias_checks": 18,
+  "runner_alias_modes": [
+    "direct",
+    "hard link"
+  ],
+  "derivation_alias_checks": 1,
+  "modified_derivation_source_rejected": true
+}
