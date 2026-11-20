@@ -1,0 +1,109 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-side-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 225,
+  "date": "2026-11-20",
+  "source_commit": "7975dbe982cf294a3c03b0361af9d9a5099f2353",
+  "claimed_state": "Private side selection and exact requested-derivative agreement over prepared candidates. Common curve identity and caller route classification are preconditions; no complete owned-curve evaluation or physical provider.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filter": "^aero\\.pchip_side$",
+    "ctest_each_configuration": "1 passed out of 1",
+    "independent_reference": "Boost cpp_rational endpoint-basis Hermite formulas with independent secant-derived slopes; tolerance 0. The perturbed interior knot has second derivatives 2-2^-200 and 2+3*2^-200. Periodic query -6 under period 3 retains phase 3 on the left and 0 on the right; side derivatives +4 and -4 disagree.",
+    "branch_controls": "Every side/order at unique Reject boundaries and interval interiors, exterior Hold, both Hold endpoints, interior knots, and period seams with agreement and disagreement. Lower requested orders preserve omission; higher-order agreement scans every component.",
+    "resource_controls": "Candidate shape/order validation, closed selector inputs, no C++ allocations during exact comparison, exact and one-less work budgets, pre-cancellation and failure precedence, previous candidates preserved, 1/2/4-thread independent agreement and visit counts.",
+    "catch_seed": 225,
+    "catch_each_configuration": "5 cases, 1034 assertions",
+    "mutation": "Compiled and linked isolated byte-identical source copies and a version that compares the left numerator with itself. Control Catch exit 0 (306 assertions); mutation Catch exit 42 (106 assertions passed, 1 failed) on low-word disagreement.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on the changed translation units Exit 0."
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "hint": "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py",
+      "sha256": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f"
+    },
+    {
+      "id": "src/aero/pchip_side.cpp",
+      "hint": "src/aero/pchip_side.cpp",
+      "sha256": "88e28a59c19f0e615b65d3ae747af89cbb11e766d46f5f384d5376d2668ebc82"
+    },
+    {
+      "id": "src/aero/pchip_side.hpp",
+      "hint": "src/aero/pchip_side.hpp",
+      "sha256": "71d7452c48c052481c3954ccbedf87c2fb6c69d89673b49252127c8a3d53e8ec"
+    },
+    {
+      "id": "src/aero/pchip_domain_route.cpp",
+      "hint": "src/aero/pchip_domain_route.cpp",
+      "sha256": "b95346c4ecd0e6fe984a56ea12234d75976254623b64fee7107c1a7ff7044584"
+    },
+    {
+      "id": "src/aero/pchip_knot_locator.cpp",
+      "hint": "src/aero/pchip_knot_locator.cpp",
+      "sha256": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631"
+    },
+    {
+      "id": "src/aero/pchip_boundary.cpp",
+      "hint": "src/aero/pchip_boundary.cpp",
+      "sha256": "65cfd2c45a03d5996e83c94611d96d176d31cdd707763a24ac4264fdcbc4065b"
+    },
+    {
+      "id": "src/aero/pchip_interval_jet.cpp",
+      "hint": "src/aero/pchip_interval_jet.cpp",
+      "sha256": "db7e9da0f4416de6d6f24a85f5e089cbe010bb8329b5822f4a7211e10e6c271a"
+    },
+    {
+      "id": "tests/aero/pchip_side_test.cpp",
+      "hint": "tests/aero/pchip_side_test.cpp",
+      "sha256": "bbaddd04bda28b11e44fec0aab619f823c49d52689edf178ae03c7fc08ef6112"
+    },
+    {
+      "id": "tests/support/allocation_audit.cpp",
+      "hint": "tests/support/allocation_audit.cpp",
+      "sha256": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc"
+    },
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "06c7fc5bf810e877368e9c24ff8710f2aab80ee2b89597ffc4063e1bccc38e66"
+    },
+    {
+      "id": "tests/CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "eacb945f35abfd8293abe749831927f82e3094f4c12c0fa1a7b1a83c415f3ee1"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/verification/IM-03/pchip-time-curve-design-v2/witness.py": "cf05c5232521edfdc439aa19e457e9f807e12a76f482295df6f57b756b68907f",
+    "src/aero/pchip_side.cpp": "88e28a59c19f0e615b65d3ae747af89cbb11e766d46f5f384d5376d2668ebc82",
+    "src/aero/pchip_side.hpp": "71d7452c48c052481c3954ccbedf87c2fb6c69d89673b49252127c8a3d53e8ec",
+    "src/aero/pchip_domain_route.cpp": "b95346c4ecd0e6fe984a56ea12234d75976254623b64fee7107c1a7ff7044584",
+    "src/aero/pchip_knot_locator.cpp": "d01716b024cb202f13b5909702630f16a5aa0d2891607e3a32fcf9891f0f9631",
+    "src/aero/pchip_boundary.cpp": "65cfd2c45a03d5996e83c94611d96d176d31cdd707763a24ac4264fdcbc4065b",
+    "src/aero/pchip_interval_jet.cpp": "db7e9da0f4416de6d6f24a85f5e089cbe010bb8329b5822f4a7211e10e6c271a",
+    "tests/aero/pchip_side_test.cpp": "bbaddd04bda28b11e44fec0aab619f823c49d52689edf178ae03c7fc08ef6112",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "CMakeLists.txt": "06c7fc5bf810e877368e9c24ff8710f2aab80ee2b89597ffc4063e1bccc38e66",
+    "tests/CMakeLists.txt": "eacb945f35abfd8293abe749831927f82e3094f4c12c0fa1a7b1a83c415f3ee1"
+  }
+}
