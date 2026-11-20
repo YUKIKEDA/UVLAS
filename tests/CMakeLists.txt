@@ -671,6 +671,15 @@ uvlas_add_test(aero.pchip_boundary
     SOURCES aero/pchip_boundary_test.cpp
     LIBS uvlas_aero Boost::multiprecision Threads::Threads)
 target_include_directories(uvlas_test_aero_pchip_boundary PRIVATE "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(aero.pchip_side
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_side_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_aero_audit uvlas::eigen Boost::headers Threads::Threads)
+target_include_directories(uvlas_test_aero_pchip_side PRIVATE "${PROJECT_SOURCE_DIR}/src")
+uvlas_enable_allocation_audit(uvlas_test_aero_pchip_side)
+uvlas_require_audited_dependencies(uvlas_test_aero_pchip_side)
+
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
     SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp
