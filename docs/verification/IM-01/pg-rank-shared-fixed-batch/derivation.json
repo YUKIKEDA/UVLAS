@@ -1,0 +1,7 @@
+{
+  "schema": "uvlas.pg-shared-fixed-batch-derivation/1",
+  "base_sha256": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+  "generated_header_sha256": "2820a2cb4de0a13329c9c17e595b8c06d217bd4f1bc697db4c92865f2ed2cf97",
+  "generated_bytes": 40210,
+  "edits": 11
+}

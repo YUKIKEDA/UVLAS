@@ -1,0 +1,72 @@
+"""Derive a header from the frozen fixed batch, preserving the arithmetic."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from runpy import run_path
+
+
+BASE_SHA256 = 'f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63'
+EDITS = (
+    ("#include \"../pg-rank-fixed-lift/allocation-profile.hpp.txt\"",
+     "#include \"../pg-rank-fixed-lift/allocation-profile.hpp.txt\"\n#include <span>"),
+    ("Report run(const Data& d, Scratch& s, const Limits& cap, bool owns_audit = true) {\n    Report r;",
+     "Report run(const Data& d, Scratch& s, const Limits& cap, bool owns_audit = true,\n           std::span<const Pair> reference = {}) {\n    Report r;\n    if (reference.empty())\n        reference = d.expected;\n    if (reference.size() != d.selected.size()) {\n        r.status = Status::ReferenceMismatch;\n        return r;\n    }"),
+    ("if (s.recovered[k].n != d.expected[k].n ||\n                        s.recovered[k].d != d.expected[k].d)",
+     "if (s.recovered[k].n != reference[k].n ||\n                        s.recovered[k].d != reference[k].d)"),
+    ("const char* certificate, int grid, int full, bool first_only) {",
+     "const char* certificate, int grid, int full, bool first_only,\n                        std::vector<Integer>* retained_scales = nullptr) {"),
+    ("    d.targets.resize(d.columns);\n    bool prepared = false;",
+     "    if (retained_scales) {\n        *retained_scales = std::move(scales);\n        return d;\n    }\n    d.targets.resize(d.columns);\n    bool prepared = false;"),
+    ("BatchReport batch(const InputData& d, Scratch& s, FullScratch& full,\n                  std::vector<ColumnResult>& columns, const BatchLimits& cap,\n                  bool first_only = false) {\n    BatchReport report;\n    if (actual(d, s, full, columns) > cap.payload) {",
+     "#include \"shared-pivot.hpp.txt\"\n\nBatchReport batch(const InputData& d, Scratch& s, FullScratch& full,\n                  std::vector<ColumnResult>& columns, const BatchLimits& cap,\n                  bool first_only = false, SharedPivot* shared = nullptr) {\n    BatchReport report;\n    if (shared)\n        shared->counts = {};\n    if (plus(actual(d, s, full, columns), shared ? shared_payload(*shared) : 0) > cap.payload) {"),
+    ("if (first_only && !d.targets[j])",
+     "if (first_only && !shared && !d.targets[j])"),
+    ("                if (!d.targets[j]) {\n                    report.status = BatchStatus::InvalidColumn;\n                    break;\n                }\n                column.lift = run(\n                    *d.targets[j], s,\n                    {payload(*d.targets[j], s), cap.bits, cap.digits, cap.events - report.events},\n                    false);",
+     "                if (shared) {\n                    if (!load_shared_target(*shared, d, j)) {\n                        report.status = BatchStatus::LiftFailure;\n                        break;\n                    }\n                    auto& target = shared->target;\n                    const auto expected = std::span<const Pair>{d.reference}.subspan(times(j, d.rank), d.rank);\n                    column.lift = run(target, s, {payload(target, s), cap.bits, cap.digits,\n                                                   cap.events - report.events}, false, expected);\n                } else {\n                    if (!d.targets[j]) {\n                        report.status = BatchStatus::InvalidColumn;\n                        break;\n                    }\n                    column.lift = run(\n                        *d.targets[j], s,\n                        {payload(*d.targets[j], s), cap.bits, cap.digits, cap.events - report.events},\n                        false);\n                }"),
+    ("const BatchReport& r, std::uint64_t bytes, std::int64_t elapsed) {",
+     "const BatchReport& r, std::uint64_t bytes, std::int64_t elapsed,\n                  const SharedPivot* shared = nullptr) {"),
+    ("              << \",\\\"batch_ms\\\":\" << elapsed << \",\\\"process_peak_bytes\\\":\" << peak_resident_bytes()\n              << \",\\\"columns\\\":[\";",
+     "              << \",\\\"batch_ms\\\":\" << elapsed << \",\\\"process_peak_bytes\\\":\" << peak_resident_bytes();\n    if (shared)\n        std::cout << \",\\\"shared_payload_bytes\\\":\" << shared_payload(*shared)\n                  << \",\\\"pivot_nonzeros\\\":\" << shared->target.matrix.size()\n                  << \",\\\"factor_off_diagonal_nonzeros\\\":\" << plus(shared->target.lower.size(), shared->target.upper.size())\n                  << \",\\\"target_loads\\\":\" << shared->counts.loads\n                  << \",\\\"rhs_rows_initialized\\\":\" << shared->counts.rows\n                  << \",\\\"rhs_entries_scanned\\\":\" << shared->counts.entries\n                  << \",\\\"maximum_shared_recurrence_bits\\\":\" << shared->counts.bits;\n    std::cout << \",\\\"columns\\\":[\";"),
+    ("int main(int argc, char** argv) try {",
+     "int frozen_original_batch_main(int argc, char** argv) try {"),
+)
+
+
+def derive(original):
+    if hashlib.sha256(original).hexdigest() != BASE_SHA256:
+        raise ValueError('frozen C++ source SHA differs')
+    result = original
+    for before, after in EDITS:
+        old, new = before.encode(), after.encode()
+        if result.count(old) != 1 or new in result:
+            raise ValueError(f'derivation anchor differs: {before}')
+        result = result.replace(old, new)
+    restored = result
+    for before, after in reversed(EDITS):
+        restored = restored.replace(after.encode(), before.encode())
+    if restored != original:
+        raise ValueError('reverse derivation differs from the frozen source')
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('base', 'guard', 'output', 'record'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args()
+    run_path(str(args.guard))['distinct_paths'](args.base, args.guard, args.output, args.record)
+    source = derive(args.base.read_bytes())
+    args.output.write_bytes(source)
+    args.record.write_text(json.dumps({
+        'schema': 'uvlas.pg-shared-fixed-batch-derivation/1',
+        'base_sha256': BASE_SHA256,
+        'generated_header_sha256': hashlib.sha256(source).hexdigest(),
+        'generated_bytes': len(source),
+        'edits': len(EDITS),
+    }, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+
+if __name__ == '__main__':
+    main()
