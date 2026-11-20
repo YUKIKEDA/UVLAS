@@ -311,3 +311,80 @@ TEST_CASE("Cancellation before and during reference reading cannot publish a pay
         CHECK_FALSE(running_token.stop_requested());
     }
 }
+
+TEST_CASE("Manifest reading owns original bytes, computed digest and stable file identity",
+          "[IO4-01][N4-02][verification][property]") {
+    const auto snapshot = [] {
+        Reader reader(binary, binary_info);
+        reader.packet = 1;
+        core::ResourcePlan plan{4};
+        Diagnostic diag = ReferenceFileDiagnostic{Reason::DigestMismatch, 0};
+        auto result = read_manifest_file(reader, limits, plan, {}, &diag);
+        CHECK(reader.read_calls == 5);
+        CHECK(reader.info_calls == 2);
+        CHECK(plan.allocated_bytes() == 4);
+        CHECK_FALSE(diag);
+        return result;
+    }();
+    REQUIRE(snapshot.has_value());
+    if (const auto view = snapshot->view()) {
+        CHECK(std::ranges::equal(view->bytes, binary));
+        CHECK(view->digest == binary_hash);
+        CHECK(view->file_info == binary_info);
+    } else {
+        FAIL("Manifest snapshot has no owned view");
+    }
+}
+
+TEST_CASE("Manifest reading rejects changes, failed admission and cancellation before publication",
+          "[IO4-01][N4-02][negative]") {
+    SECTION("Changed identity, length or modification time") {
+        for (const auto& changed :
+             {ReferenceFileInfo{{43, {std::byte{3}}}, 4, {1, 2, 3, 4}, true},
+              ReferenceFileInfo{binary_info.identity, 3, {1, 2, 3, 4}, true},
+              ReferenceFileInfo{binary_info.identity, 4, {1, 2, 3, 5}, true}}) {
+            Reader reader(binary, binary_info);
+            reader.last = changed;
+            core::ResourcePlan plan{4};
+            Diagnostic diag;
+            const auto result = read_manifest_file(reader, limits, plan, {}, &diag);
+            require_failure(result, diag, Reason::Modified, core::FailureCode::InvalidInput, 4);
+        }
+    }
+    SECTION("Early EOF or an extra byte") {
+        constexpr std::array trailing{binary[0], binary[1], binary[2], binary[3], std::byte{42}};
+        for (const auto reason : {Reason::PrematureEof, Reason::TrailingByte}) {
+            const std::span<const std::byte> payload = reason == Reason::PrematureEof
+                                                           ? std::span{binary}.first(3)
+                                                           : std::span<const std::byte>{trailing};
+            Reader reader(payload, binary_info);
+            core::ResourcePlan plan{4};
+            Diagnostic diag;
+            const auto result = read_manifest_file(reader, limits, plan, {}, &diag);
+            const auto offset = reason == Reason::PrematureEof ? 3U : 4U;
+            require_failure(result, diag, reason, core::FailureCode::InvalidInput, offset);
+        }
+    }
+    SECTION("Hash budget before allocation or reading") {
+        Reader reader(binary, binary_info);
+        core::ResourcePlan plan{4};
+        Diagnostic diag;
+        const auto result = read_manifest_file(reader, {4, 5, 5, 3}, plan, {}, &diag);
+        require_failure(result, diag, Reason::HashBytes, core::FailureCode::ResourceExceeded, 0);
+        CHECK(reader.read_calls == 0);
+        CHECK(plan.allocated_bytes() == 0);
+    }
+    SECTION("Cancellation during the terminal probe") {
+        Reader reader(binary, binary_info);
+        std::stop_source source;
+        reader.cancel_source = &source;
+        reader.cancel_read = 2;
+        core::ResourcePlan plan{4};
+        Diagnostic diag = ReferenceFileDiagnostic{Reason::DigestMismatch, 0};
+        const auto result = read_manifest_file(reader, limits, plan, source.get_token(), &diag);
+        REQUIRE_FALSE(result.has_value());
+        CHECK(result.error().code == core::FailureCode::Cancelled);
+        CHECK_FALSE(diag);
+        CHECK(reader.info_calls == 1);
+    }
+}
