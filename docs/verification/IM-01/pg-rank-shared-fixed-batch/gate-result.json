@@ -1,0 +1,14 @@
+{
+  "schema": "uvlas.pg-shared-fixed-batch-gate/1",
+  "publication_checks": 10,
+  "publication_scenarios": [
+    "valid",
+    "late-cut-failure",
+    "cut-digest-mismatch",
+    "swapped-certificate",
+    "swapped-baseline"
+  ],
+  "runner_alias_checks": 28,
+  "derivation_alias_checks": 1,
+  "modified_derivation_source_rejected": true
+}

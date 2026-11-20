@@ -1,0 +1,123 @@
+// Included in namespace batch_fixed of the derived header.
+struct SharedLoadCounts {
+    std::uint64_t loads{}, rows{}, entries{}, bits{};
+};
+struct SharedPivot {
+    Data target;
+    std::vector<std::uint32_t> row_to_pivot;
+    std::vector<Small> row_sums;
+    SharedLoadCounts counts;
+};
+
+std::uint64_t shared_payload(const SharedPivot& shared) {
+    auto bytes = plus(input_payload(shared.target), sizeof(SharedPivot) - sizeof(Data));
+    bytes = plus(bytes, times(shared.row_to_pivot.capacity(), sizeof(std::uint32_t)));
+    return plus(bytes, times(shared.row_sums.capacity(), sizeof(Small)));
+}
+
+SharedPivot prepare_shared(const InputData& input, const Elimination<Mod<p1>>& factor,
+                           const std::vector<Integer>& scales) {
+    SharedPivot shared;
+    auto& d = shared.target;
+    const auto rank = input.rank;
+    if (factor.selected.size() != rank || factor.pivot_rows.size() != rank ||
+        scales.size() != input.rows || factor.coordinates.size() != input.columns)
+        throw std::runtime_error("shared dimensions");
+    d.selected = input.selected;
+    d.initial.resize(rank);
+    d.bound.resize(rank);
+    d.scale_inverse.resize(rank);
+    d.diagonal_inverse.resize(rank);
+    d.row_offsets.resize(rank + 1);
+    d.lower_offsets.push_back(0);
+    d.upper_offsets.push_back(0);
+    shared.row_to_pivot.assign(input.rows, UINT32_MAX);
+    shared.row_sums.resize(rank);
+    for (std::uint32_t k = 0; k < rank; ++k) {
+        const auto row = static_cast<std::uint32_t>(factor.pivot_rows[k]);
+        if (row >= input.rows || shared.row_to_pivot[row] != UINT32_MAX ||
+            scales[row] <= 0 || scales[row] % p1 == 0)
+            throw std::runtime_error("shared pivot or scale");
+        shared.row_to_pivot[row] = k;
+        d.scale_inverse[k] = static_cast<std::uint32_t>((Mod<p1>{1} / Mod<p1>::parse(Q{scales[row]})).value);
+        const auto& upper = factor.pivot_upper[k];
+        if (upper.empty() || upper.back().first != static_cast<int>(k))
+            throw std::runtime_error("shared upper diagonal");
+        d.diagonal_inverse[k] = static_cast<std::uint32_t>((Mod<p1>{1} / upper.back().second).value);
+        for (const auto& [index, value] : factor.pivot_lower[k]) {
+            if (index <= static_cast<int>(k))
+                throw std::runtime_error("shared lower factor");
+            d.lower.push_back({static_cast<std::uint32_t>(index), static_cast<std::uint32_t>(value.value)});
+        }
+        d.lower_offsets.push_back(d.lower.size());
+        for (auto term = upper.begin(); term != upper.end() - 1; ++term) {
+            if (term->first >= static_cast<int>(k))
+                throw std::runtime_error("shared upper factor");
+            d.upper.push_back({static_cast<std::uint32_t>(term->first), static_cast<std::uint32_t>(term->second.value)});
+        }
+        d.upper_offsets.push_back(d.upper.size());
+    }
+    for (std::uint32_t j = 0; j < input.columns; ++j) {
+        const bool selected = std::find(d.selected.begin(), d.selected.end(), j) != d.selected.end();
+        if (!selected && !factor.coordinates[j])
+            throw std::runtime_error("shared dependent roster");
+    }
+    for (const auto column : d.selected)
+        for (auto pos = input.offsets[column]; pos < input.offsets[column + 1]; ++pos) {
+            const auto pivot = shared.row_to_pivot[input.values[pos].row];
+            if (pivot != UINT32_MAX)
+                ++d.row_offsets[pivot + 1];
+        }
+    for (std::uint32_t k = 0; k < rank; ++k)
+        d.row_offsets[k + 1] = plus(d.row_offsets[k + 1], d.row_offsets[k]);
+    d.matrix.resize(d.row_offsets.back());
+    auto next = d.row_offsets;
+    for (std::uint32_t k = 0; k < rank; ++k) {
+        const auto column = d.selected[k];
+        for (auto pos = input.offsets[column]; pos < input.offsets[column + 1]; ++pos) {
+            const auto& entry = input.values[pos];
+            const auto pivot = shared.row_to_pivot[entry.row];
+            if (pivot == UINT32_MAX)
+                continue;
+            const auto bits = bit_length(entry.value);
+            if (bits + 32 > 512)
+                throw std::runtime_error("shared pivot coefficient width");
+            const Small value{entry.value};
+            d.matrix[next[pivot]++] = {k, value};
+            shared.row_sums[pivot] += value < 0 ? -value : value;
+            if (bit_length(shared.row_sums[pivot]) + 32 > 512)
+                throw std::runtime_error("shared pivot row sum width");
+            d.matrix_bits = std::max(d.matrix_bits, bits);
+        }
+    }
+    return shared;
+}
+
+bool load_shared_target(SharedPivot& shared, const InputData& input, std::uint32_t candidate) {
+    auto& d = shared.target;
+    d.candidate = candidate;
+    std::fill(d.initial.begin(), d.initial.end(), Small{0});
+    std::copy(shared.row_sums.begin(), shared.row_sums.end(), d.bound.begin());
+    for (auto pos = input.offsets[candidate]; pos < input.offsets[candidate + 1]; ++pos) {
+        const auto& entry = input.values[pos];
+        const auto pivot = shared.row_to_pivot[entry.row];
+        if (pivot == UINT32_MAX)
+            continue;
+        if (bit_length(entry.value) + 32 > 512)
+            return false;
+        const Small value{entry.value};
+        d.initial[pivot] = value;
+        const Small magnitude = value < 0 ? -value : value;
+        if (magnitude > d.bound[pivot])
+            d.bound[pivot] = magnitude;
+    }
+    d.row_bound_bits = 0;
+    for (const auto& bound : d.bound)
+        d.row_bound_bits = std::max(d.row_bound_bits, bit_length(bound));
+    d.product_bound_bits = d.row_bound_bits + 32;
+    ++shared.counts.loads;
+    shared.counts.rows = plus(shared.counts.rows, input.rank);
+    shared.counts.entries = plus(shared.counts.entries, input.offsets[candidate + 1] - input.offsets[candidate]);
+    shared.counts.bits = std::max(shared.counts.bits, d.product_bound_bits);
+    return true;
+}

@@ -1,0 +1,102 @@
+#include "frozen-shared-batch.hpp"
+
+namespace {
+using namespace batch_fixed;
+
+void shared_controls() {
+    Matrix m;
+    m.rows = 2;
+    m.columns = {{{0, Q{1} / 2}, {1, Q{1} / 7}},
+                 {{0, Q{3} / 5}, {1, Q{6} / 35}}, {},
+                 {{0, Q{1} / 3}, {1, Q{2} / 21}}};
+    const auto factor = eliminate<Mod<p1>>(m, 1, 10000, Mod<p1>::parse, true);
+    if (!factor.complete || factor.selected != std::vector<int>{0})
+        throw std::runtime_error("control factor");
+    InputData input;
+    input.rows = 2;
+    input.columns = 4;
+    input.rank = 1;
+    input.selected = {0};
+    input.offsets = {0, 2, 4, 4, 6};
+    input.values = {{0, InputInt{15}}, {1, InputInt{15}}, {0, InputInt{18}}, {1, InputInt{18}},
+                    {0, InputInt{10}}, {1, InputInt{10}}};
+    input.integer_bits = 5;
+    input.reference = {{Big{1}, Big{1}}, {Big{6}, Big{5}}, {}, {Big{2}, Big{3}}};
+    auto shared = prepare_shared(input, factor, {Integer{30}, Integer{105}});
+    const auto before = plus(planned(input, input.columns), shared_payload(shared));
+    Scratch scratch(shared.target);
+    FullScratch full(input.rows);
+    std::vector<ColumnResult> columns(input.columns);
+    if (before != plus(actual(input, scratch, full, columns), shared_payload(shared)))
+        throw std::runtime_error("control capacity differs");
+    const BatchLimits limits{before, 8192, 128, 1000000};
+    const auto short_payload = batch(input, scratch, full, columns,
+                                     {before - 1, limits.bits, limits.digits, limits.events}, false, &shared);
+    if (short_payload.status != BatchStatus::LiftFailure || shared.counts.loads != 0)
+        throw std::runtime_error("short payload accepted");
+    const auto result = batch(input, scratch, full, columns, limits, false, &shared);
+    if (result.status != BatchStatus::Success || result.heap || result.proof_rows != 8 ||
+        result.coordinates != 4 || shared.counts.loads != 3 || shared.counts.rows != 3 ||
+        shared.counts.entries != 4 || columns[2].lift.status != Status::Success)
+        throw std::runtime_error("shared zero target after nonzero");
+    input.reference[1] = {Big{7}, Big{5}};
+    const auto mismatch = batch(input, scratch, full, columns, limits, false, &shared);
+    if (mismatch.status != BatchStatus::LiftFailure || mismatch.failed_column != 1 ||
+        columns[1].lift.status != Status::ReferenceMismatch || mismatch.heap)
+        throw std::runtime_error("borrowed coordinate not checked");
+    input.reference[1] = {Big{6}, Big{5}};
+    const auto retried = batch(input, scratch, full, columns, limits, false, &shared);
+    if (retried.status != BatchStatus::Success || retried.events != result.events || retried.heap)
+        throw std::runtime_error("shared retry differs");
+    std::cout << "{\"payload_equal_one_short\":true,\"zero_target_after_nonzero\":true,"
+                 "\"borrowed_coordinate_mismatch\":true,\"same_scratch_after_failure\":true,"
+                 "\"heap_attempts\":0,\"proof_rows\":8,\"coordinate_checks\":4}\n";
+}
+} // namespace
+
+int main(int argc, char** argv) try {
+    using namespace batch_fixed;
+    if (argc == 2 && std::string(argv[1]) == "--controls") {
+        batch_controls();
+        return 0;
+    }
+    if (argc == 2 && std::string(argv[1]) == "--shared-controls") {
+        shared_controls();
+        return 0;
+    }
+    if (argc != 5)
+        return 2;
+    const auto domain = std::string(argv[3]);
+    const auto mode = std::string(argv[4]);
+    if ((domain != "full" && domain != "cut") || (mode != "first" && mode != "all"))
+        return 2;
+    const bool first = mode == "first";
+    std::ifstream file(argv[1]);
+    const auto source = read(file);
+    if (source.n != 4 || source.full != 933)
+        throw std::runtime_error("experiment only admits n4 quartic");
+    const auto matrix = active_matrix(source, domain == "cut", true);
+    const auto factor = eliminate<Mod<p1>>(matrix, 33 + source.full, 200000000, Mod<p1>::parse, true);
+    std::vector<Integer> scales;
+    auto data = prepare_input(matrix, factor, argv[2], source.n, source.full, first, &scales);
+    auto shared = prepare_shared(data, factor, scales);
+    std::vector<Integer>{}.swap(scales);
+    const auto before = plus(planned(data, data.columns), shared_payload(shared));
+    if (before > 51539607552ULL)
+        throw std::runtime_error("batch payload admission");
+    Scratch scratch(shared.target);
+    FullScratch full(data.rows);
+    std::vector<ColumnResult> columns(data.columns);
+    const auto bytes = plus(actual(data, scratch, full, columns), shared_payload(shared));
+    if (before != bytes)
+        throw std::runtime_error("batch payload capacity differs");
+    const auto start = std::chrono::steady_clock::now();
+    const auto result = batch(data, scratch, full, columns, {bytes, 8192, 128, 2000000000}, first, &shared);
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    write_result(data, columns, result, bytes, elapsed, &shared);
+    return result.status == BatchStatus::Success ? 0 : 3;
+} catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+}
