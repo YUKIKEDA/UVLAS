@@ -1,0 +1,96 @@
+"""Check only the new case selector/gate; numeric results are captured stubs."""
+import argparse
+import copy
+import hashlib
+import json
+import tempfile
+from pathlib import Path
+import importlib.machinery
+import importlib.util
+
+
+def load(name,path):
+    loader=importlib.machinery.SourceFileLoader(name,str(path));spec=importlib.util.spec_from_loader(name,loader)
+    m=importlib.util.module_from_spec(spec);loader.exec_module(m);return m
+
+
+def main():
+    p=argparse.ArgumentParser()
+    p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    a=p.parse_args();root=a.root;folder=root/'docs/verification/IM-01/pg-rank-fixed-batch-n2'
+    case=load('n2_case',folder/'run-case.py.txt');base=load('base_batch',root/'docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt')
+    producer=load('n2_producer',folder/'derive-driver.py.txt')
+    original=(root/'docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt').read_bytes()
+    generated=producer.derive(original);record=json.loads((folder/'driver.json').read_text())
+    base.require(hashlib.sha256(generated).hexdigest()==record['generated_source_sha256'],'deterministic driver')
+    try:producer.derive(original+b' ')
+    except ValueError:pass
+    else:raise RuntimeError('unfrozen base accepted')
+    capture=json.loads((folder/'results.json').read_text());raw=json.loads((root/'out/issue140-n2-full/n2-full-raw.json').read_text())
+    selected=set(capture['result']['selected_columns']);index=next(j for j in range(730) if j not in selected)
+    first={**capture['first_probe'],'columns':[{'proof_rows':0} for _ in range(730)]}
+    first['columns'][index]=copy.deepcopy(raw['columns'][index])
+    actual_load=case.load;cases=['valid','missing-row','missing-coordinate','wrong-selection','wrong-case-count',
+        'missing-coordinate-width','negative-lift-events','float-lift-events','bool-coordinate-width',
+        'heap-attempt','total-products-float','elapsed-float','elapsed-negative','peak-bool','peak-zero','timeout','replace-failure','alias-replace-failure','swapped-input']
+    passed=0
+    with tempfile.TemporaryDirectory() as temporary:
+        d=Path(temporary);exe=d/'batch.exe';exe.write_bytes(b'captured transport stub')
+        for present in [False,True]:
+            for name in cases:
+                result=copy.deepcopy(raw)
+                dependent=next(c for c in result['columns'] if not c['selected'])
+                if name=='missing-row':result['columns'][-1]['proof_rows']-=1
+                elif name=='missing-coordinate':result['columns'][-1]['coordinate_checks']-=1
+                elif name=='wrong-selection':result['columns'][0]['selected']=False
+                elif name=='wrong-case-count':result['rows']=2504
+                elif name=='missing-coordinate-width':dependent.pop('maximum_coordinate_bits')
+                elif name=='negative-lift-events':dependent['defined_lift_events']=-1
+                elif name=='float-lift-events':dependent['defined_lift_events']=1.0
+                elif name=='bool-coordinate-width':dependent['maximum_coordinate_bits']=True
+                elif name=='heap-attempt':result['heap_attempts']=1
+                elif name=='total-products-float':result['proof_products']=float(result['proof_products'])
+                elif name=='elapsed-float':result['batch_ms']=1.0
+                elif name=='elapsed-negative':result['batch_ms']=-1
+                elif name=='peak-bool':result['process_peak_bytes']=True
+                elif name=='peak-zero':result['process_peak_bytes']=0
+                calls=[]
+                def invoke(binary,*values):
+                    calls.append(values[-1])
+                    if values==('--controls',):return capture['controls']
+                    if values[-1]=='first':return copy.deepcopy(first)
+                    if name=='timeout':raise TimeoutError('injected timeout')
+                    return result
+                base.invoke=invoke
+                case.load=lambda n,path:base if n=='batch_base' else actual_load(n,path)
+                output=d/('n2-full-raw.json' if name=='alias-replace-failure' else 'result.json');output.unlink(missing_ok=True)
+                if present:output.write_bytes(b'prior completed result\n')
+                inputs=root/'out/issue140-scratch'
+                if name=='swapped-input':
+                    inputs=d/'inputs';inputs.mkdir(exist_ok=True)
+                    (inputs/'2-quartic.txt').write_bytes((root/'out/issue140-scratch/2-flat.txt').read_bytes())
+                old=base.os.replace
+                def fail(*unused):raise OSError('injected replacement failure')
+                if name in ('replace-failure','alias-replace-failure'):base.os.replace=fail
+                argv=['--inputs',str(inputs),'--certificates',str(root/'out/issue164-fixed-verifier'),
+                    '--batch',str(exe),'--base-runner',str(root/'docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt'),
+                    '--capacity-producer',str(root/'docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt'),
+                    '--study',str(root/'docs/verification/IM-01/pg-rank-resource-study/results.json'),
+                    '--certificate-index',str(root/'docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json'),
+                    '--driver-record',str(folder/'driver.json'),'--output',str(output)]
+                accepted=False
+                try:case.main(argv);accepted=True
+                except (RuntimeError,ValueError,TimeoutError,OSError):pass
+                finally:base.os.replace=old
+                base.require(accepted==(name=='valid'),name+' publication')
+                if not accepted:base.require(output.read_bytes()==b'prior completed result\n' if present else not output.exists(),'retained output')
+                else:base.require(json.loads(output.read_text())['result']['coordinate_checks']==268640,'complete compact output')
+                base.require(not list(d.glob(f'.{output.name}.*.tmp')),'temporary cleanup')
+                if name=='swapped-input':base.require(not calls,'identity rejection precedes transport')
+                passed+=1
+    a.output.write_text(json.dumps({'schema':'uvlas.fixed-batch-n2-gate/1','transport':'captured results stub',
+        'source_reproduction_sha256':record['generated_source_sha256'],'unfrozen_source_rejected':True,
+        'normal_and_failure_output_modes':['absent','present'],'scenarios':cases,'passed':passed},indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+if __name__=='__main__':main()

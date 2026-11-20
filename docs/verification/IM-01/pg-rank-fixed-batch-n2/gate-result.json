@@ -1,0 +1,32 @@
+{
+  "schema": "uvlas.fixed-batch-n2-gate/1",
+  "transport": "captured results stub",
+  "source_reproduction_sha256": "3516c0253b60e06e73d14c9e3c9633767e11cbb9a8636160df0c6eaab33a32fe",
+  "unfrozen_source_rejected": true,
+  "normal_and_failure_output_modes": [
+    "absent",
+    "present"
+  ],
+  "scenarios": [
+    "valid",
+    "missing-row",
+    "missing-coordinate",
+    "wrong-selection",
+    "wrong-case-count",
+    "missing-coordinate-width",
+    "negative-lift-events",
+    "float-lift-events",
+    "bool-coordinate-width",
+    "heap-attempt",
+    "total-products-float",
+    "elapsed-float",
+    "elapsed-negative",
+    "peak-bool",
+    "peak-zero",
+    "timeout",
+    "replace-failure",
+    "alias-replace-failure",
+    "swapped-input"
+  ],
+  "passed": 38
+}

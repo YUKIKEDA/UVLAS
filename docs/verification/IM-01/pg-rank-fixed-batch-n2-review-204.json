@@ -1,0 +1,28 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-batch-n2-review-204",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 201,
+  "parent_issue": 140,
+  "source_commit": "651123f74f3b8bd35a75aa711d51b24f93f763e4",
+  "date": "2026-11-20",
+  "claimed_state": "2入口の衝突/来歴事前検査。旧3破壊と空来歴受理を再現、新9衝突byte保持、23種×出力有無を通常/-Oで検証。数値transportはstub、既存数値証拠はbyte保持。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2.json": "3aede3cdabbbe2cde40fff1276764160326be7a6410281c9e86b75db9bc889e0",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt": "1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/run-case.py.txt": "673c3a77879851fc5fb25168897146dc51012f4fb56247c2167328d35121b1b8",
+    ".cursor/rules/reference-data.mdc": "1c073b7ce945e5aaa3e12c71597643131d01157f0f0763c5da16491154c73703"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-correction.md": "4074c3254cf56e707e6916c3737dfb3acc5fcc156b241c99ecad02659b0e8f51",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-optimized-result.json": "9530c033b07db71195e9660d0ef0a0745190a7efce497c803f87a87bced137dc",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-original-derive-driver.py.txt": "c3d95f8f8ff9c9e1b7e0ae4a54690d1d29254f8b7406c2823be04f322574b552",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-original-manifest.json.txt": "6302b969879341d3a075bed0f7b6b37caf67b158a3dcd958e7bbd1816d9da0bf",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-original-run-case.py.txt": "610332b40c90afb85ccf235a12545d69083064f6f32b9f80a2616b0e090e8ae0",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-probe.py.txt": "1b622b537132c00fb0eec1c13b7f429e8c127eaf28d17aced16409ce60132247",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-result.json": "9530c033b07db71195e9660d0ef0a0745190a7efce497c803f87a87bced137dc"
+  }
+}
