@@ -20,12 +20,22 @@ def derive(raw):
     return result
 
 
+def distinct_paths(*paths):
+    resolved=[p.resolve() for p in paths]
+    for i,left in enumerate(resolved):
+        for right in resolved[i+1:]:
+            if left==right or (left.exists() and right.exists() and left.samefile(right)):
+                raise ValueError('base, output and record must name distinct files')
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--base',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--record',type=Path,required=True)
-    args=p.parse_args();raw=args.base.read_bytes();result=derive(raw)
+    args=p.parse_args()
+    distinct_paths(args.base,args.output,args.record)
+    raw=args.base.read_bytes();result=derive(raw)
     args.output.write_bytes(result)
     args.record.write_text(json.dumps({'schema':'uvlas.fixed-batch-n2-driver/1',
         'base_sha256':BASE_SHA256,'generated_source_sha256':hashlib.sha256(result).hexdigest(),

@@ -30,15 +30,20 @@
     "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
   },
   "artifacts": {
-    "docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt": "c3d95f8f8ff9c9e1b7e0ae4a54690d1d29254f8b7406c2823be04f322574b552",
     "docs/verification/IM-01/pg-rank-fixed-batch-n2/driver.json": "ccabda1f2d33d299257854c89011a1b3d6742729a6a5073e3032d1dbacb0c15f",
     "docs/verification/IM-01/pg-rank-fixed-batch-n2/gate-optimized-result.json": "6e6aa143c580922c353e2bfbd3253c9b5cab7a2ef79fd8a622cb3c419931108b",
     "docs/verification/IM-01/pg-rank-fixed-batch-n2/gate-probe.py.txt": "79495c54bcaa8a5d22c9b7eb13ceb7faff21df1dea00460977adb0e29e4d97dc",
     "docs/verification/IM-01/pg-rank-fixed-batch-n2/gate-result.json": "6e6aa143c580922c353e2bfbd3253c9b5cab7a2ef79fd8a622cb3c419931108b",
     "docs/verification/IM-01/pg-rank-fixed-batch-n2/results.json": "3afc6f507fae7fbb6dc8fbab2747aa564f6dc16c9d6cb75fd8ee60489cd86423",
-    "docs/verification/IM-01/pg-rank-fixed-batch-n2/run-case.py.txt": "610332b40c90afb85ccf235a12545d69083064f6f32b9f80a2616b0e090e8ae0",
     "docs/verification/IM-01/pg-rank-fixed-batch-n2/verification.md": "79240331f7f8c2e4320fbba1b27dcb7501babf6aefe2866b4120b8cfcac9bb0f",
-    "docs/verification/IM-01/pg-rank-fixed-batch.json": "f2aaf899ec9f97c3920d07eb903656b4b62a55f78573ceb1f8580e3bf7be7804"
+    "docs/verification/IM-01/pg-rank-fixed-batch.json": "f2aaf899ec9f97c3920d07eb903656b4b62a55f78573ceb1f8580e3bf7be7804",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-original-derive-driver.py.txt": "c3d95f8f8ff9c9e1b7e0ae4a54690d1d29254f8b7406c2823be04f322574b552",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-original-run-case.py.txt": "610332b40c90afb85ccf235a12545d69083064f6f32b9f80a2616b0e090e8ae0"
   },
-  "historical_manifest_reference": "The n1 manifest records its fixed review head. Current cpp/runner and the publication correction are fixed separately as sources; the unchanged old manifest is a historical artifact, not current-script acceptance."
+  "historical_manifest_reference": "The n1 manifest records its fixed review head. Current cpp/runner and the publication correction are fixed separately as sources; the unchanged old manifest is a historical artifact, not current-script acceptance.",
+  "artifact_reference_adjustment": {
+    "review_head": "651123f74f3b8bd35a75aa711d51b24f93f763e4",
+    "reason": "Only the changed entrypoint citations are rebound to byte-identical originals. Numeric evidence hashes are unchanged.",
+    "original_manifest_copy": "docs/verification/IM-01/pg-rank-fixed-batch-n2/review-204-original-manifest.json.txt"
+  }
 }
