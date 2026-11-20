@@ -1,0 +1,46 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-batch-n4-full",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 214,
+  "parent_issue": 140,
+  "source_commit": "bd2fabfbcc9aacd87a61c913b7793b0300953940",
+  "date": "2026-11-20",
+  "claimed_state": "n4平坦・四次の全背景で、全候補の全活動行を厳密に証明し、各基底座標を独立証明書と照合した。監査中の追加確保試行は両形状で0件。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "limb_bits": 32,
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt": "1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "699bf1f80bc9351fed420e473b5babb69a8704d9cec1cfebae7e36734f62825b",
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "docs/verification/IM-01/pg-rank-fixed-lift/results.json": "4b4680e9ebd9574d8319af94e0044db98c4afcdda67f031126cbc75efa6f1851",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/derive-driver.py.txt": "1b3569e6eb8f6a191a5ec382c657834e5865127290cc1eb2c2b23054ff1a5563",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/driver.json": "16cc2ecb9104c0133e0ef4b22fe232eedafedee67ab64e03dad531b514900b2e",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/flat-result.json": "8f988ad60079a85e56b93e7333396021670bf60bc88dacd06aa67ea27b143025",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/gate-probe.py.txt": "c135213ac6802fac94095c70942bc08dfc7041cc428b51e14e7da2a7b52ff443",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/gate-result.json": "417bf1fcc64214b87426106ed95fb0c21b5a93099b71d2b47b00bfea356a957a",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/quartic-result.json": "8ee56271f2464b49489831fdee23218cdced092615a1437912683c0ca9166edb",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/review-217-original-run-case.py.txt": "f26f65aba5570dc75c1a87f560ec897d2ec470f02f32d99cd3b30de3ff8ff0ee",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/verification.md": "d9dc646ecc15f62d5d49518c06e2164519fd56be21df1c6155abb7cf4893d00d"
+  }
+}

@@ -1,0 +1,74 @@
+"""Verify that either n4 full-background run protects the other shape's files."""
+
+import argparse
+import hashlib
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
+
+
+def digest(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, required=True)
+    parser.add_argument('--coefficient-dir', type=Path, required=True)
+    parser.add_argument('--certificate-dir', type=Path, required=True)
+    args = parser.parse_args()
+    evidence = args.root.resolve() / 'docs/verification/IM-01'
+    case = evidence / 'pg-rank-fixed-batch-n4-full'
+    flags = ['-O'] if sys.flags.optimize else []
+    passed = 0
+
+    with TemporaryDirectory() as scratch:
+        directory = Path(scratch)
+        binary = directory / 'batch.exe'
+        binary.write_bytes(b'not a batch executable')
+        files = {}
+        for shape in ('flat', 'quartic'):
+            coefficient = f'4-{shape}.txt'
+            certificate = f'4-{shape}-full.cert'
+            files[shape] = (directory / coefficient, directory / certificate)
+            shutil.copyfile(args.coefficient_dir / coefficient, files[shape][0])
+            shutil.copyfile(args.certificate_dir / certificate, files[shape][1])
+
+        command = [
+            sys.executable, *flags, '-B', case / 'run-case.py.txt',
+            '--inputs', directory, '--certificates', directory, '--batch', binary,
+            '--base-runner', evidence / 'pg-rank-fixed-batch/run-batch.py.txt',
+            '--shared-runner', evidence / 'pg-rank-fixed-batch-n4-cut/run-case.py.txt',
+            '--capacity-producer', evidence / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt',
+            '--study', evidence / 'pg-rank-resource-study/results.json',
+            '--certificate-index', evidence / 'pg-rank-fixed-certificate/certificate-index.json',
+            '--driver-record', case / 'driver.json',
+        ]
+        alias = directory / 'output-alias'
+        for selected, other in (('flat', 'quartic'), ('quartic', 'flat')):
+            for target in files[other]:
+                before = digest(target)
+                alias.hardlink_to(target)
+                for output in (target, alias):
+                    result = subprocess.run(
+                        [*command, '--shape', selected, '--output', output],
+                        capture_output=True, text=True, timeout=15, check=False,
+                    )
+                    expected = f'ValueError: --output must be distinct from read-only input: {target}'
+                    if result.returncode == 0 or expected not in result.stderr.splitlines():
+                        raise RuntimeError(f'{selected}: refused {output} for the wrong reason: {result.stderr}')
+                    if not alias.samefile(target) or digest(target) != before or digest(output) != before:
+                        raise RuntimeError(f'{selected}: modified {target} through {output}')
+                    if list(directory.glob('.*.tmp')):
+                        raise RuntimeError(f'{selected}: publication left a temporary file')
+                    passed += 1
+                alias.unlink()
+
+    print(f'{passed} cross-shape output collisions rejected before the batch')
+
+
+if __name__ == '__main__':
+    main()
