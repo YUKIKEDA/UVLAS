@@ -1,0 +1,53 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-root-snapshot",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 233,
+  "parent_issue": 22,
+  "date": "2026-11-20",
+  "source_commit": "21af74a394dcf44404ea21915e9b92fe73c4d1ac",
+  "base_commit": "5340e6c1a521d72f6bbb4dd20dd9ccca914b5cb4",
+  "scope": "Private same-handle snapshot acquisition for one prepared root-source ordinal, with native identity admission",
+  "environment": {
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "os": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "uncommitted_changes": false
+  },
+  "verification": {
+    "ctest_passed": 3,
+    "new_cases": 4,
+    "new_assertions": 110,
+    "manifest_identity_mutation_exit": 42
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "562ad9ed7b30b6d7fe8dcc7b7bf227d02e52c21c5b727cf219c592cabb7d2167",
+    "src/io/reference_file_snapshot.cpp": "5f3f195f1a728924239a715d5e34634a5c1abaaa4dba82637aa7cc9ca2612fce",
+    "src/io/reference_file_snapshot.hpp": "788e340c6fdc9f9e452f42ce7fb6641ecd2b91b61c4e090852c10ef3c601c844",
+    "src/io/reference_root_snapshot.cpp": "6aa6fb9c20281bf377db54854aa6225666f9c280df00552036f8c3c3462e546e",
+    "src/io/reference_root_snapshot.hpp": "7e725da70ed812801853d3526b0579e7d893a845e6e138654ce0b024ec71a441",
+    "src/io/reference_input.cpp": "3adead2c59be73f4a4acf3223890c84fbe1f7b4fbb20cc3417dbc15e1792613e",
+    "src/io/reference_root_plan.cpp": "ae5606c5e1bac25649c290533e3e00f62abebb1d27e4e33f607f57bbce83b25b",
+    "tests/io/reference_file_snapshot_test.cpp": "d981c6b5ce90fc0737bc67712bbe3dd645007e6c13b92c90c7cb46cd3a0af87c",
+    "tests/io/reference_input_test.cpp": "926f42721242a6c63759d800f2a74b94a8aee256ba1f329810b7c351327bc6de",
+    "tests/io/reference_declarations_fixture.hpp": "896a96d5f3e515ff21de94f2ad3c716e819dcc26a8eda620a906543475042397",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-root-snapshot.md": "1ab93f1499a63fb7d00edbd2443acaf3b96f169cdd95fe7502f469ede98cb3e6"
+  }
+}

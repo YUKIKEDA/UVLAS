@@ -388,3 +388,64 @@ TEST_CASE("Manifest reading rejects changes, failed admission and cancellation b
         CHECK(reader.info_calls == 1);
     }
 }
+
+TEST_CASE("Same-handle reader checks manifest and distinct source identities before payload",
+          "[IO4-01][N4-08][negative][verification]") {
+    constexpr ReferenceFileLimits no_payload{0, 0, 0, 0};
+    constexpr std::array<ReferenceFileId, 2> prior{ReferenceFileId{43, binary_info.identity.object},
+                                                   binary_info.identity};
+
+    SECTION("Manifest ID wins over prior matches, wrong digest and payload limits") {
+        Reader reader(binary, binary_info);
+        core::ResourcePlan plan{0};
+        Diagnostic diag;
+        const auto result = read_reference_file(reader, empty_hash, no_payload, plan, {}, &diag,
+                                                {binary_info.identity, prior, 1});
+        require_failure(result, diag, Reason::Cycle, core::FailureCode::InvalidInput, 0);
+        CHECK(reader.info_calls == 1);
+        CHECK(reader.read_calls == 0);
+        CHECK(plan.allocated_bytes() == 0);
+    }
+    SECTION("Distinct-source check recognizes a match only with a complete native ID") {
+        Reader reader(binary, binary_info);
+        core::ResourcePlan plan{0};
+        Diagnostic diag;
+        const auto result = read_reference_file(reader, empty_hash, no_payload, plan, {}, &diag,
+                                                {std::nullopt, prior, prior.size()});
+        require_failure(result, diag, Reason::DuplicateFile, core::FailureCode::InvalidInput, 0);
+        CHECK(reader.info_calls == 1);
+        CHECK(reader.read_calls == 0);
+        CHECK(plan.allocated_bytes() == 0);
+    }
+    SECTION("A comparison limit one below the first possible match fails before read") {
+        Reader reader(binary, binary_info);
+        core::ResourcePlan plan{0};
+        Diagnostic diag;
+        const auto result = read_reference_file(reader, empty_hash, no_payload, plan, {}, &diag,
+                                                {std::nullopt, prior, 1});
+        require_failure(result, diag, Reason::IdentityComparisons,
+                        core::FailureCode::ResourceExceeded, 0);
+        if (diag && diag->quota) {
+            CHECK(diag->quota->required == 2);
+            CHECK(diag->quota->limit == 1);
+        } else {
+            FAIL("Missing identity-work quota");
+        }
+        CHECK(reader.info_calls == 1);
+        CHECK(reader.read_calls == 0);
+        CHECK(plan.allocated_bytes() == 0);
+    }
+    SECTION("Same bytes and reader succeed when no matching native identity was recorded") {
+        Reader reader(binary, binary_info);
+        core::ResourcePlan plan{4};
+        Diagnostic diag;
+        const auto distinct = std::span{prior}.first(1);
+        const auto result = read_reference_file(reader, binary_hash, limits, plan, {}, &diag,
+                                                {std::nullopt, distinct, 1});
+        CHECK(result.has_value());
+        CHECK_FALSE(diag);
+        CHECK(reader.info_calls == 2);
+        CHECK(reader.read_calls == 2);
+        CHECK(plan.allocated_bytes() == 4);
+    }
+}
