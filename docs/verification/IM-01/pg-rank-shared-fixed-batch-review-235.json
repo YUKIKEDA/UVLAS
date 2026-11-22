@@ -1,0 +1,24 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-shared-fixed-batch-review-235",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 234,
+  "parent_issue": 140,
+  "source_commit": "55a4ce29c494ea296bbb8b327d856e6a243d8844",
+  "date": "2026-11-22",
+  "claimed_state": "派生物の置換失敗時のバイト保持と、独立に求めた右辺走査件数の完全一致を確認した。全背景64／951340件、U形切断18／231163件。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch.json": "9519db1e23fe8eb7837d303bbd763717964c9e86a3c18aeb717f7fd981492208",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/derive-header.py.txt": "fbf5c9456f66bac26deb5896a80de914243f5e9176ddaa36c5c7b6cc58824fe1",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/run-shared.py.txt": "3c612ec40315759b155c8773bd22d5f6464395da842d2af797f0f7077963bd90"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/review-235-original-manifest.json.txt": "c2b57520d55cb12fc82d18e00e5f05fe7886e50552a9d0733dd3d121819cd0b5",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/review-235-correction.md": "948ee7e19b5c49b32fa140b502677d067bb774e430e18b6835bfc4a42eed2772",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/review-235-probe.py.txt": "95761a6c19223ecd03f79be96956ae1b00645034e3a52ae5b29bb0f0dc6862cd",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/review-235-result.json": "d87fbb9d54f3c13194a046fd0ff158b03913fd19e352b56dec961270b7e5ee0e"
+  }
+}

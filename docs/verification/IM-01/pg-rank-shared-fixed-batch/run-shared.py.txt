@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+from fractions import Fraction
 from pathlib import Path
 from runpy import run_path
 
@@ -38,7 +39,65 @@ def validate_shared_controls(base, controls):
         base.integer(controls.get(key), expected, key)
 
 
-def validate_shared(base, result, census, first):
+def count_rhs_scans(path, selections):
+    """Count A L nonzeros for the dependent ordinals chosen by each certificate."""
+    with path.open('rb') as stream:
+        tag, grid, original_count, full, _, _ = stream.readline().split()
+        if tag != b'header' or int(grid) != 4:
+            raise ValueError('expected n4 coefficient header')
+        original_count, full = int(original_count), int(full)
+        originals = [dict() for _ in range(full)]
+        anchor_start = 33 + full
+        recipes = [[] for _ in range(anchor_start + original_count)]
+        for column in range(original_count):
+            recipes[anchor_start + column].append((column, Fraction(1)))
+        for line in stream:
+            tag, *fields = line.split()
+            if tag == b'coefficient':
+                column, *row, numerator, denominator = map(int, fields)
+                key = tuple(row)
+                value = Fraction(numerator, denominator)
+                if value == 0 or key in originals[column]:
+                    raise ValueError('expected distinct nonzero dictionary terms')
+                originals[column][key] = value
+            elif tag == b'column':
+                column, mode, original = map(int, fields)
+                if mode in (6, 7):
+                    recipes[anchor_start + original].append((column, Fraction(-1)))
+            elif tag in (b'required', b'anchor'):
+                column, source, numerator, denominator = map(int, fields)
+                weight = Fraction(numerator, denominator)
+                if tag == b'anchor':
+                    column += anchor_start
+                    weight = -weight
+                recipes[column].append((source, weight))
+            else:
+                raise ValueError('unknown coefficient record')
+
+    dependents = {
+        domain: [j for j in range(len(recipes)) if j not in selected]
+        for domain, selected in selections.items()
+    }
+    counts = {'full': {}, 'cut': {}}
+    for column in set(dependents['full']) | set(dependents['cut']):
+        if 33 <= column < anchor_start:
+            coefficients = originals[column - 33]
+        else:
+            coefficients = {}
+            for source, weight in recipes[column]:
+                for row, value in originals[source].items():
+                    coefficients[row] = coefficients.get(row, 0) + weight * value
+        # n4 has unit half-cells in the integer coordinates of the U shape.
+        # Sorting activity rows into sparse order permutes entries without changing the count.
+        nonzeros = [row for row, coefficient in coefficients.items() if coefficient]
+        counts['full'][column] = len(nonzeros)
+        counts['cut'][column] = sum(t in (0, 3) or (s == 0 and t in (1, 2))
+                                    for _, s, t, _, _ in nonzeros)
+    return {domain: {'first': counts[domain][columns[0]], 'all': sum(counts[domain][j] for j in columns)}
+            for domain, columns in dependents.items()}
+
+
+def validate_shared(base, result, census, first, expected_scans):
     loads = 1 if first else census['dependents']
     for key, expected in (
         ('pivot_nonzeros', census['pivot_nonzeros']),
@@ -46,8 +105,7 @@ def validate_shared(base, result, census, first):
         ('target_loads', loads), ('rhs_rows_initialized', loads * census['rank']),
     ):
         base.integer(result.get(key), expected, key)
-    entries = result.get('rhs_entries_scanned')
-    base.require(type(entries) is int and 0 <= entries <= loads * census['rows'], 'RHS sparse scans')
+    base.integer(result.get('rhs_entries_scanned'), expected_scans, 'RHS sparse scans')
     bits = result.get('maximum_shared_recurrence_bits')
     base.require(type(bits) is int and 32 < bits <= census['shared_recurrence_bits'] <= 512,
                  'shared recurrence width')
@@ -117,6 +175,7 @@ def main(argv=None):
                      == census_cases[domain]['certificate_sha256'], f'{domain} input identity')
         selections[domain] = full['read_basis'](base, certificate, dimensions)
 
+    expected_scans = count_rhs_scans(args.coefficient, selections)
     controls = base.invoke(binary, '--controls')
     base.validate_controls(controls)
     shared_controls = base.invoke(binary, '--shared-controls')
@@ -128,7 +187,7 @@ def main(argv=None):
             first = mode == 'first'
             capture = base.invoke(binary, args.coefficient, certificates[domain], domain, mode)
             full['validate_batch'](base, capture, dimensions, selections[domain], first)
-            validate_shared(base, capture, census_cases[domain], first)
+            validate_shared(base, capture, census_cases[domain], first, expected_scans[domain][mode])
             compact = ({key: value for key, value in capture.items() if key != 'columns'}
                        if first else common['compact'](capture))
             if not first:

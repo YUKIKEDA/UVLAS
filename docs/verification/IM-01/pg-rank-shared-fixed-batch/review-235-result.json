@@ -1,0 +1,16 @@
+{
+  "schema": "uvlas.pg-shared-fixed-batch-review/1",
+  "paired_publication_checks": 12,
+  "independent_scans": {
+    "full": {
+      "first": 64,
+      "all": 951340
+    },
+    "cut": {
+      "first": 18,
+      "all": 231163
+    }
+  },
+  "count_checks": 21,
+  "count_only_rejected_before_publication": 8
+}
