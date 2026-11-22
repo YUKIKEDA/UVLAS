@@ -45,6 +45,13 @@ struct ReferenceFileLimits {
     std::uint64_t maximum_hash_bytes;
 };
 
+struct ReferenceFileIdentityChecks {
+    // IDs are from the same native origin and from already authenticated sources.
+    std::optional<ReferenceFileId> manifest{};
+    std::span<const ReferenceFileId> earlier_distinct_sources{};
+    std::uint64_t maximum_comparisons = 0;
+};
+
 enum class ReferenceFileFailure : std::uint8_t {
     Metadata,
     NotRegular,
@@ -59,6 +66,9 @@ enum class ReferenceFileFailure : std::uint8_t {
     TrailingByte,
     Modified,
     DigestMismatch,
+    Cycle,
+    DuplicateFile,
+    IdentityComparisons,
 };
 
 struct ReferenceFileQuota {
@@ -106,7 +116,8 @@ private:
     friend core::Result<ReferenceFileSnapshot>
     read_reference_file(ReferenceFileReader&, const SourceDigest&, ReferenceFileLimits,
                         core::ResourcePlan&, const std::stop_token&,
-                        std::optional<ReferenceFileDiagnostic>*) noexcept;
+                        std::optional<ReferenceFileDiagnostic>*,
+                        const ReferenceFileIdentityChecks&) noexcept;
     friend core::Result<ReferenceFileSnapshot>
     read_manifest_file(ReferenceFileReader&, ReferenceFileLimits, core::ResourcePlan&,
                        const std::stop_token&, std::optional<ReferenceFileDiagnostic>*) noexcept;
@@ -114,7 +125,8 @@ private:
     [[nodiscard]] static core::Result<ReferenceFileSnapshot>
     read_from_handle(ReferenceFileReader&, const SourceDigest* declared_digest, ReferenceFileLimits,
                      core::ResourcePlan&, const std::stop_token&,
-                     std::optional<ReferenceFileDiagnostic>*) noexcept;
+                     std::optional<ReferenceFileDiagnostic>*,
+                     const ReferenceFileIdentityChecks&) noexcept;
 
     ReferenceFileSnapshot(core::PlannedBuffer<std::byte> payload, SourceDigest verified_digest,
                           ReferenceFileInfo verified_info) noexcept;
@@ -125,12 +137,14 @@ private:
 
 // Reads and verifies one handle. On failure, successful allocations stay charged but no
 // partial payload escapes. Diagnostic reports observed progress and clears on success or cancel.
+// Manifest and earlier source identities are checked against the very first metadata, before
+// payload admission, allocation or reading.
 // Adapter and ResourcePlan must have exclusive use during this synchronous call.
 [[nodiscard]] core::Result<ReferenceFileSnapshot>
 read_reference_file(ReferenceFileReader& reader, const SourceDigest& declared_digest,
                     ReferenceFileLimits limits, core::ResourcePlan& plan,
-                    const std::stop_token& stop,
-                    std::optional<ReferenceFileDiagnostic>* diagnostic) noexcept;
+                    const std::stop_token& stop, std::optional<ReferenceFileDiagnostic>* diagnostic,
+                    const ReferenceFileIdentityChecks& identities = {}) noexcept;
 
 // Reads the manifest itself, which has no enclosing declaration to supply an expected digest.
 // The same length, identity, modification, cancellation and resource checks apply. The result
