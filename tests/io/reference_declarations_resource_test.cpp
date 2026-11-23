@@ -170,6 +170,7 @@ void operator delete[](void* value, std::align_val_t, const std::nothrow_t&) noe
 
 #include "case_schema_snapshot.hpp"
 #include "reference_declarations_fixture.hpp"
+#include "reference_dependency_walk.hpp"
 #include "reference_root_plan.hpp"
 
 #include <future>
@@ -452,4 +453,56 @@ TEST_CASE(
     CHECK_FALSE(slot.detail());
     CHECK_FALSE(slot.pointer());
     CHECK(snapshot(input) == previous);
+}
+
+TEST_CASE("Dependency walk allocation failures preserve the primary cycle decision",
+          "[IO4-01][N4-02][N4-08][negative]") {
+    constexpr rd::DependencyWalkLimits caps{2, 3, 2, 20, 3 * sizeof(core::Index)};
+    for (std::int64_t point = 0; point < 4; ++point) {
+        core::ResourcePlan plan{budget};
+        const auto failed = [&] {
+            const FaultScope fault{point};
+            return rd::DependencyWalk::create(caps, plan, {});
+        }();
+        REQUIRE_FALSE(failed);
+        CHECK(failed.error().code == core::FailureCode::ResourceExceeded);
+        CHECK(plan.allocated_bytes() ==
+              static_cast<std::uint64_t>(point) * 2 * sizeof(core::Index));
+    }
+
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop requires mutable source.
+    std::stop_source stop;
+    cancel_at_allocation = &stop;
+    cancel_after = 3;
+    core::ResourcePlan cancelled_plan{budget};
+    const auto cancelled = rd::DependencyWalk::create(caps, cancelled_plan, stop.get_token());
+    cancel_at_allocation = nullptr;
+    cancel_after = -1;
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+    CHECK(cancelled_plan.allocated_bytes() == 8 * sizeof(core::Index));
+
+    core::ResourcePlan plan{budget};
+    auto walk = take(rd::DependencyWalk::create(caps, plan, {}));
+    constexpr rd::DependencyEdge root{std::nullopt, 0, io::SourceId{1},
+                                      rd::ReferenceRole::ObservationReference, 101};
+    constexpr rd::DependencyEdge loop{0, 0, io::SourceId{10},
+                                      rd::ReferenceRole::ObservationReference, 102};
+    REQUIRE(walk.enter(root, plan, {}, nullptr));
+    rd::DependencyWalkDiagnostic diagnostic;
+    const auto failed = [&] {
+        const FaultScope fault{0};
+        return walk.enter(loop, plan, {}, &diagnostic);
+    }();
+    REQUIRE_FALSE(failed);
+    CHECK(failed.error().code == core::FailureCode::InvalidInput);
+    CHECK(diagnostic.reason == rd::DependencyWalkFailure::Cycle);
+    CHECK(diagnostic.cycle.size() == 0);
+    if (const auto view = walk.view()) {
+        CHECK(view->active.size() == 1);
+        CHECK(view->edges == 1);
+        CHECK(view->work == 9);
+    } else {
+        FAIL("Missing stable traversal");
+    }
 }

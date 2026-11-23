@@ -1,0 +1,54 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-dependency-walk",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 240,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "c13c7fa29f88ec6ab389266d4bccece2129331f6",
+  "base_commit": "9e25eb8bc425f1d696d6ffc126b1437a1c379216",
+  "scope": "Private incremental ordered dependency traversal over verified source ordinals",
+  "environment": {
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "os": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "uncommitted_changes": false
+  },
+  "verification": {
+    "ctest_passed": 2,
+    "new_cases": 7,
+    "new_assertions": 6410,
+    "mutation_source_commit": "94d794e69ad1bb95975a63148de67674df1b0aa3",
+    "missing_cycle_mutation_exit": 42,
+    "original_shared_depth_regression_exit": 42,
+    "missing_shared_height_mutation_exit": 42
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "41a373ce202d0789bdef6b61b8e9a556f5e9dc5a6469df5c8c75276b09889a0c",
+    "src/io/reference_dependency_walk.cpp": "a4efd203bb173f08961fd482a470fea277d88645d3c8998fe289e3eed1155837",
+    "src/io/reference_dependency_walk.hpp": "4547ed0db00a2a1048e96615d8bdbffa8f807905bc3053445d1522d91e717f8c",
+    "tests/CMakeLists.txt": "d9d30d9d28ff2d1055a3dc79ca85c884cf6ca3686d71e9e773d586d95e236d06",
+    "tests/io/reference_dependency_walk_test.cpp": "b2cbb300db2b7b8f2f93af1b29d0b5cda05e8ba0d107269d40ba881a25197238",
+    "tests/io/reference_declarations_resource_test.cpp": "e05e15a8d139a00d9efa3b0288b6b57b5abdd1c48021930a748c82f0cc87d305",
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-dependency-walk.md": "ff17b330c3cc14ff662b374398b113852b9e12a5e60559709f6fbbc88983e311"
+  },
+  "inputs": {
+    "docs/verification/IM-06/reference-snapshot-design-cases.json": "89291c6309f2a920f5bec2cb87c70dce94fdb9b1b8af4f7fa128133c325e9d36"
+  }
+}

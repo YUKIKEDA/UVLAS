@@ -111,7 +111,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
-    src/io/reference_root_plan.cpp)
+    src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
 uvlas_configure_target(uvlas_io)
