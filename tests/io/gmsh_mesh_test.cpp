@@ -132,7 +132,7 @@ TEST_CASE("Gmsh prepares the adopted mesh types and keeps original tags, order a
         core::ResourcePlan memory{10000};
         AllocationAudit audit{cpp_backend, AuditThreadDomain::AllThreads};
         auto output = GmshMesh::prepare(input, limits, memory, {});
-        CHECK(audit.finish().cpp_allocation_attempts == 6);
+        CHECK(audit.finish().cpp_allocation_attempts == 7);
         REQUIRE(output);
         CHECK(std::ranges::equal(take_view(input.file.view()).bytes, before.bytes));
         CHECK(take_view(output->view()).digest == before.digest);
@@ -272,6 +272,36 @@ $EndElements
     CHECK(rejected.error().code == InvalidInput);
     CHECK(rejected_offset == offset);
     CHECK(rejected_plan.allocated_bytes() == 0);
+
+    // Optional sections can occur after the node and element blocks.
+    const auto begin = sparse.find("$Entities\n");
+    const auto end = sparse.find("$Nodes\n");
+    REQUIRE(begin < end);
+    auto late_entities = std::string{sparse.substr(0, begin)};
+    late_entities.append(sparse.substr(end));
+    late_entities.append(sparse.substr(begin, end - begin));
+    const auto late_source = snapshot(late_entities);
+    core::ResourcePlan late_plan{10000};
+    CHECK(GmshMesh::prepare(late_source, minimal, late_plan, {}));
+
+    for (const auto header : {"1 2147483647 0 0", "1 2147483647 1 0"}) {
+        CAPTURE(header);
+        auto dangling = late_entities;
+        const auto start = dangling.find(header);
+        REQUIRE(start != dangling.npos);
+        const auto tag_offset = start + 2;
+        dangling.replace(tag_offset, 10, "99");
+        const auto dangling_source = snapshot(dangling);
+        core::ResourcePlan dangling_plan{10000};
+        std::size_t diagnostic_offset = 0;
+        const auto attempt =
+            GmshMesh::prepare(dangling_source, minimal, dangling_plan, {}, &diagnostic_offset);
+        CHECK_FALSE(attempt);
+        if (!attempt) {
+            CHECK(attempt.error().code == InvalidInput);
+            CHECK(diagnostic_offset == tag_offset);
+        }
+    }
 }
 
 TEST_CASE("Gmsh rejects overflowing int tags in every definition and reference",

@@ -231,8 +231,14 @@ ElementType element_type(Token token) {
 
 struct Counts {
     std::size_t names = 0, entities = 0, links = 0, nodes = 0, elements = 0;
+    std::size_t blocks = 0;
     bool entities_declared = false;
     bool operator==(const Counts&) const = default;
+};
+
+struct BlockOwner {
+    GmshKey key;
+    std::size_t tag_offset = 0;
 };
 
 struct Records {
@@ -241,6 +247,7 @@ struct Records {
     std::span<GmshLink> links;
     std::span<GmshNode> nodes;
     std::span<GmshElement> elements;
+    std::span<BlockOwner> blocks;
 };
 
 template <class T>
@@ -304,6 +311,14 @@ public:
     }
 
 private:
+    GmshKey block_owner() {
+        const auto dim = dimension(input_.word());
+        const auto tag = input_.word();
+        const GmshKey owner{dim, entity_tag(tag)};
+        append(output_.blocks, result_.blocks++, BlockOwner{owner, tag.offset});
+        return owner;
+    }
+
     void names() {
         const auto limit =
             count(input_.word(), remaining_count(limits_.physical_names, result_.names));
@@ -363,8 +378,7 @@ private:
         const auto hi = unsigned_number(input_.word());
         TagRange range;
         for (std::uint64_t block = 0; block < blocks; ++block) {
-            const auto dim = dimension(input_.word());
-            const auto owner = entity_tag(input_.word());
+            const auto owner = block_owner();
             const auto parameter = input_.word();
             const auto parametric = unsigned_number(parameter);
             if (parametric > 1)
@@ -373,15 +387,14 @@ private:
             for (std::size_t i = 0; i < amount; ++i) {
                 const auto tag = positive_number(input_.word());
                 range.add(tag);
-                append(output_.nodes, written + i,
-                       GmshNode{tag, {dim, owner}, {}, {}, parametric != 0});
+                append(output_.nodes, written + i, GmshNode{tag, owner, {}, {}, parametric != 0});
             }
             for (std::size_t i = 0; i < amount; ++i) {
                 std::array<GmshLexeme, 3> coordinates{}, parameters{};
                 for (auto& coordinate : coordinates)
                     coordinate = decimal(input_.word());
                 if (parametric != 0)
-                    for (std::size_t k = 0; k < dim; ++k)
+                    for (std::size_t k = 0; k < owner.dimension; ++k)
                         parameters[k] = decimal(input_.word());
                 if (!output_.nodes.empty()) {
                     auto& node = output_.nodes[written + i];
@@ -406,16 +419,15 @@ private:
         const auto hi = unsigned_number(input_.word());
         TagRange range;
         for (std::uint64_t block = 0; block < blocks; ++block) {
-            const auto dim = dimension(input_.word());
-            const auto owner = entity_tag(input_.word());
+            const auto owner = block_owner();
             const auto type = element_type(input_.word());
-            if (type.dimension != dim)
+            if (type.dimension != owner.dimension)
                 reject(InvalidInput, input_.position());
             const auto amount = block_count(input_.word(), result_.elements - written);
             for (std::size_t i = 0; i < amount; ++i) {
                 const auto tag = positive_number(input_.word());
                 range.add(tag);
-                GmshElement value{tag, {dim, owner}, type.kind, {}};
+                GmshElement value{tag, owner, type.kind, {}};
                 for (std::size_t corner = 0; corner < type.corners; ++corner)
                     value.nodes[corner] = positive_number(input_.word());
                 append(output_.elements, written++, value);
@@ -472,15 +484,12 @@ void resolve(Records records, bool entities_declared, Work& work, std::size_t en
             for (const auto& boundary : boundaries)
                 find(records.entities, &GmshEntity::key, boundary.key, work, end);
         }
-        for (const auto& node : records.nodes)
-            find(records.entities, &GmshEntity::key, node.entity, work, end);
+        for (const auto& block : records.blocks)
+            find(records.entities, &GmshEntity::key, block.key, work, block.tag_offset);
     }
-    for (const auto& element : records.elements) {
-        if (entities_declared)
-            find(records.entities, &GmshEntity::key, element.entity, work, end);
+    for (const auto& element : records.elements)
         for (const auto node : element.connectivity())
             find(records.nodes, &GmshNode::tag, node, work, end);
-    }
 }
 
 template <class T>
@@ -548,6 +557,8 @@ core::Result<GmshMesh> GmshMesh::prepare(const AcquiredRootSnapshot& snapshot, G
             admit<GmshLink>(shape.links, capacity);
             admit<GmshNode>(shape.nodes, capacity);
             admit<GmshElement>(shape.elements, capacity);
+            const auto owner_count = shape.entities_declared ? shape.blocks : 0;
+            admit<BlockOwner>(owner_count, capacity);
             work.charge(0, 0);
             GmshMesh result;
             result.location_ = snapshot.location;
@@ -565,9 +576,10 @@ core::Result<GmshMesh> GmshMesh::prepare(const AcquiredRootSnapshot& snapshot, G
             result.links_ = allocate<GmshLink>(plan, shape.links);
             result.nodes_ = allocate<GmshNode>(plan, shape.nodes);
             result.elements_ = allocate<GmshElement>(plan, shape.elements);
-            const Records records{result.names_.values(), result.entities_.values(),
-                                  result.links_.values(), result.nodes_.values(),
-                                  result.elements_.values()};
+            auto owners = allocate<BlockOwner>(plan, owner_count);
+            const Records records{result.names_.values(),    result.entities_.values(),
+                                  result.links_.values(),    result.nodes_.values(),
+                                  result.elements_.values(), owners.values()};
             if (Parser{{copy.data(), copy.size()}, work, limits, records}.read() != shape)
                 reject(InvalidInput, 0);
             resolve(records, shape.entities_declared, work, input.size());
