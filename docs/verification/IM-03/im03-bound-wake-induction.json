@@ -11,10 +11,10 @@
   "package": "IM-03",
   "issue": 19,
   "date": "2026-11-24",
-  "source_commit": "f864312fb8d7c0ff76d2e2f4a0cbbdc072ae1542",
+  "source_commit": "75d21ee92ad565ad9dba12ddc1ab626e3f6d124f",
   "claimed_state": "Owned mixed induction action with analytic bound circulation, existing wake P1 evaluation, shared signed P0 edge reduction, JVP, and VJP.",
   "verification": {
-    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config. Debug and Release 5/5 each on source_commit.",
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config. Debug and Release 5/5 each on numerical source f864312fb8d7c0ff76d2e2f4a0cbbdc072ae1542.",
     "msvc_ctest": [
       "aero.p1_shared_action",
       "aero.p1_induction",
@@ -22,7 +22,7 @@
       "aero.local_geometry_packet",
       "aero.global_geometry"
     ],
-    "gcc": "Ubuntu Noble chroot, GCC 14.2.0 Release, warnings as errors. 4/4 on source_commit.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2.0 Release, warnings as errors. 4/4 on numerical source f864312fb8d7c0ff76d2e2f4a0cbbdc072ae1542.",
     "gcc_ctest": [
       "aero.p1_shared_action",
       "aero.p1_induction",
@@ -33,7 +33,8 @@
     "oracle": "100-digit independent endpoint line formula, central directional difference step 1e-25, comparisons using the propagated enclosure plus 1e-45.",
     "mutation": "Isolated MSVC Debug; suppressing the reversal of a bound edge contribution invalidates 3 of 6 velocity and transpose containment assertions, Catch exit 42. Control passes all six assertions.",
     "static": "clang-format 21.1.2, scoped MSVC clang-tidy 21.1.1.",
-    "scope": "The input is the contact-qualified discrete geometry and an explicit resolved query. Physical PG-ANCF collocation, implicit wake-front extraction, and original residual qualification require subsequent assembly."
+    "scope": "The input is the contact-qualified discrete geometry and an explicit resolved query. Physical PG-ANCF collocation, implicit wake-front extraction, and original residual qualification require subsequent assembly.",
+    "test_only_recheck": "After guarding the P1 test JVP dereference: aero.p1_shared_action passes MSVC Debug and Release and GCC 14.2 Release. Linux clang-tidy 21.1.1 passed all four changed production TUs and the updated test. Preceding test SHA256: a092e1dafe0c2c1cb05679761b18f26f4585529724f3ed05811aa3719e7b55c4."
   },
   "source_records": [
     {
@@ -104,7 +105,7 @@
     {
       "id": "tests/aero/p1_shared_action_test.cpp",
       "hint": "tests/aero/p1_shared_action_test.cpp",
-      "sha256": "a092e1dafe0c2c1cb05679761b18f26f4585529724f3ed05811aa3719e7b55c4"
+      "sha256": "7270fb6b382e3df3fe1251e774daebd97511e2abe32ff15ef84059dddd1c44b3"
     }
   ],
   "sources": {
@@ -121,9 +122,9 @@
     "src/aero/p1_shared_action.cpp": "7acdea3096c6c9ecf68de642e7e833e68ad9ebf69171f4ba0e3657efbb800cf8",
     "src/aero/p1_shared_action.hpp": "0e583d1be97cd55f1ac44f7b44580cc3e04271ad8d3d412580b50212c6cf721e",
     "src/aero/p1_shared_kernel.hpp": "1417c9f020ef13cd01ca131343276e7b54879f44eb6020c24d67a785d8a37543",
-    "tests/aero/p1_shared_action_test.cpp": "a092e1dafe0c2c1cb05679761b18f26f4585529724f3ed05811aa3719e7b55c4"
+    "tests/aero/p1_shared_action_test.cpp": "7270fb6b382e3df3fe1251e774daebd97511e2abe32ff15ef84059dddd1c44b3"
   },
   "artifacts": {
-    "docs/verification/IM-03/bound-wake-induction-v1/verification.md": "164c6605858607eb2ecbabda63c949f20ce8f67df39d73ee109bd4e983452b8f"
+    "docs/verification/IM-03/bound-wake-induction-v1/verification.md": "7e694ea919e3514915e53df97dfbd6e046eabc1a316b94b52f056ffa6d4dfd74"
   }
 }
