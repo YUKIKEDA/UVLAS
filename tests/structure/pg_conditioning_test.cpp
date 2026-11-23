@@ -160,7 +160,9 @@ std::vector<ExactRational> proposal(Fixture& f, const std::vector<Q>& gram, std:
     std::vector<ExactRational> result;
     for (const auto& value : inverse) {
         const Dec integer = floor(value * decimal_scale + Dec{"0.5"});
-        result.push_back(rat(f, integer.convert_to<I>(), scale));
+        // Boost's decimal-to-integer conversion negates ilogb(0)'s sentinel.
+        const auto units = integer == 0 ? I{} : integer.convert_to<I>();
+        result.push_back(rat(f, units, scale));
     }
     return result;
 }
