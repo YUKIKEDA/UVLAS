@@ -293,11 +293,12 @@ TEST_CASE("Shared P1 quad action and all derivatives match independent area quad
                 action, source, mu, dual, apply_steps, prepared.shared_workspace, prepared.memory));
             const auto& reference = fixture_oracle.at(equal ? "equal_trace" : "unequal_trace");
             const auto& jvp = value.jvp();
-            if (!jvp)
+            const auto* derivative = jvp ? &*jvp : nullptr;
+            if (derivative == nullptr)
                 FAIL("Missing JVP");
             for (std::size_t axis = 0; axis < 3; ++axis) {
                 compare(value.velocity()[axis], reference.at("velocity").at(axis));
-                compare((*jvp)[axis], reference.at("jvp").at(axis));
+                compare((*derivative)[axis], reference.at("jvp").at(axis));
             }
             duality(value, transpose);
         }
