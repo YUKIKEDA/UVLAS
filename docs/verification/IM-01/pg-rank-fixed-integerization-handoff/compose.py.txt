@@ -56,6 +56,12 @@ def compose(frozen, derive_shared, handoff):
                     '        d.scale_inverse[k] = static_cast<std::uint32_t>(\n'
                     '            (Mod<p1>{1} / Mod<p1>{static_cast<std::uint64_t>(residue)}).value);')
     core = replace(core, '#include "shared-pivot.hpp.txt"', pivot + '\n' + handoff.decode('ascii'))
+    core = replace(core, 'bool first_only = false, SharedPivot* shared = nullptr) {',
+                   'bool first_only = false, SharedPivot* shared = nullptr,\n'
+                   '                  std::uint64_t owner_extra = 0) {')
+    core = replace(core, 'if (plus(actual(d, s, full, columns), shared ? shared_payload(*shared) : 0) > cap.payload)',
+                   'if (plus(plus(actual(d, s, full, columns), shared ? shared_payload(*shared) : 0),\n'
+                   '             owner_extra) > cap.payload)')
     core = replace(core, 'const SharedPivot* shared = nullptr) {\n    std::cout',
                    'const SharedPivot* shared = nullptr, const HandoffEvidence* evidence = nullptr) {\n    std::cout')
     core = replace(core, '    std::cout << ",\\"columns\\":[";',
@@ -76,8 +82,32 @@ def compose(frozen, derive_shared, handoff):
                      '#include <string_view>')
     driver = replace(driver, 'prepare_shared(input, factor, {Integer{30}, Integer{105}})',
                      'prepare_shared(input, factor, std::vector<row_integerization::Fixed>{30, 105})')
+    driver = replace(driver, '    InputData input;', '    ConnectedInput connected;\n    auto& input = connected.data;')
+    driver = replace(driver, '    auto shared = prepare_shared(input, factor, std::vector<row_integerization::Fixed>{30, 105});',
+                     '    auto& shared = connected.shared;\n'
+                     '    shared = prepare_shared(input, factor, std::vector<row_integerization::Fixed>{30, 105});')
+    for owner in ('input', 'data'):
+        driver = replace(driver, f'plus(planned({owner}, {owner}.columns), shared_payload(shared))',
+                         f'plus(plus(planned({owner}, {owner}.columns), shared_payload(shared)), connected_owner_extra)')
+        driver = replace(driver, f'plus(actual({owner}, scratch, full, columns), shared_payload(shared))',
+                         f'plus(plus(actual({owner}, scratch, full, columns), shared_payload(shared)), connected_owner_extra)')
+    short_call = '{before - 1, limits.bits, limits.digits, limits.events}, false, &shared)'
+    driver = replace(driver, short_call, short_call[:-1] + ', connected_owner_extra)')
+    control_call = 'batch(input, scratch, full, columns, limits, false, &shared)'
+    if driver.count(control_call) != 3:
+        raise ValueError('batch control anchors differ')
+    driver = driver.replace(control_call, control_call[:-1] + ', connected_owner_extra)')
+    driver = replace(driver, '{bytes, 8192, 128, 2000000000}, first, &shared)',
+                     '{bytes, 8192, 128, 2000000000}, first, &shared, connected_owner_extra)')
+    driver = replace(driver, '    std::cout << "{\\"payload_equal_one_short\\":true,',
+                     '    std::cout << "{\\"batch_equal_one_short_bytes\\":" << before\n'
+                     '              << ",\\"payload_equal_one_short\\":true,')
     driver = replace(driver, '    if (argc != 5)\n', '''    if (argc == 2 && std::string(argv[1]) == "--row-controls") {
         row_integerization::controls();
+        return 0;
+    }
+    if (argc == 2 && std::string(argv[1]) == "--handoff-capacity-controls") {
+        handoff_capacity_controls();
         return 0;
     }
     if (argc != 5)

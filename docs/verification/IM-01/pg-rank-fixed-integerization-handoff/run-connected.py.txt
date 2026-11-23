@@ -7,10 +7,34 @@ from runpy import run_path
 
 
 DOMAINS = {'full': (20032, 933, 1496, 774), 'cut': (5634, 933, 1496, 498)}
-COMPOSITION_SHA = '8c6f4b6ec916648716a1bc360a2f0fbdad74225afc4a59e3c514495088ffce9d'
+COMPOSITION_SHA = '469824110a3e2654f67c80acc3ba2a6253dd4be0fdbedda2554a0bcc8641f38f'
 ROW_SHA = 'f5faeb7efce8f811641653dc875e412cbcab9b5b462f80f9507d1075f96b6609'
 SHARED_SHA = 'cf8c3413b005adffc936a19a52e1dbc418d4bc8ad6a6a336c204adab67767e58'
 CAP = 48 * 1024**3
+# MSVC 19.51 x64 layout, checked by the native capacity control.
+INPUT_OWNER_BYTES = 144
+SHARED_OWNER_BYTES = 400
+CONNECTED_OWNER_BYTES = 624
+OWNER_EXTRA = CONNECTED_OWNER_BYTES - INPUT_OWNER_BYTES - SHARED_OWNER_BYTES
+PAIR_BYTES = 2064
+OFFSET_BYTES = 8
+
+
+def validate_handoff_controls(base, controls):
+    expected = {
+        'input_owner_bytes': INPUT_OWNER_BYTES,
+        'shared_owner_bytes': SHARED_OWNER_BYTES,
+        'connected_owner_bytes': CONNECTED_OWNER_BYTES,
+        'connected_owner_extra_bytes': OWNER_EXTRA,
+        'pair_bytes': PAIR_BYTES,
+        'entry_bytes': 208,
+        'offset_bytes': OFFSET_BYTES,
+        'reference_equal_one_short_bytes': CONNECTED_OWNER_BYTES + 4 + 2 * PAIR_BYTES,
+        'overlap_equal_one_short_bytes': CONNECTED_OWNER_BYTES + 4 + 2 * PAIR_BYTES + 2 * 4,
+    }
+    base.require(type(controls) is dict and controls.keys() == expected.keys(), 'handoff control roster')
+    for name, value in expected.items():
+        base.integer(controls.get(name), value, name)
 
 
 def legacy_vector_capacity(size):
@@ -31,21 +55,20 @@ def validate_connection(base, result, row, legacy):
         ('max_integer_bits', row['reference_max_integer_bits']),
     ):
         base.integer(stage.get(key), expected, key)
-    remaining = row['actual_bytes'] - row['terms'] * row['term_bytes'] - row['column_offsets_compared'] * 8
+    remaining = row['actual_bytes'] - row['terms'] * row['term_bytes'] - row['column_offsets_compared'] * OFFSET_BYTES
     base.integer(stage.get('row_only_bytes'), remaining, 'row-only capacity')
-    # Pinned MSVC ABI: InputData owner (144 B), selections (4 B), reference Pair (2064 B).
-    preflight = row['actual_bytes'] + 144 + legacy['rank'] * (4 + legacy['candidates'] * 2064)
+    preflight = row['actual_bytes'] + CONNECTED_OWNER_BYTES + legacy['rank'] * (4 + legacy['candidates'] * PAIR_BYTES)
     base.require(preflight <= CAP, 'reference preflight exceeds cap')
     base.integer(stage.get('reference_preflight_bytes'), preflight, 'reference preflight')
     shared_bytes = legacy['shared_payload_bytes']
     base.integer(result.get('shared_payload_bytes'), shared_bytes, 'shared block capacity')
-    overlap = preflight + shared_bytes
+    overlap = preflight + shared_bytes - SHARED_OWNER_BYTES
     base.require(overlap <= CAP, 'handoff overlap limit')
     base.integer(stage.get('fixed_overlap_bytes'), overlap, 'handoff overlap')
     offset_count = row['column_offsets_compared']
     legacy_slack = ((legacy_vector_capacity(row['terms']) - row['terms']) * row['term_bytes']
-                    + (legacy_vector_capacity(offset_count) - offset_count) * 8)
-    base.integer(result.get('payload_bytes'), legacy['payload_bytes'] - legacy_slack, 'lift capacity')
+                    + (legacy_vector_capacity(offset_count) - offset_count) * OFFSET_BYTES)
+    base.integer(result.get('payload_bytes'), legacy['payload_bytes'] - legacy_slack + OWNER_EXTRA, 'lift capacity')
 
 
 def main(argv=None):
@@ -95,12 +118,16 @@ def main(argv=None):
     base.validate_controls(controls)
     shared_controls = base.invoke(binary, '--shared-controls')
     shared['validate_shared_controls'](base, shared_controls)
+    base.integer(shared_controls.get('batch_equal_one_short_bytes'), 36184, 'batch boundary control size')
     row_controls = base.invoke(binary, '--row-controls')
     base.require(type(row_controls) is dict and row_controls.keys() == original_rows['controls'].keys(),
                  'row control roster')
     for key, expected in original_rows['controls'].items():
         value = row_controls[key]
         base.require(type(value) is type(expected) and value == expected, f'row control {key}')
+
+    handoff_capacity_controls = base.invoke(binary, '--handoff-capacity-controls')
+    validate_handoff_controls(base, handoff_capacity_controls)
 
     cases = []
     for domain, dimensions in DOMAINS.items():
@@ -127,7 +154,8 @@ def main(argv=None):
         'domain_order': list(DOMAINS), 'row_order': 'sparse', 'input_sha256': original_rows['input_sha256'],
         'composition': composition, 'binary_sha256': full['sha256'](binary),
         'row_baseline_sha256': ROW_SHA, 'shared_baseline_sha256': SHARED_SHA,
-        'controls': controls, 'shared_controls': shared_controls, 'row_controls': row_controls, 'cases': cases,
+        'controls': controls, 'shared_controls': shared_controls, 'row_controls': row_controls,
+        'handoff_capacity_controls': handoff_capacity_controls, 'cases': cases,
     })
 
 

@@ -86,10 +86,14 @@ def main():
         ('cut-reallocated', 'CSC storage ownership'),
         ('cut-width-mismatch', 'max_integer_bits:'),
         ('cut-preflight-mismatch', 'reference preflight:'),
+        ('cut-owner-omitted', 'reference preflight:'),
+        ('cut-overlap-owner-omitted', 'handoff overlap:'),
+        ('cut-lift-owner-omitted', 'lift capacity:'),
         ('cut-payload-mismatch', 'lift capacity:'),
         ('cut-digest-mismatch', 'frozen numerical field differs: column_diagnostics_sha256'),
     )
-    stages = ('--controls', '--shared-controls', '--row-controls', 'full:first', 'full:all', 'cut:first', 'cut:all')
+    stages = ('--controls', '--shared-controls', '--row-controls', '--handoff-capacity-controls',
+              'full:first', 'full:all', 'cut:first', 'cut:all')
     with TemporaryDirectory() as scratch:
         temp = Path(scratch)
         check_composition(base, verification, temp, capture['composition'])
@@ -141,6 +145,16 @@ def main():
                                 stage['reference_preflight_bytes'] -= 1
                                 stage['fixed_overlap_bytes'] -= 1
                                 frame['row_preparation'] = stage
+                            if name in ('cut-owner-omitted', 'cut-overlap-owner-omitted'):
+                                stage = dict(frame['row_preparation'])
+                                if name == 'cut-owner-omitted':
+                                    stage['reference_preflight_bytes'] -= 480
+                                    # Reproduce all three undercounts from the reviewed head.
+                                    frame['payload_bytes'] -= 80
+                                stage['fixed_overlap_bytes'] -= 80
+                                frame['row_preparation'] = stage
+                            if name == 'cut-lift-owner-omitted':
+                                frame['payload_bytes'] -= 80
                             if name == 'cut-payload-mismatch':
                                 frame['payload_bytes'] -= 1
                             if name == 'cut-digest-mismatch':

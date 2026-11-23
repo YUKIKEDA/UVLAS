@@ -1,7 +1,7 @@
 {
   "schema": "uvlas.pg-row-handoff-gate/1",
   "composition_checks": 3,
-  "publication_checks": 14,
+  "publication_checks": 20,
   "runner_alias_checks": 28,
   "publication_scenarios": [
     "valid",
@@ -9,6 +9,9 @@
     "cut-reallocated",
     "cut-width-mismatch",
     "cut-preflight-mismatch",
+    "cut-owner-omitted",
+    "cut-overlap-owner-omitted",
+    "cut-lift-owner-omitted",
     "cut-payload-mismatch",
     "cut-digest-mismatch"
   ]

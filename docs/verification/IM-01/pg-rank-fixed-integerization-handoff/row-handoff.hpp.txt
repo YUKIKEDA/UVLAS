@@ -11,6 +11,55 @@ struct ConnectedInput {
     HandoffEvidence evidence;
 };
 
+constexpr auto connected_owner_extra = sizeof(ConnectedInput) - sizeof(InputData) - sizeof(SharedPivot);
+
+std::uint64_t reference_preflight_payload(std::uint64_t row_bytes, const InputData& data) {
+    const auto selected_bytes = times(data.rank, sizeof(std::uint32_t));
+    const auto coordinate_bytes = times(times(data.columns, data.rank), sizeof(Pair));
+    return plus(plus(row_bytes, sizeof(ConnectedInput)), plus(selected_bytes, coordinate_bytes));
+}
+
+std::uint64_t fixed_overlap_payload(std::uint64_t reference_bytes, const SharedPivot& shared) {
+    // The reference preflight already includes the live shared owner.
+    return plus(reference_bytes, shared_payload(shared) - sizeof(SharedPivot));
+}
+
+void require_fixed_capacity(std::uint64_t required, std::uint64_t cap, const char* stage) {
+    if (required > cap)
+        throw std::runtime_error(stage);
+}
+
+void handoff_capacity_controls() {
+    ConnectedInput input;
+    input.data.rank = 1;
+    input.data.columns = 2;
+    input.shared.row_to_pivot.resize(2);
+    const auto reference = reference_preflight_payload(0, input.data);
+    const auto overlap = fixed_overlap_payload(reference, input.shared);
+    const auto check_boundary = [](std::uint64_t required, const char* stage) {
+        require_fixed_capacity(required, required, stage);
+        try {
+            require_fixed_capacity(required, required - 1, stage);
+        } catch (const std::runtime_error& error) {
+            if (std::string_view{error.what()} == stage)
+                return;
+            throw;
+        }
+        throw std::runtime_error("short handoff capacity accepted");
+    };
+    check_boundary(reference, "reference preflight capacity exceeded");
+    check_boundary(overlap, "fixed overlap capacity exceeded");
+    std::cout << "{\"input_owner_bytes\":" << sizeof(InputData)
+              << ",\"shared_owner_bytes\":" << sizeof(SharedPivot)
+              << ",\"connected_owner_bytes\":" << sizeof(ConnectedInput)
+              << ",\"connected_owner_extra_bytes\":" << connected_owner_extra
+              << ",\"pair_bytes\":" << sizeof(Pair)
+              << ",\"entry_bytes\":" << sizeof(Entry)
+              << ",\"offset_bytes\":" << sizeof(std::uint64_t)
+              << ",\"reference_equal_one_short_bytes\":" << reference
+              << ",\"overlap_equal_one_short_bytes\":" << overlap << "}\n";
+}
+
 ConnectedInput connect_fixed_rows(const Matrix& matrix, const Elimination<Mod<p1>>& factor,
                                   const char* certificate, int grid, int full, std::uint64_t cap) {
     if (!factor.complete || factor.selected.empty())
@@ -31,12 +80,8 @@ ConnectedInput connect_fixed_rows(const Matrix& matrix, const Elimination<Mod<p1
     data.columns = static_cast<std::uint32_t>(matrix.columns.size());
     data.rank = static_cast<std::uint32_t>(factor.selected.size());
     data.integer_bits = rows.integer_bits;
-    const auto selected_bytes = times(data.rank, sizeof(std::uint32_t));
-    const auto coordinate_bytes = times(times(data.columns, data.rank), sizeof(Pair));
-    evidence.reference_preflight = plus(plus(rows.actual, sizeof(InputData)),
-                                        plus(selected_bytes, coordinate_bytes));
-    if (evidence.reference_preflight > cap)
-        throw std::runtime_error("reference preflight capacity exceeded");
+    evidence.reference_preflight = reference_preflight_payload(rows.actual, data);
+    require_fixed_capacity(evidence.reference_preflight, cap, "reference preflight capacity exceeded");
     const auto* entry_data = normalized.entries.data();
     const auto* offset_data = normalized.offsets.data();
     const auto csc_bytes = plus(times(normalized.entries.capacity(), sizeof(Entry)),
@@ -50,12 +95,13 @@ ConnectedInput connect_fixed_rows(const Matrix& matrix, const Elimination<Mod<p1
     data.selected.assign(factor.selected.begin(), factor.selected.end());
     read_reference(data, matrix, factor, certificate, grid, full);
     evidence.row_only_bytes = rows.actual - csc_bytes;
-    if (plus(inputs_payload(data), evidence.row_only_bytes) != evidence.reference_preflight)
+    const auto reference_actual = plus(plus(inputs_payload(data), evidence.row_only_bytes),
+                                       sizeof(ConnectedInput) - sizeof(InputData));
+    if (reference_actual != evidence.reference_preflight)
         throw std::runtime_error("reference capacity differs");
     assembled.shared = prepare_shared(data, factor, normalized.scales);
-    evidence.fixed_overlap = plus(evidence.reference_preflight, shared_payload(assembled.shared));
-    if (evidence.fixed_overlap > cap)
-        throw std::runtime_error("fixed overlap capacity exceeded");
+    evidence.fixed_overlap = fixed_overlap_payload(reference_actual, assembled.shared);
+    require_fixed_capacity(evidence.fixed_overlap, cap, "fixed overlap capacity exceeded");
 
     evidence.planned = rows.planned;
     evidence.actual = rows.actual;
