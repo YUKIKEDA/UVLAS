@@ -1,4 +1,5 @@
 #include "si_case_detail.hpp"
+#include "si_exact_words.hpp"
 #include "si_rational_plan.hpp"
 
 #include <charconv>
@@ -315,3 +316,78 @@ core::Result<ExactRational> materialize_rational(const SiRecipeView& recipe,
         });
 }
 } // namespace uvlas::io
+
+namespace uvlas::io::detail {
+namespace {
+constexpr auto word_operation = core::Operation::PrepareModel;
+constexpr std::array<std::uint32_t, 1> one_word{1};
+
+constexpr std::uint64_t size_in_words(std::uint64_t bits) noexcept {
+    return bits / 32 + (bits % 32 != 0 ? 1U : 0U);
+}
+
+bool copy_words(const structure::detail::IntegerBackend& magnitude, std::span<std::uint32_t> target,
+                const std::stop_token& stop) noexcept {
+    constexpr auto limb_bits = structure::detail::IntegerBackend::limb_bits;
+    static_assert(limb_bits % 32 == 0);
+    constexpr auto words_per_limb = limb_bits / 32;
+    for (std::size_t i = 0; i < target.size(); ++i) {
+        if (stop.stop_requested())
+            return false;
+        target[i] = static_cast<std::uint32_t>(magnitude.limbs()[i / words_per_limb] >>
+                                               (32 * (i % words_per_limb)));
+    }
+    return true;
+}
+} // namespace
+
+SiRationalWords::SiRationalWords(core::PlannedBuffer<std::uint32_t> words, std::size_t numerator,
+                                 int sign) noexcept
+    : words_(std::move(words)), numerator_(numerator), sign_(sign) {}
+
+SiRationalWordsView SiRationalWords::view() const& noexcept {
+    const auto data = words_.values();
+    if (data.empty())
+        return {0, {}, one_word};
+    return {sign_, data.first(numerator_), data.subspan(numerator_)};
+}
+
+core::Result<SiRationalWords> materialize_rational_words(const SiRecipeView& recipe,
+                                                         const structure::ExactLimits& limits,
+                                                         core::ResourcePlan& memory,
+                                                         const std::stop_token& stop) noexcept {
+    return core::guard_entry(
+        word_operation, core::FailureCode::InvalidInput, {},
+        [&]() -> core::Result<SiRationalWords> {
+            const auto cancelled = core::Failure{core::FailureCode::Cancelled, word_operation};
+            if (stop.stop_requested())
+                return std::unexpected(cancelled);
+            auto exact = materialize_rational(recipe, limits, memory);
+            if (!exact)
+                return std::unexpected(exact.error());
+            if (stop.stop_requested())
+                return std::unexpected(cancelled);
+            const auto sign = exact->sign();
+            if (sign == 0)
+                return SiRationalWords{};
+            const auto numerator = size_in_words(exact->numerator_bits());
+            const auto denominator = size_in_words(exact->denominator_bits());
+            constexpr auto index_max =
+                static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
+            if (numerator > index_max || denominator > index_max - numerator)
+                return std::unexpected(
+                    core::Failure{core::FailureCode::ResourceExceeded, word_operation});
+            auto words = memory.allocate<std::uint32_t>(
+                static_cast<core::Index>(numerator + denominator), word_operation);
+            if (!words)
+                return std::unexpected(words.error());
+            const auto& value = structure::detail::ExactFactory::value(*exact).backend();
+            const auto storage = words->values();
+            const auto split = static_cast<std::size_t>(numerator);
+            if (!copy_words(value.num(), storage.first(split), stop) ||
+                !copy_words(value.denom(), storage.subspan(split), stop) || stop.stop_requested())
+                return std::unexpected(cancelled);
+            return SiRationalWords{std::move(*words), split, sign};
+        });
+}
+} // namespace uvlas::io::detail

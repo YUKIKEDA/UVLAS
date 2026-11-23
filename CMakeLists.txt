@@ -129,6 +129,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp)
 endif()
 
+add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp)
+uvlas_configure_target(uvlas_coupling)
+target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero)
+
 add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)

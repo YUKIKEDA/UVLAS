@@ -43,7 +43,7 @@ struct ReferenceArithmetic {
             partition_fail(core::FailureCode::ResourceExceeded);
         ++scalar_operations;
     }
-    void admit() {
+    void admit(std::uint64_t live_rationals = reference_live_rationals) {
         cancel();
         if (!std::holds_alternative<ExactEstimateAdmission>(limits.algebra.external_memory))
             partition_fail(core::FailureCode::Unsupported);
@@ -54,8 +54,8 @@ struct ReferenceArithmetic {
             partition_fail(core::FailureCode::ResourceExceeded);
         const auto grown = partition_mul(4, limbs);
         // Two integers per live rational and one spare backend slot for add/sub.
-        const auto extra =
-            partition_mul(partition_mul(2 * reference_live_rationals + 1, grown), limb_bytes);
+        const auto extra = partition_mul(
+            partition_mul(partition_add(partition_mul(2, live_rationals), 1), grown), limb_bytes);
         partition_take(exact_rational_admission(limits.algebra, (limbs - 2) * limb_bits, extra));
         // Leave the same held-slot allowance in place when a leaf measures the
         // actual borrowed limbs of the participating operands.
@@ -100,8 +100,7 @@ struct ReferenceArithmetic {
     }
 };
 
-/// Arithmetic in the represented algebra a+b sqrt(g); no division in the
-/// quadratic algebra is used, so a rational-square g poses no ambiguity.
+/// Arithmetic in a+b sqrt(g), with exact sign tests for rational-square g as well.
 struct ReferenceRadicals {
     ReferenceArithmetic& math;
     const ExactRational& g;

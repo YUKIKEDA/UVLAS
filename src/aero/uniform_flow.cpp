@@ -478,10 +478,11 @@ struct Builder {
     }
 
     static CurveAdmission plan_formula_restore(const UniformFormulaSnapshotView& saved,
-                                               const UniformFlowReady& current, CurveLimits limits,
+                                               const UniformFlowReady& current,
+                                               std::uint64_t work_limit,
                                                const std::stop_token& stop,
                                                core::FailureDetails details) {
-        Meter meter{limits.arithmetic.steps, stop, details};
+        Meter meter{work_limit, stop, details};
         meter.step();
         if (saved.formula_version != formula_version)
             refuse(InvalidInput, details);
@@ -533,7 +534,8 @@ struct Builder {
             return needed(
                 pchip::forecast_pchip_restore(*saved_pchip, source, limits, stop, details));
         }
-        return plan_formula_restore(std::get<0>(saved), current, limits, stop, details);
+        return plan_formula_restore(std::get<0>(saved), current, limits.arithmetic.steps, stop,
+                                    details);
     }
 
     static UniformFlowReady restore(const UniformFlowSnapshotView& saved,
@@ -554,7 +556,8 @@ struct Builder {
             return UniformFlowReady{needed(pchip::restore_pchip_curve(
                 *saved_pchip, source, workspace.pchip_, limits, memory, stop, details))};
         }
-        const auto plan = plan_formula_restore(std::get<0>(saved), current, limits, stop, details);
+        const auto plan = plan_formula_restore(std::get<0>(saved), current, limits.arithmetic.steps,
+                                               stop, details);
         return UniformFlowReady{std::get<0>(current.data_), plan.reserved_steps};
     }
 };
@@ -607,6 +610,12 @@ core::Result<UniformFlowInput> UniformFlowReady::input() const& noexcept {
     const auto& [origin, scale, begin, end] = *source.time_map;
     return UniformFlowInput{owner.stamp, source.events,
                             PolynomialUniformFlow{origin, scale, begin, end, source.coefficients}};
+}
+
+core::Result<pchip::SharedPreparationInput> UniformFlowReady::retain_pchip_input() const noexcept {
+    if (const auto* curve = std::get_if<pchip::PchipCurveReady>(&data_))
+        return curve->retain_input();
+    return std::unexpected(failure(invalid));
 }
 
 std::uint64_t UniformFlowReady::used_steps() const noexcept {
@@ -712,6 +721,18 @@ evaluate_uniform_flow(const UniformFlowReady& field, UniformFlowQuery query,
                       core::FailureDetails details) noexcept {
     return guarded<ExactUniformFlowJet>(details, [&] {
         return Builder::evaluate(field, query, workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<std::uint64_t> match_uniform_formula_input(const UniformFlowReady& field,
+                                                        const UniformFlowReady& current,
+                                                        std::uint64_t work_limit,
+                                                        const std::stop_token& stop,
+                                                        core::FailureDetails details) noexcept {
+    return guarded<std::uint64_t>(details, [&] {
+        const UniformFormulaSnapshotView source{needed(field.input()), formula_version};
+        return Builder::plan_formula_restore(source, current, work_limit, stop, details)
+            .reserved_steps;
     });
 }
 
