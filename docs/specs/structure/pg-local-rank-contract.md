@@ -92,6 +92,8 @@ $$
 | report | m/F/r/r_RP/r_C/必須独立数、整数性/全再構成/traceの検査件数、値bitと作業bit、全call予測/実課金、任意phase timing |
 | validate_for | const辞書/分割と明示Limits/Workspace/Planでsource実内容・全再構成を再検査。hashの比較だけで成功させない |
 
+この所有・再検証の引継ぎは[有限資源による準備](pg-rank-bounded-preparation-contract.md)の `PgRankPreparation` に実装した。
+
 PgLocalRankはfactory専用constructor、default/copy不可、move-only。getterはlvalue限定readonly view、移動元はInvalidInput、borrowはowner移動/代入/破棄まで。入力破棄後もB/maps/診断は利用できる。reportのactivity spanやrank整数だけからqualified ownerを構築できない。
 
 cache identityはgraph/D/全cell/係数recipeと選択規約版を含む。入力を変えた結果を同じ寸法だけで再利用しない。validate_forは所有witnessとの実値比較と現在入力への再構成を行うので、明示予算を必要とする。物理参照や反復点評価ごとにrankを再計算しない。

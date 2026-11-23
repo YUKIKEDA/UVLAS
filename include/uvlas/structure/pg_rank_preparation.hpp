@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <stop_token>
 #include <uvlas/structure/pg_coefficients.hpp>
@@ -53,6 +54,13 @@ struct PgRankPreparationInfo {
     std::uint32_t prime = 0;
 };
 
+/// Cumulative validation work and replay payload; the original rank remains owned.
+struct PgRankValidationInfo {
+    std::uint64_t steps = 0;
+    std::uint64_t preflight_bytes = 0;
+    std::uint64_t allocated_payload_bytes = 0;
+};
+
 /// The chart, source polygon and per-cell activity retained with the basis.
 struct PgRankWitnessInfo {
     core::Index n = 0;
@@ -81,6 +89,15 @@ struct PgRankActivityCell {
     bool active;
 };
 
+/// An ordered term of G or J in raw dictionary coordinates, with its algebraic sign.
+struct PgRankRecipeTerm {
+    PgRankOriginalColumn source;
+    ExactRational coefficient;
+};
+
+/// Distinct Cartesian directions of required translation columns 30, 31 and 32.
+enum class PgRankTranslationAxis : std::uint8_t { X, Y, Z };
+
 namespace detail {
 struct PgRankState;
 }
@@ -99,6 +116,13 @@ public:
     prepare(const PgCoefficientDictionary&, const PgIntegrationPartition&,
             const PgRankPreparationLimits&, core::Workspace&, core::ResourcePlan&) noexcept;
 
+    /// Recheck the source witness and every reconstruction against live factory inputs.
+    /// The caller's plan admits new work while the original result remains resident.
+    [[nodiscard]] core::Result<PgRankValidationInfo>
+    validate_for(const PgCoefficientDictionary&, const PgIntegrationPartition&,
+                 const PgRankPreparationLimits&, core::Workspace&,
+                 core::ResourcePlan&) const noexcept;
+
     [[nodiscard]] core::Result<std::span<const PgRankRow>> rows() const& noexcept;
     [[nodiscard]] core::Result<std::span<const PgRankRow>> rows() const&& = delete;
     /// The selected ordinal in [G,I,J], in greedy order. J never extends the basis.
@@ -116,6 +140,24 @@ public:
                                                                 core::ResourcePlan&) const noexcept;
     [[nodiscard]] core::Result<PgRankActivityCell>
     source_activity(core::Index, const ExactLimits&, core::ResourcePlan&) const noexcept;
+
+    /// Ordered provenance for every raw and appended dictionary column.
+    [[nodiscard]] core::Result<std::span<const PgCoefficientSource>> provenance() const& noexcept;
+    [[nodiscard]] core::Result<std::span<const PgCoefficientSource>> provenance() const&& = delete;
+
+    /// Raw G and J recipes. Repeated source terms retain their order and sign.
+    [[nodiscard]] core::Result<std::uint64_t> recipe_terms(PgRankRequiredColumn) const noexcept;
+    [[nodiscard]] core::Result<std::uint64_t> recipe_terms(PgRankAnchorColumn) const noexcept;
+    [[nodiscard]] core::Result<PgRankRecipeTerm> recipe(PgRankRequiredColumn, core::Index term,
+                                                        const ExactLimits&,
+                                                        core::ResourcePlan&) const noexcept;
+    [[nodiscard]] core::Result<PgRankRecipeTerm> recipe(PgRankAnchorColumn, core::Index term,
+                                                        const ExactLimits&,
+                                                        core::ResourcePlan&) const noexcept;
+
+    /// Distinguish translations that share one scalar recipe. Other targets have no axis.
+    [[nodiscard]] core::Result<std::optional<PgRankTranslationAxis>>
+        translation_axis(PgRankRequiredColumn) const noexcept;
 
     /// B in the original field, cell and polynomial units. Zero is also exact.
     [[nodiscard]] core::Result<ExactRational> basis(PgRankBasisColumn, core::Index row,
