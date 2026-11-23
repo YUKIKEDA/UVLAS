@@ -1,0 +1,201 @@
+"""Exercise atomic publication for the connected PG batch, using saved aggregates."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from runpy import run_path
+from shutil import copyfile
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+
+def check_composition(base, verification, directory, expected):
+    handoff = verification / 'pg-rank-fixed-integerization-handoff'
+    sources = {
+        'base': verification / 'pg-rank-fixed-batch/fixed-batch.cpp.txt',
+        'shared-deriver': verification / 'pg-rank-shared-fixed-batch/derive-header.py.txt',
+        'guard': verification / 'pg-rank-fixed-batch-n2/derive-driver.py.txt',
+        'row-probe': verification / 'pg-rank-fixed-row-integerization/probe.cpp.txt',
+        'pivot': verification / 'pg-rank-shared-fixed-batch/shared-pivot.hpp.txt',
+        'driver': verification / 'pg-rank-shared-fixed-batch/shared-batch.cpp.txt',
+        'handoff': handoff / 'row-handoff.hpp.txt',
+    }
+    row = directory / 'row-copy.txt'
+    copyfile(sources['row-probe'], row)
+    sources['row-probe'] = row
+    source, record = directory / 'generated.cpp', directory / 'composition.json'
+    flags = ['-O'] if sys.flags.optimize else []
+    arguments = [sys.executable, *flags, '-B', str(handoff / 'compose.py.txt')]
+    arguments += [atom for name, path in sources.items() for atom in (f'--{name}', str(path))]
+    subprocess.run([*arguments, '--output', str(source), '--record', str(record)], check=True, timeout=15)
+    original_source = source.read_bytes()
+    original_record = record.read_bytes()
+    base.require(json.loads(original_record) == expected
+                 and hashlib.sha256(original_source).hexdigest() == expected['generated_sha256'],
+                 'composition content')
+    alias = directory / 'linked-source.txt'
+    alias.hardlink_to(row)
+    attempt = subprocess.run([*arguments, '--output', str(alias), '--record', str(record)],
+                             capture_output=True, timeout=15)
+    raw = row.read_bytes()
+    base.require(attempt.returncode != 0 and b'distinct files' in attempt.stderr and alias.samefile(row)
+                 and hashlib.sha256(raw).hexdigest() == expected['sources']['row_probe']
+                 and record.read_bytes() == original_record, 'composition output collision')
+    alias.unlink()
+    row.write_bytes(raw + b' ')
+    attempt = subprocess.run([*arguments, '--output', str(source), '--record', str(record)],
+                             capture_output=True, timeout=15)
+    base.require(attempt.returncode != 0 and b'frozen source SHA differs' in attempt.stderr
+                 and source.read_bytes() == original_source and record.read_bytes() == original_record,
+                 'composition source identity')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('root', 'coefficient', 'full-certificate', 'cut-certificate', 'capture'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args()
+    verification = args.root.resolve() / 'docs/verification/IM-01'
+    handoff = verification / 'pg-rank-fixed-integerization-handoff'
+    run = run_path(str(handoff / 'run-connected.py.txt'))['main']
+    capture = json.loads(args.capture.read_bytes())
+    cases = {case['domain']: case for case in capture['cases']}
+    paths = {
+        'coefficient': args.coefficient, 'full-certificate': args.full_certificate,
+        'cut-certificate': args.cut_certificate,
+        'certificate-index': verification / 'pg-rank-fixed-certificate/certificate-index.json',
+        'study': verification / 'pg-rank-resource-study/results.json',
+        'composition': handoff / 'composition.json',
+        'row-baseline': verification / 'pg-rank-fixed-row-integerization/review-243-result.json',
+        'shared-baseline': verification / 'pg-rank-shared-fixed-batch/results.json',
+        'base-runner': verification / 'pg-rank-fixed-batch/run-batch.py.txt',
+        'cut-runner': verification / 'pg-rank-fixed-batch-n4-cut/run-case.py.txt',
+        'full-runner': verification / 'pg-rank-fixed-batch-n4-full/run-case.py.txt',
+        'shared-runner': verification / 'pg-rank-shared-fixed-batch/run-shared.py.txt',
+        'capacity-producer': verification / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt',
+    }
+    cut, full, shared = (run_path(str(paths[f'{name}-runner'])) for name in ('cut', 'full', 'shared'))
+    load = cut['load']
+    base = load('handoff_gate_base', paths['base-runner'])
+    scenarios = (
+        ('valid', None),
+        ('cut-failed', 'injected cut failure'),
+        ('cut-reallocated', 'CSC storage ownership'),
+        ('cut-width-mismatch', 'max_integer_bits:'),
+        ('cut-preflight-mismatch', 'reference preflight:'),
+        ('cut-owner-omitted', 'reference preflight:'),
+        ('cut-overlap-owner-omitted', 'handoff overlap:'),
+        ('cut-lift-owner-omitted', 'lift capacity:'),
+        ('cut-payload-mismatch', 'lift capacity:'),
+        ('cut-digest-mismatch', 'frozen numerical field differs: column_diagnostics_sha256'),
+    )
+    stages = ('--controls', '--shared-controls', '--row-controls', '--handoff-capacity-controls',
+              'full:first', 'full:all', 'cut:first', 'cut:all')
+    with TemporaryDirectory() as scratch:
+        temp = Path(scratch)
+        check_composition(base, verification, temp, capture['composition'])
+        copies = {name: temp / (name + path.suffix) for name, path in paths.items()}
+        for name, path in paths.items():
+            copyfile(path, copies[name])
+        copies['binary'] = temp / 'probe.exe'
+        copies['binary'].write_bytes(b'publication transport stub')
+        arguments = [atom for name, path in copies.items() for atom in (f'--{name}', str(path))]
+        output = temp / 'result.json'
+        old = b'prior complete result\n'
+        calls = []
+
+        def get_module(name, path):
+            return base if name == 'row_handoff_base' else load(name, path)
+
+        def modules(path):
+            if Path(path) == copies['cut-runner']:
+                return {**cut, 'load': get_module, 'compact': lambda result: result}
+            if Path(path) == copies['full-runner']:
+                # Aggregate transport has no raw column array.
+                return {**full, 'validate_batch': lambda *args: None}
+            return shared
+
+        with patch.dict(run.__globals__, run_path=modules):
+            for present in (False, True):
+                for name, expected in scenarios:
+                    output.unlink(missing_ok=True)
+                    if present:
+                        output.write_bytes(old)
+                    calls.clear()
+
+                    def invoke(_binary, *values):
+                        if len(values) == 1:
+                            calls.append(values[0])
+                            return capture[values[0][2:].replace('-', '_')]
+                        domain, mode = values[-2:]
+                        calls.append(f'{domain}:{mode}')
+                        frame = dict(cases[domain]['first_probe' if mode == 'first' else 'result'])
+                        if (domain, mode) == ('cut', 'all'):
+                            if name == 'cut-failed':
+                                raise RuntimeError('injected cut failure')
+                            if name == 'cut-reallocated':
+                                frame['row_preparation'] = {**frame['row_preparation'], 'same_storage': False}
+                            if name == 'cut-width-mismatch':
+                                frame['row_preparation'] = {**frame['row_preparation'], 'max_integer_bits': 1}
+                            if name == 'cut-preflight-mismatch':
+                                stage = dict(frame['row_preparation'])
+                                stage['reference_preflight_bytes'] -= 1
+                                stage['fixed_overlap_bytes'] -= 1
+                                frame['row_preparation'] = stage
+                            if name in ('cut-owner-omitted', 'cut-overlap-owner-omitted'):
+                                stage = dict(frame['row_preparation'])
+                                if name == 'cut-owner-omitted':
+                                    stage['reference_preflight_bytes'] -= 480
+                                    # Reproduce all three undercounts from the reviewed head.
+                                    frame['payload_bytes'] -= 80
+                                stage['fixed_overlap_bytes'] -= 80
+                                frame['row_preparation'] = stage
+                            if name == 'cut-lift-owner-omitted':
+                                frame['payload_bytes'] -= 80
+                            if name == 'cut-payload-mismatch':
+                                frame['payload_bytes'] -= 1
+                            if name == 'cut-digest-mismatch':
+                                frame['column_diagnostics_sha256'] = '0' * 64
+                        return frame
+
+                    with patch.object(base, 'invoke', side_effect=invoke):
+                        try:
+                            run([*arguments, '--output', str(output)])
+                        except RuntimeError as error:
+                            base.require(expected and str(error).startswith(expected), f'{name}: {error}')
+                            base.require(output.read_bytes() == old if present else not output.exists(),
+                                         f'{name}: output changed')
+                        else:
+                            published = json.loads(output.read_bytes())
+                            base.require(expected is None and published['cases'] == capture['cases'],
+                                         f'{name}: bad publication')
+                    base.require(tuple(calls) == stages and not list(temp.glob('.*.tmp')), f'{name}: order or temp')
+
+            alias = temp / 'output-alias'
+            with patch.object(base, 'invoke', side_effect=AssertionError('probe invoked for alias')):
+                for name, target in copies.items():
+                    before = target.read_bytes()
+                    alias.hardlink_to(target)
+                    for collision in (target, alias):
+                        try:
+                            run([*arguments, '--output', str(collision)])
+                        except ValueError as error:
+                            base.require(str(error) == f'--output must be distinct from read-only input: {target}',
+                                         f'{name}: {error}')
+                        else:
+                            raise RuntimeError(f'{name}: accepted aliased output')
+                        base.require(alias.samefile(target) and target.read_bytes() == before
+                                     and not list(temp.glob('.*.tmp')), f'{name}: input changed')
+                    alias.unlink()
+    print(json.dumps({
+        'schema': 'uvlas.pg-row-handoff-gate/1', 'composition_checks': 3,
+        'publication_checks': len(scenarios) * 2, 'runner_alias_checks': 2 * len(copies),
+        'publication_scenarios': [name for name, _ in scenarios],
+    }, indent=2))
+
+
+if __name__ == '__main__':
+    main()

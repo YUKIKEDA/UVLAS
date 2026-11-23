@@ -1,0 +1,154 @@
+"""Compose the frozen row and shared batch sources with a storage handoff."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from runpy import run_path
+
+
+PINNED = {
+    'base': 'f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63',
+    'shared_deriver': 'fbf5c9456f66bac26deb5896a80de914243f5e9176ddaa36c5c7b6cc58824fe1',
+    'guard': '1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34',
+    'row_probe': '70cd45cfd6ad60c870468b5e15efaa1649e7787c44eb7fca28945c6499a945ca',
+    'pivot': '2d1c8374e3e289e8eb6b5fcb7bd4e30eee1d77eca9b2ed713408fd75a9b524fb',
+    'driver': '069c3f9fe40c206e869db7f94eeb434808dfb246d30446dc18a5aa89e7f2c918',
+}
+
+
+def replace(text, old, new):
+    if text.count(old) != 1:
+        raise ValueError(f'composition anchor differs: {old}')
+    return text.replace(old, new, 1)
+
+
+def compose(frozen, derive_shared, handoff):
+    core = derive_shared(frozen['base']).decode('ascii')
+    row = frozen['row_probe'].decode('ascii')
+    begin = 'namespace {\nconstexpr unsigned slot_bits = 1536;'
+    end = '} // namespace\n\nint main('
+    if row.count(begin) != 1 or row.count(end) != 1:
+        raise ValueError('row implementation boundary differs')
+    row = row[row.index(begin):row.index(end)] + '} // namespace row_integerization\n'
+    row = replace(row, begin, 'namespace row_integerization {\nconstexpr unsigned slot_bits = 1536;')
+    row = replace(row, 'struct Term {\n    std::uint32_t row{};\n    Fixed value{};\n};',
+                  'using Term = batch_fixed::Entry;')
+    core = '#include <string_view>\n' + core
+    core = replace(core, 'struct InputData {', row + '\nstruct InputData {')
+
+    start = '    d.reference.resize(times(d.columns, d.rank));\n'
+    finish = '    if (retained_scales) {\n'
+    if core.count(start) != 1 or core.count(finish) != 1:
+        raise ValueError('reference reader boundary differs')
+    reader = core[core.index(start):core.index(finish)]
+    core = replace(core, reader, '    read_reference(d, m, factor, certificate, grid, full);\n')
+    signature = ('void read_reference(InputData& d, const Matrix& m, '
+                 'const Elimination<Mod<p1>>& factor,\n'
+                 '                    const char* certificate, int grid, int full) {\n')
+    core = replace(core, 'InputData prepare_input(', signature + reader + '}\n\nInputData prepare_input(')
+
+    pivot = frozen['pivot'].decode('ascii')
+    pivot = replace(pivot, 'SharedPivot prepare_shared(', 'template<class Scale>\nSharedPivot prepare_shared(')
+    pivot = replace(pivot, 'const std::vector<Integer>& scales)', 'const std::vector<Scale>& scales)')
+    pivot = replace(pivot, '        d.scale_inverse[k] = static_cast<std::uint32_t>((Mod<p1>{1} / Mod<p1>::parse(Q{scales[row]})).value);',
+                    '        const Scale residue = scales[row] % p1;\n'
+                    '        d.scale_inverse[k] = static_cast<std::uint32_t>(\n'
+                    '            (Mod<p1>{1} / Mod<p1>{static_cast<std::uint64_t>(residue)}).value);')
+    core = replace(core, '#include "shared-pivot.hpp.txt"', pivot + '\n' + handoff.decode('ascii'))
+    core = replace(core, 'bool first_only = false, SharedPivot* shared = nullptr) {',
+                   'bool first_only = false, SharedPivot* shared = nullptr,\n'
+                   '                  std::uint64_t owner_extra = 0) {')
+    core = replace(core, 'if (plus(actual(d, s, full, columns), shared ? shared_payload(*shared) : 0) > cap.payload)',
+                   'if (plus(plus(actual(d, s, full, columns), shared ? shared_payload(*shared) : 0),\n'
+                   '             owner_extra) > cap.payload)')
+    core = replace(core, 'const SharedPivot* shared = nullptr) {\n    std::cout',
+                   'const SharedPivot* shared = nullptr, const HandoffEvidence* evidence = nullptr) {\n    std::cout')
+    core = replace(core, '    std::cout << ",\\"columns\\":[";',
+                   '''    if (evidence)
+        std::cout << ",\\"row_preparation\\":{\\"planned_bytes\\":" << evidence->planned
+                  << ",\\"actual_bytes\\":" << evidence->actual
+                  << ",\\"heap_attempts\\":" << evidence->heap
+                  << ",\\"terms\\":" << evidence->terms << ",\\"offsets\\":" << evidence->offsets
+                  << ",\\"max_lcm_bits\\":" << evidence->scale_bits
+                  << ",\\"max_integer_bits\\":" << evidence->integer_bits
+                  << ",\\"reference_preflight_bytes\\":" << evidence->reference_preflight
+                  << ",\\"fixed_overlap_bytes\\":" << evidence->fixed_overlap
+                  << ",\\"row_only_bytes\\":" << evidence->row_only_bytes
+                  << ",\\"same_storage\\":" << (evidence->same_storage ? "true" : "false") << '}';
+    std::cout << ",\\"columns\\":[";''')
+
+    driver = replace(frozen['driver'].decode('ascii'), '#include "frozen-shared-batch.hpp"',
+                     '#include <string_view>')
+    driver = replace(driver, 'prepare_shared(input, factor, {Integer{30}, Integer{105}})',
+                     'prepare_shared(input, factor, std::vector<row_integerization::Fixed>{30, 105})')
+    driver = replace(driver, '    InputData input;', '    ConnectedInput connected;\n    auto& input = connected.data;')
+    driver = replace(driver, '    auto shared = prepare_shared(input, factor, std::vector<row_integerization::Fixed>{30, 105});',
+                     '    auto& shared = connected.shared;\n'
+                     '    shared = prepare_shared(input, factor, std::vector<row_integerization::Fixed>{30, 105});')
+    for owner in ('input', 'data'):
+        driver = replace(driver, f'plus(planned({owner}, {owner}.columns), shared_payload(shared))',
+                         f'plus(plus(planned({owner}, {owner}.columns), shared_payload(shared)), connected_owner_extra)')
+        driver = replace(driver, f'plus(actual({owner}, scratch, full, columns), shared_payload(shared))',
+                         f'plus(plus(actual({owner}, scratch, full, columns), shared_payload(shared)), connected_owner_extra)')
+    short_call = '{before - 1, limits.bits, limits.digits, limits.events}, false, &shared)'
+    driver = replace(driver, short_call, short_call[:-1] + ', connected_owner_extra)')
+    control_call = 'batch(input, scratch, full, columns, limits, false, &shared)'
+    if driver.count(control_call) != 3:
+        raise ValueError('batch control anchors differ')
+    driver = driver.replace(control_call, control_call[:-1] + ', connected_owner_extra)')
+    driver = replace(driver, '{bytes, 8192, 128, 2000000000}, first, &shared)',
+                     '{bytes, 8192, 128, 2000000000}, first, &shared, connected_owner_extra)')
+    driver = replace(driver, '    std::cout << "{\\"payload_equal_one_short\\":true,',
+                     '    std::cout << "{\\"batch_equal_one_short_bytes\\":" << before\n'
+                     '              << ",\\"payload_equal_one_short\\":true,')
+    driver = replace(driver, '    if (argc != 5)\n', '''    if (argc == 2 && std::string(argv[1]) == "--row-controls") {
+        row_integerization::controls();
+        return 0;
+    }
+    if (argc == 2 && std::string(argv[1]) == "--handoff-capacity-controls") {
+        handoff_capacity_controls();
+        return 0;
+    }
+    if (argc != 5)
+''')
+    driver = replace(driver, '''    std::vector<Integer> scales;
+    auto data = prepare_input(matrix, factor, argv[2], source.n, source.full, first, &scales);
+    auto shared = prepare_shared(data, factor, scales);
+    std::vector<Integer>{}.swap(scales);
+''', '''    auto connected = connect_fixed_rows(matrix, factor, argv[2], source.n, source.full,
+                                        51539607552ULL);
+    auto& data = connected.data;
+    auto& shared = connected.shared;
+''')
+    driver = replace(driver, 'write_result(data, columns, result, bytes, elapsed, &shared);',
+                     'write_result(data, columns, result, bytes, elapsed, &shared, &connected.evidence);')
+    return (core + '\n' + driver).encode('ascii')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in (*PINNED, 'handoff', 'output', 'record'):
+        parser.add_argument(f'--{name.replace("_", "-")}', type=Path, required=True)
+    args = parser.parse_args()
+    frozen = {}
+    for name, expected in PINNED.items():
+        data = getattr(args, name).read_bytes()
+        if hashlib.sha256(data).hexdigest() != expected:
+            raise ValueError(f'frozen source SHA differs: {name}')
+        frozen[name] = data
+    run_path(str(args.guard))['distinct_paths'](*vars(args).values())
+    deriver = run_path(str(args.shared_deriver))
+    handoff = args.handoff.read_bytes()
+    generated = compose(frozen, deriver['derive'], handoff)
+    record = json.dumps({
+        'schema': 'uvlas.pg-row-handoff-composition/1', 'sources': PINNED,
+        'handoff_sha256': hashlib.sha256(handoff).hexdigest(),
+        'generated_sha256': hashlib.sha256(generated).hexdigest(),
+        'generated_bytes': len(generated),
+    }, indent=2).encode() + b'\n'
+    deriver['publish_pair'](args.output, generated, args.record, record)
+
+
+if __name__ == '__main__':
+    main()
