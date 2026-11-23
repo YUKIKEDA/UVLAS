@@ -48,6 +48,8 @@ public:
 
 private:
     friend class PgConditioningCertificate;
+    friend class PgFlatGram;
+    [[nodiscard]] const ExactRational& length_metres() const& noexcept;
     [[nodiscard]] detail::BasisReferencePoint locate(detail::ReferenceArithmetic&,
                                                      const PgReferencePoint&) const;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
