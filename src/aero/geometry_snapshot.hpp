@@ -237,6 +237,7 @@ struct QueryStorage;
 struct QueryArithmeticScratch;
 class GeometryEngine;
 class GeometryWorkspace;
+class SharedP1Engine;
 /// Retain immutable point/topology payload; getters never expose mutable arrays.
 class OwnedGeometry {
 public:
@@ -276,6 +277,7 @@ private:
     friend class GeometryEngine;
     friend class P1Engine;
     friend class GlobalEngine;
+    friend class SharedP1Engine;
     explicit OwnedGeometry(std::shared_ptr<const GeometryData> data, GeometryContext stamp) noexcept
         : data_(std::move(data)), context_(stamp) {}
     std::shared_ptr<const GeometryData> data_;
@@ -299,6 +301,7 @@ public:
 
 private:
     friend class GeometryEngine;
+    friend class SharedP1Engine;
     ResolvedQuery(std::shared_ptr<const GeometryData>, core::PlannedBuffer<QueryStorage>,
                   GeometryContext) noexcept;
     std::shared_ptr<const GeometryData> geometry_;

@@ -1,0 +1,42 @@
+{
+  "source_commit": "55b57bd5ded8c884a321638f7ab8482f20d00eff",
+  "reviewed_source_commit": "72a9e913e1300ed48128a6b79ed5025273216f3e",
+  "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "ctest_targets": [
+    "aero.local_geometry_packet",
+    "aero.local_geometry_packet_resources",
+    "aero.p1_induction",
+    "aero.p1_induction_resources",
+    "aero.p1_shared_action"
+  ],
+  "ctest_each_configuration": {
+    "passed": 5,
+    "failed": 0
+  },
+  "catch_seed": 268,
+  "focused_each_configuration": {
+    "cases": 2,
+    "assertions_passed": 68
+  },
+  "scope": "Shared preparation rejects eight invalid accuracy requests before allocation with both empty and nonempty topology. The valid empty topology still produces exact zero primal, JVP, and VJP. The independent area fixture and its numerical mutation evidence retain their original source revisions.",
+  "original_source_control": {
+    "replaced_translation_unit": "src/aero/p1_shared_action.cpp",
+    "platform": "MSVC Debug isolated rebuild and link against revised tests",
+    "failed_assertions": 9,
+    "exit_code": 42,
+    "failure": "Eight nonempty requests consumed payload before rejection; the empty topology accepted a NaN local width."
+  },
+  "static": "clang-tidy 21.1.1 passed on the four modified translation units.",
+  "sources": {
+    "src/aero/local_geometry_packet.cpp": "e67d98e3aa5b25169c282dab3d2cd71592ad0d5b9f9e5f9da0c25f71f3e97c4f",
+    "src/aero/local_geometry_packet.hpp": "3cbde5d79317482535e5ea3c8bd5f45cde7a4f85cad9c2c8b621b2924ce66017",
+    "src/aero/p1_induction.cpp": "8a0c322bd1e24ba0f97b705928a1f014616ceaa8e8e46aefb8e7f72812a22211",
+    "src/aero/p1_induction.hpp": "a285d20aa3ea301025ebfef6da38c99c2214f829cf25f7ede8bf4706afac14b6",
+    "src/aero/p1_shared_action.cpp": "9653c59b41c7b669ace2d9dc61cbe2e0d4e2d98176c6325a09a726f00830b23b",
+    "tests/aero/p1_shared_action_test.cpp": "b9470603f25474df75af92f66488d0b8ff6da9a63d52343e751ec5ff88a40b75"
+  }
+}

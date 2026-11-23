@@ -152,6 +152,7 @@ inline Expression norm(const Vector& a) {
 struct Options {
     std::array<std::int8_t, 3> start_sign{}, end_sign{};
     bool exterior = false;
+    std::array<bool, 3> boundary{true, true, true};
 };
 struct Output {
     std::array<std::size_t, 9> nodes{};
@@ -192,12 +193,14 @@ inline Output near_program(Program& p, const Options& options) {
         const auto k2 = dot(perpendicular, perpendicular) + in.radius * in.radius;
         ra[edge] = sqrt(s * s + k2);
         rb[edge] = sqrt(z * z + k2);
-        const bool same = options.start_sign[edge] * options.end_sign[edge] > 0;
-        const auto integral =
-            same ? length * (s + z) / (ra[edge] * rb[edge] * (s * rb[edge] + z * ra[edge]))
-                 : (s / ra[edge] - z / rb[edge]) / k2;
-        // Negative contour reverses the positive geometric boundary.
-        line[edge] = cross(tangent[edge], perpendicular) * (-integral);
+        if (options.boundary[edge]) {
+            const bool same = options.start_sign[edge] * options.end_sign[edge] > 0;
+            const auto integral =
+                same ? length * (s + z) / (ra[edge] * rb[edge] * (s * rb[edge] + z * ra[edge]))
+                     : (s / ra[edge] - z / rb[edge]) / k2;
+            // Negative contour reverses the positive geometric boundary.
+            line[edge] = cross(tangent[edge], perpendicular) * (-integral);
+        }
         // The absolute-value sum has an exact zero middle branch.
         const auto gapbase = options.start_sign[edge] < 0
                                  ? -(s * 2)
@@ -242,6 +245,8 @@ inline Output near_program(Program& p, const Options& options) {
         auto velocity = cross(cross(n, gradient), sheet);
         const std::array<Expression, 3> mu{m0, m1, m2};
         for (std::size_t edge = 0; edge < 3; ++edge) {
+            if (!options.boundary[edge])
+                continue;
             const auto strength =
                 (mu[edge] * rb[edge] + mu[(edge + 1) % 3] * ra[edge]) / (ra[edge] + rb[edge]);
             velocity = velocity + line[edge] * strength;

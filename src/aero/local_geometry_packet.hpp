@@ -20,6 +20,9 @@ struct LocalAccuracy {
     /// Timing is optional instrumentation and never changes numerical qualification.
     LocalAccuracy(core::Precision precision, double width, bool timings = false) noexcept
         : representation(precision), tau(width), collect_timings(timings) {}
+
+    /// Reject invalid request values before preparing any facet.
+    [[nodiscard]] std::optional<core::FailureCode> validation_error() const noexcept;
 };
 /// Wall-clock preparation phases. Root and width are subsets of enclosure, not extra work.
 struct LocalPacketTimings {

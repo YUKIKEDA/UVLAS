@@ -7,6 +7,7 @@
 #include "p1_program_private.hpp"
 #include "p1_quadrature_private.hpp"
 #include "p1_qualification_private.hpp"
+#include "p1_shared_kernel.hpp"
 
 #include <bit>
 #include <cfenv>
@@ -408,8 +409,10 @@ class P1Engine {
             throw p1::ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
         return result;
     }
+
+public:
     static ScaledEnclosure enclosure(const p1::Interval& interval, core::Precision precision,
-                                     P1Scratch& scratch) {
+                                     LocalRootScratch& scratch) {
         const auto top = std::max(
             static_cast<std::int64_t>(p1::bits(interval.lower.mantissa)) + interval.lower.power,
             static_cast<std::int64_t>(p1::bits(interval.upper.mantissa)) + interval.upper.power);
@@ -417,8 +420,8 @@ class P1Engine {
         const auto low = p1::at_power(interval.lower, common, false),
                    high = p1::at_power(interval.upper, common, true);
         const p1::Integer middle = (low + high) / 2;
-        const auto center = LocalBounds::dyadic(middle.convert_to<ExactInteger>(), common,
-                                                precision, scratch.output);
+        const auto center =
+            LocalBounds::dyadic(middle.convert_to<ExactInteger>(), common, precision, scratch);
         if (!center)
             throw p1::ArithmeticFailure{center.error().code};
         const p1::Integer width = std::max(middle - low, high - middle);
@@ -431,6 +434,8 @@ class P1Engine {
             throw p1::ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
         return ScaledEnclosure{center->center(), exact_radius, center->exponent()};
     }
+
+private:
     static bool width(const ScaledEnclosure& value, double tau, const ExactInteger& longest,
                       bool derivative, P1Scratch& scratch) {
         return p1::full_width_at_most(value.radius(), value.exponent(), tau, longest, derivative,
@@ -439,13 +444,23 @@ class P1Engine {
 
 public:
     static AeroResult<P1Basis> evaluate(const LocalGeometryPacket&, P1Accuracy, P1Limits,
-                                        P1Workspace&, core::ResourcePlan&,
-                                        const std::stop_token&) noexcept;
+                                        P1Workspace&, core::ResourcePlan&, const std::stop_token&,
+                                        const std::array<bool, 3>&) noexcept;
 };
+std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
+    if (!std::isfinite(tau_basis) || !std::isfinite(tau_jacobian))
+        return core::FailureCode::Nonfinite;
+    if (tau_basis < 0 || tau_jacobian < 0)
+        return core::FailureCode::InvalidInput;
+    if (representation != core::Precision::Binary64 && representation != core::Precision::TwoWord)
+        return core::FailureCode::PrecisionUnsupported;
+    return std::nullopt;
+}
+
 AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accuracy accuracy,
                                        P1Limits limits, P1Workspace& workspace,
-                                       core::ResourcePlan& plan,
-                                       const std::stop_token& stop) noexcept {
+                                       core::ResourcePlan& plan, const std::stop_token& stop,
+                                       const std::array<bool, 3>& boundary) noexcept {
     const auto context = packet.context();
     if (workspace.entered_.test_and_set())
         return std::unexpected(failed(core::FailureCode::InvalidInput, context));
@@ -460,13 +475,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
         if (!packet.active())
             return std::unexpected(failed(core::FailureCode::InvalidInput, context));
-        if (!std::isfinite(accuracy.tau_basis) || !std::isfinite(accuracy.tau_jacobian))
-            return std::unexpected(failed(core::FailureCode::Nonfinite, context));
-        if (accuracy.tau_basis < 0 || accuracy.tau_jacobian < 0)
-            return std::unexpected(failed(core::FailureCode::InvalidInput, context));
-        if (accuracy.representation != core::Precision::Binary64 &&
-            accuracy.representation != core::Precision::TwoWord)
-            return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
+        if (const auto error = accuracy.validation_error())
+            return std::unexpected(failed(*error, context));
         if (stop.stop_requested())
             return std::unexpected(failed(core::FailureCode::Cancelled, context));
         const auto mode = limits.external_memory.selection();
@@ -495,7 +505,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         auto& scratch = workspace.scratch_.values()[0];
         p1::Work work{0, limits.max_steps, stop};
         load(geometry, query, ambient, scratch, work);
-        const auto [options, scale] = prepare_input(scratch, work);
+        auto [options, scale] = prepare_input(scratch, work);
+        options.boundary = boundary;
         scratch.pi = p1::pi_constant(work);
         scratch.ln2 = p1::logarithm_series(p1::divide(p1::integer(1), p1::integer(3), work), work);
         p1::Program program{scratch.program.values()};
@@ -563,7 +574,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             for (std::size_t jet = 0; jet < 14; ++jet) {
                 work.step();
                 auto value = enclosure(p1::scale(evaluated.components[jet], -scale),
-                                       accuracy.representation, scratch);
+                                       accuracy.representation, scratch.output);
                 if (!width(value, jet == 0 ? accuracy.tau_basis : accuracy.tau_jacobian,
                            scratch.temporary[4], jet != 0, scratch))
                     throw p1::ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
@@ -721,6 +732,27 @@ AeroResult<P1Basis> evaluate_p1_basis(const LocalGeometryPacket& packet, P1Accur
                                       P1Limits limits, P1Workspace& workspace,
                                       core::ResourcePlan& plan,
                                       const std::stop_token& stop) noexcept {
-    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop);
+    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, {true, true, true});
+}
+
+bool p1_environment_supported() noexcept {
+    return supported_environment();
+}
+
+p1::Interval decode_p1_word(double value) {
+    return word(value);
+}
+
+ScaledEnclosure enclose_p1_value(const p1::Interval& value, core::Precision precision,
+                                 LocalRootScratch& scratch) {
+    return P1Engine::enclosure(value, precision, scratch);
+}
+
+AeroResult<P1Basis> evaluate_p1_partition(const LocalGeometryPacket& packet,
+                                          const std::array<bool, 3>& boundary, P1Accuracy accuracy,
+                                          P1Limits limits, P1Workspace& workspace,
+                                          core::ResourcePlan& plan,
+                                          const std::stop_token& stop) noexcept {
+    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary);
 }
 } // namespace uvlas::aero::detail

@@ -1,4 +1,5 @@
 #include "aero/pchip_boundary.hpp"
+#include "aero/pchip_curve.hpp"
 #include "aero/pchip_curve_plan.hpp"
 #include "aero/pchip_domain_route.hpp"
 #include "aero/pchip_interval_jet.hpp"
@@ -1391,4 +1392,334 @@ TEST_CASE("PCHIP shared preparation admits resources before moving the complete 
     CHECK(attempts.load() == 2);
     CHECK(final_memory.allocated_bytes() == payload);
     CHECK(p::match_preparation_input(take(accepted->input()).get(), expected, UINT64_MAX));
+}
+
+namespace {
+constinit unsigned until_curve_reentry = 0;
+constinit const void* curve_reentry_context = nullptr;
+constinit void (*curve_reentry_invoke)(const void*) = nullptr;
+
+void reenter_curve() {
+    if (--until_curve_reentry == 0)
+        curve_reentry_invoke(curve_reentry_context);
+    else
+        allocation_callback = reenter_curve;
+}
+
+template <class Call, class Unchanged>
+void verify_curve_faults(const p::CurveAdmission& plan, p::CurveLimits cap,
+                         unsigned planned_allocations, const Call& call,
+                         const Unchanged& unchanged) {
+    cap.arithmetic.steps = plan.reserved_steps;
+    cap.arithmetic.work_bits = plan.maximum_integer_bits;
+    cap.metadata = linear_memory::EstimateAdmission{plan.metadata_estimate_bytes};
+    const auto exact = [&] {
+        c::ResourcePlan memory{plan.payload_bytes};
+        auto result = [&] {
+            const FaultScope audit{INT64_MAX};
+            return call(memory, cap, {});
+        }();
+        CHECK(memory.allocated_bytes() == plan.payload_bytes);
+        return result;
+    }();
+    REQUIRE(exact);
+    const auto actual_allocations = attempts.load();
+    REQUIRE(actual_allocations == planned_allocations);
+    CHECK(unchanged());
+
+    auto work_less = cap;
+    --work_less.arithmetic.steps;
+    auto opaque_less = cap;
+    opaque_less.metadata = linear_memory::EstimateAdmission{plan.metadata_estimate_bytes - 1};
+    auto proven = cap;
+    proven.metadata = linear_memory::RequireProvenBound{UINT64_MAX};
+    auto input_one_bit = cap;
+    input_one_bit.arithmetic.input_bits = 1;
+    auto bit_less = cap;
+    --bit_less.arithmetic.work_bits;
+    const std::array rejected{work_less, opaque_less, proven, input_one_bit, bit_less, cap};
+    for (std::size_t i = 0; i < rejected.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{i == rejected.size() - 1 ? plan.payload_bytes - 1
+                                                        : plan.payload_bytes};
+        const auto refusal = [&] {
+            const FaultScope audit{0};
+            return call(memory, rejected[i], {});
+        }();
+        REQUIRE_FALSE(refusal);
+        CHECK(refusal.error().code ==
+              (i == 2 ? c::FailureCode::Unsupported : c::FailureCode::ResourceExceeded));
+        CHECK(refusal.error().operation == c::Operation::EvaluateAero);
+        CHECK(refusal.error().details.component == details().component);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+        CHECK(unchanged());
+    }
+    for (unsigned position = 1; position <= actual_allocations; ++position) {
+        CAPTURE(position);
+        c::ResourcePlan fault_memory{plan.payload_bytes};
+        const auto fault = [&] {
+            const FaultScope audit{static_cast<std::int64_t>(position) - 1};
+            return call(fault_memory, cap, {});
+        }();
+        REQUIRE_FALSE(fault);
+        CHECK(fault.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(fault.error().details.component == details().component);
+        CHECK(attempts.load() == position);
+        CHECK(fault_memory.allocated_bytes() <= plan.payload_bytes);
+        CHECK(unchanged());
+
+        // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 declares request_stop non-const.
+        std::stop_source stop;
+        cancel_source = &stop;
+        until_cancel = position;
+        allocation_callback = cancel_last;
+        c::ResourcePlan cancel_memory{plan.payload_bytes};
+        const auto cancellation = call(cancel_memory, cap, stop.get_token());
+        allocation_callback = nullptr;
+        cancel_source = nullptr;
+        REQUIRE_FALSE(cancellation);
+        CHECK(cancellation.error().code == c::FailureCode::Cancelled);
+        CHECK(cancellation.error().details == details());
+        CHECK(cancel_memory.allocated_bytes() <= plan.payload_bytes);
+        CHECK(unchanged());
+
+        c::ResourcePlan nested_memory{plan.payload_bytes};
+        std::optional<c::Failure> refusal;
+        const auto reenter = [&] {
+            auto denied = call(nested_memory, cap, {});
+            if (!denied)
+                refusal = denied.error();
+        };
+        const auto invoke = []<class F>(const F& operation) {
+            curve_reentry_context = &operation;
+            curve_reentry_invoke = [](const void* context) { (*static_cast<const F*>(context))(); };
+        };
+        invoke(reenter);
+        until_curve_reentry = position;
+        allocation_callback = reenter_curve;
+        c::ResourcePlan outer_memory{plan.payload_bytes};
+        const auto outer = call(outer_memory, cap, {});
+        allocation_callback = nullptr;
+        curve_reentry_context = nullptr;
+        curve_reentry_invoke = nullptr;
+        REQUIRE(outer);
+        if (!refusal)
+            FAIL("Same curve workspace accepted reentry");
+        CHECK(refusal->code == c::FailureCode::InvalidInput);
+        CHECK(refusal->details == details());
+        CHECK(nested_memory.allocated_bytes() == 0);
+        CHECK(unchanged());
+    }
+}
+} // namespace
+
+TEST_CASE("PCHIP curve entrypoints admit all resources and reject faults without publication",
+          "[AE-07][N4-02][N4-03][N4-08][N4-09][negative]") {
+    const Fixture fixture;
+    const p::PreparationRequest request{fixture.view(),
+                                        preparation_dimensions,
+                                        {fixture.t.front(), fixture.t.back(), p::RejectBoundary{}},
+                                        {},
+                                        preparation_stamp};
+    const p::CurveLimits cap{limits(), linear_memory::EstimateAdmission{UINT64_MAX}};
+    p::CurveWorkspace workspace;
+    p::PreparationWorkspace input_workspace;
+    p::SharedPreparationWorkspace sharing;
+    c::ResourcePlan parents{UINT64_MAX};
+    auto independent = take(p::make_preparation_input(request, input_workspace, limits(), parents));
+    const auto current = take(p::share_preparation_input(
+        std::move(independent), sharing, {cap.metadata, cap.arithmetic.steps}, parents));
+    const auto curve = take(p::prepare_pchip_curve(request, workspace, cap, parents));
+    const auto saving = take(p::snapshot_pchip_curve(curve, workspace, cap, parents));
+    const auto saved = take(saving.view());
+    const p::PchipQuery query{
+        {1, fixture.one, half_denominator}, p::JetOrder::Second, p::RequestedSide::Right};
+    const auto older_jet =
+        take(p::evaluate_pchip_curve(curve, current, query, workspace, cap, parents));
+    const auto older_value = take(older_jet.derivative(0, p::JetOrder::Value));
+    const auto older_coefficient = take(curve.coefficient(1, 0, 0));
+    const auto ledger = parents.allocated_bytes();
+
+    const auto unchanged = [&] {
+        const auto present = older_jet.derivative(0, p::JetOrder::Value);
+        const auto coefficient = curve.coefficient(1, 0, 0);
+        return present && coefficient &&
+               present->denominator.data() == older_value.denominator.data() &&
+               coefficient->numerator.data() == older_coefficient.numerator.data() &&
+               std::ranges::equal(coefficient->numerator, fixture.one) &&
+               saving.view().has_value() && parents.allocated_bytes() == ledger;
+    };
+
+    SECTION("prepare from immutable borrows") {
+        const auto plan = take(p::forecast_pchip_prepare(request, cap));
+        verify_curve_faults(
+            plan, cap, 21,
+            [&](c::ResourcePlan& memory, p::CurveLimits budget, const std::stop_token& stop) {
+                return p::prepare_pchip_curve(request, workspace, budget, memory, stop, details());
+            },
+            unchanged);
+
+        auto corrupted = request;
+        auto values = fixture.y;
+        values[1] = {1, fixture.two, fixture.two}; // Shape-valid but noncanonical 2/2.
+        corrupted.samples.values = values;
+        const auto bound = take(p::forecast_pchip_prepare(corrupted, cap));
+        c::ResourcePlan payload{bound.payload_bytes};
+        const auto invalid = [&] {
+            const FaultScope audit{INT64_MAX};
+            return p::prepare_pchip_curve(corrupted, workspace, cap, payload, {}, details());
+        }();
+        REQUIRE_FALSE(invalid);
+        CHECK(invalid.error().code == c::FailureCode::InvalidInput);
+        CHECK(attempts.load() == 21);
+        CHECK(unchanged());
+    }
+    SECTION("evaluate against independently owned expected input") {
+        const auto plan = take(p::forecast_pchip_evaluation(curve, current, query, cap));
+        verify_curve_faults(
+            plan, cap, 16,
+            [&](c::ResourcePlan& memory, p::CurveLimits budget, const std::stop_token& stop) {
+                return p::evaluate_pchip_curve(curve, current, query, workspace, budget, memory,
+                                               stop, details());
+            },
+            unchanged);
+
+        auto corrupted = query;
+        corrupted.time = {1, fixture.two, fixture.two}; // Canonicality follows all allocation.
+        const auto bound = take(p::forecast_pchip_evaluation(curve, current, corrupted, cap));
+        c::ResourcePlan payload{bound.payload_bytes};
+        const auto invalid = [&] {
+            const FaultScope audit{INT64_MAX};
+            return p::evaluate_pchip_curve(curve, current, corrupted, workspace, cap, payload, {},
+                                           details());
+        }();
+        REQUIRE_FALSE(invalid);
+        CHECK(invalid.error().code == c::FailureCode::InvalidInput);
+        CHECK(attempts.load() == 16);
+        CHECK(unchanged());
+    }
+    SECTION("restore preflight stops when an earlier phase uses the remaining steps") {
+        const auto record_steps = [](p::RationalView record) -> std::uint64_t {
+            return 1 + record.numerator.size() + record.denominator.size();
+        };
+        std::uint64_t matching = 1 + saved.input.dimensions.size() +
+                                 record_steps(saved.input.boundary.begin) +
+                                 record_steps(saved.input.boundary.end);
+        for (const auto records :
+             {saved.input.samples.times, saved.input.samples.values, saved.input.events})
+            for (const auto record : records)
+                matching += record_steps(record);
+
+        auto exhausted = cap;
+        exhausted.arithmetic.steps = matching;
+        const auto check_exhausted = [&](const p::PchipSnapshotView& snapshot,
+                                         p::CurveLimits allowed) {
+            const auto forecast =
+                p::forecast_pchip_restore(snapshot, current, allowed, {}, details());
+            REQUIRE_FALSE(forecast);
+            CHECK(forecast.error().code == c::FailureCode::ResourceExceeded);
+            c::ResourcePlan memory{UINT64_MAX};
+            const auto restored = [&] {
+                const FaultScope audit{INT64_MAX};
+                return p::restore_pchip_curve(snapshot, current, workspace, allowed, memory, {},
+                                              details());
+            }();
+            REQUIRE_FALSE(restored);
+            CHECK(restored.error().code == c::FailureCode::ResourceExceeded);
+            CHECK(attempts.load() == 0);
+            CHECK(memory.allocated_bytes() == 0);
+            CHECK(unchanged());
+        };
+        check_exhausted(saved, exhausted);
+        auto malformed_header = saved;
+        malformed_header.formula_version = 0;
+        check_exhausted(malformed_header, exhausted);
+        // One more available visit admits the header check, which detects the invalid version.
+        ++exhausted.arithmetic.steps;
+        const auto invalid_header =
+            p::forecast_pchip_restore(malformed_header, current, exhausted, {}, details());
+        REQUIRE_FALSE(invalid_header);
+        CHECK(invalid_header.error().code == c::FailureCode::InvalidInput);
+
+        const auto plan = take(p::forecast_pchip_restore(saved, current, cap));
+        std::uint64_t comparison = 0;
+        for (const auto record : saved.coefficients)
+            comparison += record_steps(record);
+        // Remove the saved scan and both per-word passes, leaving matching and preparation.
+        exhausted.arithmetic.steps =
+            plan.reserved_steps - saved.coefficients.size() - 2 * comparison;
+        std::array<p::RationalView, 8> coefficients;
+        std::ranges::copy(saved.coefficients, coefficients.begin());
+        coefficients[0].sign = 2;
+        auto malformed_coefficient = saved;
+        malformed_coefficient.coefficients = coefficients;
+        check_exhausted(malformed_coefficient, exhausted);
+        ++exhausted.arithmetic.steps;
+        const auto invalid_coefficient =
+            p::forecast_pchip_restore(malformed_coefficient, current, exhausted, {}, details());
+        REQUIRE_FALSE(invalid_coefficient);
+        CHECK(invalid_coefficient.error().code == c::FailureCode::InvalidInput);
+    }
+    SECTION("restore against independently owned expected input") {
+        const auto plan = take(p::forecast_pchip_restore(saved, current, cap));
+        verify_curve_faults(
+            plan, cap, 14,
+            [&](c::ResourcePlan& memory, p::CurveLimits budget, const std::stop_token& stop) {
+                return p::restore_pchip_curve(saved, current, workspace, budget, memory, stop,
+                                              details());
+            },
+            unchanged);
+
+        auto corrupted = saved;
+        std::array<p::RationalView, 8> coefficients;
+        std::ranges::copy(saved.coefficients, coefficients.begin());
+        coefficients[0] = {1, fixture.two, fixture.two};
+        corrupted.coefficients = coefficients;
+        const auto bound = take(p::forecast_pchip_restore(corrupted, current, cap));
+        c::ResourcePlan payload{bound.payload_bytes};
+        const auto invalid = [&] {
+            const FaultScope audit{INT64_MAX};
+            return p::restore_pchip_curve(corrupted, current, workspace, cap, payload, {},
+                                          details());
+        }();
+        REQUIRE_FALSE(invalid);
+        CHECK(invalid.error().code == c::FailureCode::InvalidInput);
+        CHECK(attempts.load() == 14);
+        CHECK(unchanged());
+    }
+}
+
+TEST_CASE("Periodic exact PCHIP reserves both automatic seam candidates before normalization",
+          "[AE-07][N4-02][N4-03][N4-08][N4-09][negative]") {
+    const Fixture fixture;
+    const std::array<p::RationalView, 3> samples{fixture.t[0], fixture.t[0], fixture.t[0]};
+    const p::PreparationRequest request{
+        {fixture.t, samples, 1},
+        preparation_dimensions,
+        {fixture.t.front(), fixture.t.back(), p::PeriodicBoundary{fixture.t.back()}},
+        {},
+        preparation_stamp};
+    const p::CurveLimits cap{limits(), linear_memory::EstimateAdmission{UINT64_MAX}};
+    p::CurveWorkspace workspace;
+    p::PreparationWorkspace input_workspace;
+    p::SharedPreparationWorkspace sharing;
+    c::ResourcePlan parents{UINT64_MAX};
+    auto owned = take(p::make_preparation_input(request, input_workspace, cap.arithmetic, parents));
+    const auto current = take(p::share_preparation_input(
+        std::move(owned), sharing, {cap.metadata, cap.arithmetic.steps}, parents));
+    const auto curve = take(p::prepare_pchip_curve(request, workspace, cap, parents));
+    const p::PchipQuery seam{{-1, fixture.two, fixture.one}, p::JetOrder::Second};
+    const auto plan = take(p::forecast_pchip_evaluation(curve, current, seam, cap));
+    const auto before = parents.allocated_bytes();
+    verify_curve_faults(
+        plan, cap, 24,
+        [&](c::ResourcePlan& memory, p::CurveLimits allowed, const std::stop_token& stop) {
+            return p::evaluate_pchip_curve(curve, current, seam, workspace, allowed, memory, stop,
+                                           details());
+        },
+        [&] {
+            const auto value = curve.coefficient(1, 0, 0);
+            return value && value->sign == 0 && parents.allocated_bytes() == before;
+        });
 }

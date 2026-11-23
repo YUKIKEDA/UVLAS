@@ -67,6 +67,12 @@ struct BoundaryUsage {
 forecast_boundary(const CoefficientBlock&, BoundaryRequest, RationalLimits,
                   const std::stop_token& stop = {}, core::FailureDetails details = {}) noexcept;
 
+/// Execute an already admitted boundary plan after its full arena was allocated.
+[[nodiscard]] core::Result<BoundaryUsage>
+check_prepared_boundary(const CoefficientBlock&, BoundaryRequest, const BoundaryPlan&, Workspace&,
+                        RationalLimits, const std::stop_token& stop = {},
+                        core::FailureDetails details = {}) noexcept;
+
 /// Check Reject containment, Hold endpoint slopes on the demanded interval, or periodic seam C1.
 /// Source and all argument borrows remain immutable until return.
 [[nodiscard]] core::Result<BoundaryUsage>

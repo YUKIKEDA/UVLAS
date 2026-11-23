@@ -1,5 +1,6 @@
 #include "pchip_coefficients.hpp"
 
+#include "pchip_shared_preparation_input.hpp"
 #include "pchip_slot_private.hpp"
 
 #include <algorithm>
@@ -36,6 +37,8 @@ struct Record {
 struct Owner {
     std::uint64_t n = 0, m = 0, w = 0, work = 0, slots = 0;
     core::FailureDetails details;
+    std::optional<SharedPreparationInput> original;
+    SampleGrid samples;
     core::PlannedBuffer<Record> records;
     core::PlannedBuffer<std::uint32_t> limbs;
 };
@@ -265,17 +268,20 @@ struct Meter {
 struct Builder {
     static core::Result<CoefficientPlan> forecast(SampleGrid samples, RationalLimits limits,
                                                   const std::stop_token& stop,
-                                                  core::FailureDetails details) noexcept {
+                                                  core::FailureDetails details,
+                                                  bool retain_original = false) noexcept {
         CoefficientPlan plan;
         CheckedCount checked;
         plan.n_ = samples.times.size();
         plan.m_ = samples.components;
         const auto nm = checked.mul(plan.n_, plan.m_);
         plan.inputs_ = checked.add(plan.n_, nm);
-        plan.records_ = checked.add(
-            plan.inputs_, checked.mul(checked.mul(plan.n_ > 0 ? plan.n_ - 1 : 0, plan.m_), 4));
-        if (!checked.ok ||
-            plan.records_ > static_cast<std::uint64_t>(std::numeric_limits<std::ptrdiff_t>::max()))
+        plan.records_ =
+            checked.add(retain_original ? 0 : plan.inputs_,
+                        checked.mul(checked.mul(plan.n_ > 0 ? plan.n_ - 1 : 0, plan.m_), 4));
+        const auto max_index =
+            static_cast<std::uint64_t>(std::numeric_limits<std::ptrdiff_t>::max());
+        if (!checked.ok || plan.inputs_ > max_index || plan.records_ > max_index)
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         if (plan.n_ < 2 || plan.m_ == 0 || nm != samples.values.size())
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
@@ -393,7 +399,17 @@ struct Builder {
         const auto counted = forecast(samples, limits, stop, details);
         if (!counted)
             return std::unexpected(counted.error());
-        const auto& plan = *counted;
+        auto storage = provision(*counted, memory, stop, details);
+        if (!storage)
+            return std::unexpected(storage.error());
+        return run(samples, *counted, *storage, limits, stop, details, nullptr,
+                   counted->preflight_);
+    }
+
+    static core::Result<CoefficientStorage> provision(const CoefficientPlan& plan,
+                                                      core::ResourcePlan& memory,
+                                                      const std::stop_token& stop,
+                                                      core::FailureDetails details) noexcept {
         if (plan.payload_ > memory.remaining_bytes())
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         auto arithmetic = Workspace::create(plan.arithmetic_, memory, details, stop);
@@ -415,33 +431,56 @@ struct Builder {
         if (!limbs)
             return std::unexpected(supplement(limbs.error(), details));
         auto& owner = header->values()[0];
+        owner.records = std::move(*records);
+        owner.limbs = std::move(*limbs);
+        return CoefficientStorage{std::move(*arithmetic), std::move(*handles), std::move(*header)};
+    }
+
+    static core::Result<CoefficientBlock>
+    run(SampleGrid samples, const CoefficientPlan& plan, CoefficientStorage& storage,
+        RationalLimits limits, const std::stop_token& stop, core::FailureDetails details,
+        const SharedPreparationInput* original, std::uint64_t preflight = 0) noexcept {
+        if (samples.times.size() != plan.n_ || samples.components != plan.m_ ||
+            samples.values.size() != plan.inputs_ - plan.n_ || storage.owner_.size() != 1 ||
+            storage.handles_.size() != plan.inputs_)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        auto& owner = storage.owner_.values()[0];
+        if (owner.records.size() != plan.records_ || owner.limbs.size() != plan.limbs_)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        auto handles = storage.handles_.values();
         owner.n = plan.n_;
         owner.m = plan.m_;
         owner.w = plan.arithmetic_.words();
         owner.details = details;
-        owner.records = std::move(*records);
-        owner.limbs = std::move(*limbs);
-        Meter meter{plan.outer_, plan.preflight_, stop, details};
-        // Snapshot every original exact word before canonical GCD checks and numerical work.
-        for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
-            const auto v = i < plan.n_ ? samples.times[static_cast<std::size_t>(i)]
-                                       : samples.values[static_cast<std::size_t>(i - plan.n_)];
-            if (const auto copied = copy(owner, i, v, meter); !copied)
-                return std::unexpected(copied.error());
+        Meter meter{plan.outer_, preflight, stop, details};
+        const auto sample = [&](std::uint64_t i) {
+            return i < plan.n_ ? samples.times[static_cast<std::size_t>(i)]
+                               : samples.values[static_cast<std::size_t>(i - plan.n_)];
+        };
+        if (original != nullptr) {
+            owner.original.emplace(*original);
+            owner.samples = samples;
+        } else {
+            // Snapshot original words before canonical GCD checks and numerical work.
+            for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
+                if (const auto copied = copy(owner, i, sample(i), meter); !copied)
+                    return std::unexpected(copied.error());
+            }
         }
-        auto lease_arithmetic = arithmetic->begin(stop, details);
+        auto lease_arithmetic = storage.arithmetic_.begin(stop, details);
         if (!lease_arithmetic)
             return std::unexpected(lease_arithmetic.error());
         auto& session = *lease_arithmetic;
         for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
             if (const auto visited = meter.visit(); !visited)
                 return std::unexpected(visited.error());
-            auto value = session.input(view(owner, i));
+            auto value = session.input(original == nullptr ? view(owner, i) : sample(i));
             if (!value)
                 return std::unexpected(value.error());
-            handles->values()[static_cast<std::size_t>(i)] = *value;
+            handles[static_cast<std::size_t>(i)] = *value;
         }
-        Machine machine{samples, Counter{limits, details}, &session, handles->values(), {}};
+        Machine machine{samples, Counter{limits, details}, &session, handles, {}};
+        const auto coefficient_begin = original == nullptr ? plan.inputs_ : 0;
         for (std::uint64_t i = 1; i < plan.n_; ++i) {
             if (const auto visited = meter.visit(); !visited)
                 return std::unexpected(visited.error());
@@ -465,8 +504,8 @@ struct Builder {
                     const auto value = session.view(*slot);
                     if (!value)
                         return std::unexpected(value.error());
-                    if (const auto copied =
-                            copy(owner, plan.inputs_ + (i * plan.m_ + c) * 4 + p, *value, meter);
+                    if (const auto copied = copy(
+                            owner, coefficient_begin + (i * plan.m_ + c) * 4 + p, *value, meter);
                         !copied)
                         return std::unexpected(copied.error());
                 }
@@ -478,10 +517,19 @@ struct Builder {
             return std::unexpected(visited.error());
         owner.work = used->steps + meter.used;
         owner.slots = used->slots;
-        return CoefficientBlock{std::move(*header)};
+        return CoefficientBlock{std::move(storage.owner_)};
     }
 };
 } // namespace coefficient_detail
+
+CoefficientStorage::CoefficientStorage(
+    Workspace arithmetic, core::PlannedBuffer<std::optional<Slot>> handles,
+    core::PlannedBuffer<coefficient_detail::Owner> owner) noexcept
+    : arithmetic_(std::move(arithmetic)), handles_(std::move(handles)), owner_(std::move(owner)) {}
+CoefficientStorage::CoefficientStorage(CoefficientStorage&&) noexcept = default;
+CoefficientStorage& CoefficientStorage::operator=(CoefficientStorage&&) noexcept = default;
+CoefficientStorage::~CoefficientStorage() = default;
+
 CoefficientBlock::CoefficientBlock(core::PlannedBuffer<coefficient_detail::Owner> owner) noexcept
     : owner_(std::move(owner)) {}
 CoefficientBlock::CoefficientBlock(CoefficientBlock&&) noexcept = default;
@@ -507,7 +555,9 @@ core::Result<RationalView> CoefficientBlock::time(std::uint64_t i) const& noexce
         return std::unexpected(
             slot_detail::failure(core::FailureCode::InvalidInput,
                                  active() ? owner_.values()[0].details : core::FailureDetails{}));
-    return coefficient_detail::Builder::view(owner_.values()[0], i);
+    const auto& owner = owner_.values()[0];
+    return owner.original ? owner.samples.times[static_cast<std::size_t>(i)]
+                          : coefficient_detail::Builder::view(owner, i);
 }
 core::Result<RationalView> CoefficientBlock::value(std::uint64_t i,
                                                    std::uint64_t c) const& noexcept {
@@ -515,7 +565,10 @@ core::Result<RationalView> CoefficientBlock::value(std::uint64_t i,
         return std::unexpected(
             slot_detail::failure(core::FailureCode::InvalidInput,
                                  active() ? owner_.values()[0].details : core::FailureDetails{}));
-    return coefficient_detail::Builder::view(owner_.values()[0], nodes() + i * components() + c);
+    const auto& owner = owner_.values()[0];
+    const auto flat = i * components() + c;
+    return owner.original ? owner.samples.values[static_cast<std::size_t>(flat)]
+                          : coefficient_detail::Builder::view(owner, nodes() + flat);
 }
 core::Result<RationalView> CoefficientBlock::coefficient(std::uint64_t i, std::uint64_t c,
                                                          std::uint64_t p) const& noexcept {
@@ -523,14 +576,38 @@ core::Result<RationalView> CoefficientBlock::coefficient(std::uint64_t i, std::u
         return std::unexpected(
             slot_detail::failure(core::FailureCode::InvalidInput,
                                  active() ? owner_.values()[0].details : core::FailureDetails{}));
-    return coefficient_detail::Builder::view(
-        owner_.values()[0], nodes() + nodes() * components() + (i * components() + c) * 4 + p);
+    const auto& owner = owner_.values()[0];
+    const auto begin = owner.original ? 0 : nodes() + nodes() * components();
+    return coefficient_detail::Builder::view(owner, begin + (i * components() + c) * 4 + p);
 }
 core::Result<CoefficientPlan> forecast_coefficients(SampleGrid samples, RationalLimits limits,
                                                     const std::stop_token& stop,
-                                                    core::FailureDetails details) noexcept {
-    return coefficient_detail::Builder::forecast(samples, limits, stop, details);
+                                                    core::FailureDetails details,
+                                                    bool retain_original) noexcept {
+    return coefficient_detail::Builder::forecast(samples, limits, stop, details, retain_original);
 }
+
+core::Result<CoefficientStorage>
+prepare_coefficient_storage(const CoefficientPlan& plan, core::ResourcePlan& memory,
+                            const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return coefficient_detail::Builder::provision(plan, memory, stop, details);
+}
+
+core::Result<CoefficientBlock>
+prepare_staged_coefficients(const SharedPreparationInput& original, const CoefficientPlan& plan,
+                            CoefficientStorage&& storage, RationalLimits limits,
+                            const std::stop_token& stop, core::FailureDetails details) noexcept {
+    using slot_detail::supplement;
+    const auto input = original.input();
+    if (!input)
+        return std::unexpected(supplement(input.error(), details));
+    const auto view = input->get().view();
+    if (!view)
+        return std::unexpected(supplement(view.error(), details));
+    return coefficient_detail::Builder::run(view->samples, plan, storage, limits, stop, details,
+                                            &original);
+}
+
 core::Result<CoefficientBlock>
 prepare_coefficients(SampleGrid samples, CoefficientWorkspace& workspace, RationalLimits limits,
                      core::ResourcePlan& memory, const std::stop_token& stop,

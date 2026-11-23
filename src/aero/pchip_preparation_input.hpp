@@ -51,6 +51,9 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return scan_;
+    }
     [[nodiscard]] const RationalPlan& arithmetic() const& noexcept {
         return arithmetic_;
     }
@@ -104,6 +107,12 @@ forecast_preparation_input(const PreparationRequest&, RationalLimits,
 make_preparation_input(const PreparationRequest&, PreparationWorkspace&, RationalLimits,
                        core::ResourcePlan&, const std::stop_token& stop = {},
                        core::FailureDetails details = {}) noexcept;
+
+/// Consume the borrowed snapshot using a forecast prepared for the same immutable input.
+[[nodiscard]] core::Result<PchipPreparationInput>
+make_planned_preparation_input(const PreparationRequest&, const PreparationPlan&, RationalLimits,
+                               core::ResourcePlan&, const std::stop_token& stop = {},
+                               core::FailureDetails details = {}) noexcept;
 
 /// No allocation or hash-based shortcut. The expected input comes from the current host.
 /// Returns charged work on equality, StaleGeneration on any stamp/content mismatch.

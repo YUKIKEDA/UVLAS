@@ -579,6 +579,25 @@ target_include_directories(uvlas_test_structure_pg_integration_partition_resourc
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_integration_partition_resources)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_integration_partition_resources)
 
+uvlas_add_test(structure.pg_rank_preparation
+    LABELS property negative verification V-PG
+    TIMEOUT 120
+    SOURCES structure/pg_rank_preparation_test.cpp
+    LIBS uvlas_structure Threads::Threads)
+uvlas_add_test(structure.pg_rank_preparation_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_rank_preparation_resource_test.cpp
+    LIBS uvlas_structure_audit)
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_rank_preparation_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_rank_preparation_resources)
+
+uvlas_add_test(structure.pg_reference_geometry
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_reference_geometry_test.cpp
+    LIBS uvlas_structure Boost::multiprecision)
+target_include_directories(uvlas_test_structure_pg_reference_geometry
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
@@ -600,6 +619,14 @@ uvlas_add_test(aero.p1_induction_resources
 target_include_directories(uvlas_test_aero_p1_induction_resources PRIVATE "${PROJECT_SOURCE_DIR}/src")
 uvlas_enable_allocation_audit(uvlas_test_aero_p1_induction_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_p1_induction_resources)
+
+uvlas_add_test(aero.p1_shared_action
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/p1_shared_action_test.cpp
+    LIBS uvlas_aero Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_p1_shared_action PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_p1_shared_action PRIVATE
+    UVLAS_P1_SHARED_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-shared-action-v1.json")
 
 uvlas_add_test(aero.global_geometry
     LABELS unit property negative verification V-AERO
@@ -686,6 +713,15 @@ uvlas_add_test(aero.pchip_preparation_input
     SOURCES aero/pchip_preparation_input_test.cpp
     LIBS uvlas_aero Boost::multiprecision Threads::Threads)
 target_include_directories(uvlas_test_aero_pchip_preparation_input PRIVATE "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(aero.pchip_curve
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_curve_test.cpp
+    LIBS uvlas_aero Boost::multiprecision nlohmann_json::nlohmann_json Threads::Threads)
+target_include_directories(uvlas_test_aero_pchip_curve PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_pchip_curve PRIVATE
+    UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json"
+    UVLAS_PCHIP_INTERVAL_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-interval-values-v1.json")
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification

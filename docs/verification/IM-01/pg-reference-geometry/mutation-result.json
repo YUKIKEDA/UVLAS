@@ -1,0 +1,87 @@
+{
+  "schema": "uvlas.pg-reference-geometry-mutation/1",
+  "platform": "Windows x64 MSVC Release",
+  "checks": [
+    {
+      "case": "baseline",
+      "source": "pg_reference_geometry.cpp",
+      "before": "",
+      "after": "",
+      "filter": "*",
+      "exit_code": 0,
+      "summary": "All tests passed (1603 assertions in 6 test cases)"
+    },
+    {
+      "case": "thickness-gradient",
+      "source": "pg_reference_geometry.cpp",
+      "before": "m.mul(m.mul(half_zeta, plane.gradient[d]), normal_b)",
+      "after": "R{}",
+      "filter": "PG physical map*",
+      "exit_code": 42,
+      "summary": [
+        "test cases:  1 |  0 passed | 1 failed",
+        "assertions: 56 | 50 passed | 6 failed"
+      ]
+    },
+    {
+      "case": "physical-length",
+      "source": "pg_reference_geometry.cpp",
+      "before": "m.mul(frame.length_metres, midsurface_tangents[d][i])",
+      "after": "m.copy(midsurface_tangents[d][i])",
+      "filter": "PG physical map*",
+      "exit_code": 42,
+      "summary": [
+        "test cases:  1 |  0 passed | 1 failed",
+        "assertions: 56 | 51 passed | 5 failed"
+      ]
+    },
+    {
+      "case": "local-derivative-scale",
+      "source": "pg_reference_geometry.cpp",
+      "before": "m.mul(value, i <= 2 ? axis_scale : scale_squared)",
+      "after": "i <= 2 ? m.copy(value) : m.mul(value, scale_squared)",
+      "filter": "PG raw coefficient*",
+      "exit_code": 42,
+      "summary": [
+        "test cases:  1 |  0 passed | 1 failed",
+        "assertions: 19 | 17 passed | 2 failed"
+      ]
+    },
+    {
+      "case": "thickness-side",
+      "source": "pg_reference_geometry.cpp",
+      "before": "thickness_plane(m, partition_take(input.partition.thickness()), piece.thickness_triangle)",
+      "after": "thickness_plane(m, partition_take(input.partition.thickness()), 0)",
+      "filter": "PG raw coefficient*",
+      "exit_code": 42,
+      "summary": [
+        "test cases:  1 |  0 passed | 1 failed",
+        "assertions: 19 | 16 passed | 3 failed"
+      ]
+    },
+    {
+      "case": "lateral-orientation",
+      "source": "pg_reference_geometry.cpp",
+      "before": "field.cross(tangent, j[2])",
+      "after": "field.cross(j[2], tangent)",
+      "filter": "PG evaluates both*",
+      "exit_code": 42,
+      "summary": [
+        "test cases:    1 |    0 passed |   1 failed",
+        "assertions: 1468 | 1122 passed | 346 failed"
+      ]
+    },
+    {
+      "case": "normal-tube-equality",
+      "source": "pg_reference_domain.hpp",
+      "before": "m.compare(q, one) >= 0",
+      "after": "m.compare(q, one) > 0",
+      "filter": "PG strict normal tube*",
+      "exit_code": 42,
+      "summary": [
+        "test cases: 1 | 1 failed",
+        "assertions: 1 | 1 failed"
+      ]
+    }
+  ]
+}

@@ -15,6 +15,9 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return preflight_;
+    }
     [[nodiscard]] const CoefficientPlan& coefficients() const& noexcept {
         return coefficients_;
     }
@@ -33,8 +36,13 @@ private:
     CoefficientPlan coefficients_;
     BoundaryPlan boundary_;
     RationalLimits boundary_limits_;
-    std::uint64_t bytes_ = 0, work_ = 0;
+    std::uint64_t bytes_ = 0, work_ = 0, preflight_ = 0;
 };
+
+/// Same forecast before the original input has been copied.
+[[nodiscard]] core::Result<CurveNumericsPlan>
+forecast_curve_numerics(const PreparationRequest&, RationalLimits, const std::stop_token& stop = {},
+                        core::FailureDetails details = {}) noexcept;
 
 /// Does not allocate or create coefficients. The plan is for this immutable input only.
 [[nodiscard]] core::Result<CurveNumericsPlan>

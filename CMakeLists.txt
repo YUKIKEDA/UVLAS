@@ -63,7 +63,8 @@ target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spec
 
 # Exact reference algebra is a preparation component, separate from physical kernels.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
-    src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp)
+    src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
+    src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -79,9 +80,9 @@ endif()
 
 # Internal geometry preparation and local qualification; no global or kernel acceptance.
 set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp
-    src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp
+    src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp src/aero/p1_shared_action.cpp
     src/aero/global_geometry.cpp src/aero/global_bvh.cpp src/aero/global_intersections.cpp
-    src/aero/alias_kinematics.cpp src/aero/pchip_rational_slots.cpp src/aero/pchip_slot_integer.cpp src/aero/pchip_coefficients.cpp src/aero/pchip_interval_jet.cpp src/aero/pchip_knot_locator.cpp src/aero/pchip_domain_route.cpp src/aero/pchip_boundary.cpp src/aero/pchip_side.cpp src/aero/pchip_preparation_input.cpp src/aero/pchip_shared_preparation_input.cpp)
+    src/aero/alias_kinematics.cpp src/aero/pchip_rational_slots.cpp src/aero/pchip_slot_integer.cpp src/aero/pchip_coefficients.cpp src/aero/pchip_interval_jet.cpp src/aero/pchip_knot_locator.cpp src/aero/pchip_domain_route.cpp src/aero/pchip_boundary.cpp src/aero/pchip_side.cpp src/aero/pchip_preparation_input.cpp src/aero/pchip_shared_preparation_input.cpp src/aero/pchip_curve.cpp)
 add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})
 uvlas_configure_target(uvlas_aero)
 target_include_directories(uvlas_aero PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

@@ -1,0 +1,96 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-bounded-preparation",
+  "ids": [
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 264,
+  "parent_issue": 140,
+  "source_commit": "fbc048f5c3d32d571cb6635fc89824fd93593632",
+  "final_code_commit": "6028c82433de099aacbeb40d67175f2902d5f063",
+  "date": "2026-11-23",
+  "claimed_state": "製品の辞書・共通分割と同じPlanで有界な局所rankを準備し、全候補の再構成と所有する基底・写像・元領域を厳密に照合した。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260",
+    "boost": "1.92.0",
+    "stack_reservation_bytes": 67108864
+  },
+  "checks": {
+    "native_series": 12,
+    "cpp_allocation_attempts_per_series": 44,
+    "coordinate_comparisons": 3746550,
+    "source_coordinate_comparisons": 2225344,
+    "basis_coefficient_comparisons": 23655910,
+    "mutations_detected": 3
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/specs/structure/pg-coefficient-contract.md": "a0b2f1d12e50e4ca907954e2b7f7b580d519759152cfcebf41bc31087f875efe",
+    "docs/specs/structure/pg-exact-algebra-resource-contract.md": "a91db105cc00dc46cf95519277ab1896afcd87a360e2d5fc1f295bcdd0212c5a",
+    "docs/specs/structure/pg-partition-incidence-budget-contract.md": "618b51877909d1fc628e56ab980073b71d0260e79d58389051d710d855ad31ac",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/result.json": "6eb270d52c16999c6fbb91dc64338d70e2156cb5dd7fd6be6ca2265034033c77",
+    "include/uvlas/core/resource_plan.hpp": "5c9402fdcd3d1a3dfbc8e50dc9f80334e6317e2e55b9d56ea9869c970199cc8a",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+    "include/uvlas/structure/pg_integration_partition.hpp": "be9b14490465be58358b0065e08835ea10e4baf93f30b93a80c6995b0b2ba3e6",
+    "src/structure/pg_partition_common.hpp": "4d84fe68350d5f85703be177e82d38c9fe51ae8cd665e37aee63b20bec0725c6",
+    "tests/structure/pg_partition_test_support.hpp": "b0bf52176dba19ccd94e4a6555aad3a26cb25c399ed98d9fc9be6c3aeb8d18cb",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-rank-bounded-preparation-contract.md": "fee19e1f8895f6e92fb1d011d1d3630db4845b31ed19b1f73ab0f4ceb79f1fb2",
+    "include/uvlas/structure/pg_rank_preparation.hpp": "eab38eb9ea784a1a29cbf89be5d03a41bcb9d1154be761c7a77e1c9378ab3936",
+    "src/structure/pg_rank_preparation.cpp": "7f70e78504f697e2a4317e7be8e9c516a4aa3240f25968e562daa2f795dd8d85",
+    "src/structure/pg_rank_storage.hpp": "5e8a4d028457b262337f921d6edc18b95fd5b587a6826edd79b37dc533b63c3b",
+    "src/structure/pg_rank_input.hpp": "84e36f5fa431fc03fe7229bd810db4a0074393f562df098a51b8c27e11ceca3e",
+    "src/structure/pg_rank_factor.hpp": "924253fd8193882b7ec36352e2e779eda924148960b23756d60c7665b101619c",
+    "src/structure/pg_rank_lift.hpp": "45ec686129f202c2930f60fce06ab75eddd4a22d8ed00ea50decea4f68b34e44",
+    "src/structure/pg_rank_witness.hpp": "60e6b4a986a936d3b873abe67329b0f1733820c673dcb342079f2d996f612f27",
+    "tests/structure/pg_rank_preparation_test.cpp": "727fcca631a027b5951c772fce6d12e665cf6af830bbb09b8ad8ad0b9cb9678a",
+    "tests/structure/pg_rank_preparation_resource_test.cpp": "e57c65c4a3a20ab328faa7a200559b88711aed51522c1333f3624b892565c7ce",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/run-series.cpp.txt": "a3fd50133f5c5a7112b86e804224460fecd9c814d0e9a5b1dba645dbb6911204",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/run-series.py.txt": "d490b24fe17e017513a9c9a53d74b2be5eb0a3aadcb8c8b6ab3eb00f32dac31f",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/result.json": "52c577334e1661100d95c8ee00a811cc1ffecbf7c477ce34258bac2de94fdba4",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/mutation-result.json": "3b7f800b172e9965d4448fb676eb014c8aafe135c1b62ab0f957789d2f5f1d74",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/verification.md": "5151d23d0d75656b048bdb6abeeac06346c580548487e63b3f49c09bbbd4060a"
+  },
+  "historical_artifacts": {
+    "commit": "fbc048f5c3d32d571cb6635fc89824fd93593632",
+    "sha256": {
+      "CMakeLists.txt": "3ad0737b3b2c16252b8271c42aa18fade9e1e1ad53f471a6db5fba7cfe4ae7a6",
+      "tests/CMakeLists.txt": "0c3ca0bd16b36b2dd4f3925df1709d880b9061f1ac46c4918033cee76a8947cf",
+      "include/uvlas/structure/pg_rank_preparation.hpp": "c987336aaa799e58315af5de082c97b029970e7835b6654042856ec5dea9b042"
+    }
+  },
+  "review_267": {
+    "historical_artifacts": {
+      "commit": "84cb0ae3a1160e1c7312fd53e736ff89cb218064",
+      "sha256": {
+        "src/structure/pg_partition_common.hpp": "31423ff43ffcf81b62dc010680fde19fe29e514e239916241b38e8928d9fc1cb",
+        "src/structure/pg_rank_storage.hpp": "ba79bb21e3d774e6f9f0e01381f1b3145691e403a0b8beb250b1a16a31544098",
+        "src/structure/pg_rank_input.hpp": "570e1d5952ea21d4628de04a8c8901f676eded9c4120e0e75b98c02404b28a87",
+        "tests/structure/pg_rank_preparation_test.cpp": "b3daf35f183668bd01370c9277358a91a0535c946a318992f0f73b4882302329",
+        "docs/verification/IM-01/pg-rank-bounded-preparation/verification.md": "776334fa2bc401e844e315c23c24c116107dfdb8dc8583168d98ac3a2b2c824a"
+      }
+    },
+    "test_commit": "17fe675dd68f596ada87d561774ec0c16ba87fa3",
+    "checks": {
+      "coefficient_denominator_bits": 101,
+      "stale_generation_work_limit": 28,
+      "one_short_work_limit": 27,
+      "debug_rank_ctest_passed": 1,
+      "release_rank_ctest_passed": 1
+    }
+  }
+}
