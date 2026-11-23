@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import argparse
 import ctypes
+import errno
 import json
 import os
 import re
@@ -31,6 +32,7 @@ COMPONENT = "uvlas-private-runtime"
 SCHEMA = "uvlas.private-runtime-image/1"
 INVENTORY = "inventory.json"
 BUILD_INFO = "build-info.json"
+DESTINATION_EXISTS = "Image destination already exists"
 NOTICES = Path("share/uvlas/third-party-notices")
 LICENSES = (Path("share/uvlas/LICENSE"), Path("share/uvlas/THIRD_PARTY_NOTICES.md"))
 
@@ -229,12 +231,18 @@ def rehearse(
 def publish_directory(source: Path, destination: Path) -> None:
     if os.name == "nt":
         # On Windows rename never replaces an existing destination.
-        source.rename(destination)
+        try:
+            source.rename(destination)
+        except FileExistsError as error:
+            raise RuntimeError(DESTINATION_EXISTS) from error
         return
     # On Linux an ordinary directory rename can replace an existing empty directory.
     # RENAME_NOREPLACE makes the commit safe even if another process wins the race.
     libc = ctypes.CDLL(None, use_errno=True)
-    rename_noreplace = libc.renameat2
+    try:
+        rename_noreplace = libc.renameat2
+    except AttributeError as error:
+        raise RuntimeError("Atomic no-replace directory rename is unavailable") from error
     rename_noreplace.argtypes = [
         ctypes.c_int,
         ctypes.c_char_p,
@@ -249,6 +257,8 @@ def publish_directory(source: Path, destination: Path) -> None:
     )
     if status != 0:
         error = ctypes.get_errno()
+        if error == errno.EEXIST:
+            raise RuntimeError(DESTINATION_EXISTS)
         raise OSError(error, os.strerror(error), destination)
 
 
@@ -262,40 +272,42 @@ def stage(
     ownership_test: Path,
     commit: str,
 ) -> dict[str, object]:
-    require(not os.path.lexists(destination), "Image destination already exists")
+    require(not os.path.lexists(destination), DESTINATION_EXISTS)
     require(not destination.is_relative_to(build), "Image destination must be outside the build")
     install_env = dict(os.environ)
     install_env.pop("DESTDIR", None)
     install_env.pop("CMAKE_INSTALL_MODE", None)
     with tempfile.TemporaryDirectory(prefix=".uvlas-image-", dir=destination.parent) as temporary:
-        work = Path(temporary).resolve()
-        image = work / "image"
-        image.mkdir()
-        output(
-            [
-                cmake,
-                "--install",
-                str(build),
-                "--config",
-                "Release",
-                "--component",
-                COMPONENT,
-                "--prefix",
-                str(image),
-            ],
-            work,
-            install_env,
-        )
-        require(
-            cli_path(image).is_file(), "Build has no private Release component; enable it in CMake"
-        )
-        require(extension_path(image).is_file(), "Build has no native CPython 3.12 extension")
-        notice_hashes(image / NOTICES, vcpkg_share)
-        write_json(image / BUILD_INFO, observed_cli(image, commit, work))
-        files = inventory(image)
-        validate_layout(image, files)
-        write_json(image / INVENTORY, {"schema": SCHEMA, "files": files})
-        result = rehearse(image, work, numpy_wheel, ownership_test, commit)
+        image = Path(temporary).resolve()
+        # Remove every rehearsal output before committing the sole staged tree.
+        with tempfile.TemporaryDirectory(prefix="uvlas-image-rehearsal-") as rehearsal:
+            work = Path(rehearsal).resolve()
+            output(
+                [
+                    cmake,
+                    "--install",
+                    str(build),
+                    "--config",
+                    "Release",
+                    "--component",
+                    COMPONENT,
+                    "--prefix",
+                    str(image),
+                ],
+                work,
+                install_env,
+            )
+            require(
+                cli_path(image).is_file(),
+                "Build has no private Release component; enable it in CMake",
+            )
+            require(extension_path(image).is_file(), "Build has no native CPython 3.12 extension")
+            notice_hashes(image / NOTICES, vcpkg_share)
+            write_json(image / BUILD_INFO, observed_cli(image, commit, work))
+            files = inventory(image)
+            validate_layout(image, files)
+            write_json(image / INVENTORY, {"schema": SCHEMA, "files": files})
+            result = rehearse(image, work, numpy_wheel, ownership_test, commit)
         publish_directory(image, destination)
         return result
 
