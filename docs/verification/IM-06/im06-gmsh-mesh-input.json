@@ -9,15 +9,17 @@
   "package": "IM-06",
   "issue": 22,
   "date": "2026-11-23",
-  "source_commit": "3824972dfbafe9db088594325ab8a258a815d066",
+  "source_commit": "c6351dc2965ee1848129413486eb15292b18bd38",
   "scope": "Owned Gmsh MSH 4.1 ASCII decoding and tag resolution, with sourced literals, controls, and boundary-orientation mutation",
   "sources": {
     "src/io/gmsh_mesh.hpp": "7fa945a918528dbf9fc47d38ab9af41b953b95c6414a7bb4de6abe1bb0243e09",
-    "src/io/gmsh_mesh.cpp": "e5c188912776497ef376544ce170029615d0b42a7153cdf4b0b9ea1df4b7cf43",
-    "tests/io/gmsh_mesh_test.cpp": "ab6fb32a7946ae4c1a0be201130fcbaa341fd513ea67608ec46e075ec9a22e2a",
-    "docs/specs/foundation/gmsh-mesh-input-contract.md": "3f1a142988b308931b87ffefb8d1eeeed8d071093891f6839a8055078605f3fa"
+    "src/io/gmsh_mesh.cpp": "23dddc8268c9cf32474cfd40ee7e6fb535a876ee32f31eade4f92ca60ea21055",
+    "tests/io/gmsh_mesh_test.cpp": "e5301a75c1dac8922d6de6d047eb7eee55838f7e953a92e63ec95b0b8b8c694a",
+    "docs/specs/foundation/gmsh-mesh-input-contract.md": "3f1a142988b308931b87ffefb8d1eeeed8d071093891f6839a8055078605f3fa",
+    "src/io/reference_input.hpp": "74816b29b6c1f5ea4645d44a83b2358ef652abdf4c8d388d6c9e549274dc117d",
+    "src/io/reference_root_snapshot.hpp": "713b63d9e82c849e05de4df80e99a2782c3a2182f27538edf698bd2dfd7ebeb4"
   },
   "artifacts": {
-    "docs/verification/IM-06/gmsh-mesh-input.md": "e3495d2a3ac611d25f42fd64dd64e3c842eaf13112cdedf70f04237b591a2628"
+    "docs/verification/IM-06/gmsh-mesh-input.md": "6a00bb64a45bb51788a5125be60de5787cc336a5aa5833bf3898002fe291e807"
   }
 }

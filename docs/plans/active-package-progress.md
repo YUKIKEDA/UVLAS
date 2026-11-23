@@ -5,8 +5,8 @@
 | パッケージ | 完了／全体 | 残り | 統合済みの成果 | 次に完了させる成果と判定条件 |
 |---|---:|---:|---|---|
 | [IM-01 構造](#im-01-構造) | 6／12（50%） | 6 | 参照幾何に加え、辞書と分割から局所rankを準備し、基底と全座標を現在の入力で厳密に再検証できる。全12系列で、元の結果を保持したまま同じ48 GiB枠で照合した。 [局所rank再検証](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) | 局所基底と参照幾何から物理内積を組み立て、保証付き条件付けの誤差上限と必須場の保持を検査する。 |
-| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有に続き、固定分割四辺形と共有辺の誘導・全微分を実装した。PCHIPの曲線準備、評価、再開時の照合も実装した。 [共有辺と四辺形](../verification/IM-03/p1-shared-action-v1/verification.md)・[#263](https://github.com/YUKIKEDA/UVLAS/pull/263) | 既知流れと指定運動を同じ時刻・座標の規則で評価できるよう、採用済み曲線と必要な投影を接続し、値・微分と再開時の一致を確かめる。 |
-| [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換を実装済み。根相対で取得した先頭の参照を、ダイジェスト照合後に依存走査へ渡した。共有と循環を判定する走査も実装済み。 [#245](https://github.com/YUKIKEDA/UVLAS/pull/245)・[#252](https://github.com/YUKIKEDA/UVLAS/pull/252) | 実入力の参照解決には、役割ごとの内容と依存抽出の規則を確定する。Gmshを起点に、採用するMSH 4.1 ASCIIの範囲、sidecar、参照の宣言方法を決める。独立に進められる配布準備では、既存のCLIとPython成果物の依存・ABIを調べ、開発環境なしでの起動を検証する。 |
+| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有、共有辺の誘導・全微分を実装した。定数・多項式・PCHIPの一様流は厳密なSI入力から速度と微分を返し、復元時に入力と係数を照合する。 [一様流の検証](../verification/IM-03/exact-uniform-flow-v1/verification.md) | ケースからの受渡しと必要な精度投影を閉じ、突風と指定運動を同じ時刻・座標規則で照合する。 |
+| [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換を実装済み。取得済みのGmshメッシュから節点と要素、幾何実体、物理名を読み取る。両OSで移設したCLIの起動と、新規venvでのPython拡張の読込みを検証した。 [メッシュの検証](../verification/IM-06/gmsh-mesh-input.md)・[#269](https://github.com/YUKIKEDA/UVLAS/pull/269) | Gmshのsidecarで部材、材料、支持、接続、参照面への対応を定め、役割ごとの参照を解決する。正式な配布形式と公開先はREL-1で判定する。 |
 
 割合は[作業分解](next-package-work-breakdown.md)の完了段階数を全段階数で割って求める。各段階の完了は、採用仕様、後続が受け取る成果、独立した検証根拠で確かめる。段階ごとに規模が異なるため、この数字から残りの工数は見積もれない。
 
@@ -64,7 +64,7 @@
 | 励振と既知入力 | 残 | schema・SI・参照snapshotと流れ／J1の契約を、時系列・イベント・必要微分へつなぐ |
 | parametric入力とprepare | 残 | 型付きcaseを共通のRawModelへ渡す。物理準備には対応するIM-01／02／03の成果が必要 |
 | Nastran | 残 | schema・SI・snapshotを入力に、採用カード、座標系、sidecarを解析する |
-| Gmsh | 残 | 同じ入力基盤を使い、採用したMSH 4.1 ASCII、物理名、sidecarを解析する |
+| Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。sidecarの型と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md) |
 | 共通参照への変換 | 残 | 外部面を共通の曲面・厚さ・接続へ変換し、質量・仕事などの誤差を評価する。対応するIM-01／02の成果が必要 |
 | 結果と診断 | 残 | 物理回復の出力をstatus、来歴、CSV／VTU／PVDと対応付ける |
 | checkpoint容器 | 残 | snapshotと状態基盤を使い、形式、整合検査、確定checkpointを守る書込みを実装する |
@@ -74,7 +74,7 @@
 | ランタイムと新規環境 | 基盤あり | CLIとbindingの基盤は [IM-00](im00-package-acceptance.md) にある。実際に配布するCLI／wheelの依存・ABIと、開発環境に依存しない導入・実行を確認する |
 | 終了審査 | 残 | V-USE・V-STATEで3入力経路とCLI／Pythonの物理結果、両OSの導入・中断・再開を照合する |
 
-schemaのLinux sanitizer実行に関する [#142](https://github.com/YUKIKEDA/UVLAS/issues/142) は継続。数値表の段階数には、同じ段階に属する個々の子Issueを重ねて加えていない。
+schemaのLinux sanitizerの2試験は [#143](https://github.com/YUKIKEDA/UVLAS/pull/143) の修正を含むmainで再計測し、49.51秒と53.22秒で通過した。Linux sanitizerだけ300秒、Linux Debug・ReleaseとWindows Debug・Releaseは60秒の登録を確認した。 [#142](https://github.com/YUKIKEDA/UVLAS/issues/142) 数値表では同じ段階の子Issueを重ねて加えない。
 
 ## 初回実務適用までの位置
 
