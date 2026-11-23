@@ -1,0 +1,228 @@
+"""Regression checks for paired derivation publication and counted RHS scans."""
+
+import argparse
+import hashlib
+from itertools import product
+import json
+import os
+from pathlib import Path
+from runpy import run_path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+
+def reject(call, expected_type, message=None):
+    try:
+        call()
+    except expected_type as error:
+        if message is None or message in str(error):
+            return
+        raise
+    raise RuntimeError(f'expected {expected_type.__name__}: {message}')
+
+
+def current_bytes(path):
+    return path.read_bytes() if path.exists() else None
+
+
+def exercise_publication(derive, original, guard, require):
+    publish = derive['publish_pair']
+    checked = 0
+    with TemporaryDirectory() as scratch:
+        directory = Path(scratch)
+        header = directory / 'header.hpp'
+        record_folder = directory / 'record'
+        record_folder.mkdir()
+        record = record_folder / 'driver.json'
+        missing = directory / 'missing-parent' / 'driver.json'
+        real_replace = os.replace
+        for had_header in (False, True):
+            if had_header:
+                header.write_bytes(b'prior header')
+            with patch.object(os, 'replace', wraps=real_replace) as replace:
+                reject(lambda: publish(header, b'new header', missing, b'new record'), FileNotFoundError)
+                require(not replace.called, 'missing parent must fail before replacement')
+            require(current_bytes(header) == (b'prior header' if had_header else None)
+                    and not missing.exists() and not list(directory.rglob('.*.tmp')),
+                    'missing parent must preserve the pair')
+            checked += 1
+
+        for had_header, had_record, failing_call in product((False, True), (False, True), (1, 2)):
+            old_header = b'prior header' if had_header else None
+            old_record = b'prior record' if had_record else None
+            for path, content in ((header, old_header), (record, old_record)):
+                path.unlink(missing_ok=True)
+                if content is not None:
+                    path.write_bytes(content)
+            calls = []
+
+            def injected_replace(source, destination):
+                calls.append(destination)
+                if len(calls) == failing_call:
+                    raise OSError('injected publication failure')
+                return real_replace(source, destination)
+
+            with patch.object(os, 'replace', side_effect=injected_replace):
+                reject(lambda: publish(header, b'new header', record, b'new record'),
+                       OSError, 'injected publication failure')
+            require(current_bytes(header) == old_header and current_bytes(record) == old_record
+                    and not list(directory.rglob('.*.tmp')), 'publication failure must preserve both bytes')
+            expected = [header.resolve()] if failing_call == 1 else [header.resolve(), record.resolve()]
+            if failing_call == 2 and had_header:
+                expected.append(header.resolve())
+            require(calls == expected, 'replacement order or rollback differs')
+            checked += 1
+
+        header.write_bytes(b'header requiring recovery')
+        record.write_bytes(b'prior record')
+        calls = []
+
+        def fail_publication_and_rollback(source, destination):
+            calls.append(destination)
+            if len(calls) in (2, 3):
+                raise OSError('injected record or rollback failure')
+            return real_replace(source, destination)
+
+        with patch.object(os, 'replace', side_effect=fail_publication_and_rollback):
+            reject(lambda: publish(header, b'new header', record, b'new record'),
+                   RuntimeError, 'header rollback failed')
+        backups = list(directory.glob('.header.hpp.*.tmp'))
+        require(len(backups) == 1 and backups[0].read_bytes() == b'header requiring recovery'
+                and record.read_bytes() == b'prior record', 'failed rollback lost recovery bytes')
+        checked += 1
+        for path in directory.rglob('.*.tmp'):
+            path.unlink()
+
+        with patch('sys.argv', ['derive-header', '--base', str(original), '--guard', str(guard),
+                                '--output', str(header), '--record', str(record)]):
+            derive['main']()
+        expected = derive['derive'](original.read_bytes())
+        require(header.read_bytes() == expected and
+                json.loads(record.read_bytes())['generated_header_sha256'] == hashlib.sha256(expected).hexdigest()
+                and not list(directory.rglob('.*.tmp')), 'successful paired derivation differs')
+        checked += 1
+    return checked
+
+
+def exercise_counts(run, paths, capture, base, full, shared):
+    counts = run.__globals__['count_rhs_scans']
+    validate = run.__globals__['validate_shared']
+    dimensions = run.__globals__['DOMAINS']
+    census = {case['domain']: case for case in json.loads(paths['shared-census'].read_bytes())['cases']}
+    selections = {domain: full['read_basis'](base, paths[f'{domain}-certificate'], shape)
+                  for domain, shape in dimensions.items()}
+    expected = counts(paths['coefficient'], selections)
+    compact = {case['domain']: case for case in capture['cases']}
+    frames = tuple(product(dimensions, ('first', 'all')))
+    count_checks = 0
+    for domain, mode in frames:
+        first = mode == 'first'
+        result = compact[domain]['first_probe' if first else 'result']
+        total = expected[domain][mode]
+        validate(base, result, census[domain], first, total)
+        count_checks += 1
+        for changed in (0, total - 1, total + 1, float(total)):
+            bad = {**result, 'rhs_entries_scanned': changed}
+            reject(lambda: validate(base, bad, census[domain], first, total), RuntimeError, 'RHS sparse scans')
+            count_checks += 1
+
+    with TemporaryDirectory() as scratch:
+        temp = Path(scratch)
+        sample = temp / 'hand.txt'
+        sample.write_bytes(
+            b'header 4 1 3 0 0\ncolumn 0 0 0\ncolumn 1 6 0\ncolumn 2 0 0\n'
+            b'coefficient 0 0 0 0 0 0 1 2\ncoefficient 0 0 0 4 0 0 1 1\n'
+            b'coefficient 1 0 0 0 0 0 1 2\ncoefficient 1 0 1 1 0 0 1 3\n'
+            b'coefficient 2 0 0 1 0 0 7 13\n'
+            b'required 0 0 1 1\nrequired 0 1 -1 1\nrequired 0 2 1 1\nanchor 0 2 -1 1\n'
+        )
+        roster = set(range(37))
+        hand = counts(sample, {'full': roster - {0, 33, 36}, 'cut': roster - {33, 36}})
+        base.require(hand == {'full': {'first': 3, 'all': 8}, 'cut': {'first': 1, 'all': 2}},
+                     'exact cancellation, U cells and candidate order')
+        count_checks += 1
+
+        paths = {**paths, 'binary': temp / 'stub.exe'}
+        paths['binary'].write_bytes(b'publication test transport')
+        output = temp / 'result.json'
+        old = b'prior complete result'
+        arguments = [atom for key, path in paths.items() for atom in (f'--{key}', str(path))]
+        arguments.extend(('--output', str(output)))
+        load = shared['load']
+
+        def load_for_gate(name, path):
+            return base if name == 'shared_batch_base' else load(name, path)
+
+        def run_path_for_gate(path):
+            if Path(path) == paths['cut-runner']:
+                return {**shared, 'load': load_for_gate, 'compact': lambda result: result}
+            # Raw columns were validated before the frozen aggregates were saved.
+            return {**full, 'validate_batch': lambda *args: None}
+
+        publication_checks = 0
+        with patch.dict(run.__globals__, run_path=run_path_for_gate,
+                        count_rhs_scans=lambda path, selected: expected):
+            for bad_frame, had_output in product(frames, (False, True)):
+                output.unlink(missing_ok=True)
+                if had_output:
+                    output.write_bytes(old)
+
+                def invoke(_binary, *values):
+                    if len(values) == 1:
+                        return capture['shared_controls' if values[0] == '--shared-controls' else 'controls']
+                    domain, mode = values[-2:]
+                    result = dict(compact[domain]['first_probe' if mode == 'first' else 'result'])
+                    if (domain, mode) == bad_frame:
+                        result['rhs_entries_scanned'] = 0
+                    return result
+
+                with patch.object(base, 'invoke', side_effect=invoke):
+                    reject(lambda: run(arguments), RuntimeError, 'RHS sparse scans')
+                base.require(current_bytes(output) == (old if had_output else None)
+                             and not list(temp.glob('.*.tmp')), 'count-only change reached publication')
+                publication_checks += 1
+    return expected, count_checks, publication_checks
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('root', 'coefficient', 'full-certificate', 'cut-certificate'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args()
+    verification = args.root.resolve() / 'docs/verification/IM-01'
+    folder = verification / 'pg-rank-shared-fixed-batch'
+    paths = {
+        'coefficient': args.coefficient, 'full-certificate': args.full_certificate,
+        'cut-certificate': args.cut_certificate,
+        'certificate-index': verification / 'pg-rank-fixed-certificate/certificate-index.json',
+        'study': verification / 'pg-rank-resource-study/results.json',
+        'derivation': folder / 'derivation.json',
+        'baseline-full': verification / 'pg-rank-fixed-batch-n4-full/quartic-result.json',
+        'baseline-cut': verification / 'pg-rank-fixed-batch-n4-cut/results.json',
+        'shared-census': verification / 'pg-rank-shared-pivot-scale/result.json',
+        'base-runner': verification / 'pg-rank-fixed-batch/run-batch.py.txt',
+        'cut-runner': verification / 'pg-rank-fixed-batch-n4-cut/run-case.py.txt',
+        'full-runner': verification / 'pg-rank-fixed-batch-n4-full/run-case.py.txt',
+        'capacity-producer': verification / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt',
+    }
+    shared = run_path(str(paths['cut-runner']))
+    full = run_path(str(paths['full-runner']))
+    base = shared['load']('review_base', paths['base-runner'])
+    derive = run_path(str(folder / 'derive-header.py.txt'))
+    paired_checks = exercise_publication(
+        derive, verification / 'pg-rank-fixed-batch/fixed-batch.cpp.txt',
+        verification / 'pg-rank-fixed-batch-n2/derive-driver.py.txt', base.require,
+    )
+    count, count_checks, publication_checks = exercise_counts(
+        run_path(str(folder / 'run-shared.py.txt'))['main'], paths,
+        json.loads((folder / 'results.json').read_bytes()), base, full, shared,
+    )
+    print(json.dumps({
+        'schema': 'uvlas.pg-shared-fixed-batch-review/1',
+        'paired_publication_checks': paired_checks, 'independent_scans': count,
+        'count_checks': count_checks, 'count_only_rejected_before_publication': publication_checks,
+    }, indent=2))
+
+
+if __name__ == '__main__':
+    main()

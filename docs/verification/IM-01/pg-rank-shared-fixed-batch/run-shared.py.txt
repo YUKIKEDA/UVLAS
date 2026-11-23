@@ -1,0 +1,218 @@
+"""Validate and publish shared fixed-batch evidence for both n4 quartic domains."""
+
+import argparse
+import hashlib
+import json
+from fractions import Fraction
+from pathlib import Path
+from runpy import run_path
+
+
+DOMAINS = {'full': (20032, 933, 1496, 774), 'cut': (5634, 933, 1496, 498)}
+BASELINE_SHA256 = {
+    'full': '8ee56271f2464b49489831fdee23218cdced092615a1437912683c0ca9166edb',
+    'cut': '4f379082d3c1ade6df1d939743c9be493060b4dbccd6b7199a80a5a39f357a95',
+}
+CENSUS_SHA256 = '4c325e4ee0bc1b23c7601ac456f8699f5475da05f2045baba6c37cd523b5d864'
+DERIVATION = {
+    'schema': 'uvlas.pg-shared-fixed-batch-derivation/1',
+    'base_sha256': 'f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63',
+    'generated_header_sha256': '2820a2cb4de0a13329c9c17e595b8c06d217bd4f1bc697db4c92865f2ed2cf97',
+    'generated_bytes': 40210,
+    'edits': 11,
+}
+VARIABLE_FIELDS = {'payload_bytes', 'batch_ms', 'process_peak_bytes'}
+
+
+def read_frozen_json(base, path, expected):
+    content = path.read_bytes()
+    base.require(hashlib.sha256(content).hexdigest() == expected, f'frozen identity: {path}')
+    return json.loads(content)
+
+
+def validate_shared_controls(base, controls):
+    base.require(type(controls) is dict, 'shared control object')
+    for key in ('payload_equal_one_short', 'zero_target_after_nonzero',
+                'borrowed_coordinate_mismatch', 'same_scratch_after_failure'):
+        base.require(controls.get(key) is True, f'shared control {key}')
+    for key, expected in (('heap_attempts', 0), ('proof_rows', 8), ('coordinate_checks', 4)):
+        base.integer(controls.get(key), expected, key)
+
+
+def count_rhs_scans(path, selections):
+    """Count A L nonzeros for the dependent ordinals chosen by each certificate."""
+    with path.open('rb') as stream:
+        tag, grid, original_count, full, _, _ = stream.readline().split()
+        if tag != b'header' or int(grid) != 4:
+            raise ValueError('expected n4 coefficient header')
+        original_count, full = int(original_count), int(full)
+        originals = [dict() for _ in range(full)]
+        anchor_start = 33 + full
+        recipes = [[] for _ in range(anchor_start + original_count)]
+        for column in range(original_count):
+            recipes[anchor_start + column].append((column, Fraction(1)))
+        for line in stream:
+            tag, *fields = line.split()
+            if tag == b'coefficient':
+                column, *row, numerator, denominator = map(int, fields)
+                key = tuple(row)
+                value = Fraction(numerator, denominator)
+                if value == 0 or key in originals[column]:
+                    raise ValueError('expected distinct nonzero dictionary terms')
+                originals[column][key] = value
+            elif tag == b'column':
+                column, mode, original = map(int, fields)
+                if mode in (6, 7):
+                    recipes[anchor_start + original].append((column, Fraction(-1)))
+            elif tag in (b'required', b'anchor'):
+                column, source, numerator, denominator = map(int, fields)
+                weight = Fraction(numerator, denominator)
+                if tag == b'anchor':
+                    column += anchor_start
+                    weight = -weight
+                recipes[column].append((source, weight))
+            else:
+                raise ValueError('unknown coefficient record')
+
+    dependents = {
+        domain: [j for j in range(len(recipes)) if j not in selected]
+        for domain, selected in selections.items()
+    }
+    counts = {'full': {}, 'cut': {}}
+    for column in set(dependents['full']) | set(dependents['cut']):
+        if 33 <= column < anchor_start:
+            coefficients = originals[column - 33]
+        else:
+            coefficients = {}
+            for source, weight in recipes[column]:
+                for row, value in originals[source].items():
+                    coefficients[row] = coefficients.get(row, 0) + weight * value
+        # n4 has unit half-cells in the integer coordinates of the U shape.
+        # Sorting activity rows into sparse order permutes entries without changing the count.
+        nonzeros = [row for row, coefficient in coefficients.items() if coefficient]
+        counts['full'][column] = len(nonzeros)
+        counts['cut'][column] = sum(t in (0, 3) or (s == 0 and t in (1, 2))
+                                    for _, s, t, _, _ in nonzeros)
+    return {domain: {'first': counts[domain][columns[0]], 'all': sum(counts[domain][j] for j in columns)}
+            for domain, columns in dependents.items()}
+
+
+def validate_shared(base, result, census, first, expected_scans):
+    loads = 1 if first else census['dependents']
+    for key, expected in (
+        ('pivot_nonzeros', census['pivot_nonzeros']),
+        ('factor_off_diagonal_nonzeros', census['factor_off_diagonal_nonzeros']),
+        ('target_loads', loads), ('rhs_rows_initialized', loads * census['rank']),
+    ):
+        base.integer(result.get(key), expected, key)
+    base.integer(result.get('rhs_entries_scanned'), expected_scans, 'RHS sparse scans')
+    bits = result.get('maximum_shared_recurrence_bits')
+    base.require(type(bits) is int and 32 < bits <= census['shared_recurrence_bits'] <= 512,
+                 'shared recurrence width')
+    if not first:
+        base.integer(bits, census['shared_recurrence_bits'], 'census recurrence width')
+    payload = result.get('shared_payload_bytes')
+    base.require(type(payload) is int and
+                 census['one_shared_block_logical_bytes'] <= payload <= result['payload_bytes'],
+                 'shared payload')
+
+
+def check_numerical_parity(base, fresh, frozen):
+    for key, expected in frozen.items():
+        if key not in VARIABLE_FIELDS:
+            base.require(fresh.get(key) == expected, f'frozen numerical field differs: {key}')
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in (
+        'coefficient', 'full-certificate', 'cut-certificate', 'certificate-index', 'study',
+        'binary', 'derivation', 'baseline-full', 'baseline-cut', 'shared-census',
+        'base-runner', 'cut-runner', 'full-runner', 'capacity-producer', 'output',
+    ):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args(argv)
+
+    common = run_path(str(args.cut_runner))
+    common['reject_output_aliases'](
+        args.output, (path for name, path in vars(args).items() if name != 'output'),
+    )
+    full = run_path(str(args.full_runner))
+    base = common['load']('shared_batch_base', args.base_runner)
+    capacity = common['load']('shared_batch_capacity', args.capacity_producer)
+    binary = args.binary.resolve()
+    derivation = json.loads(args.derivation.read_bytes())
+    base.require(type(derivation) is dict, 'derivation object')
+    for key, expected in DERIVATION.items():
+        value = derivation.get(key)
+        base.require(type(value) is type(expected) and value == expected, f'derivation field {key}')
+
+    census = read_frozen_json(base, args.shared_census, CENSUS_SHA256)
+    census_cases = {case['domain']: case for case in census['cases']}
+    baseline = {
+        domain: read_frozen_json(base, path, BASELINE_SHA256[domain])
+        for domain, path in (('full', args.baseline_full), ('cut', args.baseline_cut))
+    }
+    study = json.loads(args.study.read_bytes())['cases']
+    index = json.loads(args.certificate_index.read_bytes())['certificates']
+    certificates = {'full': args.full_certificate, 'cut': args.cut_certificate}
+    selections = {}
+    for domain, dimensions in DOMAINS.items():
+        prior = capacity.verify_input(args.coefficient, 4, 'quartic', domain, study)
+        base.require((prior['rows'], prior['columns'], prior['candidates'], prior['mod_rank'])
+                     == dimensions, f'{domain} study dimensions')
+        matches = [
+            row for row in index
+            if (row['n'], row['shape'], row['domain'], row['row_order']) == (4, 'quartic', domain, 'sparse')
+        ]
+        base.require(len(matches) == 1, f'{domain} certificate selection')
+        row, = matches
+        certificate = certificates[domain]
+        base.require(row['rank'] == dimensions[-1] and row['input_sha256'] == prior['input_sha256']
+                     == baseline[domain]['input_sha256'] == census['input_sha256']
+                     and row['bytes'] == certificate.stat().st_size
+                     and row['sha256'] == full['sha256'](certificate) == baseline[domain]['certificate_sha256']
+                     == census_cases[domain]['certificate_sha256'], f'{domain} input identity')
+        selections[domain] = full['read_basis'](base, certificate, dimensions)
+
+    expected_scans = count_rhs_scans(args.coefficient, selections)
+    controls = base.invoke(binary, '--controls')
+    base.validate_controls(controls)
+    shared_controls = base.invoke(binary, '--shared-controls')
+    validate_shared_controls(base, shared_controls)
+    cases = []
+    for domain, dimensions in DOMAINS.items():
+        frames = []
+        for mode in ('first', 'all'):
+            first = mode == 'first'
+            capture = base.invoke(binary, args.coefficient, certificates[domain], domain, mode)
+            full['validate_batch'](base, capture, dimensions, selections[domain], first)
+            validate_shared(base, capture, census_cases[domain], first, expected_scans[domain][mode])
+            compact = ({key: value for key, value in capture.items() if key != 'columns'}
+                       if first else common['compact'](capture))
+            if not first:
+                compact['lift_digits_histogram'] = {
+                    str(digit): count for digit, count in compact['lift_digits_histogram'].items()
+                }
+            check_numerical_parity(base, compact, baseline[domain]['first_probe' if first else 'result'])
+            frames.append(compact)
+        first_probe, result = frames
+        base.require(first_probe['payload_bytes'] == result['payload_bytes']
+                     < baseline[domain]['result']['payload_bytes']
+                     and first_probe['shared_payload_bytes'] == result['shared_payload_bytes'],
+                     f'{domain} held capacity must remain constant through batch')
+        cases.append({
+            'domain': domain, 'certificate_sha256': baseline[domain]['certificate_sha256'],
+            'baseline_sha256': BASELINE_SHA256[domain], 'first_probe': first_probe, 'result': result,
+        })
+    base.publish(args.output, {
+        'schema': 'uvlas.pg-shared-fixed-batch/1',
+        'n': 4, 'shape': 'quartic', 'row_order': 'sparse',
+        'input_sha256': census['input_sha256'], 'census_sha256': CENSUS_SHA256,
+        'binary_sha256': full['sha256'](binary), 'derivation': derivation,
+        'controls': controls, 'shared_controls': shared_controls, 'cases': cases,
+    })
+
+
+if __name__ == '__main__':
+    main()

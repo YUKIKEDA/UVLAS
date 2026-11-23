@@ -1,0 +1,49 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-shared-fixed-batch",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 234,
+  "parent_issue": 140,
+  "source_commit": "5340e6c1a521d72f6bbb4dd20dd9ccca914b5cb4",
+  "date": "2026-11-20",
+  "claimed_state": "共有行尺度を用いたn4四次の全背景とU形切断で全候補を厳密に照合した。列別診断は従来版と一致し、監査中の追加確保試行は0件。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt": "1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "699bf1f80bc9351fed420e473b5babb69a8704d9cec1cfebae7e36734f62825b",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/results.json": "4f379082d3c1ade6df1d939743c9be493060b4dbccd6b7199a80a5a39f357a95",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/run-case.py.txt": "0599f9bb7d1be19d7ba5d6300b9c5849f08ed712def880517094d3d701cf265d",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/quartic-result.json": "8ee56271f2464b49489831fdee23218cdced092615a1437912683c0ca9166edb",
+    "docs/verification/IM-01/pg-rank-shared-pivot-scale/result.json": "4c325e4ee0bc1b23c7601ac456f8699f5475da05f2045baba6c37cd523b5d864",
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/review-235-original-derive-header.py.txt": "13a5bc1eb3a4d00709c3494a76ca7828f0329b21dd75a01ec5076ba11cfbe325",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/derivation.json": "e01e504746715af6826d26abe7288077a59c1cb27064698898389026e9037966",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/gate-probe.py.txt": "80ab6d5344803a6c5c383ffb98facab09ae25c16ba836b4e09364690c2a6fd2f",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/gate-result.json": "cbee9d211717f82cc0e6d76af754eef355eb29271f7959c2920fd88d2068fee0",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/results.json": "cf8c3413b005adffc936a19a52e1dbc418d4bc8ad6a6a336c204adab67767e58",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/review-235-original-run-shared.py.txt": "b248d6855a32b9ddb9282c51ba3e81db3fad6476d6455b806784a2a56a460d0b",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/shared-batch.cpp.txt": "069c3f9fe40c206e869db7f94eeb434808dfb246d30446dc18a5aa89e7f2c918",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/shared-pivot.hpp.txt": "2d1c8374e3e289e8eb6b5fcb7bd4e30eee1d77eca9b2ed713408fd75a9b524fb",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/verification.md": "7a43a69e6a9eba6de7304e2d8d8242d814ac109b31aa55df2ca59d4e1c0442de"
+  }
+}
