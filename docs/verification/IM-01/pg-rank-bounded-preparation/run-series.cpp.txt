@@ -1,0 +1,611 @@
+// SPDX-License-Identifier: Apache-2.0
+// Compare a product preparation to independent frozen coefficients and coordinates.
+// Test inputs are opened only after the product has returned its owning result.
+#include "allocation_audit.hpp"
+#include "exact_polynomial_detail.hpp"
+
+#include <uvlas/structure/pg_rank_preparation.hpp>
+
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#if defined(_WIN32)
+#include <Windows.h>
+#include <Psapi.h>
+#else
+#include <sys/resource.h>
+#endif
+
+namespace {
+using namespace uvlas;
+using namespace uvlas::structure;
+using core::Index;
+constexpr auto gib = std::uint64_t{1} << 30;
+constexpr auto product_cap = 48 * gib;
+constexpr auto step_cap = std::uint64_t{10'000'000'000'000};
+constexpr auto digit_cap = std::uint32_t{128};
+// State4 + witness1 + input11 + factor13 + lift10 + final5, all with positive counts.
+constexpr auto planned_cpp_allocations = std::uint64_t{44};
+constexpr Index required_count = 33;
+
+std::uint64_t product_peak_resident() {
+#if defined(_WIN32)
+    PROCESS_MEMORY_COUNTERS counters{};
+    counters.cb = static_cast<DWORD>(sizeof(counters));
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, counters.cb) == 0)
+        throw std::runtime_error("product working-set observation failed");
+    return counters.PeakWorkingSetSize;
+#else
+    rusage usage{};
+    if (getrusage(RUSAGE_SELF, &usage) != 0 || usage.ru_maxrss <= 0)
+        throw std::runtime_error("product resident observation failed");
+#if defined(__APPLE__)
+    return static_cast<std::uint64_t>(usage.ru_maxrss);
+#else
+    return static_cast<std::uint64_t>(usage.ru_maxrss) * 1024;
+#endif
+#endif
+}
+
+const ExactLimits dictionary_exact{64, 1000, 4096, 32, 32, 65536, 2000000,
+                                   ExactEstimateAdmission{16 * gib}, ExactTimingMode::Disabled};
+const ExactLimits partition_exact{10000, 1000, 10000, 32, 32, 1000000000, 2000000000,
+                                  ExactEstimateAdmission{32 * gib}, ExactTimingMode::Disabled};
+const ExactLimits oracle_exact{8192, 8192, 32768, 32, 32, 65536, 2000000,
+                               ExactEstimateAdmission{gib}, ExactTimingMode::Disabled};
+
+void require(bool condition, std::string_view label) {
+    if (!condition) {
+        throw std::runtime_error(std::string{label});
+    }
+}
+
+template <class T> T take(core::Result<T> result, std::string_view stage) {
+    if (!result) {
+        throw std::runtime_error(std::string{stage} + " failed with code " +
+                                 std::to_string(static_cast<unsigned>(result.error().code)));
+    }
+    return std::move(*result);
+}
+
+[[nodiscard]] Index grid_size(std::string_view label) {
+    if (label == "1") {
+        return 1;
+    }
+    if (label == "2") {
+        return 2;
+    }
+    require(label == "4", "expected grid 1, 2 or 4");
+    return 4;
+}
+
+[[nodiscard]] ExactRational number(core::ResourcePlan& plan, const ExactLimits& limits,
+                                  std::string_view numerator,
+                                  std::string_view denominator = "1") {
+    return take(ExactRational::from_integer_pair(numerator, denominator, limits, plan), "rational");
+}
+
+[[nodiscard]] PgGraph make_graph(Index n, bool curved, core::ResourcePlan& plan) {
+    const auto x0 = number(plan, dictionary_exact, "2", "7");
+    const auto width = number(plan, dictionary_exact, "4", "5");
+    const auto skew = number(plan, dictionary_exact, "3", "20");
+    std::array<ExactRational, 15> values;
+    std::vector<ExactInputTerm> terms;
+    if (curved) {
+        terms.reserve(values.size());
+        for (Index i = 0; i <= 4; ++i) {
+            for (Index j = 0; j <= 4 - i; ++j) {
+                auto& value = values[terms.size()];
+                value = number(plan, dictionary_exact, std::to_string(i + 2 * j + 1),
+                               std::to_string(i + j + 1));
+                terms.push_back({{i, j}, value});
+            }
+        }
+    }
+    const auto height =
+        take(ExactChartPolynomial::make(terms, dictionary_exact, plan), "chart polynomial");
+    return take(PgGraph::prepare({x0, width, skew, height, n, PgGraphConvention::Version1},
+                                 {dictionary_exact, 64, {}}, plan),
+                "graph");
+}
+
+[[nodiscard]] PgPartitionPoint point(core::ResourcePlan& plan, int s, int t, int denominator) {
+    const auto den = std::to_string(denominator);
+    return {number(plan, partition_exact, std::to_string(s), den),
+            number(plan, partition_exact, std::to_string(t), den)};
+}
+
+struct PartitionFixture {
+    std::vector<PgPartitionPoint> domain;
+    std::array<PgPartitionPoint, 4> thickness;
+    std::array<ExactRational, 4> height;
+    std::array<std::array<Index, 3>, 2> triangles{{{0, 1, 2}, {0, 2, 3}}};
+    std::array<ExactRational, 3> zeta;
+    std::vector<PgPartitionLayer> layers;
+    std::array<PgPartitionPoint, 2> boundary_points;
+    std::vector<PgPartitionBoundary> names;
+    std::array<PgPartitionPoint, 2> cut_points;
+    std::vector<PgPartitionRefinement> refinements;
+
+    PartitionFixture(bool cut, core::ResourcePlan& plan) {
+        constexpr std::array<std::array<int, 2>, 4> square{{{0, 0}, {1, 0}, {1, 1}, {0, 1}}};
+        for (std::size_t i = 0; i < square.size(); ++i) {
+            thickness[i] = point(plan, square[i][0], square[i][1], 1);
+            height[i] = number(plan, partition_exact, cut && i != 0 ? "2" : "1");
+        }
+        if (cut) {
+            constexpr std::array<std::array<int, 2>, 8> boundary{
+                {{0, 0}, {8, 0}, {8, 1}, {1, 1}, {1, 3}, {8, 3}, {8, 4}, {0, 4}}};
+            domain.reserve(boundary.size());
+            for (const auto& xy : boundary) {
+                domain.push_back(point(plan, xy[0], xy[1], 8));
+            }
+            boundary_points[0] = point(plan, 1, 0, 4);
+            boundary_points[1] = point(plan, 3, 0, 4);
+            names.push_back({"partial", boundary_points});
+            cut_points[0] = point(plan, 1, 8, 10);
+            cut_points[1] = point(plan, 9, 2, 10);
+            refinements.push_back({23, 4, cut_points[0], cut_points[1]});
+        } else {
+            domain.reserve(square.size());
+            for (const auto& xy : square) {
+                domain.push_back(point(plan, xy[0], xy[1], 1));
+            }
+        }
+        zeta = {number(plan, partition_exact, "-1"), number(plan, partition_exact, "-1", "3"),
+                number(plan, partition_exact, "1")};
+        layers.push_back({core::LayerId{11}, zeta[0], zeta[1]});
+        layers.push_back({core::LayerId{29}, zeta[1], zeta[2]});
+    }
+
+    [[nodiscard]] PgPartitionRequest request(const PgGraph& graph) const {
+        return {graph, domain, {thickness, triangles, height}, layers, names, refinements};
+    }
+};
+
+[[nodiscard]] std::uint64_t verify_activity(const PgIntegrationPartition& partition, Index n,
+                                            bool cut) {
+    const auto map = take(partition.activity_map(), "activity map");
+    const auto side = 2 * n;
+    const auto step = 4 / n;
+    require(std::cmp_equal(map.size(), side * side), "activity roster");
+    std::uint64_t active = 0;
+    for (const auto& cell : map) {
+        const auto s = step * cell.cell.first;
+        const auto t = step * cell.cell.second;
+        // Exact positive intersection with the three rectangles of the frozen U.
+        const bool expected = !cut || (t < 1 && t + step > 0) ||
+                              (t < 4 && t + step > 3) || (s < 1 && t < 3 && t + step > 1);
+        require(cell.active == expected, "independent activity mismatch");
+        active += cell.active ? 1U : 0U;
+    }
+    return active;
+}
+
+void compare_rational(const ExactRational& value, const std::string& numerator,
+                      const std::string& denominator, std::string_view label) {
+    const auto& canonical = detail::ExactFactory::value(value).backend();
+    require(canonical.num().str(0, std::ios_base::dec) == numerator &&
+                canonical.denom().str(0, std::ios_base::dec) == denominator,
+            label);
+}
+
+void expect_eof(std::istream& input, std::string_view label) {
+    std::string extra;
+    require(!(input >> extra) && input.eof() && !input.bad(), label);
+}
+
+struct DictionaryCounts {
+    std::uint64_t terms = 0;
+    std::uint64_t required = 0;
+    std::uint64_t anchor = 0;
+};
+
+[[nodiscard]] DictionaryCounts compare_dictionary(const PgCoefficientDictionary& dictionary,
+                                                  Index n, const char* path) {
+    std::ifstream file(path, std::ios::binary);
+    require(static_cast<bool>(file), "open frozen coefficient input");
+    const auto columns = take(dictionary.columns(), "dictionary columns");
+    std::string tag, numerator, denominator;
+    Index grid, original_count, full_count;
+    std::uint64_t exporter_plan_bytes, exporter_external_bytes;
+    require(static_cast<bool>(file >> tag >> grid >> original_count >> full_count >>
+                              exporter_plan_bytes >> exporter_external_bytes) &&
+                tag == "header" && grid == n &&
+                original_count == take(dictionary.original_columns(), "original columns") &&
+                std::cmp_equal(full_count, columns.size()),
+            "frozen coefficient identity");
+
+    for (std::size_t index = 0; index < columns.size(); ++index) {
+        Index ordinal, source;
+        unsigned kind;
+        require(static_cast<bool>(file >> tag >> ordinal >> kind >> source) && tag == "column" &&
+                    std::cmp_equal(ordinal, index) &&
+                    kind == static_cast<unsigned>(columns[index].kind) &&
+                    source == columns[index].original.value,
+                "frozen dictionary column provenance");
+    }
+
+    DictionaryCounts counts;
+    for (const auto& row : take(dictionary.records(), "dictionary records")) {
+        for (const auto& term : row.polynomial.terms()) {
+            Index column, cell_s, cell_t, exponent_s, exponent_t;
+            unsigned field;
+            require(static_cast<bool>(file >> tag >> column >> field >> cell_s >> cell_t >>
+                                      exponent_s >> exponent_t >> numerator >> denominator) &&
+                        tag == "coefficient" && column == row.column.value &&
+                        field == static_cast<unsigned>(row.field) && cell_s == row.cell.first &&
+                        cell_t == row.cell.second && exponent_s == term.powers.first &&
+                        exponent_t == term.powers.second,
+                    "frozen coefficient location");
+            compare_rational(term.coefficient, numerator, denominator, "frozen coefficient value");
+            ++counts.terms;
+        }
+    }
+
+    for (const auto& entry : take(dictionary.required_map(), "required map")) {
+        unsigned target;
+        Index source;
+        require(static_cast<bool>(file >> tag >> target >> source >> numerator >> denominator) &&
+                    tag == "required" && target == static_cast<unsigned>(entry.target) &&
+                    source == entry.source.value,
+                "frozen required map location");
+        compare_rational(entry.coefficient, numerator, denominator, "frozen required map value");
+        ++counts.required;
+    }
+
+    for (const auto& entry : take(dictionary.anchor_c_map(), "anchor map")) {
+        Index source, target;
+        require(static_cast<bool>(file >> tag >> source >> target >> numerator >> denominator) &&
+                    tag == "anchor" && source == entry.source.value && target == entry.target.value,
+                "frozen anchor map location");
+        compare_rational(entry.coefficient, numerator, denominator, "frozen anchor map value");
+        ++counts.anchor;
+    }
+    expect_eof(file, "extra frozen dictionary records");
+    return counts;
+}
+
+using RowKey = std::tuple<unsigned, Index, Index, Index, Index>;
+using ExpectedTerms = std::map<Index, detail::Rational>;
+
+[[nodiscard]] RowKey row_key(PgCoefficientField field, const PgCellIndex& cell,
+                            const ExactPowers& powers) {
+    return {static_cast<unsigned>(field), cell.first, cell.second, powers.first, powers.second};
+}
+
+struct BasisCounts {
+    std::uint64_t source_coordinates = 0;
+    std::uint64_t field_coordinates = 0;
+};
+
+[[nodiscard]] BasisCounts compare_basis(const PgRankPreparation& rank,
+                                        const PgCoefficientDictionary& dictionary,
+                                        const PgIntegrationPartition& partition, Index n,
+                                        core::ResourcePlan& oracle_plan) {
+    const auto selected = take(rank.selected(), "basis selection");
+    const auto rows = take(rank.rows(), "basis rows");
+    const auto full_columns = take(dictionary.columns(), "basis source columns").size();
+    const auto cell_active = take(partition.activity_map(), "basis activity");
+    std::map<RowKey, Index> active_rows;
+    Index ordinal = 0;
+    for (const auto& row : rows) {
+        require(active_rows.emplace(row_key(row.field, row.cell, row.powers), ordinal).second,
+                "duplicate product row");
+        ++ordinal;
+    }
+
+    struct OriginalTerm {
+        Index row;
+        const ExactRational* coefficient;
+    };
+    std::vector<std::vector<OriginalTerm>> originals(full_columns);
+    std::vector<bool> observed(rows.size());
+    const auto grid_side = 2 * n;
+    for (const auto& record : take(dictionary.records(), "basis source records")) {
+        const auto cell = record.cell.first * grid_side + record.cell.second;
+        require(cell >= 0 && std::cmp_less(cell, cell_active.size()), "basis source cell index");
+        const auto& cell_record = cell_active[static_cast<std::size_t>(cell)];
+        require(cell_record.cell.first == record.cell.first &&
+                    cell_record.cell.second == record.cell.second,
+                "basis source cell order");
+        if (!cell_record.active) {
+            continue;
+        }
+        auto& column = originals.at(static_cast<std::size_t>(record.column.value));
+        for (const auto& term : record.polynomial.terms()) {
+            const auto pos = active_rows.find(row_key(record.field, record.cell, term.powers));
+            require(pos != active_rows.end(), "active dictionary coefficient row missing");
+            observed[static_cast<std::size_t>(pos->second)] = true;
+            column.push_back({pos->second, &term.coefficient});
+        }
+    }
+    require(std::ranges::all_of(observed, [](bool value) { return value; }),
+            "product row absent from exact active dictionary");
+
+    std::array<ExpectedTerms, required_count> requirements;
+    for (const auto& entry : take(dictionary.required_map(), "basis independent required map")) {
+        auto& coefficients = requirements.at(static_cast<std::size_t>(entry.target));
+        coefficients[entry.source.value] += detail::ExactFactory::value(entry.coefficient);
+    }
+    BasisCounts counts;
+    for (std::size_t k = 0; k < selected.size(); ++k) {
+        const auto basis = PgRankBasisColumn{static_cast<Index>(k)};
+        const auto candidate = static_cast<Index>(selected[k]);
+        ExpectedTerms expected_source;
+        if (candidate < required_count) {
+            expected_source = requirements[static_cast<std::size_t>(candidate)];
+        } else {
+            const auto index = candidate - required_count;
+            require(std::cmp_less(index, full_columns), "anchor unexpectedly selected");
+            expected_source[index] = 1;
+        }
+
+        for (std::size_t i = 0; i < full_columns; ++i) {
+            const auto column = static_cast<Index>(i);
+            const auto expected = expected_source.find(column);
+            const auto value = take(rank.source_map(basis, {column}, oracle_exact, oracle_plan),
+                                    "owned source coordinate");
+            const bool same = expected == expected_source.end()
+                                  ? value.sign() == 0
+                                  : detail::ExactFactory::value(value) == expected->second;
+            require(same, "independent T coordinate mismatch");
+            ++counts.source_coordinates;
+        }
+
+        ExpectedTerms expected_field;
+        for (const auto& [column, scale] : expected_source) {
+            for (const auto& term : originals.at(static_cast<std::size_t>(column))) {
+                expected_field[term.row] += detail::ExactFactory::value(*term.coefficient) * scale;
+            }
+        }
+        for (Index row = 0; std::cmp_less(row, rows.size()); ++row) {
+            const auto expected = expected_field.find(row);
+            const auto value =
+                take(rank.basis(basis, row, oracle_exact, oracle_plan), "owned basis field");
+            const bool same = expected == expected_field.end()
+                                  ? value.sign() == 0
+                                  : detail::ExactFactory::value(value) == expected->second;
+            require(same, "independent B coefficient mismatch");
+            ++counts.field_coordinates;
+        }
+    }
+    return counts;
+}
+
+[[nodiscard]] ExactRational coordinate(const PgRankPreparation& rank, Index basis, Index candidate,
+                                       Index full_count, core::ResourcePlan& oracle_plan) {
+    if (candidate < required_count) {
+        return take(rank.required({basis}, {candidate}, oracle_exact, oracle_plan),
+                    "required coordinate");
+    }
+    candidate -= required_count;
+    if (candidate < full_count) {
+        return take(rank.original({basis}, {candidate}, oracle_exact, oracle_plan),
+                    "original coordinate");
+    }
+    return take(rank.anchor({basis}, {candidate - full_count}, oracle_exact, oracle_plan),
+                "anchor coordinate");
+}
+
+struct CertificateCounts {
+    std::uint64_t coordinates = 0;
+    std::uint64_t nonzero = 0;
+};
+
+[[nodiscard]] CertificateCounts compare_certificate(const PgRankPreparation& rank,
+                                                    const PgRankPreparationInfo& info,
+                                                    const PgCoefficientDictionary& dictionary,
+                                                    Index n, const char* path,
+                                                    core::ResourcePlan& oracle_plan) {
+    std::ifstream file(path, std::ios::binary);
+    require(static_cast<bool>(file), "open independent certificate");
+    const auto selected = take(rank.selected(), "selected candidates");
+    const auto full = take(dictionary.columns(), "certificate full size").size();
+    const auto original = take(dictionary.original_columns(), "certificate raw size");
+    std::string tag;
+    Index grid, rows, full_count, candidates, basis_count;
+    require(static_cast<bool>(file >> tag >> grid >> rows >> full_count >> candidates >> basis_count) &&
+                tag == "certificate" && grid == n && std::cmp_equal(rows, info.active_rows) &&
+                std::cmp_equal(full_count, full) && candidates == required_count + full_count + original &&
+                std::cmp_equal(candidates, info.candidates) && std::cmp_equal(basis_count, info.rank) &&
+                std::cmp_equal(basis_count, selected.size()),
+            "independent certificate identity");
+
+    for (Index k = 0; k < basis_count; ++k) {
+        Index ordinal, candidate, pivot;
+        require(static_cast<bool>(file >> tag >> ordinal >> candidate >> pivot) && tag == "basis" &&
+                    ordinal == k && std::cmp_equal(candidate, selected[static_cast<std::size_t>(k)]) &&
+                    pivot >= 0 && pivot < rows,
+                "independent selected candidate");
+    }
+
+    CertificateCounts counts;
+    for (Index j = 0; j < candidates; ++j) {
+        Index candidate, nonzero;
+        require(static_cast<bool>(file >> tag >> candidate >> nonzero) && tag == "column" &&
+                    candidate == j && nonzero >= 0 && nonzero <= basis_count,
+                "independent coordinate column");
+        Index consumed = 0;
+        Index next = -1;
+        std::string numerator, denominator;
+        if (nonzero != 0) {
+            require(static_cast<bool>(file >> next >> numerator >> denominator) &&
+                        next >= 0 && next < basis_count && numerator != "0" &&
+                        !denominator.empty() && denominator.front() != '-' && denominator != "0",
+                    "independent coefficient");
+        }
+        for (Index k = 0; k < basis_count; ++k) {
+            const auto value = coordinate(rank, k, j, full_count, oracle_plan);
+            if (k == next) {
+                compare_rational(value, numerator, denominator, "independent coordinate mismatch");
+                ++consumed;
+                ++counts.nonzero;
+                next = -1;
+                if (consumed < nonzero) {
+                    require(static_cast<bool>(file >> next >> numerator >> denominator) &&
+                                next > k && next < basis_count && numerator != "0" &&
+                                !denominator.empty() && denominator.front() != '-' &&
+                                denominator != "0",
+                            "independent coordinate order");
+                }
+            } else {
+                require(value.sign() == 0, "independent zero coordinate mismatch");
+            }
+            ++counts.coordinates;
+        }
+        require(consumed == nonzero, "independent coordinate count");
+    }
+    expect_eof(file, "extra independent certificate records");
+    return counts;
+}
+} // namespace
+
+int main(int argc, char** argv) {
+    try {
+        require(argc == 6, "usage: run-series <n> <flat|quartic> <full|cut> <coefficients> <certificate>");
+        const auto n = grid_size(argv[1]);
+        const std::string_view shape = argv[2];
+        const std::string_view domain = argv[3];
+        require(shape == "flat" || shape == "quartic", "invalid shape");
+        require(domain == "full" || domain == "cut", "invalid domain");
+        const bool cut = domain == "cut";
+
+        core::ResourcePlan plan{product_cap};
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        const auto graph = make_graph(n, shape == "quartic", plan);
+        const auto dictionary = take(
+            PgCoefficientDictionary::prepare(graph, {dictionary_exact, 1000, 20000000, 2000, {}},
+                                             workspace, plan),
+            "dictionary");
+        const PartitionFixture fixture(cut, plan);
+        const auto request = fixture.request(graph);
+        const auto partition = take(
+            PgIntegrationPartition::prepare(
+                request,
+                {partition_exact, 1000000, 1000000, 1000000, 10000000, 10000000,
+                 10000000, 1000000, step_cap, step_cap, 1000000, {}},
+                workspace, plan),
+            "partition");
+        const auto before_rank = plan.allocated_bytes();
+        const auto graph_external = graph.preparation().arithmetic.estimated_external_payload_bytes;
+        const auto dictionary_external =
+            dictionary.preparation().arithmetic.estimated_external_payload_bytes;
+        const auto partition_external = partition.preparation().estimated_external_bytes;
+        auto rank_payload_limit = product_cap;
+        for (const auto held : {before_rank, graph_external, dictionary_external, partition_external}) {
+            require(held <= rank_payload_limit, "prior inputs exceed combined envelope");
+            rank_payload_limit -= held;
+        }
+        const auto start = std::chrono::steady_clock::now();
+        test_support::AllocationAudit audit{test_support::cpp_backend,
+                                            test_support::AuditThreadDomain::CallingThread};
+        auto prepared = PgRankPreparation::prepare(
+            dictionary, partition, {rank_payload_limit, step_cap, digit_cap, {}}, workspace, plan);
+        const auto allocations = audit.finish();
+        const auto rank = take(std::move(prepared), "rank preparation");
+        require(allocations.status == test_support::AllocationAuditStatus::AllocationObserved &&
+                    allocations.cpp_allocation_attempts == planned_cpp_allocations,
+                "unexpected C++ allocation count in rank preparation");
+        const auto rank_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - start);
+        const auto peak_before_oracle = product_peak_resident();
+        const auto final_product = plan.allocated_bytes();
+        const auto info = take(rank.preparation(), "rank evidence");
+        const auto active = verify_activity(partition, n, cut);
+        require(info.preflight_bytes <= rank_payload_limit && peak_before_oracle <= product_cap &&
+                    final_product <= product_cap &&
+                    info.allocated_payload_bytes == final_product - before_rank,
+                "rank payload differs from the single plan");
+
+        const auto input_counts = compare_dictionary(dictionary, n, argv[4]);
+        core::ResourcePlan oracle_plan{8 * gib};
+        const auto witness = take(rank.witness(), "rank source witness");
+        const auto graph_value = take(graph.view(), "graph witness source");
+        const auto chart = take(rank.source_chart(dictionary_exact, oracle_plan), "chart witness");
+        const auto activity = take(partition.activity_map(), "activity witness source");
+        require(witness.n == n && witness.convention == graph_value.convention &&
+                    witness.recipe_version == 1 && witness.reduction_version == 1 &&
+                    witness.graph_identity == graph_value.identity &&
+                    witness.domain_vertices == request.domain.size() &&
+                    witness.activity_cells == activity.size() &&
+                    witness.height_terms == graph_value.height.terms().size() &&
+                    chart.x0 == graph_value.x0 && chart.width == graph_value.width &&
+                    chart.skew == graph_value.skew,
+                "owned witness header or chart differs");
+        for (std::size_t i = 0; i < request.domain.size(); ++i) {
+            const auto p = take(rank.source_domain(static_cast<Index>(i), dictionary_exact,
+                                                  oracle_plan), "domain witness");
+            require(p.s == request.domain[i].s && p.t == request.domain[i].t,
+                    "owned original domain vertex differs");
+        }
+        for (std::size_t i = 0; i < activity.size(); ++i) {
+            const auto cell = take(rank.source_activity(static_cast<Index>(i), dictionary_exact,
+                                                         oracle_plan), "activity witness");
+            require(cell.cell == activity[i].cell && cell.area == activity[i].area &&
+                        cell.active == activity[i].active,
+                    "owned activity witness differs");
+        }
+        for (std::size_t i = 0; i < graph_value.height.terms().size(); ++i) {
+            const auto term = take(rank.source_height(static_cast<Index>(i), dictionary_exact,
+                                                       oracle_plan), "height witness");
+            const auto& expected = graph_value.height.terms()[i];
+            require(term.powers.first == expected.powers.first &&
+                        term.powers.second == expected.powers.second &&
+                        term.coefficient == expected.coefficient,
+                    "owned height witness differs");
+        }
+        const auto compared = compare_certificate(rank, info, dictionary, n, argv[5], oracle_plan);
+        const auto basis_compared = compare_basis(rank, dictionary, partition, n, oracle_plan);
+        require(static_cast<bool>(partition.validate_for(request)), "held partition invalid after comparison");
+
+        std::cout << "{\"n\":" << n << ",\"shape\":\"" << shape << "\",\"domain\":\"" << domain
+                  << "\",\"active_cells\":" << active << ",\"active_rows\":" << info.active_rows
+                  << ",\"anchor_rows\":" << info.anchor_rows << ",\"candidates\":" << info.candidates
+                  << ",\"normalized_terms\":" << info.normalized_terms << ",\"rank\":" << info.rank
+                  << ",\"rank_c\":" << info.rank_c
+                  << ",\"independent_required\":" << info.independent_required
+                  << ",\"proof_rows\":" << info.proof_rows
+                  << ",\"verified_anchor_rows\":" << info.verified_anchor_rows
+                  << ",\"steps\":" << info.steps << ",\"prime\":" << info.prime
+                  << ",\"rank_payload_forecast\":" << info.preflight_bytes
+                  << ",\"rank_payload_actual\":" << info.allocated_payload_bytes
+                  << ",\"pre_rank_plan_bytes\":" << before_rank
+                  << ",\"combined_plan_bytes\":" << final_product
+                  << ",\"graph_external_estimate\":" << graph_external
+                  << ",\"dictionary_external_estimate\":" << dictionary_external
+                  << ",\"partition_external_estimate\":" << partition_external
+                  << ",\"rank_payload_limit\":" << rank_payload_limit
+                  << ",\"combined_forecast_bytes\":" << product_cap - rank_payload_limit + info.preflight_bytes
+                  << ",\"product_peak_resident_bytes\":" << peak_before_oracle
+                  << ",\"rank_cpp_allocation_attempts\":" << allocations.cpp_allocation_attempts
+                  << ",\"planned_cpp_allocations\":" << planned_cpp_allocations
+                  << ",\"rank_milliseconds\":" << rank_elapsed.count()
+                  << ",\"frozen_dictionary_terms\":" << input_counts.terms
+                  << ",\"frozen_required_terms\":" << input_counts.required
+                  << ",\"frozen_anchor_terms\":" << input_counts.anchor
+                  << ",\"coordinate_comparisons\":" << compared.coordinates
+                  << ",\"nonzero_coordinate_comparisons\":" << compared.nonzero
+                  << ",\"source_coordinate_comparisons\":" << basis_compared.source_coordinates
+                  << ",\"basis_coefficient_comparisons\":" << basis_compared.field_coordinates
+                  << ",\"witness_domain_vertices\":" << witness.domain_vertices
+                  << ",\"witness_activity_cells\":" << witness.activity_cells
+                  << ",\"witness_height_terms\":" << witness.height_terms
+                  << ",\"oracle_plan_bytes\":" << oracle_plan.allocated_bytes() << "}\n";
+        return std::cout ? 0 : 3;
+    } catch (const std::exception& error) {
+        std::cerr << error.what() << '\n';
+        return 1;
+    }
+}

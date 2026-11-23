@@ -64,7 +64,7 @@ target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spec
 # Exact reference algebra is a preparation component, separate from physical kernels.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
-    src/structure/pg_reference_geometry.cpp)
+    src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

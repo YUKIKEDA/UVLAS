@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.pg-rank-bounded-product-mutations/1",
+  "platform": "Windows x64 MSVC Release",
+  "mutations": [
+    {
+      "case": "restore-column-scale",
+      "source": "pg_rank_preparation.cpp",
+      "before": "RankWide{columns.column_scale.values()[selected[k]]}",
+      "after": "RankWide{columns.column_scale.values()[j]}",
+      "grid": 1,
+      "shape": "quartic",
+      "domain": "full",
+      "exit_code": 1,
+      "diagnostic": "independent coordinate mismatch"
+    },
+    {
+      "case": "retain-inactive-cells",
+      "source": "pg_rank_input.hpp",
+      "before": "result.active[cell] = activity.active;",
+      "after": "result.active[cell] = true;",
+      "grid": 2,
+      "shape": "quartic",
+      "domain": "cut",
+      "exit_code": 1,
+      "diagnostic": "independent certificate identity"
+    },
+    {
+      "case": "anchor-map-sign",
+      "source": "pg_rank_input.hpp",
+      "before": "weight = -weight;",
+      "after": "weight = weight;",
+      "grid": 1,
+      "shape": "flat",
+      "domain": "full",
+      "exit_code": 1,
+      "diagnostic": "rank preparation failed with code 3"
+    }
+  ]
+}

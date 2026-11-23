@@ -579,6 +579,18 @@ target_include_directories(uvlas_test_structure_pg_integration_partition_resourc
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_integration_partition_resources)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_integration_partition_resources)
 
+uvlas_add_test(structure.pg_rank_preparation
+    LABELS property negative verification V-PG
+    TIMEOUT 120
+    SOURCES structure/pg_rank_preparation_test.cpp
+    LIBS uvlas_structure Threads::Threads)
+uvlas_add_test(structure.pg_rank_preparation_resources
+    LABELS property negative verification V-PG
+    SOURCES structure/pg_rank_preparation_resource_test.cpp
+    LIBS uvlas_structure_audit)
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_rank_preparation_resources)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_rank_preparation_resources)
+
 uvlas_add_test(structure.pg_reference_geometry
     LABELS unit property negative verification V-PG
     SOURCES structure/pg_reference_geometry_test.cpp
