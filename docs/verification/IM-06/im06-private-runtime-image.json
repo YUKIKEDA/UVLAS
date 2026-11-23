@@ -1,0 +1,61 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-private-runtime-image",
+  "ids": [
+    "IO4-02",
+    "QA-05",
+    "QA-06",
+    "QA-09",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 265,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "099ed73d9d14cf64aff35d2c7b544e82f6fa4263",
+  "base_commit": "3bd47688e07ac7c63b968e3848935cd3c58ea25e",
+  "scope": "Native private Release install image, relocation and normal CPython site-packages import on Windows x64 and Linux x86_64",
+  "verification": {
+    "platforms": 2,
+    "byte_exact_files_per_repeat": 42,
+    "ownership_cases_per_platform": 10,
+    "input_rejection_controls_per_platform": 6,
+    "concurrent_exit_codes": [
+      0,
+      1
+    ],
+    "temporary_install_directories_remaining": 0,
+    "native_preexisting_empty_directory_preserved": true
+  },
+  "claimed_state": {
+    "private_runtime_image_verified": true,
+    "release_qualified": false,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "e6e65cdd85a5d36a4adebc5fa8797ec457b252f2f556e91792c53e0f349d6184",
+    "cmake/PrivateRuntimeImage.cmake": "79b04281cb7b01e1517c1aedfe2f62ba590831867a91185491a3e369f2fe6fe1",
+    "cmake/CompilerPolicy.cmake": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+    "cmake/Dependencies.cmake": "925c1403e57b34e45f386c68cc7c1fa4ccf09e981ff4a83898f8ffbae7a43386",
+    "src/python/CMakeLists.txt": "58a3ee3264552d7f908a59ba063da089c94a94559fcd338c03680fa8a1fff5ba",
+    "src/app/main.cpp": "d9abac3fda7a6f4f03770f5c99ad5cb1440f3972f74eb0c3c8980cd02fe8f03f",
+    "src/python/module.cpp": "fe7f0fae78723adeb0b978de57a62092f36a252a09541ced044920f9acabe227",
+    "tools/qa/private_runtime_image.py": "2ad37f1c4e7f04ef5db6efbfa632843ad60b0e3766562800915c44731bec9f0c",
+    "tools/qa/runtime_artifact_audit.py": "b3637b39f7d327eaabc70eba1b2d90e69acdfcefc467dec903d663672137b278",
+    "tests/python/test_ownership.py": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd",
+    "tests/python/requirements.txt": "7bd6b8946940b79948c548c8048e545684b91c8edc9444d8dfc0c8f76a97c0a7",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "THIRD_PARTY_NOTICES.md": "aec26cb1340d34423922fdab125e248570eb9bc2a86be0aeaa2cbf7799b09689"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/private-runtime-image.md": "2b92d847fcf7ec7870f09e3c011026b3c9d5d62958d1fef47ad77848a557ad78",
+    "docs/verification/IM-06/private-runtime-image-probe.py": "3a07cf87bbb5706f9e3aa1e1fbbee25f2cac4b533141edcc685e3603dbe20ea3",
+    "docs/verification/IM-06/private-runtime-image/windows.json": "1773eac6ecf18624ac8d9f645685664dae37f2000f4dfc54ffef4c3c4ecd61f8",
+    "docs/verification/IM-06/private-runtime-image/linux.json": "4b7e573f227b0e221ebe41bbcb942710815fabd340cd7c7f528ed71df3891270"
+  }
+}
