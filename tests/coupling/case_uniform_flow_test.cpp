@@ -496,25 +496,28 @@ TEST_CASE("Typed SI uniform jet projects all components and retains the exact so
     auto exact_jet = evaluate(field, current, work, time, p::RequestedSide::Right);
     cf::CaseFlowProjectionRequest request{
         core::Precision::Binary64, host_requirements, host_requirements, {4096, budget}};
-    reject(cf::project_case_uniform_flow(std::move(exact_jet), request),
-           core::FailureCode::PrecisionUnresolved);
+    // The projection consumes its input only on success.
+    const auto project = [&](cf::CaseUniformFlowEvaluation& evaluation,
+                             const std::stop_token& stop = {}) {
+        return cf::project_case_uniform_flow(std::move(evaluation), request, stop);
+    };
+    reject(project(exact_jet), core::FailureCode::PrecisionUnresolved);
     CHECK(exact_jet.jet.active());
     const std::array wide_values{wide, wide, wide};
     request.velocity = wide_values;
     request.time_partial = wide_values;
     request.time_partial[2] = {scale.view(), zero.view(), zero.view()};
-    reject(cf::project_case_uniform_flow(std::move(exact_jet), request),
-           core::FailureCode::PrecisionUnresolved);
+    reject(project(exact_jet), core::FailureCode::PrecisionUnresolved);
     CHECK(exact_jet.jet.active());
     request.time_partial = wide_values;
     auto first = evaluate(field, current, work, time, p::RequestedSide::Right);
-    const auto binary = take(cf::project_case_uniform_flow(std::move(first), request));
+    const auto binary = take(project(first));
     CHECK(binary.representation() == core::Precision::Binary64);
 
     request.representation = core::Precision::TwoWord;
     request.velocity = host_requirements;
     request.time_partial = host_requirements;
-    const auto projected = take(cf::project_case_uniform_flow(std::move(exact_jet), request));
+    const auto projected = take(project(exact_jet));
     CHECK_FALSE(exact_jet.jet.active());
     CHECK(projected.representation() == core::Precision::TwoWord);
     CHECK(projected.source().requested_side == p::RequestedSide::Right);
@@ -536,31 +539,26 @@ TEST_CASE("Typed SI uniform jet projects all components and retains the exact so
     auto trial = evaluate(field, current, work, time);
     REQUIRE(projected.used_steps() > 1);
     request.limits.steps = projected.used_steps() - 1;
-    reject(cf::project_case_uniform_flow(std::move(trial), request),
-           core::FailureCode::ResourceExceeded);
+    reject(project(trial), core::FailureCode::ResourceExceeded);
     CHECK(trial.jet.active());
     request.limits.steps = projected.used_steps();
-    const auto at_limit = take(cf::project_case_uniform_flow(std::move(trial), request));
+    const auto at_limit = take(project(trial));
     CHECK(at_limit.used_steps() == projected.used_steps());
 
     auto refusals = evaluate(field, current, work, time);
     request.velocity[0].scale = zero.view();
-    reject(cf::project_case_uniform_flow(std::move(refusals), request),
-           core::FailureCode::InvalidInput);
+    reject(project(refusals), core::FailureCode::InvalidInput);
     request.velocity = host_requirements;
     request.representation = static_cast<core::Precision>(255);
-    reject(cf::project_case_uniform_flow(std::move(refusals), request),
-           core::FailureCode::PrecisionUnsupported);
+    reject(project(refusals), core::FailureCode::PrecisionUnsupported);
     request.representation = core::Precision::TwoWord;
     request.limits.input_integer_bits = 64;
-    reject(cf::project_case_uniform_flow(std::move(refusals), request),
-           core::FailureCode::ResourceExceeded);
+    reject(project(refusals), core::FailureCode::ResourceExceeded);
     request.limits.input_integer_bits = 4096;
     // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 declares request_stop non-const.
     std::stop_source cancellation;
     cancellation.request_stop();
-    reject(cf::project_case_uniform_flow(std::move(refusals), request, cancellation.get_token()),
-           core::FailureCode::Cancelled);
+    reject(project(refusals, cancellation.get_token()), core::FailureCode::Cancelled);
     CHECK(refusals.jet.active());
 }
 
@@ -603,6 +601,24 @@ TEST_CASE("Scaled rational projection preserves distant exact words and their ex
             source, exact, core::Precision::Binary64, work, {}, {}));
         within(scaled.value, source.sign * two_power(power), Rat{0});
     }
+    // 1+2^-53 is halfway between consecutive binary64 words. Exactly 2^-53 is admissible.
+    constexpr std::array<std::uint32_t, 2> half_n{1, 1U << 21U}, half_d{0, 1U << 21U};
+    constexpr std::array<std::uint32_t, 2> below_n{0xffffffffU, (1U << 21U) - 1};
+    constexpr std::array<std::uint32_t, 4> below_d{0, 0, 0, 1U << 10U};
+    const SiRationalWordsView halfway{1, half_n, half_d};
+    const io::detail::SiRationalProjectionBudget enough{unit, {1, one, half_d}, zero};
+    const auto tie = take(io::detail::project_rational_words(
+        halfway, enough, core::Precision::Binary64, work, {}, {}));
+    const auto* binary = std::get_if<io::ScaledBinary64>(&tie.value);
+    if (!binary)
+        FAIL("Requested one-word output");
+    CHECK(binary->center == 1.0);
+    within(tie.value, 1 + two_power(-53), two_power(-53));
+    const io::detail::SiRationalProjectionBudget too_small{unit, {1, below_n, below_d}, zero};
+    reject(io::detail::project_rational_words(halfway, too_small, core::Precision::Binary64, work,
+                                              {}, {}),
+           core::FailureCode::PrecisionUnresolved);
+
     const std::array<std::uint32_t, 1> three{3};
     reject(io::detail::project_rational_words({1, one, three}, exact, core::Precision::TwoWord,
                                               work, {}, {}),
