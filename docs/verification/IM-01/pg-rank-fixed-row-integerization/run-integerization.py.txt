@@ -30,12 +30,14 @@ def validate(base, result, domain, terms):
         ('coefficients_compared', terms), ('heap_attempts', 0),
     ):
         base.integer(result.get(key), expected, key)
-    for key, limit in (
-        ('max_lcm_bits', WIDTH), ('max_integer_bits', WIDTH), ('owner_bytes', 4096),
-        ('scale_bytes', 4096), ('term_bytes', 4096), ('scratch_bytes', 4096),
-    ):
+    for key in ('max_lcm_bits', 'max_integer_bits'):
+        reference_key = f'reference_{key}'
+        reference = result.get(reference_key)
+        base.require(type(reference) is int and 0 < reference <= WIDTH, f'{reference_key} range')
+        base.integer(result.get(key), reference, key)
+    for key in ('owner_bytes', 'scale_bytes', 'term_bytes', 'scratch_bytes'):
         value = result.get(key)
-        base.require(type(value) is int and 0 < value <= limit, f'{key} range')
+        base.require(type(value) is int and 0 < value <= 4096, f'{key} range')
     base.require(result['scale_bytes'] < result['term_bytes']
                  and result['scratch_bytes'] < result['owner_bytes'], 'layout components')
     expected = (result['owner_bytes'] + rows * (result['scale_bytes'] + 4)

@@ -31,12 +31,20 @@ def main():
     capture = json.loads(args.capture.read_bytes())
     cases = {case['domain']: case for case in capture['cases']}
     phases = ('--controls', 'full', 'cut')
-    scenarios = (
-        ('valid', None, phases),
-        ('cut-failed', 'injected cut failure', phases),
-        ('cut-wrong-count', 'terms:', phases),
-        ('cut-missing-heap-count', 'heap_attempts:', phases),
-    )
+    scenarios = [
+        ('valid', None, phases, None),
+        ('cut-failed', 'injected cut failure', phases, None),
+        ('cut-wrong-count', 'terms:', phases, None),
+        ('cut-missing-heap-count', 'heap_attempts:', phases, None),
+    ]
+    for domain in ('full', 'cut'):
+        order = phases[:phases.index(domain) + 1]
+        for name, fields in (
+            ('both-widths', ('max_lcm_bits', 'max_integer_bits')),
+            ('lcm-width', ('max_lcm_bits',)),
+            ('integer-width', ('max_integer_bits',)),
+        ):
+            scenarios.append((f'{domain}-{name}', f'{fields[0]}:', order, (domain, fields)))
     with TemporaryDirectory() as scratch:
         temp = Path(scratch)
         copies = {name: temp / (name + path.suffix) for name, path in paths.items()}
@@ -63,7 +71,7 @@ def main():
 
         with patch.dict(run.__globals__, run_path=run_for_gate):
             for present in (False, True):
-                for name, expected, order in scenarios:
+                for name, expected, order, widths in scenarios:
                     output.unlink(missing_ok=True)
                     if present:
                         output.write_bytes(old)
@@ -81,6 +89,9 @@ def main():
                             result['terms'] -= 1
                         if name == 'cut-missing-heap-count' and phase == 'cut':
                             del result['heap_attempts']
+                        if widths and phase == widths[0]:
+                            for field in widths[1]:
+                                result[field] = 1
                         return result
 
                     with patch.object(base, 'invoke', side_effect=invoke):
@@ -114,7 +125,7 @@ def main():
     print(json.dumps({
         'schema': 'uvlas.pg-fixed-row-integerization-gate/1',
         'publication_checks': len(scenarios) * 2,
-        'publication_scenarios': [name for name, _, _ in scenarios],
+        'publication_scenarios': [name for name, _, _, _ in scenarios],
         'runner_alias_checks': len(copies) * 2, 'alias_modes': ['direct', 'hard link'],
     }, indent=2))
 

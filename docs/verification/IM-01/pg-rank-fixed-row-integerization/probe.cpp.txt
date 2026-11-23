@@ -199,7 +199,15 @@ void require(bool condition, const char* diagnostic) {
 
 struct Compared {
     std::uint64_t scales{}, offsets{}, entries{};
+    unsigned lcm_bits{}, integer_bits{};
 };
+
+unsigned dynamic_magnitude_bits(const Integer& value) {
+    if (value == 0)
+        return 0;
+    const Integer magnitude = boost::multiprecision::abs(value);
+    return boost::multiprecision::msb(magnitude) + 1;
+}
 
 Compared compare_exact(const Matrix& input, const Prepared& prepared) {
     std::vector<Integer> scales(input.rows, Integer{1});
@@ -212,6 +220,7 @@ Compared compare_exact(const Matrix& input, const Prepared& prepared) {
     Compared compared;
     for (std::size_t row = 0; row < scales.size(); ++row) {
         require(Integer{prepared.scales[row]} == scales[row], "oracle LCM differs");
+        compared.lcm_bits = std::max(compared.lcm_bits, dynamic_magnitude_bits(scales[row]));
         ++compared.scales;
     }
     std::size_t pos = 0;
@@ -222,9 +231,11 @@ Compared compare_exact(const Matrix& input, const Prepared& prepared) {
         for (const auto& [row, value] : input.columns[column]) {
             require(pos < prepared.entries.size(), "oracle expected entry");
             const Q expected = value * scales[row];
+            const Integer integer = numerator(expected);
             const auto& term = prepared.entries[pos++];
-            require(denominator(expected) == 1 && numerator(expected) == Integer{term.value}
+            require(denominator(expected) == 1 && integer == Integer{term.value}
                         && term.row == static_cast<std::uint32_t>(row), "oracle integer coefficient differs");
+            compared.integer_bits = std::max(compared.integer_bits, dynamic_magnitude_bits(integer));
             ++compared.entries;
         }
     }
@@ -253,6 +264,9 @@ void controls() {
                 ready.entries[0].value == -9 && ready.entries[1].value == 35, "signed hand oracle");
     const auto checked = compare_exact(hand, ready);
     require(checked.scales == 2 && checked.offsets == 4 && checked.entries == 2, "hand oracle counts");
+    require(checked.lcm_bits == 5 && checked.integer_bits == 6 &&
+                equal.lcm_bits == checked.lcm_bits && equal.integer_bits == checked.integer_bits,
+            "hand oracle widths");
 
     const auto reject = [](const Matrix& input, Status expected) {
         const auto got = prepare(input, byte_cap);
@@ -333,6 +347,8 @@ int main(int argc, char* argv[]) try {
         return 3;
     }
     const auto compared = compare_exact(matrix, *result.prepared);
+    require(result.lcm_bits == compared.lcm_bits && result.integer_bits == compared.integer_bits,
+            "reported widths differ from dynamic oracle");
     std::cout << "{\"domain\":\"" << domain << "\",\"rows\":" << matrix.rows
               << ",\"candidates\":" << matrix.columns.size()
               << ",\"terms\":" << result.prepared->entries.size()
@@ -343,6 +359,8 @@ int main(int argc, char* argv[]) try {
               << ",\"scale_bytes\":" << sizeof(Fixed) << ",\"term_bytes\":" << sizeof(Term)
               << ",\"scratch_bytes\":" << sizeof(Workspace) << ",\"owner_bytes\":" << sizeof(Prepared)
               << ",\"max_lcm_bits\":" << result.lcm_bits << ",\"max_integer_bits\":" << result.integer_bits
+              << ",\"reference_max_lcm_bits\":" << compared.lcm_bits
+              << ",\"reference_max_integer_bits\":" << compared.integer_bits
               << ",\"heap_attempts\":" << result.heap << "}\n";
     return 0;
 } catch (const std::exception& error) {

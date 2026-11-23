@@ -31,11 +31,16 @@
     "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
   },
   "artifacts": {
-    "docs/verification/IM-01/pg-rank-fixed-row-integerization/gate-probe.py.txt": "7cc0bbd444d3584b1e981eb0a521e401ddf544dda93890ff093575be168b8091",
     "docs/verification/IM-01/pg-rank-fixed-row-integerization/gate-result.json": "13d50d53b7d2850365c18b84560a8ab0bc6131f01b6f1ec889c0a64f0b1356eb",
-    "docs/verification/IM-01/pg-rank-fixed-row-integerization/probe.cpp.txt": "774ad5f47a9d48fc07dd2763ac06fae1718e9febc01db1c59c3e44873302fe00",
     "docs/verification/IM-01/pg-rank-fixed-row-integerization/result.json": "595a847933b0bbab5bccb77c5018243c412b60b4eae992fa29efc07e52902b74",
-    "docs/verification/IM-01/pg-rank-fixed-row-integerization/run-integerization.py.txt": "049ca7f78bd328ab84cfce6f91dbe910ff069e6de4b314b85e301b05a878f1c2",
     "docs/verification/IM-01/pg-rank-fixed-row-integerization/verification.md": "3be5480f83c4619405c0c600cc5c969237e56c4c05b68ae82c68a30798b8eea0"
+  },
+  "historical_artifacts": {
+    "commit": "049e769f0370e55250fc9917f188c260af581b9e",
+    "sha256": {
+      "docs/verification/IM-01/pg-rank-fixed-row-integerization/gate-probe.py.txt": "7cc0bbd444d3584b1e981eb0a521e401ddf544dda93890ff093575be168b8091",
+      "docs/verification/IM-01/pg-rank-fixed-row-integerization/probe.cpp.txt": "774ad5f47a9d48fc07dd2763ac06fae1718e9febc01db1c59c3e44873302fe00",
+      "docs/verification/IM-01/pg-rank-fixed-row-integerization/run-integerization.py.txt": "049ca7f78bd328ab84cfce6f91dbe910ff069e6de4b314b85e301b05a878f1c2"
+    }
   }
 }
