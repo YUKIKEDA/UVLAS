@@ -13,6 +13,13 @@ namespace uvlas::structure::detail {
 /// Fixed live slots of the largest point path (including input/output and nested
 /// jet, matrix, and radical expressions). Each exact op charges its own allocation.
 inline constexpr std::uint64_t reference_live_rationals = 256;
+inline constexpr std::uint64_t basis_live_rationals = reference_live_rationals + 64;
+
+struct BasisReferencePoint {
+    PgReferenceValue reference;
+    std::array<ExactRational, 2> g_gradient;
+    ExactRational axis_scale, u, v;
+};
 
 struct ReferenceArithmetic {
     const PgReferenceLimits& limits;
