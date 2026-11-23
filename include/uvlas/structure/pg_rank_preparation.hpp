@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -98,9 +99,12 @@ struct PgRankRecipeTerm {
 /// Distinct Cartesian directions of required translation columns 30, 31 and 32.
 enum class PgRankTranslationAxis : std::uint8_t { X, Y, Z };
 
+class PgReferenceBasis;
+
 namespace detail {
 struct PgRankState;
-}
+struct ReferenceArithmetic;
+} // namespace detail
 
 /// Owns one bounded, unconditioned local basis and its exact reconstruction maps.
 /// Source owners remain unchanged. Independent certificates are test inputs only.
@@ -179,6 +183,12 @@ public:
                                                      core::ResourcePlan&) const noexcept;
 
 private:
+    friend class PgReferenceBasis;
+    [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
+    basis_cell_jet(detail::ReferenceArithmetic&, PgRankBasisColumn, PgCellIndex,
+                   const ExactRational& u, const ExactRational& v,
+                   const ExactRational& axis_scale) const;
+
     explicit PgRankPreparation(core::PlannedBuffer<detail::PgRankState>) noexcept;
     core::PlannedBuffer<detail::PgRankState> state_;
 };

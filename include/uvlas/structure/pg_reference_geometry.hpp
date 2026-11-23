@@ -182,6 +182,7 @@ public:
     [[nodiscard]] core::Result<const ExactRational*> determinant_lower_bound() const&& = delete;
 
 private:
+    friend class PgReferenceBasis;
     PgReferenceGeometry(PgReferenceInputs&& source, std::array<ExactRational, 9> rotation,
                         std::array<ExactRational, 3> origin, ExactRational length,
                         ExactRational determinant_bound, PgReferenceIdentity identity,

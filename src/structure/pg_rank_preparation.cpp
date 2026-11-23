@@ -1,7 +1,9 @@
 #include "pg_rank_lift.hpp"
 #include "pg_rank_witness.hpp"
+#include "pg_reference_polynomials.hpp"
 
 #include <limits>
+#include <tuple>
 #include <utility>
 
 namespace uvlas::structure::detail {
@@ -529,6 +531,50 @@ PgRankPreparation::translation_axis(PgRankRequiredColumn target) const noexcept 
             return std::nullopt;
         return axes[index - (rank_required - axes.size())];
     });
+}
+
+std::array<std::array<ExactRational, 3>, 3>
+PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn column,
+                                  PgCellIndex cell, const ExactRational& u, const ExactRational& v,
+                                  const ExactRational& axis_scale) const {
+    const auto& state = rank_state(state_);
+    math.visit(1);
+    const auto k = rank_index(column.value, state.info.rank);
+    const auto begin = static_cast<std::size_t>(state.basis_offsets.values()[k]);
+    const auto end = static_cast<std::size_t>(state.basis_offsets.values()[k + 1]);
+    const auto indices = state.basis_rows.values().subspan(begin, end - begin);
+    const auto key = [&](std::uint32_t ordinal) {
+        math.visit(1);
+        const auto& row = state.rows.values()[ordinal];
+        return std::tuple{row.field, row.cell.first, row.cell.second};
+    };
+    constexpr std::array fields{PgCoefficientField::R, PgCoefficientField::P,
+                                PgCoefficientField::C};
+    std::array<std::array<ExactRational, 3>, 3> jet{};
+    for (std::size_t field = 0; field < fields.size(); ++field) {
+        const auto target = std::tuple{fields[field], cell.first, cell.second};
+        const auto first = std::partition_point(indices.begin(), indices.end(),
+                                                [&](auto i) { return key(i) < target; });
+        for (auto term = first; term != indices.end() && key(*term) == target; ++term) {
+            const auto& row = state.rows.values()[*term];
+            const auto offset = begin + static_cast<std::size_t>(term - indices.begin());
+            math.charge();
+            const auto coefficient =
+                rank_exact(state.basis_values.values()[offset], math.leaf_limits, math.plan);
+            for (std::size_t i = 0; i < jet[field].size(); ++i) {
+                const auto order = reference_orders[i];
+                if (order.first > row.powers.first || order.second > row.powers.second)
+                    continue;
+                auto value =
+                    times_monomial(math, math.copy(coefficient), row.powers.first, order.first, u);
+                value = times_monomial(math, std::move(value), row.powers.second, order.second, v);
+                jet[field][i] = math.add(jet[field][i], value);
+            }
+        }
+        for (std::size_t i = 1; i < jet[field].size(); ++i)
+            jet[field][i] = math.mul(jet[field][i], axis_scale);
+    }
+    return jet;
 }
 
 core::Result<ExactRational> PgRankPreparation::basis(PgRankBasisColumn column, core::Index row,
