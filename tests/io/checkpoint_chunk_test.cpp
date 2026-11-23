@@ -42,13 +42,16 @@ constexpr std::array<Index, 1> vector_shape{3};
 template <class T>
 void check_integer_payload(std::span<const T> values, CheckpointDtype dtype,
                            std::string_view golden_hex) {
-    ResourcePlan plan{80};
+    ResourcePlan plan{88};
     auto chunk = CheckpointChunk::encode(vector_shape, values, limits, plan, {});
     REQUIRE(chunk);
     const auto view = chunk_view(*chunk);
     CHECK(view.header.dtype == dtype);
     CHECK(std::ranges::equal(view.bytes, from_hex(golden_hex)));
-    auto recovered = chunk->decode(plan, {});
+    const auto wire = from_hex(golden_hex);
+    const auto received = CheckpointChunk::authenticate({view.header, wire}, limits, plan, {});
+    REQUIRE(received);
+    auto recovered = received->decode(plan, {});
     REQUIRE(recovered);
     CHECK(std::ranges::equal(std::get<uvlas::core::PlannedBuffer<T>>(*recovered).values(), values));
 }
@@ -108,6 +111,7 @@ TEST_CASE("Recovery rejects corrupt declarations and bytes before allocating a c
     const auto valid = chunk_view(*chunk);
     auto candidate = valid;
     auto expected_error = FailureCode::CheckpointCorrupt;
+    std::stop_source stop;
     std::array<std::byte, 9> changed{};
     std::ranges::copy(valid.bytes, changed.begin());
     constexpr std::array<Index, 2> invalid_shape{0, -1};
@@ -134,8 +138,12 @@ TEST_CASE("Recovery rejects corrupt declarations and bytes before allocating a c
         candidate.header.dtype = static_cast<CheckpointDtype>(255);
         expected_error = FailureCode::CheckpointIncompatible;
     }
+    SECTION("cancellation precedes reading the payload") {
+        REQUIRE(stop.request_stop());
+        expected_error = FailureCode::Cancelled;
+    }
     ResourcePlan ingress{16};
-    const auto result = CheckpointChunk::authenticate(candidate, limits, ingress, {});
+    const auto result = CheckpointChunk::authenticate(candidate, limits, ingress, stop.get_token());
     REQUIRE_FALSE(result);
     CHECK(result.error().code == expected_error);
     CHECK(ingress.allocated_bytes() == 0);
