@@ -4,6 +4,7 @@
 #include "local_geometry_input_private.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <new>
 #include <type_traits>
@@ -50,6 +51,16 @@ FacetScatter facet_scatter(const FacetStorage& facet) noexcept {
     return IndependentP1Scatter{{1, 0, 0, 0, 1, 0, 0, 0, 1}};
 }
 } // namespace
+
+std::optional<core::FailureCode> LocalAccuracy::validation_error() const noexcept {
+    if (!std::isfinite(tau))
+        return core::FailureCode::Nonfinite;
+    if (tau < 0 ||
+        (representation != core::Precision::Binary64 && representation != core::Precision::TwoWord))
+        return core::FailureCode::InvalidInput;
+    return std::nullopt;
+}
+
 struct LocalPacketData {
     OwnedGeometry snapshot;
     LocalAmbientDescriptor ambient;
@@ -147,11 +158,8 @@ public:
             if (limits.max_steps < 3108)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
-            if (!std::isfinite(accuracy.tau))
-                return std::unexpected(packet_failure(core::FailureCode::Nonfinite, context));
-            if (accuracy.tau < 0 || (accuracy.representation != core::Precision::Binary64 &&
-                                     accuracy.representation != core::Precision::TwoWord))
-                return std::unexpected(packet_failure(core::FailureCode::InvalidInput, context));
+            if (const auto error = accuracy.validation_error())
+                return std::unexpected(packet_failure(*error, context));
             auto expression = query.definition();
             if (!expression)
                 return std::unexpected(expression.error());

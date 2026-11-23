@@ -470,6 +470,57 @@ TEST_CASE("P1 retains the selected far formula and refuses incompatible replay a
     CHECK(decode(valid.velocity()[2].real).center != 0);
 }
 
+TEST_CASE("P1 shared preparation rejects invalid accuracy independently of facet count",
+          "[UI-D01][UI-D04][N4-02][negative]") {
+    constexpr auto two_word = core::Precision::TwoWord;
+    constexpr auto invalid_precision = static_cast<core::Precision>(255);
+    constexpr auto nan = std::numeric_limits<double>::quiet_NaN();
+    const p::LocalAccuracy local{two_word, 1e-10};
+    const p::P1Accuracy kernel{two_word, 1e-10, 1e-10};
+    struct AccuracyCase {
+        const char* name;
+        p::LocalAccuracy packet;
+        p::P1Accuracy p1;
+        core::FailureCode expected;
+    };
+    using enum core::FailureCode;
+    const std::array cases{
+        AccuracyCase{"local nonfinite", {two_word, nan}, kernel, Nonfinite},
+        AccuracyCase{"local negative", {two_word, -1}, kernel, InvalidInput},
+        AccuracyCase{"local representation", {invalid_precision, 0}, kernel, InvalidInput},
+        AccuracyCase{"basis nonfinite", local, {two_word, nan, 0}, Nonfinite},
+        AccuracyCase{"Jacobian nonfinite", local, {two_word, 0, nan}, Nonfinite},
+        AccuracyCase{"basis negative", local, {two_word, -1, 0}, InvalidInput},
+        AccuracyCase{"Jacobian negative", local, {two_word, 0, -1}, InvalidInput},
+        AccuracyCase{
+            "basis representation", local, {invalid_precision, 0, 0}, PrecisionUnsupported},
+    };
+    for (const bool empty : {false, true}) {
+        GeometryFixture geometry;
+        geometry.empty = empty;
+        Prepared prepared{geometry};
+        const auto query = prepared.query(geometry.query());
+        const p::P1ActionSource source{prepared.contact, query, {12, 0}};
+        const auto map = maps(geometry, true);
+        const auto faces = empty ? std::span<const p::P1FaceStrengths>{}
+                                 : std::span<const p::P1FaceStrengths>{map};
+        const auto strengths =
+            empty ? std::span<const p::P1StrengthId>{} : std::span<const p::P1StrengthId>{strength};
+        const auto forecast =
+            test_geometry::take(p::forecast_shared_p1(source, faces, strengths, limits()));
+        for (const auto& entry : cases) {
+            CAPTURE(empty, entry.name);
+            core::ResourcePlan memory{forecast.payload_bytes};
+            rejected(p::prepare_shared_p1(source, faces, strengths, entry.packet, entry.p1,
+                                          limits(), prepared.shared_workspace,
+                                          *prepared.local_workspace, *prepared.kernel_workspace,
+                                          memory),
+                     entry.expected);
+            CHECK(memory.allocated_bytes() == 0);
+        }
+    }
+}
+
 TEST_CASE("P1 empty contact topology is an exact zero action",
           "[UI-D01][UI-D04][N4-02][property]") {
     GeometryFixture geometry;

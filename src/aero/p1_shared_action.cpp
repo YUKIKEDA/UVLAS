@@ -592,6 +592,10 @@ public:
         const Lease lease{workspace.entered_};
         return guarded<SharedP1Action>(context, [&] {
             operator_environment();
+            if (const auto error = local_accuracy.validation_error())
+                throw ArithmeticFailure{*error};
+            if (const auto error = accuracy.validation_error())
+                throw ArithmeticFailure{*error};
             Work work{0, limits.steps, stop};
             const auto plan = count(source, faces, strengths, limits, work);
             (void)checked_limit(plan.payload_bytes, memory.remaining_bytes());

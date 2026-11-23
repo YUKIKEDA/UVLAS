@@ -19,6 +19,9 @@ struct P1Accuracy {
     /// Require all numerical choices explicitly; no uninitialized request exists.
     P1Accuracy(core::Precision precision, double basis_width, double derivative_width) noexcept
         : representation(precision), tau_basis(basis_width), tau_jacobian(derivative_width) {}
+
+    /// Reject invalid request values before evaluating any basis.
+    [[nodiscard]] std::optional<core::FailureCode> validation_error() const noexcept;
 };
 /// Explicit arithmetic work and external-memory admission; zero means no budget.
 struct P1Limits {

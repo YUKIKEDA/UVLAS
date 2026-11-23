@@ -447,6 +447,16 @@ public:
                                         P1Workspace&, core::ResourcePlan&, const std::stop_token&,
                                         const std::array<bool, 3>&) noexcept;
 };
+std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
+    if (!std::isfinite(tau_basis) || !std::isfinite(tau_jacobian))
+        return core::FailureCode::Nonfinite;
+    if (tau_basis < 0 || tau_jacobian < 0)
+        return core::FailureCode::InvalidInput;
+    if (representation != core::Precision::Binary64 && representation != core::Precision::TwoWord)
+        return core::FailureCode::PrecisionUnsupported;
+    return std::nullopt;
+}
+
 AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accuracy accuracy,
                                        P1Limits limits, P1Workspace& workspace,
                                        core::ResourcePlan& plan, const std::stop_token& stop,
@@ -465,13 +475,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
         if (!packet.active())
             return std::unexpected(failed(core::FailureCode::InvalidInput, context));
-        if (!std::isfinite(accuracy.tau_basis) || !std::isfinite(accuracy.tau_jacobian))
-            return std::unexpected(failed(core::FailureCode::Nonfinite, context));
-        if (accuracy.tau_basis < 0 || accuracy.tau_jacobian < 0)
-            return std::unexpected(failed(core::FailureCode::InvalidInput, context));
-        if (accuracy.representation != core::Precision::Binary64 &&
-            accuracy.representation != core::Precision::TwoWord)
-            return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
+        if (const auto error = accuracy.validation_error())
+            return std::unexpected(failed(*error, context));
         if (stop.stop_requested())
             return std::unexpected(failed(core::FailureCode::Cancelled, context));
         const auto mode = limits.external_memory.selection();
