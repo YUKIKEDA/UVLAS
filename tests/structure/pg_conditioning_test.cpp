@@ -3,7 +3,7 @@
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-#include <uvlas/structure/pg_conditioning.hpp>
+#include <uvlas/structure/pg_flat_gram.hpp>
 
 namespace {
 using namespace uvlas;
@@ -23,10 +23,8 @@ PgReferenceLimits query_limits() {
     return {a, 20'000'000, 10'000'000, {}};
 }
 
-PgReferenceBasis flat_basis(core::Workspace& ws, core::ResourcePlan& plan) {
-    Fixture f;
-    for (auto& value : f.heights)
-        value = f.r("2");
+PgReferenceBasis make_basis(Fixture& f, const ExactRational& length, core::Workspace& ws,
+                            core::ResourcePlan& plan) {
     auto dictionary = take(PgCoefficientDictionary::prepare(
         *f.graph, {exact_limits(), 2000, 20000000, 100000, {}}, ws, plan));
     auto partition = take(PgIntegrationPartition::prepare(f.request(), limits(), ws, plan));
@@ -36,7 +34,6 @@ PgReferenceBasis flat_basis(core::Workspace& ws, core::ResourcePlan& plan) {
     rotation[4] = f.r("1");
     rotation[8] = f.r("1");
     const std::array<ExactRational, 3> origin{};
-    const auto length = f.r("1");
     auto geometry = take(PgReferenceGeometry::prepare(std::move(input), {rotation, origin, length},
                                                       query_limits(), plan));
     const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
@@ -45,6 +42,14 @@ PgReferenceBasis flat_basis(core::Workspace& ws, core::ResourcePlan& plan) {
         PgRankPreparation::prepare(source.dictionary, source.partition, rank_limits, ws, plan));
     return take(
         PgReferenceBasis::prepare(std::move(geometry), std::move(rank), rank_limits, ws, plan));
+}
+
+PgReferenceBasis flat_basis(core::Workspace& ws, core::ResourcePlan& plan) {
+    Fixture f;
+    for (auto& value : f.heights)
+        value = f.r("2");
+    const auto length = f.r("1");
+    return make_basis(f, length, ws, plan);
 }
 
 const Q& q(const ExactRational& value) {
@@ -65,16 +70,18 @@ Q moment(core::Index degree) {
     return degree % 2 == 0 ? Q{2} / (degree + 1) : Q{};
 }
 
-Q integrate_terms(const Term& a, const Term& b) {
-    // For H=2, L=1, a flat unit chart has zhat=zeta and det J=1.
-    // The local half-cell coordinates introduce 1/16 and C carries 1/2.
+Q integrate_terms(const Term& a, const Term& b, const Q& h, const Q& measure) {
+    // Independently integrate u, v and zeta; C contributes the factor 1/2.
     const auto i = static_cast<core::Index>(a.row.field);
     const auto j = static_cast<core::Index>(b.row.field);
     if (a.row.cell != b.row.cell || (i + j) % 2 != 0)
         return {};
+    Q thickness_factor{1};
+    for (core::Index k = 0; k < i + j; ++k)
+        thickness_factor *= h;
     return a.value * b.value * moment(a.row.powers.first + b.row.powers.first) *
-           moment(a.row.powers.second + b.row.powers.second) * moment(i + j) /
-           (16 * (i == 2 ? 2 : 1) * (j == 2 ? 2 : 1));
+           moment(a.row.powers.second + b.row.powers.second) * moment(i + j) * measure *
+           thickness_factor / ((i == 2 ? 2 : 1) * (j == 2 ? 2 : 1));
 }
 
 std::vector<std::vector<Term>> basis_terms(const PgRankPreparation& rank, std::size_t count,
@@ -92,14 +99,15 @@ std::vector<std::vector<Term>> basis_terms(const PgRankPreparation& rank, std::s
     return basis;
 }
 
-std::vector<Q> analytic_gram(const std::vector<std::vector<Term>>& basis) {
+std::vector<Q> analytic_gram(const std::vector<std::vector<Term>>& basis, const Q& h = Q{1},
+                             const Q& measure = Q("1/16")) {
     const auto count = basis.size();
     std::vector<Q> entries(slot(0, count));
     for (std::size_t j = 0; j < count; ++j)
         for (std::size_t i = 0; i <= j; ++i)
             for (const auto& a : basis[i])
                 for (const auto& b : basis[j])
-                    entries[slot(i, j)] += integrate_terms(a, b);
+                    entries[slot(i, j)] += integrate_terms(a, b, h, measure);
     return entries;
 }
 
@@ -397,9 +405,23 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
             break;
     }
     REQUIRE(last != 0);
+    const PgFlatGramLimits flat_caps{query_limits(), steps};
+    auto supplied = take(PgFlatGram::prepare(std::move(basis), bits, flat_caps, ws, plan));
+    const auto owned = take(supplied.enclosure());
+    REQUIRE(owned.upper_triangle.size() == enclosure.size());
+    CHECK(owned.fractional_bits == bits);
+    for (std::size_t i = 0; i < enclosure.size(); ++i) {
+        CHECK(owned.upper_triangle[i].lower == enclosure[i].lower);
+        CHECK(owned.upper_triangle[i].upper == enclosure[i].upper);
+    }
+    const auto certify_owned = [&](PgFlatGram& source, core::ResourcePlan& budget) {
+        return std::move(source).certify({transform, bits}, {profile, steps, {}}, ws, budget);
+    };
+    core::ResourcePlan refused{0};
+    check_failure(certify_owned(supplied, refused), core::FailureCode::ResourceExceeded);
+    REQUIRE(supplied.enclosure());
     const auto prior = plan.allocated_bytes();
-    const auto certificate =
-        take(verify(basis, enclosure, transform, {profile, steps, {}}, ws, plan));
+    const auto certificate = take(certify_owned(supplied, plan));
     const auto info = take(certificate.info());
     CHECK(info.rank == count);
     CHECK(info.payload_bytes == plan.allocated_bytes() - prior);
@@ -492,4 +514,102 @@ TEST_CASE("PG conditioning rejects row-sum excess and honors exact work and byte
     CHECK(short_bytes.allocated_bytes() == 0);
     core::ResourcePlan equal{info.payload_bytes};
     CHECK(verify(basis, gram, transform, caps, ws, equal));
+}
+
+TEST_CASE("PG analytic Gram rejects unqualified shapes before consuming the reference",
+          "[SH-D03][SH-D07][N4-08][negative][verification]") {
+    Fixture f;
+    const auto length = f.r("1");
+    auto expected = core::FailureCode::Unsupported;
+    bool cancelled = false;
+    SECTION("nonconstant thickness") {
+        f.heights.front() = f.r("2");
+    }
+    SECTION("partial cell coverage") {
+        f.domain.clear();
+        f.domain.push_back(f.point("0", "0"));
+        f.domain.push_back({f.r("1", "2"), f.r("0")});
+        f.domain.push_back({f.r("1", "2"), f.r("1", "2")});
+        f.domain.push_back({f.r("0"), f.r("1", "2")});
+    }
+    SECTION("varying height") {
+        const auto zero = f.r("0"), one = f.r("1"), height = f.r("1", "32");
+        const std::array<ExactInputTerm, 1> terms{{{{2, 0}, height}}};
+        const auto graph = take(ExactChartPolynomial::make(terms, exact_limits(), f.input_plan));
+        f.graph = take(PgGraph::prepare({zero, one, zero, graph, 1, PgGraphConvention::Version1},
+                                        {exact_limits(), 64, {}}, f.input_plan));
+    }
+    bool no_steps = false;
+    SECTION("zero integer work budget") {
+        no_steps = true;
+        expected = core::FailureCode::ResourceExceeded;
+    }
+    SECTION("cancellation before input visits") {
+        cancelled = true;
+        expected = core::FailureCode::Cancelled;
+    }
+    core::ResourcePlan setup{profile};
+    core::Workspace ws{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(f, length, ws, setup);
+    auto caps = PgFlatGramLimits{query_limits(), no_steps ? 0 : steps};
+    std::stop_source stop;
+    if (cancelled) {
+        REQUIRE(stop.request_stop());
+        caps.arithmetic.cancellation = stop.get_token();
+    }
+    core::ResourcePlan refused{profile};
+    const auto prepare = [](PgReferenceBasis& source, const PgFlatGramLimits& limits,
+                            core::Workspace& workspace, core::ResourcePlan& plan) {
+        return PgFlatGram::prepare(std::move(source), bits, limits, workspace, plan);
+    };
+    check_failure(prepare(basis, caps, ws, refused), expected);
+    REQUIRE(basis.source());
+    if (cancelled)
+        CHECK(refused.allocated_bytes() == 0);
+}
+
+TEST_CASE("PG analytic Gram retains physical chart scales on adopted larger grids",
+          "[SH-D03][N4-02][verification]") {
+    for (const core::Index n : {2, 4}) {
+        CAPTURE(n);
+        Fixture f{n};
+        const auto length = f.r("3", "2"), width = f.r("4", "3"), skew = f.r("1", "9");
+        for (auto& value : f.heights)
+            value = f.r("5", "4");
+        const auto zero = f.r("0"), constant = f.r("1", "7");
+        const std::array<ExactInputTerm, 1> terms{{{{0, 0}, constant}}};
+        const auto height = take(ExactChartPolynomial::make(terms, exact_limits(), f.input_plan));
+        f.graph = take(PgGraph::prepare({zero, width, skew, height, n, PgGraphConvention::Version1},
+                                        {exact_limits(), 64, {}}, f.input_plan));
+        core::Workspace ws{core::PlannedBuffer<std::byte>{}};
+        core::ResourcePlan plan{profile};
+        auto basis = make_basis(f, length, ws, plan);
+        const auto count = static_cast<std::size_t>(take(basis.size()));
+        const auto* rank = take(basis.rank());
+        // Include early R/P combinations and a last C column at both grids.
+        const auto selected = std::array<std::size_t, 4>{0, 1, count / 2, count - 1};
+        const auto rows = take(rank->rows());
+        const auto algebra = query_limits().algebra;
+        std::vector<std::vector<Term>> independent(selected.size());
+        for (std::size_t k = 0; k < selected.size(); ++k)
+            for (std::size_t i = 0; i < rows.size(); ++i) {
+                const auto value = take(rank->basis({static_cast<core::Index>(selected[k])},
+                                                    static_cast<core::Index>(i), algebra, plan));
+                if (value.sign() != 0)
+                    independent[k].push_back({rows[i], q(value)});
+            }
+        const Q h("5/12");
+        const auto expected =
+            enclose(f, analytic_gram(independent, h, h * Q("4/3") / (16 * n * n)));
+        const auto flat =
+            take(PgFlatGram::prepare(std::move(basis), bits, {query_limits(), steps}, ws, plan));
+        const auto supplied = take(flat.enclosure());
+        REQUIRE(supplied.upper_triangle.size() == slot(0, count));
+        for (std::size_t j = 0; j < selected.size(); ++j)
+            for (std::size_t i = 0; i <= j; ++i) {
+                const auto& actual = supplied.upper_triangle[slot(selected[i], selected[j])];
+                CHECK(actual.lower == expected[slot(i, j)].lower);
+                CHECK(actual.upper == expected[slot(i, j)].upper);
+            }
+    }
 }

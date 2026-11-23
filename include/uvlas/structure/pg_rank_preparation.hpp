@@ -184,6 +184,9 @@ public:
 
 private:
     friend class PgReferenceBasis;
+    friend class PgFlatGram;
+    [[nodiscard]] core::Result<std::span<const std::uint32_t>>
+        basis_indices(PgRankBasisColumn) const& noexcept;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     basis_cell_jet(detail::ReferenceArithmetic&, PgRankBasisColumn, PgCellIndex,
                    const ExactRational& u, const ExactRational& v,

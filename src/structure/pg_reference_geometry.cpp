@@ -430,6 +430,10 @@ core::Result<const PgRankPreparation*> PgReferenceBasis::rank() const& noexcept 
     return &rank_;
 }
 
+const ExactRational& PgReferenceBasis::length_metres() const& noexcept {
+    return geometry_.length_;
+}
+
 core::Result<PgReferenceSource> PgReferenceBasis::source() const& noexcept {
     return geometry_.source();
 }
