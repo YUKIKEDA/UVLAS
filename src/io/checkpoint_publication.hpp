@@ -32,7 +32,7 @@ enum class CheckpointPublicationStage : std::uint8_t {
 };
 
 struct CheckpointPublicationDiagnostic {
-    CheckpointPublicationStage stage;
+    CheckpointPublicationStage stage = CheckpointPublicationStage::Preflight;
     std::optional<std::size_t> chunk;
     std::optional<std::uint32_t> native_error;
 };
