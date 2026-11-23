@@ -55,13 +55,13 @@ struct PgRankPreparationInfo {
 
 /// The chart, source polygon and per-cell activity retained with the basis.
 struct PgRankWitnessInfo {
-    core::Index n;
-    PgGraphConvention convention;
-    std::uint32_t recipe_version;
-    std::uint32_t reduction_version;
-    std::uint64_t height_terms;
-    std::uint64_t domain_vertices;
-    std::uint64_t activity_cells;
+    core::Index n = 0;
+    PgGraphConvention convention = PgGraphConvention::Version1;
+    std::uint32_t recipe_version = 0;
+    std::uint32_t reduction_version = 0;
+    std::uint64_t height_terms = 0;
+    std::uint64_t domain_vertices = 0;
+    std::uint64_t activity_cells = 0;
     PgGraphContentIdentity graph_identity{{}};
 };
 
