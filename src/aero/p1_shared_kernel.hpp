@@ -16,4 +16,10 @@ struct Interval;
 [[nodiscard]] AeroResult<P1Basis>
 evaluate_p1_partition(const LocalGeometryPacket&, const std::array<bool, 3>& boundary, P1Accuracy,
                       P1Limits, P1Workspace&, core::ResourcePlan&, const std::stop_token&) noexcept;
+/// Analytic P0 contour columns indexed by the three negative-oriented facet edges.
+[[nodiscard]] AeroResult<P1Basis> evaluate_bound_partition(const LocalGeometryPacket&,
+                                                           const std::array<bool, 3>& boundary,
+                                                           P1Accuracy, P1Limits, P1Workspace&,
+                                                           core::ResourcePlan&,
+                                                           const std::stop_token&) noexcept;
 } // namespace uvlas::aero::detail

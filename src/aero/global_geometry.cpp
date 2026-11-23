@@ -184,7 +184,8 @@ GlobalResult<GlobalTopology> GlobalEngine::build(const OwnedGeometry& source,
             const auto i = lookup(g.face_lookup.values(), role.face.value(), run, role.face);
             if (data.roles.values()[i] != 0 || static_cast<unsigned>(role.role) > 1)
                 reject(core::FailureCode::InvalidInput, role.face);
-            data.roles.values()[i] = role.role == AeroFaceRole::Bound ? 1 : 2;
+            data.roles.values()[i] =
+                role.role == AeroFaceRole::Bound ? GlobalTopologyData::bound_role : 2;
         }
         for (const auto& binding : input.edges) {
             const auto i = lookup(g.edge_lookup.values(), binding.edge.value(), run, binding.edge);
@@ -265,7 +266,8 @@ GlobalResult<GlobalTopology> GlobalEngine::build(const OwnedGeometry& source,
             for (const auto& facet : g.facets.values())
                 for (std::size_t k = 0; k < 3; ++k) {
                     run.step();
-                    if (data.roles.values()[static_cast<std::size_t>(facet.face)] == 1 &&
+                    if (data.roles.values()[static_cast<std::size_t>(facet.face)] ==
+                            GlobalTopologyData::bound_role &&
                         data.edges.values()[static_cast<std::size_t>(facet.edges[k])].owner ==
                             owner) {
                         ++count;

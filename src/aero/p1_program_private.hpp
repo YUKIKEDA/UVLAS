@@ -169,6 +169,12 @@ inline Inputs inputs(Program& p) {
               {p.input(9), p.input(10), p.input(11)}}},
             p.input(12)};
 }
+inline Expression contour_integral(Expression length, Expression s, Expression z, Expression ra,
+                                   Expression rb, Expression k2, bool same) {
+    if (same)
+        return length * (s + z) / (ra * rb * (s * rb + z * ra));
+    return (s / ra - z / rb) / k2;
+}
 /// Shared edge geometry makes every P1 column consume the identical RM kernel.
 inline Output near_program(Program& p, const Options& options) {
     const auto in = inputs(p);
@@ -195,9 +201,7 @@ inline Output near_program(Program& p, const Options& options) {
         rb[edge] = sqrt(z * z + k2);
         if (options.boundary[edge]) {
             const bool same = options.start_sign[edge] * options.end_sign[edge] > 0;
-            const auto integral =
-                same ? length * (s + z) / (ra[edge] * rb[edge] * (s * rb[edge] + z * ra[edge]))
-                     : (s / ra[edge] - z / rb[edge]) / k2;
+            const auto integral = contour_integral(length, s, z, ra[edge], rb[edge], k2, same);
             // Negative contour reverses the positive geometric boundary.
             line[edge] = cross(tangent[edge], perpendicular) * (-integral);
         }
@@ -255,6 +259,33 @@ inline Output near_program(Program& p, const Options& options) {
             output.nodes[3 * k + axis] = (velocity[axis] * factor).index;
     }
     return output;
+}
+// One unit-circulation column per facet edge. Bound rings follow the negative
+// geometric boundary, the same physical convention as the P1 sheet.
+inline Output bound_program(Program& p, const Options& options) {
+    const auto in = inputs(p);
+    const auto zero = p.constant(0);
+    const auto factor = p.constant(-1) / (p.pi() * 4);
+    Output out;
+    for (std::size_t edge = 0; edge < 3; ++edge) {
+        Vector velocity{zero, zero, zero};
+        if (options.boundary[edge]) {
+            const auto delta = in.vertices[(edge + 1) % 3] - in.vertices[edge];
+            const auto length = norm(delta);
+            const auto tangent = delta / length;
+            const auto r = in.point - in.vertices[edge];
+            const auto s = dot(r, tangent), z = s - length;
+            const auto perpendicular = cross(tangent, r);
+            const auto k2 = dot(perpendicular, perpendicular) + in.radius * in.radius;
+            const auto ra = sqrt(s * s + k2), rb = sqrt(z * z + k2);
+            const bool same = options.start_sign[edge] * options.end_sign[edge] > 0;
+            const auto integral = contour_integral(length, s, z, ra, rb, k2, same);
+            velocity = perpendicular * (factor * integral);
+        }
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            out.nodes[3 * edge + axis] = velocity[axis].index;
+    }
+    return out;
 }
 inline Output far_program(Program& p) {
     const auto in = inputs(p);

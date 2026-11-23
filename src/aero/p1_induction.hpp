@@ -37,7 +37,8 @@ struct P1Limits {
 enum class P1Branch : std::uint8_t {
     Analytic,              ///< Regularized boundary and constant in-plane sheet formula.
     IdealCoplanarExterior, ///< Zero-radius plane exterior limit retaining normal derivatives.
-    FarGauss12             ///< Fixed tensor twelve-by-twelve area quadrature.
+    FarGauss12,            ///< Fixed tensor twelve-by-twelve area quadrature.
+    BoundContour           ///< Three constant directed edge kernels, without a sheet.
 };
 /// Difference of two fixed quadrature rules; never a certified continuous-integral bound.
 struct P1QuadratureDifference {

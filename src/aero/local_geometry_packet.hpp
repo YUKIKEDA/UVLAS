@@ -62,7 +62,9 @@ struct VerifiedIncidence {
 };
 /// The query is outside the finite closed triangle; no proximity self exclusion.
 struct Detached {};
-using LocalQualification = std::variant<VerifiedIncidence, Detached>;
+/// A point on an oriented bound quad away from its physical contour.
+struct BoundInterior {};
+using LocalQualification = std::variant<VerifiedIncidence, Detached, BoundInterior>;
 using ClosestEntity = std::variant<PointId, EdgeId, FacetId>;
 /// The order of the twelve owned physical output enclosures.
 enum class LocalQuantity : std::uint8_t {
@@ -184,4 +186,10 @@ private:
 prepare_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalAccuracy,
                      const GeometryLimits&, LocalPacketWorkspace&, core::ResourcePlan&,
                      const std::stop_token& = {}) noexcept;
+/// Evaluate bound-contour geometry. Interior faces and artificial diagonals
+/// carry no vortex source, while unqualified contact with a physical edge fails.
+[[nodiscard]] AeroResult<LocalGeometryPacket>
+prepare_bound_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalAccuracy,
+                           const GeometryLimits&, LocalPacketWorkspace&, core::ResourcePlan&,
+                           const std::stop_token&) noexcept;
 } // namespace uvlas::aero::detail
