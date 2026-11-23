@@ -330,7 +330,10 @@ struct Builder {
                             include(bounds[2], source.coefficient(interval, component, power));
                         !found)
                         return std::unexpected(found.error());
-        auto plan = forecast(source, IntervalRequest{0, {}, order}, limits, stop, details, bounds);
+        auto remaining = limits;
+        remaining.steps -= scan.used;
+        auto plan =
+            forecast(source, IntervalRequest{0, {}, order}, remaining, stop, details, bounds);
         if (!plan)
             return std::unexpected(plan.error());
         CheckedCount checked;
