@@ -64,7 +64,7 @@ constexpr cp::CheckpointDirectoryLimits files{{8192, 8193, 16, 8192}, 16};
 constexpr cp::CheckpointPublicationLimits publication{8, 8192, 16'384};
 constexpr cp::CheckpointDiscoveryLimits discovery{16, 8};
 constexpr uvlas::io::SourceId input{554};
-enum class Newest { Corrupt, Incompatible, ExtraChunk };
+enum class Newest : std::uint8_t { Corrupt, Incompatible, ExtraChunk };
 
 TEST_CASE("Checkpoint directories round-trip typed data and discover the latest valid number",
           "[IO4-06][N4-02]") {
