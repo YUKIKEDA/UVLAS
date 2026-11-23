@@ -23,3 +23,9 @@
 ## 試験コードの追試
 
 Linuxのclang-tidyが、既存P1回帰のJVP参照に対して検査不足を報告した。試験の参照取得を条件式内で確定させたコミットは `75d21ee92ad565ad9dba12ddc1ab626e3f6d124f`。この追試ではMSVC Debug・ReleaseとGCC 14.2 Releaseで `aero.p1_shared_action` を各1件合格した。Linuxのclang-tidy 21.1.1は変更した製品4翻訳単位と、この試験の追試で合格した。
+
+## 束縛循環と独立後流のID
+
+束縛面IDと後流係数IDの数値が同じ場合も、別々の列として準備・評価・散布する。先頭後流が束縛循環を参照する場合は、束縛列のIDを明示して渡す。近方と遠方の独立値・JVPと随伴、明示接続による解析辺の相殺、束縛列を欠く入力の拒否を確認した。
+
+対象ソースは `3f469cd56eb256a00512f6a8b1d3956c1d11c7ca`。MSVC Debug・Releaseで `aero.p1_shared_action`、`aero.global_geometry`、`aero.uniform_flow` が各3件合格。GCC 14.2 Releaseでは `aero.p1_shared_action` が合格。各構成の `[UW-D01]` は3ケース104項目合格。Windowsの変更翻訳単位はclang-tidy 21.1.1を通過した。
