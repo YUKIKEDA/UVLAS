@@ -70,8 +70,8 @@ template <class I>
 
 /// Horner over native limbs. Only a single native limb is multiplied by Boost
 /// at a time, so neither this path nor the one-limb path can use Karatsuba.
-template <class I>
-[[nodiscard]] I rank_product(RankBudget& budget, const I& left, const I& right) {
+template <class I, class Budget>
+[[nodiscard]] I rank_product(Budget& budget, const I& left, const I& right) {
     const auto* a = &left;
     const auto* b = &right;
     if (a->backend().size() < b->backend().size())
@@ -161,6 +161,29 @@ template <class I>
     budget.charge(1 + std::uint64_t{a.numerator.backend().size()} + a.denominator.backend().size() +
                   b.numerator.backend().size() + b.denominator.backend().size());
     return a.numerator == b.numerator && a.denominator == b.denominator;
+}
+
+template <class I>
+[[nodiscard]] ExactRational rank_exact(const RankFraction<I>& fraction, const ExactLimits& limits,
+                                       core::ResourcePlan& plan) {
+    if (fraction.numerator == 0)
+        return {};
+    const auto width = std::max(rank_bits(fraction.numerator), rank_bits(fraction.denominator));
+    if (width > limits.maximum_value_bits)
+        partition_fail(core::FailureCode::ResourceExceeded);
+    if (sizeof(RationalStorage) > plan.remaining_bytes())
+        partition_fail(core::FailureCode::ResourceExceeded);
+    const auto admission = partition_take(exact_rational_admission(limits, width, 0));
+    try {
+        Rational raw;
+        raw.backend().num() = fraction.numerator.backend();
+        raw.backend().denom() = fraction.denominator.backend();
+        return partition_take(ExactFactory::rational(std::move(raw), limits, plan, admission));
+    } catch (const std::overflow_error&) {
+        partition_fail(core::FailureCode::ResourceExceeded);
+    } catch (const std::range_error&) {
+        partition_fail(core::FailureCode::ResourceExceeded);
+    }
 }
 
 struct RankSizer {
