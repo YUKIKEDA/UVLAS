@@ -22,7 +22,7 @@
 | 多角形と全積分分割 | 完了 | 被覆を検査した分割と資源計画。 [分割](https://github.com/YUKIKEDA/UVLAS/pull/128)・[資源計画](https://github.com/YUKIKEDA/UVLAS/pull/149) |
 | 局所独立化 | 完了 | 局所rank、基底、写像と来歴を所有する。再利用時にグラフ・領域・活動面積・辞書を照合し、B/T/S/W/Zを全活動行で厳密に再検証する。全12系列を独立参照と照合した。 [準備の検証](../verification/IM-01/pg-rank-bounded-preparation/verification.md)・[再検証と資源](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
-| 保証付き条件付け | 実装中 | 条件付け証明書から、指定した層・面側で変換後の基底と一階微分を評価できる。平面の全rankで必須場を再構成した。次は製品の求積と保証付き物理内積を組み立て、変換と必須場を検証する。 [基底評価の契約](../specs/structure/pg-reference-basis-contract.md) |
+| 保証付き条件付け | 実装中 | 条件付け証明書から、指定した層・面側で変換後の基底と一階微分を評価できる。平面の全rankで必須場を再構成した。次は製品の求積と保証付き物理内積を組み立て、変換と必須場を検証する。 [条件付け済み基底の検証](../verification/IM-01/pg-conditioned-reference-point/verification.md)・[基底評価の契約](../specs/structure/pg-reference-basis-contract.md) |
 | PreparedPatchと参照作用 | 残 | 条件付け済み基底を、層・面・片側の参照作用と反復用Workspaceへつなぐ |
 | 全位置traceと拘束 | 残 | 辞書・分割・基底を使い、非整合界面の全厚位置、元拘束、双対量を保持する |
 | 固定pivot疎chart | 残 | 元拘束と疎解法から写像と微分・転置作用を実装し、拘束と仕事を照合する |
@@ -66,7 +66,7 @@
 | Nastran | 残 | schema・SI・snapshotを入力に、採用カード、座標系、sidecarを解析する |
 | Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。sidecarの型と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md) |
 | 共通参照への変換 | 残 | 外部面を共通の曲面・厚さ・接続へ変換し、質量・仕事などの誤差を評価する。対応するIM-01／02の成果が必要 |
-| 結果と診断 | 実装中 | 実行結果と来歴をJSONに、確定済みの観測値をCSVに変換する。次は物理回復、解決済みケース、可視化出力を接続し、実行経路から発行する |
+| 結果と診断 | 実装中 | 実行結果と来歴をJSONに、確定済みの観測値をCSVに変換する。次は物理回復、解決済みケース、可視化出力を接続し、実行経路から発行する。 [結果JSON](../verification/IM-06/result-documents.md)・[観測CSV](../verification/IM-06/observation-csv.md) |
 | checkpoint容器 | 完了 | 型付きチャンクと指紋からマニフェストを作り、既存番号を保持したまま確定する。中断した保存を除外し、型、長さ、SHA-256、指紋が一致する最新番号を復元する。 [マニフェストと確定ディレクトリの検証](../verification/IM-06/checkpoint-manifest.md) |
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |
 | CLI | 残 | 共通処理にvalidate／prepare／run／resume／inspectと終了状態を接続する |
