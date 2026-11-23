@@ -1,0 +1,36 @@
+{
+  "windows": {
+    "clean_relink_recreated_receipt_and_manifest": true,
+    "commit": "4e0b8866caaaf920c1fc6ac8022a560fe93162a8",
+    "compiler": "MSVC 19.51.36260.0",
+    "foreign_extension_sha256": "f73f54e5b167227903028726d67bc206451e4c8667392e3bcd62fede2168575c",
+    "foreign_extension_with_matching_stale_receipt_exit": 1,
+    "preserved_mtime_foreign_extension_exit": 1,
+    "rebuilt_manifest_sha256": "0611b2eb6c50f1f680de5ab0b28b16cb03714f6966698037cecc0e9bd7aabc45",
+    "receipt_and_manifest_unchanged_on_failure": true,
+    "stale_receipt_source": "previous revision fixture with matching artifact hash",
+    "relocated_ownership_cases": 10,
+    "relocated_python_notice": {
+      "file": "LICENSE.txt",
+      "path": "base_python/LICENSE.txt",
+      "sha256": "886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a"
+    }
+  },
+  "linux": {
+    "clean_relink_recreated_receipt_and_manifest": true,
+    "commit": "4e0b8866caaaf920c1fc6ac8022a560fe93162a8",
+    "compiler": "GNU 14.2.0",
+    "foreign_extension_sha256": "76d47c2aeedb974be9fc2e00a4dcb849ca83a968121ab80c6dd45a1e0839e8a1",
+    "foreign_extension_with_matching_stale_receipt_exit": 1,
+    "preserved_mtime_foreign_extension_exit": 1,
+    "rebuilt_manifest_sha256": "d1484f4f3130a38f7a8a6c2fc663e5d07cd6eddd3ebfe7fd0c5253911600d459",
+    "receipt_and_manifest_unchanged_on_failure": true,
+    "stale_receipt_source": "previous revision fixture with matching artifact hash",
+    "relocated_ownership_cases": 10,
+    "relocated_python_notice": {
+      "file": "copyright",
+      "path": "/usr/share/doc/python3.12/copyright",
+      "sha256": "f1cbf908e1daa8789b389fdcf17811ed36b675d736b39a103591399861350382"
+    }
+  }
+}
