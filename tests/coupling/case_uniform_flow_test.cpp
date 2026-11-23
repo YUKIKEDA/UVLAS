@@ -1,9 +1,13 @@
 #include "coupling/case_uniform_flow.hpp"
+#include "coupling/case_uniform_flow_projection.hpp"
 #include "io/case_schema_test_adapter.hpp"
+#include "io/si_rational_projection.hpp"
 
+#include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 namespace {
@@ -430,4 +434,177 @@ TEST_CASE("Typed case flow rejects incompatible coverage opaque variants quotas 
     const auto uncovered = materialize(incomplete, io::SourceId{12});
     reject(cf::prepare_case_uniform_flow(uncovered, stamp, {}, work, limits, refused),
            core::FailureCode::InvalidInput);
+}
+
+namespace {
+using Big = boost::multiprecision::cpp_int;
+using Rat = boost::multiprecision::cpp_rational;
+
+Rat two_power(std::int64_t exponent) {
+    if (exponent >= 0)
+        return Rat{Big{1} << static_cast<unsigned>(exponent)};
+    return Rat{1} / (Big{1} << static_cast<unsigned>(-exponent));
+}
+
+/// Independent exact reconstruction of a binary word using its binary decomposition.
+Rat rational_word(double word) {
+    REQUIRE(std::isfinite(word));
+    int exponent = 0;
+    const auto fraction = std::frexp(word, &exponent);
+    const auto significand = static_cast<std::int64_t>(std::ldexp(fraction, 53));
+    return Rat{significand} * two_power(exponent - 53);
+}
+
+void within(const io::SiEnclosure& enclosure, const Rat& actual, const Rat& allowed) {
+    std::visit(
+        [&](const auto& result) {
+            REQUIRE(result.exponent2 > -4096);
+            REQUIRE(result.exponent2 < 4096);
+            const auto c = [&]() -> Rat {
+                if constexpr (std::is_same_v<std::remove_cvref_t<decltype(result)>,
+                                             io::ScaledBinary64>)
+                    return rational_word(result.center);
+                else
+                    return rational_word(result.high) + rational_word(result.low);
+            }();
+            const auto radius = rational_word(result.radius) * two_power(result.exponent2);
+            CHECK(radius >= 0);
+            CHECK(abs(c * two_power(result.exponent2) - actual) <= radius);
+            CHECK(radius <= allowed);
+        },
+        enclosure);
+}
+} // namespace
+
+TEST_CASE("Typed SI uniform jet projects all components and retains the exact source",
+          "[AE-07][N4-06][N4-08][N4-09][property][negative]") {
+    const auto input = source(
+        R"({"kind":"pchip","times":[0,1,2],"values":[[0,-2,1],[1,-2,-1],[4,-2,-7]],"outside":{"kind":"reject"}})",
+        R"([{"start":0,"end":2,"step":1,"restart":"initial"}])");
+    a::UniformFlowWorkspace work;
+    const auto field = import(input, io::SourceId{31}, work);
+    const auto current = import(input, io::SourceId{32}, work);
+    const Number time{30}, zero{0}, scale{2};
+    constexpr std::array<std::uint32_t, 1> one_word{1};
+    constexpr std::array<std::uint32_t, 3> den90{0, 0, 1U << 26U};
+    constexpr std::array<std::uint32_t, 2> den40{0, 1U << 8U};
+    const cf::CaseFlowComponentBudget strict{scale.view(), zero.view(),
+                                             p::RationalView{1, one_word, den90}};
+    const cf::CaseFlowComponentBudget wide{scale.view(), p::RationalView{1, one_word, den40},
+                                           zero.view()};
+    const std::array host_requirements{strict, strict, strict};
+    auto exact_jet = evaluate(field, current, work, time, p::RequestedSide::Right);
+    cf::CaseFlowProjectionRequest request{
+        core::Precision::Binary64, host_requirements, host_requirements, {4096, budget}};
+    reject(cf::project_case_uniform_flow(std::move(exact_jet), request),
+           core::FailureCode::PrecisionUnresolved);
+    CHECK(exact_jet.jet.active());
+    const std::array wide_values{wide, wide, wide};
+    request.velocity = wide_values;
+    request.time_partial = wide_values;
+    request.time_partial[2] = {scale.view(), zero.view(), zero.view()};
+    reject(cf::project_case_uniform_flow(std::move(exact_jet), request),
+           core::FailureCode::PrecisionUnresolved);
+    CHECK(exact_jet.jet.active());
+    request.time_partial = wide_values;
+    auto first = evaluate(field, current, work, time, p::RequestedSide::Right);
+    const auto binary = take(cf::project_case_uniform_flow(std::move(first), request));
+    CHECK(binary.representation() == core::Precision::Binary64);
+
+    request.representation = core::Precision::TwoWord;
+    request.velocity = host_requirements;
+    request.time_partial = host_requirements;
+    const auto projected = take(cf::project_case_uniform_flow(std::move(exact_jet), request));
+    CHECK_FALSE(exact_jet.jet.active());
+    CHECK(projected.representation() == core::Precision::TwoWord);
+    CHECK(projected.source().requested_side == p::RequestedSide::Right);
+    CHECK(take(projected.source().jet.stamp()) == stamp);
+    exact(take(projected.source().jet.time()), time);
+
+    const std::array<Rat, 3> truth_u{Rat{127} / 80000, Rat{-127} / 12500, Rat{381} / 200000};
+    const std::array<Rat, 3> truth_dt{Rat{381} / 4000000, Rat{0}, Rat{-381} / 2000000};
+    for (std::size_t c = 0; c < 3; ++c) {
+        within(take(projected.velocity(c)), truth_u[c], abs(truth_u[c]) * two_power(-90));
+        within(take(projected.time_partial(c)), truth_dt[c], abs(truth_dt[c]) * two_power(-90));
+        within(take(binary.velocity(c)), truth_u[c], two_power(-39));
+        within(take(binary.time_partial(c)), truth_dt[c], two_power(-39));
+        for (std::size_t x = 0; x < 3; ++x)
+            within(take(projected.spatial_partial(c, x)), Rat{0}, Rat{0});
+    }
+    reject(projected.spatial_partial(0, 3), core::FailureCode::InvalidInput);
+
+    auto trial = evaluate(field, current, work, time);
+    REQUIRE(projected.used_steps() > 1);
+    request.limits.steps = projected.used_steps() - 1;
+    reject(cf::project_case_uniform_flow(std::move(trial), request),
+           core::FailureCode::ResourceExceeded);
+    CHECK(trial.jet.active());
+    request.limits.steps = projected.used_steps();
+    const auto at_limit = take(cf::project_case_uniform_flow(std::move(trial), request));
+    CHECK(at_limit.used_steps() == projected.used_steps());
+
+    auto refusals = evaluate(field, current, work, time);
+    request.velocity[0].scale = zero.view();
+    reject(cf::project_case_uniform_flow(std::move(refusals), request),
+           core::FailureCode::InvalidInput);
+    request.velocity = host_requirements;
+    request.representation = static_cast<core::Precision>(255);
+    reject(cf::project_case_uniform_flow(std::move(refusals), request),
+           core::FailureCode::PrecisionUnsupported);
+    request.representation = core::Precision::TwoWord;
+    request.limits.input_integer_bits = 64;
+    reject(cf::project_case_uniform_flow(std::move(refusals), request),
+           core::FailureCode::ResourceExceeded);
+    request.limits.input_integer_bits = 4096;
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 declares request_stop non-const.
+    std::stop_source cancellation;
+    cancellation.request_stop();
+    reject(cf::project_case_uniform_flow(std::move(refusals), request, cancellation.get_token()),
+           core::FailureCode::Cancelled);
+    CHECK(refusals.jet.active());
+}
+
+TEST_CASE("Scaled rational projection preserves distant exact words and their exponent",
+          "[AE-07][N4-06][N4-08][property][negative]") {
+    using io::detail::SiRationalWordsView;
+    constexpr std::array<std::uint32_t, 1> one{1};
+    const SiRationalWordsView zero{0, {}, one}, unit{1, one, one};
+    const io::detail::SiRationalProjectionBudget exact{unit, zero, zero};
+    const io::detail::SiRationalProjectionLimits work{4096, budget};
+    const auto check_two = [&](SiRationalWordsView source, const Rat& expected, double high,
+                               double low) {
+        const auto result = take(io::detail::project_rational_words(
+            source, exact, core::Precision::TwoWord, work, {}, {}));
+        const auto* words = std::get_if<io::ScaledTwoWord>(&result.value);
+        if (!words)
+            FAIL("Requested two-word output");
+        CHECK(words->high == high);
+        CHECK(words->low == low);
+        CHECK(words->radius == 0.0);
+        within(result.value, expected, Rat{0});
+    };
+    std::array<std::uint32_t, 29> numerator{}, denominator{};
+    numerator.front() = 1;
+    numerator.back() = denominator.back() = 1U << 4U;
+    check_two({1, numerator, denominator}, 1 + two_power(-900), 1.0, std::ldexp(1.0, -900));
+
+    std::array<std::uint32_t, 34> at_two{}, grid{};
+    at_two.fill(std::numeric_limits<std::uint32_t>::max());
+    at_two.back() = (1U << 19U) - 1;
+    grid.back() = 1U << 18U;
+    check_two({1, at_two, grid}, 2 - two_power(-1074), 2.0,
+              -std::numeric_limits<double>::denorm_min());
+
+    std::array<std::uint32_t, 35> boundary{};
+    boundary.back() = 1U << 12U;
+    for (const auto& [source, power] : {std::pair{SiRationalWordsView{1, boundary, one}, 1100},
+                                        std::pair{SiRationalWordsView{-1, one, boundary}, -1100}}) {
+        const auto scaled = take(io::detail::project_rational_words(
+            source, exact, core::Precision::Binary64, work, {}, {}));
+        within(scaled.value, source.sign * two_power(power), Rat{0});
+    }
+    const std::array<std::uint32_t, 1> three{3};
+    reject(io::detail::project_rational_words({1, one, three}, exact, core::Precision::TwoWord,
+                                              work, {}, {}),
+           core::FailureCode::PrecisionUnresolved);
 }

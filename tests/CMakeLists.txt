@@ -746,7 +746,7 @@ target_include_directories(uvlas_test_aero_uniform_flow PRIVATE "${PROJECT_SOURC
 uvlas_add_test(coupling.case_uniform_flow
     LABELS V-AERO property negative verification
     SOURCES coupling/case_uniform_flow_test.cpp
-    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 
