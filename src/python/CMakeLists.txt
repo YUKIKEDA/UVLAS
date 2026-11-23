@@ -9,6 +9,9 @@ pybind11_add_module(uvlas_python MODULE NO_EXTRAS module.cpp)
 uvlas_configure_target(uvlas_python)
 target_link_libraries(uvlas_python PRIVATE uvlas_core uvlas_numerics)
 set_target_properties(uvlas_python PROPERTIES OUTPUT_NAME _uvlas)
+if(NOT CMAKE_CROSSCOMPILING)
+    uvlas_record_runtime_link(uvlas_python)
+endif()
 
 if(BUILD_TESTING)
     add_test(NAME python.ownership
