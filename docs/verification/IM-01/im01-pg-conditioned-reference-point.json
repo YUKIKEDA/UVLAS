@@ -1,0 +1,58 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-conditioned-reference-point",
+  "ids": [
+    "SH-D02",
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "253f17579d2b87ef60a2cdb42947d25e93812e50",
+  "claimed_state": "認定した離散基底変換から、片側のN、チャート偏微分、物理勾配、参照測度を厳密に評価した。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Debug / Release",
+    "boost": "1.92.0"
+  },
+  "checks": {
+    "debug_affected_ctest_passed": 2,
+    "release_affected_ctest_passed": 2,
+    "conditioning_cases": 2,
+    "conditioning_assertions": 18799,
+    "geometry_cases": 10,
+    "geometry_assertions": 1710,
+    "clang_tidy_translation_units": 3,
+    "rejected_mutation": {
+      "change": "add one to each nonzero point transform weight",
+      "failed_assertions": 25
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-reference-basis-contract.md": "08401786ad4d96b39e4719b75a0ae4ed28cefda39826bba75765a2481b7264e1",
+    "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
+    "include/uvlas/structure/pg_rank_preparation.hpp": "6b401b5e502965670a461ef19148e5aee8c990ad374ef61aff2a38d608da4b78",
+    "src/structure/pg_rank_preparation.cpp": "00f37fe1767471b075e41047fe8fedefe25c05bb17fcf37b8bdddc205e771f18",
+    "src/structure/pg_reference_domain.hpp": "73b04ad4e1536ce010aab0969f6ae2ba56b63d0424e600c85ad6c94869be9836",
+    "tests/structure/pg_partition_test_support.hpp": "b0bf52176dba19ccd94e4a6555aad3a26cb25c399ed98d9fc9be6c3aeb8d18cb",
+    "tests/structure/pg_reference_geometry_test.cpp": "9ea90ac5e06160b24246e2d069eebcbbdc83dd37788b4547c6163a87b4bf43fd",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "include/uvlas/structure/pg_reference_basis.hpp": "a4070b6ef199131f8f6baec6675a2ac76df4045b6a6351bb363bf6eca0478530",
+    "include/uvlas/structure/pg_conditioning.hpp": "c20efd468d32dccbd4f85116a1e03226b8b1b924141b98266d9cd23c584d532e",
+    "src/structure/pg_conditioning.cpp": "aea7a102bc0a5e85bb1a3467a4952002211c6ded5b93804a1ed5f660fe40d05e",
+    "src/structure/pg_reference_arithmetic.hpp": "775653032f0dc129701844b3287ba54ed4b1d120e2e0e84e03324282b0c31f67",
+    "src/structure/pg_reference_geometry.cpp": "8eb69cd5f8246202d5e795cea982af19bb4473d1af365edce289c679a6b551c0",
+    "tests/structure/pg_conditioning_test.cpp": "0f3dede976c6afddd850e7aaab17722b2ae45f90045be0129be5efce072bbb21",
+    "docs/verification/IM-01/im01-pg-discrete-conditioning.json": "ea7ec1ae310c4599da92082a624ca882615f523dd39dd0eab3397e8f5c6811f5",
+    "docs/verification/IM-01/pg-conditioned-reference-point/verification.md": "8debdb85d177ada0821e962cedb9ea1c45065e81059d585b0087bf7ccc98a315",
+    "docs/specs/structure/pg-conditioned-reference-point-contract.md": "2a1c54cbefac7f0e36707d0f943ff02c1632f6ecd769d1fbd9b1590d8c2f3e13"
+  }
+}
