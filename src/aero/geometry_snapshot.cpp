@@ -146,6 +146,12 @@ struct Run {
             return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
         return {};
     }
+    AeroResult<void> charge(std::uint64_t count) noexcept {
+        if (const auto allowed = check_steps(count); !allowed)
+            return allowed;
+        steps += count;
+        return {};
+    }
     AeroResult<void> step(Problem problem = {}) noexcept {
         if (stop.stop_requested())
             return std::unexpected(rejected(core::FailureCode::Cancelled, context, problem));
@@ -245,8 +251,9 @@ AeroResult<void> validate_time(pchip::RationalView time, Run& run) {
 
     const auto decode = [&](std::span<const std::uint32_t> words,
                             ExactInteger& value) -> AeroResult<void> {
+        std::uint64_t occupied = 0;
         for (auto it = words.rbegin(); it != words.rend(); ++it) {
-            if (const auto step = run.step(); !step)
+            if (const auto step = run.charge(++occupied); !step)
                 return step;
             value <<= 32;
             value += *it;
@@ -258,9 +265,14 @@ AeroResult<void> validate_time(pchip::RationalView time, Run& run) {
         return decoded;
     if (const auto decoded = decode(time.denominator, denominator); !decoded)
         return decoded;
+    const auto integer_words = [](const ExactInteger& value) {
+        return static_cast<std::uint64_t>(boost::multiprecision::msb(value)) / 32 + 1;
+    };
     auto a = numerator, b = denominator;
     while (b != 0) {
-        if (const auto step = run.step(); !step)
+        const auto left = integer_words(a), right = integer_words(b);
+        // Charge a conservative schoolbook quotient bound in 32-bit limb visits.
+        if (const auto step = run.charge(left * right + left + right); !step)
             return step;
         ExactInteger remainder = a % b;
         a = std::move(b);
@@ -269,7 +281,12 @@ AeroResult<void> validate_time(pchip::RationalView time, Run& run) {
     if (a != 1)
         return invalid();
 
-    if (const auto step = run.step(); !step)
+    // The binary64 grid midpoints fit in 66 limbs. Charge two full products,
+    // the grid decodes/additions, and shifting/comparing the exact numerator.
+    constexpr std::uint64_t binary_grid_words = (2099 + 31) / 32;
+    const auto widths = time.numerator.size() + time.denominator.size();
+    const auto midpoint_work = 2 * binary_grid_words * (time.denominator.size() + 3) + 3 * widths;
+    if (const auto step = run.charge(midpoint_work); !step)
         return step;
     // Compare exact adjacent midpoints, including subnormals and the overflow
     // midpoint, without taking a floating-point midpoint. Ties go to even.
@@ -513,6 +530,10 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
             return std::unexpected(r.error());
         if (auto step = run.step(); !step)
             return std::unexpected(step.error());
+        if (instant) {
+            if (const auto hashed = run.charge(4 + time_words); !hashed)
+                return std::unexpected(hashed.error());
+        }
         hash(*data);
         return OwnedGeometry{std::move(data), context};
     });
@@ -924,7 +945,8 @@ void GeometryEngine::hash(GeometryData& data) {
     // Preserve the legacy identity when no explicit exact instant was supplied.
     if (data.time_words.size() != 0) {
         word(UINT64_C(0x55564c415354494d));
-        word(static_cast<std::uint64_t>(data.time_sign + 1));
+        const auto encoded_sign = data.time_sign + 1;
+        word(static_cast<std::uint64_t>(encoded_sign));
         word(data.time_numerator_words);
         word(data.time_words.size());
         for (const auto digit : data.time_words.values())
