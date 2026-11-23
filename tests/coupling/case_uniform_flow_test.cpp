@@ -851,3 +851,126 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         reject(result.row(1), core::FailureCode::InvalidInput);
     }
 }
+
+TEST_CASE("Discrete nonpenetration matches an owned decimal event on its requested side",
+          "[AE-07][UW-D03][N4-06][verification]") {
+    auto input_case = source(
+        R"({"kind":"pchip","times":[0,0.1,0.2],"values":[[0,0,0.508],[0,0,0.508],[0,0,0.508]],"outside":{"kind":"reject"}})",
+        R"([{"start":0,"end":0.1,"step":0.1,"restart":"initial"},{"start":0.1,"end":0.2,"step":0.1,"restart":"event"}])");
+    input_case.field("units").set("time", string("s"));
+    input_case.field("units").set("length", string("m"));
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = import(input_case, io::SourceId{103}, flow_workspace);
+    const auto current = import(input_case, io::SourceId{104}, flow_workspace);
+    const Number zero{0}, one{1}, absolute{1, 1000000000}, event{1, 10}, remote{1, 5};
+    const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
+    const std::array budgets{component, component, component};
+    const cf::CaseFlowProjectionRequest projection{
+        core::Precision::TwoWord, budgets, budgets, {4096, budget}};
+    const auto project = [&](p::RationalView time, p::RequestedSide side) {
+        core::ResourcePlan resources{budget};
+        auto evaluation = take(cf::evaluate_case_uniform_flow(
+            provider, current, {stamp, time, side}, flow_workspace, limits.flow, resources));
+        return take(cf::project_case_uniform_flow(std::move(evaluation), projection));
+    };
+    constexpr auto words = [](std::uint64_t value) noexcept {
+        return std::array{static_cast<std::uint32_t>(value),
+                          static_cast<std::uint32_t>(value >> 32U)};
+    };
+    constexpr auto next_numerator = words(UINT64_C(100000000000000001));
+    constexpr auto next_denominator = words(UINT64_C(1000000000000000000));
+    const p::RationalView nearby{1, next_numerator, next_denominator};
+    const ResidualFixture fixture;
+    core::ResourcePlan memory{128ULL * 1024 * 1024};
+    auto geometry_work = test_geometry::workspace(memory);
+    const auto prepare = [&](p::RationalView exact_time) {
+        auto input = fixture.input();
+        input.context.time = 0.1;
+        input.exact_time = exact_time;
+        return a::prepare_owned_geometry(input, test_geometry::limits(), *geometry_work, memory);
+    };
+    const auto geometry = [&] {
+        Number original{1, 10};
+        auto captured = test_geometry::take(prepare(original.view()));
+        original.n[0] = 7;
+        original.d[0] = 9;
+        const auto copied = test_geometry::take(captured.exact_time());
+        if (!copied)
+            FAIL("The geometry did not copy the original time");
+        exact(*copied, event);
+        return captured;
+    }();
+    const auto retained = test_geometry::take(geometry.exact_time());
+    if (!retained)
+        FAIL("The geometry lost its original event time");
+    exact(*retained, event);
+
+    const auto alternative = test_geometry::take(prepare(nearby));
+    CHECK(geometry.context() == alternative.context());
+    CHECK(test_geometry::take(geometry.identity()) != test_geometry::take(alternative.identity()));
+    const auto inconsistent = prepare(remote.view());
+    if (inconsistent)
+        FAIL("The geometry accepted a disagreeing binary64 time");
+    CHECK(inconsistent.error().cause.code == core::FailureCode::InvalidInput);
+
+    const a::GlobalLimits cap{std::numeric_limits<std::uint64_t>::max() / 4,
+                              numerics::linear::EstimateAdmission{4096}};
+    auto global = take(a::GlobalWorkspace::create(memory, cap.metadata));
+    // The reference model can be reused at another exact current event.
+    const auto topology = take_global(
+        a::build_global_topology(alternative, fixture.topology(), cap, *global, memory));
+    const auto contact =
+        take_global(a::check_global_geometry(topology, geometry, cap, *global, memory));
+    const auto query = test_geometry::take(
+        a::resolve_query(geometry, {a::QueryId{29}, a::FreePoint{a::FreeSingle{{.75, .5, 0}}}},
+                         geometry.context(), test_geometry::limits(), *geometry_work, memory));
+    const std::array collocation{
+        cf::DiscreteCollocation{a::FacetId{200},
+                                query,
+                                {coordinates(1, 0, 0), coordinates(0, 2, 0)},
+                                coordinates(.25, .25, .5),
+                                a::DoubleWord{.75, 0x1p-60},
+                                a::SingleWord{-.5}}};
+    const auto old_id = a::P1StrengthId{0};
+    const std::array wake{cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, old_id}};
+    const std::array history{cf::FrozenWakeTrace{old_id, a::SingleWord{-.25}}};
+    const cf::DiscreteNonpenetrationInput view{contact,
+                                               collocation,
+                                               wake,
+                                               {core::AcceptedStateId{2}, history},
+                                               {7, 11},
+                                               stamp,
+                                               p::RequestedSide::Right};
+    const cf::DiscreteNonpenetrationLimits residual_limits{
+        {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10},
+        {test_geometry::limits(),
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(6000000000)};
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const auto run = [&](cf::ProjectedCaseUniformFlow& flow) {
+        return cf::evaluate_discrete_nonpenetration(view, std::move(flow), residual_limits, shared,
+                                                    *local, *kernel, memory);
+    };
+    auto wrong_time = project(nearby, p::RequestedSide::Right);
+    reject(run(wrong_time), core::FailureCode::StaleGeneration);
+    CHECK(wrong_time.source().jet.active());
+    auto wrong_side = project(event.view(), p::RequestedSide::Left);
+    reject(run(wrong_side), core::FailureCode::StaleGeneration);
+    CHECK(wrong_side.source().jet.active());
+
+    auto right = project(event.view(), p::RequestedSide::Right);
+    const auto result = take(run(right));
+    exact(take(result.flow().source().jet.time()), event);
+    CHECK(result.flow().source().requested_side == p::RequestedSide::Right);
+    const auto row = take(result.row(0));
+    const Rat denominator{Big{"10000000000000000000000000000000000000000"}};
+    residual_expected(row.residual,
+                      -Rat{Big{"5671057487729860677895669210567132495399"}} / denominator);
+    residual_expected(row.circulation_action,
+                      Rat{Big{"3730450057081755951141985320248458351172"}} / denominator);
+}

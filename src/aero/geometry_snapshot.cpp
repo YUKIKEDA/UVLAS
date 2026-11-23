@@ -103,6 +103,8 @@ ScalarWords restore(const ParameterStorage& words) {
         return DoubleWord{(*p)[0], (*p)[1]};
     throw std::logic_error("Invalid parameter storage");
 }
+// A context is the legacy request stamp. The owned snapshot identity also binds
+// the exact time, when present, and is retained by every resolved query.
 bool same_context(const GeometryContext& a, const GeometryContext& b) noexcept {
     return a.fingerprint == b.fingerprint && a.model == b.model && a.reference == b.reference &&
            a.current == b.current && a.mapping == b.mapping && a.connectivity == b.connectivity &&
@@ -191,6 +193,7 @@ ScalarWords input_position(PositionView view, std::size_t index) {
     throw std::logic_error("Invalid position view");
 }
 AeroResult<std::uint64_t> footprint(const GeometryCounts& n, std::uint8_t wr, std::uint8_t wc,
+                                    std::uint64_t time_words,
                                     const GeometryContext& context) noexcept {
     std::uint64_t total = 0;
     const auto add = [&](std::uint64_t count, std::uint64_t bytes) {
@@ -209,13 +212,87 @@ AeroResult<std::uint64_t> footprint(const GeometryCounts& n, std::uint8_t wr, st
         !add(n.faces, sizeof(FaceStorage) + sizeof(IdLookup)) ||
         !add(n.bands, sizeof(std::uint64_t) + sizeof(IdLookup)) ||
         !add(n.triangles, sizeof(TriangleStorage)) || !add(n.quads, sizeof(QuadStorage)) ||
-        !add(facets, sizeof(FacetStorage) + sizeof(IdLookup)))
+        !add(facets, sizeof(FacetStorage) + sizeof(IdLookup)) ||
+        !add(time_words, sizeof(std::uint32_t)))
         return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
     // SHA-256's canonical message has a 64-bit bit count, not an arbitrary wraparound.
-    if (total > std::numeric_limits<std::uint64_t>::max() / 8 - 1024)
+    if (total >
+        std::numeric_limits<std::uint64_t>::max() / 8 - 1024 - time_words * sizeof(std::uint32_t))
         return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
     return total;
 }
+// Two finite binary64 encodings summed on the 2^-1074 grid require at
+// most 2099 bits. Leave that headroom for the exact rounding comparisons.
+constexpr std::size_t time_integer_words = (std::numeric_limits<ExactInteger>::digits - 2099) / 32;
+
+AeroResult<void> validate_time(pchip::RationalView time, Run& run) {
+    const auto invalid = [&] {
+        return std::unexpected(rejected(core::FailureCode::InvalidInput, run.context));
+    };
+    if (time.denominator.empty() || time.denominator.back() == 0)
+        return invalid();
+    const auto raw = std::bit_cast<std::uint64_t>(run.context.time);
+    const auto bits = raw & UINT64_C(0x7fffffffffffffff);
+    if (time.sign == 0) {
+        if (!time.numerator.empty() || time.denominator.size() != 1 || time.denominator[0] != 1 ||
+            bits != 0)
+            return invalid();
+        return {};
+    }
+    if (time.sign != ((raw >> 63U) == 0 ? 1 : -1) || time.numerator.empty() ||
+        time.numerator.back() == 0)
+        return invalid();
+
+    const auto decode = [&](std::span<const std::uint32_t> words,
+                            ExactInteger& value) -> AeroResult<void> {
+        for (auto it = words.rbegin(); it != words.rend(); ++it) {
+            if (const auto step = run.step(); !step)
+                return step;
+            value <<= 32;
+            value += *it;
+        }
+        return {};
+    };
+    ExactInteger numerator, denominator;
+    if (const auto decoded = decode(time.numerator, numerator); !decoded)
+        return decoded;
+    if (const auto decoded = decode(time.denominator, denominator); !decoded)
+        return decoded;
+    auto a = numerator, b = denominator;
+    while (b != 0) {
+        if (const auto step = run.step(); !step)
+            return step;
+        ExactInteger remainder = a % b;
+        a = std::move(b);
+        b = std::move(remainder);
+    }
+    if (a != 1)
+        return invalid();
+
+    if (const auto step = run.step(); !step)
+        return step;
+    // Compare exact adjacent midpoints, including subnormals and the overflow
+    // midpoint, without taking a floating-point midpoint. Ties go to even.
+    numerator <<= 1075;
+    ExactInteger center, neighbor;
+    decode_into(std::bit_cast<double>(bits), 0, center);
+    const bool odd = (bits & 1U) != 0;
+    if (bits != 0) {
+        decode_into(std::bit_cast<double>(bits - 1), 0, neighbor);
+        neighbor = (center + neighbor) * denominator;
+        if (numerator < neighbor || (numerator == neighbor && odd))
+            return invalid();
+    }
+    if (bits == UINT64_C(0x7fefffffffffffff))
+        neighbor = ExactInteger{1} << 2098;
+    else
+        decode_into(std::bit_cast<double>(bits + 1), 0, neighbor);
+    neighbor = (center + neighbor) * denominator;
+    if (numerator > neighbor || (numerator == neighbor && odd))
+        return invalid();
+    return {};
+}
+
 template <class T>
 AeroResult<void> allocate(core::PlannedBuffer<T>& destination, std::uint64_t count,
                           core::ResourcePlan& plan, const GeometryContext& context) noexcept {
@@ -310,7 +387,14 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
             !fits(n.faces, limits.counts.faces) || !fits(n.bands, limits.counts.bands) ||
             !fits(n.triangles, limits.counts.triangles) || !fits(n.quads, limits.counts.quads))
             return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
-        auto bytes = footprint(n, word_count(input.reference), word_count(input.current), context);
+        const auto instant = input.exact_time;
+        if (instant && (instant->numerator.size() > time_integer_words ||
+                        instant->denominator.size() > time_integer_words))
+            return std::unexpected(rejected(core::FailureCode::ResourceExceeded, context));
+        const auto time_words =
+            instant ? instant->numerator.size() + instant->denominator.size() : 0;
+        auto bytes = footprint(n, word_count(input.reference), word_count(input.current),
+                               time_words, context);
         if (!bytes)
             return std::unexpected(bytes.error());
         // Admit the complete point-word phase before selecting its canonical
@@ -390,12 +474,32 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
                 return r;
             if (auto r = allocate(data->band_lookup, n.bands, plan, context); !r)
                 return r;
-            return allocate(data->facet_lookup, facets, plan, context);
+            if (auto r = allocate(data->facet_lookup, facets, plan, context); !r)
+                return r;
+            return allocate(data->time_words, time_words, plan, context);
         };
         if (auto r = allocate_all(); !r)
             return std::unexpected(r.error());
         if (auto r = copy(input, *data, run); !r)
             return std::unexpected(r.error());
+        if (instant) {
+            data->time_sign = instant->sign;
+            data->time_numerator_words = instant->numerator.size();
+            auto words = data->time_words.values();
+            std::size_t i = 0;
+            for (const auto part : {instant->numerator, instant->denominator})
+                for (const auto word : part) {
+                    if (auto step = run.step(); !step)
+                        return std::unexpected(step.error());
+                    words[i++] = word;
+                }
+            const auto split = data->time_numerator_words;
+            const pchip::RationalView captured{data->time_sign, words.first(split),
+                                               words.subspan(split)};
+            // A present time requires a denominator, even for exact zero.
+            if (auto checked = validate_time(captured, run); !checked)
+                return std::unexpected(checked.error());
+        }
         // No external input is read after this snapshot boundary.
         if (auto r = lookups(*data, run); !r)
             return std::unexpected(r.error());
@@ -817,9 +921,29 @@ void GeometryEngine::hash(GeometryData& data) {
         for (const auto id : q.facets)
             word(id);
     }
+    // Preserve the legacy identity when no explicit exact instant was supplied.
+    if (data.time_words.size() != 0) {
+        word(UINT64_C(0x55564c415354494d));
+        word(static_cast<std::uint64_t>(data.time_sign + 1));
+        word(data.time_numerator_words);
+        word(data.time_words.size());
+        for (const auto digit : data.time_words.values())
+            word(digit);
+    }
     const auto result = digest.result();
     for (std::size_t i = 0; i < data.identity.size(); ++i)
         data.identity[i] = static_cast<std::byte>(result[i]);
+}
+
+AeroResult<std::optional<pchip::RationalView>> OwnedGeometry::exact_time() const& noexcept {
+    if (!data_)
+        return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
+    if (data_->time_words.size() == 0)
+        return std::optional<pchip::RationalView>{};
+    const auto words = data_->time_words.values();
+    const auto split = data_->time_numerator_words;
+    return std::optional{
+        pchip::RationalView{data_->time_sign, words.first(split), words.subspan(split)}};
 }
 
 AeroResult<std::array<std::byte, 32>> OwnedGeometry::identity() const noexcept {
