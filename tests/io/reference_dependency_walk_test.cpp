@@ -197,7 +197,7 @@ TEST_CASE("Shared reference depth is independent of root declaration order",
     // The longest path is 0 -> 1 -> 2 -> 3. The manifest also declares 2 directly.
     constexpr std::array<Index, 4> expected_order{3, 2, 1, 0};
     for (const bool shared_root_first : {false, true}) {
-        for (const std::uint64_t depth : {3, 4}) {
+        for (const auto depth : std::array<std::uint64_t, 2>{3, 4}) {
             CAPTURE(shared_root_first, depth);
             core::ResourcePlan plan{(8 + 2 * depth) * sizeof(Index)};
             auto walk = take(rd::DependencyWalk::create({4, 5, depth, 25, 0}, plan, {}));
