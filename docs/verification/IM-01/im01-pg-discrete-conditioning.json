@@ -46,11 +46,37 @@
   },
   "artifacts": {
     "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
-    "docs/verification/IM-01/pg-discrete-conditioning/verification.md": "8283ca93f6f707d85a942b59f276bea7b06092f90e1d290005cfc29f20c6ce37",
+    "docs/verification/IM-01/pg-discrete-conditioning/verification.md": "506dd022695f0a3c491c00e3d6e213867ab5e464c03e4c17cc8d9cdc537dc23a",
     "include/uvlas/structure/pg_conditioning.hpp": "ebe9e71d59a40432c00c3083cf2553023169c9eeaeb30b4646c04dfe46de8494",
     "src/structure/pg_conditioning.cpp": "235e039a6166f5b4cef2c5098d5972335d44728a29df923ca7ddf26c3241468d",
     "src/structure/pg_rank_storage.hpp": "1b0acf007bf39909c62e8e58a28482e487ab6598ade8ef80e3c484f03ee347f2",
     "src/structure/pg_rank_preparation.cpp": "00f37fe1767471b075e41047fe8fedefe25c05bb17fcf37b8bdddc205e771f18",
-    "tests/structure/pg_conditioning_test.cpp": "50407fe22e1300a123e50732c159ddfde11f1c757f1e534d16c9700691dc278c"
+    "tests/structure/pg_conditioning_test.cpp": "3bdf16ae06b57814945d5f13eb79bccaef75e7d6c7f07e84a764b601a3f84cdc"
+  },
+  "review_284": {
+    "historical_artifacts": {
+      "commit": "dd4aa81996fdd0a63f2a0ed3380d924a467d415a",
+      "sha256": {
+        "tests/structure/pg_conditioning_test.cpp": "50407fe22e1300a123e50732c159ddfde11f1c757f1e534d16c9700691dc278c",
+        "docs/verification/IM-01/pg-discrete-conditioning/verification.md": "8283ca93f6f707d85a942b59f276bea7b06092f90e1d290005cfc29f20c6ce37"
+      }
+    },
+    "test_commit": "3499bfc7d0f4e1e8fd4a3a8e0e6f8db4e6c7a7f7",
+    "environment": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "boost": "1.92.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "checks": {
+      "baseline_ctest_exit": 8,
+      "fixed_ctest_passed": 1,
+      "test_cases": 2,
+      "assertions": 18704
+    }
   }
 }
