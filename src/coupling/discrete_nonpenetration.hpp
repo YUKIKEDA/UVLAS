@@ -9,6 +9,16 @@ using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 /// Explicit discrete collocation in the current geometry. The tangents orient its
 /// normal and the velocity is in m/s. No physical PG mapping is inferred.
 struct DiscreteCollocation {
+    DiscreteCollocation(aero::detail::FacetId source, const aero::detail::ResolvedQuery& point,
+                        const std::array<NonpenetrationVector, 2>& frame,
+                        const NonpenetrationVector& motion, const aero::detail::ScalarWords& gamma,
+                        const aero::detail::ScalarWords& direction) noexcept
+        : facet(source),
+          query(point),
+          tangents(frame),
+          velocity(motion),
+          circulation(gamma),
+          circulation_direction(direction) {}
     aero::detail::FacetId facet; ///< Either child of the bound physical quadrilateral.
     const aero::detail::ResolvedQuery& query;
     std::array<NonpenetrationVector, 2> tangents;
@@ -19,6 +29,10 @@ struct DiscreteCollocation {
 
 struct AttachedWakeFront {};
 struct DiscreteWakePanel {
+    DiscreteWakePanel(aero::detail::FacetId source,
+                      std::variant<AttachedWakeFront, aero::detail::P1StrengthId> left,
+                      aero::detail::P1StrengthId right) noexcept
+        : facet(source), leading(left), trailing(right) {}
     aero::detail::FacetId facet; ///< Either child of the retained wake quadrilateral.
     std::variant<AttachedWakeFront, aero::detail::P1StrengthId> leading;
     aero::detail::P1StrengthId trailing;
@@ -29,11 +43,27 @@ struct FrozenWakeTrace {
     aero::detail::ScalarWords strength;
 };
 struct FrozenWakeTraces {
+    FrozenWakeTraces(core::AcceptedStateId accepted,
+                     std::span<const FrozenWakeTrace> trace_columns) noexcept
+        : parent(accepted), columns(trace_columns) {}
     core::AcceptedStateId parent;
     std::span<const FrozenWakeTrace> columns; ///< Strictly increasing independent history IDs.
 };
 
 struct DiscreteNonpenetrationInput {
+    DiscreteNonpenetrationInput(const aero::detail::GlobalContactState& qualified,
+                                std::span<const DiscreteCollocation> rows,
+                                std::span<const DiscreteWakePanel> wake_panels,
+                                FrozenWakeTraces frozen, aero::detail::P1ActionStamp trial,
+                                aero::detail::pchip::PchipInputStamp known_flow,
+                                aero::detail::pchip::RequestedSide side) noexcept
+        : contact(qualified),
+          collocations(rows),
+          wake(wake_panels),
+          history(frozen),
+          trial_stamp(trial),
+          flow_stamp(known_flow),
+          flow_side(side) {}
     const aero::detail::GlobalContactState& contact;
     std::span<const DiscreteCollocation> collocations;
     std::span<const DiscreteWakePanel> wake;
@@ -44,6 +74,15 @@ struct DiscreteNonpenetrationInput {
 };
 
 struct DiscreteNonpenetrationLimits {
+    DiscreteNonpenetrationLimits(aero::detail::LocalAccuracy packet,
+                                 aero::detail::P1Accuracy action,
+                                 const aero::detail::P1AssemblyLimits& assembly,
+                                 std::uint64_t per_action, std::uint64_t total) noexcept
+        : geometry_accuracy(packet),
+          induction_accuracy(action),
+          induction(assembly),
+          action_steps(per_action),
+          steps(total) {}
     aero::detail::LocalAccuracy geometry_accuracy;
     aero::detail::P1Accuracy induction_accuracy;
     aero::detail::P1AssemblyLimits induction;

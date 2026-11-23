@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <bit>
+#include <cmath>
 #include <limits>
 
 namespace uvlas::coupling::detail {
@@ -52,20 +53,25 @@ core::PlannedBuffer<T> allocate(core::ResourcePlan& resources, std::uint64_t cou
     return require(resources.allocate<T>(static_cast<core::Index>(count), evaluate));
 }
 
+p::Interval checked_word(double word) {
+    if (!std::isfinite(word))
+        reject(core::FailureCode::Nonfinite);
+    return a::decode_p1_word(word);
+}
 p::Interval import(const a::ScalarWords& words, p::Work& work) {
     work.step();
     if (const auto* single = std::get_if<a::SingleWord>(&words))
-        return a::decode_p1_word(single->value);
+        return checked_word(single->value);
     const auto* two = std::get_if<a::DoubleWord>(&words);
     if (two == nullptr)
         reject(core::FailureCode::InvalidInput);
-    return p::add(a::decode_p1_word(two->high), a::decode_p1_word(two->low), work);
+    return p::add(checked_word(two->high), checked_word(two->low), work);
 }
 Vector import(const NonpenetrationVector& value, p::Work& work) {
     return {import(value[0], work), import(value[1], work), import(value[2], work)};
 }
-p::Interval enclose(p::Interval center, double radius, int scale, p::Work& work) {
-    const auto error = a::decode_p1_word(radius);
+p::Interval enclose(const p::Interval& center, double radius, int scale, p::Work& work) {
+    const auto error = checked_word(radius);
     return p::scale(
         p::Interval{p::subtract(center, error, work).lower, p::add(center, error, work).upper},
         scale);
@@ -107,14 +113,19 @@ Vector difference(const Vector& a, const Vector& b, p::Work& work) {
     return {p::subtract(a[0], b[0], work), p::subtract(a[1], b[1], work),
             p::subtract(a[2], b[2], work)};
 }
+void require_positive(const p::Interval& interval) {
+    if (p::compare(interval.upper, {}) <= 0)
+        reject(core::FailureCode::GeometryInvalid);
+    if (p::compare(interval.lower, {}) <= 0)
+        reject(core::FailureCode::PrecisionUnresolved);
+}
 Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel,
                       const DiscreteCollocation& input, p::Work& work) {
     const auto tx = import(input.tangents[0], work);
     const auto ty = import(input.tangents[1], work);
     auto normal = cross(tx, ty, work);
     const auto length2 = dot(normal, normal, work);
-    if (p::compare(length2.lower, {}) <= 0)
-        reject(core::FailureCode::GeometryInvalid);
+    require_positive(length2);
     for (auto facet : panel.facets) {
         const auto ids = require(geometry.facet_points(facet));
         const auto x0 =
@@ -126,8 +137,7 @@ Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel
         const auto edge1 = difference(x1, x0, work);
         const auto edge2 = difference(x2, x0, work);
         const auto outward = cross(edge1, edge2, work);
-        if (p::compare(dot(normal, outward, work).lower, {}) <= 0)
-            reject(core::FailureCode::GeometryInvalid);
+        require_positive(dot(normal, outward, work));
     }
     const auto length = p::square_root(length2, work);
     for (auto& coordinate : normal)
@@ -139,7 +149,7 @@ Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel
 // dyadic, using the canonical limbs of the independently qualified flow jet.
 bool same_time(double word, a::pchip::RationalView time, p::Work& work) {
     work.step();
-    const auto value = a::decode_p1_word(word).lower;
+    const auto value = checked_word(word).lower;
     if (value.mantissa == 0)
         return time.sign == 0;
     const bool negative = value.mantissa < 0;
@@ -149,7 +159,8 @@ bool same_time(double word, a::pchip::RationalView time, p::Work& work) {
     const auto trailing = boost::multiprecision::lsb(magnitude);
     const p::Integer normalized = magnitude >> trailing;
     const auto mantissa = normalized.convert_to<std::uint64_t>();
-    const auto power = p::exponent(static_cast<std::int64_t>(value.power) + trailing);
+    const auto power =
+        p::exponent(static_cast<std::int64_t>(value.power) + static_cast<std::int64_t>(trailing));
     const auto equal_words = [&](std::span<const std::uint32_t> limbs, std::uint64_t digits,
                                  unsigned shift) {
         const auto width = static_cast<unsigned>(std::bit_width(digits)) + shift;
@@ -285,7 +296,7 @@ struct NonpenetrationBuilder {
         auto maps = allocate<a::P1FaceStrengths>(memory, face_count);
         auto traces = allocate<Trace>(memory, face_count + input.history.columns.size());
         auto attachments = allocate<std::uint64_t>(memory, input.contact.trailing_edge_count());
-        auto trace = traces.values();
+        const auto trace = traces.values();
         std::size_t num_traces = 0;
         for (std::size_t i = 0; i < bound_count; ++i) {
             const auto& row = input.collocations[i];
