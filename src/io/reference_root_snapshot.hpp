@@ -84,10 +84,10 @@ struct PendingRootDependencies {
 };
 
 struct ReferenceWalkStartView {
-    SchemaIdentity parent;
+    SchemaIdentity parent{{SourceId{0}, 0, {}}, 0, 0};
     DependencyWalkView walk;
     // Present only after the first reference has been authenticated and entered.
-    const PendingRootDependencies* pending_root;
+    const PendingRootDependencies* pending_root = nullptr;
 };
 
 // Owns an intermediate walk before role-specific dependency extraction. Views borrow this

@@ -119,8 +119,9 @@ private:
 
 std::uint64_t unsigned_number(Token token) {
     std::uint64_t value = 0;
-    const auto end = token.text.data() + token.text.size();
-    const auto parsed = std::from_chars(token.text.data(), end, value);
+    const auto* first = token.text.data();
+    const auto* end = first + token.text.size();
+    const auto parsed = std::from_chars(first, end, value);
     if (parsed.ec != std::errc{} || parsed.ptr != end)
         reject(InvalidInput, token.offset);
     return value;
@@ -315,9 +316,9 @@ private:
             amount = count(input_.word(), remaining_count(limits_.entities, result_.entities));
             result_.entities += amount;
         }
-        for (std::uint8_t dim = 0; dim < dimensions.size(); ++dim) {
+        for (std::size_t dim = 0; dim < dimensions.size(); ++dim) {
             for (std::size_t i = 0; i < dimensions[dim]; ++i)
-                entity(dim, record++);
+                entity(static_cast<std::uint8_t>(dim), record++);
         }
         input_.expect("$EndEntities");
     }

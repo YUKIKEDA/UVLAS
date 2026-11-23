@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -105,6 +106,12 @@ AcquiredRootSnapshot snapshot(std::string_view text, const SourceDigest* expecte
     return {location, std::move(*result), {}};
 }
 
+template <class T>
+T take_view(std::optional<T> value) {
+    if (!value)
+        throw std::logic_error("Missing mesh or source view");
+    return *value;
+}
 std::string edited(std::string_view from, std::string_view to) {
     auto copy = std::string{mesh};
     const auto offset = copy.find(from);
@@ -121,54 +128,52 @@ TEST_CASE("Gmsh prepares the adopted mesh types and keeps original tags, order a
     const auto value = [] {
         constexpr auto digest = fixture_digest();
         const auto input = snapshot(mesh, &digest);
-        const auto before = input.file.view();
-        REQUIRE(before);
+        const auto before = take_view(input.file.view());
         core::ResourcePlan memory{10000};
         AllocationAudit audit{cpp_backend, AuditThreadDomain::AllThreads};
         auto output = GmshMesh::prepare(input, limits, memory, {});
         CHECK(audit.finish().cpp_allocation_attempts == 6);
         REQUIRE(output);
-        CHECK(std::ranges::equal(input.file.view()->bytes, before->bytes));
-        CHECK(output->view()->digest == before->digest);
+        CHECK(std::ranges::equal(take_view(input.file.view()).bytes, before.bytes));
+        CHECK(take_view(output->view()).digest == before.digest);
         return std::move(*output);
     }();
-    const auto view = value.view();
-    REQUIRE(view);
-    CHECK(view->bytes == mesh);
-    CHECK(view->location.parent.source.source == SourceId{19});
-    CHECK(view->location.source == SourceId{81});
-    CHECK(view->location.declaration_node == 5);
-    CHECK(view->entities_declared);
-    CHECK(view->physical_names.size() == 3);
-    CHECK(view->physical_names[0].group == GmshKey{0, 7});
-    CHECK(view->physical_names[1].group == GmshKey{1, 7});
-    CHECK(view->physical_names[2].group == GmshKey{2, 7});
-    CHECK(view->text(view->physical_names[2].name) == "wing skin");
-    REQUIRE(view->entities.size() == 4);
-    const auto& surface = view->entities[3];
+    const auto view = take_view(value.view());
+    CHECK(view.bytes == mesh);
+    CHECK(view.location.parent.source.source == SourceId{19});
+    CHECK(view.location.source == SourceId{81});
+    CHECK(view.location.declaration_node == 5);
+    CHECK(view.entities_declared);
+    CHECK(view.physical_names.size() == 3);
+    CHECK(view.physical_names[0].group == GmshKey{0, 7});
+    CHECK(view.physical_names[1].group == GmshKey{1, 7});
+    CHECK(view.physical_names[2].group == GmshKey{2, 7});
+    CHECK(view.text(view.physical_names[2].name) == "wing skin");
+    REQUIRE(view.entities.size() == 4);
+    const auto& surface = view.entities[3];
     CHECK(surface.key == GmshKey{2, 17});
     REQUIRE(surface.physical_count == 1);
-    CHECK(view->entity_links[surface.first_physical].key == GmshKey{2, 7});
+    CHECK(view.entity_links[surface.first_physical].key == GmshKey{2, 7});
     REQUIRE(surface.boundary_count == 1);
-    CHECK(view->entity_links[surface.first_boundary].key == GmshKey{1, 3});
-    CHECK(view->entity_links[surface.first_boundary].reversed);
-    REQUIRE(view->nodes.size() == 4);
-    CHECK(view->nodes[0].tag == 11);
-    CHECK(view->text(view->nodes[0].coordinates[0]) == "-0");
-    CHECK(view->nodes[1].tag == 42);
-    CHECK(view->text(view->nodes[1].coordinates[0]) == "1.");
-    CHECK(view->nodes[2].tag == 400);
-    CHECK(view->text(view->nodes[2].parameters[1]) == "+.250");
-    CHECK(view->nodes[3].tag == huge_node);
-    CHECK(view->nodes[3].parametric);
-    CHECK(view->text(view->nodes[3].parameters[1]) == "-0.25");
-    REQUIRE(view->elements.size() == 4);
-    CHECK(view->elements[0].kind == GmshElementKind::Point);
-    CHECK(view->elements[1].kind == GmshElementKind::Line);
-    CHECK(view->elements[2].kind == GmshElementKind::Triangle);
-    CHECK(view->elements[3].kind == GmshElementKind::Quadrangle);
+    CHECK(view.entity_links[surface.first_boundary].key == GmshKey{1, 3});
+    CHECK(view.entity_links[surface.first_boundary].reversed);
+    REQUIRE(view.nodes.size() == 4);
+    CHECK(view.nodes[0].tag == 11);
+    CHECK(view.text(view.nodes[0].coordinates[0]) == "-0");
+    CHECK(view.nodes[1].tag == 42);
+    CHECK(view.text(view.nodes[1].coordinates[0]) == "1.");
+    CHECK(view.nodes[2].tag == 400);
+    CHECK(view.text(view.nodes[2].parameters[1]) == "+.250");
+    CHECK(view.nodes[3].tag == huge_node);
+    CHECK(view.nodes[3].parametric);
+    CHECK(view.text(view.nodes[3].parameters[1]) == "-0.25");
+    REQUIRE(view.elements.size() == 4);
+    CHECK(view.elements[0].kind == GmshElementKind::Point);
+    CHECK(view.elements[1].kind == GmshElementKind::Line);
+    CHECK(view.elements[2].kind == GmshElementKind::Triangle);
+    CHECK(view.elements[3].kind == GmshElementKind::Quadrangle);
     constexpr std::array quad{std::uint64_t{11}, std::uint64_t{42}, huge_node, std::uint64_t{400}};
-    CHECK(std::ranges::equal(view->elements[3].connectivity(), quad));
+    CHECK(std::ranges::equal(view.elements[3].connectivity(), quad));
 }
 
 TEST_CASE("Gmsh accepts sparse repeated sections and does not invent optional groups",
@@ -199,15 +204,14 @@ $EndElements
     const GmshLimits minimal{sparse.size(), 0, 0, 0, 2, 1, 10000};
     const auto parsed = GmshMesh::prepare(input, minimal, plan, {});
     REQUIRE(parsed);
-    const auto view = parsed->view();
-    REQUIRE(view);
-    CHECK_FALSE(view->entities_declared);
-    CHECK(view->physical_names.empty());
-    CHECK(view->entity_links.empty());
-    REQUIRE(view->nodes.size() == 2);
-    CHECK(view->nodes[0].tag == 11);
-    CHECK(view->text(view->nodes[0].coordinates[0]) == "1e-500");
-    CHECK(view->nodes[1].tag == 42);
+    const auto view = take_view(parsed->view());
+    CHECK_FALSE(view.entities_declared);
+    CHECK(view.physical_names.empty());
+    CHECK(view.entity_links.empty());
+    REQUIRE(view.nodes.size() == 2);
+    CHECK(view.nodes[0].tag == 11);
+    CHECK(view.text(view.nodes[0].coordinates[0]) == "1e-500");
+    CHECK(view.nodes[1].tag == 42);
 }
 
 TEST_CASE("Gmsh distinguishes inconsistent mesh topology from unsupported sections and kinds",
@@ -244,7 +248,7 @@ TEST_CASE("Gmsh distinguishes inconsistent mesh topology from unsupported sectio
         REQUIRE_FALSE(result);
         CHECK(result.error().code == trial.code);
         CHECK(offset <= bytes.size());
-        CHECK(input.file.view()->bytes.size() == bytes.size());
+        CHECK(take_view(input.file.view()).bytes.size() == bytes.size());
     }
 }
 
@@ -254,14 +258,13 @@ TEST_CASE("Gmsh mesh resource bounds include the saved bytes and both syntax and
     core::ResourcePlan memory{10000};
     const auto parsed = GmshMesh::prepare(input, limits, memory, {});
     REQUIRE(parsed);
-    const auto view = parsed->view();
-    REQUIRE(view);
+    const auto view = take_view(parsed->view());
     const auto bytes = memory.allocated_bytes();
     REQUIRE(bytes > 0);
-    REQUIRE(view->work > 3 * mesh.size());
+    REQUIRE(view.work > 3 * mesh.size());
 
     auto quota = limits;
-    quota.work = view->work;
+    quota.work = view.work;
     core::ResourcePlan exact{bytes};
     CHECK(GmshMesh::prepare(input, quota, exact, {}));
     CHECK(exact.allocated_bytes() == bytes);
