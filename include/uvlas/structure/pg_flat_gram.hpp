@@ -6,7 +6,7 @@ namespace uvlas::structure {
 
 struct PgFlatGramLimits {
     PgReferenceLimits arithmetic;
-    std::uint64_t maximum_integer_steps;
+    std::uint64_t maximum_integer_steps = 0;
 };
 
 /// Density-one geometric Gram enclosure for a full, flat chart of constant thickness.
