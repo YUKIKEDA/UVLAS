@@ -71,6 +71,9 @@ target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/i
 target_link_libraries(uvlas_structure PUBLIC uvlas_core PRIVATE Boost::headers Boost::hash2)
 
 if(UVLAS_BUILD_PYTHON)
+    if(NOT CMAKE_CROSSCOMPILING)
+        include(cmake/RuntimeArtifactReceipts.cmake)
+    endif()
     if(NOT "python" IN_LIST VCPKG_MANIFEST_FEATURES)
         message(FATAL_ERROR "UVLAS_BUILD_PYTHON requires the vcpkg python feature")
     endif()
@@ -131,9 +134,32 @@ uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_link_libraries(uvlas_cli PRIVATE uvlas_core)
 
+option(UVLAS_ENABLE_PRIVATE_RUNTIME_IMAGE "Enable the local Release runtime image component" OFF)
+if(UVLAS_ENABLE_PRIVATE_RUNTIME_IMAGE)
+    include(cmake/PrivateRuntimeImage.cmake)
+endif()
+
 add_executable(uvlas_eigen_generalized_canary qa/eigen_generalized/main.cpp)
 uvlas_configure_target(uvlas_eigen_generalized_canary)
 target_link_libraries(uvlas_eigen_generalized_canary PRIVATE uvlas_numerics)
+
+if(UVLAS_BUILD_PYTHON AND NOT CMAKE_CROSSCOMPILING)
+    uvlas_record_runtime_link(uvlas_cli)
+    add_custom_target(uvlas_runtime_artifact_manifest
+        COMMAND "${CMAKE_COMMAND}"
+            "-DCONFIG=$<CONFIG>"
+            "-DCLI=$<TARGET_FILE:uvlas_cli>"
+            "-DEXTENSION=$<TARGET_FILE:uvlas_python>"
+            "-DCLI_RECEIPT=${uvlas_runtime_receipt_dir}/uvlas_cli-$<CONFIG>.sha256"
+            "-DEXTENSION_RECEIPT=${uvlas_runtime_receipt_dir}/uvlas_python-$<CONFIG>.sha256"
+            "-DREVISION_HEADER=${uvlas_runtime_revision_header}"
+            "-DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+            "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/runtime-artifacts-$<CONFIG>.json"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RuntimeArtifactManifest.cmake"
+        DEPENDS uvlas_cli uvlas_python
+        VERBATIM)
+endif()
+
 
 if(BUILD_TESTING)
     include(cmake/AllocationAudit.cmake)

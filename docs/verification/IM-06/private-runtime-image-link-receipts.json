@@ -1,0 +1,122 @@
+{
+  "windows": {
+    "link_receipt": {
+      "clean_relink_recreated_receipt_and_manifest": true,
+      "commit": "b299413e0d33326249192b4689f84d93b06753a1",
+      "compiler": "MSVC 19.51.36260.0",
+      "foreign_extension_sha256": "32282b650f6b5c70236c607b20a7d4fbac498015586108b9d8cc5d1b0bdd869b",
+      "foreign_extension_with_matching_stale_receipt_exit": 1,
+      "preserved_mtime_foreign_extension_exit": 1,
+      "previous_artifact_same_digest_as_current": false,
+      "rebuilt_manifest_sha256": "fb0c2d39a224773879a65b4c1fd3e8827070f704e3c49b8acb9088476bb5e3b4",
+      "receipt_and_manifest_unchanged_on_failure": true,
+      "stale_receipt_source": "native prior commit"
+    },
+    "private_image": {
+      "foreign_extension_after_inventory_rehash": {
+        "diagnostic": "extension does not match the producer manifest: _uvlas.cp312-win_amd64.pyd",
+        "exit_code": 1
+      },
+      "foreign_extension_sha256": "32282b650f6b5c70236c607b20a7d4fbac498015586108b9d8cc5d1b0bdd869b",
+      "foreign_extension_stage": {
+        "diagnostic": "extension does not match the producer manifest: _uvlas.cp312-win_amd64.pyd",
+        "exit_code": 1,
+        "output_exists": false
+      },
+      "relocated_rehearsal_matches": true,
+      "repeated_stage_matches": true,
+      "stage": {
+        "build_info": {
+          "commit": "b299413e0d33326249192b4689f84d93b06753a1",
+          "compiler": "MSVC 19.51.36260.0",
+          "configuration": "Release",
+          "dependencies": {
+            "boost": "1.92.0",
+            "eigen": "5.0.1",
+            "nlohmann_json": "3.12.0",
+            "spectra": "1.2.0"
+          },
+          "dependency_repairs": {
+            "nlohmann_json_sax_allocation": 1
+          },
+          "floating_point": "/fp:strict",
+          "instruction_set": "sse2",
+          "platform": "Windows AMD64",
+          "platform_key": "windows-x64-msvc19.51-sse2",
+          "schema": "uvlas.build-info/1",
+          "uncommitted_changes": false,
+          "version": "0.1.0-dev"
+        },
+        "cli_invalid_option_exit": 2,
+        "cpython": "3.12.8",
+        "extension_sha256": "cb91ca002d8aeca8dc1480bcbc0d09a109164bc5fb1521d8460a7f596b825ffe",
+        "files": 42,
+        "inventory_sha256": "2ee3e7eb1dc1357a24b1d448a68578b389de9ee37c458bb1e5a141cb5e8c8c95",
+        "normal_site_packages_import": true,
+        "numpy": "2.3.5",
+        "ownership_cases": 10,
+        "producer_manifest_sha256": "fb0c2d39a224773879a65b4c1fd3e8827070f704e3c49b8acb9088476bb5e3b4"
+      }
+    }
+  },
+  "linux": {
+    "link_receipt": {
+      "clean_relink_recreated_receipt_and_manifest": true,
+      "commit": "b299413e0d33326249192b4689f84d93b06753a1",
+      "compiler": "GNU 14.2.0",
+      "foreign_extension_sha256": "76d47c2aeedb974be9fc2e00a4dcb849ca83a968121ab80c6dd45a1e0839e8a1",
+      "foreign_extension_with_matching_stale_receipt_exit": 1,
+      "preserved_mtime_foreign_extension_exit": 1,
+      "previous_artifact_same_digest_as_current": true,
+      "rebuilt_manifest_sha256": "9d5a05d5e9298196555a21a4133421302546852410a18b27c7e44042b90cd72e",
+      "receipt_and_manifest_unchanged_on_failure": true,
+      "stale_receipt_source": "native prior commit"
+    },
+    "private_image": {
+      "foreign_extension_after_inventory_rehash": {
+        "diagnostic": "extension does not match the producer manifest: _uvlas.cpython-312-x86_64-linux-gnu.so",
+        "exit_code": 1
+      },
+      "foreign_extension_sha256": "76d47c2aeedb974be9fc2e00a4dcb849ca83a968121ab80c6dd45a1e0839e8a1",
+      "foreign_extension_stage": {
+        "diagnostic": "extension does not match the producer manifest: _uvlas.cpython-312-x86_64-linux-gnu.so",
+        "exit_code": 1,
+        "output_exists": false
+      },
+      "relocated_rehearsal_matches": true,
+      "repeated_stage_matches": true,
+      "stage": {
+        "build_info": {
+          "commit": "b299413e0d33326249192b4689f84d93b06753a1",
+          "compiler": "GNU 14.2.0",
+          "configuration": "Release",
+          "dependencies": {
+            "boost": "1.92.0",
+            "eigen": "5.0.1",
+            "nlohmann_json": "3.12.0",
+            "spectra": "1.2.0"
+          },
+          "dependency_repairs": {
+            "nlohmann_json_sax_allocation": 1
+          },
+          "floating_point": "-ffp-contract=off -fno-fast-math",
+          "instruction_set": "sse2",
+          "platform": "Linux x86_64",
+          "platform_key": "linux-x64-gnu14.2-sse2",
+          "schema": "uvlas.build-info/1",
+          "uncommitted_changes": false,
+          "version": "0.1.0-dev"
+        },
+        "cli_invalid_option_exit": 2,
+        "cpython": "3.12.3",
+        "extension_sha256": "fa15fa31d44b732cc7877c59aee460b2ffbf4beabf20c98cb5f55fafe05cfdb9",
+        "files": 42,
+        "inventory_sha256": "0efe88b66f1a895750b04b1ef4f52e4883cd446e5b77c4ff3ece99661dfc7c25",
+        "normal_site_packages_import": true,
+        "numpy": "2.3.5",
+        "ownership_cases": 10,
+        "producer_manifest_sha256": "9d5a05d5e9298196555a21a4133421302546852410a18b27c7e44042b90cd72e"
+      }
+    }
+  }
+}

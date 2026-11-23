@@ -1,0 +1,33 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-private-runtime-image-link-receipts",
+  "ids": [
+    "IO4-02",
+    "QA-05",
+    "QA-06",
+    "QA-09",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 265,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "b299413e0d33326249192b4689f84d93b06753a1",
+  "prior_native_producer_commit": "4e0b8866caaaf920c1fc6ac8022a560fe93162a8",
+  "scope": "Private native runtime generation, staging, and relocation versus valid same-name extension and prior native link receipts",
+  "sources": {
+    "CMakeLists.txt": "f3a3ac1f2222617da87f52f846814d350fcca0ab69611326170849229070e17b",
+    "cmake/GitRevision.cmake": "785bc8ddfa6684639771d2232ed77ed1675a58e7ede4cfe4da716d63bc82b53d",
+    "cmake/RuntimeArtifactReceipts.cmake": "a0a174884f2afe7623b1abfa966a45b1e9f3e0e9c6d93b168ac501356354c406",
+    "cmake/RecordRuntimeArtifactLink.cmake": "729c5a41a02e14ebfce148e1df541a31f7ca7c3925322d58cdd942fa1c7d8ad1",
+    "cmake/RuntimeArtifactManifest.cmake": "464e0f8d4402980e22a1f2e3b2dde55dbdec2e9d80b9786557fd7f405597d3c8",
+    "src/python/CMakeLists.txt": "bbc3882ae8a3e914ef119a88ae4d890ced8adaa73c3186b86dc389b00e5baa98",
+    "tools/qa/runtime_artifact_audit.py": "a0b9490bc07a1784e948db7c42c23a3c62f5791de7d5343d6404606c683a34f4",
+    "tools/qa/private_runtime_image.py": "a8d84af7574868617442328fd83c199bc326d448c594b747ebab0b829355d67b",
+    "tests/python/test_ownership.py": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/private-runtime-image-link-receipts.md": "96f764d47a174f294fc7b5d4243444b9a5cb051ee3a226a68a9f2ad749076ed5",
+    "docs/verification/IM-06/private-runtime-image-link-receipts.json": "affabdfabd686543e1649bc2258f6fe39e14d62cc326ccb7d728f8608a565855"
+  }
+}

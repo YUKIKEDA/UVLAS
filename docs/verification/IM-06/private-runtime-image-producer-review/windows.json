@@ -1,0 +1,46 @@
+{
+  "foreign_extension_after_inventory_rehash": {
+    "diagnostic": "extension does not match the producer manifest: _uvlas.cp312-win_amd64.pyd",
+    "exit_code": 1
+  },
+  "foreign_extension_sha256": "d6c4ed343193aebdcfa8995e60ea4aead18d548de75e7890acc9b8518d95c764",
+  "foreign_extension_stage": {
+    "diagnostic": "extension does not match the producer manifest: _uvlas.cp312-win_amd64.pyd",
+    "exit_code": 1,
+    "output_exists": false
+  },
+  "relocated_rehearsal_matches": true,
+  "repeated_stage_matches": true,
+  "stage": {
+    "build_info": {
+      "commit": "0a93f2d8c5e3ec49a14af26db72bc12ecd567d54",
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "dependencies": {
+        "boost": "1.92.0",
+        "eigen": "5.0.1",
+        "nlohmann_json": "3.12.0",
+        "spectra": "1.2.0"
+      },
+      "dependency_repairs": {
+        "nlohmann_json_sax_allocation": 1
+      },
+      "floating_point": "/fp:strict",
+      "instruction_set": "sse2",
+      "platform": "Windows AMD64",
+      "platform_key": "windows-x64-msvc19.51-sse2",
+      "schema": "uvlas.build-info/1",
+      "uncommitted_changes": false,
+      "version": "0.1.0-dev"
+    },
+    "cli_invalid_option_exit": 2,
+    "cpython": "3.12.8",
+    "extension_sha256": "f73f54e5b167227903028726d67bc206451e4c8667392e3bcd62fede2168575c",
+    "files": 42,
+    "inventory_sha256": "dc9ec7151f5ab8f72df6efc679541e1b04ee990b51b249176a3d725b30f29a87",
+    "normal_site_packages_import": true,
+    "numpy": "2.3.5",
+    "ownership_cases": 10,
+    "producer_manifest_sha256": "47e184195d9f538344f1c198a1f21940f3c69d132649eb5bf20224e775414805"
+  }
+}

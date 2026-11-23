@@ -1,0 +1,40 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-private-runtime-image-producer-review",
+  "ids": [
+    "IO4-02",
+    "QA-05",
+    "QA-06",
+    "QA-09",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 265,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "0a93f2d8c5e3ec49a14af26db72bc12ecd567d54",
+  "scope": "Native producer checks during private staging and relocated image rehearsal on Windows and Linux",
+  "verification": {
+    "platforms": 2,
+    "staged_files_including_inventory": 43,
+    "ownership_cases_per_platform": 10,
+    "repeatable_stage_per_platform": true,
+    "relocated_rehearsal_per_platform": true,
+    "staging_foreign_extension_rejection_per_platform": 1,
+    "rehashed_inventory_foreign_extension_rejection_per_platform": 1
+  },
+  "sources": {
+    "CMakeLists.txt": "0d7deb062715d582101cf7b26ffa28bde0c69601d591c6c4dd0af48f372a2b78",
+    "cmake/RuntimeArtifactManifest.cmake": "fadb55920542bbfc33a3cb8b01d4d26541ecf61a8f805fe7729d5ce093296e48",
+    "tools/qa/runtime_artifact_audit.py": "a0b9490bc07a1784e948db7c42c23a3c62f5791de7d5343d6404606c683a34f4",
+    "tools/qa/private_runtime_image.py": "a8d84af7574868617442328fd83c199bc326d448c594b747ebab0b829355d67b",
+    "tests/python/test_ownership.py": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/private-runtime-image-producer-review.md": "417098916249f35bde0e95891117e9928cb198a7161efc24e6319602fe0adc18",
+    "docs/verification/IM-06/private-runtime-image-producer-review/windows.json": "d574179cbe016e5478a0d9678f8be31e6071f077225ccc4d01f335cd47f9cbdd",
+    "docs/verification/IM-06/private-runtime-image-producer-review/linux.json": "9987f007cdeb2704622af61c848063830479d9587b3920f5b050c4ab6ecc76f1"
+  }
+}

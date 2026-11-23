@@ -139,6 +139,10 @@ kernelの計測は [benchmarks/README.md](../benchmarks/README.md) の独立し�
 
 `UVLAS_BUILD_PYTHON=ON` とvcpkgの `tests;python` featureを、通常構成とは別の導入prefixへ指定する。外部CPython 3.12のInterpreter・Development.ModuleとNumPy 2.xを使う。構築例とAPIの使い方は [Python拡張](../src/python/README.md)。通常の `just lint` は任意moduleを除き、その構成のcompile databaseを使う専用のclang-tidyと `python.ownership` をWindows/LinuxのCIで実行する。ケースのrun/resumeとwheel配布はIM-06。
 
+## 非公開のランタイム用ディレクトリ
+
+ReleaseのCLI、CPython拡張、ライセンスを一つの場所へ配置し、ビルド先と異なる場所で実行できる。CPython 3.12と実行環境向けNumPy wheelを用意し、[構成・作成・移設の手順](verification/IM-06/private-runtime-image-producer-review.md)に従う。検証には新規venvを使う。
+
 ## 疎求解の対象検証
 
 `numerics.sparse_spd` は外向きSPD bound、`numerics.sparse_triangular` は抽出・両置換・非重複span、`numerics.sparse_solve` は元CSCの求解と認定、`numerics.sparse_allocation` は準備済み三角kernelのC++/Eigen確保を検査する。`numerics.sparse_capacity` は10万未知数の合成三重対角で、準備・求解時間とprocess lifetime peak RSSを出す。容量試験を実務graphの性能やメモリprofileの認定に転用しない。
