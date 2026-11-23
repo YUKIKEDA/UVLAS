@@ -1,0 +1,193 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-exact-curve-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 258,
+  "date": "2026-11-23",
+  "source_commit": "cf82f8a69ae4acd3d518c2f329084dd91e1d78db",
+  "claimed_state": "Product-private exact PCHIP preparation, evaluation, and requalification of in-memory snapshots under AE-07 sections 1–6.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filter": "^aero\\.pchip_",
+    "ctest_each_configuration": "11 passed out of 11",
+    "catch_seed": 258,
+    "catch_integrated_each_configuration": "4 cases, 46064 assertions",
+    "catch_allocation_audit_each_configuration": "2 cases, 1396 assertions",
+    "reference": "60 frozen coefficient fixtures and 360 independent exact Hermite queries evaluated through the qualified curve entrypoints in derivative orders 0, 1, and 2. Tolerance 0. Explicit and Automatic side, physical-time derivatives at knots and seams, noncanonical words, failed C1, negative periodic floor, and independently restored/corrupted inputs are covered.",
+    "allocation_order": "Prepare counts the immutable borrows before allocation, reserves both owners, coefficient and boundary workspace, then allocates the remaining input buffers and arena before its snapshot and canonical arithmetic. Evaluate reserves the result, route, locator and the maximum candidate arenas before copying the original query and performing exact routing/arithmetic. Restore compares the original prepared under its bounded word walk, then obtains every new buffer and copies saved coefficients before recomputing and comparing. All owner buffers exist before numerical execution. Final publication rechecks cancellation and requires no further allocation.",
+    "resources": "Observed allocation attempts equal the complete published plan on the four audited calls: 21 prepare, 16 nonperiodic explicit evaluation, 14 restore, 24 periodic Automatic evaluation with both candidates. Cumulative payload equals the accepted cap for these fixtures; one-less payload, work, maximum intermediate bit and opaque-estimate caps reject without allocation. Fault, cancellation and same-workspace reentry were exercised at every listed position. Shape-valid noncanonical requests in prepare, evaluation and restore reach every scheduled allocation before rejection. Shared control/allocator opaque charges are estimates, with proven-bound requests refused. This is not a wall-clock or RSS qualification.",
+    "ownership": "The coefficient block retains the original canonical samples through the shared owner instead of copying them. Same shared ownership is checked only for a retained immutable owner. Independent equivalent owners go through full content and stamp comparison. Curve, jet, and snapshot retain their required data beyond input/workspace/budget destruction. A successful snapshot retains the descriptor and coefficient bytes; restore consumes a synchronous view and makes all required exact checks against separately held current input.",
+    "mutation_script": "docs/verification/IM-03/pchip-curve-v1/run-mutations.ps1",
+    "mutation_control": "Byte-identical copy compiles and links separately. Catch exit 0 with 489 assertions across policy and restore cases.",
+    "mutation_saved_coefficients": "Skipping exact comparison with recomputed coefficients accepts a corrupted saved value. Catch exit 42, 182 passed, 1 failed.",
+    "mutation_automatic_side": "Skipping the equality check between left and right second derivatives incorrectly accepts Automatic. Catch exit 42, 23 passed, 1 failed.",
+    "static": "clang-format 21.1.2. clang-tidy 21.1.1 over all changed translation units. Linux and sanitizers are PR CI checks."
+  },
+  "source_records": [
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "99b9fcd42a0e8682dcb5ed76a34aa9407d3fa16b9bcac01aa17b9dc672d2947d"
+    },
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "src/aero/pchip_boundary.cpp",
+      "hint": "src/aero/pchip_boundary.cpp",
+      "sha256": "d1222a7b0c9beb8b6466d2eb571950b867f76c52acf5a87aa187d3a7c8fea3f3"
+    },
+    {
+      "id": "src/aero/pchip_boundary.hpp",
+      "hint": "src/aero/pchip_boundary.hpp",
+      "sha256": "7c6f90fba0df79c7a1a57f35d435a802832b3cdcbcd3e8f24cd212870e795201"
+    },
+    {
+      "id": "src/aero/pchip_coefficients.cpp",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "98d45e9ae541a22ee4db85031c759099593ea0915e98fd9a6aad1cf9fc30a731"
+    },
+    {
+      "id": "src/aero/pchip_coefficients.hpp",
+      "hint": "src/aero/pchip_coefficients.hpp",
+      "sha256": "1d1809f998f3ad3b5d61c8aa19e3bc0cdcbf70f7d874e06952cb0054f2651c5b"
+    },
+    {
+      "id": "src/aero/pchip_curve_plan.hpp",
+      "hint": "src/aero/pchip_curve_plan.hpp",
+      "sha256": "4b24d2cbeb129225a2d2c498fbe85704efef64c2945af3c6aa6f70137ed8b072"
+    },
+    {
+      "id": "src/aero/pchip_curve.cpp",
+      "hint": "src/aero/pchip_curve.cpp",
+      "sha256": "0a845652e85c75f7de8a3049f68fe708981ddd86ab5abb59ba724b9373388942"
+    },
+    {
+      "id": "src/aero/pchip_curve.hpp",
+      "hint": "src/aero/pchip_curve.hpp",
+      "sha256": "59d97fac568e526ae4d5390e307afbdfb597f1a52660639d708e23fbe3f02522"
+    },
+    {
+      "id": "src/aero/pchip_domain_route.cpp",
+      "hint": "src/aero/pchip_domain_route.cpp",
+      "sha256": "a7d48ca29a2ea2e6a4c32fe3860564c55258506240607e22d9cbb8a0400a74a4"
+    },
+    {
+      "id": "src/aero/pchip_domain_route.hpp",
+      "hint": "src/aero/pchip_domain_route.hpp",
+      "sha256": "a510b9e56dcb98d9a1cd5b49967214d5f272455e68d3e91995d498a8b57b5f51"
+    },
+    {
+      "id": "src/aero/pchip_interval_jet.cpp",
+      "hint": "src/aero/pchip_interval_jet.cpp",
+      "sha256": "7e08910da78e9b2371ed8d0f0209340eca10e1915d2abf46aec4b1eb283e5574"
+    },
+    {
+      "id": "src/aero/pchip_interval_jet.hpp",
+      "hint": "src/aero/pchip_interval_jet.hpp",
+      "sha256": "8256fda4b45ad86eee97ee7aa2177c41279d169e76becb978cfa355295c04780"
+    },
+    {
+      "id": "src/aero/pchip_knot_locator.cpp",
+      "hint": "src/aero/pchip_knot_locator.cpp",
+      "sha256": "878ba0e772f0609d3ba244c6e832460c6f1acb3a29d3e986d1181935d3b7e830"
+    },
+    {
+      "id": "src/aero/pchip_knot_locator.hpp",
+      "hint": "src/aero/pchip_knot_locator.hpp",
+      "sha256": "dd0c1d37409149dfe3f1f30850ab94627f0352636bfe4140561c66671f64e67a"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.cpp",
+      "hint": "src/aero/pchip_preparation_input.cpp",
+      "sha256": "d04180f5b0bbae463af612f4526f0e63d0cc56028665daacc43f7f7d270dc275"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.hpp",
+      "hint": "src/aero/pchip_preparation_input.hpp",
+      "sha256": "89fa44783084306222aecd4349ba06e17257716c150e163bbe99046e8cc65abb"
+    },
+    {
+      "id": "src/aero/pchip_shared_preparation_input.cpp",
+      "hint": "src/aero/pchip_shared_preparation_input.cpp",
+      "sha256": "e3b0f0d324265bc93ef23b1a0a0bd9e1267d693f50c16adb10a1e9d5e7ba396f"
+    },
+    {
+      "id": "src/aero/pchip_shared_preparation_input.hpp",
+      "hint": "src/aero/pchip_shared_preparation_input.hpp",
+      "sha256": "57fcbac7851701506b8c9b5d2d8e418c2e1fe26dbb834887824e22a28019093f"
+    },
+    {
+      "id": "tests/aero/fixtures/pchip-coefficients-v1.json",
+      "hint": "tests/aero/fixtures/pchip-coefficients-v1.json",
+      "sha256": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8"
+    },
+    {
+      "id": "tests/aero/fixtures/pchip-interval-values-v1.json",
+      "hint": "tests/aero/fixtures/pchip-interval-values-v1.json",
+      "sha256": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694"
+    },
+    {
+      "id": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "18f508e324dca5ee5eda36f9efe4d3a0a849bc51d18dcc20fd597808ffdaad3c"
+    },
+    {
+      "id": "tests/aero/pchip_curve_test.cpp",
+      "hint": "tests/aero/pchip_curve_test.cpp",
+      "sha256": "6f8c3794c75a878d44afebd474d87da052aa94584063f6e9e934a938522611e9"
+    },
+    {
+      "id": "tests/CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "242bef4bf1f36575d57e4e2da6036780af38a6d913a3b54d994d4d4e8d7000d4"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "99b9fcd42a0e8682dcb5ed76a34aa9407d3fa16b9bcac01aa17b9dc672d2947d",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "src/aero/pchip_boundary.cpp": "d1222a7b0c9beb8b6466d2eb571950b867f76c52acf5a87aa187d3a7c8fea3f3",
+    "src/aero/pchip_boundary.hpp": "7c6f90fba0df79c7a1a57f35d435a802832b3cdcbcd3e8f24cd212870e795201",
+    "src/aero/pchip_coefficients.cpp": "98d45e9ae541a22ee4db85031c759099593ea0915e98fd9a6aad1cf9fc30a731",
+    "src/aero/pchip_coefficients.hpp": "1d1809f998f3ad3b5d61c8aa19e3bc0cdcbf70f7d874e06952cb0054f2651c5b",
+    "src/aero/pchip_curve_plan.hpp": "4b24d2cbeb129225a2d2c498fbe85704efef64c2945af3c6aa6f70137ed8b072",
+    "src/aero/pchip_curve.cpp": "0a845652e85c75f7de8a3049f68fe708981ddd86ab5abb59ba724b9373388942",
+    "src/aero/pchip_curve.hpp": "59d97fac568e526ae4d5390e307afbdfb597f1a52660639d708e23fbe3f02522",
+    "src/aero/pchip_domain_route.cpp": "a7d48ca29a2ea2e6a4c32fe3860564c55258506240607e22d9cbb8a0400a74a4",
+    "src/aero/pchip_domain_route.hpp": "a510b9e56dcb98d9a1cd5b49967214d5f272455e68d3e91995d498a8b57b5f51",
+    "src/aero/pchip_interval_jet.cpp": "7e08910da78e9b2371ed8d0f0209340eca10e1915d2abf46aec4b1eb283e5574",
+    "src/aero/pchip_interval_jet.hpp": "8256fda4b45ad86eee97ee7aa2177c41279d169e76becb978cfa355295c04780",
+    "src/aero/pchip_knot_locator.cpp": "878ba0e772f0609d3ba244c6e832460c6f1acb3a29d3e986d1181935d3b7e830",
+    "src/aero/pchip_knot_locator.hpp": "dd0c1d37409149dfe3f1f30850ab94627f0352636bfe4140561c66671f64e67a",
+    "src/aero/pchip_preparation_input.cpp": "d04180f5b0bbae463af612f4526f0e63d0cc56028665daacc43f7f7d270dc275",
+    "src/aero/pchip_preparation_input.hpp": "89fa44783084306222aecd4349ba06e17257716c150e163bbe99046e8cc65abb",
+    "src/aero/pchip_shared_preparation_input.cpp": "e3b0f0d324265bc93ef23b1a0a0bd9e1267d693f50c16adb10a1e9d5e7ba396f",
+    "src/aero/pchip_shared_preparation_input.hpp": "57fcbac7851701506b8c9b5d2d8e418c2e1fe26dbb834887824e22a28019093f",
+    "tests/aero/fixtures/pchip-coefficients-v1.json": "c8b8afb2b25acd691eef0060b8a38afe6dedf56eb9e6bbe8e10cd877c903c1e8",
+    "tests/aero/fixtures/pchip-interval-values-v1.json": "6d2b86afbad9f56a3a6e6c36857337cbbfe8123db7f10bd768994bc94ce5c694",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "18f508e324dca5ee5eda36f9efe4d3a0a849bc51d18dcc20fd597808ffdaad3c",
+    "tests/aero/pchip_curve_test.cpp": "6f8c3794c75a878d44afebd474d87da052aa94584063f6e9e934a938522611e9",
+    "tests/CMakeLists.txt": "242bef4bf1f36575d57e4e2da6036780af38a6d913a3b54d994d4d4e8d7000d4"
+  },
+  "specification_cross_refs": [
+    "FD-02",
+    "FD-06"
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/pchip-curve-v1/run-mutations.ps1": "77d4fe1df34c120882a3568d78f9bcde444a624bee715bf7b1a4acfa129285e5"
+  }
+}
