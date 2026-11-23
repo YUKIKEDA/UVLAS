@@ -1,0 +1,151 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-p1-shared-action-v1",
+  "ids": [
+    "UI-D01",
+    "UI-D02",
+    "UI-D04",
+    "UI-D05",
+    "UI-D06",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 266,
+  "date": "2026-11-23",
+  "source_commit": "7db5eb486ba3383c3bd720ec53a35337f0abc6e1",
+  "claimed_state": "Native shared-edge and fixed-quad P1 actions, real and complex application, full occurrence JVP and real-inner-product VJP.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_targets": [
+      "aero.geometry_snapshot",
+      "aero.local_geometry_packet",
+      "aero.p1_induction",
+      "aero.p1_induction_resources",
+      "aero.p1_shared_action",
+      "aero.global_geometry"
+    ],
+    "ctest": "Six affected targets passed in each configuration; Debug allocation audit had a scoped re-run after correcting the opaque allocation observation.",
+    "catch_seed": 266,
+    "catch_normal_each_configuration": "5 cases, 286 assertions",
+    "catch_resource_each_configuration": "1 case, 353 assertions",
+    "oracle": "New standalone 60-decimal Decimal direct area integral and analytic directional derivative for warped fixed quad and neighboring triangle, tensor Gauss-Legendre 24/36/48 with Duffy map. Reference 24→36 and 36→48 maximum differences 4.92391794e-17 and 1.90624793e-25. Product compares independent values and directional derivatives with absolute tolerance 1e-22 plus the retained arithmetic enclosure. Separate controls cover two-word geometry at 2^900, explicit reversed edge alias, low coefficient word and numerically equal values with distinct strength IDs.",
+    "cancellation": "An oriented physical-edge pair with the same strength IDs is omitted before analytic expression evaluation. Distinct traces survive, sheet terms are retained, and mixed and wholly far facets preserve the selected Gauss12 area expression and local error diagnostic. A foreign different-core owner is refused before applying the action.",
+    "resources": "Single-facet assembly fixture observed 77 C++ allocation attempts in MSVC; 12 fixed allocations arise from the owner/result/scratch plan and 65 arise from legacy exact geometric predicates within the separate opaque backend estimate. All 77 allocation failures and all five VJP allocation failures were injected. Application performs zero allocations. Final-allocation cancellation and same-workspace reentry preserve prior results. Byte/work/estimate equality and one-less admissions, unsupported proven metadata, nonfinite input, and stale replay are verified.",
+    "mutation": "MSVC Debug isolated control 211 assertions, exit 0. Ignoring oriented strength IDs falsely cancels distinct traces (178 passed, 33 failed, exit 42). Omitting the third point occurrence in JVP violates independent area-derivative and dual results (169 passed, 42 failed, exit 42).",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 for affected translation units passed. Linux CI remains for the submitted head.",
+    "baseline_and_mutation_source_commit": "45936de4ce5f1d6f74c99ad41c993dbe67b249ea",
+    "empty_topology": "The existing global contact factory qualifies an empty topology. The prepared action obeys its payload cap with no strengths and returns exact zero velocity, JVP and VJP. Both affected targets were re-run in Debug and Release."
+  },
+  "source_records": [
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "ea66ec833e0c54bdfbb2c23a3f5388d2a77c711906c8e710994d1880b86e9980"
+    },
+    {
+      "id": "docs/specs/aero/owned-geometry-query-contract.md",
+      "hint": "docs/specs/aero/owned-geometry-query-contract.md",
+      "sha256": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3"
+    },
+    {
+      "id": "docs/specs/aero/p1-induction-kernel-contract.md",
+      "hint": "docs/specs/aero/p1-induction-kernel-contract.md",
+      "sha256": "b177098e77eefa0e57ac15bb0365f166064f01c670a9d79c7a03f50b703e72c9"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "sha256": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "src/aero/geometry_snapshot.hpp",
+      "hint": "src/aero/geometry_snapshot.hpp",
+      "sha256": "a18c26d3fb0542162431a6e1d1623bb79b69f7853093354296affe0581d47687"
+    },
+    {
+      "id": "src/aero/global_geometry.hpp",
+      "hint": "src/aero/global_geometry.hpp",
+      "sha256": "3e7c41068d14f2e8ef21cb7eaf514619c75da66f705c997b1955fc79ed0af393"
+    },
+    {
+      "id": "src/aero/p1_induction.cpp",
+      "hint": "src/aero/p1_induction.cpp",
+      "sha256": "6c3b3d3495e89c92021420fa32b8c2d6a6ee7e49ce00832ea2a212efb23294ba"
+    },
+    {
+      "id": "src/aero/p1_program_private.hpp",
+      "hint": "src/aero/p1_program_private.hpp",
+      "sha256": "e409d78604a5bde975502246ef5354fd3f12b9089584f068c1fbae89efcd8530"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "345cb3795e9af99303204ce4bed0db47327b0e49aff717309584443bd4328ab2"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "20ecf26a435abc2338df9f9b68e9d1ae1c475a8cc0499f5c618b9bf41564721b"
+    },
+    {
+      "id": "src/aero/p1_shared_kernel.hpp",
+      "hint": "src/aero/p1_shared_kernel.hpp",
+      "sha256": "e9f4aea4dd9ba57d8e9f29d8820a386ffb0e10da36fed096adeba006d8c7cab3"
+    },
+    {
+      "id": "tests/aero/fixtures/p1-shared-action-v1.json",
+      "hint": "tests/aero/fixtures/p1-shared-action-v1.json",
+      "sha256": "28b03ec0b391024ac1862262327eca38e79ff82ec7a2904672260d8c64d2767e"
+    },
+    {
+      "id": "tests/aero/p1_induction_resources_test.cpp",
+      "hint": "tests/aero/p1_induction_resources_test.cpp",
+      "sha256": "366a362244fdd172871707c9d767998d19b1dd380654486ec6e665a46b26160d"
+    },
+    {
+      "id": "tests/aero/p1_shared_action_test.cpp",
+      "hint": "tests/aero/p1_shared_action_test.cpp",
+      "sha256": "74855e870d33c50a1da21810d54aac48c21aa31197aa0f7ee93db1d585701af3"
+    },
+    {
+      "id": "tests/CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "9c5f883807430dd402f81c779885b89c68fa69b57ff1d62d421882ad1ee893fd"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "ea66ec833e0c54bdfbb2c23a3f5388d2a77c711906c8e710994d1880b86e9980",
+    "docs/specs/aero/owned-geometry-query-contract.md": "ff82dcb757a8c9737d3b2d32fc0a4b65971cd1888df93d2c83d0bbe02699fcd3",
+    "docs/specs/aero/p1-induction-kernel-contract.md": "b177098e77eefa0e57ac15bb0365f166064f01c670a9d79c7a03f50b703e72c9",
+    "docs/specs/aero/uvlm-induction-adopted-specification.md": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "src/aero/geometry_snapshot.hpp": "a18c26d3fb0542162431a6e1d1623bb79b69f7853093354296affe0581d47687",
+    "src/aero/global_geometry.hpp": "3e7c41068d14f2e8ef21cb7eaf514619c75da66f705c997b1955fc79ed0af393",
+    "src/aero/p1_induction.cpp": "6c3b3d3495e89c92021420fa32b8c2d6a6ee7e49ce00832ea2a212efb23294ba",
+    "src/aero/p1_program_private.hpp": "e409d78604a5bde975502246ef5354fd3f12b9089584f068c1fbae89efcd8530",
+    "src/aero/p1_shared_action.cpp": "345cb3795e9af99303204ce4bed0db47327b0e49aff717309584443bd4328ab2",
+    "src/aero/p1_shared_action.hpp": "20ecf26a435abc2338df9f9b68e9d1ae1c475a8cc0499f5c618b9bf41564721b",
+    "src/aero/p1_shared_kernel.hpp": "e9f4aea4dd9ba57d8e9f29d8820a386ffb0e10da36fed096adeba006d8c7cab3",
+    "tests/aero/fixtures/p1-shared-action-v1.json": "28b03ec0b391024ac1862262327eca38e79ff82ec7a2904672260d8c64d2767e",
+    "tests/aero/p1_induction_resources_test.cpp": "366a362244fdd172871707c9d767998d19b1dd380654486ec6e665a46b26160d",
+    "tests/aero/p1_shared_action_test.cpp": "74855e870d33c50a1da21810d54aac48c21aa31197aa0f7ee93db1d585701af3",
+    "tests/CMakeLists.txt": "9c5f883807430dd402f81c779885b89c68fa69b57ff1d62d421882ad1ee893fd"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/p1-shared-action-v1/verification.md": "607a244c9554db58c9d025645f802a92cfa77205d1e11ec8aaaf22896becb696",
+    "docs/verification/IM-03/p1-shared-action-v1/run-mutations.ps1": "a3f54d2ca4c75879993226455433ac3eb531a28f5bcf728184177c96ded8703a"
+  }
+}
