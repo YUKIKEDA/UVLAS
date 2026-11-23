@@ -98,8 +98,8 @@ template <class I, class Budget>
     return result;
 }
 
-template <class I>
-[[nodiscard]] I rank_gcd(RankBudget& budget, I a, I b) {
+template <class I, class Budget>
+[[nodiscard]] I rank_gcd(Budget& budget, I a, I b) {
     a = rank_abs(a);
     b = rank_abs(b);
     while (b != 0) {
@@ -111,8 +111,8 @@ template <class I>
     return a;
 }
 
-template <class I>
-[[nodiscard]] I rank_lcm(RankBudget& budget, const I& left, const I& right) {
+template <class I, class Budget>
+[[nodiscard]] I rank_lcm(Budget& budget, const I& left, const I& right) {
     if (left == 1 || right == 1)
         return left == 1 ? right : left;
     const I divisor = rank_gcd(budget, left, right);
@@ -184,6 +184,21 @@ template <class I>
     } catch (const std::range_error&) {
         partition_fail(core::FailureCode::ResourceExceeded);
     }
+}
+
+template <class I>
+[[nodiscard]] ExactRational rank_materialize_dyadic(const I& units, std::uint32_t scale,
+                                                    const ExactLimits& limits,
+                                                    core::ResourcePlan& plan) {
+    if (units == 0)
+        return {};
+    const auto magnitude = rank_abs(units);
+    const auto trailing = std::min<std::uint64_t>(scale, boost::multiprecision::lsb(magnitude));
+    auto numerator = I{magnitude >> trailing};
+    if (units < 0)
+        numerator = -numerator;
+    return rank_exact(RankFraction<I>{std::move(numerator), I{I{1} << (scale - trailing)}}, limits,
+                      plan);
 }
 
 struct RankSizer {

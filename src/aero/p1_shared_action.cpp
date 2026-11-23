@@ -569,8 +569,9 @@ class SharedP1Engine {
                                   sum(product(n, sum(30, sum(logarithmic_visits(faces.size()),
                                                              product(3, logarithmic_visits(s))))),
                                       64));
+        result.preflight_steps = scan.used;
         result.reserved_steps =
-            sum(scan.used,
+            sum(result.preflight_steps,
                 sum(metadata, product(n, sum(limits.geometry.max_steps, limits.kernel.max_steps))));
         (void)checked_limit(result.reserved_steps, limits.steps);
         return result;
