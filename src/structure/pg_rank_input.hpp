@@ -83,7 +83,8 @@ struct RankKey {
                                                 const PgIntegrationPartition& partition,
                                                 RankBudget& budget) {
     const auto graph = partition_take(dictionary.graph());
-    if (!partition_same_graph(graph, partition_take(partition.graph())))
+    if (!partition_same_graph(graph, partition_take(partition.graph()),
+                              [&](std::uint64_t units) { budget.charge(units); }))
         partition_fail(core::FailureCode::StaleGeneration);
     RankShape result;
     result.cells_axis = static_cast<std::uint32_t>(2 * graph.n);
