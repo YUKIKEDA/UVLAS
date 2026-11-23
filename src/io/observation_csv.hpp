@@ -9,7 +9,7 @@
 
 namespace uvlas::io::detail {
 
-enum class ObservationSide { None, Interior, Lower, Upper };
+enum class ObservationSide : std::uint8_t { None, Interior, Lower, Upper };
 
 /// An already-qualified component, in the order supplied to the observation evaluator.
 struct ObservationCsvColumn {
@@ -25,9 +25,9 @@ struct ObservationCsvColumn {
 
 /// An accepted sample, with one qualified enclosure per column in the same order.
 struct ObservationCsvSample {
-    numerics::TwoWordValue time_seconds;
-    std::uint64_t checkpoint;
-    std::uint64_t segment;
+    numerics::TwoWordValue time_seconds{};
+    std::uint64_t checkpoint = 0;
+    std::uint64_t segment = 0;
     std::span<const SiEnclosure> values;
 };
 

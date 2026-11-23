@@ -212,6 +212,7 @@ encode_observation_csv(std::span<const ObservationCsvColumn> columns,
                                      require(columns.size() <= limits.maximum_columns &&
                                                  samples.size() <= limits.maximum_samples,
                                              capacity);
+            require(!columns.empty() || samples.empty());
                                      validate_columns(columns, limits, resources, stop);
                                      CsvWriter counter{limits.maximum_output_bytes};
                                      write_series(counter, columns, samples, stop);

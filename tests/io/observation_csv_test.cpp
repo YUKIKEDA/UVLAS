@@ -111,6 +111,10 @@ TEST_CASE("Observation CSV rejects malformed metadata, samples and numerical wor
     SECTION("incomplete sample") {
         samples[0].values = {};
     }
+    SECTION("history without observable columns") {
+        column_view = {};
+        samples[0].values = {};
+    }
     SECTION("invalid layer association") {
         columns[0].side = ObservationSide::Upper;
     }

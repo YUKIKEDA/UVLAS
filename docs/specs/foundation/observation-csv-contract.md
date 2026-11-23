@@ -1,10 +1,11 @@
 # 観測CSVの内部出力契約
 
-[IO4-05](io-execution-adoption-specification.md#io4-05-結果)に従い、検査済みの観測値を、採用された試料ごとにCSVへ変換する。
+[IO4-05](io-execution-adoption-specification.md#io4-05-結果)に従い、検査済みの観測値を、確定済みの試料ごとにCSVへ変換する。
 `encode_observation_csv`には観測成分の定義と確定済み試料を渡す。
 観測の物理評価と精度認定は呼び出し側が担う。
-試料は、確定番号の昇順で渡す。
+試料は、確定番号が厳密に増える順で渡す。
 各試料には、渡した観測成分と同じ数・順序の値を含める。
+試料があれば、観測成分を一つ以上渡す。
 
 CSVはBOMなしのUTF-8とし、ヘッダーと各レコードをCRLFで終える。
 確定番号の順に、各試料の観測成分を渡された順で一行ずつ書く。
@@ -17,11 +18,12 @@ CSVはBOMなしのUTF-8とし、ヘッダーと各レコードをCRLFで終え�
 | `checkpoint`, `segment` | 確定番号と区間番号。ともに符号なし64ビット整数 |
 | `observation`, `component` | 観測IDと成分番号。ともに符号なし64ビット整数 |
 | `quantity`, `unit`, `basis`, `reference_point` | 観測の物理量、単位、基底、参照点。適用外の欄にも呼び出し側がその旨を表す記述を渡す |
-| `layer`, `side` | 層IDと層内・層下側・層上側を表す `interior`、`lower`、`upper`。層が適用外なら層IDを空欄にして `none` とする |
+| `layer`, `side` | 層IDと層内・層下側・層上側を表す `interior`、`lower`、`upper`。層が適用外なら層IDは空欄、`side` は `none` とする |
 | `representation`, `value_hi`, `value_lo`, `radius`, `exponent2` | `binary64` または `two_word` の中心語、外向き誤差半径、2の冪の指数。`binary64` の低位語の欄は空欄とする |
 
 整数は十進で出し、浮動小数点各語は同じbinary64値へ読み戻せる十進表現で出す。
-観測値の中心と半径に共通の倍率は $2^{\mathrm{exponent2}}$ とする。
+観測値の中心は $(\mathrm{value\_hi}+\mathrm{value\_lo})\,2^{\mathrm{exponent2}}$ とし、`binary64` では高位語だけを使う。
+誤差半径は $\mathrm{radius}\,2^{\mathrm{exponent2}}$ とする。
 一つの界面の両側を観測する場合は、別々の層ID／面側の組を渡す。
 層と面側の組、観測ID、成分番号が同じ成分定義は重複として受け付けない。
 
