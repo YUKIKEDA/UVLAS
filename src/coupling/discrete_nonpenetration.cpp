@@ -306,7 +306,7 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::InvalidInput);
             bound.values()[i] = PanelRow{panel, i};
             maps.values()[i] = a::P1FaceStrengths{panel.face, a::P0BoundColumn{}};
-            trace[num_traces++] = {a::P1StrengthId{panel.face.value()}, row.circulation,
+            trace[num_traces++] = {a::P1StrengthId::bound(panel.face), row.circulation,
                                    row.circulation_direction};
         }
         std::ranges::sort(bound.values(), [&](const PanelRow& l, const PanelRow& r) {
@@ -316,7 +316,8 @@ struct NonpenetrationBuilder {
         auto prior = input.history.columns.end();
         for (auto it = input.history.columns.begin(); it != input.history.columns.end(); ++it) {
             work.step();
-            if (prior != input.history.columns.end() && prior->id >= it->id)
+            if (it->id.bound_face() ||
+                (prior != input.history.columns.end() && prior->id >= it->id))
                 reject(core::FailureCode::InvalidInput);
             prior = it;
             trace[num_traces++] = {it->id, it->strength, a::SingleWord{0}};
@@ -335,14 +336,20 @@ struct NonpenetrationBuilder {
         std::size_t visit = 0, attached = 0;
         std::uint64_t spare = 0;
         const auto new_column = [&] {
-            for (; visit < existing && trace[visit].id.value() <= spare; ++visit) {
+            for (; visit < existing; ++visit) {
                 work.step();
-                if (trace[visit].id.value() == spare)
+                const auto old = trace[visit].id.wake_value();
+                // Independent wake IDs precede the bound identity domain.
+                if (!old || *old > spare)
+                    break;
+                if (*old == spare)
                     ++spare;
             }
             return a::P1StrengthId{spare++};
         };
         const auto history = [&](a::P1StrengthId id) {
+            if (id.bound_face())
+                reject(core::FailureCode::InvalidInput);
             return find(input.history.columns, id, &FrozenWakeTrace::id, work).id;
         };
         for (std::size_t i = 0; i < input.wake.size(); ++i) {
@@ -364,12 +371,13 @@ struct NonpenetrationBuilder {
                 const auto& source = find(
                     std::span<const PanelRow>{bound.values()}, entry.bound_face,
                     [](const PanelRow& b) { return b.panel.face; }, work);
-                leading = a::P1StrengthId{entry.bound_face.value()};
                 if (entry.coefficient == -1) {
                     const auto& collocation = input.collocations[source.caller];
                     leading = new_column();
                     trace[num_traces++] = {leading, negative(collocation.circulation),
                                            negative(collocation.circulation_direction)};
+                } else {
+                    leading = a::P1StrengthId::bound(entry.bound_face);
                 }
             }
             maps.values()[bound_count + i] =

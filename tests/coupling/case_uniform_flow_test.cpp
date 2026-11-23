@@ -779,10 +779,14 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                                                        coordinates(.25, .25, .5),
                                                        a::DoubleWord{.75, 0x1p-60},
                                                        a::SingleWord{-.5}}};
+        // The positive front shares the bound type even when an independent history ID
+        // has the same numeric face value. The negative front must skip wake ID zero.
+        const auto bound_id = a::P1StrengthId::bound(fixture.faces[0].id);
+        const auto historical_id = a::P1StrengthId{reversed ? 0 : fixture.faces[0].id.value()};
         std::array wake{
-            cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, a::P1StrengthId{0}}};
+            cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, historical_id}};
         const std::array history{
-            cf::FrozenWakeTrace{a::P1StrengthId{0}, a::SingleWord{reversed ? .25 : -.25}}};
+            cf::FrozenWakeTrace{historical_id, a::SingleWord{reversed ? .25 : -.25}}};
         cf::DiscreteNonpenetrationInput view{contact,
                                              collocation,
                                              wake,
@@ -812,9 +816,16 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         core::ResourcePlan rejected_memory{0};
         reject(run(flow, residual_limits, rejected_memory), core::FailureCode::ResourceExceeded);
         CHECK(rejected_memory.allocated_bytes() == 0);
-        wake[0].leading = a::P1StrengthId{0};
+        wake[0].leading = historical_id;
         reject(run(flow, residual_limits, memory), core::FailureCode::InvalidInput);
         wake[0].leading = cf::AttachedWakeFront{};
+        wake[0].trailing = bound_id;
+        reject(run(flow, residual_limits, memory), core::FailureCode::InvalidInput);
+        wake[0].trailing = historical_id;
+        const std::array invalid_history{cf::FrozenWakeTrace{bound_id, history[0].strength}};
+        view.history.columns = invalid_history;
+        reject(run(flow, residual_limits, memory), core::FailureCode::InvalidInput);
+        view.history.columns = history;
         collocation[0].tangents[1] = coordinates(0, -2, 0);
         reject(run(flow, residual_limits, memory), core::FailureCode::GeometryInvalid);
         collocation[0].tangents[1] = coordinates(0, 2, 0);
