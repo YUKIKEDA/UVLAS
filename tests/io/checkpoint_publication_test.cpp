@@ -95,7 +95,7 @@ const std::array chunks{
 }
 
 TEST_CASE("Native publication makes exactly the verified files visible", "[IO4-06]") {
-    Directory dir;
+    const Directory dir;
     const auto stale = dir.path / ".uvlas-checkpoint-interrupted";
     REQUIRE(fs::create_directory(stale));
     std::ofstream(stale / "chunk-old.bin", std::ios::binary) << "incomplete";
@@ -122,7 +122,7 @@ TEST_CASE("Native publication makes exactly the verified files visible", "[IO4-0
 
 TEST_CASE("Failed checkpoint saves preserve prior paths and remove only their staging files",
           "[IO4-06]") {
-    Directory dir;
+    const Directory dir;
     std::optional<CheckpointPublicationDiagnostic> diagnostic;
     ResourcePlan plan{4096};
     REQUIRE(publish_checkpoint_directory(dir.path, 41, chunks, bytes_of(manifest), limits, plan, {},
@@ -132,7 +132,9 @@ TEST_CASE("Failed checkpoint saves preserve prior paths and remove only their st
                                                        limits, plan, {}, &diagnostic);
     REQUIRE_FALSE(rejected);
     REQUIRE(diagnostic);
-    CHECK(diagnostic->stage == CheckpointPublicationStage::DestinationExists);
+    if (diagnostic) {
+        CHECK(diagnostic->stage == CheckpointPublicationStage::DestinationExists);
+    }
     CHECK(fs::is_empty(dir.path / "checkpoint-42"));
 
     auto mismatch = chunks;
@@ -142,8 +144,10 @@ TEST_CASE("Failed checkpoint saves preserve prior paths and remove only their st
     REQUIRE_FALSE(corrupt);
     CHECK(corrupt.error().code == FailureCode::CheckpointCorrupt);
     REQUIRE(diagnostic);
-    CHECK(diagnostic->stage == CheckpointPublicationStage::Verify);
-    CHECK(diagnostic->chunk == 1);
+    if (diagnostic) {
+        CHECK(diagnostic->stage == CheckpointPublicationStage::Verify);
+        CHECK(diagnostic->chunk == 1);
+    }
     CHECK_FALSE(fs::exists(dir.path / "checkpoint-43"));
 
     // MSVC request_stop is non-const.
@@ -180,7 +184,7 @@ TEST_CASE("Failed checkpoint saves preserve prior paths and remove only their st
 }
 
 TEST_CASE("Simultaneous checkpoint writers cannot replace the winning directory", "[IO4-06]") {
-    Directory dir;
+    const Directory dir;
     constexpr std::string_view first = R"({"schema":"uvlas.checkpoint/1","writer":"first"})";
     constexpr std::string_view second = R"({"schema":"uvlas.checkpoint/1","writer":"second"})";
     std::array<bool, 2> success{};
@@ -194,15 +198,18 @@ TEST_CASE("Simultaneous checkpoint writers cannot replace the winning directory"
                                .has_value();
     };
     {
-        std::jthread a{write, 0, first};
-        std::jthread b{write, 1, second};
+        const std::jthread a{write, 0, first};
+        const std::jthread b{write, 1, second};
     }
     REQUIRE(success[0] != success[1]);
     const auto winner = success[0] ? 0U : 1U;
     const auto loser = 1U - winner;
     CHECK_FALSE(diagnostics[winner]);
-    REQUIRE(diagnostics[loser]);
-    CHECK(diagnostics[loser]->stage == CheckpointPublicationStage::DestinationExists);
+    const auto& lost = diagnostics[loser];
+    REQUIRE(lost);
+    if (lost) {
+        CHECK(lost->stage == CheckpointPublicationStage::DestinationExists);
+    }
     CHECK(read(dir.path / "checkpoint-99" / "manifest.json") == (success[0] ? first : second));
     CHECK(read(dir.path / "checkpoint-99" / "chunk-first.bin") == payload);
     CHECK(temp_count(dir.path) == 0);
@@ -223,22 +230,29 @@ TEST_CASE("Only canonical checkpoint sequence names can select a published direc
 
 #ifdef __linux__
 TEST_CASE("A killed writer cannot make a partial directory a checkpoint", "[IO4-06]") {
-    Directory dir;
+    const Directory dir;
     ResourcePlan plan{4096};
     REQUIRE(
         publish_checkpoint_directory(dir.path, 12, chunks, bytes_of(manifest), limits, plan, {}));
+    constexpr std::string_view second_payload{"\0\1\2\3\4\5\6\7\0\1\2\3\4\5\6\7", 16};
+    constexpr std::array<uvlas::core::Index, 1> two_words{2};
+    constexpr auto second_digest =
+        digest_of("d2a1c23b0d2514a61539937da65e56acf4fbd42f22631050e07284a8703dccb2");
+    auto interrupted_chunks = chunks;
+    interrupted_chunks[1] = {
+        "second", {{CheckpointDtype::U64, two_words, 16, second_digest}, bytes_of(second_payload)}};
     const auto child = fork();
     REQUIRE(child >= 0);
     if (child == 0) {
         const rlimit no_core{0, 0};
-        const rlimit file_limit{7, 7};
+        const rlimit file_limit{12, 12};
         if (setrlimit(RLIMIT_CORE, &no_core) != 0 || setrlimit(RLIMIT_FSIZE, &file_limit) != 0 ||
             std::signal(SIGXFSZ, SIG_DFL) == SIG_ERR) {
             _exit(91);
         }
         ResourcePlan child_plan{4096};
-        const auto result = publish_checkpoint_directory(dir.path, 13, chunks, bytes_of(manifest),
-                                                         limits, child_plan, {});
+        const auto result = publish_checkpoint_directory(
+            dir.path, 13, interrupted_chunks, bytes_of(manifest), limits, child_plan, {});
         _exit(result ? 0 : 92);
     }
     int status = 0;
@@ -252,13 +266,15 @@ TEST_CASE("A killed writer cannot make a partial directory a checkpoint", "[IO4-
         const auto base = entry.path().filename().string();
         if (base.starts_with(".uvlas-checkpoint-")) {
             CHECK_FALSE(parse_checkpoint_directory_name(base));
-            CHECK(read(entry.path() / "chunk-first.bin") == payload.substr(0, 7));
+            CHECK(read(entry.path() / "chunk-first.bin") == payload);
+            CHECK(read(entry.path() / "chunk-second.bin") == second_payload.substr(0, 12));
             CHECK_FALSE(fs::exists(entry.path() / "manifest.json"));
         }
     }
-    REQUIRE(
-        publish_checkpoint_directory(dir.path, 13, chunks, bytes_of(manifest), limits, plan, {}));
+    REQUIRE(publish_checkpoint_directory(dir.path, 13, interrupted_chunks, bytes_of(manifest),
+                                         limits, plan, {}));
     CHECK(read(dir.path / "checkpoint-13" / "chunk-first.bin") == payload);
+    CHECK(read(dir.path / "checkpoint-13" / "chunk-second.bin") == second_payload);
 }
 #endif
 } // namespace
