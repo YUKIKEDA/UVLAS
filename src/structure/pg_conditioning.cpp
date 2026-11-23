@@ -305,7 +305,7 @@ PgConditioningCertificate::coefficient(PgRankBasisColumn column, core::Index row
             math.visit(1);
             if (accepted.transform.values()[packed(i, j)] == 0)
                 continue;
-            math.visit(std::bit_width(rows.size()));
+            math.visit(static_cast<std::uint64_t>(std::bit_width(rows.size())));
             math.charge();
             const auto value =
                 partition_take(rank->basis({partition_index(i)}, row, math.leaf_limits, plan));
