@@ -29,7 +29,6 @@
     "mutations_detected": 6
   },
   "sources": {
-    "docs/plans/next-package-work-breakdown.md": "d14bb2fdc6344f38f294e5ea9ab27ed8a0e883d5992fd092d97e2faaf37320a8",
     "docs/papers/pg-ancf-technical-report-v1.md": "daab2375cbb0797d85266b6624b238bbadb751896c5182a592e2e6029b3b3207",
     "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
     "docs/specs/structure/pg-coefficient-contract.md": "a0b2f1d12e50e4ca907954e2b7f7b580d519759152cfcebf41bc31087f875efe",
@@ -58,5 +57,11 @@
     "tests/structure/pg_reference_geometry_test.cpp": "b5eb00910ef305b8597c4f8fffebaee0c8fc395b503370682ece2900ff1f9adf",
     "docs/verification/IM-01/pg-reference-geometry/mutation-result.json": "d9231b56ffa01cff0da3111aa24463a5be1ef29bcb629bc0d483d90e44014041",
     "docs/verification/IM-01/pg-reference-geometry/verification.md": "0532670bf0ff9ec98f81cea40ee6a2ec79cb72dcde327eb33b7696faf42fdadc"
+  },
+  "historical_artifacts": {
+    "commit": "09e983ff5d63d9ab95e0b2c75883687b64f219b1",
+    "sha256": {
+      "docs/plans/next-package-work-breakdown.md": "d14bb2fdc6344f38f294e5ea9ab27ed8a0e883d5992fd092d97e2faaf37320a8"
+    }
   }
 }
