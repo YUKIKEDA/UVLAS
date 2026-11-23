@@ -1,0 +1,15 @@
+{
+  "schema": "uvlas.pg-fixed-row-integerization-gate/1",
+  "publication_checks": 8,
+  "publication_scenarios": [
+    "valid",
+    "cut-failed",
+    "cut-wrong-count",
+    "cut-missing-heap-count"
+  ],
+  "runner_alias_checks": 14,
+  "alias_modes": [
+    "direct",
+    "hard link"
+  ]
+}

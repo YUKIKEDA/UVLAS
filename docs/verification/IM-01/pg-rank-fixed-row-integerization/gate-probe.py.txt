@@ -1,0 +1,123 @@
+"""Test complete publication using the saved observations as probe responses."""
+
+import argparse
+import json
+from pathlib import Path
+from runpy import run_path
+from shutil import copyfile
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('root', 'coefficient', 'capture'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args()
+    verification = args.root.resolve() / 'docs/verification/IM-01'
+    case_dir = verification / 'pg-rank-fixed-row-integerization'
+    run = run_path(str(case_dir / 'run-integerization.py.txt'))['main']
+    paths = {
+        'coefficient': args.coefficient,
+        'study': verification / 'pg-rank-resource-study/results.json',
+        'base-runner': verification / 'pg-rank-fixed-batch/run-batch.py.txt',
+        'path-guard': verification / 'pg-rank-fixed-batch-n4-cut/run-case.py.txt',
+        'capacity-producer': verification / 'pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt',
+        'count-oracle': verification / 'pg-rank-shared-fixed-batch/run-shared.py.txt',
+    }
+    guard = run_path(str(paths['path-guard']))
+    load = guard['load']
+    base = load('integerization_gate_base', paths['base-runner'])
+    capture = json.loads(args.capture.read_bytes())
+    cases = {case['domain']: case for case in capture['cases']}
+    phases = ('--controls', 'full', 'cut')
+    scenarios = (
+        ('valid', None, phases),
+        ('cut-failed', 'injected cut failure', phases),
+        ('cut-wrong-count', 'terms:', phases),
+        ('cut-missing-heap-count', 'heap_attempts:', phases),
+    )
+    with TemporaryDirectory() as scratch:
+        temp = Path(scratch)
+        copies = {name: temp / (name + path.suffix) for name, path in paths.items()}
+        for name, path in paths.items():
+            copyfile(path, copies[name])
+        copies['binary'] = temp / 'probe.exe'
+        copies['binary'].write_bytes(b'publication transport stub')
+        old = b'prior complete result\n'
+        output = temp / 'result.json'
+        args_list = [atom for name, path in copies.items() for atom in (f'--{name}', str(path))]
+        calls = []
+
+        def load_module(name, path):
+            return base if name == 'fixed_integerization_base' else load(name, path)
+
+        def counts(_path, selections):
+            base.require(selections == {domain: set() for domain in cases}, 'all candidates must be counted')
+            return {domain: {'all': result['terms']} for domain, result in cases.items()}
+
+        def run_for_gate(path):
+            if Path(path) == copies['path-guard']:
+                return {**guard, 'load': load_module}
+            return {'count_rhs_scans': counts}
+
+        with patch.dict(run.__globals__, run_path=run_for_gate):
+            for present in (False, True):
+                for name, expected, order in scenarios:
+                    output.unlink(missing_ok=True)
+                    if present:
+                        output.write_bytes(old)
+                    calls.clear()
+
+                    def invoke(_binary, *values):
+                        phase = values[-1]
+                        calls.append(phase)
+                        if phase == '--controls':
+                            return capture['controls']
+                        if name == 'cut-failed' and phase == 'cut':
+                            raise RuntimeError('injected cut failure')
+                        result = dict(cases[phase])
+                        if name == 'cut-wrong-count' and phase == 'cut':
+                            result['terms'] -= 1
+                        if name == 'cut-missing-heap-count' and phase == 'cut':
+                            del result['heap_attempts']
+                        return result
+
+                    with patch.object(base, 'invoke', side_effect=invoke):
+                        try:
+                            run([*args_list, '--output', str(output)])
+                        except RuntimeError as error:
+                            base.require(expected and str(error).startswith(expected), f'{name}: {error}')
+                            base.require(output.read_bytes() == old if present else not output.exists(),
+                                         f'{name}: output changed')
+                        else:
+                            base.require(expected is None and json.loads(output.read_bytes()) == capture,
+                                         f'{name}: bad publication')
+                    base.require(tuple(calls) == order and not list(temp.glob('.*.tmp')), f'{name}: order or temp')
+
+            alias = temp / 'output-alias'
+            with patch.object(base, 'invoke', side_effect=AssertionError('probe invoked for alias')):
+                for name, target in copies.items():
+                    before = target.read_bytes()
+                    alias.hardlink_to(target)
+                    for collision in (target, alias):
+                        try:
+                            run([*args_list, '--output', str(collision)])
+                        except ValueError as error:
+                            base.require(str(error) == f'--output must be distinct from read-only input: {target}',
+                                         f'{name}: {error}')
+                        else:
+                            raise RuntimeError(f'{name}: accepted aliased output')
+                        base.require(alias.samefile(target) and target.read_bytes() == before
+                                     and not list(temp.glob('.*.tmp')), f'{name}: input changed')
+                    alias.unlink()
+    print(json.dumps({
+        'schema': 'uvlas.pg-fixed-row-integerization-gate/1',
+        'publication_checks': len(scenarios) * 2,
+        'publication_scenarios': [name for name, _, _ in scenarios],
+        'runner_alias_checks': len(copies) * 2, 'alias_modes': ['direct', 'hard link'],
+    }, indent=2))
+
+
+if __name__ == '__main__':
+    main()

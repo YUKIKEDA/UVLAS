@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-row-integerization",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 241,
+  "parent_issue": 140,
+  "source_commit": "9e25eb8bc425f1d696d6ffc126b1437a1c379216",
+  "date": "2026-11-23",
+  "claimed_state": "n4四次の全背景とU形切断で、固定領域上の全行尺度・全列境界・全整数係数が動的な厳密算術と一致した。算術中の追加確保試行は0件。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "699bf1f80bc9351fed420e473b5babb69a8704d9cec1cfebae7e36734f62825b",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/run-shared.py.txt": "3c612ec40315759b155c8773bd22d5f6464395da842d2af797f0f7077963bd90",
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/gate-probe.py.txt": "7cc0bbd444d3584b1e981eb0a521e401ddf544dda93890ff093575be168b8091",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/gate-result.json": "13d50d53b7d2850365c18b84560a8ab0bc6131f01b6f1ec889c0a64f0b1356eb",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/probe.cpp.txt": "774ad5f47a9d48fc07dd2763ac06fae1718e9febc01db1c59c3e44873302fe00",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/result.json": "595a847933b0bbab5bccb77c5018243c412b60b4eae992fa29efc07e52902b74",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/run-integerization.py.txt": "049ca7f78bd328ab84cfce6f91dbe910ff069e6de4b314b85e301b05a878f1c2",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/verification.md": "3be5480f83c4619405c0c600cc5c969237e56c4c05b68ae82c68a30798b8eea0"
+  }
+}

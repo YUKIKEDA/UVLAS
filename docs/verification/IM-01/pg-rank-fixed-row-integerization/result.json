@@ -1,0 +1,59 @@
+{
+  "schema": "uvlas.pg-fixed-row-integerization/1",
+  "n": 4,
+  "shape": "quartic",
+  "row_order": "sparse",
+  "input_sha256": "f60df0b774db8eb2e4241fbd31c378d8d57d16587fc2aa771d1620a7e38a1ed8",
+  "slot_bits": 1536,
+  "product_bits": 3072,
+  "byte_cap": 51539607552,
+  "controls": {
+    "equal_and_one_short": true,
+    "signed_terms_and_empty_row": true,
+    "bad_row_duplicate_zero": true,
+    "operand_width_boundary": true,
+    "lcm_overflow": true,
+    "integer_overflow": true,
+    "wide_product_boundary": true,
+    "payload_overflow": true,
+    "heap_attempts": 0
+  },
+  "cases": [
+    {
+      "domain": "full",
+      "rows": 20032,
+      "candidates": 1496,
+      "terms": 2146784,
+      "scales_compared": 20032,
+      "column_offsets_compared": 1497,
+      "coefficients_compared": 2146784,
+      "planned_bytes": 450631648,
+      "actual_bytes": 450631648,
+      "scale_bytes": 200,
+      "term_bytes": 208,
+      "scratch_bytes": 1976,
+      "owner_bytes": 2072,
+      "max_lcm_bits": 110,
+      "max_integer_bits": 127,
+      "heap_attempts": 0
+    },
+    {
+      "domain": "cut",
+      "rows": 5634,
+      "candidates": 1496,
+      "terms": 524715,
+      "scales_compared": 5634,
+      "column_offsets_compared": 1497,
+      "coefficients_compared": 524715,
+      "planned_bytes": 110304104,
+      "actual_bytes": 110304104,
+      "scale_bytes": 200,
+      "term_bytes": 208,
+      "scratch_bytes": 1976,
+      "owner_bytes": 2072,
+      "max_lcm_bits": 110,
+      "max_integer_bits": 124,
+      "heap_attempts": 0
+    }
+  ]
+}
