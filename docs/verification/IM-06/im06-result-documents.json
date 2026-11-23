@@ -35,9 +35,12 @@
       "stable_operation_name": "WriteResults"
     }
   },
-  "sources": {
+  "tested_target_registration": {
+    "commit": "d6e165c2f2cfda53b75d1d9ea869825cb01324fb",
     "CMakeLists.txt": "c574a1ef3fd3d82d18b18111d1ceb59f82744b7bbdebf7af3ea06f5b2eeddc04",
-    "tests/CMakeLists.txt": "6039b375dcaed8f12132d55daad9c94cdae4dca910d10686420f316879bd1466",
+    "tests/CMakeLists.txt": "6039b375dcaed8f12132d55daad9c94cdae4dca910d10686420f316879bd1466"
+  },
+  "sources": {
     "src/io/result_documents.cpp": "a53fbd382a2a7d98d5d94838f29efd08360cd2fa3e46835ce1fe7970e9848995",
     "src/io/result_documents.hpp": "627376817b7d57a029d49e31ac93093bd8a37d4d322616632d747bedbae4c959",
     "src/core/build_info.cpp": "78ba2a6cd427f6d9f447e83f883a521e18cfd9459ca2169e3e13aa40c8998588",
