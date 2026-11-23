@@ -47,6 +47,8 @@ public:
     [[nodiscard]] bool active() const noexcept;
     [[nodiscard]] core::Result<PreparationRequest> input() const& noexcept;
     [[nodiscard]] core::Result<PreparationRequest> input() const&& = delete;
+    /// Retain the exact immutable input for a composition that exclusively owns this curve.
+    [[nodiscard]] core::Result<SharedPreparationInput> retain_input() const noexcept;
     [[nodiscard]] core::Result<std::uint64_t> formula_version() const noexcept;
     [[nodiscard]] core::Result<RationalView> coefficient(std::uint64_t interval,
                                                          std::uint64_t component,
