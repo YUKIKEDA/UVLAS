@@ -710,6 +710,12 @@ uvlas_add_test(io.reference_root_plan
     SOURCES io/reference_root_plan_test.cpp
     LIBS uvlas_io nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_io_reference_root_plan PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_add_test(io.reference_dependency_walk
+    LABELS unit property negative verification
+    SOURCES io/reference_dependency_walk_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_reference_dependency_walk
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 uvlas_add_test(io.reference_declarations
     LABELS unit property negative verification
     SOURCES io/reference_declarations_test.cpp
