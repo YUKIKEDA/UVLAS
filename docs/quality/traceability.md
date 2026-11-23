@@ -93,7 +93,7 @@
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 11 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 1 | 1 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 6 | 2 | 0 |
-| IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 10 | 1 | 0 |
+| IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 10 | 2 | 0 |
 | IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 18 | 2 | 0 |
 | IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
@@ -125,7 +125,7 @@
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 104 | 17 | 0 |
 | N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 182 | 45 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
-| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 180 | 64 | 1 |
+| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 180 | 65 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 87 | 44 | 1 |
 | N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 11 | 7 | 0 |
 | QA-01 | [quality-plan.md:13](../quality/quality-plan.md) | 0 | 0 | 0 |
@@ -133,7 +133,7 @@
 | QA-03 | [quality-plan.md:31](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-04 | [quality-plan.md:39](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-05 | [quality-plan.md:51](../quality/quality-plan.md) | 0 | 6 | 0 |
-| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 1 | 6 | 0 |
+| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 1 | 7 | 0 |
 | QA-07 | [quality-plan.md:71](../quality/quality-plan.md) | 0 | 0 | 1 |
 | QA-08 | [quality-plan.md:82](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 6 | 0 |
