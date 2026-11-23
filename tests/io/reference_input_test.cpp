@@ -1,3 +1,4 @@
+#include "gmsh_mesh.hpp"
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
 #include "reference_root_snapshot.hpp"
@@ -418,7 +419,250 @@ void check_read_reason(const rd::RootSnapshotDiagnostic& diagnostic,
     }
 }
 
+constexpr std::string_view inventory_mesh = R"($MeshFormat
+4.1 0 8
+$EndMeshFormat
+$Nodes
+1 3 11 99
+2 1 0 3
+99
+11
+42
+0 1 0
+0 0 0
+1.000 0 0
+$EndNodes
+$Elements
+1 1 91 91
+2 1 2 1
+91 11 42 99
+$EndElements
+)";
+constexpr std::string_view inventory_mesh_hash =
+    "fb2e2468f3fdb30ac0980510dba4adf79db7f8578b3ca88984465297f00c7d79";
+constexpr std::array inventory_ids{300U, 301U, 302U, 200U, 201U, 700U, 900U, 800U};
+constexpr std::array inventory_roles{rd::ReferenceRole::GmshMesh,
+                                     rd::ReferenceRole::GmshSidecar,
+                                     rd::ReferenceRole::ReferenceGeometry,
+                                     rd::ReferenceRole::NastranDeck,
+                                     rd::ReferenceRole::NastranSidecar,
+                                     rd::ReferenceRole::PreparationHistory,
+                                     rd::ReferenceRole::ObservationReference,
+                                     rd::ReferenceRole::InitialHistory};
+constexpr std::uint64_t inventory_payload = inventory_mesh.size() + std::uint64_t{7} * 3;
+constexpr rd::RootInventoryLimits memory_inventory_bounds{
+    {{inventory_mesh.size(), inventory_mesh.size() + 1, 2, inventory_mesh.size()}, 8, 256},
+    inventory_ids.size(),
+    inventory_payload,
+    inventory_payload + inventory_ids.size(),
+    2 * inventory_ids.size(),
+    inventory_payload,
+    28};
+
+std::string write_root_inventory(const fs::path& directory) {
+    auto json = fixture::all_roles();
+    auto& geometry = json.field("model").field("geometry").elements;
+    auto& observation = json.field("observations")
+                            .elements[0]
+                            .field("comparison")
+                            .field("reference")
+                            .field("source");
+    const auto write = [&](fixture::JsonToken& declaration, std::string_view filename,
+                           std::string_view body = "abc", std::string_view hash = abc_hex) {
+        write_file(directory / filename, body);
+        declare_path(declaration, filename, hash);
+    };
+    write(geometry[0].field("mesh"), "skin.msh", inventory_mesh, inventory_mesh_hash);
+    write(geometry[0].field("sidecar"), "sidecar.json");
+    write(geometry[0].field("reference").field("file"), "geometry.json");
+    write(geometry[1].field("deck"), "model.bdf");
+    write(geometry[1].field("sidecar"), "model-sidecar.json");
+    write(json.field("analysis").field("branch").field("seed").field("history"), "seed.history");
+    write(observation, "observation.dat");
+    write(json.field("initial").field("file"), "initial.history");
+    auto repeat = json.field("observations").elements[0];
+    repeat.set("id", fixture::json("\"2\""));
+    repeat.field("comparison")
+        .field("reference")
+        .field("source")
+        .set("source_id", fixture::json("\"0900\""));
+    json.field("observations").elements.push_back(std::move(repeat));
+    return json.wire();
+}
+
 } // namespace
+
+TEST_CASE("The root inventory owns every direct declaration and feeds the verified Gmsh mesh",
+          "[IO4-01][IO4-04][N4-02][integration][verification]") {
+    auto [inventory, parent] = [] {
+        const Tree tree;
+        const auto text = write_root_inventory(tree.root);
+        write_file(tree.root / "case.json", text);
+        core::ResourcePlan source_memory{fixture::budget};
+        const auto input = fixture::take(rd::ReferenceInput::from_file(
+            tree.root, "case.json", source, manifest_limits, limits(), source_memory, {}, nullptr));
+        auto declarations = prepare(input);
+        const auto expected_parent = fixture::take(declarations.identity());
+        auto bounds = memory_inventory_bounds;
+        bounds.total_identity_comparisons += inventory_ids.size();
+        core::ResourcePlan inventory_memory{fixture::budget};
+        rd::RootSnapshotDiagnostic diagnostic;
+        auto files = fixture::take(rd::acquire_root_references(
+            input, std::move(declarations), bounds, inventory_memory, {}, &diagnostic));
+        CHECK_FALSE(diagnostic.reason);
+        return std::pair{std::move(files), expected_parent};
+    }(); // Manifest, all native handles, plans, and the tree are gone before consumption.
+    CHECK(fixture::same_identity(parent, fixture::take(inventory.identity())));
+    const auto count = fixture::take(inventory.report());
+    CHECK(count.declarations == 9);
+    CHECK(count.unique_sources == inventory_ids.size());
+    constexpr std::array ordinals{0, 1, 2, 3, 4, 5, 6, 6, 7};
+    for (std::size_t i = 0; i < ordinals.size(); ++i) {
+        const auto index = static_cast<std::size_t>(ordinals[i]);
+        const auto declaration = fixture::take(inventory.declaration(static_cast<core::Index>(i)));
+        CHECK(declaration.source_ordinal == ordinals[i]);
+        CHECK(declaration.original.source_id == io::SourceId{inventory_ids[index]});
+        CHECK(declaration.original.role == inventory_roles[index]);
+    }
+    CHECK(fixture::take(inventory.declaration(6)).original.source_id_spelling == "900");
+    CHECK(fixture::take(inventory.declaration(7)).original.source_id_spelling == "0900");
+    for (std::size_t i = 0; i < inventory_ids.size(); ++i) {
+        const auto reference = fixture::take(
+            inventory.find(parent, io::SourceId{inventory_ids[i]}, inventory_roles[i], {}));
+        const auto payload = reference.get().file.view();
+        if (!payload) {
+            FAIL("Missing authenticated file");
+            return;
+        }
+        CHECK(std::ranges::equal(payload->bytes, bytes_of(i == 0 ? inventory_mesh : "abc")));
+        CHECK(payload->digest == (i == 0 ? digest_literal(inventory_mesh_hash) : abc_digest));
+        CHECK(payload->read_calls == 2);
+        CHECK_FALSE(reference.get().pointer().empty());
+    }
+    const auto mesh =
+        fixture::take(inventory.find(parent, io::SourceId{300}, rd::ReferenceRole::GmshMesh, {}));
+    core::ResourcePlan mesh_memory{fixture::budget};
+    const auto parsed = fixture::take(rd::GmshMesh::prepare(
+        mesh.get(), {inventory_mesh.size(), 0, 0, 0, 3, 1, 4096}, mesh_memory, {}));
+    const auto view = parsed.view();
+    if (!view) {
+        FAIL("Missing owned mesh");
+        return;
+    }
+    CHECK(view->bytes == inventory_mesh);
+    CHECK(view->location.source == io::SourceId{300});
+    REQUIRE(view->nodes.size() == 3);
+    CHECK(view->nodes[0].tag == 11);
+    CHECK(view->nodes[1].tag == 42);
+    CHECK(view->nodes[2].tag == 99);
+    CHECK(view->text(view->nodes[1].coordinates[0]) == "1.000");
+    REQUIRE(view->elements.size() == 1);
+    CHECK(view->elements[0].tag == 91);
+    constexpr std::array<std::uint64_t, 3> nodes{11, 42, 99};
+    CHECK(std::ranges::equal(view->elements[0].connectivity(), nodes));
+
+    auto wrong_parent = parent;
+    ++wrong_parent.representation_revision;
+    check_acquisition_failure(
+        inventory.find(wrong_parent, io::SourceId{300}, rd::ReferenceRole::GmshMesh, {}),
+        core::FailureCode::StaleGeneration);
+    check_acquisition_failure(
+        inventory.find(parent, io::SourceId{300}, rd::ReferenceRole::GmshSidecar, {}),
+        core::FailureCode::InvalidInput);
+    check_acquisition_failure(
+        inventory.find(parent, io::SourceId{999}, rd::ReferenceRole::GmshMesh, {}),
+        core::FailureCode::InvalidInput);
+}
+
+TEST_CASE("Direct inventory checks cumulative limits and retains the input on any refusal",
+          "[IO4-01][N4-02][N4-08][integration][negative]") {
+    using enum core::FailureCode;
+    using Reason = rd::ReferenceFileFailure;
+    const Tree tree;
+    const auto text = write_root_inventory(tree.root);
+    const auto input = from_memory(tree.root, text);
+    auto prepared = prepare(input);
+    auto bounds = memory_inventory_bounds;
+    auto budget = fixture::budget;
+    std::stop_source cancelled;
+    auto expected = ResourceExceeded;
+    auto stage = rd::RootSnapshotFailure::Read;
+    std::optional<Reason> read;
+    std::optional<io::SourceId> location = io::SourceId{800};
+    SECTION("source count is decided before reads") {
+        --bounds.maximum_sources;
+        stage = rd::RootSnapshotFailure::SourceLimit;
+        location.reset();
+    }
+    SECTION("record arrays must be admitted before reads") {
+        budget = 0;
+        stage = rd::RootSnapshotFailure::InventoryStorage;
+        location.reset();
+    }
+    SECTION("payload bytes include previous files") {
+        --bounds.total_payload_bytes;
+        read = Reason::FileBytes;
+    }
+    SECTION("read bytes include an EOF probe per file") {
+        --bounds.total_read_bytes;
+        read = Reason::ReadBytes;
+    }
+    SECTION("read call charges include every previous file") {
+        --bounds.total_read_calls;
+        read = Reason::ReadCalls;
+    }
+    SECTION("hash bytes include all authenticated bytes") {
+        --bounds.total_hash_bytes;
+        read = Reason::HashBytes;
+    }
+    SECTION("identity comparisons are cumulative") {
+        --bounds.total_identity_comparisons;
+        read = Reason::IdentityComparisons;
+    }
+    SECTION("the last distinct ID cannot alias an earlier file") {
+        REQUIRE(fs::remove(tree.root / "initial.history"));
+        fs::create_hard_link(tree.root / "sidecar.json", tree.root / "initial.history");
+        expected = InvalidInput;
+        read = Reason::DuplicateFile;
+    }
+    SECTION("the last digest cannot differ even after earlier files verified") {
+        write_file(tree.root / "initial.history", "abd");
+        expected = InvalidInput;
+        read = Reason::DigestMismatch;
+    }
+    SECTION("a cancelled collection performs no reads or allocation") {
+        REQUIRE(cancelled.request_stop());
+        expected = Cancelled;
+        location.reset();
+    }
+    core::ResourcePlan memory{budget};
+    rd::RootSnapshotDiagnostic diagnostic;
+    const auto result = rd::acquire_root_references(input, std::move(prepared), bounds, memory,
+                                                    cancelled.get_token(), &diagnostic);
+    check_acquisition_failure(result, expected);
+    // NOLINTNEXTLINE(bugprone-use-after-move): the rvalue is consumed only on success.
+    CHECK(fixture::take(prepared.report()).declarations == 9);
+    CHECK(input.view());
+    if (expected == Cancelled) {
+        CHECK_FALSE(diagnostic.reason);
+        CHECK(memory.allocated_bytes() == 0);
+    } else {
+        CHECK(diagnostic.reason == stage);
+    }
+    if (location) {
+        if (const auto observed = diagnostic.location)
+            CHECK(observed->source == location);
+        else
+            FAIL("Missing original declaration location");
+        CHECK(diagnostic.pointer() == "/initial/file");
+    }
+    if (read) {
+        if (const auto observed = diagnostic.read)
+            CHECK(observed->reason == read);
+        else
+            FAIL("Missing same-handle failure");
+    }
+}
 
 TEST_CASE("File acquisition rejects its manifest and manifest alias before payload admission",
           "[IO4-01][N4-08][integration][negative]") {

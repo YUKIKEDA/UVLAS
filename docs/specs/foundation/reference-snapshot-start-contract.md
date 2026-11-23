@@ -13,6 +13,14 @@
 
 論理入口は `resolve_references(const ReferenceInput&, SnapshotLimits, ResourcePlan&, std::stop_token, SnapshotDiagnostic*) -> Result<ReferencedCase>` とする。外部参照の収集とSI変換は同じ `ReferenceInput` の `SchemaCase` から始める。SI変換後に参照を収集する場合も元の `ReferenceInput` を渡す。`SiCase::source_case()` 単独からファイル由来の情報を復元できない。CLIの入力検証は、参照整合のためにSI変換用の許容誤差を要求しない。
 
+### マニフェスト直下の参照
+
+`acquire_root_references` は `ReferenceInput` と検査済みの `PreparedRootReferences` を照合し、マニフェストに直接宣言した全ファイルを初出順に取得する。同じIDの再宣言は同じ保存先を使い、宣言位置と元の字句は各出現について保持する。すべての取得が成功すると、`AcquiredRootReferences` に宣言と元バイト列を移す。途中で失敗しても、呼び出し側の入力と宣言は再利用できる。
+
+各ファイルの上限に加え、全ファイルで占めるバイト数、読取りに必要なバイト数と呼出し回数、ハッシュの対象バイト数、実体IDの比較回数を制限する。次のファイルの処理では個別上限と集計の残量の小さい方を適用する。EOF確認の1バイト枠と実際の読取り回数も計上する。
+
+消費側は `SchemaIdentity` と `(SourceId, role)` を指定して、取得済みの配列を借りる。マニフェストを含め別名で同じ実体を指す宣言は、元バイト列を読む前に拒否する。ファイル内の依存宣言の解決と各形式の内容の適格性は、後続の役割別処理で検査する。
+
 初期参照の採取対象は次の8役割とする。列挙器の生成・検証は辞書と同じ入力を使い、現行辞書の全 `FileRef` の型と実際の到達経路を独立に照合する。
 
 | 起点 | role |
