@@ -1,0 +1,69 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-source-validation",
+  "ids": [
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 140,
+  "parent_issue": 17,
+  "date": "2026-11-23",
+  "source_commit": "7bf34d058b5284c8a0635551596b250f92de2233",
+  "claimed_state": "所有した局所rankの来歴と全写像を現在の実入力で再検証し、初回準備を含む同じ48 GiB計画で全12系列を通過した。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Debug / Release",
+    "boost": "1.92.0",
+    "stack_reservation_bytes": 67108864
+  },
+  "checks": {
+    "native_series": 12,
+    "rank_validation_calls": 12,
+    "cpp_allocation_attempts_per_prepare": 43,
+    "cpp_allocation_attempts_per_validation": 43,
+    "coordinate_comparisons": 3746550,
+    "source_coordinate_comparisons": 2225344,
+    "basis_coefficient_comparisons": 23655910,
+    "rejected_changed_native_reports": 60,
+    "debug_affected_ctest_passed": 2,
+    "release_affected_ctest_passed": 2
+  },
+  "generated_runner_sha256": {
+    "run-series.cpp.txt": "c70dcabebd2ee208e77dcbb25a227dec0ad7f9c5f2f0f8fc20dada98d8b23d8b",
+    "run-series.py.txt": "1f1da0ff96e2913000530ba55ff4a3824baa631543aa25826fcce7db4d76f211"
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/specs/structure/pg-rank-bounded-preparation-contract.md": "d7f28b39c4eaff063a7004fe4675d3ed27016a668654dd48b9e9d40458a0f19e",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "include/uvlas/structure/pg_rank_preparation.hpp": "05b7e07e97bd62b13b91ab3bde79417af80f533340e72309b1dbd7a8382ea385",
+    "src/structure/pg_partition_common.hpp": "4d84fe68350d5f85703be177e82d38c9fe51ae8cd665e37aee63b20bec0725c6",
+    "src/structure/pg_rank_storage.hpp": "f280a94a363e732ce38fbcc195cf1b0aacf2c9426ab7b98583fa97280c0fc55f",
+    "src/structure/pg_rank_input.hpp": "84e36f5fa431fc03fe7229bd810db4a0074393f562df098a51b8c27e11ceca3e",
+    "src/structure/pg_rank_factor.hpp": "924253fd8193882b7ec36352e2e779eda924148960b23756d60c7665b101619c",
+    "src/structure/pg_rank_lift.hpp": "45ec686129f202c2930f60fce06ab75eddd4a22d8ed00ea50decea4f68b34e44",
+    "src/structure/pg_rank_witness.hpp": "d46cb85b694bddd06af09ea30f8c456d29d5874aff62334357cab131661089f9",
+    "src/structure/pg_rank_preparation.cpp": "79ea7eedc31e464d9531dc50acd2d5fba7a2ae504db2a7fb9854e47b7c30c7dc",
+    "tests/structure/pg_rank_preparation_test.cpp": "d55dfc9def833914be8fe629abaf402ba07b16f414ddfc94e5d1bbcfacb9f336",
+    "tests/structure/pg_rank_preparation_resource_test.cpp": "2e1d87f5c5b3a2237da1927b76e58889e9f03eb964ed29df5f0a61927248350b",
+    "tests/structure/pg_partition_test_support.hpp": "b0bf52176dba19ccd94e4a6555aad3a26cb25c399ed98d9fc9be6c3aeb8d18cb",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-bounded-preparation.json": "f987c800fbdcd77c9e4cfd6a563a05b67e636fcc414170a7ee7341fa0cc29a16",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/run-series.cpp.txt": "a3fd50133f5c5a7112b86e804224460fecd9c814d0e9a5b1dba645dbb6911204",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/run-series.py.txt": "d490b24fe17e017513a9c9a53d74b2be5eb0a3aadcb8c8b6ab3eb00f32dac31f",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/result.json": "52c577334e1661100d95c8ee00a811cc1ffecbf7c477ce34258bac2de94fdba4",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/mutation-result.json": "3b7f800b172e9965d4448fb676eb014c8aafe135c1b62ab0f957789d2f5f1d74",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/validation-runner.patch": "434742d995e7976dfcbd3cb711639b90a1df07afcb87656b77ca872855ddc12f",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/validation-result.json": "1063ec6802bf5469004cd09331570bc22b5c2ee8484569db6c7972482b45c36b",
+    "docs/verification/IM-01/pg-rank-bounded-preparation/validation-verification.md": "be5b0de32fa8382f23bd322b5b009afe0fe9a7ec506d3f2ed2dbd705a27cf7bb"
+  }
+}

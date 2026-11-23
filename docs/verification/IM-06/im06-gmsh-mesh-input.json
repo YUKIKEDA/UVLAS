@@ -1,0 +1,47 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-gmsh-mesh-input",
+  "ids": [
+    "IO4-04",
+    "IO4-01",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "357928cb8fc1e42b6377e40dc6762b0524c93605",
+  "scope": "Owned Gmsh MSH 4.1 ASCII decoding and tag resolution, with sourced literals, controls, and boundary-orientation mutation",
+  "sources": {
+    "src/io/gmsh_mesh.hpp": "04d96006e6924e40d8927c9a0671d7649838d73dd439bebb76f17bad9fe0bee9",
+    "src/io/gmsh_mesh.cpp": "1c6256986eeac7f1eaae11d1c99e68df5bd5dff33d4bcd54a1c9a8cccf28ae0b",
+    "tests/io/gmsh_mesh_test.cpp": "e0917bdeaa711e6a38115f9d550b31d79348902ba86d13e3ad2a6ad7a9c475c4",
+    "docs/specs/foundation/gmsh-mesh-input-contract.md": "4e79f6240ab02ba7f14a1f3a2c01352cb4efb5431efdd34d96eb836c4a34b069",
+    "src/io/reference_input.hpp": "74816b29b6c1f5ea4645d44a83b2358ef652abdf4c8d388d6c9e549274dc117d",
+    "src/io/reference_root_snapshot.hpp": "713b63d9e82c849e05de4df80e99a2782c3a2182f27538edf698bd2dfd7ebeb4"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/gmsh-mesh-input.md": "38c712c59f59d665d94bd3173242b0aaa9f7b6343001d783cbc2cd22bb365b41"
+  },
+  "baseline": {
+    "source_commit": "c6351dc2965ee1848129413486eb15292b18bd38",
+    "measured_hashes": {
+      "src/io/gmsh_mesh.hpp": "7fa945a918528dbf9fc47d38ab9af41b953b95c6414a7bb4de6abe1bb0243e09",
+      "src/io/gmsh_mesh.cpp": "23dddc8268c9cf32474cfd40ee7e6fb535a876ee32f31eade4f92ca60ea21055",
+      "tests/io/gmsh_mesh_test.cpp": "e5301a75c1dac8922d6de6d047eb7eee55838f7e953a92e63ec95b0b8b8c694a",
+      "docs/specs/foundation/gmsh-mesh-input-contract.md": "3f1a142988b308931b87ffefb8d1eeeed8d071093891f6839a8055078605f3fa",
+      "src/io/reference_input.hpp": "74816b29b6c1f5ea4645d44a83b2358ef652abdf4c8d388d6c9e549274dc117d",
+      "src/io/reference_root_snapshot.hpp": "713b63d9e82c849e05de4df80e99a2782c3a2182f27538edf698bd2dfd7ebeb4"
+    }
+  },
+  "previous_review": {
+    "source_commit": "27c8918f04e178e5cfc152dcb397e9ccdf22c6fa",
+    "measured_hashes": {
+      "src/io/gmsh_mesh.hpp": "04d96006e6924e40d8927c9a0671d7649838d73dd439bebb76f17bad9fe0bee9",
+      "src/io/gmsh_mesh.cpp": "511349d9162abd952f4d5ea8162dcf3c5e454f0949bb47e5c0086320302cbbaa",
+      "tests/io/gmsh_mesh_test.cpp": "56df7bd03551ae912a7225d6b12b0226814c6e87e677355bd6b8d66c8bac107a",
+      "docs/specs/foundation/gmsh-mesh-input-contract.md": "4b9ce600c942d6b79885551db335a00a06b476f98df3b927f3cbb561c33272c6",
+      "src/io/reference_input.hpp": "74816b29b6c1f5ea4645d44a83b2358ef652abdf4c8d388d6c9e549274dc117d",
+      "src/io/reference_root_snapshot.hpp": "713b63d9e82c849e05de4df80e99a2782c3a2182f27538edf698bd2dfd7ebeb4"
+    }
+  }
+}

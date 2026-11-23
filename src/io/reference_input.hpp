@@ -63,7 +63,7 @@ struct ReferenceInputDiagnostic {
 // Borrows the schema and root from the input until it is moved or destroyed.
 struct ReferenceInputView {
     const SchemaCase& schema;
-    const ReadRoot* root;
+    const ReadRoot* root = nullptr;
     std::optional<ReferenceFileId> manifest_identity;
 };
 

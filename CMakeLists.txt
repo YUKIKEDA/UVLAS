@@ -85,7 +85,7 @@ endif()
 set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp
     src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp src/aero/p1_shared_action.cpp
     src/aero/global_geometry.cpp src/aero/global_bvh.cpp src/aero/global_intersections.cpp
-    src/aero/alias_kinematics.cpp src/aero/pchip_rational_slots.cpp src/aero/pchip_slot_integer.cpp src/aero/pchip_coefficients.cpp src/aero/pchip_interval_jet.cpp src/aero/pchip_knot_locator.cpp src/aero/pchip_domain_route.cpp src/aero/pchip_boundary.cpp src/aero/pchip_side.cpp src/aero/pchip_preparation_input.cpp src/aero/pchip_shared_preparation_input.cpp src/aero/pchip_curve.cpp)
+    src/aero/alias_kinematics.cpp src/aero/pchip_rational_slots.cpp src/aero/pchip_slot_integer.cpp src/aero/pchip_coefficients.cpp src/aero/pchip_interval_jet.cpp src/aero/pchip_knot_locator.cpp src/aero/pchip_domain_route.cpp src/aero/pchip_boundary.cpp src/aero/pchip_side.cpp src/aero/pchip_preparation_input.cpp src/aero/pchip_shared_preparation_input.cpp src/aero/pchip_curve.cpp src/aero/uniform_flow.cpp)
 add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})
 uvlas_configure_target(uvlas_aero)
 target_include_directories(uvlas_aero PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -111,7 +111,7 @@ target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 
 # Strict input scalars share the core value and failure contracts.
 set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
-    src/io/reference_path.cpp src/io/reference_file_snapshot.cpp
+    src/io/reference_path.cpp src/io/reference_file_snapshot.cpp src/io/gmsh_mesh.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp

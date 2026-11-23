@@ -1,0 +1,113 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-exact-uniform-flow-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-23",
+  "source_commit": "e82c4ac500fff61fd389cc2bf84e77e6ceedf6aa",
+  "claimed_state": "Internal adopted exact uniform velocity from constant, polynomial and PCHIP inputs. Owned world-coordinate velocity/time/spatial derivatives and source-checked restart.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_targets": [
+      "aero.uniform_flow",
+      "aero.pchip_curve",
+      "aero.pchip_coefficients_resources"
+    ],
+    "ctest_each_configuration": "3 passed out of 3",
+    "catch_seed": 271,
+    "normal_each_configuration": "5 cases, 731 assertions",
+    "resource_each_configuration": "1 new case, 268 assertions matching Exact uniform polynomial*",
+    "reference": "Independent literal fractions obtained by expansion and analytical differentiation of a scaled cubic and hand calculation of the first PCHIP interval. Canonical numerator and denominator comparisons use tolerance zero. All nine spatial derivatives are exact zeros.",
+    "restart": "Distinct prepared owners, retained results after source lifetimes, exact source and event comparison, forged PCHIP coefficient refusal. Valid Hold and Periodic sources share the normal PCHIP path.",
+    "resource_controls": "Exact and one-less payload and step limits; zero allocation on budget refusal; 7 preparation and 4 evaluation allocations with failure, cancellation and reentry injected at every position; previous owner and jet survive.",
+    "mutation": "On an isolated MSVC Debug copy of uniform_flow.cpp, replace the derivative division by dtdu with the unscaled derivative, leaving the rest of the product unchanged. The scaled cubic test reports 220 assertions passed, 9 exact derivative assertions failed, exit 42.",
+    "scope": "Canonical SI rational input. SI case adaptation, analytic gust, support motion and downstream-consumer precision projection remain in their existing IM03-0 and IM06-0 work.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on four changed translation units, exit 0",
+    "clean_build": true
+  },
+  "source_records": [
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "c8f4f9b41570ae7bcd0b01665afa01024aa3d7aafa101038a5db8e693000d3b3"
+    },
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b"
+    },
+    {
+      "id": "src/aero/pchip_curve.cpp",
+      "hint": "src/aero/pchip_curve.cpp",
+      "sha256": "f4c6b6f402b8654bb36eff7452f3bf9d9f21d9dc4cacf4387e441a97e8ed67c2"
+    },
+    {
+      "id": "src/aero/pchip_curve.hpp",
+      "hint": "src/aero/pchip_curve.hpp",
+      "sha256": "ac8f4151d2ccc43a6bacdb5cdf7e7916d8360d7f8b6acbe759bb092f27a7ebf4"
+    },
+    {
+      "id": "src/aero/uniform_flow.cpp",
+      "hint": "src/aero/uniform_flow.cpp",
+      "sha256": "9830ffb6d2368d6bdddbee08d973729ab29307c0e3f97187141e73e5dba3a2d2"
+    },
+    {
+      "id": "src/aero/uniform_flow.hpp",
+      "hint": "src/aero/uniform_flow.hpp",
+      "sha256": "7f0024195154c6f827e1d698d29c5ef857795d36fd0f8ce405c8b37553bd2a10"
+    },
+    {
+      "id": "tests/CMakeLists.txt",
+      "hint": "tests/CMakeLists.txt",
+      "sha256": "a018410aec8998001e6810dd8624ba32dd8bf2d438c1db20a88bc4d26ee4d87c"
+    },
+    {
+      "id": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "3efee4be7d1bec9f00e7bc43d99ed68e60eb36f8a9332e05790fa07af6c8138d"
+    },
+    {
+      "id": "tests/aero/uniform_flow_test.cpp",
+      "hint": "tests/aero/uniform_flow_test.cpp",
+      "sha256": "f4c607e3c0913ec8d2bd7a2fce6d7c57501e4baec7c580fdbbf0bc17244326a1"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "c8f4f9b41570ae7bcd0b01665afa01024aa3d7aafa101038a5db8e693000d3b3",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "src/aero/pchip_curve.cpp": "f4c6b6f402b8654bb36eff7452f3bf9d9f21d9dc4cacf4387e441a97e8ed67c2",
+    "src/aero/pchip_curve.hpp": "ac8f4151d2ccc43a6bacdb5cdf7e7916d8360d7f8b6acbe759bb092f27a7ebf4",
+    "src/aero/uniform_flow.cpp": "9830ffb6d2368d6bdddbee08d973729ab29307c0e3f97187141e73e5dba3a2d2",
+    "src/aero/uniform_flow.hpp": "7f0024195154c6f827e1d698d29c5ef857795d36fd0f8ce405c8b37553bd2a10",
+    "tests/CMakeLists.txt": "a018410aec8998001e6810dd8624ba32dd8bf2d438c1db20a88bc4d26ee4d87c",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "3efee4be7d1bec9f00e7bc43d99ed68e60eb36f8a9332e05790fa07af6c8138d",
+    "tests/aero/uniform_flow_test.cpp": "f4c607e3c0913ec8d2bd7a2fce6d7c57501e4baec7c580fdbbf0bc17244326a1"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/exact-uniform-flow-v1/current-pchip-review.json": "4fe04b4704e15d8390404fcd12ed46d62b531385ed6262f77ba81c82e8a3e50b",
+    "docs/verification/IM-03/exact-uniform-flow-v1/verification.md": "a90701ee1b5787b528ec63884890d059fa0e99f609257e3b2b67b3d9f46e35bb"
+  }
+}

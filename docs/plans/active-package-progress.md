@@ -1,18 +1,18 @@
 # IM-01・IM-03・IM-06の進捗と残作業
 
-今回の変更までを統合した時点で、実装中の3パッケージは **16／43段階（約37%）が完了**する。残り27段階のうち24段階が実装・検証、3段階が終了審査。下表は統合後の成果と次の完了条件を示す。
+局所独立化の再検証を統合すると、実装中の3パッケージは **17／43段階（約40%）が完了**する。残り26段階のうち23段階が実装・検証、3段階が終了審査。下表は統合後の成果と次の完了条件を示す。
 
 | パッケージ | 完了／全体 | 残り | 統合済みの成果 | 次に完了させる成果と判定条件 |
 |---|---:|---:|---|---|
-| [IM-01 構造](#im-01-構造) | 5／12（42%） | 7 | 参照位置と微分に加え、辞書・分割から局所rankを準備し、入力の来歴、基底、全座標を所有する。全12系列を独立参照と厳密に照合した。 [参照幾何の検証](../verification/IM-01/pg-reference-geometry/verification.md)・[#264](https://github.com/YUKIKEDA/UVLAS/issues/264) | 局所rankの資源方式の審査と、後続が再利用する際の入出力照合を閉じる。 [#140](https://github.com/YUKIKEDA/UVLAS/issues/140)・[#133](https://github.com/YUKIKEDA/UVLAS/issues/133) |
-| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有に続き、固定分割四辺形と共有辺の誘導・全微分を実装した。PCHIPの曲線準備、評価、再開時の照合も実装した。 [共有辺と四辺形](../verification/IM-03/p1-shared-action-v1/verification.md)・[#263](https://github.com/YUKIKEDA/UVLAS/pull/263) | 既知流れと指定運動を同じ時刻・座標の規則で評価できるよう、採用済み曲線と必要な投影を接続し、値・微分と再開時の一致を確かめる。 |
-| [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換を実装済み。根相対で取得した先頭の参照を、ダイジェスト照合後に依存走査へ渡した。共有と循環を判定する走査も実装済み。 [#245](https://github.com/YUKIKEDA/UVLAS/pull/245)・[#252](https://github.com/YUKIKEDA/UVLAS/pull/252) | 実入力の参照解決には、役割ごとの内容と依存抽出の規則を確定する。Gmshを起点に、採用するMSH 4.1 ASCIIの範囲、sidecar、参照の宣言方法を決める。独立に進められる配布準備では、既存のCLIとPython成果物の依存・ABIを調べ、開発環境なしでの起動を検証する。 |
+| [IM-01 構造](#im-01-構造) | 6／12（50%） | 6 | 参照幾何に加え、辞書と分割から局所rankを準備し、基底と全座標を現在の入力で厳密に再検証できる。全12系列で、元の結果を保持したまま同じ48 GiB枠で照合した。 [局所rank再検証](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) | 局所基底と参照幾何から物理内積を組み立て、保証付き条件付けの誤差上限と必須場の保持を検査する。 |
+| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有、共有辺の誘導・全微分を実装した。定数・多項式・PCHIPの一様流は厳密なSI入力から速度と微分を返し、復元時に入力と係数を照合する。 [一様流の検証](../verification/IM-03/exact-uniform-flow-v1/verification.md) | ケースからの受渡しと必要な精度投影を閉じ、突風と指定運動を同じ時刻・座標規則で照合する。 |
+| [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換を実装済み。取得済みのGmshメッシュから節点と要素、幾何実体、物理名を読み取る。両OSで移設したCLIの起動と、新規venvでのPython拡張の読込みを検証した。 [メッシュの検証](../verification/IM-06/gmsh-mesh-input.md)・[#269](https://github.com/YUKIKEDA/UVLAS/pull/269) | Gmshのsidecarで部材、材料、支持、接続、参照面への対応を定め、役割ごとの参照を解決する。正式な配布形式と公開先はREL-1で判定する。 |
 
 割合は[作業分解](next-package-work-breakdown.md)の完了段階数を全段階数で割って求める。各段階の完了は、採用仕様、後続が受け取る成果、独立した検証根拠で確かめる。段階ごとに規模が異なるため、この数字から残りの工数は見積もれない。
 
 ## IM-01 構造
 
-[#17](https://github.com/YUKIKEDA/UVLAS/issues/17) の終了審査まで7段階。参照幾何から位置・微分・測度を受け取れる。保証付き条件付けを始めるには、局所rankの資源条件と全列再構成の確認が残る。
+[#17](https://github.com/YUKIKEDA/UVLAS/issues/17) の終了審査まで6段階。参照幾何から位置・微分・測度を受け取り、局所基底とその再構成を現在の入力で確かめられる。次の段階は保証付き条件付けである。
 
 | 段階 | 状態 | 到達点と残作業 |
 |---|---|---|
@@ -20,7 +20,7 @@
 | グラフとセル | 完了 | 有理グラフ、half-cell、矩形の活動map。 [#103](https://github.com/YUKIKEDA/UVLAS/pull/103) |
 | 全原辞書と full V | 完了 | アンカー補完、必須場と並進の厳密な写像。 [#113](https://github.com/YUKIKEDA/UVLAS/pull/113) |
 | 多角形と全積分分割 | 完了 | 被覆を検査した分割と資源計画。 [分割](https://github.com/YUKIKEDA/UVLAS/pull/128)・[資源計画](https://github.com/YUKIKEDA/UVLAS/pull/149) |
-| 局所独立化 | 検証中 | 固定領域の証明器と難条件2列の復元は統合済み。全候補の有限体探索の固定領域実証も [#186](https://github.com/YUKIKEDA/UVLAS/pull/186) で統合済み。n1四次・全背景の全383列の有理復元と全1252行の厳密証明は [#196](https://github.com/YUKIKEDA/UVLAS/pull/196) で統合済みの限定実証。n2四次・全背景でも [#204](https://github.com/YUKIKEDA/UVLAS/pull/204) で全730列の復元と全5008活動行の厳密証明を確認した。[#210](https://github.com/YUKIKEDA/UVLAS/pull/210) では、n4四次U形切断の全1,496候補を復元し、元式8,428,464行と独立証明書の745,008座標を厳密に照合した。[#217](https://github.com/YUKIKEDA/UVLAS/pull/217) でn4平坦1,237候補と四次1,496候補の全背景を検証し、元式の全活動行と独立証明書の全座標を厳密に照合した。[#227](https://github.com/YUKIKEDA/UVLAS/pull/227) では、四次の全背景とU形切断で、共通行尺度が補正桁と残差更新を保つ条件を検証した。[#235](https://github.com/YUKIKEDA/UVLAS/pull/235) で共有尺度を固定バッチへ接続し、両領域の全候補で列別の診断が従来と一致した。[#243](https://github.com/YUKIKEDA/UVLAS/pull/243) では両領域の全行尺度と全整数係数を固定領域で作り、最大ビット幅も動的な厳密参照と照合した。[#253](https://github.com/YUKIKEDA/UVLAS/pull/253) では、同じ疎係数と列境界の配列を共有持上げへ渡し、両領域で全候補の元式と独立証明書を照合した。[#264](https://github.com/YUKIKEDA/UVLAS/issues/264) で、辞書・分割から基底・全座標と入力の来歴を所有する準備を実装し、全12系列を独立参照と照合した。辞書・分割を同時に保持する48 GiBの予算でn=4の四次U形も通過した。資源方式の審査と再利用時の照合が残る。 [数学契約 #133](https://github.com/YUKIKEDA/UVLAS/issues/133)・[資源方式 #140](https://github.com/YUKIKEDA/UVLAS/issues/140) |
+| 局所独立化 | 完了 | 局所rank、基底、写像と来歴を所有する。再利用時にグラフ・領域・活動面積・辞書を照合し、B/T/S/W/Zを全活動行で厳密に再検証する。全12系列を独立参照と照合した。 [準備の検証](../verification/IM-01/pg-rank-bounded-preparation/verification.md)・[再検証と資源](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
 | 保証付き条件付け | 残 | 局所独立化と参照幾何を結合し、幾何内積と基底変換を誤差上界付きで検証する |
 | PreparedPatchと参照作用 | 残 | 条件付け済み基底を、層・面・片側の参照作用と反復用Workspaceへつなぐ |
@@ -64,7 +64,7 @@
 | 励振と既知入力 | 残 | schema・SI・参照snapshotと流れ／J1の契約を、時系列・イベント・必要微分へつなぐ |
 | parametric入力とprepare | 残 | 型付きcaseを共通のRawModelへ渡す。物理準備には対応するIM-01／02／03の成果が必要 |
 | Nastran | 残 | schema・SI・snapshotを入力に、採用カード、座標系、sidecarを解析する |
-| Gmsh | 残 | 同じ入力基盤を使い、採用したMSH 4.1 ASCII、物理名、sidecarを解析する |
+| Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。sidecarの型と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md) |
 | 共通参照への変換 | 残 | 外部面を共通の曲面・厚さ・接続へ変換し、質量・仕事などの誤差を評価する。対応するIM-01／02の成果が必要 |
 | 結果と診断 | 残 | 物理回復の出力をstatus、来歴、CSV／VTU／PVDと対応付ける |
 | checkpoint容器 | 残 | snapshotと状態基盤を使い、形式、整合検査、確定checkpointを守る書込みを実装する |
@@ -74,7 +74,7 @@
 | ランタイムと新規環境 | 基盤あり | CLIとbindingの基盤は [IM-00](im00-package-acceptance.md) にある。実際に配布するCLI／wheelの依存・ABIと、開発環境に依存しない導入・実行を確認する |
 | 終了審査 | 残 | V-USE・V-STATEで3入力経路とCLI／Pythonの物理結果、両OSの導入・中断・再開を照合する |
 
-schemaのLinux sanitizer実行に関する [#142](https://github.com/YUKIKEDA/UVLAS/issues/142) は継続。数値表の段階数には、同じ段階に属する個々の子Issueを重ねて加えていない。
+schemaのLinux sanitizerの2試験は [#143](https://github.com/YUKIKEDA/UVLAS/pull/143) の修正を含むmainで再計測し、49.51秒と53.22秒で通過した。Linux sanitizerだけ300秒、Linux Debug・ReleaseとWindows Debug・Releaseは60秒の登録を確認した。 [#142](https://github.com/YUKIKEDA/UVLAS/issues/142) 数値表では同じ段階の子Issueを重ねて加えない。
 
 ## 初回実務適用までの位置
 
