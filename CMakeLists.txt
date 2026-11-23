@@ -123,10 +123,10 @@ target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
 target_link_libraries(uvlas_io PUBLIC uvlas_core uvlas_structure PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
 if(WIN32)
     # Native OS allocations are outside the instrumented numerical libraries.
-    target_sources(uvlas_io PRIVATE src/io/windows_reference_root.cpp)
+    target_sources(uvlas_io PRIVATE src/io/windows_reference_root.cpp src/io/checkpoint_publication.cpp)
     target_link_libraries(uvlas_io PRIVATE ntdll)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp)
+    target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp src/io/checkpoint_publication.cpp)
 endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp)
