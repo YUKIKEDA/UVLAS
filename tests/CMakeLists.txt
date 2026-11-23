@@ -72,6 +72,14 @@ target_include_directories(uvlas_test_io_reference_file_snapshot PRIVATE "${PROJ
 uvlas_enable_allocation_audit(uvlas_test_io_reference_file_snapshot)
 uvlas_require_audited_dependencies(uvlas_test_io_reference_file_snapshot)
 
+uvlas_add_test(io.gmsh_mesh
+    LABELS unit property negative verification
+    SOURCES io/gmsh_mesh_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_io_audit uvlas::eigen)
+target_include_directories(uvlas_test_io_gmsh_mesh PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+uvlas_enable_allocation_audit(uvlas_test_io_gmsh_mesh)
+uvlas_require_audited_dependencies(uvlas_test_io_gmsh_mesh)
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.reference_input
         LABELS integration property negative verification
