@@ -33,8 +33,9 @@ parse_checkpoint_directory_name(std::string_view name) noexcept {
         return std::nullopt;
     }
     std::uint64_t number = 0;
-    const auto end = name.data() + name.size();
-    const auto converted = std::from_chars(name.data(), end, number);
+    const auto* begin = name.data();
+    const auto* end = begin + name.size();
+    const auto converted = std::from_chars(begin, end, number);
     if (converted.ec != std::errc{} || converted.ptr != end) {
         return std::nullopt;
     }

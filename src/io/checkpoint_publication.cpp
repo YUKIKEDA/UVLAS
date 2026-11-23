@@ -13,9 +13,10 @@
 #include <windows.h>
 #include <winternl.h>
 
-// The user-mode export is in ntdll; the SDK's winternl.h omits its declaration.
+// The user-mode export is in ntdll. Use the ABI's 32-bit information class because
+// the SDK's enum omits FileRenameInformation.
 extern "C" NTSYSAPI NTSTATUS NTAPI NtSetInformationFile(HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG,
-                                                        FILE_INFORMATION_CLASS);
+                                                        ULONG);
 #else
 #include <cerrno>
 #include <fcntl.h>
@@ -32,7 +33,7 @@ constexpr auto save = core::Operation::SaveCheckpoint;
 using Code = core::FailureCode;
 using Stage = CheckpointPublicationStage;
 using Name = std::array<char, 80>;
-constexpr std::size_t block_size = 64 * 1024;
+constexpr std::size_t block_size = std::size_t{64} * 1024;
 
 [[nodiscard]] Name name_with(std::string_view prefix, std::string_view middle,
                              std::string_view suffix) noexcept {
@@ -122,6 +123,8 @@ const RawHandle invalid_handle = nullptr;
         return std::unexpected(native_error());
     }
     if (!valid_parent(handle)) {
+        // Cleanup cannot supersede the operation status or return a second failure.
+        // NOLINTNEXTLINE(bugprone-unused-return-value)
         static_cast<void>(close_native(handle));
         return std::unexpected(ERROR_DIRECTORY);
     }
@@ -233,6 +236,8 @@ void remove_stage_file(RawHandle stage, const Name& name) noexcept {
     auto file = open_relative(stage, name, DELETE, FILE_OPEN, FILE_NON_DIRECTORY_FILE);
     if (file) {
         mark_for_removal(*file);
+        // Cleanup cannot supersede the operation status or return a second failure.
+        // NOLINTNEXTLINE(bugprone-unused-return-value)
         static_cast<void>(close_native(*file));
     }
 }
@@ -255,7 +260,7 @@ void remove_stage(RawHandle /*parent*/, RawHandle stage, const Name& /*name*/) n
         static_cast<DWORD>(std::char_traits<char>::length(final_name.data()) * sizeof(wchar_t)),
         wide_name(final_name)};
     // FileRenameInformation supports a directory-handle-relative destination.
-    constexpr auto rename_class = static_cast<FILE_INFORMATION_CLASS>(10);
+    constexpr ULONG rename_class = 10;
     IO_STATUS_BLOCK info{};
     const auto length = static_cast<ULONG>(offsetof(RenameBuffer, text)) + rename_info.length;
     const auto status = NtSetInformationFile(stage, &info, &rename_info, length, rename_class);
@@ -419,6 +424,8 @@ public:
     Handle& operator=(const Handle&) = delete;
     ~Handle() {
         if (raw_ != invalid_handle) {
+            // Cleanup cannot supersede the operation status or return a second failure.
+            // NOLINTNEXTLINE(bugprone-unused-return-value)
             static_cast<void>(close_native(raw_));
         }
     }
@@ -435,7 +442,7 @@ private:
 
 struct Publication {
     const std::stop_token& stop;
-    std::optional<CheckpointPublicationDiagnostic>* diagnostic;
+    std::optional<CheckpointPublicationDiagnostic>* diagnostic = nullptr;
     std::optional<std::size_t> chunk;
 
     [[nodiscard]] auto fail(Stage stage, Code code,
