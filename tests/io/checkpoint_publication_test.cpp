@@ -1,0 +1,194 @@
+#include "checkpoint_publication.hpp"
+
+#include <catch2/catch_test_macros.hpp>
+
+#include <array>
+#include <barrier>
+#include <chrono>
+#include <fstream>
+#include <thread>
+
+namespace {
+
+namespace fs = std::filesystem;
+using namespace uvlas::io::detail;
+using uvlas::core::FailureCode;
+using uvlas::core::ResourcePlan;
+
+constexpr CheckpointPublicationLimits limits{3, 1024, 4096};
+constexpr std::string_view manifest = R"({"schema":"uvlas.checkpoint/1","byte_order":"little"})";
+
+struct Directory {
+    fs::path path;
+    Directory() {
+        const auto tick = std::chrono::steady_clock::now().time_since_epoch().count();
+        for (int attempt = 0; attempt < 32; ++attempt) {
+            const auto candidate =
+                fs::temp_directory_path() / ("uvlas-io4-06-publication-" + std::to_string(tick) +
+                                             "-" + std::to_string(attempt));
+            if (fs::create_directory(candidate)) {
+                path = candidate;
+                return;
+            }
+        }
+        FAIL("Could not reserve a private output directory");
+    }
+    Directory(const Directory&) = delete;
+    Directory& operator=(const Directory&) = delete;
+    ~Directory() {
+        if (!path.empty()) {
+            std::error_code ignored;
+            fs::remove_all(path, ignored);
+        }
+    }
+};
+
+auto bytes_of(std::string_view text) noexcept {
+    return std::as_bytes(std::span{text});
+}
+
+consteval uvlas::io::SourceDigest digest_of(std::string_view text) {
+    constexpr std::string_view digits = "0123456789abcdef";
+    uvlas::io::SourceDigest result{};
+    for (std::size_t i = 0; i < result.bytes.size(); ++i) {
+        result.bytes[i] =
+            static_cast<std::byte>(16 * digits.find(text[2 * i]) + digits.find(text[2 * i + 1]));
+    }
+    return result;
+}
+
+constexpr std::string_view payload{"\0\1\2\3\4\5\6\7", 8};
+constexpr std::array<uvlas::core::Index, 1> words{1};
+constexpr std::array<uvlas::core::Index, 1> zero{0};
+constexpr auto payload_digest =
+    digest_of("8a851ff82ee7048ad09ec3847f1ddf44944104d2cbd17ef4e3db22c6785a0d45");
+constexpr auto empty_digest =
+    digest_of("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+
+const std::array chunks{
+    CheckpointPublicationChunk{
+        "first", {{CheckpointDtype::U64, words, 8, payload_digest}, bytes_of(payload)}},
+    CheckpointPublicationChunk{"empty", {{CheckpointDtype::I64, zero, 0, empty_digest}, {}}}};
+
+[[nodiscard]] std::string read(const fs::path& file) {
+    std::ifstream stream(file, std::ios::binary);
+    REQUIRE(stream.is_open());
+    return {std::istreambuf_iterator<char>{stream}, {}};
+}
+
+[[nodiscard]] std::size_t temp_count(const fs::path& path) {
+    std::size_t count = 0;
+    for (const auto& entry : fs::directory_iterator{path}) {
+        if (entry.path().filename().string().starts_with(".uvlas-checkpoint-")) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+TEST_CASE("Native publication makes exactly the verified files visible", "[IO4-06]") {
+    Directory dir;
+    const auto stale = dir.path / ".uvlas-checkpoint-interrupted";
+    REQUIRE(fs::create_directory(stale));
+    std::ofstream(stale / "chunk-old.bin", std::ios::binary) << "incomplete";
+    ResourcePlan plan{2 * sizeof(std::string_view) + manifest.size()};
+    std::optional<CheckpointPublicationDiagnostic> diagnostic;
+    REQUIRE(publish_checkpoint_directory(dir.path, "42", chunks, bytes_of(manifest), limits, plan,
+                                         {}, &diagnostic));
+    CHECK_FALSE(diagnostic);
+    CHECK(read(dir.path / "42" / "manifest.json") == manifest);
+    CHECK(read(dir.path / "42" / "chunk-first.bin") == payload);
+    CHECK(read(dir.path / "42" / "chunk-empty.bin").empty());
+    CHECK(std::distance(fs::directory_iterator{dir.path / "42"}, fs::directory_iterator{}) == 3);
+    CHECK(read(stale / "chunk-old.bin") == "incomplete");
+    CHECK_FALSE(fs::exists(stale / "manifest.json"));
+    CHECK(temp_count(dir.path) == 1);
+}
+
+TEST_CASE("Failed checkpoint saves preserve prior paths and remove only their staging files",
+          "[IO4-06]") {
+    Directory dir;
+    std::optional<CheckpointPublicationDiagnostic> diagnostic;
+    ResourcePlan plan{4096};
+    REQUIRE(publish_checkpoint_directory(dir.path, "41", chunks, bytes_of(manifest), limits, plan,
+                                         {}, &diagnostic));
+    REQUIRE(fs::create_directory(dir.path / "42"));
+    const auto rejected = publish_checkpoint_directory(dir.path, "42", chunks, bytes_of(manifest),
+                                                       limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(rejected);
+    REQUIRE(diagnostic);
+    CHECK(diagnostic->stage == CheckpointPublicationStage::DestinationExists);
+    CHECK(fs::is_empty(dir.path / "42"));
+
+    auto mismatch = chunks;
+    mismatch[1].chunk.header.digest = payload_digest;
+    const auto corrupt = publish_checkpoint_directory(dir.path, "43", mismatch, bytes_of(manifest),
+                                                      limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(corrupt);
+    CHECK(corrupt.error().code == FailureCode::CheckpointCorrupt);
+    REQUIRE(diagnostic);
+    CHECK(diagnostic->stage == CheckpointPublicationStage::Verify);
+    CHECK(diagnostic->chunk == 1);
+    CHECK_FALSE(fs::exists(dir.path / "43"));
+
+    // MSVC request_stop is non-const.
+    // NOLINTNEXTLINE(misc-const-correctness)
+    std::stop_source cancel;
+    static_cast<void>(cancel.request_stop());
+    const auto cancelled = publish_checkpoint_directory(
+        dir.path, "44", chunks, bytes_of(manifest), limits, plan, cancel.get_token(), &diagnostic);
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == FailureCode::Cancelled);
+    CHECK_FALSE(fs::exists(dir.path / "44"));
+
+    auto duplicate = chunks;
+    duplicate[1].logical_name = duplicate[0].logical_name;
+    const auto duplicated = publish_checkpoint_directory(
+        dir.path, "45", duplicate, bytes_of(manifest), limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(duplicated);
+    CHECK(duplicated.error().code == FailureCode::InvalidInput);
+    const auto traversal = publish_checkpoint_directory(
+        dir.path, "../escape", chunks, bytes_of(manifest), limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(traversal);
+    CHECK(traversal.error().code == FailureCode::InvalidInput);
+    ResourcePlan insufficient{2 * sizeof(std::string_view) + manifest.size() - 1};
+    const auto limited = publish_checkpoint_directory(dir.path, "46", chunks, bytes_of(manifest),
+                                                      limits, insufficient, {}, &diagnostic);
+    REQUIRE_FALSE(limited);
+    CHECK(limited.error().code == FailureCode::ResourceExceeded);
+    CHECK_FALSE(fs::exists(dir.path / "46"));
+    CHECK(read(dir.path / "41" / "manifest.json") == manifest);
+    CHECK(read(dir.path / "41" / "chunk-first.bin") == payload);
+    CHECK(temp_count(dir.path) == 0);
+}
+
+TEST_CASE("Simultaneous checkpoint writers cannot replace the winning directory", "[IO4-06]") {
+    Directory dir;
+    constexpr std::string_view first = R"({"schema":"uvlas.checkpoint/1","writer":"first"})";
+    constexpr std::string_view second = R"({"schema":"uvlas.checkpoint/1","writer":"second"})";
+    std::array<bool, 2> success{};
+    std::array<std::optional<CheckpointPublicationDiagnostic>, 2> diagnostics{};
+    std::barrier begin{2};
+    const auto write = [&](std::size_t ordinal, std::string_view text) {
+        ResourcePlan plan{4096};
+        begin.arrive_and_wait();
+        success[ordinal] = publish_checkpoint_directory(dir.path, "99", chunks, bytes_of(text),
+                                                        limits, plan, {}, &diagnostics[ordinal])
+                               .has_value();
+    };
+    {
+        std::jthread a{write, 0, first};
+        std::jthread b{write, 1, second};
+    }
+    REQUIRE(success[0] != success[1]);
+    const auto winner = success[0] ? 0U : 1U;
+    const auto loser = 1U - winner;
+    CHECK_FALSE(diagnostics[winner]);
+    REQUIRE(diagnostics[loser]);
+    CHECK(diagnostics[loser]->stage == CheckpointPublicationStage::DestinationExists);
+    CHECK(read(dir.path / "99" / "manifest.json") == (success[0] ? first : second));
+    CHECK(read(dir.path / "99" / "chunk-first.bin") == payload);
+    CHECK(temp_count(dir.path) == 0);
+}
+
+} // namespace
