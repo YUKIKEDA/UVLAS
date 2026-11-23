@@ -54,6 +54,8 @@ struct CaseUniformFlowQuery {
 struct CaseUniformFlowEvaluation {
     aero::detail::ExactUniformFlowJet jet;
     std::uint64_t used_steps = 0; ///< Includes current-input comparison.
+    aero::detail::pchip::RequestedSide requested_side =
+        aero::detail::pchip::RequestedSide::Automatic;
 };
 
 /// Transient PCHIP uses the checked case intervals. Other PCHIP callers supply a C1 window.

@@ -1,0 +1,116 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-uniform-flow-projection-v1",
+  "ids": [
+    "AE-07",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-23",
+  "source_commit": "78fb014e4b4b0be87054f4dd588c9c18080d8df2",
+  "claimed_state": "Explicit owned scaled Binary64/TwoWord projection of the typed-case exact uniform-flow jet, with the source and actual component error bounds.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_targets": [
+      "coupling.case_uniform_flow",
+      "aero.uniform_flow",
+      "io.si_case"
+    ],
+    "ctest_each_configuration": "3 passed out of 3",
+    "catch_seed": 19,
+    "native_each_configuration": "8 cases, 701 assertions",
+    "projection_each_configuration": "2 cases, 246 assertions",
+    "independent_reference": "Analytic ft/min PCHIP fixture and cpp_rational reconstruction of each actual returned binary word with frexp/ldexp. Check its outward radius and supplied exact absolute/relative budget separately.",
+    "controls": "One-word success with explicit absolute budget, stricter relative budget requiring two words, late-component failure retaining parent, signed dyadics with a 900-bit gap, a high-word carry to two with minimum subnormal inward low, exponents +/-1100, exact positive budget equality and rejection just below, zero budget rejecting 1/3, one-less work, input-bit cap and cancellation.",
+    "mutation": "Zero only the low word after qualifying the actual candidate. Isolated MSVC Debug compile/link exits normally; the native projection control passes 200 assertions, the mutant fails five independent containment assertions (195 passed), exit 42.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on four affected translation units, exit 0.",
+    "scope": "Caller-supplied per-component error budgets; full physical consumer error propagation remains in its adopted downstream work.",
+    "clean_build": true
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "docs/specs/foundation/precision-contract.md",
+      "hint": "docs/specs/foundation/precision-contract.md",
+      "sha256": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4"
+    },
+    {
+      "id": "docs/specs/foundation/si-precision-conversion-contract.md",
+      "hint": "docs/specs/foundation/si-precision-conversion-contract.md",
+      "sha256": "b15d01590c82e106210ea9f1078bcb24c097a7a1a050c5972a34de8aaf315879"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.cpp",
+      "hint": "src/coupling/case_uniform_flow.cpp",
+      "sha256": "136c8b3c1701c1323388cb9e24fcde1d9629e0c0c70ac9e5ab2e649840f003a8"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.hpp",
+      "hint": "src/coupling/case_uniform_flow.hpp",
+      "sha256": "8fc9de30f63909b2e84896badc1e4287b72222cba851754dec28ee9721fece47"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow_projection.cpp",
+      "hint": "src/coupling/case_uniform_flow_projection.cpp",
+      "sha256": "0beb0a6f8a8fb3c5d07c1c4edad64ae0b64f865a1376525154bba2e5adbbdae8"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow_projection.hpp",
+      "hint": "src/coupling/case_uniform_flow_projection.hpp",
+      "sha256": "ed540816e60e779385050ef4e46f5912a443ed20729d682ce950e2505b19c613"
+    },
+    {
+      "id": "src/io/si_exact_words.hpp",
+      "hint": "src/io/si_exact_words.hpp",
+      "sha256": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177"
+    },
+    {
+      "id": "src/io/si_interval.hpp",
+      "hint": "src/io/si_interval.hpp",
+      "sha256": "106ebaff243acde6aa03f31bee9135bade49cffd828aac1d9ccb8c317213d52c"
+    },
+    {
+      "id": "src/io/si_rational_projection.cpp",
+      "hint": "src/io/si_rational_projection.cpp",
+      "sha256": "e23a0831c547f5eb502ef43fff554e99695162dea0cd45a23f6258644a661307"
+    },
+    {
+      "id": "src/io/si_rational_projection.hpp",
+      "hint": "src/io/si_rational_projection.hpp",
+      "sha256": "24c978984b2dc65165863acd3b82442d06a8689ea7482631377319658ab82da2"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "27b21a7a2dc9746330ed5b15b74d460484575ea71e9173d557d3076fc237662e"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/specs/foundation/precision-contract.md": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+    "docs/specs/foundation/si-precision-conversion-contract.md": "b15d01590c82e106210ea9f1078bcb24c097a7a1a050c5972a34de8aaf315879",
+    "src/coupling/case_uniform_flow.cpp": "136c8b3c1701c1323388cb9e24fcde1d9629e0c0c70ac9e5ab2e649840f003a8",
+    "src/coupling/case_uniform_flow.hpp": "8fc9de30f63909b2e84896badc1e4287b72222cba851754dec28ee9721fece47",
+    "src/coupling/case_uniform_flow_projection.cpp": "0beb0a6f8a8fb3c5d07c1c4edad64ae0b64f865a1376525154bba2e5adbbdae8",
+    "src/coupling/case_uniform_flow_projection.hpp": "ed540816e60e779385050ef4e46f5912a443ed20729d682ce950e2505b19c613",
+    "src/io/si_exact_words.hpp": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177",
+    "src/io/si_interval.hpp": "106ebaff243acde6aa03f31bee9135bade49cffd828aac1d9ccb8c317213d52c",
+    "src/io/si_rational_projection.cpp": "e23a0831c547f5eb502ef43fff554e99695162dea0cd45a23f6258644a661307",
+    "src/io/si_rational_projection.hpp": "24c978984b2dc65165863acd3b82442d06a8689ea7482631377319658ab82da2",
+    "tests/coupling/case_uniform_flow_test.cpp": "27b21a7a2dc9746330ed5b15b74d460484575ea71e9173d557d3076fc237662e"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/uniform-flow-projection-v1/verification.md": "aa7e7042dea28aaaef7bb3cff6c6b1b64c62a145b1d1857b467accc3c69356b1"
+  }
+}
