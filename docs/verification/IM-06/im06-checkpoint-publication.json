@@ -6,7 +6,7 @@
   ],
   "package": "IM-06",
   "issue": 22,
-  "date": "2026-11-24",
+  "date": "2026-11-23",
   "source_commit": "2dc3720e8126d5eca75a19d164f7b98fdf62aad5",
   "scope": "Native checkpoint directory staging, file flush and SHA-256 readback, manifest-last, cancellation, conflict and process interruption",
   "verification": {
