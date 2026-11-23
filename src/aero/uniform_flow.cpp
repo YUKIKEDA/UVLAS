@@ -274,8 +274,15 @@ pchip::PreparationRequest pchip_input(const UniformFlowInput& input, const Pchip
     return {series.samples, dimensions, series.boundary, input.events, input.stamp};
 }
 
-pchip::PchipQuery pchip_query(UniformFlowQuery query) {
+pchip::PchipQuery pchip_query(const UniformFlowQuery& query) {
     return {query.time, pchip::JetOrder::First, query.side};
+}
+
+const pchip::SharedPreparationInput& expected_pchip(const UniformFlowQuery& query,
+                                                    core::FailureDetails details) {
+    if (!query.expected_pchip)
+        refuse(InvalidInput, details);
+    return query.expected_pchip->get();
 }
 
 } // namespace
@@ -405,7 +412,7 @@ struct Builder {
                                    core::FailureDetails details) {
         match_stamp(field, query, details);
         if (const auto* curve = std::get_if<pchip::PchipCurveReady>(&field.data_)) {
-            const auto source = needed(curve->retain_input());
+            const auto& source = expected_pchip(query, details);
             return needed(pchip::forecast_pchip_evaluation(*curve, source, pchip_query(query),
                                                            limits, stop, details));
         }
@@ -421,7 +428,7 @@ struct Builder {
         const Lease lease{workspace.entered_};
         match_stamp(field, query, details);
         if (const auto* curve = std::get_if<pchip::PchipCurveReady>(&field.data_)) {
-            const auto source = needed(curve->retain_input());
+            const auto& source = expected_pchip(query, details);
             return ExactUniformFlowJet{needed(
                 pchip::evaluate_pchip_curve(*curve, source, pchip_query(query), workspace.pchip_,
                                             limits, memory, stop, details))};

@@ -98,10 +98,29 @@ a::UniformFlowReady prepare(const a::UniformFlowInput& input, a::UniformFlowWork
     return result;
 }
 
+p::SharedPreparationInput current_pchip(const a::UniformFlowInput& input) {
+    const auto* series = std::get_if<a::PchipUniformFlow>(&input.series);
+    if (!series)
+        FAIL("Expected PCHIP current input");
+    constexpr uvlas::numerics::SiDimension velocity{{1, 0, -1, 0, 0, 0, 0}};
+    constexpr std::array dimensions{velocity, velocity, velocity};
+    p::PreparationWorkspace workspace;
+    p::SharedPreparationWorkspace shared;
+    c::ResourcePlan memory{max};
+    auto original = take(p::make_preparation_input(
+        {series->samples, dimensions, series->boundary, input.events, input.stamp}, workspace,
+        cap.arithmetic, memory));
+    return take(p::share_preparation_input(std::move(original), shared,
+                                           {cap.metadata, cap.arithmetic.steps}, memory));
+}
+
 a::ExactUniformFlowJet evaluate(const a::UniformFlowReady& field, const Fraction& time,
                                 a::UniformFlowWorkspace& workspace,
-                                p::RequestedSide side = p::RequestedSide::Automatic) {
-    const a::UniformFlowQuery request{stamp, time.view(), side};
+                                p::RequestedSide side = p::RequestedSide::Automatic,
+                                const p::SharedPreparationInput* expected = nullptr) {
+    a::UniformFlowQuery request{stamp, time.view(), side};
+    if (expected)
+        request.expected_pchip.emplace(*expected);
     const auto forecast = take(a::forecast_uniform_flow_evaluation(field, request, cap));
     auto limits = cap;
     limits.arithmetic.steps = forecast.reserved_steps;
@@ -243,14 +262,15 @@ TEST_CASE("Uniform PCHIP replays the actual qualified coefficients and physical 
     const auto owned_save = snapshot(field, work);
     const auto saved_view = take(owned_save.view());
     const auto restored = restore(saved_view, current, work);
+    const auto expected = current_pchip(request);
     // On [0,1] the first component is 3t²/2-t³/2. The third is 1-2 times the first.
     const std::array value{Fraction{5, 16}, Fraction{-2}, Fraction{3, 8}};
     const std::array derivative{Fraction{9, 8}, Fraction{0}, Fraction{-9, 4}};
-    const auto jet = evaluate(restored, time, work);
+    const auto jet = evaluate(restored, time, work, p::RequestedSide::Automatic, &expected);
     check_jet(jet, time, value, derivative);
 
     for (auto side : {p::RequestedSide::Left, p::RequestedSide::Right}) {
-        const auto at_knot = evaluate(field, times[1], work, side);
+        const auto at_knot = evaluate(field, times[1], work, side, &expected);
         check_jet(at_knot, times[1], {Fraction{1}, Fraction{-2}, Fraction{-1}},
                   {Fraction{3, 2}, Fraction{0}, Fraction{-3}});
     }
@@ -291,9 +311,48 @@ TEST_CASE("Uniform PCHIP honours declared endpoint hold and periodic normalizati
         const a::UniformFlowInput request{
             stamp, {}, a::PchipUniformFlow{{x, y, 3}, {x.front(), x.back(), policy}}};
         const auto field = prepare(request, work);
-        const auto jet = evaluate(field, outside, work);
+        const auto expected = current_pchip(request);
+        const auto jet = evaluate(field, outside, work, p::RequestedSide::Automatic, &expected);
         check_jet(jet, outside, value, zeros);
     }
+}
+
+TEST_CASE("Uniform PCHIP forecast and evaluation check the independent current source",
+          "[AE-07][N4-02][N4-08][N4-09][negative]") {
+    const std::array times{Fraction{0}, Fraction{1}, Fraction{2}};
+    const std::array samples{Fraction{0},  Fraction{-2}, Fraction{1},  Fraction{1}, Fraction{-2},
+                             Fraction{-1}, Fraction{4},  Fraction{-2}, Fraction{-7}};
+    const auto x = views(times);
+    const auto y = views(samples);
+    const a::PchipUniformFlow source{{x, y, 3}, {x.front(), x.back(), p::RejectBoundary{}}};
+    const a::UniformFlowInput input{stamp, {}, source};
+    const Fraction time{1, 2};
+    a::UniformFlowWorkspace work;
+    const auto field = prepare(input, work);
+    const auto expected = current_pchip(input);
+    const auto good = evaluate(field, time, work, p::RequestedSide::Automatic, &expected);
+    const std::array value{Fraction{5, 16}, Fraction{-2}, Fraction{3, 8}};
+    const std::array derivative{Fraction{9, 8}, Fraction{0}, Fraction{-9, 4}};
+    check_jet(good, time, value, derivative);
+
+    auto edited_values = y;
+    edited_values[4] = times[1].view();
+    auto edited = source;
+    edited.samples.values = edited_values;
+    const auto changed_samples = current_pchip({stamp, {}, edited});
+    const std::array events{time.view()};
+    const auto changed_events = current_pchip({stamp, events, source});
+    const auto check_refusal = [&](a::UniformFlowQuery query, c::FailureCode code) {
+        c::ResourcePlan memory{max};
+        reject(a::forecast_uniform_flow_evaluation(field, query, cap), code);
+        reject(a::evaluate_uniform_flow(field, query, work, cap, memory), code);
+        CHECK(memory.allocated_bytes() == 0);
+    };
+    check_refusal({stamp, time.view()}, c::FailureCode::InvalidInput);
+    for (const auto& current : {std::cref(changed_samples), std::cref(changed_events)})
+        check_refusal({stamp, time.view(), p::RequestedSide::Automatic, current},
+                      c::FailureCode::StaleGeneration);
+    check_jet(good, time, value, derivative);
 }
 
 TEST_CASE("Uniform flow rejects malformed input and cancelled admission",
