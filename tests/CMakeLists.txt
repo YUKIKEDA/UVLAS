@@ -86,6 +86,25 @@ uvlas_add_test(io.checkpoint_chunk
     LIBS uvlas_io)
 target_include_directories(uvlas_test_io_checkpoint_chunk PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.checkpoint_manifest
+    LABELS unit property negative verification
+    SOURCES io/checkpoint_manifest_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_checkpoint_manifest PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    uvlas_add_test(io.checkpoint_publication
+        LABELS integration negative verification
+        SOURCES io/checkpoint_publication_test.cpp
+        LIBS uvlas_io Threads::Threads)
+    target_include_directories(uvlas_test_io_checkpoint_publication PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+    uvlas_add_test(io.checkpoint_directory
+        LABELS integration negative verification
+        SOURCES io/checkpoint_directory_test.cpp
+        LIBS uvlas_io)
+    target_include_directories(uvlas_test_io_checkpoint_directory PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+endif()
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.reference_input
         LABELS integration property negative verification
@@ -612,6 +631,14 @@ uvlas_add_test(structure.pg_reference_geometry
 target_include_directories(uvlas_test_structure_pg_reference_geometry
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 
+uvlas_add_test(structure.pg_conditioning
+    LABELS property negative verification V-PG
+    TIMEOUT 180
+    SOURCES structure/pg_conditioning_test.cpp
+    LIBS uvlas_structure Boost::multiprecision)
+target_include_directories(uvlas_test_structure_pg_conditioning
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
@@ -746,7 +773,7 @@ target_include_directories(uvlas_test_aero_uniform_flow PRIVATE "${PROJECT_SOURC
 uvlas_add_test(coupling.case_uniform_flow
     LABELS V-AERO property negative verification
     SOURCES coupling/case_uniform_flow_test.cpp
-    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 

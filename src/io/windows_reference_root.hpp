@@ -63,6 +63,7 @@ public:
               std::optional<WindowsReferenceOpenDiagnostic>* diagnostic = nullptr) const noexcept;
 
 private:
+    friend struct CheckpointDirectoryReader;
     explicit WindowsReferenceRoot(WindowsHandle directory) noexcept;
     WindowsHandle directory_;
 };

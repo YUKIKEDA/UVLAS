@@ -64,7 +64,8 @@ target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spec
 # Exact reference algebra is a preparation component, separate from physical kernels.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
-    src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp)
+    src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
+    src/structure/pg_conditioning.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -114,22 +115,27 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_path.cpp src/io/reference_file_snapshot.cpp src/io/gmsh_mesh.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
-    src/io/si_exact_center.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
-    src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp)
+    src/io/si_exact_center.cpp src/io/si_rational_projection.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
+    src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp
+    src/io/checkpoint_manifest.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_io PUBLIC uvlas_core uvlas_structure PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
+if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_sources(uvlas_io PRIVATE src/io/checkpoint_directory.cpp)
+endif()
 if(WIN32)
     # Native OS allocations are outside the instrumented numerical libraries.
-    target_sources(uvlas_io PRIVATE src/io/windows_reference_root.cpp)
+    target_sources(uvlas_io PRIVATE src/io/windows_reference_root.cpp src/io/checkpoint_publication.cpp)
     target_link_libraries(uvlas_io PRIVATE ntdll)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp)
+    target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp src/io/checkpoint_publication.cpp)
 endif()
 
-add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp)
+add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp
+    src/coupling/case_uniform_flow_projection.cpp)
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero)

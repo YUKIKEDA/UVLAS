@@ -211,29 +211,6 @@ void rank_own_basis(const RankShape& shape, const RankColumns& columns, const Ra
     out.info.verified_anchor_rows = partition_mul(shape.originals, shape.trace_rows);
 }
 
-template <class I>
-[[nodiscard]] ExactRational rank_exact(const RankFraction<I>& fraction, const ExactLimits& limits,
-                                       core::ResourcePlan& plan) {
-    if (fraction.numerator == 0)
-        return {};
-    const auto width = std::max(rank_bits(fraction.numerator), rank_bits(fraction.denominator));
-    if (width > limits.maximum_value_bits)
-        partition_fail(core::FailureCode::ResourceExceeded);
-    if (sizeof(RationalStorage) > plan.remaining_bytes())
-        partition_fail(core::FailureCode::ResourceExceeded);
-    const auto admission = partition_take(exact_rational_admission(limits, width, 0));
-    try {
-        Rational raw;
-        raw.backend().num() = fraction.numerator.backend();
-        raw.backend().denom() = fraction.denominator.backend();
-        return partition_take(ExactFactory::rational(std::move(raw), limits, plan, admission));
-    } catch (const std::overflow_error&) {
-        partition_fail(core::FailureCode::ResourceExceeded);
-    } catch (const std::range_error&) {
-        partition_fail(core::FailureCode::ResourceExceeded);
-    }
-}
-
 [[nodiscard]] const PgRankState& rank_state(const core::PlannedBuffer<PgRankState>& buffer) {
     if (buffer.size() != 1)
         partition_fail(core::FailureCode::InvalidInput);

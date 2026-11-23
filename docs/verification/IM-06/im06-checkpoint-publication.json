@@ -1,0 +1,73 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-checkpoint-publication",
+  "ids": [
+    "IO4-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "8dc34f70234b7ac5029f0e2b56e16c732f88bb83",
+  "diagnostic_header_windows_retest_commit": "49a5808c2ec51f02399b40571cfecb2e34047d73",
+  "scope": "Native checkpoint directory staging, file flush and SHA-256 readback, manifest-last, cancellation, conflict and process interruption",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "filesystem": "NTFS",
+      "targeted_ctest_passed": 2,
+      "publication_suite_repeated": 12,
+      "native_content_and_collision_controls": true,
+      "targeted_clang_tidy": "21.1.1 PASS at 6ebf99eea22179b1eb33634860c5ca51bea76d1a; final test change Linux-guarded",
+      "final_debug_and_release": "2 targeted tests and 12 publication repeats each; 300 integrated Release relink controls"
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "filesystem": "ext4",
+      "targeted_ctest_passed": 2,
+      "publication_suite_repeated": 12,
+      "native_content_and_collision_controls": true,
+      "separate_process_interruption": {
+        "signal": "SIGXFSZ",
+        "first_file_bytes": 8,
+        "second_expected_bytes": 16,
+        "second_file_bytes_on_stop": 12,
+        "temporary_manifest_present": false,
+        "final_directory_present": false,
+        "new_attempt_published": true
+      },
+      "sanitizer_libraries": [
+        "libasan.so.8",
+        "libubsan.so.1"
+      ],
+      "targeted_clang_tidy": "21.1.1 PASS",
+      "ancestor_symlink_review": {
+        "source_commit": "946107b53aa0aaa9cd800070cb28fdec02846d4b",
+        "date": "2026-11-24",
+        "targeted_ctest_passed": 2,
+        "publication_suite_repeated": 12,
+        "focused_assertions": 12,
+        "publish_failure": "InvalidInput at OpenParent",
+        "actual_parent_empty_after_failure": true,
+        "direct_path_byte_readback_passed": true,
+        "targeted_clang_tidy": "21.1.1 PASS"
+      }
+    }
+  },
+  "tested_target_registration": {
+    "commit": "2dc3720e8126d5eca75a19d164f7b98fdf62aad5",
+    "CMakeLists.txt": "a6803b875b7ad6d8ff6df0dc7346655d2e8d73271febbaeddc2923105fa6c4a5",
+    "tests/CMakeLists.txt": "7ca2f90cb81146c757f99304efc5abb84964a045feb2ddf6fbbaba1683b5798c"
+  },
+  "sources": {
+    "src/io/checkpoint_publication.cpp": "a8eebabdbd671f013cf48e79cd6028ee5694abb3ee6630ecb6343ffe4f53c73c",
+    "src/io/checkpoint_publication.hpp": "f11c5ee3e0996d9b24b3141b35386bcf31761aff2f099c03c6a7973fe15fd3e4",
+    "src/io/checkpoint_directory_name.hpp": "2fadb3519f26e983093974f1e89d9830f527bc7c2bac44573ab642779352aaaf",
+    "tests/io/checkpoint_publication_test.cpp": "982651b8c363d10ad51b180ba3d5d392174c6554e8e3f801ece0f1b7112d0dea"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/checkpoint-publication.md": "0163a4cb10e9bd628aca1ea96bf4bfa3fcf94c69cb17dca58e9915e987317bad"
+  },
+  "initial_platform_source_commit": "2dc3720e8126d5eca75a19d164f7b98fdf62aad5"
+}

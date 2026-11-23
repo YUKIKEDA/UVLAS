@@ -1,5 +1,6 @@
 #include "checkpoint_chunk.hpp"
 
+#include "reference_file_snapshot.hpp"
 #include "source_digest.hpp"
 
 #include <algorithm>
@@ -23,6 +24,11 @@ struct ChunkStorage {
     core::Index bytes;
     core::Index rank;
 };
+
+[[nodiscard]] bool supported(CheckpointDtype dtype) noexcept {
+    return dtype == CheckpointDtype::F64 || dtype == CheckpointDtype::I64 ||
+           dtype == CheckpointDtype::U64;
+}
 
 [[nodiscard]] std::unexpected<core::Failure> fail(core::FailureCode code,
                                                   core::Operation operation) noexcept {
@@ -235,8 +241,7 @@ core::Result<CheckpointChunk> CheckpointChunk::authenticate(CheckpointChunkView 
                                                             core::ResourcePlan& plan,
                                                             const std::stop_token& stop) noexcept {
     const auto& header = input.header;
-    if (header.dtype != CheckpointDtype::F64 && header.dtype != CheckpointDtype::I64 &&
-        header.dtype != CheckpointDtype::U64) {
+    if (!supported(header.dtype)) {
         return fail(core::FailureCode::CheckpointIncompatible, recover);
     }
     const auto size = measure(header.shape, limits, recover, stop);
@@ -286,6 +291,31 @@ core::Result<CheckpointChunk> CheckpointChunk::authenticate(CheckpointChunkView 
     }
     return CheckpointChunk{header.dtype, header.digest, size->words, std::move(*owned_shape),
                            std::move(*bytes)};
+}
+
+core::Result<CheckpointChunk>
+CheckpointChunk::from_verified_file(CheckpointChunkHeader header, ReferenceFileSnapshot&& file,
+                                    CheckpointChunkLimits limits, core::ResourcePlan& plan,
+                                    const std::stop_token& stop) noexcept {
+    if (!supported(header.dtype))
+        return fail(core::FailureCode::CheckpointIncompatible, recover);
+    const auto size = measure(header.shape, limits, recover, stop);
+    if (!size)
+        return std::unexpected(size.error());
+    const auto source = file.view();
+    if (!source || source->bytes.size() != header.byte_count ||
+        header.byte_count != static_cast<std::uint64_t>(size->bytes) ||
+        source->digest != header.digest) {
+        return fail(core::FailureCode::CheckpointCorrupt, recover);
+    }
+    auto shape = copy_shape(header.shape, size->rank, plan, recover, stop);
+    if (!shape)
+        return std::unexpected(shape.error());
+    if (stop.stop_requested())
+        return fail(core::FailureCode::Cancelled, recover);
+    file.info_.reset();
+    return CheckpointChunk{header.dtype, header.digest, size->words, std::move(*shape),
+                           std::move(file.bytes_)};
 }
 
 std::optional<CheckpointChunkView> CheckpointChunk::view() const& noexcept {

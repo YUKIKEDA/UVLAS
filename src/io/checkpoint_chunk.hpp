@@ -8,6 +8,8 @@
 
 namespace uvlas::io::detail {
 
+class ReferenceFileSnapshot;
+
 enum class CheckpointDtype : std::uint8_t { F64, I64, U64 };
 
 using CheckpointInput = std::variant<std::span<const double>, std::span<const std::int64_t>,
@@ -17,10 +19,10 @@ using CheckpointValues =
                  core::PlannedBuffer<std::uint64_t>>;
 
 struct CheckpointChunkHeader {
-    CheckpointDtype dtype;
+    CheckpointDtype dtype = CheckpointDtype::F64;
     std::span<const core::Index> shape;
-    std::uint64_t byte_count;
-    SourceDigest digest;
+    std::uint64_t byte_count = 0;
+    SourceDigest digest{};
 };
 
 struct CheckpointChunkView {
@@ -47,6 +49,12 @@ public:
     [[nodiscard]] static core::Result<CheckpointChunk>
     authenticate(CheckpointChunkView input, CheckpointChunkLimits limits, core::ResourcePlan& plan,
                  const std::stop_token& stop) noexcept;
+
+    /// Reuse bytes already read and hashed from a stable native file handle. The
+    /// snapshot is consumed only after shape, size and digest agree.
+    [[nodiscard]] static core::Result<CheckpointChunk>
+    from_verified_file(CheckpointChunkHeader, ReferenceFileSnapshot&&, CheckpointChunkLimits,
+                       core::ResourcePlan&, const std::stop_token&) noexcept;
 
     /// Borrow until destruction or ownership transfer. A moved-from chunk has no view.
     [[nodiscard]] std::optional<CheckpointChunkView> view() const& noexcept;

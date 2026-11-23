@@ -380,7 +380,7 @@ evaluate_case_uniform_flow(const CaseUniformFlowReady& field, const CaseUniformF
                 auto jet = take(a::evaluate_uniform_flow(field.uniform(), request, workspace,
                                                          remaining, memory, stop, details));
                 const auto used = compared + jet.used_steps();
-                return CaseUniformFlowEvaluation{std::move(jet), used};
+                return CaseUniformFlowEvaluation{std::move(jet), used, request.side};
             });
     });
 }

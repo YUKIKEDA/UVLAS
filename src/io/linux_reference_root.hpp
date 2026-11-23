@@ -63,6 +63,7 @@ public:
               std::optional<LinuxReferenceOpenReason>* diagnostic = nullptr) const noexcept;
 
 private:
+    friend struct CheckpointDirectoryReader;
     explicit LinuxReferenceRoot(LinuxReferenceHandle directory) noexcept;
     LinuxReferenceHandle directory_;
 };

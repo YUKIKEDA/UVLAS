@@ -1,0 +1,82 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-discrete-conditioning",
+  "ids": [
+    "SH-D03",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-23",
+  "source_commit": "3c0de5d0a3c8f42dc59eaecfb0b35cf39c59388f",
+  "claimed_state": "供給された離散幾何内積の成分区間に対する全合同誤差の認定と、変換係数・必須場の厳密再構成。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Debug / Release",
+    "boost": "1.92.0"
+  },
+  "checks": {
+    "independent_flat_rank": 109,
+    "independent_gram_entries": 5995,
+    "independent_congruence_rows": 3,
+    "required_fields": 33,
+    "required_coordinates": 3597,
+    "measured_payload_bytes": 3935552,
+    "charged_steps": 4516355,
+    "reported_exact_congruence_bound": "75054071558007512083704222975716665320338082200182982199327319911737474510844070354740874347215/19701003098197239606139520050071806902539869635232723333974146702122860885748605305707133127442457820403313995153408",
+    "debug_affected_ctest_passed": 3,
+    "release_affected_ctest_passed": 3,
+    "conditioning_test_cases": 2,
+    "conditioning_assertions": 18704,
+    "mutation_detected": "replace row sums with entry maxima"
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-reference-basis-contract.md": "08401786ad4d96b39e4719b75a0ae4ed28cefda39826bba75765a2481b7264e1",
+    "docs/specs/structure/pg-rank-bounded-preparation-contract.md": "d7f28b39c4eaff063a7004fe4675d3ed27016a668654dd48b9e9d40458a0f19e",
+    "rd/structure/main-shell/paired-geometry/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "rd/structure/main-shell/paired-geometry/records/exact-paired-r4-protocol.md": "d8e0d5f0e4f114fcadc3d3c2c372eafe3a444064bf1e877c45baae73b85f8cd7",
+    "src/structure/pg_reference_arithmetic.hpp": "955fa72d56f90d4354ab4f7f191daeec3fc04e4db4e241342b753835bf7623c7",
+    "include/uvlas/structure/pg_reference_basis.hpp": "98c41cdc954913f4953d9618b52bdf95175a3787431ad55819fce3ec77ef26e3",
+    "include/uvlas/structure/pg_rank_preparation.hpp": "6b401b5e502965670a461ef19148e5aee8c990ad374ef61aff2a38d608da4b78",
+    "tests/structure/pg_partition_test_support.hpp": "b0bf52176dba19ccd94e4a6555aad3a26cb25c399ed98d9fc9be6c3aeb8d18cb",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
+    "docs/verification/IM-01/pg-discrete-conditioning/verification.md": "506dd022695f0a3c491c00e3d6e213867ab5e464c03e4c17cc8d9cdc537dc23a",
+    "include/uvlas/structure/pg_conditioning.hpp": "ebe9e71d59a40432c00c3083cf2553023169c9eeaeb30b4646c04dfe46de8494",
+    "src/structure/pg_conditioning.cpp": "235e039a6166f5b4cef2c5098d5972335d44728a29df923ca7ddf26c3241468d",
+    "src/structure/pg_rank_storage.hpp": "1b0acf007bf39909c62e8e58a28482e487ab6598ade8ef80e3c484f03ee347f2",
+    "src/structure/pg_rank_preparation.cpp": "00f37fe1767471b075e41047fe8fedefe25c05bb17fcf37b8bdddc205e771f18",
+    "tests/structure/pg_conditioning_test.cpp": "3bdf16ae06b57814945d5f13eb79bccaef75e7d6c7f07e84a764b601a3f84cdc"
+  },
+  "review_284": {
+    "historical_artifacts": {
+      "commit": "dd4aa81996fdd0a63f2a0ed3380d924a467d415a",
+      "sha256": {
+        "tests/structure/pg_conditioning_test.cpp": "50407fe22e1300a123e50732c159ddfde11f1c757f1e534d16c9700691dc278c",
+        "docs/verification/IM-01/pg-discrete-conditioning/verification.md": "8283ca93f6f707d85a942b59f276bea7b06092f90e1d290005cfc29f20c6ce37"
+      }
+    },
+    "test_commit": "3499bfc7d0f4e1e8fd4a3a8e0e6f8db4e6c7a7f7",
+    "environment": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "boost": "1.92.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "checks": {
+      "baseline_ctest_exit": 8,
+      "fixed_ctest_passed": 1,
+      "test_cases": 2,
+      "assertions": 18704
+    }
+  }
+}
