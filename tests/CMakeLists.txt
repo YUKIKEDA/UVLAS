@@ -80,6 +80,12 @@ target_include_directories(uvlas_test_io_gmsh_mesh PRIVATE "${PROJECT_SOURCE_DIR
 uvlas_enable_allocation_audit(uvlas_test_io_gmsh_mesh)
 uvlas_require_audited_dependencies(uvlas_test_io_gmsh_mesh)
 
+uvlas_add_test(io.checkpoint_chunk
+    LABELS unit property negative verification
+    SOURCES io/checkpoint_chunk_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_checkpoint_chunk PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.reference_input
         LABELS integration property negative verification
@@ -736,6 +742,13 @@ uvlas_add_test(aero.uniform_flow
     SOURCES aero/uniform_flow_test.cpp
     LIBS uvlas_aero)
 target_include_directories(uvlas_test_aero_uniform_flow PRIVATE "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(coupling.case_uniform_flow
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_uniform_flow_test.cpp
+    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification

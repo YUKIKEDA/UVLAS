@@ -109,7 +109,7 @@ private:
 /// Borrowed representation of an in-memory save. Coefficients use (interval, component, power).
 struct PchipSnapshotView {
     PreparationRequest input;
-    std::uint64_t formula_version;
+    std::uint64_t formula_version = 0;
     std::span<const RationalView> coefficients;
 };
 

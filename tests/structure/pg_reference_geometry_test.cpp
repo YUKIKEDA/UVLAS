@@ -1,6 +1,7 @@
 #include "exact_polynomial_detail.hpp"
 #include "pg_partition_test_support.hpp"
 
+#include <algorithm>
 #include <array>
 #include <optional>
 #include <span>
@@ -8,7 +9,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
-#include <uvlas/structure/pg_reference_geometry.hpp>
+#include <uvlas/structure/pg_reference_basis.hpp>
 
 namespace {
 using namespace uvlas;
@@ -157,6 +158,63 @@ void check_exact_vector(const PgReferenceVector& actual, const std::array<std::s
         if (columns[i].kind == kind && columns[i].component == component)
             return {static_cast<core::Index>(i)};
     FAIL("Reference test dictionary column is absent");
+}
+
+[[nodiscard]] PgRankPreparationLimits rank_limits() {
+    return {std::uint64_t{48} << 30U, 10000000000000ULL, 128, {}};
+}
+
+[[nodiscard]] PgRankPreparation make_rank(const PgReferenceGeometry& geometry,
+                                          core::Workspace& workspace, core::ResourcePlan& plan) {
+    const auto source = take(geometry.source());
+    return take(PgRankPreparation::prepare(source.dictionary, source.partition, rank_limits(),
+                                           workspace, plan));
+}
+
+[[nodiscard]] core::Result<PgReferenceBasis> bind_basis(PgReferenceGeometry& geometry,
+                                                        PgRankPreparation& rank,
+                                                        const PgRankPreparationLimits& limits,
+                                                        core::Workspace& workspace,
+                                                        core::ResourcePlan& plan) {
+    return PgReferenceBasis::prepare(std::move(geometry), std::move(rank), limits, workspace, plan);
+}
+
+[[nodiscard]] PgRankBasisColumn selected_required(const PgRankPreparation& rank,
+                                                  std::uint32_t target) {
+    const auto selected = take(rank.selected());
+    const auto position = std::ranges::find(selected, target);
+    REQUIRE(position != selected.end());
+    return {static_cast<core::Index>(position - selected.begin())};
+}
+
+[[nodiscard]] PgRankBasisColumn centre_c(const PgRankPreparation& rank) {
+    const auto selected = take(rank.selected());
+    const auto sources = take(rank.provenance());
+    for (std::size_t i = 0; i < selected.size(); ++i) {
+        if (selected[i] < 33)
+            continue;
+        const auto& origin = sources[selected[i] - 33];
+        if (origin.kind == PgCoefficientKind::BasicC && origin.first == 1 && origin.second == 1)
+            return {static_cast<core::Index>(i)};
+    }
+    FAIL("Selected basis has no centre C column");
+}
+
+struct IndependentRadical {
+    Q a, b;
+};
+
+[[nodiscard]] IndependentRadical oracle_dot(const PgReferenceVector& gradient,
+                                            const std::array<IndependentRadical, 3>& column,
+                                            const Q& g) {
+    IndependentRadical product{};
+    for (std::size_t i = 0; i < gradient.size(); ++i) {
+        const auto& x = rational(gradient[i].rational);
+        const auto& y = rational(gradient[i].radical);
+        product.a += x * column[i].a + g * y * column[i].b;
+        product.b += x * column[i].b + y * column[i].a;
+    }
+    return product;
 }
 
 } // namespace
@@ -634,4 +692,247 @@ TEST_CASE("PG reference caps and cancels distinct graph comparison before geomet
     limits.maximum_partition_visits = comparison + pieces + vertices;
     const auto prepared = take(prepare_candidate(inputs, frame.view(), limits, call_plan));
     CHECK(prepared.preparation().partition_visits == limits.maximum_partition_visits);
+}
+
+TEST_CASE("Selected PG director basis satisfies the quartic physical gradient equations",
+          "[SH-D02][SH-D03][N4-02][N4-06][V-PG][verification]") {
+    Fixture f;
+    bounds(f, "1", "2");
+    const auto w = f.r("4", "5"), a = f.r("3", "20");
+    const auto three_quarters = f.r("3", "4"), half = f.r("1", "2");
+    const std::array<ExactInputTerm, 2> terms{{{{3, 1}, three_quarters}, {{2, 2}, half}}};
+    set_graph(f, 1, w, a, terms);
+    set_heights(f, {"1/2", "3/5", "13/20", "11/20"});
+    f.zeta[1] = f.r("0");
+    const Frame frame{f};
+    core::ResourcePlan plan{cap};
+    auto inputs = prepare_inputs(f, plan);
+    auto geometry = take(prepare_candidate(inputs, frame.view(), reference_limits(), plan));
+    const auto id = take(geometry.identity());
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto rank = make_rank(geometry, workspace, plan);
+    const auto column = selected_required(rank, 29);
+    const auto coordinate_x = selected_required(rank, 0);
+    const auto rank_size = take(rank.preparation()).rank;
+    const auto basis = take(bind_basis(geometry, rank, rank_limits(), workspace, plan));
+    CHECK(take(basis.size()) == rank_size);
+    CHECK(take(take(basis.rank())->preparation()).rank == rank_size);
+    const auto& partition = take(basis.source()).partition;
+    const auto triangles = take(partition.triangles());
+    const auto volumes = take(partition.volumes());
+    const auto depth = f.r("1", "3");
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        if (volumes[i].layer != 1)
+            continue;
+        const auto bary =
+            inside(f, partition, triangles[static_cast<std::size_t>(volumes[i].triangle)], Q("1/3"),
+                   Q("1/5"));
+        if (!bary)
+            continue;
+        const PgReferenceVolumePoint query{static_cast<core::Index>(i), bary->u, bary->v, depth};
+        auto point_plan = core::ResourcePlan{cap};
+        const auto sample = take(basis.evaluate(query, column, reference_limits(), point_plan));
+        CHECK(sample.reference.identity == id);
+        CHECK(sample.column.value == column.value);
+        CHECK(sample.reference.call_info.allocated_owned_payload_bytes ==
+              point_plan.allocated_bytes());
+
+        // at (s,t,zeta)=(1/3,1/5,1/3), with Q(x,y,z)=(z,x,y) and L=2.
+        const Q g{"23217889/23040000"}, vx{"-19/240"}, vy{"-61/1600"};
+        const Q vxs{"-17/40"}, vyt{Q("3/20") * Q("23/48") - Q("1/9")};
+        const Q vxt{"-23/48"}, vys{Q("3/20") * Q("17/40") - Q("23/60")};
+        const Q z{"11/225"};
+        const std::array<Q, 3> derivatives{
+            Q("1/60") / g - z * (vx * vxs + vy * vys) / (g * g),
+            Q("1/120") / g - z * (vx * vxt + vy * vyt) / (g * g),
+            Q("11/75") / g,
+        };
+        CHECK(rational(sample.reference.g) == g);
+        CHECK(rational(sample.value.rational) == 0);
+        CHECK(rational(sample.value.radical) == z / g);
+        // Independent Jacobian from analytic height/thickness derivatives.
+        const std::array<std::array<IndependentRadical, 3>, 3> jacobian{
+            std::array{IndependentRadical{Q("19/150"), Q("15452557670400/539070369616321")},
+                       IndependentRadical{Q("8/5"), Q("-23453063126400/539070369616321")},
+                       IndependentRadical{Q("0"), Q("-51915054633760/1617211108848963")}},
+            std::array{IndependentRadical{Q("1/10"), Q("6869079424000/539070369616321")},
+                       IndependentRadical{Q("3/10"), Q("-76820218100800/1617211108848963")},
+                       IndependentRadical{Q("2"), Q("-20827247934640/4851633326546889")}},
+            std::array{IndependentRadical{Q("0"), Q("6758400/23217889")},
+                       IndependentRadical{Q("0"), Q("-535040/23217889")},
+                       IndependentRadical{Q("0"), Q("-257664/23217889")}},
+        };
+        for (std::size_t d = 0; d < derivatives.size(); ++d) {
+            CHECK(rational(sample.chart_derivatives[d].rational) == 0);
+            CHECK(rational(sample.chart_derivatives[d].radical) == derivatives[d]);
+            const auto pullback = oracle_dot(sample.physical_gradient_per_metre, jacobian[d], g);
+            CHECK(pullback.a == 0);
+            CHECK(pullback.b == derivatives[d]);
+        }
+
+        const auto position_x = take(basis.evaluate(query, coordinate_x, reference_limits(), plan));
+        CHECK(rational(position_x.value.rational) == Q("89/300"));
+        CHECK(rational(position_x.value.radical) == 0);
+        const std::array<Q, 3> x_derivatives{Q("4/5"), Q("3/20"), Q("0")};
+        for (std::size_t d = 0; d < x_derivatives.size(); ++d) {
+            CHECK(rational(position_x.chart_derivatives[d].rational) == x_derivatives[d]);
+            CHECK(rational(position_x.chart_derivatives[d].radical) == 0);
+            const auto pullback =
+                oracle_dot(position_x.physical_gradient_per_metre, jacobian[d], g);
+            CHECK(pullback.a == x_derivatives[d]);
+            CHECK(pullback.b == 0);
+        }
+
+        auto exact_caps = reference_limits();
+        exact_caps.maximum_scalar_operations = sample.reference.call_info.scalar_operations;
+        exact_caps.maximum_partition_visits = sample.reference.call_info.partition_visits;
+        const auto bytes = sample.reference.call_info.allocated_owned_payload_bytes;
+        core::ResourcePlan equal{bytes};
+        REQUIRE(basis.evaluate(query, column, exact_caps, equal));
+        core::ResourcePlan short_bytes{bytes - 1};
+        const auto byte_failure = basis.evaluate(query, column, exact_caps, short_bytes);
+        REQUIRE_FALSE(byte_failure);
+        CHECK(byte_failure.error().code == core::FailureCode::ResourceExceeded);
+        --exact_caps.maximum_scalar_operations;
+        const auto scalar_failure = basis.evaluate(query, column, exact_caps, plan);
+        REQUIRE_FALSE(scalar_failure);
+        CHECK(scalar_failure.error().code == core::FailureCode::ResourceExceeded);
+        ++exact_caps.maximum_scalar_operations;
+        --exact_caps.maximum_partition_visits;
+        const auto visit_failure = basis.evaluate(query, column, exact_caps, plan);
+        REQUIRE_FALSE(visit_failure);
+        CHECK(visit_failure.error().code == core::FailureCode::ResourceExceeded);
+        std::stop_source stop;
+        REQUIRE(stop.request_stop());
+        exact_caps.cancellation = stop.get_token();
+        core::ResourcePlan no_allocations{0};
+        const auto stopped = basis.evaluate(query, column, exact_caps, no_allocations);
+        REQUIRE_FALSE(stopped);
+        CHECK(stopped.error().code == core::FailureCode::Cancelled);
+        CHECK(no_allocations.allocated_bytes() == 0);
+        return;
+    }
+    FAIL("Independent point is absent");
+}
+
+TEST_CASE("Selected PG quadratic-thickness basis preserves both cell sides and face kinds",
+          "[SH-D02][SH-D03][SH-D07][N4-06][V-PG][verification]") {
+    Fixture f{2};
+    f.zeta[1] = f.r("0");
+    const Frame frame{f};
+    auto inputs = prepare_inputs(f, f.input_plan);
+    auto geometry = take(prepare_candidate(inputs, frame.view(), reference_limits(), f.input_plan));
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto rank = make_rank(geometry, workspace, f.input_plan);
+    const auto column = centre_c(rank);
+    const auto basis = take(bind_basis(geometry, rank, rank_limits(), workspace, f.input_plan));
+    const auto& partition = take(basis.source()).partition;
+    const auto triangles = take(partition.triangles());
+    const auto pieces = take(partition.pieces());
+    const auto volumes = take(partition.volumes());
+    const auto depth = f.r("1", "2");
+    std::array<bool, 2> sides{};
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        if (volumes[i].layer != 1)
+            continue;
+        const auto& tri = triangles[static_cast<std::size_t>(volumes[i].triangle)];
+        const auto& piece = pieces[static_cast<std::size_t>(tri.piece)];
+        const auto side = piece.cell.first == 1 ? std::size_t{0} : std::size_t{1};
+        const auto bary = inside(f, partition, tri, Q("1/2"), Q("1/3"));
+        if (!bary || sides[side])
+            continue;
+        const auto sample = take(basis.evaluate(
+            PgReferenceVolumePoint{static_cast<core::Index>(i), bary->u, bary->v, depth}, column,
+            reference_limits(), f.input_plan));
+        const auto derivatives = side == 0 ? Q("1/96") : Q("-1/96");
+        const Q z_hat{"1/8"};
+        // C is the tensor of centred linear hats on s,t. H=1m and L=2m.
+        REQUIRE(rational(sample.reference.g) == 1);
+        CHECK(rational_value(sample.value) == z_hat * z_hat / 3);
+        CHECK(rational_value(sample.chart_derivatives[0]) == derivatives);
+        CHECK(rational_value(sample.chart_derivatives[1]) == Q("1/64"));
+        CHECK(rational_value(sample.chart_derivatives[2]) == Q("1/48"));
+        CHECK(rational_value(sample.physical_gradient_per_metre[0]) == Q("1/24"));
+        CHECK(rational_value(sample.physical_gradient_per_metre[1]) == derivatives / 2);
+        CHECK(rational_value(sample.physical_gradient_per_metre[2]) == Q("1/128"));
+        sides[side] = true;
+    }
+    REQUIRE(sides[0]);
+    REQUIRE(sides[1]);
+
+    const auto zero = f.r("0");
+    const auto horizontal = take(partition.horizontal_faces());
+    std::array<bool, 2> faces{};
+    for (std::size_t i = 0; i < horizontal.size(); ++i) {
+        const auto& face = horizontal[i];
+        if (face.layer < 0 || face.layer > 1 || face.triangle != volumes.front().triangle)
+            continue;
+        const auto layer = static_cast<std::size_t>(face.layer);
+        const auto expected = layer == 0 ? PgPartitionFaceSide::Upper : PgPartitionFaceSide::Lower;
+        if (face.side != expected)
+            continue;
+        const auto sample =
+            take(basis.evaluate(PgReferenceHorizontalPoint{static_cast<core::Index>(i), zero, zero},
+                                column, reference_limits(), f.input_plan));
+        CHECK(rational(sample.reference.zeta) == 0);
+        CHECK(std::get<PgReferenceHorizontalMeasure>(sample.reference.measure).side == expected);
+        CHECK(rational_value(sample.value) == 0);
+        faces[layer] = true;
+    }
+    REQUIRE(faces[0]);
+    REQUIRE(faces[1]);
+    const auto side = take(basis.evaluate(PgReferenceLateralPoint{0, zero, depth}, column,
+                                          reference_limits(), f.input_plan));
+    CHECK(std::holds_alternative<PgReferenceLateralMeasure>(side.reference.measure));
+    CHECK(rational_value(side.value) == 0); // Boundary vanishes for the interior C hat.
+}
+
+TEST_CASE("PG basis binding rejects stale rank or work limits before moving the owners",
+          "[SH-D03][N4-08][negative][verification]") {
+    Fixture f;
+    const Frame frame{f};
+    core::ResourcePlan plan{cap};
+    auto inputs = prepare_inputs(f, plan);
+    auto geometry = take(prepare_candidate(inputs, frame.view(), reference_limits(), plan));
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto rank = make_rank(geometry, workspace, plan);
+
+    Fixture reordered;
+    std::rotate(reordered.domain.begin(), reordered.domain.begin() + 1, reordered.domain.end());
+    auto other_inputs = prepare_inputs(reordered, plan);
+    auto different = take(prepare_candidate(other_inputs, frame.view(), reference_limits(), plan));
+    core::ResourcePlan no_allocations{0};
+    const auto stale = bind_basis(different, rank, rank_limits(), workspace, no_allocations);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+    REQUIRE(different.source());
+    REQUIRE(rank.preparation());
+    CHECK(no_allocations.allocated_bytes() == 0);
+
+    auto limit = rank_limits();
+    limit.maximum_steps = 0;
+    const auto capped = bind_basis(geometry, rank, limit, workspace, no_allocations);
+    REQUIRE_FALSE(capped);
+    CHECK(capped.error().code == core::FailureCode::ResourceExceeded);
+    REQUIRE(geometry.source());
+    REQUIRE(rank.preparation());
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    limit.cancellation = stop.get_token();
+    const auto stopped = bind_basis(geometry, rank, limit, workspace, no_allocations);
+    REQUIRE_FALSE(stopped);
+    CHECK(stopped.error().code == core::FailureCode::Cancelled);
+    REQUIRE(geometry.source());
+    REQUIRE(rank.preparation());
+    CHECK(no_allocations.allocated_bytes() == 0);
+    const auto accepted = take(bind_basis(geometry, rank, rank_limits(), workspace, plan));
+    REQUIRE(accepted.source());
+    CHECK_FALSE(geometry.source());
+    CHECK_FALSE(rank.preparation());
+    const auto zero = f.r("0");
+    const auto invalid = accepted.evaluate(PgReferenceVolumePoint{0, zero, zero, zero}, {-1},
+                                           reference_limits(), no_allocations);
+    REQUIRE_FALSE(invalid);
+    CHECK(invalid.error().code == core::FailureCode::InvalidInput);
+    CHECK(no_allocations.allocated_bytes() == 0);
 }
