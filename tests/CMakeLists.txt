@@ -92,6 +92,12 @@ uvlas_add_test(io.checkpoint_manifest
     LIBS uvlas_io)
 target_include_directories(uvlas_test_io_checkpoint_manifest PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.observation_csv
+    LABELS unit property negative verification
+    SOURCES io/observation_csv_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_observation_csv PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.checkpoint_publication
         LABELS integration negative verification
