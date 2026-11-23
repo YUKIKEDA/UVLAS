@@ -15,11 +15,17 @@ template <class T>
     return values[static_cast<std::size_t>(index)];
 }
 
-[[nodiscard]] inline PgGraphView validate_reference_inputs(const PgReferenceInputs& source) {
-    partition_take(source.dictionary.validate_for(source.graph));
+[[nodiscard]] inline PgGraphView validate_reference_inputs(ReferenceArithmetic& math,
+                                                           const PgReferenceInputs& source) {
+    math.cancel();
     const auto graph = partition_take(source.graph.view());
+    const auto dictionary = partition_take(source.dictionary.graph());
+    const auto charge = [&](std::uint64_t work) { math.visit(work); };
+    math.visit(1); // The dictionary also requires equality of the fixed-size content ID.
+    if (graph.identity != dictionary.identity || !partition_same_graph(graph, dictionary, charge))
+        partition_fail(core::FailureCode::StaleGeneration);
     const auto partition = partition_take(source.partition.graph());
-    if (!partition_same_graph(graph, partition))
+    if (!partition_same_graph(graph, partition, charge))
         partition_fail(core::FailureCode::StaleGeneration);
     return graph;
 }

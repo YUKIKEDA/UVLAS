@@ -60,20 +60,42 @@ inline std::uint64_t partition_retained(const ExactRational& x) {
 inline bool partition_equal_point(const PgPartitionPoint& a, const PgPartitionPoint& b) noexcept {
     return a.s == b.s && a.t == b.t;
 }
-inline bool partition_same_graph(const PgGraphView& a, const PgGraphView& b) noexcept {
-    if (a.n != b.n || a.convention != b.convention || !(a.x0 == b.x0) || !(a.width == b.width) ||
-        !(a.skew == b.skew) || a.cells.size() != b.cells.size())
+/// Charge a conservative allocation-free comparison workload before each read.
+/// A 32-bit-word bound covers the native limb loop on both supported platforms.
+template <class Charge>
+inline bool partition_same_graph(const PgGraphView& a, const PgGraphView& b, Charge&& charge) {
+    const auto equal = [&](const ExactRational& x, const ExactRational& y) {
+        charge(1);
+        const auto words = [](std::uint64_t bits) { return bits / 32 + (bits % 32 != 0 ? 1 : 0); };
+        charge(words(x.numerator_bits()) + words(x.denominator_bits()) + words(y.numerator_bits()) +
+               words(y.denominator_bits()));
+        return x == y;
+    };
+
+    charge(1);
+    if (a.n != b.n || a.convention != b.convention || a.cells.size() != b.cells.size())
         return false;
-    if (!std::equal(a.cells.begin(), a.cells.end(), b.cells.begin()))
+    if (!equal(a.x0, b.x0) || !equal(a.width, b.width) || !equal(a.skew, b.skew))
         return false;
+    for (std::size_t i = 0; i < a.cells.size(); ++i) {
+        charge(1);
+        if (a.cells[i] != b.cells[i])
+            return false;
+    }
     const auto x = a.height.terms(), y = b.height.terms();
     if (x.size() != y.size())
         return false;
-    for (std::size_t i = 0; i < x.size(); ++i)
+    for (std::size_t i = 0; i < x.size(); ++i) {
+        charge(1);
         if (x[i].powers.first != y[i].powers.first || x[i].powers.second != y[i].powers.second ||
-            !(x[i].coefficient == y[i].coefficient))
+            !equal(x[i].coefficient, y[i].coefficient))
             return false;
+    }
     return true;
+}
+
+inline bool partition_same_graph(const PgGraphView& a, const PgGraphView& b) noexcept {
+    return partition_same_graph(a, b, [](std::uint64_t) noexcept {});
 }
 [[nodiscard]] inline PgGraphView partition_graph(const PgPartitionData& data) {
     if (!data.graph)
