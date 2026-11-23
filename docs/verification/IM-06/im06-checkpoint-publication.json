@@ -8,6 +8,7 @@
   "issue": 22,
   "date": "2026-11-23",
   "source_commit": "2dc3720e8126d5eca75a19d164f7b98fdf62aad5",
+  "diagnostic_header_windows_retest_commit": "49a5808c2ec51f02399b40571cfecb2e34047d73",
   "scope": "Native checkpoint directory staging, file flush and SHA-256 readback, manifest-last, cancellation, conflict and process interruption",
   "verification": {
     "windows": {
@@ -46,7 +47,7 @@
     "CMakeLists.txt": "a6803b875b7ad6d8ff6df0dc7346655d2e8d73271febbaeddc2923105fa6c4a5",
     "tests/CMakeLists.txt": "7ca2f90cb81146c757f99304efc5abb84964a045feb2ddf6fbbaba1683b5798c",
     "src/io/checkpoint_publication.cpp": "0f8cf5a8ec1ace64f423d3f1624df3f3444769fcc1b8c8c4e8ad7e0aedb8f339",
-    "src/io/checkpoint_publication.hpp": "95b62e2636ace41f0fe5a1198081236bfa264c9ee089b8b3a560ff3860f32380",
+    "src/io/checkpoint_publication.hpp": "f11c5ee3e0996d9b24b3141b35386bcf31761aff2f099c03c6a7973fe15fd3e4",
     "src/io/checkpoint_directory_name.hpp": "2fadb3519f26e983093974f1e89d9830f527bc7c2bac44573ab642779352aaaf",
     "tests/io/checkpoint_publication_test.cpp": "bb178971c322681c97bfc0c935017f3502c0fa4186c320052b698fef36e02346"
   },
