@@ -17,4 +17,6 @@
 
 両環境で `io.checkpoint_chunk` と `io.checkpoint_publication` が合格し、保存試験の12回繰返しも通った。WindowsのDebug・Releaseで修正後の対象2件と保存試験の12回反復が通った。修正した保存の翻訳単位を統合Release試験にリンクした対照は、同じ作業ディレクトリで300回通った。検証サンドボックス下で別に発生した `ERROR_INVALID_HANDLE` は同じバイナリを通常のNTFSで直接実行して切り分けた。
 
+Linux の保存先は、復元と同じ `RESOLVE_NO_SYMLINKS` で開く。実ディレクトリを指すシンボリックリンクを祖先に置いた対照では、一時ディレクトリを作る前に拒否した。続けて実パスに同じ番号で保存し、manifest と chunk のバイト列を照合した。
+
 この検証は操作者が管理する保存先でのファイル書込みとプロセス中断を対象とする。電源断後の保持、最新確定番号の探索、物理状態の再開は別の検証で扱う。[Linux の rename](https://man7.org/linux/man-pages/man2/renameat2.2.html) [Windows の rename 情報](https://learn.microsoft.com/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_rename_information)

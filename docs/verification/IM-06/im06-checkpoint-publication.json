@@ -41,7 +41,18 @@
         "libasan.so.8",
         "libubsan.so.1"
       ],
-      "targeted_clang_tidy": "21.1.1 PASS"
+      "targeted_clang_tidy": "21.1.1 PASS",
+      "ancestor_symlink_review": {
+        "source_commit": "946107b53aa0aaa9cd800070cb28fdec02846d4b",
+        "date": "2026-11-24",
+        "targeted_ctest_passed": 2,
+        "publication_suite_repeated": 12,
+        "focused_assertions": 12,
+        "publish_failure": "InvalidInput at OpenParent",
+        "actual_parent_empty_after_failure": true,
+        "direct_path_byte_readback_passed": true,
+        "targeted_clang_tidy": "21.1.1 PASS"
+      }
     }
   },
   "tested_target_registration": {
@@ -50,13 +61,13 @@
     "tests/CMakeLists.txt": "7ca2f90cb81146c757f99304efc5abb84964a045feb2ddf6fbbaba1683b5798c"
   },
   "sources": {
-    "src/io/checkpoint_publication.cpp": "f517c18b7602e1281458f3bd37868cfc5b355338dfaac50c98160501841292e8",
+    "src/io/checkpoint_publication.cpp": "a8eebabdbd671f013cf48e79cd6028ee5694abb3ee6630ecb6343ffe4f53c73c",
     "src/io/checkpoint_publication.hpp": "f11c5ee3e0996d9b24b3141b35386bcf31761aff2f099c03c6a7973fe15fd3e4",
     "src/io/checkpoint_directory_name.hpp": "2fadb3519f26e983093974f1e89d9830f527bc7c2bac44573ab642779352aaaf",
-    "tests/io/checkpoint_publication_test.cpp": "bb178971c322681c97bfc0c935017f3502c0fa4186c320052b698fef36e02346"
+    "tests/io/checkpoint_publication_test.cpp": "982651b8c363d10ad51b180ba3d5d392174c6554e8e3f801ece0f1b7112d0dea"
   },
   "artifacts": {
-    "docs/verification/IM-06/checkpoint-publication.md": "3b93ff2db210761c7a2d85479b47cfd17342e6677d2965d36d8286b8b49a351b"
+    "docs/verification/IM-06/checkpoint-publication.md": "0163a4cb10e9bd628aca1ea96bf4bfa3fcf94c69cb17dca58e9915e987317bad"
   },
   "initial_platform_source_commit": "2dc3720e8126d5eca75a19d164f7b98fdf62aad5"
 }
