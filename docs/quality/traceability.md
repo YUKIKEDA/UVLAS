@@ -89,11 +89,11 @@
 | EIG-12 | [eigen-extraction-contract.md:192](../specs/foundation/eigen-extraction-contract.md) | 25 | 3 | 0 |
 | EIG-13 | [eigen-extraction-contract.md:215](../specs/foundation/eigen-extraction-contract.md) | 18 | 4 | 0 |
 | EIG-14 | [eigen-extraction-contract.md:235](../specs/foundation/eigen-extraction-contract.md) | 0 | 3 | 0 |
-| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 143 | 23 | 0 |
+| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 144 | 23 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 11 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 1 | 1 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 7 | 3 | 0 |
-| IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 10 | 2 | 0 |
+| IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 11 | 2 | 0 |
 | IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 18 | 2 | 0 |
 | IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
@@ -133,7 +133,7 @@
 | QA-03 | [quality-plan.md:31](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-04 | [quality-plan.md:39](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-05 | [quality-plan.md:51](../quality/quality-plan.md) | 0 | 6 | 0 |
-| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 1 | 7 | 0 |
+| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 2 | 7 | 0 |
 | QA-07 | [quality-plan.md:71](../quality/quality-plan.md) | 0 | 0 | 1 |
 | QA-08 | [quality-plan.md:82](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 6 | 0 |

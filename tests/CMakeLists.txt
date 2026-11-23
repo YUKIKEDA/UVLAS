@@ -36,6 +36,12 @@ uvlas_add_test(io.result_documents
     LIBS uvlas_io nlohmann_json::nlohmann_json Boost::hash2)
 target_include_directories(uvlas_test_io_result_documents PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.resolved_case_document
+    LABELS unit integration negative verification
+    SOURCES io/resolved_case_document_test.cpp
+    LIBS uvlas_io nlohmann_json::nlohmann_json Boost::hash2)
+target_include_directories(uvlas_test_io_resolved_case_document PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.input_scalar
     LABELS unit property negative verification
     SOURCES io/input_scalar_test.cpp
