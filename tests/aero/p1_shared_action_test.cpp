@@ -78,7 +78,7 @@ struct GeometryFixture {
                          faces[1].id,
                          {point[0], point[1], point[4]},
                          {edges[0].id, edges[5].id, edges[6].id}}};
-    bool shifted = false, aliased = false;
+    bool shifted = false, aliased = false, empty = false;
     double radius = .125;
 
     void share_by_alias() noexcept {
@@ -87,6 +87,9 @@ struct GeometryFixture {
     }
 
     [[nodiscard]] p::GeometryInput input() const {
+        if (empty)
+            return {{}, {}, p::SinglePositions{{}}, p::SinglePositions{{}},  {}, {}, {},
+                    {}, {}, word(radius),           test_geometry::context()};
         const p::PositionView words = shifted
                                           ? p::PositionView{p::DoublePositions{offset, coordinates}}
                                           : p::PositionView{p::SinglePositions{coordinates}};
@@ -103,6 +106,8 @@ struct GeometryFixture {
                 test_geometry::context()};
     }
     [[nodiscard]] p::GlobalTopologyInput topology() const {
+        if (empty)
+            return {{}, {}, {}};
         return {
             roles, std::span<const p::EdgeBindingInput>{edge_bindings}.first(aliased ? 8 : 7), {}};
     }
@@ -463,4 +468,41 @@ TEST_CASE("P1 retains the selected far formula and refuses incompatible replay a
              core::FailureCode::ResourceExceeded);
     CHECK(test_geometry::take(action.report()).used_steps == report.used_steps);
     CHECK(decode(valid.velocity()[2].real).center != 0);
+}
+
+TEST_CASE("P1 empty contact topology is an exact zero action",
+          "[UI-D01][UI-D04][N4-02][property]") {
+    GeometryFixture geometry;
+    geometry.empty = true;
+    Prepared prepared{geometry};
+    const auto query = prepared.query(geometry.query());
+    const p::P1ActionSource source{prepared.contact, query, {12, 0}};
+    const auto forecast = test_geometry::take(p::forecast_shared_p1(source, {}, {}, limits()));
+    core::ResourcePlan memory{forecast.payload_bytes};
+    const auto action = test_geometry::take(p::prepare_shared_p1(
+        source, {}, {}, {core::Precision::TwoWord, 0}, {core::Precision::TwoWord, 0, 0}, limits(),
+        prepared.shared_workspace, *prepared.local_workspace, *prepared.kernel_workspace, memory));
+    CHECK(memory.allocated_bytes() == forecast.payload_bytes);
+    CHECK(action.point_count() == 0);
+    CHECK(action.strength_count() == 0);
+    CHECK(test_geometry::take(action.report()).facets == 0);
+    const p::P1ActionDirection direction{{}, {}, vector(3, 4, 5), word(6)};
+    const auto result = test_geometry::take(
+        p::apply_shared_p1(action, source, {}, direction, apply_steps, prepared.shared_workspace));
+    const auto& jvp = result.jvp();
+    if (!jvp)
+        FAIL("Missing zero JVP");
+    const auto vjp = test_geometry::take(p::adjoint_shared_p1(
+        action, source, {}, dual, apply_steps, prepared.shared_workspace, prepared.memory));
+    for (std::size_t axis = 0; axis < 3; ++axis) {
+        CHECK(decode(result.velocity()[axis].real).center == 0);
+        CHECK(decode(result.velocity()[axis].real).radius == 0);
+        CHECK(decode((*jvp)[axis].real).center == 0);
+        CHECK(decode((*jvp)[axis].imaginary).radius == 0);
+        const auto covector = test_geometry::take(vjp.free_query(axis));
+        if (!covector)
+            FAIL("Missing zero query cotangent");
+        CHECK(decode(*covector).center == 0);
+    }
+    CHECK(decode(test_geometry::take(vjp.radius())).center == 0);
 }

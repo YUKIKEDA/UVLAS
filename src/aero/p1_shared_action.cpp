@@ -429,9 +429,9 @@ class SharedP1Engine {
             actual.faces > allowed.faces || actual.bands > allowed.bands ||
             actual.triangles > allowed.triangles || actual.quads > allowed.quads)
             throw ArithmeticFailure{exceeded};
-        if (geometry.facets.size() == 0 || faces.size() != geometry.faces.size() ||
-            strengths.empty())
+        if (faces.size() != geometry.faces.size())
             throw ArithmeticFailure{invalid};
+        scan.step();
         const auto finite_outer = [&]() {
             for (std::size_t i = 0; i < strengths.size(); ++i) {
                 scan.step();
