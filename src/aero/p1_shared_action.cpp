@@ -200,10 +200,10 @@ finish(const std::array<Complex, 3>& value, core::Precision precision, LocalRoot
            same_words(left->u, right->u) && same_words(left->v, right->v);
 }
 
-template <class T, class Key>
-[[nodiscard]] std::size_t locate(std::span<const T> sorted, std::uint64_t id, Key key, Work& work) {
+template <class T, class Id, class Key>
+[[nodiscard]] std::size_t locate(std::span<const T> sorted, Id id, Key key, Work& work) {
     const auto position =
-        std::lower_bound(sorted.begin(), sorted.end(), id, [&](const T& item, std::uint64_t value) {
+        std::lower_bound(sorted.begin(), sorted.end(), id, [&](const T& item, Id value) {
             work.step();
             return std::invoke(key, item) < value;
         });
@@ -347,7 +347,8 @@ struct SharedP1Data {
     QueryRequest query{QueryId{0}, FreePoint{FreeSingle{}}};
     P1ActionStamp stamp;
     shared_p1::MaterialPoint material;
-    core::PlannedBuffer<std::uint64_t> points, strengths;
+    core::PlannedBuffer<std::uint64_t> points;
+    core::PlannedBuffer<P1StrengthId> strengths;
     core::PlannedBuffer<shared_p1::Facet> facets;
     core::PlannedBuffer<shared_p1::EdgeOccurrence> occurrences;
     P1AssemblyReport report;
@@ -504,8 +505,14 @@ class SharedP1Engine {
         const auto finite_outer = [&]() {
             for (std::size_t i = 0; i < strengths.size(); ++i) {
                 scan.step();
-                if (i != 0 && strengths[i - 1].value() >= strengths[i].value())
+                if (i != 0 && strengths[i - 1] >= strengths[i])
                     throw ArithmeticFailure{invalid};
+                if (const auto face = strengths[i].bound_face()) {
+                    const auto row = ordinal(geometry.face_lookup.values(), face->value(), scan);
+                    if (!mixed ||
+                        verified.topology->roles.values()[row] != GlobalTopologyData::bound_role)
+                        throw ArithmeticFailure{invalid};
+                }
             }
             for (std::size_t i = 0; i < faces.size(); ++i) {
                 scan.step();
@@ -521,10 +528,11 @@ class SharedP1Engine {
                 std::visit(
                     [&](const auto& keys) {
                         if constexpr (std::is_same_v<std::decay_t<decltype(keys)>, P0BoundColumn>)
-                            (void)locate(strengths, face, &P1StrengthId::value, scan);
+                            (void)locate(strengths, P1StrengthId::bound(PhysicalFaceId{face}),
+                                         std::identity{}, scan);
                         else {
                             for (const auto& key : keys)
-                                (void)locate(strengths, key.value(), &P1StrengthId::value, scan);
+                                (void)locate(strengths, key, std::identity{}, scan);
                         }
                     },
                     faces[i].columns);
@@ -548,7 +556,7 @@ class SharedP1Engine {
         const auto s = strengths.size();
         P1AssemblyPlan result;
         result.payload_bytes =
-            sum(sum(bytes<SharedP1Data>(1), sum(bytes<std::uint64_t>(p), bytes<std::uint64_t>(s))),
+            sum(sum(bytes<SharedP1Data>(1), sum(bytes<std::uint64_t>(p), bytes<P1StrengthId>(s))),
                 sum(sum(bytes<Facet>(n), bytes<std::optional<LocalGeometryPacket>>(n)),
                     sum(sum(bytes<std::size_t>(p), product(bytes<EdgeOccurrence>(e), 2)),
                         product(n, sum(ExactTriangleResult::payload_bytes(),
@@ -614,7 +622,7 @@ class SharedP1Engine {
                         work.step();
                         if (coefficients[local * keys.size() + col] == 1) {
                             target.strength[local] =
-                                locate(strengths, keys[col].value(), &P1StrengthId::value, work);
+                                locate(strengths, keys[col], std::identity{}, work);
                             break;
                         }
                     }
@@ -622,7 +630,8 @@ class SharedP1Engine {
             };
             target.bound = std::holds_alternative<P0BoundColumn>(map);
             if (target.bound) {
-                target.strength.fill(locate(strengths, face, &P1StrengthId::value, work));
+                target.strength.fill(locate(strengths, P1StrengthId::bound(PhysicalFaceId{face}),
+                                            std::identity{}, work));
             } else if (const auto* quad = std::get_if<QuadLRScatter>(&scatter)) {
                 const auto* keys = std::get_if<std::array<P1StrengthId, 2>>(&map);
                 if (keys == nullptr)
@@ -693,7 +702,7 @@ public:
             auto holder = std::make_shared<ActionHolder>(std::move(storage));
             auto& data = holder->payload.values()[0];
             data.points = allocate<std::uint64_t>(memory, point_slots, context, stop);
-            data.strengths = allocate<std::uint64_t>(memory, strengths.size(), context, stop);
+            data.strengths = allocate<P1StrengthId>(memory, strengths.size(), context, stop);
             data.facets = allocate<Facet>(memory, facet_count, context, stop);
             auto packets =
                 allocate<std::optional<LocalGeometryPacket>>(memory, facet_count, context, stop);
@@ -712,7 +721,7 @@ public:
             data.material = material(geometry, data.query, point_columns.values(), work);
             for (std::size_t s = 0; s < strengths.size(); ++s) {
                 work.step();
-                data.strengths.values()[s] = strengths[s].value();
+                data.strengths.values()[s] = strengths[s];
             }
             map_facets(data, geometry, faces, strengths, point_columns.values(),
                        occurrences.values(), work);
@@ -1008,7 +1017,7 @@ AeroResult<PointId> SharedP1Action::point(std::size_t index) const noexcept {
 AeroResult<P1StrengthId> SharedP1Action::strength(std::size_t index) const noexcept {
     if (!data_ || index >= data_->strengths.size())
         return std::unexpected(failure(invalid, context_));
-    return P1StrengthId{data_->strengths.values()[index]};
+    return data_->strengths.values()[index];
 }
 AeroResult<P1AssemblyReport> SharedP1Action::report() const noexcept {
     if (!data_)
