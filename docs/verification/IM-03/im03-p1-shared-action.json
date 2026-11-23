@@ -42,6 +42,7 @@
     "mutation": "MSVC Debug isolated control 211 assertions, exit 0. Ignoring oriented strength IDs falsely cancels distinct traces (178 passed, 33 failed, exit 42). Omitting the third point occurrence in JVP violates independent area-derivative and dual results (169 passed, 42 failed, exit 42).",
     "static": "clang-format 21.1.2 and clang-tidy 21.1.1 for affected translation units passed. Linux CI remains for the submitted head.",
     "baseline_and_mutation_source_commit": "45936de4ce5f1d6f74c99ad41c993dbe67b249ea",
+    "accuracy_review": "docs/verification/IM-03/p1-shared-action-v1/accuracy-review.json",
     "empty_topology": "The existing global contact factory qualifies an empty topology. The prepared action obeys its payload cap with no strengths and returns exact zero velocity, JVP and VJP. Both affected targets were re-run in Debug and Release."
   },
   "source_records": [
@@ -145,6 +146,7 @@
     "tests/CMakeLists.txt": "9c5f883807430dd402f81c779885b89c68fa69b57ff1d62d421882ad1ee893fd"
   },
   "artifacts": {
+    "docs/verification/IM-03/p1-shared-action-v1/accuracy-review.json": "23058ef8ce198cc3332cd64554db02b6ddc9feaed5d8b6a614c0072d9fb968c4",
     "docs/verification/IM-03/p1-shared-action-v1/verification.md": "607a244c9554db58c9d025645f802a92cfa77205d1e11ec8aaaf22896becb696",
     "docs/verification/IM-03/p1-shared-action-v1/run-mutations.ps1": "a3f54d2ca4c75879993226455433ac3eb531a28f5bcf728184177c96ded8703a"
   }
