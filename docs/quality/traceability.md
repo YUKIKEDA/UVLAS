@@ -92,7 +92,7 @@
 | IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 135 | 21 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 11 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 1 | 1 | 0 |
-| IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 4 | 2 | 0 |
+| IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 6 | 2 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
 | IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
 | IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
@@ -119,7 +119,7 @@
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 14 | 4 | 0 |
-| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 212 | 61 | 4 |
+| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 213 | 61 | 4 |
 | N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 128 | 49 | 2 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 104 | 17 | 0 |

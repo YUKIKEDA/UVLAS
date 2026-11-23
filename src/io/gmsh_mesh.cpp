@@ -134,13 +134,20 @@ std::uint64_t positive_number(Token token) {
     return value;
 }
 
+std::int32_t entity_tag(Token token) {
+    const auto value = positive_number(token);
+    if (value > static_cast<std::uint64_t>(std::numeric_limits<std::int32_t>::max()))
+        reject(InvalidInput, token.offset);
+    return static_cast<std::int32_t>(value);
+}
+
 GmshLink boundary_link(Token token, std::uint8_t dimension) {
     const bool reversed = token.text.starts_with('-');
     if (reversed)
         token.text.remove_prefix(1);
     if (token.text.empty())
         reject(InvalidInput, token.offset);
-    return {{dimension, positive_number(token)}, reversed};
+    return {{dimension, entity_tag(token)}, reversed};
 }
 
 GmshLexeme decimal(Token token) {
@@ -302,7 +309,7 @@ private:
             count(input_.word(), remaining_count(limits_.physical_names, result_.names));
         for (std::size_t i = 0; i < limit; ++i) {
             const auto dim = dimension(input_.word());
-            const auto tag = positive_number(input_.word());
+            const auto tag = entity_tag(input_.word());
             const auto name = input_.quoted();
             append(output_.names, result_.names++, GmshNames{{dim, tag}, name.range()});
         }
@@ -325,7 +332,7 @@ private:
 
     void entity(std::uint8_t dim, std::size_t record) {
         GmshEntity value{};
-        value.key = {dim, positive_number(input_.word())};
+        value.key = {dim, entity_tag(input_.word())};
         const auto entries = dim == 0 ? 3U : 6U;
         for (std::size_t i = 0; i < entries; ++i)
             value.bounds[i] = decimal(input_.word());
@@ -333,7 +340,7 @@ private:
         value.physical_count =
             count(input_.word(), remaining_count(limits_.entity_links, result_.links));
         for (std::size_t i = 0; i < value.physical_count; ++i) {
-            const auto tag = positive_number(input_.word());
+            const auto tag = entity_tag(input_.word());
             append(output_.links, result_.links++, GmshLink{{dim, tag}, false});
         }
         value.first_boundary = result_.links;
@@ -349,15 +356,15 @@ private:
     }
 
     void nodes() {
-        const auto blocks = count(input_.word(), limits_.nodes);
+        const auto blocks = unsigned_number(input_.word());
         auto written = result_.nodes;
         result_.nodes += count(input_.word(), remaining_count(limits_.nodes, result_.nodes));
         const auto lo = unsigned_number(input_.word());
         const auto hi = unsigned_number(input_.word());
         TagRange range;
-        for (std::size_t block = 0; block < blocks; ++block) {
+        for (std::uint64_t block = 0; block < blocks; ++block) {
             const auto dim = dimension(input_.word());
-            const auto owner = positive_number(input_.word());
+            const auto owner = entity_tag(input_.word());
             const auto parameter = input_.word();
             const auto parametric = unsigned_number(parameter);
             if (parametric > 1)
@@ -391,16 +398,16 @@ private:
     }
 
     void elements() {
-        const auto blocks = count(input_.word(), limits_.elements);
+        const auto blocks = unsigned_number(input_.word());
         auto written = result_.elements;
         result_.elements +=
             count(input_.word(), remaining_count(limits_.elements, result_.elements));
         const auto lo = unsigned_number(input_.word());
         const auto hi = unsigned_number(input_.word());
         TagRange range;
-        for (std::size_t block = 0; block < blocks; ++block) {
+        for (std::uint64_t block = 0; block < blocks; ++block) {
             const auto dim = dimension(input_.word());
-            const auto owner = positive_number(input_.word());
+            const auto owner = entity_tag(input_.word());
             const auto type = element_type(input_.word());
             if (type.dimension != dim)
                 reject(InvalidInput, input_.position());

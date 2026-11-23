@@ -19,7 +19,7 @@ struct GmshLimits {
 
 struct GmshKey {
     std::uint8_t dimension = 0;
-    std::uint64_t tag = 0;
+    std::int32_t tag = 0;
     auto operator<=>(const GmshKey&) const = default;
 };
 

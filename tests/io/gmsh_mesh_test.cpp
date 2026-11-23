@@ -214,6 +214,94 @@ $EndElements
     CHECK(view.nodes[1].tag == 42);
 }
 
+TEST_CASE("Gmsh counts empty entity blocks separately from stored nodes and elements",
+          "[IO4-04][N4-02][verification][property]") {
+    constexpr std::string_view sparse = R"($MeshFormat
+4.1 0 8
+$EndMeshFormat
+$PhysicalNames
+1
+0 2147483647 "at the tag limit"
+$EndPhysicalNames
+$Entities
+1 1 0 0
+2147483647 0 0 0 1 2147483647
+2147483647 0 0 0 1 1 1 0 1 -2147483647
+$EndEntities
+$Nodes
+2 1 18446744073709551615 18446744073709551615
+1 2147483647 0 0
+0 2147483647 0 1
+18446744073709551615
+0 0 0
+$EndNodes
+$Elements
+2 1 18446744073709551615 18446744073709551615
+1 2147483647 1 0
+0 2147483647 15 1
+18446744073709551615 18446744073709551615
+$EndElements
+)";
+    const auto input = snapshot(sparse);
+    const GmshLimits minimal{sparse.size(), 1, 2, 2, 1, 1, 10000};
+    core::ResourcePlan plan{10000};
+    const auto parsed = GmshMesh::prepare(input, minimal, plan, {});
+    REQUIRE(parsed);
+    const auto view = take_view(parsed->view());
+    REQUIRE(view.nodes.size() == 1);
+    REQUIRE(view.elements.size() == 1);
+    CHECK(view.nodes[0].tag == std::numeric_limits<std::uint64_t>::max());
+    CHECK(view.elements[0].tag == view.nodes[0].tag);
+    REQUIRE(view.elements[0].connectivity().size() == 1);
+    CHECK(view.elements[0].connectivity()[0] == view.nodes[0].tag);
+    REQUIRE(view.physical_names.size() == 1);
+    CHECK(view.physical_names[0].group.tag == std::numeric_limits<std::int32_t>::max());
+    REQUIRE(view.entity_links.size() == 2);
+    CHECK(view.entity_links[1].reversed);
+    CHECK(view.entity_links[1].key.tag == std::numeric_limits<std::int32_t>::max());
+
+    auto out_of_range = std::string{sparse};
+    const auto offset = out_of_range.find("2147483647");
+    REQUIRE(offset != out_of_range.npos);
+    out_of_range.replace(offset, 10, "2147483648");
+    const auto bad = snapshot(out_of_range);
+    core::ResourcePlan rejected_plan{10000};
+    std::size_t rejected_offset = 0;
+    const auto rejected = GmshMesh::prepare(bad, minimal, rejected_plan, {}, &rejected_offset);
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == InvalidInput);
+    CHECK(rejected_offset == offset);
+    CHECK(rejected_plan.allocated_bytes() == 0);
+}
+
+TEST_CASE("Gmsh rejects overflowing int tags in every definition and reference",
+          "[IO4-04][negative][verification]") {
+    constexpr std::array replacements{
+        std::pair{"2 7 \"wing skin\"", "2 2147483648 \"wing skin\""},
+        std::pair{"3 0 0 0 1 1 0", "2147483648 0 0 0 1 1 0"},
+        std::pair{"0 1 1 0 1 7", "0 1 1 0 1 2147483648"},
+        std::pair{"1 7 2 1 -9", "1 7 2 1 -2147483648"},
+        std::pair{"2 17 1 2", "2 2147483648 1 2"},
+        std::pair{"2 17 3 1", "2 2147483648 3 1"},
+    };
+    for (const auto& [before, after] : replacements) {
+        CAPTURE(before, after);
+        const auto bytes = edited(before, after);
+        const auto input = snapshot(bytes);
+        auto quota = limits;
+        quota.file_bytes = bytes.size();
+        core::ResourcePlan plan{10000};
+        std::size_t offset = 0;
+        const auto result = GmshMesh::prepare(input, quota, plan, {}, &offset);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == InvalidInput);
+        CHECK(plan.allocated_bytes() == 0);
+        const auto digits = bytes.find("2147483648");
+        REQUIRE(digits != std::string::npos);
+        CHECK(offset == (bytes[digits - 1] == '-' ? digits - 1 : digits));
+    }
+}
+
 TEST_CASE("Gmsh distinguishes inconsistent mesh topology from unsupported sections and kinds",
           "[IO4-04][negative][verification]") {
     struct Case {
