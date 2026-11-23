@@ -12,7 +12,7 @@
   "package": "IM-03",
   "issue": 19,
   "date": "2026-11-23",
-  "source_commit": "530ea090b8556480242710b865cc9b12367eb1be",
+  "source_commit": "b5d76ae5bebaa83026fea4e395ec39e9cc56e4dd",
   "claimed_state": "Native typed SI case to owned no-gust uniform velocity and exact evaluation and replay for constant, polynomial and PCHIP.",
   "verification": {
     "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
@@ -28,13 +28,16 @@
     "target_registration": "The tested CMake revision registers uvlas_coupling and coupling.case_uniform_flow.",
     "ctest_each_configuration": "3 passed out of 3",
     "catch_seed": 19,
-    "each_configuration": "5 cases and 438 assertions",
+    "each_configuration": "6 cases and 455 assertions, including 17 transient polynomial coverage assertions",
     "independent_ref": "Manual exact ft/min conversion, a 71-bit numerator with an interior zero limb, termwise polynomial and PCHIP physical-time derivatives, exact zero spatial Jacobian.",
-    "coverage": "Actual typed transient window beginning at one minute, event and both sides, Reject/Hold/Periodic, explicit nontransient exact demand, changed current samples/events and issuer generation, independent equal case restore, matching cost, cap refusal, pre-stopped import and unsupported sine.",
+    "coverage": "Actual typed transient window beginning at one minute, event and both sides, Reject/Hold/Periodic, explicit nontransient exact demand, changed current samples/events and issuer generation, independent equal case restore, matching cost, cap refusal, pre-stopped import and unsupported sine. Transient polynomial preparation compares both case-end times with its inclusive SI domain and rejects either uncovered bound.",
     "mutation": "Replace the source recipe's time unit by seconds before exact materialization. MSVC Debug isolated compile/link succeeds. Constant-flow case: 23 assertions passed, 4 exact fraction assertions failed, exit 42.",
-    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on four affected translation units, exit 0.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1: four baseline translation units and three changed review translation units, exit 0.",
     "scope": "The internal composition uses cases with no gust. The fixture qualifies the case's SI input using existing SI rules and checks exact output; solver projection and support motion remain later work.",
-    "clean_build": true
+    "clean_build": true,
+    "baseline_source_commit": "530ea090b8556480242710b865cc9b12367eb1be",
+    "baseline_case_flow_tests_each_configuration": "5 cases and 438 assertions",
+    "transient_polynomial_review": "docs/verification/IM-03/case-uniform-flow-v1/transient-polynomial-review.json"
   },
   "source_records": [
     {
@@ -70,7 +73,7 @@
     {
       "id": "src/coupling/case_uniform_flow.cpp",
       "hint": "src/coupling/case_uniform_flow.cpp",
-      "sha256": "4b3739e1dab9ee5681306709dcd05d793fb8012d68d0b2268feeae27fd920861"
+      "sha256": "1c1000587f17388e3745f2dd82d85fe97e44f2055a2dba305b8031f1a05288bb"
     },
     {
       "id": "src/coupling/case_uniform_flow.hpp",
@@ -80,17 +83,17 @@
     {
       "id": "src/io/si_exact.cpp",
       "hint": "src/io/si_exact.cpp",
-      "sha256": "02d3cc5235e607a0988f4e21cf6053327dba6ba51314a4e8f9d5b25b0b2a32e3"
+      "sha256": "a85c46cef604636505a116021419177d0ed21c6a73ba8a464d06aca76adf72c8"
     },
     {
       "id": "src/io/si_exact_words.hpp",
       "hint": "src/io/si_exact_words.hpp",
-      "sha256": "a6b6200a835954aaab3e73dd22cf9c0a9d0001cebba40bf74f8fcf4f5f86e692"
+      "sha256": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177"
     },
     {
       "id": "tests/coupling/case_uniform_flow_test.cpp",
       "hint": "tests/coupling/case_uniform_flow_test.cpp",
-      "sha256": "df17c0cdbd12993d7eb66a6901e8aa629268212e6025c9342815a52890e5227f"
+      "sha256": "29d40ea7627fa42a233281ee07da47fe0647757f5368f5c2b08b086f617c1d33"
     },
     {
       "id": "tests/io/case_schema_corpus.hpp",
@@ -110,15 +113,16 @@
     "src/aero/pchip_curve.hpp": "343036850180b7472e4100b5521e2e69b5358778d3579896552f34b2b5d9931e",
     "src/aero/uniform_flow.cpp": "948a42d9002bf7dd21ef9df5cf3ad4c42c75886c1a6ca0c201fbc3015a26189b",
     "src/aero/uniform_flow.hpp": "7c901b722579cf3b80417b6963792b51c9ff6f2727a2ca417e8efd488107e37e",
-    "src/coupling/case_uniform_flow.cpp": "4b3739e1dab9ee5681306709dcd05d793fb8012d68d0b2268feeae27fd920861",
+    "src/coupling/case_uniform_flow.cpp": "1c1000587f17388e3745f2dd82d85fe97e44f2055a2dba305b8031f1a05288bb",
     "src/coupling/case_uniform_flow.hpp": "117b626d5c79d281aa191f1daa71d5b1d0ec80cef5415ed8340787586cd94ee9",
-    "src/io/si_exact.cpp": "02d3cc5235e607a0988f4e21cf6053327dba6ba51314a4e8f9d5b25b0b2a32e3",
-    "src/io/si_exact_words.hpp": "a6b6200a835954aaab3e73dd22cf9c0a9d0001cebba40bf74f8fcf4f5f86e692",
-    "tests/coupling/case_uniform_flow_test.cpp": "df17c0cdbd12993d7eb66a6901e8aa629268212e6025c9342815a52890e5227f",
+    "src/io/si_exact.cpp": "a85c46cef604636505a116021419177d0ed21c6a73ba8a464d06aca76adf72c8",
+    "src/io/si_exact_words.hpp": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177",
+    "tests/coupling/case_uniform_flow_test.cpp": "29d40ea7627fa42a233281ee07da47fe0647757f5368f5c2b08b086f617c1d33",
     "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
     "tests/io/case_schema_test_adapter.hpp": "c57c9d59174bf117c8ec81e4b1a380f79d9a9efbe8060ce10333ae97fc09401c"
   },
   "artifacts": {
-    "docs/verification/IM-03/case-uniform-flow-v1/verification.md": "488c5d1c48d6d0127c2506518e2ab6426203630c04c3e8ff57f9c60defd0626a"
+    "docs/verification/IM-03/case-uniform-flow-v1/transient-polynomial-review.json": "edd3eeff234853ffb43b3f41fabbf9e83e304a28ff72e192882c0931ccb91e34",
+    "docs/verification/IM-03/case-uniform-flow-v1/verification.md": "4129ae68f1a7714f64cd667404f5ca1b552aabb74b2269edf8914412cc80dd60"
   }
 }

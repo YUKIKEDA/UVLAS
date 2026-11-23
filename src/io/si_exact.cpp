@@ -352,26 +352,20 @@ SiRationalWordsView SiRationalWords::view() const& noexcept {
     return {sign_, data.first(numerator_), data.subspan(numerator_)};
 }
 
-core::Result<SiRationalWords> materialize_rational_words(const SiRecipeView& recipe,
-                                                         const structure::ExactLimits& limits,
-                                                         core::ResourcePlan& memory,
-                                                         const std::stop_token& stop) noexcept {
+core::Result<SiRationalWords> copy_rational_words(const structure::ExactRational& exact,
+                                                  core::ResourcePlan& memory,
+                                                  const std::stop_token& stop) noexcept {
     return core::guard_entry(
         word_operation, core::FailureCode::InvalidInput, {},
         [&]() -> core::Result<SiRationalWords> {
             const auto cancelled = core::Failure{core::FailureCode::Cancelled, word_operation};
             if (stop.stop_requested())
                 return std::unexpected(cancelled);
-            auto exact = materialize_rational(recipe, limits, memory);
-            if (!exact)
-                return std::unexpected(exact.error());
-            if (stop.stop_requested())
-                return std::unexpected(cancelled);
-            const auto sign = exact->sign();
+            const auto sign = exact.sign();
             if (sign == 0)
                 return SiRationalWords{};
-            const auto numerator = size_in_words(exact->numerator_bits());
-            const auto denominator = size_in_words(exact->denominator_bits());
+            const auto numerator = size_in_words(exact.numerator_bits());
+            const auto denominator = size_in_words(exact.denominator_bits());
             constexpr auto index_max =
                 static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
             if (numerator > index_max || denominator > index_max - numerator)
@@ -381,7 +375,7 @@ core::Result<SiRationalWords> materialize_rational_words(const SiRecipeView& rec
                 static_cast<core::Index>(numerator + denominator), word_operation);
             if (!words)
                 return std::unexpected(words.error());
-            const auto& value = structure::detail::ExactFactory::value(*exact).backend();
+            const auto& value = structure::detail::ExactFactory::value(exact).backend();
             const auto storage = words->values();
             const auto split = static_cast<std::size_t>(numerator);
             if (!copy_words(value.num(), storage.first(split), stop) ||

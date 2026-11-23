@@ -252,6 +252,50 @@ TEST_CASE("Typed SI polynomial flow converts time origin scale coefficients and 
         core::FailureCode::StaleGeneration);
 }
 
+TEST_CASE("Typed SI polynomial covers both ends of the transient analysis before publication",
+          "[AE-07][IO4-01][N4-08][negative]") {
+    const auto input = source(
+        R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,2],"coefficients":[[1,2,3]]})",
+        R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"step_change"}])");
+    a::UniformFlowWorkspace work;
+    const auto check_bad = [&](std::string_view domain, io::SourceId id) {
+        auto edited = input;
+        edited.field("flow").field("uniform").set("domain", parse(domain));
+        const auto si = materialize(edited, id);
+        core::ResourcePlan memory{budget};
+        const auto refusal = cf::prepare_case_uniform_flow(si, stamp, {}, work, limits, memory);
+        reject(refusal, core::FailureCode::InvalidInput);
+        if (!refusal)
+            CHECK(refusal.error().operation == core::Operation::PrepareModel);
+    };
+    check_bad("[0.5,2]", io::SourceId{18});
+    check_bad("[0,1]", io::SourceId{19});
+
+    const auto at_limits = materialize(input, io::SourceId{20});
+    auto short_limits = limits;
+    short_limits.maximum_exact_numbers = 8;
+    core::ResourcePlan memory{budget};
+    reject(cf::prepare_case_uniform_flow(at_limits, stamp, {}, work, short_limits, memory),
+           core::FailureCode::ResourceExceeded);
+    CHECK(memory.allocated_bytes() == 0);
+    ++short_limits.maximum_exact_numbers;
+    const auto control =
+        take(cf::prepare_case_uniform_flow(at_limits, stamp, {}, work, short_limits, memory));
+    const auto current =
+        take(cf::prepare_case_uniform_flow(at_limits, stamp, {}, work, short_limits, memory));
+    const Number begin{0}, end{120};
+    CHECK(evaluate(control, current, work, begin).jet.active());
+    CHECK(evaluate(control, current, work, end).jet.active());
+
+    auto steady = root("aerodynamic_steady");
+    steady.field("flow").set(
+        "uniform",
+        parse(
+            R"({"kind":"polynomial","origin":1,"scale":1,"domain":[1,2],"coefficients":[[1,2,3]]})"));
+    const auto steady_flow = import(steady, io::SourceId{21}, work);
+    CHECK(steady_flow.uniform().active());
+}
+
 TEST_CASE("Typed SI PCHIP uses the declared closed time window and independent current case",
           "[AE-07][IO4-01][N4-02][N4-03][N4-08][N4-09][property][negative]") {
     auto input = source(

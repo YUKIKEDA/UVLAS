@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <type_traits>
+#include <utility>
 
 namespace uvlas::coupling::detail {
 namespace a = aero::detail;
@@ -62,8 +63,8 @@ struct TimeWindowFields {
 
 using TimeWindow = std::variant<TimeWindowFields, CaseUniformTimeWindow>;
 
-TimeWindow window_for(const s::Case& root, std::optional<CaseUniformTimeWindow> supplied,
-                      core::FailureDetails details) {
+std::optional<TimeWindowFields> transient_window(const s::Case& root,
+                                                 core::FailureDetails details) {
     const auto analysis = root.analysis.record();
     if (const auto* transient = std::get_if<s::AnalysisTransient>(&analysis)) {
         const auto count = transient->intervals.size();
@@ -76,6 +77,13 @@ TimeWindow window_for(const s::Case& root, std::optional<CaseUniformTimeWindow> 
             take(transient->intervals.at(static_cast<core::Index>(count - 1))).record().end;
         return TimeWindowFields{begin, end};
     }
+    return std::nullopt;
+}
+
+TimeWindow window_for(const s::Case& root, std::optional<CaseUniformTimeWindow> supplied,
+                      core::FailureDetails details) {
+    if (const auto inferred = transient_window(root, details))
+        return *inferred;
     if (!supplied)
         fail(Unsupported, preparation, details);
     return *supplied;
@@ -85,7 +93,8 @@ TimeWindow window_for(const s::Case& root, std::optional<CaseUniformTimeWindow> 
 class SiSeries {
 public:
     SiSeries(const io::SiCase& source, std::uint64_t count, const CaseUniformFlowLimits& limits,
-             core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details)
+             core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details,
+             std::uint64_t comparison_numbers = 0)
         : source_(source),
           limits_(limits.conversion),
           memory_(memory),
@@ -93,7 +102,7 @@ public:
           details_(details) {
         constexpr auto element_bytes = sizeof(io::detail::SiRationalWords) + sizeof(RationalView);
         check_stop();
-        if (count > limits.maximum_exact_numbers || count > index_max ||
+        if (add_count(count, comparison_numbers, details_) > limits.maximum_exact_numbers ||
             count > memory.remaining_bytes() / element_bytes)
             fail(ResourceExceeded, preparation, details_);
         values_ = take(memory_.allocate<io::detail::SiRationalWords>(
@@ -104,20 +113,40 @@ public:
     }
 
     template <class Field>
-    RationalView read(Field number, const io::SchemaDimension& expected) {
+    structure::ExactRational number(Field field, const io::SchemaDimension& expected) {
+        check_stop();
+        const auto quantity = take(source_.quantity(field));
+        if (quantity.recipe.dimensions.exponents != expected.exponents)
+            fail(InvalidInput, preparation, details_);
+        return take(io::materialize_rational(quantity.recipe, limits_, memory_));
+    }
+
+    void check_coverage(const structure::ExactRational& lower,
+                        const structure::ExactRational& upper, const TimeWindowFields& required) {
+        const auto compare = [&](auto field, const structure::ExactRational& bound) {
+            const auto endpoint = number(field, seconds);
+            check_stop();
+            return take(endpoint.compare(bound, limits_, memory_));
+        };
+        if (compare(required.begin, lower) < 0 || compare(required.end, upper) > 0)
+            fail(InvalidInput, preparation, details_);
+    }
+
+    RationalView retain(const structure::ExactRational& exact) {
         check_stop();
         if (cursor_ == records_.values().size())
             fail(ResourceExceeded, preparation, details_);
-        const auto quantity = take(source_.quantity(number));
-        if (quantity.recipe.dimensions.exponents != expected.exponents)
-            fail(InvalidInput, preparation, details_);
         auto& owned = values_.values()[cursor_];
-        owned =
-            take(io::detail::materialize_rational_words(quantity.recipe, limits_, memory_, stop_));
+        owned = take(io::detail::copy_rational_words(exact, memory_, stop_));
         const auto words = owned.view();
         const RationalView result{words.sign, words.numerator, words.denominator};
         records_.values()[cursor_++] = result;
         return result;
+    }
+
+    template <class Field>
+    RationalView read(Field field, const io::SchemaDimension& expected) {
+        return retain(number(field, expected));
     }
 
     template <class Array>
@@ -210,15 +239,21 @@ struct ImportContext {
                           add_count(flow.events.size(),
                                     components(series.coefficients.size(), details), details),
                           details);
-            SiSeries values{source, count, limits, memory, stop, details};
+            const auto required = transient_window(root, details);
+            SiSeries values{source, count, limits, memory, stop, details, required ? 2U : 0U};
+            const auto domain = [&] {
+                const auto lower = values.number(take(series.domain.at(0)), seconds);
+                const auto upper = values.number(take(series.domain.at(1)), seconds);
+                if (required)
+                    values.check_coverage(lower, upper, *required);
+                return std::pair{values.retain(lower), values.retain(upper)};
+            }();
             const auto events = values.sequence(flow.events, seconds);
             return prepare(
                 {stamp, events,
                  a::PolynomialUniformFlow{values.read(series.origin, seconds),
-                                          values.read(series.scale, seconds),
-                                          values.read(take(series.domain.at(0)), seconds),
-                                          values.read(take(series.domain.at(1)), seconds),
-                                          values.grid(series.coefficients)}});
+                                          values.read(series.scale, seconds), domain.first,
+                                          domain.second, values.grid(series.coefficients)}});
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPchip>) {
             const auto requested = window_for(root, window, details);
             const auto outside = series.outside.record();
