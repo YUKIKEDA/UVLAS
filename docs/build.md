@@ -141,7 +141,7 @@ kernelの計測は [benchmarks/README.md](../benchmarks/README.md) の独立し�
 
 ## 非公開のランタイム用ディレクトリ
 
-ReleaseのCLI、CPython拡張、ライセンスを一つの場所へ配置し、ビルド先と異なる場所で実行できる。CPython 3.12と実行環境向けNumPy wheelを用意し、[構成・作成・移設の手順](verification/IM-06/private-runtime-image.md)に従う。検証には新規venvを使う。
+ReleaseのCLI、CPython拡張、ライセンスを一つの場所へ配置し、ビルド先と異なる場所で実行できる。CPython 3.12と実行環境向けNumPy wheelを用意し、[構成・作成・移設の手順](verification/IM-06/private-runtime-image-producer-review.md)に従う。検証には新規venvを使う。
 
 ## 疎求解の対象検証
 

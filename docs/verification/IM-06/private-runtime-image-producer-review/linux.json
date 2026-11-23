@@ -1,0 +1,46 @@
+{
+  "foreign_extension_after_inventory_rehash": {
+    "diagnostic": "extension does not match the producer manifest: _uvlas.cpython-312-x86_64-linux-gnu.so",
+    "exit_code": 1
+  },
+  "foreign_extension_sha256": "76d47c2aeedb974be9fc2e00a4dcb849ca83a968121ab80c6dd45a1e0839e8a1",
+  "foreign_extension_stage": {
+    "diagnostic": "extension does not match the producer manifest: _uvlas.cpython-312-x86_64-linux-gnu.so",
+    "exit_code": 1,
+    "output_exists": false
+  },
+  "relocated_rehearsal_matches": true,
+  "repeated_stage_matches": true,
+  "stage": {
+    "build_info": {
+      "commit": "0a93f2d8c5e3ec49a14af26db72bc12ecd567d54",
+      "compiler": "GNU 14.2.0",
+      "configuration": "Release",
+      "dependencies": {
+        "boost": "1.92.0",
+        "eigen": "5.0.1",
+        "nlohmann_json": "3.12.0",
+        "spectra": "1.2.0"
+      },
+      "dependency_repairs": {
+        "nlohmann_json_sax_allocation": 1
+      },
+      "floating_point": "-ffp-contract=off -fno-fast-math",
+      "instruction_set": "sse2",
+      "platform": "Linux x86_64",
+      "platform_key": "linux-x64-gnu14.2-sse2",
+      "schema": "uvlas.build-info/1",
+      "uncommitted_changes": false,
+      "version": "0.1.0-dev"
+    },
+    "cli_invalid_option_exit": 2,
+    "cpython": "3.12.3",
+    "extension_sha256": "fa15fa31d44b732cc7877c59aee460b2ffbf4beabf20c98cb5f55fafe05cfdb9",
+    "files": 42,
+    "inventory_sha256": "39361e0be6c9ac0f24ff38cfad61bdbb951b396638b92bf19fb6ba467a2159b9",
+    "normal_site_packages_import": true,
+    "numpy": "2.3.5",
+    "ownership_cases": 10,
+    "producer_manifest_sha256": "3918c255cc6ff890b3661f83ed40ce7cd0feac19bc104b388f7a3cdaeacd5dc7"
+  }
+}
