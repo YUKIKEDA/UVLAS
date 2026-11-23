@@ -364,9 +364,9 @@ namespace shared_p1 {
 
 template <class Operation>
 void visit_coefficients(const SharedP1Data& action, const Facet& facet, std::size_t column,
-                        Work& work, Operation&& operation) {
+                        Work& work, Operation&& visit) {
     if (!facet.bound) {
-        std::invoke(operation, facet.strength[column], true);
+        std::invoke(visit, facet.strength[column], true);
         return;
     }
     const auto& range = facet.bound_edges[column];
@@ -374,7 +374,7 @@ void visit_coefficients(const SharedP1Data& action, const Facet& facet, std::siz
         work.step();
         const auto& edge = action.occurrences.values()[i];
         if (edge.retained_bound)
-            std::invoke(operation, action.facets.values()[edge.facet].strength[edge.edge],
+            std::invoke(visit, action.facets.values()[edge.facet].strength[edge.edge],
                         edge.positive == range.positive);
     }
 }
