@@ -1,5 +1,6 @@
 #include "pchip_boundary.hpp"
 
+#include "pchip_curve_plan.hpp"
 #include "pchip_slot_private.hpp"
 
 #include <algorithm>
@@ -49,14 +50,38 @@ core::Result<BitBound> shape(RationalView value, RationalLimits limits,
     return bound;
 }
 
-template <class Arithmetic>
+// The counter uses the same grid already admitted by the coefficient forecast.
+struct BoundedCoefficients {
+    SampleGrid grid;
+    BitBound coefficient_width;
+    [[nodiscard]] bool active() const noexcept {
+        return true;
+    }
+    [[nodiscard]] std::uint64_t nodes() const noexcept {
+        return grid.times.size();
+    }
+    [[nodiscard]] std::uint64_t components() const noexcept {
+        return grid.components;
+    }
+    [[nodiscard]] RationalView time(std::uint64_t node) const noexcept {
+        return grid.times[static_cast<std::size_t>(node)];
+    }
+    [[nodiscard]] RationalView value(std::uint64_t node, std::uint64_t component) const noexcept {
+        return grid.values[static_cast<std::size_t>(node * grid.components + component)];
+    }
+    [[nodiscard]] BitBound coefficient(std::uint64_t, std::uint64_t, std::uint64_t) const noexcept {
+        return coefficient_width;
+    }
+};
+
+template <class Arithmetic, class Source>
 class Program {
     static constexpr bool counting = std::is_same_v<Arithmetic, Counter>;
     using Value = std::conditional_t<counting, BitBound, Slot>;
 
 public:
     Program(Arithmetic& arithmetic, Visits& visits, RationalLimits limits,
-            const CoefficientBlock& source) noexcept
+            const Source& source) noexcept
         : arithmetic_(arithmetic),
           visits_(visits),
           limits_(limits),
@@ -84,7 +109,7 @@ private:
     Arithmetic& arithmetic_;
     Visits& visits_;
     RationalLimits limits_;
-    const CoefficientBlock& source_;
+    const Source& source_;
     std::uint64_t last_;
 
     core::Result<Value> read(RationalView value) noexcept {
@@ -105,6 +130,12 @@ private:
         if (!value)
             return std::unexpected(supplement(value.error(), visits_.details));
         return read(*value);
+    }
+
+    core::Result<Value> read(BitBound bound) noexcept
+        requires counting
+    {
+        return visits_.next().and_then([&] { return arithmetic_.input(bound); });
     }
 
     core::Result<Value> integer(std::int64_t value) noexcept {
@@ -289,10 +320,11 @@ struct Builder {
         }
     };
 
-    static core::Result<BoundaryPlan> forecast(const CoefficientBlock& source,
-                                               const BoundaryRequest& request,
+    template <class Source>
+    static core::Result<BoundaryPlan> forecast(const Source& source, const BoundaryRequest& request,
                                                RationalLimits limits, const std::stop_token& stop,
-                                               core::FailureDetails details) noexcept {
+                                               core::FailureDetails details,
+                                               std::uint64_t derived_bits = 0) noexcept {
         if (!source.active() || source.nodes() < 2 || source.components() == 0)
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         // Check the caller's shapes before a requested stop. Canonical GCD checks are
@@ -307,7 +339,9 @@ struct Builder {
                 return std::unexpected(bound.error());
         }
         Visits scan{limits.steps, 0, stop, details};
-        Counter counter{limits, details};
+        auto arithmetic_limits = limits;
+        arithmetic_limits.input_bits = std::max(limits.input_bits, derived_bits);
+        Counter counter{arithmetic_limits, details};
         Program program{counter, scan, limits, source};
         const auto checked = program.check(request);
         if (!checked)
@@ -323,6 +357,42 @@ struct Builder {
         BoundaryPlan result;
         result.arithmetic_ = *arithmetic;
         result.scan_ = count.add(scan.count, argument_count);
+        result.work_ = work;
+        return result;
+    }
+
+    static core::Result<CurveNumericsPlan> forecast_curve(const PchipPreparationInput& input,
+                                                          RationalLimits limits,
+                                                          const std::stop_token& stop,
+                                                          core::FailureDetails details) noexcept {
+        const auto source = input.view();
+        if (!source)
+            return std::unexpected(supplement(source.error(), details));
+        const auto coefficients = forecast_coefficients(source->samples, limits, stop, details);
+        if (!coefficients)
+            return std::unexpected(coefficients.error());
+        const auto bits = coefficients->arithmetic().integer_bits();
+        const BoundedCoefficients bounded{source->samples, {bits, bits}};
+        const auto boundary = forecast(bounded, source->boundary, limits, stop, details, bits);
+        if (!boundary)
+            return std::unexpected(boundary.error());
+        CheckedCount count;
+        const auto bytes = count.add(coefficients->payload_bytes(), boundary->payload_bytes());
+        const auto forecasts =
+            count.add(coefficients->preflight_steps(), boundary->preflight_steps());
+        const auto calls = count.add(coefficients->reserved_steps(), boundary->reserved_steps());
+        const auto work = count.add(count.add(forecasts, calls), 1);
+        if (!count.ok || work > limits.steps)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
+        if (stop.stop_requested())
+            return std::unexpected(failure(core::FailureCode::Cancelled, details));
+
+        CurveNumericsPlan result;
+        result.coefficients_ = *coefficients;
+        result.boundary_ = *boundary;
+        result.boundary_limits_ = limits;
+        result.boundary_limits_.input_bits = std::max(limits.input_bits, bits);
+        result.bytes_ = bytes;
         result.work_ = work;
         return result;
     }
@@ -365,6 +435,13 @@ core::Result<BoundaryPlan> forecast_boundary(const CoefficientBlock& source,
                                              const std::stop_token& stop,
                                              core::FailureDetails details) noexcept {
     return boundary_detail::Builder::forecast(source, request, limits, stop, details);
+}
+
+core::Result<CurveNumericsPlan> forecast_curve_numerics(const PchipPreparationInput& input,
+                                                        RationalLimits limits,
+                                                        const std::stop_token& stop,
+                                                        core::FailureDetails details) noexcept {
+    return boundary_detail::Builder::forecast_curve(input, limits, stop, details);
 }
 
 core::Result<BoundaryUsage> check_boundary(const CoefficientBlock& source, BoundaryRequest request,
