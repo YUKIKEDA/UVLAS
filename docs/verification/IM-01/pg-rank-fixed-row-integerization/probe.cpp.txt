@@ -1,0 +1,369 @@
+#include "allocation-profile.hpp.txt"
+
+#include <string_view>
+
+namespace {
+constexpr unsigned slot_bits = 1536;
+constexpr unsigned product_bits = 2 * slot_bits;
+constexpr std::uint64_t byte_cap = 48ULL * 1024 * 1024 * 1024;
+using Fixed = bounded::Int<slot_bits>;
+using Wide = bounded::Int<product_bits>;
+
+struct Term {
+    std::uint32_t row{};
+    Fixed value{};
+};
+
+struct Workspace {
+    Fixed numerator{}, denominator{}, divisor{}, quotient{};
+    Wide left{}, right{}, product{};
+};
+
+struct Prepared {
+    std::vector<Fixed> scales;
+    std::vector<std::uint64_t> offsets;
+    std::vector<Term> entries;
+    std::vector<std::uint32_t> seen;
+    Workspace work;
+};
+
+struct Admission {
+    std::uint64_t rows{}, offsets{}, terms{}, bytes{};
+};
+
+enum class Status {
+    Success,
+    InvalidInput,
+    PayloadExceeded,
+    CapacityMismatch,
+    OperandWidth,
+    LcmWidth,
+    IntegerWidth,
+    InexactDivision,
+    AllocationAttempt,
+    ArithmeticFailure,
+};
+
+struct Result {
+    std::optional<Prepared> prepared;
+    Status status{Status::InvalidInput};
+    std::uint64_t planned{}, actual{}, heap{};
+    unsigned lcm_bits{}, integer_bits{};
+};
+
+std::uint64_t add_size(std::uint64_t left, std::uint64_t right) {
+    if (right > UINT64_MAX - left)
+        throw std::overflow_error("row integerization byte sum");
+    return left + right;
+}
+
+std::uint64_t multiply_size(std::uint64_t count, std::uint64_t width) {
+    if (width && count > UINT64_MAX / width)
+        throw std::overflow_error("row integerization byte product");
+    return count * width;
+}
+
+std::uint64_t payload(std::uint64_t scales, std::uint64_t offsets, std::uint64_t entries,
+                      std::uint64_t seen) {
+    auto total = add_size(sizeof(Prepared), multiply_size(scales, sizeof(Fixed)));
+    total = add_size(total, multiply_size(offsets, sizeof(std::uint64_t)));
+    total = add_size(total, multiply_size(entries, sizeof(Term)));
+    return add_size(total, multiply_size(seen, sizeof(std::uint32_t)));
+}
+
+Admission plan(const Matrix& input) {
+    Admission requested;
+    requested.rows = static_cast<std::uint64_t>(input.rows);
+    requested.offsets = add_size(input.columns.size(), 1);
+    for (const auto& column : input.columns)
+        requested.terms = add_size(requested.terms, column.size());
+    requested.bytes = payload(requested.rows, requested.offsets, requested.terms, requested.rows);
+    return requested;
+}
+
+template<class Backend>
+unsigned magnitude_bits(const Backend& value) {
+    const auto limbs = value.size();
+    const auto high = value.limbs()[limbs - 1];
+    constexpr auto limb_bits = std::numeric_limits<decltype(high)>::digits;
+    return static_cast<unsigned>((limbs - 1) * limb_bits + std::bit_width(high));
+}
+
+bool fits_slot(const Fixed& left, const Fixed& right, Workspace& work) {
+    work.left = left;
+    work.right = right;
+    work.product = work.left * work.right;
+    return magnitude_bits(work.product.backend()) <= slot_bits;
+}
+
+Status fill_integerized(const Matrix& input, Prepared& target, Result& result) {
+    auto& work = target.work;
+    std::fill(target.scales.begin(), target.scales.end(), Fixed{1});
+    std::fill(target.seen.begin(), target.seen.end(), UINT32_MAX);
+    for (std::uint32_t column = 0; column < input.columns.size(); ++column) {
+        for (const auto& [row, q] : input.columns[column]) {
+            if (row < 0 || row >= input.rows || target.seen[row] == column)
+                return Status::InvalidInput;
+            target.seen[row] = column;
+            const auto& raw_n = q.backend().num();
+            const auto& raw_d = q.backend().denom();
+            const auto n_bits = magnitude_bits(raw_n);
+            const auto d_bits = magnitude_bits(raw_d);
+            if (n_bits == 0 || d_bits == 0 || raw_d.sign())
+                return Status::InvalidInput;
+            if (n_bits > slot_bits || d_bits > slot_bits)
+                return Status::OperandWidth;
+            work.denominator.backend() = raw_d;
+            auto& scale = target.scales[row];
+            work.divisor = boost::multiprecision::gcd(scale, work.denominator);
+            work.quotient = scale / work.divisor;
+            if (!fits_slot(work.quotient, work.denominator, work))
+                return Status::LcmWidth;
+            scale = Fixed{work.product};
+        }
+    }
+
+    result.lcm_bits = 0;
+    for (const auto& scale : target.scales)
+        result.lcm_bits = std::max(result.lcm_bits, magnitude_bits(scale.backend()));
+    std::size_t pos = 0;
+    target.offsets[0] = 0;
+    for (std::size_t column = 0; column < input.columns.size(); ++column) {
+        for (const auto& [row, q] : input.columns[column]) {
+            work.numerator.backend() = q.backend().num();
+            work.denominator.backend() = q.backend().denom();
+            const auto& scale = target.scales[row];
+            if (scale % work.denominator != 0)
+                return Status::InexactDivision;
+            work.quotient = scale / work.denominator;
+            if (!fits_slot(work.numerator, work.quotient, work))
+                return Status::IntegerWidth;
+            result.integer_bits = std::max(result.integer_bits, magnitude_bits(work.product.backend()));
+            target.entries[pos++] = {static_cast<std::uint32_t>(row), Fixed{work.product}};
+        }
+        target.offsets[column + 1] = pos;
+    }
+    return Status::Success;
+}
+
+struct AllocationWatch {
+    AllocationWatch() {
+        bounded::heap_attempts = 0;
+        bounded::watched = true;
+    }
+    ~AllocationWatch() { bounded::watched = false; }
+};
+
+Result prepare(const Matrix& input, std::uint64_t cap) {
+    Result result;
+    if (input.rows < 0 || input.columns.size() > UINT32_MAX)
+        return result;
+    const auto requested = plan(input);
+    result.planned = requested.bytes;
+    if (requested.bytes > cap) {
+        result.status = Status::PayloadExceeded;
+        return result;
+    }
+    result.prepared.emplace();
+    auto& accepted = *result.prepared;
+    accepted.scales.resize(requested.rows);
+    accepted.offsets.resize(requested.offsets);
+    accepted.entries.resize(requested.terms);
+    accepted.seen.resize(requested.rows);
+    result.actual = payload(accepted.scales.capacity(), accepted.offsets.capacity(),
+                            accepted.entries.capacity(), accepted.seen.capacity());
+    if (result.actual != result.planned) {
+        result.status = Status::CapacityMismatch;
+    } else {
+        try {
+            const AllocationWatch watch;
+            result.status = fill_integerized(input, accepted, result);
+        } catch (const std::bad_alloc&) {
+            result.status = Status::AllocationAttempt;
+        } catch (...) {
+            result.status = Status::ArithmeticFailure;
+        }
+        result.heap = bounded::heap_attempts.load();
+        if (result.heap != 0)
+            result.status = Status::AllocationAttempt;
+    }
+    if (result.status != Status::Success)
+        result.prepared.reset();
+    return result;
+}
+
+void require(bool condition, const char* diagnostic) {
+    if (!condition)
+        throw std::runtime_error(diagnostic);
+}
+
+struct Compared {
+    std::uint64_t scales{}, offsets{}, entries{};
+    unsigned lcm_bits{}, integer_bits{};
+};
+
+unsigned dynamic_magnitude_bits(const Integer& value) {
+    if (value == 0)
+        return 0;
+    const Integer magnitude = boost::multiprecision::abs(value);
+    return boost::multiprecision::msb(magnitude) + 1;
+}
+
+Compared compare_exact(const Matrix& input, const Prepared& prepared) {
+    std::vector<Integer> scales(input.rows, Integer{1});
+    for (const auto& column : input.columns)
+        for (const auto& [row, q] : column) {
+            const Integer denominator_value = denominator(q);
+            scales[row] = (scales[row] / gcd(scales[row], denominator_value)) * denominator_value;
+        }
+    require(scales.size() == prepared.scales.size(), "oracle row count");
+    Compared compared;
+    for (std::size_t row = 0; row < scales.size(); ++row) {
+        require(Integer{prepared.scales[row]} == scales[row], "oracle LCM differs");
+        compared.lcm_bits = std::max(compared.lcm_bits, dynamic_magnitude_bits(scales[row]));
+        ++compared.scales;
+    }
+    std::size_t pos = 0;
+    require(prepared.offsets.size() == input.columns.size() + 1, "oracle offset count");
+    for (std::size_t column = 0; column < input.columns.size(); ++column) {
+        require(prepared.offsets[column] == pos, "oracle column prefix differs");
+        ++compared.offsets;
+        for (const auto& [row, value] : input.columns[column]) {
+            require(pos < prepared.entries.size(), "oracle expected entry");
+            const Q expected = value * scales[row];
+            const Integer integer = numerator(expected);
+            const auto& term = prepared.entries[pos++];
+            require(denominator(expected) == 1 && integer == Integer{term.value}
+                        && term.row == static_cast<std::uint32_t>(row), "oracle integer coefficient differs");
+            compared.integer_bits = std::max(compared.integer_bits, dynamic_magnitude_bits(integer));
+            ++compared.entries;
+        }
+    }
+    require(prepared.offsets.back() == pos && prepared.entries.size() == pos, "oracle final offset");
+    ++compared.offsets;
+    return compared;
+}
+
+void controls() {
+    Matrix hand;
+    hand.rows = 2;
+    hand.columns = {{{0, Q{-3} / 10}}, {{0, Q{7} / 6}}, {}};
+    const auto cap = plan(hand).bytes;
+    Result short_result;
+    {
+        const AllocationWatch watch;
+        short_result = prepare(hand, cap - 1);
+    }
+    require(short_result.status == Status::PayloadExceeded && !short_result.prepared &&
+                short_result.actual == 0 && bounded::heap_attempts == 0, "short capacity allocated");
+    const auto equal = prepare(hand, cap);
+    require(equal.prepared && equal.heap == 0 && equal.actual == cap, "exact capacity rejected");
+    const auto& ready = *equal.prepared;
+    require(ready.scales == std::vector<Fixed>{30, 1} &&
+                ready.offsets == std::vector<std::uint64_t>{0, 1, 2, 2} &&
+                ready.entries[0].value == -9 && ready.entries[1].value == 35, "signed hand oracle");
+    const auto checked = compare_exact(hand, ready);
+    require(checked.scales == 2 && checked.offsets == 4 && checked.entries == 2, "hand oracle counts");
+    require(checked.lcm_bits == 5 && checked.integer_bits == 6 &&
+                equal.lcm_bits == checked.lcm_bits && equal.integer_bits == checked.integer_bits,
+            "hand oracle widths");
+
+    const auto reject = [](const Matrix& input, Status expected) {
+        const auto got = prepare(input, byte_cap);
+        require(got.status == expected && got.heap == 0 && !got.prepared, "negative control differs");
+    };
+    Matrix bad = hand;
+    bad.columns[0][0].first = 2;
+    reject(bad, Status::InvalidInput);
+    bad = hand;
+    bad.columns[0].push_back(bad.columns[0][0]);
+    reject(bad, Status::InvalidInput);
+    bad = hand;
+    bad.columns[0][0].second = 0;
+    reject(bad, Status::InvalidInput);
+
+    const Integer exact = Integer{1} << (slot_bits - 1);
+    Matrix boundary;
+    boundary.rows = 1;
+    boundary.columns = {{{0, Q{1} / exact}}, {{0, Q{-1}}}};
+    const auto max_fit = prepare(boundary, byte_cap);
+    require(max_fit.prepared && max_fit.heap == 0 && max_fit.lcm_bits == slot_bits &&
+                max_fit.integer_bits == slot_bits && max_fit.prepared->entries[1].value == -Fixed{exact},
+            "representable operand or result rejected");
+    bad = boundary;
+    bad.columns[0][0].second = Q{1} / (exact * 2);
+    reject(bad, Status::OperandWidth);
+    bad = boundary;
+    bad.columns[0][0].second = Q{exact * 2};
+    reject(bad, Status::OperandWidth);
+    const Integer large = Integer{1} << 800;
+    bad.columns = {{{0, Q{1} / large}}, {{0, Q{1} / (large + 1)}}};
+    reject(bad, Status::LcmWidth);
+    bad.columns = {{{0, Q{1} / large}}, {{0, Q{large}}}};
+    reject(bad, Status::IntegerWidth);
+    const auto largest_slot = (std::numeric_limits<Fixed>::max)();
+    Workspace wide;
+    bool full_product_fits_slot = false;
+    {
+        const AllocationWatch watch;
+        full_product_fits_slot = fits_slot(largest_slot, largest_slot, wide);
+    }
+    require(!full_product_fits_slot && magnitude_bits(wide.product.backend()) == product_bits &&
+                bounded::heap_attempts == 0, "wide product boundary");
+    bool overflow = false;
+    try {
+        static_cast<void>(multiply_size(UINT64_MAX, 2));
+    } catch (const std::overflow_error&) {
+        overflow = true;
+    }
+    require(overflow, "unchecked payload multiplication");
+    std::cout << "{\"equal_and_one_short\":true,\"signed_terms_and_empty_row\":true,"
+                 "\"bad_row_duplicate_zero\":true,\"operand_width_boundary\":true,"
+                 "\"lcm_overflow\":true,\"integer_overflow\":true,\"wide_product_boundary\":true,\"payload_overflow\":true,"
+                 "\"heap_attempts\":0}\n";
+}
+} // namespace
+
+int main(int argc, char* argv[]) try {
+    if (argc == 2 && std::string_view{argv[1]} == "--controls") {
+        controls();
+        return 0;
+    }
+    require(argc == 3, "expected coefficient and domain");
+    const std::string_view domain{argv[2]};
+    const bool cut = domain == "cut";
+    require(cut || domain == "full", "expected full or cut domain");
+    std::ifstream coefficient(argv[1]);
+    require(coefficient.is_open(), "cannot open coefficient");
+    const auto source = read(coefficient);
+    require(source.n == 4 && source.full == 933, "source dimensions");
+    const auto matrix = active_matrix(source, cut, true);
+    require(matrix.rows == (cut ? 5634 : 20032) && matrix.columns.size() == 1496, "matrix dimensions");
+    const auto result = prepare(matrix, byte_cap);
+    if (!result.prepared) {
+        std::cerr << "integerization status=" << static_cast<int>(result.status)
+                  << " planned=" << result.planned << " actual=" << result.actual
+                  << " heap_attempts=" << result.heap << '\n';
+        return 3;
+    }
+    const auto compared = compare_exact(matrix, *result.prepared);
+    require(result.lcm_bits == compared.lcm_bits && result.integer_bits == compared.integer_bits,
+            "reported widths differ from dynamic oracle");
+    std::cout << "{\"domain\":\"" << domain << "\",\"rows\":" << matrix.rows
+              << ",\"candidates\":" << matrix.columns.size()
+              << ",\"terms\":" << result.prepared->entries.size()
+              << ",\"scales_compared\":" << compared.scales
+              << ",\"column_offsets_compared\":" << compared.offsets
+              << ",\"coefficients_compared\":" << compared.entries
+              << ",\"planned_bytes\":" << result.planned << ",\"actual_bytes\":" << result.actual
+              << ",\"scale_bytes\":" << sizeof(Fixed) << ",\"term_bytes\":" << sizeof(Term)
+              << ",\"scratch_bytes\":" << sizeof(Workspace) << ",\"owner_bytes\":" << sizeof(Prepared)
+              << ",\"max_lcm_bits\":" << result.lcm_bits << ",\"max_integer_bits\":" << result.integer_bits
+              << ",\"reference_max_lcm_bits\":" << compared.lcm_bits
+              << ",\"reference_max_integer_bits\":" << compared.integer_bits
+              << ",\"heap_attempts\":" << result.heap << "}\n";
+    return 0;
+} catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+}

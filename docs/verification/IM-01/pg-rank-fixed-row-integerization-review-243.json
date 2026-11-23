@@ -1,0 +1,24 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-row-integerization-review-243",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 241,
+  "parent_issue": 140,
+  "source_commit": "049e769f0370e55250fc9917f188c260af581b9e",
+  "date": "2026-11-23",
+  "claimed_state": "全行尺度と全整数係数を動的厳密参照へ照合し、最大幅を独立再集計した。幅のみの誤報を公開前に拒否した。",
+  "sources": {
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization.json": "1903764f0d00ab68ecf27a4d56983831a67726382d2de1172fbc2fdd25acefd2"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/probe.cpp.txt": "70cd45cfd6ad60c870468b5e15efaa1649e7787c44eb7fca28945c6499a945ca",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/run-integerization.py.txt": "b1a3fb8fc011e56b250f0c42f80a083b3aead9523f867944f9811edf87c06e11",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/gate-probe.py.txt": "c61784193287656327ba1bfe44b17faf8918859bab3df8b5c0ba9eb12e8a754a",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/review-243-verification.md": "55f717f045b7d92a0fe5ed73fe6f5837e751cb696a0b895b7d46a15d08c6fe5a",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/review-243-result.json": "f5faeb7efce8f811641653dc875e412cbcab9b5b462f80f9507d1075f96b6609",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/review-243-gate-result.json": "e7d6fcb1507a45b06065b6a0ab6c78ab0c00e1b0881844903b3c5f5d258644f0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "uvlas.pg-fixed-row-integerization-gate/1",
+  "publication_checks": 20,
+  "publication_scenarios": [
+    "valid",
+    "cut-failed",
+    "cut-wrong-count",
+    "cut-missing-heap-count",
+    "full-both-widths",
+    "full-lcm-width",
+    "full-integer-width",
+    "cut-both-widths",
+    "cut-lcm-width",
+    "cut-integer-width"
+  ],
+  "runner_alias_checks": 14,
+  "alias_modes": [
+    "direct",
+    "hard link"
+  ]
+}

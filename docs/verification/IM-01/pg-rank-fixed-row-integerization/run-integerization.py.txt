@@ -1,0 +1,90 @@
+"""Verify fixed-slot integerization in both frozen n4 quartic domains."""
+
+import argparse
+import json
+from pathlib import Path
+from runpy import run_path
+
+
+DOMAINS = {'full': 20032, 'cut': 5634}
+CANDIDATES = 1496
+WIDTH = 1536
+CAP = 48 * 1024**3
+
+
+def validate_controls(base, result):
+    base.require(type(result) is dict, 'control result')
+    for key in ('equal_and_one_short', 'signed_terms_and_empty_row', 'bad_row_duplicate_zero',
+                'operand_width_boundary', 'lcm_overflow', 'integer_overflow', 'wide_product_boundary',
+                'payload_overflow'):
+        base.require(result.get(key) is True, f'control {key}')
+    base.integer(result.get('heap_attempts'), 0, 'control heap attempts')
+
+
+def validate(base, result, domain, terms):
+    rows = DOMAINS[domain]
+    base.require(type(result) is dict and result.get('domain') == domain, 'domain result')
+    for key, expected in (
+        ('rows', rows), ('candidates', CANDIDATES), ('terms', terms),
+        ('scales_compared', rows), ('column_offsets_compared', CANDIDATES + 1),
+        ('coefficients_compared', terms), ('heap_attempts', 0),
+    ):
+        base.integer(result.get(key), expected, key)
+    for key in ('max_lcm_bits', 'max_integer_bits'):
+        reference_key = f'reference_{key}'
+        reference = result.get(reference_key)
+        base.require(type(reference) is int and 0 < reference <= WIDTH, f'{reference_key} range')
+        base.integer(result.get(key), reference, key)
+    for key in ('owner_bytes', 'scale_bytes', 'term_bytes', 'scratch_bytes'):
+        value = result.get(key)
+        base.require(type(value) is int and 0 < value <= 4096, f'{key} range')
+    base.require(result['scale_bytes'] < result['term_bytes']
+                 and result['scratch_bytes'] < result['owner_bytes'], 'layout components')
+    expected = (result['owner_bytes'] + rows * (result['scale_bytes'] + 4)
+                + (CANDIDATES + 1) * 8 + terms * result['term_bytes'])
+    base.require(expected <= CAP, 'payload exceeds cap')
+    base.integer(result.get('planned_bytes'), expected, 'planned bytes')
+    base.integer(result.get('actual_bytes'), expected, 'actual capacity')
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('coefficient', 'binary', 'study', 'base-runner', 'path-guard',
+                 'capacity-producer', 'count-oracle', 'output'):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args(argv)
+    shared = run_path(str(args.path_guard))
+    shared['reject_output_aliases'](
+        args.output, (path for name, path in vars(args).items() if name != 'output'),
+    )
+    base = shared['load']('fixed_integerization_base', args.base_runner)
+    capacity = shared['load']('fixed_integerization_capacity', args.capacity_producer)
+    study = json.loads(args.study.read_bytes())['cases']
+    priors = {}
+    for domain, rows in DOMAINS.items():
+        prior = capacity.verify_input(args.coefficient, 4, 'quartic', domain, study)
+        base.require((prior['rows'], prior['columns'], prior['candidates']) == (rows, 933, CANDIDATES),
+                     f'{domain} study dimensions')
+        priors[domain] = prior
+    # Empty selection means every candidate contributes to the independent term tally.
+    counts = run_path(str(args.count_oracle))['count_rhs_scans'](
+        args.coefficient, {domain: set() for domain in DOMAINS},
+    )
+    binary = args.binary.resolve()
+    controls = base.invoke(binary, '--controls')
+    validate_controls(base, controls)
+    cases = []
+    for domain in DOMAINS:
+        result = base.invoke(binary, args.coefficient, domain)
+        validate(base, result, domain, counts[domain]['all'])
+        cases.append(result)
+    base.publish(args.output, {
+        'schema': 'uvlas.pg-fixed-row-integerization/1', 'n': 4, 'shape': 'quartic',
+        'row_order': 'sparse', 'input_sha256': priors['full']['input_sha256'],
+        'slot_bits': WIDTH, 'product_bits': 2 * WIDTH, 'byte_cap': CAP,
+        'controls': controls, 'cases': cases,
+    })
+
+
+if __name__ == '__main__':
+    main()
