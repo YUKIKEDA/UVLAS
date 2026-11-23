@@ -58,8 +58,9 @@ template <class I>
         return 0;
     const auto& backend = value.backend();
     const auto high = backend.limbs()[backend.size() - 1];
-    return std::uint64_t{backend.size() - 1} * std::numeric_limits<RankWord>::digits +
-           std::bit_width(high);
+    constexpr auto limb_bits = static_cast<std::uint64_t>(std::numeric_limits<RankWord>::digits);
+    return std::uint64_t{backend.size() - 1} * limb_bits +
+           static_cast<std::uint64_t>(std::bit_width(high));
 }
 
 template <class I>
