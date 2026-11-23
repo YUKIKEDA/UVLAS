@@ -574,3 +574,64 @@ TEST_CASE("PG reference identity follows an exact non-axis frame and stamps owne
     CHECK(rational_value(out.normal[2]) == 1);
     CHECK(rational_value(out.determinant_metres_cubed) == 2);
 }
+
+TEST_CASE("PG reference caps and cancels distinct graph comparison before geometry work",
+          "[SH-D02][N4-08][V-PG][negative][verification]") {
+    Fixture f;
+    const auto width = f.r("1"), skew = f.r("0");
+    // The coefficient is 2^-130, so its canonical denominator takes five 32-bit words.
+    const auto height = f.r("1", "1361129467683753853853498429727072845824");
+    const std::array<ExactInputTerm, 1> terms{{{{2, 0}, height}}};
+    set_graph(f, 1, width, skew, terms);
+    core::ResourcePlan producer_plan{cap};
+    auto inputs = prepare_inputs(f, producer_plan);
+    Frame frame{f};
+    frame.length = f.r("-1"); // Deliberate failure immediately after input comparison.
+    const auto zero = f.r("0");
+    const auto query = PgReferenceVolumePoint{0, zero, zero, zero};
+
+    // One fixed digest; each graph has one header, four cells, one term, and
+    // canonical equalities for x0=0, width=1, skew=0, and height=2^-130.
+    constexpr std::uint64_t comparison = 1 + 2 * (1 + 4 + 1 + 3 + 5 + 3 + 13);
+    const auto check_code = [](const auto& result, core::FailureCode code) {
+        if (result)
+            FAIL("The negative reference comparison control succeeded");
+        else
+            CHECK(result.error().code == code);
+    };
+    auto limits = reference_limits();
+    core::ResourcePlan call_plan{cap};
+    for (const auto visit_cap : {comparison - 1, comparison}) {
+        limits.maximum_partition_visits = visit_cap;
+        const auto expected = visit_cap == comparison ? core::FailureCode::GeometryInvalid
+                                                      : core::FailureCode::ResourceExceeded;
+        check_code(prepare_candidate(inputs, frame.view(), limits, call_plan), expected);
+        check_code(
+            PgReferenceGeometry::diagnose_point(inputs, frame.view(), query, limits, call_plan),
+            expected);
+        CHECK(call_plan.allocated_bytes() == 0);
+    }
+
+    // A cancelled request takes precedence over a stale graph, even when no
+    // comparison budget is available.
+    set_graph(f, 1, width, skew, {});
+    std::swap(inputs.graph, *f.graph);
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    limits.cancellation = stop.get_token();
+    limits.maximum_partition_visits = 0;
+    check_code(prepare_candidate(inputs, frame.view(), limits, call_plan),
+               core::FailureCode::Cancelled);
+    check_code(PgReferenceGeometry::diagnose_point(inputs, frame.view(), query, limits, call_plan),
+               core::FailureCode::Cancelled);
+    CHECK(call_plan.allocated_bytes() == 0);
+    std::swap(inputs.graph, *f.graph);
+
+    const auto pieces = take(inputs.partition.pieces()).size();
+    const auto vertices = take(inputs.partition.piece_vertex_indices()).size();
+    frame.length = f.r("2");
+    limits = reference_limits();
+    limits.maximum_partition_visits = comparison + pieces + vertices;
+    const auto prepared = take(prepare_candidate(inputs, frame.view(), limits, call_plan));
+    CHECK(prepared.preparation().partition_visits == limits.maximum_partition_visits);
+}
