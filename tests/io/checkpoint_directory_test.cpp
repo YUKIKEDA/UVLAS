@@ -60,15 +60,16 @@ const cp::CheckpointManifestLimits limits{
     {4, 1024},
     8,
     2048};
-constexpr cp::ReferenceFileLimits files{8192, 8193, 16, 8192};
+constexpr cp::CheckpointDirectoryLimits files{{8192, 8193, 16, 8192}, 16};
 constexpr cp::CheckpointPublicationLimits publication{8, 8192, 16'384};
 constexpr cp::CheckpointDiscoveryLimits discovery{16, 8};
 constexpr uvlas::io::SourceId input{554};
+enum class Newest { Corrupt, Incompatible, ExtraChunk };
 
 TEST_CASE("Checkpoint directories round-trip typed data and discover the latest valid number",
           "[IO4-06][N4-02]") {
-    const bool incompatible_newest = GENERATE(false, true);
-    CAPTURE(incompatible_newest);
+    const auto newest = GENERATE(Newest::Corrupt, Newest::Incompatible, Newest::ExtraChunk);
+    CAPTURE(newest);
     const TestDirectory root;
     core::ResourcePlan plan{6'000'000};
     auto identity = cp::CheckpointFingerprints{};
@@ -99,7 +100,7 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
     CHECK_FALSE(save(12, first, identity));
 
     const auto good = root.path() / "checkpoint-12";
-    if (incompatible_newest) {
+    if (newest == Newest::Incompatible) {
         auto other = identity;
         other.model.bytes[0] = std::byte{1};
         REQUIRE(save(14, first, other));
@@ -107,7 +108,7 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
             root.path() / "checkpoint-14", input, identity, limits, files, plan, {});
         REQUIRE_FALSE(incompatible);
         CHECK(incompatible.error().code == core::FailureCode::CheckpointIncompatible);
-    } else {
+    } else if (newest == Newest::Corrupt) {
         const auto broken = root.path() / "checkpoint-13";
         REQUIRE(fs::create_directory(broken));
         REQUIRE(fs::copy_file(good / "manifest.json", broken / "manifest.json"));
@@ -121,6 +122,14 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
             cp::read_checkpoint_directory(broken, input, identity, limits, files, plan, {});
         REQUIRE_FALSE(corrupt);
         CHECK(corrupt.error().code == core::FailureCode::CheckpointCorrupt);
+    } else {
+        REQUIRE(save(14, first, identity));
+        const auto extra = root.path() / "checkpoint-14";
+        REQUIRE(fs::copy_file(good / "chunk-node_id.bin", extra / "chunk-extra.bin"));
+        const auto corrupted =
+            cp::read_checkpoint_directory(extra, input, identity, limits, files, plan, {});
+        REQUIRE_FALSE(corrupted);
+        CHECK(corrupted.error().code == core::FailureCode::CheckpointCorrupt);
     }
     // Even a complete set is invisible under a staging name.
     fs::copy(good, root.path() / ".uvlas-checkpoint-fixture");
@@ -142,10 +151,60 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
     auto previous = take(take(first_checkpoint.payloads.at(0)).get().decode(plan, {}));
     CHECK(std::get<core::PlannedBuffer<std::uint64_t>>(previous).values().front() == 42);
 
+    auto entry_cap = files;
+    entry_cap.maximum_entries = 2;
+    REQUIRE(cp::read_checkpoint_directory(good, input, identity, limits, entry_cap, plan, {}));
+    REQUIRE(fs::copy_file(good / "manifest.json", good / "notes.txt"));
+    const auto excess_entries =
+        cp::read_checkpoint_directory(good, input, identity, limits, entry_cap, plan, {});
+    REQUIRE_FALSE(excess_entries);
+    CHECK(excess_entries.error().code == core::FailureCode::ResourceExceeded);
+    REQUIRE(cp::read_checkpoint_directory(good, input, identity, limits, files, plan, {}));
+
     const auto denied =
         cp::read_latest_checkpoint(root.path(), input, identity, limits, files, {16, 1}, plan, {});
     REQUIRE_FALSE(denied);
     CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
+
+    if (newest == Newest::ExtraChunk) {
+        for (int i = 0; i < 40; ++i)
+            REQUIRE(fs::copy_file(good / "manifest.json",
+                                  good / ("note-" + std::to_string(i) + ".txt")));
+        entry_cap.maximum_entries = 43;
+        REQUIRE(cp::read_checkpoint_directory(good, input, identity, limits, entry_cap, plan, {}));
+        --entry_cap.maximum_entries;
+        const auto bounded =
+            cp::read_checkpoint_directory(good, input, identity, limits, entry_cap, plan, {});
+        REQUIRE_FALSE(bounded);
+        CHECK(bounded.error().code == core::FailureCode::ResourceExceeded);
+    }
 }
+
+#ifdef __linux__
+TEST_CASE("Linux checkpoint save and recovery reject an ancestor symlink", "[IO4-06][negative]") {
+    const TestDirectory root;
+    const auto actual = root.path() / "actual";
+    const auto parent = actual / "runs";
+    const auto alias = root.path() / "alias";
+    REQUIRE(fs::create_directories(parent));
+    fs::create_directory_symlink(actual, alias);
+    const auto via_alias = alias / "runs";
+    core::ResourcePlan plan{1'000'000};
+    const cp::CheckpointFingerprints context{};
+    const std::array<std::uint64_t, 1> values{42};
+    const auto chunk = take(cp::CheckpointChunk::encode({}, std::span<const std::uint64_t>{values},
+                                                        limits.chunk, plan, {}));
+    const std::array named{cp::NamedCheckpointChunk{"node_id", chunk}};
+    CHECK_FALSE(
+        cp::save_checkpoint_directory(via_alias, 1, named, context, limits, publication, plan, {}));
+    CHECK(fs::is_empty(parent));
+    REQUIRE(
+        cp::save_checkpoint_directory(parent, 1, named, context, limits, publication, plan, {}));
+    CHECK_FALSE(cp::read_checkpoint_directory(via_alias / "checkpoint-1", input, context, limits,
+                                              files, plan, {}));
+    REQUIRE(cp::read_checkpoint_directory(parent / "checkpoint-1", input, context, limits, files,
+                                          plan, {}));
+}
+#endif
 
 } // namespace

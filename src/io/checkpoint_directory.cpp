@@ -4,8 +4,17 @@
 
 #if defined(_WIN32)
 #include "windows_reference_root.hpp"
+
+#include <cstring>
+#include <windows.h>
 #elif defined(__linux__)
 #include "linux_reference_root.hpp"
+
+#include <cerrno>
+#include <dirent.h>
+#include <fcntl.h>
+#include <memory>
+#include <unistd.h>
 #endif
 
 #include <algorithm>
@@ -17,6 +26,10 @@ namespace {
 
 constexpr auto recover = core::Operation::Recover;
 constexpr auto corrupt = core::FailureCode::CheckpointCorrupt;
+constexpr auto exceeded = core::FailureCode::ResourceExceeded;
+constexpr auto cancelled = core::FailureCode::Cancelled;
+constexpr std::string_view chunk_prefix = "chunk-";
+constexpr std::string_view chunk_suffix = ".bin";
 
 #if defined(_WIN32)
 using NativeRoot = WindowsReferenceRoot;
@@ -73,15 +86,157 @@ template <class T>
     return parse_checkpoint_directory_name({ascii.data(), native.size()});
 }
 
+[[noreturn]] void reject(core::FailureCode code) {
+    throw core::Failure{code, recover, {}};
+}
+
+template <class Char>
+[[nodiscard]] bool resembles_chunk(std::basic_string_view<Char> name) noexcept {
+    const auto same_letter = [](Char actual, char expected) {
+        const auto value = static_cast<std::uint32_t>(actual);
+        const auto lower = value >= 'A' && value <= 'Z' ? value + ('a' - 'A') : value;
+        return lower == static_cast<std::uint32_t>(expected);
+    };
+    return name.size() >= chunk_prefix.size() + chunk_suffix.size() &&
+           std::ranges::equal(name.substr(0, chunk_prefix.size()), chunk_prefix, same_letter) &&
+           std::ranges::equal(name.substr(name.size() - chunk_suffix.size()), chunk_suffix,
+                              same_letter);
+}
+
+class DirectoryEntries {
+public:
+    DirectoryEntries(const CheckpointManifest& manifest, std::uint64_t limit,
+                     const std::stop_token& stop) noexcept
+        : manifest_(manifest), limit_(limit), stop_(stop) {}
+
+    template <class Char>
+    void inspect(std::basic_string_view<Char> name) {
+        poll();
+        if ((name.size() == 1 && name[0] == '.') ||
+            (name.size() == 2 && name[0] == '.' && name[1] == '.')) {
+            return;
+        }
+        if (examined_ == limit_)
+            reject(exceeded);
+        ++examined_;
+        if (!resembles_chunk(name))
+            return;
+        std::array<char, 74> ascii{};
+        if (name.size() > ascii.size())
+            reject(corrupt);
+        for (std::size_t i = 0; i < name.size(); ++i) {
+            if (static_cast<std::uint32_t>(name[i]) > 127)
+                reject(corrupt);
+            ascii[i] = static_cast<char>(name[i]);
+        }
+        const std::string_view filename{ascii.data(), name.size()};
+        if (!filename.starts_with(chunk_prefix) || !filename.ends_with(chunk_suffix))
+            reject(corrupt);
+        const auto label = filename.substr(
+            chunk_prefix.size(), filename.size() - chunk_prefix.size() - chunk_suffix.size());
+        core::Index first = 0;
+        auto last = manifest_.size();
+        while (first < last) {
+            const auto middle = first + (last - first) / 2;
+            if (checked(manifest_.at(middle)).name < label)
+                first = middle + 1;
+            else
+                last = middle;
+        }
+        if (first == manifest_.size() || checked(manifest_.at(first)).name != label ||
+            counted_ == manifest_.size())
+            reject(corrupt);
+        ++counted_;
+    }
+
+    void poll() const {
+        if (stop_.stop_requested())
+            reject(cancelled);
+    }
+
+    void finish() const {
+        poll();
+        if (counted_ != manifest_.size())
+            reject(corrupt);
+    }
+
+private:
+    const CheckpointManifest& manifest_;
+    std::uint64_t limit_;
+    const std::stop_token& stop_;
+    std::uint64_t examined_ = 0;
+    core::Index counted_ = 0;
+};
+
+#ifdef _WIN32
+void inspect_directory(HANDLE directory, DirectoryEntries& entries) {
+    constexpr auto header_bytes = offsetof(FILE_ID_BOTH_DIR_INFO, FileName);
+    alignas(FILE_ID_BOTH_DIR_INFO) std::array<std::byte, 4096> buffer{};
+    auto information = FileIdBothDirectoryRestartInfo;
+    for (;;) {
+        entries.poll();
+        if (!GetFileInformationByHandleEx(directory, information, buffer.data(),
+                                          static_cast<DWORD>(buffer.size()))) {
+            if (GetLastError() == ERROR_NO_MORE_FILES)
+                return;
+            reject(corrupt);
+        }
+        information = FileIdBothDirectoryInfo;
+        std::span<const std::byte> record{buffer};
+        for (;;) {
+            if (record.size() < header_bytes)
+                reject(corrupt);
+            FILE_ID_BOTH_DIR_INFO info{};
+            std::memcpy(&info, record.data(), header_bytes);
+            const auto bytes = info.FileNameLength;
+            if (bytes == 0 || bytes % sizeof(wchar_t) != 0 || bytes > record.size() - header_bytes)
+                reject(corrupt);
+            std::array<wchar_t, buffer.size() / sizeof(wchar_t)> name{};
+            std::memcpy(name.data(), record.subspan(header_bytes).data(), bytes);
+            entries.inspect(std::wstring_view{name.data(), bytes / sizeof(wchar_t)});
+            const auto offset = info.NextEntryOffset;
+            if (offset == 0)
+                break;
+            if (offset < header_bytes + bytes || offset >= record.size())
+                reject(corrupt);
+            record = record.subspan(offset);
+        }
+    }
+}
+#else
+void inspect_directory(int directory, DirectoryEntries& entries) {
+    const auto fd = ::openat(directory, ".", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    if (fd < 0)
+        reject(errno == ENOMEM || errno == EMFILE || errno == ENFILE ? exceeded : corrupt);
+    auto* stream = ::fdopendir(fd);
+    if (stream == nullptr) {
+        const auto error = errno;
+        const LinuxReferenceHandle owned{fd};
+        reject(error == ENOMEM ? exceeded : corrupt);
+    }
+    const auto close = [](DIR* handle) noexcept { static_cast<void>(::closedir(handle)); };
+    const std::unique_ptr<DIR, decltype(close)> owned{stream, close};
+    for (;;) {
+        entries.poll();
+        errno = 0;
+        const auto* entry = ::readdir(owned.get());
+        if (entry == nullptr) {
+            if (errno != 0)
+                reject(corrupt);
+            return;
+        }
+        entries.inspect(std::string_view{entry->d_name});
+    }
+}
+#endif
+
 [[nodiscard]] ReferenceFileSnapshot
 read_payload(const NativeRoot& root, const CheckpointManifestEntry& entry, ReferenceFileId manifest,
              ReferenceFileLimits limits, core::ResourcePlan& plan, const std::stop_token& stop) {
-    constexpr auto prefix = std::string_view{"chunk-"};
-    constexpr auto suffix = std::string_view{".bin"};
     std::array<char, 74> filename{};
-    auto end = std::ranges::copy(prefix, filename.begin()).out;
+    auto end = std::ranges::copy(chunk_prefix, filename.begin()).out;
     end = std::ranges::copy(entry.name, end).out;
-    end = std::ranges::copy(suffix, end).out;
+    end = std::ranges::copy(chunk_suffix, end).out;
     const std::string_view name{filename.data(), static_cast<std::size_t>(end - filename.begin())};
     auto file = checked_file(name, root, plan, stop);
     const auto info = checked(file.info());
@@ -98,23 +253,27 @@ struct CheckpointDirectoryReader {
     [[nodiscard]] static LoadedCheckpointDirectory
     read(const std::filesystem::path& directory, SourceId source,
          const CheckpointFingerprints& expected, const CheckpointManifestLimits& limits,
-         ReferenceFileLimits files, core::ResourcePlan& plan, const std::stop_token& stop) {
+         CheckpointDirectoryLimits files, core::ResourcePlan& plan, const std::stop_token& stop) {
         if (stop.stop_requested())
             throw core::Failure{core::FailureCode::Cancelled, recover, {}};
         const auto number = checked(checkpoint_number(directory));
         const auto root = checked(NativeRoot::open(directory, stop));
         auto manifest_handle = checked_file("manifest.json", root, plan, stop);
-        const auto snapshot = checked(
-            read_manifest_file(manifest_handle, bound_size(files, limits.json.maximum_source_bytes),
-                               plan, stop, nullptr));
+        const auto snapshot = checked(read_manifest_file(
+            manifest_handle, bound_size(files.file, limits.json.maximum_source_bytes), plan, stop,
+            nullptr));
         const auto original = checked(snapshot.view());
         auto manifest =
             checked(CheckpointManifest::read(original.bytes, source, expected, limits, plan, stop));
+        DirectoryEntries entries{manifest, files.maximum_entries, stop};
+        inspect_directory(root.directory_.get(), entries);
+        entries.finish();
         auto chunks =
             checked(plan.allocate<std::optional<CheckpointChunk>>(manifest.size(), recover));
         for (core::Index i = 0; i < manifest.size(); ++i) {
             const auto entry = checked(manifest.at(i));
-            auto file = read_payload(root, entry, original.file_info.identity, files, plan, stop);
+            auto file =
+                read_payload(root, entry, original.file_info.identity, files.file, plan, stop);
             chunks.values()[static_cast<std::size_t>(i)].emplace(
                 checked(CheckpointChunk::from_verified_file(entry.header, std::move(file),
                                                             limits.chunk, plan, stop)));
@@ -157,7 +316,7 @@ core::Result<void> save_checkpoint_directory(
 core::Result<LoadedCheckpointDirectory>
 read_checkpoint_directory(const std::filesystem::path& directory, SourceId source,
                           const CheckpointFingerprints& expected,
-                          const CheckpointManifestLimits& limits, ReferenceFileLimits files,
+                          const CheckpointManifestLimits& limits, CheckpointDirectoryLimits files,
                           core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
     return core::guard_entry(recover, corrupt, {},
                              [&]() -> core::Result<LoadedCheckpointDirectory> {
@@ -173,7 +332,7 @@ read_checkpoint_directory(const std::filesystem::path& directory, SourceId sourc
 core::Result<LoadedCheckpointDirectory>
 read_latest_checkpoint(const std::filesystem::path& parent, SourceId source,
                        const CheckpointFingerprints& expected,
-                       const CheckpointManifestLimits& limits, ReferenceFileLimits files,
+                       const CheckpointManifestLimits& limits, CheckpointDirectoryLimits files,
                        CheckpointDiscoveryLimits discovery, core::ResourcePlan& plan,
                        const std::stop_token& stop) noexcept {
     using core::FailureCode;
