@@ -1,0 +1,48 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-resolved-case-document",
+  "ids": [
+    "IO4-01",
+    "IO4-05",
+    "QA-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "66dd1ac33c23bf2e02a81f168e6f00c780cc72b2",
+  "scope": "Private owned UTF-8 SI-case report and digest-linked status and provenance from a validated structural case",
+  "verification": {
+    "ctest_regex": "^io\\.(resolved_case_document|result_documents)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 2,
+      "resolved_case_catch_assertions": 701
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 2,
+      "clang_tidy": "21.1.1 PASS on the new implementation and test"
+    }
+  },
+  "tested_target_registration": {
+    "commit": "66dd1ac33c23bf2e02a81f168e6f00c780cc72b2",
+    "CMakeLists.txt": "dca7de98cb73435861b415aa866c3985a95b0bb800084fd646f5a3ab96bb66e3",
+    "tests/CMakeLists.txt": "77e42df81f0113874d574617c31de897713b3f64d7f8d0e97109dbbe65176bb9"
+  },
+  "sources": {
+    "src/io/resolved_case_document.cpp": "ad8aaa4620c5d619e1a99a519dcf38193ff905953f60c583733dfee8150e3bf1",
+    "src/io/resolved_case_document.hpp": "36b3455020f3cf86e8c0adf7f508169157efed4b8d32acc4ff280a6a9c297f53",
+    "src/io/result_documents.cpp": "a53fbd382a2a7d98d5d94838f29efd08360cd2fa3e46835ce1fe7970e9848995",
+    "src/io/result_documents.hpp": "627376817b7d57a029d49e31ac93093bd8a37d4d322616632d747bedbae4c959",
+    "src/io/si_case_detail.hpp": "b446ecf25fa6eca434247e5b066546824926248ca3079c22e419b03d86c859eb",
+    "include/uvlas/io/si_case.hpp": "6ed8563e7f522ee312ea38f1eeb95ecf3b78c331c4105cd66570eb7537110479",
+    "tests/io/resolved_case_document_test.cpp": "e0e12ef62ac112c5e2cf137e5900cfa4605d61736a14155932339c33317b7f27",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/resolved-case-document.md": "1c161aa4870b8c2c9159d4cafd606a9e05c5a69b87b270c05a29e9d80fb3e778"
+  }
+}
