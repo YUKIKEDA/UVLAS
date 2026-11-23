@@ -1,0 +1,69 @@
+// Included in batch_fixed after the shared pivot helpers.
+struct HandoffEvidence {
+    std::uint64_t planned{}, actual{}, heap{}, terms{}, offsets{};
+    std::uint64_t reference_preflight{}, fixed_overlap{}, row_only_bytes{};
+    unsigned scale_bits{}, integer_bits{};
+    bool same_storage{};
+};
+struct ConnectedInput {
+    InputData data;
+    SharedPivot shared;
+    HandoffEvidence evidence;
+};
+
+ConnectedInput connect_fixed_rows(const Matrix& matrix, const Elimination<Mod<p1>>& factor,
+                                  const char* certificate, int grid, int full, std::uint64_t cap) {
+    if (!factor.complete || factor.selected.empty())
+        throw std::runtime_error("incomplete discovery");
+    auto rows = row_integerization::prepare(matrix, cap);
+    if (!rows.prepared || rows.heap)
+        throw std::runtime_error("fixed row preparation rejected: " +
+                                 std::to_string(static_cast<int>(rows.status)));
+    auto& normalized = *rows.prepared;
+    const auto compared = row_integerization::compare_exact(matrix, normalized);
+    if (rows.lcm_bits != compared.lcm_bits || rows.integer_bits != compared.integer_bits)
+        throw std::runtime_error("fixed row oracle widths differ");
+
+    auto assembled = ConnectedInput{};
+    auto& data = assembled.data;
+    auto& evidence = assembled.evidence;
+    data.rows = static_cast<std::uint32_t>(matrix.rows);
+    data.columns = static_cast<std::uint32_t>(matrix.columns.size());
+    data.rank = static_cast<std::uint32_t>(factor.selected.size());
+    data.integer_bits = rows.integer_bits;
+    const auto selected_bytes = times(data.rank, sizeof(std::uint32_t));
+    const auto coordinate_bytes = times(times(data.columns, data.rank), sizeof(Pair));
+    evidence.reference_preflight = plus(plus(rows.actual, sizeof(InputData)),
+                                        plus(selected_bytes, coordinate_bytes));
+    if (evidence.reference_preflight > cap)
+        throw std::runtime_error("reference preflight capacity exceeded");
+    const auto* entry_data = normalized.entries.data();
+    const auto* offset_data = normalized.offsets.data();
+    const auto csc_bytes = plus(times(normalized.entries.capacity(), sizeof(Entry)),
+                                times(normalized.offsets.capacity(), sizeof(std::uint64_t)));
+    data.values = std::move(normalized.entries);
+    data.offsets = std::move(normalized.offsets);
+    evidence.same_storage = data.values.data() == entry_data && data.offsets.data() == offset_data;
+    if (!evidence.same_storage)
+        throw std::runtime_error("fixed rows were relocated");
+
+    data.selected.assign(factor.selected.begin(), factor.selected.end());
+    read_reference(data, matrix, factor, certificate, grid, full);
+    evidence.row_only_bytes = rows.actual - csc_bytes;
+    if (plus(inputs_payload(data), evidence.row_only_bytes) != evidence.reference_preflight)
+        throw std::runtime_error("reference capacity differs");
+    assembled.shared = prepare_shared(data, factor, normalized.scales);
+    evidence.fixed_overlap = plus(evidence.reference_preflight, shared_payload(assembled.shared));
+    if (evidence.fixed_overlap > cap)
+        throw std::runtime_error("fixed overlap capacity exceeded");
+
+    evidence.planned = rows.planned;
+    evidence.actual = rows.actual;
+    evidence.heap = rows.heap;
+    evidence.terms = compared.entries;
+    evidence.offsets = compared.offsets;
+    evidence.scale_bits = compared.lcm_bits;
+    evidence.integer_bits = compared.integer_bits;
+    // Row scales, row marks and arithmetic scratch have no lifetime in the batch.
+    return assembled;
+}

@@ -1,0 +1,52 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "pg-rank-fixed-integerization-handoff",
+  "ids": [
+    "SH-D03"
+  ],
+  "package": "IM-01",
+  "issue": 250,
+  "parent_issue": 140,
+  "source_commit": "ff011d7998384be787b94acf653da632524529dc",
+  "date": "2026-11-23",
+  "claimed_state": "n4四次の全背景とU形切断で固定整数化のCSCを共有リフトへ無複製で移し、全候補と固定領域の容量を厳密に照合した。整数化とリフトで監査対象の追加確保試行は0件。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Release",
+    "boost": "1.92.0",
+    "stack_reservation_bytes": 67108864
+  },
+  "sources": {
+    "docs/specs/structure/pg-local-rank-contract.md": "6f05c99a3662a1229dc5d0222b0a50755645b39d6546b5c871211c64c1fc9ddb",
+    "docs/verification/IM-01/pg-rank-fixed-batch/fixed-batch.cpp.txt": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "docs/verification/IM-01/pg-rank-fixed-batch/run-batch.py.txt": "9a01fdb93428968c29cd6aaed4cdc31a93a1f1372ea0b5b7ff351fd3ab6d6533",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n2/derive-driver.py.txt": "1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-cut/run-case.py.txt": "699bf1f80bc9351fed420e473b5babb69a8704d9cec1cfebae7e36734f62825b",
+    "docs/verification/IM-01/pg-rank-fixed-batch-n4-full/run-case.py.txt": "0599f9bb7d1be19d7ba5d6300b9c5849f08ed712def880517094d3d701cf265d",
+    "docs/verification/IM-01/pg-rank-fixed-certificate/certificate-index.json": "7f5168f8a8f39d8c9a6e908283cd8d6f0e4f4c11816ec1a8e1e31edb395f6b5c",
+    "docs/verification/IM-01/pg-rank-fixed-lift/allocation-profile.hpp.txt": "2156b59364dcd08105921d55c54eff5b646eb761334b51bec549756bbc4e5375",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/probe.cpp.txt": "70cd45cfd6ad60c870468b5e15efaa1649e7787c44eb7fca28945c6499a945ca",
+    "docs/verification/IM-01/pg-rank-fixed-row-integerization/review-243-result.json": "f5faeb7efce8f811641653dc875e412cbcab9b5b462f80f9507d1075f96b6609",
+    "docs/verification/IM-01/pg-rank-fixed-slot-design/capacity-oracle-v2.py.txt": "1a390bf709998c4c09e0b144a003f79573a09d3a0c022871183b4ab4af643308",
+    "docs/verification/IM-01/pg-rank-resource-study/rank-comparison.cpp.txt": "4da9ce582139da66b10227adf211868f3c71edf12b837593a763c40d55025c87",
+    "docs/verification/IM-01/pg-rank-resource-study/results.json": "c88d4bc42b79e231bc6e7f57e386265542b27cd3bb7513c569883cae4e4910d5",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/derive-header.py.txt": "fbf5c9456f66bac26deb5896a80de914243f5e9176ddaa36c5c7b6cc58824fe1",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/results.json": "cf8c3413b005adffc936a19a52e1dbc418d4bc8ad6a6a336c204adab67767e58",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/run-shared.py.txt": "3c612ec40315759b155c8773bd22d5f6464395da842d2af797f0f7077963bd90",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/shared-batch.cpp.txt": "069c3f9fe40c206e869db7f94eeb434808dfb246d30446dc18a5aa89e7f2c918",
+    "docs/verification/IM-01/pg-rank-shared-fixed-batch/shared-pivot.hpp.txt": "2d1c8374e3e289e8eb6b5fcb7bd4e30eee1d77eca9b2ed713408fd75a9b524fb",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/compose.py.txt": "a8e90a2ca1f1e8b4c63cb646fdd00e04beb1985fb2cd56519f7c8151b494131f",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/composition.json": "8c6f4b6ec916648716a1bc360a2f0fbdad74225afc4a59e3c514495088ffce9d",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/gate-probe.py.txt": "8558f0bd7e56c56d4198b62065af3b490701233b15455046345b4187afcf3123",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/gate-result.json": "6db8d5a13baab5f7fee1699abce0cbd9307eb2a9d99116eda4f8bb6f01aae016",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/result.json": "471bf83586b135f7490f50c40d61b2a2af49c3c5575c0cbbbb7fd46d84842e9c",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/row-handoff.hpp.txt": "38a1213b9257731adc54018ab3fd16ca79bc973591fad3104d197ec327aa842f",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/run-connected.py.txt": "6c3aebc001437f629397cc3ead0d47de773a5617e3e2184ede910d65eb88387f",
+    "docs/verification/IM-01/pg-rank-fixed-integerization-handoff/verification.md": "81ded51522298898d264afb879fabceb8de320911b6920bbc96c06beffef9374"
+  }
+}

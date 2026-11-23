@@ -1,0 +1,15 @@
+{
+  "schema": "uvlas.pg-row-handoff-gate/1",
+  "composition_checks": 3,
+  "publication_checks": 14,
+  "runner_alias_checks": 28,
+  "publication_scenarios": [
+    "valid",
+    "cut-failed",
+    "cut-reallocated",
+    "cut-width-mismatch",
+    "cut-preflight-mismatch",
+    "cut-payload-mismatch",
+    "cut-digest-mismatch"
+  ]
+}

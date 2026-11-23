@@ -1,0 +1,135 @@
+"""Publish connected fixed-row and shared-lift evidence after both domains pass."""
+
+import argparse
+import json
+from pathlib import Path
+from runpy import run_path
+
+
+DOMAINS = {'full': (20032, 933, 1496, 774), 'cut': (5634, 933, 1496, 498)}
+COMPOSITION_SHA = '8c6f4b6ec916648716a1bc360a2f0fbdad74225afc4a59e3c514495088ffce9d'
+ROW_SHA = 'f5faeb7efce8f811641653dc875e412cbcab9b5b462f80f9507d1075f96b6609'
+SHARED_SHA = 'cf8c3413b005adffc936a19a52e1dbc418d4bc8ad6a6a336c204adab67767e58'
+CAP = 48 * 1024**3
+
+
+def legacy_vector_capacity(size):
+    # Pinned MSVC vector push_back grows by 1.5x, or by one when that is larger.
+    capacity = 0
+    while capacity < size:
+        capacity = max(capacity + 1, capacity + capacity // 2)
+    return capacity
+
+
+def validate_connection(base, result, row, legacy):
+    stage = result.get('row_preparation')
+    base.require(type(stage) is dict and stage.get('same_storage') is True, 'CSC storage ownership')
+    for key, expected in (
+        ('planned_bytes', row['planned_bytes']), ('actual_bytes', row['actual_bytes']),
+        ('heap_attempts', 0), ('terms', row['terms']), ('offsets', row['column_offsets_compared']),
+        ('max_lcm_bits', row['reference_max_lcm_bits']),
+        ('max_integer_bits', row['reference_max_integer_bits']),
+    ):
+        base.integer(stage.get(key), expected, key)
+    remaining = row['actual_bytes'] - row['terms'] * row['term_bytes'] - row['column_offsets_compared'] * 8
+    base.integer(stage.get('row_only_bytes'), remaining, 'row-only capacity')
+    # Pinned MSVC ABI: InputData owner (144 B), selections (4 B), reference Pair (2064 B).
+    preflight = row['actual_bytes'] + 144 + legacy['rank'] * (4 + legacy['candidates'] * 2064)
+    base.require(preflight <= CAP, 'reference preflight exceeds cap')
+    base.integer(stage.get('reference_preflight_bytes'), preflight, 'reference preflight')
+    shared_bytes = legacy['shared_payload_bytes']
+    base.integer(result.get('shared_payload_bytes'), shared_bytes, 'shared block capacity')
+    overlap = preflight + shared_bytes
+    base.require(overlap <= CAP, 'handoff overlap limit')
+    base.integer(stage.get('fixed_overlap_bytes'), overlap, 'handoff overlap')
+    offset_count = row['column_offsets_compared']
+    legacy_slack = ((legacy_vector_capacity(row['terms']) - row['terms']) * row['term_bytes']
+                    + (legacy_vector_capacity(offset_count) - offset_count) * 8)
+    base.integer(result.get('payload_bytes'), legacy['payload_bytes'] - legacy_slack, 'lift capacity')
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in (
+        'coefficient', 'full-certificate', 'cut-certificate', 'certificate-index', 'study',
+        'binary', 'composition', 'row-baseline', 'shared-baseline',
+        'base-runner', 'cut-runner', 'full-runner', 'shared-runner', 'capacity-producer', 'output',
+    ):
+        parser.add_argument(f'--{name}', type=Path, required=True)
+    args = parser.parse_args(argv)
+    cut = run_path(str(args.cut_runner))
+    cut['reject_output_aliases'](args.output, (path for name, path in vars(args).items() if name != 'output'))
+    full = run_path(str(args.full_runner))
+    shared = run_path(str(args.shared_runner))
+    base = cut['load']('row_handoff_base', args.base_runner)
+    capacity = cut['load']('row_handoff_capacity', args.capacity_producer)
+    frozen_json = shared['read_frozen_json']
+    composition = frozen_json(base, args.composition, COMPOSITION_SHA)
+    original_rows = frozen_json(base, args.row_baseline, ROW_SHA)
+    original_lift = frozen_json(base, args.shared_baseline, SHARED_SHA)
+    rows = {item['domain']: item for item in original_rows['cases']}
+    lift = {item['domain']: item for item in original_lift['cases']}
+    certificates = {'full': args.full_certificate, 'cut': args.cut_certificate}
+    index = json.loads(args.certificate_index.read_bytes())['certificates']
+    study = json.loads(args.study.read_bytes())['cases']
+    basis = {}
+    for domain, dimensions in DOMAINS.items():
+        prior = capacity.verify_input(args.coefficient, 4, 'quartic', domain, study)
+        base.require((prior['rows'], prior['columns'], prior['candidates'], prior['mod_rank'])
+                     == dimensions, f'{domain} study dimensions')
+        matches = [
+            record for record in index
+            if (record['n'], record['shape'], record['domain'], record['row_order']) == (4, 'quartic', domain, 'sparse')
+        ]
+        base.require(len(matches) == 1, f'{domain} certificate selection')
+        record, = matches
+        certificate = certificates[domain]
+        base.require(record['rank'] == dimensions[-1] and record['bytes'] == certificate.stat().st_size
+                     and record['sha256'] == full['sha256'](certificate) == lift[domain]['certificate_sha256']
+                     and record['input_sha256'] == prior['input_sha256'] == original_rows['input_sha256']
+                     == original_lift['input_sha256'], f'{domain} input identity')
+        basis[domain] = full['read_basis'](base, certificate, dimensions)
+
+    binary = args.binary.resolve()
+    controls = base.invoke(binary, '--controls')
+    base.validate_controls(controls)
+    shared_controls = base.invoke(binary, '--shared-controls')
+    shared['validate_shared_controls'](base, shared_controls)
+    row_controls = base.invoke(binary, '--row-controls')
+    base.require(type(row_controls) is dict and row_controls.keys() == original_rows['controls'].keys(),
+                 'row control roster')
+    for key, expected in original_rows['controls'].items():
+        value = row_controls[key]
+        base.require(type(value) is type(expected) and value == expected, f'row control {key}')
+
+    cases = []
+    for domain, dimensions in DOMAINS.items():
+        frames = []
+        for mode, key in (('first', 'first_probe'), ('all', 'result')):
+            current = base.invoke(binary, args.coefficient, certificates[domain], domain, mode)
+            first = mode == 'first'
+            full['validate_batch'](base, current, dimensions, basis[domain], first)
+            validate_connection(base, current, rows[domain], lift[domain][key])
+            compact = ({k: v for k, v in current.items() if k != 'columns'} if first else cut['compact'](current))
+            if not first:
+                compact['lift_digits_histogram'] = {
+                    str(digit): count for digit, count in compact['lift_digits_histogram'].items()
+                }
+            shared['check_numerical_parity'](base, compact, lift[domain][key])
+            frames.append(compact)
+        first_probe, result = frames
+        base.require(first_probe['row_preparation'] == result['row_preparation']
+                     and first_probe['payload_bytes'] == result['payload_bytes'], 'batch capacity changed with mode')
+        cases.append({'domain': domain, 'certificate_sha256': lift[domain]['certificate_sha256'],
+                      'first_probe': first_probe, 'result': result})
+    base.publish(args.output, {
+        'schema': 'uvlas.pg-fixed-integerization-handoff/1', 'n': 4, 'shape': 'quartic',
+        'domain_order': list(DOMAINS), 'row_order': 'sparse', 'input_sha256': original_rows['input_sha256'],
+        'composition': composition, 'binary_sha256': full['sha256'](binary),
+        'row_baseline_sha256': ROW_SHA, 'shared_baseline_sha256': SHARED_SHA,
+        'controls': controls, 'shared_controls': shared_controls, 'row_controls': row_controls, 'cases': cases,
+    })
+
+
+if __name__ == '__main__':
+    main()

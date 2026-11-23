@@ -1,0 +1,14 @@
+{
+  "schema": "uvlas.pg-row-handoff-composition/1",
+  "sources": {
+    "base": "f46f8dbe506c1efa7e834c298b64dc1329c0d4b6b96ff1cb893ade44ce7cdb63",
+    "shared_deriver": "fbf5c9456f66bac26deb5896a80de914243f5e9176ddaa36c5c7b6cc58824fe1",
+    "guard": "1eb5f24dea7fe4b673bd787b49bd8d0991dde02ddf1c610faf6c8c6ba2c94a34",
+    "row_probe": "70cd45cfd6ad60c870468b5e15efaa1649e7787c44eb7fca28945c6499a945ca",
+    "pivot": "2d1c8374e3e289e8eb6b5fcb7bd4e30eee1d77eca9b2ed713408fd75a9b524fb",
+    "driver": "069c3f9fe40c206e869db7f94eeb434808dfb246d30446dc18a5aa89e7f2c918"
+  },
+  "handoff_sha256": "38a1213b9257731adc54018ab3fd16ca79bc973591fad3104d197ec327aa842f",
+  "generated_sha256": "89f332b133d597fe378aa4025481222d0411cf57dfd457e27bac82f633152c86",
+  "generated_bytes": 69182
+}
