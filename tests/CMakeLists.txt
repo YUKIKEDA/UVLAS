@@ -608,6 +608,14 @@ target_include_directories(uvlas_test_aero_p1_induction_resources PRIVATE "${PRO
 uvlas_enable_allocation_audit(uvlas_test_aero_p1_induction_resources)
 uvlas_require_audited_dependencies(uvlas_test_aero_p1_induction_resources)
 
+uvlas_add_test(aero.p1_shared_action
+    LABELS unit property negative verification V-AERO
+    SOURCES aero/p1_shared_action_test.cpp
+    LIBS uvlas_aero Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_aero_p1_shared_action PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_p1_shared_action PRIVATE
+    UVLAS_P1_SHARED_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/p1-shared-action-v1.json")
+
 uvlas_add_test(aero.global_geometry
     LABELS unit property negative verification V-AERO
     SOURCES aero/global_geometry_test.cpp

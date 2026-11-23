@@ -49,7 +49,8 @@ struct GlobalTopologyInput {
 };
 /// Caller-selected work and opaque ownership-metadata admission limits.
 struct GlobalLimits {
-    std::uint64_t max_steps; ///< Whole-call fixed-capacity primitive units; zero is a real limit.
+    std::uint64_t max_steps =
+        0; ///< Whole-call fixed-capacity primitive units; zero is a real limit.
     numerics::linear::BackendMemoryLimit metadata; ///< Explicit forecast/proven-bound choice.
 };
 /// A global failure retains its first entity and, for contacts, the second facet.
@@ -162,6 +163,7 @@ public:
 
 private:
     friend class GlobalEngine;
+    friend class SharedP1Engine;
     explicit GlobalContactState(core::PlannedBuffer<GlobalContactData>, GeometryContext) noexcept;
     core::PlannedBuffer<GlobalContactData> data_;
     GeometryContext context_;

@@ -80,7 +80,7 @@ endif()
 
 # Internal geometry preparation and local qualification; no global or kernel acceptance.
 set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp
-    src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp
+    src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp src/aero/p1_shared_action.cpp
     src/aero/global_geometry.cpp src/aero/global_bvh.cpp src/aero/global_intersections.cpp
     src/aero/alias_kinematics.cpp src/aero/pchip_rational_slots.cpp src/aero/pchip_slot_integer.cpp src/aero/pchip_coefficients.cpp src/aero/pchip_interval_jet.cpp src/aero/pchip_knot_locator.cpp src/aero/pchip_domain_route.cpp src/aero/pchip_boundary.cpp src/aero/pchip_side.cpp src/aero/pchip_preparation_input.cpp src/aero/pchip_shared_preparation_input.cpp src/aero/pchip_curve.cpp)
 add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})

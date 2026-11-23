@@ -1,4 +1,5 @@
 #include "aero/p1_induction.hpp"
+#include "aero/p1_shared_action.hpp"
 #include "geometry_snapshot_fixture.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -441,3 +442,156 @@ TEST_CASE("P1 rejects either subnormal flushing mode without reserving output",
     }
 }
 #endif
+
+namespace {
+constinit std::stop_source* shared_stop = nullptr;
+constinit unsigned allocations_before_stop = 0;
+void request_shared_stop() noexcept {
+    if (--allocations_before_stop == 0)
+        shared_stop->request_stop();
+    else
+        allocation_hook = &request_shared_stop;
+}
+struct SharedReentry {
+    const void* state = nullptr;
+    void (*invoke)(const void*) noexcept = nullptr;
+};
+constinit SharedReentry shared_reentry;
+void try_shared_reentry() noexcept {
+    shared_reentry.invoke(shared_reentry.state);
+}
+} // namespace
+
+TEST_CASE("Shared P1 assembly and VJP reject every allocation fault and preserve old results",
+          "[UI-D04][UI-D05][N4-02][N4-03][N4-08][N4-09][negative][verification]") {
+    core::ResourcePlan setup{128ULL * 1024 * 1024};
+    const TriangleFixture fixture;
+    auto geometry_workspace = workspace(setup);
+    const auto geometry =
+        take(prepare_owned_geometry(fixture.input(), limits(), *geometry_workspace, setup));
+    auto global_workspace =
+        GlobalWorkspace::create(setup, numerics::linear::EstimateAdmission{4096});
+    REQUIRE(global_workspace);
+    const std::array roles{FaceRoleInput{fixture.faces[0].id, AeroFaceRole::Bound}};
+    const std::array edges{EdgeBindingInput{fixture.edges[0].id, CanonicalEdge{}},
+                           EdgeBindingInput{fixture.edges[1].id, CanonicalEdge{}},
+                           EdgeBindingInput{fixture.edges[2].id, CanonicalEdge{}}};
+    const GlobalLimits global_limits{UINT64_MAX / 4, numerics::linear::EstimateAdmission{4096}};
+    auto topology = build_global_topology(geometry, {roles, edges, {}}, global_limits,
+                                          **global_workspace, setup);
+    REQUIRE(topology);
+    auto contact =
+        check_global_geometry(*topology, geometry, global_limits, **global_workspace, setup);
+    REQUIRE(contact);
+    const auto query =
+        take(resolve_query(geometry, {QueryId{19}, FreePoint{FreeSingle{{.75, 1, 2}}}},
+                           geometry.context(), limits(), *geometry_workspace, setup));
+    const P1ActionSource source{*contact, query, {4, 5}};
+    const std::array strengths{P1StrengthId{1}, P1StrengthId{2}, P1StrengthId{3}};
+    const std::array maps{P1FaceStrengths{fixture.faces[0].id, strengths}};
+    const P1AssemblyLimits assembly_limits{
+        limits(),
+        {numerics::linear::EstimateAdmission{32768}, UINT64_C(1000000000)},
+        UINT64_C(2000000000)};
+    auto local = LocalPacketWorkspace::create(setup);
+    auto kernel = P1Workspace::create(setup);
+    REQUIRE(local);
+    REQUIRE(kernel);
+    SharedP1Workspace shared;
+    const auto forecast = take(forecast_shared_p1(source, maps, strengths, assembly_limits));
+    const auto assemble = [&](core::ResourcePlan& resources, const std::stop_token& stop = {}) {
+        return prepare_shared_p1(source, maps, strengths, {core::Precision::TwoWord, 1e-10},
+                                 {core::Precision::TwoWord, 1e-10, 1e-10}, assembly_limits, shared,
+                                 **local, **kernel, resources, stop);
+    };
+    core::ResourcePlan accepted{forecast.payload_bytes};
+    const auto action = [&] {
+        const FaultScope allocations{INT64_MAX};
+        return assemble(accepted);
+    }();
+    REQUIRE(action);
+    // Exact geometric classification also allocates through the existing opaque Boost
+    // backend. The number of its attempts is observed here, not a hard memory bound.
+    const auto prepare_attempts = attempts.load();
+    REQUIRE(prepare_attempts >= 12);
+    REQUIRE(prepare_attempts <= std::numeric_limits<unsigned>::max());
+    CHECK(accepted.allocated_bytes() == forecast.payload_bytes);
+    const auto original = take(action->report());
+    const std::array mu{P1ComplexWords{SingleWord{1}, SingleWord{.5}}, P1ComplexWords{},
+                        P1ComplexWords{SingleWord{-.25}, SingleWord{0}}};
+    const std::array dual{P1ComplexWords{SingleWord{.5}}, P1ComplexWords{}, P1ComplexWords{}};
+
+    const auto baseline = [&] {
+        const FaultScope no_allocations{0};
+        return apply_shared_p1(*action, source, mu, {}, 20000, shared);
+    }();
+    REQUIRE(baseline);
+    CHECK(attempts.load() == 0);
+    for (std::uint64_t index = 0; index < prepare_attempts; ++index) {
+        CAPTURE(index);
+        core::ResourcePlan faults{forecast.payload_bytes};
+        const auto refusal = [&] {
+            const FaultScope injection{static_cast<std::int64_t>(index)};
+            return assemble(faults);
+        }();
+        REQUIRE_FALSE(refusal);
+        CHECK(refusal.error().cause.code == core::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(index + 1));
+        CHECK(take(action->report()).used_steps == original.used_steps);
+    }
+    std::optional<core::FailureCode> nested;
+    core::ResourcePlan attempted{forecast.payload_bytes};
+    const auto reenter = [&] {
+        const auto refused = assemble(attempted);
+        if (!refused)
+            nested = refused.error().cause.code;
+    };
+    const auto record = []<class F>(const F& callback) {
+        shared_reentry = {&callback,
+                          [](const void* state) noexcept { (*static_cast<const F*>(state))(); }};
+    };
+    record(reenter);
+    allocation_hook = &try_shared_reentry;
+    core::ResourcePlan forward{forecast.payload_bytes};
+    const auto after_reentry = assemble(forward);
+    allocation_hook = nullptr;
+    shared_reentry = {};
+    REQUIRE(after_reentry);
+    CHECK(nested == core::FailureCode::InvalidInput);
+    CHECK(attempted.allocated_bytes() == 0);
+    CHECK(forward.allocated_bytes() == forecast.payload_bytes);
+
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop is not const.
+    std::stop_source stop;
+    shared_stop = &stop;
+    allocations_before_stop = static_cast<unsigned>(prepare_attempts);
+    allocation_hook = &request_shared_stop;
+    core::ResourcePlan cancel{forecast.payload_bytes};
+    const auto stopped = assemble(cancel, stop.get_token());
+    allocation_hook = nullptr;
+    shared_stop = nullptr;
+    REQUIRE_FALSE(stopped);
+    CHECK(stopped.error().cause.code == core::FailureCode::Cancelled);
+    CHECK(take(action->report()).used_steps == original.used_steps);
+
+    core::ResourcePlan memory{setup.remaining_bytes()};
+    const auto adjoint = [&] {
+        const FaultScope allocations{INT64_MAX};
+        return adjoint_shared_p1(*action, source, mu, dual, 20000, shared, memory);
+    }();
+    REQUIRE(adjoint);
+    CHECK(attempts.load() == 5);
+    for (std::int64_t index = 0; index < 5; ++index) {
+        CAPTURE(index);
+        core::ResourcePlan fault{memory.allocated_bytes()};
+        const auto refused = [&] {
+            const FaultScope injection{index};
+            return adjoint_shared_p1(*action, source, mu, dual, 20000, shared, fault);
+        }();
+        REQUIRE_FALSE(refused);
+        CHECK(refused.error().cause.code == core::FailureCode::ResourceExceeded);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(index + 1));
+        CHECK(adjoint->radius());
+        CHECK(take(action->report()).used_steps == original.used_steps);
+    }
+}
