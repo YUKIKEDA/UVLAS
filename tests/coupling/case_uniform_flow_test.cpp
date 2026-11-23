@@ -818,6 +818,12 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         collocation[0].tangents[1] = coordinates(0, -2, 0);
         reject(run(flow, residual_limits, memory), core::FailureCode::GeometryInvalid);
         collocation[0].tangents[1] = coordinates(0, 2, 0);
+        collocation[0].velocity[2] = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+        reject(run(flow, residual_limits, memory), core::FailureCode::Nonfinite);
+        collocation[0].velocity[2] = a::SingleWord{.5};
+        auto exhausted = residual_limits;
+        exhausted.steps = 0;
+        reject(run(flow, exhausted, memory), core::FailureCode::ResourceExceeded);
         CHECK(flow.source().jet.active());
 
         const auto result = take(run(flow, residual_limits, memory));
