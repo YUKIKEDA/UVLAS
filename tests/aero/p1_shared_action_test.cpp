@@ -166,8 +166,8 @@ const std::array mu{scalar(.75, .25), scalar(-.375, .125), scalar(.5, -.25)};
 const std::array dual{scalar(.25, -.0625), scalar(-.5, .125), scalar(.0625, .375)};
 
 struct Prepared {
-    core::ResourcePlan memory{128ULL * 1024 * 1024};
-    std::unique_ptr<p::GeometryWorkspace> geometry_workspace = test_geometry::workspace(memory);
+    core::ResourcePlan memory;
+    std::unique_ptr<p::GeometryWorkspace> geometry_workspace;
     p::OwnedGeometry geometry;
     std::unique_ptr<p::GlobalWorkspace> global_workspace;
     p::GlobalTopology topology;
@@ -176,8 +176,11 @@ struct Prepared {
     std::unique_ptr<p::P1Workspace> kernel_workspace;
     p::SharedP1Workspace shared_workspace;
 
-    explicit Prepared(const GeometryFixture& input)
-        : geometry(test_geometry::take(p::prepare_owned_geometry(input.input(), limits().geometry,
+    template <class Fixture>
+    explicit Prepared(const Fixture& input)
+        : memory(128ULL * 1024 * 1024),
+          geometry_workspace(test_geometry::workspace(memory)),
+          geometry(test_geometry::take(p::prepare_owned_geometry(input.input(), limits().geometry,
                                                                  *geometry_workspace, memory))),
           global_workspace(global_workspace_create(memory)),
           topology(global(p::build_global_topology(geometry, input.topology(), global_limits(),
@@ -556,4 +559,280 @@ TEST_CASE("P1 empty contact topology is an exact zero action",
         CHECK(decode(*covector).center == 0);
     }
     CHECK(decode(test_geometry::take(vjp.radius())).center == 0);
+}
+
+namespace {
+using BigVector = std::array<Big, 3>;
+BigVector minus(const BigVector& a, const BigVector& b) {
+    return {a[0] - b[0], a[1] - b[1], a[2] - b[2]};
+}
+Big dot(const BigVector& a, const BigVector& b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+BigVector cross(const BigVector& a, const BigVector& b) {
+    return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
+}
+
+// Independent dimensional segment formula from analytic Biot–Savart integration.
+// It uses the unnormalized endpoints directly, and has no sheet, facet, or scatter inputs.
+BigVector ring(const GeometryFixture& geometry, double z, const Big& fraction, double x = .375,
+               double y = .4375) {
+    const BigVector query{Big{x} + fraction * high(direction_query[0]),
+                          Big{y} + fraction * high(direction_query[1]),
+                          Big{z} + fraction * high(direction_query[2])};
+    const Big radius = Big{geometry.radius} + fraction * Big{.015625};
+    const Big pi = acos(Big{-1});
+    BigVector result{};
+    for (std::size_t i = 0; i < 4; ++i) {
+        BigVector a{}, b{};
+        const auto next = (i + 1) % 4;
+        for (std::size_t j = 0; j < 3; ++j) {
+            a[j] = Big{geometry.coordinates[3 * i + j]} + fraction * high(direction_points[i][j]);
+            b[j] = Big{geometry.coordinates[3 * next + j]} +
+                   fraction * high(direction_points[next][j]);
+        }
+        const auto chord = minus(b, a);
+        const auto start = minus(query, a), end = minus(query, b);
+        const auto numerator = cross(chord, start);
+        const Big denominator = dot(numerator, numerator) + radius * radius * dot(chord, chord);
+        const Big weight = (dot(chord, start) / sqrt(dot(start, start) + radius * radius) -
+                            dot(chord, end) / sqrt(dot(end, end) + radius * radius)) /
+                           (4 * pi * denominator);
+        for (std::size_t j = 0; j < 3; ++j)
+            result[j] += numerator[j] * weight;
+    }
+    return result;
+}
+} // namespace
+
+TEST_CASE("Mixed induction follows the bound circulation contour and the wake scatter",
+          "[UW-D01][UW-D02][UW-D07][UI-D05][N4-06][verification]") {
+    GeometryFixture geometry;
+    geometry.roles[0].role = p::AeroFaceRole::Bound;
+    geometry.share_by_alias();
+    Prepared prepared{geometry};
+    const std::array ids{strength[0], strength[1], p::P1StrengthId{geometry.faces[0].id.value()}};
+    const std::array bound_wake{
+        p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
+        p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[1], ids[0]}}};
+    const std::array wake_only{p::P1FaceStrengths{geometry.faces[0].id, std::array{ids[2], ids[2]}},
+                               bound_wake[1]};
+    const auto prepare_mixed = [&](const p::P1ActionSource& source, auto maps, auto keys,
+                                   core::ResourcePlan& memory) {
+        return p::prepare_bound_wake_induction(
+            source, maps, keys, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, memory);
+    };
+    for (const double z : {.75, 12.}) {
+        CAPTURE(z);
+        const auto query = prepared.query(geometry.query(z));
+        const p::P1ActionSource source{prepared.contact, query, {3, 5}};
+        const auto forecast = test_geometry::take(
+            p::forecast_bound_wake_induction(source, bound_wake, ids, limits()));
+        core::ResourcePlan memory{forecast.payload_bytes};
+        const auto mixed = test_geometry::take(prepare_mixed(source, bound_wake, ids, memory));
+        const auto report = test_geometry::take(mixed.report());
+        CHECK(memory.allocated_bytes() == forecast.payload_bytes);
+        CHECK(report.far_facets == (z > 1 ? 1 : 0));
+        CHECK(report.cancelled_analytic_pairs == 1);
+        rejected(p::forecast_bound_wake_induction(source, wake_only, ids, limits()),
+                 core::FailureCode::InvalidInput);
+        rejected(p::forecast_bound_wake_induction(source, bound_wake, std::span{ids}.first<2>(),
+                                                  limits()),
+                 core::FailureCode::InvalidInput);
+        rejected(p::forecast_shared_p1(source, bound_wake, ids, limits()),
+                 core::FailureCode::InvalidInput);
+        core::ResourcePlan short_memory{forecast.payload_bytes - 1};
+        rejected(prepare_mixed(source, bound_wake, ids, short_memory),
+                 core::FailureCode::ResourceExceeded);
+        CHECK(short_memory.allocated_bytes() == 0);
+
+        const auto wake = test_geometry::take(p::prepare_shared_p1(
+            source, wake_only, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, prepared.memory));
+        auto wake_values = mu, wake_deltas = direction_mu;
+        wake_values[2] = wake_deltas[2] = scalar(0);
+        const p::P1ActionDirection direction{direction_points, direction_mu, direction_query,
+                                             word(.015625)};
+        const p::P1ActionDirection wake_direction{direction_points, wake_deltas, direction_query,
+                                                  word(.015625)};
+        const auto value = test_geometry::take(p::apply_shared_p1(
+            mixed, source, mu, direction, apply_steps, prepared.shared_workspace));
+        const auto background = test_geometry::take(p::apply_shared_p1(
+            wake, source, wake_values, wake_direction, apply_steps, prepared.shared_workspace));
+        const auto transpose = test_geometry::take(p::adjoint_shared_p1(
+            mixed, source, mu, dual, apply_steps, prepared.shared_workspace, prepared.memory));
+        duality(value, transpose);
+        const Big h{"1e-25"};
+        const auto center = ring(geometry, z, Big{0});
+        const auto plus = ring(geometry, z, h), neg = ring(geometry, z, -h);
+        const auto& jvp = value.jvp();
+        const auto& wake_jvp = background.jvp();
+        if (!jvp || !wake_jvp)
+            FAIL("Missing mixed derivative");
+        for (std::size_t axis = 0; axis < center.size(); ++axis) {
+            const Big derivative = (plus[axis] - neg[axis]) / (2 * h);
+            const auto check = [](const p::ScaledEnclosure& total, const p::ScaledEnclosure& base,
+                                  const Big& expected) {
+                const auto total_bound = decode(total), wake_bound = decode(base);
+                CHECK(abs(total_bound.center - wake_bound.center - expected) <=
+                      total_bound.radius + wake_bound.radius + Big{"1e-45"});
+                CHECK(total_bound.radius < Big{"1e-15"});
+            };
+            check(value.velocity()[axis].real, background.velocity()[axis].real,
+                  center[axis] * high(mu[2].real));
+            check(value.velocity()[axis].imaginary, background.velocity()[axis].imaginary,
+                  center[axis] * high(mu[2].imaginary));
+            check((*jvp)[axis].real, (*wake_jvp)[axis].real,
+                  derivative * high(mu[2].real) + center[axis] * high(direction_mu[2].real));
+            check((*jvp)[axis].imaginary, (*wake_jvp)[axis].imaginary,
+                  derivative * high(mu[2].imaginary) +
+                      center[axis] * high(direction_mu[2].imaginary));
+        }
+    }
+}
+
+TEST_CASE("Bound collocation may lie on a planar panel and its artificial diagonal",
+          "[UW-D01][UW-D02][UW-D07][verification]") {
+    for (const double radius : {0., .125}) {
+        GeometryFixture geometry;
+        geometry.radius = radius;
+        geometry.coordinates[8] = 0;
+        geometry.roles[0].role = p::AeroFaceRole::Bound;
+        Prepared prepared{geometry};
+        const std::array ids{p::P1StrengthId{5}, p::P1StrengthId{geometry.faces[0].id.value()}};
+        const std::array bound_wake{
+            p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
+            p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[0], ids[0]}}};
+        for (const double x : {.375, .5, 1.}) {
+            CAPTURE(radius, x);
+            const auto query =
+                prepared.query({p::QueryId{29}, p::FreePoint{p::FreeSingle{{x, .5, 0.}}}});
+            const p::P1ActionSource source{prepared.contact, query, {3, 5}};
+            const auto forecast = test_geometry::take(
+                p::forecast_bound_wake_induction(source, bound_wake, ids, limits()));
+            core::ResourcePlan memory{forecast.payload_bytes};
+            auto result = p::prepare_bound_wake_induction(
+                source, bound_wake, ids, {core::Precision::TwoWord, 1e-10},
+                {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+                *prepared.local_workspace, *prepared.kernel_workspace, memory);
+            if (x == 1.) {
+                rejected(result, core::FailureCode::GeometryInvalid);
+                continue;
+            }
+            const auto action = test_geometry::take(std::move(result));
+            const auto value = test_geometry::take(
+                p::apply_shared_p1(action, source, std::array{scalar(0), scalar(1)}, std::nullopt,
+                                   apply_steps, prepared.shared_workspace));
+            const auto expected = ring(geometry, 0., Big{0}, x, .5);
+            for (std::size_t axis = 0; axis < expected.size(); ++axis) {
+                const auto bound = decode(value.velocity()[axis].real);
+                CHECK(abs(bound.center - expected[axis]) <= bound.radius + Big{"1e-45"});
+            }
+        }
+    }
+}
+
+namespace {
+struct TwoBoundPanels {
+    GeometryFixture base;
+    std::array<p::PointId, 6> points{p::PointId{1}, p::PointId{2}, p::PointId{3},
+                                     p::PointId{4}, p::PointId{5}, p::PointId{6}};
+    std::array<p::PointBinding, 6> bindings{test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding()};
+    std::array<double, 18> coordinates{0, 0, 0, 0,  1, 0,     1,  1, .25,
+                                       1, 0, 0, -1, 0, -.125, -1, 1, .125};
+    std::array<p::EdgeInput, 9> edges{base.edges[0],
+                                      base.edges[1],
+                                      base.edges[2],
+                                      base.edges[3],
+                                      base.edges[4],
+                                      p::EdgeInput{p::EdgeId{15}, {points[0], points[4]}},
+                                      p::EdgeInput{p::EdgeId{16}, {points[4], points[5]}},
+                                      p::EdgeInput{p::EdgeId{17}, {points[5], points[1]}},
+                                      p::EdgeInput{p::EdgeId{18}, {points[1], points[4]}}};
+    std::array<p::QuadInput, 2> quads{
+        base.quad[0], p::QuadInput{base.faces[1].id,
+                                   {points[1], points[0], points[4], points[5]},
+                                   {edges[0].id, edges[5].id, edges[6].id, edges[7].id},
+                                   edges[8].id,
+                                   {p::FacetId{202}, p::FacetId{203}}}};
+    std::array<p::EdgeBindingInput, 9> owned{p::EdgeBindingInput{edges[0].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[1].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[2].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[3].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[4].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[5].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[6].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[7].id, p::CanonicalEdge{}},
+                                             p::EdgeBindingInput{edges[8].id, p::CanonicalEdge{}}};
+    std::array<p::FaceRoleInput, 2> roles{
+        p::FaceRoleInput{base.faces[0].id, p::AeroFaceRole::Bound},
+        p::FaceRoleInput{base.faces[1].id, p::AeroFaceRole::Bound}};
+    [[nodiscard]] p::GeometryInput input() const {
+        const p::SinglePositions xyz{coordinates};
+        return {points,
+                bindings,
+                xyz,
+                xyz,
+                edges,
+                base.faces,
+                base.bands,
+                {},
+                quads,
+                word(base.radius),
+                test_geometry::context()};
+    }
+    [[nodiscard]] p::GlobalTopologyInput topology() const {
+        return {roles, owned, {}};
+    }
+};
+} // namespace
+
+TEST_CASE("Two bound circulation columns share the signed edge kernel",
+          "[UW-D01][UW-D02][UW-D07][UI-D05][verification]") {
+    const TwoBoundPanels geometry;
+    Prepared prepared{geometry};
+    const auto query = prepared.query(geometry.base.query());
+    const p::P1ActionSource source{prepared.contact, query, {3, 5}};
+    const std::array ids{p::P1StrengthId{geometry.base.faces[0].id.value()},
+                         p::P1StrengthId{geometry.base.faces[1].id.value()}};
+    const std::array bound{p::P1FaceStrengths{geometry.base.faces[0].id, p::P0BoundColumn{}},
+                           p::P1FaceStrengths{geometry.base.faces[1].id, p::P0BoundColumn{}}};
+    auto resources = limits();
+    resources.steps *= 2;
+    const auto action = test_geometry::take(p::prepare_bound_wake_induction(
+        source, bound, ids, {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10}, resources, prepared.shared_workspace,
+        *prepared.local_workspace, *prepared.kernel_workspace, prepared.memory));
+    CHECK(test_geometry::take(action.report()).cancelled_analytic_pairs == 2);
+    const auto first = ring(geometry.base, .75, Big{0});
+    // Re-pack the second quad's vertices in its declared clockwise loop.
+    auto second_geometry = geometry.base;
+    for (std::size_t i = 0; i < 4; ++i) {
+        constexpr std::array<std::size_t, 4> loop{1, 0, 4, 5};
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            second_geometry.coordinates[3 * i + axis] = geometry.coordinates[3 * loop[i] + axis];
+    }
+    const auto second = ring(second_geometry, .75, Big{0});
+    const auto values =
+        std::array{p::P1ComplexWords{p::DoubleWord{1., 0x1p-60}, word(0)}, scalar(1)};
+    const auto answer = test_geometry::take(p::apply_shared_p1(
+        action, source, values, std::nullopt, apply_steps, prepared.shared_workspace));
+    auto core_resources = core::ResourcePlan{1024ULL * 1024};
+    const auto transpose = test_geometry::take(
+        p::adjoint_shared_p1(action, source, values, {scalar(0), scalar(0), scalar(1)}, apply_steps,
+                             prepared.shared_workspace, core_resources));
+    for (std::size_t axis = 0; axis < first.size(); ++axis) {
+        const auto velocity = decode(answer.velocity()[axis].real);
+        const Big expected = first[axis] * (Big{1} + Big{0x1p-60}) + second[axis];
+        CHECK(abs(velocity.center - expected) <= velocity.radius + Big{"1e-45"});
+    }
+    const auto first_gradient = decode(test_geometry::take(transpose.strength(0)).real);
+    const auto second_gradient = decode(test_geometry::take(transpose.strength(1)).real);
+    CHECK(abs(first_gradient.center - first[2]) <= first_gradient.radius + Big{"1e-45"});
+    CHECK(abs(second_gradient.center - second[2]) <= second_gradient.radius + Big{"1e-45"});
 }

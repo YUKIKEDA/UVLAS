@@ -56,6 +56,7 @@ struct GlobalScratch {
     std::array<std::uint32_t, 256> packed{};
 };
 struct GlobalTopologyData {
+    static constexpr std::uint8_t bound_role = 1;
     std::optional<OwnedGeometry> geometry;
     core::PlannedBuffer<std::uint8_t> roles;
     core::PlannedBuffer<global_detail::BoundEdge> edges;

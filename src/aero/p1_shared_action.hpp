@@ -10,8 +10,11 @@ struct SharedP1AdjointData;
 struct P1StrengthTag;
 using P1StrengthId = core::Identifier<P1StrengthTag>;
 
-/// Independent triangles hold all three columns; each fixed quad holds its ordered L/R.
-using P1FaceColumns = std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>>;
+/// One independent circulation column, keyed by its physical face identifier.
+struct P0BoundColumn {};
+/// Wake triangles hold three columns and wake quads hold their ordered L/R.
+using P1FaceColumns =
+    std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>, P0BoundColumn>;
 struct P1FaceStrengths {
     P1FaceStrengths(PhysicalFaceId physical, const P1FaceColumns& basis) noexcept
         : face(physical), columns(basis) {}
@@ -60,7 +63,7 @@ private:
     std::atomic_flag entered_ = ATOMIC_FLAG_INIT;
 };
 
-/// Retain an immutable, sparse P1 action and all local evaluation qualifications.
+/// Retain the immutable sparse induction action and all local qualifications.
 class SharedP1Action {
 public:
     SharedP1Action(SharedP1Action&&) noexcept = default;
@@ -158,6 +161,18 @@ prepare_shared_p1(const P1ActionSource&, std::span<const P1FaceStrengths>,
                   std::span<const P1StrengthId>, LocalAccuracy, P1Accuracy, const P1AssemblyLimits&,
                   SharedP1Workspace&, LocalPacketWorkspace&, P1Workspace&, core::ResourcePlan&,
                   const std::stop_token& = {}) noexcept;
+
+/// Forecast or prepare the UW-D01 mixed action. Bound quadrilaterals require
+/// P0BoundColumn, while wake faces retain their existing P1 scatter.
+[[nodiscard]] AeroResult<P1AssemblyPlan>
+forecast_bound_wake_induction(const P1ActionSource&, std::span<const P1FaceStrengths>,
+                              std::span<const P1StrengthId>, const P1AssemblyLimits&,
+                              const std::stop_token& = {}) noexcept;
+
+[[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_induction(
+    const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
+    LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
+    P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
 /// The input coefficient order matches the prepared IDs exactly. Geometry is unchanged.
 [[nodiscard]] AeroResult<P1ActionValue>
