@@ -52,7 +52,38 @@
     "src/structure/pg_reference_geometry.cpp": "8eb69cd5f8246202d5e795cea982af19bb4473d1af365edce289c679a6b551c0",
     "tests/structure/pg_conditioning_test.cpp": "0f3dede976c6afddd850e7aaab17722b2ae45f90045be0129be5efce072bbb21",
     "docs/verification/IM-01/im01-pg-discrete-conditioning.json": "ea7ec1ae310c4599da92082a624ca882615f523dd39dd0eab3397e8f5c6811f5",
-    "docs/verification/IM-01/pg-conditioned-reference-point/verification.md": "8debdb85d177ada0821e962cedb9ea1c45065e81059d585b0087bf7ccc98a315",
+    "docs/verification/IM-01/pg-conditioned-reference-point/verification.md": "5211b034860bbbee31e34fbd38d94c0b376e1e6bba43b9530323f8006d2ca315",
     "docs/specs/structure/pg-conditioned-reference-point-contract.md": "2a1c54cbefac7f0e36707d0f943ff02c1632f6ecd769d1fbd9b1590d8c2f3e13"
+  },
+  "linux_sanitizer": {
+    "archive_commit": "730ec16db41dcbb6cccb5f555b75a17dafc3724c",
+    "historical_artifacts": {
+      "commit": "730ec16db41dcbb6cccb5f555b75a17dafc3724c",
+      "sha256": {
+        "docs/verification/IM-01/pg-conditioned-reference-point/verification.md": "8debdb85d177ada0821e962cedb9ea1c45065e81059d585b0087bf7ccc98a315"
+      }
+    },
+    "environment": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "boost": "1.92.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "checks": {
+      "conditioning_ctest_passed": 1,
+      "conditioning_test_cases": 2,
+      "conditioning_assertions": 18799,
+      "geometry_first_ctest_status": "timeout",
+      "geometry_first_ctest_timeout_seconds": 60,
+      "geometry_direct_test_passed": 1,
+      "geometry_direct_timeout_seconds": 150,
+      "geometry_direct_elapsed_seconds": 32.716,
+      "geometry_test_cases": 10,
+      "geometry_assertions": 1710
+    }
   }
 }
