@@ -187,7 +187,7 @@ TEST_CASE("PG rank preparation rejects short budgets without changing sources",
     const auto shifted = changed.r("1", "7");
     const ExactChartPolynomial flat;
     make_graph(changed, shifted, flat);
-    Producers mismatched(changed);
+    const Producers mismatched(changed);
     cap = limits();
     core::ResourcePlan comparison{48 * gib};
     check_failure(PgRankPreparation::prepare(inputs.dictionary, mismatched.partition, cap,
@@ -344,4 +344,158 @@ TEST_CASE("Independent PG rank workspaces preserve the same canonical exact resu
     for (core::Index k = 0; k < static_cast<core::Index>(info.rank); ++k)
         for (core::Index i = 0; i < static_cast<core::Index>(info.active_rows); ++i)
             CHECK(take(a.basis({k}, i, algebra, query)) == take(b.basis({k}, i, algebra, query)));
+}
+
+TEST_CASE("Owned PG rank recipes reproduce dictionary G and full-background J",
+          "[SH-D03][SH-D05][SH-D07][N4-02][verification]") {
+    const auto rank = make_owned_flat(); // The original dictionary and partition are gone.
+    Fixture f;
+    const Producers current{f};
+    const auto roster = take(current.dictionary.columns());
+    const auto saved = take(rank.provenance());
+    REQUIRE(saved.size() == roster.size());
+    for (std::size_t i = 0; i < roster.size(); ++i) {
+        CHECK(saved[i].kind == roster[i].kind);
+        CHECK(saved[i].first == roster[i].first);
+        CHECK(saved[i].second == roster[i].second);
+        CHECK(saved[i].axis == roster[i].axis);
+        CHECK(saved[i].component == roster[i].component);
+        CHECK(saved[i].original == roster[i].original);
+    }
+    const auto algebra = partition_test::exact_limits();
+    core::ResourcePlan reads{48 * gib};
+    const auto one = f.r("1");
+    const auto minus_one = f.r("-1");
+    const auto raw_g = take(current.dictionary.required_map());
+    for (core::Index ordinal = 0; ordinal < 33; ++ordinal) {
+        const auto target = PgRankRequiredColumn{ordinal};
+        core::Index term = 0;
+        for (const auto& entry : raw_g) {
+            if (entry.target != ordinal)
+                continue;
+            const auto actual = take(rank.recipe(target, term++, algebra, reads));
+            CHECK(actual.source.value == entry.source.value);
+            CHECK(actual.coefficient == entry.coefficient);
+        }
+        CHECK(take(rank.recipe_terms(target)) == static_cast<std::uint64_t>(term));
+    }
+    CHECK(take(rank.translation_axis({29})) == std::nullopt);
+    CHECK(take(rank.translation_axis({30})) == PgRankTranslationAxis::X);
+    CHECK(take(rank.translation_axis({31})) == PgRankTranslationAxis::Y);
+    CHECK(take(rank.translation_axis({32})) == PgRankTranslationAxis::Z);
+    check_failure(rank.translation_axis({33}), core::FailureCode::InvalidInput);
+
+    const auto originals = take(current.dictionary.original_columns());
+    const auto raw_c = take(current.dictionary.anchor_c_map());
+    for (core::Index ordinal = 0; ordinal < originals; ++ordinal) {
+        const auto target = PgRankAnchorColumn{ordinal};
+        const auto unit = take(rank.recipe(target, 0, algebra, reads));
+        CHECK(unit.source.value == ordinal);
+        CHECK(unit.coefficient == one);
+        core::Index term = 1;
+        for (auto i = static_cast<std::size_t>(originals); i < roster.size(); ++i) {
+            if (roster[i].original.value != ordinal)
+                continue;
+            const auto actual = take(rank.recipe(target, term++, algebra, reads));
+            CHECK(actual.source.value == static_cast<core::Index>(i));
+            CHECK(actual.coefficient == minus_one);
+        }
+        for (const auto& entry : raw_c) {
+            if (entry.source.value != ordinal)
+                continue;
+            const auto actual = take(rank.recipe(target, term++, algebra, reads));
+            CHECK(actual.source.value == entry.target.value);
+            CHECK(actual.coefficient == take(f.r("0").subtract(entry.coefficient, algebra, reads)));
+        }
+        CHECK(take(rank.recipe_terms(target)) == static_cast<std::uint64_t>(term));
+    }
+}
+
+TEST_CASE("PG rank revalidates equivalence and rejects stale same-shape sources under limits",
+          "[SH-D03][SH-D05][SH-D07][N4-08][negative][verification]") {
+    auto source = make_owned_flat();
+    const auto saved = take(source.preparation());
+    auto rank = std::move(source);
+    Fixture f;
+    const Producers current{f};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{48 * gib};
+    auto cap = limits();
+    const auto proof =
+        take(rank.validate_for(current.dictionary, current.partition, cap, workspace, plan));
+    CHECK(proof.steps > saved.steps);
+    CHECK(proof.preflight_bytes == saved.preflight_bytes);
+    CHECK(proof.allocated_payload_bytes == plan.allocated_bytes());
+    CHECK(proof.allocated_payload_bytes == saved.allocated_payload_bytes);
+
+    cap.maximum_steps = proof.steps;
+    cap.maximum_payload_bytes = proof.preflight_bytes;
+    core::ResourcePlan equal{proof.preflight_bytes};
+    CHECK(take(rank.validate_for(current.dictionary, current.partition, cap, workspace, equal))
+              .steps == proof.steps);
+
+    core::ResourcePlan short_plan{proof.preflight_bytes - 1};
+    check_failure(
+        rank.validate_for(current.dictionary, current.partition, cap, workspace, short_plan),
+        core::FailureCode::ResourceExceeded);
+    CHECK(short_plan.allocated_bytes() == 0);
+    core::ResourcePlan negative{48 * gib};
+    --cap.maximum_payload_bytes;
+    check_failure(
+        rank.validate_for(current.dictionary, current.partition, cap, workspace, negative),
+        core::FailureCode::ResourceExceeded);
+    CHECK(negative.allocated_bytes() == 0);
+    cap.maximum_payload_bytes = proof.preflight_bytes;
+    --cap.maximum_steps;
+    core::ResourcePlan short_work{proof.preflight_bytes};
+    check_failure(
+        rank.validate_for(current.dictionary, current.partition, cap, workspace, short_work),
+        core::FailureCode::ResourceExceeded);
+
+    cap = limits();
+    Fixture same_area_reordered;
+    std::rotate(same_area_reordered.domain.begin(), same_area_reordered.domain.begin() + 1,
+                same_area_reordered.domain.end());
+    const Producers reordered{same_area_reordered};
+    check_failure(
+        rank.validate_for(current.dictionary, reordered.partition, cap, workspace, negative),
+        core::FailureCode::StaleGeneration);
+    Fixture same_active_smaller_area;
+    same_active_smaller_area.domain[0] = {same_active_smaller_area.r("1", "8"),
+                                          same_active_smaller_area.r("1", "8")};
+    const Producers smaller_area{same_active_smaller_area};
+    check_failure(
+        rank.validate_for(current.dictionary, smaller_area.partition, cap, workspace, negative),
+        core::FailureCode::StaleGeneration);
+    Fixture different_graph;
+    make_graph(different_graph, different_graph.r("1", "7"), {});
+    const Producers shifted{different_graph};
+    check_failure(
+        rank.validate_for(shifted.dictionary, shifted.partition, cap, workspace, negative),
+        core::FailureCode::StaleGeneration);
+    check_failure(
+        rank.validate_for(shifted.dictionary, current.partition, cap, workspace, negative),
+        core::FailureCode::StaleGeneration);
+    check_failure(
+        // NOLINTNEXTLINE(bugprone-use-after-move): Public moved-from failure contract.
+        source.validate_for(current.dictionary, current.partition, cap, workspace, negative),
+        core::FailureCode::InvalidInput);
+
+    cap.maximum_steps = 0;
+    check_failure(
+        rank.validate_for(current.dictionary, current.partition, cap, workspace, negative),
+        core::FailureCode::ResourceExceeded);
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    cap.cancellation = stop.get_token();
+    check_failure(
+        rank.validate_for(current.dictionary, reordered.partition, cap, workspace, negative),
+        core::FailureCode::Cancelled);
+    const auto lease = take(workspace.acquire());
+    check_failure(
+        rank.validate_for(current.dictionary, current.partition, limits(), workspace, negative),
+        core::FailureCode::InvalidInput);
+    static_cast<void>(lease);
+    CHECK(negative.allocated_bytes() == 0);
+    CHECK(take(rank.preparation()).steps == saved.steps);
 }

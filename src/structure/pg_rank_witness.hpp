@@ -19,6 +19,9 @@ struct RankWitnessCell {
     bool active = false;
 };
 
+inline constexpr std::uint8_t rank_recipe_version = 1;
+inline constexpr std::uint8_t rank_reduction_version = 1;
+
 struct RankWitness {
     RankFraction<RankWide> x0{}, width{}, skew{};
     std::array<RankWitnessTerm, 15> height{};
@@ -26,8 +29,8 @@ struct RankWitness {
     core::Index n = 0;
     PgGraphConvention convention = PgGraphConvention::Version1;
     PgGraphContentIdentity graph_identity{{}};
-    std::uint8_t recipe_version = 1;
-    std::uint8_t reduction_version = 1;
+    std::uint8_t recipe_version = rank_recipe_version;
+    std::uint8_t reduction_version = rank_reduction_version;
     std::array<RankWitnessCell, rank_max_cells> activity{};
     std::size_t activity_count = 0;
     core::PlannedBuffer<RankWitnessPoint> domain;
@@ -113,6 +116,46 @@ inline void fill_rank_witness(RankWitness& witness, const PgCoefficientDictionar
         auto& point = witness.domain.values()[i];
         point.s = rank_witness_value(points[i].s, budget);
         point.t = rank_witness_value(points[i].t, budget);
+    }
+}
+
+inline void rank_match_witness(const RankWitness& witness, const PgGraphView& graph,
+                               const PgIntegrationPartition& partition, std::uint64_t domain_count,
+                               RankBudget& budget) {
+    const auto height = graph.height.terms();
+    const auto cells = partition_take(partition.activity_map());
+    const auto match = [&](const RankFraction<RankWide>& old, const ExactRational& current) {
+        return rank_equal_fraction(old, rank_witness_value(current, budget), budget);
+    };
+    budget.charge();
+    if (witness.n != graph.n || witness.convention != graph.convention ||
+        witness.recipe_version != rank_recipe_version ||
+        witness.reduction_version != rank_reduction_version ||
+        height.size() != witness.height_count || cells.size() != witness.activity_count ||
+        domain_count != witness.domain.size() || !match(witness.x0, graph.x0) ||
+        !match(witness.width, graph.width) || !match(witness.skew, graph.skew))
+        partition_fail(core::FailureCode::StaleGeneration);
+    for (std::size_t i = 0; i < height.size(); ++i) {
+        budget.charge();
+        const auto& saved = witness.height[i];
+        if (saved.powers.first != height[i].powers.first ||
+            saved.powers.second != height[i].powers.second ||
+            !match(saved.coefficient, height[i].coefficient))
+            partition_fail(core::FailureCode::StaleGeneration);
+    }
+    for (std::size_t i = 0; i < cells.size(); ++i) {
+        budget.charge();
+        const auto& saved = witness.activity[i];
+        if (saved.cell != cells[i].cell || saved.active != cells[i].active ||
+            !match(saved.area, cells[i].area))
+            partition_fail(core::FailureCode::StaleGeneration);
+    }
+    const auto points = partition_take(partition.source_points());
+    for (std::size_t i = 0; i < witness.domain.size(); ++i) {
+        budget.charge();
+        const auto& saved = witness.domain.values()[i];
+        if (!match(saved.s, points[i].s) || !match(saved.t, points[i].t))
+            partition_fail(core::FailureCode::StaleGeneration);
     }
 }
 

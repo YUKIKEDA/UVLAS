@@ -72,7 +72,7 @@ TEST_CASE("PG local rank abandons a partial result after allocation failure",
     const auto old =
         take(PgRankPreparation::prepare(dictionary, partition, limits, workspace, control));
     const auto previous = take(old.preparation());
-    for (const std::int64_t after : {0, 43}) {
+    for (const std::int64_t after : {0, 42}) {
         CAPTURE(after);
         core::ResourcePlan trial{cap};
         const auto attempt = [&] {
@@ -86,6 +86,14 @@ TEST_CASE("PG local rank abandons a partial result after allocation failure",
         else
             CHECK(trial.allocated_bytes() > 0);
         CHECK(take(partition.identity()) == saved);
+        CHECK(take(old.preparation()).steps == previous.steps);
+        core::ResourcePlan validation_trial{cap};
+        const auto validation_attempt = [&] {
+            const ArrayFault fault(after);
+            return old.validate_for(dictionary, partition, limits, workspace, validation_trial);
+        }();
+        REQUIRE_FALSE(validation_attempt);
+        CHECK(validation_attempt.error().code == core::FailureCode::ResourceExceeded);
         CHECK(take(old.preparation()).steps == previous.steps);
         core::ResourcePlan retry_plan{cap};
         const auto retry =
