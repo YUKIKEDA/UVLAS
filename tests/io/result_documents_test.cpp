@@ -6,6 +6,7 @@
 
 #include <array>
 #include <limits>
+#include <stdexcept>
 #include <uvlas/core/build_info.hpp>
 
 namespace {
@@ -156,8 +157,9 @@ TEST_CASE("Result statuses reject invalid termination and moved or inconsistent 
     auto old = accept(plan);
     const auto accepted = std::move(old);
     CHECK_FALSE(ResultStatus::completed(&old));
-    const Failure mismatched{
-        FailureCode::Nonfinite, Operation::EvaluateStep, {.last_accepted = AcceptedStateId{0}}};
+    FailureDetails mismatched_context{};
+    mismatched_context.last_accepted = AcceptedStateId{0};
+    const Failure mismatched{FailureCode::Nonfinite, Operation::EvaluateStep, mismatched_context};
     const auto stale = ResultStatus::failed(mismatched, FailedResultExit::Numerical, &accepted);
     REQUIRE_FALSE(stale);
     CHECK(stale.error().code == FailureCode::StaleGeneration);
@@ -202,6 +204,29 @@ TEST_CASE("Result document admission is exact and failure delivers no partial by
     REQUIRE_FALSE(cancelled);
     CHECK(cancelled.error().code == FailureCode::Cancelled);
     CHECK(short_output.allocated_bytes() == 0);
+}
+
+TEST_CASE("The adopted failed exit categories are emitted as numbers", "[IO4-05]") {
+    struct Entry {
+        FailureCode code;
+        FailedResultExit exit;
+        int number;
+    };
+    constexpr std::array entries{
+        Entry{FailureCode::InvalidInput, FailedResultExit::Input, 2},
+        Entry{FailureCode::GeometryInvalid, FailedResultExit::Geometry, 3},
+        Entry{FailureCode::LinearUnconverged, FailedResultExit::Numerical, 4},
+        Entry{FailureCode::ResourceExceeded, FailedResultExit::Resources, 5},
+        Entry{FailureCode::CheckpointIncompatible, FailedResultExit::Persistence, 6},
+        Entry{FailureCode::Cancelled, FailedResultExit::Interrupted, 130}};
+    for (const auto& [code, exit, number] : entries) {
+        ResourcePlan plan{capacity};
+        const auto status = take(ResultStatus::failed({code, Operation::PrepareModel}, exit));
+        const auto documents = take(write_result_documents(status, {}, capacity, plan, {}));
+        const auto run = Json::parse(documents.status());
+        CHECK(run.at("exit_code") == number);
+        CHECK(run.at("completed") == false);
+    }
 }
 
 } // namespace
