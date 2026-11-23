@@ -372,7 +372,10 @@ struct Builder {
             return std::unexpected(coefficients.error());
         const auto bits = coefficients->arithmetic().integer_bits();
         const BoundedCoefficients bounded{source.samples, {bits, bits}};
-        const auto boundary = forecast(bounded, source.boundary, limits, stop, details, bits);
+        auto boundary_limits = limits;
+        boundary_limits.steps -= coefficients->reserved_steps();
+        const auto boundary =
+            forecast(bounded, source.boundary, boundary_limits, stop, details, bits);
         if (!boundary)
             return std::unexpected(boundary.error());
         CheckedCount count;
@@ -389,7 +392,7 @@ struct Builder {
         CurveNumericsPlan result;
         result.coefficients_ = *coefficients;
         result.boundary_ = *boundary;
-        result.boundary_limits_ = limits;
+        result.boundary_limits_ = boundary_limits;
         result.boundary_limits_.input_bits = std::max(limits.input_bits, bits);
         result.bytes_ = bytes;
         result.work_ = work;

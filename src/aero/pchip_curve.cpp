@@ -59,10 +59,14 @@ struct Meter {
     core::FailureDetails details;
     std::uint64_t used = 0;
 
+    [[nodiscard]] std::uint64_t remaining() const noexcept {
+        return cap - used;
+    }
+
     [[nodiscard]] core::Result<void> visit(std::uint64_t steps = 1) noexcept {
         if (stop.stop_requested())
             return std::unexpected(failure(core::FailureCode::Cancelled, details));
-        if (steps > cap - used)
+        if (steps > remaining())
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         used += steps;
         return {};
@@ -229,13 +233,15 @@ struct Builder {
         std::uint64_t input_preflight = 0, input_bits = 0;
         std::optional<SharedPreparationPlan> shared_plan;
         std::optional<PreparationPlan> input_plan;
+        auto numerical_limits = limits.arithmetic;
         if (copy_input) {
             const auto source = forecast_preparation_input(input, limits.arithmetic, stop, details);
             if (!source)
                 return std::unexpected(source.error());
             input_plan.emplace(*source);
             const auto shared = forecast_shared_preparation(
-                {limits.metadata, limits.arithmetic.steps}, stop, details);
+                {limits.metadata, numerical_limits.steps - source->reserved_steps()}, stop,
+                details);
             if (!shared)
                 return std::unexpected(shared.error());
             shared_plan.emplace(*shared);
@@ -249,8 +255,9 @@ struct Builder {
                             checked.add(shared->metadata_estimate_bytes(), allocator_estimate));
             if (!checked.ok)
                 return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
+            numerical_limits.steps -= input_steps;
         }
-        const auto numerics = forecast_curve_numerics(input, limits.arithmetic, stop, details);
+        const auto numerics = forecast_curve_numerics(input, numerical_limits, stop, details);
         if (!numerics)
             return std::unexpected(numerics.error());
         CheckedCount checked;
@@ -441,13 +448,15 @@ struct Builder {
         if (!input)
             return std::unexpected(supplement(input.error(), details));
         const auto& coefficients = curve.owner_->coefficients;
+        auto remaining = limits.arithmetic;
+        remaining.steps -= *matched;
         auto normalized = *time;
         auto interval_time = *time;
         DomainForecast domain_plan;
         std::uint64_t domain_bytes = 0, domain_steps = 0, domain_preflight = 0, domain_bits = 0;
         if (const auto* periodic = std::get_if<PeriodicBoundary>(&input->boundary.policy)) {
             const auto domain = forecast_periodic_time(coefficients, query.time, periodic->period,
-                                                       limits.arithmetic, stop, details);
+                                                       remaining, stop, details);
             if (!domain)
                 return std::unexpected(domain.error());
             normalized = domain->normalized_bound();
@@ -464,9 +473,8 @@ struct Builder {
             domain_bits = domain->arithmetic().integer_bits();
             domain_plan = *domain;
         } else {
-            const auto domain =
-                forecast_domain(coefficients, query.time, domain_policy(input->boundary),
-                                limits.arithmetic, stop, details);
+            const auto domain = forecast_domain(
+                coefficients, query.time, domain_policy(input->boundary), remaining, stop, details);
             if (!domain)
                 return std::unexpected(domain.error());
             domain_bytes = domain->payload_bytes();
@@ -477,12 +485,15 @@ struct Builder {
         }
         auto derived = limits.arithmetic;
         derived.input_bits = std::max(derived.input_bits, derived.work_bits);
+        remaining.input_bits = derived.input_bits;
+        remaining.steps -= domain_steps;
         const auto locator =
-            forecast_location_bound(coefficients, normalized, derived, stop, details);
+            forecast_location_bound(coefficients, normalized, remaining, stop, details);
         if (!locator)
             return std::unexpected(locator.error());
+        remaining.steps -= locator->reserved_steps();
         const auto interval = forecast_interval_bound(coefficients, interval_time, query.order,
-                                                      derived, stop, details);
+                                                      remaining, stop, details);
         if (!interval)
             return std::unexpected(interval.error());
 
@@ -496,8 +507,13 @@ struct Builder {
         const auto records =
             count.add(count.mul(components, 1 + static_cast<std::uint64_t>(query.order)), 2);
         const auto per_record = count.mul(words, 2);
+        const auto interval_work = count.add(
+            interval->preflight_steps(),
+            count.mul(candidates, interval->reserved_steps() - interval->local_preflight_steps()));
+        if (!count.ok || interval_work > remaining.steps)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         std::uint64_t packed_words = words;
-        Meter hold_scan{limits.arithmetic.steps, stop, details};
+        Meter hold_scan{remaining.steps - interval_work, stop, details};
         if (std::holds_alternative<HoldBoundary>(input->boundary.policy)) {
             for (const auto node : {std::uint64_t{0}, coefficients.nodes() - 1}) {
                 for (std::uint64_t c = 0; c < components; ++c) {
@@ -1002,6 +1018,12 @@ struct Builder {
         const auto matched = compare_inputs(saved.input, *current, meter);
         if (!matched)
             return std::unexpected(matched.error());
+        auto remaining = limits;
+        remaining.arithmetic.steps = meter.remaining();
+        if (stop.stop_requested())
+            return std::unexpected(failure(core::FailureCode::Cancelled, details));
+        if (remaining.arithmetic.steps == 0)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         if (saved.formula_version != CoefficientBlock::formula_version())
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         CheckedCount checked;
@@ -1011,13 +1033,14 @@ struct Builder {
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         if (count != saved.coefficients.size())
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
-        const auto prepare = plan_prepare(*current, limits, stop, details, false);
+        const auto prepare = plan_prepare(*current, remaining, stop, details, false);
         if (!prepare)
             return std::unexpected(prepare.error());
         const auto width = prepare->numerics.coefficients().arithmetic().integer_bits();
+        Meter saved_scan{remaining.arithmetic.steps - prepare->all.reserved_steps, stop, details};
         std::uint64_t limbs = 0;
         for (const auto coefficient : saved.coefficients) {
-            const auto visited = meter.visit();
+            const auto visited = saved_scan.visit();
             if (!visited)
                 return std::unexpected(visited.error());
             const auto bound =
@@ -1028,15 +1051,16 @@ struct Builder {
                 limbs, checked.add(coefficient.numerator.size(), coefficient.denominator.size()));
         }
         const auto comparison = checked.add(count, limbs);
-        RestorePlan result{*prepare, meter.used, comparison, limbs};
+        const auto structural_work = checked.add(meter.used, saved_scan.used);
+        RestorePlan result{*prepare, structural_work, comparison, limbs};
         auto& admission = result.prepare.all;
         admission.payload_bytes = checked.add(
             admission.payload_bytes, checked.add(checked.mul(count, sizeof(RationalView)),
                                                  checked.mul(limbs, sizeof(std::uint32_t))));
         admission.metadata_estimate_bytes =
             checked.add(admission.metadata_estimate_bytes, 2 * allocator_estimate);
-        admission.reserved_steps = checked.add(admission.reserved_steps,
-                                               checked.add(meter.used, checked.mul(2, comparison)));
+        admission.reserved_steps = checked.add(
+            admission.reserved_steps, checked.add(structural_work, checked.mul(2, comparison)));
         constexpr auto max_index =
             static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
         if (!checked.ok || admission.reserved_steps > limits.arithmetic.steps ||
