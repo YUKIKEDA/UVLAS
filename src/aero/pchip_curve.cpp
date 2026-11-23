@@ -1130,6 +1130,11 @@ core::Result<PreparationRequest> PchipCurveReady::input() const& noexcept {
         return std::unexpected(curve_detail::failure(core::FailureCode::InvalidInput));
     return curve_detail::input_view(owner_->input, {});
 }
+core::Result<SharedPreparationInput> PchipCurveReady::retain_input() const noexcept {
+    if (!active())
+        return std::unexpected(curve_detail::failure(core::FailureCode::InvalidInput));
+    return owner_->input;
+}
 core::Result<std::uint64_t> PchipCurveReady::formula_version() const noexcept {
     if (!active())
         return std::unexpected(curve_detail::failure(core::FailureCode::InvalidInput));

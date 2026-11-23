@@ -6,6 +6,7 @@
 #include "aero/pchip_knot_locator.hpp"
 #include "aero/pchip_preparation_input.hpp"
 #include "aero/pchip_shared_preparation_input.hpp"
+#include "aero/uniform_flow.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1722,4 +1723,46 @@ TEST_CASE("Periodic exact PCHIP reserves both automatic seam candidates before n
             const auto value = curve.coefficient(1, 0, 0);
             return value && value->sign == 0 && parents.allocated_bytes() == before;
         });
+}
+
+TEST_CASE("Exact uniform polynomial admits all payload before arithmetic and publication",
+          "[AE-07][FD-06][N4-02][N4-08][N4-09][negative]") {
+    namespace a = uvlas::aero::detail;
+    const Fixture fixture;
+    const std::array coefficients{
+        fixture.y[0], fixture.y[1], fixture.y[2], fixture.y[1], fixture.y[2], fixture.y[0],
+    };
+    const a::UniformFlowInput request{preparation_stamp,
+                                      {},
+                                      a::PolynomialUniformFlow{fixture.t[0], fixture.t[2],
+                                                               fixture.t[0], fixture.t[2],
+                                                               coefficients}};
+    const p::CurveLimits cap{limits(), linear_memory::EstimateAdmission{UINT64_MAX}};
+    a::UniformFlowWorkspace work;
+    c::ResourcePlan retained{UINT64_MAX};
+    const auto original = take(a::prepare_uniform_flow(request, work, cap, retained));
+    const a::UniformFlowQuery query{preparation_stamp, fixture.t[1]};
+    const auto jet = take(a::evaluate_uniform_flow(original, query, work, cap, retained));
+    const auto canonical = take(jet.velocity(1));
+    const auto bytes = retained.allocated_bytes();
+    const auto unchanged = [&] {
+        const auto value = jet.velocity(1);
+        return original.active() && value &&
+               canonical.numerator.data() == value->numerator.data() &&
+               retained.allocated_bytes() == bytes;
+    };
+    const auto prepare = take(a::forecast_uniform_flow_prepare(request, cap));
+    verify_curve_faults(
+        prepare, cap, 7,
+        [&](c::ResourcePlan& memory, p::CurveLimits budget, const std::stop_token& stop) {
+            return a::prepare_uniform_flow(request, work, budget, memory, stop, details());
+        },
+        unchanged);
+    const auto evaluation = take(a::forecast_uniform_flow_evaluation(original, query, cap));
+    verify_curve_faults(
+        evaluation, cap, 4,
+        [&](c::ResourcePlan& memory, p::CurveLimits budget, const std::stop_token& stop) {
+            return a::evaluate_uniform_flow(original, query, work, budget, memory, stop, details());
+        },
+        unchanged);
 }

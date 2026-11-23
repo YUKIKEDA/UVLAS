@@ -155,6 +155,14 @@ template <class I>
     return {rank_copy_integer<I>(source.num()), rank_copy_integer<I>(source.denom())};
 }
 
+template <class I>
+[[nodiscard]] bool rank_equal_fraction(const RankFraction<I>& a, const RankFraction<I>& b,
+                                       RankBudget& budget) {
+    budget.charge(1 + std::uint64_t{a.numerator.backend().size()} + a.denominator.backend().size() +
+                  b.numerator.backend().size() + b.denominator.backend().size());
+    return a.numerator == b.numerator && a.denominator == b.denominator;
+}
+
 struct RankSizer {
     std::uint64_t bytes = 0;
 
