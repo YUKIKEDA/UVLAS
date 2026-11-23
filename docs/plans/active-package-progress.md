@@ -1,11 +1,11 @@
 # IM-01・IM-03・IM-06の進捗と残作業
 
-参照幾何と微分の統合後、実装中の3パッケージは **15／43段階（約35%）が完了**する。残り28段階のうち25段階が実装・検証、3段階が終了審査。mainの基準は [`fbe0e27`](https://github.com/YUKIKEDA/UVLAS/commit/fbe0e27)、検証済みの参照幾何は [`09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)。下表はこの変更を統合した時点の成果と残作業を示す。
+今回の変更までを統合した時点で、実装中の3パッケージは **16／43段階（約37%）が完了**する。残り27段階のうち24段階が実装・検証、3段階が終了審査。下表は統合後の成果と次の完了条件を示す。
 
 | パッケージ | 完了／全体 | 残り | 統合済みの成果 | 次に完了させる成果と判定条件 |
 |---|---:|---:|---|---|
-| [IM-01 構造](#im-01-構造) | 5／12（42%） | 7 | 原辞書と積分分割に続き、参照位置、可変法線、厚さ、測度、高階・片側微分を製品で評価できる。全nの矩形・U形と独立な四次曲面で照合した。 [参照幾何の検証](../verification/IM-01/pg-reference-geometry/verification.md) | 辞書と分割を同時に保持した状態で、局所rankの準備から全再構成までを同じ資源計画で検証する。結果を独立に審査し、製品実装の開始を判定する。 [#140](https://github.com/YUKIKEDA/UVLAS/issues/140) |
-| [IM-03 空力](#im-03-空力) | 5／13（38%） | 8 | 局所P1核、大域幾何、後縁所有を実装済み。PCHIPは係数・境界検査・時刻と微分側の選択・入力の共有所有まで統合した。 [#244](https://github.com/YUKIKEDA/UVLAS/pull/244)・[#251](https://github.com/YUKIKEDA/UVLAS/pull/251) | 厳密入力から、一括の資源判定を経て境界検査済みの曲線を作り、値と時間微分を返す。保存した内容を独立の期待入力・再計算結果と照合して復元する。既知流れと指定運動への接続はその次に扱う。 |
+| [IM-01 構造](#im-01-構造) | 5／12（42%） | 7 | 参照位置と微分に加え、辞書・分割から局所rankを準備し、入力の来歴、基底、全座標を所有する。全12系列を独立参照と厳密に照合した。 [参照幾何の検証](../verification/IM-01/pg-reference-geometry/verification.md)・[#264](https://github.com/YUKIKEDA/UVLAS/issues/264) | 局所rankの資源方式の審査と、後続が再利用する際の入出力照合を閉じる。 [#140](https://github.com/YUKIKEDA/UVLAS/issues/140)・[#133](https://github.com/YUKIKEDA/UVLAS/issues/133) |
+| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有に続き、固定分割四辺形と共有辺の誘導・全微分を実装した。PCHIPの曲線準備、評価、再開時の照合も実装した。 [共有辺と四辺形](../verification/IM-03/p1-shared-action-v1/verification.md)・[#263](https://github.com/YUKIKEDA/UVLAS/pull/263) | 既知流れと指定運動を同じ時刻・座標の規則で評価できるよう、採用済み曲線と必要な投影を接続し、値・微分と再開時の一致を確かめる。 |
 | [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換を実装済み。根相対で取得した先頭の参照を、ダイジェスト照合後に依存走査へ渡した。共有と循環を判定する走査も実装済み。 [#245](https://github.com/YUKIKEDA/UVLAS/pull/245)・[#252](https://github.com/YUKIKEDA/UVLAS/pull/252) | 実入力の参照解決には、役割ごとの内容と依存抽出の規則を確定する。Gmshを起点に、採用するMSH 4.1 ASCIIの範囲、sidecar、参照の宣言方法を決める。独立に進められる配布準備では、既存のCLIとPython成果物の依存・ABIを調べ、開発環境なしでの起動を検証する。 |
 
 割合は[作業分解](next-package-work-breakdown.md)の完了段階数を全段階数で割って求める。各段階の完了は、採用仕様、後続が受け取る成果、独立した検証根拠で確かめる。段階ごとに規模が異なるため、この数字から残りの工数は見積もれない。
@@ -20,7 +20,7 @@
 | グラフとセル | 完了 | 有理グラフ、half-cell、矩形の活動map。 [#103](https://github.com/YUKIKEDA/UVLAS/pull/103) |
 | 全原辞書と full V | 完了 | アンカー補完、必須場と並進の厳密な写像。 [#113](https://github.com/YUKIKEDA/UVLAS/pull/113) |
 | 多角形と全積分分割 | 完了 | 被覆を検査した分割と資源計画。 [分割](https://github.com/YUKIKEDA/UVLAS/pull/128)・[資源計画](https://github.com/YUKIKEDA/UVLAS/pull/149) |
-| 局所独立化 | 検証中 | 固定領域の証明器と難条件2列の復元は統合済み。全候補の有限体探索の固定領域実証も [#186](https://github.com/YUKIKEDA/UVLAS/pull/186) で統合済み。n1四次・全背景の全383列の有理復元と全1252行の厳密証明は [#196](https://github.com/YUKIKEDA/UVLAS/pull/196) で統合済みの限定実証。n2四次・全背景でも [#204](https://github.com/YUKIKEDA/UVLAS/pull/204) で全730列の復元と全5008活動行の厳密証明を確認した。[#210](https://github.com/YUKIKEDA/UVLAS/pull/210) では、n4四次U形切断の全1,496候補を復元し、元式8,428,464行と独立証明書の745,008座標を厳密に照合した。[#217](https://github.com/YUKIKEDA/UVLAS/pull/217) でn4平坦1,237候補と四次1,496候補の全背景を検証し、元式の全活動行と独立証明書の全座標を厳密に照合した。[#227](https://github.com/YUKIKEDA/UVLAS/pull/227) では、四次の全背景とU形切断で、共通行尺度が補正桁と残差更新を保つ条件を検証した。[#235](https://github.com/YUKIKEDA/UVLAS/pull/235) で共有尺度を固定バッチへ接続し、両領域の全候補で列別の診断が従来と一致した。[#243](https://github.com/YUKIKEDA/UVLAS/pull/243) では両領域の全行尺度と全整数係数を固定領域で作り、最大ビット幅も動的な厳密参照と照合した。[#253](https://github.com/YUKIKEDA/UVLAS/pull/253) では、同じ疎係数と列境界の配列を共有持上げへ渡し、両領域で全候補の元式と独立証明書を照合した。残る活動条件の検証と、辞書・分割を含む全準備の資源審査を経て、製品実装の開始を判定する。 [数学契約 #133](https://github.com/YUKIKEDA/UVLAS/issues/133)・[資源方式 #140](https://github.com/YUKIKEDA/UVLAS/issues/140) |
+| 局所独立化 | 検証中 | 固定領域の証明器と難条件2列の復元は統合済み。全候補の有限体探索の固定領域実証も [#186](https://github.com/YUKIKEDA/UVLAS/pull/186) で統合済み。n1四次・全背景の全383列の有理復元と全1252行の厳密証明は [#196](https://github.com/YUKIKEDA/UVLAS/pull/196) で統合済みの限定実証。n2四次・全背景でも [#204](https://github.com/YUKIKEDA/UVLAS/pull/204) で全730列の復元と全5008活動行の厳密証明を確認した。[#210](https://github.com/YUKIKEDA/UVLAS/pull/210) では、n4四次U形切断の全1,496候補を復元し、元式8,428,464行と独立証明書の745,008座標を厳密に照合した。[#217](https://github.com/YUKIKEDA/UVLAS/pull/217) でn4平坦1,237候補と四次1,496候補の全背景を検証し、元式の全活動行と独立証明書の全座標を厳密に照合した。[#227](https://github.com/YUKIKEDA/UVLAS/pull/227) では、四次の全背景とU形切断で、共通行尺度が補正桁と残差更新を保つ条件を検証した。[#235](https://github.com/YUKIKEDA/UVLAS/pull/235) で共有尺度を固定バッチへ接続し、両領域の全候補で列別の診断が従来と一致した。[#243](https://github.com/YUKIKEDA/UVLAS/pull/243) では両領域の全行尺度と全整数係数を固定領域で作り、最大ビット幅も動的な厳密参照と照合した。[#253](https://github.com/YUKIKEDA/UVLAS/pull/253) では、同じ疎係数と列境界の配列を共有持上げへ渡し、両領域で全候補の元式と独立証明書を照合した。[#264](https://github.com/YUKIKEDA/UVLAS/issues/264) で、辞書・分割から基底・全座標と入力の来歴を所有する準備を実装し、全12系列を独立参照と照合した。辞書・分割を同時に保持する48 GiBの予算でn=4の四次U形も通過した。資源方式の審査と再利用時の照合が残る。 [数学契約 #133](https://github.com/YUKIKEDA/UVLAS/issues/133)・[資源方式 #140](https://github.com/YUKIKEDA/UVLAS/issues/140) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
 | 保証付き条件付け | 残 | 局所独立化と参照幾何を結合し、幾何内積と基底変換を誤差上界付きで検証する |
 | PreparedPatchと参照作用 | 残 | 条件付け済み基底を、層・面・片側の参照作用と反復用Workspaceへつなぐ |
@@ -31,7 +31,7 @@
 
 ## IM-03 空力
 
-[#19](https://github.com/YUKIKEDA/UVLAS/issues/19) の終了審査まで8段階。局所核を共有辺・四辺形へ組み立てる作業と既知流れの実装は並行できる。循環とその微分が、全荷重・後流へ進む共通の先行条件。
+[#19](https://github.com/YUKIKEDA/UVLAS/issues/19) の終了審査まで7段階。共有辺・四辺形の誘導作用を循環計算へ渡せる。既知流れの実装は独立して進められる。循環とその微分が、全荷重・後流へ進む共通の先行条件。
 
 | 段階 | 状態 | 到達点と残作業 |
 |---|---|---|
@@ -39,9 +39,9 @@
 | 所有幾何・ID・query | 完了 | 幾何snapshot、整数接続、厳密な物質位置式。 [#102](https://github.com/YUKIKEDA/UVLAS/pull/102) |
 | 包絡と局所packet | 完了 | 位置・幾何包絡と局所適格性。 [#112](https://github.com/YUKIKEDA/UVLAS/pull/112) |
 | P1核と全13変数の微分 | 完了 | 3基底の局所誘導核と全Jacobian。 [#129](https://github.com/YUKIKEDA/UVLAS/pull/129) |
-| 共有辺・四辺形・全作用 | 残 | 局所核と接続を使い、共有出現の鎖則・相殺、JVPとVJP、双対内積を検証する |
+| 共有辺・四辺形・全作用 | 完了 | 固定分割に従って全出現に散布し、核半径と強度トレースが一致する逆向きの解析辺を相殺する。値とJVPを独立面積分、VJPを双対内積で照合した。 [共有辺と四辺形の検証](../verification/IM-03/p1-shared-action-v1/verification.md) |
 | 大域幾何と後縁所有 | 完了 | 大域接触・不適格の検査、alias運動学、後縁の放出所有。 [#153](https://github.com/YUKIKEDA/UVLAS/pull/153) |
-| 既知流れと指定運動 | 実装中 | [PCHIP係数](https://github.com/YUKIKEDA/UVLAS/pull/179)は統合済み。指定区間の値・時間微分も [#187](https://github.com/YUKIKEDA/UVLAS/pull/187) で統合済み。閉定義域内の節点検索と左右区間候補の取得は [#197](https://github.com/YUKIKEDA/UVLAS/pull/197) で統合済み。[#205](https://github.com/YUKIKEDA/UVLAS/pull/205) で、範囲外のRejectとHold、およびHold端点の内外候補の取得を統合した。[#211](https://github.com/YUKIKEDA/UVLAS/pull/211) で、宣言した周期と節点幅の一致を検査し、負時刻を含む周期時刻の厳密な正規化を統合した。[#218](https://github.com/YUKIKEDA/UVLAS/pull/218) で、要求区間、Hold端点のゼロ傾き、周期端の値と時間微分の一致を厳密に検査する部品を統合した。[#228](https://github.com/YUKIKEDA/UVLAS/pull/228) で、微分を評価する側の選択と、Automaticで必要になる導関数の厳密な一致判定を統合した。[#237](https://github.com/YUKIKEDA/UVLAS/pull/237) で、準備入力を所有し、発行元・世代・実内容を照合する部品を統合した。[#244](https://github.com/YUKIKEDA/UVLAS/pull/244) で、係数準備と境界検査の確保量・処理量を係数の確保前に見積もる部品を統合した。[#251](https://github.com/YUKIKEDA/UVLAS/pull/251) で、確定済みの準備入力を読み取り専用で共有する部品を統合した。曲線を所有する領域の計画、一括の受入と資格検査、評価と再開への接続、既知流れ・運動への組込みが残る |
+| 既知流れと指定運動 | 実装中 | [PCHIP係数](https://github.com/YUKIKEDA/UVLAS/pull/179)は統合済み。指定区間の値・時間微分も [#187](https://github.com/YUKIKEDA/UVLAS/pull/187) で統合済み。閉定義域内の節点検索と左右区間候補の取得は [#197](https://github.com/YUKIKEDA/UVLAS/pull/197) で統合済み。[#205](https://github.com/YUKIKEDA/UVLAS/pull/205) で、範囲外のRejectとHold、およびHold端点の内外候補の取得を統合した。[#211](https://github.com/YUKIKEDA/UVLAS/pull/211) で、宣言した周期と節点幅の一致を検査し、負時刻を含む周期時刻の厳密な正規化を統合した。[#218](https://github.com/YUKIKEDA/UVLAS/pull/218) で、要求区間、Hold端点のゼロ傾き、周期端の値と時間微分の一致を厳密に検査する部品を統合した。[#228](https://github.com/YUKIKEDA/UVLAS/pull/228) で、微分を評価する側の選択と、Automaticで必要になる導関数の厳密な一致判定を統合した。[#237](https://github.com/YUKIKEDA/UVLAS/pull/237) で、準備入力を所有し、発行元・世代・実内容を照合する部品を統合した。[#244](https://github.com/YUKIKEDA/UVLAS/pull/244) で、係数準備と境界検査の確保量・処理量を係数の確保前に見積もる部品を統合した。[#251](https://github.com/YUKIKEDA/UVLAS/pull/251) で、確定済みの準備入力を読み取り専用で共有する部品を統合した。[#263](https://github.com/YUKIKEDA/UVLAS/pull/263) で、曲線の一括受入・評価と実内容を照合する復元までを検証した。既知流れ・指定運動への接続、空間・時間微分と再開時の一致の検証が残る |
 | 循環と全微分 | 残 | 核、大域幾何、流れと共通求解器を結合し、非貫通の原残差、全束縛・全後流作用、循環微分・随伴を検証する |
 | 全ベクトル荷重 | 残 | 循環・共有核・幾何から全荷重と微分を実装する。構造への双対写像にはIM-01／02の成果が必要 |
 | 後流値・移流・試行 | 残 | 同じ循環・荷重状態から自由／指定輸送、全履歴、試行の親不変性と全微分を検証する |
