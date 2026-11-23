@@ -187,7 +187,7 @@ TEST_CASE("PG rank preparation rejects short budgets without changing sources",
     const auto shifted = changed.r("1", "7");
     const ExactChartPolynomial flat;
     make_graph(changed, shifted, flat);
-    Producers mismatched(changed);
+    const Producers mismatched(changed);
     cap = limits();
     core::ResourcePlan comparison{48 * gib};
     check_failure(PgRankPreparation::prepare(inputs.dictionary, mismatched.partition, cap,
@@ -477,6 +477,7 @@ TEST_CASE("PG rank revalidates equivalence and rejects stale same-shape sources 
         rank.validate_for(shifted.dictionary, current.partition, cap, workspace, negative),
         core::FailureCode::StaleGeneration);
     check_failure(
+        // NOLINTNEXTLINE(bugprone-use-after-move): Public moved-from failure contract.
         source.validate_for(current.dictionary, current.partition, cap, workspace, negative),
         core::FailureCode::InvalidInput);
 

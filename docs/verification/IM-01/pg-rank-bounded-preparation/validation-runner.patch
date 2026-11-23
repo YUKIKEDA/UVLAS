@@ -1,0 +1,62 @@
+--- a/run-series.cpp.txt
++++ b/run-series.cpp.txt
+@@ -39 +39 @@
+-constexpr auto planned_cpp_allocations = std::uint64_t{44};
++constexpr auto planned_cpp_allocations = std::uint64_t{43};
+@@ -531,0 +532,21 @@
++        require(info.allocated_payload_bytes <= rank_payload_limit,
++                "original rank exceeds replay allowance");
++        const auto validation_limit = rank_payload_limit - info.allocated_payload_bytes;
++        const auto validation_start = std::chrono::steady_clock::now();
++        test_support::AllocationAudit validation_audit{
++            test_support::cpp_backend, test_support::AuditThreadDomain::CallingThread};
++        auto validation_attempt = rank.validate_for(
++            dictionary, partition, {validation_limit, step_cap, digit_cap, {}}, workspace, plan);
++        const auto validation_allocations = validation_audit.finish();
++        const auto validation = take(std::move(validation_attempt), "rank revalidation");
++        require(validation_allocations.status == test_support::AllocationAuditStatus::AllocationObserved &&
++                    validation_allocations.cpp_allocation_attempts == planned_cpp_allocations &&
++                    validation.preflight_bytes <= validation_limit &&
++                    validation.allocated_payload_bytes == plan.allocated_bytes() - final_product &&
++                    validation.allocated_payload_bytes <= validation.preflight_bytes,
++                "revalidation payload or allocation count differs from its admission");
++        const auto validation_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
++            std::chrono::steady_clock::now() - validation_start);
++        const auto validation_peak = product_peak_resident();
++        require(validation_peak <= product_cap, "product revalidation process peak exceeds cap");
++
+@@ -594,0 +616,8 @@
++                  << ",\"validation_payload_limit\":" << validation_limit
++                  << ",\"validation_payload_forecast\":" << validation.preflight_bytes
++                  << ",\"validation_payload_actual\":" << validation.allocated_payload_bytes
++                  << ",\"validation_combined_plan_bytes\":" << plan.allocated_bytes()
++                  << ",\"validation_product_peak_resident_bytes\":" << validation_peak
++                  << ",\"validation_cpp_allocation_attempts\":" << validation_allocations.cpp_allocation_attempts
++                  << ",\"validation_steps\":" << validation.steps
++                  << ",\"validation_milliseconds\":" << validation_elapsed.count()
+--- a/run-series.py.txt
++++ b/run-series.py.txt
+@@ -16 +16 @@
+-PLANNED_CPP_ALLOCATIONS = 44
++PLANNED_CPP_ALLOCATIONS = 43
+@@ -69,0 +70,3 @@
++        "validation_payload_limit", "validation_payload_forecast", "validation_payload_actual",
++        "validation_combined_plan_bytes", "validation_product_peak_resident_bytes",
++        "validation_cpp_allocation_attempts", "validation_steps", "validation_milliseconds",
+@@ -112,0 +116,16 @@
++    )
++
++    require(
++        report["validation_payload_limit"] == RANK_CAP - report["combined_plan_bytes"] - phase_estimates
++        and report["validation_payload_actual"] == report["rank_payload_actual"]
++        and report["validation_payload_forecast"] == report["rank_payload_forecast"]
++        and 0 < report["validation_payload_actual"] <= report["validation_payload_forecast"]
++        <= report["validation_payload_limit"]
++        and report["validation_combined_plan_bytes"] == report["combined_plan_bytes"]
++        + report["validation_payload_actual"]
++        and report["validation_combined_plan_bytes"] <= RANK_CAP
++        and report["product_peak_resident_bytes"]
++        <= report["validation_product_peak_resident_bytes"] <= RANK_CAP
++        and report["validation_cpp_allocation_attempts"] == PLANNED_CPP_ALLOCATIONS
++        and report["steps"] < report["validation_steps"] <= STEP_CAP,
++        f"rank revalidation in the original cumulative envelope: {case}",
