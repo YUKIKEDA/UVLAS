@@ -21,6 +21,7 @@ extern "C" NTSYSAPI NTSTATUS NTAPI NtSetInformationFile(HANDLE, PIO_STATUS_BLOCK
 #include <cerrno>
 #include <fcntl.h>
 #include <linux/fs.h>
+#include <linux/openat2.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -329,7 +330,9 @@ constexpr RawHandle invalid_handle = -1;
 }
 
 [[nodiscard]] auto open_parent(const std::filesystem::path& parent) noexcept {
-    return own_fd(open(parent.c_str(), O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC));
+    constexpr open_how how{O_RDONLY | O_DIRECTORY | O_CLOEXEC, 0, RESOLVE_NO_SYMLINKS};
+    return own_fd(
+        static_cast<int>(::syscall(SYS_openat2, AT_FDCWD, parent.c_str(), &how, sizeof(how))));
 }
 
 [[nodiscard]] NativeResult<RawHandle> create_stage(RawHandle parent, const Name& name) noexcept {

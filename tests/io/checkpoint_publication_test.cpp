@@ -229,6 +229,32 @@ TEST_CASE("Only canonical checkpoint sequence names can select a published direc
 }
 
 #ifdef __linux__
+TEST_CASE("Linux rejects checkpoint output through an ancestor symlink", "[IO4-06]") {
+    const Directory dir;
+    const auto actual = dir.path / "actual";
+    const auto runs = actual / "runs";
+    const auto alias = dir.path / "alias";
+    REQUIRE(fs::create_directories(runs));
+    fs::create_directory_symlink(actual, alias);
+    REQUIRE(fs::is_directory(alias / "runs"));
+
+    ResourcePlan plan{4096};
+    std::optional<CheckpointPublicationDiagnostic> diagnostic;
+    const auto denied = publish_checkpoint_directory(alias / "runs", 7, chunks, bytes_of(manifest),
+                                                     limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(denied);
+    CHECK(denied.error().code == FailureCode::InvalidInput);
+    REQUIRE(diagnostic);
+    if (diagnostic) {
+        CHECK(diagnostic->stage == CheckpointPublicationStage::OpenParent);
+    }
+    CHECK(fs::is_empty(runs));
+
+    REQUIRE(publish_checkpoint_directory(runs, 7, chunks, bytes_of(manifest), limits, plan, {}));
+    CHECK(read(runs / "checkpoint-7" / "manifest.json") == manifest);
+    CHECK(read(runs / "checkpoint-7" / "chunk-first.bin") == payload);
+}
+
 TEST_CASE("A killed writer cannot make a partial directory a checkpoint", "[IO4-06]") {
     const Directory dir;
     ResourcePlan plan{4096};
