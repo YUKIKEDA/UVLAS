@@ -1,5 +1,6 @@
 #include "exact_polynomial_detail.hpp"
 #include "pg_partition_test_support.hpp"
+#include "pg_rank_storage.hpp"
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -14,7 +15,7 @@ using I = detail::Integer;
 using Dec = boost::multiprecision::cpp_dec_float_100;
 constexpr auto profile = std::uint64_t{48} << 30U;
 constexpr auto steps = 10'000'000'000'000ULL;
-constexpr std::uint32_t bits = 128;
+constexpr std::uint32_t dyadic_fractional_bits = 128;
 
 PgReferenceLimits query_limits() {
     auto a = exact_limits();
@@ -128,7 +129,7 @@ Q exact_congruence_row(const std::vector<Q>& gram, std::span<const ExactRational
 }
 
 std::vector<PgGramEntry> enclose(Fixture& f, const std::vector<Q>& gram) {
-    const I scale = I{1} << bits;
+    const I scale = I{1} << dyadic_fractional_bits;
     std::vector<PgGramEntry> result;
     for (const auto& value : gram) {
         const Q scaled = value * scale;
@@ -168,7 +169,7 @@ std::vector<ExactRational> proposal(Fixture& f, const std::vector<Q>& gram, std:
                 residual -= factor[slot(i, l)] * inverse[slot(l, j)];
             inverse[slot(i, j)] = residual / factor[slot(i, i)];
         }
-    const I scale = I{1} << bits;
+    const I scale = I{1} << dyadic_fractional_bits;
     const auto decimal_scale = scale.convert_to<Dec>();
     std::vector<ExactRational> result;
     for (const auto& value : inverse) {
@@ -185,8 +186,8 @@ core::Result<PgConditioningCertificate> verify(PgReferenceBasis& basis,
                                                std::span<const ExactRational> candidate,
                                                const PgConditioningLimits& caps,
                                                core::Workspace& ws, core::ResourcePlan& plan) {
-    return PgConditioningCertificate::certify(std::move(basis), {gram, bits}, {candidate, bits},
-                                              caps, ws, plan);
+    return PgConditioningCertificate::certify(std::move(basis), {gram, dyadic_fractional_bits},
+                                              {candidate, dyadic_fractional_bits}, caps, ws, plan);
 }
 
 template <class T>
@@ -406,16 +407,18 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
     }
     REQUIRE(last != 0);
     const PgFlatGramLimits flat_caps{query_limits(), steps};
-    auto supplied = take(PgFlatGram::prepare(std::move(basis), bits, flat_caps, ws, plan));
+    auto supplied =
+        take(PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits, flat_caps, ws, plan));
     const auto owned = take(supplied.enclosure());
     REQUIRE(owned.upper_triangle.size() == enclosure.size());
-    CHECK(owned.fractional_bits == bits);
+    CHECK(owned.fractional_bits == dyadic_fractional_bits);
     for (std::size_t i = 0; i < enclosure.size(); ++i) {
         CHECK(owned.upper_triangle[i].lower == enclosure[i].lower);
         CHECK(owned.upper_triangle[i].upper == enclosure[i].upper);
     }
     const auto certify_owned = [&](PgFlatGram& source, core::ResourcePlan& budget) {
-        return std::move(source).certify({transform, bits}, {profile, steps, {}}, ws, budget);
+        return std::move(source).certify({transform, dyadic_fractional_bits}, {profile, steps, {}},
+                                         ws, budget);
     };
     core::ResourcePlan refused{0};
     check_failure(certify_owned(supplied, refused), core::FailureCode::ResourceExceeded);
@@ -560,7 +563,8 @@ TEST_CASE("PG analytic Gram rejects unqualified shapes before consuming the refe
     core::ResourcePlan refused{profile};
     const auto prepare = [](PgReferenceBasis& source, const PgFlatGramLimits& limits,
                             core::Workspace& workspace, core::ResourcePlan& plan) {
-        return PgFlatGram::prepare(std::move(source), bits, limits, workspace, plan);
+        return PgFlatGram::prepare(std::move(source), dyadic_fractional_bits, limits, workspace,
+                                   plan);
     };
     check_failure(prepare(basis, caps, ws, refused), expected);
     REQUIRE(basis.source());
@@ -601,8 +605,8 @@ TEST_CASE("PG analytic Gram retains physical chart scales on adopted larger grid
         const Q h("5/12");
         const auto expected =
             enclose(f, analytic_gram(independent, h, h * Q("4/3") / (16 * n * n)));
-        const auto flat =
-            take(PgFlatGram::prepare(std::move(basis), bits, {query_limits(), steps}, ws, plan));
+        const auto flat = take(PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits,
+                                                   {query_limits(), steps}, ws, plan));
         const auto supplied = take(flat.enclosure());
         REQUIRE(supplied.upper_triangle.size() == slot(0, count));
         for (std::size_t j = 0; j < selected.size(); ++j)
@@ -612,4 +616,34 @@ TEST_CASE("PG analytic Gram retains physical chart scales on adopted larger grid
                 CHECK(actual.upper == expected[slot(i, j)].upper);
             }
     }
+}
+
+TEST_CASE("PG LCM meters both limbs of its division before the final product",
+          "[SH-D03][N4-08][negative][verification]") {
+    using namespace uvlas::structure::detail;
+    const RankWide base = RankWide{1} << std::numeric_limits<RankWord>::digits;
+    const RankWide left = 6 * base, right = 9 * base;
+
+    // Three Euclidean remainders (6P, 3P, 0) each read two limbs from
+    // each operand: 12. The following 6P / 3P costs four, and 2 * 9P costs two.
+    constexpr std::uint64_t gcd_steps = 12, division_steps = 4, product_steps = 2;
+    constexpr auto expected = gcd_steps + division_steps + product_steps;
+    const auto attempt = [&](std::uint64_t maximum_steps) {
+        const PgRankPreparationLimits caps{0, maximum_steps, 0, {}};
+        auto ledger = RankBudget{caps};
+        auto result = partition_entry(
+            [&]() -> core::Result<RankWide> { return rank_lcm(ledger, left, right); });
+        return std::pair{std::move(result), ledger.steps};
+    };
+
+    const auto [equal, equal_used] = attempt(expected);
+    REQUIRE(equal);
+    CHECK(*equal == 18 * base);
+    CHECK(equal_used == expected);
+    const auto [short_product, product_used] = attempt(expected - 1);
+    check_failure(short_product, core::FailureCode::ResourceExceeded);
+    CHECK(product_used == gcd_steps + division_steps);
+    const auto [short_division, division_used] = attempt(gcd_steps + division_steps - 1);
+    check_failure(short_division, core::FailureCode::ResourceExceeded);
+    CHECK(division_used == gcd_steps);
 }

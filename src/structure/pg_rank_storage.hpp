@@ -116,6 +116,7 @@ template <class I, class Budget>
     if (left == 1 || right == 1)
         return left == 1 ? right : left;
     const I divisor = rank_gcd(budget, left, right);
+    budget.charge(partition_mul(left.backend().size(), divisor.backend().size()));
     const I reduced = left / divisor;
     return rank_product(budget, reduced, right);
 }
