@@ -366,34 +366,53 @@ core::Result<PgReferenceBasis> PgReferenceBasis::prepare(PgReferenceGeometry&& g
     });
 }
 
+BasisReferencePoint PgReferenceBasis::locate(ReferenceArithmetic& m,
+                                             const PgReferencePoint& query) const {
+    const auto graph = partition_take(geometry_.inputs_.graph.view());
+    const PgReferenceFrame frame{geometry_.rotation_, geometry_.origin_, geometry_.length_};
+    std::array<R, 2> g_gradient;
+    auto point = evaluate_reference(m, graph, geometry_.inputs_, frame, query, std::nullopt,
+                                    &geometry_.determinant_bound_, &g_gradient);
+    point.identity = geometry_.identity_;
+    auto axis = index_value(m, 4 * graph.n);
+    auto u = m.sub(m.mul(axis, point.s), index_value(m, 2 * point.cell.first + 1));
+    auto v = m.sub(m.mul(axis, point.t), index_value(m, 2 * point.cell.second + 1));
+    return {std::move(point), std::move(g_gradient), std::move(axis), std::move(u), std::move(v)};
+}
+
+std::array<std::array<ExactRational, 3>, 3>
+PgReferenceBasis::numerator_jet(ReferenceArithmetic& m, PgRankBasisColumn column,
+                                const BasisReferencePoint& point) const {
+    return rank_.basis_cell_jet(m, column, point.reference.cell, point.u, point.v,
+                                point.axis_scale);
+}
+
+PgReferenceBasisValue
+PgReferenceBasis::assemble(ReferenceArithmetic& m, BasisReferencePoint&& point,
+                           PgRankBasisColumn column,
+                           const std::array<std::array<ExactRational, 3>, 3>& numerators) const {
+    auto shape =
+        reference_shape(m, numerators, point.reference, point.g_gradient, geometry_.length_);
+    auto gradient = physical_gradient(m, point.reference, shape.chart_derivatives);
+    m.cancel();
+    point.reference.call_info = m.info();
+    return {std::move(point.reference), column, std::move(shape.value),
+            std::move(shape.chart_derivatives), std::move(gradient)};
+}
+
 core::Result<PgReferenceBasisValue>
 PgReferenceBasis::evaluate(const PgReferencePoint& query, PgRankBasisColumn column,
                            const PgReferenceLimits& limits,
                            core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<PgReferenceBasisValue> {
         auto m = ReferenceArithmetic{limits, plan};
-        // Geometry's 256 slots cover that entire phase. The subsequent selected
-        // column, cofactor and inversion path has fewer than 64 additional live slots.
-        m.admit(reference_live_rationals + 64);
+        m.admit(basis_live_rationals);
         const auto rank = partition_take(rank_.preparation()).rank;
         if (column.value < 0 || static_cast<std::uint64_t>(column.value) >= rank)
             partition_fail(core::FailureCode::InvalidInput);
-        const auto graph = partition_take(geometry_.inputs_.graph.view());
-        const PgReferenceFrame frame{geometry_.rotation_, geometry_.origin_, geometry_.length_};
-        std::array<R, 2> g_gradient;
-        auto point = evaluate_reference(m, graph, geometry_.inputs_, frame, query, std::nullopt,
-                                        &geometry_.determinant_bound_, &g_gradient);
-        point.identity = geometry_.identity_;
-        const auto axis = index_value(m, 4 * graph.n);
-        const auto u = m.sub(m.mul(axis, point.s), index_value(m, 2 * point.cell.first + 1));
-        const auto v = m.sub(m.mul(axis, point.t), index_value(m, 2 * point.cell.second + 1));
-        const auto numerators = rank_.basis_cell_jet(m, column, point.cell, u, v, axis);
-        auto shape = reference_shape(m, numerators, point, g_gradient, frame.length_metres);
-        auto gradient = physical_gradient(m, point, shape.chart_derivatives);
-        m.cancel();
-        point.call_info = m.info();
-        return PgReferenceBasisValue{std::move(point), column, std::move(shape.value),
-                                     std::move(shape.chart_derivatives), std::move(gradient)};
+        auto point = locate(m, query);
+        const auto numerators = numerator_jet(m, column, point);
+        return assemble(m, std::move(point), column, numerators);
     });
 }
 

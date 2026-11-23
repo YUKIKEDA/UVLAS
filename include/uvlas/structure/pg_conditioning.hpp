@@ -67,6 +67,13 @@ public:
     transform_coefficient(PgRankBasisColumn row, PgRankBasisColumn column, const ExactLimits&,
                           core::ResourcePlan&) const noexcept;
 
+    /// Evaluate one conditioned column of B T on the requested reference side.
+    /// The reference, T, and the selected order all belong to this certificate.
+    [[nodiscard]] core::Result<PgReferenceBasisValue> evaluate(const PgReferencePoint&,
+                                                               PgRankBasisColumn,
+                                                               const PgReferenceLimits&,
+                                                               core::ResourcePlan&) const noexcept;
+
     /// Exact coefficient of B T, indexed by the original canonical coefficient row.
     [[nodiscard]] core::Result<ExactRational> coefficient(PgRankBasisColumn, core::Index row,
                                                           const PgReferenceLimits&,
