@@ -25,6 +25,12 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return preflight_;
+    }
+    [[nodiscard]] std::uint64_t local_preflight_steps() const noexcept {
+        return preflight_ - all_intervals_scan_;
+    }
     /// Exact slot forecast used by the shared prepared rational executor.
     [[nodiscard]] const RationalPlan& arithmetic() const& noexcept {
         return arithmetic_;
@@ -35,8 +41,24 @@ private:
     friend struct interval_detail::Builder;
     RationalPlan arithmetic_;
     std::uint64_t m_ = 0, inputs_ = 0, records_ = 0, limbs_ = 0, payload_ = 0, work_ = 0,
-                  outer_ = 0, preflight_ = 0, fields_ = 0;
+                  outer_ = 0, preflight_ = 0, fields_ = 0, all_intervals_scan_ = 0;
 };
+/// Scratch and result storage reserved before curve routing and exact arithmetic.
+class IntervalStorage {
+public:
+    IntervalStorage(IntervalStorage&&) noexcept;
+    IntervalStorage& operator=(IntervalStorage&&) noexcept;
+    ~IntervalStorage();
+
+private:
+    friend struct interval_detail::Builder;
+    IntervalStorage(Workspace, core::PlannedBuffer<std::optional<Slot>>,
+                    core::PlannedBuffer<interval_detail::Owner>) noexcept;
+    Workspace arithmetic_;
+    core::PlannedBuffer<std::optional<Slot>> handles_;
+    core::PlannedBuffer<interval_detail::Owner> owner_;
+};
+
 /// Exclusive synchronous call lease. All arena allocation precedes numeric execution.
 class IntervalWorkspace {
 public:
@@ -98,6 +120,21 @@ private:
 [[nodiscard]] core::Result<IntervalPlan>
 forecast_interval(const CoefficientBlock&, IntervalRequest, RationalLimits,
                   const std::stop_token& stop = {}, core::FailureDetails details = {}) noexcept;
+/// Count the same expression before the interval and its exact query have been selected.
+[[nodiscard]] core::Result<IntervalPlan>
+forecast_interval_bound(const CoefficientBlock&, BitBound query, JetOrder, RationalLimits,
+                        const std::stop_token& stop = {},
+                        core::FailureDetails details = {}) noexcept;
+[[nodiscard]] core::Result<IntervalStorage>
+prepare_interval_storage(const IntervalPlan&, core::ResourcePlan&, const std::stop_token& stop = {},
+                         core::FailureDetails details = {}) noexcept;
+
+/// The plan and storage cover the selected interval, query and order.
+[[nodiscard]] core::Result<IntervalValues>
+evaluate_staged_interval(const CoefficientBlock&, IntervalRequest, const IntervalPlan&,
+                         IntervalStorage&&, RationalLimits, const std::stop_token& stop = {},
+                         core::FailureDetails details = {}) noexcept;
+
 /// Recount/admit all arrays, then evaluate on a prepared arena without allocation in numeric loops.
 /// Reject queries outside the selected closed interval. Keep source/query borrows immutable to
 /// return.

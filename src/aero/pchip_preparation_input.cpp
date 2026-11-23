@@ -294,6 +294,25 @@ struct Builder {
         const auto plan = forecast(request, limits, stop, details);
         if (!plan)
             return std::unexpected(plan.error());
+        return run(request, *plan, limits, resources, stop, details, plan->scan_);
+    }
+
+    static core::Result<PchipPreparationInput>
+    run(const PreparationRequest& request, const PreparationPlan& admission, RationalLimits limits,
+        core::ResourcePlan& resources, const std::stop_token& stop, core::FailureDetails details,
+        std::uint64_t preflight = 0) noexcept {
+        const auto* plan = &admission;
+        CheckedCount count;
+        const auto& grid = request.samples;
+        const auto values = count.mul(grid.times.size(), grid.components);
+        const auto fixed = which(request.boundary) == Policy::Periodic ? 3U : 2U;
+        const auto records_count = count.add(
+            count.add(count.add(grid.times.size(), values), request.events.size()), fixed);
+        if (!count.ok)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
+        if (grid.times.size() < 2 || grid.components == 0 || grid.values.size() != values ||
+            request.dimensions.size() != grid.components || records_count != plan->records_)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         if (plan->payload_bytes() > resources.remaining_bytes())
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         if (stop.stop_requested())
@@ -328,7 +347,7 @@ struct Builder {
         owner.limbs = std::move(*limbs);
         owner.dimensions = std::move(*dimensions);
         const auto cap = plan->work_ - plan->arithmetic_.reserved_steps();
-        Visits visits{cap, plan->scan_, stop, details};
+        Visits visits{cap, preflight, stop, details};
         const auto copied = copy(request, owner, visits);
         if (!copied)
             return std::unexpected(copied.error());
@@ -431,6 +450,9 @@ private:
         auto data = owner.limbs.values();
         const auto words = [&](std::span<const std::uint32_t> source)
             -> core::Result<std::span<const std::uint32_t>> {
+            if (source.size() > data.size() - cursor)
+                return std::unexpected(
+                    failure(core::FailureCode::ResourceExceeded, visits.details));
             const auto target = data.subspan(cursor, source.size());
             for (std::size_t j = 0; j < source.size(); ++j) {
                 const auto next = visits.next();
@@ -528,6 +550,13 @@ make_preparation_input(const PreparationRequest& request, PreparationWorkspace& 
                        RationalLimits limits, core::ResourcePlan& resources,
                        const std::stop_token& stop, core::FailureDetails details) noexcept {
     return preparation_detail::Builder::make(request, workspace, limits, resources, stop, details);
+}
+
+core::Result<PchipPreparationInput>
+make_planned_preparation_input(const PreparationRequest& request, const PreparationPlan& plan,
+                               RationalLimits limits, core::ResourcePlan& memory,
+                               const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return preparation_detail::Builder::run(request, plan, limits, memory, stop, details);
 }
 
 core::Result<std::uint64_t> match_preparation_input(const PchipPreparationInput& actual,

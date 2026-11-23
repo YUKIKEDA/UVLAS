@@ -129,17 +129,26 @@ struct Builder {
         const auto counted = forecast(source, query, policy, limits, stop, details);
         if (!counted)
             return std::unexpected(counted.error());
-        const auto& plan = *counted;
-        if (plan.payload_bytes() > memory.remaining_bytes())
-            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
-        auto arithmetic = Workspace::create(plan.arithmetic_, memory, details, stop);
+        auto arithmetic = Workspace::create(counted->arithmetic_, memory, details, stop);
         if (!arithmetic)
             return std::unexpected(arithmetic.error());
-        auto numerical = arithmetic->begin(stop, details);
+        return route_prepared(source, query, policy, *counted, *arithmetic, stop, details,
+                              counted->preflight_);
+    }
+
+    static core::Result<DomainRoute>
+    route_prepared(const CoefficientBlock& source, RationalView query, DomainPolicy policy,
+                   const DomainPlan& plan, Workspace& arithmetic, const std::stop_token& stop,
+                   core::FailureDetails details, std::uint64_t preflight = 0) noexcept {
+        if (policy != DomainPolicy::Reject && policy != DomainPolicy::Hold)
+            return std::unexpected(failure(core::FailureCode::Unsupported, details));
+        if (!source.active() || source.nodes() < 2)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        auto numerical = arithmetic.begin(stop, details);
         if (!numerical)
             return std::unexpected(numerical.error());
         auto& session = *numerical;
-        Meter meter{plan.outer_, plan.preflight_, stop, details};
+        Meter meter{plan.outer_ - plan.preflight_ + preflight, preflight, stop, details};
         const auto first = source.time(0), last = source.time(source.nodes() - 1);
         if (!first)
             return std::unexpected(supplement(first.error(), details));
@@ -241,6 +250,7 @@ struct Builder {
             return std::unexpected(arithmetic.error());
 
         PeriodicTimePlan plan;
+        plan.normalized_ = *normalized;
         plan.arithmetic_ = *arithmetic;
         plan.preflight_ = scan.used;
         CheckedCount checked;
@@ -268,7 +278,17 @@ struct Builder {
         const auto counted = forecast_periodic(source, query, period, limits, stop, details);
         if (!counted)
             return std::unexpected(counted.error());
-        const auto& plan = *counted;
+        auto storage = periodic_storage(*counted, memory, stop, details);
+        if (!storage)
+            return std::unexpected(storage.error());
+        return periodic_prepared(source, query, period, *counted, *storage, stop, details,
+                                 counted->preflight_);
+    }
+
+    static core::Result<PeriodicStorage> periodic_storage(const PeriodicTimePlan& plan,
+                                                          core::ResourcePlan& memory,
+                                                          const std::stop_token& stop,
+                                                          core::FailureDetails details) noexcept {
         if (plan.payload_bytes() > memory.remaining_bytes())
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         auto arithmetic = Workspace::create(plan.arithmetic_, memory, details, stop);
@@ -278,12 +298,23 @@ struct Builder {
                                                     slot_detail::operation);
         if (!limbs)
             return std::unexpected(supplement(limbs.error(), details));
+        if (stop.stop_requested())
+            return std::unexpected(failure(core::FailureCode::Cancelled, details));
+        return PeriodicStorage{std::move(*arithmetic), std::move(*limbs)};
+    }
 
-        auto numerical = arithmetic->begin(stop, details);
+    static core::Result<PeriodicTime>
+    periodic_prepared(const CoefficientBlock& source, RationalView query, RationalView period,
+                      const PeriodicTimePlan& plan, PeriodicStorage& storage,
+                      const std::stop_token& stop, core::FailureDetails details,
+                      std::uint64_t preflight = 0) noexcept {
+        if (storage.limbs_.size() != plan.limbs_ || plan.limbs_ == 0)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        auto numerical = storage.arena_.begin(stop, details);
         if (!numerical)
             return std::unexpected(numerical.error());
         auto& session = *numerical;
-        Meter meter{plan.outer_, plan.preflight_, stop, details};
+        Meter meter{plan.outer_ - plan.preflight_ + preflight, preflight, stop, details};
         const auto inputs = periodic_inputs(source, query, period, details);
         if (!inputs)
             return std::unexpected(inputs.error());
@@ -329,7 +360,9 @@ struct Builder {
         if (!value)
             return std::unexpected(value.error());
         const auto words = static_cast<std::size_t>(plan.arithmetic_.words());
-        auto output = limbs->values();
+        auto output = storage.limbs_.values();
+        if (value->numerator.size() > words || value->denominator.size() > words)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         const auto copy = [&](std::span<const std::uint32_t> from,
                               std::span<std::uint32_t> to) -> core::Result<void> {
             for (std::size_t i = 0; i < from.size(); ++i) {
@@ -348,8 +381,9 @@ struct Builder {
             return std::unexpected(used.error());
         if (const auto visited = meter.visit(); !visited)
             return std::unexpected(visited.error());
-        return PeriodicTime{std::move(*limbs), value->numerator.size(), value->denominator.size(),
-                            value->sign,       *compare_first == 0,     used->steps + meter.used};
+        return PeriodicTime{std::move(storage.limbs_), value->numerator.size(),
+                            value->denominator.size(), value->sign,
+                            *compare_first == 0,       used->steps + meter.used};
     }
 };
 } // namespace domain_detail
@@ -366,6 +400,20 @@ core::Result<DomainPlan> forecast_domain(const CoefficientBlock& source, Rationa
                                          core::FailureDetails details) noexcept {
     return domain_detail::Builder::forecast(source, query, policy, limits, stop, details);
 }
+core::Result<Workspace> prepare_domain_storage(const DomainPlan& plan, core::ResourcePlan& memory,
+                                               const std::stop_token& stop,
+                                               core::FailureDetails details) noexcept {
+    return Workspace::create(plan.arithmetic(), memory, details, stop);
+}
+
+core::Result<DomainRoute> route_prepared_domain(const CoefficientBlock& source, RationalView query,
+                                                DomainPolicy policy, const DomainPlan& plan,
+                                                Workspace&& storage, const std::stop_token& stop,
+                                                core::FailureDetails details) noexcept {
+    return domain_detail::Builder::route_prepared(source, query, policy, plan, storage, stop,
+                                                  details);
+}
+
 core::Result<DomainRoute> route_domain(const CoefficientBlock& source, RationalView query,
                                        DomainPolicy policy, DomainWorkspace& workspace,
                                        RationalLimits limits, core::ResourcePlan& memory,
@@ -388,6 +436,23 @@ core::Result<PeriodicTimePlan> forecast_periodic_time(const CoefficientBlock& so
                                                       core::FailureDetails details) noexcept {
     return domain_detail::Builder::forecast_periodic(source, query, period, limits, stop, details);
 }
+core::Result<PeriodicStorage> prepare_periodic_storage(const PeriodicTimePlan& plan,
+                                                       core::ResourcePlan& memory,
+                                                       const std::stop_token& stop,
+                                                       core::FailureDetails details) noexcept {
+    return domain_detail::Builder::periodic_storage(plan, memory, stop, details);
+}
+
+core::Result<PeriodicTime> normalize_prepared_periodic_time(const CoefficientBlock& source,
+                                                            RationalView query, RationalView period,
+                                                            const PeriodicTimePlan& plan,
+                                                            PeriodicStorage&& storage,
+                                                            const std::stop_token& stop,
+                                                            core::FailureDetails details) noexcept {
+    return domain_detail::Builder::periodic_prepared(source, query, period, plan, storage, stop,
+                                                     details);
+}
+
 core::Result<PeriodicTime>
 normalize_periodic_time(const CoefficientBlock& source, RationalView query, RationalView period,
                         DomainWorkspace& workspace, RationalLimits limits,

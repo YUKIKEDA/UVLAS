@@ -361,19 +361,18 @@ struct Builder {
         return result;
     }
 
-    static core::Result<CurveNumericsPlan> forecast_curve(const PchipPreparationInput& input,
+    static core::Result<CurveNumericsPlan> forecast_curve(const PreparationRequest& source,
                                                           RationalLimits limits,
                                                           const std::stop_token& stop,
-                                                          core::FailureDetails details) noexcept {
-        const auto source = input.view();
-        if (!source)
-            return std::unexpected(supplement(source.error(), details));
-        const auto coefficients = forecast_coefficients(source->samples, limits, stop, details);
+                                                          core::FailureDetails details,
+                                                          bool retain_original) noexcept {
+        const auto coefficients =
+            forecast_coefficients(source.samples, limits, stop, details, retain_original);
         if (!coefficients)
             return std::unexpected(coefficients.error());
         const auto bits = coefficients->arithmetic().integer_bits();
-        const BoundedCoefficients bounded{source->samples, {bits, bits}};
-        const auto boundary = forecast(bounded, source->boundary, limits, stop, details, bits);
+        const BoundedCoefficients bounded{source.samples, {bits, bits}};
+        const auto boundary = forecast(bounded, source.boundary, limits, stop, details, bits);
         if (!boundary)
             return std::unexpected(boundary.error());
         CheckedCount count;
@@ -381,7 +380,7 @@ struct Builder {
         const auto forecasts =
             count.add(coefficients->preflight_steps(), boundary->preflight_steps());
         const auto calls = count.add(coefficients->reserved_steps(), boundary->reserved_steps());
-        const auto work = count.add(count.add(forecasts, calls), 1);
+        const auto work = count.add(retain_original ? calls : count.add(forecasts, calls), 1);
         if (!count.ok || work > limits.steps)
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         if (stop.stop_requested())
@@ -394,6 +393,7 @@ struct Builder {
         result.boundary_limits_.input_bits = std::max(limits.input_bits, bits);
         result.bytes_ = bytes;
         result.work_ = work;
+        result.preflight_ = forecasts + 1;
         return result;
     }
 
@@ -410,11 +410,18 @@ struct Builder {
         auto arithmetic = Workspace::create(plan->arithmetic_, memory, details, stop);
         if (!arithmetic)
             return std::unexpected(arithmetic.error());
-        auto session = arithmetic->begin(stop, details);
+        return run(source, request, *plan, *arithmetic, limits, stop, details, plan->scan_);
+    }
+
+    static core::Result<BoundaryUsage>
+    run(const CoefficientBlock& source, const BoundaryRequest& request, const BoundaryPlan& plan,
+        Workspace& arithmetic, RationalLimits limits, const std::stop_token& stop,
+        core::FailureDetails details, std::uint64_t preflight = 0) noexcept {
+        auto session = arithmetic.begin(stop, details);
         if (!session)
             return std::unexpected(session.error());
-        const auto outer = plan->work_ - plan->arithmetic_.reserved_steps();
-        Visits visits{outer, plan->scan_, stop, details};
+        const auto outer = plan.work_ - plan.arithmetic_.reserved_steps();
+        Visits visits{outer, preflight, stop, details};
         Program program{*session, visits, limits, source};
         const auto checked = program.check(request);
         if (!checked)
@@ -441,7 +448,17 @@ core::Result<CurveNumericsPlan> forecast_curve_numerics(const PchipPreparationIn
                                                         RationalLimits limits,
                                                         const std::stop_token& stop,
                                                         core::FailureDetails details) noexcept {
-    return boundary_detail::Builder::forecast_curve(input, limits, stop, details);
+    const auto source = input.view();
+    if (!source)
+        return std::unexpected(slot_detail::supplement(source.error(), details));
+    return boundary_detail::Builder::forecast_curve(*source, limits, stop, details, false);
+}
+
+core::Result<BoundaryUsage>
+check_prepared_boundary(const CoefficientBlock& source, BoundaryRequest request,
+                        const BoundaryPlan& plan, Workspace& arithmetic, RationalLimits limits,
+                        const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return boundary_detail::Builder::run(source, request, plan, arithmetic, limits, stop, details);
 }
 
 core::Result<BoundaryUsage> check_boundary(const CoefficientBlock& source, BoundaryRequest request,
@@ -450,5 +467,11 @@ core::Result<BoundaryUsage> check_boundary(const CoefficientBlock& source, Bound
                                            core::FailureDetails details) noexcept {
     return boundary_detail::Builder::check(source, request, workspace, limits, memory, stop,
                                            details);
+}
+core::Result<CurveNumericsPlan> forecast_curve_numerics(const PreparationRequest& source,
+                                                        RationalLimits limits,
+                                                        const std::stop_token& stop,
+                                                        core::FailureDetails details) noexcept {
+    return boundary_detail::Builder::forecast_curve(source, limits, stop, details, true);
 }
 } // namespace uvlas::aero::detail::pchip

@@ -30,12 +30,9 @@ struct Builder {
         }
     };
 
-    static core::Result<SharedPreparationPlan> forecast(const PchipPreparationInput& input,
-                                                        SharedPreparationLimits limits,
+    static core::Result<SharedPreparationPlan> forecast(SharedPreparationLimits limits,
                                                         const std::stop_token& stop,
                                                         core::FailureDetails details) noexcept {
-        if (!input.active())
-            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         if (stop.stop_requested())
             return std::unexpected(failure(core::FailureCode::Cancelled, details));
         const auto metadata = limits.metadata.selection();
@@ -54,28 +51,50 @@ struct Builder {
         if (workspace.busy_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         const Lease lease{workspace};
-        const auto plan = forecast(source, limits, stop, details);
+        if (!source.active())
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        const auto plan = forecast(limits, stop, details);
         if (!plan)
             return std::unexpected(plan.error());
 
+        auto storage = provision(memory, stop, details);
+        if (!storage)
+            return std::unexpected(storage.error());
+        return publish(source, *storage, stop, details);
+    }
+
+    static core::Result<SharedPreparationStorage> provision(core::ResourcePlan& memory,
+                                                            const std::stop_token& stop,
+                                                            core::FailureDetails details) noexcept {
         auto payload = memory.allocate<Payload>(1, slot_detail::operation);
         if (!payload)
             return std::unexpected(supplement(payload.error(), details));
         if (stop.stop_requested())
             return std::unexpected(failure(core::FailureCode::Cancelled, details));
 
-        return core::guard_entry(
-            slot_detail::operation, core::FailureCode::InvalidInput, details,
-            [&]() -> core::Result<SharedPreparationInput> {
-                auto holder = std::make_shared<Holder>(std::move(*payload));
-                if (stop.stop_requested())
-                    return std::unexpected(failure(core::FailureCode::Cancelled, details));
+        return core::guard_entry(slot_detail::operation, core::FailureCode::InvalidInput, details,
+                                 [&]() -> core::Result<SharedPreparationStorage> {
+                                     auto holder = std::make_shared<Holder>(std::move(*payload));
+                                     if (stop.stop_requested())
+                                         return std::unexpected(
+                                             failure(core::FailureCode::Cancelled, details));
+                                     return SharedPreparationStorage{std::move(holder)};
+                                 });
+    }
 
-                // Publication is now nonthrowing; no failure can consume the old owner.
-                const auto& value = holder->payload.values()[0].input.emplace(std::move(source));
-                return SharedPreparationInput{
-                    std::shared_ptr<const PchipPreparationInput>{std::move(holder), &value}};
-            });
+    static core::Result<SharedPreparationInput> publish(PchipPreparationInput& source,
+                                                        SharedPreparationStorage& storage,
+                                                        const std::stop_token& stop,
+                                                        core::FailureDetails details) noexcept {
+        if (!source.active() || !storage.holder_)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        if (stop.stop_requested())
+            return std::unexpected(failure(core::FailureCode::Cancelled, details));
+
+        // Publication is now nonthrowing; no failure can consume the old owner.
+        const auto& value = storage.holder_->payload.values()[0].input.emplace(std::move(source));
+        return SharedPreparationInput{
+            std::shared_ptr<const PchipPreparationInput>{std::move(storage.holder_), &value}};
     }
 };
 } // namespace shared_preparation_detail
@@ -90,7 +109,28 @@ SharedPreparationInput::input() const& noexcept {
 core::Result<SharedPreparationPlan>
 forecast_shared_preparation(const PchipPreparationInput& input, SharedPreparationLimits limits,
                             const std::stop_token& stop, core::FailureDetails details) noexcept {
-    return shared_preparation_detail::Builder::forecast(input, limits, stop, details);
+    if (!input.active())
+        return std::unexpected(slot_detail::failure(core::FailureCode::InvalidInput, details));
+    return forecast_shared_preparation(limits, stop, details);
+}
+
+core::Result<SharedPreparationPlan>
+forecast_shared_preparation(SharedPreparationLimits limits, const std::stop_token& stop,
+                            core::FailureDetails details) noexcept {
+    return shared_preparation_detail::Builder::forecast(limits, stop, details);
+}
+
+core::Result<SharedPreparationStorage>
+prepare_shared_preparation_storage(const SharedPreparationPlan&, core::ResourcePlan& memory,
+                                   const std::stop_token& stop,
+                                   core::FailureDetails details) noexcept {
+    return shared_preparation_detail::Builder::provision(memory, stop, details);
+}
+
+core::Result<SharedPreparationInput>
+publish_shared_preparation(PchipPreparationInput&& source, SharedPreparationStorage&& storage,
+                           const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return shared_preparation_detail::Builder::publish(source, storage, stop, details);
 }
 
 core::Result<SharedPreparationInput>

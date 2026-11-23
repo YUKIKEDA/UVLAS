@@ -5,6 +5,8 @@
 #include <optional>
 namespace uvlas::aero::detail::pchip {
 /// Borrow canonical row-major samples for one synchronous mathematical preparation.
+class SharedPreparationInput;
+
 struct SampleGrid {
     std::span<const RationalView> times;  ///< Exactly n>=2 strictly increasing exact times.
     std::span<const RationalView> values; ///< n*m exact values, node then component order.
@@ -42,6 +44,22 @@ private:
     std::uint64_t n_ = 0, m_ = 0, inputs_ = 0, records_ = 0, payload_ = 0, work_ = 0, outer_ = 0,
                   limbs_ = 0, preflight_ = 0;
 };
+/// Storage reserved before an integrated preparation enters exact arithmetic.
+class CoefficientStorage {
+public:
+    CoefficientStorage(CoefficientStorage&&) noexcept;
+    CoefficientStorage& operator=(CoefficientStorage&&) noexcept;
+    ~CoefficientStorage();
+
+private:
+    friend struct coefficient_detail::Builder;
+    CoefficientStorage(Workspace, core::PlannedBuffer<std::optional<Slot>>,
+                       core::PlannedBuffer<coefficient_detail::Owner>) noexcept;
+    Workspace arithmetic_;
+    core::PlannedBuffer<std::optional<Slot>> handles_;
+    core::PlannedBuffer<coefficient_detail::Owner> owner_;
+};
+
 /// Exclusive call lease. Preparation allocates its entire planned arena once before arithmetic.
 /// Destroy only after the synchronous call returns; distinct workspaces may run concurrently.
 class CoefficientWorkspace {
@@ -100,7 +118,19 @@ private:
 /// GCD canonicality is checked after admission by prepare_coefficients.
 [[nodiscard]] core::Result<CoefficientPlan>
 forecast_coefficients(SampleGrid, RationalLimits, const std::stop_token& stop = {},
-                      core::FailureDetails details = {}) noexcept;
+                      core::FailureDetails details = {}, bool retain_original = false) noexcept;
+
+[[nodiscard]] core::Result<CoefficientStorage>
+prepare_coefficient_storage(const CoefficientPlan&, core::ResourcePlan&,
+                            const std::stop_token& stop = {},
+                            core::FailureDetails details = {}) noexcept;
+
+/// Run a plan counted for these inputs in retained-sample mode.
+[[nodiscard]] core::Result<CoefficientBlock>
+prepare_staged_coefficients(const SharedPreparationInput&, const CoefficientPlan&,
+                            CoefficientStorage&&, RationalLimits, const std::stop_token& stop = {},
+                            core::FailureDetails details = {}) noexcept;
+
 /// Admit all scratch plus owned-result payload before allocating. Every numeric loop is prepared.
 /// Caller keeps the sample borrow immutable until return. Failure leaves it and old blocks intact.
 [[nodiscard]] core::Result<CoefficientBlock>

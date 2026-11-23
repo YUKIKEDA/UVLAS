@@ -17,6 +17,9 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return preflight_;
+    }
     /// Range2 + lower_bound bit_width(n) + equality1 comparison bound.
     [[nodiscard]] std::uint64_t maximum_comparisons() const noexcept {
         return comparisons_;
@@ -106,6 +109,22 @@ private:
 [[nodiscard]] core::Result<LocatorPlan>
 forecast_location(const CoefficientBlock&, RationalView, RationalLimits,
                   const std::stop_token& stop = {}, core::FailureDetails details = {}) noexcept;
+/// Count for a query whose exact shape is conservatively known before normalization.
+[[nodiscard]] core::Result<LocatorPlan>
+forecast_location_bound(const CoefficientBlock&, BitBound, RationalLimits,
+                        const std::stop_token& stop = {},
+                        core::FailureDetails details = {}) noexcept;
+/// Allocate the search arena before evaluating an independently planned phase.
+[[nodiscard]] core::Result<Workspace>
+prepare_locator_storage(const LocatorPlan&, core::ResourcePlan&, const std::stop_token& stop = {},
+                        core::FailureDetails details = {}) noexcept;
+
+/// Search with the planned arena and immutable source. The exact query may be narrower than
+/// its forecast. Forecast visits are excluded from the returned usage.
+[[nodiscard]] core::Result<KnotLocation>
+locate_prepared_time(const CoefficientBlock&, RationalView, const LocatorPlan&, Workspace&&,
+                     const std::stop_token& stop = {}, core::FailureDetails details = {}) noexcept;
+
 /// Search only the source's closed domain. Caller preserves source/query borrows to return.
 /// The selected index can be passed directly to IntervalRequest; policy decisions remain separate.
 [[nodiscard]] core::Result<KnotLocation> locate_time(const CoefficientBlock&, RationalView,

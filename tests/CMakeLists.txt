@@ -687,6 +687,15 @@ uvlas_add_test(aero.pchip_preparation_input
     LIBS uvlas_aero Boost::multiprecision Threads::Threads)
 target_include_directories(uvlas_test_aero_pchip_preparation_input PRIVATE "${PROJECT_SOURCE_DIR}/src")
 
+uvlas_add_test(aero.pchip_curve
+    LABELS V-AERO property negative verification
+    SOURCES aero/pchip_curve_test.cpp
+    LIBS uvlas_aero Boost::multiprecision nlohmann_json::nlohmann_json Threads::Threads)
+target_include_directories(uvlas_test_aero_pchip_curve PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_compile_definitions(uvlas_test_aero_pchip_curve PRIVATE
+    UVLAS_PCHIP_COEFFICIENT_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-coefficients-v1.json"
+    UVLAS_PCHIP_INTERVAL_REFERENCE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/pchip-interval-values-v1.json")
+
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
     SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp

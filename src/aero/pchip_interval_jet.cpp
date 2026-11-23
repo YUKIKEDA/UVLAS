@@ -75,6 +75,8 @@ struct Value {
     BitBound bound;
     std::optional<Slot> slot;
 };
+using InputBounds = std::array<BitBound, 3>; // Query, all knots, all coefficients.
+
 struct Machine {
     const CoefficientBlock& source;
     IntervalRequest query;
@@ -83,6 +85,7 @@ struct Machine {
     Session* session = nullptr;
     std::span<std::optional<Slot>> handles;
     std::optional<core::Failure> error;
+    std::optional<InputBounds> bounds;
     Machine(const CoefficientBlock& block, IntervalRequest request, RationalLimits limits,
             core::FailureDetails context)
         : source(block), query(request), counter(limits, context), details(context) {}
@@ -114,6 +117,10 @@ struct Machine {
                 return {};
             }
             return {{}, slot};
+        }
+        if (bounds) {
+            const std::size_t kind = i == 0 ? 0U : i < 3 ? 1U : 2U;
+            return {(*bounds)[kind], {}};
         }
         const auto value = input(source, query, i);
         if (!value) {
@@ -224,7 +231,8 @@ struct Builder {
     static core::Result<IntervalPlan> forecast(const CoefficientBlock& source,
                                                IntervalRequest query, RationalLimits limits,
                                                const std::stop_token& stop,
-                                               core::FailureDetails details) noexcept {
+                                               core::FailureDetails details,
+                                               std::optional<InputBounds> bounds = {}) noexcept {
         if (!source.active() || source.nodes() < 2 || query.interval >= source.nodes() - 1 ||
             static_cast<std::uint64_t>(query.order) > 2)
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
@@ -239,17 +247,24 @@ struct Builder {
         if (!checked.ok || plan.inputs_ > max_index || plan.records_ > max_index)
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         Machine machine{source, query, limits, details};
+        machine.bounds = bounds;
         Meter scan{limits.steps, 0, stop, details};
         for (std::uint64_t i = 0; i < plan.inputs_; ++i) {
             if (const auto visited = scan.visit(); !visited)
                 return std::unexpected(visited.error());
-            const auto value = input(source, query, i);
-            if (!value)
-                return std::unexpected(supplement(value.error(), details));
-            const auto bound = check_shape(*value, limits, details);
-            if (!bound)
-                return std::unexpected(bound.error());
-            const auto counted = machine.counter.input(*bound);
+            BitBound bound;
+            if (bounds) {
+                bound = machine.get(i).bound;
+            } else {
+                const auto value = input(source, query, i);
+                if (!value)
+                    return std::unexpected(supplement(value.error(), details));
+                const auto checked_shape = check_shape(*value, limits, details);
+                if (!checked_shape)
+                    return std::unexpected(checked_shape.error());
+                bound = *checked_shape;
+            }
+            const auto counted = machine.counter.input(bound);
             if (!counted)
                 return std::unexpected(counted.error());
         }
@@ -286,6 +301,46 @@ struct Builder {
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         return plan;
     }
+    static core::Result<IntervalPlan> forecast_bound(const CoefficientBlock& source, BitBound time,
+                                                     JetOrder order, RationalLimits limits,
+                                                     const std::stop_token& stop,
+                                                     core::FailureDetails details) noexcept {
+        if (!source.active())
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        Meter scan{limits.steps, 0, stop, details};
+        InputBounds bounds{time, BitBound{}, BitBound{}};
+        const auto include = [&](BitBound& bound,
+                                 core::Result<RationalView> value) -> core::Result<void> {
+            if (const auto visited = scan.visit(); !visited)
+                return std::unexpected(visited.error());
+            if (!value)
+                return std::unexpected(supplement(value.error(), details));
+            const auto actual = known_shape(*value);
+            bound.numerator = std::max(bound.numerator, actual.numerator);
+            bound.denominator = std::max(bound.denominator, actual.denominator);
+            return {};
+        };
+        for (std::uint64_t node = 0; node < source.nodes(); ++node)
+            if (const auto found = include(bounds[1], source.time(node)); !found)
+                return std::unexpected(found.error());
+        for (std::uint64_t interval = 0; interval < source.nodes() - 1; ++interval)
+            for (std::uint64_t component = 0; component < source.components(); ++component)
+                for (std::uint64_t power = 0; power < 4; ++power)
+                    if (const auto found =
+                            include(bounds[2], source.coefficient(interval, component, power));
+                        !found)
+                        return std::unexpected(found.error());
+        auto plan = forecast(source, IntervalRequest{0, {}, order}, limits, stop, details, bounds);
+        if (!plan)
+            return std::unexpected(plan.error());
+        CheckedCount checked;
+        plan->all_intervals_scan_ = scan.used;
+        plan->preflight_ = checked.add(plan->preflight_, scan.used);
+        if (!checked.ok || plan->preflight_ > limits.steps)
+            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
+        return plan;
+    }
+
     static RationalView view(const Owner& owner, std::uint64_t record) {
         const auto& meta = owner.records.values()[static_cast<std::size_t>(record)];
         const auto first = static_cast<std::size_t>(2 * record * owner.words);
@@ -331,7 +386,16 @@ struct Builder {
         const auto counted = forecast(source, query, limits, stop, details);
         if (!counted)
             return std::unexpected(counted.error());
-        const auto& plan = *counted;
+        auto storage = provision(*counted, memory, stop, details);
+        if (!storage)
+            return std::unexpected(storage.error());
+        return run(source, query, *counted, *storage, limits, stop, details, counted->preflight_);
+    }
+
+    static core::Result<IntervalStorage> provision(const IntervalPlan& plan,
+                                                   core::ResourcePlan& memory,
+                                                   const std::stop_token& stop,
+                                                   core::FailureDetails details) noexcept {
         if (plan.payload_ > memory.remaining_bytes())
             return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
         auto arithmetic = Workspace::create(plan.arithmetic_, memory, details, stop);
@@ -353,16 +417,32 @@ struct Builder {
         if (!limbs)
             return std::unexpected(supplement(limbs.error(), details));
         auto& owner = header->values()[0];
+        owner.records = std::move(*records);
+        owner.limbs = std::move(*limbs);
+        return IntervalStorage{std::move(*arithmetic), std::move(*handles), std::move(*header)};
+    }
+
+    static core::Result<IntervalValues> run(const CoefficientBlock& source, IntervalRequest query,
+                                            const IntervalPlan& plan, IntervalStorage& storage,
+                                            RationalLimits limits, const std::stop_token& stop,
+                                            core::FailureDetails details,
+                                            std::uint64_t preflight = 0) noexcept {
+        if (!source.active() || source.nodes() < 2 || query.interval >= source.nodes() - 1 ||
+            source.components() != plan.m_ || static_cast<std::uint64_t>(query.order) > 2 ||
+            static_cast<std::uint64_t>(query.order) + 1 != plan.fields_ ||
+            storage.owner_.size() != 1 || storage.handles_.size() != plan.inputs_)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        auto& owner = storage.owner_.values()[0];
+        if (owner.records.size() != plan.records_ || owner.limbs.size() != plan.limbs_)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         owner.components = plan.m_;
         owner.interval = query.interval;
         owner.fields = plan.fields_;
         owner.words = plan.arithmetic_.words();
         owner.order = query.order;
         owner.details = details;
-        owner.records = std::move(*records);
-        owner.limbs = std::move(*limbs);
-        Meter meter{plan.outer_, plan.preflight_, stop, details};
-        auto numerical = arithmetic->begin(stop, details);
+        Meter meter{plan.outer_, preflight, stop, details};
+        auto numerical = storage.arithmetic_.begin(stop, details);
         if (!numerical)
             return std::unexpected(numerical.error());
         auto& session = *numerical;
@@ -375,11 +455,11 @@ struct Builder {
             const auto imported = session.input(*value);
             if (!imported)
                 return std::unexpected(imported.error());
-            handles->values()[static_cast<std::size_t>(i)] = *imported;
+            storage.handles_.values()[static_cast<std::size_t>(i)] = *imported;
         }
         Machine machine{source, query, limits, details};
         machine.session = &session;
-        machine.handles = handles->values();
+        machine.handles = storage.handles_.values();
         if (const auto visited = meter.visit(2); !visited)
             return std::unexpected(visited.error());
         const auto lower = machine.compare(machine.get(0), machine.get(1)),
@@ -423,7 +503,7 @@ struct Builder {
             return std::unexpected(visited.error());
         owner.work = used->steps + meter.used;
         owner.slots = used->slots;
-        return IntervalValues{std::move(*header)};
+        return IntervalValues{std::move(storage.owner_)};
     }
     static core::Failure invalid(const core::PlannedBuffer<Owner>& owner) {
         return failure(core::FailureCode::InvalidInput,
@@ -431,6 +511,15 @@ struct Builder {
     }
 };
 } // namespace interval_detail
+
+IntervalStorage::IntervalStorage(Workspace arithmetic,
+                                 core::PlannedBuffer<std::optional<Slot>> handles,
+                                 core::PlannedBuffer<interval_detail::Owner> owner) noexcept
+    : arithmetic_(std::move(arithmetic)), handles_(std::move(handles)), owner_(std::move(owner)) {}
+IntervalStorage::IntervalStorage(IntervalStorage&&) noexcept = default;
+IntervalStorage& IntervalStorage::operator=(IntervalStorage&&) noexcept = default;
+IntervalStorage::~IntervalStorage() = default;
+
 IntervalValues::IntervalValues(core::PlannedBuffer<interval_detail::Owner> owner) noexcept
     : owner_(std::move(owner)) {}
 IntervalValues::IntervalValues(IntervalValues&&) noexcept = default;
@@ -480,6 +569,26 @@ core::Result<IntervalPlan> forecast_interval(const CoefficientBlock& source, Int
                                              core::FailureDetails details) noexcept {
     return interval_detail::Builder::forecast(source, query, limits, stop, details);
 }
+core::Result<IntervalPlan> forecast_interval_bound(const CoefficientBlock& source, BitBound query,
+                                                   JetOrder order, RationalLimits limits,
+                                                   const std::stop_token& stop,
+                                                   core::FailureDetails details) noexcept {
+    return interval_detail::Builder::forecast_bound(source, query, order, limits, stop, details);
+}
+core::Result<IntervalStorage> prepare_interval_storage(const IntervalPlan& plan,
+                                                       core::ResourcePlan& memory,
+                                                       const std::stop_token& stop,
+                                                       core::FailureDetails details) noexcept {
+    return interval_detail::Builder::provision(plan, memory, stop, details);
+}
+
+core::Result<IntervalValues>
+evaluate_staged_interval(const CoefficientBlock& source, IntervalRequest query,
+                         const IntervalPlan& plan, IntervalStorage&& storage, RationalLimits limits,
+                         const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return interval_detail::Builder::run(source, query, plan, storage, limits, stop, details);
+}
+
 core::Result<IntervalValues> evaluate_interval(const CoefficientBlock& source,
                                                IntervalRequest query, IntervalWorkspace& workspace,
                                                RationalLimits limits, core::ResourcePlan& memory,

@@ -46,7 +46,8 @@ core::Result<BitBound> shape(RationalView value, RationalLimits limits,
 struct Builder {
     static core::Result<LocatorPlan> forecast(const CoefficientBlock& source, RationalView query,
                                               RationalLimits limits, const std::stop_token& stop,
-                                              core::FailureDetails details) noexcept {
+                                              core::FailureDetails details,
+                                              std::optional<BitBound> query_bound = {}) noexcept {
         if (!source.active() || source.nodes() < 2)
             return std::unexpected(failure(core::FailureCode::InvalidInput, details));
         LocatorPlan plan;
@@ -57,7 +58,8 @@ struct Builder {
         Meter scan{limits.steps, 0, stop, details};
         if (const auto visited = scan.visit(); !visited)
             return std::unexpected(visited.error());
-        const auto query_shape = shape(query, limits, details);
+        const auto query_shape =
+            query_bound ? core::Result<BitBound>{*query_bound} : shape(query, limits, details);
         if (!query_shape)
             return std::unexpected(query_shape.error());
         BitBound maximum{0, 1};
@@ -116,17 +118,24 @@ struct Builder {
         const auto counted = forecast(source, query, limits, stop, details);
         if (!counted)
             return std::unexpected(counted.error());
-        const auto& plan = *counted;
-        if (plan.payload_bytes() > memory.remaining_bytes())
-            return std::unexpected(failure(core::FailureCode::ResourceExceeded, details));
-        auto arithmetic = Workspace::create(plan.arithmetic_, memory, details, stop);
+        auto arithmetic = Workspace::create(counted->arithmetic_, memory, details, stop);
         if (!arithmetic)
             return std::unexpected(arithmetic.error());
-        auto numerical = arithmetic->begin(stop, details);
+        return locate_prepared(source, query, *counted, *arithmetic, stop, details,
+                               counted->preflight_);
+    }
+
+    static core::Result<KnotLocation>
+    locate_prepared(const CoefficientBlock& source, RationalView query, const LocatorPlan& plan,
+                    Workspace& arithmetic, const std::stop_token& stop,
+                    core::FailureDetails details, std::uint64_t preflight = 0) noexcept {
+        if (!source.active() || source.nodes() != plan.nodes_ || plan.nodes_ < 2)
+            return std::unexpected(failure(core::FailureCode::InvalidInput, details));
+        auto numerical = arithmetic.begin(stop, details);
         if (!numerical)
             return std::unexpected(numerical.error());
         auto& session = *numerical;
-        Meter meter{plan.outer_, plan.preflight_, stop, details};
+        Meter meter{plan.outer_ - plan.preflight_ + preflight, preflight, stop, details};
         if (const auto visited = meter.visit(); !visited)
             return std::unexpected(visited.error());
         const auto imported = session.input(query);
@@ -224,6 +233,25 @@ core::Result<LocatorPlan> forecast_location(const CoefficientBlock& source, Rati
                                             core::FailureDetails details) noexcept {
     return locator_detail::Builder::forecast(source, query, limits, stop, details);
 }
+core::Result<LocatorPlan> forecast_location_bound(const CoefficientBlock& source, BitBound bound,
+                                                  RationalLimits limits,
+                                                  const std::stop_token& stop,
+                                                  core::FailureDetails details) noexcept {
+    return locator_detail::Builder::forecast(source, {}, limits, stop, details, bound);
+}
+core::Result<Workspace> prepare_locator_storage(const LocatorPlan& plan, core::ResourcePlan& memory,
+                                                const std::stop_token& stop,
+                                                core::FailureDetails details) noexcept {
+    return Workspace::create(plan.arithmetic(), memory, details, stop);
+}
+
+core::Result<KnotLocation> locate_prepared_time(const CoefficientBlock& source, RationalView query,
+                                                const LocatorPlan& plan, Workspace&& storage,
+                                                const std::stop_token& stop,
+                                                core::FailureDetails details) noexcept {
+    return locator_detail::Builder::locate_prepared(source, query, plan, storage, stop, details);
+}
+
 core::Result<KnotLocation> locate_time(const CoefficientBlock& source, RationalView query,
                                        LocatorWorkspace& workspace, RationalLimits limits,
                                        core::ResourcePlan& memory, const std::stop_token& stop,

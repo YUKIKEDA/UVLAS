@@ -19,6 +19,9 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return preflight_;
+    }
     /// Arithmetic capacity for three imports and two comparisons.
     [[nodiscard]] const RationalPlan& arithmetic() const& noexcept {
         return arithmetic_;
@@ -84,6 +87,17 @@ private:
                                                        DomainPolicy, RationalLimits,
                                                        const std::stop_token& stop = {},
                                                        core::FailureDetails details = {}) noexcept;
+/// Allocate the forecast arena for a whole-call admission, before executing any phase.
+[[nodiscard]] core::Result<Workspace>
+prepare_domain_storage(const DomainPlan&, core::ResourcePlan&, const std::stop_token& stop = {},
+                       core::FailureDetails details = {}) noexcept;
+
+/// Use storage for the supplied forecast and immutable inputs. Forecast visits are excluded.
+[[nodiscard]] core::Result<DomainRoute>
+route_prepared_domain(const CoefficientBlock&, RationalView, DomainPolicy, const DomainPlan&,
+                      Workspace&&, const std::stop_token& stop = {},
+                      core::FailureDetails details = {}) noexcept;
+
 /// Classify exact time; caller preserves immutable source/query borrows until return.
 /// Reject outside is InvalidInput. No Automatic continuity or derivative choice is made here.
 [[nodiscard]] core::Result<DomainRoute> route_domain(const CoefficientBlock&, RationalView,
@@ -95,6 +109,12 @@ private:
 /// Admission for exact reduction by a supplied positive period.
 class PeriodicTimePlan {
 public:
+    [[nodiscard]] BitBound normalized_bound() const noexcept {
+        return normalized_;
+    }
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return preflight_;
+    }
     [[nodiscard]] std::uint64_t payload_bytes() const noexcept {
         return payload_;
     }
@@ -110,6 +130,7 @@ private:
     friend struct domain_detail::Builder;
     RationalPlan arithmetic_;
     std::uint64_t payload_ = 0, work_ = 0, outer_ = 0, preflight_ = 0, limbs_ = 0;
+    BitBound normalized_;
 };
 
 /// Owned canonical physical time in [first,last), independent of the source and workspace.
@@ -144,11 +165,40 @@ private:
     std::uint64_t used_;
 };
 
+/// Output words and arithmetic arena reserved together for a planned periodic phase.
+class PeriodicStorage {
+public:
+    PeriodicStorage(PeriodicStorage&&) noexcept = default;
+    PeriodicStorage& operator=(PeriodicStorage&&) noexcept = default;
+    PeriodicStorage(const PeriodicStorage&) = delete;
+    PeriodicStorage& operator=(const PeriodicStorage&) = delete;
+
+private:
+    friend struct domain_detail::Builder;
+    PeriodicStorage(Workspace arena, core::PlannedBuffer<std::uint32_t> limbs) noexcept
+        : arena_(std::move(arena)), limbs_(std::move(limbs)) {}
+    Workspace arena_;
+    core::PlannedBuffer<std::uint32_t> limbs_;
+};
+
 /// Require an explicit canonical period; an empty view is rejected as malformed input.
 [[nodiscard]] core::Result<PeriodicTimePlan>
 forecast_periodic_time(const CoefficientBlock&, RationalView query, RationalView period,
                        RationalLimits, const std::stop_token& stop = {},
                        core::FailureDetails details = {}) noexcept;
+
+/// Allocate the forecast arena and output before another phase starts arithmetic.
+[[nodiscard]] core::Result<PeriodicStorage>
+prepare_periodic_storage(const PeriodicTimePlan&, core::ResourcePlan&,
+                         const std::stop_token& stop = {},
+                         core::FailureDetails details = {}) noexcept;
+
+/// Use storage for the supplied forecast and immutable inputs. Forecast visits are excluded.
+[[nodiscard]] core::Result<PeriodicTime>
+normalize_prepared_periodic_time(const CoefficientBlock&, RationalView query, RationalView period,
+                                 const PeriodicTimePlan&, PeriodicStorage&&,
+                                 const std::stop_token& stop = {},
+                                 core::FailureDetails details = {}) noexcept;
 
 /// Check the period against the exact domain width and reduce the immutable query.
 /// This private operation only handles time; seam value and slope qualification is separate.
