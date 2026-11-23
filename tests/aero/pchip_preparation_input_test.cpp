@@ -1,4 +1,5 @@
 #include "aero/pchip_curve_plan.hpp"
+#include "aero/pchip_shared_preparation_input.hpp"
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -391,4 +392,70 @@ TEST_CASE("PCHIP boundary plan separates derived widths from raw input limits",
     CHECK(moved.active());
     // NOLINTNEXTLINE(bugprone-use-after-move): verify documented rejection of an inactive owner.
     refuses(p::forecast_curve_numerics(old, limits), c::FailureCode::InvalidInput);
+}
+
+TEST_CASE("PCHIP shared preparation retains the exact original input without copying words",
+          "[AE-07][N4-03][N4-06][V-AERO][verification]") {
+    using uvlas::numerics::linear::EstimateAdmission;
+    const p::SharedPreparationLimits allowed{EstimateAdmission{UINT64_MAX}, UINT64_MAX};
+    const Definition fixture;
+    const auto expected = take(make(fixture));
+    const auto input = [&] {
+        auto source = take(make(fixture));
+        const auto before = take(p::forecast_curve_numerics(source, limits));
+        const auto source_view = take(source.view());
+        const auto hold_plan = take(p::forecast_shared_preparation(source, allowed));
+        const p::SharedPreparationLimits tight{
+            EstimateAdmission{hold_plan.metadata_estimate_bytes()}, hold_plan.reserved_steps()};
+        c::ResourcePlan memory{hold_plan.payload_bytes()};
+        p::SharedPreparationWorkspace workspace;
+        const auto handle =
+            take(p::share_preparation_input(std::move(source), workspace, tight, memory));
+        // NOLINTNEXTLINE(bugprone-use-after-move): successful transfer leaves the source inactive.
+        CHECK_FALSE(source.active());
+        const auto view = take(take(handle.input()).get().view());
+        CHECK(view.samples.times.data() == source_view.samples.times.data());
+        CHECK(view.samples.values.data() == source_view.samples.values.data());
+        CHECK(view.events.data() == source_view.events.data());
+        CHECK(view.dimensions.data() == source_view.dimensions.data());
+        const auto after = take(p::forecast_curve_numerics(take(handle.input()).get(), limits));
+        CHECK(after.payload_bytes() == before.payload_bytes());
+        CHECK(after.reserved_steps() == before.reserved_steps());
+        CHECK(memory.allocated_bytes() == hold_plan.payload_bytes());
+        return p::SharedPreparationInput{
+            handle}; // Original handle, source, workspace and budget all die here.
+    }();
+
+    auto copy = input;
+    const auto moved = std::move(copy);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moved-from shared handle is explicitly inactive.
+    CHECK_FALSE(copy.active());
+    // NOLINTNEXTLINE(bugprone-use-after-move): verify that inactive handles cannot yield a borrow.
+    refuses(copy.input(), c::FailureCode::InvalidInput);
+    const auto& a = take(input.input()).get();
+    const auto& b = take(moved.input()).get();
+    CHECK(&a == &b);
+    CHECK(take(a.formula_version()) == p::CoefficientBlock::formula_version());
+    CHECK(p::match_preparation_input(a, expected, UINT64_MAX).has_value());
+    const auto owned = take(b.view());
+    CHECK(owned.stamp == zero);
+    REQUIRE(owned.events.size() == fixture.events.size());
+    for (std::size_t i = 0; i < fixture.events.size(); ++i)
+        CHECK(decode(owned.events[i]) == fixture.events[i]);
+    if (const auto* period = std::get_if<p::PeriodicBoundary>(&owned.boundary.policy)) {
+        CHECK(decode(period->period) == fixture.period);
+    } else {
+        FAIL("Expected the original periodic input");
+    }
+
+    const auto other_issuer =
+        take(make(fixture, {p::PchipIssuerId{1}, p::PchipInputGeneration{0}}));
+    const auto other_generation =
+        take(make(fixture, {p::PchipIssuerId{0}, p::PchipInputGeneration{1}}));
+    Definition edited = fixture;
+    edited.values.back() += Rat{1} / (Big{1} << 200);
+    const auto changed_words = take(make(edited));
+    for (const auto* distinct : {&other_issuer, &other_generation, &changed_words})
+        refuses(p::match_preparation_input(b, *distinct, UINT64_MAX),
+                c::FailureCode::StaleGeneration);
 }

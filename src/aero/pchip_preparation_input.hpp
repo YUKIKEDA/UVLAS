@@ -25,6 +25,17 @@ struct PchipInputStamp {
 
 /// Borrows remain immutable for the synchronous count and owned copy.
 struct PreparationRequest {
+    PreparationRequest(SampleGrid source_samples,
+                       std::span<const numerics::SiDimension> source_dimensions,
+                       const BoundaryRequest& source_boundary,
+                       std::span<const RationalView> source_events,
+                       PchipInputStamp input_stamp) noexcept
+        : samples(source_samples),
+          dimensions(source_dimensions),
+          boundary(source_boundary),
+          events(source_events),
+          stamp(input_stamp) {}
+
     SampleGrid samples;
     std::span<const numerics::SiDimension> dimensions;
     BoundaryRequest boundary;
