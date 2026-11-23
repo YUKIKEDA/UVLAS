@@ -1599,6 +1599,68 @@ TEST_CASE("PCHIP curve entrypoints admit all resources and reject faults without
         CHECK(attempts.load() == 16);
         CHECK(unchanged());
     }
+    SECTION("restore preflight stops when an earlier phase uses the remaining steps") {
+        const auto record_steps = [](p::RationalView record) -> std::uint64_t {
+            return 1 + record.numerator.size() + record.denominator.size();
+        };
+        std::uint64_t matching = 1 + saved.input.dimensions.size() +
+                                 record_steps(saved.input.boundary.begin) +
+                                 record_steps(saved.input.boundary.end);
+        for (const auto records :
+             {saved.input.samples.times, saved.input.samples.values, saved.input.events})
+            for (const auto record : records)
+                matching += record_steps(record);
+
+        auto exhausted = cap;
+        exhausted.arithmetic.steps = matching;
+        const auto check_exhausted = [&](const p::PchipSnapshotView& snapshot,
+                                         p::CurveLimits allowed) {
+            const auto forecast =
+                p::forecast_pchip_restore(snapshot, current, allowed, {}, details());
+            REQUIRE_FALSE(forecast);
+            CHECK(forecast.error().code == c::FailureCode::ResourceExceeded);
+            c::ResourcePlan memory{UINT64_MAX};
+            const auto restored = [&] {
+                const FaultScope audit{INT64_MAX};
+                return p::restore_pchip_curve(snapshot, current, workspace, allowed, memory, {},
+                                              details());
+            }();
+            REQUIRE_FALSE(restored);
+            CHECK(restored.error().code == c::FailureCode::ResourceExceeded);
+            CHECK(attempts.load() == 0);
+            CHECK(memory.allocated_bytes() == 0);
+            CHECK(unchanged());
+        };
+        check_exhausted(saved, exhausted);
+        auto malformed_header = saved;
+        malformed_header.formula_version = 0;
+        check_exhausted(malformed_header, exhausted);
+        // One more available visit admits the header check, which detects the invalid version.
+        ++exhausted.arithmetic.steps;
+        const auto invalid_header =
+            p::forecast_pchip_restore(malformed_header, current, exhausted, {}, details());
+        REQUIRE_FALSE(invalid_header);
+        CHECK(invalid_header.error().code == c::FailureCode::InvalidInput);
+
+        const auto plan = take(p::forecast_pchip_restore(saved, current, cap));
+        std::uint64_t comparison = 0;
+        for (const auto record : saved.coefficients)
+            comparison += record_steps(record);
+        // Remove the saved scan and both per-word passes, leaving matching and preparation.
+        exhausted.arithmetic.steps =
+            plan.reserved_steps - saved.coefficients.size() - 2 * comparison;
+        std::array<p::RationalView, 8> coefficients;
+        std::ranges::copy(saved.coefficients, coefficients.begin());
+        coefficients[0].sign = 2;
+        auto malformed_coefficient = saved;
+        malformed_coefficient.coefficients = coefficients;
+        check_exhausted(malformed_coefficient, exhausted);
+        ++exhausted.arithmetic.steps;
+        const auto invalid_coefficient =
+            p::forecast_pchip_restore(malformed_coefficient, current, exhausted, {}, details());
+        REQUIRE_FALSE(invalid_coefficient);
+        CHECK(invalid_coefficient.error().code == c::FailureCode::InvalidInput);
+    }
     SECTION("restore against independently owned expected input") {
         const auto plan = take(p::forecast_pchip_restore(saved, current, cap));
         verify_curve_faults(

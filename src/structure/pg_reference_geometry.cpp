@@ -220,9 +220,9 @@ core::Result<PgReferenceGeometry> PgReferenceGeometry::prepare(PgReferenceInputs
                                                                const PgReferenceLimits& limits,
                                                                core::ResourcePlan& plan) noexcept {
     return partition_entry([&]() -> core::Result<PgReferenceGeometry> {
-        const auto graph = validate_reference_inputs(inputs);
         auto math = ReferenceArithmetic{limits, plan};
         math.admit();
+        const auto graph = validate_reference_inputs(math, inputs);
         validate_frame(math, frame);
         auto bound = normal_tube_bound(math, graph, inputs.partition, frame.length_metres);
         std::array<R, 9> rotation;
@@ -262,9 +262,9 @@ core::Result<void> PgReferenceGeometry::diagnose_point(const PgReferenceInputs& 
                                                        const PgReferenceLimits& limits,
                                                        core::ResourcePlan& plan) noexcept {
     return partition_entry([&]() -> core::Result<void> {
-        const auto graph = validate_reference_inputs(inputs);
         auto math = ReferenceArithmetic{limits, plan};
         math.admit();
+        const auto graph = validate_reference_inputs(math, inputs);
         validate_frame(math, frame);
         static_cast<void>(
             evaluate_reference(math, graph, inputs, frame, query, std::nullopt, nullptr));

@@ -36,7 +36,7 @@ struct PgReferenceFrame {
 struct PgReferenceLimits {
     ExactLimits algebra;
     std::uint64_t maximum_scalar_operations;
-    std::uint64_t maximum_partition_visits;
+    std::uint64_t maximum_partition_visits; ///< Includes graph comparison and its limb work.
     std::stop_token cancellation;
 };
 

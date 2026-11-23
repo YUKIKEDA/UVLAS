@@ -183,12 +183,28 @@ TEST_CASE("PG rank preparation rejects short budgets without changing sources",
                   core::FailureCode::ResourceExceeded);
     CHECK(take(inputs.partition.identity()) == input_identity);
 
+    Fixture changed;
+    const auto shifted = changed.r("1", "7");
+    const ExactChartPolynomial flat;
+    make_graph(changed, shifted, flat);
+    Producers mismatched(changed);
+    cap = limits();
+    core::ResourcePlan comparison{48 * gib};
+    check_failure(PgRankPreparation::prepare(inputs.dictionary, mismatched.partition, cap,
+                                             inputs.workspace, comparison),
+                  core::FailureCode::StaleGeneration);
+    cap.maximum_steps = 0;
+    check_failure(PgRankPreparation::prepare(inputs.dictionary, mismatched.partition, cap,
+                                             inputs.workspace, comparison),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(comparison.allocated_bytes() == 0);
+
     std::stop_source source;
     REQUIRE(source.request_stop());
     cap = limits();
     cap.cancellation = source.get_token();
     core::ResourcePlan cancelled{48 * gib};
-    check_failure(PgRankPreparation::prepare(inputs.dictionary, inputs.partition, cap,
+    check_failure(PgRankPreparation::prepare(inputs.dictionary, mismatched.partition, cap,
                                              inputs.workspace, cancelled),
                   core::FailureCode::Cancelled);
     CHECK(cancelled.allocated_bytes() == 0);
