@@ -14,8 +14,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
-from typing import cast
+from pathlib import Path, PurePosixPath
+from typing import NamedTuple, cast
 
 REQUIRED_NOTICES = (
     "boost-hash2",
@@ -84,13 +84,19 @@ result = {
 }
 if os.name == "nt":
     python_license = Path(sys.base_prefix) / "LICENSE.txt"
+    notice_path = "base_python/LICENSE.txt"
 else:
     python_license = Path("/usr/share/doc/python3.12/copyright")
-if python_license.is_file():
-    result["python_license"] = {
-        "file": python_license.name,
-        "sha256": hashlib.sha256(python_license.read_bytes()).hexdigest(),
-    }
+    notice_path = str(python_license)
+try:
+    notice_bytes = python_license.read_bytes()
+except OSError as error:
+    raise RuntimeError(f"Cannot read required CPython notice at {python_license}") from error
+result["python_license"] = {
+    "file": python_license.name,
+    "path": notice_path,
+    "sha256": hashlib.sha256(notice_bytes).hexdigest(),
+}
 if os.name == "nt":
     from ctypes import wintypes
 
@@ -175,11 +181,82 @@ def output(command: list[str], cwd: Path, env: dict[str, str] | None = None) -> 
     return result.stdout
 
 
+def object_members(value: object, description: str) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise ValueError(f"Expected a JSON object for {description}")
+    return cast(dict[str, object], value)
+
+
 def document(text: str) -> dict[str, object]:
     value: object = json.loads(text)
-    if not isinstance(value, dict):
-        raise ValueError("Expected a JSON object")
-    return cast(dict[str, object], value)
+    return object_members(value, "document")
+
+
+class ProducedArtifact(NamedTuple):
+    name: str
+    relative_path: PurePosixPath
+    sha256: str
+
+
+class RuntimeArtifactProducer(NamedTuple):
+    build_info: dict[str, object]
+    cli: ProducedArtifact
+    extension: ProducedArtifact
+    sha256: str
+
+
+def producer_artifact(value: object) -> ProducedArtifact:
+    record = object_members(value, "produced artifact")
+    name, relative, expected = (record.get(key) for key in ("name", "relative_path", "sha256"))
+    if not isinstance(name, str) or not isinstance(relative, str) or not isinstance(expected, str):
+        raise ValueError("Incomplete produced artifact")
+    path = PurePosixPath(relative)
+    require(
+        path.as_posix() == relative
+        and path.name == name
+        and all(part != ".." and re.fullmatch(r"[A-Za-z0-9_.+-]+", part) for part in path.parts),
+        "Invalid producer artifact relative path",
+    )
+    require(bool(re.fullmatch(r"[0-9a-f]{64}", expected)), "Invalid producer artifact SHA-256")
+    return ProducedArtifact(name, path, expected)
+
+
+def read_producer_manifest(path: Path, commit: str) -> RuntimeArtifactProducer:
+    require(bool(re.fullmatch(r"[0-9a-f]{40}", commit)), "Use the full source commit")
+    data = path.read_bytes()
+    manifest = document(data.decode("utf-8"))
+    require(
+        manifest.get("schema") == "uvlas.runtime-artifact-producer/1",
+        "Unexpected runtime artifact producer manifest",
+    )
+    info = object_members(manifest.get("build_info"), "producer build info")
+    require(
+        info.get("schema") == "uvlas.build-info/1"
+        and info.get("commit") == commit
+        and info.get("configuration") == "Release"
+        and info.get("uncommitted_changes") is False,
+        "Producer manifest does not identify the requested clean Release commit",
+    )
+    artifacts = object_members(manifest.get("artifacts"), "producer artifacts")
+    return RuntimeArtifactProducer(
+        info,
+        producer_artifact(artifacts.get("cli")),
+        producer_artifact(artifacts.get("extension")),
+        hashlib.sha256(data).hexdigest(),
+    )
+
+
+def verify_producer_artifacts(
+    producer: RuntimeArtifactProducer, cli: Path, extension: Path
+) -> None:
+    for kind, path, expected in (
+        ("CLI", cli, producer.cli),
+        ("extension", extension, producer.extension),
+    ):
+        require(
+            path.name == expected.name and digest(path) == expected.sha256,
+            f"{kind} does not match the producer manifest: {path.name}",
+        )
 
 
 def isolated_environment(directory: Path) -> dict[str, str]:
@@ -324,11 +401,13 @@ def audit(
     source_test: Path,
     *,
     commit: str,
+    producer_manifest: Path,
     dumpbin: str,
 ) -> dict[str, object]:
     # The audit interpreter is outside the build; never resolve a venv's python symlink.
     require(python.is_absolute(), "Use an absolute path to the fresh venv interpreter")
-    require(bool(re.fullmatch(r"[0-9a-f]{40}", commit)), "Use the full source commit")
+    producer = read_producer_manifest(producer_manifest, commit)
+    verify_producer_artifacts(producer, cli, extension)
     with tempfile.TemporaryDirectory(prefix="uvlas-runtime-audit-") as prepared:
         stage = Path(prepared).resolve()
         for source in (cli, extension, source_test):
@@ -345,8 +424,8 @@ def audit(
         shutil.copy2(extension, staged_extension)
         cli_hash = digest(staged_cli)
         extension_hash = digest(staged_extension)
-        require(cli_hash == digest(cli), "CLI differs after copying")
-        require(extension_hash == digest(extension), "Extension differs after copying")
+        require(cli_hash == producer.cli.sha256, "CLI differs after copying")
+        require(extension_hash == producer.extension.sha256, "Extension differs after copying")
         cli_imports: list[str] = []
         extension_imports: list[str] = []
         if os.name == "nt":
@@ -358,13 +437,7 @@ def audit(
         else:
             raise RuntimeError("Expected Windows or Linux")
         banner = document(output([str(staged_cli), "--build-info"], stage, env))
-        require(
-            banner.get("schema") == "uvlas.build-info/1"
-            and banner.get("commit") == commit
-            and banner.get("configuration") == "Release"
-            and banner.get("uncommitted_changes") is False,
-            "CLI did not report the fixed clean Release source",
-        )
+        require(banner == producer.build_info, "CLI build info differs from the producer manifest")
         compiler = banner.get("compiler")
         required_prefix = "MSVC " if os.name == "nt" else "GNU 14."
         require(
@@ -391,6 +464,7 @@ def audit(
         )
         return {
             "platform": platform.system(),
+            "producer_manifest_sha256": producer.sha256,
             "kernel_release": platform.release(),
             "platform_version": platform.version(),
             "isolated_environment_keys": sorted(env),
@@ -407,6 +481,7 @@ def main() -> None:
     for name in ("cli", "extension", "python", "ownership-test", "notices", "vcpkg-share"):
         parser.add_argument(f"--{name}", required=True, type=Path)
     parser.add_argument("--commit", required=True)
+    parser.add_argument("--producer-manifest", required=True, type=Path)
     parser.add_argument("--dumpbin", default="dumpbin")
     args = parser.parse_args()
     result = audit(
@@ -415,6 +490,7 @@ def main() -> None:
         args.python,
         args.ownership_test,
         commit=args.commit,
+        producer_manifest=args.producer_manifest,
         dumpbin=args.dumpbin,
     )
     result["vcpkg_notice_sha256"] = notice_hashes(args.notices, args.vcpkg_share)

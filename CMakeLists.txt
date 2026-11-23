@@ -134,6 +134,20 @@ add_executable(uvlas_eigen_generalized_canary qa/eigen_generalized/main.cpp)
 uvlas_configure_target(uvlas_eigen_generalized_canary)
 target_link_libraries(uvlas_eigen_generalized_canary PRIVATE uvlas_numerics)
 
+if(UVLAS_BUILD_PYTHON AND NOT CMAKE_CROSSCOMPILING)
+    add_custom_target(uvlas_runtime_artifact_manifest
+        COMMAND "${CMAKE_COMMAND}"
+            "-DCONFIG=$<CONFIG>"
+            "-DCLI=$<TARGET_FILE:uvlas_cli>"
+            "-DEXTENSION=$<TARGET_FILE:uvlas_python>"
+            "-DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+            "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/runtime-artifacts-$<CONFIG>.json"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RuntimeArtifactManifest.cmake"
+        DEPENDS uvlas_cli uvlas_python
+        VERBATIM)
+endif()
+
+
 if(BUILD_TESTING)
     include(cmake/AllocationAudit.cmake)
     # Audits recompile product sources; mixing normal Eigen inline definitions is forbidden.
