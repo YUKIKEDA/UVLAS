@@ -171,9 +171,11 @@ class OwnershipTests(unittest.TestCase):
                 "CertifyError",
                 "ExtractEigen",
                 "SaveCheckpoint",
+                "WriteResults",
             },
         )
         self.assertEqual(uvlas.Operation.SaveCheckpoint.name, "SaveCheckpoint")
+        self.assertEqual(uvlas.Operation.WriteResults.name, "WriteResults")
 
     def test_integer_and_resource_diagnostics(self):
         largest = 2**64 - 1
