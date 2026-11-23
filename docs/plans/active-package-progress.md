@@ -1,12 +1,12 @@
 # IM-01・IM-03・IM-06の進捗と残作業
 
-実装中の3パッケージは**全43段階のうち14段階が完了（約33%）**。残り29段階のうち26段階が機能の実装・検証、3段階が費用検証などを含む各パッケージの終了審査。対象のmainは [`ff011d7`](https://github.com/YUKIKEDA/UVLAS/commit/ff011d7)。
+実装中の3パッケージは**全43段階のうち14段階が完了（約33%）**。残り29段階のうち26段階が機能の実装・検証、3段階が費用検証などを含む各パッケージの終了審査。対象のmainは [`89a1310`](https://github.com/YUKIKEDA/UVLAS/commit/89a1310)。
 
 | パッケージ | 完了／全体 | 残り | 現在の到達点 |
 |---|---:|---:|---|
 | [IM-01 構造](#im-01-構造) | 4／12（33%） | 8 | 原辞書と積分分割まで実装済み。n4で全候補の厳密再構成を確認し、四次の2領域で行尺度を共有する固定バッチと疎係数の固定領域での整数化を検証 |
-| [IM-03 空力](#im-03-空力) | 5／13（38%） | 8 | 局所P1核、大域幾何、後縁の放出所有まで実装済み。既知流れではPCHIPの係数、区間評価、節点検索、時刻の処理、片側微分の選択、準備入力の所有と世代照合、係数確保前の準備・境界検査の見積もりを統合 |
-| [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換まで実装済み。検査済みの参照宣言から同じハンドルで元バイト列を取得する処理と、宣言順に依存をたどる内部処理を統合 |
+| [IM-03 空力](#im-03-空力) | 5／13（38%） | 8 | 局所P1核、大域幾何、後縁の放出所有まで実装済み。既知流れではPCHIPの係数、区間評価、節点検索、時刻の処理、片側微分の選択、準備入力の所有と世代照合、係数確保前の準備・境界検査の見積もり、準備入力の共有所有を統合 |
+| [IM-06 入出力](#im-06-入出力) | 5／18（28%） | 13 | 型付きschemaとSI変換まで実装済み。検査済みの参照宣言から同じハンドルで元バイト列を取得する処理と、宣言順の依存走査と、先頭の参照取得から走査への接続を統合 |
 
 割合は[既存の作業分解](next-package-work-breakdown.md)の段階を各1件として数えたもの。段階の成果がmainに入り、その段階の範囲を満たした時点で完了とする。完了欄の分子に、試作・部分実装・レビュー中の変更は加えない。段階ごとに規模が異なり、全43段階には現在の3パッケージの作業だけが含まれる。工数と初回実務適用の進捗を出すには、後続パッケージも含む個別の見積もりが必要になる。統合で到達点が変わったときは、該当行と冒頭の集計をこのページで更新する。
 
@@ -41,7 +41,7 @@
 | P1核と全13変数の微分 | 完了 | 3基底の局所誘導核と全Jacobian。 [#129](https://github.com/YUKIKEDA/UVLAS/pull/129) |
 | 共有辺・四辺形・全作用 | 残 | 局所核と接続を使い、共有出現の鎖則・相殺、JVPとVJP、双対内積を検証する |
 | 大域幾何と後縁所有 | 完了 | 大域接触・不適格の検査、alias運動学、後縁の放出所有。 [#153](https://github.com/YUKIKEDA/UVLAS/pull/153) |
-| 既知流れと指定運動 | 実装中 | [PCHIP係数](https://github.com/YUKIKEDA/UVLAS/pull/179)は統合済み。指定区間の値・時間微分も [#187](https://github.com/YUKIKEDA/UVLAS/pull/187) で統合済み。閉定義域内の節点検索と左右区間候補の取得は [#197](https://github.com/YUKIKEDA/UVLAS/pull/197) で統合済み。[#205](https://github.com/YUKIKEDA/UVLAS/pull/205) で、範囲外のRejectとHold、およびHold端点の内外候補の取得を統合した。[#211](https://github.com/YUKIKEDA/UVLAS/pull/211) で、宣言した周期と節点幅の一致を検査し、負時刻を含む周期時刻の厳密な正規化を統合した。[#218](https://github.com/YUKIKEDA/UVLAS/pull/218) で、要求区間、Hold端点のゼロ傾き、周期端の値と時間微分の一致を厳密に検査する部品を統合した。[#228](https://github.com/YUKIKEDA/UVLAS/pull/228) で、微分を評価する側の選択と、Automaticで必要になる導関数の厳密な一致判定を統合した。[#237](https://github.com/YUKIKEDA/UVLAS/pull/237) で、準備入力を所有し、発行元・世代・実内容を照合する部品を統合した。[#244](https://github.com/YUKIKEDA/UVLAS/pull/244) で、係数準備と境界検査の確保量・処理量を係数の確保前に見積もる部品を統合した。曲線を所有する領域の計画、一括の受入と資格検査、評価と再開への接続、既知流れ・運動への組込みが残る |
+| 既知流れと指定運動 | 実装中 | [PCHIP係数](https://github.com/YUKIKEDA/UVLAS/pull/179)は統合済み。指定区間の値・時間微分も [#187](https://github.com/YUKIKEDA/UVLAS/pull/187) で統合済み。閉定義域内の節点検索と左右区間候補の取得は [#197](https://github.com/YUKIKEDA/UVLAS/pull/197) で統合済み。[#205](https://github.com/YUKIKEDA/UVLAS/pull/205) で、範囲外のRejectとHold、およびHold端点の内外候補の取得を統合した。[#211](https://github.com/YUKIKEDA/UVLAS/pull/211) で、宣言した周期と節点幅の一致を検査し、負時刻を含む周期時刻の厳密な正規化を統合した。[#218](https://github.com/YUKIKEDA/UVLAS/pull/218) で、要求区間、Hold端点のゼロ傾き、周期端の値と時間微分の一致を厳密に検査する部品を統合した。[#228](https://github.com/YUKIKEDA/UVLAS/pull/228) で、微分を評価する側の選択と、Automaticで必要になる導関数の厳密な一致判定を統合した。[#237](https://github.com/YUKIKEDA/UVLAS/pull/237) で、準備入力を所有し、発行元・世代・実内容を照合する部品を統合した。[#244](https://github.com/YUKIKEDA/UVLAS/pull/244) で、係数準備と境界検査の確保量・処理量を係数の確保前に見積もる部品を統合した。[#251](https://github.com/YUKIKEDA/UVLAS/pull/251) で、確定済みの準備入力を読み取り専用で共有する部品を統合した。曲線を所有する領域の計画、一括の受入と資格検査、評価と再開への接続、既知流れ・運動への組込みが残る |
 | 循環と全微分 | 残 | 核、大域幾何、流れと共通求解器を結合し、非貫通の原残差、全束縛・全後流作用、循環微分・随伴を検証する |
 | 全ベクトル荷重 | 残 | 循環・共有核・幾何から全荷重と微分を実装する。構造への双対写像にはIM-01／02の成果が必要 |
 | 後流値・移流・試行 | 残 | 同じ循環・荷重状態から自由／指定輸送、全履歴、試行の親不変性と全微分を検証する |
@@ -60,7 +60,7 @@
 | 所有文書 | 完了 | 元バイト列、digest、型、十進字句を保持。 [#104](https://github.com/YUKIKEDA/UVLAS/pull/104) |
 | 全schema | 完了 | 全caseの型、入れ子、参照と相互条件の検証。 [#130](https://github.com/YUKIKEDA/UVLAS/pull/130) |
 | SI・精度変換 | 完了 | 元の厳密値、SI倍率、成分別の精度管理。 [#154](https://github.com/YUKIKEDA/UVLAS/pull/154) |
-| 参照snapshot | 実装中 | 宣言収集、パスの正規化、[単一ハンドルの照合](https://github.com/YUKIKEDA/UVLAS/pull/177)は統合済み。Windowsの根相対adapterは [#184](https://github.com/YUKIKEDA/UVLAS/pull/184)、Linuxの根相対adapterは [#195](https://github.com/YUKIKEDA/UVLAS/pull/195) で統合済み。[#202](https://github.com/YUKIKEDA/UVLAS/pull/202) で、マニフェストの元バイト列とdigestを単一のファイルハンドルから取得する部品を統合した。[#219](https://github.com/YUKIKEDA/UVLAS/pull/219) で、Fileは元マニフェストのハンドルと実体ID、Memoryは呼出し側が開いた根を検査済みケースとともに保持するようにした。[#229](https://github.com/YUKIKEDA/UVLAS/pull/229) で、参照ファイルを開く前に、宣言順と位置を保持して参照先を正規化・索引化する部品を統合した。[#236](https://github.com/YUKIKEDA/UVLAS/pull/236) で、指定された参照先1件の実体を内容の読み取り前に照合し、同じハンドルから取得した元バイト列を保持する部品を統合した。[#245](https://github.com/YUKIKEDA/UVLAS/pull/245) で、宣言順に依存をたどり、循環と共有経路の深さ上限を検査する内部処理を統合した。取得と走査の接続、各形式からの依存抽出、所有参照表への結合が残る |
+| 参照snapshot | 実装中 | 宣言収集、パスの正規化、[単一ハンドルの照合](https://github.com/YUKIKEDA/UVLAS/pull/177)は統合済み。Windowsの根相対adapterは [#184](https://github.com/YUKIKEDA/UVLAS/pull/184)、Linuxの根相対adapterは [#195](https://github.com/YUKIKEDA/UVLAS/pull/195) で統合済み。[#202](https://github.com/YUKIKEDA/UVLAS/pull/202) で、マニフェストの元バイト列とdigestを単一のファイルハンドルから取得する部品を統合した。[#219](https://github.com/YUKIKEDA/UVLAS/pull/219) で、Fileは元マニフェストのハンドルと実体ID、Memoryは呼出し側が開いた根を検査済みケースとともに保持するようにした。[#229](https://github.com/YUKIKEDA/UVLAS/pull/229) で、参照ファイルを開く前に、宣言順と位置を保持して参照先を正規化・索引化する部品を統合した。[#236](https://github.com/YUKIKEDA/UVLAS/pull/236) で、指定された参照先1件の実体を内容の読み取り前に照合し、同じハンドルから取得した元バイト列を保持する部品を統合した。[#245](https://github.com/YUKIKEDA/UVLAS/pull/245) で、宣言順に依存をたどり、循環と共有経路の深さ上限を検査する内部処理を統合した。[#252](https://github.com/YUKIKEDA/UVLAS/pull/252) で、先頭の根宣言から取得したバイト列とダイジェストを照合し、依存走査へ渡す内部処理を統合した。各形式からの依存抽出、後続の根と子の取得、所有参照表への結合が残る |
 | 励振と既知入力 | 残 | schema・SI・参照snapshotと流れ／J1の契約を、時系列・イベント・必要微分へつなぐ |
 | parametric入力とprepare | 残 | 型付きcaseを共通のRawModelへ渡す。物理準備には対応するIM-01／02／03の成果が必要 |
 | Nastran | 残 | schema・SI・snapshotを入力に、採用カード、座標系、sidecarを解析する |
