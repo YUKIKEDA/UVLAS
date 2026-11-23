@@ -1,0 +1,91 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-curve-plan-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 242,
+  "date": "2026-11-23",
+  "source_commit": "e0ac1354214f2eca03c4b3c2f92350c5ae34b351",
+  "claimed_state": "Conservative nonallocating preparation plan for both coefficient preparation and C1 boundary checks over the same owned input. Curve owner and qualification remain separate.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filter": "^aero\\.pchip_(preparation_input|coefficients_resources|boundary)$",
+    "ctest_each_configuration": "3 passed out of 3",
+    "catch_seed": 242,
+    "catch_normal_each_configuration": "5 cases, 254 assertions",
+    "catch_forecast_audit_each_configuration": "1 case, 7 assertions",
+    "reference": "Five inputs covering Reject, Hold, Periodic, two nodes, nonuniform times, scalar/vector, and a 2^-200 value difference. The actual plan after building coefficients stays within the forecast for bits, payload and work, with the same slots. Source knots and values match independent Boost cpp_rational values at tolerance 0.",
+    "work": "Bound includes the two standalone call reservations and both extra forecast passes made by the bridge. Equal cap admitted; one-less aggregate cap refused even when both local caps fit. Forecast and rejection allocate zero times. Original input bit cap still applies to boundary endpoints and period.",
+    "mutation": "Byte-identical control and a version predicting one-bit coefficients compiled and linked in isolation with MSVC Debug. Control 127 assertions passed. Mutation Catch exit 42 (100 assertions passed, 8 failed), including nonuniform Hold boundary needing 203 rather than 9 integer bits and 2760 rather than 1464 payload bytes.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 for changed translation units passed."
+  },
+  "source_records": [
+    {
+      "id": "src/aero/pchip_boundary.cpp",
+      "hint": "src/aero/pchip_boundary.cpp",
+      "sha256": "a943655fc6e767b1a642af999cdbf6353e555e4be1c4018cb86de3372b5bcdea"
+    },
+    {
+      "id": "src/aero/pchip_boundary.hpp",
+      "hint": "src/aero/pchip_boundary.hpp",
+      "sha256": "5d036ef94f27d9bb775ada918fcbb23f089c09f8b8d420435fcd8cc64c80fce7"
+    },
+    {
+      "id": "src/aero/pchip_coefficients.hpp",
+      "hint": "src/aero/pchip_coefficients.hpp",
+      "sha256": "3f928bf217d6460c71a2270f06753321b0a84582eaebaa3dbc0b15c21a09f908"
+    },
+    {
+      "id": "src/aero/pchip_curve_plan.hpp",
+      "hint": "src/aero/pchip_curve_plan.hpp",
+      "sha256": "9e30b9b1bf94296b868a8070d11a0aa2bcbecca14343b994b359a29a2d79b22e"
+    },
+    {
+      "id": "tests/aero/pchip_preparation_input_test.cpp",
+      "hint": "tests/aero/pchip_preparation_input_test.cpp",
+      "sha256": "288319f3c5d42a81ad1f964d1d8a1c029cd070a28bd9360eb52ba81ae3b1fd32"
+    },
+    {
+      "id": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "2b2b2d79c92940bfbe94f2ff625239185c1df6e46c1fcd121ca838edc4ff8b98"
+    },
+    {
+      "id": "src/aero/pchip_coefficients.cpp",
+      "hint": "src/aero/pchip_coefficients.cpp",
+      "sha256": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.cpp",
+      "hint": "src/aero/pchip_preparation_input.cpp",
+      "sha256": "7032d5a3de9fbc5ead552cd8945be878ce85ee32285408b8f68840ad4046c4dd"
+    },
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    }
+  ],
+  "sources": {
+    "src/aero/pchip_boundary.cpp": "a943655fc6e767b1a642af999cdbf6353e555e4be1c4018cb86de3372b5bcdea",
+    "src/aero/pchip_boundary.hpp": "5d036ef94f27d9bb775ada918fcbb23f089c09f8b8d420435fcd8cc64c80fce7",
+    "src/aero/pchip_coefficients.hpp": "3f928bf217d6460c71a2270f06753321b0a84582eaebaa3dbc0b15c21a09f908",
+    "src/aero/pchip_curve_plan.hpp": "9e30b9b1bf94296b868a8070d11a0aa2bcbecca14343b994b359a29a2d79b22e",
+    "tests/aero/pchip_preparation_input_test.cpp": "288319f3c5d42a81ad1f964d1d8a1c029cd070a28bd9360eb52ba81ae3b1fd32",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "2b2b2d79c92940bfbe94f2ff625239185c1df6e46c1fcd121ca838edc4ff8b98",
+    "src/aero/pchip_coefficients.cpp": "453416989b7df88c8bb9052f2423d73555f00ade74ff34a4970f608a835b1682",
+    "src/aero/pchip_preparation_input.cpp": "7032d5a3de9fbc5ead552cd8945be878ce85ee32285408b8f68840ad4046c4dd",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+  }
+}
