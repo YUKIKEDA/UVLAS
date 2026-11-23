@@ -44,6 +44,8 @@ std::uint64_t linear_geometry_work(std::uint64_t f) {
 void same_model(const GeometryData& a, const GeometryData& b, Run& r) {
     auto ca = a.context, cb = b.context;
     ca.current = cb.current;
+    // Reference compatibility ignores both trial time representations. The
+    // current geometry owner retains its own exact-time identity.
     ca.time = cb.time;
     ca.diagnostics = cb.diagnostics;
     if (ca != cb)

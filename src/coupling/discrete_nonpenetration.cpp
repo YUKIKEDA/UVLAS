@@ -147,7 +147,7 @@ Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel
 
 // The geometry context presently holds a binary64 time. Compare the exact
 // dyadic, using the canonical limbs of the independently qualified flow jet.
-bool same_time(double word, a::pchip::RationalView time, p::Work& work) {
+bool same_legacy_time(double word, a::pchip::RationalView time, p::Work& work) {
     work.step();
     const auto value = checked_word(word).lower;
     if (value.mantissa == 0)
@@ -182,6 +182,22 @@ bool same_time(double word, a::pchip::RationalView time, p::Work& work) {
     return equal_words(time.numerator, mantissa, static_cast<unsigned>(std::max(power, 0))) &&
            equal_words(time.denominator, 1, static_cast<unsigned>(std::max(-power, 0)));
 }
+bool same_time(const a::OwnedGeometry& geometry, a::pchip::RationalView supplied, p::Work& work) {
+    const auto exact = require(geometry.exact_time());
+    if (!exact)
+        return same_legacy_time(geometry.context().time, supplied, work);
+    work.step();
+    const auto equal = [&](std::span<const std::uint32_t> l, std::span<const std::uint32_t> r) {
+        return std::equal(l.begin(), l.end(), r.begin(), r.end(),
+                          [&](std::uint32_t a, std::uint32_t b) {
+                              work.step();
+                              return a == b;
+                          });
+    };
+    return exact->sign == supplied.sign && equal(exact->numerator, supplied.numerator) &&
+           equal(exact->denominator, supplied.denominator);
+}
+
 struct PanelRow {
     a::UvlmQuad panel{
         a::PhysicalFaceId{0}, a::AeroFaceRole::Bound, {a::FacetId{0}, a::FacetId{0}}, {}, 0};
@@ -275,7 +291,7 @@ struct NonpenetrationBuilder {
         const auto& jet = flow.source().jet;
         if (require(jet.stamp()) != input.flow_stamp ||
             flow.source().requested_side != input.flow_side ||
-            !same_time(geometry.context().time, require(jet.time()), work))
+            !same_time(geometry, require(jet.time()), work))
             reject(core::FailureCode::StaleGeneration);
         if (!input.wake.empty() && geometry.context().diagnostics.parent != input.history.parent)
             reject(core::FailureCode::StaleGeneration);

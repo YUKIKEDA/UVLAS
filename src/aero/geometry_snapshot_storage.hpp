@@ -103,6 +103,9 @@ struct GeometryData {
     std::uint8_t reference_words, current_words;
     std::array<std::byte, 32> identity{};
     std::uint64_t payload = 0;
+    int time_sign = 0;
+    std::size_t time_numerator_words = 0;
+    core::PlannedBuffer<std::uint32_t> time_words;
     core::PlannedBuffer<double> reference_high, reference_low, current_high, current_low;
     core::PlannedBuffer<PointStorage> points;
     core::PlannedBuffer<EdgeStorage> edges;
