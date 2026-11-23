@@ -41,6 +41,6 @@
     "tests/io/reference_input_test.cpp": "c24cee094425bef891cfc59651277f30795d69c929f8a0b5a371cd4ea3554645"
   },
   "artifacts": {
-    "docs/verification/IM-06/declared-reference-inventory.md": "a8be60512db53f87f129986df17dcb7198331ac76f3af7d5943d3de0774aaf82"
+    "docs/verification/IM-06/declared-reference-inventory.md": "16ee2f84d437d9a040362698a7a387d007dba8c7920b43a520ad6fc1258a4aa2"
   }
 }
