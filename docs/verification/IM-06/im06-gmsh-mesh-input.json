@@ -9,17 +9,28 @@
   "package": "IM-06",
   "issue": 22,
   "date": "2026-11-23",
-  "source_commit": "c6351dc2965ee1848129413486eb15292b18bd38",
+  "source_commit": "27c8918f04e178e5cfc152dcb397e9ccdf22c6fa",
   "scope": "Owned Gmsh MSH 4.1 ASCII decoding and tag resolution, with sourced literals, controls, and boundary-orientation mutation",
   "sources": {
-    "src/io/gmsh_mesh.hpp": "7fa945a918528dbf9fc47d38ab9af41b953b95c6414a7bb4de6abe1bb0243e09",
-    "src/io/gmsh_mesh.cpp": "23dddc8268c9cf32474cfd40ee7e6fb535a876ee32f31eade4f92ca60ea21055",
-    "tests/io/gmsh_mesh_test.cpp": "e5301a75c1dac8922d6de6d047eb7eee55838f7e953a92e63ec95b0b8b8c694a",
-    "docs/specs/foundation/gmsh-mesh-input-contract.md": "3f1a142988b308931b87ffefb8d1eeeed8d071093891f6839a8055078605f3fa",
+    "src/io/gmsh_mesh.hpp": "04d96006e6924e40d8927c9a0671d7649838d73dd439bebb76f17bad9fe0bee9",
+    "src/io/gmsh_mesh.cpp": "511349d9162abd952f4d5ea8162dcf3c5e454f0949bb47e5c0086320302cbbaa",
+    "tests/io/gmsh_mesh_test.cpp": "56df7bd03551ae912a7225d6b12b0226814c6e87e677355bd6b8d66c8bac107a",
+    "docs/specs/foundation/gmsh-mesh-input-contract.md": "4b9ce600c942d6b79885551db335a00a06b476f98df3b927f3cbb561c33272c6",
     "src/io/reference_input.hpp": "74816b29b6c1f5ea4645d44a83b2358ef652abdf4c8d388d6c9e549274dc117d",
     "src/io/reference_root_snapshot.hpp": "713b63d9e82c849e05de4df80e99a2782c3a2182f27538edf698bd2dfd7ebeb4"
   },
   "artifacts": {
-    "docs/verification/IM-06/gmsh-mesh-input.md": "6a00bb64a45bb51788a5125be60de5787cc336a5aa5833bf3898002fe291e807"
+    "docs/verification/IM-06/gmsh-mesh-input.md": "6c7e0a19d3a647f2e6fc851abb70147dc91db60bdd96cf0392999f2f52b0ae59"
+  },
+  "baseline": {
+    "source_commit": "c6351dc2965ee1848129413486eb15292b18bd38",
+    "measured_hashes": {
+      "src/io/gmsh_mesh.hpp": "7fa945a918528dbf9fc47d38ab9af41b953b95c6414a7bb4de6abe1bb0243e09",
+      "src/io/gmsh_mesh.cpp": "23dddc8268c9cf32474cfd40ee7e6fb535a876ee32f31eade4f92ca60ea21055",
+      "tests/io/gmsh_mesh_test.cpp": "e5301a75c1dac8922d6de6d047eb7eee55838f7e953a92e63ec95b0b8b8c694a",
+      "docs/specs/foundation/gmsh-mesh-input-contract.md": "3f1a142988b308931b87ffefb8d1eeeed8d071093891f6839a8055078605f3fa",
+      "src/io/reference_input.hpp": "74816b29b6c1f5ea4645d44a83b2358ef652abdf4c8d388d6c9e549274dc117d",
+      "src/io/reference_root_snapshot.hpp": "713b63d9e82c849e05de4df80e99a2782c3a2182f27538edf698bd2dfd7ebeb4"
+    }
   }
 }
