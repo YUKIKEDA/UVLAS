@@ -77,6 +77,8 @@ TEST_CASE("Owned result documents preserve a real accepted state and link proven
         status, {SourceIdentity{SourceId{maximum}, maximum, original}, resolved}, capacity,
         output_plan, {}));
     auto moved = std::move(documents);
+    // A moved-from owner expressly provides empty views.
+    // NOLINTNEXTLINE(bugprone-use-after-move)
     CHECK(documents.status().empty());
     CHECK(documents.provenance().empty());
     const auto run = Json::parse(moved.status());
@@ -156,6 +158,8 @@ TEST_CASE("Result statuses reject invalid termination and moved or inconsistent 
 
     auto old = accept(plan);
     const auto accepted = std::move(old);
+    // AcceptedState expressly exposes an inactive moved-from value.
+    // NOLINTNEXTLINE(bugprone-use-after-move)
     CHECK_FALSE(ResultStatus::completed(&old));
     FailureDetails mismatched_context{};
     mismatched_context.last_accepted = AcceptedStateId{0};
