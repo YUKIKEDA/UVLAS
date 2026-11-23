@@ -1,0 +1,52 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-walk-start",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 249,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "9ff84c2deeb5088defc3e2f9a9f75e0ccf85c497",
+  "base_commit": "ff011d7998384be787b94acf653da632524529dc",
+  "scope": "Private acquisition and traversal admission of the first root declaration, pending role extraction",
+  "environment": {
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "os": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "uncommitted_changes": false
+  },
+  "verification": {
+    "ctest_passed": 2,
+    "new_cases": 3,
+    "new_assertions": 132,
+    "second_declaration_mutation_exit": 42
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "src/io/reference_root_snapshot.cpp": "0c59a88003f8c7150c57ba5715b6239db13f42b177c01163663d46f847c8b62a",
+    "src/io/reference_root_snapshot.hpp": "ff4ccf30f7c9c367f6c56f863693b2e27d08739106eae9c36ce81557be25834d",
+    "src/io/reference_root_plan.cpp": "ae5606c5e1bac25649c290533e3e00f62abebb1d27e4e33f607f57bbce83b25b",
+    "src/io/reference_dependency_walk.cpp": "a4efd203bb173f08961fd482a470fea277d88645d3c8998fe289e3eed1155837",
+    "src/io/reference_input.cpp": "3adead2c59be73f4a4acf3223890c84fbe1f7b4fbb20cc3417dbc15e1792613e",
+    "src/io/reference_file_snapshot.cpp": "5f3f195f1a728924239a715d5e34634a5c1abaaa4dba82637aa7cc9ca2612fce",
+    "tests/io/reference_input_test.cpp": "a93c055a0fcc1c96b95379ae169ce7f1a93b7ba8cb5b6ee2f8e7296da7ae210a",
+    "tests/io/reference_declarations_fixture.hpp": "896a96d5f3e515ff21de94f2ad3c716e819dcc26a8eda620a906543475042397",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab",
+    "tests/CMakeLists.txt": "d9d30d9d28ff2d1055a3dc79ca85c884cf6ca3686d71e9e773d586d95e236d06"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-walk-start.md": "23ecca1c7cdc330004b5ae531124b6c5f54e507ff54ce8e9d2188f701d7116c2"
+  }
+}
