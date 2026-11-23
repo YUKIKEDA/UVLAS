@@ -29,12 +29,12 @@ T take(Result<T> value) {
     return std::move(*value);
 }
 
-AcceptedState accept(ResourcePlan& plan) {
+AcceptedState accept(ResourcePlan& plan, ModelGeneration generation = ModelGeneration{maximum}) {
     const AcceptancePlan requirements{{{ObservationId{1}, ScopeId{20}, 1, Precision::Binary64},
                                        {ObservationId{2}, ScopeId{20}, 1, Precision::Binary64},
                                        {ObservationId{3}, ScopeId{20}, 1, Precision::Binary64},
                                        {ObservationId{4}, ScopeId{20}, 1, Precision::Binary64}}};
-    const auto model = take(Model::create({}, ModelGeneration{maximum}, requirements, plan));
+    const auto model = take(Model::create({}, generation, requirements, plan));
     auto trial = take(TrialState::initial(model, TrialId{1}, NumericalGeneration{0}, {}, plan));
     const auto assessment = [&](std::size_t i) {
         const auto& requirement = requirements[i];
@@ -168,6 +168,18 @@ TEST_CASE("Result statuses reject invalid termination and moved or inconsistent 
     REQUIRE_FALSE(stale);
     CHECK(stale.error().code == FailureCode::StaleGeneration);
     CHECK(stale.error().operation == Operation::WriteResults);
+
+    const auto other = accept(plan, ModelGeneration{maximum - 1});
+    REQUIRE(other.id() == accepted.id());
+    FailureDetails same_id_context{};
+    same_id_context.model = ModelGeneration{maximum};
+    same_id_context.last_accepted = accepted.id();
+    const Failure same_id{FailureCode::Nonfinite, Operation::EvaluateStep, same_id_context};
+    CHECK(ResultStatus::failed(same_id, FailedResultExit::Numerical, &accepted));
+    const auto stale_model = ResultStatus::failed(same_id, FailedResultExit::Numerical, &other);
+    REQUIRE_FALSE(stale_model);
+    CHECK(stale_model.error().code == FailureCode::StaleGeneration);
+    CHECK(stale_model.error().operation == Operation::WriteResults);
 
     const Failure nonfinite{FailureCode::Nonfinite, Operation::EvaluateStep};
     CHECK(take(ResultStatus::failed(nonfinite, FailedResultExit::Numerical)).exit_code() == 4);

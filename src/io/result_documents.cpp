@@ -230,7 +230,8 @@ core::Result<ResultStatus> ResultStatus::failed(core::Failure failure, FailedRes
         return fail(Code::InvalidInput);
     }
     if (last != nullptr &&
-        (!last->active() || (details.last_accepted && *details.last_accepted != last->id()))) {
+        (!last->active() || (details.last_accepted && *details.last_accepted != last->id()) ||
+         (details.model && *details.model != last->model().generation()))) {
         return fail(Code::StaleGeneration);
     }
     return ResultStatus{static_cast<std::uint8_t>(exit), failure, snapshot(last)};
