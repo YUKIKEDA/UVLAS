@@ -3,7 +3,6 @@
 #include "pchip_curve.hpp"
 
 #include <array>
-#include <utility>
 #include <variant>
 
 namespace uvlas::aero::detail {
@@ -31,7 +30,7 @@ struct UniformFlowInput {
     UniformFlowInput(pchip::PchipInputStamp input_stamp,
                      std::span<const pchip::RationalView> input_events,
                      Series input_series) noexcept
-        : stamp(input_stamp), events(input_events), series(std::move(input_series)) {}
+        : stamp(input_stamp), events(input_events), series(input_series) {}
 
     pchip::PchipInputStamp stamp;
     std::span<const pchip::RationalView> events;

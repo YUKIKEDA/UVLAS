@@ -6,6 +6,7 @@
 #include <bit>
 #include <limits>
 #include <type_traits>
+#include <utility>
 
 namespace uvlas::aero::detail::uniform_flow_detail {
 namespace {
