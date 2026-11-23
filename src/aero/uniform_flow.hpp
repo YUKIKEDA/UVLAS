@@ -80,6 +80,12 @@ private:
 };
 
 struct UniformFlowQuery {
+    UniformFlowQuery(pchip::PchipInputStamp input_stamp, pchip::RationalView instant,
+                     pchip::RequestedSide requested_side = pchip::RequestedSide::Automatic,
+                     std::optional<std::reference_wrapper<const pchip::SharedPreparationInput>>
+                         current = {}) noexcept
+        : stamp(input_stamp), time(instant), side(requested_side), expected_pchip(current) {}
+
     pchip::PchipInputStamp stamp;
     pchip::RationalView time;
     pchip::RequestedSide side = pchip::RequestedSide::Automatic;

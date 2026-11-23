@@ -67,8 +67,10 @@ TimeWindow window_for(const s::Case& root, std::optional<CaseUniformTimeWindow> 
     const auto analysis = root.analysis.record();
     if (const auto* transient = std::get_if<s::AnalysisTransient>(&analysis)) {
         const auto count = transient->intervals.size();
-        if (count == 0 || count > index_max)
+        if (count == 0)
             fail(InvalidInput, preparation, details);
+        if (count > index_max)
+            fail(ResourceExceeded, preparation, details);
         const auto begin = take(transient->intervals.at(0)).record().start;
         const auto end =
             take(transient->intervals.at(static_cast<core::Index>(count - 1))).record().end;
@@ -190,7 +192,7 @@ struct ImportContext {
     const std::stop_token& stop;
     core::FailureDetails details;
 
-    a::UniformFlowReady prepare(const a::UniformFlowInput& request) const {
+    [[nodiscard]] a::UniformFlowReady prepare(const a::UniformFlowInput& request) const {
         return take(
             a::prepare_uniform_flow(request, workspace, limits.flow, memory, stop, details));
     }

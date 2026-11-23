@@ -16,7 +16,7 @@ namespace cf = coupling::detail;
 constexpr std::uint64_t budget = std::uint64_t{1} << 48U;
 const p::PchipInputStamp stamp{p::PchipIssuerId{71}, p::PchipInputGeneration{8}};
 
-structure::ExactLimits exact_limits() {
+structure::ExactLimits exact_limits() noexcept {
     return {100000,
             100000,
             100000,
@@ -255,9 +255,9 @@ TEST_CASE("Typed SI polynomial flow converts time origin scale coefficients and 
 TEST_CASE("Typed SI PCHIP uses the declared closed time window and independent current case",
           "[AE-07][IO4-01][N4-02][N4-03][N4-08][N4-09][property][negative]") {
     auto input = source(
-        R"({"kind":"pchip","times":[0,1,2],"values":[[0,-2,1],[1,-2,-1],[4,-2,-7]],"outside":{"kind":"reject"}})",
-        two_step);
-    input.field("flow").set("events", parse("[1]"));
+        R"({"kind":"pchip","times":[1,2,3],"values":[[0,-2,1],[1,-2,-1],[4,-2,-7]],"outside":{"kind":"reject"}})",
+        R"([{"start":1,"end":2,"step":1,"restart":"initial"},{"start":2,"end":3,"step":1,"restart":"event"}])");
+    input.field("flow").set("events", parse("[2]"));
     a::UniformFlowWorkspace work;
     const auto field = import(input, io::SourceId{7}, work);
     const auto current = import(input, io::SourceId{8}, work);
@@ -265,22 +265,22 @@ TEST_CASE("Typed SI PCHIP uses the declared closed time window and independent c
     const auto* pchip = std::get_if<a::PchipUniformFlow>(&converted.series);
     if (!pchip || converted.events.size() != 1)
         FAIL("Expected typed PCHIP with one retained event");
-    exact(pchip->boundary.begin, Number{0});
-    exact(pchip->boundary.end, Number{120});
-    exact(converted.events[0], Number{60});
+    exact(pchip->boundary.begin, Number{60});
+    exact(pchip->boundary.end, Number{180});
+    exact(converted.events[0], Number{120});
 
     core::ResourcePlan memory{budget};
     const auto saved = take(cf::snapshot_case_uniform_flow(field, work, limits.flow, memory));
     const auto saved_view = take(saved.view());
     const auto replay =
         take(cf::restore_case_uniform_flow(saved_view, current, work, limits.flow, memory));
-    // In source minutes x(t)=3t²/2-t³/2 on [0,1]. The third entry is 1-2x.
-    const Number time{30};
+    // In local source minutes x(u)=3u²/2-u³/2 on [0,1]. The third entry is 1-2x.
+    const Number time{90};
     const auto result = evaluate(replay, current, work, time);
     jet(result.jet, {Number{127, 80000}, Number{127, 12500, -1}, Number{381, 200000}},
         {Number{381, 4000000}, Number{0}, Number{381, 2000000, -1}}, time);
 
-    const Number knot{60};
+    const Number knot{120};
     for (const auto side : {p::RequestedSide::Left, p::RequestedSide::Right}) {
         const auto at_knot = evaluate(replay, current, work, knot, side);
         jet(at_knot.jet, {Number{127, 25000}, Number{127, 12500, -1}, Number{127, 25000, -1}},

@@ -6,7 +6,7 @@
 namespace uvlas::io::detail {
 
 struct SiRationalWordsView {
-    int sign;
+    int sign = 0;
     std::span<const std::uint32_t> numerator, denominator;
 };
 
