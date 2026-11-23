@@ -4,6 +4,7 @@
 #include <array>
 #include <span>
 #include <utility>
+#include <uvlas/structure/pg_reference_basis.hpp>
 
 namespace uvlas::structure {
 namespace {
@@ -21,6 +22,74 @@ using namespace detail;
     for (std::size_t i = 0; i < a.size(); ++i)
         result = m.add(result, m.mul(a[i], b[i]));
     return result;
+}
+
+struct ReferenceShape {
+    PgReferenceScalar value;
+    PgReferenceVector chart_derivatives;
+};
+
+template <std::size_t Orders>
+[[nodiscard]] ReferenceShape reference_shape(ReferenceArithmetic& m,
+                                             const std::array<std::array<R, Orders>, 3>& numerators,
+                                             const PgReferenceValue& point,
+                                             const std::array<R, 2>& g_gradient, const R& length) {
+    static_assert(Orders >= 3);
+    ReferenceShape result;
+    const auto& [r, p, c] = numerators;
+    const auto two = m.constant("2"), three = m.constant("3");
+    const auto two_length = m.mul(two, length);
+    const auto z_zeta = m.div(point.full_thickness_metres, two_length);
+    const auto z = m.mul(z_zeta, point.zeta);
+    const auto half_z_squared = m.div(m.square(z), two);
+    const auto g_squared = m.square(point.g);
+    const auto director = m.div(p[0], g_squared);
+    result.value = {m.add(r[0], m.mul(half_z_squared, c[0])), m.mul(z, director)};
+    for (std::size_t i = 0; i < g_gradient.size(); ++i) {
+        const auto z_a = m.div(m.mul(point.thickness_gradient_metres[i], point.zeta), two_length);
+        const auto numerator =
+            m.sub(p[i + 1], m.div(m.mul(three, m.mul(p[0], g_gradient[i])), m.mul(two, point.g)));
+        const auto d_a = m.div(numerator, g_squared);
+        result.chart_derivatives[i] = {
+            m.add(m.add(r[i + 1], m.mul(half_z_squared, c[i + 1])), m.mul(m.mul(z, z_a), c[0])),
+            m.add(m.mul(z, d_a), m.mul(z_a, director)),
+        };
+    }
+    result.chart_derivatives[2] = {m.mul(m.mul(z, z_zeta), c[0]), m.mul(z_zeta, director)};
+    return result;
+}
+
+[[nodiscard]] PgReferenceScalar inverse_determinant(ReferenceArithmetic& m, const R& g,
+                                                    const PgReferenceScalar& determinant) {
+    const auto& [a, b] = determinant;
+    const auto one = m.constant("1");
+    if (b.sign() == 0)
+        return {m.div(one, a), {}};
+    if (a.sign() == 0)
+        return {{}, m.div(one, m.mul(b, g))};
+    const auto norm = m.sub(m.square(a), m.mul(g, m.square(b)));
+    if (norm.sign() == 0) {
+        // A nonzero determinant and zero conjugate imply b sqrt(g) = a.
+        return {m.div(one, m.add(a, a)), {}};
+    }
+    return {m.div(a, norm), m.div(m.neg(b), norm)};
+}
+
+[[nodiscard]] PgReferenceVector physical_gradient(ReferenceArithmetic& m,
+                                                  const PgReferenceValue& point,
+                                                  const PgReferenceVector& chart_derivatives) {
+    auto field = ReferenceRadicals{m, point.g};
+    const auto& jacobian = point.jacobian_columns_metres;
+    const auto inverse = inverse_determinant(m, point.g, point.determinant_metres_cubed);
+    PgReferenceVector gradient;
+    for (std::size_t d = 0; d < chart_derivatives.size(); ++d) {
+        const auto dual = field.cross(jacobian[(d + 1) % 3], jacobian[(d + 2) % 3]);
+        for (std::size_t j = 0; j < gradient.size(); ++j)
+            gradient[j] = field.add(gradient[j], field.mul(chart_derivatives[d], dual[j]));
+    }
+    for (auto& value : gradient)
+        value = field.mul(value, inverse);
+    return gradient;
 }
 
 [[nodiscard]] PgReferenceColumnValue
@@ -48,33 +117,17 @@ column_at(ReferenceArithmetic& m, const PgCoefficientDictionary& dictionary,
             result.numerators[field][i] = std::move(value);
         }
     }
-    const auto& [r, p, c] = result.numerators;
-    const auto two = m.constant("2"), three = m.constant("3");
-    const auto two_length = m.mul(two, length);
-    const auto z_zeta = m.div(point.full_thickness_metres, two_length);
-    const auto z = m.mul(z_zeta, point.zeta);
-    const auto half_z_squared = m.div(m.square(z), two);
-    const auto g_squared = m.square(point.g);
-    const auto director = m.div(p[0], g_squared);
-    result.value = {m.add(r[0], m.mul(half_z_squared, c[0])), m.mul(z, director)};
-    for (std::size_t i = 0; i < g_gradient.size(); ++i) {
-        const auto z_a = m.div(m.mul(point.thickness_gradient_metres[i], point.zeta), two_length);
-        const auto numerator =
-            m.sub(p[i + 1], m.div(m.mul(three, m.mul(p[0], g_gradient[i])), m.mul(two, point.g)));
-        const auto d_a = m.div(numerator, g_squared);
-        result.chart_derivatives[i] = {
-            m.add(m.add(r[i + 1], m.mul(half_z_squared, c[i + 1])), m.mul(m.mul(z, z_a), c[0])),
-            m.add(m.mul(z, d_a), m.mul(z_a, director)),
-        };
-    }
-    result.chart_derivatives[2] = {m.mul(m.mul(z, z_zeta), c[0]), m.mul(z_zeta, director)};
+    auto position = reference_shape(m, result.numerators, point, g_gradient, length);
+    result.value = std::move(position.value);
+    result.chart_derivatives = std::move(position.chart_derivatives);
     return result;
 }
 
 [[nodiscard]] PgReferenceValue
 evaluate_reference(ReferenceArithmetic& m, const PgGraphView& graph, const PgReferenceInputs& input,
                    const PgReferenceFrame& frame, const PgReferencePoint& query,
-                   std::optional<PgCoefficientColumn> column, const R* determinant_bound) {
+                   std::optional<PgCoefficientColumn> column, const R* determinant_bound,
+                   std::array<R, 2>* point_g_gradient = nullptr) {
     m.visit(1);
     const auto chart = std::visit(
         [&](const auto& point) {
@@ -196,6 +249,8 @@ evaluate_reference(ReferenceArithmetic& m, const PgGraphView& graph, const PgRef
     if (column)
         out.column = column_at(m, input.dictionary, out, g_gradient, *column,
                                index_value(m, 4 * graph.n), frame.length_metres);
+    if (point_g_gradient != nullptr)
+        *point_g_gradient = std::move(g_gradient);
     m.cancel();
     out.call_info = m.info();
     return out;
@@ -292,6 +347,72 @@ core::Result<const R*> PgReferenceGeometry::determinant_lower_bound() const& noe
     if (length_.sign() == 0)
         return std::unexpected(core::Failure{core::FailureCode::InvalidInput, partition_operation});
     return &determinant_bound_;
+}
+
+PgReferenceBasis::PgReferenceBasis(PgReferenceGeometry&& geometry,
+                                   PgRankPreparation&& rank) noexcept
+    : geometry_(std::move(geometry)), rank_(std::move(rank)) {}
+
+core::Result<PgReferenceBasis> PgReferenceBasis::prepare(PgReferenceGeometry&& geometry,
+                                                         PgRankPreparation&& rank,
+                                                         const PgRankPreparationLimits& limits,
+                                                         core::Workspace& workspace,
+                                                         core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgReferenceBasis> {
+        const auto source = partition_take(geometry.source());
+        partition_take(
+            rank.validate_for(source.dictionary, source.partition, limits, workspace, plan));
+        return PgReferenceBasis{std::move(geometry), std::move(rank)};
+    });
+}
+
+core::Result<PgReferenceBasisValue>
+PgReferenceBasis::evaluate(const PgReferencePoint& query, PgRankBasisColumn column,
+                           const PgReferenceLimits& limits,
+                           core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<PgReferenceBasisValue> {
+        auto m = ReferenceArithmetic{limits, plan};
+        // Geometry's 256 slots cover that entire phase. The subsequent selected
+        // column, cofactor and inversion path has fewer than 64 additional live slots.
+        m.admit(reference_live_rationals + 64);
+        const auto rank = partition_take(rank_.preparation()).rank;
+        if (column.value < 0 || static_cast<std::uint64_t>(column.value) >= rank)
+            partition_fail(core::FailureCode::InvalidInput);
+        const auto graph = partition_take(geometry_.inputs_.graph.view());
+        const PgReferenceFrame frame{geometry_.rotation_, geometry_.origin_, geometry_.length_};
+        std::array<R, 2> g_gradient;
+        auto point = evaluate_reference(m, graph, geometry_.inputs_, frame, query, std::nullopt,
+                                        &geometry_.determinant_bound_, &g_gradient);
+        point.identity = geometry_.identity_;
+        const auto axis = index_value(m, 4 * graph.n);
+        const auto u = m.sub(m.mul(axis, point.s), index_value(m, 2 * point.cell.first + 1));
+        const auto v = m.sub(m.mul(axis, point.t), index_value(m, 2 * point.cell.second + 1));
+        const auto numerators = rank_.basis_cell_jet(m, column, point.cell, u, v, axis);
+        auto shape = reference_shape(m, numerators, point, g_gradient, frame.length_metres);
+        auto gradient = physical_gradient(m, point, shape.chart_derivatives);
+        m.cancel();
+        point.call_info = m.info();
+        return PgReferenceBasisValue{std::move(point), column, std::move(shape.value),
+                                     std::move(shape.chart_derivatives), std::move(gradient)};
+    });
+}
+
+core::Result<std::uint64_t> PgReferenceBasis::size() const noexcept {
+    const auto info = rank_.preparation();
+    if (!info)
+        return std::unexpected(info.error());
+    return info->rank;
+}
+
+core::Result<const PgRankPreparation*> PgReferenceBasis::rank() const& noexcept {
+    const auto info = rank_.preparation();
+    if (!info)
+        return std::unexpected(info.error());
+    return &rank_;
+}
+
+core::Result<PgReferenceSource> PgReferenceBasis::source() const& noexcept {
+    return geometry_.source();
 }
 
 } // namespace uvlas::structure
