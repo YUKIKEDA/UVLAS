@@ -8,7 +8,38 @@ class SharedP1Engine;
 struct SharedP1Data;
 struct SharedP1AdjointData;
 struct P1StrengthTag;
-using P1StrengthId = core::Identifier<P1StrengthTag>;
+/// Independent wake identifiers and bound circulation identities have disjoint domains.
+class P1StrengthId {
+    using WakeId = core::Identifier<P1StrengthTag>;
+
+public:
+    P1StrengthId() noexcept = default;
+    explicit P1StrengthId(std::uint64_t wake) noexcept : identity_(WakeId{wake}) {}
+
+    /// Explicitly tie a trace to a bound circulation column.
+    [[nodiscard]] static P1StrengthId bound(PhysicalFaceId face) noexcept {
+        return P1StrengthId{face};
+    }
+
+    [[nodiscard]] std::optional<PhysicalFaceId> bound_face() const noexcept {
+        if (const auto* face = std::get_if<PhysicalFaceId>(&identity_))
+            return *face;
+        return std::nullopt;
+    }
+
+    [[nodiscard]] std::optional<std::uint64_t> wake_value() const noexcept {
+        if (const auto* wake = std::get_if<WakeId>(&identity_))
+            return wake->value();
+        return std::nullopt;
+    }
+
+    /// Wake IDs sort first. Each domain uses its own stable numeric order.
+    auto operator<=>(const P1StrengthId&) const = default;
+
+private:
+    explicit P1StrengthId(PhysicalFaceId face) noexcept : identity_(face) {}
+    std::variant<WakeId, PhysicalFaceId> identity_{WakeId{0}};
+};
 
 /// One independent circulation column, keyed by its physical face identifier.
 struct P0BoundColumn {};

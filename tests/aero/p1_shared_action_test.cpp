@@ -612,12 +612,20 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
     geometry.roles[0].role = p::AeroFaceRole::Bound;
     geometry.share_by_alias();
     Prepared prepared{geometry};
-    const std::array ids{strength[0], strength[1], p::P1StrengthId{geometry.faces[0].id.value()}};
+    const auto face = geometry.faces[0].id;
+    const auto wake_same_number = p::P1StrengthId{face.value()};
+    const auto circulation = p::P1StrengthId::bound(face);
+    CHECK(wake_same_number != circulation);
+    CHECK(wake_same_number.wake_value() == face.value());
+    CHECK(circulation.bound_face() == face);
+    const std::array ids{strength[0], wake_same_number, circulation};
+    const std::array wake_ids{ids[0], ids[1], p::P1StrengthId{101}};
     const std::array bound_wake{
         p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
         p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[1], ids[0]}}};
-    const std::array wake_only{p::P1FaceStrengths{geometry.faces[0].id, std::array{ids[2], ids[2]}},
-                               bound_wake[1]};
+    const std::array wake_only{
+        p::P1FaceStrengths{geometry.faces[0].id, std::array{wake_ids[2], wake_ids[2]}},
+        bound_wake[1]};
     const auto prepare_mixed = [&](const p::P1ActionSource& source, auto maps, auto keys,
                                    core::ResourcePlan& memory) {
         return p::prepare_bound_wake_induction(
@@ -637,7 +645,16 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         CHECK(memory.allocated_bytes() == forecast.payload_bytes);
         CHECK(report.far_facets == (z > 1 ? 1 : 0));
         CHECK(report.cancelled_analytic_pairs == 1);
-        rejected(p::forecast_bound_wake_induction(source, wake_only, ids, limits()),
+        CHECK(test_geometry::take(mixed.strength(1)) == wake_same_number);
+        CHECK(test_geometry::take(mixed.strength(2)) == circulation);
+        if (z < 1) {
+            auto explicit_tie = bound_wake;
+            explicit_tie[1].columns = std::array{circulation, circulation, ids[0]};
+            const auto tied =
+                test_geometry::take(prepare_mixed(source, explicit_tie, ids, prepared.memory));
+            CHECK(test_geometry::take(tied.report()).cancelled_analytic_pairs == 2);
+        }
+        rejected(p::forecast_bound_wake_induction(source, wake_only, wake_ids, limits()),
                  core::FailureCode::InvalidInput);
         rejected(p::forecast_bound_wake_induction(source, bound_wake, std::span{ids}.first<2>(),
                                                   limits()),
@@ -650,7 +667,7 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         CHECK(short_memory.allocated_bytes() == 0);
 
         const auto wake = test_geometry::take(p::prepare_shared_p1(
-            source, wake_only, ids, {core::Precision::TwoWord, 1e-10},
+            source, wake_only, wake_ids, {core::Precision::TwoWord, 1e-10},
             {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
             *prepared.local_workspace, *prepared.kernel_workspace, prepared.memory));
         auto wake_values = mu, wake_deltas = direction_mu;
@@ -703,7 +720,7 @@ TEST_CASE("Bound collocation may lie on a planar panel and its artificial diagon
         geometry.coordinates[8] = 0;
         geometry.roles[0].role = p::AeroFaceRole::Bound;
         Prepared prepared{geometry};
-        const std::array ids{p::P1StrengthId{5}, p::P1StrengthId{geometry.faces[0].id.value()}};
+        const std::array ids{p::P1StrengthId{5}, p::P1StrengthId::bound(geometry.faces[0].id)};
         const std::array bound_wake{
             p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
             p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[0], ids[0]}}};
@@ -799,8 +816,8 @@ TEST_CASE("Two bound circulation columns share the signed edge kernel",
     Prepared prepared{geometry};
     const auto query = prepared.query(geometry.base.query());
     const p::P1ActionSource source{prepared.contact, query, {3, 5}};
-    const std::array ids{p::P1StrengthId{geometry.base.faces[0].id.value()},
-                         p::P1StrengthId{geometry.base.faces[1].id.value()}};
+    const std::array ids{p::P1StrengthId::bound(geometry.base.faces[0].id),
+                         p::P1StrengthId::bound(geometry.base.faces[1].id)};
     const std::array bound{p::P1FaceStrengths{geometry.base.faces[0].id, p::P0BoundColumn{}},
                            p::P1FaceStrengths{geometry.base.faces[1].id, p::P0BoundColumn{}}};
     auto resources = limits();
