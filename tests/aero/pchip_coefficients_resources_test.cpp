@@ -4,6 +4,7 @@
 #include "aero/pchip_interval_jet.hpp"
 #include "aero/pchip_knot_locator.hpp"
 #include "aero/pchip_preparation_input.hpp"
+#include "aero/pchip_shared_preparation_input.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1233,4 +1234,161 @@ TEST_CASE("PCHIP curve numerical forecast never allocates before aggregate admis
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == c::FailureCode::ResourceExceeded);
     CHECK(attempts.load() == 0);
+}
+
+namespace {
+namespace linear_memory = uvlas::numerics::linear;
+
+struct ShareReentry {
+    p::PchipPreparationInput& original;
+    p::SharedPreparationWorkspace& workspace;
+    p::SharedPreparationLimits limits;
+    c::ResourcePlan& memory;
+    std::optional<c::Failure> failure;
+};
+
+constinit ShareReentry* pending_share = nullptr;
+
+void try_share_reentry() {
+    auto& call = *pending_share;
+    const auto result = p::share_preparation_input(std::move(call.original), call.workspace,
+                                                   call.limits, call.memory, {}, details());
+    if (!result)
+        call.failure = result.error();
+}
+
+} // namespace
+
+TEST_CASE("PCHIP shared preparation admits resources before moving the complete input",
+          "[AE-07][N4-02][N4-03][N4-08][N4-09][negative]") {
+    const Fixture fixture;
+    const p::PreparationRequest request{fixture.view(),
+                                        preparation_dimensions,
+                                        {fixture.t.front(), fixture.t.back(), p::RejectBoundary{}},
+                                        {},
+                                        preparation_stamp};
+    c::ResourcePlan preparation_memory{UINT64_MAX};
+    p::PreparationWorkspace preparation_workspace;
+    const auto new_input = [&] {
+        return take(p::make_preparation_input(request, preparation_workspace, limits(),
+                                              preparation_memory));
+    };
+    auto input = new_input();
+    const auto expected = new_input();
+    const auto initial_charge = preparation_memory.allocated_bytes();
+    const p::SharedPreparationLimits unlimited{linear_memory::EstimateAdmission{UINT64_MAX},
+                                               UINT64_MAX};
+    const auto plan = [&] {
+        const FaultScope audit{0};
+        return p::forecast_shared_preparation(input, unlimited);
+    }();
+    REQUIRE(plan);
+    CHECK(attempts.load() == 0);
+    const auto payload = plan->payload_bytes();
+    const auto meta = plan->metadata_estimate_bytes();
+    const auto steps = plan->reserved_steps();
+    REQUIRE(payload > 0);
+    REQUIRE(meta > 0);
+    REQUIRE(steps > 0);
+    const p::SharedPreparationLimits exact{linear_memory::EstimateAdmission{meta}, steps};
+    p::SharedPreparationWorkspace workspace;
+    const auto share = [&](c::ResourcePlan& memory, p::SharedPreparationLimits cap,
+                           const std::stop_token& stop = {}) {
+        return p::share_preparation_input(std::move(input), workspace, cap, memory, stop,
+                                          details());
+    };
+    const auto unchanged = [&] {
+        return p::match_preparation_input(input, expected, UINT64_MAX).has_value();
+    };
+
+    const std::array rejected_limits{
+        p::SharedPreparationLimits{linear_memory::RequireProvenBound{UINT64_MAX}, steps},
+        p::SharedPreparationLimits{linear_memory::EstimateAdmission{meta - 1}, steps},
+        p::SharedPreparationLimits{linear_memory::EstimateAdmission{meta}, steps - 1}, exact};
+    for (std::size_t i = 0; i < rejected_limits.size(); ++i) {
+        CAPTURE(i);
+        c::ResourcePlan memory{i == 3 ? payload - 1 : payload};
+        const auto rejected = [&] {
+            const FaultScope audit{0};
+            return share(memory, rejected_limits[i]);
+        }();
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code ==
+              (i == 0 ? c::FailureCode::Unsupported : c::FailureCode::ResourceExceeded));
+        CHECK(rejected.error().details.component == details().component);
+        CHECK(attempts.load() == 0);
+        CHECK(memory.allocated_bytes() == 0);
+        CHECK(unchanged());
+    }
+
+    for (const std::int64_t allocation : {std::int64_t{0}, std::int64_t{1}}) {
+        CAPTURE(allocation);
+        c::ResourcePlan memory{payload};
+        const auto rejected = [&] {
+            const FaultScope audit{allocation};
+            return share(memory, exact);
+        }();
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == c::FailureCode::ResourceExceeded);
+        CHECK(rejected.error().details.component == details().component);
+        CHECK(attempts.load() == static_cast<std::uint64_t>(allocation + 1));
+        CHECK(memory.allocated_bytes() == (allocation == 0 ? 0 : payload));
+        CHECK(unchanged());
+    }
+
+    for (const unsigned allocation : {1U, 2U}) {
+        CAPTURE(allocation);
+        c::ResourcePlan memory{payload};
+        std::stop_source stop;
+        cancel_source = &stop;
+        until_cancel = allocation;
+        allocation_callback = cancel_last;
+        const auto rejected = share(memory, exact, stop.get_token());
+        allocation_callback = nullptr;
+        cancel_source = nullptr;
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == c::FailureCode::Cancelled);
+        CHECK(rejected.error().details == details());
+        CHECK(memory.allocated_bytes() == payload);
+        CHECK(unchanged());
+    }
+
+    // Verify that reentry attempted by each allocation leaves the complete input untouched.
+    for (const unsigned allocation : {1U, 2U}) {
+        CAPTURE(allocation);
+        auto nested_input = new_input();
+        c::ResourcePlan memory{payload};
+        ShareReentry context{nested_input, workspace, exact, memory, {}};
+        pending_share = &context;
+        if (allocation == 1) {
+            allocation_callback = try_share_reentry;
+        } else {
+            allocation_callback = [] { allocation_callback = try_share_reentry; };
+        }
+        const auto handle =
+            p::share_preparation_input(std::move(nested_input), workspace, exact, memory);
+        allocation_callback = nullptr;
+        pending_share = nullptr;
+        REQUIRE(handle);
+        if (context.failure) {
+            CHECK(context.failure->code == c::FailureCode::InvalidInput);
+            CHECK(context.failure->details == details());
+        } else {
+            FAIL("The shared-input workspace accepted reentry");
+        }
+        CHECK(memory.allocated_bytes() == payload);
+        CHECK(p::match_preparation_input(take(handle->input()).get(), expected, UINT64_MAX));
+    }
+    CHECK(preparation_memory.allocated_bytes() > initial_charge);
+    CHECK(unchanged());
+
+    c::ResourcePlan final_memory{payload};
+    const auto accepted = [&] {
+        const FaultScope audit{INT64_MAX};
+        return share(final_memory, exact);
+    }();
+    REQUIRE(accepted);
+    CHECK(attempts.load() == 2);
+    CHECK(final_memory.allocated_bytes() == payload);
+    CHECK(p::match_preparation_input(take(accepted->input()).get(), expected, UINT64_MAX));
 }

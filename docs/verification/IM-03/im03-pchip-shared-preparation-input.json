@@ -1,0 +1,95 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pchip-shared-preparation-input-v1",
+  "ids": [
+    "AE-07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 248,
+  "date": "2026-11-23",
+  "source_commit": "59d040009cc9f67c7d846eb47c3f46c97f975411",
+  "claimed_state": "Private, immutable shared ownership of one previously admitted PCHIP preparation input, with a fixed publication forecast and no new numeric qualification.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_filters": [
+      "^aero\\.pchip_(preparation_input|coefficients_resources)$",
+      "^aero\\.pchip_boundary$"
+    ],
+    "ctest_each_configuration": "3 passed out of 3",
+    "catch_seed": 248,
+    "catch_normal_each_configuration": "1 case, 30 assertions",
+    "catch_resource_each_configuration": "1 case, 67 assertions",
+    "reference": "Independent rational decoding of retained knots, values, events and period alongside units, version and stamp, at tolerance 0. Distinct identical preparation owners compare equal; issuer, generation and 2^-200 value changes are refused.",
+    "resource": "Forecast costs four wrapper visits and does not allocate. Original owned storage is transferred at the same addresses. Exactly one extra ResourcePlan payload is charged; the separate shared-control allocation is admitted by an estimate. A proven metadata bound, an insufficient opaque estimate, insufficient work and insufficient payload are refused without allocating.",
+    "atomicity": "Exact input match after both allocator fault positions and both allocator cancellation callback positions. Reentry during each allocation is refused without consuming either source. A copied handle retains input beyond the lifetime of the original handle, source, workspace and budget. The whole-curve numeric forecast reports the same reservations before and after sharing.",
+    "mutation": "MSVC Debug compiled and linked a byte-identical control and a version with the final stop check after make_shared removed. Control passed 67 assertions with Catch exit 0. Mutation stopped at the unexpected successful share after allocation 2 requested cancellation (46 assertions passed, 1 failed; Catch exit 42).",
+    "static": "Targeted clang-tidy 21.1.1 and clang-format 21.1.2 passed."
+  },
+  "source_records": [
+    {
+      "id": "CMakeLists.txt",
+      "hint": "CMakeLists.txt",
+      "sha256": "7d855612ccceb0cc88acf3929693e2474fe9d6d4c4150dee4cd2377ff82e98c3"
+    },
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "src/aero/pchip_curve_plan.hpp",
+      "hint": "src/aero/pchip_curve_plan.hpp",
+      "sha256": "9e30b9b1bf94296b868a8070d11a0aa2bcbecca14343b994b359a29a2d79b22e"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.cpp",
+      "hint": "src/aero/pchip_preparation_input.cpp",
+      "sha256": "7032d5a3de9fbc5ead552cd8945be878ce85ee32285408b8f68840ad4046c4dd"
+    },
+    {
+      "id": "src/aero/pchip_preparation_input.hpp",
+      "hint": "src/aero/pchip_preparation_input.hpp",
+      "sha256": "433675891a993b7d2ddd4076621c8c743f614c180378b5d47c494fc7d57cd51e"
+    },
+    {
+      "id": "src/aero/pchip_shared_preparation_input.cpp",
+      "hint": "src/aero/pchip_shared_preparation_input.cpp",
+      "sha256": "7d005091ff42cdec239809cd936d1c4e6d5935c78e23a5ab37bc1315147e3726"
+    },
+    {
+      "id": "src/aero/pchip_shared_preparation_input.hpp",
+      "hint": "src/aero/pchip_shared_preparation_input.hpp",
+      "sha256": "50d5f7313a761865bac9f9d7d3a20f24f214ec89dfda77099a1b9820ef7f4c76"
+    },
+    {
+      "id": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "hint": "tests/aero/pchip_coefficients_resources_test.cpp",
+      "sha256": "ab850b789d210c391ef0256e53aace609ce7f1c696ba3063a4466984a3321073"
+    },
+    {
+      "id": "tests/aero/pchip_preparation_input_test.cpp",
+      "hint": "tests/aero/pchip_preparation_input_test.cpp",
+      "sha256": "8893a2bca2ddac6c6a60bd5a3f88d9011b81b0c3a9f276d9f6f2f96cfdd1807e"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "7d855612ccceb0cc88acf3929693e2474fe9d6d4c4150dee4cd2377ff82e98c3",
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "src/aero/pchip_curve_plan.hpp": "9e30b9b1bf94296b868a8070d11a0aa2bcbecca14343b994b359a29a2d79b22e",
+    "src/aero/pchip_preparation_input.cpp": "7032d5a3de9fbc5ead552cd8945be878ce85ee32285408b8f68840ad4046c4dd",
+    "src/aero/pchip_preparation_input.hpp": "433675891a993b7d2ddd4076621c8c743f614c180378b5d47c494fc7d57cd51e",
+    "src/aero/pchip_shared_preparation_input.cpp": "7d005091ff42cdec239809cd936d1c4e6d5935c78e23a5ab37bc1315147e3726",
+    "src/aero/pchip_shared_preparation_input.hpp": "50d5f7313a761865bac9f9d7d3a20f24f214ec89dfda77099a1b9820ef7f4c76",
+    "tests/aero/pchip_coefficients_resources_test.cpp": "ab850b789d210c391ef0256e53aace609ce7f1c696ba3063a4466984a3321073",
+    "tests/aero/pchip_preparation_input_test.cpp": "8893a2bca2ddac6c6a60bd5a3f88d9011b81b0c3a9f276d9f6f2f96cfdd1807e"
+  }
+}
