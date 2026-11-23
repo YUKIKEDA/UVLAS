@@ -1,5 +1,6 @@
 #include "checkpoint_publication.hpp"
 
+#include "checkpoint_directory_name.hpp"
 #include "source_digest.hpp"
 
 #include <algorithm>
@@ -11,6 +12,10 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <winternl.h>
+
+// The user-mode export is in ntdll; the SDK's winternl.h omits its declaration.
+extern "C" NTSYSAPI NTSTATUS NTAPI NtSetInformationFile(HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG,
+                                                        FILE_INFORMATION_CLASS);
 #else
 #include <cerrno>
 #include <fcntl.h>
@@ -42,9 +47,9 @@ constexpr std::size_t block_size = 64 * 1024;
     return name_with("chunk-", logical_name, ".bin");
 }
 
-[[nodiscard]] bool safe_name(std::string_view name, bool chunk) noexcept {
+[[nodiscard]] bool safe_chunk_name(std::string_view name) noexcept {
     const auto letter = [](char c) { return c >= 'a' && c <= 'z'; };
-    return !name.empty() && name.size() <= 64 && (!chunk || letter(name.front())) &&
+    return !name.empty() && name.size() <= 64 && letter(name.front()) &&
            std::ranges::all_of(name, [&](char c) {
                return letter(c) || (c >= '0' && c <= '9') || c == '_' || c == '-';
            });
@@ -219,10 +224,9 @@ struct FileInfo {
 }
 
 void mark_for_removal(RawHandle file) noexcept {
-    const FILE_DISPOSITION_INFO disposition{TRUE};
-    auto writable = disposition;
+    FILE_DISPOSITION_INFO disposition{TRUE};
     static_cast<void>(
-        SetFileInformationByHandle(file, FileDispositionInfo, &writable, sizeof(writable)));
+        SetFileInformationByHandle(file, FileDispositionInfo, &disposition, sizeof(disposition)));
 }
 
 void remove_stage_file(RawHandle stage, const Name& name) noexcept {
@@ -250,8 +254,13 @@ void remove_stage(RawHandle /*parent*/, RawHandle stage, const Name& /*name*/) n
         0, parent,
         static_cast<DWORD>(std::char_traits<char>::length(final_name.data()) * sizeof(wchar_t)),
         wide_name(final_name)};
-    if (!SetFileInformationByHandle(stage, FileRenameInfo, &rename_info, sizeof(rename_info))) {
-        return std::unexpected(native_error());
+    // FileRenameInformation supports a directory-handle-relative destination.
+    constexpr auto rename_class = static_cast<FILE_INFORMATION_CLASS>(10);
+    IO_STATUS_BLOCK info{};
+    const auto length = static_cast<ULONG>(offsetof(RenameBuffer, text)) + rename_info.length;
+    const auto status = NtSetInformationFile(stage, &info, &rename_info, length, rename_class);
+    if (status < 0) {
+        return std::unexpected(RtlNtStatusToDosError(status));
     }
     return {};
 }
@@ -596,7 +605,7 @@ struct Staging {
 } // namespace
 
 core::Result<void> publish_checkpoint_directory(
-    const std::filesystem::path& parent, std::string_view final_name,
+    const std::filesystem::path& parent, std::uint64_t checkpoint_number,
     std::span<const CheckpointPublicationChunk> chunks, std::span<const std::byte> manifest,
     CheckpointPublicationLimits limits, core::ResourcePlan& plan, const std::stop_token& stop,
     std::optional<CheckpointPublicationDiagnostic>* diagnostic) noexcept {
@@ -607,7 +616,7 @@ core::Result<void> publish_checkpoint_directory(
     if (stop.stop_requested()) {
         return state.fail(Stage::Preflight, Code::Cancelled);
     }
-    if (!safe_name(final_name, false) || parent.empty() || manifest.empty() ||
+    if (parent.empty() || manifest.empty() ||
         parent.native().find(std::filesystem::path::value_type{}) !=
             std::filesystem::path::string_type::npos) {
         return state.fail(Stage::Preflight, Code::InvalidInput);
@@ -625,7 +634,7 @@ core::Result<void> publish_checkpoint_directory(
             return state.fail(Stage::Preflight, Code::Cancelled);
         }
         const auto& [name, input] = chunks[i];
-        if (!safe_name(name, true) || input.bytes.size() != input.header.byte_count) {
+        if (!safe_chunk_name(name) || input.bytes.size() != input.header.byte_count) {
             return state.fail(Stage::Preflight, Code::InvalidInput);
         }
         if (input.bytes.size() > limits.maximum_file_bytes ||
@@ -692,8 +701,9 @@ core::Result<void> publish_checkpoint_directory(
     if (stop.stop_requested()) {
         return state.fail(Stage::Publish, Code::Cancelled);
     }
+    const auto final_name = make_checkpoint_directory_name(checkpoint_number);
     const auto published =
-        publish(root.get(), stage.directory.get(), temporary, name_with("", final_name, ""));
+        publish(root.get(), stage.directory.get(), temporary, name_with("", final_name.data(), ""));
     if (!published) {
         return state.fail_io(exists_error(published.error()) ? Stage::DestinationExists
                                                              : Stage::Publish,

@@ -38,12 +38,12 @@ struct CheckpointPublicationDiagnostic {
 };
 
 // Publish an already validated container in a caller-managed output directory. The caller
-// keeps the input stable until return and supplies its final single-component directory
+// keeps the input stable until return and supplies the committed sequence number for the directory
 // name. The native publisher does not interpret the manifest or advance a solver state.
 // Interruption before the rename can leave a temporary name but never publishes a
 // checkpoint. The operation does not claim retention across hardware or volume failures.
 [[nodiscard]] core::Result<void> publish_checkpoint_directory(
-    const std::filesystem::path& parent, std::string_view final_name,
+    const std::filesystem::path& parent, std::uint64_t checkpoint_number,
     std::span<const CheckpointPublicationChunk> chunks, std::span<const std::byte> manifest,
     CheckpointPublicationLimits limits, core::ResourcePlan& plan, const std::stop_token& stop,
     std::optional<CheckpointPublicationDiagnostic>* diagnostic = nullptr) noexcept;
