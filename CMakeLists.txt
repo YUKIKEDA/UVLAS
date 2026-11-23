@@ -120,6 +120,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/checkpoint_manifest.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
+target_sources(uvlas_io PRIVATE src/io/result_documents.cpp)
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_io PUBLIC uvlas_core uvlas_structure PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
