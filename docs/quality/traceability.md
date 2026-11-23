@@ -94,8 +94,8 @@
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 1 | 1 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 6 | 2 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
-| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 9 | 1 | 0 |
-| IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
+| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 14 | 1 | 0 |
+| IO4-07 | [io-execution-adoption-specification.md:84](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
 | J1-D02 | [j1-discrete-equilibrium-and-chart-contract.md:10](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
 | J1-D03 | [j1-discrete-equilibrium-and-chart-contract.md:11](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
@@ -119,7 +119,7 @@
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 14 | 4 | 0 |
-| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 221 | 63 | 4 |
+| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 226 | 63 | 4 |
 | N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 132 | 50 | 2 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 104 | 17 | 0 |

@@ -1,4 +1,5 @@
 #include "input_document_detail.hpp"
+#include "json_object_reader.hpp"
 #include "source_digest.hpp"
 
 #include <nlohmann/json.hpp>
@@ -681,12 +682,14 @@ private:
     std::uint64_t next_event_ = 0;
 };
 
-void root_envelope(InputDocumentData& data, Context& context) {
+void root_envelope(InputDocumentData& data, Context& context, bool require_case) {
     context.event = data.nodes.values()[0].event;
     context.position.reset();
     const auto* root = std::get_if<detail::ObjectValue>(&data.nodes.values()[0].value);
     if (root == nullptr)
         context.reject(core::FailureCode::InvalidInput, InputDiagnosticReason::RootType);
+    if (!require_case)
+        return;
     constexpr std::array<std::string_view, 12> keys{
         "schema",   "units",     "model",  "flow",    "analysis", "observations",
         "numerics", "resources", "output", "initial", "restart",  "provenance"};
@@ -723,13 +726,11 @@ void root_envelope(InputDocumentData& data, Context& context) {
             context.reject(core::FailureCode::InvalidInput, InputDiagnosticReason::MissingRootKey);
         }
 }
-} // namespace
-
-core::Result<InputDocument> read_input_document(std::span<const std::byte> bytes, SourceId source,
-                                                const InputLimits& limits,
-                                                core::ResourcePlan& resources,
-                                                std::optional<InputDiagnostic>& diagnostic,
-                                                core::FailureDetails details) noexcept {
+core::Result<InputDocument> read_document(std::span<const std::byte> bytes, SourceId source,
+                                          const InputLimits& limits, core::ResourcePlan& resources,
+                                          std::optional<InputDiagnostic>& diagnostic,
+                                          core::FailureDetails details,
+                                          bool require_case) noexcept {
     diagnostic.reset();
     Context context{source,       diagnostic,   details,     std::nullopt,
                     std::nullopt, std::nullopt, std::nullopt};
@@ -833,7 +834,7 @@ core::Result<InputDocument> read_input_document(std::span<const std::byte> bytes
                 if (!parser.sax_parse(&sax, true))
                     context.reject(core::FailureCode::InvalidInput,
                                    InputDiagnosticReason::JsonSyntax);
-                root_envelope(data, context);
+                root_envelope(data, context, require_case);
                 diagnostic.reset();
                 return InputDocumentFactory::document(std::move(owner));
             } catch (const Rejection& rejection) {
@@ -846,5 +847,21 @@ core::Result<InputDocument> read_input_document(std::span<const std::byte> bytes
                              : InputDiagnosticReason::UnexpectedException);
     }
     return result;
+}
+} // namespace
+
+core::Result<InputDocument> read_input_document(std::span<const std::byte> bytes, SourceId source,
+                                                const InputLimits& limits,
+                                                core::ResourcePlan& resources,
+                                                std::optional<InputDiagnostic>& diagnostic,
+                                                core::FailureDetails details) noexcept {
+    return read_document(bytes, source, limits, resources, diagnostic, details, true);
+}
+
+core::Result<InputDocument>
+detail::read_json_object(std::span<const std::byte> bytes, SourceId source,
+                         const InputLimits& limits, core::ResourcePlan& resources,
+                         std::optional<InputDiagnostic>& diagnostic) noexcept {
+    return read_document(bytes, source, limits, resources, diagnostic, {}, false);
 }
 } // namespace uvlas::io

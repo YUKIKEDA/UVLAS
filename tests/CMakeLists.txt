@@ -86,12 +86,23 @@ uvlas_add_test(io.checkpoint_chunk
     LIBS uvlas_io)
 target_include_directories(uvlas_test_io_checkpoint_chunk PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.checkpoint_manifest
+    LABELS unit property negative verification
+    SOURCES io/checkpoint_manifest_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_checkpoint_manifest PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.checkpoint_publication
         LABELS integration negative verification
         SOURCES io/checkpoint_publication_test.cpp
         LIBS uvlas_io Threads::Threads)
     target_include_directories(uvlas_test_io_checkpoint_publication PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+    uvlas_add_test(io.checkpoint_directory
+        LABELS integration negative verification
+        SOURCES io/checkpoint_directory_test.cpp
+        LIBS uvlas_io)
+    target_include_directories(uvlas_test_io_checkpoint_directory PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 endif()
 
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")

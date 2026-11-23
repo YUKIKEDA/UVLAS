@@ -113,6 +113,7 @@ public:
     [[nodiscard]] std::optional<ReferenceFileView> view() const&& = delete;
 
 private:
+    friend class CheckpointChunk;
     friend core::Result<ReferenceFileSnapshot>
     read_reference_file(ReferenceFileReader&, const SourceDigest&, ReferenceFileLimits,
                         core::ResourcePlan&, const std::stop_token&,
