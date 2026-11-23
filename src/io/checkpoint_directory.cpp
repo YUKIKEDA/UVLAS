@@ -3,6 +3,7 @@
 #include "checkpoint_directory_name.hpp"
 
 #if defined(_WIN32)
+#include "windows_checkpoint_query.hpp"
 #include "windows_reference_root.hpp"
 
 #include <cstring>
@@ -177,9 +178,11 @@ void inspect_directory(HANDLE directory, DirectoryEntries& entries) {
         entries.poll();
         if (!GetFileInformationByHandleEx(directory, information, buffer.data(),
                                           static_cast<DWORD>(buffer.size()))) {
-            if (GetLastError() == ERROR_NO_MORE_FILES)
+            const auto error = GetLastError();
+            const auto failure = windows_checkpoint_query_failure(error);
+            if (!failure)
                 return;
-            reject(corrupt);
+            reject(*failure);
         }
         information = FileIdBothDirectoryInfo;
         std::span<const std::byte> record{buffer};
@@ -221,8 +224,9 @@ void inspect_directory(int directory, DirectoryEntries& entries) {
         errno = 0;
         const auto* entry = ::readdir(owned.get());
         if (entry == nullptr) {
-            if (errno != 0)
-                reject(corrupt);
+            const auto error = errno;
+            if (error != 0)
+                reject(error == ENOMEM ? exceeded : corrupt);
             return;
         }
         entries.inspect(std::string_view{entry->d_name});

@@ -1,6 +1,10 @@
 #include "checkpoint_directory.hpp"
 #include "checkpoint_directory_name.hpp"
 
+#ifdef _WIN32
+#include "windows_checkpoint_query.hpp"
+#endif
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
@@ -65,6 +69,46 @@ constexpr cp::CheckpointPublicationLimits publication{8, 8192, 16'384};
 constexpr cp::CheckpointDiscoveryLimits discovery{16, 8};
 constexpr uvlas::io::SourceId input{554};
 enum class Newest : std::uint8_t { Corrupt, Incompatible, ExtraChunk };
+
+#ifdef _WIN32
+TEST_CASE("Windows checkpoint directory query classifies native resource exhaustion",
+          "[IO4-06][negative]") {
+    CHECK_FALSE(cp::windows_checkpoint_query_failure(ERROR_NO_MORE_FILES));
+    for (const auto error : {ERROR_NOT_ENOUGH_MEMORY, ERROR_OUTOFMEMORY, ERROR_NO_SYSTEM_RESOURCES,
+                             ERROR_NOT_ENOUGH_QUOTA, ERROR_COMMITMENT_LIMIT}) {
+        CHECK(cp::windows_checkpoint_query_failure(error) == core::FailureCode::ResourceExceeded);
+    }
+    CHECK(cp::windows_checkpoint_query_failure(ERROR_INVALID_DATA) ==
+          core::FailureCode::CheckpointCorrupt);
+}
+#endif
+
+TEST_CASE("Latest checkpoint lookup stops if a candidate exhausts its enumeration limit",
+          "[IO4-06][negative]") {
+    const TestDirectory root;
+    core::ResourcePlan plan{1'000'000};
+    const cp::CheckpointFingerprints context{};
+    constexpr std::array<std::uint64_t, 1> values{42};
+    const auto chunk = take(cp::CheckpointChunk::encode({}, std::span<const std::uint64_t>{values},
+                                                        limits.chunk, plan, {}));
+    const std::array named{cp::NamedCheckpointChunk{"node_id", chunk}};
+    REQUIRE(cp::save_checkpoint_directory(root.path(), 1, named, context, limits, publication, plan,
+                                          {}));
+    REQUIRE(cp::save_checkpoint_directory(root.path(), 2, named, context, limits, publication, plan,
+                                          {}));
+    const auto latest = root.path() / "checkpoint-2";
+    REQUIRE(fs::copy_file(latest / "manifest.json", latest / "notes.txt"));
+
+    auto entry_cap = files;
+    entry_cap.maximum_entries = 2;
+    REQUIRE(cp::read_checkpoint_directory(root.path() / "checkpoint-1", input, context, limits,
+                                          entry_cap, plan, {}));
+    const auto result = cp::read_latest_checkpoint(root.path(), input, context, limits, entry_cap,
+                                                   discovery, plan, {});
+    REQUIRE_FALSE(result);
+    CHECK(result.error().code == core::FailureCode::ResourceExceeded);
+    CHECK(result.error().operation == core::Operation::Recover);
+}
 
 TEST_CASE("Checkpoint directories round-trip typed data and discover the latest valid number",
           "[IO4-06][N4-02]") {
