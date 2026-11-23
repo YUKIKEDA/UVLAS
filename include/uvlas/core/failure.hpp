@@ -47,7 +47,8 @@ enum class Operation : std::uint8_t {
     SearchFlutter,        ///< Flutter search.
     Recover,              ///< Checkpoint recovery.
     CertifyError,         ///< Error-certificate input validation.
-    ExtractEigen          ///< Eigenvalue extraction and qualification of the original problem.
+    ExtractEigen,         ///< Eigenvalue extraction and qualification of the original problem.
+    SaveCheckpoint        ///< Checkpoint serialization.
 };
 
 /// Unit shared by the required and observed counts in ResourceUsage.

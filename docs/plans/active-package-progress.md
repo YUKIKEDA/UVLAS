@@ -1,6 +1,6 @@
 # IM-01・IM-03・IM-06の進捗と残作業
 
-局所独立化の再検証を統合すると、実装中の3パッケージは **17／43段階（約40%）が完了**する。残り26段階のうち23段階が実装・検証、3段階が終了審査。下表は統合後の成果と次の完了条件を示す。
+実装中の3パッケージは **17／43段階（約40%）が完了**した。残り26段階のうち23段階が実装・検証、3段階が終了審査。下表は現在の成果と次の完了条件を示す。
 
 | パッケージ | 完了／全体 | 残り | 統合済みの成果 | 次に完了させる成果と判定条件 |
 |---|---:|---:|---|---|
@@ -22,7 +22,7 @@
 | 多角形と全積分分割 | 完了 | 被覆を検査した分割と資源計画。 [分割](https://github.com/YUKIKEDA/UVLAS/pull/128)・[資源計画](https://github.com/YUKIKEDA/UVLAS/pull/149) |
 | 局所独立化 | 完了 | 局所rank、基底、写像と来歴を所有する。再利用時にグラフ・領域・活動面積・辞書を照合し、B/T/S/W/Zを全活動行で厳密に再検証する。全12系列を独立参照と照合した。 [準備の検証](../verification/IM-01/pg-rank-bounded-preparation/verification.md)・[再検証と資源](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
-| 保証付き条件付け | 残 | 局所独立化と参照幾何を結合し、幾何内積と基底変換を誤差上界付きで検証する |
+| 保証付き条件付け | 実装中 | 局所rankを参照幾何の実入力と照合し、選択基底の値と物理勾配を片側指定で厳密に評価できる。次は幾何内積と基底変換を誤差上界付きで検証する。 [基底評価の契約](../specs/structure/pg-reference-basis-contract.md) |
 | PreparedPatchと参照作用 | 残 | 条件付け済み基底を、層・面・片側の参照作用と反復用Workspaceへつなぐ |
 | 全位置traceと拘束 | 残 | 辞書・分割・基底を使い、非整合界面の全厚位置、元拘束、双対量を保持する |
 | 固定pivot疎chart | 残 | 元拘束と疎解法から写像と微分・転置作用を実装し、拘束と仕事を照合する |
@@ -61,13 +61,13 @@
 | 全schema | 完了 | 全caseの型、入れ子、参照と相互条件の検証。 [#130](https://github.com/YUKIKEDA/UVLAS/pull/130) |
 | SI・精度変換 | 完了 | 元の厳密値、SI倍率、成分別の精度管理。 [#154](https://github.com/YUKIKEDA/UVLAS/pull/154) |
 | 参照snapshot | 実装中 | 宣言収集、パスの正規化、[単一ハンドルの照合](https://github.com/YUKIKEDA/UVLAS/pull/177)は統合済み。Windowsの根相対adapterは [#184](https://github.com/YUKIKEDA/UVLAS/pull/184)、Linuxの根相対adapterは [#195](https://github.com/YUKIKEDA/UVLAS/pull/195) で統合済み。[#202](https://github.com/YUKIKEDA/UVLAS/pull/202) で、マニフェストの元バイト列とdigestを単一のファイルハンドルから取得する部品を統合した。[#219](https://github.com/YUKIKEDA/UVLAS/pull/219) で、Fileは元マニフェストのハンドルと実体ID、Memoryは呼出し側が開いた根を検査済みケースとともに保持するようにした。[#229](https://github.com/YUKIKEDA/UVLAS/pull/229) で、参照ファイルを開く前に、宣言順と位置を保持して参照先を正規化・索引化する部品を統合した。[#236](https://github.com/YUKIKEDA/UVLAS/pull/236) で、指定された参照先1件の実体を内容の読み取り前に照合し、同じハンドルから取得した元バイト列を保持する部品を統合した。[#245](https://github.com/YUKIKEDA/UVLAS/pull/245) で、宣言順に依存をたどり、循環と共有経路の深さ上限を検査する内部処理を統合した。[#252](https://github.com/YUKIKEDA/UVLAS/pull/252) で、先頭の根宣言から取得したバイト列とダイジェストを照合し、依存走査へ渡す内部処理を統合した。各形式からの依存抽出、後続の根と子の取得、所有参照表への結合が残る |
-| 励振と既知入力 | 残 | schema・SI・参照snapshotと流れ／J1の契約を、時系列・イベント・必要微分へつなぐ |
+| 励振と既知入力 | 実装中 | 型付きSIケースから突風なしの一様流を準備し、定数・多項式・PCHIPの値と時間微分を評価できる。参照snapshot、対象となる励振、必要な精度投影、J1への接続が残る |
 | parametric入力とprepare | 残 | 型付きcaseを共通のRawModelへ渡す。物理準備には対応するIM-01／02／03の成果が必要 |
 | Nastran | 残 | schema・SI・snapshotを入力に、採用カード、座標系、sidecarを解析する |
 | Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。sidecarの型と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md) |
 | 共通参照への変換 | 残 | 外部面を共通の曲面・厚さ・接続へ変換し、質量・仕事などの誤差を評価する。対応するIM-01／02の成果が必要 |
 | 結果と診断 | 残 | 物理回復の出力をstatus、来歴、CSV／VTU／PVDと対応付ける |
-| checkpoint容器 | 残 | snapshotと状態基盤を使い、形式、整合検査、確定checkpointを守る書込みを実装する |
+| checkpoint容器 | 実装中 | 単一チャンクの型・形状・長さ・SHA-256を照合し、元の語を復元できる。マニフェストと指紋の照合、パス制限、確定checkpointを守る書込みが残る。 [チャンクの検証](../verification/IM-06/checkpoint-chunk.md) |
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |
 | CLI | 残 | 共通処理にvalidate／prepare／run／resume／inspectと終了状態を接続する |
 | Python | 残 | 同じC++処理にPythonの辞書・ファイル・実行・再開と所有権を接続する |

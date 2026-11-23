@@ -80,6 +80,12 @@ target_include_directories(uvlas_test_io_gmsh_mesh PRIVATE "${PROJECT_SOURCE_DIR
 uvlas_enable_allocation_audit(uvlas_test_io_gmsh_mesh)
 uvlas_require_audited_dependencies(uvlas_test_io_gmsh_mesh)
 
+uvlas_add_test(io.checkpoint_chunk
+    LABELS unit property negative verification
+    SOURCES io/checkpoint_chunk_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_checkpoint_chunk PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.reference_input
         LABELS integration property negative verification
