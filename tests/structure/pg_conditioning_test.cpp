@@ -77,8 +77,8 @@ Q integrate_terms(const Term& a, const Term& b) {
            (16 * (i == 2 ? 2 : 1) * (j == 2 ? 2 : 1));
 }
 
-std::vector<Q> analytic_gram(const PgRankPreparation& rank, std::size_t count,
-                             core::ResourcePlan& plan) {
+std::vector<std::vector<Term>> basis_terms(const PgRankPreparation& rank, std::size_t count,
+                                           core::ResourcePlan& plan) {
     const auto rows = take(rank.rows());
     const auto algebra = query_limits().algebra;
     std::vector<std::vector<Term>> basis(count);
@@ -89,6 +89,11 @@ std::vector<Q> analytic_gram(const PgRankPreparation& rank, std::size_t count,
             if (x.sign() != 0)
                 basis[k].push_back({rows[i], q(x)});
         }
+    return basis;
+}
+
+std::vector<Q> analytic_gram(const std::vector<std::vector<Term>>& basis) {
+    const auto count = basis.size();
     std::vector<Q> entries(slot(0, count));
     for (std::size_t j = 0; j < count; ++j)
         for (std::size_t i = 0; i <= j; ++i)
@@ -181,6 +186,179 @@ void check_failure(const core::Result<T>& failure, core::FailureCode expected) {
     REQUIRE_FALSE(failure);
     CHECK(failure.error().code == expected);
 }
+Q power(const Q& x, core::Index exponent) {
+    Q result{1};
+    for (core::Index i = 0; i < exponent; ++i)
+        result *= x;
+    return result;
+}
+
+std::array<Q, 4> conditioned_jet(const std::vector<std::vector<Term>>& source,
+                                 std::span<const ExactRational> transform, std::size_t j,
+                                 PgCellIndex cell, const Q& s, const Q& t, const Q& zeta) {
+    const Q u = 4 * s - (2 * cell.first + 1);
+    const Q v = 4 * t - (2 * cell.second + 1);
+    std::array<Q, 4> out{};
+    for (std::size_t i = 0; i <= j; ++i) {
+        const auto& weight = q(transform[slot(i, j)]);
+        if (weight == 0)
+            continue;
+        for (const auto& term : source[i]) {
+            if (term.row.cell != cell)
+                continue;
+            const auto z = static_cast<core::Index>(term.row.field);
+            const auto [a, b] = term.row.powers;
+            const Q c = term.value * weight / (z == 2 ? 2 : 1);
+            const auto h = power(zeta, z);
+            out[0] += c * power(u, a) * power(v, b) * h;
+            if (a > 0)
+                out[1] += 4 * a * c * power(u, a - 1) * power(v, b) * h;
+            if (b > 0)
+                out[2] += 4 * b * c * power(u, a) * power(v, b - 1) * h;
+            if (z > 0)
+                out[3] += z * c * power(u, a) * power(v, b) * power(zeta, z - 1);
+        }
+    }
+    return out;
+}
+
+void check_jet(const PgReferenceBasisValue& result, const std::array<Q, 4>& expected) {
+    // This flat, unit-frame H=2 fixture has g=1 and physical J=I.
+    REQUIRE(q(result.reference.g) == 1);
+    const auto value = [](const PgReferenceScalar& x) -> Q { return q(x.rational) + q(x.radical); };
+    CHECK(value(result.value) == expected[0]);
+    for (std::size_t i = 0; i < 3; ++i) {
+        CHECK(value(result.chart_derivatives[i]) == expected[i + 1]);
+        CHECK(value(result.physical_gradient_per_metre[i]) == expected[i + 1]);
+    }
+}
+
+void check_reference_points(Fixture& f, const PgConditioningCertificate& certificate,
+                            const std::vector<std::vector<Term>>& terms,
+                            std::span<const ExactRational> transform) {
+    const auto* basis = take(certificate.reference_basis());
+    const auto& partition = take(basis->source()).partition;
+    const auto triangles = take(partition.triangles());
+    const auto vertices = take(partition.vertices());
+    const auto pieces = take(partition.pieces());
+    const auto volumes = take(partition.volumes());
+    const auto faces = take(partition.horizontal_faces());
+    const auto zero = f.r("0"), one = f.r("1"), half = f.r("1", "2");
+    const Q s{"1/2"}, t{0}, zeta{"1/3"};
+    struct VertexQuery {
+        core::Index volume = -1, triangle = -1;
+        std::size_t vertex = 0;
+    };
+    std::array<VertexQuery, 2> side{};
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        if (volumes[i].layer != 1)
+            continue;
+        const auto& triangle = triangles[static_cast<std::size_t>(volumes[i].triangle)];
+        const auto cell = pieces[static_cast<std::size_t>(triangle.piece)].cell;
+        if (cell.second != 0)
+            continue;
+        for (std::size_t k = 0; k < triangle.vertices.size(); ++k) {
+            const auto& v = vertices[static_cast<std::size_t>(triangle.vertices[k])];
+            if (q(v.s) == s && q(v.t) == t)
+                side[static_cast<std::size_t>(cell.first)] = {static_cast<core::Index>(i),
+                                                              volumes[i].triangle, k};
+        }
+    }
+    REQUIRE(side[0].volume >= 0);
+    REQUIRE(side[1].volume >= 0);
+    std::size_t j = 0;
+    for (; j < terms.size(); ++j) {
+        const auto left = conditioned_jet(terms, transform, j, {0, 0}, s, t, zeta);
+        const auto right = conditioned_jet(terms, transform, j, {1, 0}, s, t, zeta);
+        const auto weights = transform.subspan(slot(0, j), j + 1);
+        if (left[1] != right[1] &&
+            std::ranges::count_if(weights, [](const auto& x) { return x.sign() != 0; }) > 1)
+            break;
+    }
+    REQUIRE(j < terms.size());
+    const PgRankBasisColumn column{static_cast<core::Index>(j)};
+    auto caps = query_limits();
+    std::array<Q, 2> values{};
+    for (std::size_t i = 0; i < side.size(); ++i) {
+        const auto& row = side[i];
+        const PgReferenceVolumePoint query{row.volume, row.vertex == 1 ? one : zero,
+                                           row.vertex == 2 ? one : zero, half};
+        core::ResourcePlan evaluation{profile};
+        const auto point = take(certificate.evaluate(query, column, caps, evaluation));
+        const PgCellIndex cell{static_cast<core::Index>(i), 0};
+        CHECK(point.reference.cell == cell);
+        CHECK(point.reference.layer == core::LayerId{29});
+        CHECK(q(point.reference.s) == s);
+        CHECK(q(point.reference.t) == t);
+        CHECK(q(point.reference.zeta) == zeta);
+        CHECK(std::holds_alternative<PgReferenceVolumeMeasure>(point.reference.measure));
+        const auto expected = conditioned_jet(terms, transform, j, cell, s, t, zeta);
+        check_jet(point, expected);
+        values[i] = expected[0];
+        const auto& used = point.reference.call_info;
+        CHECK(used.allocated_owned_payload_bytes == evaluation.allocated_bytes());
+        auto exact = caps;
+        exact.maximum_scalar_operations = used.scalar_operations;
+        exact.maximum_partition_visits = used.partition_visits;
+        core::ResourcePlan equal{used.allocated_owned_payload_bytes};
+        REQUIRE(certificate.evaluate(query, column, exact, equal));
+        core::ResourcePlan short_bytes{used.allocated_owned_payload_bytes - 1};
+        check_failure(certificate.evaluate(query, column, exact, short_bytes),
+                      core::FailureCode::ResourceExceeded);
+        --exact.maximum_scalar_operations;
+        check_failure(certificate.evaluate(query, column, exact, evaluation),
+                      core::FailureCode::ResourceExceeded);
+        ++exact.maximum_scalar_operations;
+        --exact.maximum_partition_visits;
+        check_failure(certificate.evaluate(query, column, exact, evaluation),
+                      core::FailureCode::ResourceExceeded);
+        core::ResourcePlan empty{0};
+        check_failure(certificate.evaluate(query, {-1}, caps, empty),
+                      core::FailureCode::InvalidInput);
+        std::stop_source stop;
+        REQUIRE(stop.request_stop());
+        exact.cancellation = stop.get_token();
+        check_failure(certificate.evaluate(query, column, exact, empty),
+                      core::FailureCode::Cancelled);
+        CHECK(empty.allocated_bytes() == 0);
+    }
+    CHECK(values[0] == values[1]);
+
+    const auto& left = side[0];
+    std::array<bool, 2> layer_seen{};
+    core::ResourcePlan faces_plan{profile};
+    for (std::size_t i = 0; i < faces.size(); ++i) {
+        const auto& face = faces[i];
+        if (face.triangle != left.triangle)
+            continue;
+        const auto direction =
+            face.layer == 0 ? PgPartitionFaceSide::Upper : PgPartitionFaceSide::Lower;
+        if (face.side != direction)
+            continue;
+        const PgReferenceHorizontalPoint query{static_cast<core::Index>(i),
+                                               left.vertex == 1 ? one : zero,
+                                               left.vertex == 2 ? one : zero};
+        const auto point = take(certificate.evaluate(query, column, caps, faces_plan));
+        CHECK(q(point.reference.zeta) == Q("-1/3"));
+        CHECK(std::get<PgReferenceHorizontalMeasure>(point.reference.measure).side == direction);
+        const auto layer = static_cast<std::size_t>(face.layer);
+        CHECK(point.reference.layer == core::LayerId{layer == 0 ? 11U : 29U});
+        layer_seen[layer] = true;
+        check_jet(point, conditioned_jet(terms, transform, j, {0, 0}, s, t, Q("-1/3")));
+    }
+    REQUIRE(layer_seen[0]);
+    REQUIRE(layer_seen[1]);
+
+    const auto lateral = take(
+        certificate.evaluate(PgReferenceLateralPoint{0, half, half}, column, caps, faces_plan));
+    CHECK(std::holds_alternative<PgReferenceLateralMeasure>(lateral.reference.measure));
+    const auto& r = lateral.reference;
+    check_jet(lateral, conditioned_jet(terms, transform, j, r.cell, q(r.s), q(r.t), q(r.zeta)));
+    check_failure(
+        certificate.evaluate(PgReferenceLateralPoint{-1, half, half}, column, caps, faces_plan),
+        core::FailureCode::InvalidInput);
+}
+
 } // namespace
 
 TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory fields",
@@ -195,7 +373,8 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
         static_cast<std::size_t>(take(rank->preparation()).independent_required);
     REQUIRE(count == 109);
     REQUIRE(protected_count > 0);
-    const auto gram = analytic_gram(*rank, count, plan);
+    const auto terms = basis_terms(*rank, count, plan);
+    const auto gram = analytic_gram(terms);
     const auto enclosure = enclose(f, gram);
     const auto transform = proposal(f, gram, count);
     const auto limits = query_limits();
@@ -235,6 +414,7 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
     for (const auto row : std::array<std::size_t, 3>{0, count / 2, count - 1})
         CHECK(exact_congruence_row(gram, transform, row, count) <= bound);
     CHECK(info.steps > 0);
+    check_reference_points(f, certificate, terms, transform);
     CHECK(q(take(certificate.coefficient({static_cast<core::Index>(count - 1)}, checked_row, limits,
                                          plan))) == last);
     for (std::size_t t = 0; t < 33; ++t) {

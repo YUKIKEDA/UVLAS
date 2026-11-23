@@ -5,7 +5,11 @@
 
 namespace uvlas::structure {
 
-/// An owned reference point and one selected, unconditioned scalar basis column.
+namespace detail {
+struct BasisReferencePoint;
+}
+
+/// An owned reference point and one scalar basis column.
 /// All scalar components use the radicand in the same reference point.
 struct PgReferenceBasisValue {
     PgReferenceValue reference;
@@ -43,6 +47,16 @@ public:
     [[nodiscard]] core::Result<PgReferenceSource> source() const&& = delete;
 
 private:
+    friend class PgConditioningCertificate;
+    [[nodiscard]] detail::BasisReferencePoint locate(detail::ReferenceArithmetic&,
+                                                     const PgReferencePoint&) const;
+    [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
+    numerator_jet(detail::ReferenceArithmetic&, PgRankBasisColumn,
+                  const detail::BasisReferencePoint&) const;
+    [[nodiscard]] PgReferenceBasisValue
+    assemble(detail::ReferenceArithmetic&, detail::BasisReferencePoint&&, PgRankBasisColumn,
+             const std::array<std::array<ExactRational, 3>, 3>&) const;
+
     PgReferenceBasis(PgReferenceGeometry&&, PgRankPreparation&&) noexcept;
 
     PgReferenceGeometry geometry_;
