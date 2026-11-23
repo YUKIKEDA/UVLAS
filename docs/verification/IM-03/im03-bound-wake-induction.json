@@ -1,0 +1,129 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-bound-wake-induction-v1",
+  "ids": [
+    "UW-D01",
+    "UW-D02",
+    "UW-D07",
+    "UI-D05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "f864312fb8d7c0ff76d2e2f4a0cbbdc072ae1542",
+  "claimed_state": "Owned mixed induction action with analytic bound circulation, existing wake P1 evaluation, shared signed P0 edge reduction, JVP, and VJP.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config. Debug and Release 5/5 each on source_commit.",
+    "msvc_ctest": [
+      "aero.p1_shared_action",
+      "aero.p1_induction",
+      "aero.p1_induction_resources",
+      "aero.local_geometry_packet",
+      "aero.global_geometry"
+    ],
+    "gcc": "Ubuntu Noble chroot, GCC 14.2.0 Release, warnings as errors. 4/4 on source_commit.",
+    "gcc_ctest": [
+      "aero.p1_shared_action",
+      "aero.p1_induction",
+      "aero.local_geometry_packet",
+      "aero.global_geometry"
+    ],
+    "catch_new": "All platforms 3 cases and 96 assertions filtered by [UW-D01], seed 23.",
+    "oracle": "100-digit independent endpoint line formula, central directional difference step 1e-25, comparisons using the propagated enclosure plus 1e-45.",
+    "mutation": "Isolated MSVC Debug; suppressing the reversal of a bound edge contribution invalidates 3 of 6 velocity and transpose containment assertions, Catch exit 42. Control passes all six assertions.",
+    "static": "clang-format 21.1.2, scoped MSVC clang-tidy 21.1.1.",
+    "scope": "The input is the contact-qualified discrete geometry and an explicit resolved query. Physical PG-ANCF collocation, implicit wake-front extraction, and original residual qualification require subsequent assembly."
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/p1-induction-kernel-contract.md",
+      "hint": "docs/specs/aero/p1-induction-kernel-contract.md",
+      "sha256": "b177098e77eefa0e57ac15bb0365f166064f01c670a9d79c7a03f50b703e72c9"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "rd/aero/wake-loads/experiments/uvlm_wake_assembly.py",
+      "hint": "rd/aero/wake-loads/experiments/uvlm_wake_assembly.py",
+      "sha256": "ce80ea76feb147d955485074de8876f774a78a44ffa014e1d33a7d85ba3aeaf2"
+    },
+    {
+      "id": "src/aero/global_geometry_storage.hpp",
+      "hint": "src/aero/global_geometry_storage.hpp",
+      "sha256": "0ba583a7c9e8dcc260739b1ad428875b73c5044beb942fe7bc4d00b9ecc373d6"
+    },
+    {
+      "id": "src/aero/global_geometry.cpp",
+      "hint": "src/aero/global_geometry.cpp",
+      "sha256": "b589a8c1171ff41c8804951c93e9104218ff6818871c47084ff0b5a13832ef51"
+    },
+    {
+      "id": "src/aero/local_geometry_packet.cpp",
+      "hint": "src/aero/local_geometry_packet.cpp",
+      "sha256": "5b8e51e9d92786b2eb3c44a296a1fa9cbca1728e0380aefe4c4f638356941786"
+    },
+    {
+      "id": "src/aero/local_geometry_packet.hpp",
+      "hint": "src/aero/local_geometry_packet.hpp",
+      "sha256": "ede3b6d111b8db84a7f92efd9c4546f1db5404f3c76edc90321d4c3c890df06c"
+    },
+    {
+      "id": "src/aero/p1_induction.cpp",
+      "hint": "src/aero/p1_induction.cpp",
+      "sha256": "4b39647d3153de2d983c201126df2c195c6715861bac78718a08f4184a2f7688"
+    },
+    {
+      "id": "src/aero/p1_induction.hpp",
+      "hint": "src/aero/p1_induction.hpp",
+      "sha256": "a831aa161f1262c0f4a2b346077f789f9d11340de12dcac48fd66669c4493da2"
+    },
+    {
+      "id": "src/aero/p1_program_private.hpp",
+      "hint": "src/aero/p1_program_private.hpp",
+      "sha256": "2f6ee6d27933717bd03a9c19012ece35f8ff2e77aec262cbf5a0cf0b7cb7ab36"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "7acdea3096c6c9ecf68de642e7e833e68ad9ebf69171f4ba0e3657efbb800cf8"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "0e583d1be97cd55f1ac44f7b44580cc3e04271ad8d3d412580b50212c6cf721e"
+    },
+    {
+      "id": "src/aero/p1_shared_kernel.hpp",
+      "hint": "src/aero/p1_shared_kernel.hpp",
+      "sha256": "1417c9f020ef13cd01ca131343276e7b54879f44eb6020c24d67a785d8a37543"
+    },
+    {
+      "id": "tests/aero/p1_shared_action_test.cpp",
+      "hint": "tests/aero/p1_shared_action_test.cpp",
+      "sha256": "a092e1dafe0c2c1cb05679761b18f26f4585529724f3ed05811aa3719e7b55c4"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/p1-induction-kernel-contract.md": "b177098e77eefa0e57ac15bb0365f166064f01c670a9d79c7a03f50b703e72c9",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "rd/aero/wake-loads/experiments/uvlm_wake_assembly.py": "ce80ea76feb147d955485074de8876f774a78a44ffa014e1d33a7d85ba3aeaf2",
+    "src/aero/global_geometry_storage.hpp": "0ba583a7c9e8dcc260739b1ad428875b73c5044beb942fe7bc4d00b9ecc373d6",
+    "src/aero/global_geometry.cpp": "b589a8c1171ff41c8804951c93e9104218ff6818871c47084ff0b5a13832ef51",
+    "src/aero/local_geometry_packet.cpp": "5b8e51e9d92786b2eb3c44a296a1fa9cbca1728e0380aefe4c4f638356941786",
+    "src/aero/local_geometry_packet.hpp": "ede3b6d111b8db84a7f92efd9c4546f1db5404f3c76edc90321d4c3c890df06c",
+    "src/aero/p1_induction.cpp": "4b39647d3153de2d983c201126df2c195c6715861bac78718a08f4184a2f7688",
+    "src/aero/p1_induction.hpp": "a831aa161f1262c0f4a2b346077f789f9d11340de12dcac48fd66669c4493da2",
+    "src/aero/p1_program_private.hpp": "2f6ee6d27933717bd03a9c19012ece35f8ff2e77aec262cbf5a0cf0b7cb7ab36",
+    "src/aero/p1_shared_action.cpp": "7acdea3096c6c9ecf68de642e7e833e68ad9ebf69171f4ba0e3657efbb800cf8",
+    "src/aero/p1_shared_action.hpp": "0e583d1be97cd55f1ac44f7b44580cc3e04271ad8d3d412580b50212c6cf721e",
+    "src/aero/p1_shared_kernel.hpp": "1417c9f020ef13cd01ca131343276e7b54879f44eb6020c24d67a785d8a37543",
+    "tests/aero/p1_shared_action_test.cpp": "a092e1dafe0c2c1cb05679761b18f26f4585529724f3ed05811aa3719e7b55c4"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/bound-wake-induction-v1/verification.md": "164c6605858607eb2ecbabda63c949f20ce8f67df39d73ee109bd4e983452b8f"
+  }
+}
