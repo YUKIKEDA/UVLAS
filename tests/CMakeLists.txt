@@ -579,6 +579,13 @@ target_include_directories(uvlas_test_structure_pg_integration_partition_resourc
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_integration_partition_resources)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_integration_partition_resources)
 
+uvlas_add_test(structure.pg_reference_geometry
+    LABELS unit property negative verification V-PG
+    SOURCES structure/pg_reference_geometry_test.cpp
+    LIBS uvlas_structure Boost::multiprecision)
+target_include_directories(uvlas_test_structure_pg_reference_geometry
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp

@@ -1,0 +1,62 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-reference-geometry",
+  "ids": [
+    "SH-D01",
+    "SH-D02",
+    "SH-D07",
+    "N4-02",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 259,
+  "parent_issue": 17,
+  "date": "2026-11-23",
+  "source_commit": "df11771ce33902c6944cee1671defeb54f844934",
+  "claimed_state": "採用された参照幾何・片側微分・物理測度・局所法線管正則性の製品実装適合。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260 Debug / Release",
+    "boost": "1.92.0"
+  },
+  "checks": {
+    "debug_affected_ctest_passed": 3,
+    "release_affected_ctest_passed": 3,
+    "final_geometry_ctest_passed_per_config": 1,
+    "geometry_cases": 6,
+    "geometry_assertions": 1603,
+    "mutations_detected": 6
+  },
+  "sources": {
+    "docs/plans/next-package-work-breakdown.md": "d14bb2fdc6344f38f294e5ea9ab27ed8a0e883d5992fd092d97e2faaf37320a8",
+    "docs/papers/pg-ancf-technical-report-v1.md": "daab2375cbb0797d85266b6624b238bbadb751896c5182a592e2e6029b3b3207",
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-coefficient-contract.md": "a0b2f1d12e50e4ca907954e2b7f7b580d519759152cfcebf41bc31087f875efe",
+    "docs/specs/structure/pg-integration-partition-contract.md": "ecb1dd5d0819fa73a74fe4521cd33b1bc9b618b6df597debfe628c2fd45a90d0",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "include/uvlas/structure/pg_graph.hpp": "4fff623c646d8151e0d08979da4f8b6fb7890a46ff00bdd5055a048bf61c0661",
+    "include/uvlas/structure/pg_coefficients.hpp": "a92339f2e098aa1d9421e1759f805838479fbf90d16cd1d707b7edf32bacbb3c",
+    "include/uvlas/structure/pg_integration_partition.hpp": "be9b14490465be58358b0065e08835ea10e4baf93f30b93a80c6995b0b2ba3e6",
+    "src/structure/exact_polynomial.cpp": "bcb9bc521ddbef820b94286065ae5807fe55c51439984ca281c471c159706017",
+    "src/structure/pg_partition_common.hpp": "31423ff43ffcf81b62dc010680fde19fe29e514e239916241b38e8928d9fc1cb",
+    "tests/structure/pg_partition_test_support.hpp": "b0bf52176dba19ccd94e4a6555aad3a26cb25c399ed98d9fc9be6c3aeb8d18cb",
+    "tools/dev/msvc.ps1": "6154c310d035a3c9782b8438aaf0b656e6b9b46e8ec3764ee7f29f32508be84c",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-reference-geometry-contract.md": "48a3604a313e3993ef66308d2adb87e41bf0a767da50028909cd74a327b137a0",
+    "CMakeLists.txt": "dfcdba49f6fcec74a32fadda52cdc4bf14fc0f70e0beb145868bd00a142b1a90",
+    "tests/CMakeLists.txt": "d3e8fffc3cdfd8485fb60b01852a9b28c6e46eb60c8d2220e299391a37118495",
+    "include/uvlas/structure/pg_reference_geometry.hpp": "3e66cd630deec02e8eacbf9a3d3fe4315d31ab85fc29b1003c450aced70ec7b8",
+    "src/structure/pg_reference_arithmetic.hpp": "2ef32dbedb247be9702f286b1f4d8fbde64979e435be7e2c0d6389317ca98e20",
+    "src/structure/pg_reference_domain.hpp": "c0a97a062310b2f7e0884e85a1293970c06b114a8c56c4863ec8d9a3eb250296",
+    "src/structure/pg_reference_geometry.cpp": "febd91b7ae06b99f448594b1539f5022c03e9cfff530154d60eadf18c844bada",
+    "src/structure/pg_reference_hash.hpp": "61a0a8f30c4bc5d6c742cbb26e2e3600bb0c32479b85dfa83c48efb312520f85",
+    "src/structure/pg_reference_polynomials.hpp": "1a79036487bf321708bdea4182401e334b98467259fd740f6b8080c308713a59",
+    "tests/structure/pg_reference_geometry_test.cpp": "b5eb00910ef305b8597c4f8fffebaee0c8fc395b503370682ece2900ff1f9adf",
+    "docs/verification/IM-01/pg-reference-geometry/mutation-result.json": "d9231b56ffa01cff0da3111aa24463a5be1ef29bcb629bc0d483d90e44014041",
+    "docs/verification/IM-01/pg-reference-geometry/verification.md": "0532670bf0ff9ec98f81cea40ee6a2ec79cb72dcde327eb33b7696faf42fdadc"
+  }
+}
