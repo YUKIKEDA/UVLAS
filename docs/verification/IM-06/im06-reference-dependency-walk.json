@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-dependency-walk",
+  "ids": [
+    "IO4-01",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "issue": 240,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "62466fe78709bebf974a8b508851f405870066c9",
+  "base_commit": "9e25eb8bc425f1d696d6ffc126b1437a1c379216",
+  "scope": "Private incremental ordered dependency traversal over verified source ordinals",
+  "environment": {
+    "platform_key": "windows-x64-msvc19.51-sse2",
+    "os": "Windows AMD64",
+    "compiler": "MSVC 19.51.36260.0",
+    "configuration": "Debug",
+    "uncommitted_changes": false
+  },
+  "verification": {
+    "ctest_passed": 2,
+    "new_cases": 5,
+    "new_assertions": 6297,
+    "missing_cycle_mutation_exit": 42
+  },
+  "claimed_state": {
+    "implementation_conforms": true,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "41a373ce202d0789bdef6b61b8e9a556f5e9dc5a6469df5c8c75276b09889a0c",
+    "src/io/reference_dependency_walk.cpp": "8f65628703f963b989d7e54fd3266bd8322074a3a02a68567ec7288755b43a88",
+    "src/io/reference_dependency_walk.hpp": "88ee4c54c4e4dfded9e6ca9766bec3c2e6c7a5d81b09706ed69c2b430d90bbc1",
+    "tests/CMakeLists.txt": "d9d30d9d28ff2d1055a3dc79ca85c884cf6ca3686d71e9e773d586d95e236d06",
+    "tests/io/reference_dependency_walk_test.cpp": "789fabd5b7035b21389305f4c50cb987418ff00e42a4d8bc49579ed3e86efdac",
+    "tests/io/reference_declarations_resource_test.cpp": "1890b2e5242c1e8d12cf1961b9cf912a413a739a4442a25af37e23b7dd066cdc",
+    "docs/specs/foundation/reference-snapshot-start-contract.md": "cfcb688dfdcef447674d2e1bca36bc156c6c5053b2d3383db7d3c5259465b1ab"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-dependency-walk.md": "5a74f8a90a36cd8cde0806bf0eccc4db71d8c2a505f7a41aedddaa0774a83c44"
+  },
+  "inputs": {
+    "docs/verification/IM-06/reference-snapshot-design-cases.json": "89291c6309f2a920f5bec2cb87c70dce94fdb9b1b8af4f7fa128133c325e9d36"
+  }
+}
