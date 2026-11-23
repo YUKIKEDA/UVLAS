@@ -4,13 +4,13 @@
 
 ## 順序
 
-Grill（設計が分岐するとき）→ Issue → ブランチ → 作業 → PR → レビュー → squash merge → 振り返り。CIはPR上で非同期に実行し、mergeに必要な成功はmerge前に確認する。
+Grill（設計が分岐するとき）→ Issue → ブランチ → 作業 → PR → レビュー → squash merge → 振り返り。CIはPR上で非同期に実行する。マージ時は対象headの現在の状態とGitHubの保護規則を確認する。
 
 - Issueはテンプレートから作る。白紙のIssueは作れない。Issueには [docs/roadmap.md](docs/roadmap.md) の行IDを書く。
 - ブランチ名は `type/<Issue番号>-<slug>`。`main` へ直接commitしない。
-- 1 Issueは1 PR。mergeは人が行い、mergeしたブランチは消す。
+- 1 Issueは1 PR。人がレビューし、マージしたブランチは消す。エージェントは利用者が名指ししたPRをマージする。
 - エージェントへ実行を依頼したタスクは、検査・commit・通常のpush・PR作成まで進める。commit・pushごとの確認は不要で、変更内容は原則PRレビューで確認する。設計や範囲の判断が分かれる場合は、PR前に確認する。
-- エージェントはCIの完了を原則待たず、PRのURLと現在の状態を報告して返す。完了までのポーリングは行わない。利用者が待機を指定した場合や、結果が次の処理の必須入力となる場合だけ待つ。
+- エージェントはPRのURLとCIの現在の状態を報告する。利用者が対象PRのマージを指示した場合も、待機の指定がない限りCIの完了を待たない。判明した失敗に対応し、必須チェックはGitHubの保護規則に従う。
 - commitの件名は `type(scope): subject`（英語）。
 
 | テンプレート | ラベル | commitのtype |
