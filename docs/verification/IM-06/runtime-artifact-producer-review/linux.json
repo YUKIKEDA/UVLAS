@@ -1,0 +1,198 @@
+{
+  "cli": {
+    "format": "ELF64",
+    "interpreter": "/lib64/ld-linux-x86-64.so.2",
+    "ldd": [
+      "linux-vdso.so.1",
+      "libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6",
+      "libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6",
+      "libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6",
+      "/lib64/ld-linux-x86-64.so.2"
+    ],
+    "machine": "x86_64",
+    "name": "uvlas",
+    "needed": [
+      "libstdc++.so.6",
+      "libm.so.6",
+      "libgcc_s.so.1",
+      "libc.so.6"
+    ],
+    "required_symbol_versions": [
+      "CXXABI_1.3",
+      "CXXABI_1.3.9",
+      "GCC_3.0",
+      "GCC_4.3.0",
+      "GLIBCXX_3.4",
+      "GLIBCXX_3.4.20",
+      "GLIBCXX_3.4.21",
+      "GLIBCXX_3.4.29",
+      "GLIBCXX_3.4.31",
+      "GLIBCXX_3.4.32",
+      "GLIBCXX_3.4.9",
+      "GLIBC_2.14",
+      "GLIBC_2.2.5",
+      "GLIBC_2.34",
+      "GLIBC_2.4"
+    ],
+    "search_paths": [],
+    "sha256": "6ce06a2cba949b4bd2d370daeb61cf3a02782fb1fe62dcbafb524a8e779473dc"
+  },
+  "extension": {
+    "format": "ELF64",
+    "interpreter": null,
+    "ldd": [
+      "linux-vdso.so.1",
+      "libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6",
+      "libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6",
+      "/lib64/ld-linux-x86-64.so.2",
+      "libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6"
+    ],
+    "machine": "x86_64",
+    "name": "_uvlas.cpython-312-x86_64-linux-gnu.so",
+    "needed": [
+      "libstdc++.so.6",
+      "libgcc_s.so.1",
+      "libc.so.6",
+      "ld-linux-x86-64.so.2"
+    ],
+    "required_symbol_versions": [
+      "CXXABI_1.3",
+      "CXXABI_1.3.11",
+      "CXXABI_1.3.13",
+      "CXXABI_1.3.15",
+      "CXXABI_1.3.2",
+      "CXXABI_1.3.3",
+      "CXXABI_1.3.5",
+      "CXXABI_1.3.8",
+      "CXXABI_1.3.9",
+      "GCC_3.0",
+      "GLIBCXX_3.4",
+      "GLIBCXX_3.4.11",
+      "GLIBCXX_3.4.18",
+      "GLIBCXX_3.4.20",
+      "GLIBCXX_3.4.21",
+      "GLIBCXX_3.4.29",
+      "GLIBCXX_3.4.31",
+      "GLIBC_2.14",
+      "GLIBC_2.2.5",
+      "GLIBC_2.3",
+      "GLIBC_2.32",
+      "GLIBC_2.34",
+      "GLIBC_2.4"
+    ],
+    "search_paths": [],
+    "sha256": "fa15fa31d44b732cc7877c59aee460b2ffbf4beabf20c98cb5f55fafe05cfdb9"
+  },
+  "isolated_environment_keys": [
+    "HOME",
+    "LANG",
+    "PATH"
+  ],
+  "kernel_release": "6.18.58.1-microsoft-standard-WSL2",
+  "libc": [
+    "glibc",
+    "2.39"
+  ],
+  "platform": "Linux",
+  "platform_version": "#1 SMP PREEMPT_DYNAMIC Tue Oct 27 00:24:11 UTC 2026",
+  "producer_manifest_sha256": "65ab378f686b8a16bde0e10fb197aec92ed983f7dddb88af4e0423ef11fdc340",
+  "relocated_cli": {
+    "build_info": {
+      "commit": "72d374a8884472e0b3f4169cd5fc356c01ea3b36",
+      "compiler": "GNU 14.2.0",
+      "configuration": "Release",
+      "dependencies": {
+        "boost": "1.92.0",
+        "eigen": "5.0.1",
+        "nlohmann_json": "3.12.0",
+        "spectra": "1.2.0"
+      },
+      "dependency_repairs": {
+        "nlohmann_json_sax_allocation": 1
+      },
+      "floating_point": "-ffp-contract=off -fno-fast-math",
+      "instruction_set": "sse2",
+      "platform": "Linux x86_64",
+      "platform_key": "linux-x64-gnu14.2-sse2",
+      "schema": "uvlas.build-info/1",
+      "uncommitted_changes": false,
+      "version": "0.1.0-dev"
+    },
+    "invalid_option_status": 2
+  },
+  "relocated_python": {
+    "extension_suffix": ".cpython-312-x86_64-linux-gnu.so",
+    "implementation": "cpython",
+    "isolated": true,
+    "loaded_extension": "_uvlas.cpython-312-x86_64-linux-gnu.so",
+    "numpy": "2.3.5",
+    "numpy_bundled_runtimes": {
+      "libgfortran-040039e1-0352e75f.so.5.0.0": "c6090048eccc763522c12ef016f81da6b627cb3a044f55cf0479a839c41c0980",
+      "libquadmath-96973f99-934c22de.so.0.0.0": "6ed5137f412781ad7863439fb543613f620b43c32b63292a0029246162f5bbc6",
+      "libscipy_openblas64_-fdde5778.so": "ee2039cf13a45e1e89f04d0cea9585657d93ffaa425594e1935161013fdf4e12"
+    },
+    "numpy_license_expression": null,
+    "numpy_license_files": {
+      "LICENSE.txt": "2046a3130e50b11c01659b3a0d963e6ae0b7436ff8e89cbcfd9e87bc6112d595"
+    },
+    "numpy_wheel_tags": [
+      "cp312-cp312-manylinux_2_27_x86_64",
+      "cp312-cp312-manylinux_2_28_x86_64"
+    ],
+    "ownership_test": {
+      "cases": 10,
+      "no_extension_error": "ModuleNotFoundError: No module named '_uvlas'",
+      "no_extension_status": 1,
+      "script_sha256": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd",
+      "status": 0
+    },
+    "python_license": {
+      "file": "copyright",
+      "path": "/usr/share/doc/python3.12/copyright",
+      "sha256": "f1cbf908e1daa8789b389fdcf17811ed36b675d736b39a103591399861350382"
+    },
+    "soabi": "cpython-312-x86_64-linux-gnu",
+    "venv": true,
+    "version": "3.12.3"
+  },
+  "vcpkg_notice_sha256": {
+    "boost-assert": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-cmake": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-compat": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-concept-check": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-config": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-container": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-container-hash": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-core": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-describe": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-dynamic-bitset": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-hash2": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-headers": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-integer": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-intrusive": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-io": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-lexical-cast": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-math": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-move": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-mp11": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-multiprecision": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-predef": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-preprocessor": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-random": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-system": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-throw-exception": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-type-traits": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-utility": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-variant2": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "boost-winapi": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "eigen3": "9af2ed6fee290d31684b61774741b985aa2505e246fc28eca403f407262daf77",
+    "nlohmann-json": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+    "pybind11": "83965b843b98f670d3a85bd041ed4b372c8ec50d7b4a5995a83ac697ba675dcb",
+    "spectra": "2684de17300e0a434686f1ec7f8af6045207a4b457a3fe04b2b9ce655e7c5d50",
+    "vcpkg-boost": "1ee376fc340e0aa6ad6a3581c94126e741468705096ac92263048a21daa86460",
+    "vcpkg-cmake": "1ee376fc340e0aa6ad6a3581c94126e741468705096ac92263048a21daa86460",
+    "vcpkg-cmake-config": "04b60f99a43bfd7fefdc8364b24aac704a2160cef969b75ba6a38b62dc4c4b70"
+  }
+}

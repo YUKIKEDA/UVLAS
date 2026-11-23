@@ -1,0 +1,38 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-runtime-artifact-producer-review",
+  "ids": [
+    "IO4-02",
+    "QA-05",
+    "QA-06",
+    "QA-09",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 260,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "72d374a8884472e0b3f4169cd5fc356c01ea3b36",
+  "scope": "Native Release producer identity and required CPython notice review on Windows and Linux",
+  "verification": {
+    "platforms": 2,
+    "ownership_cases_per_platform": 10,
+    "foreign_extension_rejection_exit_windows": 1,
+    "foreign_extension_rejection_exit_linux": 1,
+    "missing_python_notice_rejection_exit_windows": 1,
+    "missing_python_notice_rejection_exit_linux": 1
+  },
+  "sources": {
+    "CMakeLists.txt": "8087bfa038c0a53b57bc1b4e1b3601acc0d3f3363ba339bb679dea663308f2b3",
+    "cmake/RuntimeArtifactManifest.cmake": "fadb55920542bbfc33a3cb8b01d4d26541ecf61a8f805fe7729d5ce093296e48",
+    "tools/qa/runtime_artifact_audit.py": "a0b9490bc07a1784e948db7c42c23a3c62f5791de7d5343d6404606c683a34f4",
+    "tests/python/test_ownership.py": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/runtime-artifact-producer-review.md": "b8611c8856fe6081d964c008fc6a4ff5a17baedeafff23736101743f907c782a",
+    "docs/verification/IM-06/runtime-artifact-producer-review/windows.json": "1f6c29f7efdab7cd7a570db859728c8ff71a344a4ec9de427f926d9ade811f7d",
+    "docs/verification/IM-06/runtime-artifact-producer-review/linux.json": "9d97ccd7da840138253e2f679b018b70f8d40b8699aa584314dbbb9379875237"
+  }
+}

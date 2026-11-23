@@ -24,14 +24,17 @@ from runtime_artifact_audit import (
     isolated_environment,
     notice_hashes,
     output,
+    read_producer_manifest,
     require,
     run,
+    verify_producer_artifacts,
 )
 
 COMPONENT = "uvlas-private-runtime"
 SCHEMA = "uvlas.private-runtime-image/1"
 INVENTORY = "inventory.json"
 BUILD_INFO = "build-info.json"
+PRODUCER_MANIFEST = "runtime-artifacts-Release.json"
 DESTINATION_EXISTS = "Image destination already exists"
 NOTICES = Path("share/uvlas/third-party-notices")
 LICENSES = (Path("share/uvlas/LICENSE"), Path("share/uvlas/THIRD_PARTY_NOTICES.md"))
@@ -95,7 +98,7 @@ def inventory(image: Path) -> dict[str, str]:
 
 
 def validate_layout(image: Path, files: dict[str, str]) -> None:
-    required = {file.as_posix() for file in (*LICENSES, Path(BUILD_INFO))}
+    required = {file.as_posix() for file in (*LICENSES, Path(BUILD_INFO), Path(PRODUCER_MANIFEST))}
     required.update(
         path.relative_to(image).as_posix() for path in (cli_path(image), extension_path(image))
     )
@@ -155,13 +158,17 @@ def rehearse(
 ) -> dict[str, object]:
     # Hash before copying, then verify the copied image before loading a binary.
     files = validate_image(image)
+    producer = read_producer_manifest(image / PRODUCER_MANIFEST, commit)
+    require(producer.sha256 == files[PRODUCER_MANIFEST], "Image producer manifest differs")
+    verify_producer_artifacts(producer, cli_path(image), extension_path(image))
     runtime = work / "relocated"
     shutil.copytree(image, runtime)
     require(files == validate_image(runtime), "Relocated image differs")
     banner = observed_cli(runtime, commit, work)
     require(
-        banner == document((runtime / BUILD_INFO).read_text(encoding="utf-8")),
-        "CLI and stored build info differ",
+        banner == producer.build_info
+        and banner == document((runtime / BUILD_INFO).read_text(encoding="utf-8")),
+        "CLI and recorded build info differ",
     )
     env = isolated_environment(work)
     venv = work / "venv"
@@ -220,6 +227,7 @@ def rehearse(
         "build_info": banner,
         "files": len(files),
         "inventory_sha256": digest(runtime / INVENTORY),
+        "producer_manifest_sha256": producer.sha256,
         "normal_site_packages_import": True,
         "extension_sha256": digest(installed),
         "cli_invalid_option_exit": 2,
@@ -274,6 +282,11 @@ def stage(
 ) -> dict[str, object]:
     require(not os.path.lexists(destination), DESTINATION_EXISTS)
     require(not destination.is_relative_to(build), "Image destination must be outside the build")
+    manifest_path = build / PRODUCER_MANIFEST
+    producer = read_producer_manifest(manifest_path, commit)
+    verify_producer_artifacts(
+        producer, build / producer.cli.relative_path, build / producer.extension.relative_path
+    )
     install_env = dict(os.environ)
     install_env.pop("DESTDIR", None)
     install_env.pop("CMAKE_INSTALL_MODE", None)
@@ -302,8 +315,13 @@ def stage(
                 "Build has no private Release component; enable it in CMake",
             )
             require(extension_path(image).is_file(), "Build has no native CPython 3.12 extension")
+            verify_producer_artifacts(producer, cli_path(image), extension_path(image))
             notice_hashes(image / NOTICES, vcpkg_share)
-            write_json(image / BUILD_INFO, observed_cli(image, commit, work))
+            shutil.copyfile(manifest_path, image / PRODUCER_MANIFEST)
+            require(
+                digest(image / PRODUCER_MANIFEST) == producer.sha256, "Producer manifest differs"
+            )
+            write_json(image / BUILD_INFO, producer.build_info)
             files = inventory(image)
             validate_layout(image, files)
             write_json(image / INVENTORY, {"schema": SCHEMA, "files": files})
