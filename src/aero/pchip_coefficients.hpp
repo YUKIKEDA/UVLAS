@@ -26,6 +26,10 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    /// Structural visits already performed by a separate coefficient forecast.
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return preflight_;
+    }
     /// Rational slot/bit/work forecast used by the shared exact executor.
     [[nodiscard]] const RationalPlan& arithmetic() const& noexcept {
         return arithmetic_;
