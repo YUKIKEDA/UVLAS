@@ -1,0 +1,233 @@
+{
+  "schema": "uvlas.runtime-artifact-audit/1",
+  "environment": {
+    "source_commit": "df11771ce33902c6944cee1671defeb54f844934",
+    "os_version": "10.0.26300.0",
+    "compiler": "MSVC 19.51.36260.0",
+    "cmake": "cmake version 3.30.4",
+    "ninja": "1.13.2",
+    "configuration": "Release",
+    "generator": "Ninja Multi-Config",
+    "warnings_as_errors": true,
+    "build_testing": false,
+    "build_python": true,
+    "vcpkg_baseline": "2ec0f1747d8186a5c9babe276e2ad57cd2b12d2a",
+    "vcpkg_triplet": "x64-windows",
+    "vcpkg_manifest_feature": "python",
+    "vcpkg_manifest_install": true,
+    "loaded_abi": {
+      "system32": {
+        "kernel32.dll": {
+          "file_version": "10.0.26100.9974 (WinBuild.160101.0800)",
+          "sha256": "970e5e15eed7d53c8b88e06ddc71884c31804f1cb5286abf01fbce39b7f0e29f"
+        },
+        "msvcp140.dll": {
+          "file_version": "14.51.36247.0",
+          "sha256": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca"
+        },
+        "vcruntime140.dll": {
+          "file_version": "14.51.36247.0",
+          "sha256": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7"
+        },
+        "vcruntime140_1.dll": {
+          "file_version": "14.51.36247.0",
+          "sha256": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e"
+        },
+        "ucrtbase.dll": {
+          "file_version": "10.0.26100.9711 (WinBuild.160101.0800)",
+          "sha256": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca"
+        }
+      },
+      "base_python": {
+        "python312.dll": {
+          "file_version": "3.12.8",
+          "sha256": "fbddf09b578bc1489827bcc19f591e2cd6be687f3db26b60e4dfca15f331800b"
+        },
+        "vcruntime140.dll": {
+          "file_version": "14.42.34433.0",
+          "sha256": "bb2281b178b5c47fc98e4cf4293e59a07684e6c6d929d1c2f0acdcb245211417"
+        },
+        "vcruntime140_1.dll": {
+          "file_version": "14.42.34433.0",
+          "sha256": "c2fa6e9ad1b41bd3f7621ba7cb6cddfc10903b73a33c36d7b13afcf3ff99dbf8"
+        }
+      }
+    },
+    "negative_unpatched_prefix": {
+      "exit_code": 1,
+      "rejection": "Expected the current vcpkg JSON allocation repair",
+      "python_optimize": 1
+    },
+    "negative_missing_transitive_notice": {
+      "exit_code": 1,
+      "missing": "boost-core",
+      "python_optimize": 1
+    }
+  },
+  "observed": {
+    "cli": {
+      "format": "PE32+",
+      "imports": [
+        "MSVCP140.dll",
+        "VCRUNTIME140.dll",
+        "VCRUNTIME140_1.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "KERNEL32.dll"
+      ],
+      "machine": "AMD64",
+      "name": "uvlas.exe",
+      "sha256": "3ec977619001e137aadcddb4f8b6a04f0979f1c8b2f5d2a147e87c9675edc13a"
+    },
+    "extension": {
+      "format": "PE32+",
+      "imports": [
+        "python312.dll",
+        "MSVCP140.dll",
+        "VCRUNTIME140.dll",
+        "VCRUNTIME140_1.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "KERNEL32.dll"
+      ],
+      "machine": "AMD64",
+      "name": "_uvlas.cp312-win_amd64.pyd",
+      "sha256": "32282b650f6b5c70236c607b20a7d4fbac498015586108b9d8cc5d1b0bdd869b"
+    },
+    "isolated_environment_keys": [
+      "PATH",
+      "SYSTEMROOT",
+      "TEMP",
+      "TMP",
+      "WINDIR"
+    ],
+    "kernel_release": "11",
+    "libc": null,
+    "platform": "Windows",
+    "platform_version": "10.0.26300",
+    "relocated_cli": {
+      "build_info": {
+        "commit": "df11771ce33902c6944cee1671defeb54f844934",
+        "compiler": "MSVC 19.51.36260.0",
+        "configuration": "Release",
+        "dependencies": {
+          "boost": "1.92.0",
+          "eigen": "5.0.1",
+          "nlohmann_json": "3.12.0",
+          "spectra": "1.2.0"
+        },
+        "dependency_repairs": {
+          "nlohmann_json_sax_allocation": 1
+        },
+        "floating_point": "/fp:strict",
+        "instruction_set": "sse2",
+        "platform": "Windows AMD64",
+        "platform_key": "windows-x64-msvc19.51-sse2",
+        "schema": "uvlas.build-info/1",
+        "uncommitted_changes": false,
+        "version": "0.1.0-dev"
+      },
+      "invalid_option_status": 2
+    },
+    "relocated_python": {
+      "extension_loaded_modules": {
+        "KERNEL32.dll": "windows/System32/kernel32.dll",
+        "MSVCP140.dll": "windows/System32/msvcp140.dll",
+        "VCRUNTIME140.dll": "base_python/vcruntime140.dll",
+        "VCRUNTIME140_1.dll": "base_python/vcruntime140_1.dll",
+        "python312.dll": "base_python/python312.dll"
+      },
+      "extension_suffix": ".cp312-win_amd64.pyd",
+      "implementation": "cpython",
+      "isolated": true,
+      "loaded_extension": "_uvlas.cp312-win_amd64.pyd",
+      "numpy": "2.3.5",
+      "numpy_bundled_runtimes": {
+        "libscipy_openblas64_-9e3e5a4229c1ca39f10dc82bba9e2b2b.dll": "9e3e5a4229c1ca39f10dc82bba9e2b2bf48037790932566f37aff1a7ccf3588f",
+        "msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+      },
+      "numpy_license_expression": null,
+      "numpy_license_files": {
+        "LICENSE.txt": "596b953e1dcbe829b32ae444387efa15003fc6abdeca8a2179f364a6364c286e"
+      },
+      "numpy_wheel_tags": [
+        "cp312-cp312-win_amd64"
+      ],
+      "ownership_test": {
+        "cases": 10,
+        "no_extension_error": "ModuleNotFoundError: No module named '_uvlas'",
+        "no_extension_status": 1,
+        "script_sha256": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd",
+        "status": 0
+      },
+      "python_license": {
+        "file": "LICENSE.txt",
+        "sha256": "886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a"
+      },
+      "soabi": null,
+      "venv": true,
+      "version": "3.12.8",
+      "windows_loader_probe": {
+        "KERNEL32.dll": "windows/System32/kernel32.dll",
+        "MSVCP140.dll": "windows/System32/msvcp140.dll",
+        "VCRUNTIME140.dll": "base_python/vcruntime140.dll",
+        "VCRUNTIME140_1.dll": "base_python/vcruntime140_1.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-math-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-string-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "python312.dll": "base_python/python312.dll"
+      }
+    },
+    "vcpkg_notice_sha256": {
+      "boost-assert": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-cmake": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-compat": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-concept-check": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-config": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-container": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-container-hash": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-core": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-describe": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-dynamic-bitset": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-hash2": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-headers": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-integer": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-intrusive": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-io": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-lexical-cast": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-math": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-move": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-mp11": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-multiprecision": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-predef": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-preprocessor": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-random": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-system": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-throw-exception": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-type-traits": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-utility": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-variant2": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "boost-winapi": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "eigen3": "ad251846a5a37acfed04407b7eee9161fbd58a91874b20fd949904413c407b2a",
+      "nlohmann-json": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+      "pybind11": "83965b843b98f670d3a85bd041ed4b372c8ec50d7b4a5995a83ac697ba675dcb",
+      "spectra": "2684de17300e0a434686f1ec7f8af6045207a4b457a3fe04b2b9ce655e7c5d50",
+      "vcpkg-boost": "1ee376fc340e0aa6ad6a3581c94126e741468705096ac92263048a21daa86460",
+      "vcpkg-cmake": "1ee376fc340e0aa6ad6a3581c94126e741468705096ac92263048a21daa86460",
+      "vcpkg-cmake-config": "04b60f99a43bfd7fefdc8364b24aac704a2160cef969b75ba6a38b62dc4c4b70"
+    }
+  },
+  "installed_port_count": 37,
+  "metadata_ports_without_notice": [
+    "boost-uninstall"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-runtime-artifact-audit",
+  "ids": [
+    "IO4-02",
+    "QA-05",
+    "QA-06",
+    "QA-09",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 260,
+  "parent_issue": 22,
+  "date": "2026-11-23",
+  "source_commit": "df11771ce33902c6944cee1671defeb54f844934",
+  "audit_tool_commit": "327b03161eaafe244c763dcb34c8cb1d9c8c9fd6",
+  "scope": "Relocated CLI and CPython extension dependency, ABI, notice, and ownership audit on Windows AMD64 and Ubuntu 24.04.5 x86_64",
+  "verification": {
+    "platforms": 2,
+    "cli_build_info_passed": 2,
+    "ownership_cases_per_platform": 10,
+    "core_vcpkg_notices_per_platform": 36,
+    "missing_extension_exit": 1,
+    "invalid_option_exit": 2,
+    "jammy_cpp_runtime_rejection": 1,
+    "unpatched_prefix_rejection": 1,
+    "missing_transitive_notice_rejection": 1
+  },
+  "claimed_state": {
+    "runtime_first_gate_observed": true,
+    "release_qualified": false,
+    "numerical_qualification": false,
+    "experimental_validation": false,
+    "product_scale_performance": false,
+    "practical_acceptance": false
+  },
+  "sources": {
+    "CMakeLists.txt": "7d855612ccceb0cc88acf3929693e2474fe9d6d4c4150dee4cd2377ff82e98c3",
+    "cmake/CompilerPolicy.cmake": "2443c41a5248dad34dea7ae082e5d8491cdedda3adb4e0be9eaeda183ec093e8",
+    "cmake/Dependencies.cmake": "925c1403e57b34e45f386c68cc7c1fa4ccf09e981ff4a83898f8ffbae7a43386",
+    "cmake/build_config.hpp.in": "1209ca9da89bc64c23aa6602472c1d92444e100969b7d78d8e0053ebb4a39abc",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e",
+    "src/app/main.cpp": "d9abac3fda7a6f4f03770f5c99ad5cb1440f3972f74eb0c3c8980cd02fe8f03f",
+    "src/python/CMakeLists.txt": "58a3ee3264552d7f908a59ba063da089c94a94559fcd338c03680fa8a1fff5ba",
+    "src/python/module.cpp": "fe7f0fae78723adeb0b978de57a62092f36a252a09541ced044920f9acabe227",
+    "tests/python/test_ownership.py": "14411a7038147c183b6786ddab025c50902b5d58ab85c5b79638ea92c89385cd",
+    "tests/python/requirements.txt": "7bd6b8946940b79948c548c8048e545684b91c8edc9444d8dfc0c8f76a97c0a7",
+    "tools/qa/runtime_artifact_audit.py": "b3637b39f7d327eaabc70eba1b2d90e69acdfcefc467dec903d663672137b278",
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "docs/specs/foundation/io-execution-adoption-specification.md": "df926d9f6726a62af313e534e04c6a9b9aa4b838f7fa252567f3a50519039123"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/runtime-artifact-audit.md": "212f0bf557887860f536a76108fc6ee0b24ad36074597462b6a2f2f51ec92fac",
+    "docs/verification/IM-06/runtime-artifact-audit/windows.json": "18fe80dcb57d26eaf09e27ae529330bba52da0091acea245715fb81ea8e195c4",
+    "docs/verification/IM-06/runtime-artifact-audit/linux.json": "965153454d5fb00fa862e37b06e1f6665627427c73301246ed197683f81944e5"
+  }
+}
