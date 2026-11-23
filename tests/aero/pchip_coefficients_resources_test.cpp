@@ -1,4 +1,5 @@
 #include "aero/pchip_boundary.hpp"
+#include "aero/pchip_curve_plan.hpp"
 #include "aero/pchip_domain_route.hpp"
 #include "aero/pchip_interval_jet.hpp"
 #include "aero/pchip_knot_locator.hpp"
@@ -1201,4 +1202,35 @@ TEST_CASE("Private PCHIP preparation input preflights storage and retains old ow
     CHECK(before.samples.times.data() == after.samples.times.data());
     CHECK(before.stamp == after.stamp);
     CHECK(std::ranges::equal(after.samples.values.back().numerator, fixture.four));
+}
+
+TEST_CASE("PCHIP curve numerical forecast never allocates before aggregate admission",
+          "[AE-07][N4-02][N4-09][negative]") {
+    const Fixture fixture;
+    const p::PreparationRequest request{fixture.view(),
+                                        preparation_dimensions,
+                                        {fixture.t.front(), fixture.t.back(), p::RejectBoundary{}},
+                                        {},
+                                        preparation_stamp};
+    c::ResourcePlan immutable_memory{UINT64_MAX};
+    p::PreparationWorkspace workspace;
+    const auto input =
+        take(p::make_preparation_input(request, workspace, limits(), immutable_memory));
+    const auto planned = [&] {
+        const FaultScope audit{0};
+        return p::forecast_curve_numerics(input, limits());
+    }();
+    REQUIRE(planned);
+    CHECK(attempts.load() == 0);
+    auto small = limits();
+    small.steps = planned->reserved_steps() - 1;
+    CHECK(small.steps >= planned->coefficients().reserved_steps());
+    CHECK(small.steps >= planned->boundary().reserved_steps());
+    const auto rejected = [&] {
+        const FaultScope audit{0};
+        return p::forecast_curve_numerics(input, small);
+    }();
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == c::FailureCode::ResourceExceeded);
+    CHECK(attempts.load() == 0);
 }

@@ -1,4 +1,4 @@
-#include "aero/pchip_preparation_input.hpp"
+#include "aero/pchip_curve_plan.hpp"
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -74,6 +74,7 @@ std::vector<p::RationalView> views(const std::vector<Input>& input) {
 }
 
 using Policy = decltype(p::BoundaryRequest::policy);
+enum class Outside : std::uint8_t { Reject, Hold, Periodic };
 
 struct Definition {
     std::vector<Rat> times{0, 1, 2, 3};
@@ -84,13 +85,17 @@ struct Definition {
 };
 
 c::Result<p::PchipPreparationInput> make(const Definition& definition,
-                                         p::PchipInputStamp stamp = zero, bool periodic = true) {
+                                         p::PchipInputStamp stamp = zero,
+                                         Outside policy = Outside::Periodic) {
     const auto t = input_words(definition.times), y = input_words(definition.values);
     const auto e = input_words(definition.events);
     const auto tv = views(t), yv = views(y), ev = views(e);
     const Input begin{definition.begin}, end{definition.end}, period{definition.period};
-    const auto outside =
-        periodic ? Policy{p::PeriodicBoundary{period.view()}} : Policy{p::HoldBoundary{}};
+    Policy outside = p::RejectBoundary{};
+    if (policy == Outside::Periodic)
+        outside = p::PeriodicBoundary{period.view()};
+    if (policy == Outside::Hold)
+        outside = p::HoldBoundary{};
     const p::PreparationRequest request{{tv, yv, definition.dimensions.size()},
                                         definition.dimensions,
                                         {begin.view(), end.view(), outside},
@@ -169,7 +174,7 @@ TEST_CASE("PCHIP compares independent owners by both stamp and all input fields"
         refuses(p::match_preparation_input(at, different, UINT64_MAX),
                 c::FailureCode::StaleGeneration);
     }
-    const auto other_policy = take(make(Definition{}, zero, false));
+    const auto other_policy = take(make(Definition{}, zero, Outside::Hold));
     refuses(p::match_preparation_input(at, other_policy, UINT64_MAX),
             c::FailureCode::StaleGeneration);
 
@@ -285,4 +290,105 @@ TEST_CASE("PCHIP rejects malformed input before publishing an owner",
         if (empty_period)
             CHECK(memory.allocated_bytes() == 0);
     }
+}
+
+TEST_CASE("PCHIP forecasts cumulative numerical work before coefficients exist",
+          "[AE-07][N4-02][N4-03][N4-06][V-AERO][verification]") {
+    struct Entry {
+        Definition definition;
+        Outside policy = Outside::Reject;
+    };
+    Definition reject;
+    reject.begin = 0;
+    reject.end = 3;
+    Definition hold = reject;
+    hold.begin = 1;
+    hold.end = 2;
+    Definition two;
+    two.times = {0, Rat{3} / 2};
+    two.values = {5, 5};
+    two.dimensions = {velocity};
+    two.period = Rat{3} / 2;
+    Definition nonuniform = hold;
+    nonuniform.times = {0, Rat{3} / 2, 2, 3};
+    nonuniform.values[3] += Rat{1} / (Big{1} << 200);
+
+    const std::array fixtures{Entry{reject, Outside::Reject}, Entry{hold, Outside::Hold},
+                              Entry{Definition{}, Outside::Periodic}, Entry{two, Outside::Periodic},
+                              Entry{nonuniform, Outside::Hold}};
+    for (std::size_t i = 0; i < fixtures.size(); ++i) {
+        CAPTURE(i);
+        const auto& entry = fixtures[i];
+        const auto input = take(make(entry.definition, zero, entry.policy));
+        auto caps = limits;
+        caps.work_bits = 65536;
+        const auto predicted = take(p::forecast_curve_numerics(input, caps));
+        const auto view = take(input.view());
+        c::ResourcePlan memory{predicted.payload_bytes()};
+        p::CoefficientWorkspace coefficient_ws;
+        const auto actual =
+            take(p::prepare_coefficients(view.samples, coefficient_ws, caps, memory));
+        const auto boundary =
+            take(p::forecast_boundary(actual, view.boundary, predicted.boundary_limits()));
+        CHECK(boundary.arithmetic().integer_bits() <=
+              predicted.boundary().arithmetic().integer_bits());
+        CHECK(boundary.arithmetic().slots() == predicted.boundary().arithmetic().slots());
+        CHECK(boundary.payload_bytes() <= predicted.boundary().payload_bytes());
+        CHECK(boundary.reserved_steps() <= predicted.boundary().reserved_steps());
+        CHECK(boundary.preflight_steps() == predicted.boundary().preflight_steps());
+        CHECK(predicted.payload_bytes() ==
+              predicted.coefficients().payload_bytes() + predicted.boundary().payload_bytes());
+        CHECK(predicted.reserved_steps() == 1 + predicted.coefficients().preflight_steps() +
+                                                predicted.boundary().preflight_steps() +
+                                                predicted.coefficients().reserved_steps() +
+                                                predicted.boundary().reserved_steps());
+        p::BoundaryWorkspace boundary_ws;
+        const auto checked = take(p::check_boundary(actual, view.boundary, boundary_ws,
+                                                    predicted.boundary_limits(), memory));
+        CHECK(actual.used_steps() <= predicted.coefficients().reserved_steps());
+        CHECK(checked.steps <= predicted.boundary().reserved_steps());
+        CHECK(memory.allocated_bytes() ==
+              (predicted.coefficients().payload_bytes() + boundary.payload_bytes()));
+        CHECK(memory.allocated_bytes() <= predicted.payload_bytes());
+        for (std::uint64_t row = 0; row < actual.nodes(); ++row) {
+            CHECK(decode(take(actual.time(row))) == entry.definition.times[row]);
+            for (std::uint64_t c = 0; c < actual.components(); ++c)
+                CHECK(decode(take(actual.value(row, c))) ==
+                      entry.definition.values[row * actual.components() + c]);
+        }
+        caps.steps = predicted.reserved_steps();
+        const auto exact = take(p::forecast_curve_numerics(input, caps));
+        CHECK(exact.reserved_steps() == caps.steps);
+        --caps.steps;
+        refuses(p::forecast_curve_numerics(input, caps), c::FailureCode::ResourceExceeded);
+    }
+}
+
+TEST_CASE("PCHIP boundary plan separates derived widths from raw input limits",
+          "[AE-07][N4-02][N4-08][negative]") {
+    Definition def;
+    def.begin = 0;
+    def.end = 3;
+    const auto input = take(make(def, zero, Outside::Hold));
+    auto caps = limits;
+    caps.input_bits = 3;
+    const auto predicted = take(p::forecast_curve_numerics(input, caps));
+    CHECK(predicted.boundary_limits().input_bits > caps.input_bits);
+    CHECK(predicted.boundary_limits().input_bits ==
+          predicted.coefficients().arithmetic().integer_bits());
+
+    def.begin = Rat{1} / (Big{1} << 200);
+    const auto too_wide = take(make(def, zero, Outside::Hold));
+    refuses(p::forecast_curve_numerics(too_wide, caps), c::FailureCode::ResourceExceeded);
+
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() is non-const.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    refuses(p::forecast_curve_numerics(input, limits, stop.get_token()), c::FailureCode::Cancelled);
+
+    auto old = take(make(Definition{}));
+    const auto moved = std::move(old);
+    CHECK(moved.active());
+    // NOLINTNEXTLINE(bugprone-use-after-move): verify documented rejection of an inactive owner.
+    refuses(p::forecast_curve_numerics(old, limits), c::FailureCode::InvalidInput);
 }

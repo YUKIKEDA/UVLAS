@@ -30,6 +30,10 @@ public:
     [[nodiscard]] std::uint64_t reserved_steps() const noexcept {
         return work_;
     }
+    /// Structural visits already performed by a separate boundary forecast.
+    [[nodiscard]] std::uint64_t preflight_steps() const noexcept {
+        return scan_;
+    }
     [[nodiscard]] const RationalPlan& arithmetic() const& noexcept {
         return arithmetic_;
     }
