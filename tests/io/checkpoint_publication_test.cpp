@@ -234,18 +234,25 @@ TEST_CASE("A killed writer cannot make a partial directory a checkpoint", "[IO4-
     ResourcePlan plan{4096};
     REQUIRE(
         publish_checkpoint_directory(dir.path, 12, chunks, bytes_of(manifest), limits, plan, {}));
+    constexpr std::string_view second_payload{"\0\1\2\3\4\5\6\7\0\1\2\3\4\5\6\7", 16};
+    constexpr std::array<uvlas::core::Index, 1> two_words{2};
+    constexpr auto second_digest =
+        digest_of("d2a1c23b0d2514a61539937da65e56acf4fbd42f22631050e07284a8703dccb2");
+    auto interrupted_chunks = chunks;
+    interrupted_chunks[1] = {
+        "second", {{CheckpointDtype::U64, two_words, 16, second_digest}, bytes_of(second_payload)}};
     const auto child = fork();
     REQUIRE(child >= 0);
     if (child == 0) {
         const rlimit no_core{0, 0};
-        const rlimit file_limit{7, 7};
+        const rlimit file_limit{12, 12};
         if (setrlimit(RLIMIT_CORE, &no_core) != 0 || setrlimit(RLIMIT_FSIZE, &file_limit) != 0 ||
             std::signal(SIGXFSZ, SIG_DFL) == SIG_ERR) {
             _exit(91);
         }
         ResourcePlan child_plan{4096};
-        const auto result = publish_checkpoint_directory(dir.path, 13, chunks, bytes_of(manifest),
-                                                         limits, child_plan, {});
+        const auto result = publish_checkpoint_directory(
+            dir.path, 13, interrupted_chunks, bytes_of(manifest), limits, child_plan, {});
         _exit(result ? 0 : 92);
     }
     int status = 0;
@@ -259,13 +266,15 @@ TEST_CASE("A killed writer cannot make a partial directory a checkpoint", "[IO4-
         const auto base = entry.path().filename().string();
         if (base.starts_with(".uvlas-checkpoint-")) {
             CHECK_FALSE(parse_checkpoint_directory_name(base));
-            CHECK(read(entry.path() / "chunk-first.bin") == payload.substr(0, 7));
+            CHECK(read(entry.path() / "chunk-first.bin") == payload);
+            CHECK(read(entry.path() / "chunk-second.bin") == second_payload.substr(0, 12));
             CHECK_FALSE(fs::exists(entry.path() / "manifest.json"));
         }
     }
-    REQUIRE(
-        publish_checkpoint_directory(dir.path, 13, chunks, bytes_of(manifest), limits, plan, {}));
+    REQUIRE(publish_checkpoint_directory(dir.path, 13, interrupted_chunks, bytes_of(manifest),
+                                         limits, plan, {}));
     CHECK(read(dir.path / "checkpoint-13" / "chunk-first.bin") == payload);
+    CHECK(read(dir.path / "checkpoint-13" / "chunk-second.bin") == second_payload);
 }
 #endif
 } // namespace
