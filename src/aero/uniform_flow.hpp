@@ -3,6 +3,8 @@
 #include "pchip_curve.hpp"
 
 #include <array>
+#include <functional>
+#include <optional>
 #include <variant>
 
 namespace uvlas::aero::detail {
@@ -79,6 +81,8 @@ struct UniformFlowQuery {
     pchip::PchipInputStamp stamp;
     pchip::RationalView time;
     pchip::RequestedSide side = pchip::RequestedSide::Automatic;
+    /// Required for PCHIP. Supply the host's independently qualified current input.
+    std::optional<std::reference_wrapper<const pchip::SharedPreparationInput>> expected_pchip{};
 };
 
 /// Exact world velocity [m/s], time partial [m/s²] and spatial Jacobian [1/s].

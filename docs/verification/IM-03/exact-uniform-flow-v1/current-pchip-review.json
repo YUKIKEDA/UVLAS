@@ -1,0 +1,31 @@
+{
+  "source_commit": "cdbe839a7d09d15152228bb28fedd2b823c4b76a",
+  "reviewed_source_commit": "3edae08d24e0998fd08b176837598767f0fee870",
+  "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "ctest_targets": [
+    "aero.uniform_flow",
+    "aero.pchip_curve",
+    "aero.pchip_coefficients_resources"
+  ],
+  "ctest_each_configuration": {
+    "passed": 3,
+    "failed": 0
+  },
+  "catch_seed": 274,
+  "focused_each_configuration": {
+    "cases": 1,
+    "assertions_passed": 135
+  },
+  "scope": "Forecast and evaluate take the host's independently qualified current PCHIP input. Both reject missing input and same-stamp changes to either samples or events without allocating. Independent equal inputs return the exact world velocity and derivatives, including the matching cost in the admitted step budget.",
+  "static": "clang-tidy 21.1.1 passed on the changed implementation, its test and the dependent resource test.",
+  "clean_build": true,
+  "sources": {
+    "src/aero/uniform_flow.cpp": "3efb424adf14ba54481ce99770d9eb1c578604b5aab6885b42462628c77c450f",
+    "src/aero/uniform_flow.hpp": "538959b2a870b957ceabb1a2946f0dc5043b174d6bb6c81f4e5fb16723754994",
+    "tests/aero/uniform_flow_test.cpp": "842526fc1f4bf557255a2d8d757e711cc888ccbb675623d9d6371f79c28e3810"
+  }
+}
