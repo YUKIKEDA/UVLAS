@@ -400,8 +400,8 @@ rd::ReferenceInput from_memory(const fs::path& directory, std::string_view wire,
                                                          limits(), plan, {}, nullptr));
 }
 
-void check_acquisition_failure(const core::Result<rd::AcquiredRootSnapshot>& outcome,
-                               core::FailureCode expected) {
+template <class T>
+void check_acquisition_failure(const core::Result<T>& outcome, core::FailureCode expected) {
     REQUIRE_FALSE(outcome);
     CHECK(outcome.error().code == expected);
     CHECK(outcome.error().operation == core::Operation::PrepareModel);
@@ -562,4 +562,225 @@ TEST_CASE("Memory root accepts a hard link to a separate manifest as ordinary fi
         rd::acquire_root_snapshot(input, prepared, 0, {}, too_short, plan, {}, &diagnostic);
     check_acquisition_failure(failed, core::FailureCode::ResourceExceeded);
     check_read_reason(diagnostic, rd::ReferenceFileFailure::ReadBytes);
+}
+
+TEST_CASE("The first authenticated root enters the walk while later roots stay pending",
+          "[IO4-01][N4-02][N4-08][integration][property]") {
+    const auto retained = [] {
+        constexpr rd::DependencyWalkLimits walk_limits{8, 1, 1, 19, 0};
+        const Tree tree;
+        const auto wire = manifest_with_reference("first-input.msh", abc_hex).wire();
+        write_file(tree.root / "manifest.json", wire);
+        write_file(tree.root / "first-input.msh", "abc");
+        core::ResourcePlan creation{fixture::budget};
+        const auto input = fixture::take(rd::ReferenceInput::from_file(
+            tree.root, "manifest.json", source, manifest_limits, limits(), creation, {}, nullptr));
+        const auto prepared = prepare(input);
+        CHECK(fixture::take(prepared.report()).unique_sources == 8);
+        const auto first = fixture::take(prepared.declaration(0));
+        core::ResourcePlan plan{fixture::budget};
+        rd::ReferenceWalkStartDiagnostic diagnostic;
+        auto started = fixture::take(rd::start_reference_walk(
+            input, prepared, walk_limits, acquisition_limits, plan, {}, &diagnostic));
+        CHECK_FALSE(diagnostic.reason);
+        if (const auto state = started.view()) {
+            CHECK(fixture::same_identity(state->parent, fixture::take(prepared.identity())));
+            if (const auto* pending = state->pending_root) {
+                CHECK(pending->edge.declaration_node == first.original.declaration_node);
+                CHECK(pending->snapshot.location.declaration_node ==
+                      pending->edge.declaration_node);
+            } else {
+                FAIL("Expected pending dependencies");
+            }
+        } else {
+            FAIL("Expected an owned traversal");
+        }
+
+        const auto charges = plan.allocated_bytes();
+        REQUIRE(charges > 18 * sizeof(core::Index));
+        core::ResourcePlan exact{charges};
+        REQUIRE(rd::start_reference_walk(input, prepared, walk_limits, acquisition_limits, exact,
+                                         {}, nullptr));
+        CHECK(exact.remaining_bytes() == 0);
+        core::ResourcePlan short_plan{charges - 1};
+        check_acquisition_failure(rd::start_reference_walk(input, prepared, walk_limits,
+                                                           acquisition_limits, short_plan, {},
+                                                           &diagnostic),
+                                  core::FailureCode::ResourceExceeded);
+        CHECK(diagnostic.reason == rd::ReferenceWalkStartFailure::Snapshot);
+        CHECK(diagnostic.snapshot.reason == rd::RootSnapshotFailure::ProvenanceStorage);
+        REQUIRE(fs::remove(tree.root / "first-input.msh"));
+        return started;
+    }();
+    if (const auto state = retained.view()) {
+        constexpr std::array<core::Index, 1> active{0};
+        CHECK(state->parent.source.source == source);
+        CHECK(std::ranges::equal(state->walk.active, active));
+        CHECK(state->walk.dependency_first.empty());
+        CHECK(state->walk.edges == 1);
+        CHECK(state->walk.work == 19);
+        if (const auto* pending = state->pending_root) {
+            CHECK_FALSE(pending->edge.consumer);
+            CHECK(pending->edge.declaring_source == source);
+            CHECK(pending->edge.dependency == 0);
+            CHECK(pending->edge.role == rd::ReferenceRole::GmshMesh);
+            CHECK(pending->snapshot.location.source == io::SourceId{300});
+            CHECK(pending->snapshot.location.role == rd::ReferenceRole::GmshMesh);
+            CHECK(pending->snapshot.pointer() == "/model/geometry/0/mesh");
+            if (const auto payload = pending->snapshot.file.view()) {
+                CHECK(std::ranges::equal(payload->bytes, bytes_of("abc")));
+                CHECK(payload->digest == abc_digest);
+            } else {
+                FAIL("Missing authenticated bytes");
+            }
+        } else {
+            FAIL("Expected pending dependencies after dropping the input");
+        }
+    } else {
+        FAIL("Expected a traversal after dropping the input");
+    }
+}
+
+TEST_CASE("An empty root walk still requires the original checked parent",
+          "[IO4-01][N4-02][N4-08][integration][negative]") {
+    const auto make_input = [](std::string_view wire, io::SourceId id) {
+        core::ResourcePlan plan{fixture::budget};
+        return fixture::take(rd::ReferenceInput::from_memory(bytes_of(wire), id, std::nullopt,
+                                                             limits(), plan, {}, nullptr));
+    };
+    const auto input = make_input(static_case(), source);
+    const auto other = make_input(static_case(), io::SourceId{20});
+    const auto different_bytes = make_input(std::string{static_case()} + " ", source);
+    const auto prepared = prepare(input);
+    core::ResourcePlan plan{0};
+    rd::ReferenceWalkStartDiagnostic diagnostic;
+    check_acquisition_failure(
+        rd::start_reference_walk(other, prepared, {}, {}, plan, {}, &diagnostic),
+        core::FailureCode::StaleGeneration);
+    CHECK(diagnostic.reason == rd::ReferenceWalkStartFailure::Binding);
+    CHECK(diagnostic.snapshot.reason == rd::RootSnapshotFailure::StaleParent);
+    check_acquisition_failure(
+        rd::start_reference_walk(different_bytes, prepared, {}, {}, plan, {}, nullptr),
+        core::FailureCode::StaleGeneration);
+    const auto empty =
+        fixture::take(rd::start_reference_walk(input, prepared, {}, {}, plan, {}, &diagnostic));
+    CHECK_FALSE(diagnostic.reason);
+    CHECK_FALSE(diagnostic.snapshot.reason);
+    if (const auto state = empty.view()) {
+        CHECK(fixture::same_identity(state->parent, fixture::take(prepared.identity())));
+        CHECK(state->pending_root == nullptr);
+        CHECK(state->walk.active.empty());
+        CHECK(state->walk.dependency_first.empty());
+        CHECK(state->walk.edges == 0);
+        CHECK(state->walk.work == 0);
+    } else {
+        FAIL("Missing empty traversal");
+    }
+    CHECK(plan.allocated_bytes() == 0);
+}
+
+TEST_CASE("Root walk applies preflight, snapshot, and edge failures in order",
+          "[IO4-01][N4-02][N4-08][integration][negative]") {
+    const Tree tree;
+    const auto wire = manifest_with_reference("first-input.msh", abc_hex).wire();
+    const auto payload_path = tree.root / "first-input.msh";
+    const auto input = from_memory(tree.root, wire);
+    const auto prepared = prepare(input);
+    rd::ReferenceWalkStartDiagnostic diagnostic;
+    core::ResourcePlan initial{fixture::budget};
+    const auto start = [&](rd::DependencyWalkLimits bounds, core::ResourcePlan& plan,
+                           const std::stop_token& stop = {}) {
+        return rd::start_reference_walk(input, prepared, bounds, acquisition_limits, plan, stop,
+                                        &diagnostic);
+    };
+    using Code = core::FailureCode;
+    using Stage = rd::ReferenceWalkStartFailure;
+    check_acquisition_failure(start({7, 1, 1, 19, 0}, initial), Code::ResourceExceeded);
+    CHECK(diagnostic.reason == Stage::Sources);
+    if (const auto& quota = diagnostic.sources) {
+        CHECK(quota->required == 8);
+        CHECK(quota->limit == 7);
+    } else {
+        FAIL("Missing source capacity");
+    }
+    check_acquisition_failure(start({8, 1, 1, 17, 0}, initial), Code::ResourceExceeded);
+    CHECK(diagnostic.reason == Stage::WalkStorage);
+    CHECK(initial.allocated_bytes() == 0);
+    core::ResourcePlan insufficient{18 * sizeof(core::Index) - 1};
+    check_acquisition_failure(start({8, 1, 1, 19, 0}, insufficient), Code::ResourceExceeded);
+    CHECK(diagnostic.reason == Stage::WalkStorage);
+    CHECK(insufficient.allocated_bytes() == 0);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop requires mutable source.
+    std::stop_source cancel;
+    REQUIRE(cancel.request_stop());
+    check_acquisition_failure(start({8, 1, 1, 19, 0}, initial, cancel.get_token()),
+                              Code::Cancelled);
+    CHECK_FALSE(diagnostic.reason);
+    CHECK_FALSE(diagnostic.snapshot.reason);
+    CHECK(initial.allocated_bytes() == 0);
+
+    core::ResourcePlan missing_plan{fixture::budget};
+    check_acquisition_failure(start({8, 0, 0, 16, 0}, missing_plan), Code::InvalidInput);
+    CHECK(diagnostic.reason == Stage::Snapshot);
+    CHECK(diagnostic.snapshot.reason == rd::RootSnapshotFailure::Open);
+    CHECK_FALSE(diagnostic.walk.reason);
+    CHECK(missing_plan.allocated_bytes() >= 16 * sizeof(core::Index));
+
+    write_file(payload_path, "abd");
+    core::ResourcePlan wrong_digest{fixture::budget};
+    check_acquisition_failure(start({8, 0, 0, 16, 0}, wrong_digest), Code::InvalidInput);
+    CHECK(diagnostic.reason == Stage::Snapshot);
+    check_read_reason(diagnostic.snapshot, rd::ReferenceFileFailure::DigestMismatch);
+    CHECK(diagnostic.pointer() == "/model/geometry/0/mesh");
+    CHECK_FALSE(diagnostic.walk.reason);
+    CHECK(wrong_digest.allocated_bytes() > 16 * sizeof(core::Index));
+
+    write_file(payload_path, "abc");
+    using WalkReason = rd::DependencyWalkFailure;
+    struct Rejection {
+        rd::DependencyWalkLimits caps;
+        WalkReason reason;
+        std::uint64_t limit;
+    };
+    constexpr std::array cases{
+        Rejection{{8, 0, 1, 19, 0}, WalkReason::EdgeLimit, 0},
+        Rejection{{8, 1, 1, 18, 0}, WalkReason::Work, 18},
+        Rejection{{8, 1, 0, 17, 0}, WalkReason::DepthLimit, 0},
+    };
+    for (const auto& candidate : cases) {
+        CAPTURE(candidate.reason);
+        core::ResourcePlan plan{fixture::budget};
+        check_acquisition_failure(start(candidate.caps, plan), Code::ResourceExceeded);
+        CHECK(diagnostic.reason == Stage::Edge);
+        CHECK_FALSE(diagnostic.snapshot.reason);
+        CHECK(diagnostic.walk.reason == candidate.reason);
+        CHECK(diagnostic.walk.required == candidate.limit + 1);
+        CHECK(diagnostic.walk.limit == candidate.limit);
+        CHECK(diagnostic.pointer() == "/model/geometry/0/mesh");
+        CHECK(plan.allocated_bytes() > 16 * sizeof(core::Index));
+    }
+
+    auto tiny_diag = acquisition_limits;
+    tiny_diag.diagnostic_bytes = 0;
+    core::ResourcePlan compact_plan{fixture::budget};
+    check_acquisition_failure(rd::start_reference_walk(input, prepared, cases.front().caps,
+                                                       tiny_diag, compact_plan, {}, &diagnostic),
+                              Code::ResourceExceeded);
+    CHECK(diagnostic.reason == Stage::Edge);
+    CHECK(diagnostic.walk.reason == WalkReason::EdgeLimit);
+    if (const auto& declaration = diagnostic.walk.edge) {
+        CHECK(declaration->declaring_source == source);
+        CHECK(declaration->role == rd::ReferenceRole::GmshMesh);
+        CHECK(declaration->declaration_node ==
+              fixture::take(prepared.declaration(0)).original.declaration_node);
+    } else {
+        FAIL("Missing declaration with no pointer budget");
+    }
+    CHECK(diagnostic.pointer().empty());
+
+    core::ResourcePlan final_plan{fixture::budget};
+    REQUIRE(start({8, 1, 1, 19, 0}, final_plan));
+    CHECK_FALSE(diagnostic.reason);
+    CHECK_FALSE(diagnostic.walk.reason);
+    CHECK(diagnostic.pointer().empty());
 }
