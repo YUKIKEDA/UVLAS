@@ -612,6 +612,14 @@ uvlas_add_test(structure.pg_reference_geometry
 target_include_directories(uvlas_test_structure_pg_reference_geometry
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 
+uvlas_add_test(structure.pg_conditioning
+    LABELS property negative verification V-PG
+    TIMEOUT 180
+    SOURCES structure/pg_conditioning_test.cpp
+    LIBS uvlas_structure Boost::multiprecision)
+target_include_directories(uvlas_test_structure_pg_conditioning
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
