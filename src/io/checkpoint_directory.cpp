@@ -129,9 +129,12 @@ core::Result<void> save_checkpoint_directory(
     const std::filesystem::path& parent, std::uint64_t number,
     std::span<const NamedCheckpointChunk> chunks, const CheckpointFingerprints& identity,
     const CheckpointManifestLimits& limits, CheckpointPublicationLimits publication,
-    core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<CheckpointPublicationDiagnostic>* diagnostic) noexcept {
     constexpr auto save = core::Operation::SaveCheckpoint;
     constexpr auto invalid = core::FailureCode::InvalidInput;
+    if (diagnostic != nullptr)
+        diagnostic->reset();
     auto manifest = write_checkpoint_manifest(chunks, identity, limits, plan, stop);
     if (!manifest)
         return std::unexpected(manifest.error());
@@ -147,7 +150,8 @@ core::Result<void> save_checkpoint_directory(
         entries->values()[i] = {chunk.name, *view};
     }
     return publish_checkpoint_directory(parent, number, entries->values(),
-                                        std::as_bytes(manifest->values()), publication, plan, stop);
+                                        std::as_bytes(manifest->values()), publication, plan, stop,
+                                        diagnostic);
 }
 
 core::Result<LoadedCheckpointDirectory>

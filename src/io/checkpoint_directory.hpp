@@ -25,7 +25,8 @@ struct CheckpointDiscoveryLimits {
 save_checkpoint_directory(const std::filesystem::path& parent, std::uint64_t number,
                           std::span<const NamedCheckpointChunk>, const CheckpointFingerprints&,
                           const CheckpointManifestLimits&, CheckpointPublicationLimits,
-                          core::ResourcePlan&, const std::stop_token&) noexcept;
+                          core::ResourcePlan&, const std::stop_token&,
+                          std::optional<CheckpointPublicationDiagnostic>* = nullptr) noexcept;
 
 /// Read a selected completed checkpoint on Windows or Linux. The last path component
 /// must be its canonical checkpoint number. Every child is opened under one root handle.

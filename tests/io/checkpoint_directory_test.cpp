@@ -2,6 +2,7 @@
 #include "checkpoint_directory_name.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include <array>
 #include <atomic>
@@ -66,6 +67,8 @@ constexpr uvlas::io::SourceId input{554};
 
 TEST_CASE("Checkpoint directories round-trip typed data and discover the latest valid number",
           "[IO4-06][N4-02]") {
+    const bool incompatible_newest = GENERATE(false, true);
+    CAPTURE(incompatible_newest);
     const TestDirectory root;
     core::ResourcePlan plan{6'000'000};
     auto identity = cp::CheckpointFingerprints{};
@@ -79,41 +82,48 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
     const auto b = chunk(47);
     const std::array first{cp::NamedCheckpointChunk{"node_id", a}};
     const std::array second{cp::NamedCheckpointChunk{"node_id", b}};
-    REQUIRE(cp::save_checkpoint_directory(root.path(), 4, first, identity, limits, publication,
-                                          plan, {}));
-    REQUIRE(cp::save_checkpoint_directory(root.path(), 12, second, identity, limits, publication,
-                                          plan, {}));
-    REQUIRE(cp::save_checkpoint_directory(root.path(), 13, first, identity, limits, publication,
-                                          plan, {}));
-    CHECK_FALSE(cp::save_checkpoint_directory(root.path(), 12, first, identity, limits, publication,
-                                              plan, {}));
+    const auto save = [&](std::uint64_t number, std::span<const cp::NamedCheckpointChunk> chunks,
+                          const cp::CheckpointFingerprints& context) {
+        std::optional<cp::CheckpointPublicationDiagnostic> diagnostic;
+        const auto result = cp::save_checkpoint_directory(
+            root.path(), number, chunks, context, limits, publication, plan, {}, &diagnostic);
+        if (diagnostic) {
+            UNSCOPED_INFO("native save stage " << static_cast<unsigned>(diagnostic->stage)
+                                               << ", error "
+                                               << diagnostic->native_error.value_or(0));
+        }
+        return result;
+    };
+    REQUIRE(save(4, first, identity));
+    REQUIRE(save(12, second, identity));
+    CHECK_FALSE(save(12, first, identity));
 
-    bool incompatible_newest = false;
-    SECTION("skip a published directory with a corrupted last byte") {
-        std::ofstream damage(root.path() / "checkpoint-13" / "chunk-node_id.bin",
-                             std::ios::binary | std::ios::trunc);
+    const auto good = root.path() / "checkpoint-12";
+    if (incompatible_newest) {
+        auto other = identity;
+        other.model.bytes[0] = std::byte{1};
+        REQUIRE(save(14, first, other));
+        const auto incompatible = cp::read_checkpoint_directory(
+            root.path() / "checkpoint-14", input, identity, limits, files, plan, {});
+        REQUIRE_FALSE(incompatible);
+        CHECK(incompatible.error().code == core::FailureCode::CheckpointIncompatible);
+    } else {
+        const auto broken = root.path() / "checkpoint-13";
+        REQUIRE(fs::create_directory(broken));
+        REQUIRE(fs::copy_file(good / "manifest.json", broken / "manifest.json"));
+        std::ofstream damage(broken / "chunk-node_id.bin", std::ios::binary | std::ios::trunc);
         REQUIRE(damage.is_open());
         const std::array<char, 8> wrong{};
         damage.write(wrong.data(), static_cast<std::streamsize>(wrong.size()));
         damage.close();
         REQUIRE(damage.good());
-    }
-    SECTION("skip an incompatible completed manifest") {
-        incompatible_newest = true;
-        auto other = identity;
-        other.model.bytes[0] = std::byte{1};
-        REQUIRE(cp::save_checkpoint_directory(root.path(), 14, first, other, limits, publication,
-                                              plan, {}));
-        fs::rename(root.path() / "checkpoint-13", root.path() / ".uvlas-checkpoint-fixture");
-    }
-    if (!incompatible_newest) {
-        // Even a complete set is invisible under a staging name.
-        fs::copy(root.path() / "checkpoint-12", root.path() / ".uvlas-checkpoint-fixture");
-        const auto corrupt = cp::read_checkpoint_directory(root.path() / "checkpoint-13", input,
-                                                           identity, limits, files, plan, {});
+        const auto corrupt =
+            cp::read_checkpoint_directory(broken, input, identity, limits, files, plan, {});
         REQUIRE_FALSE(corrupt);
         CHECK(corrupt.error().code == core::FailureCode::CheckpointCorrupt);
     }
+    // Even a complete set is invisible under a staging name.
+    fs::copy(good, root.path() / ".uvlas-checkpoint-fixture");
     const auto staging = cp::read_checkpoint_directory(root.path() / ".uvlas-checkpoint-fixture",
                                                        input, identity, limits, files, plan, {});
     REQUIRE_FALSE(staging);
