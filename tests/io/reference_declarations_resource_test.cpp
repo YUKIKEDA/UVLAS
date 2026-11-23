@@ -458,7 +458,7 @@ TEST_CASE(
 TEST_CASE("Dependency walk allocation failures preserve the primary cycle decision",
           "[IO4-01][N4-02][N4-08][negative]") {
     constexpr rd::DependencyWalkLimits caps{2, 3, 2, 20, 3 * sizeof(core::Index)};
-    for (std::int64_t point = 0; point < 3; ++point) {
+    for (std::int64_t point = 0; point < 4; ++point) {
         core::ResourcePlan plan{budget};
         const auto failed = [&] {
             const FaultScope fault{point};
@@ -473,14 +473,14 @@ TEST_CASE("Dependency walk allocation failures preserve the primary cycle decisi
     // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop requires mutable source.
     std::stop_source stop;
     cancel_at_allocation = &stop;
-    cancel_after = 2;
+    cancel_after = 3;
     core::ResourcePlan cancelled_plan{budget};
     const auto cancelled = rd::DependencyWalk::create(caps, cancelled_plan, stop.get_token());
     cancel_at_allocation = nullptr;
     cancel_after = -1;
     REQUIRE_FALSE(cancelled);
     CHECK(cancelled.error().code == core::FailureCode::Cancelled);
-    CHECK(cancelled_plan.allocated_bytes() == 6 * sizeof(core::Index));
+    CHECK(cancelled_plan.allocated_bytes() == 8 * sizeof(core::Index));
 
     core::ResourcePlan plan{budget};
     auto walk = take(rd::DependencyWalk::create(caps, plan, {}));
@@ -501,7 +501,7 @@ TEST_CASE("Dependency walk allocation failures preserve the primary cycle decisi
     if (const auto view = walk.view()) {
         CHECK(view->active.size() == 1);
         CHECK(view->edges == 1);
-        CHECK(view->work == 7);
+        CHECK(view->work == 9);
     } else {
         FAIL("Missing stable traversal");
     }

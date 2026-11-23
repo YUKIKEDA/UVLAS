@@ -65,13 +65,18 @@ public:
 
 private:
     DependencyWalk(DependencyWalkLimits limits, core::PlannedBuffer<core::Index> positions,
-                   core::PlannedBuffer<core::Index> frames, core::PlannedBuffer<core::Index> order,
+                   core::PlannedBuffer<core::Index> frames,
+                   core::PlannedBuffer<core::Index> heights, core::PlannedBuffer<core::Index> order,
                    std::uint64_t work) noexcept;
 
+    void remember_height(core::Index dependency_height) noexcept;
+
     std::optional<DependencyWalkLimits> limits_;
-    // Zero means unseen, positive is the one-based stack position, -1 means finished.
+    // Zero means unseen, positive is the one-based stack position, negative is the
+    // negated height of a finished source, including the source itself.
     core::PlannedBuffer<core::Index> positions_;
     core::PlannedBuffer<core::Index> frames_;
+    core::PlannedBuffer<core::Index> heights_; // Longest admitted path from each active frame.
     core::PlannedBuffer<core::Index> order_;
     std::size_t active_ = 0;
     std::size_t finished_ = 0;

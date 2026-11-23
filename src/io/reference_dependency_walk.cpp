@@ -28,10 +28,12 @@ void DependencyWalkDiagnostic::reset() noexcept {
 DependencyWalk::DependencyWalk(DependencyWalkLimits limits,
                                core::PlannedBuffer<core::Index> positions,
                                core::PlannedBuffer<core::Index> frames,
+                               core::PlannedBuffer<core::Index> heights,
                                core::PlannedBuffer<core::Index> order, std::uint64_t work) noexcept
     : limits_(limits),
       positions_(std::move(positions)),
       frames_(std::move(frames)),
+      heights_(std::move(heights)),
       order_(std::move(order)),
       work_(work) {}
 
@@ -39,6 +41,7 @@ DependencyWalk::DependencyWalk(DependencyWalk&& other) noexcept
     : limits_(std::exchange(other.limits_, std::nullopt)),
       positions_(std::move(other.positions_)),
       frames_(std::move(other.frames_)),
+      heights_(std::move(other.heights_)),
       order_(std::move(other.order_)),
       active_(other.active_),
       finished_(other.finished_),
@@ -53,11 +56,11 @@ core::Result<DependencyWalk> DependencyWalk::create(DependencyWalkLimits limits,
     }
     const auto frames = std::min(limits.depth, limits.sources);
     constexpr auto index_max = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
-    if (frames > index_max || limits.sources > (index_max - frames) / 2) {
+    if (frames > index_max / 2 || limits.sources > index_max / 2 - frames) {
         return fail(Code::ResourceExceeded);
     }
-    // The two source arrays and the explicit stack are value-initialized under the work cap.
-    const auto cells = 2 * limits.sources + frames;
+    // Two source arrays and two stack arrays are value-initialized under the work cap.
+    const auto cells = 2 * (limits.sources + frames);
     const auto bytes =
         core::checked_byte_count(static_cast<core::Index>(cells), sizeof(core::Index), operation);
     if (!bytes) {
@@ -82,12 +85,17 @@ core::Result<DependencyWalk> DependencyWalk::create(DependencyWalkLimits limits,
     if (!stack) {
         return std::unexpected(stack.error());
     }
+    auto heights = allocate(frames);
+    if (!heights) {
+        return std::unexpected(heights.error());
+    }
     auto order = allocate(limits.sources);
     if (!order) {
         return std::unexpected(order.error());
     }
-    return DependencyWalk{limits, std::move(*positions), std::move(*stack), std::move(*order),
-                          cells};
+    return DependencyWalk{
+        limits, std::move(*positions), std::move(*stack), std::move(*heights), std::move(*order),
+        cells};
 }
 
 core::Result<DependencyStep> DependencyWalk::enter(const DependencyEdge& edge,
@@ -100,12 +108,14 @@ core::Result<DependencyStep> DependencyWalk::enter(const DependencyEdge& edge,
     if (stop.stop_requested()) {
         return fail(Code::Cancelled);
     }
-    const auto reject = [&](Code code, Reason reason, std::optional<std::uint64_t> cap = {}) {
+    const auto reject = [&](Code code, Reason reason, std::optional<std::uint64_t> cap = {},
+                            std::optional<std::uint64_t> required = {}) {
         if (diagnostic) {
             diagnostic->reason = reason;
             diagnostic->edge = edge;
             diagnostic->limit = cap;
-            if (cap && *cap != std::numeric_limits<std::uint64_t>::max()) {
+            diagnostic->required = required;
+            if (!required && cap && *cap != std::numeric_limits<std::uint64_t>::max()) {
                 diagnostic->required = *cap + 1;
             }
         }
@@ -160,8 +170,12 @@ core::Result<DependencyStep> DependencyWalk::enter(const DependencyEdge& edge,
         }
         return reject(Code::InvalidInput, Reason::Cycle);
     }
-    if (position == 0 && active_ == frames_.size()) {
-        return reject(Code::ResourceExceeded, Reason::DepthLimit, limits_->depth);
+    const auto height = position < 0 ? -position : core::Index{1};
+    // The active prefix and completed height fit individually in the frame capacity,
+    // which create() bounds by half the maximum Index.
+    const auto required_depth = active_ + static_cast<std::uint64_t>(height);
+    if (required_depth > limits_->depth) {
+        return reject(Code::ResourceExceeded, Reason::DepthLimit, limits_->depth, required_depth);
     }
     if (stop.stop_requested()) {
         return fail(Code::Cancelled);
@@ -169,9 +183,11 @@ core::Result<DependencyStep> DependencyWalk::enter(const DependencyEdge& edge,
     ++edges_;
     ++work_;
     if (position < 0) {
+        remember_height(height);
         return DependencyStep::Shared;
     }
-    frames_.values()[active_++] = edge.dependency;
+    frames_.values()[active_] = edge.dependency;
+    heights_.values()[active_++] = height;
     position = static_cast<core::Index>(active_);
     return DependencyStep::Visit;
 }
@@ -188,11 +204,20 @@ core::Result<void> DependencyWalk::finish(core::Index source,
         return fail(Code::ResourceExceeded);
     }
     // Every active slot was admitted by enter, and a finished source is never pushed again.
-    positions_.values()[static_cast<std::size_t>(source)] = -1;
+    const auto height = heights_.values()[active_ - 1];
+    positions_.values()[static_cast<std::size_t>(source)] = -height;
     order_.values()[finished_++] = source;
     --active_;
+    remember_height(height);
     ++work_;
     return {};
+}
+
+void DependencyWalk::remember_height(core::Index dependency_height) noexcept {
+    if (active_ != 0) {
+        auto& height = heights_.values()[active_ - 1];
+        height = std::max(height, dependency_height + 1);
+    }
 }
 
 std::optional<DependencyWalkView> DependencyWalk::view() const& noexcept {
