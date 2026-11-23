@@ -66,6 +66,8 @@ public:
     [[nodiscard]] bool active() const noexcept;
     [[nodiscard]] core::Result<UniformFlowInput> input() const& noexcept;
     [[nodiscard]] core::Result<UniformFlowInput> input() const&& = delete;
+    /// Retain this host-current PCHIP input for use against another prepared curve.
+    [[nodiscard]] core::Result<pchip::SharedPreparationInput> retain_pchip_input() const noexcept;
     [[nodiscard]] std::uint64_t used_steps() const noexcept;
 
 private:
@@ -135,6 +137,12 @@ forecast_uniform_flow_evaluation(const UniformFlowReady&, UniformFlowQuery, pchi
 evaluate_uniform_flow(const UniformFlowReady&, UniformFlowQuery, UniformFlowWorkspace&,
                       pchip::CurveLimits, core::ResourcePlan&, const std::stop_token& = {},
                       core::FailureDetails = {}) noexcept;
+
+/// Compare exact constant or polynomial inputs before reusing a cached provider.
+[[nodiscard]] core::Result<std::uint64_t>
+match_uniform_formula_input(const UniformFlowReady&, const UniformFlowReady& current,
+                            std::uint64_t work_limit, const std::stop_token& = {},
+                            core::FailureDetails = {}) noexcept;
 
 struct UniformFormulaSnapshotView {
     UniformFlowInput input;
