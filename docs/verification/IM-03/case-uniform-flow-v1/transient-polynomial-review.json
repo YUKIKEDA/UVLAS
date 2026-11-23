@@ -1,0 +1,41 @@
+{
+  "source_commit": "b5d76ae5bebaa83026fea4e395ec39e9cc56e4dd",
+  "reviewed_source_commit": "21a57d1f07ac45a556126a6de2e8169c5c8152df",
+  "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "ctest_targets": [
+    "coupling.case_uniform_flow",
+    "aero.uniform_flow",
+    "io.si_case"
+  ],
+  "ctest_each_configuration": {
+    "passed": 3,
+    "failed": 0
+  },
+  "catch_seed": 279,
+  "focused_each_configuration": {
+    "cases": 1,
+    "assertions_passed": 17
+  },
+  "all_case_flow_tests_each_configuration": {
+    "cases": 6,
+    "assertions_passed": 455
+  },
+  "scope": "Before publishing a transient polynomial, compare the first start and last end, in exact SI seconds, with both inclusive domain bounds. Each outside bound and an exact equality control use the actual case-to-SI preparation path. The stationary case accepts its declared domain; the transient import quotas include both extra time recipes.",
+  "mutation": {
+    "configuration": "isolated Windows Debug compile and link",
+    "lower": "Reversing only the lower comparison accepted an invalid domain and failed the test, exit 42.",
+    "upper": "Reversing only the upper comparison accepted an invalid domain and failed the test, exit 42."
+  },
+  "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on three changed translation units, exit 0.",
+  "clean_build": true,
+  "sources": {
+    "src/coupling/case_uniform_flow.cpp": "1c1000587f17388e3745f2dd82d85fe97e44f2055a2dba305b8031f1a05288bb",
+    "src/io/si_exact.cpp": "a85c46cef604636505a116021419177d0ed21c6a73ba8a464d06aca76adf72c8",
+    "src/io/si_exact_words.hpp": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177",
+    "tests/coupling/case_uniform_flow_test.cpp": "29d40ea7627fa42a233281ee07da47fe0647757f5368f5c2b08b086f617c1d33"
+  }
+}
