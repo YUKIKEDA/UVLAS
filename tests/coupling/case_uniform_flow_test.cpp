@@ -909,12 +909,25 @@ TEST_CASE("Discrete nonpenetration matches an owned decimal event on its request
     CHECK(geometry.context() == alternative.context());
     CHECK(test_geometry::take(geometry.identity()) != test_geometry::take(alternative.identity()));
     const auto low_work = [&] {
-        auto input = fixture.input();
-        input.context.time = 0.1;
-        input.exact_time = event.view();
+        auto context = test_geometry::context();
+        context.time = 0.1;
+        a::GeometryInput empty{{},
+                               {},
+                               a::SinglePositions{{}},
+                               a::SinglePositions{{}},
+                               {},
+                               {},
+                               {},
+                               {},
+                               {},
+                               a::SingleWord{.125},
+                               context};
         auto cap = test_geometry::limits();
         cap.max_steps = 200;
-        return a::prepare_owned_geometry(input, cap, *geometry_work, memory);
+        CHECK(test_geometry::take(a::prepare_owned_geometry(empty, cap, *geometry_work, memory))
+                  .active());
+        empty.exact_time = event.view();
+        return a::prepare_owned_geometry(empty, cap, *geometry_work, memory);
     }();
     if (low_work)
         FAIL("The geometry exceeded its exact-time work cap");
