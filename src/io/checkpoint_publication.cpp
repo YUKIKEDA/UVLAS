@@ -88,6 +88,9 @@ const RawHandle invalid_handle = nullptr;
 }
 
 [[nodiscard]] Code native_code(std::uint32_t error) noexcept {
+    if (error == ERROR_CANCELLED) {
+        return Code::Cancelled;
+    }
     if (error == ERROR_DISK_FULL || error == ERROR_HANDLE_DISK_FULL ||
         error == ERROR_NOT_ENOUGH_MEMORY || error == ERROR_OUTOFMEMORY) {
         return Code::ResourceExceeded;
@@ -246,8 +249,8 @@ void remove_stage(RawHandle /*parent*/, RawHandle stage, const Name& /*name*/) n
     mark_for_removal(stage);
 }
 
-[[nodiscard]] NativeStatus publish(RawHandle parent, RawHandle stage, const Name& /*temporary*/,
-                                   const Name& final_name) noexcept {
+[[nodiscard]] NativeStatus publish(RawHandle /*parent*/, RawHandle stage, const Name& /*temporary*/,
+                                   const Name& final_name, const std::stop_token& stop) noexcept {
     struct RenameBuffer {
         DWORD flags;
         HANDLE root;
@@ -256,18 +259,31 @@ void remove_stage(RawHandle /*parent*/, RawHandle stage, const Name& /*name*/) n
     };
     static_assert(offsetof(RenameBuffer, text) == offsetof(FILE_RENAME_INFO, FileName));
     RenameBuffer rename_info{
-        0, parent,
+        0, nullptr,
         static_cast<DWORD>(std::char_traits<char>::length(final_name.data()) * sizeof(wchar_t)),
         wide_name(final_name)};
-    // FileRenameInformation supports a directory-handle-relative destination.
+    // A simple name with a null RootDirectory renames within the opened stage's directory.
     constexpr ULONG rename_class = 10;
-    IO_STATUS_BLOCK info{};
+    constexpr unsigned rename_retries = 12;
+    constexpr DWORD retry_delay_ms = 10;
     const auto length = static_cast<ULONG>(offsetof(RenameBuffer, text)) + rename_info.length;
-    const auto status = NtSetInformationFile(stage, &info, &rename_info, length, rename_class);
-    if (status < 0) {
-        return std::unexpected(RtlNtStatusToDosError(status));
+    for (unsigned attempt = 0;; ++attempt) {
+        if (stop.stop_requested()) {
+            return std::unexpected(ERROR_CANCELLED);
+        }
+        IO_STATUS_BLOCK info{};
+        const auto status = NtSetInformationFile(stage, &info, &rename_info, length, rename_class);
+        if (status >= 0) {
+            return {};
+        }
+        const auto error = RtlNtStatusToDosError(status);
+        // Windows can briefly deny a rename of freshly closed output files.
+        // Retry only this observed denial and keep the no-replace flags every time.
+        if (error != ERROR_ACCESS_DENIED || attempt == rename_retries) {
+            return std::unexpected(error);
+        }
+        Sleep(retry_delay_ms);
     }
-    return {};
 }
 
 [[nodiscard]] auto process_id() noexcept {
@@ -400,7 +416,8 @@ void remove_stage(RawHandle parent, RawHandle stage, const Name& name) noexcept 
 }
 
 [[nodiscard]] NativeStatus publish(RawHandle parent, RawHandle stage, const Name& temporary,
-                                   const Name& final_name) noexcept {
+                                   const Name& final_name,
+                                   const std::stop_token& /*stop*/) noexcept {
     if (!still_named(parent, stage, temporary)) {
         return std::unexpected(ENOENT);
     }
@@ -709,8 +726,8 @@ core::Result<void> publish_checkpoint_directory(
         return state.fail(Stage::Publish, Code::Cancelled);
     }
     const auto final_name = make_checkpoint_directory_name(checkpoint_number);
-    const auto published =
-        publish(root.get(), stage.directory.get(), temporary, name_with("", final_name.data(), ""));
+    const auto published = publish(root.get(), stage.directory.get(), temporary,
+                                   name_with("", final_name.data(), ""), stop);
     if (!published) {
         return state.fail_io(exists_error(published.error()) ? Stage::DestinationExists
                                                              : Stage::Publish,
