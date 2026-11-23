@@ -216,6 +216,54 @@ TEST_CASE("PG rank preparation rejects short budgets without changing sources",
     static_cast<void>(lease);
 }
 
+TEST_CASE("PG rank meters exact compatibility of separately owned input graphs",
+          "[SH-D03][N4-08][negative][verification]") {
+    const auto install_height = [](Fixture& f, std::string_view numerator) {
+        constexpr std::string_view denominator = "1267650600228229401496703205376"; // 2^100
+        const auto coefficient = f.r(numerator, denominator);
+        const std::array<ExactInputTerm, 1> terms{{{{2, 1}, coefficient}}};
+        const auto height =
+            take(ExactChartPolynomial::make(terms, partition_test::exact_limits(), f.input_plan));
+        make_graph(f, f.r("0"), height);
+    };
+    Fixture dictionary_graph;
+    Fixture equal_graph;
+    Fixture changed_graph;
+    install_height(dictionary_graph, "1");
+    install_height(equal_graph, "1");
+    install_height(changed_graph, "3");
+    const Producers dictionary{dictionary_graph};
+    const Producers equal{equal_graph};
+    const Producers changed{changed_graph};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{48 * gib};
+
+    auto cap = limits();
+    cap.maximum_steps = 0;
+    const auto run = [&](const PgIntegrationPartition& partition) {
+        return PgRankPreparation::prepare(dictionary.dictionary, partition, cap, workspace, plan);
+    };
+    check_failure(run(equal.partition), core::FailureCode::ResourceExceeded);
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    cap.cancellation = stop.get_token();
+    check_failure(run(equal.partition), core::FailureCode::Cancelled);
+    cap.cancellation = {};
+
+    // Header, x0/width/skew (3+5+3), four cells, height powers, and the two
+    // 101-bit denominators and one-word numerators (1+2*(1+4)) cost 28 units.
+    constexpr auto comparison_steps = std::uint64_t{1 + 3 + 5 + 3 + 4 + 1 + 1 + 2 * (1 + 4)};
+    cap.maximum_steps = comparison_steps - 1;
+    check_failure(run(changed.partition), core::FailureCode::ResourceExceeded);
+    cap.maximum_steps = comparison_steps;
+    check_failure(run(changed.partition), core::FailureCode::StaleGeneration);
+    CHECK(plan.allocated_bytes() == 0);
+
+    cap = limits();
+    const auto rank = take(run(equal.partition));
+    CHECK(take(rank.preparation()).rank > 109);
+}
+
 TEST_CASE("PG bounded rank retries a prime dividing a real input denominator",
           "[SH-D03][N4-02][negative][verification]") {
     Fixture f;
