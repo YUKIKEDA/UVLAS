@@ -49,7 +49,7 @@
   },
   "artifacts": {
     "docs/specs/structure/pg-flat-gram-contract.md": "77b18bcdd8c5fd4210e419b75cf4253e433e43d5aef499788ae3612331953331",
-    "docs/verification/IM-01/pg-flat-gram/verification.md": "631c95f0d0273c6dddbf7bcbdfce4e2223f449417931f47140ad463df1345a53",
+    "docs/verification/IM-01/pg-flat-gram/verification.md": "a6a2caca6b610d3bd054dc957e6e0cfb525c7ced08a19fce528e1af95895e955",
     "docs/verification/IM-01/im01-pg-discrete-conditioning.json": "ea7ec1ae310c4599da92082a624ca882615f523dd39dd0eab3397e8f5c6811f5",
     "docs/verification/IM-01/im01-pg-conditioned-reference-point.json": "7e3aa70ae119c3d76e8fc2bbbe4ca7b97db549e10125bf139c001b8d71ac362f",
     "include/uvlas/structure/pg_flat_gram.hpp": "6b6e9b43e75fd3575521b6fb35582effe1913ab3a54ef56221e47b2c463de312",
@@ -58,8 +58,47 @@
     "src/structure/pg_flat_gram.cpp": "1b4d7836a3a6089adfb4bb2372c1fdfcd4b3673cfe95a1b1440b74a7486e54ec",
     "src/structure/pg_conditioning.cpp": "7cb3f07a53b53b24ac66191acb707e3fe0782f6c69f10b7b69139c1d083c1fb5",
     "src/structure/pg_rank_preparation.cpp": "ba63c217f34539aadd33a46abb4c98ea7ce74007a361248f33be42258483931d",
-    "src/structure/pg_rank_storage.hpp": "fcfda4f7f16ca922cb386c8c04fc9266953ff1a1f17adb3f9bdbeb3577884001",
+    "src/structure/pg_rank_storage.hpp": "baf41ab8cf4a8ee63f11b05a2c4714eff277484bfa38ae352cfe436911ff6e7f",
     "src/structure/pg_reference_geometry.cpp": "afceea95a3eaffc8d249f29d306d81a631a53a55f8796e2401697f654af73876",
-    "tests/structure/pg_conditioning_test.cpp": "dae99bff397d4ef3f75c9acfe33898ee6aa6dc0f87db509c04acccaccf855008"
+    "tests/structure/pg_conditioning_test.cpp": "ccbd85b722b62bb0f9436151363e2d69c8ac0c6dad1352d1f5d171eebb64c8cb"
+  },
+  "review_289": {
+    "historical_artifacts": {
+      "commit": "b2113106616aaab8decd87d06db77151c11466a4",
+      "sha256": {
+        "src/structure/pg_rank_storage.hpp": "fcfda4f7f16ca922cb386c8c04fc9266953ff1a1f17adb3f9bdbeb3577884001",
+        "tests/structure/pg_conditioning_test.cpp": "dae99bff397d4ef3f75c9acfe33898ee6aa6dc0f87db509c04acccaccf855008",
+        "docs/verification/IM-01/pg-flat-gram/verification.md": "631c95f0d0273c6dddbf7bcbdfce4e2223f449417931f47140ad463df1345a53"
+      }
+    },
+    "test_commit": "8707158a7e7a2a5a8df054727fc5701983df199f",
+    "environment": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260 Debug / Release",
+      "boost": "1.92.0"
+    },
+    "checks": {
+      "lcm_expected_steps": {
+        "gcd": 12,
+        "division": 4,
+        "product": 2,
+        "total": 18
+      },
+      "equal_limit_accepted": 18,
+      "short_limit_rejected": {
+        "limit": 17,
+        "charged_steps": 16
+      },
+      "short_division_rejected": {
+        "limit": 15,
+        "charged_steps": 12
+      },
+      "baseline_limit_17_accepted_at_steps": 14,
+      "windows_debug_affected_ctest_passed": 3,
+      "windows_release_affected_ctest_passed": 3,
+      "conditioning_assertions": 30902,
+      "rank_assertions": 81063,
+      "rank_allocation_audit_assertions": 18
+    }
   }
 }
