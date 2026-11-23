@@ -23,9 +23,9 @@ public:
     [[nodiscard]] SiRationalWordsView view() const&& = delete;
 
 private:
-    friend core::Result<SiRationalWords>
-    materialize_rational_words(const SiRecipeView&, const structure::ExactLimits&,
-                               core::ResourcePlan&, const std::stop_token&) noexcept;
+    friend core::Result<SiRationalWords> copy_rational_words(const structure::ExactRational&,
+                                                             core::ResourcePlan&,
+                                                             const std::stop_token&) noexcept;
     SiRationalWords(core::PlannedBuffer<std::uint32_t> words, std::size_t numerator,
                     int sign) noexcept;
     core::PlannedBuffer<std::uint32_t> words_;
@@ -33,8 +33,8 @@ private:
     int sign_ = 0;
 };
 
-[[nodiscard]] core::Result<SiRationalWords>
-materialize_rational_words(const SiRecipeView&, const structure::ExactLimits&, core::ResourcePlan&,
-                           const std::stop_token&) noexcept;
+[[nodiscard]] core::Result<SiRationalWords> copy_rational_words(const structure::ExactRational&,
+                                                                core::ResourcePlan&,
+                                                                const std::stop_token&) noexcept;
 
 } // namespace uvlas::io::detail
