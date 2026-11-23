@@ -130,6 +130,11 @@ uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_link_libraries(uvlas_cli PRIVATE uvlas_core)
 
+option(UVLAS_ENABLE_PRIVATE_RUNTIME_IMAGE "Enable the local Release runtime image component" OFF)
+if(UVLAS_ENABLE_PRIVATE_RUNTIME_IMAGE)
+    include(cmake/PrivateRuntimeImage.cmake)
+endif()
+
 add_executable(uvlas_eigen_generalized_canary qa/eigen_generalized/main.cpp)
 uvlas_configure_target(uvlas_eigen_generalized_canary)
 target_link_libraries(uvlas_eigen_generalized_canary PRIVATE uvlas_numerics)
