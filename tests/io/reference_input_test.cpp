@@ -768,6 +768,14 @@ TEST_CASE("Root walk applies preflight, snapshot, and edge failures in order",
                               Code::ResourceExceeded);
     CHECK(diagnostic.reason == Stage::Edge);
     CHECK(diagnostic.walk.reason == WalkReason::EdgeLimit);
+    if (const auto& declaration = diagnostic.walk.edge) {
+        CHECK(declaration->declaring_source == source);
+        CHECK(declaration->role == rd::ReferenceRole::GmshMesh);
+        CHECK(declaration->declaration_node ==
+              fixture::take(prepared.declaration(0)).original.declaration_node);
+    } else {
+        FAIL("Missing declaration with no pointer budget");
+    }
     CHECK(diagnostic.pointer().empty());
 
     core::ResourcePlan final_plan{fixture::budget};
