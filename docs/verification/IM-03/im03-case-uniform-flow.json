@@ -1,0 +1,124 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-uniform-flow-v1",
+  "ids": [
+    "AE-07",
+    "IO4-01",
+    "N4-02",
+    "N4-03",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-23",
+  "source_commit": "530ea090b8556480242710b865cc9b12367eb1be",
+  "claimed_state": "Native typed SI case to owned no-gust uniform velocity and exact evaluation and replay for constant, polynomial and PCHIP.",
+  "verification": {
+    "platform": "Windows 11 x64, MSVC 19.51.36260.0, Ninja Multi-Config",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "ctest_targets": [
+      "coupling.case_uniform_flow",
+      "aero.uniform_flow",
+      "io.si_case"
+    ],
+    "target_registration": "The tested CMake revision registers uvlas_coupling and coupling.case_uniform_flow.",
+    "ctest_each_configuration": "3 passed out of 3",
+    "catch_seed": 19,
+    "each_configuration": "5 cases and 438 assertions",
+    "independent_ref": "Manual exact ft/min conversion, a 71-bit numerator with an interior zero limb, termwise polynomial and PCHIP physical-time derivatives, exact zero spatial Jacobian.",
+    "coverage": "Actual typed transient window beginning at one minute, event and both sides, Reject/Hold/Periodic, explicit nontransient exact demand, changed current samples/events and issuer generation, independent equal case restore, matching cost, cap refusal, pre-stopped import and unsupported sine.",
+    "mutation": "Replace the source recipe's time unit by seconds before exact materialization. MSVC Debug isolated compile/link succeeds. Constant-flow case: 23 assertions passed, 4 exact fraction assertions failed, exit 42.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on four affected translation units, exit 0.",
+    "scope": "The internal composition uses cases with no gust. The fixture qualifies the case's SI input using existing SI rules and checks exact output; solver projection and support motion remain later work.",
+    "clean_build": true
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/pchip-time-curve-contract.md",
+      "hint": "docs/specs/aero/pchip-time-curve-contract.md",
+      "sha256": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b"
+    },
+    {
+      "id": "src/aero/pchip_curve.hpp",
+      "hint": "src/aero/pchip_curve.hpp",
+      "sha256": "343036850180b7472e4100b5521e2e69b5358778d3579896552f34b2b5d9931e"
+    },
+    {
+      "id": "src/aero/uniform_flow.cpp",
+      "hint": "src/aero/uniform_flow.cpp",
+      "sha256": "948a42d9002bf7dd21ef9df5cf3ad4c42c75886c1a6ca0c201fbc3015a26189b"
+    },
+    {
+      "id": "src/aero/uniform_flow.hpp",
+      "hint": "src/aero/uniform_flow.hpp",
+      "sha256": "7c901b722579cf3b80417b6963792b51c9ff6f2727a2ca417e8efd488107e37e"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.cpp",
+      "hint": "src/coupling/case_uniform_flow.cpp",
+      "sha256": "4b3739e1dab9ee5681306709dcd05d793fb8012d68d0b2268feeae27fd920861"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.hpp",
+      "hint": "src/coupling/case_uniform_flow.hpp",
+      "sha256": "117b626d5c79d281aa191f1daa71d5b1d0ec80cef5415ed8340787586cd94ee9"
+    },
+    {
+      "id": "src/io/si_exact.cpp",
+      "hint": "src/io/si_exact.cpp",
+      "sha256": "02d3cc5235e607a0988f4e21cf6053327dba6ba51314a4e8f9d5b25b0b2a32e3"
+    },
+    {
+      "id": "src/io/si_exact_words.hpp",
+      "hint": "src/io/si_exact_words.hpp",
+      "sha256": "a6b6200a835954aaab3e73dd22cf9c0a9d0001cebba40bf74f8fcf4f5f86e692"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "df17c0cdbd12993d7eb66a6901e8aa629268212e6025c9342815a52890e5227f"
+    },
+    {
+      "id": "tests/io/case_schema_corpus.hpp",
+      "hint": "tests/io/case_schema_corpus.hpp",
+      "sha256": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf"
+    },
+    {
+      "id": "tests/io/case_schema_test_adapter.hpp",
+      "hint": "tests/io/case_schema_test_adapter.hpp",
+      "sha256": "c57c9d59174bf117c8ec81e4b1a380f79d9a9efbe8060ce10333ae97fc09401c"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/pchip-time-curve-contract.md": "747f0dcdf7d3283741b373352e931ad22ff4206a74bb16e5e75e88ffd0c3eeeb",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "src/aero/pchip_curve.hpp": "343036850180b7472e4100b5521e2e69b5358778d3579896552f34b2b5d9931e",
+    "src/aero/uniform_flow.cpp": "948a42d9002bf7dd21ef9df5cf3ad4c42c75886c1a6ca0c201fbc3015a26189b",
+    "src/aero/uniform_flow.hpp": "7c901b722579cf3b80417b6963792b51c9ff6f2727a2ca417e8efd488107e37e",
+    "src/coupling/case_uniform_flow.cpp": "4b3739e1dab9ee5681306709dcd05d793fb8012d68d0b2268feeae27fd920861",
+    "src/coupling/case_uniform_flow.hpp": "117b626d5c79d281aa191f1daa71d5b1d0ec80cef5415ed8340787586cd94ee9",
+    "src/io/si_exact.cpp": "02d3cc5235e607a0988f4e21cf6053327dba6ba51314a4e8f9d5b25b0b2a32e3",
+    "src/io/si_exact_words.hpp": "a6b6200a835954aaab3e73dd22cf9c0a9d0001cebba40bf74f8fcf4f5f86e692",
+    "tests/coupling/case_uniform_flow_test.cpp": "df17c0cdbd12993d7eb66a6901e8aa629268212e6025c9342815a52890e5227f",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "tests/io/case_schema_test_adapter.hpp": "c57c9d59174bf117c8ec81e4b1a380f79d9a9efbe8060ce10333ae97fc09401c"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-uniform-flow-v1/verification.md": "488c5d1c48d6d0127c2506518e2ab6426203630c04c3e8ff57f9c60defd0626a"
+  }
+}
