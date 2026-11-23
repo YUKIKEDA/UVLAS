@@ -8,7 +8,13 @@ class SharedP1Engine;
 struct SharedP1Data;
 struct SharedP1AdjointData;
 struct P1StrengthTag;
-using P1StrengthId = core::Identifier<P1StrengthTag>;
+class P1StrengthId : public core::Identifier<P1StrengthTag> {
+    using Base = core::Identifier<P1StrengthTag>;
+
+public:
+    using Base::Base;
+    P1StrengthId() noexcept : Base(0) {} ///< Zero is a legal identifier, not an absence marker.
+};
 
 /// One independent circulation column, keyed by its physical face identifier.
 struct P0BoundColumn {};
@@ -16,10 +22,11 @@ struct P0BoundColumn {};
 using P1FaceColumns =
     std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>, P0BoundColumn>;
 struct P1FaceStrengths {
+    P1FaceStrengths() noexcept = default; ///< Empty staging slot filled before qualification.
     P1FaceStrengths(PhysicalFaceId physical, const P1FaceColumns& basis) noexcept
         : face(physical), columns(basis) {}
-    PhysicalFaceId face;
-    P1FaceColumns columns;
+    PhysicalFaceId face{0};
+    P1FaceColumns columns{P0BoundColumn{}};
 };
 
 struct P1ActionStamp {
@@ -44,6 +51,7 @@ struct P1AssemblyPlan {
     std::uint64_t payload_bytes = 0;
     std::uint64_t estimated_metadata_bytes = 0;
     std::uint64_t reserved_steps = 0;
+    std::uint64_t preflight_steps = 0; ///< Measured visits spent producing the forecast.
 };
 
 struct P1AssemblyReport {

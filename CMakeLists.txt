@@ -136,10 +136,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp
-    src/coupling/case_uniform_flow_projection.cpp)
+    src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero)
+target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero PRIVATE Boost::multiprecision)
 
 add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)

@@ -80,6 +80,14 @@ struct TrailingEdgeRow {
     std::int8_t coefficient = 0;  ///< T entry in {-1,+1} in a qualified result.
     std::int8_t wake_sign = 0;    ///< Wake induction sign in canonical endpoint order.
 };
+/// Contact-qualified fixed quadrilateral and its declared leading attachment.
+struct UvlmQuad {
+    PhysicalFaceId face;
+    AeroFaceRole role;
+    std::array<FacetId, 2> facets;
+    std::optional<TrailingEdgeRow> attachment;
+    std::uint64_t used_steps;
+};
 /// Stable key of a released material point; no lossy packing or hash identity.
 struct MaterialReleaseKey {
     PointId point;      ///< Canonical physical TE point.
@@ -154,6 +162,10 @@ public:
     geometry() const& noexcept;
     [[nodiscard]] GlobalResult<std::reference_wrapper<const OwnedGeometry>>
     geometry() const&& = delete;
+    /// Inspect the fixed quad of a source facet. A wake's L edge uses quad vertices 0→1.
+    [[nodiscard]] GlobalResult<UvlmQuad> uvlm_quad(FacetId, std::uint64_t max_steps,
+                                                   const std::stop_token& = {}) const noexcept;
+    [[nodiscard]] std::size_t trailing_edge_count() const noexcept;
     /// Two-pass traversal, narrow-pair and planned-payload counters.
     [[nodiscard]] GlobalResult<GlobalWorkPlan> work_plan() const noexcept;
     /// Contact clearance does not certify physical mapping or state paths.

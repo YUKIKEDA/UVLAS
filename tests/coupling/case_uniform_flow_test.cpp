@@ -1,5 +1,7 @@
+#include "aero/geometry_snapshot_fixture.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
+#include "coupling/discrete_nonpenetration.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "io/si_rational_projection.hpp"
 
@@ -623,4 +625,212 @@ TEST_CASE("Scaled rational projection preserves distant exact words and their ex
     reject(io::detail::project_rational_words({1, one, three}, exact, core::Precision::TwoWord,
                                               work, {}, {}),
            core::FailureCode::PrecisionUnresolved);
+}
+
+namespace {
+cf::NonpenetrationVector coordinates(double x, double y, double z) noexcept {
+    return {a::SingleWord{x}, a::SingleWord{y}, a::SingleWord{z}};
+}
+
+template <class T>
+T take_global(a::GlobalResult<T> result) {
+    if (!result)
+        FAIL("Unexpected global qualification failure "
+             << static_cast<int>(result.error().origin.cause.code));
+    return std::move(*result);
+}
+
+struct ResidualFixture {
+    std::array<a::PointId, 6> id{a::PointId{1}, a::PointId{2}, a::PointId{3},
+                                 a::PointId{4}, a::PointId{5}, a::PointId{6}};
+    std::array<a::PointBinding, 6> bindings{test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding()};
+    std::array<double, 18> points{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 2, 1, 0, 2, 0, 0};
+    std::array<a::BandId, 2> bands{a::BandId{50}, a::BandId{51}};
+    std::array<a::FaceInput, 2> faces{a::FaceInput{a::PhysicalFaceId{100}, bands[0]},
+                                      a::FaceInput{a::PhysicalFaceId{101}, bands[1]}};
+    std::array<a::FaceRoleInput, 2> roles{a::FaceRoleInput{faces[0].id, a::AeroFaceRole::Bound},
+                                          a::FaceRoleInput{faces[1].id, a::AeroFaceRole::Wake}};
+    std::array<a::EdgeInput, 9> edges{
+        a::EdgeInput{a::EdgeId{10}, {id[0], id[1]}}, a::EdgeInput{a::EdgeId{11}, {id[1], id[2]}},
+        a::EdgeInput{a::EdgeId{12}, {id[2], id[3]}}, a::EdgeInput{a::EdgeId{13}, {id[3], id[0]}},
+        a::EdgeInput{a::EdgeId{14}, {id[0], id[2]}}, a::EdgeInput{a::EdgeId{15}, {id[2], id[4]}},
+        a::EdgeInput{a::EdgeId{16}, {id[4], id[5]}}, a::EdgeInput{a::EdgeId{17}, {id[5], id[3]}},
+        a::EdgeInput{a::EdgeId{18}, {id[3], id[4]}}};
+    std::array<a::EdgeBindingInput, 9> edge_owners{
+        a::EdgeBindingInput{edges[0].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[1].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[2].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[3].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[4].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[5].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[6].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[7].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[8].id, a::CanonicalEdge{}}};
+    std::array<a::TrailingEdgeInput, 1> trailing{{{edges[2].id, {id[3], id[2]}}}};
+    std::array<a::QuadInput, 2> quads{
+        a::QuadInput{faces[0].id,
+                     {id[0], id[1], id[2], id[3]},
+                     {edges[0].id, edges[1].id, edges[2].id, edges[3].id},
+                     edges[4].id,
+                     {a::FacetId{200}, a::FacetId{201}}},
+        a::QuadInput{faces[1].id,
+                     {id[3], id[2], id[4], id[5]},
+                     {edges[2].id, edges[5].id, edges[6].id, edges[7].id},
+                     edges[8].id,
+                     {a::FacetId{202}, a::FacetId{203}}}};
+    void reverse_wake() noexcept {
+        edges[8].points = {id[2], id[5]};
+        trailing[0].points = {id[2], id[3]};
+        quads[1].points = {id[2], id[3], id[5], id[4]};
+        quads[1].edges = {edges[2].id, edges[7].id, edges[6].id, edges[5].id};
+    }
+    [[nodiscard]] a::GeometryInput input() const noexcept {
+        const a::SinglePositions xyz{points};
+        return {id,
+                bindings,
+                xyz,
+                xyz,
+                edges,
+                faces,
+                bands,
+                {},
+                quads,
+                a::SingleWord{.125},
+                test_geometry::context()};
+    }
+    [[nodiscard]] a::GlobalTopologyInput topology() const noexcept {
+        return {roles, edge_owners, trailing};
+    }
+};
+
+void residual_expected(const a::ScaledEnclosure& value, const Rat& oracle) {
+    const auto center =
+        std::visit(
+            [](const auto& word) -> Rat {
+                if constexpr (std::is_same_v<std::decay_t<decltype(word)>, a::SingleWord>)
+                    return rational_word(word.value);
+                else
+                    return rational_word(word.high) + rational_word(word.low);
+            },
+            value.center()) *
+        two_power(value.exponent());
+    const auto radius = rational_word(value.radius()) * two_power(value.exponent());
+    const Rat comparison_uncertainty{Big{1}, Big{"1000000000000000000000000"}};
+    CHECK(abs(center - oracle) <= radius + comparison_uncertainty);
+    CHECK(radius < comparison_uncertainty);
+}
+} // namespace
+
+TEST_CASE("Discrete nonpenetration joins the original residual and implicit circulation action",
+          "[AE-07][UW-D01][UW-D03][UW-D06][N4-06][verification]") {
+    const auto source_case = source(R"({"kind":"constant","value":[0,0,100]})", one_step);
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = import(source_case, io::SourceId{101}, flow_workspace);
+    const auto current = import(source_case, io::SourceId{102}, flow_workspace);
+    const Number one{1}, zero{0}, absolute{1, 1000000000}, time{5, 4}, wrong_time{127, 100};
+    const cf::CaseFlowComponentBudget budget_component{one.view(), absolute.view(), zero.view()};
+    const std::array budgets{budget_component, budget_component, budget_component};
+    const cf::CaseFlowProjectionRequest projection{
+        core::Precision::TwoWord, budgets, budgets, {4096, budget}};
+    const auto projected_at = [&](const Number& instant) {
+        auto value = evaluate(provider, current, flow_workspace, instant);
+        return take(cf::project_case_uniform_flow(std::move(value), projection));
+    };
+    const a::GlobalLimits cap{std::numeric_limits<std::uint64_t>::max() / 4,
+                              numerics::linear::EstimateAdmission{4096}};
+    const cf::DiscreteNonpenetrationLimits residual_limits{
+        {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10},
+        {test_geometry::limits(),
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(6000000000)};
+    const Rat denominator{Big{"10000000000000000000000000000000000000000"}};
+    const Rat residual = -Rat{Big{"5671057487729860677895669210567132495399"}} / denominator;
+    const Rat action = Rat{Big{"3730450057081755951141985320248458351172"}} / denominator;
+    for (const bool reversed : {false, true}) {
+        CAPTURE(reversed);
+        ResidualFixture fixture;
+        if (reversed)
+            fixture.reverse_wake();
+        core::ResourcePlan memory{128ULL * 1024 * 1024};
+        auto geometry_work = test_geometry::workspace(memory);
+        const auto geometry = test_geometry::take(a::prepare_owned_geometry(
+            fixture.input(), test_geometry::limits(), *geometry_work, memory));
+        auto global = take(a::GlobalWorkspace::create(memory, cap.metadata));
+        const auto topology = take_global(
+            a::build_global_topology(geometry, fixture.topology(), cap, *global, memory));
+        const auto contact =
+            take_global(a::check_global_geometry(topology, geometry, cap, *global, memory));
+        const auto query = test_geometry::take(
+            a::resolve_query(geometry, {a::QueryId{29}, a::FreePoint{a::FreeSingle{{.75, .5, 0}}}},
+                             geometry.context(), test_geometry::limits(), *geometry_work, memory));
+        const auto wake_geometry = take_global(contact.uvlm_quad(a::FacetId{202}, 1000));
+        const auto& attachment = wake_geometry.attachment;
+        if (!attachment)
+            FAIL("The wake has no directed attachment");
+        CHECK(static_cast<int>(attachment->coefficient) == (reversed ? -1 : 1));
+        std::array collocation{cf::DiscreteCollocation{a::FacetId{200},
+                                                       query,
+                                                       {coordinates(1, 0, 0), coordinates(0, 2, 0)},
+                                                       coordinates(.25, .25, .5),
+                                                       a::DoubleWord{.75, 0x1p-60},
+                                                       a::SingleWord{-.5}}};
+        std::array wake{
+            cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, a::P1StrengthId{0}}};
+        const std::array history{
+            cf::FrozenWakeTrace{a::P1StrengthId{0}, a::SingleWord{reversed ? .25 : -.25}}};
+        cf::DiscreteNonpenetrationInput view{contact,
+                                             collocation,
+                                             wake,
+                                             {core::AcceptedStateId{2}, history},
+                                             {7, 11},
+                                             stamp,
+                                             p::RequestedSide::Automatic};
+        a::SharedP1Workspace shared;
+        auto local = take(a::LocalPacketWorkspace::create(memory));
+        auto kernel = take(a::P1Workspace::create(memory));
+        const auto run = [&](cf::ProjectedCaseUniformFlow& flow,
+                             const cf::DiscreteNonpenetrationLimits& selected,
+                             core::ResourcePlan& plan) {
+            return cf::evaluate_discrete_nonpenetration(view, std::move(flow), selected, shared,
+                                                        *local, *kernel, plan);
+        };
+        auto old_time = projected_at(wrong_time);
+        reject(run(old_time, residual_limits, memory), core::FailureCode::StaleGeneration);
+        CHECK(old_time.source().jet.active());
+        auto flow = projected_at(time);
+        view.history.parent = core::AcceptedStateId{99};
+        reject(run(flow, residual_limits, memory), core::FailureCode::StaleGeneration);
+        view.history.parent = core::AcceptedStateId{2};
+        view.flow_side = p::RequestedSide::Left;
+        reject(run(flow, residual_limits, memory), core::FailureCode::StaleGeneration);
+        view.flow_side = p::RequestedSide::Automatic;
+        core::ResourcePlan rejected_memory{0};
+        reject(run(flow, residual_limits, rejected_memory), core::FailureCode::ResourceExceeded);
+        CHECK(rejected_memory.allocated_bytes() == 0);
+        wake[0].leading = a::P1StrengthId{0};
+        reject(run(flow, residual_limits, memory), core::FailureCode::InvalidInput);
+        wake[0].leading = cf::AttachedWakeFront{};
+        collocation[0].tangents[1] = coordinates(0, -2, 0);
+        reject(run(flow, residual_limits, memory), core::FailureCode::GeometryInvalid);
+        collocation[0].tangents[1] = coordinates(0, 2, 0);
+        CHECK(flow.source().jet.active());
+
+        const auto result = take(run(flow, residual_limits, memory));
+        CHECK_FALSE(flow.source().jet.active());
+        CHECK(result.size() == 1);
+        CHECK(result.geometry_context() == geometry.context());
+        CHECK(result.trial_stamp() == view.trial_stamp);
+        const auto row = take(result.row(0));
+        CHECK(row.face == fixture.faces[0].id);
+        CHECK_FALSE(row.includes_wake_quadrature);
+        CHECK(result.used_steps() <= residual_limits.steps);
+        residual_expected(row.residual, residual);
+        residual_expected(row.circulation_action, action);
+        reject(result.row(1), core::FailureCode::InvalidInput);
+    }
 }
