@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-case-gmsh-pg-set",
+  "ids": [
+    "FD-03",
+    "IO4-01",
+    "IO4-04",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "2508aa71f25a583270e2cc6b1605249d2a7dd342",
+  "claimed_state": "同じSI Caseと認証済みGmsh対応表に属する全Shellについて、PG・所属・厚さとfitを含む幾何の証拠をまとめて所有する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "real_file_assertions": 87
+  },
+  "artifacts": {
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/case-gmsh-pg-set.md": "1787915462b7ce2ba08148bf3703a12e78d97a2d85974c7dc3e80a542225888d",
+    "src/coupling/case_external_pg.cpp": "a3774be78e3c763779393f230f417ad8798bffc9ab37c7b08fe0381bed6fea35",
+    "src/coupling/case_external_pg.hpp": "e75e010f185d670ceba920bb800a51c240d9bfc154cc8a16846baf0f476c348a",
+    "src/coupling/case_pg_reference.cpp": "7e5d9f5a7e8edc07fa509ff7a0578f36baf8cb5ab46867d18f3b6ae384652044",
+    "src/io/external_mesh_sidecar_binding.cpp": "af973ca65c706bb62798bd98aec41f57372df75256ffd72db9a8c2fe3e5443eb",
+    "src/io/external_mesh_sidecar_pg.cpp": "deae36cd176ec6709ff3752eb1d7f9dcdfdccbc057d1a38735f4a710ddb76e5b",
+    "src/io/external_mesh_sidecar_pg.hpp": "098a7542c5378f0c815a8a56635d275e2936f7ef29540a554bababc4a72e7cea",
+    "src/io/external_pg_regional_thickness.cpp": "6b6628da70e1e51d85e63ce157d6c1773e83996801d889545c22a938a72f7863",
+    "src/io/external_pg_regional_thickness.hpp": "e5bf87181ce828c4f4c4f34b15ee12f7811cc8eb861eb41b7b7628baa76551a3",
+    "src/io/external_planar_pg.cpp": "85b8ec021962d97604616065cdb68fd2a4ca0b459302927f86fe6cfcb4217c10",
+    "tests/CMakeLists.txt": "7b78b6c7da1b93a6666f00775ba788b8ea68f7ca29989f2a8d03d4b86d6d98a1",
+    "tests/io/gmsh_shell_reference_set_test.cpp": "b613355e6621c4f93d11af8ae5ad5182df0be3a19a557874d1c349ca11a4b257",
+    "tests/io/reference_file_test_fixture.hpp": "6c14eafea3b396fa43fc768c1dcae6b4efff0e02b3ccf43cb86b5b2d7bf716de",
+    "tests/io/reference_input_test.cpp": "be225d17478a0084227a52360488938f895e7817724d325555ff9440ad7e53b7"
+  }
+}
