@@ -2675,28 +2675,38 @@ struct NonpenetrationBuilder {
     static void finish_wake_dual(DiscreteFreeWakeRun& out, WakeDualAccumulator& dual,
                                  const Assembly& assembly, const DiscreteNonpenetrationInput& input,
                                  core::Precision representation, a::LocalRootScratch& rounding,
-                                 core::ResourcePlan& memory, p::Work& work) {
+                                 core::ResourcePlan& memory, p::Work& work,
+                                 FreeWakeSeedScale seed_scale) {
+        const auto scale = [seed_scale](const p::Interval& value) {
+            // Apply the exact exponent shift before rounding. Halving the input
+            // words can erase subnormal seeds even when the pullback is normal.
+            return seed_scale == FreeWakeSeedScale::NegativeHalf ? p::scale(value, -1) : value;
+        };
+        const auto scale_vector = [&](const Vector& value) -> Vector {
+            return {scale(value[0]), scale(value[1]), scale(value[2])};
+        };
         out.points = allocate<std::optional<CirculationPointCovector>>(memory, dual.ids.size());
         out.strengths = allocate<std::optional<FreeWakeStrengthCovector>>(
             memory, input.collocations.size() + input.history.columns.size());
         for (std::size_t i = 0; i < dual.ids.size(); ++i)
-            out.points.values()[i].emplace(CirculationPointCovector{
-                a::PointId{dual.ids.values()[i]},
-                enclose_vector(dual.positions.values()[i], representation, rounding, work)});
+            out.points.values()[i].emplace(
+                CirculationPointCovector{a::PointId{dual.ids.values()[i]},
+                                         enclose_vector(scale_vector(dual.positions.values()[i]),
+                                                        representation, rounding, work)});
         std::size_t count = 0;
         for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
             work.step();
             const auto& trace = assembly.traces.values()[i];
             if (trace.transfer && trace.transfer->reverse)
                 continue;
-            out.strengths.values()[count++].emplace(
-                FreeWakeStrengthCovector{trace.id, a::enclose_p1_value(dual.strengths.values()[i],
-                                                                       representation, rounding)});
+            out.strengths.values()[count++].emplace(FreeWakeStrengthCovector{
+                trace.id,
+                a::enclose_p1_value(scale(dual.strengths.values()[i]), representation, rounding)});
         }
-        out.field.emplace(
-            FreeWakeFieldCovector{enclose_vector(dual.ambient, representation, rounding, work),
-                                  a::enclose_p1_value(dual.time, representation, rounding),
-                                  a::enclose_p1_value(dual.radius, representation, rounding)});
+        out.field.emplace(FreeWakeFieldCovector{
+            enclose_vector(scale_vector(dual.ambient), representation, rounding, work),
+            a::enclose_p1_value(scale(dual.time), representation, rounding),
+            a::enclose_p1_value(scale(dual.radius), representation, rounding)});
     }
 
     static DiscreteFreeWakeVelocity evaluate_wake_velocity(
@@ -2704,10 +2714,12 @@ struct NonpenetrationBuilder {
         std::span<const a::PointId> particles, const DiscreteFreeWakeDirection* direction,
         std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits& limits,
         a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-        core::ResourcePlan& memory, const std::stop_token& stop, FreeWakeSeedSign seed_sign) {
+        core::ResourcePlan& memory, const std::stop_token& stop, FreeWakeSeedScale seed_scale) {
         p::Work work{0, limits.action.steps, stop};
         work.step();
-        if (seed_sign != FreeWakeSeedSign::Positive && seed_sign != FreeWakeSeedSign::Negative)
+        if (seed_scale != FreeWakeSeedScale::Positive &&
+            seed_scale != FreeWakeSeedScale::Negative &&
+            seed_scale != FreeWakeSeedScale::NegativeHalf)
             reject(core::FailureCode::InvalidInput);
         if (particles.empty() || input.wake.empty() ||
             (!seeds.empty() && seeds.size() != particles.size()))
@@ -2786,7 +2798,7 @@ struct NonpenetrationBuilder {
             if (!seeds.empty()) {
                 const auto& requested = seeds[i];
                 const auto seed =
-                    seed_sign == FreeWakeSeedSign::Positive
+                    seed_scale == FreeWakeSeedScale::Positive
                         ? requested
                         : NonpenetrationVector{negative(requested[0]), negative(requested[1]),
                                                negative(requested[2])};
@@ -2802,7 +2814,8 @@ struct NonpenetrationBuilder {
                 std::move(*sample.jet)});
         }
         if (!seeds.empty())
-            finish_wake_dual(out, dual, assembly, input, representation, rounding, memory, work);
+            finish_wake_dual(out, dual, assembly, input, representation, rounding, memory, work,
+                             seed_scale);
         work.step();
         out.steps = work.used;
         out.source.emplace(geometry.context(), input.trial_stamp, input.history.parent);
@@ -3952,11 +3965,12 @@ core::Result<DiscreteFreeWakeVelocity> evaluate_discrete_free_wake_velocity(
     std::span<const a::PointId> particles, const DiscreteFreeWakeDirection* direction,
     std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits& limits,
     a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-    core::ResourcePlan& memory, const std::stop_token& stop, FreeWakeSeedSign seed_sign) noexcept {
+    core::ResourcePlan& memory, const std::stop_token& stop,
+    FreeWakeSeedScale seed_scale) noexcept {
     try {
         return NonpenetrationBuilder::evaluate_wake_velocity(input, flow, particles, direction,
                                                              seeds, limits, shared, local, kernel,
-                                                             memory, stop, seed_sign);
+                                                             memory, stop, seed_scale);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {

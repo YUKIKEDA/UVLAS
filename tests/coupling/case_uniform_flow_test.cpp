@@ -4036,6 +4036,105 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     near(left.value, .118145889468151347);
     CHECK(abs(left.value - right.value) <= left.radius + right.radius + rational_word(1e-15));
 
+    const Number previous_time{9, 8}, start_time{1};
+    const auto& previous_geometry = take_global(previous.geometry()).get();
+    const auto& start_geometry = take_global(older.geometry()).get();
+    const auto earlier_collocation = [&](const auto& shape) {
+        return test_geometry::take(
+            a::resolve_query(shape, {a::QueryId{1}, a::FreePoint{a::FreeSingle{{.75, .5, 0}}}},
+                             shape.context(), test_geometry::limits(), *geometry_work, memory));
+    };
+    const auto earlier_query = earlier_collocation(previous_geometry);
+    const auto start_query = earlier_collocation(start_geometry);
+    const std::array previous_bound{cf::DiscreteCollocation{
+        a::FacetId{200}, earlier_query, frame, zero, a::SingleWord{.5}, a::SingleWord{.125}}};
+    const std::array start_bound{cf::DiscreteCollocation{a::FacetId{200}, start_query, frame, zero,
+                                                         a::SingleWord{.5}, a::SingleWord{.125}}};
+    const cf::DiscreteNonpenetrationInput previous_source{
+        previous, previous_bound, wake, input.history, {7, 10}, stamp, p::RequestedSide::Automatic};
+    const cf::DiscreteNonpenetrationInput start_source{
+        older, start_bound, wake, input.history, {7, 9}, stamp, p::RequestedSide::Right};
+    const cf::DiscreteKnownFlowInput previous_flow{
+        provider,        current,          {stamp, previous_time.view()},
+        flow.projection, flow.flow_limits, flow.coordinate_limits,
+        *geometry_work,  flow_workspace};
+    const cf::DiscreteKnownFlowInput start_flow{
+        provider,        current,          {stamp, start_time.view(), p::RequestedSide::Right},
+        flow.projection, flow.flow_limits, flow.coordinate_limits,
+        *geometry_work,  flow_workspace};
+    const std::array trailing_point{id[2]};
+    const cf::FirstFreeWakeEndpoint newest{input, flow, selected, &d};
+    const cf::FirstFreeWakeEndpoint at_trailing_edge{previous_source, previous_flow, trailing_point,
+                                                     &d};
+    const cf::FirstFreeWakeEndpoint retained_previous{previous_source, previous_flow, selected, &d};
+    const cf::FirstFreeWakeEndpoint retained_start{start_source, start_flow, selected, &d};
+    const std::array born{cf::FirstFreeWakePoint{material[0], std::nullopt}};
+    const std::array restarted{cf::FirstFreeWakePoint{material[0], material[0]}};
+    const auto first = [&](const auto& clock, const auto& trial, const auto& parent, auto epoch,
+                           const auto& material_points) {
+        return cf::evaluate_first_free_wake_transport(
+            clock, trial, parent, epoch, material_points, transport_seeds, transport_limits,
+            cap_velocity, shared, *local, *kernel, memory);
+    };
+    reject(first(transport_clock, newest, at_trailing_edge, a::ReleaseEpoch{9}, born),
+           core::FailureCode::StaleGeneration);
+    reject(first(transport_clock, newest, retained_previous, release.epoch, born),
+           core::FailureCode::StaleGeneration);
+    reject(first(transport_clock, newest, retained_previous, std::nullopt, restarted),
+           core::FailureCode::InvalidInput);
+    reject(first(transport_clock, newest, newest, release.epoch, born),
+           core::FailureCode::StaleGeneration);
+    const auto birth = take(first(transport_clock, newest, at_trailing_edge, release.epoch, born));
+    const auto birth_row = take(birth.row(0));
+    REQUIRE(birth_row.direction);
+    CHECK(birth_row.release == release);
+    residual_expected(birth_row.residual[0], Rat{8});
+    residual_expected(birth_row.residual[1], Rat{0});
+    residual_expected((*birth_row.direction)[0], Rat{-1, 8});
+    const auto& parent_velocity = take(birth.parent_free_velocity()).get();
+    const auto& trial_velocity = take(birth.free_velocity()).get();
+    const auto parent_row = take(parent_velocity.row(0));
+    const auto trial_row = take(trial_velocity.row(0));
+    CHECK(parent_row.owner == release.point);
+    CHECK(trial_row.owner == material[0].point);
+    exact(take(take(parent_velocity.ambient(0)).get().time()), previous_time);
+    CHECK(abs(center(birth_row.residual[2]) +
+              (center(parent_row.velocity[2]) + center(trial_row.velocity[2])) / 2) <
+          rational_word(1e-15));
+    const auto birth_dual = take(birth.position_dual(0));
+    residual_expected(birth_dual.stencil[0][0], Rat{-1});
+    residual_expected(birth_dual.stencil[1][0], Rat{1});
+    residual_expected(birth_dual.stencil[2][0], Rat{0});
+    WorkEnclosure birth_left, birth_right;
+    birth_left.add(*birth_row.direction, transport_seeds[0]);
+    birth_right.add(birth_dual.stencil[0], dx);
+    birth_right.add(birth_dual.stencil[1], dx);
+    for (const auto* endpoint : {&trial_velocity, &parent_velocity}) {
+        REQUIRE(endpoint->point_count() == points.size());
+        for (std::size_t i = 0; i < points.size(); ++i)
+            birth_right.add(take(endpoint->point_dual(i)).position, displacements[i]);
+        birth_right.add(take(endpoint->strength_dual(0)).value, dhistory[0].strength);
+        birth_right.add(take(endpoint->strength_dual(1)).value, bound[0].circulation_direction);
+        const auto dual_field = take(endpoint->field_dual());
+        birth_right.add(dual_field.uniform_flow, dambient);
+        birth_right.add(dual_field.flow_time, d.flow_time);
+        birth_right.add(dual_field.core_radius, d.core_radius);
+    }
+    CHECK(abs(birth_left.value - birth_right.value) <=
+          birth_left.radius + birth_right.radius + rational_word(1e-15));
+
+    const cf::WakeTransportClock first_interval{
+        wake_grid, wake_grid, {stamp, 0, 1, p::RequestedSide::Automatic}};
+    const auto restarted_result =
+        take(first(first_interval, retained_previous, retained_start, std::nullopt, restarted));
+    const auto restarted_row = take(restarted_result.row(0));
+    residual_expected(restarted_row.residual[0], Rat{2});
+    const auto& restart_parent = take(restarted_result.parent_free_velocity()).get();
+    CHECK(take(restart_parent.row(0)).owner == material[0].point);
+    exact(take(take(restart_parent.ambient(0)).get().time()), start_time);
+    reject(first(first_interval, retained_previous, retained_start, release.epoch, restarted),
+           core::FailureCode::StaleGeneration);
+
     auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
                                   R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
     prescribed_case.field("units").set("length", string("m"));

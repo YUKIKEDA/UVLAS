@@ -1130,7 +1130,7 @@ private:
 };
 
 /// Compose the velocity pullback directly into a signed residual.
-enum class FreeWakeSeedSign : std::uint8_t { Positive, Negative };
+enum class FreeWakeSeedScale : std::uint8_t { Positive, Negative, NegativeHalf };
 
 /// Use a fixed contact-qualified source state and its positive common SI radius.
 /// Each selected particle belongs to a retained wake face. The listed IDs can be
@@ -1145,6 +1145,6 @@ enum class FreeWakeSeedSign : std::uint8_t { Positive, Negative };
     std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits&,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {},
-    FreeWakeSeedSign = FreeWakeSeedSign::Positive) noexcept;
+    FreeWakeSeedScale = FreeWakeSeedScale::Positive) noexcept;
 
 } // namespace uvlas::coupling::detail

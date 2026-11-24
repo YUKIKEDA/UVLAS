@@ -36,7 +36,8 @@ struct WakeTransportLimits {
 
 struct WakeTransportRow {
     aero::detail::MaterialReleaseKey release;
-    DiscreteLoadVector residual; ///< m/s, physical BDF2 minus the flow velocity.
+    DiscreteLoadVector
+        residual; ///< m/s, discrete transport rate minus the corresponding fluid velocity.
     std::optional<DiscreteLoadVector> direction;
     std::optional<DiscreteLoadVector> prescribed_position; ///< Explicit fixed-step candidate, m.
     std::optional<DiscreteLoadVector> prescribed_position_direction;
@@ -66,6 +67,10 @@ public:
     [[nodiscard]] std::size_t size() const noexcept;
     [[nodiscard]] core::Result<WakeTransportRow> row(std::size_t) const noexcept;
     [[nodiscard]] core::Result<WakeTransportPositionDual> position_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
+    parent_free_velocity() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
+    parent_free_velocity() const&& = delete;
     [[nodiscard]] core::Result<aero::detail::ScaledEnclosure> prescribed_time_dual() const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
     free_velocity() const& noexcept;
@@ -85,6 +90,30 @@ private:
     const DiscreteNonpenetrationInput&, const DiscreteKnownFlowInput&,
     std::span<const aero::detail::PointId> particles, const DiscreteFreeWakeDirection*,
     const WakeTransportHistoryDirection&, std::span<const NonpenetrationVector> seeds,
+    const WakeTransportLimits&, const DiscreteFreeWakeLimits&, aero::detail::SharedP1Workspace&,
+    aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
+
+struct FirstFreeWakeEndpoint {
+    const DiscreteNonpenetrationInput& source;
+    const DiscreteKnownFlowInput& flow;
+    std::span<const aero::detail::PointId> particles; ///< In material row order.
+    const DiscreteFreeWakeDirection* direction{};
+};
+
+struct FirstFreeWakePoint {
+    WakeMaterialPoint current;
+    /// Empty at birth: the parent endpoint is the canonical trailing-edge point.
+    std::optional<WakeMaterialPoint> parent;
+};
+
+/// Trapezoidal transport for newly released points, and for retained free
+/// points on the first accepted interval step. Each fluid action and its
+/// tangent/pullback are evaluated at that endpoint's own geometry and clock.
+[[nodiscard]] core::Result<WakeTransportResult> evaluate_first_free_wake_transport(
+    const WakeTransportClock&, const FirstFreeWakeEndpoint& current,
+    const FirstFreeWakeEndpoint& parent, std::optional<aero::detail::ReleaseEpoch> birth_epoch,
+    std::span<const FirstFreeWakePoint>, std::span<const NonpenetrationVector> seeds,
     const WakeTransportLimits&, const DiscreteFreeWakeLimits&, aero::detail::SharedP1Workspace&,
     aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;
