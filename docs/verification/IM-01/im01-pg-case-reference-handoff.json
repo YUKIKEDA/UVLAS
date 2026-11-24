@@ -35,8 +35,8 @@
       "point_ordinal": 281,
       "column": 157,
       "derivative": "Cartesian x",
-      "g_per_metre": 9.95894e+24,
-      "independent_two_word_error_per_metre": 5.8842e-8
+      "g_per_metre": 9.95894E+24,
+      "independent_two_word_error_per_metre": 5.8842E-08
     }
   },
   "cases": [
@@ -153,6 +153,38 @@
       },
       "compiled_wide_driver_sha256": "5efdeff07a8fbe1027489c89f1eed0afdd898689d64ac02185f349d0d142b115",
       "archive_driver_sha256": "f32210092c122da06b6e00c73a7a62b7c931d25b5fc4359747747ebdd014355a"
+    }
+  },
+  "case_product_dispatch": {
+    "source_commit": "c1a8898003f4c4bdfbc774937b46b298905c9b9a",
+    "driver_sha256": "b4c56400ba743be98ab30789e2443a85232a8ff4d6bc71ad28d0f7f3d19df68c",
+    "based_on_case": "r5-taper-00, height polynomial set to zero",
+    "order": [
+      7,
+      7,
+      3
+    ],
+    "volume_count": 19,
+    "points": 2793,
+    "original_rows": 192,
+    "rank": 37,
+    "assertions_per_platform": 14574,
+    "support_ctests_per_platform": 2,
+    "resource_plan_bytes": {
+      "msvc": {
+        "product_through_residual": 720430793,
+        "explicit_through_chart": 720213705
+      },
+      "gcc14": {
+        "product_through_residual": 723087977,
+        "explicit_through_chart": 722870889
+      }
+    },
+    "logs_sha256": {
+      "msvc-case-product.log": "7de6add66a9c7b8d6ca59b908d98511b9b8216b92c942827bd6abe44c802b69a",
+      "msvc-case-product-ctest.log": "aae0636fedf04e598e6a366bc599e1eb34611328e0a8ef413edfbcf9da1dbe3a",
+      "gcc-case-product.log": "2cd5660bde3c8197a3f53428cfd40b207244c52e4e19e5553efde0d08757d541",
+      "gcc-case-product-ctest.log": "8ed40a5b1eda6459b94f3d0249ce77b202c05642e9707dae738c111f231fd71d"
     }
   }
 }
