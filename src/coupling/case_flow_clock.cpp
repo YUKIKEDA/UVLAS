@@ -134,8 +134,25 @@ public:
         }
     }
 
-    void check_loads(const s::AnalysisTransient& analysis) {
-        for (core::Index i = 0; std::cmp_less(i, analysis.loads.size()); ++i) {
+    void check_model(const s::Model& model, const s::AnalysisTransient& analysis) {
+        check_motions(model);
+        check_loads(analysis.loads);
+        check_member_loads(model.shells);
+        check_member_loads(model.beams);
+    }
+
+private:
+    template <class Members>
+    void check_member_loads(const Members& members) {
+        for (core::Index i = 0; std::cmp_less(i, members.size()); ++i) {
+            charge(1);
+            check_loads(take(members.at(i)).record().loads);
+        }
+    }
+
+    template <class Loads>
+    void check_loads(const Loads& loads) {
+        for (core::Index i = 0; std::cmp_less(i, loads.size()); ++i) {
             charge(1);
             std::visit(
                 [&](const auto& load) {
@@ -150,10 +167,11 @@ public:
                     else
                         check(load.multiplier.record());
                 },
-                take(analysis.loads.at(i)).record());
+                take(loads.at(i)).record());
         }
     }
 
+public:
     void check_events(decltype(s::Motion::events) events) {
         for (core::Index i = 0; std::cmp_less(i, events.size()); ++i) {
             charge(1);
@@ -281,6 +299,23 @@ private:
 };
 
 struct Builder {
+    static void check_model_events(const io::SiCase& source, const Grid& grid,
+                                   const CaseFlowClockLimits& limits, core::ResourcePlan& memory,
+                                   const std::stop_token& stop, core::FailureDetails details) {
+        const auto root = take(take(source.source_case()).get().root());
+        const auto transient = std::get<s::AnalysisTransient>(root.analysis.record());
+        const auto arithmetic = limits.fields.flow.arithmetic;
+        TimeSeriesEventCheck events{source,
+                                    grid.intervals.values(),
+                                    limits.fields.conversion,
+                                    arithmetic,
+                                    arithmetic.steps,
+                                    memory,
+                                    stop,
+                                    details};
+        events.check_model(root.model.record(), transient);
+    }
+
     static Grid make_grid(const io::SiCase& source, p::PchipInputStamp stamp,
                           const CaseFlowClockLimits& limits, core::ResourcePlan& memory,
                           const std::stop_token& stop, core::FailureDetails details) {
@@ -321,6 +356,7 @@ struct Builder {
                                  const CaseFlowClockLimits& limits, core::ResourcePlan& memory,
                                  const std::stop_token& stop, core::FailureDetails details) {
         auto grid = make_grid(source, stamp, limits, memory, stop, details);
+        check_model_events(source, grid, limits, memory, stop, details);
         auto ambient = take(prepare_case_uniform_flow(source, stamp, {}, workspace, limits.fields,
                                                       memory, stop, details));
         auto wake = take(prepare_case_prescribed_wake(source, stamp, {}, workspace, limits.fields,
@@ -335,6 +371,7 @@ struct Builder {
                                       core::ResourcePlan& memory, const std::stop_token& stop,
                                       core::FailureDetails details) {
         auto grid = make_grid(source, stamp, limits.clock_and_wake, memory, stop, details);
+        check_model_events(source, grid, limits.clock_and_wake, memory, stop, details);
         auto ambient = take(prepare_case_known_flow(source, stamp, {}, workspace, limits.ambient,
                                                     memory, stop, details));
         auto wake = take(prepare_case_prescribed_wake(
@@ -535,8 +572,7 @@ struct Builder {
                                     memory,
                                     stop,
                                     details};
-        events.check_motions(root.model.record());
-        events.check_loads(transient);
+        events.check_model(root.model.record(), transient);
         events.check_events(ambient.events);
         events.check(ambient.uniform.record());
         if (const auto* sine = std::get_if<s::GustSine>(&gust))
@@ -677,8 +713,7 @@ prepare_case_reference_clock(const io::SiCase& source, p::PchipInputStamp stamp,
                                                        memory,
                                                        stop,
                                                        details};
-        events.check_motions(root.model.record());
-        events.check_loads(transient);
+        events.check_model(root.model.record(), transient);
         check_stop(stop, prepare, details);
         return grid;
     });

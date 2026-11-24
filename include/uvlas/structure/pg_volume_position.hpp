@@ -44,6 +44,11 @@ public:
     /// Scratch to stage up to this destination's full capacity.
     [[nodiscard]] core::Index workspace_bytes() const noexcept;
 
+    /// Work units from the last successful action. Failures retain this count.
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return used_steps_;
+    }
+
     /// Empty before the first successful action. Borrow until the next
     /// successful action or destruction of this destination.
     [[nodiscard]] PgCartesianWords words() const& noexcept;
@@ -103,6 +108,7 @@ private:
     core::Index workspace_bytes_;
     core::PlannedBuffer<double> high_, low_;
     std::size_t size_ = 0;
+    std::uint64_t used_steps_ = 0;
 };
 
 /// Apply N or its transpose in fixed Cartesian order, using both input and

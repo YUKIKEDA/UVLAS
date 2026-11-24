@@ -699,6 +699,7 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
         take(core::Workspace::create(output.workspace_bytes() - 1, plan))};
     auto& workspace = *workspaces[0];
     CHECK(output.words().high.empty());
+    CHECK(output.used_steps() == 0);
 
     const auto exact_word = [](PgCartesianWords words, std::size_t k) -> Q {
         auto value = independent_double(words.high[k]);
@@ -741,10 +742,14 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
         return retained;
     };
     const auto positions = evaluate(forward, q_input, fwd_caps);
-    const auto repeated = compare_run(forward, q_input, fwd_caps);
+    auto wide = fwd_caps;
+    ++wide.maximum_steps;
+    const auto repeated = compare_run(forward, q_input, wide);
+    CHECK(output.used_steps() == forward_steps);
     for (std::size_t i = 0; i < positions.size(); ++i)
         CHECK(exact_word(repeated, i) == positions[i]);
     const auto forces = evaluate(transpose, f_input, trans_caps);
+    CHECK(output.used_steps() == transpose_steps);
 
     Q forward_work{}, transpose_work{}, input_norm{};
     for (std::size_t i = 0; i < positions.size(); ++i) {
@@ -765,6 +770,7 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
                               core::Workspace& scratch, core::FailureCode failure) {
         check_failure(apply(reference, transpose, input, bounds, scratch, output), failure);
         REQUIRE(output.words().high.size() == forces.size());
+        CHECK(output.used_steps() == transpose_steps);
         for (std::size_t i = 0; i < forces.size(); ++i)
             CHECK(exact_word(output.words(), i) == forces[i]);
     };

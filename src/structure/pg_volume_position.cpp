@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstring>
+#include <optional>
 #include <uvlas/structure/pg_boundary_tangents.hpp>
 #include <uvlas/structure/pg_material_tangents.hpp>
 #include <uvlas/structure/pg_prepared_volume.hpp>
@@ -58,14 +59,18 @@ void stage_word(std::span<std::byte> bytes, std::size_t component, double value)
     return {};
 }
 
-[[nodiscard]] bool fits_steps(std::uint64_t steps, PgCartesianWords input, std::size_t inner,
-                              std::size_t output) noexcept {
+[[nodiscard]] std::optional<std::uint64_t> checked_steps(std::uint64_t limit,
+                                                         PgCartesianWords input, std::size_t inner,
+                                                         std::size_t output) noexcept {
+    auto remaining = limit;
     for (const auto count : {input.high.size(), input.low.size(), output}) {
-        if (count > steps)
-            return false;
-        steps -= count;
+        if (count > remaining)
+            return {};
+        remaining -= count;
     }
-    return inner == 0 || output <= steps / inner;
+    if (inner != 0 && output > remaining / inner)
+        return {};
+    return (limit - remaining) + static_cast<std::uint64_t>(output) * inner;
 }
 
 } // namespace
@@ -143,8 +148,8 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
             if (input.high.size() != input_size ||
                 input.low.size() != (input_paired ? input_size : 0))
                 return reject(core::FailureCode::InvalidInput);
-            if (output_size > high_.size() ||
-                !fits_steps(limits.maximum_steps, input, inner, output_size))
+            const auto steps = checked_steps(limits.maximum_steps, input, inner, output_size);
+            if (output_size > high_.size() || !steps)
                 return reject(core::FailureCode::ResourceExceeded);
 
             auto lease = workspace.acquire();
@@ -195,7 +200,8 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
                 if (output_paired)
                     std::memcpy(low_.values().data(), low.data(), bytes);
             }
-            size_ = static_cast<std::size_t>(output_size);
+            size_ = output_size;
+            used_steps_ = *steps;
             return {};
         });
 }
