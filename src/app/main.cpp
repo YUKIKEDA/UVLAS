@@ -1,3 +1,4 @@
+#include "inspect_result.hpp"
 #include "uvlas/core/build_info.hpp"
 #include "validate_case.hpp"
 
@@ -8,7 +9,8 @@
 namespace {
 
 constexpr std::string_view usage = "Usage: uvlas --help | --version | --build-info\n"
-                                   "       uvlas validate case.json\n";
+                                   "       uvlas validate case.json\n"
+                                   "       uvlas inspect result-dir\n";
 
 int run(int argc, std::filesystem::path::value_type* argv[]) {
     if (argc < 2) {
@@ -24,6 +26,13 @@ int run(int argc, std::filesystem::path::value_type* argv[]) {
             return 2;
         }
         return uvlas::app::validate_case(std::filesystem::path{argv[2]});
+    }
+    if (option == "inspect") {
+        if (argc != 3) {
+            std::cerr << "Expected one result directory.\n" << usage;
+            return 2;
+        }
+        return uvlas::app::inspect_result(std::filesystem::path{argv[2]});
     }
     if (argc != 2) {
         std::cerr << "Expected exactly one option.\n" << usage;

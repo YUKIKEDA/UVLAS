@@ -1024,6 +1024,21 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                 selected_request, shared, *local, *kernel, memory);
         };
 
+        const auto check_collision = [&](const cf::DiscreteCirculationRequest& collision) {
+            auto collision_flow = projected_at(time);
+            const auto allocated = memory.allocated_bytes();
+            const auto result = run_direction(view, direction, collision_flow, collision);
+            CHECK((!result && result.error().code == core::FailureCode::StaleGeneration));
+            CHECK(collision_flow.source().jet.active());
+            CHECK(memory.allocated_bytes() == allocated);
+        };
+        auto rhs_collision = tangent_request;
+        rhs_collision.rhs_generation = request.rhs_generation;
+        check_collision(rhs_collision);
+        auto retained_collision = tangent_request;
+        retained_collision.retained_generation = request.retained_generation;
+        check_collision(retained_collision);
+
         auto direction_flow = projected_at(time);
         auto zero_projection = tangent_request;
         zero_projection.rhs_absolute = 0;
@@ -1034,6 +1049,12 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         stale_tangent.scales.context.cache.matrix = core::NumericalGeneration{80};
         reject(run_direction(view, direction, direction_flow, stale_tangent),
                core::FailureCode::StaleGeneration);
+        const std::array changed_scale{2 * tangent_request.scales.unknown.front()};
+        stale_tangent = tangent_request;
+        stale_tangent.scales.unknown = changed_scale;
+        reject(run_direction(view, direction, direction_flow, stale_tangent),
+               core::FailureCode::StaleGeneration);
+        CHECK(direction_flow.source().jet.active());
         auto no_query_direction = direction;
         auto other_rows = row_directions;
         other_rows[0].free_query.reset();
@@ -1065,6 +1086,12 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         CHECK(checked.used_steps() <= solve_limits.steps);
         CHECK(checked.tangent().used_steps() < checked.used_steps());
         CHECK(checked.primal().flow().source().jet.active());
+        CHECK(checked.primal().solution().certificate().rhs_generation() == request.rhs_generation);
+        CHECK(checked.tangent().solution().certificate().rhs_generation() ==
+              tangent_request.rhs_generation);
+        CHECK(checked.primal().solution().values().generation() == request.retained_generation);
+        CHECK(checked.tangent().solution().values().generation() ==
+              tangent_request.retained_generation);
         CHECK(abs(solution_word(checked.primal().solution(), 0) - expected) <=
               rational_word(1e-15));
         CHECK(abs(solution_word(checked.tangent().solution(), 0) - expected_direction) <=
@@ -1777,6 +1804,29 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     auto stale = transpose_request;
     stale.scales.context.cache.matrix = scales.context.cache.matrix;
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    stale = transpose_request;
+    stale.scales.context.cache.scales = scales.context.cache.scales;
+    reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    auto changed_unknown = unknown_scales;
+    changed_unknown.front() *= 2;
+    auto stale_tangent = tangent_request;
+    stale_tangent.scales.unknown = changed_unknown;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+    auto changed_residual = residual_scales;
+    changed_residual.back() *= 2;
+    stale_tangent = tangent_request;
+    stale_tangent.scales.residual = changed_residual;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+    stale_tangent = tangent_request;
+    stale_tangent.scales.unknown_units = velocity_units;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+
+    auto fresh_tangent = tangent_request;
+    fresh_tangent.scales.unknown = changed_unknown;
+    fresh_tangent.scales.context.cache.scales = core::ScaleGeneration{38};
+    const auto fresh = take(linearize(tangent_sense, forcing, fresh_tangent));
+    CHECK(fresh.solution().certificate().context().cache.scales == core::ScaleGeneration{38});
+    CHECK(std::ranges::equal(fresh.solution().certificate().unknown_scales(), changed_unknown));
     stale = transpose_request;
     stale.scales.context.trial = core::TrialId{99};
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);

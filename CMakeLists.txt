@@ -66,7 +66,7 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
     src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp
-    src/structure/pg_volume_mass_reference.cpp)
+    src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -114,11 +114,12 @@ target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 # Strict input scalars share the core value and failure contracts.
 set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_path.cpp src/io/reference_file_snapshot.cpp src/io/gmsh_mesh.cpp
+    src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_rational_projection.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
     src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp
-    src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp)
+    src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp src/io/nastran_number_fields.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp src/io/reference_resolution.cpp)
 target_sources(uvlas_io PRIVATE src/io/result_documents.cpp src/io/resolved_case_document.cpp)
@@ -144,7 +145,7 @@ target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/s
 target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero
     PRIVATE uvlas_numerics Boost::multiprecision)
 
-add_executable(uvlas_cli src/app/main.cpp src/app/validate_case.cpp)
+add_executable(uvlas_cli src/app/main.cpp src/app/validate_case.cpp src/app/inspect_result.cpp)
 uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_include_directories(uvlas_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/io")

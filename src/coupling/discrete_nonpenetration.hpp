@@ -275,7 +275,8 @@ private:
 
 /// Solve A_eff δΓ = −δR or A_effᵀ λ = seed. The latter pairs with −δR.
 /// RHS rows and component scales follow the primal's ascending face IDs. The
-/// transpose has a distinct matrix generation and its own dual layout IDs.
+/// transpose has distinct matrix and scale generations and its own dual layout IDs.
+/// Reusing the primal scale generation requires its certified scale values and units.
 /// rhs_absolute uses the RHS's units and matrix_absolute uses 1/m in both senses.
 [[nodiscard]] core::Result<DiscreteCirculationLinearization>
 solve_discrete_circulation_linearization(const DiscreteCirculation&, CirculationSense,
@@ -349,6 +350,7 @@ private:
 /// signed attached wake fronts and fixed history. The unprojected δR enclosure
 /// is checked with the attained tangent. Both use limits.steps cumulatively.
 /// Time, radius and old wake strengths are fixed. No PG mapping is inferred.
+/// The primal and tangent must have distinct RHS and retained-value generations.
 /// Consume the supplied flow only once both original residual checks succeed.
 [[nodiscard]] core::Result<DiscreteCirculationDirectionalSolve>
 solve_discrete_circulation_direction(

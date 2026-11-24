@@ -1,0 +1,78 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-flat-gram-cut",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "4dab180dfe50678e077631f3add7dc4fe09dd251",
+  "claimed_state": "一定高さ・一定厚平板の切断領域で全上三角の幾何内積区間を供給し、n=1の認定入口まで照合した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "sloping_cut_grids": [
+      1,
+      2,
+      4
+    ],
+    "first_grid_all_entries_exact_endpoints": true,
+    "selected_entries_exact_endpoints_per_larger_grid": 10,
+    "first_grid_cut_congruence_certified": true,
+    "cell_aligned_all_entries_exact_endpoints": true,
+    "full_background_regression_passed": true,
+    "fixed_width_cut_rejection_denominator": "2^190",
+    "windows_release_ctest_passed": 1,
+    "windows_debug_ctest_passed": 1,
+    "linux_sanitizer_test_cases": 10,
+    "linux_sanitizer_assertions": 84578,
+    "linux_sanitizer_direct_timeout_seconds": 180,
+    "clang_tidy_translation_units": 2,
+    "rejected_mutation": {
+      "change": "drop all odd total-degree moments on partial cells",
+      "failed_assertions": 4389
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-flat-gram-contract.md": "77b18bcdd8c5fd4210e419b75cf4253e433e43d5aef499788ae3612331953331",
+    "docs/specs/structure/pg-integration-partition-contract.md": "ecb1dd5d0819fa73a74fe4521cd33b1bc9b618b6df597debfe628c2fd45a90d0",
+    "include/uvlas/structure/pg_integration_partition.hpp": "be9b14490465be58358b0065e08835ea10e4baf93f30b93a80c6995b0b2ba3e6",
+    "src/structure/pg_rank_storage.hpp": "baf41ab8cf4a8ee63f11b05a2c4714eff277484bfa38ae352cfe436911ff6e7f",
+    "src/structure/pg_rank_input.hpp": "84e36f5fa431fc03fe7229bd810db4a0074393f562df098a51b8c27e11ceca3e",
+    "tests/structure/pg_partition_test_support.hpp": "33246f600d8b6d95492b35b9cf3b4ee2431296cc2aa73c03e3c538f84e2ba79b",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-flat-gram-cut-contract.md": "ed486f1cfe68d9779b2ee0a5f3797f6d849d2388f304372d7ae72fbe716d1004",
+    "include/uvlas/structure/pg_flat_gram.hpp": "25a6208df9936f206a2950660e30158e44ee03cbb7fc315c92826261db646a66",
+    "src/structure/pg_flat_gram.cpp": "775a492107ba1c89f7c4f5d05e8c1de7f29993943fafaa1c544fcef7dd2904b4",
+    "src/structure/pg_flat_gram_cut_moments.hpp": "defaa900908ada9e165855c9c9522fb514405f418be47bab270c026b01079fa2",
+    "tests/structure/pg_conditioning_test.cpp": "e57e3df6180558ebc22da8e2d5f31d20e2b4016c4d365d637c475c3517c53e2d",
+    "docs/verification/IM-01/pg-flat-gram-cut.md": "70fce8cb348261fdf5d126db9a03e5a93a5e4c610a6cc70f36a7fc938004c71f"
+  }
+}
