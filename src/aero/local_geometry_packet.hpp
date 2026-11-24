@@ -7,6 +7,7 @@
 #include <uvlas/core/instrumentation.hpp>
 
 namespace uvlas::aero::detail {
+class GlobalContactState;
 class LocalPacketEngine;
 class LocalBounds;
 struct LocalRootScratch;
@@ -192,12 +193,11 @@ prepare_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalA
 prepare_bound_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalAccuracy,
                            const GeometryLimits&, LocalPacketWorkspace&, core::ResourcePlan&,
                            const std::stop_token&) noexcept;
-/// This midpoint packet follows a raw facet edge explicitly bound by the
-/// qualified global topology to the query's canonical edge. Check the exact
-/// corresponding local projection while retaining the original query words.
+/// Verify a declared alias of the query's canonical edge in the contact-owned
+/// topology, then require the exact material midpoint and matching local edge.
 [[nodiscard]] AeroResult<LocalGeometryPacket>
-prepare_aliased_midpoint_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId,
-                                EdgeId raw_alias, bool bound, LocalAccuracy, const GeometryLimits&,
+prepare_aliased_midpoint_packet(const GlobalContactState&, const ResolvedQuery&, FacetId,
+                                bool bound, LocalAccuracy, const GeometryLimits&,
                                 LocalPacketWorkspace&, core::ResourcePlan&,
                                 const std::stop_token&) noexcept;
 
