@@ -1,5 +1,9 @@
 #include "case_nastran_reference_inputs.hpp"
 
+#include "io/si_case_detail.hpp"
+#include "structure/pg_reference_arithmetic.hpp"
+
+#include <algorithm>
 #include <utility>
 
 namespace uvlas::coupling::detail {
@@ -220,6 +224,171 @@ core::Result<CaseNastranReferenceInputs> CaseNastranReferenceInputs::prepare(
     result.masses_ = std::move(*masses);
     result.joints_ = std::move(*joints);
     return result;
+}
+
+core::Result<CaseNastranParticleMass>
+certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
+                                   CaseNastranMassId id, const structure::PgReferenceLimits& limits,
+                                   core::ResourcePlan& plan,
+                                   CaseNastranParticleDiagnostic* diagnostic) noexcept {
+    namespace ref = structure::detail;
+    using ref::partition_take;
+    using Reason = CaseNastranParticleFailure;
+    if (diagnostic)
+        *diagnostic = {};
+    return ref::partition_entry([&]() -> core::Result<CaseNastranParticleMass> {
+        ref::ReferenceArithmetic math{limits, plan};
+        CaseNastranParticleDiagnostic detail{};
+        const auto mark = [&](Reason reason,
+                              std::optional<native::NastranBulkPosition> field = {}) {
+            detail.reason = reason;
+            detail.field = field;
+        };
+        const auto reject = [&](FailureCode code) -> core::Result<CaseNastranParticleMass> {
+            if (diagnostic)
+                *diagnostic = detail;
+            return std::unexpected(Failure{code, operation});
+        };
+        math.cancel();
+        const auto& schema = partition_take(si.source_case()).get();
+        const auto identity = partition_take(schema.identity());
+        const auto sidecar = prepared.sidecar_source();
+        const auto deck = prepared.deck_source();
+        if (!native::same_identity(identity, sidecar.parent) ||
+            !native::same_identity(identity, deck.parent))
+            return reject(FailureCode::StaleGeneration);
+
+        mark(Reason::Selection);
+        const CaseNastranReferenceInputs::Mass* selected = nullptr;
+        for (const auto& slot : prepared.masses()) {
+            math.visit(1);
+            if (!slot || slot->binding.target != id)
+                continue;
+            detail.element = slot->binding.element;
+            if (selected)
+                return reject(FailureCode::InvalidInput);
+            selected = &*slot;
+        }
+        if (!selected)
+            return reject(FailureCode::InvalidInput);
+        const auto& original = selected->physical;
+        if (!native::same_identity(identity, original.source.location.parent) ||
+            original.source.location.source != deck.source ||
+            original.source.digest != prepared.deck_digest()) {
+            mark(Reason::Source);
+            return reject(FailureCode::StaleGeneration);
+        }
+
+        mark(Reason::Kind, original.card.id_field.position);
+        if (original.kind != native::NastranBasicMassKind::Particle)
+            return reject(FailureCode::InvalidInput);
+        for (std::size_t axis = 0; axis < original.grid_to_centre_metres.size(); ++axis) {
+            math.visit(1);
+            const auto& lever = original.grid_to_centre_metres[axis];
+            if (lever.lower.sign() == 0 && lever.upper.sign() == 0)
+                continue;
+            const auto& field = original.card.position[axis].field;
+            mark(Reason::Kind, field ? field->position : original.card.grid_field.position);
+            return reject(lever.lower.sign() > 0 || lever.upper.sign() < 0
+                              ? FailureCode::InvalidInput
+                              : FailureCode::PrecisionUnresolved);
+        }
+
+        const auto model = partition_take(schema.root()).model.record();
+        std::optional<io::schema::MassParticle> particle;
+        for (std::size_t i = 0; i < model.masses.size(); ++i) {
+            math.visit(1);
+            const auto value = partition_take(model.masses.at(ref::partition_index(i))).record();
+            if (const auto* candidate = std::get_if<io::schema::MassParticle>(&value);
+                candidate && candidate->id.unsigned_value() == id.value()) {
+                particle = *candidate;
+                break;
+            }
+        }
+        if (!particle)
+            return reject(FailureCode::InvalidInput);
+
+        const auto point = particle->target.record();
+        const auto member = point.target.record();
+        mark(Reason::Position, original.card.grid_field.position);
+        if (member.kind.selected() != decltype(member.kind.selected())::ItemShell ||
+            point.side.selected() != decltype(point.side.selected())::ItemInterior)
+            return reject(FailureCode::Unsupported);
+        const native::MeshShellId shell{member.id.unsigned_value()};
+        const auto& set = prepared.shells();
+        if (!set)
+            return reject(FailureCode::Unsupported);
+        const auto find_shell = [&]() -> const CaseNastranPlanarPgSet::Shell* {
+            for (std::size_t i = 0; i < set->size(); ++i) {
+                math.visit(1);
+                const auto& item = partition_take(set->at(ref::partition_index(i))).get();
+                if (item.match().planar.shell == shell)
+                    return &item;
+            }
+            return nullptr;
+        };
+        const auto* certified = find_shell();
+        if (!certified)
+            return reject(FailureCode::Unsupported);
+        const auto& match = certified->match().planar;
+        const auto geometry = match.geometry.view();
+        const auto patch = partition_take(certified->reference().identity());
+        if (!geometry || geometry->patch != patch ||
+            !native::same_identity(identity, geometry->source.parent) ||
+            geometry->source.source != deck.source || geometry->digest != prepared.deck_digest() ||
+            match.sidecar.source != sidecar.source ||
+            match.sidecar_digest != prepared.sidecar_digest()) {
+            mark(Reason::Source);
+            return reject(FailureCode::StaleGeneration);
+        }
+
+        math.admit();
+        const auto exact = [&](const auto& field) {
+            math.charge();
+            return partition_take(io::materialize_rational(
+                partition_take(si.quantity(field)).recipe, math.leaf_limits, plan));
+        };
+        mark(Reason::Mass,
+             original.card.mass.field.transform([](const auto& f) { return f.position; }));
+        auto mass = exact(particle->mass);
+        if (math.compare(mass, original.mass_kg) != 0)
+            return reject(FailureCode::InvalidInput);
+
+        mark(Reason::Position, original.card.grid_field.position);
+        if (exact(partition_take(point.coordinates.at(2))).sign() != 0)
+            return reject(FailureCode::InvalidInput);
+        const auto s = exact(partition_take(point.coordinates.at(0)));
+        const auto t = exact(partition_take(point.coordinates.at(1)));
+        for (const auto& face : geometry->faces) {
+            for (const auto& corner : face.ring()) {
+                math.visit(1);
+                if (corner.node != original.card.grid.value() ||
+                    math.compare(corner.chart.s, s) != 0 || math.compare(corner.chart.t, t) != 0)
+                    continue;
+                if (!corner.nastran) {
+                    mark(Reason::Source);
+                    return reject(FailureCode::StaleGeneration);
+                }
+                if (const auto &unshifted = corner.nastran->unshifted_metres;
+                    unshifted && !std::ranges::equal(*unshifted, corner.position_metres,
+                                                     [&](const auto& a, const auto& b) {
+                                                         return math.compare(a, b) == 0;
+                                                     }))
+                    return reject(FailureCode::InvalidInput);
+                return CaseNastranParticleMass{deck,
+                                               sidecar,
+                                               prepared.deck_digest(),
+                                               prepared.sidecar_digest(),
+                                               selected->binding,
+                                               shell,
+                                               patch,
+                                               original.card.grid,
+                                               face.element,
+                                               std::move(mass)};
+            }
+        }
+        return reject(FailureCode::InvalidInput);
+    });
 }
 
 } // namespace uvlas::coupling::detail
