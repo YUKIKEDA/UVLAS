@@ -4189,6 +4189,116 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                                                release.epoch, transport_limits, memory),
            core::FailureCode::ResourceExceeded);
 
+    const a::PointId far_up{9}, far_down{10};
+    const a::EdgeId far_upper{21}, far_end{22}, far_lower{23}, far_diagonal{24};
+    const std::array extended_ids{id[0], id[1], id[2],      id[3],  id[4],
+                                  id[5], alias, coincident, far_up, far_down};
+    const std::array extended_bindings{bindings[0],
+                                       bindings[1],
+                                       bindings[2],
+                                       bindings[3],
+                                       bindings[4],
+                                       bindings[5],
+                                       bindings[6],
+                                       bindings[7],
+                                       test_geometry::binding(),
+                                       test_geometry::binding()};
+    const std::array<double, 30> extended_xyz{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 2, 1, 0,
+                                              2, 0, 0, 1, 0, 0, 1, 0, 0, 3, 1, 0, 3, 0, 0};
+    const std::array extended_edges{edges[0],
+                                    edges[1],
+                                    edges[2],
+                                    edges[3],
+                                    edges[4],
+                                    edges[5],
+                                    edges[6],
+                                    edges[7],
+                                    edges[8],
+                                    edges[9],
+                                    a::EdgeInput{far_upper, {id[4], far_up}},
+                                    a::EdgeInput{far_end, {far_up, far_down}},
+                                    a::EdgeInput{far_lower, {far_down, id[5]}},
+                                    a::EdgeInput{far_diagonal, {id[5], far_up}}};
+    const a::PhysicalFaceId far_face{102};
+    const a::BandId far_band{52};
+    const a::FacetId far_facet{204};
+    const std::array extended_bands{fixture.bands[0], fixture.bands[1], far_band};
+    const std::array extended_faces{fixture.faces[0], fixture.faces[1],
+                                    a::FaceInput{far_face, far_band}};
+    const std::array extended_roles{fixture.roles[0], fixture.roles[1],
+                                    a::FaceRoleInput{far_face, a::AeroFaceRole::Wake}};
+    const std::array extended_quads{fixture.quads[0], fixture.quads[1],
+                                    a::QuadInput{far_face,
+                                                 {id[5], id[4], far_up, far_down},
+                                                 {edges[6].id, far_upper, far_end, far_lower},
+                                                 far_diagonal,
+                                                 {far_facet, a::FacetId{205}}}};
+    const std::array extended_ownership{ownership[0],
+                                        ownership[1],
+                                        ownership[2],
+                                        ownership[3],
+                                        ownership[4],
+                                        ownership[5],
+                                        ownership[6],
+                                        ownership[7],
+                                        ownership[8],
+                                        ownership[9],
+                                        a::EdgeBindingInput{far_upper, a::CanonicalEdge{}},
+                                        a::EdgeBindingInput{far_end, a::CanonicalEdge{}},
+                                        a::EdgeBindingInput{far_lower, a::CanonicalEdge{}},
+                                        a::EdgeBindingInput{far_diagonal, a::CanonicalEdge{}}};
+    auto extended_input = input_geometry;
+    extended_input.points = extended_ids;
+    extended_input.bindings = extended_bindings;
+    extended_input.reference = a::SinglePositions{extended_xyz};
+    extended_input.current = a::SinglePositions{extended_xyz};
+    extended_input.edges = extended_edges;
+    extended_input.faces = extended_faces;
+    extended_input.bands = extended_bands;
+    extended_input.quads = extended_quads;
+    const auto extended_geometry = test_geometry::take(
+        a::prepare_owned_geometry(extended_input, test_geometry::limits(), *geometry_work, memory));
+    const auto extended_topology = take_global(a::build_global_topology(
+        extended_geometry, {extended_roles, extended_ownership, trailing}, cap, *global, memory));
+    const auto extended_contact = take_global(
+        a::check_global_geometry(extended_topology, extended_geometry, cap, *global, memory));
+    const a::ReleaseEpoch next_epoch{9};
+    const std::array extended_points{
+        cf::WakeMaterialPoint{release, far_up, far_facet},
+        cf::WakeMaterialPoint{{release.point, next_epoch}, id[4], a::FacetId{202}},
+        cf::WakeMaterialPoint{second_release, far_down, far_facet},
+        cf::WakeMaterialPoint{{second_release.point, next_epoch}, id[5], a::FacetId{202}}};
+    const cf::WakeMaterialSnapshot extended_trial{extended_contact, extended_points};
+    auto extended_limits = growth_limits;
+    extended_limits.maximum_particles = 4;
+    const auto extended = take(
+        cf::prepare_growing_wake_transition(wake_si, transport_clock, growth_trial, extended_trial,
+                                            next_epoch, extended_limits, memory));
+    REQUIRE(extended.size() == 4);
+    const auto inherited = take(extended.row(0));
+    REQUIRE(inherited.parent);
+    CHECK(inherited.parent->point == id[4]);
+    CHECK(inherited.current.point == far_up);
+    CHECK_FALSE(take(extended.row(1)).parent);
+    CHECK(take(extended.row(2)).current.point == far_down);
+
+    auto limited_case = source_case;
+    limited_case.field("numerics")
+        .set("wake_rows", parse(R"({"kind":"limited","maximum_rows":1})"));
+    const auto limited_si = materialize(limited_case, io::SourceId{486});
+    const auto limited_grid = take(cf::prepare_case_reference_clock(
+        limited_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock limited_first{limited_grid, limited_grid,
+                                               first_interval.destination};
+    const cf::WakeTransportClock limited_second{limited_grid, limited_grid, destination};
+    CHECK(take(cf::prepare_growing_wake_transition(limited_si, limited_first, growth_parent,
+                                                   growth_trial, release.epoch, extended_limits,
+                                                   memory))
+              .size() == 2);
+    reject(cf::prepare_growing_wake_transition(limited_si, limited_second, growth_trial,
+                                               extended_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::ResourceExceeded);
+
     const std::array birth_origin{cf::WakeMaterialPoint{release, release.point, std::nullopt}};
     auto from_origin = stages;
     from_origin[2].points = birth_origin;

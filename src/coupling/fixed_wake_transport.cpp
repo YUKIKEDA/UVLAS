@@ -531,6 +531,26 @@ struct WakeTransportBuilder {
         if (previous != parent.points.size())
             reject(StaleGeneration);
         unique_owners(visited.values());
+
+        const auto row_capacity = input.numerics.record().wake_rows.record();
+        if (const auto* limited = std::get_if<io::schema::WakeCapacityLimited>(&row_capacity)) {
+            auto epochs = visited.values();
+            for (std::size_t i = 0; i < epochs.size(); ++i) {
+                work.step();
+                epochs[i] = trial.points[i].release.epoch.value();
+            }
+            std::ranges::sort(epochs, [&](auto lhs, auto rhs) {
+                work.step();
+                return lhs < rhs;
+            });
+            const auto distinct = std::ranges::unique(epochs, [&](auto lhs, auto rhs) {
+                work.step();
+                return lhs == rhs;
+            });
+            const auto rows = static_cast<std::uint64_t>(distinct.begin() - epochs.begin());
+            if (rows > limited->maximum_rows.unsigned_value())
+                reject(ResourceExceeded);
+        }
         work.step();
         return GrowingWakeTransition{std::move(output)};
     }
