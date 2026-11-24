@@ -99,5 +99,60 @@
   },
   "evidence": [
     "docs/verification/IM-01/pg-case-reference-handoff/verification.md"
-  ]
+  ],
+  "gradient_diagnostics": {
+    "rounded_required_fields": {
+      "case": "r5-taper-00",
+      "points": [
+        280,
+        281
+      ],
+      "maximum_translation_derivative_error_per_metre": 7.87339E-32,
+      "maximum_reference_position_derivative_error": 2.9412E-33,
+      "assertions": 36042,
+      "compiled_driver_sha256": "ae1c0e841e1d0a4e40ea9dc3111c885102f0d8c9ed1780561ae8750f9e8e01f2",
+      "archive_driver_sha256": "95cbe2444ce3294698f6b9c855659419fe2d423766e44c73c0ff4052d8396f46",
+      "log_sha256": "785f6460cb3bd1bcbf7c0a8cde7bdf4976114418b6f6b2a8e44c5bfa54558189"
+    },
+    "gradient_component_cycle": {
+      "first_failed_assertion": 36657,
+      "log_sha256": "5adfdad32af0e97bb3df5c5f14c46fa6fb236738b510800e8a11d86dc12cdb39"
+    },
+    "product_rule_r5_msvc": {
+      "case": "r5-taper-00",
+      "source_commit": "b379d8732a2fff47a1bf648064390db0f201bbc0",
+      "order": [
+        17,
+        17,
+        3
+      ],
+      "exact_rule_denominator": "10^48",
+      "volumes": 19,
+      "point_count": 16473,
+      "resource_profile_bytes": 51539607552,
+      "narrow": {
+        "value_work_bits": [
+          8192,
+          32768
+        ],
+        "outcome": "ResourceExceeded",
+        "cumulative_bytes": 541239401,
+        "log_sha256": "18b01935a5d892240b3046e5d99762ad47bd4ca2fce2def32c832ec6ef60a42f"
+      },
+      "wide": {
+        "value_work_bits": [
+          65536,
+          262144
+        ],
+        "outcome": "externally stopped during Gram",
+        "wall_seconds": 662.88,
+        "cpu_seconds": 650.25,
+        "peak_working_set_bytes": 356036608,
+        "log_sha256": "54e5b21b4b617b335f6bce75fd16e7c2e90a80426a68a2db66c244e41d2b1ba4",
+        "process_sample_sha256": "72010e587e8433eec9fa8eeabac9d76aba5f9c61bba4a7a7eed2e7f602c65953"
+      },
+      "compiled_wide_driver_sha256": "5efdeff07a8fbe1027489c89f1eed0afdd898689d64ac02185f349d0d142b115",
+      "archive_driver_sha256": "f32210092c122da06b6e00c73a7a62b7c931d25b5fc4359747747ebdd014355a"
+    }
+  }
 }
