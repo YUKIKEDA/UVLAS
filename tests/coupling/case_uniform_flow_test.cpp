@@ -6,8 +6,10 @@
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
+#include "coupling/pg_aero_attachment.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "io/si_rational_projection.hpp"
+#include "structure/pg_conditioning_test_support.hpp"
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -15,6 +17,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <uvlas/structure/pg_flat_gram.hpp>
 
 namespace {
 using namespace uvlas;
@@ -3986,4 +3989,270 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
            core::FailureCode::ResourceExceeded);
     CHECK(refused.allocated_bytes() == 0);
     CHECK(test_geometry::take(geometry.owner(alias)) == id[3]);
+}
+
+TEST_CASE("PG structural attachment retains a curved material point and transfers work",
+          "[AE-02][UW-D01][UW-D06][SH-D02][N4-06][verification][negative]") {
+    namespace st = uvlas::structure;
+    namespace pg = pg_conditioning_test;
+    pg::Fixture f;
+    for (auto& thickness : f.heights)
+        thickness = f.r("2");
+    const auto one_metre = f.r("1");
+    core::Workspace reference_scratch{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan memory{pg::profile};
+    const auto pg_limits = pg::query_limits();
+    auto basis = pg::make_basis(f, one_metre, reference_scratch, memory);
+    auto gram = take(st::PgFlatGram::prepare(std::move(basis), 256, {pg_limits, pg::steps},
+                                             reference_scratch, memory));
+    auto certificate = take(std::move(gram).generate_and_certify(
+        {320, 246}, {pg::profile, pg::steps, {}}, reference_scratch, memory));
+    const auto patch = take(
+        st::PgPreparedPatch::prepare(std::move(certificate), pg_limits, reference_scratch, memory));
+    const auto curve =
+        take(patch.conditioning().required_coordinates({19}, pg_limits, reference_scratch, memory));
+    const auto& partition = take(take(patch.conditioning().reference_basis())->source()).partition;
+    const auto nodes = take(partition.vertices());
+    const auto triangles = take(partition.triangles());
+    const auto faces = take(partition.horizontal_faces());
+    const auto layers = take(partition.layers());
+    const auto host = [&](const pg::Q& s, const pg::Q& t) {
+        for (std::size_t i = 0; i < faces.size(); ++i) {
+            const auto& face = faces[i];
+            if (face.side != st::PgPartitionFaceSide::Upper ||
+                pg::q(layers[static_cast<std::size_t>(face.layer)].upper) != 1)
+                continue;
+            const auto& triangle = triangles[static_cast<std::size_t>(face.triangle)];
+            const auto& o = nodes[static_cast<std::size_t>(triangle.vertices[0])];
+            const auto& b = nodes[static_cast<std::size_t>(triangle.vertices[1])];
+            const auto& c = nodes[static_cast<std::size_t>(triangle.vertices[2])];
+            const pg::Q bx = pg::q(b.s) - pg::q(o.s), by = pg::q(b.t) - pg::q(o.t);
+            const pg::Q cx = pg::q(c.s) - pg::q(o.s), cy = pg::q(c.t) - pg::q(o.t);
+            const pg::Q x = s - pg::q(o.s), y = t - pg::q(o.t);
+            const pg::Q det = bx * cy - cx * by;
+            REQUIRE(det > 0);
+            const pg::Q u = (x * cy - cx * y) / det, v = (bx * y - x * by) / det;
+            if (u >= 0 && v >= 0 && u + v <= 1)
+                return std::tuple{static_cast<core::Index>(i),
+                                  pg::rat(f, numerator(u), denominator(u)),
+                                  pg::rat(f, numerator(v), denominator(v))};
+        }
+        throw std::runtime_error("fixture material point missing");
+    };
+    const auto first = host(0, 0), second = host(0, 1), third = host(1, 1), fourth = host(1, 0),
+               control = host(pg::Q{3, 4}, pg::Q{3, 8});
+    const auto point = [](const auto& x) -> st::PgBoundaryPositionPoint {
+        return st::PgReferenceHorizontalPoint{std::get<0>(x), std::get<1>(x), std::get<2>(x)};
+    };
+    const std::array material{point(first), point(second), point(third), point(fourth),
+                              point(control)};
+    const auto columns = patch.reference_coordinates();
+    std::vector<double> q_high(3 * columns.size()), q_low(q_high.size()), v_high(q_high.size()),
+        v_low(q_high.size());
+    const auto words = [](const Rat& exact, double& high, double& low) {
+        high = exact.convert_to<double>();
+        low = (exact - rational_word(high)).convert_to<double>();
+    };
+    const auto as_rat = [](const pg::Q& q) {
+        return Rat{Big{numerator(q).str()}, Big{denominator(q).str()}};
+    };
+    REQUIRE(curve.size() == columns.size());
+    // Constant z curvature on this flat patch integrates to s²/2.
+    // The current top surface has X_z=1+s²/2 and V_z=s².
+    for (std::size_t i = 0; i < columns.size(); ++i)
+        for (std::size_t k = 0; k < 3; ++k) {
+            const Rat change = k == 2 ? as_rat(pg::q(curve.values()[i])) : Rat{0};
+            words(as_rat(pg::q(columns[i][k])) + change, q_high[3 * i + k], q_low[3 * i + k]);
+            words(2 * change, v_high[3 * i + k], v_low[3 * i + k]);
+        }
+
+    ResidualFixture fixture;
+    const std::array<double, 15> flat{0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1};
+    const std::array<double, 15> low{};
+    fixture.bindings[4].ownership = a::AliasOf{fixture.id[2]};
+    fixture.quads[0].points[2] = fixture.id[4];
+    auto reference = fixture.input();
+    reference.points = reference.points.first(5);
+    reference.bindings = reference.bindings.first(5);
+    reference.reference = a::DoublePositions{flat, low};
+    reference.current = reference.reference;
+    reference.edges = reference.edges.first(5);
+    reference.faces = reference.faces.first(1);
+    reference.bands = reference.bands.first(1);
+    reference.quads = reference.quads.first(1);
+    const a::GlobalLimits global_limits{UINT64_C(5000000000),
+                                        numerics::linear::EstimateAdmission{65536}};
+    const auto topo = fixture.topology();
+    const a::GlobalTopologyInput topology_input{topo.roles.first(1), topo.edges.first(5), {}};
+    auto geometry_work = test_geometry::workspace(memory);
+    auto global = take(a::GlobalWorkspace::create(memory, global_limits.metadata));
+    const auto geometry = test_geometry::take(
+        a::prepare_owned_geometry(reference, test_geometry::limits(), *geometry_work, memory));
+    const auto topology = take_global(
+        a::build_global_topology(geometry, topology_input, global_limits, *global, memory));
+    const std::array roles{cf::PgAeroCollocation{a::FacetId{200}, a::QueryId{501}, {}}};
+    constexpr auto format = core::Precision::TwoWord;
+    constexpr st::PgPreparedReferenceProjection projection{format, 1e-26, 1e-26,
+                                                           1e-24,  1e-24, 1e-24};
+    const auto prepare = [&](const auto& requests) {
+        return cf::PgAeroMap::prepare(patch, reference.points.first(4), requests, material,
+                                      projection, 1e-24, pg_limits, memory);
+    };
+    const auto map = take(prepare(roles));
+    const cf::PgAeroState state{take(patch.info()).identity,
+                                reference.context,
+                                {format, q_high, q_low},
+                                {format, v_high, v_low},
+                                {501, 502}};
+    const std::array edges{a::EdgeId{10}, a::EdgeId{11}, a::EdgeId{12}, a::EdgeId{13}};
+    const cf::PgAeroChart chart{topology, reference, edges};
+    const cf::PgAeroLimits kinematic_limits{{100000, 1e-21, {}},
+                                            {100000, 1e-21, {}},
+                                            {100000, 1e-20, {}},
+                                            test_geometry::limits(),
+                                            global_limits,
+                                            UINT64_C(6000000000),
+                                            1e-20,
+                                            1e-20};
+    auto storage = take(memory.allocate<std::byte>(4096, core::Operation::EvaluateAero));
+    core::Workspace scratch{std::move(storage)};
+    const auto run = [&](const cf::PgAeroMap& mapping, const cf::PgAeroState& current) {
+        return cf::evaluate_pg_aero_trial(mapping, current, chart, kinematic_limits, scratch,
+                                          *geometry_work, *global, memory);
+    };
+    auto wrong_patch = state;
+    wrong_patch.patch.bytes.front() ^= std::byte{1};
+    reject(run(map, wrong_patch), core::FailureCode::StaleGeneration);
+    auto wrong_state = state;
+    wrong_state.context.current = core::GeometryGeneration{999};
+    reject(run(map, wrong_state), core::FailureCode::StaleGeneration);
+    auto wrong_incidence = roles;
+    wrong_incidence[0].incidence.emplace(a::FacetId{200}, a::SingleWord{.375}, a::SingleWord{.375});
+    const auto impostor = take(prepare(wrong_incidence));
+    reject(run(impostor, state), core::FailureCode::GeometryInvalid);
+    const auto trial = take(run(map, state));
+    const auto& contact = take(trial.contact()).get();
+    const auto& current = take_global(contact.geometry()).get();
+    REQUIRE(trial.collocation_count() == 1);
+    CHECK(test_geometry::take(current.owner(fixture.id[4])) == fixture.id[2]);
+    const auto alias_xyz =
+        test_geometry::take(current.point_words(fixture.id[4], a::Configuration::Current));
+    const auto owner_xyz =
+        test_geometry::take(current.point_words(fixture.id[2], a::Configuration::Current));
+    for (std::size_t axis = 0; axis < 3; ++axis)
+        CHECK(sum_words(alias_xyz[axis]) == sum_words(owner_xyz[axis]));
+    const std::array mismatched_points{material[1], material[0], material[2], material[3],
+                                       material[4]};
+    const auto wrong_reference =
+        take(cf::PgAeroMap::prepare(patch, reference.points.first(4), roles, mismatched_points,
+                                    projection, 1e-24, pg_limits, memory));
+    reject(run(wrong_reference, state), core::FailureCode::GeometryInvalid);
+    auto no_work = kinematic_limits;
+    no_work.maximum_steps = 0;
+    reject(cf::evaluate_pg_aero_trial(map, state, chart, no_work, scratch, *geometry_work, *global,
+                                      memory),
+           core::FailureCode::ResourceExceeded);
+    const std::array rows{take(trial.collocation(0))};
+    const auto exact = test_geometry::take(a::exact_query_coordinates(
+        current, rows[0].query, test_geometry::limits(), *geometry_work));
+    REQUIRE(exact.point_count == 0);
+    const auto position = [&](std::size_t k) {
+        return Rat{exact.numerator[k].convert_to<Big>()} *
+               two_power(-static_cast<int>(a::ExactQueryCoordinates::denominator_shift));
+    };
+    CHECK(abs(position(0) - Rat{3, 4}) < rational_word(1e-21));
+    CHECK(abs(position(1) - Rat{3, 8}) < rational_word(1e-21));
+    CHECK(abs(position(2) - Rat{41, 32}) < rational_word(1e-21));
+    CHECK(abs(sum_words(rows[0].velocity[2]) - Rat{9, 16}) < rational_word(1e-21));
+    const auto& tangent = std::get<cf::ExplicitCollocationTangents>(rows[0].tangents);
+    const auto normal = [&](std::size_t xyz) -> Rat {
+        const auto j = (xyz + 1) % 3, k = (xyz + 2) % 3;
+        return sum_words(tangent[0][j]) * sum_words(tangent[1][k]) -
+               sum_words(tangent[0][k]) * sum_words(tangent[1][j]);
+    };
+    REQUIRE(normal(2) > 0);
+    CHECK(abs(normal(0) / normal(2) + Rat{3, 4}) < rational_word(1e-20));
+    CHECK(abs(normal(1) / normal(2)) < rational_word(1e-20));
+    const std::array midpoint{take(trial.midpoint(0)), take(trial.midpoint(1)),
+                              take(trial.midpoint(2)), take(trial.midpoint(3))};
+    for (std::size_t i = 0; i < midpoint.size(); ++i) {
+        constexpr std::array expected{0., .5, 1., .5};
+        CHECK(midpoint[i].edge == edges[i]);
+        CHECK(abs(sum_words(midpoint[i].velocity[2]) - rational_word(expected[i])) <
+              rational_word(1e-20));
+    }
+
+    const auto source_case = source(R"({"kind":"constant","value":[0,0,2]})", one_step);
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = import(source_case, io::SourceId{501}, flow_workspace);
+    const Number one{1}, zero{0}, tolerance{1, 1000000000}, time{5, 4};
+    const cf::CaseFlowComponentBudget component{one.view(), tolerance.view(), zero.view()};
+    const std::array budgets{component, component, component};
+    auto flow =
+        take(cf::project_case_uniform_flow(evaluate(provider, provider, flow_workspace, time),
+                                           {format, budgets, budgets, {4096, budget}}));
+    const cf::DiscreteNonpenetrationInput input{contact,
+                                                rows,
+                                                {},
+                                                {core::AcceptedStateId{2}, {}},
+                                                {501, 502},
+                                                stamp,
+                                                p::RequestedSide::Automatic};
+    const std::array<ls::UnitDimensions, 1> gamma_units{ls::UnitDimensions{2, 0, -1, 0, 0, 0, 0}};
+    const std::array<ls::UnitDimensions, 1> speed_units{ls::UnitDimensions{1, 0, -1, 0, 0, 0, 0}};
+    const std::array scales{1.};
+    const auto request = circulation_request(
+        {scales, scales, gamma_units, speed_units, circulation_context(current.context())}, 1,
+        ls::Norm::Infinity);
+    const std::array rates{cf::BoundCirculationRate{fixture.faces[0].id, a::SingleWord{.25}}};
+    const cf::DiscreteVectorLoadInput load_input{
+        input.trial_stamp,   request.retained_generation, midpoint, rates,
+        a::SingleWord{1.25}, coordinates(0, 0, 0)};
+    const cf::DiscreteNonpenetrationLimits load_limits{
+        {format, 1e-10},
+        {format, 1e-10, 1e-10},
+        {test_geometry::limits(),
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(24000000000)};
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const auto loads = take(cf::solve_discrete_circulation_loads(
+        input, load_input, std::move(flow), load_limits, request, *geometry_work, shared, *local,
+        *kernel, memory));
+    REQUIRE(loads.point_count() == 4);
+    const std::array forces{take(loads.point(0)), take(loads.point(1)), take(loads.point(2)),
+                            take(loads.point(3))};
+    auto different_stamp = state;
+    different_stamp.stamp.generation++;
+    const auto other_trial = take(run(map, different_stamp));
+    reject(other_trial.pullback_nodal_forces(loads, format, 1e-16, 1000000, memory),
+           core::FailureCode::StaleGeneration);
+    auto shifted_q = q_high;
+    for (std::size_t i = 2; i < shifted_q.size(); i += 3)
+        shifted_q[i] += v_high[i] * .125;
+    auto same_stamp_new_geometry = state;
+    same_stamp_new_geometry.position.high = shifted_q;
+    const auto shifted_trial = take(run(map, same_stamp_new_geometry));
+    reject(shifted_trial.pullback_nodal_forces(loads, format, 1e-16, 1000000, memory),
+           core::FailureCode::StaleGeneration);
+    const auto structural_forces =
+        take(trial.pullback_nodal_forces(loads, format, 1e-16, 1000000, memory));
+    REQUIRE(structural_forces.size() == columns.size());
+    WorkEnclosure structural, fluid;
+    for (std::size_t i = 0; i < columns.size(); ++i) {
+        const auto& result = structural_forces.values()[i];
+        if (!result)
+            FAIL("missing column force");
+        const auto& force = result.value();
+        for (std::size_t k = 0; k < 3; ++k)
+            structural.add(force[k], a::DoubleWord{v_high[3 * i + k], v_low[3 * i + k]});
+    }
+    for (std::size_t i = 0; i < forces.size(); ++i)
+        fluid.add(forces[i].force[2], a::SingleWord{i >= 2 ? 1. : 0.});
+    CHECK(abs(fluid.value) > rational_word(.001));
+    CHECK(abs(structural.value - fluid.value) <=
+          structural.radius + fluid.radius + rational_word(1e-20));
 }

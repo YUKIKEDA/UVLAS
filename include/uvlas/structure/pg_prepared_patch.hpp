@@ -3,7 +3,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <span>
+#include <uvlas/structure/pg_boundary_position.hpp>
 #include <uvlas/structure/pg_discrete_gram.hpp>
+#include <uvlas/structure/pg_volume_position.hpp>
 
 namespace uvlas::structure {
 
@@ -90,6 +92,13 @@ private:
     core::PlannedBuffer<double> high_, low_;
 };
 
+/// Use the N entries of a prepared point batch, in the patch's Cartesian column order.
+[[nodiscard]] core::Result<void>
+apply_pg_prepared_reference_position(const PgProjectedReferenceBatch&, PgPreparedPatchIdentity,
+                                     PgVolumePositionDirection, PgCartesianWords,
+                                     const PgVolumePositionLimits&, core::Workspace&,
+                                     PgVolumePositionResult&) noexcept;
+
 /// Immutable reference patch. q0 is Cartesian metres, by column and axis.
 class PgPreparedPatch {
 public:
@@ -141,7 +150,18 @@ public:
     project_reference(std::span<const PgReferencePoint>, const PgPreparedReferenceProjection&,
                       const PgReferenceLimits&, core::ResourcePlan&) const noexcept;
 
+    /// Project material-side queries without introducing a volume point.
+    [[nodiscard]] core::Result<PgProjectedReferenceBatch>
+    project_boundary_reference(std::span<const PgBoundaryPositionPoint>,
+                               const PgPreparedReferenceProjection&, const PgReferenceLimits&,
+                               core::ResourcePlan&) const noexcept;
+
 private:
+    template <class Query>
+    [[nodiscard]] core::Result<PgProjectedReferenceBatch>
+    project_points(std::span<const Query>, const PgPreparedReferenceProjection&,
+                   const PgReferenceLimits&, core::ResourcePlan&) const noexcept;
+
     struct Coordinates;
     using Conditioning = std::variant<PgConditioningCertificate, PgFixedDiscreteGramCertificate>;
     PgPreparedPatch(Conditioning, Coordinates) noexcept;

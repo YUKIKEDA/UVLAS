@@ -279,8 +279,9 @@ PgProjectedReferenceBatch::PgProjectedReferenceBatch(
       high_(std::move(high)),
       low_(std::move(low)) {}
 
-core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_reference(
-    std::span<const PgReferencePoint> queries, const PgPreparedReferenceProjection& projection,
+template <class Query>
+core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_points(
+    std::span<const Query> queries, const PgPreparedReferenceProjection& projection,
     const PgReferenceLimits& limits, core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<PgProjectedReferenceBatch> {
         auto math = ReferenceArithmetic{limits, plan};
@@ -307,6 +308,20 @@ core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_reference(
                                          std::move(rows.high),
                                          std::move(rows.low)};
     });
+}
+
+core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_reference(
+    std::span<const PgReferencePoint> queries, const PgPreparedReferenceProjection& projection,
+    const PgReferenceLimits& limits, core::ResourcePlan& plan) const noexcept {
+    return project_points(queries, projection, limits, plan);
+}
+
+core::Result<PgProjectedReferenceBatch>
+PgPreparedPatch::project_boundary_reference(std::span<const PgBoundaryPositionPoint> queries,
+                                            const PgPreparedReferenceProjection& projection,
+                                            const PgReferenceLimits& limits,
+                                            core::ResourcePlan& plan) const noexcept {
+    return project_points(queries, projection, limits, plan);
 }
 
 PgVolumeMassReference::PgVolumeMassReference(PgConditioningCertificate&& conditioning,

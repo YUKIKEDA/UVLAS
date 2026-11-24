@@ -25,6 +25,7 @@ class PgBoundaryPositionReference;
 class PgBoundaryTangentReference;
 class PgPreparedVolumeReference;
 struct PgPreparedPatchIdentity;
+class PgProjectedReferenceBatch;
 
 /// Reusable owned destination. Its prior words remain valid after any failed
 /// action. Stage writes in a separate exclusive Workspace before publishing.
@@ -69,12 +70,19 @@ private:
                                       const PgVolumePositionLimits&, core::Workspace&,
                                       PgVolumePositionResult&) noexcept;
 
+    friend core::Result<void>
+    apply_pg_prepared_reference_position(const PgProjectedReferenceBatch&, PgPreparedPatchIdentity,
+                                         PgVolumePositionDirection, PgCartesianWords,
+                                         const PgVolumePositionLimits&, core::Workspace&,
+                                         PgVolumePositionResult&) noexcept;
+
     struct MatrixView {
         const PgConditioningCertificate* certificate;
         std::size_t rank, rows;
         std::span<const double> high, low;
         std::size_t prefix;
         double maximum_coefficient_error;
+        std::size_t column_stride = 1;
     };
 
     [[nodiscard]] core::Result<void> apply(const MatrixView&, PgVolumePositionDirection,
