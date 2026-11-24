@@ -1570,10 +1570,30 @@ struct NonpenetrationBuilder {
         const auto row_bytes_before = memory.allocated_bytes();
         auto native_row = allocate<p::Interval>(memory, order);
         const auto row_bytes = memory.allocated_bytes() - row_bytes_before;
-        auto data = allocate<CirculationRowData>(memory, order);
+        struct ReplayRow {
+            CirculationRowData coefficients;
+            std::optional<a::ResolvedQuery> query;
+        };
+        auto data = allocate<ReplayRow>(memory, order);
+        const auto coordinates = require(a::GeometryWorkspace::create(memory));
+        const auto ambient = ambient_velocity(retained.flow_, work);
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& item = bound[i];
+            const auto& original = input.collocations[item.caller];
+            auto& owned = data.values()[i];
+            owned.coefficients.normal = qualify_normal(geometry, item.panel, original, work);
+            owned.coefficients.relative =
+                difference(ambient, import(original.velocity, work), work);
+            auto coordinate_limits = limits.induction.geometry;
+            coordinate_limits.max_steps = std::min(coordinate_limits.max_steps, remaining(work));
+            auto resolved = require(a::resolve_query(geometry, require(original.query.definition()),
+                                                     geometry.context(), coordinate_limits,
+                                                     *coordinates, memory, stop));
+            account(work, resolved.used_steps());
+            owned.query.emplace(std::move(resolved));
+        }
         // Each row uses two forward actions and three adjoints, as in the dense reference.
         admit(assembly, input, limits, memory, 2, 5, work);
-        const auto ambient = ambient_velocity(retained.flow_, work);
         a::LocalRootScratch rounding;
         const auto forward = [&](const a::SharedP1Action& action, const a::P1ActionSource& source) {
             auto value = require(
@@ -1587,11 +1607,11 @@ struct NonpenetrationBuilder {
         };
         for (std::size_t i = 0; i < order; ++i) {
             const auto& item = bound[i];
-            const auto& row = input.collocations[item.caller];
-            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
-            auto& record = data.values()[i];
-            record.normal = qualify_normal(geometry, item.panel, row, work);
-            record.relative = difference(ambient, import(row.velocity, work), work);
+            auto& owned = data.values()[i];
+            if (!owned.query)
+                reject(core::FailureCode::InvalidInput);
+            auto& record = owned.coefficients;
+            const a::P1ActionSource source{input.contact, *owned.query, input.trial_stamp};
             const auto action =
                 prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
             const auto known = forward(action, source);
@@ -1645,9 +1665,11 @@ struct NonpenetrationBuilder {
         NativeResidualCheck check{request};
         for (std::size_t i = 0; i < order; ++i) {
             const auto& item = bound[i];
-            const auto& row = input.collocations[item.caller];
-            const auto& record = data.values()[i];
-            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
+            const auto& owned = data.values()[i];
+            if (!owned.query)
+                reject(core::FailureCode::InvalidInput);
+            const auto& record = owned.coefficients;
+            const a::P1ActionSource source{input.contact, *owned.query, input.trial_stamp};
             const auto action =
                 prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
             const auto result = forward(action, source);
