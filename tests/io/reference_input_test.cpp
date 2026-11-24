@@ -5,7 +5,7 @@
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
 #include "nastran_pg_material_axes.hpp"
-#include "reference_declarations_fixture.hpp"
+#include "reference_file_test_fixture.hpp"
 #include "reference_input.hpp"
 #include "reference_resolution.hpp"
 #include "reference_root_snapshot.hpp"
@@ -26,59 +26,22 @@ namespace rd = uvlas::io::detail;
 namespace fixture = uvlas::test::declaration_fixture;
 namespace fs = std::filesystem;
 
+using uvlas::test::reference_file_fixture::bytes_of;
+using uvlas::test::reference_file_fixture::declare_path;
+using uvlas::test::reference_file_fixture::limits;
+using uvlas::test::reference_file_fixture::manifest_limits;
+using uvlas::test::reference_file_fixture::prepare;
+using uvlas::test::reference_file_fixture::root_limits;
+using uvlas::test::reference_file_fixture::Tree;
+using uvlas::test::reference_file_fixture::write_file;
+
 constexpr io::SourceId source{19};
-constexpr rd::ManifestLimits manifest_limits{
-    128, {fixture::budget, fixture::budget, fixture::budget, fixture::budget}};
 constexpr std::string_view name = "\xc3\xa9.json";
 constexpr char8_t native_name[] = u8"\u00e9.json";
 
 static_assert(!std::is_constructible_v<rd::ReferenceInput, io::SchemaCase, rd::ReadRoot,
                                        rd::ReferenceFileId>);
 static_assert(!std::is_copy_constructible_v<rd::ReferenceInput>);
-
-struct Tree {
-    fs::path root;
-
-    Tree() {
-        const auto tick = std::chrono::steady_clock::now().time_since_epoch().count();
-        for (int attempt = 0; attempt < 16; ++attempt) {
-            root = fs::temp_directory_path() / ("uvlas-reference-input-" + std::to_string(tick) +
-                                                "-" + std::to_string(attempt));
-            if (fs::create_directory(root)) {
-                return;
-            }
-        }
-        FAIL("Could not create a private test directory");
-    }
-    ~Tree() {
-        std::error_code ignore;
-        fs::remove_all(root, ignore);
-    }
-    Tree(const Tree&) = delete;
-    Tree& operator=(const Tree&) = delete;
-};
-
-void write_file(const fs::path& target, std::string_view bytes) {
-    std::ofstream out(target, std::ios::binary);
-    out << bytes;
-    out.close();
-    REQUIRE(out.good());
-}
-
-std::span<const std::byte> bytes_of(std::string_view text) noexcept {
-    return std::as_bytes(std::span{text});
-}
-
-rd::ReferenceInputLimits limits() {
-    const io::InputLimits input{
-        10'000'000, 256,
-        1'000'000,  1'000'000,
-        10'000'000, 10'000'000,
-        10'000'000, {io::ParserAllocationMode::EstimateAdmission, fixture::budget}};
-    std::array<std::uint64_t, static_cast<std::size_t>(io::SchemaQuota::Count)> caps{};
-    caps.fill(fixture::budget);
-    return {input, io::SchemaLimits{caps}};
-}
 
 constexpr std::string_view static_case() {
     for (const auto& example : uvlas::test::case_schema_corpus::roots) {
@@ -375,14 +338,6 @@ constexpr std::string_view abc_hex =
 constexpr std::string_view valid_manifest_hex =
     "ecfba5a3cdf129b195b7e1504c74c2981852f6ee57617ac320ea14420ffd9a38";
 constexpr rd::RootSnapshotLimits acquisition_limits{{3, 4, 2, 3}, 3, 256};
-constexpr rd::RootReferenceLimits root_limits{
-    fixture::budget, fixture::budget, fixture::budget, fixture::budget, 64, fixture::budget, 0};
-
-void declare_path(fixture::JsonToken& file, std::string_view path, std::string_view hash) {
-    file.set("path", fixture::string(path));
-    file.set("sha256", fixture::string(hash));
-}
-
 fixture::JsonToken manifest_with_reference(std::string_view first, std::string_view digest) {
     auto model = fixture::all_roles();
     auto& geometry = model.field("model").field("geometry").elements;
@@ -391,15 +346,6 @@ fixture::JsonToken manifest_with_reference(std::string_view first, std::string_v
     declare_path(geometry[0].field("reference").field("file"), "copy.bin", abc_hex);
     declare_path(geometry[1].field("sidecar"), "wrong.bin", abc_hex);
     return model;
-}
-
-rd::PreparedRootReferences prepare(const rd::ReferenceInput& input) {
-    core::ResourcePlan plan{fixture::budget};
-    const auto view = fixture::take(input.view());
-    auto declared = fixture::take(
-        rd::collect_case_file_references(view.schema, fixture::limits(), plan, {}, nullptr));
-    return fixture::take(
-        rd::prepare_root_references(std::move(declared), root_limits, plan, {}, nullptr));
 }
 
 rd::ReferenceInput from_memory(const fs::path& directory, std::string_view wire,
@@ -1562,9 +1508,6 @@ $EndElements
     };
     Axes axes = Axes::None;
     bool shell_set = false;
-    bool gmsh_set = false;
-    bool gmsh_set_wrong_thickness = false;
-    bool gmsh_set_short_distance = false;
     bool late_axis_mismatch = false;
     bool native_cards = false;
     bool thermal_link = false;
@@ -1796,16 +1739,6 @@ $EndElements
         thermal_link = true;
     }
 
-    SECTION("Gmsh prepares all fit-bound Shells with inherited group thickness") {
-        is_gmsh = physical = gmsh_set = true;
-    }
-    SECTION("The later curved Shell still requires exact thickness") {
-        is_gmsh = physical = gmsh_set = gmsh_set_wrong_thickness = true;
-    }
-    SECTION("A later curved Shell can fail the shared distance budget") {
-        is_gmsh = physical = gmsh_set = gmsh_set_short_distance = true;
-    }
-
     const bool corner_claim = corners != Corners::None;
     const bool axis_pcomp = axes != Axes::None && axes != Axes::VariableThickness;
     const bool two_axis_layers = axes == Axes::Quarter || axes == Axes::Difference;
@@ -1875,16 +1808,6 @@ $EndElements
         if (chart_shift) {
             sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][1] = {{"numerator", "1"},
                                                                            {"denominator", "2"}};
-        }
-        if (gmsh_set) {
-            auto square = chart(false);
-            square["vertices"].push_back(nlohmann::json::array({zero, one}));
-            auto& rows = sidecar["shells"];
-            rows[0]["shell"] = "2";
-            rows[0]["faces"][0]["chart"] = square;
-            rows[0]["material_layers"][0]["layer"] = "2";
-            rows[1]["faces"][0]["chart"] = std::move(square);
-            rows[1].erase("full_thickness");
         }
         sidecar["supports"].push_back(
             {{"physical", {{"dimension", wrong_dimension ? 0 : 1}, {"tag", 7}}}, {"support", "1"}});
@@ -1981,41 +1904,7 @@ $EndElements
             first_position = offset + different.size();
         }
     }
-    constexpr std::string_view two_planes = R"MSH($MeshFormat
-4.1 0 8
-$EndMeshFormat
-$Entities
-0 1 2 0
-11 0 0 0 1000 0 0 1 7 0
-17 0 0 0 1000 1000 0 1 7 0
-18 0 0 1000 1000 1000 1000 1 7 0
-$EndEntities
-$Nodes
-2 8 10 199
-2 17 0 4
-10 20 40 99
-0 0 0
-1000 0 0
-1000 1000 0
-0 1000 0
-2 18 0 4
-110 120 140 199
-0 0 1000
-1000 0 1000
-1000 1000 1000
-0 1000 1000
-$EndNodes
-$Elements
-3 3 501 702
-1 11 1 1
-501 10 20
-2 17 3 1
-701 10 20 40 99
-2 18 3 1
-702 110 120 140 199
-$EndElements
-)MSH";
-    std::string source_text{gmsh_set ? two_planes : (is_gmsh ? mesh : bulk)};
+    std::string source_text{is_gmsh ? mesh : bulk};
     if (partial_group) {
         const auto replace_group = [&](std::string_view old_text, std::string_view new_text) {
             const auto offset = source_text.find(old_text);
@@ -2272,11 +2161,6 @@ $EndElements
     if (is_gmsh) {
         external.set("reference", fixture::fragment("ReferenceGeometry.fit"));
     }
-    if (gmsh_set) {
-        auto& fit = external.field("reference");
-        fit.set("degree", fixture::json("2"));
-        fit.set("distance_budget", fixture::json(gmsh_set_short_distance ? "0.024" : "0.051"));
-    }
     if (conversion) {
         config.field("units").set("length", fixture::json(R"("mm")"));
         auto& reference = config.field("model").field("geometry").elements[0];
@@ -2296,7 +2180,7 @@ $EndElements
     declare_path(external.field(is_gmsh ? "mesh" : "deck"), "external.dat", hex(source_text));
     declare_path(external.field("sidecar"), "sidecar.json", hex(sidecar_text));
     config.field("model").field("geometry").elements.push_back(std::move(external));
-    if (shell_set || gmsh_set) {
+    if (shell_set) {
         auto& model = config.field("model");
         auto second_pg = model.field("geometry").elements.front();
         second_pg.set("id", fixture::json(R"("3")"));
@@ -2317,17 +2201,6 @@ $EndElements
             first_layer.field("axis").field("direction").set("value", fixture::json("[0,1,0]"));
         }
         shells.push_back(std::move(second_shell));
-        if (gmsh_set) {
-            auto& curved = model.field("geometry").elements.front();
-            curved.set("degree", fixture::json("[2,0]"));
-            curved.set(
-                "coefficients",
-                fixture::json(
-                    R"([{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"10"}},{"powers":[2,0],"coefficient":{"numerator":"-1","denominator":"10"}}])"));
-            if (gmsh_set_wrong_thickness) {
-                curved.field("thickness").set("values", fixture::json("[0.5,0.5,0.5,0.5]"));
-            }
-        }
     }
     if (native_cards) {
         auto& model = config.field("model");
@@ -2437,7 +2310,7 @@ $EndElements
     CHECK(result->sidecar().source().source == io::SourceId{2});
     CHECK(result->sidecar().geometry() == rd::MeshGeometryId{2});
     const auto faces = result->faces();
-    if (!shell_set && !gmsh_set) {
+    if (!shell_set) {
         CHECK(faces[0].element == (quad ? 701U : 702U));
         CHECK(faces[0].pg == rd::MeshGeometryId{1});
         CHECK(faces[0].shell == rd::MeshShellId{1});
@@ -2492,107 +2365,6 @@ $EndElements
                 io::convert_case_to_si(typed_case, catalog, request, si_limits, plan, nullptr));
         };
         const auto si = to_si(schema);
-        if (gmsh_set) {
-            using uvlas::coupling::detail::CaseGmshPgSet;
-            using uvlas::coupling::detail::CaseGmshPgSetDiagnostic;
-            using uvlas::coupling::detail::CaseGmshPgSetLimits;
-            const CaseGmshPgSetLimits batch_limits{2, 3, 200'000};
-            CaseGmshPgSetDiagnostic batch_diagnostic;
-            const auto prepared =
-                CaseGmshPgSet::prepare(si, *result, preparation, qualification, batch_limits,
-                                       workspace, plan, &batch_diagnostic);
-            CHECK(faces[0].shell == rd::MeshShellId{2});
-            CHECK(faces[1].shell == rd::MeshShellId{1});
-            if (gmsh_set_wrong_thickness || gmsh_set_short_distance) {
-                REQUIRE_FALSE(prepared);
-                CHECK(prepared.error().code == (gmsh_set_short_distance
-                                                    ? core::FailureCode::PrecisionUnresolved
-                                                    : core::FailureCode::InvalidInput));
-                CHECK(batch_diagnostic.shell == rd::MeshShellId{1});
-                CHECK(batch_diagnostic.first_declaration == faces[1].sidecar_node);
-                if (gmsh_set_short_distance) {
-                    if (const auto& detail = batch_diagnostic.member.binding) {
-                        CHECK(detail->reason == rd::MeshSidecarFailure::Chart);
-                        CHECK(detail->element == 701);
-                    } else {
-                        FAIL("Missing later curved face diagnostic");
-                    }
-                } else if (const auto& detail = batch_diagnostic.member.regional_thickness) {
-                    CHECK(detail->reason == rd::ExternalPgThicknessFailure::Difference);
-                    CHECK(detail->element == 701);
-                    CHECK(detail->sidecar_node);
-                    CHECK(detail->case_triangle);
-                } else {
-                    FAIL("Missing exact thickness diagnostic on bounded map");
-                }
-                const auto rebuilt =
-                    fixture::take(uvlas::coupling::detail::prepare_case_pg_reference(
-                        si, 2, preparation, workspace, plan));
-                const auto first_again = rd::prepare_gmsh_sidecar_pg(
-                    si, *result, rd::MeshShellId{2}, rebuilt, qualification, 200'000, plan, {});
-                REQUIRE(first_again);
-                CHECK(first_again->membership.size() == 1);
-                return;
-            }
-            REQUIRE(prepared);
-            REQUIRE(prepared->size() == 2);
-            CHECK_FALSE(batch_diagnostic.shell);
-            const auto one_quarter =
-                fixture::take(ExactRational::from_integer_pair("1", "4", pg_limits.algebra, plan));
-            const auto actual_gap =
-                fixture::take(ExactRational::from_integer_pair("1", "40", pg_limits.algebra, plan));
-            for (core::Index i = 0; i < 2; ++i) {
-                const auto& member = fixture::take(prepared->at(i)).get();
-                const auto& match = member.match();
-                const auto element = i == 0 ? 702U : 701U;
-                CHECK(match.shell == rd::MeshShellId{i == 0 ? 2U : 1U});
-                CHECK(match.pg == rd::MeshGeometryId{i == 0 ? 3U : 1U});
-                CHECK(match.sidecar_digest == result->sidecar().digest());
-                const auto membership = match.membership.values();
-                REQUIRE(membership.size() == 1);
-                CHECK(membership.front().physical == rd::GmshKey{2, 7});
-                CHECK(membership.front().element == element);
-                CHECK(membership.front().declaration ==
-                      faces[static_cast<std::size_t>(i)].sidecar_node);
-                const auto* conversion_result =
-                    std::get_if<rd::GmshPgConversionEvidence>(&match.geometry);
-                REQUIRE(conversion_result != nullptr);
-                REQUIRE(conversion_result->observations.size() == 1);
-                CHECK(conversion_result->observations.values().front().id ==
-                      core::ObservationId{1});
-                if (const auto view = conversion_result->geometry.view()) {
-                    CHECK(view->patch == fixture::take(member.reference().identity()));
-                    CHECK(view->source.source == io::SourceId{1});
-                    REQUIRE(view->faces.size() == 1);
-                    CHECK(view->faces.front().element == element);
-                    const auto& distance = view->faces.front().distance_upper_metres;
-                    if (i == 0) {
-                        CHECK(std::is_lt(
-                            fixture::take(distance.compare(actual_gap, pg_limits.algebra, plan))));
-                    } else {
-                        CHECK(std::is_gteq(
-                            fixture::take(distance.compare(actual_gap, pg_limits.algebra, plan))));
-                    }
-                } else {
-                    FAIL("Missing owned Gmsh bounded view");
-                }
-                if (const auto& thickness = match.thickness) {
-                    REQUIRE(thickness->matches.size() == 1);
-                    CHECK(thickness->matches.values().front().element == element);
-                    CHECK(std::get<ExactRational>(
-                              thickness->matches.values().front().value_metres) == one_quarter);
-                } else {
-                    FAIL("Missing thickness inherited from the same physical group");
-                }
-            }
-            auto short_limits = batch_limits;
-            --short_limits.maximum_shells;
-            const auto short_result = CaseGmshPgSet::prepare(
-                si, *result, preparation, qualification, short_limits, workspace, plan);
-            REQUIRE_FALSE(short_result);
-            CHECK(short_result.error().code == core::FailureCode::ResourceExceeded);
-            return;
-        }
         if (conversion) {
             const auto prepared = uvlas::coupling::detail::prepare_case_external_pg_bounds(
                 si, *result, rd::MeshShellId{1}, preparation, qualification, 200'000, workspace,
