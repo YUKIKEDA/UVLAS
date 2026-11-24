@@ -305,6 +305,25 @@ struct Builder {
         }
     }
 
+    /// Both save and restore check bounds and qualifications with bind before copying.
+    static Grid copy_grid(const Grid& source, const CaseFlowClockLimits& limits,
+                          core::ResourcePlan& memory, const std::stop_token& stop,
+                          core::FailureDetails details) {
+        const auto intervals = source.intervals.values();
+        const auto size = static_cast<core::Index>(intervals.size());
+        auto copied = take(memory.allocate<Grid::Interval>(size, prepare));
+        const auto& arithmetic = limits.fields.conversion;
+        for (std::size_t i = 0; i < intervals.size(); ++i) {
+            check_stop(stop, prepare, details);
+            const auto& record = intervals[i];
+            copied.values()[i] = {take(record.begin.clone(arithmetic, memory)),
+                                  take(record.end.clone(arithmetic, memory)),
+                                  take(record.step.clone(arithmetic, memory)), record.steps,
+                                  record.restart};
+        }
+        return {source.source, source.stamp, std::move(copied)};
+    }
+
     struct Node {
         const Grid::Interval& interval;
         std::optional<structure::ExactRational> interior;
@@ -460,6 +479,55 @@ struct Builder {
         }
         check_stop(stop, prepare, details);
         return {std::move(grid), std::move(flow), std::move(transport), std::move(moving)};
+    }
+
+    static CaseClockedPrescribedSnapshot
+    save(const CaseClockedPrescribedInputs& source, a::UniformFlowWorkspace& field_workspace,
+         p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+         core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details) {
+        check_stop(stop, prepare, details);
+        const auto& clock = limits.flow.clock_and_wake;
+        bind(source.grid_, source.grid_, source.grid_.stamp, clock, stop, details);
+        auto grid = copy_grid(source.grid_, clock, memory, stop, details);
+        auto ambient = take(snapshot_case_known_flow(source.ambient_, field_workspace,
+                                                     limits.flow.ambient, memory, stop, details));
+        std::optional<CasePrescribedWakeSnapshot> transport;
+        if (const auto& prescribed = source.prescribed_)
+            transport.emplace(take(snapshot_case_prescribed_wake(
+                *prescribed, field_workspace, clock.fields.flow, memory, stop, details)));
+        auto motion = take(snapshot_case_motion(source.attachment_.motion_, motion_workspace,
+                                                limits.motion, memory, stop, details));
+        check_stop(stop, prepare, details);
+        return {std::move(grid), std::move(ambient), std::move(transport), std::move(motion)};
+    }
+
+    static CaseClockedPrescribedInputs
+    restore(const CaseClockedPrescribedSnapshot& saved, const CaseClockedPrescribedInputs& current,
+            a::UniformFlowWorkspace& field_workspace, p::CurveWorkspace& motion_workspace,
+            const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+            const std::stop_token& stop, core::FailureDetails details) {
+        check_stop(stop, prepare, details);
+        const auto& clock = limits.flow.clock_and_wake;
+        bind(saved.grid_, current.grid_, current.grid_.stamp, clock, stop, details);
+        const auto& saved_wake = saved.prescribed_;
+        const auto& live_wake = current.prescribed_;
+        if (saved_wake.has_value() != live_wake.has_value())
+            fail(StaleGeneration, prepare, details);
+        auto ambient =
+            take(restore_case_known_flow(saved.ambient_, current.ambient_, field_workspace,
+                                         limits.flow.ambient, memory, stop, details));
+        std::optional<CasePrescribedWakeReady> transport;
+        if (saved_wake && live_wake)
+            transport.emplace(
+                take(restore_case_prescribed_wake(*saved_wake, *live_wake, field_workspace,
+                                                  clock.fields.flow, memory, stop, details)));
+        auto moving =
+            take(restore_case_motion(take(saved.motion_.view()), current.attachment_.motion_,
+                                     motion_workspace, limits.motion, memory, stop, details));
+        auto grid = copy_grid(current.grid_, clock, memory, stop, details);
+        check_stop(stop, prepare, details);
+        return {std::move(grid), std::move(ambient), std::move(transport),
+                PrescribedAeroAttachment{std::move(moving)}};
     }
 
     static CaseClockedPrescribedSample
@@ -625,6 +693,28 @@ core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs
     return guarded<CaseClockedPrescribedInputs>(prepare, details, [&] {
         return case_clock_detail::Builder::make(source, attachment, stamp, flow_workspace,
                                                 motion_workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<CaseClockedPrescribedSnapshot> snapshot_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs& source, a::UniformFlowWorkspace& field_workspace,
+    p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+    core::ResourcePlan& memory, const std::stop_token& stop,
+    core::FailureDetails details) noexcept {
+    return guarded<CaseClockedPrescribedSnapshot>(prepare, details, [&] {
+        return case_clock_detail::Builder::save(source, field_workspace, motion_workspace, limits,
+                                                memory, stop, details);
+    });
+}
+
+core::Result<CaseClockedPrescribedInputs> restore_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedSnapshot& saved, const CaseClockedPrescribedInputs& current,
+    a::UniformFlowWorkspace& field_workspace, p::CurveWorkspace& motion_workspace,
+    const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CaseClockedPrescribedInputs>(prepare, details, [&] {
+        return case_clock_detail::Builder::restore(saved, current, field_workspace,
+                                                   motion_workspace, limits, memory, stop, details);
     });
 }
 

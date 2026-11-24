@@ -121,6 +121,15 @@ void exact(core::Result<p::RationalView> result, std::uint32_t n, std::uint32_t 
     CHECK(std::ranges::equal(view.numerator, expected));
     CHECK(std::ranges::equal(view.denominator, denominator));
 }
+
+void same_enclosure(core::Result<io::SiEnclosure> a, core::Result<io::SiEnclosure> b) {
+    const auto left = std::get<io::ScaledTwoWord>(take(std::move(a)));
+    const auto right = std::get<io::ScaledTwoWord>(take(std::move(b)));
+    CHECK(std::bit_cast<std::uint64_t>(left.high) == std::bit_cast<std::uint64_t>(right.high));
+    CHECK(std::bit_cast<std::uint64_t>(left.low) == std::bit_cast<std::uint64_t>(right.low));
+    CHECK(std::bit_cast<std::uint64_t>(left.radius) == std::bit_cast<std::uint64_t>(right.radius));
+    CHECK(left.exponent2 == right.exponent2);
+}
 } // namespace
 
 TEST_CASE("Typed Motion owns polynomial jets and a common exact coefficient of pi",
@@ -294,7 +303,7 @@ TEST_CASE("Typed Motion retains Hold and periodic knot accelerations in SI time"
 }
 
 TEST_CASE("Clocked prescribed inputs share one exact node and event side",
-          "[AE-07][FD-02][N4-03][N4-06][verification][negative]") {
+          "[AE-07][FD-02][FD-06][FD-07][IO4-06][N4-03][N4-06][verification][negative]") {
     auto input = a::root("aerodynamic_prescribed_transient");
     input.field("analysis")
         .set(
@@ -381,6 +390,10 @@ TEST_CASE("Clocked prescribed inputs share one exact node and event side",
             REQUIRE(sample.prescribed);
             exact(sample.prescribed->jet().time(), 1);
             exact(sample.prescribed->jet().velocity(0), 6);
+            exact(sample.prescribed->jet().time_partial(0), 2);
+            const auto acceleration_word = take(sample.ambient.time_partial(0));
+            const auto& dt = std::get<io::ScaledTwoWord>(acceleration_word);
+            CHECK(std::ldexp(dt.high + dt.low, static_cast<int>(dt.exponent2)) == 3.0);
             const auto velocity = take(sample.ambient.velocity(0));
             const auto& enclosed = std::get<io::ScaledTwoWord>(velocity);
             CHECK(std::ldexp(enclosed.high + enclosed.low, static_cast<int>(enclosed.exponent2)) ==
@@ -396,6 +409,138 @@ TEST_CASE("Clocked prescribed inputs share one exact node and event side",
         const p::PchipInputStamp stale{p::PchipIssuerId{71}, p::PchipInputGeneration{9}};
         rejected(evaluate(ready, current, {stale, 0, 2, Left}, wake),
                  core::FailureCode::StaleGeneration);
+    }
+
+    SECTION("the owned snapshot restores every checked input at both sides of the event") {
+        const auto current = take(prepare(input, clock_limits));
+        const auto restored = [&] {
+            const auto archive = [&] {
+                core::ResourcePlan local{budget};
+                aero::detail::UniformFlowWorkspace local_fields;
+                p::CurveWorkspace local_motion;
+                const auto original = checked_case(input);
+                const auto ready = take(c::prepare_case_clocked_prescribed_inputs(
+                    original, attachment_field(original), stamp, local_fields, local_motion,
+                    clock_limits, local));
+                return take(c::snapshot_case_clocked_prescribed_inputs(
+                    ready, local_fields, local_motion, clock_limits, local));
+            }();
+            const auto requalify = [&](const c::CaseClockedPrescribedInputs& live) {
+                return c::restore_case_clocked_prescribed_inputs(
+                    archive, live, flow_workspace, motion_workspace, clock_limits, memory);
+            };
+            const auto refuse_case = [&](const a::JsonToken& json, core::Operation operation) {
+                const auto changed = take(prepare(json, clock_limits));
+                const auto result = requalify(changed);
+                if (result)
+                    FAIL("Unexpected clocked restore success");
+                CHECK(result.error().code == core::FailureCode::StaleGeneration);
+                CHECK(result.error().operation == operation);
+            };
+            auto alternate = input;
+            alternate.field("analysis")
+                .field("intervals")
+                .elements[1]
+                .set("step", a::parse("0.25"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            alternate.field("analysis")
+                .field("intervals")
+                .elements[1]
+                .set("restart", a::string("step_change"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            alternate.field("flow").field("uniform").set("coefficients",
+                                                         a::parse("[[1,0,0],[4,0,0]]"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            alternate.field("analysis")
+                .field("wake")
+                .field("convection")
+                .field("velocity")
+                .set("coefficients", a::parse("[[4,0,0],[3,0,0]]"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            motion_json(alternate)
+                .field("translation")
+                .set("values", a::parse("[[0,0,0],[1,0,0],[4,0,0]]"));
+            refuse_case(alternate, core::Operation::PrepareModel);
+            alternate = input;
+            alternate.field("analysis")
+                .field("wake")
+                .set("convection", a::parse(R"({"kind":"free"})"));
+            const auto free = take(prepare(alternate, clock_limits));
+            core::ResourcePlan mismatch{0};
+            rejected(c::restore_case_clocked_prescribed_inputs(
+                         archive, free, flow_workspace, motion_workspace, clock_limits, mismatch),
+                     core::FailureCode::StaleGeneration);
+            CHECK(mismatch.allocated_bytes() == 0);
+            const auto free_archive = take(c::snapshot_case_clocked_prescribed_inputs(
+                free, flow_workspace, motion_workspace, clock_limits, memory));
+            const auto current_free = take(prepare(alternate, clock_limits));
+            const auto restored_free = take(c::restore_case_clocked_prescribed_inputs(
+                free_archive, current_free, flow_workspace, motion_workspace, clock_limits,
+                memory));
+            const auto free_sample =
+                take(evaluate(restored_free, current_free, {stamp, 0, 2, Left}, {}));
+            CHECK_FALSE(free_sample.prescribed);
+            exact(free_sample.ambient.time(), 1);
+            rejected(c::restore_case_clocked_prescribed_inputs(free_archive, current,
+                                                               flow_workspace, motion_workspace,
+                                                               clock_limits, mismatch),
+                     core::FailureCode::StaleGeneration);
+            return take(requalify(current));
+        }();
+        for (const auto address : {c::CaseFlowClockQuery{stamp, 0, 2, Left},
+                                   c::CaseFlowClockQuery{stamp, 1, 0, Right}}) {
+            const auto uninterrupted = take(evaluate(current, current, address, wake));
+            const auto resumed = take(evaluate(restored, current, address, wake));
+            CHECK(resumed.address.side == address.side);
+            CHECK(resumed.restart == uninterrupted.restart);
+            CHECK(resumed.restart == (address.side == Left ? c::CaseClockRestart::ItemInitial
+                                                           : c::CaseClockRestart::ItemEvent));
+            const auto step = resumed.step.view();
+            exact(p::RationalView{step.sign, step.numerator, step.denominator}, 1, 2);
+            const auto& motion_jet = take(resumed.motion.time()).get();
+            exact(motion_jet.time(), 1);
+            exact(motion_jet.translation(0, First), 4, 3);
+            exact(motion_jet.translation(0, Second), address.side == Left ? 1U : 5U, 3);
+            exact(motion_jet.rotation_coefficient(2, First), 1, 2);
+            exact(resumed.ambient.time(), 1);
+            CHECK(motion_jet.requested_side() == address.side);
+            CHECK(resumed.ambient.requested_side() == address.side);
+            const auto& saved_wake = resumed.prescribed;
+            const auto& original_wake = uninterrupted.prescribed;
+            if (!saved_wake || !original_wake)
+                FAIL("The restored prescribed mode lost its velocity input");
+            CHECK(saved_wake->requested_side() == address.side);
+            exact(saved_wake->jet().time(), 1);
+            exact(saved_wake->jet().velocity(0), 6);
+            exact(saved_wake->jet().time_partial(0), 2);
+            for (std::size_t k = 0; k < 3; ++k) {
+                same_enclosure(resumed.ambient.velocity(k), uninterrupted.ambient.velocity(k));
+                same_enclosure(resumed.ambient.time_partial(k),
+                               uninterrupted.ambient.time_partial(k));
+                same_enclosure(saved_wake->velocity(k), original_wake->velocity(k));
+                same_enclosure(saved_wake->time_partial(k), original_wake->time_partial(k));
+                for (std::size_t j = 0; j < 3; ++j)
+                    same_enclosure(resumed.ambient.spatial_partial(k, j),
+                                   uninterrupted.ambient.spatial_partial(k, j));
+            }
+            for (const auto order : {Value, First, Second}) {
+                for (std::size_t i = 0; i < 3; ++i) {
+                    same_enclosure(resumed.motion.centre(i, order),
+                                   uninterrupted.motion.centre(i, order));
+                    for (std::size_t j = 0; j < 3; ++j)
+                        same_enclosure(resumed.motion.rotation(i, j, order),
+                                       uninterrupted.motion.rotation(i, j, order));
+                }
+            }
+        }
+    }
+
+    SECTION("direct evaluation refuses independently changed ready input") {
+        const auto ready = take(prepare(input, clock_limits));
         input.field("analysis").field("intervals").elements[1].set("step", a::parse("0.25"));
         const auto changed_grid = take(prepare(input, clock_limits));
         rejected(evaluate(ready, changed_grid, {stamp, 0, 2, Left}, wake),
@@ -731,23 +876,12 @@ TEST_CASE("Prescribed Motion restores owned exact inputs and requalifies saved c
         exact(time.rotation_coefficient(2, First), 1, 2);
         CHECK(time.rotation_pi_power() == 1);
         CHECK(time.requested_side() == side);
-        const auto compare = [](core::Result<io::SiEnclosure> a, core::Result<io::SiEnclosure> b) {
-            const auto left = std::get<io::ScaledTwoWord>(take(std::move(a)));
-            const auto right = std::get<io::ScaledTwoWord>(take(std::move(b)));
-            CHECK(std::bit_cast<std::uint64_t>(left.high) ==
-                  std::bit_cast<std::uint64_t>(right.high));
-            CHECK(std::bit_cast<std::uint64_t>(left.low) ==
-                  std::bit_cast<std::uint64_t>(right.low));
-            CHECK(std::bit_cast<std::uint64_t>(left.radius) ==
-                  std::bit_cast<std::uint64_t>(right.radius));
-            CHECK(left.exponent2 == right.exponent2);
-        };
         for (const auto order : {Value, First, Second}) {
             for (std::size_t axis = 0; axis < 3; ++axis) {
-                compare(resumed.centre(axis, order), uninterrupted.centre(axis, order));
+                same_enclosure(resumed.centre(axis, order), uninterrupted.centre(axis, order));
                 for (std::size_t col = 0; col < 3; ++col)
-                    compare(resumed.rotation(axis, col, order),
-                            uninterrupted.rotation(axis, col, order));
+                    same_enclosure(resumed.rotation(axis, col, order),
+                                   uninterrupted.rotation(axis, col, order));
             }
         }
     }
