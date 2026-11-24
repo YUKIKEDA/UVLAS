@@ -63,6 +63,7 @@ struct CaseMotionTimeSnapshotView {
     std::uint64_t declaration_ordinal{};
     aero::detail::pchip::PchipInputStamp stamp;
     std::int16_t pi_power{};
+    CaseMotionContinuity continuity = CaseMotionContinuity::PiecewiseC2;
     aero::detail::pchip::RationalView begin, end;
     std::span<const aero::detail::pchip::RationalView> events;
     CaseMotionSeriesSnapshotView translation, rotation;
