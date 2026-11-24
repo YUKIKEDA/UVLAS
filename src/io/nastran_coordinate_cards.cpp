@@ -122,10 +122,10 @@ public:
         if (!source || source->size == 0)
             return {std::nullopt, source};
         work_.charge(source->size + 1, source->position);
-        auto value = bulk_.real(*source);
+        const auto value = bulk_.real(*source);
         if (!value)
             reject(value.error().code, Reason::InvalidField, source->position);
-        return {std::move(*value), source};
+        return {*value, source};
     }
 
     [[nodiscard]] std::array<NastranCoordinateValue, 3> triple(std::size_t index,
@@ -172,7 +172,7 @@ NastranGridPoint grid(const NastranBulkCard& card, const Fields& fields) {
     if (id <= 0 || id >= grid_id_exclusive_limit)
         reject(Code::InvalidInput, Reason::InvalidField, id_token.position);
     const auto cp = fields.reference(1);
-    auto position = fields.triple(2, false);
+    const auto position = fields.triple(2, false);
     const auto cd_token = fields.field(5);
     const auto cd = fields.integer_or_basic(5);
     if (cd < 0) {
@@ -196,7 +196,7 @@ NastranGridPoint grid(const NastranBulkCard& card, const Fields& fields) {
             id_token,
             cp,
             displacement,
-            std::move(position),
+            position,
             permanent,
             fields.field(6),
             sid_token};
@@ -214,18 +214,18 @@ NastranCoordinateDefinition coordinate(const NastranBulkCard& card, Card kind,
     if (kind == Card::Spherical)
         chart = NastranCoordinateKind::Spherical;
     const auto rid = fields.reference(1);
-    auto a = fields.triple(2, true);
-    auto b = fields.triple(5, true);
-    auto c = fields.triple(8, true);
+    const auto a = fields.triple(2, true);
+    const auto b = fields.triple(5, true);
+    const auto c = fields.triple(8, true);
     fields.check_tail(11);
     return {NastranCoordinateId{static_cast<std::uint64_t>(id)},
             chart,
             card.name,
             id_token,
             rid,
-            std::move(a),
-            std::move(b),
-            std::move(c)};
+            a,
+            b,
+            c};
 }
 
 template <class T>
