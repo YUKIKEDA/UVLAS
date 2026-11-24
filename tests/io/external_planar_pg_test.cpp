@@ -299,29 +299,29 @@ TEST_CASE("Planar certification separates winding, coverage and overlap without 
     REQUIRE(qualify(target, deck, full));
 }
 
-PgReferenceGeometry horizontal(Fixture& f, core::ResourcePlan& plan) {
+PgReferenceGeometry flat_target(Fixture& f, const PgReferenceFrame& frame,
+                                core::ResourcePlan& plan) {
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
     auto dictionary = take(PgCoefficientDictionary::prepare(
         f.chart_graph(), {partition_test::exact_limits(), 2000, 20000000, 100000, {}}, workspace,
         plan));
     auto partition = take(
         PgIntegrationPartition::prepare(f.request(), partition_test::limits(), workspace, plan));
-    const auto length = f.r("1");
-    const std::array origin{f.r("61", "50"), f.r("-27", "50"), f.r("1")};
-    const std::array rotation{f.r("4", "5"),  f.r("-3", "5"), f.r("0"),
-                              f.r("-3", "5"), f.r("-4", "5"), f.r("0"),
-                              f.r("0"),       f.r("0"),       f.r("-1")};
     PgReferenceInputs input{std::move(f.chart_graph()), std::move(dictionary),
                             std::move(partition)};
-    return take(PgReferenceGeometry::prepare(std::move(input), {rotation, origin, length},
-                                             reference_limits(), plan));
+    return take(PgReferenceGeometry::prepare(std::move(input), frame, reference_limits(), plan));
 }
 
 TEST_CASE("Nastran rectangular ancestors and signed shell offsets match one exact PG plane",
           "[IO4-03][IO4-04][SH-D02][N4-02][integration][negative][verification]") {
     Fixture f;
     core::ResourcePlan plan{budget};
-    const auto target = horizontal(f, plan);
+    const auto length = f.r("1");
+    const std::array origin{f.r("61", "50"), f.r("-27", "50"), f.r("1")};
+    const std::array rotation{f.r("4", "5"),  f.r("-3", "5"), f.r("0"),
+                              f.r("-3", "5"), f.r("-4", "5"), f.r("0"),
+                              f.r("0"),       f.r("0"),       f.r("-1")};
+    const auto target = flat_target(f, {rotation, origin, length}, plan);
     const std::array points{f.point("0", "0"), f.point("1", "0"), f.point("1", "1"),
                             f.point("0", "1")};
     const std::array abcd{ExternalPgCorner{10, points[0]}, ExternalPgCorner{40, points[1]},
@@ -420,6 +420,36 @@ TEST_CASE("Nastran rectangular ancestors and signed shell offsets match one exac
     rejected(qualify(invalid, forward), Code::GeometryInvalid, diagnostic, Reason::CoordinateFrame);
     const auto curvilinear = abnormal("CORD2C,5,0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n");
     rejected(qualify(curvilinear, forward), Code::Unsupported, diagnostic, Reason::PositionSystem);
+}
+
+TEST_CASE("Nastran ZOFFS moves both components of an oblique planar normal",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto length = f.r("1");
+    const std::array origin{f.r("0"), f.r("3", "10"), f.r("2", "5")};
+    const std::array rotation{f.r("1"),      f.r("0"), f.r("0"),       f.r("0"),     f.r("4", "5"),
+                              f.r("3", "5"), f.r("0"), f.r("-3", "5"), f.r("4", "5")};
+    const auto target = flat_target(f, {rotation, origin, length}, plan);
+    const std::array points{f.point("0", "0"), f.point("1", "0"), f.point("1", "1"),
+                            f.point("0", "1")};
+    const std::array ring{ExternalPgCorner{10, points[0]}, ExternalPgCorner{40, points[1]},
+                          ExternalPgCorner{90, points[2]}, ExternalPgCorner{95, points[3]}};
+    const std::array selection{ExternalPgFace{201, Winding::Forward, ring}};
+    const auto deck =
+        read_cards("GRID,10,0,0.0,0.0,0.0\nGRID,40,0,1000.0,0.0,0.0\n"
+                   "GRID,90,0,1000.0,800.0,-600.0\nGRID,95,0,0.0,800.0,-600.0\n"
+                   "PSHELL,20,8,2.54,8,,8\nMAT1,8,1.0\nCQUAD4,201,20,10,40,90,95,,500.0\n",
+                   plan);
+    const ExternalPgLimits limits{reference_limits(), 1};
+    const auto result = take(
+        ExternalPlanarPg::prepare(target, deck, SiLengthUnit::Millimetre, selection, limits, plan));
+    const auto face = take(result.view());
+    const auto& point = face.faces.front().ring()[2];
+    // A source point at (1, .8, -.6) plus .5*(0, .6, .8).
+    CHECK(point.position_metres[0] == f.r("1"));
+    CHECK(point.position_metres[1] == f.r("11", "10"));
+    CHECK(point.position_metres[2] == f.r("-1", "5"));
 }
 
 } // namespace

@@ -24,8 +24,9 @@ using Position = std::array<Rational, 3>;
 constexpr auto operation = core::Operation::PrepareModel;
 // Each ring retains (s,t) and SI Cartesian coordinates. With ZOFFS the
 // deck may also retain the four unshifted GRID positions and the scalar.
-constexpr std::uint64_t gmsh_rationals_per_face = 4 * (2 + 3);
-constexpr std::uint64_t nastran_rationals_per_face = gmsh_rationals_per_face + 4 * 3 + 1;
+constexpr std::uint64_t gmsh_rationals_per_face = std::uint64_t{4} * (2 + 3);
+constexpr std::uint64_t nastran_rationals_per_face =
+    gmsh_rationals_per_face + std::uint64_t{4} * 3 + 1;
 
 struct Corner {
     std::uint64_t tag{};
@@ -90,8 +91,8 @@ struct Diagnostic {
 
 struct DirectionSite {
     const Diagnostic& diagnostic;
-    Reason reason;
-    std::uint64_t element;
+    Reason reason = Reason::CoordinateFrame;
+    std::uint64_t element{};
     std::optional<std::uint64_t> node, byte;
     std::optional<NastranCoordinateId> coordinate;
 };
