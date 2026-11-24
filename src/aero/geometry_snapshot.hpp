@@ -260,6 +260,7 @@ public:
     [[nodiscard]] AeroResult<std::optional<pchip::RationalView>> exact_time() const&& = delete;
     [[nodiscard]] AeroResult<GeometryCounts> counts() const noexcept;
     [[nodiscard]] AeroResult<std::uint64_t> payload_bytes() const noexcept;
+    [[nodiscard]] AeroResult<std::uint64_t> used_preparation_steps() const noexcept;
     [[nodiscard]] AeroResult<PointId> owner(PointId point) const noexcept;
     [[nodiscard]] AeroResult<std::array<ScalarWords, 3>> point_words(PointId,
                                                                      Configuration) const noexcept;

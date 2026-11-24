@@ -3880,6 +3880,16 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     const auto row = take(state.collocation(0));
     const auto& contact = take(state.contact()).get();
     const auto& geometry = take_global(contact.geometry()).get();
+    auto larger_geometry_cap = caps;
+    larger_geometry_cap.geometry.max_steps = caps.work;
+    const auto same_trial =
+        take(run_clocked(current_clock, arrival, model, projection, larger_geometry_cap, memory));
+    const auto& same_geometry = take_global(take(same_trial.contact()).get().geometry()).get();
+    CHECK(test_geometry::take(same_geometry.identity()) ==
+          test_geometry::take(geometry.identity()));
+    const auto same_row = take(same_trial.collocation(0));
+    for (std::size_t axis = 0; axis < row.velocity.size(); ++axis)
+        CHECK(sum_words(same_row.velocity[axis]) == sum_words(row.velocity[axis]));
     CHECK(test_geometry::take(geometry.owner(alias)) == id[3]);
     const auto alias_position =
         test_geometry::take(geometry.point_words(alias, a::Configuration::Current));

@@ -542,6 +542,7 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
                 return std::unexpected(hashed.error());
         }
         hash(*data);
+        data->preparation_steps = run.steps;
         return OwnedGeometry{std::move(data), context};
     });
 }
@@ -989,6 +990,11 @@ AeroResult<std::uint64_t> OwnedGeometry::payload_bytes() const noexcept {
     if (!data_)
         return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
     return data_->payload;
+}
+AeroResult<std::uint64_t> OwnedGeometry::used_preparation_steps() const noexcept {
+    if (!data_)
+        return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
+    return data_->preparation_steps;
 }
 AeroResult<PointId> OwnedGeometry::owner(PointId id) const noexcept {
     if (!data_)
