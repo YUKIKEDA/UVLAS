@@ -140,8 +140,9 @@ bool is_one(std::string_view decimal) noexcept {
     if (text.starts_with('+'))
         text.remove_prefix(1);
     int exponent = 0;
-    const auto end = text.data() + text.size();
-    const auto parsed = std::from_chars(text.data(), end, exponent);
+    const auto* begin = text.data();
+    const auto* end = begin + text.size();
+    const auto parsed = std::from_chars(begin, end, exponent);
     return parsed.ec == std::errc{} && parsed.ptr == end && exponent == -mantissa_power;
 }
 
