@@ -4,6 +4,13 @@
 
 namespace uvlas::io::detail {
 
+struct ExternalPgCornerThicknessClaim {
+    std::uint64_t node{};
+    const structure::ExactRational* value_metres{};
+    std::optional<NastranBulkPosition> field{};
+    std::optional<NastranBulkPosition> scale_field{};
+};
+
 struct ExternalPgThicknessClaim {
     ExternalPgThicknessClaim() noexcept = default;
     ExternalPgThicknessClaim(std::uint64_t tag, const structure::ExactRational& metres,
@@ -11,10 +18,17 @@ struct ExternalPgThicknessClaim {
                              std::optional<NastranBulkPosition> card = {}) noexcept
         : element(tag), value_metres(&metres), sidecar_node(declaration), field(card) {}
 
+    ExternalPgThicknessClaim(std::uint64_t tag,
+                             std::span<const ExternalPgCornerThicknessClaim> samples,
+                             std::optional<core::Index> declaration = {}) noexcept
+        : element(tag), sidecar_node(declaration), corners(samples) {}
+
     std::uint64_t element{};
     const structure::ExactRational* value_metres{};
     std::optional<core::Index> sidecar_node{};
     std::optional<NastranBulkPosition> field{};
+    std::span<const ExternalPgCornerThicknessClaim> corners{};
+    std::optional<NastranPropertyId> property{};
 };
 
 enum class ExternalPgThicknessFailure : std::uint8_t { Source, Selection, Difference };
@@ -26,6 +40,9 @@ struct ExternalPgThicknessDiagnostic {
     std::optional<NastranBulkPosition> field{};
     std::optional<core::Index> case_triangle{};
     std::optional<std::size_t> overlap_vertex{};
+    std::optional<std::uint64_t> node{};
+    std::optional<NastranBulkPosition> scale_field{};
+    std::optional<NastranPropertyId> property{};
 };
 
 struct ExternalPgThicknessLimits {
@@ -38,15 +55,28 @@ struct ExternalPgThicknessLimits {
     std::uint64_t case_vertices;
 };
 
+struct ExternalPgCornerThickness {
+    std::uint64_t node{};
+    structure::ExactRational value_metres;
+    std::optional<NastranBulkPosition> field{};
+    std::optional<NastranBulkPosition> scale_field{};
+};
+
+struct ExternalPgNodalThickness {
+    std::array<ExternalPgCornerThickness, 4> values;
+    std::size_t count{};
+};
+
 struct ExternalPgThicknessMatch {
     std::uint64_t element{};
     ExternalPgWinding winding = ExternalPgWinding::Forward;
-    structure::ExactRational value_metres;
+    std::variant<structure::ExactRational, ExternalPgNodalThickness> value_metres;
     structure::ExactRational twice_chart_area;
     std::uint64_t pieces{};
-    std::uint64_t vertices{};
+    std::uint64_t vertices{}; // Vertices of the clipped positive-area polygons.
     std::optional<core::Index> sidecar_node{};
     std::optional<NastranBulkPosition> field{};
+    std::optional<NastranPropertyId> property{};
 };
 
 struct ExternalPgThicknessReport {
@@ -57,10 +87,10 @@ struct ExternalPgThicknessReport {
     structure::PgReferenceCallInfo work;
 };
 
-// Compare one external constant per declared original face on the exact common
-// subdivision between that face's certified chart polygon and the prepared PG.
-// Each declaration applies only on its own face. Zero-area contacts do not compare
-// values from the adjacent material region. The caller's owners remain read-only.
+// Compare a constant or original-node thickness on the exact common subdivision
+// of the certified face and PG. Original triangles use affine interpolation and
+// original quadrilaterals use their bilinear chart map without a diagonal split.
+// Each declaration applies only on its positive-area region. All inputs are read-only.
 [[nodiscard]] core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
     const ExternalPlanarPg&, const structure::PgReferenceGeometry&,
     std::span<const ExternalPgThicknessClaim>, const ExternalPgThicknessLimits&,

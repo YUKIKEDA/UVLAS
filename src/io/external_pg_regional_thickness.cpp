@@ -20,7 +20,8 @@ struct Diagnosis {
     ExternalPgThicknessDiagnostic value{};
 
     void select(const ExternalPgThicknessClaim& claim) noexcept {
-        value = {Reason::Selection, claim.element, claim.sidecar_node, claim.field, {}, {}};
+        value = {Reason::Selection, claim.element, claim.sidecar_node, claim.field, {}, {}, {}, {},
+                 claim.property};
     }
 
     [[noreturn]] void fail(Reason reason, Code code) const {
@@ -95,18 +96,80 @@ struct CasePlanes {
     std::uint64_t used{};
 };
 
+void validate_claim(const ExternalPgOwnedFace& face, const ExternalPgThicknessClaim& claim,
+                    Diagnosis& diagnosis) {
+    if (claim.value_metres && claim.corners.empty() && claim.value_metres->sign() > 0) {
+        return;
+    }
+    const auto ring = face.ring();
+    if (claim.value_metres || claim.corners.size() != ring.size()) {
+        diagnosis.fail(Reason::Selection, Code::InvalidInput);
+    }
+    bool positive = false;
+    for (std::size_t i = 0; i < ring.size(); ++i) {
+        const auto& corner = claim.corners[i];
+        if (corner.node != ring[i].node || !corner.value_metres ||
+            corner.value_metres->sign() < 0) {
+            diagnosis.value.field = corner.field;
+            diagnosis.value.scale_field = corner.scale_field;
+            diagnosis.value.node = corner.node;
+            diagnosis.fail(Reason::Selection, Code::InvalidInput);
+        }
+        positive = positive || corner.value_metres->sign() > 0;
+    }
+    if (!positive) {
+        diagnosis.fail(Reason::Selection, Code::InvalidInput);
+    }
+}
+
+void compare_constant(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& plane,
+                      std::span<const chart::Point> vertices, const chart::Rational& expected,
+                      core::Index original, Diagnosis& diagnosis) {
+    // The difference is affine on this common piece.
+    for (std::size_t i = 0; i < vertices.size(); ++i) {
+        math.visit(1);
+        const auto h = plane.evaluate(math, vertices[i].s, vertices[i].t);
+        if (math.compare(h, expected) != 0) {
+            diagnosis.value.case_triangle = original;
+            diagnosis.value.overlap_vertex = i;
+            diagnosis.fail(Reason::Difference, Code::InvalidInput);
+        }
+    }
+}
+
+void compare_nodal(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& plane,
+                   const ExternalPgOwnedFace& face,
+                   std::span<const ExternalPgCornerThicknessClaim> claims, core::Index original,
+                   Diagnosis& diagnosis) {
+    // A Case thickness plane composed with this triangle's affine chart map or
+    // this quadrilateral's bilinear chart map has the same shape functions as the
+    // source thickness. Equality on a positive-area open subset requires all
+    // coefficients to agree. Evaluate the polynomial at the source interpolation
+    // nodes, even when a node is outside the current clipped polygon.
+    const auto ring = face.ring();
+    for (std::size_t i = 0; i < ring.size(); ++i) {
+        math.visit(1);
+        const auto& corner = ring[i];
+        const auto h = plane.evaluate(math, corner.chart.s, corner.chart.t);
+        if (math.compare(h, *claims[i].value_metres) != 0) {
+            diagnosis.value.case_triangle = original;
+            diagnosis.value.node = corner.node;
+            diagnosis.value.field = claims[i].field;
+            diagnosis.value.scale_field = claims[i].scale_field;
+            diagnosis.fail(Reason::Difference, Code::InvalidInput);
+        }
+    }
+}
+
 [[nodiscard]] ExternalPgThicknessMatch compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg,
                                                      const ExternalPgOwnedFace& face,
                                                      const ExternalPgThicknessClaim& claim,
                                                      Diagnosis& diagnosis) {
-    const auto* value = claim.value_metres;
-    if (!value || value->sign() <= 0) {
-        diagnosis.fail(Reason::Selection, Code::InvalidInput);
-    }
+    validate_claim(face, claim, diagnosis);
     const auto outward = positive_ring(face);
     const auto domain = std::span{outward}.first(face.ring().size());
-    ExternalPgThicknessMatch match{face.element,       face.winding, {}, {}, 0, 0,
-                                   claim.sidecar_node, claim.field};
+    ExternalPgThicknessMatch match{face.element, face.winding,  {}, {}, 0, 0, claim.sidecar_node,
+                                   claim.field,  claim.property};
     for (const auto& triangle : pg.triangles) {
         math.visit(1);
         const chart::Triangle basis{&ref::reference_at(pg.vertices, triangle.vertices[0]),
@@ -120,17 +183,11 @@ struct CasePlanes {
         const auto original = ref::reference_at(pg.pieces, triangle.piece).thickness_triangle;
         pg.admit(math, original);
         const auto plane = ref::thickness_plane(math, pg.thickness, original);
-        // The difference is affine on the entire clipped piece. Matching all
-        // its exact vertices proves the full piece, including the chosen trace.
         const auto vertices = overlap.vertices();
-        for (std::size_t i = 0; i < vertices.size(); ++i) {
-            math.visit(1);
-            const auto h = plane.evaluate(math, vertices[i].s, vertices[i].t);
-            if (math.compare(h, *value) != 0) {
-                diagnosis.value.case_triangle = original;
-                diagnosis.value.overlap_vertex = i;
-                diagnosis.fail(Reason::Difference, Code::InvalidInput);
-            }
+        if (const auto* value = claim.value_metres) {
+            compare_constant(math, plane, vertices, *value, original, diagnosis);
+        } else {
+            compare_nodal(math, plane, face, claim.corners, original, diagnosis);
         }
         match.twice_chart_area = math.add(match.twice_chart_area, area);
         match.pieces = ref::partition_add(match.pieces, 1);
@@ -139,7 +196,18 @@ struct CasePlanes {
     if (match.pieces == 0) {
         diagnosis.fail(Reason::Source, Code::GeometryInvalid);
     }
-    match.value_metres = math.copy(*value);
+    if (const auto* value = claim.value_metres) {
+        match.value_metres = math.copy(*value);
+    } else {
+        ExternalPgNodalThickness result;
+        result.count = claim.corners.size();
+        for (std::size_t i = 0; i < result.count; ++i) {
+            const auto& native = claim.corners[i];
+            result.values[i] = {native.node, math.copy(*native.value_metres), native.field,
+                                native.scale_field};
+        }
+        match.value_metres = std::move(result);
+    }
     return match;
 }
 

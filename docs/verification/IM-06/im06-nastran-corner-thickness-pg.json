@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-corner-thickness-pg",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "182e67b3fac8943fe7f42b56e1e261e6204f8c86",
+  "claimed_state": "均質なPSHELLのCTRIA3・CQUAD4を、認証済みの元面とCase PGの厳密な厚さ対応で照合する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "regional_assertions": 111,
+    "real_file_assertions": 927,
+    "overlap_node_only_comparison_failures": 1,
+    "restored_regional_assertions": 111
+  },
+  "artifacts": {
+    "CMakeLists.txt": "45f6b0b663ebb2cf6a0d41800739af2517f3ce9b56b959149cdee11abbf207c8",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/nastran-corner-thickness-pg.md": "a78d84291d7d3665c23e3c0e6feef13cf338ae01b45c93bc02b426bd246ec865",
+    "src/coupling/case_external_pg.cpp": "5858290149f7b88316a7f19497c2e25febb2ae8dbcdd6bc65087e4c56ff23969",
+    "src/io/external_mesh_sidecar_pg.cpp": "873c7902a6e65e28af4293e68b5d91377f947f6dde658f4986af63307fd81a48",
+    "src/io/external_mesh_sidecar_pg.hpp": "fe7df41e278273ad9da8e6900610b5b190d9aefa5f805552bfa2162f4493999e",
+    "src/io/external_pg_chart_clip.hpp": "c2f3174f6ea2cda95bf1d3895c940bcc2c53a9d957f73fa58acd51565872107b",
+    "src/io/external_pg_regional_thickness.cpp": "2df1ea8ce5d744513b100ed10923e3935336dd1c4298450b21fd8a2feb134bb4",
+    "src/io/external_pg_regional_thickness.hpp": "17a17dc15825d2ae554419bfc8a2864ed7ef1f3238641bcf1f8dc4fa31aed521",
+    "src/io/external_planar_pg.cpp": "85b8ec021962d97604616065cdb68fd2a4ca0b459302927f86fe6cfcb4217c10",
+    "src/io/nastran_isotropic_shell_cards.cpp": "b08e7be8c7237e71d60685a050bb16040fc5d0a9bf9c5cdd12a718ddff49bf0b",
+    "src/io/nastran_shell_cards.cpp": "a48b567d637649309f1fe9fe42fd49e77f6457f50796e91c8475df4aefefab07",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/external_pg_regional_thickness_test.cpp": "f79c4d779ee7c1a67a07af3da453044ad168aed8438ec4b846f7f2d3ce90dde9",
+    "tests/io/reference_input_test.cpp": "ec7f1ed34c6b3c6e70c47109eca660ce9bccc80a8b2d2a33c951785da498f7d3"
+  }
+}
