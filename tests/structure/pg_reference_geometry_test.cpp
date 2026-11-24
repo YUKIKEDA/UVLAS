@@ -650,44 +650,156 @@ TEST_CASE("PG reproduces the independent reference geometry across all frozen R4
     }
 }
 
+namespace {
+
+PgReferenceGeometry prepare_r5_geometry(Fixture& fixture, core::Index resolution,
+                                        const Q& base_thickness, core::ResourcePlan& plan) {
+    // R5, polynomial_reference_surface.coefficients((.4,.2,0.,.1,-.06,.025)).
+    const auto s2 = fixture.r("1", "5"), t2 = fixture.r("1", "10");
+    const auto s3 = fixture.r("1", "30"), t3 = fixture.r("-1", "50");
+    const auto mixed = fixture.r("1", "40");
+    const std::array<ExactInputTerm, 5> height_terms{
+        {{{2, 0}, s2}, {{0, 2}, t2}, {{3, 0}, s3}, {{0, 3}, t3}, {{2, 2}, mixed}}};
+    const auto zero = fixture.r("0"), one = fixture.r("1");
+    set_graph(fixture, resolution, one, zero, height_terms);
+    fixture.domain.clear();
+    fixture.domain.push_back(fixture.point("0", "0"));
+    fixture.domain.push_back({fixture.r("1"), fixture.r("3", "10")});
+    fixture.domain.push_back({fixture.r("1"), fixture.r("9", "10")});
+    fixture.domain.push_back(fixture.point("0", "1"));
+    for (std::size_t i = 0; i < fixture.thickness.size(); ++i) {
+        const auto& vertex = fixture.thickness[i];
+        const Q thickness =
+            base_thickness * (1 + rational(vertex.s) / 10 + rational(vertex.t) / 20);
+        fixture.heights[i] = fraction(fixture, thickness);
+    }
+    std::array<R, 9> rotation;
+    for (const auto diagonal : {0U, 4U, 8U})
+        rotation[diagonal] = fixture.r("1");
+    const std::array<R, 3> origin;
+    auto inputs = prepare_inputs(fixture, plan);
+    return take(prepare_candidate(inputs, {rotation, origin, one}, reference_limits(), plan));
+}
+
+using ExactVector = std::array<IndependentRadical, 3>;
+
+IndependentRadical radical_product(const IndependentRadical& x, const IndependentRadical& y,
+                                   const Q& g) {
+    return {Q(x.a * y.a + g * x.b * y.b), Q(x.a * y.b + x.b * y.a)};
+}
+
+ExactVector area_vector(const ExactVector& u, const ExactVector& v, const Q& g, const Q& scale) {
+    ExactVector cross{};
+    for (std::size_t i = 0; i < cross.size(); ++i) {
+        const auto b = (i + 1) % 3, c = (i + 2) % 3;
+        const auto positive = radical_product(u[b], v[c], g);
+        const auto negative = radical_product(u[c], v[b], g);
+        cross[i] = {Q(scale * (positive.a - negative.a)), Q(scale * (positive.b - negative.b))};
+    }
+    return cross;
+}
+
+void check_projected_area(const PgReferenceAreaMeasure& actual, const ExactVector& expected,
+                          const Q& g) {
+    IndependentRadical norm{};
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        CHECK(rational(actual.outward[i].rational) == expected[i].a);
+        CHECK(rational(actual.outward[i].radical) == expected[i].b);
+        const auto square = radical_product(expected[i], expected[i], g);
+        norm.a += square.a;
+        norm.b += square.b;
+    }
+    CHECK(rational(actual.squared_norm.rational) == norm.a);
+    CHECK(rational(actual.squared_norm.radical) == norm.b);
+}
+
+struct R5Point {
+    Q g, thickness, depth;
+    std::array<Q, 3> base, normal_radical;
+    std::array<ExactVector, 3> columns;
+    IndependentRadical determinant;
+};
+
+R5Point r5_point(const Q& s, const Q& t, const Q& zeta, const Q& h0) {
+    // World polynomial from the R5 v2 source, directly differentiated.
+    const Q f = s * s / 5 + t * t / 10 + s * s * s / 30 - t * t * t / 50 + s * s * t * t / 40;
+    const Q fs = 2 * s / 5 + s * s / 10 + s * t * t / 20;
+    const Q ft = t / 5 - 3 * t * t / 50 + s * s * t / 20;
+    const Q fss = Q(2, 5) + s / 5 + t * t / 20;
+    const Q fst = s * t / 10;
+    const Q ftt = Q(1, 5) - 3 * t / 25 + s * s / 20;
+    const Q g = 1 + fs * fs + ft * ft;
+    const Q h = h0 * (1 + s / 10 + t / 20);
+    const Q z = zeta * h / 2;
+
+    const std::array<Q, 3> normal{Q(-fs), Q(-ft), Q(1)};
+    const std::array<std::array<Q, 3>, 2> normal_slope{std::array<Q, 3>{Q(-fss), Q(-fst), Q(0)},
+                                                       std::array<Q, 3>{Q(-fst), Q(-ftt), Q(0)}};
+    const std::array<std::array<Q, 3>, 2> tangents{std::array<Q, 3>{Q(1), Q(0), fs},
+                                                   std::array<Q, 3>{Q(0), Q(1), ft}};
+    const std::array<Q, 2> thickness_slope{Q(h0 / 10), Q(h0 / 20)};
+
+    const Q trace = (1 + ft * ft) * fss - 2 * fs * ft * fst + (1 + fs * fs) * ftt;
+    const Q gaussian = fss * ftt - fst * fst;
+    R5Point point{g,
+                  h,
+                  z,
+                  {s, t, f},
+                  {},
+                  {},
+                  {Q(-h * z * trace / (2 * g)), Q(h * (1 + z * z * gaussian / (g * g)) / 2)}};
+    for (std::size_t axis = 0; axis < normal.size(); ++axis) {
+        point.normal_radical[axis] = normal[axis] / g;
+        point.columns[2][axis].b = h * point.normal_radical[axis] / 2;
+    }
+    for (std::size_t direction = 0; direction < tangents.size(); ++direction) {
+        const auto& nd = normal_slope[direction];
+        const Q scalar = normal[0] * nd[0] + normal[1] * nd[1] + normal[2] * nd[2];
+        const Q dz = zeta * thickness_slope[direction] / 2;
+        for (std::size_t axis = 0; axis < normal.size(); ++axis) {
+            const Q normal_derivative = (nd[axis] * g - normal[axis] * scalar) / (g * g);
+            point.columns[direction][axis] = {
+                tangents[direction][axis],
+                Q(dz * point.normal_radical[axis] + z * normal_derivative)};
+        }
+    }
+    return point;
+}
+
+R5Point check_r5_point(const PgReferenceValue& actual, const Q& s, const Q& t, const Q& zeta,
+                       const Q& h0) {
+    const auto reference = r5_point(s, t, zeta, h0);
+    CHECK(rational(actual.s) == s);
+    CHECK(rational(actual.t) == t);
+    CHECK(rational(actual.zeta) == zeta);
+    CHECK(rational(actual.g) == reference.g);
+    CHECK(rational(actual.full_thickness_metres) == reference.thickness);
+    CHECK(rational(actual.determinant_metres_cubed.rational) == reference.determinant.a);
+    CHECK(rational(actual.determinant_metres_cubed.radical) == reference.determinant.b);
+    for (std::size_t axis = 0; axis < reference.base.size(); ++axis) {
+        CHECK(rational(actual.position_metres[axis].rational) == reference.base[axis]);
+        CHECK(rational(actual.position_metres[axis].radical) ==
+              reference.depth * reference.normal_radical[axis]);
+        CHECK(rational(actual.normal[axis].rational) == 0);
+        CHECK(rational(actual.normal[axis].radical) == reference.normal_radical[axis]);
+    }
+    return reference;
+}
+
+} // namespace
+
 TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
           "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
     for (const core::Index resolution : {1, 2}) {
         for (const auto denominator : {"100", "10000"}) {
             CAPTURE(resolution, denominator);
             Fixture fixture;
-            // R5, polynomial_reference_surface.coefficients((.4,.2,0.,.1,-.06,.025)).
-            const auto s2 = fixture.r("1", "5"), t2 = fixture.r("1", "10");
-            const auto s3 = fixture.r("1", "30"), t3 = fixture.r("-1", "50");
-            const auto mixed = fixture.r("1", "40");
-            const std::array<ExactInputTerm, 5> height_terms{
-                {{{2, 0}, s2}, {{0, 2}, t2}, {{3, 0}, s3}, {{0, 3}, t3}, {{2, 2}, mixed}}};
-            const auto zero = fixture.r("0"), one = fixture.r("1");
-            set_graph(fixture, resolution, one, zero, height_terms);
-            fixture.domain.clear();
-            fixture.domain.push_back(fixture.point("0", "0"));
-            fixture.domain.push_back({fixture.r("1"), fixture.r("3", "10")});
-            fixture.domain.push_back({fixture.r("1"), fixture.r("9", "10")});
-            fixture.domain.push_back(fixture.point("0", "1"));
             const Q base_thickness{std::string("1/") + denominator};
-            for (std::size_t i = 0; i < fixture.thickness.size(); ++i) {
-                const auto& vertex = fixture.thickness[i];
-                const Q thickness =
-                    base_thickness * (1 + rational(vertex.s) / 10 + rational(vertex.t) / 20);
-                fixture.heights[i] = fraction(fixture, thickness);
-            }
             fixture.layers.clear();
             fixture.layers.push_back(
                 {core::LayerId{11}, fixture.zeta.front(), fixture.zeta.back()});
-
-            std::array<R, 9> rotation;
-            for (const auto diagonal : {0U, 4U, 8U})
-                rotation[diagonal] = fixture.r("1");
-            const std::array<R, 3> origin;
             core::ResourcePlan plan{cap};
-            auto inputs = prepare_inputs(fixture, plan);
-            const auto geometry =
-                take(prepare_candidate(inputs, {rotation, origin, one}, reference_limits(), plan));
+            const auto geometry = prepare_r5_geometry(fixture, resolution, base_thickness, plan);
             const auto& partition = take(geometry.source()).partition;
             const auto vertices = take(partition.vertices());
             const auto triangles = take(partition.triangles());
@@ -756,6 +868,148 @@ TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
             CHECK(std::abs(integrated.weak_work - expected_work) <= 1e-9 * expected_work);
             for (const auto component : integrated.load_resultant)
                 CHECK(std::abs(component) <= 1e-10 * expected_volume);
+        }
+    }
+}
+
+TEST_CASE("PG checks every material side and cut edge of the frozen R5 footprint",
+          "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
+    for (const core::Index resolution : {1, 2}) {
+        for (const auto denominator : {"100", "10000"}) {
+            CAPTURE(resolution, denominator);
+            Fixture fixture;
+            const Q h0{std::string("1/") + denominator};
+            core::ResourcePlan plan{cap};
+            const auto geometry = prepare_r5_geometry(fixture, resolution, h0, plan);
+            const auto& partition = take(geometry.source()).partition;
+            const auto vertices = take(partition.vertices());
+            const auto triangles = take(partition.triangles());
+            const auto volumes = take(partition.volumes());
+            const auto horizontal = take(partition.horizontal_faces());
+            const auto lateral = take(partition.lateral_faces());
+            const auto edges = take(partition.edges());
+            constexpr std::size_t layer_count = 2;
+            REQUIRE(fixture.layers.size() == layer_count);
+            REQUIRE(volumes.size() == layer_count * triangles.size());
+            REQUIRE(horizontal.size() == 2 * volumes.size());
+            const auto third = fixture.r("1", "3");
+            const auto depth = fixture.r("3", "4");
+            const auto triangle_coordinates = [&](core::Index triangle) {
+                const auto corners = triangles[static_cast<std::size_t>(triangle)].vertices;
+                const auto& a = vertices[static_cast<std::size_t>(corners[0])];
+                const auto& b = vertices[static_cast<std::size_t>(corners[1])];
+                const auto& c = vertices[static_cast<std::size_t>(corners[2])];
+                const Q s = (rational(a.s) + rational(b.s) + rational(c.s)) / 3;
+                const Q t = (rational(a.t) + rational(b.t) + rational(c.t)) / 3;
+                const Q twice_area =
+                    (rational(b.s) - rational(a.s)) * (rational(c.t) - rational(a.t)) -
+                    (rational(b.t) - rational(a.t)) * (rational(c.s) - rational(a.s));
+                return std::tuple{s, t, twice_area};
+            };
+            const auto layer_span = [](const PgPartitionLayer& layer) -> Q {
+                return rational(layer.upper) - rational(layer.lower);
+            };
+            const auto in_layer = [&](const PgPartitionLayer& layer) -> Q {
+                return rational(layer.lower) + 3 * layer_span(layer) / 4;
+            };
+
+            std::array<Q, layer_count> areas{};
+            for (std::size_t i = 0; i < volumes.size(); ++i) {
+                CAPTURE(i);
+                const auto& v = volumes[i];
+                const auto index = static_cast<std::size_t>(v.layer);
+                const auto& layer = fixture.layers[index];
+                const auto [s, t, twice_area] = triangle_coordinates(v.triangle);
+                REQUIRE(twice_area > 0);
+                areas[index] += twice_area / 2;
+                const auto actual = take(geometry.evaluate(
+                    PgReferenceVolumePoint{static_cast<core::Index>(i), third, third, depth},
+                    std::nullopt, reference_limits(), plan));
+                const auto point = check_r5_point(actual, s, t, in_layer(layer), h0);
+                const Q weight = twice_area * layer_span(layer);
+                CHECK(actual.layer == layer.id);
+                const auto& measure = std::get<PgReferenceVolumeMeasure>(actual.measure);
+                CHECK(rational(measure.jacobian.rational) == weight * point.determinant.a);
+                CHECK(rational(measure.jacobian.radical) == weight * point.determinant.b);
+            }
+            for (const auto& area : areas)
+                CHECK(area == Q(4, 5));
+
+            std::array<std::array<std::size_t, 2>, layer_count> faces_per_layer{};
+            for (std::size_t i = 0; i < horizontal.size(); ++i) {
+                CAPTURE(i);
+                const auto& face = horizontal[i];
+                const auto index = static_cast<std::size_t>(face.layer);
+                const auto& layer = fixture.layers[index];
+                const auto [s, t, twice_area] = triangle_coordinates(face.triangle);
+                const auto lower = face.side == PgPartitionFaceSide::Lower;
+                const auto& zeta = rational(lower ? layer.lower : layer.upper);
+                const auto actual = take(geometry.evaluate(
+                    PgReferenceHorizontalPoint{static_cast<core::Index>(i), third, third},
+                    std::nullopt, reference_limits(), plan));
+                const auto point = check_r5_point(actual, s, t, zeta, h0);
+                CHECK(actual.layer == layer.id);
+                const auto& measure = std::get<PgReferenceHorizontalMeasure>(actual.measure);
+                CHECK(measure.side == face.side);
+                const Q sign = lower ? Q(-1) : Q(1);
+                check_projected_area(
+                    measure.area,
+                    area_vector(point.columns[0], point.columns[1], point.g, sign * twice_area),
+                    point.g);
+                ++faces_per_layer[index][lower ? 0U : 1U];
+            }
+            for (const auto& layer : faces_per_layer) {
+                CHECK(layer[0] == triangles.size());
+                CHECK(layer[1] == triangles.size());
+            }
+
+            std::array<std::array<Q, 4>, layer_count> coverage{};
+            const auto on_original_edge = [](const PgPartitionPoint& p) {
+                const auto& s = rational(p.s);
+                const auto& t = rational(p.t);
+                return std::array{t == 3 * s / 10, s == 1, t == 1 - s / 10, s == 0};
+            };
+            for (std::size_t i = 0; i < lateral.size(); ++i) {
+                CAPTURE(i);
+                const auto& face = lateral[i];
+                const auto index = static_cast<std::size_t>(face.layer);
+                const auto& layer = fixture.layers[index];
+                const auto& edge = edges[static_cast<std::size_t>(face.edge)];
+                const auto& a = vertices[static_cast<std::size_t>(
+                    edge.vertices[face.canonical_direction ? 0 : 1])];
+                const auto& b = vertices[static_cast<std::size_t>(
+                    edge.vertices[face.canonical_direction ? 1 : 0])];
+                const Q ds = rational(b.s) - rational(a.s);
+                const Q dt = rational(b.t) - rational(a.t);
+                const auto left = on_original_edge(a), right = on_original_edge(b);
+                const std::array<Q, 4> ccw_step{ds, dt, Q(-ds), Q(-dt)};
+                std::size_t matching = 0;
+                for (std::size_t side = 0; side < left.size(); ++side) {
+                    if (!left[side] || !right[side])
+                        continue;
+                    CHECK(ccw_step[side] > 0);
+                    coverage[index][side] += ccw_step[side];
+                    ++matching;
+                }
+                REQUIRE(matching == 1);
+                const Q s = rational(a.s) + ds / 3;
+                const Q t = rational(a.t) + dt / 3;
+                const auto actual = take(geometry.evaluate(
+                    PgReferenceLateralPoint{static_cast<core::Index>(i), third, depth},
+                    std::nullopt, reference_limits(), plan));
+                const auto point = check_r5_point(actual, s, t, in_layer(layer), h0);
+                CHECK(actual.layer == layer.id);
+                ExactVector tangent{};
+                for (std::size_t k = 0; k < tangent.size(); ++k)
+                    tangent[k] = {Q(ds * point.columns[0][k].a + dt * point.columns[1][k].a),
+                                  Q(ds * point.columns[0][k].b + dt * point.columns[1][k].b)};
+                check_projected_area(
+                    std::get<PgReferenceLateralMeasure>(actual.measure).area,
+                    area_vector(tangent, point.columns[2], point.g, layer_span(layer)), point.g);
+            }
+            const std::array<Q, 4> original_length{Q(1), Q(3, 5), Q(1), Q(1)};
+            for (const auto& layer : coverage)
+                CHECK(layer == original_length);
         }
     }
 }
