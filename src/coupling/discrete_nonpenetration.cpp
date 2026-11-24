@@ -1652,16 +1652,80 @@ struct NonpenetrationBuilder {
         pullback.flow.emplace(enclose_vector(pullback.ambient, representation, scratch, work));
     }
 
+    static void propagate_load_circulation(
+        LoadPullbackData& loads, PullbackData& implicit, const PrimalCirculationData& primal,
+        const Assembly& assembly, const DiscreteNonpenetrationInput& input, const Vector& ambient,
+        const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
+        a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+        a::LocalRootScratch& rounding, p::Work& work) {
+        const auto before = work.used;
+        const auto face = [&](std::size_t i) { return face_at(primal.rows.values(), i); };
+        auto transpose =
+            linearize_native(CirculationSense::Transpose, face, primal.influence.values(),
+                             loads.gamma.values(), implicit.request, memory, work);
+        transpose.steps_ = work.used - before;
+        implicit.transpose.emplace(std::move(transpose));
+        implicit.rows =
+            allocate<std::optional<CirculationCollocationCovector>>(memory, assembly.bound.size());
+        admit(assembly, input, limits, memory, 1, 4, work);
+        const auto geometry = require(input.contact.geometry());
+
+        for (std::size_t i = 0; i < assembly.bound.size(); ++i) {
+            work.step();
+            const auto& item = assembly.bound.values()[i];
+            const auto& row = input.collocations[item.caller];
+            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
+            CirculationRowData record;
+            record.normal = qualify_normal(geometry.get(), item.panel, row, work);
+            record.relative = difference(ambient, import(row.velocity, work), work);
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+            const auto full = require(a::apply_shared_p1(
+                action, source, assembly.values.values(), std::nullopt,
+                std::min(limits.action_steps, remaining(work)), shared, work.stop));
+            account(work, full.used_steps());
+            implicit.rows.values()[i].emplace(pullback_row(implicit, i, item, row, record, full,
+                                                           action, source, assembly, limits, shared,
+                                                           memory, rounding, work));
+        }
+
+        const auto direct_points = loads.point_ids.values();
+        const auto implicit_points = implicit.point_ids.values();
+        std::size_t next = 0;
+        for (std::size_t i = 0; i < implicit_points.size(); ++i) {
+            work.step();
+            if (next < direct_points.size() && direct_points[next] == implicit_points[i]) {
+                accumulate_vector(implicit.point_covectors.values()[i],
+                                  loads.position.values()[next], work);
+                ++next;
+            }
+        }
+        if (next != direct_points.size())
+            reject(core::FailureCode::InvalidInput);
+        loads.point_ids = std::move(implicit.point_ids);
+        loads.position = std::move(implicit.point_covectors);
+        accumulate_vector(loads.ambient, implicit.flow, work);
+    }
+
     static DiscreteCirculationLoads
     solve_loads(const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
                 ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
                 const DiscreteCirculationRequest& request, a::GeometryWorkspace& geometry_work,
                 a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local,
                 a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop,
-                LoadDirections* direction = nullptr, LoadPullbackData* pullback = nullptr) {
+                LoadDirections* direction = nullptr, LoadPullbackData* pullback = nullptr,
+                PullbackData* implicit = nullptr) {
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto order = input.collocations.size();
+        if (implicit != nullptr) {
+            match_linearization_context(implicit->request.scales.context, request.scales.context,
+                                        true);
+            if (implicit->request.rhs_generation == request.rhs_generation ||
+                implicit->request.retained_generation == request.retained_generation)
+                reject(core::FailureCode::StaleGeneration);
+            validate_circulation(implicit->request, order, work, true);
+        }
         if (loads.stamp != input.trial_stamp || loads.circulation != request.retained_generation)
             reject(core::FailureCode::StaleGeneration);
         if (loads.rates.size() != order)
@@ -1914,6 +1978,9 @@ struct NonpenetrationBuilder {
         }
         if (pullback != nullptr) {
             scatter_force_edge_strength(*pullback, occurrences.values(), edges.values(), work);
+            if (implicit != nullptr)
+                propagate_load_circulation(*pullback, *implicit, primal, assembly, input, ambient,
+                                           limits, shared, local, kernel, memory, rounding, work);
             finish_load_pullback(*pullback, bound, representation, rounding, memory, work);
         }
         const auto force = finish(totals.force);
@@ -1964,6 +2031,25 @@ struct NonpenetrationBuilder {
             reject(core::FailureCode::InvalidInput);
         return {std::move(value), std::move(target.points), std::move(target.edges),
                 std::move(target.bound), *target.flow};
+    }
+
+    static DiscreteCirculationImplicitLoadVjp solve_implicit_load_pullback(
+        const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+        const DiscreteVectorLoadWeights& weights, ProjectedCaseUniformFlow&& flow,
+        const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+        const DiscreteCirculationRequest& transpose, a::GeometryWorkspace& geometry_work,
+        a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+        core::ResourcePlan& memory, const std::stop_token& stop) {
+        LoadPullbackData target{weights};
+        PullbackData implicit{transpose, {}};
+        auto value = solve_loads(input, loads, std::move(flow), limits, request, geometry_work,
+                                 shared, local, kernel, memory, stop, nullptr, &target, &implicit);
+        if (!target.flow || !implicit.transpose)
+            reject(core::FailureCode::InvalidInput);
+        return {DiscreteCirculationLoadVjp{std::move(value), std::move(target.points),
+                                           std::move(target.edges), std::move(target.bound),
+                                           *target.flow},
+                std::move(*implicit.transpose), std::move(implicit.rows)};
     }
 
     static a::PhysicalFaceId face_at(std::span<const std::optional<CirculationResidualRow>> rows,
@@ -2379,6 +2465,41 @@ core::Result<DiscreteCirculationLoadVjp> solve_discrete_circulation_load_pullbac
         return NonpenetrationBuilder::solve_load_pullback(input, loads, weights, std::move(flow),
                                                           limits, request, geometry_work, shared,
                                                           local, kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+core::Result<LoadCirculationRateCovector>
+DiscreteCirculationImplicitLoadVjp::circulation_rate(std::size_t i) const noexcept {
+    const auto dual = values_.bound(i);
+    if (!dual)
+        return std::unexpected(dual.error());
+    return LoadCirculationRateCovector{dual->face, dual->circulation_rate};
+}
+
+core::Result<CirculationCollocationCovector>
+DiscreteCirculationImplicitLoadVjp::collocation(std::size_t i) const noexcept {
+    return load_row(rows_, i);
+}
+
+core::Result<DiscreteCirculationImplicitLoadVjp> solve_discrete_circulation_implicit_load_pullback(
+    const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+    const DiscreteVectorLoadWeights& weights, ProjectedCaseUniformFlow&& flow,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& primal,
+    const DiscreteCirculationRequest& transpose, a::GeometryWorkspace& geometry_work,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_implicit_load_pullback(
+            input, loads, weights, std::move(flow), limits, primal, transpose, geometry_work,
+            shared, local, kernel, memory, stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {
