@@ -9,7 +9,8 @@ struct PgFlatGramLimits {
     std::uint64_t maximum_integer_steps = 0;
 };
 
-/// Density-one geometric Gram enclosure for a full, flat chart of constant thickness.
+/// Density-one geometric Gram enclosure on the actual domain of a flat chart
+/// with constant height and certified piecewise-affine thickness.
 /// Preparation consumes the matching physical basis only on success.
 class PgFlatGram {
 public:
@@ -29,6 +30,11 @@ public:
                                                                   const PgConditioningLimits&,
                                                                   core::Workspace&,
                                                                   core::ResourcePlan&) && noexcept;
+
+    /// Generate and certify using the enclosure and reference owned together.
+    [[nodiscard]] core::Result<PgConditioningCertificate>
+    generate_and_certify(PgConditioningGeneration, const PgConditioningLimits&, core::Workspace&,
+                         core::ResourcePlan&) && noexcept;
 
 private:
     PgFlatGram(PgReferenceBasis&&, core::PlannedBuffer<PgGramEntry>, std::uint32_t) noexcept;

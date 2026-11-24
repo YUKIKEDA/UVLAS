@@ -1,0 +1,89 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-flat-gram-affine-thickness",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "fd875824da3ba08d7104d70c98fe6c04f948dfc7",
+  "claimed_state": "平板の区分一次厚さを持つ全被覆・切断領域で、全上三角の幾何内積区間を供給し、切断n=1の合同認定入口まで照合した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "affine_grids": [
+      1,
+      2,
+      4
+    ],
+    "cut_n1_exact_endpoints_for_all_entries": true,
+    "selected_intervals_per_other_model": 10,
+    "full_background_n1_affine_checked": true,
+    "enclosure_fractional_bits": 256,
+    "cut_n1_congruence_certified": true,
+    "congruence_tolerance": "1e-20",
+    "coarse_enclosure": {
+      "fractional_bits": 128,
+      "fixture": "same cut n=1 shape as the 256-bit acceptance",
+      "expected_certificate_failure": "PrecisionUnresolved",
+      "assertions_passed": 24094,
+      "isolated_test_source_sha256": "4bccaf52835d66d2224c62ce2224671a29f5c11c44852945df424fd5ff8ad012"
+    },
+    "constant_thickness_regressions_passed": true,
+    "fixed_width_rejection_input_denominator": "2^1700",
+    "windows_release_ctest_passed": 1,
+    "windows_debug_ctest_passed": 1,
+    "linux_sanitizer_test_cases": 12,
+    "linux_sanitizer_assertions": 108795,
+    "linux_sanitizer_direct_timeout_seconds": 180,
+    "clang_tidy_translation_units": 2,
+    "rejected_mutation": {
+      "change": "use the first thickness triangle for every partition piece",
+      "failed_assertions": 5349
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-flat-gram-contract.md": "77b18bcdd8c5fd4210e419b75cf4253e433e43d5aef499788ae3612331953331",
+    "docs/specs/structure/pg-flat-gram-cut-contract.md": "ed486f1cfe68d9779b2ee0a5f3797f6d849d2388f304372d7ae72fbe716d1004",
+    "docs/specs/structure/pg-integration-partition-contract.md": "ecb1dd5d0819fa73a74fe4521cd33b1bc9b618b6df597debfe628c2fd45a90d0",
+    "include/uvlas/structure/pg_integration_partition.hpp": "be9b14490465be58358b0065e08835ea10e4baf93f30b93a80c6995b0b2ba3e6",
+    "src/structure/pg_reference_domain.hpp": "73b04ad4e1536ce010aab0969f6ae2ba56b63d0424e600c85ad6c94869be9836",
+    "src/structure/pg_rank_storage.hpp": "baf41ab8cf4a8ee63f11b05a2c4714eff277484bfa38ae352cfe436911ff6e7f",
+    "tests/structure/pg_partition_test_support.hpp": "33246f600d8b6d95492b35b9cf3b4ee2431296cc2aa73c03e3c538f84e2ba79b",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-flat-gram-affine-thickness-contract.md": "a143245c2f6e10fa84fef708fe2358e53f63129c6be0115706c1ae650afae1b0",
+    "include/uvlas/structure/pg_flat_gram.hpp": "63094abfb6fdce1808b725e6e2e90107100e82a9e288354170f170009008696e",
+    "src/structure/pg_flat_gram.cpp": "82fabee0571c2272ae707897aa411e5ae9a336f14e538206fd938eb0b2fc4915",
+    "src/structure/pg_flat_gram_cut_moments.hpp": "329ac38cdddb3d5c319c1965a9d57d5f3db550aa9c80e6287aa65ac0b4df20eb",
+    "src/structure/pg_flat_gram_thickness_moments.hpp": "454e3bf97ba73828c0fa61dcb90b5a928ad1181c6f2f451bd287c58db5978f69",
+    "tests/structure/pg_conditioning_test.cpp": "806db007fdb06427c12f628a695b82245dfc4b937c79eda729e77e9ccb2836f0",
+    "docs/verification/IM-01/pg-flat-gram-affine-thickness.md": "fbeb0ce54c8fdf635f263e2cf830a32f2b354c8baea1a743c99befd21ddaf6ac"
+  }
+}

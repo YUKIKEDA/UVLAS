@@ -1,6 +1,7 @@
 #pragma once
 
 #include <uvlas/structure/pg_reference_basis.hpp>
+#include <variant>
 
 namespace uvlas::structure {
 
@@ -21,6 +22,12 @@ struct PgDiscreteGramEnclosure {
 struct PgConditioningCandidate {
     std::span<const ExactRational> upper_triangle;
     std::uint32_t fractional_bits = 0;
+};
+
+/// Explicit dyadic grids for the approximate factor and the certified result.
+struct PgConditioningGeneration {
+    std::uint32_t factor_fractional_bits = 0;
+    std::uint32_t candidate_fractional_bits = 0;
 };
 
 struct PgConditioningLimits {
@@ -68,6 +75,13 @@ public:
     certify(PgReferenceBasis&&, PgDiscreteGramEnclosure, PgConditioningCandidate,
             const PgConditioningLimits&, core::Workspace&, core::ResourcePlan&) noexcept;
 
+    /// Generate a midpoint factor and certify the actual candidate against the
+    /// original enclosure. The caller binds the enclosure to this actual basis.
+    [[nodiscard]] static core::Result<PgConditioningCertificate>
+    generate_and_certify(PgReferenceBasis&&, PgDiscreteGramEnclosure, PgConditioningGeneration,
+                         const PgConditioningLimits&, core::Workspace&,
+                         core::ResourcePlan&) noexcept;
+
     [[nodiscard]] core::Result<PgConditioningInfo> info() const noexcept;
     /// Exact infinity-norm upper bound.
     [[nodiscard]] core::Result<ExactRational> congruence_bound(const ExactLimits&,
@@ -106,6 +120,11 @@ public:
                          core::ResourcePlan&) const noexcept;
 
 private:
+    [[nodiscard]] static core::Result<PgConditioningCertificate>
+    certify_impl(PgReferenceBasis&&, PgDiscreteGramEnclosure,
+                 std::variant<PgConditioningCandidate, PgConditioningGeneration>,
+                 const PgConditioningLimits&, core::Workspace&, core::ResourcePlan&) noexcept;
+
     PgConditioningCertificate(PgReferenceBasis&&,
                               core::PlannedBuffer<detail::PgConditioningState>) noexcept;
     PgReferenceBasis basis_;

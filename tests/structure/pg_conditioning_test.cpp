@@ -121,6 +121,71 @@ std::vector<Q> analytic_gram(const std::vector<std::vector<Term>>& basis, const 
     return entries;
 }
 
+// The fixture cuts the chart by s+t <= 1+1/(4n). In local coordinates a
+// boundary cell is a square minus one corner triangle or the opposite corner
+// triangle alone. Integrate that triangle by successive exact integration:
+// I(a,b) = (1/(a+1) - B(b+2,a+1))/(b+1).
+Q fixture_corner_moment(core::Index a, core::Index b) {
+    Q beta = Q{1} / (b + 2);
+    for (core::Index k = 1; k <= a; ++k)
+        beta *= Q{k} / (b + 2 + k);
+    return (Q{1} / (a + 1) - beta) / (b + 1);
+}
+
+std::vector<Q> analytic_cut_gram(const std::vector<std::vector<Term>>& basis, core::Index n) {
+    constexpr core::Index maximum_degree = 42;
+    std::array<std::array<Q, maximum_degree + 1>, maximum_degree + 1> triangle{};
+    for (core::Index a = 0; a <= maximum_degree; ++a)
+        for (core::Index b = 0; b <= maximum_degree - a; ++b)
+            triangle[static_cast<std::size_t>(a)][static_cast<std::size_t>(b)] =
+                fixture_corner_moment(a, b);
+    const auto count = basis.size();
+    std::vector<Q> result(slot(0, count));
+    const auto measure = Q{1} / (16 * n * n);
+    for (std::size_t j = 0; j < count; ++j)
+        for (std::size_t i = 0; i <= j; ++i)
+            for (const auto& a : basis[i])
+                for (const auto& b : basis[j]) {
+                    if (a.row.cell != b.row.cell)
+                        continue;
+                    const auto field_a = static_cast<core::Index>(a.row.field);
+                    const auto field_b = static_cast<core::Index>(b.row.field);
+                    const auto z = field_a + field_b;
+                    if (z % 2 != 0)
+                        continue;
+                    const auto u = a.row.powers.first + b.row.powers.first;
+                    const auto v = a.row.powers.second + b.row.powers.second;
+                    const auto boundary = 4 * n - 1 - 2 * (a.row.cell.first + a.row.cell.second);
+                    Q planar;
+                    if (boundary >= 2) {
+                        planar = moment(u) * moment(v);
+                    } else {
+                        if (boundary != -1 && boundary != 1)
+                            throw std::runtime_error("Unexpected active cell in the cut oracle");
+                        const auto& corner =
+                            triangle[static_cast<std::size_t>(u)][static_cast<std::size_t>(v)];
+                        if (boundary == 1)
+                            planar = moment(u) * moment(v) - corner;
+                        else
+                            planar = (u + v) % 2 == 0 ? corner : -corner;
+                    }
+                    result[slot(i, j)] += a.value * b.value * planar * moment(z) * measure /
+                                          ((field_a == 2 ? 2 : 1) * (field_b == 2 ? 2 : 1));
+                }
+    return result;
+}
+
+void make_sloping_cut(Fixture& f, const I& denominator) {
+    f.domain.clear();
+    f.domain.push_back(f.point("0", "0"));
+    f.domain.push_back(f.point("1", "0"));
+    f.domain.push_back({f.r("1"), rat(f, I{1}, denominator)});
+    f.domain.push_back({rat(f, I{1}, denominator), f.r("1")});
+    f.domain.push_back(f.point("0", "1"));
+    for (auto& height : f.heights)
+        height = f.r("2");
+}
+
 Q exact_congruence_row(const std::vector<Q>& gram, std::span<const ExactRational> transform,
                        std::size_t i, std::size_t count) {
     std::vector<Q> left(count);
@@ -137,8 +202,9 @@ Q exact_congruence_row(const std::vector<Q>& gram, std::span<const ExactRational
     return sum;
 }
 
-std::vector<PgGramEntry> enclose(Fixture& f, const std::vector<Q>& gram) {
-    const I scale = I{1} << dyadic_fractional_bits;
+std::vector<PgGramEntry> enclose(Fixture& f, const std::vector<Q>& gram,
+                                 std::uint32_t bits = dyadic_fractional_bits) {
+    const I scale = I{1} << bits;
     std::vector<PgGramEntry> result;
     for (const auto& value : gram) {
         const Q scaled = value * scale;
@@ -154,7 +220,8 @@ std::vector<PgGramEntry> enclose(Fixture& f, const std::vector<Q>& gram) {
     return result;
 }
 
-std::vector<ExactRational> proposal(Fixture& f, const std::vector<Q>& gram, std::size_t count) {
+std::vector<ExactRational> proposal(Fixture& f, const std::vector<Q>& gram, std::size_t count,
+                                    std::uint32_t bits = dyadic_fractional_bits) {
     // Approximate test-side generator, independent of the checker.
     std::vector<Dec> factor(gram.size()), inverse(gram.size());
     for (std::size_t j = 0; j < count; ++j)
@@ -178,7 +245,7 @@ std::vector<ExactRational> proposal(Fixture& f, const std::vector<Q>& gram, std:
                 residual -= factor[slot(i, l)] * inverse[slot(l, j)];
             inverse[slot(i, j)] = residual / factor[slot(i, i)];
         }
-    const I scale = I{1} << dyadic_fractional_bits;
+    const I scale = I{1} << bits;
     const auto decimal_scale = scale.convert_to<Dec>();
     std::vector<ExactRational> result;
     for (const auto& value : inverse) {
@@ -204,10 +271,187 @@ void check_failure(const core::Result<T>& failure, core::FailureCode expected) {
     REQUIRE_FALSE(failure);
     CHECK(failure.error().code == expected);
 }
+void check_generated_required(const PgConditioningCertificate& accepted, std::uint32_t bits,
+                              std::span<const ExactRational> independent,
+                              core::Workspace& workspace, core::ResourcePlan& plan) {
+    const auto info = take(accepted.info());
+    const auto count = static_cast<std::size_t>(info.rank);
+    const auto leading = static_cast<std::size_t>(info.protected_rank);
+    REQUIRE(independent.size() == slot(0, count));
+    const auto limits = query_limits();
+    const auto* basis = take(accepted.reference_basis());
+    const auto* rank = take(basis->rank());
+    const Q ulp = Q{1} / (I{1} << bits);
+    std::vector<Q> transform(independent.size());
+    for (std::size_t j = 0; j < count; ++j)
+        for (std::size_t i = 0; i <= j; ++i) {
+            const auto k = slot(i, j);
+            transform[k] = q(take(accepted.transform_coefficient({static_cast<core::Index>(i)},
+                                                                 {static_cast<core::Index>(j)},
+                                                                 limits.algebra, plan)));
+            CHECK(abs(transform[k] - q(independent[k])) <= ulp);
+        }
+    for (core::Index t = 0; t < 33; ++t) {
+        const auto coordinates = take(accepted.required_coordinates({t}, limits, workspace, plan));
+        REQUIRE(coordinates.size() == count);
+        for (std::size_t i = 0; i < count; ++i) {
+            if (i >= leading)
+                CHECK(coordinates.values()[i].sign() == 0);
+            Q restored{};
+            for (std::size_t j = i; j < leading; ++j)
+                restored += transform[slot(i, j)] * q(coordinates.values()[j]);
+            const auto expected =
+                take(rank->required({static_cast<core::Index>(i)}, {t}, limits.algebra, plan));
+            CHECK(restored == q(expected));
+        }
+    }
+}
+
 Q power(const Q& x, core::Index exponent) {
     Q result{1};
     for (core::Index i = 0; i < exponent; ++i)
         result *= x;
+    return result;
+}
+
+struct AffineThicknessCase {
+    core::Index n;
+    Q s_min, s_max, t_min, t_max;
+    bool certify;
+};
+
+ExactRational fixture_exact(Fixture& f, const Q& value) {
+    return rat(f, numerator(value), denominator(value));
+}
+
+void set_affine_thickness_fixture(Fixture& f, const AffineThicknessCase& model) {
+    f.domain.clear();
+    for (const auto& s : {model.s_min, model.s_max}) {
+        const auto forward = s == model.s_min;
+        f.domain.push_back(
+            {fixture_exact(f, s), fixture_exact(f, forward ? model.t_max : model.t_min)});
+        f.domain.push_back(
+            {fixture_exact(f, s), fixture_exact(f, forward ? model.t_min : model.t_max)});
+    }
+    f.thickness.clear();
+    f.heights.clear();
+    for (const Q& t : {Q{0}, Q{1}}) {
+        for (const Q& s : {Q{0}, Q{"1/4"}, Q{1}}) {
+            const Q h = s <= Q{"1/4"} ? Q{2 + 2 * s + t} : Q{1 + 6 * s + t};
+            f.thickness.push_back({fixture_exact(f, s), fixture_exact(f, t)});
+            f.heights.push_back(fixture_exact(f, h));
+        }
+    }
+    f.triangles = {{0, 1, 4}, {0, 4, 3}, {1, 2, 5}, {1, 5, 4}};
+    const auto width = f.r("4", "3"), skew = f.r("1", "9"), zero = f.r("0");
+    f.graph = take(PgGraph::prepare({zero, width, skew, {}, model.n, PgGraphConvention::Version1},
+                                    {exact_limits(), 64, {}}, f.input_plan));
+}
+
+constexpr std::array<std::size_t, 3> affine_oracle_degree{26, 42, 4};
+using AffineOracleCell = std::array<std::vector<Q>, 3>;
+
+std::array<Q, 48> rectangular_powers(const Q& low, const Q& high) {
+    std::array<Q, 48> result{};
+    Q a = low, b = high;
+    for (std::size_t k = 0; k < result.size(); ++k) {
+        result[k] = (b - a) / (k + 1);
+        a *= low;
+        b *= high;
+    }
+    return result;
+}
+
+Q choose(std::size_t n, std::size_t k) {
+    Q result{1};
+    for (std::size_t j = 1; j <= k; ++j)
+        result *= Q{n + 1 - j} / j;
+    return result;
+}
+
+void affine_rectangle_oracle(AffineOracleCell& result, const std::array<Q, 3>& h,
+                             const std::array<Q, 48>& u, const std::array<Q, 48>& v) {
+    for (std::size_t f = 0; f < result.size(); ++f) {
+        const auto degree = affine_oracle_degree[f];
+        auto& table = result[f];
+        if (table.empty())
+            table.resize((degree + 1) * (degree + 1));
+        const auto power_of_h = 2 * f + 1;
+        for (std::size_t i = 0; i <= power_of_h; ++i)
+            for (std::size_t j = 0; j <= power_of_h - i; ++j) {
+                const Q coefficient = choose(power_of_h, i) * choose(power_of_h - i, j) *
+                                      power(h[0], static_cast<core::Index>(power_of_h - i - j)) *
+                                      power(h[1], static_cast<core::Index>(i)) *
+                                      power(h[2], static_cast<core::Index>(j));
+                for (std::size_t a = 0; a <= degree; ++a)
+                    for (std::size_t b = 0; b <= degree - a; ++b)
+                        table[a * (degree + 1) + b] += coefficient * u[a + i] * v[b + j];
+            }
+    }
+}
+
+std::vector<AffineOracleCell> affine_oracle_tables(const AffineThicknessCase& model) {
+    const auto axis = 2 * model.n, local = 4 * model.n;
+    std::vector<AffineOracleCell> tables(static_cast<std::size_t>(axis * axis));
+    const Q split{"1/4"};
+    for (core::Index i = 0; i < axis; ++i)
+        for (core::Index j = 0; j < axis; ++j) {
+            auto& table = tables[static_cast<std::size_t>(i * axis + j)];
+            const Q t_lo = std::max(model.t_min, Q{j} / axis);
+            const Q t_hi = std::min(model.t_max, Q{j + 1} / axis);
+            if (t_lo >= t_hi)
+                continue;
+            const auto v =
+                rectangular_powers(local * t_lo - (2 * j + 1), local * t_hi - (2 * j + 1));
+            for (const bool left : {true, false}) {
+                const Q s_lo = std::max({model.s_min, Q{i} / axis, left ? Q{} : split});
+                const Q s_hi = std::min({model.s_max, Q{i + 1} / axis, left ? split : Q{1}});
+                if (s_lo >= s_hi)
+                    continue;
+                const auto u =
+                    rectangular_powers(local * s_lo - (2 * i + 1), local * s_hi - (2 * i + 1));
+                const auto slope = left ? 2 : 6, base = left ? 2 : 1;
+                // Half thickness is H/(2L_ref) with L_ref = 3/2.
+                const std::array<Q, 3> coefficients{
+                    (Q{base} + Q{slope * (2 * i + 1) + 2 * j + 1} / local) / 3,
+                    Q{slope} / (3 * local), Q{1} / (3 * local)};
+                affine_rectangle_oracle(table, coefficients, u, v);
+            }
+        }
+    return tables;
+}
+
+std::vector<Q> analytic_affine_gram(const std::vector<std::vector<Term>>& basis,
+                                    const AffineThicknessCase& model) {
+    const auto tables = affine_oracle_tables(model);
+    const auto count = basis.size();
+    std::vector<Q> result(slot(0, count));
+    const auto axis = 2 * model.n;
+    const Q measure = Q{"4/3"} / (16 * model.n * model.n);
+    for (std::size_t j = 0; j < count; ++j)
+        for (std::size_t i = 0; i <= j; ++i)
+            for (const auto& a : basis[i])
+                for (const auto& b : basis[j]) {
+                    if (a.row.cell != b.row.cell)
+                        continue;
+                    const auto field_a = static_cast<std::size_t>(a.row.field);
+                    const auto field_b = static_cast<std::size_t>(b.row.field);
+                    const auto z = field_a + field_b;
+                    if (z % 2 != 0)
+                        continue;
+                    const auto index =
+                        static_cast<std::size_t>(a.row.cell.first * axis + a.row.cell.second);
+                    const auto& table = tables[index][z / 2];
+                    const auto u =
+                        static_cast<std::size_t>(a.row.powers.first + b.row.powers.first);
+                    const auto v =
+                        static_cast<std::size_t>(a.row.powers.second + b.row.powers.second);
+                    const auto degree = affine_oracle_degree[z / 2];
+                    const auto& planar = table.at(u * (degree + 1) + v);
+                    result[slot(i, j)] += a.value * b.value * planar *
+                                          moment(static_cast<core::Index>(z)) * measure /
+                                          ((field_a == 2 ? 2 : 1) * (field_b == 2 ? 2 : 1));
+                }
     return result;
 }
 
@@ -1017,16 +1261,6 @@ TEST_CASE("PG analytic Gram rejects unqualified shapes before consuming the refe
     const auto length = f.r("1");
     auto expected = core::FailureCode::Unsupported;
     bool cancelled = false;
-    SECTION("nonconstant thickness") {
-        f.heights.front() = f.r("2");
-    }
-    SECTION("partial cell coverage") {
-        f.domain.clear();
-        f.domain.push_back(f.point("0", "0"));
-        f.domain.push_back({f.r("1", "2"), f.r("0")});
-        f.domain.push_back({f.r("1", "2"), f.r("1", "2")});
-        f.domain.push_back({f.r("0"), f.r("1", "2")});
-    }
     SECTION("varying height") {
         const auto zero = f.r("0"), one = f.r("1"), height = f.r("1", "32");
         const std::array<ExactInputTerm, 1> terms{{{{2, 0}, height}}};
@@ -1211,4 +1445,278 @@ TEST_CASE("PG dyadic dot preserves cancellation and subnormal rounding",
     CHECK(paired.high == 1);
     CHECK(paired.low == 0x1p-53);
     check_failure(volume_finalize(tie, {}, {}, false), core::FailureCode::PrecisionUnresolved);
+}
+
+TEST_CASE("PG analytic Gram integrates a clipped constant-thickness plane",
+          "[SH-D03][SH-D07][N4-02][N4-08][verification]") {
+    for (const core::Index n : {1, 2, 4}) {
+        CAPTURE(n);
+        Fixture f{n};
+        make_sloping_cut(f, I{4 * n});
+        if (n == 1) {
+            f.cut_points.push_back({f.r("0"), f.r("1", "3")});
+            f.cut_points.push_back({f.r("1"), f.r("3", "7")});
+            f.refinements.push_back({23, 4, f.cut_points[0], f.cut_points[1]});
+        }
+        core::ResourcePlan plan{profile};
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        auto basis = make_basis(f, f.r("1"), workspace, plan);
+        const auto count = static_cast<std::size_t>(take(basis.size()));
+        const auto* rank = take(basis.rank());
+        const auto rows = take(rank->rows());
+        std::vector<std::size_t> selected;
+        if (n == 1) {
+            selected.resize(count);
+            for (std::size_t j = 0; j < count; ++j)
+                selected[j] = j;
+        } else {
+            selected = {0, 1, count / 2, count - 1};
+        }
+        std::vector<std::vector<Term>> independent(selected.size());
+        const auto arithmetic = query_limits();
+        for (std::size_t j = 0; j < selected.size(); ++j) {
+            const PgRankBasisColumn col{static_cast<core::Index>(selected[j])};
+            for (std::size_t row = 0; row < rows.size(); ++row) {
+                const auto x =
+                    take(rank->basis(col, static_cast<core::Index>(row), arithmetic.algebra, plan));
+                if (x.sign() != 0)
+                    independent[j].push_back({rows[row], q(x)});
+            }
+        }
+        const auto exact = analytic_cut_gram(independent, n);
+        const auto expected = enclose(f, exact);
+        const auto caps = PgFlatGramLimits{arithmetic, steps};
+        const auto prepare = [&](core::ResourcePlan& resources) {
+            return PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits, caps, workspace,
+                                       resources);
+        };
+        if (n == 1) {
+            core::ResourcePlan short_payload{1024};
+            check_failure(prepare(short_payload), core::FailureCode::ResourceExceeded);
+        }
+        auto flat = take(prepare(plan));
+        const auto supplied = take(flat.enclosure());
+        REQUIRE(supplied.upper_triangle.size() == slot(0, count));
+        for (std::size_t j = 0; j < selected.size(); ++j)
+            for (std::size_t i = 0; i <= j; ++i) {
+                const auto& actual = supplied.upper_triangle[slot(selected[i], selected[j])];
+                CHECK(actual.lower == expected[slot(i, j)].lower);
+                CHECK(actual.upper == expected[slot(i, j)].upper);
+            }
+        if (n == 1) {
+            const auto transform = proposal(f, exact, count);
+            const auto accepted = take(std::move(flat).certify(
+                {transform, dyadic_fractional_bits}, {profile, steps, {}}, workspace, plan));
+            CHECK(take(accepted.info()).rank == count);
+            CHECK(q(take(accepted.congruence_bound(arithmetic.algebra, plan))) <=
+                  Q("1/100000000000000000000"));
+            REQUIRE(accepted.reference_basis());
+        }
+    }
+}
+
+TEST_CASE("PG analytic Gram rejects a cut outside the fixed-width moment scale",
+          "[SH-D03][SH-D07][N4-02][N4-08][negative][verification]") {
+    Fixture f;
+    make_sloping_cut(f, I{1} << 190U);
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(f, f.r("1"), workspace, plan);
+    const auto project = [&](std::uint64_t limit) {
+        return PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits,
+                                   {query_limits(), limit}, workspace, plan);
+    };
+    check_failure(project(steps), core::FailureCode::ResourceExceeded);
+    REQUIRE(basis.source());
+}
+
+TEST_CASE("PG analytic Gram uses rectangular moments on a cell-aligned subdomain",
+          "[SH-D03][SH-D07][N4-02][verification]") {
+    Fixture f;
+    f.domain.clear();
+    f.domain.push_back(f.point("0", "0"));
+    f.domain.push_back({f.r("1", "2"), f.r("0")});
+    f.domain.push_back({f.r("1", "2"), f.r("1", "2")});
+    f.domain.push_back({f.r("0"), f.r("1", "2")});
+    for (auto& height : f.heights)
+        height = f.r("2");
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(f, f.r("1"), workspace, plan);
+    const auto count = static_cast<std::size_t>(take(basis.size()));
+    const auto independent = basis_terms(*take(basis.rank()), count, plan);
+    for (const auto& column : independent)
+        for (const auto& term : column)
+            REQUIRE(term.row.cell == PgCellIndex{0, 0});
+    const auto expected = enclose(f, analytic_gram(independent));
+    const auto flat = take(PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits,
+                                               {query_limits(), steps}, workspace, plan));
+    const auto actual = take(flat.enclosure()).upper_triangle;
+    REQUIRE(actual.size() == expected.size());
+    for (std::size_t k = 0; k < actual.size(); ++k) {
+        CHECK(actual[k].lower == expected[k].lower);
+        CHECK(actual[k].upper == expected[k].upper);
+    }
+}
+
+TEST_CASE("PG analytic Gram integrates certified piecewise-affine thickness",
+          "[SH-D03][SH-D07][N4-02][N4-08][verification]") {
+    constexpr std::uint32_t enclosure_bits = 256;
+    const std::array models{AffineThicknessCase{1, Q{}, Q{1}, Q{}, Q{1}, false},
+                            AffineThicknessCase{1, Q{"1/8"}, Q{"7/8"}, Q{"1/16"}, Q{"15/16"}, true},
+                            AffineThicknessCase{2, Q{"1/8"}, Q{"3/8"}, Q{"1/8"}, Q{"3/8"}, false},
+                            AffineThicknessCase{4, Q{"1/8"}, Q{"3/8"}, Q{"1/8"}, Q{"3/8"}, false}};
+    for (const auto& model : models) {
+        CAPTURE(model.n, model.certify);
+        Fixture f{model.n};
+        set_affine_thickness_fixture(f, model);
+        core::ResourcePlan plan{profile};
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        auto basis = make_basis(f, f.r("3", "2"), workspace, plan);
+        const auto count = static_cast<std::size_t>(take(basis.size()));
+        const auto* rank = take(basis.rank());
+        const auto rows = take(rank->rows());
+        std::vector<std::size_t> selected;
+        if (model.certify) {
+            selected.resize(count);
+            for (std::size_t j = 0; j < count; ++j)
+                selected[j] = j;
+        } else {
+            selected = {0, 1, count / 2, count - 1};
+        }
+        std::vector<std::vector<Term>> independent(selected.size());
+        const auto caps = PgFlatGramLimits{query_limits(), steps};
+        for (std::size_t j = 0; j < selected.size(); ++j) {
+            const PgRankBasisColumn col{static_cast<core::Index>(selected[j])};
+            for (std::size_t row = 0; row < rows.size(); ++row) {
+                const auto x = take(
+                    rank->basis(col, static_cast<core::Index>(row), caps.arithmetic.algebra, plan));
+                if (x.sign() != 0)
+                    independent[j].push_back({rows[row], q(x)});
+            }
+        }
+        const auto exact = analytic_affine_gram(independent, model);
+        const auto expected = enclose(f, exact, enclosure_bits);
+        const auto prepare = [&](core::ResourcePlan& resources) {
+            return PgFlatGram::prepare(std::move(basis), enclosure_bits, caps, workspace,
+                                       resources);
+        };
+        if (model.certify) {
+            core::ResourcePlan short_payload{1024};
+            check_failure(prepare(short_payload), core::FailureCode::ResourceExceeded);
+        }
+        auto flat = take(prepare(plan));
+        const auto supplied = take(flat.enclosure());
+        REQUIRE(supplied.upper_triangle.size() == slot(0, count));
+        for (std::size_t j = 0; j < selected.size(); ++j)
+            for (std::size_t i = 0; i <= j; ++i) {
+                const auto& actual = supplied.upper_triangle[slot(selected[i], selected[j])];
+                CHECK(actual.lower == expected[slot(i, j)].lower);
+                CHECK(actual.upper == expected[slot(i, j)].upper);
+            }
+        if (model.certify) {
+            std::vector<Q> midpoint;
+            midpoint.reserve(expected.size());
+            for (const auto& interval : expected)
+                midpoint.emplace_back((q(interval.lower) + q(interval.upper)) / 2);
+            const auto independent_transform = proposal(f, midpoint, count, enclosure_bits);
+            const PgConditioningGeneration grids{512, enclosure_bits};
+            const auto certify = [&](const PgConditioningLimits& limits) {
+                return std::move(flat).generate_and_certify(grids, limits, workspace, plan);
+            };
+            check_failure(certify({0, steps, {}}), core::FailureCode::ResourceExceeded);
+            REQUIRE(flat.enclosure());
+            const auto accepted = take(certify({profile, steps, {}}));
+            CHECK(take(accepted.info()).rank == count);
+            CHECK(q(take(accepted.congruence_bound(caps.arithmetic.algebra, plan))) <=
+                  Q("1/100000000000000000000"));
+            check_generated_required(accepted, enclosure_bits, independent_transform, workspace,
+                                     plan);
+        }
+    }
+}
+
+TEST_CASE("PG analytic Gram rejects affine thickness outside the fixed moment width",
+          "[SH-D03][SH-D07][N4-02][N4-08][negative][verification]") {
+    Fixture f;
+    const I d = I{1} << 1700U;
+    f.heights.front() = rat(f, d + 1, d);
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(f, f.r("1"), workspace, plan);
+    const auto prepare = [&] {
+        return PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits,
+                                   {query_limits(), steps}, workspace, plan);
+    };
+    check_failure(prepare(), core::FailureCode::ResourceExceeded);
+    REQUIRE(basis.source());
+}
+
+TEST_CASE("PG generated factor certifies the original interval and uses one budget",
+          "[SH-D03][N4-02][N4-08][negative][verification]") {
+    // Synthetic dyadic unit control for R = [[2,3/4],[0,1/2]], padded
+    // with identity. This exercises the algebra, not geometric enclosure provenance.
+    Fixture f;
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan setup{profile};
+    auto basis = flat_basis(workspace, setup);
+    const auto rank = static_cast<std::size_t>(take(basis.size()));
+    std::vector<PgGramEntry> gram(slot(0, rank));
+    const auto exact_interval = [&](std::size_t k, std::string_view n, std::string_view d = "1") {
+        gram[k] = {f.r(n, d), f.r(n, d)};
+    };
+    for (std::size_t j = 0; j < rank; ++j)
+        exact_interval(slot(j, j), "1");
+    exact_interval(0, "4");
+    exact_interval(1, "3", "2");
+    exact_interval(2, "13", "16");
+    const PgConditioningGeneration grids{64, 16};
+    const PgConditioningLimits full{profile, steps, {}};
+    const auto certify = [&](PgConditioningGeneration generation,
+                             const PgConditioningLimits& limits, core::ResourcePlan& plan,
+                             std::span<const PgGramEntry> source) {
+        return PgConditioningCertificate::generate_and_certify(std::move(basis), {source, 16},
+                                                               generation, limits, workspace, plan);
+    };
+    core::ResourcePlan none{0}, refused{profile};
+    check_failure(certify(grids, full, none, std::span{gram}.first(1)),
+                  core::FailureCode::InvalidInput);
+    check_failure(certify({1536, 16}, full, none, gram), core::FailureCode::ResourceExceeded);
+    check_failure(certify(grids, {profile, steps, requested_stop_token()}, none, gram),
+                  core::FailureCode::Cancelled);
+    CHECK(none.allocated_bytes() == 0);
+
+    gram.front() = {f.r("3"), f.r("5")};
+    check_failure(certify(grids, full, refused, gram), core::FailureCode::PrecisionUnresolved);
+    gram.front() = {f.r("5"), f.r("3")};
+    check_failure(certify(grids, full, refused, gram), core::FailureCode::InvalidInput);
+    exact_interval(0, "1", "3");
+    check_failure(certify(grids, full, refused, gram), core::FailureCode::InvalidInput);
+    exact_interval(0, "1", "16");
+    check_failure(certify({0, 16}, full, refused, gram), core::FailureCode::PrecisionUnresolved);
+    exact_interval(0, "4");
+    REQUIRE(basis.size());
+
+    core::ResourcePlan observed{profile};
+    const auto accepted = take(certify(grids, full, observed, gram));
+    const auto used = take(accepted.info());
+    CHECK(used.payload_bytes == observed.allocated_bytes());
+    const auto exact = query_limits().algebra;
+    CHECK(take(accepted.congruence_bound(exact, setup)).sign() == 0);
+    CHECK(q(take(accepted.transform_coefficient({0}, {0}, exact, setup))) == Q("1/2"));
+    CHECK(q(take(accepted.transform_coefficient({0}, {1}, exact, setup))) == Q("-3/4"));
+    CHECK(q(take(accepted.transform_coefficient({1}, {1}, exact, setup))) == 2);
+    CHECK(take(accepted.transform_coefficient({1}, {0}, exact, setup)).sign() == 0);
+
+    basis = flat_basis(workspace, setup);
+    core::ResourcePlan one_byte_short{used.payload_bytes - 1};
+    check_failure(certify(grids, {used.payload_bytes, used.steps, {}}, one_byte_short, gram),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(one_byte_short.allocated_bytes() == 0);
+    check_failure(certify(grids, {used.payload_bytes, used.steps - 1, {}}, refused, gram),
+                  core::FailureCode::ResourceExceeded);
+    core::ResourcePlan equality{used.payload_bytes};
+    const auto replay = take(certify(grids, {used.payload_bytes, used.steps, {}}, equality, gram));
+    CHECK(take(replay.info()).steps == used.steps);
+    CHECK(take(replay.info()).payload_bytes == used.payload_bytes);
 }

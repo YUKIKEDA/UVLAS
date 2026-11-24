@@ -775,6 +775,56 @@ void residual_small(const a::ScaledEnclosure& value, const Rat& limit) {
     CHECK((abs(center) + rational_word(value.radius())) * scale <= limit);
 }
 
+Rat sum_words(const a::ScalarWords& words) {
+    return std::visit(
+        [](const auto& word) -> Rat {
+            if constexpr (std::is_same_v<std::decay_t<decltype(word)>, a::SingleWord>)
+                return rational_word(word.value);
+            else
+                return rational_word(word.high) + rational_word(word.low);
+        },
+        words);
+}
+
+struct WorkEnclosure {
+    Rat value{};
+    Rat radius{};
+
+    void add(const cf::CirculationVectorCovector& dual, const cf::NonpenetrationVector& direction) {
+        for (std::size_t axis = 0; axis < dual.size(); ++axis) {
+            const auto scale = two_power(dual[axis].exponent());
+            const auto displacement = sum_words(direction[axis]);
+            value += sum_words(dual[axis].center()) * scale * displacement;
+            radius += rational_word(dual[axis].radius()) * scale * abs(displacement);
+        }
+    }
+};
+
+WorkEnclosure pullback_work(const cf::DiscreteCirculationPullback& value,
+                            const cf::DiscreteCirculationDirection& direction) {
+    REQUIRE(value.point_count() == direction.points.size());
+    REQUIRE(value.row_count() == direction.rows.size());
+    WorkEnclosure work;
+    work.add(value.uniform_flow(), direction.uniform_flow);
+    for (std::size_t i = 0; i < value.point_count(); ++i) {
+        const auto point = take(value.point(i));
+        CHECK(point.point == direction.points[i]);
+        work.add(point.position, direction.displacements[i]);
+    }
+    for (std::size_t i = 0; i < value.row_count(); ++i) {
+        const auto row = take(value.row(i));
+        CHECK(row.face == direction.rows[i].face);
+        const auto& input = direction.rows[i];
+        REQUIRE(row.free_query.has_value() == input.free_query.has_value());
+        if (row.free_query && input.free_query)
+            work.add(*row.free_query, *input.free_query);
+        work.add(row.tangents[0], input.tangents[0]);
+        work.add(row.tangents[1], input.tangents[1]);
+        work.add(row.velocity, input.velocity);
+    }
+    return work;
+}
+
 } // namespace
 
 TEST_CASE("Discrete nonpenetration joins the original residual and implicit circulation action",
@@ -1053,6 +1103,74 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         residual_small(take(checked.tangent().row(0)).original_residual, rational_word(1e-13));
         reject(checked.forcing(1), core::FailureCode::InvalidInput);
 
+        const std::array<ls::UnitDimensions, 1> dual_speed{{{-1, 0, 1, 0, 0, 0, 0}}};
+        const std::array<ls::UnitDimensions, 1> dual_gamma{{{-2, 0, 1, 0, 0, 0, 0}}};
+        auto dual_context = solve_scales.context;
+        dual_context.cache.matrix = core::NumericalGeneration{81};
+        dual_context.cache.scales = core::ScaleGeneration{82};
+        dual_context.unknown_layout = core::ScopeId{83};
+        dual_context.residual_layout = core::ScopeId{84};
+        const ls::Scales dual_scales{unit_scale, unit_scale, dual_speed, dual_gamma, dual_context};
+        auto dual_request = circulation_request(dual_scales, 1, ls::Norm::Infinity);
+        dual_request.rhs_generation = core::RhsGeneration{85};
+        dual_request.retained_generation = core::NumericalGeneration{86};
+        const auto objective = a::DoubleWord{.375, 0x1p-58};
+        const std::array seed{cf::CirculationLinearRhs{row.face, objective}};
+        const auto run_pullback = [&](const cf::DiscreteNonpenetrationInput& selected,
+                                      std::span<const cf::CirculationLinearRhs> objective_seed,
+                                      cf::ProjectedCaseUniformFlow& projected,
+                                      const cf::DiscreteCirculationRequest& transpose_request) {
+            return cf::solve_discrete_circulation_pullback(
+                selected, objective_seed, std::move(projected), solve_limits, request,
+                transpose_request, shared, *local, *kernel, memory);
+        };
+        auto pullback_flow = projected_at(time);
+        auto exact_seed = dual_request;
+        exact_seed.rhs_absolute = 0;
+        reject(run_pullback(view, seed, pullback_flow, exact_seed),
+               core::FailureCode::PrecisionUnresolved);
+        CHECK(pullback_flow.source().jet.active());
+        if (!reversed) {
+            auto stale_dual = dual_request;
+            stale_dual.scales.context.cache.matrix = solve_scales.context.cache.matrix;
+            reject(run_pullback(view, seed, pullback_flow, stale_dual),
+                   core::FailureCode::StaleGeneration);
+            const std::array wrong_face{cf::CirculationLinearRhs{fixture.faces[1].id, objective}};
+            reject(run_pullback(view, wrong_face, pullback_flow, dual_request),
+                   core::FailureCode::InvalidInput);
+            const std::array nonfinite{cf::CirculationLinearRhs{
+                row.face, a::SingleWord{std::numeric_limits<double>::quiet_NaN()}}};
+            reject(run_pullback(view, nonfinite, pullback_flow, dual_request),
+                   core::FailureCode::Nonfinite);
+            reject(run_pullback(view, {}, pullback_flow, dual_request),
+                   core::FailureCode::InvalidInput);
+            CHECK(pullback_flow.source().jet.active());
+        }
+        const auto pullback = take(run_pullback(view, seed, pullback_flow, dual_request));
+        CHECK_FALSE(pullback_flow.source().jet.active());
+        CHECK(pullback.used_steps() <= solve_limits.steps);
+        CHECK(pullback.transpose().used_steps() < pullback.used_steps());
+        CHECK(pullback.primal().flow().source().jet.active());
+        CHECK(pullback.transpose().sense() == cf::CirculationSense::Transpose);
+        CHECK(pullback.transpose().solution().values().precision() == core::Precision::TwoWord);
+        const auto lambda = solution_word(pullback.transpose().solution(), 0);
+        const auto pullback_row = take(pullback.row(0));
+        const auto uniform_dual = pullback.uniform_flow();
+        residual_expected(uniform_dual[2], -lambda);
+        residual_expected(pullback_row.velocity[2], lambda);
+        residual_expected(pullback_row.tangents[0][2], -lambda / 4);
+        residual_expected(pullback_row.tangents[1][2], -lambda / 8);
+        residual_small(take(pullback.transpose().row(0)).original_residual, rational_word(1e-13));
+        const auto free_work = pullback_work(pullback, direction);
+        const auto seed_value = sum_words(seed[0].value);
+        CHECK(free_work.radius < rational_word(1e-24));
+        CHECK(abs(free_work.value - seed_value * expected_direction) <=
+              free_work.radius + rational_word(1e-16));
+        CHECK(abs(free_work.value - seed_value * solution_word(checked.tangent().solution(), 0)) <=
+              free_work.radius + rational_word(1e-16));
+        reject(pullback.row(1), core::FailureCode::InvalidInput);
+        reject(pullback.point(fixture.id.size()), core::FailureCode::InvalidInput);
+
         if (!reversed) {
             const auto material = test_geometry::take(a::resolve_query(
                 geometry,
@@ -1078,7 +1196,391 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                               rational_word(1e-16));
             CHECK(abs(solution_word(material_result.tangent().solution(), 0) - material_tangent) <=
                   rational_word(1e-15));
+
+            auto material_pullback_flow = projected_at(time);
+            const auto material_dual =
+                take(run_pullback(material_input, seed, material_pullback_flow, dual_request));
+            const auto material_work = pullback_work(material_dual, no_query_direction);
+            CHECK(material_work.radius < rational_word(1e-24));
+            CHECK(abs(material_work.value - seed_value * material_tangent) <=
+                  material_work.radius + rational_word(1e-16));
+            CHECK(abs(material_work.value -
+                      seed_value * solution_word(material_result.tangent().solution(), 0)) <=
+                  material_work.radius + rational_word(1e-16));
         }
+    }
+}
+
+TEST_CASE("Discrete circulation loads keep midpoint and triangle force and moment",
+          "[UW-D01][UW-D03][UW-D05][UW-D06][N4-06][verification][negative]") {
+    const auto source_case = source(R"({"kind":"constant","value":[0,0,100]})", one_step);
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = import(source_case, io::SourceId{120}, flow_workspace);
+    const auto current = import(source_case, io::SourceId{121}, flow_workspace);
+    const Number one{1}, zero{0}, absolute{1, 1000000000}, time{5, 4};
+    const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
+    const std::array budgets{component, component, component};
+    const cf::CaseFlowProjectionRequest projection{
+        core::Precision::TwoWord, budgets, budgets, {4096, budget}};
+    const auto flow_at = [&] {
+        auto exact = evaluate(provider, current, flow_workspace, time);
+        return take(cf::project_case_uniform_flow(std::move(exact), projection));
+    };
+    const auto expected = [](const cf::DiscreteLoadVector& value, std::array<double, 3> reference) {
+        for (std::size_t axis = 0; axis < value.size(); ++axis)
+            residual_expected(value[axis], rational_word(reference[axis]), rational_word(4e-15));
+    };
+    const a::GlobalLimits cap{std::numeric_limits<std::uint64_t>::max() / 4,
+                              numerics::linear::EstimateAdmission{4096}};
+    const cf::DiscreteNonpenetrationLimits load_limits{
+        {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10},
+        {test_geometry::limits(),
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(24000000000)};
+    const std::array<ls::UnitDimensions, 2> gamma_units{
+        {{2, 0, -1, 0, 0, 0, 0}, {2, 0, -1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 2> speed_units{
+        {{1, 0, -1, 0, 0, 0, 0}, {1, 0, -1, 0, 0, 0, 0}}};
+    const std::array scales{1., 1.};
+    const auto moment_origin = coordinates(.25, -.125, .5);
+
+    enum class LoadCase : std::uint8_t { Wake, ReversedWake, Shared, AliasedShared, ZeroRadius };
+    for (const auto mode : {LoadCase::Wake, LoadCase::ReversedWake, LoadCase::Shared,
+                            LoadCase::AliasedShared, LoadCase::ZeroRadius}) {
+        CAPTURE(mode);
+        const bool has_wake = mode != LoadCase::Shared && mode != LoadCase::AliasedShared;
+        const bool reversed = mode == LoadCase::ReversedWake;
+        ResidualFixture fixture;
+        if (reversed)
+            fixture.reverse_wake();
+        if (!has_wake)
+            fixture.roles[1].role = a::AeroFaceRole::Bound;
+        auto topology_input = fixture.topology();
+        auto geometry_input = fixture.input();
+        if (!has_wake)
+            topology_input.trailing_edges = {};
+        if (mode == LoadCase::ZeroRadius)
+            geometry_input.core_radius = a::SingleWord{0};
+        const a::EdgeId alias{90};
+        const std::array with_alias{
+            fixture.edges[0], fixture.edges[1],
+            fixture.edges[2], fixture.edges[3],
+            fixture.edges[4], fixture.edges[5],
+            fixture.edges[6], fixture.edges[7],
+            fixture.edges[8], a::EdgeInput{alias, {fixture.id[3], fixture.id[2]}}};
+        const std::array owners_with_alias{
+            fixture.edge_owners[0], fixture.edge_owners[1],
+            fixture.edge_owners[2], fixture.edge_owners[3],
+            fixture.edge_owners[4], fixture.edge_owners[5],
+            fixture.edge_owners[6], fixture.edge_owners[7],
+            fixture.edge_owners[8], a::EdgeBindingInput{alias, a::EdgeId{12}}};
+        if (mode == LoadCase::AliasedShared) {
+            fixture.quads[1].edges[0] = alias;
+            geometry_input.edges = with_alias;
+            topology_input.edges = owners_with_alias;
+        }
+        core::ResourcePlan memory{128ULL * 1024 * 1024};
+        auto geometry_work = test_geometry::workspace(memory);
+        const auto geometry = test_geometry::take(a::prepare_owned_geometry(
+            geometry_input, test_geometry::limits(), *geometry_work, memory));
+        auto global = take(a::GlobalWorkspace::create(memory, cap.metadata));
+        const auto topology =
+            take_global(a::build_global_topology(geometry, topology_input, cap, *global, memory));
+        const auto contact =
+            take_global(a::check_global_geometry(topology, geometry, cap, *global, memory));
+        const auto collocate = [&](a::QueryId id, std::array<double, 3> point) {
+            return test_geometry::take(a::resolve_query(
+                geometry, {id, a::FreePoint{a::FreeSingle{point}}}, geometry.context(),
+                test_geometry::limits(), *geometry_work, memory));
+        };
+        const auto first = collocate(a::QueryId{90}, {.75, .5, 0});
+        const auto second = collocate(a::QueryId{91}, {1.625, .375, 0});
+        const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
+        const std::array rows{
+            cf::DiscreteCollocation{a::FacetId{200}, first, frame, coordinates(0, 0, .5),
+                                    a::SingleWord{3}, a::SingleWord{0}},
+            cf::DiscreteCollocation{a::FacetId{202}, second, frame, coordinates(0, 0, .75),
+                                    a::SingleWord{-4}, a::SingleWord{0}}};
+        const std::array wake{
+            cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, a::P1StrengthId{0}}};
+        const std::array old{
+            cf::FrozenWakeTrace{a::P1StrengthId{0}, a::SingleWord{reversed ? .25 : -.25}}};
+        const std::size_t count = has_wake ? 1U : 2U;
+        const cf::DiscreteNonpenetrationInput input{
+            contact,
+            std::span{rows}.first(count),
+            has_wake ? std::span<const cf::DiscreteWakePanel>{wake}
+                     : std::span<const cf::DiscreteWakePanel>{},
+            {core::AcceptedStateId{2}, has_wake ? std::span<const cf::FrozenWakeTrace>{old}
+                                                : std::span<const cf::FrozenWakeTrace>{}},
+            {70, 71},
+            stamp,
+            p::RequestedSide::Automatic};
+        const ls::Scales model{std::span{scales}.first(count), std::span{scales}.first(count),
+                               std::span{gamma_units}.first(count),
+                               std::span{speed_units}.first(count),
+                               circulation_context(geometry.context())};
+        const auto request =
+            circulation_request(model, static_cast<core::Index>(count), ls::Norm::Infinity);
+        const std::array rates{
+            cf::BoundCirculationRate{fixture.faces[0].id, a::DoubleWord{.375, 0x1p-57}},
+            cf::BoundCirculationRate{fixture.faces[1].id, a::SingleWord{-.125}}};
+        const std::array midpoint_velocities{
+            cf::EdgeMidpointVelocity{a::EdgeId{10}, coordinates(.125, -.25, .375)},
+            cf::EdgeMidpointVelocity{a::EdgeId{11}, coordinates(.25, .125, .125)},
+            cf::EdgeMidpointVelocity{a::EdgeId{12}, coordinates(.25, 0, .125)},
+            cf::EdgeMidpointVelocity{a::EdgeId{13}, coordinates(-.125, .25, -.25)},
+            cf::EdgeMidpointVelocity{a::EdgeId{15}, coordinates(.125, -.25, .125)},
+            cf::EdgeMidpointVelocity{a::EdgeId{16}, coordinates(0, .5, .25)},
+            cf::EdgeMidpointVelocity{a::EdgeId{17}, coordinates(.125, .25, -.125)}};
+        const std::array wake_force_edges{midpoint_velocities[0], midpoint_velocities[1],
+                                          midpoint_velocities[3]};
+        const cf::DiscreteVectorLoadInput load_input{
+            input.trial_stamp,
+            request.retained_generation,
+            has_wake ? std::span<const cf::EdgeMidpointVelocity>{wake_force_edges}
+                     : std::span<const cf::EdgeMidpointVelocity>{midpoint_velocities},
+            std::span{rates}.first(count),
+            a::SingleWord{1.25},
+            moment_origin};
+        a::SharedP1Workspace shared;
+        auto local = take(a::LocalPacketWorkspace::create(memory));
+        auto kernel = take(a::P1Workspace::create(memory));
+        auto flow = flow_at();
+        const auto run = [&](const cf::DiscreteVectorLoadInput& load,
+                             const std::stop_token& stop = {}) {
+            return cf::solve_discrete_circulation_loads(input, load, std::move(flow), load_limits,
+                                                        request, *geometry_work, shared, *local,
+                                                        *kernel, memory, stop);
+        };
+        if (mode == LoadCase::ZeroRadius) {
+            reject(run(load_input), core::FailureCode::GeometryInvalid);
+            CHECK(flow.source().jet.active());
+            continue;
+        }
+        if (mode == LoadCase::Wake) {
+            // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+            std::stop_source cancellation;
+            REQUIRE(cancellation.request_stop());
+            const auto before = memory.allocated_bytes();
+            reject(run(load_input, cancellation.get_token()), core::FailureCode::Cancelled);
+            CHECK(memory.allocated_bytes() == before);
+            auto invalid = load_input;
+            invalid.circulation = core::NumericalGeneration{901};
+            reject(run(invalid), core::FailureCode::StaleGeneration);
+            invalid = load_input;
+            invalid.rates = {};
+            reject(run(invalid), core::FailureCode::InvalidInput);
+            invalid = load_input;
+            invalid.density = a::SingleWord{0};
+            reject(run(invalid), core::FailureCode::InvalidInput);
+            invalid = load_input;
+            invalid.edges = std::span{midpoint_velocities}.first(3);
+            reject(run(invalid), core::FailureCode::InvalidInput); // TE is not a force edge.
+            invalid = load_input;
+            auto bad_rate = rates;
+            bad_rate[0].rate = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+            invalid.rates = std::span{bad_rate}.first(1);
+            reject(run(invalid), core::FailureCode::Nonfinite);
+            CHECK(flow.source().jet.active());
+        }
+        const auto result = take(run(load_input));
+        CHECK_FALSE(flow.source().jet.active());
+        CHECK(result.primal().flow().source().jet.active());
+        CHECK(result.used_steps() <= load_limits.steps);
+        CHECK(result.edge_count() == load_input.edges.size());
+        CHECK(result.facet_count() == 2 * count);
+        CHECK(result.point_count() == (has_wake ? 4U : 6U));
+        expected(result.moment_origin(), {.25, -.125, .5});
+        for (std::size_t i = 0; i < result.edge_count(); ++i) {
+            const auto edge = take(result.edge(i));
+            CHECK(edge.edge == load_input.edges[i].edge);
+            CHECK(edge.excluded_bound_occurrences == (edge.edge == a::EdgeId{12} ? 2U : 1U));
+        }
+        const auto first_edge = take(result.edge(0));
+        const auto first_facet = take(result.facet(0));
+        CHECK(first_facet.face == fixture.faces[0].id);
+        CHECK(first_facet.facet == a::FacetId{200});
+        expected(first_edge.position, {0, .5, 0});
+        expected(first_facet.position, {1. / 3, 2. / 3, 0});
+        const auto exact_force = (Rat{3, 8} + two_power(-57)) * Rat{5, 8};
+        residual_expected(first_facet.force[2], exact_force);
+        for (const auto axis : {0U, 1U})
+            residual_expected(first_facet.force[axis], Rat{0});
+
+        if (has_wake) {
+            expected(first_edge.force, {.00169150653666965886, 0, .00157869696002152417});
+            expected(take(result.edge(1)).force,
+                     {0, -.00480275125434878304, -.00157869696002152417});
+            expected(take(result.edge(2)).force, {0, .00953884213441335554, .00315739392004304834});
+            expected(result.total_force(),
+                     {.00169150653666965886, .00473609088006457251, .471907393920043057});
+            expected(result.total_moment(),
+                     {.294942121200026911, -.118033253268334832, .000126831134597606338});
+            expected(take(result.point(0)).force,
+                     {.000845753268334829431, .00476942106720667777, .158618045440032289});
+        } else {
+            expected(take(result.edge(2)).force, {.132938445560404041, 0, .0665551441246223153});
+            expected(result.total_force(),
+                     {.0228578348623865182, .118653830124245513, .574683855573414792});
+            expected(result.total_moment(),
+                     {.402874718995620042, -.201706821835838983, .102771929266541399});
+        }
+
+        std::array<Rat, 3> nodal_force{}, nodal_moment{};
+        const std::array origin{Rat{1, 4}, -Rat{1, 8}, Rat{1, 2}};
+        const auto unpack = [](const a::ScaledEnclosure& enclosure) {
+            return sum_words(enclosure.center()) * two_power(enclosure.exponent());
+        };
+        for (std::size_t i = 0; i < result.point_count(); ++i) {
+            const auto point = take(result.point(i));
+            CHECK(point.point == fixture.id[i]);
+            std::array<Rat, 3> local_force{}, lever{};
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                local_force[axis] = unpack(point.force[axis]);
+                lever[axis] = rational_word(fixture.points[3 * i + axis]) - origin[axis];
+                nodal_force[axis] += local_force[axis];
+            }
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                const auto j = (axis + 1) % 3;
+                const auto k = (axis + 2) % 3;
+                nodal_moment[axis] += lever[j] * local_force[k] - lever[k] * local_force[j];
+            }
+        }
+        const auto force = result.total_force();
+        const auto moment = result.total_moment();
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            CHECK(abs(nodal_force[axis] - unpack(force[axis])) <= rational_word(1e-24));
+            CHECK(abs(nodal_moment[axis] - unpack(moment[axis])) <= rational_word(1e-24));
+        }
+        reject(result.edge(result.edge_count()), core::FailureCode::InvalidInput);
+        reject(result.point(result.point_count()), core::FailureCode::InvalidInput);
+        reject(result.facet(result.facet_count()), core::FailureCode::InvalidInput);
+
+        const auto displacement = [&](std::size_t i) {
+            const auto x = fixture.points[3 * i];
+            const auto y = fixture.points[3 * i + 1];
+            return coordinates(x / 8 + y / 16, -x / 32 + y / 8, x / 16 + y / 32);
+        };
+        const std::array motion{displacement(0), displacement(1), displacement(2),
+                                displacement(3), displacement(4), displacement(5)};
+        const auto velocity_direction = [](const cf::EdgeMidpointVelocity& entry) {
+            return cf::EdgeMidpointVelocity{
+                entry.edge,
+                coordinates(.03125, -.0625, static_cast<double>(entry.edge.value()) / 256)};
+        };
+        const std::array all_midpoint_variations{
+            velocity_direction(midpoint_velocities[0]), velocity_direction(midpoint_velocities[1]),
+            velocity_direction(midpoint_velocities[2]), velocity_direction(midpoint_velocities[3]),
+            velocity_direction(midpoint_velocities[4]), velocity_direction(midpoint_velocities[5]),
+            velocity_direction(midpoint_velocities[6])};
+        const std::array wake_midpoint_variations{
+            all_midpoint_variations[0], all_midpoint_variations[1], all_midpoint_variations[3]};
+        const std::array gamma_directions{
+            cf::BoundLoadDirection{fixture.faces[0].id, a::DoubleWord{.1875, 0x1p-56},
+                                   a::DoubleWord{-.25, 0x1p-58}},
+            cf::BoundLoadDirection{fixture.faces[1].id, a::SingleWord{-.15625},
+                                   a::SingleWord{.0625}}};
+        const cf::DiscreteVectorLoadDirection variation{
+            input.trial_stamp,
+            request.retained_generation,
+            fixture.id,
+            motion,
+            has_wake ? std::span<const cf::EdgeMidpointVelocity>{wake_midpoint_variations}
+                     : std::span<const cf::EdgeMidpointVelocity>{all_midpoint_variations},
+            std::span{gamma_directions}.first(count),
+            coordinates(.125, -.0625, .09375)};
+        auto jvp_flow = flow_at();
+        const auto run_direction = [&](const cf::DiscreteVectorLoadDirection& delta) {
+            return cf::solve_discrete_circulation_load_direction(
+                input, load_input, delta, std::move(jvp_flow), load_limits, request, *geometry_work,
+                shared, *local, *kernel, memory);
+        };
+        if (mode == LoadCase::Wake) {
+            auto invalid = variation;
+            invalid.circulation = core::NumericalGeneration{902};
+            const auto before = memory.allocated_bytes();
+            reject(run_direction(invalid), core::FailureCode::StaleGeneration);
+            CHECK(memory.allocated_bytes() == before);
+            invalid = variation;
+            invalid.displacements = std::span{motion}.first(5);
+            reject(run_direction(invalid), core::FailureCode::InvalidInput);
+            invalid = variation;
+            auto bad_rows = gamma_directions;
+            bad_rows[0].circulation = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+            invalid.bound = std::span{bad_rows}.first(1);
+            reject(run_direction(invalid), core::FailureCode::Nonfinite);
+            invalid = variation;
+            auto wrong_edge_directions = wake_midpoint_variations;
+            std::swap(wrong_edge_directions[0], wrong_edge_directions[1]);
+            invalid.edges = wrong_edge_directions;
+            reject(run_direction(invalid), core::FailureCode::InvalidInput);
+            CHECK(jvp_flow.source().jet.active());
+        }
+        const auto jvp = take(run_direction(variation));
+        CHECK_FALSE(jvp_flow.source().jet.active());
+        CHECK(jvp.loads().primal().flow().source().jet.active());
+        CHECK(jvp.loads().used_steps() <= load_limits.steps);
+        const auto edge_direction = take(jvp.edge(0));
+        const auto facet_direction = take(jvp.facet(0));
+        expected(edge_direction.position, {.03125, .0625, .015625});
+        expected(facet_direction.position, {1. / 12, 7. / 96, 1. / 24});
+        expected(facet_direction.force, {-.0146484375, -.00732421875, -.09765625});
+        const auto exact_direction = Rat{5, 4} * ((-Rat{1, 4} + two_power(-58)) * Rat{1, 2} +
+                                                  (Rat{3, 8} + two_power(-57)) * Rat{1, 8});
+        residual_expected(facet_direction.force[2], exact_direction);
+        if (has_wake) {
+            expected(edge_direction.force,
+                     {-.0313421017332066007, -.000155053438542526309, -.0300854876693103419});
+            expected(take(jvp.edge(1)).force,
+                     {-.0000514174166970542093, .0883611191373407818, .0290019435772196279});
+            expected(take(jvp.edge(2)).force,
+                     {.00010075169669772684, -.176050182858272690, -.0582494842972189574});
+            expected(jvp.total_force_direction(),
+                     {-.0605896424532059286, -.102492554659474434, -.254645528389309665});
+            expected(jvp.total_moment_direction(),
+                     {-.144922614949141765, .0349452424989099995, .0122891137124191336});
+            expected(take(jvp.point(0)).force,
+                     {-.0253863000182544371, -.0929854306484076081, -.109271652649931314});
+        } else {
+            expected(take(jvp.edge(2)).force,
+                     {.237429517694973129, -.0103885011014196999, .0927190867664370914});
+            expected(jvp.total_force_direction(),
+                     {.0584661631586267516, -.0431664920836314646, .0342573010497334486});
+            expected(jvp.total_moment_direction(),
+                     {.0598305790447179028, -.387825417382047371, .0294373849541907755});
+        }
+        std::array<Rat, 3> sum_df{}, sum_dm{};
+        for (std::size_t i = 0; i < jvp.loads().point_count(); ++i) {
+            const auto value = take(jvp.loads().point(i));
+            const auto delta = take(jvp.point(i));
+            CHECK(value.point == delta.point);
+            std::array<Rat, 3> r{}, dx{}, f{}, df{};
+            for (std::size_t axis = 0; axis < r.size(); ++axis) {
+                r[axis] = rational_word(fixture.points[3 * i + axis]) - origin[axis];
+                dx[axis] = sum_words(motion[i][axis]);
+                f[axis] = unpack(value.force[axis]);
+                df[axis] = unpack(delta.force[axis]);
+                sum_df[axis] += df[axis];
+            }
+            for (std::size_t axis = 0; axis < r.size(); ++axis) {
+                const auto j = (axis + 1) % 3;
+                const auto k = (axis + 2) % 3;
+                sum_dm[axis] += dx[j] * f[k] - dx[k] * f[j] + r[j] * df[k] - r[k] * df[j];
+            }
+        }
+        for (std::size_t axis = 0; axis < sum_df.size(); ++axis) {
+            CHECK(abs(sum_df[axis] - unpack(jvp.total_force_direction()[axis])) <=
+                  rational_word(1e-24));
+            CHECK(abs(sum_dm[axis] - unpack(jvp.total_moment_direction()[axis])) <=
+                  rational_word(1e-24));
+        }
+        reject(jvp.edge(result.edge_count()), core::FailureCode::InvalidInput);
+        reject(jvp.point(result.point_count()), core::FailureCode::InvalidInput);
+        reject(jvp.facet(result.facet_count()), core::FailureCode::InvalidInput);
     }
 }
 
@@ -1537,6 +2039,34 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
         CHECK(solution_word(zero_tangent.solution(), i) == Rat{0});
         residual_small(take(zero_tangent.row(i)).original_residual, Rat{0});
     }
+
+    // A uniform-velocity direction is shared across these two nonsymmetric rows.
+    const auto two_collocations = rows(second);
+    const cf::DiscreteNonpenetrationInput pullback_input{
+        contact, two_collocations,           {}, {core::AcceptedStateId{2}, {}}, {7, 11},
+        stamp,   p::RequestedSide::Automatic};
+    auto exact_objective_flow = evaluate(provider, current, flow_workspace, time);
+    auto objective_flow =
+        take(cf::project_case_uniform_flow(std::move(exact_objective_flow), projection));
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    core::ResourcePlan no_pullback_bytes{0};
+    const auto pullback = [&](core::ResourcePlan& arena, const std::stop_token& cancel = {}) {
+        return cf::solve_discrete_circulation_pullback(
+            pullback_input, seed, std::move(objective_flow), solve_limits, request,
+            transpose_request, shared, *local, *kernel, arena, cancel);
+    };
+    reject(pullback(no_pullback_bytes, stop.get_token()), core::FailureCode::Cancelled);
+    CHECK(no_pullback_bytes.allocated_bytes() == 0);
+    CHECK(objective_flow.source().jet.active());
+    const auto dual_pullback = take(pullback(memory));
+    const auto lambda_a = solution_word(transpose.solution(), 0);
+    const auto lambda_b = solution_word(transpose.solution(), 1);
+    const auto flow_dual = dual_pullback.uniform_flow();
+    residual_expected(flow_dual[2], -lambda_a - lambda_b);
+    residual_expected(take(dual_pullback.row(0)).velocity[2], lambda_a);
+    residual_expected(take(dual_pullback.row(1)).velocity[2], lambda_b);
 
     const auto relocated = std::move(solved);
     reject(linearize(tangent_sense, {}, tangent_request), core::FailureCode::InvalidInput);
