@@ -721,6 +721,59 @@ void residual_expected(const a::ScaledEnclosure& value, const Rat& oracle) {
     CHECK(abs(center - oracle) <= radius + comparison_uncertainty);
     CHECK(radius < comparison_uncertainty);
 }
+
+namespace ls = numerics::linear;
+ls::Context circulation_context(const a::GeometryContext& geometry) {
+    const auto trial = geometry.diagnostics.trial;
+    if (!trial)
+        FAIL("The circulation fixture requires a trial");
+    return {{geometry.fingerprint, geometry.model, geometry.current, core::ChartGeneration{1},
+             core::SparsityGeneration{2}, core::NumericalGeneration{3}, core::ScaleGeneration{4},
+             geometry.precision, core::Precision::Binary64, core::WakePolicyGeneration{5},
+             core::TimeIntervalGeneration{6}, core::BackendGeneration{7}},
+            *trial,
+            core::ScopeId{8},
+            core::ScopeId{9},
+            geometry.time};
+}
+
+cf::DiscreteCirculationRequest circulation_request(const ls::Scales& scales, core::Index order,
+                                                   ls::Norm norm) {
+    return {scales,
+            {order, 1, 0, 5, ls::EstimateAdmission{1U << 20U}},
+            {norm, 1e-28, 0., 1e-26, core::ObservationId{20}, core::ObservationId{21}},
+            core::RhsGeneration{3},
+            core::NumericalGeneration{4},
+            1e-14,
+            1e-14,
+            1e-13,
+            0.};
+}
+
+Rat solution_word(const cf::DiscreteCirculation& value, std::size_t i) {
+    return std::visit(
+        [&](const auto& words) -> Rat {
+            if constexpr (std::is_same_v<std::decay_t<decltype(words)>, numerics::Binary64<double>>)
+                return rational_word(words.values.values()[i]);
+            else
+                return rational_word(words.hi.values()[i]) + rational_word(words.lo.values()[i]);
+        },
+        value.solution().values().storage());
+}
+
+void residual_small(const a::ScaledEnclosure& value, const Rat& limit) {
+    const auto center = std::visit(
+        [](const auto& word) -> Rat {
+            if constexpr (std::is_same_v<std::decay_t<decltype(word)>, a::SingleWord>)
+                return rational_word(word.value);
+            else
+                return rational_word(word.high) + rational_word(word.low);
+        },
+        value.center());
+    const auto scale = two_power(value.exponent());
+    CHECK((abs(center) + rational_word(value.radius())) * scale <= limit);
+}
+
 } // namespace
 
 TEST_CASE("Discrete nonpenetration joins the original residual and implicit circulation action",
@@ -849,6 +902,43 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         residual_expected(row.residual, residual);
         residual_expected(row.circulation_action, action);
         reject(result.row(1), core::FailureCode::InvalidInput);
+
+        auto solve_limits = residual_limits;
+        solve_limits.steps = UINT64_C(12000000000);
+        const std::array unit_scale{1.};
+        const std::array<ls::UnitDimensions, 1> gamma_units{{{2, 0, -1, 0, 0, 0, 0}}};
+        const std::array<ls::UnitDimensions, 1> normal_units{{{1, 0, -1, 0, 0, 0, 0}}};
+        const ls::Scales solve_scales{unit_scale, unit_scale, gamma_units, normal_units,
+                                      circulation_context(geometry.context())};
+        const auto request = circulation_request(solve_scales, 1, ls::Norm::Infinity);
+        const auto solve = [&](cf::ProjectedCaseUniformFlow& projected,
+                               const cf::DiscreteCirculationRequest& selected) {
+            return cf::solve_discrete_circulation(view, std::move(projected), solve_limits,
+                                                  selected, shared, *local, *kernel, memory);
+        };
+        auto solve_flow = projected_at(time);
+        auto too_tight = request;
+        too_tight.matrix_absolute = 0;
+        reject(solve(solve_flow, too_tight), core::FailureCode::PrecisionUnresolved);
+        CHECK(solve_flow.source().jet.active());
+        too_tight = request;
+        too_tight.original_absolute = 0;
+        reject(solve(solve_flow, too_tight), core::FailureCode::LinearUnconverged);
+        CHECK(solve_flow.source().jet.active());
+        auto stale = request;
+        stale.scales.context.trial = core::TrialId{99};
+        reject(solve(solve_flow, stale), core::FailureCode::StaleGeneration);
+
+        const auto solved = take(solve(solve_flow, request));
+        CHECK_FALSE(solve_flow.source().jet.active());
+        CHECK(solved.solution().values().precision() == core::Precision::TwoWord);
+        const Rat expected = -Rat{Big{"10103660544137754684298736617717105223494942188"}} /
+                             Rat{Big{"1000000000000000000000000000000000000000000000000"}};
+        CHECK(abs(solution_word(solved, 0) - expected) <= rational_word(1e-15));
+        const auto original = take(solved.row(0));
+        CHECK(original.face == fixture.faces[0].id);
+        residual_small(original.original_residual, rational_word(1e-13));
+        reject(solved.row(1), core::FailureCode::InvalidInput);
     }
 }
 
@@ -997,4 +1087,157 @@ TEST_CASE("Discrete nonpenetration matches an owned decimal event on its request
                       -Rat{Big{"5671057487729860677895669210567132495399"}} / denominator);
     residual_expected(row.circulation_action,
                       Rat{Big{"3730450057081755951141985320248458351172"}} / denominator);
+}
+
+namespace {
+struct DisjointCirculationPanels {
+    std::array<a::PointId, 8> points{a::PointId{1}, a::PointId{2}, a::PointId{3}, a::PointId{4},
+                                     a::PointId{5}, a::PointId{6}, a::PointId{7}, a::PointId{8}};
+    std::array<a::PointBinding, 8> bindings{test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding(),
+                                            test_geometry::binding(), test_geometry::binding()};
+    std::array<double, 24> xyz{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0,
+                               0, 2, 0, 0, 3, 0, 1, 3, 0, 1, 2, 0};
+    std::array<a::BandId, 2> bands{a::BandId{50}, a::BandId{51}};
+    std::array<a::FaceInput, 2> faces{a::FaceInput{a::PhysicalFaceId{100}, bands[0]},
+                                      a::FaceInput{a::PhysicalFaceId{101}, bands[1]}};
+    std::array<a::FaceRoleInput, 2> roles{a::FaceRoleInput{faces[0].id, a::AeroFaceRole::Bound},
+                                          a::FaceRoleInput{faces[1].id, a::AeroFaceRole::Bound}};
+    std::array<a::EdgeInput, 10> edges{a::EdgeInput{a::EdgeId{10}, {points[0], points[1]}},
+                                       a::EdgeInput{a::EdgeId{11}, {points[1], points[2]}},
+                                       a::EdgeInput{a::EdgeId{12}, {points[2], points[3]}},
+                                       a::EdgeInput{a::EdgeId{13}, {points[3], points[0]}},
+                                       a::EdgeInput{a::EdgeId{14}, {points[0], points[2]}},
+                                       a::EdgeInput{a::EdgeId{15}, {points[4], points[5]}},
+                                       a::EdgeInput{a::EdgeId{16}, {points[5], points[6]}},
+                                       a::EdgeInput{a::EdgeId{17}, {points[6], points[7]}},
+                                       a::EdgeInput{a::EdgeId{18}, {points[7], points[4]}},
+                                       a::EdgeInput{a::EdgeId{19}, {points[4], points[6]}}};
+    std::array<a::EdgeBindingInput, 10> owners{
+        a::EdgeBindingInput{edges[0].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[1].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[2].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[3].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[4].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[5].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[6].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[7].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[8].id, a::CanonicalEdge{}},
+        a::EdgeBindingInput{edges[9].id, a::CanonicalEdge{}}};
+    std::array<a::QuadInput, 2> quads{
+        a::QuadInput{faces[0].id,
+                     {points[0], points[1], points[2], points[3]},
+                     {edges[0].id, edges[1].id, edges[2].id, edges[3].id},
+                     edges[4].id,
+                     {a::FacetId{200}, a::FacetId{201}}},
+        a::QuadInput{faces[1].id,
+                     {points[4], points[5], points[6], points[7]},
+                     {edges[5].id, edges[6].id, edges[7].id, edges[8].id},
+                     edges[9].id,
+                     {a::FacetId{202}, a::FacetId{203}}}};
+
+    [[nodiscard]] a::GeometryInput input() const noexcept {
+        const a::SinglePositions positions{xyz};
+        return {points,
+                bindings,
+                positions,
+                positions,
+                edges,
+                faces,
+                bands,
+                {},
+                quads,
+                a::SingleWord{.125},
+                test_geometry::context()};
+    }
+};
+} // namespace
+
+TEST_CASE(
+    "Discrete circulation solves all nonsymmetric mutual influences and rejects singular rows",
+    "[UW-D01][UW-D06][N4-05][N4-06][verification][negative]") {
+    const auto input_case = source(R"({"kind":"constant","value":[0,0,100]})", one_step);
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = import(input_case, io::SourceId{110}, flow_workspace);
+    const auto current = import(input_case, io::SourceId{111}, flow_workspace);
+    const Number one{1}, zero{0}, absolute{1, 1000000000}, time{5, 4};
+    const cf::CaseFlowComponentBudget budget_component{one.view(), absolute.view(), zero.view()};
+    const std::array budgets{budget_component, budget_component, budget_component};
+    const cf::CaseFlowProjectionRequest projection{
+        core::Precision::TwoWord, budgets, budgets, {4096, budget}};
+    auto exact_flow = evaluate(provider, current, flow_workspace, time);
+    auto flow = take(cf::project_case_uniform_flow(std::move(exact_flow), projection));
+    const DisjointCirculationPanels fixture;
+    const a::GlobalLimits cap{std::numeric_limits<std::uint64_t>::max() / 4,
+                              numerics::linear::EstimateAdmission{4096}};
+    core::ResourcePlan memory{128ULL * 1024 * 1024};
+    auto geometry_work = test_geometry::workspace(memory);
+    const auto geometry = test_geometry::take(a::prepare_owned_geometry(
+        fixture.input(), test_geometry::limits(), *geometry_work, memory));
+    auto global = take(a::GlobalWorkspace::create(memory, cap.metadata));
+    const auto topology = take_global(a::build_global_topology(
+        geometry, {fixture.roles, fixture.owners, {}}, cap, *global, memory));
+    const auto contact =
+        take_global(a::check_global_geometry(topology, geometry, cap, *global, memory));
+    const auto collocate = [&](a::QueryId id, std::array<double, 3> point) {
+        return test_geometry::take(
+            a::resolve_query(geometry, {id, a::FreePoint{a::FreeSingle{point}}}, geometry.context(),
+                             test_geometry::limits(), *geometry_work, memory));
+    };
+    const auto first = collocate(a::QueryId{1}, {.75, .5, 0.});
+    const auto second = collocate(a::QueryId{2}, {.625, 2.375, 0.});
+    const auto rows = [&](const a::ResolvedQuery& second_query) {
+        const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
+        // The input may arrive in a different order than the qualified physical face order.
+        return std::array{
+            cf::DiscreteCollocation{a::FacetId{202}, second_query, frame, coordinates(0, 0, .75),
+                                    a::SingleWord{9}, a::SingleWord{0}},
+            cf::DiscreteCollocation{a::FacetId{200}, first, frame, coordinates(0, 0, .5),
+                                    a::SingleWord{7}, a::SingleWord{0}}};
+    };
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const cf::DiscreteNonpenetrationLimits solve_limits{
+        {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10},
+        {test_geometry::limits(),
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(24000000000)};
+    const std::array unknown_scales{.5, 2.}, residual_scales{1., .125};
+    const std::array<ls::UnitDimensions, 2> gamma_units{
+        {{2, 0, -1, 0, 0, 0, 0}, {2, 0, -1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 2> velocity_units{
+        {{1, 0, -1, 0, 0, 0, 0}, {1, 0, -1, 0, 0, 0, 0}}};
+    const ls::Scales scales{unknown_scales, residual_scales, gamma_units, velocity_units,
+                            circulation_context(geometry.context())};
+    const auto request = circulation_request(scales, 2, ls::Norm::L2);
+    const auto solve = [&](const a::ResolvedQuery& query) {
+        const auto collocations = rows(query);
+        const cf::DiscreteNonpenetrationInput input{contact,
+                                                    collocations,
+                                                    {},
+                                                    {core::AcceptedStateId{2}, {}},
+                                                    {7, 11},
+                                                    stamp,
+                                                    p::RequestedSide::Automatic};
+        return cf::solve_discrete_circulation(input, std::move(flow), solve_limits, request, shared,
+                                              *local, *kernel, memory);
+    };
+    reject(solve(first), core::FailureCode::RankUnresolved);
+    CHECK(flow.source().jet.active());
+    const auto solved = take(solve(second));
+    const Rat denominator{Big{"1000000000000000000000000000000000000"}};
+    const std::array reference{Rat{Big{"5487032447771171614219353426944195"}} / denominator,
+                               -Rat{Big{"274509732948309252476622637390296804"}} / denominator};
+    for (std::size_t i = 0; i < reference.size(); ++i) {
+        CAPTURE(i);
+        CHECK(abs(solution_word(solved, i) - reference[i]) <= rational_word(1e-14));
+        const auto original = take(solved.row(i));
+        CHECK(original.face == fixture.faces[i].id);
+        residual_small(original.original_residual, rational_word(1e-13) * residual_scales[i]);
+    }
 }

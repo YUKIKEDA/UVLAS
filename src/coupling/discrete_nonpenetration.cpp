@@ -8,10 +8,12 @@
 #include <bit>
 #include <cmath>
 #include <limits>
+#include <uvlas/numerics/dense_solve.hpp>
 
 namespace uvlas::coupling::detail {
 namespace a = aero::detail;
 namespace p = a::p1;
+namespace linear = numerics::linear;
 namespace {
 constexpr auto evaluate = core::Operation::EvaluateAero;
 using Vector = std::array<p::Interval, 3>;
@@ -203,10 +205,22 @@ struct PanelRow {
         a::PhysicalFaceId{0}, a::AeroFaceRole::Bound, {a::FacetId{0}, a::FacetId{0}}, {}, 0};
     std::size_t caller = 0;
 };
+struct Transfer {
+    a::PhysicalFaceId face;
+    bool reverse;
+};
 struct Trace {
     a::P1StrengthId id{0};
     a::ScalarWords value{a::SingleWord{0}};
     a::ScalarWords direction{a::SingleWord{0}};
+    std::optional<Transfer> transfer{};
+};
+struct Assembly {
+    core::PlannedBuffer<PanelRow> bound;
+    core::PlannedBuffer<a::P1FaceStrengths> maps;
+    core::PlannedBuffer<Trace> traces;
+    core::PlannedBuffer<a::P1StrengthId> ids;
+    core::PlannedBuffer<a::P1ComplexWords> values, directions;
 };
 a::ScalarWords negative(a::ScalarWords words) {
     if (const auto* one = std::get_if<a::SingleWord>(&words))
@@ -227,6 +241,142 @@ const T& find(std::span<const T> items, Key key, Projection project, p::Work& wo
         reject(core::FailureCode::InvalidInput);
     return *it;
 }
+
+struct CirculationRowData {
+    Vector normal{}, relative{};
+    p::Interval rhs;
+};
+
+void validate_circulation(const DiscreteCirculationRequest& request, const a::GeometryContext& geo,
+                          std::size_t order, p::Work& work) {
+    const auto& context = request.scales.context;
+    const auto& key = context.cache;
+    if ((geo.diagnostics.trial && *geo.diagnostics.trial != context.trial) ||
+        key.fingerprint != geo.fingerprint || key.model != geo.model ||
+        key.geometry != geo.current || key.precision != geo.precision || context.time != geo.time)
+        reject(core::FailureCode::StaleGeneration);
+    if (key.representation != core::Precision::Binary64)
+        reject(core::FailureCode::PrecisionUnsupported);
+    if (request.solver_limits.maximum_order < 0 || request.solver_limits.maximum_rhs_columns < 0)
+        reject(core::FailureCode::InvalidInput);
+    if (std::cmp_greater(order, request.solver_limits.maximum_order) ||
+        request.solver_limits.maximum_rhs_columns < 1)
+        reject(core::FailureCode::ResourceExceeded);
+    if (request.scales.unknown.size() != order || request.scales.residual.size() != order ||
+        request.scales.unknown_units.size() != order ||
+        request.scales.residual_units.size() != order)
+        reject(core::FailureCode::InvalidInput);
+    if (request.algebraic.norm != linear::Norm::Infinity &&
+        request.algebraic.norm != linear::Norm::L2)
+        reject(core::FailureCode::InvalidInput);
+    for (const auto budget : {request.matrix_absolute, request.rhs_absolute,
+                              request.original_absolute, request.original_relative}) {
+        if (!std::isfinite(budget))
+            reject(core::FailureCode::Nonfinite);
+        if (budget < 0)
+            reject(core::FailureCode::InvalidInput);
+    }
+    constexpr linear::UnitDimensions circulation_units{2, 0, -1, 0, 0, 0, 0};
+    constexpr linear::UnitDimensions speed_units{1, 0, -1, 0, 0, 0, 0};
+    for (std::size_t i = 0; i < order; ++i) {
+        work.step();
+        const auto& scales = request.scales;
+        if (!std::isfinite(scales.unknown[i]) || !std::isfinite(scales.residual[i]))
+            reject(core::FailureCode::Nonfinite);
+        if (scales.unknown[i] <= 0 || scales.residual[i] <= 0 ||
+            scales.unknown_units[i] != circulation_units || scales.residual_units[i] != speed_units)
+            reject(core::FailureCode::InvalidInput);
+    }
+}
+
+class NoDenseConsumerChecks final : public linear::ConsumerEvaluator<double> {
+public:
+    [[nodiscard]] numerics::SupportedPrecision supported_precision() const noexcept override {
+        return numerics::SupportedPrecision::Binary64AndTwoWord;
+    }
+    [[nodiscard]] core::Result<core::ErrorCertificate>
+    assess(const numerics::PrecisionBuffer<double>&, const numerics::PrecisionBuffer<double>&,
+           const linear::Context&, const linear::ConsumerCheck& request,
+           core::CertificateContext context) const override {
+        return core::ErrorCertificate::unevaluated(context, request.budget);
+    }
+};
+
+double project_binary64(const p::Interval& source, double budget, a::LocalRootScratch& scratch,
+                        p::Work& work) {
+    work.step();
+    const auto scaled = a::enclose_p1_value(source, core::Precision::Binary64, scratch);
+    const auto center = scaled.center();
+    const auto* word = std::get_if<a::SingleWord>(&center);
+    if (word == nullptr)
+        reject(core::FailureCode::PrecisionUnsupported);
+    const double value = std::scalbn(word->value, scaled.exponent());
+    if (!std::isfinite(value))
+        reject(core::FailureCode::PrecisionUnresolved);
+    const auto error = p::absolute(p::subtract(source, checked_word(value), work));
+    if (p::compare(error.upper, checked_word(budget).lower) > 0)
+        reject(core::FailureCode::PrecisionUnresolved);
+    return value;
+}
+
+p::Interval native_residual(const Vector& normal, const Vector& relative,
+                            const a::P1ActionValue& induced, p::Work& work) {
+    Vector total{};
+    for (std::size_t axis = 0; axis < normal.size(); ++axis)
+        total[axis] = p::add(relative[axis], import(induced.velocity()[axis].real, work), work);
+    return dot(normal, total, work);
+}
+
+a::ScalarWords retained_word(const numerics::PrecisionBuffer<double>& retained, std::size_t i) {
+    if (const auto* one = std::get_if<numerics::Binary64<double>>(&retained.storage()))
+        return a::SingleWord{one->values.values()[i]};
+    const auto* two = std::get_if<numerics::TwoWord<double>>(&retained.storage());
+    if (two == nullptr)
+        reject(core::FailureCode::PrecisionUnsupported);
+    return a::DoubleWord{two->hi.values()[i], two->lo.values()[i]};
+}
+
+class NativeResidualCheck {
+public:
+    explicit NativeResidualCheck(const DiscreteCirculationRequest& request) noexcept
+        : request_(request) {}
+
+    void add(const p::Interval& original, const p::Interval& rhs, std::size_t row, p::Work& work) {
+        const auto tolerance = p::add(
+            p::multiply(checked_word(request_.original_absolute),
+                        checked_word(request_.scales.residual[row]), work),
+            p::multiply(checked_word(request_.original_relative), p::absolute(rhs), work), work);
+        const auto magnitude = p::absolute(original);
+        if (p::compare(magnitude.upper, {}) == 0)
+            return;
+        if (p::compare(magnitude.lower, tolerance.upper) > 0)
+            reject(core::FailureCode::LinearUnconverged);
+        if (p::compare(tolerance.lower, {}) <= 0)
+            reject(core::FailureCode::PrecisionUnresolved);
+        const auto ratio = p::divide(magnitude, tolerance, work);
+        if (request_.algebraic.norm == linear::Norm::L2)
+            sum_squared_ = p::add(sum_squared_, p::multiply(ratio, ratio, work), work);
+        else
+            check_at_most_one(ratio);
+    }
+
+    void finish() const {
+        if (request_.algebraic.norm == linear::Norm::L2)
+            check_at_most_one(sum_squared_);
+    }
+
+private:
+    static void check_at_most_one(const p::Interval& value) {
+        const auto one = p::integer(1).lower;
+        if (p::compare(value.lower, one) > 0)
+            reject(core::FailureCode::LinearUnconverged);
+        if (p::compare(value.upper, one) > 0)
+            reject(core::FailureCode::PrecisionUnresolved);
+    }
+    const DiscreteCirculationRequest& request_;
+    p::Interval sum_squared_{};
+};
+
 } // namespace
 
 struct NonpenetrationStorage {
@@ -273,12 +423,11 @@ a::P1ActionStamp DiscreteNonpenetration::trial_stamp() const noexcept {
 }
 
 struct NonpenetrationBuilder {
-    static DiscreteNonpenetration
-    evaluate_rows(const DiscreteNonpenetrationInput& input, ProjectedCaseUniformFlow&& flow,
-                  const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
-                  a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-                  core::ResourcePlan& memory, const std::stop_token& stop) {
-        p::Work work{0, limits.steps, stop};
+    static Assembly assemble(const DiscreteNonpenetrationInput& input,
+                             const ProjectedCaseUniformFlow& flow,
+                             const DiscreteNonpenetrationLimits& limits, core::ResourcePlan& memory,
+                             p::Work& work, bool solve) {
+        const auto& stop = work.stop;
         work.step();
         if (!a::p1_environment_supported())
             reject(core::FailureCode::PrecisionUnsupported);
@@ -307,7 +456,6 @@ struct NonpenetrationBuilder {
         const auto maximum = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
         if (face_count > maximum || input.history.columns.size() > maximum - face_count)
             reject(core::FailureCode::ResourceExceeded);
-        auto rows = allocate<NonpenetrationStorage>(memory, bound_count);
         auto bound = allocate<PanelRow>(memory, bound_count);
         auto maps = allocate<a::P1FaceStrengths>(memory, face_count);
         auto traces = allocate<Trace>(memory, face_count + input.history.columns.size());
@@ -322,8 +470,10 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::InvalidInput);
             bound.values()[i] = PanelRow{panel, i};
             maps.values()[i] = a::P1FaceStrengths{panel.face, a::P0BoundColumn{}};
-            trace[num_traces++] = {a::P1StrengthId::bound(panel.face), row.circulation,
-                                   row.circulation_direction};
+            const auto zero = a::ScalarWords{a::SingleWord{0}};
+            trace[num_traces++] = {
+                a::P1StrengthId::bound(panel.face), solve ? zero : row.circulation,
+                solve ? zero : row.circulation_direction, Transfer{panel.face, false}};
         }
         std::ranges::sort(bound.values(), [&](const PanelRow& l, const PanelRow& r) {
             work.step();
@@ -390,8 +540,11 @@ struct NonpenetrationBuilder {
                 if (entry.coefficient == -1) {
                     const auto& collocation = input.collocations[source.caller];
                     leading = new_column();
-                    trace[num_traces++] = {leading, negative(collocation.circulation),
-                                           negative(collocation.circulation_direction)};
+                    const auto zero = a::ScalarWords{a::SingleWord{0}};
+                    trace[num_traces++] = {
+                        leading, solve ? zero : negative(collocation.circulation),
+                        solve ? zero : negative(collocation.circulation_direction),
+                        Transfer{entry.bound_face, true}};
                 } else {
                     leading = a::P1StrengthId::bound(entry.bound_face);
                 }
@@ -432,46 +585,87 @@ struct NonpenetrationBuilder {
             values.values()[i].real = trace[i].value;
             directions.values()[i].real = trace[i].direction;
         }
+        return {std::move(bound), std::move(maps),   std::move(traces),
+                std::move(ids),   std::move(values), std::move(directions)};
+    }
+
+    static void admit(const Assembly& assembly, const DiscreteNonpenetrationInput& input,
+                      const DiscreteNonpenetrationLimits& limits, const core::ResourcePlan& memory,
+                      std::uint64_t preparations, std::uint64_t applications, p::Work& work) {
         std::uint64_t payload = 0, reserved_steps = 0;
-        const auto application_reserve = sum_budget(limits.action_steps, limits.action_steps);
-        for (const auto& item : bound.values()) {
+        const auto multiply_budget = [](std::uint64_t value, std::uint64_t count) {
+            if (count != 0 && value > std::numeric_limits<std::uint64_t>::max() / count)
+                reject(core::FailureCode::ResourceExceeded);
+            return value * count;
+        };
+        const auto application_reserve = multiply_budget(limits.action_steps, applications);
+        for (const auto& item : assembly.bound.values()) {
             const auto& row = input.collocations[item.caller];
             const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
             auto preflight_limits = limits.induction;
             preflight_limits.steps = std::min(preflight_limits.steps, remaining(work));
             const auto plan = require(a::forecast_bound_wake_induction(
-                source, maps.values(), ids.values(), preflight_limits, stop));
+                source, assembly.maps.values(), assembly.ids.values(), preflight_limits,
+                work.stop));
             account(work, plan.preflight_steps);
-            payload = sum_budget(payload, plan.payload_bytes);
+            payload = sum_budget(payload, multiply_budget(plan.payload_bytes, preparations));
+            const auto prepare_reserve = multiply_budget(plan.reserved_steps, preparations);
             reserved_steps =
-                sum_budget(reserved_steps, sum_budget(plan.reserved_steps, application_reserve));
+                sum_budget(reserved_steps, sum_budget(prepare_reserve, application_reserve));
         }
         if (payload > memory.remaining_bytes() || reserved_steps > remaining(work))
             reject(core::FailureCode::ResourceExceeded);
+    }
 
-        const Vector ambient{import(require(flow.velocity(0)), work),
-                             import(require(flow.velocity(1)), work),
-                             import(require(flow.velocity(2)), work)};
+    static a::SharedP1Action prepare_action(const Assembly& assembly,
+                                            const a::P1ActionSource& source,
+                                            const DiscreteNonpenetrationLimits& limits,
+                                            a::SharedP1Workspace& shared,
+                                            a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+                                            core::ResourcePlan& memory, p::Work& work) {
+        auto induction_limits = limits.induction;
+        induction_limits.steps = std::min(induction_limits.steps, remaining(work));
+        auto action = require(a::prepare_bound_wake_induction(
+            source, assembly.maps.values(), assembly.ids.values(), limits.geometry_accuracy,
+            limits.induction_accuracy, induction_limits, shared, local, kernel, memory, work.stop));
+        account(work, require(action.report()).used_steps);
+        return action;
+    }
+
+    static Vector ambient_velocity(const ProjectedCaseUniformFlow& flow, p::Work& work) {
+        return {import(require(flow.velocity(0)), work), import(require(flow.velocity(1)), work),
+                import(require(flow.velocity(2)), work)};
+    }
+
+    static DiscreteNonpenetration
+    evaluate_rows(const DiscreteNonpenetrationInput& input, ProjectedCaseUniformFlow&& flow,
+                  const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
+                  a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+                  core::ResourcePlan& memory, const std::stop_token& stop) {
+        p::Work work{0, limits.steps, stop};
+        const auto geometry_owner = require(input.contact.geometry());
+        const auto& geometry = geometry_owner.get();
+        const auto assembly = assemble(input, flow, limits, memory, work, false);
+        const auto bound = assembly.bound.values();
+        auto rows = allocate<NonpenetrationStorage>(memory, bound.size());
+        admit(assembly, input, limits, memory, 1, 2, work);
+        const auto ambient = ambient_velocity(flow, work);
         std::optional<a::P1ActionValue> geometry_retainer;
-        for (std::size_t i = 0; i < bound_count; ++i) {
-            const auto& item = bound.values()[i];
+        for (std::size_t i = 0; i < bound.size(); ++i) {
+            const auto& item = bound[i];
             const auto& row = input.collocations[item.caller];
             const auto normal = qualify_normal(geometry, item.panel, row, work);
             const auto relative = difference(ambient, import(row.velocity, work), work);
             const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
-            auto induction_limits = limits.induction;
-            induction_limits.steps = std::min(induction_limits.steps, remaining(work));
-            const auto action = require(a::prepare_bound_wake_induction(
-                source, maps.values(), ids.values(), limits.geometry_accuracy,
-                limits.induction_accuracy, induction_limits, shared, local, kernel, memory, stop));
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
             const auto report = require(action.report());
-            account(work, report.used_steps);
-            auto full = require(a::apply_shared_p1(action, source, values.values(), std::nullopt,
-                                                   std::min(limits.action_steps, remaining(work)),
-                                                   shared, stop));
+            auto full = require(
+                a::apply_shared_p1(action, source, assembly.values.values(), std::nullopt,
+                                   std::min(limits.action_steps, remaining(work)), shared, stop));
             account(work, full.used_steps());
             const auto linear = require(
-                a::apply_shared_p1(action, source, directions.values(), std::nullopt,
+                a::apply_shared_p1(action, source, assembly.directions.values(), std::nullopt,
                                    std::min(limits.action_steps, remaining(work)), shared, stop));
             account(work, linear.used_steps());
             Vector velocity{}, delta{};
@@ -496,6 +690,158 @@ struct NonpenetrationBuilder {
         return {std::move(rows),    std::move(flow),   std::move(geometry_retainer),
                 geometry.context(), input.trial_stamp, work.used};
     }
+
+    static std::size_t transfer_column(std::span<const PanelRow> bound, const Transfer& transfer,
+                                       p::Work& work) {
+        const auto& row =
+            find(bound, transfer.face, [](const PanelRow& b) { return b.panel.face; }, work);
+        return static_cast<std::size_t>(&row - bound.data());
+    }
+
+    static void assemble_influence(const Assembly& assembly, const a::SharedP1Action& action,
+                                   const a::P1ActionSource& source, const Vector& normal,
+                                   a::SharedP1Workspace& shared, core::ResourcePlan& memory,
+                                   const DiscreteNonpenetrationLimits& limits,
+                                   std::span<p::Interval> influence, p::Work& work) {
+        const auto transpose = [&](std::size_t axis) {
+            std::array<a::P1ComplexWords, 3> covector{};
+            covector[axis].real = a::SingleWord{1};
+            auto coefficient = require(a::adjoint_shared_p1(
+                action, source, assembly.directions.values(), covector,
+                std::min(limits.action_steps, remaining(work)), shared, memory, work.stop));
+            account(work, coefficient.used_steps());
+            return coefficient;
+        };
+        const std::array coefficients{transpose(0), transpose(1), transpose(2)};
+        for (auto& entry : influence) {
+            work.step();
+            entry = {};
+        }
+        for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
+            work.step();
+            const auto& transfer = assembly.traces.values()[i].transfer;
+            if (!transfer)
+                continue;
+            const Vector spatial{import(require(coefficients[0].strength(i)).real, work),
+                                 import(require(coefficients[1].strength(i)).real, work),
+                                 import(require(coefficients[2].strength(i)).real, work)};
+            const auto projected = dot(normal, spatial, work);
+            auto& column = influence[transfer_column(assembly.bound.values(), *transfer, work)];
+            column = transfer->reverse ? p::subtract(column, projected, work)
+                                       : p::add(column, projected, work);
+        }
+    }
+
+    static DiscreteCirculation
+    solve(const DiscreteNonpenetrationInput& input, ProjectedCaseUniformFlow&& flow,
+          const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+          a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+          core::ResourcePlan& memory, const std::stop_token& stop) {
+        p::Work work{0, limits.steps, stop};
+        work.step();
+        const auto geometry_owner = require(input.contact.geometry());
+        const auto& geometry = geometry_owner.get();
+        const auto order = input.collocations.size();
+        validate_circulation(request, geometry.context(), order, work);
+        const auto maximum = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
+        if (order != 0 && order > maximum / order)
+            reject(core::FailureCode::ResourceExceeded);
+        const auto n = static_cast<core::Index>(order);
+        auto assembly = assemble(input, flow, limits, memory, work, true);
+        const auto bound = std::span<const PanelRow>{assembly.bound.values()};
+        auto data = allocate<CirculationRowData>(memory, order);
+        auto results = allocate<std::optional<CirculationResidualRow>>(memory, order);
+        auto influence = allocate<p::Interval>(memory, order);
+        auto [matrix, rhs] = [&] {
+            const auto zeros = allocate<double>(memory, sum_budget(order * order, order));
+            return std::pair{
+                require(numerics::DenseReal::copy({n, n, n}, zeros.values().first(order * order),
+                                                  memory, core::Operation::SolveLinear)),
+                require(numerics::DenseReal::copy({n, 1, n}, zeros.values().subspan(order * order),
+                                                  memory, core::Operation::SolveLinear))};
+        }();
+        admit(assembly, input, limits, memory, 2, 5, work);
+
+        const auto ambient = ambient_velocity(flow, work);
+        a::LocalRootScratch rounding;
+        const auto apply = [&](const a::SharedP1Action& action, const a::P1ActionSource& source) {
+            auto value = require(
+                a::apply_shared_p1(action, source, assembly.values.values(), std::nullopt,
+                                   std::min(limits.action_steps, remaining(work)), shared, stop));
+            account(work, value.used_steps());
+            return value;
+        };
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& item = bound[i];
+            const auto& row = input.collocations[item.caller];
+            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
+            auto& record = data.values()[i];
+            record.normal = qualify_normal(geometry, item.panel, row, work);
+            record.relative = difference(ambient, import(row.velocity, work), work);
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+            const auto old_wake = apply(action, source);
+            record.rhs =
+                p::negate(native_residual(record.normal, record.relative, old_wake, work), work);
+            rhs.values()[i] = project_binary64(record.rhs, request.rhs_absolute, rounding, work);
+            assemble_influence(assembly, action, source, record.normal, shared, memory, limits,
+                               influence.values(), work);
+            for (std::size_t col = 0; col < order; ++col)
+                matrix.values()[col * order + i] = project_binary64(
+                    influence.values()[col], request.matrix_absolute, rounding, work);
+        }
+
+        work.step();
+        const auto& context = request.scales.context;
+        const linear::DenseOperator op{matrix, context};
+        const auto rhs_values = require(numerics::PrecisionBuffer<double>::binary64(
+            std::move(rhs), core::NumericalGeneration{request.rhs_generation.value()}));
+        const linear::Rhs<double> right{rhs_values, context, request.rhs_generation};
+        auto factor = require(
+            linear::DensePrepared::prepare(op, request.scales, request.solver_limits, memory));
+        work.step();
+        const NoDenseConsumerChecks no_checks;
+        const linear::Precision<double> precision{
+            linear::RetainedPrecision{request.retained_generation}, {}, no_checks};
+        auto solution =
+            require(linear::solve_linear(op, right, request.scales, precision, request.algebraic,
+                                         request.solver_limits, factor, memory));
+
+        for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
+            work.step();
+            const auto& transfer = assembly.traces.values()[i].transfer;
+            if (!transfer)
+                continue;
+            const auto coordinate =
+                retained_word(solution.values(), transfer_column(bound, *transfer, work));
+            assembly.values.values()[i].real =
+                transfer->reverse ? negative(coordinate) : coordinate;
+        }
+
+        NativeResidualCheck check{request};
+        std::optional<a::P1ActionValue> geometry_parent;
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& item = bound[i];
+            const auto& row = input.collocations[item.caller];
+            const auto& record = data.values()[i];
+            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+            auto full = apply(action, source);
+            const auto original = native_residual(record.normal, record.relative, full, work);
+            check.add(original, record.rhs, i, work);
+            const auto enclosed =
+                a::enclose_p1_value(original, limits.induction_accuracy.representation, rounding);
+            results.values()[i].emplace(CirculationResidualRow{
+                item.panel.face, enclosed, require(action.report()).far_facets != 0});
+            if (i == 0)
+                geometry_parent.emplace(std::move(full));
+        }
+        check.finish();
+        work.step();
+        return {std::move(solution), std::move(flow), std::move(results),
+                std::move(geometry_parent), work.used};
+    }
 };
 
 core::Result<DiscreteNonpenetration> evaluate_discrete_nonpenetration(
@@ -516,4 +862,43 @@ core::Result<DiscreteNonpenetration> evaluate_discrete_nonpenetration(
         return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
     }
 }
+
+DiscreteCirculation::DiscreteCirculation(
+    linear::Solution<double> solution, ProjectedCaseUniformFlow&& flow,
+    core::PlannedBuffer<std::optional<CirculationResidualRow>> rows,
+    std::optional<a::P1ActionValue> geometry_owner, std::uint64_t steps) noexcept
+    : solution_(std::move(solution)),
+      flow_(std::move(flow)),
+      rows_(std::move(rows)),
+      geometry_owner_(std::move(geometry_owner)),
+      steps_(steps) {}
+
+core::Result<CirculationResidualRow> DiscreteCirculation::row(std::size_t i) const noexcept {
+    if (i >= rows_.size() || !geometry_owner_)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    const auto& residual = rows_.values()[i];
+    if (!residual)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    return *residual;
+}
+
+core::Result<DiscreteCirculation> solve_discrete_circulation(
+    const DiscreteNonpenetrationInput& input, ProjectedCaseUniformFlow&& flow,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve(input, std::move(flow), limits, request, shared, local,
+                                            kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
 } // namespace uvlas::coupling::detail
