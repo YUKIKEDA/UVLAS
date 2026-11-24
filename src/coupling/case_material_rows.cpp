@@ -205,7 +205,7 @@ CaseMaterialRows::prepare(const CaseMaterialChart& chart, const CaseReferenceSur
         use(m, position.call_info());
         std::optional<s::PgMaterialTangentReference> tangents;
         if (std::holds_alternative<CaseMaterialCollocationSite>(site)) {
-            std::array<s::PgMaterialDirections, 1> directions{{
+            const std::array<s::PgMaterialDirections, 1> directions{{
                 {std::move(selected.chart.chord_tangent), std::move(selected.chart.span_tangent)},
             }};
             tangents.emplace(partition_take(s::PgMaterialTangentReference::prepare(

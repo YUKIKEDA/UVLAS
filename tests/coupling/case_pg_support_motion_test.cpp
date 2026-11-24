@@ -265,15 +265,15 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
     model.field("geometry").elements.push_back(std::move(thin_geometry));
     wire.field("numerics").field("patch").set("geometry_error", a::parse("0.000001"));
     auto& layers = model.field("shells").elements.at(0).field("layers").elements;
-    auto high = layers.at(0);
+    auto upper_layer = layers.at(0);
     layers.at(0).set(
         "interval",
         a::parse(R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
-    high.set("id", a::string("9"));
-    high.set(
+    upper_layer.set("id", a::string("9"));
+    upper_layer.set(
         "interval",
         a::parse(R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
-    layers.push_back(std::move(high));
+    layers.push_back(std::move(upper_layer));
     auto& surface = model.field("aero_surfaces").elements.at(0);
     surface.set("span", a::parse("[0,0.5,1]"));
     surface.set("geometry", a::string("2"));
