@@ -177,7 +177,8 @@ ExactRational original_row_defect(ReferenceArithmetic& math, const PgGlobalConst
 struct PgChartCandidate::Data {
     PgSparseChartIdentity identity;
     std::optional<linear::Context> forward, backward;
-    std::optional<linear::SparsePrepared> factor;
+    // SparsePrepared leases its existing scratch during a solve.
+    mutable std::optional<linear::SparsePrepared> factor;
     SparseReal matrix;
     core::PlannedBuffer<std::size_t> offsets;
     core::PlannedBuffer<Entry> entries;
@@ -190,7 +191,8 @@ struct PgChartCandidate::Data {
     }
 
     [[nodiscard]] Solved solve(std::span<const Words> rhs, bool transpose,
-                               const PgChartCandidateSolve& request, core::ResourcePlan& plan) {
+                               const PgChartCandidateSolve& request,
+                               core::ResourcePlan& plan) const {
         const auto expected = transpose ? backward : forward;
         if (!expected || request.scales.context != *expected)
             partition_fail(core::FailureCode::StaleGeneration);
@@ -332,7 +334,7 @@ core::Result<PgChartCandidateLift> PgChartCandidate::lift(PgChartCandidateInput 
                                                           PgChartCandidateInput original_rhs,
                                                           const PgChartCandidateSolve& request,
                                                           core::Workspace& workspace,
-                                                          core::ResourcePlan& plan) noexcept {
+                                                          core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<PgChartCandidateLift> {
         VisitBudget budget{request.maximum_visits, request.cancellation};
         budget.visit();
@@ -395,10 +397,9 @@ core::Result<PgChartCandidateLift> PgChartCandidate::lift(PgChartCandidateInput 
     });
 }
 
-core::Result<PgChartCandidateDual> PgChartCandidate::transpose(PgChartCandidateInput force,
-                                                               const PgChartCandidateSolve& request,
-                                                               core::Workspace& workspace,
-                                                               core::ResourcePlan& plan) noexcept {
+core::Result<PgChartCandidateDual>
+PgChartCandidate::transpose(PgChartCandidateInput force, const PgChartCandidateSolve& request,
+                            core::Workspace& workspace, core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<PgChartCandidateDual> {
         VisitBudget budget{request.maximum_visits, request.cancellation};
         budget.visit();
@@ -472,7 +473,7 @@ core::Result<PgChartRefined<PgChartCandidateLift>>
 PgChartCandidate::refine_lift(PgChartCandidateInput independent, PgChartCandidateInput original_rhs,
                               const PgChartCandidateSolve& request,
                               const PgChartRefinement& refinement, core::Workspace& workspace,
-                              core::ResourcePlan& plan) noexcept {
+                              core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<PgChartRefined<PgChartCandidateLift>> {
         VisitBudget budget{request.maximum_visits, request.cancellation};
         budget.visit();
@@ -564,7 +565,7 @@ core::Result<PgChartRefined<PgChartCandidateDual>>
 PgChartCandidate::refine_transpose(PgChartCandidateInput force,
                                    const PgChartCandidateSolve& request,
                                    const PgChartRefinement& refinement, core::Workspace& workspace,
-                                   core::ResourcePlan& plan) noexcept {
+                                   core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<PgChartRefined<PgChartCandidateDual>> {
         VisitBudget budget{request.maximum_visits, request.cancellation};
         budget.visit();
@@ -710,6 +711,29 @@ PgChartCandidate::work_defect(PgChartCandidateInput force, PgChartCandidateInput
             partition_fail(core::FailureCode::PrecisionUnresolved);
         return upper(magnitude);
     });
+}
+
+const PgSparseChart& PgChartOwner::exact() const& noexcept {
+    if (const auto* candidate = numerical())
+        return candidate->exact();
+    return *std::get_if<PgSparseChart>(&storage_);
+}
+
+const PgChartCandidate* PgChartOwner::numerical() const& noexcept {
+    return std::get_if<PgChartCandidate>(&storage_);
+}
+
+core::Result<void> PgChartOwner::prepare_numerical(const linear::Scales& forward,
+                                                   const linear::Scales& transpose,
+                                                   const PgChartCandidatePreparation& request,
+                                                   core::ResourcePlan& plan) & noexcept {
+    auto* current = std::get_if<PgChartCandidate>(&storage_);
+    auto& chart = current != nullptr ? current->exact_ : *std::get_if<PgSparseChart>(&storage_);
+    auto prepared = PgChartCandidate::prepare(std::move(chart), forward, transpose, request, plan);
+    if (!prepared)
+        return std::unexpected(prepared.error());
+    storage_ = decltype(storage_){std::move(*prepared)};
+    return {};
 }
 
 } // namespace uvlas::structure

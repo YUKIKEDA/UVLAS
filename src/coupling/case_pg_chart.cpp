@@ -554,13 +554,29 @@ CasePgChart::shell_reference(numerics::PatchId shell, std::uint64_t maximum_patc
 }
 
 const CaseStructuralSupport* CasePgChart::motion() const& noexcept {
-    return motion_ ? &*motion_ : nullptr;
+    return std::get_if<CaseStructuralSupport>(&chart_);
 }
 
 const pg::PgSparseChart& CasePgChart::chart() const& noexcept {
     if (const auto* ready = motion())
         return ready->support().chart();
-    return chart_;
+    return std::get_if<pg::PgChartOwner>(&chart_)->exact();
+}
+
+const pg::PgChartCandidate* CasePgChart::numerical() const& noexcept {
+    if (const auto* ready = motion())
+        return ready->support().numerical();
+    return std::get_if<pg::PgChartOwner>(&chart_)->numerical();
+}
+
+core::Result<void> CasePgChart::prepare_numerical(const numerics::linear::Scales& forward,
+                                                  const numerics::linear::Scales& transpose,
+                                                  const pg::PgChartCandidatePreparation& request,
+                                                  core::ResourcePlan& plan) & noexcept {
+    if (auto* ready = std::get_if<CaseStructuralSupport>(&chart_))
+        return ready->support_.prepare_numerical(forward, transpose, request, plan);
+    return std::get_if<pg::PgChartOwner>(&chart_)->prepare_numerical(forward, transpose, request,
+                                                                     plan);
 }
 
 namespace case_pg_chart_detail {
@@ -737,7 +753,6 @@ core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
                     workspace, plan));
                 auto chart = partition_take(
                     pg::PgSparseChart::prepare(std::move(original), limits.chart, workspace, plan));
-                auto result = CasePgChart{std::move(patches), std::move(chart)};
                 if (motion != nullptr) {
                     // Bind the very chart and patch owners used in row assembly. No new trace
                     // or factorization replaces this chart during evaluation.
@@ -745,12 +760,13 @@ core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
                         {support_ids, moving_count},
                         {support_ids + stationary_start, support_count - stationary_start}};
                     auto support = partition_take(prepare_case_structural_pg_support(
-                        source, std::move(result.chart_), {patch_bindings, rules.size()}, selection,
+                        source, std::move(chart), {patch_bindings, rules.size()}, selection,
                         motion->stamp, workspace, motion->workspace, motion->limits, plan, token));
-                    result.motion_.emplace(std::move(support));
+                    input.step(0);
+                    return CasePgChart{std::move(patches), std::move(support)};
                 }
                 input.step(0);
-                return result;
+                return CasePgChart{std::move(patches), std::move(chart)};
             } catch (const pg::detail::PartitionAbort& error) {
                 return std::unexpected(error.failure);
             }

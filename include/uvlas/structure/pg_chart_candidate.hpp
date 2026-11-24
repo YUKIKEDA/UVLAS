@@ -1,7 +1,9 @@
 #pragma once
 
+#include <utility>
 #include <uvlas/numerics/sparse_solve.hpp>
 #include <uvlas/structure/pg_sparse_chart.hpp>
+#include <variant>
 
 namespace uvlas::structure {
 
@@ -75,23 +77,24 @@ public:
 
     [[nodiscard]] core::Result<PgChartCandidateLift>
     lift(PgChartCandidateInput independent, PgChartCandidateInput original_rhs,
-         const PgChartCandidateSolve&, core::Workspace&, core::ResourcePlan&) noexcept;
+         const PgChartCandidateSolve&, core::Workspace&, core::ResourcePlan&) const noexcept;
 
     [[nodiscard]] core::Result<PgChartCandidateDual> transpose(PgChartCandidateInput force,
                                                                const PgChartCandidateSolve&,
                                                                core::Workspace&,
-                                                               core::ResourcePlan&) noexcept;
+                                                               core::ResourcePlan&) const noexcept;
 
     /// Qualify a retained TwoWord result directly with the original sparse rational rows.
     /// The inner solve requires retained precision and algebraic checks only.
     [[nodiscard]] core::Result<PgChartRefined<PgChartCandidateLift>>
     refine_lift(PgChartCandidateInput independent, PgChartCandidateInput original_rhs,
                 const PgChartCandidateSolve&, const PgChartRefinement&, core::Workspace&,
-                core::ResourcePlan&) noexcept;
+                core::ResourcePlan&) const noexcept;
 
     [[nodiscard]] core::Result<PgChartRefined<PgChartCandidateDual>>
     refine_transpose(PgChartCandidateInput force, const PgChartCandidateSolve&,
-                     const PgChartRefinement&, core::Workspace&, core::ResourcePlan&) noexcept;
+                     const PgChartRefinement&, core::Workspace&,
+                     core::ResourcePlan&) const noexcept;
 
     /// Check actual retained work: f^T*q = h^T*r + lambda^T*c.
     [[nodiscard]] core::Result<double>
@@ -101,10 +104,36 @@ public:
                 std::uint64_t maximum_visits, std::stop_token) const noexcept;
 
 private:
+    friend class PgChartOwner;
     struct Data;
     PgChartCandidate(PgSparseChart&&, core::PlannedBuffer<Data>) noexcept;
     PgSparseChart exact_;
     core::PlannedBuffer<Data> data_;
+};
+
+/// Owns one exact chart throughout optional numerical preparation.
+/// A successful preparation invalidates prior borrows of this chart and candidate.
+class PgChartOwner {
+public:
+    explicit PgChartOwner(PgSparseChart&& exact) noexcept : storage_(std::move(exact)) {}
+    PgChartOwner(PgChartOwner&&) noexcept = default;
+    PgChartOwner& operator=(PgChartOwner&&) noexcept = default;
+    PgChartOwner(const PgChartOwner&) = delete;
+    PgChartOwner& operator=(const PgChartOwner&) = delete;
+
+    [[nodiscard]] const PgSparseChart& exact() const& noexcept;
+    [[nodiscard]] const PgSparseChart& exact() const&& = delete;
+    [[nodiscard]] const PgChartCandidate* numerical() const& noexcept;
+    [[nodiscard]] const PgChartCandidate* numerical() const&& = delete;
+
+    /// Prepare from the current exact chart. Failure retains both exact and numerical owners.
+    [[nodiscard]] core::Result<void> prepare_numerical(const numerics::linear::Scales&,
+                                                       const numerics::linear::Scales&,
+                                                       const PgChartCandidatePreparation&,
+                                                       core::ResourcePlan&) & noexcept;
+
+private:
+    std::variant<PgSparseChart, PgChartCandidate> storage_;
 };
 
 } // namespace uvlas::structure
