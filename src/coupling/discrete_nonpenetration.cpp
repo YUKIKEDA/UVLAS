@@ -2483,8 +2483,7 @@ struct NonpenetrationBuilder {
                 {a::QueryId{particles[i].value()},
                  a::SourceVertex{a::PointId{canonical.values()[i]}}},
                 geometry.context(), coordinate_limits, flow.coordinates, memory, work.stop));
-            // Query resolution has an explicit allowance, with no measured-work readback.
-            account(work, coordinate_limits.max_steps);
+            account(work, query.used_steps());
             const a::P1ActionSource source{input.contact, query, input.trial_stamp};
             auto action_limits = limits.action.induction;
             action_limits.steps = std::min(action_limits.steps, remaining(work));
