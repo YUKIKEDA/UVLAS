@@ -171,6 +171,35 @@ TEST_CASE("PG nonconforming full trace owns coefficient rows and the original du
     REQUIRE(a.info());
     REQUIRE(b.info());
 
+    const auto partial_first = left.r("1", "8"), partial_last = left.r("1", "4");
+    // The physical endpoints are inside the first atomic edge of each unlike partition.
+    const auto along_at = [&](const PgTraceEdgeSpan& span, const ExactRational& eta) {
+        const Q fraction = (q(eta) - q(span.first)) / (q(span.last) - q(span.first));
+        const Q value = q(span.along_first) + fraction * (q(span.along_last) - q(span.along_first));
+        return rat(left, numerator(value), denominator(value));
+    };
+    const auto a_first = along_at(as.front(), partial_first);
+    const auto a_last = along_at(as.front(), partial_last);
+    const auto b_first = along_at(bs.front(), partial_first);
+    const auto b_last = along_at(bs.front(), partial_last);
+    const std::array partial_a{PgTraceEdgeSpan{as.front().edge, partial_first, partial_last,
+                                               a_first, a_last, core::Index{0}}};
+    const std::array partial_b{PgTraceEdgeSpan{bs.front().edge, partial_first, partial_last,
+                                               b_first, b_last, core::Index{0}}};
+    auto partial = take(verify(partial_a, partial_b, limits, plan));
+    REQUIRE(partial.overlaps().size() == 1);
+    const auto& clip = partial.overlaps().front();
+    CHECK(q(clip.first) == Q("1/8"));
+    CHECK(q(clip.last) == Q("1/4"));
+    CHECK(clip.left_layer == 0);
+    CHECK(clip.right_layer == 0);
+    CHECK(q(clip.left_depth.lower_first) == -1);
+    CHECK(q(clip.right_depth.lower_first) == Q("-1/2"));
+    CHECK(q(clip.left_depth.upper_last) == Q("-1/3"));
+    CHECK(q(clip.right_depth.upper_last) == Q("-1/6"));
+    check_failure(PgFullTrace::prepare(a, partial_a, a, partial_a, limits, ws, plan),
+                  core::FailureCode::GeometryInvalid);
+
     auto connection = take(verify(as, bs, limits, plan));
     const auto info = take(connection.info());
     REQUIRE(info.overlaps == 4);
@@ -251,9 +280,34 @@ TEST_CASE("PG nonconforming full trace owns coefficient rows and the original du
     const auto only_first = std::span{as}.first(1);
     check_failure(PgFullTrace::prepare_support(a, only_first, info.right, ca, limits, ws, none),
                   core::FailureCode::StaleGeneration);
+    const auto split_eta = left.r("1", "4");
+    const auto split_along = along_at(as.front(), split_eta);
+    const std::array support_spans{
+        PgTraceEdgeSpan{
+            as.front().edge, as.front().first, split_eta, as.front().along_first, split_along, {}},
+        PgTraceEdgeSpan{
+            as.front().edge, split_eta, as.front().last, split_along, as.front().along_last, {}}};
     const auto support =
-        take(PgFullTrace::prepare_support(a, only_first, info.left, ca, limits, ws, plan));
+        take(PgFullTrace::prepare_support(a, support_spans, info.left, ca, limits, ws, plan));
     const auto fixed = take(support.info());
+    REQUIRE(fixed.overlaps == 2);
+    const auto bending_slope = [](const PgTraceOriginalRow& row) {
+        return row.field == PgCoefficientField::C && row.power == 1;
+    };
+    const auto raw = support.original_rows();
+    const auto first_slope = std::ranges::find_if(raw, bending_slope);
+    REQUIRE(first_slope != raw.end());
+    const auto second_slope =
+        std::ranges::find_if(std::span{first_slope + 1, raw.end()}, bending_slope);
+    REQUIRE(second_slope != raw.end());
+    CHECK(first_slope->overlap == 0);
+    CHECK(second_slope->overlap == 1);
+    REQUIRE(first_slope->unique_row >= 0);
+    CHECK(first_slope->unique_row == second_slope->unique_row);
+    CHECK(q(first_slope->scale) == q(second_slope->scale));
+    const auto normalized_slope = take(support.unique_row(first_slope->unique_row));
+    REQUIRE_FALSE(normalized_slope.empty());
+    CHECK(q(normalized_slope.front().coefficient) == 1);
     CHECK(fixed.kind == PgTraceKind::Support);
     CHECK(fixed.right_columns == 0);
     CHECK(std::ranges::any_of(support.original_rows(), [](const auto& row) {
