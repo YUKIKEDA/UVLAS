@@ -1219,7 +1219,7 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
     const std::array scales{1., 1.};
     const auto moment_origin = coordinates(.25, -.125, .5);
 
-    enum class LoadCase { Wake, ReversedWake, Shared, AliasedShared, ZeroRadius };
+    enum class LoadCase : std::uint8_t { Wake, ReversedWake, Shared, AliasedShared, ZeroRadius };
     for (const auto mode : {LoadCase::Wake, LoadCase::ReversedWake, LoadCase::Shared,
                             LoadCase::AliasedShared, LoadCase::ZeroRadius}) {
         CAPTURE(mode);
@@ -1280,7 +1280,7 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, a::P1StrengthId{0}}};
         const std::array old{
             cf::FrozenWakeTrace{a::P1StrengthId{0}, a::SingleWord{reversed ? .25 : -.25}}};
-        const auto count = has_wake ? 1U : 2U;
+        const std::size_t count = has_wake ? 1U : 2U;
         const cf::DiscreteNonpenetrationInput input{
             contact,
             std::span{rows}.first(count),
@@ -1295,7 +1295,8 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
                                std::span{gamma_units}.first(count),
                                std::span{speed_units}.first(count),
                                circulation_context(geometry.context())};
-        const auto request = circulation_request(model, count, ls::Norm::Infinity);
+        const auto request =
+            circulation_request(model, static_cast<core::Index>(count), ls::Norm::Infinity);
         const std::array rates{
             cf::BoundCirculationRate{fixture.faces[0].id, a::DoubleWord{.375, 0x1p-57}},
             cf::BoundCirculationRate{fixture.faces[1].id, a::SingleWord{-.125}}};
