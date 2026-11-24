@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <functional>
+#include <utility>
 #include <uvlas/numerics/linear_solve.hpp>
 
 namespace uvlas::aero::detail {
@@ -184,6 +185,11 @@ public:
     /// Resolve an original edge or explicit alias to the edge owner and TE classification.
     [[nodiscard]] GlobalResult<UvlmLoadEdge>
     uvlm_load_edge(EdgeId, std::uint64_t max_steps, const std::stop_token& = {}) const noexcept;
+    /// Find the unique raw side of a retained facet declared as an alias of the canonical edge.
+    /// The result also reports visits against max_steps.
+    [[nodiscard]] GlobalResult<std::pair<EdgeId, std::uint64_t>>
+    facet_edge_alias(FacetId, EdgeId, std::uint64_t max_steps,
+                     const std::stop_token&) const noexcept;
     /// Two-pass traversal, narrow-pair and planned-payload counters.
     [[nodiscard]] GlobalResult<GlobalWorkPlan> work_plan() const noexcept;
     /// Contact clearance does not certify physical mapping or state paths.
