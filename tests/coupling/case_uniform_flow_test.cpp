@@ -775,6 +775,56 @@ void residual_small(const a::ScaledEnclosure& value, const Rat& limit) {
     CHECK((abs(center) + rational_word(value.radius())) * scale <= limit);
 }
 
+Rat sum_words(const a::ScalarWords& words) {
+    return std::visit(
+        [](const auto& word) -> Rat {
+            if constexpr (std::is_same_v<std::decay_t<decltype(word)>, a::SingleWord>)
+                return rational_word(word.value);
+            else
+                return rational_word(word.high) + rational_word(word.low);
+        },
+        words);
+}
+
+struct WorkEnclosure {
+    Rat value{};
+    Rat radius{};
+
+    void add(const cf::CirculationVectorCovector& dual, const cf::NonpenetrationVector& direction) {
+        for (std::size_t axis = 0; axis < dual.size(); ++axis) {
+            const auto scale = two_power(dual[axis].exponent());
+            const auto displacement = sum_words(direction[axis]);
+            value += sum_words(dual[axis].center()) * scale * displacement;
+            radius += rational_word(dual[axis].radius()) * scale * abs(displacement);
+        }
+    }
+};
+
+WorkEnclosure pullback_work(const cf::DiscreteCirculationPullback& value,
+                            const cf::DiscreteCirculationDirection& direction) {
+    REQUIRE(value.point_count() == direction.points.size());
+    REQUIRE(value.row_count() == direction.rows.size());
+    WorkEnclosure work;
+    work.add(value.uniform_flow(), direction.uniform_flow);
+    for (std::size_t i = 0; i < value.point_count(); ++i) {
+        const auto point = take(value.point(i));
+        CHECK(point.point == direction.points[i]);
+        work.add(point.position, direction.displacements[i]);
+    }
+    for (std::size_t i = 0; i < value.row_count(); ++i) {
+        const auto row = take(value.row(i));
+        CHECK(row.face == direction.rows[i].face);
+        const auto& input = direction.rows[i];
+        REQUIRE(row.free_query.has_value() == input.free_query.has_value());
+        if (row.free_query && input.free_query)
+            work.add(*row.free_query, *input.free_query);
+        work.add(row.tangents[0], input.tangents[0]);
+        work.add(row.tangents[1], input.tangents[1]);
+        work.add(row.velocity, input.velocity);
+    }
+    return work;
+}
+
 } // namespace
 
 TEST_CASE("Discrete nonpenetration joins the original residual and implicit circulation action",
@@ -1025,6 +1075,74 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         residual_small(take(checked.tangent().row(0)).original_residual, rational_word(1e-13));
         reject(checked.forcing(1), core::FailureCode::InvalidInput);
 
+        const std::array<ls::UnitDimensions, 1> dual_speed{{{-1, 0, 1, 0, 0, 0, 0}}};
+        const std::array<ls::UnitDimensions, 1> dual_gamma{{{-2, 0, 1, 0, 0, 0, 0}}};
+        auto dual_context = solve_scales.context;
+        dual_context.cache.matrix = core::NumericalGeneration{81};
+        dual_context.cache.scales = core::ScaleGeneration{82};
+        dual_context.unknown_layout = core::ScopeId{83};
+        dual_context.residual_layout = core::ScopeId{84};
+        const ls::Scales dual_scales{unit_scale, unit_scale, dual_speed, dual_gamma, dual_context};
+        auto dual_request = circulation_request(dual_scales, 1, ls::Norm::Infinity);
+        dual_request.rhs_generation = core::RhsGeneration{85};
+        dual_request.retained_generation = core::NumericalGeneration{86};
+        const auto objective = a::DoubleWord{.375, 0x1p-58};
+        const std::array seed{cf::CirculationLinearRhs{row.face, objective}};
+        const auto run_pullback = [&](const cf::DiscreteNonpenetrationInput& selected,
+                                      std::span<const cf::CirculationLinearRhs> objective_seed,
+                                      cf::ProjectedCaseUniformFlow& projected,
+                                      const cf::DiscreteCirculationRequest& transpose_request) {
+            return cf::solve_discrete_circulation_pullback(
+                selected, objective_seed, std::move(projected), solve_limits, request,
+                transpose_request, shared, *local, *kernel, memory);
+        };
+        auto pullback_flow = projected_at(time);
+        auto exact_seed = dual_request;
+        exact_seed.rhs_absolute = 0;
+        reject(run_pullback(view, seed, pullback_flow, exact_seed),
+               core::FailureCode::PrecisionUnresolved);
+        CHECK(pullback_flow.source().jet.active());
+        if (!reversed) {
+            auto stale_dual = dual_request;
+            stale_dual.scales.context.cache.matrix = solve_scales.context.cache.matrix;
+            reject(run_pullback(view, seed, pullback_flow, stale_dual),
+                   core::FailureCode::StaleGeneration);
+            const std::array wrong_face{cf::CirculationLinearRhs{fixture.faces[1].id, objective}};
+            reject(run_pullback(view, wrong_face, pullback_flow, dual_request),
+                   core::FailureCode::InvalidInput);
+            const std::array nonfinite{cf::CirculationLinearRhs{
+                row.face, a::SingleWord{std::numeric_limits<double>::quiet_NaN()}}};
+            reject(run_pullback(view, nonfinite, pullback_flow, dual_request),
+                   core::FailureCode::Nonfinite);
+            reject(run_pullback(view, {}, pullback_flow, dual_request),
+                   core::FailureCode::InvalidInput);
+            CHECK(pullback_flow.source().jet.active());
+        }
+        const auto pullback = take(run_pullback(view, seed, pullback_flow, dual_request));
+        CHECK_FALSE(pullback_flow.source().jet.active());
+        CHECK(pullback.used_steps() <= solve_limits.steps);
+        CHECK(pullback.transpose().used_steps() < pullback.used_steps());
+        CHECK(pullback.primal().flow().source().jet.active());
+        CHECK(pullback.transpose().sense() == cf::CirculationSense::Transpose);
+        CHECK(pullback.transpose().solution().values().precision() == core::Precision::TwoWord);
+        const auto lambda = solution_word(pullback.transpose().solution(), 0);
+        const auto pullback_row = take(pullback.row(0));
+        const auto uniform_dual = pullback.uniform_flow();
+        residual_expected(uniform_dual[2], -lambda);
+        residual_expected(pullback_row.velocity[2], lambda);
+        residual_expected(pullback_row.tangents[0][2], -lambda / 4);
+        residual_expected(pullback_row.tangents[1][2], -lambda / 8);
+        residual_small(take(pullback.transpose().row(0)).original_residual, rational_word(1e-13));
+        const auto free_work = pullback_work(pullback, direction);
+        const auto seed_value = sum_words(seed[0].value);
+        CHECK(free_work.radius < rational_word(1e-24));
+        CHECK(abs(free_work.value - seed_value * expected_direction) <=
+              free_work.radius + rational_word(1e-16));
+        CHECK(abs(free_work.value - seed_value * solution_word(checked.tangent().solution(), 0)) <=
+              free_work.radius + rational_word(1e-16));
+        reject(pullback.row(1), core::FailureCode::InvalidInput);
+        reject(pullback.point(fixture.id.size()), core::FailureCode::InvalidInput);
+
         if (!reversed) {
             const auto material = test_geometry::take(a::resolve_query(
                 geometry,
@@ -1050,6 +1168,17 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                               rational_word(1e-16));
             CHECK(abs(solution_word(material_result.tangent().solution(), 0) - material_tangent) <=
                   rational_word(1e-15));
+
+            auto material_pullback_flow = projected_at(time);
+            const auto material_dual =
+                take(run_pullback(material_input, seed, material_pullback_flow, dual_request));
+            const auto material_work = pullback_work(material_dual, no_query_direction);
+            CHECK(material_work.radius < rational_word(1e-24));
+            CHECK(abs(material_work.value - seed_value * material_tangent) <=
+                  material_work.radius + rational_word(1e-16));
+            CHECK(abs(material_work.value -
+                      seed_value * solution_word(material_result.tangent().solution(), 0)) <=
+                  material_work.radius + rational_word(1e-16));
         }
     }
 }
@@ -1486,6 +1615,34 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
         CHECK(solution_word(zero_tangent.solution(), i) == Rat{0});
         residual_small(take(zero_tangent.row(i)).original_residual, Rat{0});
     }
+
+    // A uniform-velocity direction is shared across these two nonsymmetric rows.
+    const auto two_collocations = rows(second);
+    const cf::DiscreteNonpenetrationInput pullback_input{
+        contact, two_collocations,           {}, {core::AcceptedStateId{2}, {}}, {7, 11},
+        stamp,   p::RequestedSide::Automatic};
+    auto exact_objective_flow = evaluate(provider, current, flow_workspace, time);
+    auto objective_flow =
+        take(cf::project_case_uniform_flow(std::move(exact_objective_flow), projection));
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    core::ResourcePlan no_pullback_bytes{0};
+    reject(cf::solve_discrete_circulation_pullback(
+               pullback_input, seed, std::move(objective_flow), solve_limits, request,
+               transpose_request, shared, *local, *kernel, no_pullback_bytes, stop.get_token()),
+           core::FailureCode::Cancelled);
+    CHECK(no_pullback_bytes.allocated_bytes() == 0);
+    CHECK(objective_flow.source().jet.active());
+    const auto dual_pullback = take(cf::solve_discrete_circulation_pullback(
+        pullback_input, seed, std::move(objective_flow), solve_limits, request, transpose_request,
+        shared, *local, *kernel, memory));
+    const auto lambda_a = solution_word(transpose.solution(), 0);
+    const auto lambda_b = solution_word(transpose.solution(), 1);
+    const auto flow_dual = dual_pullback.uniform_flow();
+    residual_expected(flow_dual[2], -lambda_a - lambda_b);
+    residual_expected(take(dual_pullback.row(0)).velocity[2], lambda_a);
+    residual_expected(take(dual_pullback.row(1)).velocity[2], lambda_b);
 
     const auto relocated = std::move(solved);
     reject(linearize(tangent_sense, {}, tangent_request), core::FailureCode::InvalidInput);

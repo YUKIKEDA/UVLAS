@@ -358,4 +358,74 @@ solve_discrete_circulation_direction(
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
+using CirculationVectorCovector = std::array<aero::detail::ScaledEnclosure, 3>;
+
+struct CirculationPointCovector {
+    aero::detail::PointId point;
+    CirculationVectorCovector position; ///< Dual to that canonical SI position.
+};
+
+struct CirculationCollocationCovector {
+    aero::detail::PhysicalFaceId face;
+    std::optional<CirculationVectorCovector> free_query; ///< Present only for a free query.
+    std::array<CirculationVectorCovector, 2> tangents;   ///< Duals to the two input tangents.
+    CirculationVectorCovector velocity;                  ///< Dual to the face velocity, s/m.
+};
+
+/// Pullback for a dimensionless scalar objective with a covector on circulation.
+/// All covectors enclose the action of the actual retained transpose solution.
+class DiscreteCirculationPullback {
+public:
+    DiscreteCirculationPullback(DiscreteCirculationPullback&&) noexcept = default;
+    DiscreteCirculationPullback& operator=(DiscreteCirculationPullback&&) noexcept = default;
+    DiscreteCirculationPullback(const DiscreteCirculationPullback&) = delete;
+    DiscreteCirculationPullback& operator=(const DiscreteCirculationPullback&) = delete;
+    [[nodiscard]] const DiscreteCirculation& primal() const& noexcept {
+        return primal_;
+    }
+    [[nodiscard]] const DiscreteCirculation& primal() const&& = delete;
+    [[nodiscard]] const DiscreteCirculationLinearization& transpose() const& noexcept {
+        return transpose_;
+    }
+    [[nodiscard]] const DiscreteCirculationLinearization& transpose() const&& = delete;
+    [[nodiscard]] CirculationVectorCovector uniform_flow() const noexcept {
+        return uniform_flow_;
+    }
+    [[nodiscard]] std::size_t point_count() const noexcept {
+        return points_.size();
+    }
+    [[nodiscard]] std::size_t row_count() const noexcept {
+        return rows_.size();
+    }
+    [[nodiscard]] core::Result<CirculationPointCovector> point(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationCollocationCovector> row(std::size_t) const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return steps_;
+    }
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationPullback(DiscreteCirculation&&, DiscreteCirculationLinearization&&,
+                                core::PlannedBuffer<std::optional<CirculationPointCovector>>,
+                                core::PlannedBuffer<std::optional<CirculationCollocationCovector>>,
+                                const CirculationVectorCovector&, std::uint64_t) noexcept;
+    DiscreteCirculation primal_;
+    DiscreteCirculationLinearization transpose_;
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points_;
+    core::PlannedBuffer<std::optional<CirculationCollocationCovector>> rows_;
+    CirculationVectorCovector uniform_flow_;
+    std::uint64_t steps_;
+};
+
+/// Solve A_effᵀ λ=seed in the same discrete chart and return −(dR/dinputs)ᵀ λ
+/// using the attained primal and transpose words. Material query contributions
+/// accumulate in their canonical point covectors. Time, core radius and inherited
+/// strength are fixed. The supplied flow is consumed only on complete success.
+[[nodiscard]] core::Result<DiscreteCirculationPullback> solve_discrete_circulation_pullback(
+    const DiscreteNonpenetrationInput&, std::span<const CirculationLinearRhs> seed,
+    ProjectedCaseUniformFlow&&, const DiscreteNonpenetrationLimits&,
+    const DiscreteCirculationRequest& primal, const DiscreteCirculationRequest& transpose,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail

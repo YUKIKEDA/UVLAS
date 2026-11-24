@@ -380,12 +380,46 @@ double project_binary64(const p::Interval& source, double budget, a::LocalRootSc
     return value;
 }
 
+Vector native_velocity(const Vector& relative, const a::P1ActionValue& induced, p::Work& work) {
+    Vector total{};
+    for (std::size_t axis = 0; axis < total.size(); ++axis)
+        total[axis] = p::add(relative[axis], import(induced.velocity()[axis].real, work), work);
+    return total;
+}
+
 p::Interval native_residual(const Vector& normal, const Vector& relative,
                             const a::P1ActionValue& induced, p::Work& work) {
-    Vector total{};
-    for (std::size_t axis = 0; axis < normal.size(); ++axis)
-        total[axis] = p::add(relative[axis], import(induced.velocity()[axis].real, work), work);
-    return dot(normal, total, work);
+    return dot(normal, native_velocity(relative, induced, work), work);
+}
+
+Vector normal_projection(const Vector& normal, const Vector& value, const p::Interval& length,
+                         p::Work& work) {
+    const auto projection = dot(normal, value, work);
+    Vector output{};
+    for (std::size_t axis = 0; axis < output.size(); ++axis)
+        output[axis] =
+            p::divide(p::subtract(value[axis], p::multiply(normal[axis], projection, work), work),
+                      length, work);
+    return output;
+}
+
+p::Interval tangent_length(const Vector& x, const Vector& y, p::Work& work) {
+    const auto area = cross(x, y, work);
+    return p::square_root(dot(area, area, work), work);
+}
+
+Vector scale_vector(const Vector& value, const p::Interval& factor, p::Work& work) {
+    return {p::multiply(value[0], factor, work), p::multiply(value[1], factor, work),
+            p::multiply(value[2], factor, work)};
+}
+
+CirculationVectorCovector enclose_vector(const Vector& value, core::Precision representation,
+                                         a::LocalRootScratch& rounding, p::Work& work) {
+    const auto enclose_axis = [&](std::size_t axis) {
+        work.step();
+        return a::enclose_p1_value(value[axis], representation, rounding);
+    };
+    return {enclose_axis(0), enclose_axis(1), enclose_axis(2)};
 }
 
 p::Interval fixed_circulation_direction(const DiscreteCollocation& row,
@@ -397,27 +431,22 @@ p::Interval fixed_circulation_direction(const DiscreteCollocation& row,
     const auto y = import(row.tangents[1], work);
     const auto dx = import(direction.tangents[0], work);
     const auto dy = import(direction.tangents[1], work);
-    const auto length_vector = cross(x, y, work);
-    const auto length = p::square_root(dot(length_vector, length_vector, work), work);
+    const auto length = tangent_length(x, y, work);
     const auto d_first = cross(dx, y, work);
     const auto d_second = cross(x, dy, work);
-    Vector d_area{}, d_normal{}, total{}, d_total{};
+    Vector d_area{}, d_total{};
     for (std::size_t axis = 0; axis < d_area.size(); ++axis)
         d_area[axis] = p::add(d_first[axis], d_second[axis], work);
-    const auto projection = dot(normal, d_area, work);
+    const auto d_normal = normal_projection(normal, d_area, length, work);
     const auto d_relative = difference(ambient_direction, import(direction.velocity, work), work);
     const auto& induction_direction = induced.jvp();
     if (!induction_direction)
         reject(core::FailureCode::InvalidInput);
-    for (std::size_t axis = 0; axis < d_area.size(); ++axis) {
-        d_normal[axis] =
-            p::divide(p::subtract(d_area[axis], p::multiply(normal[axis], projection, work), work),
-                      length, work);
-        total[axis] = p::add(relative[axis], import(induced.velocity()[axis].real, work), work);
+    for (std::size_t axis = 0; axis < d_area.size(); ++axis)
         d_total[axis] =
             p::add(d_relative[axis], import((*induction_direction)[axis].real, work), work);
-    }
-    return p::add(dot(d_normal, total, work), dot(normal, d_total, work), work);
+    return p::add(dot(d_normal, native_velocity(relative, induced, work), work),
+                  dot(normal, d_total, work), work);
 }
 
 struct PrimalCirculationData {
@@ -426,6 +455,19 @@ struct PrimalCirculationData {
     std::optional<a::P1ActionValue> geometry_owner;
     core::PlannedBuffer<p::Interval> influence;
     std::uint64_t steps;
+};
+
+struct PullbackData {
+    PullbackData(const DiscreteCirculationRequest& settings,
+                 std::span<const CirculationLinearRhs> objective) noexcept
+        : request(settings), seed(objective) {}
+    const DiscreteCirculationRequest& request;
+    std::span<const CirculationLinearRhs> seed;
+    std::optional<DiscreteCirculationLinearization> transpose{};
+    core::PlannedBuffer<std::uint64_t> point_ids;
+    core::PlannedBuffer<Vector> point_covectors;
+    core::PlannedBuffer<std::optional<CirculationCollocationCovector>> rows;
+    Vector flow{};
 };
 
 a::ScalarWords retained_word(const numerics::PrecisionBuffer<double>& retained, std::size_t i) {
@@ -803,19 +845,100 @@ struct NonpenetrationBuilder {
         return static_cast<std::size_t>(&row - bound.data());
     }
 
+    static a::P1ActionAdjoint
+    adjoint_axis(const a::SharedP1Action& action, const a::P1ActionSource& source,
+                 std::span<const a::P1ComplexWords> strengths, std::size_t axis,
+                 const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
+                 core::ResourcePlan& memory, p::Work& work) {
+        std::array<a::P1ComplexWords, 3> dual{};
+        dual[axis].real = a::SingleWord{1};
+        auto result = require(a::adjoint_shared_p1(action, source, strengths, dual,
+                                                   std::min(limits.action_steps, remaining(work)),
+                                                   shared, memory, work.stop));
+        account(work, result.used_steps());
+        return result;
+    }
+
+    static void scatter_geometry(const a::P1ActionAdjoint& adjoint, const p::Interval& weight,
+                                 std::span<Vector> points, std::optional<Vector>& query,
+                                 p::Work& work) {
+        constexpr std::size_t axes = std::tuple_size_v<Vector>;
+        for (std::size_t i = 0; i < points.size(); ++i)
+            for (std::size_t axis = 0; axis < axes; ++axis) {
+                auto& entry = points[i][axis];
+                const auto value = import(require(adjoint.point(i, axis)), work);
+                entry = p::add(entry, p::multiply(weight, value, work), work);
+            }
+        for (std::size_t axis = 0; axis < axes; ++axis) {
+            const auto coordinate = require(adjoint.free_query(axis));
+            if (coordinate.has_value() != query.has_value())
+                reject(core::FailureCode::InvalidInput);
+            if (coordinate && query) {
+                auto& entry = (*query)[axis];
+                entry = p::add(entry, p::multiply(weight, import(*coordinate, work), work), work);
+            }
+        }
+    }
+
+    static CirculationCollocationCovector
+    pullback_row(PullbackData& target, std::size_t i, const PanelRow& panel,
+                 const DiscreteCollocation& row, const CirculationRowData& data,
+                 const a::P1ActionValue& primal, const a::SharedP1Action& action,
+                 const a::P1ActionSource& source, const Assembly& assembly,
+                 const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
+                 core::ResourcePlan& memory, a::LocalRootScratch& rounding, p::Work& work) {
+        const auto& transpose = target.transpose;
+        if (!transpose)
+            reject(core::FailureCode::InvalidInput);
+        const auto weight =
+            p::negate(import(retained_word(transpose->solution().values(), i), work), work);
+        const auto velocity_dual = scale_vector(data.normal, weight, work);
+        const auto x = import(row.tangents[0], work);
+        const auto y = import(row.tangents[1], work);
+        const auto direction = native_velocity(data.relative, primal, work);
+        const auto area_dual = scale_vector(
+            normal_projection(data.normal, direction, tangent_length(x, y, work), work), weight,
+            work);
+        std::optional<Vector> query;
+        if (std::holds_alternative<a::FreePoint>(require(source.query.definition()).definition))
+            query.emplace();
+        if (i == 0) {
+            target.point_ids = allocate<std::uint64_t>(memory, action.point_count());
+            target.point_covectors = allocate<Vector>(memory, action.point_count());
+            for (std::size_t point = 0; point < action.point_count(); ++point) {
+                work.step();
+                target.point_ids.values()[point] = require(action.point(point)).value();
+            }
+        }
+        for (std::size_t axis = 0; axis < velocity_dual.size(); ++axis) {
+            target.flow[axis] = p::add(target.flow[axis], velocity_dual[axis], work);
+            const auto dual = adjoint_axis(action, source, assembly.values.values(), axis, limits,
+                                           shared, memory, work);
+            scatter_geometry(dual, velocity_dual[axis], target.point_covectors.values(), query,
+                             work);
+        }
+        const auto representation = limits.induction_accuracy.representation;
+        std::optional<CirculationVectorCovector> enclosed_query;
+        if (query)
+            enclosed_query.emplace(enclose_vector(*query, representation, rounding, work));
+        const auto x_dual = cross(y, area_dual, work);
+        const auto y_dual = cross(area_dual, x, work);
+        return {panel.panel.face,
+                std::move(enclosed_query),
+                {enclose_vector(x_dual, representation, rounding, work),
+                 enclose_vector(y_dual, representation, rounding, work)},
+                enclose_vector(scale_vector(velocity_dual, p::integer(-1), work), representation,
+                               rounding, work)};
+    }
+
     static void assemble_influence(const Assembly& assembly, const a::SharedP1Action& action,
                                    const a::P1ActionSource& source, const Vector& normal,
                                    a::SharedP1Workspace& shared, core::ResourcePlan& memory,
                                    const DiscreteNonpenetrationLimits& limits,
                                    std::span<p::Interval> influence, p::Work& work) {
         const auto transpose = [&](std::size_t axis) {
-            std::array<a::P1ComplexWords, 3> covector{};
-            covector[axis].real = a::SingleWord{1};
-            auto coefficient = require(a::adjoint_shared_p1(
-                action, source, assembly.directions.values(), covector,
-                std::min(limits.action_steps, remaining(work)), shared, memory, work.stop));
-            account(work, coefficient.used_steps());
-            return coefficient;
+            return adjoint_axis(action, source, assembly.directions.values(), axis, limits, shared,
+                                memory, work);
         };
         const std::array coefficients{transpose(0), transpose(1), transpose(2)};
         for (auto& entry : influence) {
@@ -843,7 +966,7 @@ struct NonpenetrationBuilder {
                const DiscreteCirculationRequest& request, a::SharedP1Workspace& shared,
                a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
                p::Work& work, const DiscreteCirculationDirection* direction,
-               std::span<p::Interval> forcing) {
+               std::span<p::Interval> forcing, PullbackData* pullback = nullptr) {
         const auto& stop = work.stop;
         work.step();
         const auto geometry_owner = require(input.contact.geometry());
@@ -881,7 +1004,18 @@ struct NonpenetrationBuilder {
                 (void)import(row.velocity, work);
             }
         }
-        admit(assembly, input, limits, memory, 2, 5, work);
+        core::PlannedBuffer<p::Interval> objective;
+        if (pullback != nullptr) {
+            objective = allocate<p::Interval>(memory, order);
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                const auto& seed = pullback->seed[i];
+                if (seed.face != bound[i].panel.face)
+                    reject(core::FailureCode::InvalidInput);
+                objective.values()[i] = import(seed.value, work);
+            }
+        }
+        admit(assembly, input, limits, memory, 2, pullback != nullptr ? 8U : 5U, work);
 
         const auto ambient = ambient_velocity(flow, work);
         a::LocalRootScratch rounding;
@@ -925,6 +1059,14 @@ struct NonpenetrationBuilder {
         }
 
         auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
+        if (pullback != nullptr) {
+            const auto before = work.used;
+            const auto face = [&](std::size_t i) { return bound[i].panel.face; };
+            auto transpose = linearize_native(CirculationSense::Transpose, face, influence.values(),
+                                              objective.values(), pullback->request, memory, work);
+            transpose.steps_ = work.used - before;
+            pullback->transpose.emplace(std::move(transpose));
+        }
 
         for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
             work.step();
@@ -958,6 +1100,10 @@ struct NonpenetrationBuilder {
                                                 record.relative, ambient_direction, full, work);
             const auto original = native_residual(record.normal, record.relative, full, work);
             check.add(original, record.rhs, i, work);
+            if (pullback != nullptr)
+                pullback->rows.values()[i].emplace(
+                    pullback_row(*pullback, i, item, row, record, full, action, source, assembly,
+                                 limits, shared, memory, rounding, work));
             const auto enclosed =
                 a::enclose_p1_value(original, limits.induction_accuracy.representation, rounding);
             results.values()[i].emplace(CirculationResidualRow{
@@ -1018,13 +1164,64 @@ struct NonpenetrationBuilder {
             native_rhs.values()[i] = p::negate(native_rhs.values()[i], work);
         }
         const auto before_tangent = work.used;
-        auto tangent = linearize_native(CirculationSense::Tangent, primal.rows.values(),
-                                        primal.influence.values(), native_rhs.values(),
-                                        tangent_request, memory, work);
+        const auto face = [&](std::size_t i) { return face_at(primal.rows.values(), i); };
+        auto tangent = linearize_native(CirculationSense::Tangent, face, primal.influence.values(),
+                                        native_rhs.values(), tangent_request, memory, work);
         work.step();
         tangent.steps_ = work.used - before_tangent;
         return {finish_primal(std::move(primal), std::move(flow)), std::move(tangent),
                 std::move(forcing), work.used};
+    }
+
+    static DiscreteCirculationPullback solve_pullback(
+        const DiscreteNonpenetrationInput& input, std::span<const CirculationLinearRhs> seed,
+        ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
+        const DiscreteCirculationRequest& primal_request,
+        const DiscreteCirculationRequest& transpose_request, a::SharedP1Workspace& shared,
+        a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+        const std::stop_token& stop) {
+        p::Work work{0, limits.steps, stop};
+        work.step();
+        const auto order = input.collocations.size();
+        if (seed.size() != order)
+            reject(core::FailureCode::InvalidInput);
+        match_linearization_context(transpose_request.scales.context, primal_request.scales.context,
+                                    true);
+        validate_circulation(transpose_request, order, work, true);
+        PullbackData target{transpose_request, seed};
+        target.rows = allocate<std::optional<CirculationCollocationCovector>>(memory, order);
+        auto primal = solve_data(input, flow, limits, primal_request, shared, local, kernel, memory,
+                                 work, nullptr, {}, &target);
+        auto& transpose = target.transpose;
+        if (!transpose)
+            reject(core::FailureCode::InvalidInput);
+        auto points =
+            allocate<std::optional<CirculationPointCovector>>(memory, target.point_ids.size());
+        const auto representation = limits.induction_accuracy.representation;
+        a::LocalRootScratch rounding;
+        for (std::size_t i = 0; i < points.size(); ++i) {
+            work.step();
+            points.values()[i].emplace(
+                CirculationPointCovector{a::PointId{target.point_ids.values()[i]},
+                                         enclose_vector(target.point_covectors.values()[i],
+                                                        representation, rounding, work)});
+        }
+        const auto uniform = enclose_vector(target.flow, representation, rounding, work);
+        work.step();
+        return {finish_primal(std::move(primal), std::move(flow)),
+                std::move(*transpose),
+                std::move(points),
+                std::move(target.rows),
+                uniform,
+                work.used};
+    }
+
+    static a::PhysicalFaceId face_at(std::span<const std::optional<CirculationResidualRow>> rows,
+                                     std::size_t i) {
+        const auto& row = rows[i];
+        if (!row)
+            reject(core::FailureCode::InvalidInput);
+        return row->face;
     }
 
     static DiscreteCirculationLinearization
@@ -1053,17 +1250,17 @@ struct NonpenetrationBuilder {
             const auto value = import(input[i].value, work);
             right.values()[i] = transposed ? value : p::negate(value, work);
         }
-        return linearize_native(sense, primal.rows_.values(), primal.influence_.values(),
-                                right.values(), request, memory, work);
+        const auto face = [&](std::size_t i) { return face_at(primal.rows_.values(), i); };
+        return linearize_native(sense, face, primal.influence_.values(), right.values(), request,
+                                memory, work);
     }
 
+    template <class FaceAt>
     static DiscreteCirculationLinearization
-    linearize_native(CirculationSense sense,
-                     std::span<const std::optional<CirculationResidualRow>> original_rows,
-                     std::span<const p::Interval> native, std::span<const p::Interval> right,
-                     const DiscreteCirculationRequest& request, core::ResourcePlan& memory,
-                     p::Work& work) {
-        const auto order = original_rows.size();
+    linearize_native(CirculationSense sense, FaceAt face_at, std::span<const p::Interval> native,
+                     std::span<const p::Interval> right, const DiscreteCirculationRequest& request,
+                     core::ResourcePlan& memory, p::Work& work) {
+        const auto order = right.size();
         const bool transposed = sense == CirculationSense::Transpose;
         const auto coefficient = [&](std::size_t row, std::size_t column) -> const p::Interval& {
             return transposed ? native[column * order + row] : native[row * order + column];
@@ -1090,11 +1287,8 @@ struct NonpenetrationBuilder {
                 original = p::add(original,
                                   p::multiply(coefficient(i, j), retained.values()[j], work), work);
             check.add(original, original_rhs, i, work);
-            const auto& row = original_rows[i];
-            if (!row)
-                reject(core::FailureCode::InvalidInput);
             rows.values()[i].emplace(CirculationLinearRow{
-                row->face, a::enclose_p1_value(original, core::Precision::TwoWord, rounding)});
+                face_at(i), a::enclose_p1_value(original, core::Precision::TwoWord, rounding)});
         }
         check.finish();
         work.step();
@@ -1227,6 +1421,59 @@ core::Result<DiscreteCirculationDirectionalSolve> solve_discrete_circulation_dir
         return NonpenetrationBuilder::solve_direction(input, direction, std::move(flow), limits,
                                                       primal, tangent, shared, local, kernel,
                                                       memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+DiscreteCirculationPullback::DiscreteCirculationPullback(
+    DiscreteCirculation&& primal, DiscreteCirculationLinearization&& transpose,
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points,
+    core::PlannedBuffer<std::optional<CirculationCollocationCovector>> rows,
+    const CirculationVectorCovector& uniform_flow, std::uint64_t steps) noexcept
+    : primal_(std::move(primal)),
+      transpose_(std::move(transpose)),
+      points_(std::move(points)),
+      rows_(std::move(rows)),
+      uniform_flow_(uniform_flow),
+      steps_(steps) {}
+
+core::Result<CirculationPointCovector>
+DiscreteCirculationPullback::point(std::size_t i) const noexcept {
+    if (i >= points_.size())
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    const auto& point = points_.values()[i];
+    if (!point)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    return *point;
+}
+
+core::Result<CirculationCollocationCovector>
+DiscreteCirculationPullback::row(std::size_t i) const noexcept {
+    if (i >= rows_.size())
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    const auto& row = rows_.values()[i];
+    if (!row)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    return *row;
+}
+
+core::Result<DiscreteCirculationPullback> solve_discrete_circulation_pullback(
+    const DiscreteNonpenetrationInput& input, std::span<const CirculationLinearRhs> seed,
+    ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
+    const DiscreteCirculationRequest& primal, const DiscreteCirculationRequest& transpose,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_pullback(input, seed, std::move(flow), limits, primal,
+                                                     transpose, shared, local, kernel, memory,
+                                                     stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {
