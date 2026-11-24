@@ -230,15 +230,14 @@ TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
     const auto missing = c::prepare_case_pg_reference(si, 77, limits, workspace, plan);
     REQUIRE_FALSE(missing);
     CHECK(missing.error().code == core::FailureCode::InvalidInput);
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
+    const auto stop = partition_test::requested_stop_token();
     auto cancelled = limits;
-    cancelled.cancellation = stop.get_token();
+    cancelled.cancellation = stop;
     const auto entry_stop = c::prepare_case_pg_reference(si, 1, cancelled, workspace, plan);
     REQUIRE_FALSE(entry_stop);
     CHECK(entry_stop.error().code == core::FailureCode::Cancelled);
     cancelled.cancellation = {};
-    cancelled.partition.cancellation = stop.get_token();
+    cancelled.partition.cancellation = stop;
     const auto stage_stop = c::prepare_case_pg_reference(si, 1, cancelled, workspace, plan);
     REQUIRE_FALSE(stage_stop);
     CHECK(stage_stop.error().code == core::FailureCode::Cancelled);
