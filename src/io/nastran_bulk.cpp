@@ -264,7 +264,9 @@ struct Continuation {
 
 void link(std::span<Row> rows, std::size_t from, std::size_t to) {
     const auto& following = rows[to];
-    if (rows[from].format != following.format)
+    const auto preceding = rows[from].format;
+    if (preceding != following.format &&
+        (preceding == Format::Free || following.format == Format::Free))
         reject(Code::Unsupported, Reason::UnsupportedForm, following.first.position);
     if (rows[from].next != no_row)
         reject(Code::InvalidInput, Reason::Continuation, following.first.position);
@@ -349,19 +351,22 @@ void flatten(std::string_view bytes, std::span<Row> rows, std::span<NastranBulkC
         if (head.kind != RowKind::Card)
             continue;
         const auto start = field_slot;
-        std::size_t lines = 0;
+        bool incomplete_large_group = false;
         for (auto next = i; next != no_row; next = rows[next].next) {
             auto& row = rows[next];
             work.charge(1, row.first.position);
             if (row.used)
                 reject(Code::InvalidInput, Reason::Continuation, row.first.position);
             row.used = true;
-            ++lines;
+            if (row.format == Format::Large)
+                incomplete_large_group = !incomplete_large_group;
+            else if (incomplete_large_group)
+                reject(Code::Unsupported, Reason::UnsupportedForm, row.first.position);
             const auto pos = row.physical.position;
             data_fields({spelling(bytes, row.physical), pos.byte, pos.line}, row.format, work,
                         [&](Lexeme field) { fields[field_slot++] = field; });
         }
-        if (head.format == Format::Large && lines % 2 != 0)
+        if (incomplete_large_group)
             reject(Code::InvalidInput, Reason::Continuation, head.first.position);
         cards[card_slot++] = {head.format, head.first, start, field_slot - start};
     }

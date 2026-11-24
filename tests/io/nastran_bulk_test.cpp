@@ -174,6 +174,35 @@ TEST_CASE("Nastran lexer retains formats, spelling and source positions in one s
     CHECK_FALSE(result.integer(continued[9]));
 }
 
+TEST_CASE("Fixed continuations can change width at a complete field group",
+          "[IO4-03][integration]") {
+    const auto text =
+        fixed("CORD2R", {"42", "", "0.0", "0.0", "0.0", "1.0", "0.0", "0.0"}, 8, "*G1") + "\n" +
+        fixed("*G2", {}, 16) + "\n" + fixed("*G1", {"0.125D+1", "1.0", "0.0"}, 16, "+G2") + "\n" +
+        fixed("SPC1*", {"1", "123", "1", "2"}, 16, "+S1") + "\n" +
+        fixed("*S1", {"3", "4", "5", "6"}, 16, "*S2") + "\n" + fixed("+S2", {"7", "8"}, 8);
+    auto source = snapshot(text);
+    core::ResourcePlan plan{memory};
+    const auto deck = take(NastranBulkDeck::prepare(std::move(source), limits, plan, {}));
+    const auto view = take(deck.view());
+    REQUIRE(view.cards.size() == 2);
+    CHECK(view.cards[0].format == NastranBulkFormat::Small);
+    CHECK(view.cards[1].format == NastranBulkFormat::Large);
+    const auto coordinates = view.data_fields(view.cards[0]);
+    const auto points = view.data_fields(view.cards[1]);
+    REQUIRE(coordinates.size() == 16);
+    REQUIRE(points.size() == 16);
+    CHECK(view.text(coordinates[7]) == "0.0");
+    CHECK(view.text(coordinates[8]) == "0.125D+1");
+    CHECK(coordinates[8].position == NastranBulkPosition{text.find("0.125D+1"), 3, 9});
+    CHECK(coordinates[12].position.line == 2);
+    CHECK(view.text(coordinates[15]).empty());
+    CHECK(take(view.integer(points[7])) == 6);
+    CHECK(take(view.integer(points[8])) == 7);
+    CHECK(points[8].position == NastranBulkPosition{text.find("+S2") + 8, 6, 9});
+    CHECK(view.text(points[15]).empty());
+}
+
 TEST_CASE("The checked lexical limits count padding and preserve the snapshot on failure",
           "[IO4-03][N4-02][negative]") {
     const auto text = std::string{"GRID    42\nSPC1,1, 12,,45,"};
