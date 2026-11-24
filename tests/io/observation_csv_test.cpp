@@ -152,6 +152,7 @@ TEST_CASE("Observation CSV admits exact budgets and returns no bytes on refusal"
     REQUIRE(baseline);
     auto budget = baseline_memory.allocated_bytes();
     ObservationCsvLimits limits{1, 1, plain_column.quantity.size(), baseline->size()};
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() is non-const.
     std::stop_source cancel;
     auto code = FailureCode::ResourceExceeded;
     bool succeeds = false;
