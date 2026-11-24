@@ -3,6 +3,7 @@
 #include "case_pg_reference.hpp"
 #include "io/nastran_pg_material_axes.hpp"
 
+#include <functional>
 #include <optional>
 #include <utility>
 
@@ -58,6 +59,45 @@ struct CaseNastranPgDiagnostic {
     const io::detail::NastranLaminateCards&, const CasePgReferenceLimits&,
     const io::detail::ExternalSidecarPgLimits&, std::uint64_t maximum_axis_matches,
     core::Workspace&, core::ResourcePlan&, CaseNastranPgDiagnostic* = nullptr) noexcept;
+
+struct CaseNastranPgSetLimits {
+    std::uint64_t maximum_shells{};
+    std::uint64_t maximum_selection_work{};
+    std::uint64_t maximum_axis_matches_per_shell{};
+};
+
+struct CaseNastranPgSetDiagnostic {
+    std::optional<io::detail::MeshShellId> shell{};
+    std::optional<core::Index> first_declaration{};
+    CaseNastranPgDiagnostic member{};
+};
+
+/// Owns the complete planar evidence for the Shells named by one bound Nastran sidecar.
+class CaseNastranPlanarPgSet {
+public:
+    using Shell = CaseExternalPg<CaseNastranPgMatch>;
+
+    // Shells appear in first sidecar declaration order. All owners retain the same
+    // Case and deck provenance. Per-Shell limits and the shared plan apply on every call.
+    [[nodiscard]] static core::Result<CaseNastranPlanarPgSet>
+    prepare(const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&,
+            const io::detail::NastranLaminateCards&, const CasePgReferenceLimits&,
+            const io::detail::ExternalSidecarPgLimits&, const CaseNastranPgSetLimits&,
+            core::Workspace&, core::ResourcePlan&, CaseNastranPgSetDiagnostic* = nullptr) noexcept;
+
+    [[nodiscard]] std::size_t size() const noexcept {
+        return shells_.size();
+    }
+    [[nodiscard]] core::Result<std::reference_wrapper<const Shell>> at(core::Index) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const Shell>>
+        at(core::Index) const&& = delete;
+
+private:
+    explicit CaseNastranPlanarPgSet(core::PlannedBuffer<std::optional<Shell>>&& shells) noexcept
+        : shells_(std::move(shells)) {}
+
+    core::PlannedBuffer<std::optional<Shell>> shells_;
+};
 
 /// Prepare the same reference for whole-face bounds against an explicit conversion budget.
 /// The retained observation IDs identify the remaining independent physical checks.
