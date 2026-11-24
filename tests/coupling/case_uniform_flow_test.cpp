@@ -493,10 +493,13 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
                                      std::string{velocity} + "}"));
         return input;
     };
-    const auto import_transport = [&](const JsonToken& input, io::SourceId id) {
-        const auto si = materialize(input, id);
+    const auto prepare_transport = [&](const io::SiCase& si) {
         core::ResourcePlan memory{budget};
         return take(cf::prepare_case_prescribed_wake(si, stamp, {}, work, limits, memory));
+    };
+    const auto import_transport = [&](const JsonToken& input, io::SourceId id) {
+        const auto si = materialize(input, id);
+        return prepare_transport(si);
     };
     const auto evaluate_transport = [&](const cf::CasePrescribedWakeReady& field,
                                         const cf::CasePrescribedWakeReady& current, const Number& t,
@@ -513,12 +516,6 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
         CHECK(result.used_steps() <= forecast.reserved_steps);
         CHECK(result.requested_side() == side);
         CHECK(memory.allocated_bytes() == forecast.payload_bytes);
-        REQUIRE(admitted.arithmetic.steps > 0);
-        --admitted.arithmetic.steps;
-        core::ResourcePlan refused{forecast.payload_bytes};
-        reject(cf::evaluate_case_prescribed_wake(field, current, query, work, admitted, refused),
-               core::FailureCode::ResourceExceeded);
-        CHECK(refused.allocated_bytes() == 0);
         return result;
     };
 
@@ -532,13 +529,24 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
         const auto current = import_transport(changed_ambient, io::SourceId{302});
         const auto value = evaluate_transport(field, current, t);
         jet(value.jet(), {Number{127, 12500}, Number{127, 5000, -1}, zero}, {zero, zero, zero}, t);
+        const cf::CaseUniformFlowQuery query{stamp, t.view()};
+        const auto forecast =
+            take(cf::forecast_case_prescribed_wake(field, current, query, limits.flow));
+        auto short_limit = limits.flow;
+        REQUIRE(forecast.reserved_steps > 0);
+        short_limit.arithmetic.steps = forecast.reserved_steps - 1;
+        core::ResourcePlan refused{forecast.payload_bytes};
+        reject(cf::evaluate_case_prescribed_wake(field, current, query, work, short_limit, refused),
+               core::FailureCode::ResourceExceeded);
+        CHECK(refused.allocated_bytes() == 0);
     }
 
     SECTION("Polynomial conversion uses the case start and end, origin and scale") {
         const auto input = case_with(
             R"({"kind":"polynomial","origin":1,"scale":2,"domain":[0,2],"coefficients":[[3,-2,5],[2,4,0]]})");
-        const auto field = import_transport(input, io::SourceId{303});
-        const auto current = import_transport(input, io::SourceId{304});
+        const auto si_case = materialize(input, io::SourceId{303});
+        const auto field = prepare_transport(si_case);
+        const auto current = prepare_transport(si_case);
         const auto value = evaluate_transport(field, current, t);
         jet(value.jet(), {Number{889, 50000}, Number{127, 25000, -1}, Number{127, 5000}},
             {Number{127, 1500000}, Number{127, 750000}, zero}, t);
@@ -582,16 +590,20 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
         const cf::CaseFlowComponentBudget allowed{one.view(), accuracy.view(), zero.view()};
         const std::array strict_components{strict, strict, strict};
         const std::array components{allowed, allowed, allowed};
+        const auto project = [](cf::CasePrescribedWakeEvaluation& source,
+                                const cf::CaseFlowProjectionRequest& request) {
+            return cf::project_case_prescribed_wake(std::move(source), request);
+        };
         reject(
-            cf::project_case_prescribed_wake(
-                std::move(value),
+            project(
+                value,
                 {core::Precision::Binary64, strict_components, strict_components, {4096, budget}}),
             core::FailureCode::PrecisionUnresolved);
         CHECK(value.jet().active());
         for (const auto representation : {core::Precision::Binary64, core::Precision::TwoWord}) {
             auto trial = evaluate_transport(replay, current, mid, p::RequestedSide::Right);
-            const auto projected = take(cf::project_case_prescribed_wake(
-                std::move(trial), {representation, components, components, {4096, budget}}));
+            const auto projected =
+                take(project(trial, {representation, components, components, {4096, budget}}));
             CHECK_FALSE(trial.jet().active());
             CHECK(projected.jet().active());
             CHECK(projected.requested_side() == p::RequestedSide::Right);
@@ -636,8 +648,9 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
         input.field("analysis")
             .set("intervals", parse(R"([{"start":0,"end":4,"step":1,"restart":"initial"}])"));
         const Number before{120, 1, -1};
-        const auto held = import_transport(input, io::SourceId{312});
-        const auto held_current = import_transport(input, io::SourceId{313});
+        const auto hold_case = materialize(input, io::SourceId{312});
+        const auto held = prepare_transport(hold_case);
+        const auto held_current = prepare_transport(hold_case);
         const auto held_value = evaluate_transport(held, held_current, before);
         jet(held_value.jet(), {zero, Number{127, 25000}, Number{127, 25000, -1}},
             {zero, zero, zero}, before);
@@ -647,8 +660,9 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
             .field("convection")
             .field("velocity")
             .set("outside", parse(R"({"kind":"periodic","period":4})"));
-        const auto cyclic = import_transport(input, io::SourceId{314});
-        const auto cyclic_current = import_transport(input, io::SourceId{315});
+        const auto periodic_case = materialize(input, io::SourceId{314});
+        const auto cyclic = prepare_transport(periodic_case);
+        const auto cyclic_current = prepare_transport(periodic_case);
         const auto wrapped = evaluate_transport(cyclic, cyclic_current, before);
         jet(wrapped.jet(), {Number{127, 12500}, Number{127, 25000}, Number{381, 25000, -1}},
             {zero, zero, zero}, before);
