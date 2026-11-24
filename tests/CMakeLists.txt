@@ -126,6 +126,12 @@ uvlas_add_test(io.nastran_beam_cards
     LIBS uvlas_io Boost::hash2)
 target_include_directories(uvlas_test_io_nastran_beam_cards PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.nastran_pbeam_cards
+    LABELS unit integration negative verification
+    SOURCES io/nastran_pbeam_cards_test.cpp
+    LIBS uvlas_io Boost::hash2)
+target_include_directories(uvlas_test_io_nastran_pbeam_cards PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.gmsh_mesh
     LABELS unit property negative verification
     SOURCES io/gmsh_mesh_test.cpp support/allocation_audit.cpp
