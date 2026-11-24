@@ -1,0 +1,57 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-reference-graph",
+  "ids": [
+    "IO4-01",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "89b141d7bb8355c21348b5af5e3b47ca33a178a7",
+  "scope": "Owned reference graph and ordered native snapshot acquisition for admitted role declarations",
+  "verification": {
+    "ctest_regex": "^io\\.(reference_input|reference_dependency_walk|reference_root_plan|reference_file_snapshot|reference_path|gmsh_mesh|nastran_bulk)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 7,
+      "reference_input_cases": 15,
+      "reference_input_assertions": 742
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 7,
+      "reference_input_cases": 15,
+      "reference_input_assertions": 746,
+      "clang_tidy": "21.1.1 PASS on changed sources and reference input test",
+      "mutation": {
+        "change": "Open an authenticated source again on each edge",
+        "affected_case": "An authenticated dependency graph owns sources, provenance and adjacency after cleanup",
+        "mutated": {
+          "cases_failed": 1,
+          "assertions_failed": 3
+        },
+        "restored": {
+          "cases_passed": 1,
+          "assertions_passed": 43
+        }
+      }
+    }
+  },
+  "sources": {
+    "src/io/reference_dependency_walk.cpp": "127a7f443b89cf6a10d5a59e6046ced9b9a2b720462e8b0e8db3a9afc7473098",
+    "src/io/reference_dependency_walk.hpp": "47293d565ccc961fdac80b7ab11d9c62704c81cc964306eac46f05a9b41f5de3",
+    "src/io/reference_resolution.cpp": "213085e281f717bf301980087eb97170129bec7f257b54700f463552cdd32649",
+    "src/io/reference_resolution.hpp": "be6729e2027c941de4ecd05e76e39841c657e1c2d352877ecb3242425dd66d83",
+    "src/io/reference_root_snapshot.cpp": "1dc219aaf67ca1420447253a40f5d6229176a3f4ae9d0bc01ebdd29718968e55",
+    "src/io/reference_root_snapshot.hpp": "0d9b1e703674c38e6cc28794e19a087e67b14e2dae79f3bbff92e6cf40fb9282",
+    "tests/io/reference_input_test.cpp": "8e445a3a397cc6bb61348eeadd47b5ae5fbcad0b11b8d451671a78183285ed05"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/reference-graph.md": "1392bd9086cd93affc19fe56d6ce692210ac25953adcce5c6c971b73d2acf731",
+    "docs/verification/IM-06/reference-snapshot-design-cases.json": "89291c6309f2a920f5bec2cb87c70dce94fdb9b1b8af4f7fa128133c325e9d36"
+  }
+}
