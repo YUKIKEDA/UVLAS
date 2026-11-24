@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-beam-cards",
+  "ids": [
+    "IO4-01",
+    "IO4-03",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "964f225fca0899ff8ffef43e18ca4d1cd30fdb2a",
+  "scope": "MSC Nastran 2022.1 typed CBEAM connectivity, offset and orientation interpretations, endpoint releases and warping point references, and PBEAM identity lookup",
+  "verification": {
+    "ctest_regex": "^io\\.nastran_(beam_cards|isotropic_shell_cards|shell_cards|coordinate_cards|bulk|number_fields)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 6,
+      "beam_card_cases": 5,
+      "beam_card_assertions": 304
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 6,
+      "beam_card_cases": 5,
+      "beam_card_assertions": 304,
+      "clang_tidy": "21.1.1 PASS on parser normal/audit and test"
+    }
+  },
+  "reference": {
+    "title": "MSC Nastran 2022.1 Quick Reference Guide",
+    "printed_pages": "1470-1473",
+    "pdf_sha256": "c0675eed07f664ee985bc0cb3f1e1c00cc138b3a9a0ec1bf538ef345a172fcef"
+  },
+  "tested_target_registration": {
+    "commit": "964f225fca0899ff8ffef43e18ca4d1cd30fdb2a",
+    "CMakeLists.txt": "73b98ccef0aef1460e52c71360612d15c2fe337a1b61509bbac03ef70517d3c5",
+    "tests/CMakeLists.txt": "4adae71208d5c773d9fb221e2c60f50514a9c54316752d125dea2452f3379042"
+  },
+  "sources": {
+    "src/io/nastran_beam_cards.cpp": "f0fd0aa78dc0e51859b03ba96d58688f58c9daa3efd351731e18bbe05c120640",
+    "src/io/nastran_beam_cards.hpp": "fb079f7c9f6b9f8cf6ca6ea12b4093aee897d9f5c951e8f3fc357d1646365dcc",
+    "tests/io/nastran_beam_cards_test.cpp": "cba8f6edf9aee015b8d8085631e49256b6c2e1be14e12ccd0fb7334fb3affd08"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-beam-cards.md": "462f19dfbda6e5234ccc29e524f156c6ad071f9188939efbe5995e0ab659527e"
+  }
+}
