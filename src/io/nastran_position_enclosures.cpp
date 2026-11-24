@@ -85,14 +85,23 @@ public:
         return result;
     }
 
-    [[nodiscard]] std::array<NastranComponentAxis, 3>
-    component_axes(const NastranGridPoint& point) {
+    [[nodiscard]] std::array<NastranComponentAxis, 3> component_axes(const NastranGridPoint& point,
+                                                                     std::uint8_t components) {
         const auto* definition = coordinate(point.displacement_system);
         const auto cd_kind = kind(definition);
         auto physical = reference_frame(definition);
         if (cd_kind == NastranCoordinateKind::Rectangular) {
             return {retain_axis(physical.axes[0]), retain_axis(physical.axes[1]),
                     retain_axis(physical.axes[2])};
+        }
+
+        constexpr unsigned transverse_components =
+            (1U << 0U) | (1U << 1U) | (1U << 3U) | (1U << 4U);
+        if (cd_kind == NastranCoordinateKind::Cylindrical &&
+            (components & transverse_components) == 0) {
+            // At a pole the axial components are the same in the cylindrical
+            // and defining rectangular frames. Do not infer either transverse axis.
+            return {NastranComponentAxis{}, NastranComponentAxis{}, retain_axis(physical.axes[2])};
         }
 
         Position position;
@@ -472,7 +481,7 @@ core::Result<NastranSpcDirections> NastranSpcDirections::prepare(
             budget.admit(18 + 16);
             Transform transform{*deck, budget.leaf_limits, plan, work, active};
             const auto& point = transform.select(grid);
-            auto axes = transform.component_axes(point);
+            auto axes = transform.component_axes(point, row.components);
             work.step();
             return NastranSpcDirections{{parsed->source, row.set, grid,
                                          point.displacement_system.id, point.id_field.position,

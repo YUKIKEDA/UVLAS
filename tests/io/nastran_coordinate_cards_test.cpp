@@ -528,7 +528,9 @@ constexpr std::string_view spc_fixture =
     "SPC,10,1,14,0.125\n"
     "SPC1,20,123,2,THRU,7\n"
     "SPC,30,3,123456,0.0\n"
-    "SPC,40,4,2,0.0\n";
+    "SPC,40,4,2,0.0\n"
+    "GRID,8,20,0.0,30.0,2.0,20\n"
+    "SPC1,50,36,7,THRU,8\n";
 
 [[nodiscard]] NastranSpcDirectionLimits spc_limits() noexcept {
     const auto base = position_limits();
@@ -647,6 +649,17 @@ TEST_CASE("SPC direction preparation diagnoses polar axes and stale or absent so
     CHECK(take(diagnostic).reason == PositionReason::DisplacementAxis);
     CHECK(take(diagnostic).grid == NastranGridId{7});
     CHECK(take(diagnostic).position == take(deck.grids[5].displacement_system.field).position);
+
+    // The cylindrical axial direction is unique even at the polar axis.
+    for (const auto grid : {7U, 8U}) {
+        const auto axial = take(read(4, grid));
+        CHECK_FALSE(axial.direction(1));
+        const auto& direction = take(axial.direction(3)).basic;
+        CHECK(&direction == &take(axial.direction(6)).basic);
+        contains_signed_root(direction[0], 1, Q("1/2"));
+        contains(direction[1], Q{0});
+        contains_signed_root(direction[2], 1, Q("1/2"));
+    }
 
     const auto missing = read(1, 5);
     REQUIRE_FALSE(missing);
