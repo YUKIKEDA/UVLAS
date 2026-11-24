@@ -500,9 +500,14 @@ struct PgAeroBuilder {
         candidate.current = single != nullptr
                                 ? a::PositionView{a::SinglePositions{high.values()}}
                                 : a::PositionView{a::DoublePositions{high.values(), low.values()}};
-        account(work, limits.geometry.max_steps);
-        const auto geometry =
-            take(a::prepare_owned_geometry(candidate, limits.geometry, coordinates, memory, stop));
+        const auto geometry_budget = [&] {
+            auto budget = limits.geometry;
+            budget.max_steps = std::min(budget.max_steps, remaining(work));
+            return budget;
+        };
+        const auto geometry = take(
+            a::prepare_owned_geometry(candidate, geometry_budget(), coordinates, memory, stop));
+        account(work, take(geometry.used_preparation_steps()));
         auto contact_limits = limits.contact;
         contact_limits.max_steps = std::min(contact_limits.max_steps, remaining(work));
         auto contact = take(a::check_global_geometry(chart.topology, geometry, contact_limits,
@@ -514,9 +519,10 @@ struct PgAeroBuilder {
         out.midpoints =
             allocate<std::optional<EdgeMidpointVelocity>>(memory, chart.load_edges.size());
         const auto resolve = [&](a::QueryId id, a::QueryDefinition definition) {
-            account(work, limits.geometry.max_steps);
-            return take(a::resolve_query(geometry, {id, definition}, state.context, limits.geometry,
-                                         coordinates, memory, stop));
+            auto query = take(a::resolve_query(geometry, {id, definition}, state.context,
+                                               geometry_budget(), coordinates, memory, stop));
+            account(work, query.used_steps());
+            return query;
         };
         for (std::size_t i = 0; i < map.data_->rows.size(); ++i) {
             work.step();
