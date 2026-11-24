@@ -7,7 +7,8 @@ namespace uvlas::structure {
 
 namespace detail {
 struct BasisReferencePoint;
-}
+struct BasisReferenceSample;
+} // namespace detail
 
 /// An owned reference point and one scalar basis column.
 /// All scalar components use the radicand in the same reference point.
@@ -55,6 +56,9 @@ private:
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     numerator_jet(detail::ReferenceArithmetic&, PgRankBasisColumn,
                   const detail::BasisReferencePoint&) const;
+    [[nodiscard]] detail::BasisReferenceSample
+    sample(detail::ReferenceArithmetic&, const detail::BasisReferencePoint&,
+           const std::array<std::array<ExactRational, 3>, 3>&) const;
     [[nodiscard]] PgReferenceBasisValue
     assemble(detail::ReferenceArithmetic&, detail::BasisReferencePoint&&, PgRankBasisColumn,
              const std::array<std::array<ExactRational, 3>, 3>&) const;
