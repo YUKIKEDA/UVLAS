@@ -1,0 +1,40 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-wide-continuations",
+  "ids": [
+    "IO4-03"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "78ce602a3600587cbd54d06da72993aabff3024d",
+  "scope": "Eight-field boundary changes between fixed widths and adjacent large GRID forms through typed shell references",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 4
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 4,
+      "clang_tidy": "21.1.1 PASS on the lexer and two tests"
+    },
+    "mutation": "The prior lexer caused io.nastran_bulk and io.nastran_shell_cards to fail; all four passed when restored."
+  },
+  "tested_target_registration": {
+    "commit": "78ce602a3600587cbd54d06da72993aabff3024d",
+    "CMakeLists.txt": "ec42e29583fcf8e2ecd2da371796c6fdc45e584e069e3781308da628002ea892",
+    "tests/CMakeLists.txt": "d84f3c53760e98e0be2e89d9d570a045504c3f4adfca09a81d6b33776aed25c0"
+  },
+  "sources": {
+    "src/io/nastran_bulk.cpp": "bb02ce5bea52eb514197b3bc53bdab78fc4b069d5150b0ec7ddaefc61a00422e",
+    "src/io/nastran_bulk.hpp": "9acc234a5fddb9c10f6b17329039836120b6e6566a6b9eee3db9bd521f3e3927",
+    "tests/io/nastran_bulk_test.cpp": "9601ac1767e87a7970f7866524112a6274cd8809dfa4d11df95408e3b86c81ba",
+    "tests/io/nastran_shell_cards_test.cpp": "e3b414912226c963ce13498203ec1816a571f56427e8a21d6780fc8a3f1bdb2c"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-wide-continuations.md": "7f2ec97abe3e85c6a1d737d0b3acc9719747ed1da2fb2701280d4fea13cc671c"
+  }
+}
