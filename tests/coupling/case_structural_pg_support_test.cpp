@@ -249,10 +249,11 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
         evaluation, {exact, exact, count}, trace_limits, 2, 100'000};
     constexpr std::array first{support_id, duplicate_id}, reverse{duplicate_id, support_id};
     const auto ready = [&](const a::JsonToken& json, PgSparseChart& source,
-                           std::span<const PgConstraintId> ids) {
+                           std::span<const PgConstraintId> ids,
+                           const c::CaseStructuralSupportLimits& request_limits) {
         const auto typed = checked_case(json);
         return c::prepare_case_structural_pg_support(typed, std::move(source), patches, ids, stamp,
-                                                     ws, motion_workspace, caps, memory);
+                                                     ws, motion_workspace, request_limits, memory);
     };
     auto other = input;
     auto& other_supports = other.field("model").field("supports").elements;
@@ -260,7 +261,10 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
         "rotation_vector",
         a::parse(
             R"({"kind":"pchip","times":[0,2],"values":[[0,0,0],[0,0,178]],"outside":{"kind":"reject"}})"));
-    check_failure(ready(other, chart, first), core::FailureCode::Unsupported);
+    check_failure(ready(other, chart, first, caps), core::FailureCode::ResourceExceeded);
+    auto group_caps = caps;
+    group_caps.maximum_motion_groups = 2;
+    check_failure(ready(other, chart, first, group_caps), core::FailureCode::InvalidInput);
     CHECK(take(chart.identity()) == id);
     auto wrong_region = input;
     wrong_region.field("model")
@@ -268,15 +272,17 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
         .elements[0]
         .field("region")
         .set("boundary", a::parse("1"));
-    check_failure(ready(wrong_region, chart, first), core::FailureCode::StaleGeneration);
+    check_failure(ready(wrong_region, chart, first, caps), core::FailureCode::StaleGeneration);
     auto partial_chart = make_chart(clipped);
-    check_failure(ready(input, partial_chart, first), core::FailureCode::StaleGeneration);
+    check_failure(ready(input, partial_chart, first, caps), core::FailureCode::StaleGeneration);
     auto shortened_chart = make_chart(shortened);
-    check_failure(ready(input, shortened_chart, first), core::FailureCode::StaleGeneration);
-    check_failure(ready(input, chart, std::array{support_id}), core::FailureCode::Unsupported);
-    const auto prepared = take(ready(input, chart, first));
+    check_failure(ready(input, shortened_chart, first, caps), core::FailureCode::StaleGeneration);
+    check_failure(ready(input, chart, std::array{support_id}, caps),
+                  core::FailureCode::Unsupported);
+    const auto prepared = take(ready(input, chart, first, caps));
+    REQUIRE(prepared.support().group_count() == 1);
     auto duplicate_chart = make_chart(trace);
-    const auto current = take(ready(input, duplicate_chart, reverse));
+    const auto current = take(ready(input, duplicate_chart, reverse, caps));
 
     const std::array<std::uint32_t, 1> word{1};
     const std::array<std::uint32_t, 2> denom{0, 1U << 12U};
@@ -294,6 +300,7 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
     };
     const auto left = take(query({stamp, 0, 1, Left}));
     const auto right = take(query({stamp, 1, 0, Right}));
+    REQUIRE(left.motion_count() == 1);
     CHECK(q(left.node().seconds) == 1);
     CHECK(q(right.node().seconds) == 1);
     CHECK(right.chart() == id);
@@ -431,5 +438,149 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
         const auto defect = take(c::work_case_structural_pg_support(
             candidate, {id, forcing}, {id, r}, rhs, result, reaction, 1e-6, 2'000'000));
         CHECK(defect <= 1e-6);
+    }
+    // Two separately prescribed rigid fields can share one chart if their zero-extended
+    // generators pass separately. Here the supports act on physically separate plates.
+    auto grouped_input = other;
+    auto& grouped_model = grouped_input.field("model");
+    auto second_geometry = grouped_model.field("geometry").elements.front();
+    second_geometry.set("id", a::string("2"));
+    second_geometry.field("frame").set("origin", a::parse("[5,-1,0]"));
+    grouped_model.field("geometry").elements.push_back(std::move(second_geometry));
+    auto second_shell = grouped_model.field("shells").elements.front();
+    second_shell.set("id", a::string("2"));
+    second_shell.set("geometry", a::string("2"));
+    second_shell.field("layers").elements.front().set("id", a::string("2"));
+    grouped_model.field("shells").elements.push_back(std::move(second_shell));
+    auto& separate_support = grouped_model.field("supports").elements.front();
+    auto& region = separate_support.field("region");
+    region.field("target").set("id", a::string("2"));
+    region.set("geometry", a::string("2"));
+    auto& separate_motion = separate_support.field("motion");
+    separate_motion.set("origin",
+                        a::parse(R"({"origin":[3,1,-2],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    separate_motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[2,0,0],[4,0,0]],"outside":{"kind":"reject"}})"));
+    separate_motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+
+    const std::array second_origin{f.r("5"), f.r("-1"), f.r("0")};
+    Fixture second_fixture;
+    second_fixture.names.push_back({"leading", boundary});
+    second_fixture.layers.clear();
+    second_fixture.layers.push_back(
+        {core::LayerId{2}, second_fixture.zeta[0], second_fixture.zeta[2]});
+    const auto second_patch = patch(second_fixture, {rotation, second_origin, one}, ws, memory);
+    const auto second_ranges = vertical_edges(second_fixture, second_patch, Q{0}, Q{1});
+    const auto second_spans = edge_spans(second_ranges, zero, one);
+    const auto second_trace = take(PgFullTrace::prepare_support(
+        second_patch, second_spans, take(second_patch.info()).identity,
+        second_patch.reference_coordinates(), trace_limits, ws, memory));
+    const std::array two_patches{patches.front(),
+                                 PgConstraintPatchBinding{numerics::PatchId{2}, second_patch}};
+    const std::array two_traces{PgConstraintTraceBinding{support_id, second_trace, 1, {}},
+                                PgConstraintTraceBinding{duplicate_id, trace, 0, {}}};
+    const auto make_grouped = [&] {
+        auto original = take(PgGlobalConstraints::prepare(
+            two_patches, two_traces, {arithmetic, 2, 2, 4096, 30000}, ws, memory));
+        return take(
+            PgSparseChart::prepare(std::move(original), {exact, 280, 280, 24000}, ws, memory));
+    };
+    auto first_grouped = make_grouped();
+    auto second_grouped = make_grouped();
+    const auto grouped_identity = take(first_grouped.identity());
+    const auto group_case = checked_case(grouped_input);
+    const auto grouped = take(c::prepare_case_structural_pg_support(
+        group_case, std::move(first_grouped), two_patches, first, stamp, ws, motion_workspace,
+        group_caps, memory));
+    const auto current_case = checked_case(grouped_input);
+    const auto grouped_current = take(c::prepare_case_structural_pg_support(
+        current_case, std::move(second_grouped), two_patches, reverse, stamp, ws, motion_workspace,
+        group_caps, memory));
+    REQUIRE(grouped.support().group_count() == 2);
+    auto changed = grouped_input;
+    changed.field("model")
+        .field("supports")
+        .elements.front()
+        .field("motion")
+        .set(
+            "translation",
+            a::parse(
+                R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[3,0,0],[6,0,0]],"outside":{"kind":"reject"}})"));
+    auto changed_chart = make_grouped();
+    const auto changed_case = checked_case(changed);
+    const auto changed_current = take(c::prepare_case_structural_pg_support(
+        changed_case, std::move(changed_chart), two_patches, first, stamp, ws, motion_workspace,
+        group_caps, memory));
+    check_failure(c::evaluate_case_structural_pg_support(grouped, changed_current,
+                                                         {stamp, 1, 0, Right}, Second, projection,
+                                                         motion_workspace, evaluation, memory),
+                  core::FailureCode::StaleGeneration);
+
+    const auto grouped_sample = take(c::evaluate_case_structural_pg_support(
+        grouped, grouped_current, {stamp, 1, 0, Right}, Second, projection, motion_workspace,
+        evaluation, memory));
+    REQUIRE(grouped_sample.motion_count() == 2);
+    CHECK(q(grouped_sample.node().seconds) == 1);
+    check_failure(grouped_sample.motion(2), core::FailureCode::InvalidInput);
+    const auto& raw_grouped = grouped.support().chart().original();
+    const auto& group_chart = grouped.support().chart();
+    const auto second_positions = second_patch.reference_coordinates();
+    const auto second_translations = second_patch.translation();
+    const auto layout = raw_grouped.layout();
+    REQUIRE(layout.size() == 2);
+    REQUIRE(layout[0].id == numerics::PatchId{1});
+    REQUIRE(layout[1].id == numerics::PatchId{2});
+    std::vector<PgCartesianExactPosition> group_free(group_chart.free_columns().size());
+    std::vector<PgCartesianExactPosition> group_force(
+        static_cast<std::size_t>(take(raw_grouped.info()).columns));
+    for (const auto& item : layout)
+        group_force[static_cast<std::size_t>(item.first)][0] = f.r("1");
+    const auto group_dual =
+        take(group_chart.transpose({grouped_identity, group_force}, exact, ws, memory));
+    for (std::size_t d = 0; d < 3; ++d) {
+        const auto part = static_cast<p::JetOrder>(d);
+        const auto recovered = take(c::lift_case_structural_pg_support_exact(
+            grouped, grouped_sample, part, group_free, group_caps.exact, ws, memory));
+        const auto applied = take(raw_grouped.apply(
+            {raw_grouped.layout(), recovered.coordinates.values()}, exact, ws, memory));
+        CHECK(std::ranges::equal(applied.values(), recovered.original_rhs.values()));
+        Q work_gap = 0;
+        for (std::size_t col = 0; col < group_force.size(); ++col)
+            work_gap += q(recovered.coordinates.values()[col][0]) * q(group_force[col][0]);
+        for (const auto& source : raw_grouped.sources()) {
+            const bool separate = source.id == support_id;
+            const auto& patch_layout = layout[separate ? 1U : 0U];
+            for (core::Index offset = 0; offset < source.rows; ++offset) {
+                const auto row = source.first_row + offset;
+                const auto actual = static_cast<std::size_t>(row);
+                CHECK(grouped_sample.row_groups()[actual] == (separate ? 1U : 0U));
+                Triple expected{};
+                for (const auto& term : take(raw_grouped.row(row))) {
+                    const auto local = static_cast<std::size_t>(term.column - patch_layout.first);
+                    const auto coefficient = exact_dec(term.coefficient);
+                    for (std::size_t axis = 0; axis < 3; ++axis) {
+                        Dec value;
+                        if (!separate) {
+                            value = full[local][d][axis];
+                        } else if (d == 0) {
+                            value = exact_dec(second_positions[local][axis]);
+                        }
+                        if (separate && axis == 0 && d <= 1)
+                            value += 2 * exact_dec(second_translations[local]);
+                        expected[axis] += coefficient * value;
+                    }
+                }
+                for (std::size_t axis = 0; axis < 3; ++axis) {
+                    const auto& rhs_value = recovered.original_rhs.values()[actual][axis];
+                    CHECK(abs(exact_dec(rhs_value) - expected[axis]) <=
+                          exact_dec(recovered.maximum_rhs_error) + Dec("1e-85"));
+                    work_gap -=
+                        q(rhs_value) * q(group_dual.original_multipliers.values()[actual][axis]);
+                }
+            }
+        }
+        CHECK(work_gap == 0);
     }
 }

@@ -93,12 +93,17 @@ RigidCoefficients coefficients(const CaseMotionEvaluation& motion, p::JetOrder o
     return out;
 }
 
-void fill_rhs(const structure::PgRigidSupportRows& support, const CaseMotionEvaluation& motion,
+using RigidJet = std::array<RigidCoefficients, 3>;
+
+void fill_jet(RigidJet& out, const CaseMotionEvaluation& motion, std::size_t orders,
+              m::Work& work) {
+    for (std::size_t d = 0; d < orders; ++d)
+        out[d] = coefficients(motion, static_cast<p::JetOrder>(d), work);
+}
+
+void fill_rhs(const structure::PgRigidSupportRows& support, std::span<const RigidJet> jets,
               const CasePgSupportProjection& projection, const CasePgSupportLimits& limits,
               std::size_t orders, std::span<io::SiEnclosure> output, m::Work& work) {
-    std::array<RigidCoefficients, 3> jets{};
-    for (std::size_t d = 0; d < orders; ++d)
-        jets[d] = coefficients(motion, static_cast<p::JetOrder>(d), work);
     auto scratch = a::LocalRootScratch{};
     const auto map = support.rows();
     const auto original = support.chart().original().original_rows();
@@ -108,19 +113,19 @@ void fill_rhs(const structure::PgRigidSupportRows& support, const CaseMotionEval
         std::array<m::Interval, axes> x{};
         for (std::size_t k = 0; k < axes; ++k)
             x[k] =
-                rational(source.moving ? source.reference_position[k] : original[row].prescribed[k],
+                rational(source.group ? source.reference_position[k] : original[row].prescribed[k],
                          limits.maximum_row_width_bits, work);
-        const auto b = source.moving
+        const auto b = source.group
                            ? rational(source.translation, limits.maximum_row_width_bits, work)
                            : m::integer(0);
         for (std::size_t d = 0; d < orders; ++d)
             for (std::size_t axis = 0; axis < axes; ++axis) {
                 auto value = d == 0 ? x[axis] : m::integer(0);
-                if (source.moving) {
-                    value = m::multiply(jets[d].translation[axis], b, work);
+                if (source.group) {
+                    const auto& jet = jets[*source.group][d];
+                    value = m::multiply(jet.translation[axis], b, work);
                     for (std::size_t k = 0; k < axes; ++k)
-                        value =
-                            m::add(value, m::multiply(jets[d].rotation[axis][k], x[k], work), work);
+                        value = m::add(value, m::multiply(jet.rotation[axis][k], x[k], work), work);
                 }
                 output[(d * map.size() + row) * axes + axis] = case_components::project(
                     value, projection.original_rhs[d * axes + axis], projection.representation,
@@ -150,6 +155,8 @@ core::Result<CasePgSupportSample> evaluate_case_clocked_pg_support(
                     case_components::reject(InvalidInput);
                 const auto identity = take(support.chart().identity());
                 const auto count = support.rows().size();
+                if (support.group_count() > 1)
+                    case_components::reject(InvalidInput);
                 if (count > limits.maximum_original_rows ||
                     count > static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max()) /
                                 (axes * orders))
@@ -164,7 +171,10 @@ core::Result<CasePgSupportSample> evaluate_case_clocked_pg_support(
                     {projection.representation, projection.motion, probes}, flow_workspace,
                     motion_workspace, limits.clock, plan, stop, details));
                 auto rhs = take(plan.allocate<io::SiEnclosure>(entries, operation));
-                fill_rhs(support, sample.motion, projection, limits, orders, rhs.values(), work);
+                RigidJet jet{};
+                fill_jet(jet, sample.motion, orders, work);
+                fill_rhs(support, std::span{&jet, 1U}, projection, limits, orders, rhs.values(),
+                         work);
                 work.step();
                 return CasePgSupportSample{
                     std::move(sample), identity, std::move(rhs), count, orders, work.used};
@@ -458,8 +468,16 @@ struct Builder {
             work.step();
             return a < b;
         });
-        std::optional<CaseMotionReady> representative;
-        std::optional<CaseMotionSnapshot> archive;
+        const auto capacity = std::min(ids.size(), limits.maximum_motion_groups);
+        if (capacity == 0)
+            case_components::reject(ResourceExceeded);
+        auto motions = take(plan.allocate<std::optional<CaseMotionReady>>(
+            static_cast<core::Index>(capacity), preparation));
+        auto archives = take(plan.allocate<std::optional<CaseMotionSnapshot>>(
+            static_cast<core::Index>(capacity), preparation));
+        auto bindings = take(plan.allocate<PgRigidSupportBinding>(
+            static_cast<core::Index>(ids.size()), preparation));
+        std::size_t group_count = 0;
         const auto& original = chart.original();
         const auto sources = original.sources();
         const auto in_group = [&](std::uint64_t id) {
@@ -519,24 +537,29 @@ struct Builder {
             auto selected = take(prepare_case_motion(
                 si, declaration.motion, {intervals.front().begin, intervals.back().end}, stamp,
                 motion_workspace, timing.motion, plan, stop, details));
-            if (!representative) {
-                archive = take(snapshot_case_motion(selected, motion_workspace, timing.motion, plan,
-                                                    stop, details));
-                representative.emplace(std::move(selected));
-            } else {
-                const auto current = take(snapshot_case_motion(selected, motion_workspace,
-                                                               timing.motion, plan, stop, details));
-                if (!archive || !equal_motion(take(archive->view()), take(current.view()), work))
-                    case_components::reject(Unsupported);
+            auto snapshot = take(snapshot_case_motion(selected, motion_workspace, timing.motion,
+                                                      plan, stop, details));
+            const auto view = take(snapshot.view());
+            const auto occupied = archives.values().first(group_count);
+            const auto match = std::ranges::find_if(occupied, [&](const auto& known) {
+                work.step();
+                return equal_motion(take(known->view()), view, work);
+            });
+            const auto group = static_cast<std::size_t>(match - occupied.begin());
+            if (match == occupied.end()) {
+                if (group_count == capacity)
+                    case_components::reject(ResourceExceeded);
+                motions.values()[group].emplace(std::move(selected));
+                archives.values()[group].emplace(std::move(snapshot));
+                ++group_count;
             }
+            bindings.values()[i] = {id, group};
         }
-        if (!representative)
-            case_components::reject(InvalidInput);
         auto exact = limits.exact;
         exact.arithmetic.cancellation = stop;
-        auto support = take(
-            PgRigidSupportRows::prepare(std::move(chart), patches, ids, exact, pg_workspace, plan));
-        return {std::move(grid), std::move(*representative), std::move(support)};
+        auto support = take(PgRigidSupportRows::prepare_groups(
+            std::move(chart), patches, bindings.values(), group_count, exact, pg_workspace, plan));
+        return {std::move(grid), std::move(motions), std::move(support)};
     }
 
     static CaseStructuralSupportSample
@@ -554,11 +577,14 @@ struct Builder {
             case_components::reject(InvalidInput);
         const auto id = take(field.support_.chart().identity());
         const auto map = field.support_.rows(), live = current.support_.rows();
-        if (id != take(current.support_.chart().identity()) || map.size() != live.size())
+        const auto groups = field.support_.group_count();
+        if (id != take(current.support_.chart().identity()) || map.size() != live.size() ||
+            current.support_.group_count() != groups || groups > field.motions_.size() ||
+            groups > current.motions_.size())
             case_components::reject(StaleGeneration);
         for (std::size_t i = 0; i < map.size(); ++i) {
             work.step();
-            if (map[i].moving != live[i].moving)
+            if (map[i].group != live[i].group)
                 case_components::reject(StaleGeneration);
         }
         if (map.size() > limits.maximum_original_rows ||
@@ -569,24 +595,47 @@ struct Builder {
                                                        limits.clock.flow.clock_and_wake, plan, stop,
                                                        details));
         const auto probes = reference_probes(projection.probe);
-        auto result = take(evaluate_case_motion(
-            field.motion_, current.motion_, {address.stamp, node.seconds, order, address.side},
-            {projection.representation, projection.motion, probes}, motion_workspace,
-            limits.clock.motion, plan, stop, details));
+        const auto group_size = static_cast<core::Index>(groups);
+        auto result =
+            take(plan.allocate<std::optional<CaseMotionEvaluation>>(group_size, operation));
+        auto jets = take(plan.allocate<RigidJet>(group_size, operation));
+        for (std::size_t group = 0; group < groups; ++group) {
+            work.step();
+            const auto& motion = field.motions_.values()[group];
+            const auto& current_motion = current.motions_.values()[group];
+            if (!motion || !current_motion)
+                case_components::reject(StaleGeneration);
+            const auto& published = result.values()[group].emplace(take(evaluate_case_motion(
+                *motion, *current_motion, {address.stamp, node.seconds, order, address.side},
+                {projection.representation, projection.motion, probes}, motion_workspace,
+                limits.clock.motion, plan, stop, details)));
+            fill_jet(jets.values()[group], published, orders, work);
+        }
         auto rhs = take(plan.allocate<io::SiEnclosure>(
             static_cast<core::Index>(map.size() * axes * orders), operation));
-        fill_rhs(field.support_, result, projection, limits, orders, rhs.values(), work);
+        fill_rhs(field.support_, jets.values(), projection, limits, orders, rhs.values(), work);
         work.step();
-        auto moving = take(plan.allocate<bool>(static_cast<core::Index>(map.size()), operation));
+        auto row_groups = take(plan.allocate<std::optional<std::size_t>>(
+            static_cast<core::Index>(map.size()), operation));
         for (std::size_t i = 0; i < map.size(); ++i) {
             work.step();
-            moving.values()[i] = map[i].moving;
+            row_groups.values()[i] = map[i].group;
         }
-        return {std::move(node), std::move(result), id,         field.source(),
-                std::move(rhs),  std::move(moving), map.size(), orders};
+        return {std::move(node), std::move(result),     id,         field.source(),
+                std::move(rhs),  std::move(row_groups), map.size(), orders};
     }
 };
 } // namespace structural_support_detail
+
+core::Result<std::reference_wrapper<const CaseMotionEvaluation>>
+CaseStructuralSupportSample::motion(std::size_t group) const& noexcept {
+    if (group >= motions_.size())
+        return std::unexpected(core::Failure{InvalidInput, operation});
+    const auto& result = motions_.values()[group];
+    if (!result)
+        return std::unexpected(core::Failure{StaleGeneration, operation});
+    return std::cref(*result);
+}
 
 core::Result<CaseStructuralSupport> prepare_case_structural_pg_support(
     const io::SiCase& si, structure::PgSparseChart&& chart,
@@ -809,18 +858,21 @@ core::Result<CaseStructuralExactLift> lift_case_structural_pg_support_exact(
         if (sample.rows() != map.size() || d >= sample.orders() || sample.orders() > 3 ||
             source.size() != partition_mul(partition_mul(map.size(), axes), sample.orders()))
             partition_fail(InvalidInput);
-        const auto selected = sample.moving_rows();
-        if (selected.size() != map.size())
+        const auto groups = field.support().group_count();
+        const auto selected = sample.row_groups();
+        if (selected.size() != map.size() || sample.motion_count() != groups)
             partition_fail(StaleGeneration);
         for (std::size_t i = 0; i < map.size(); ++i) {
             math.visit(1);
-            if (selected[i] != map[i].moving)
+            if (selected[i] != map[i].group)
                 partition_fail(StaleGeneration);
         }
         if (map.size() > limits.maximum_original_rows)
             partition_fail(ResourceExceeded);
         const auto growing = partition_mul(axes, map.size());
-        math.admit(partition_add(reference_live_rationals, growing));
+        const auto group_rationals = partition_mul(axes * (axes + 1), groups);
+        math.admit(
+            partition_add(reference_live_rationals, partition_add(growing, group_rationals)));
 
         const auto centre = [&](const io::SiEnclosure& input, bool include_radius) {
             return std::visit(
@@ -862,26 +914,35 @@ core::Result<CaseStructuralExactLift> lift_case_structural_pg_support_exact(
             {
                 const auto lease = partition_take(workspace.acquire());
                 static_cast<void>(lease);
-                PgCartesianExactPosition translation;
-                std::array<PgCartesianExactPosition, axes> rotation;
-                for (std::size_t axis = 0; axis < axes; ++axis) {
-                    translation[axis] =
-                        centre(partition_take(sample.motion().point(0, axis, order)), false);
-                    for (std::size_t j = 0; j < axes; ++j)
-                        rotation[axis][j] = math.sub(
-                            centre(partition_take(sample.motion().point(j + 1, axis, order)),
-                                   false),
-                            translation[axis]);
+                struct GroupJet {
+                    PgCartesianExactPosition translation;
+                    std::array<PgCartesianExactPosition, axes> rotation;
+                };
+                auto jets = partition_take(
+                    plan.allocate<GroupJet>(partition_index(groups), partition_operation));
+                for (std::size_t group = 0; group < groups; ++group) {
+                    math.visit(1);
+                    const auto& motion = partition_take(sample.motion(group)).get();
+                    auto& jet = jets.values()[group];
+                    for (std::size_t axis = 0; axis < axes; ++axis) {
+                        jet.translation[axis] =
+                            centre(partition_take(motion.point(0, axis, order)), false);
+                        for (std::size_t j = 0; j < axes; ++j)
+                            jet.rotation[axis][j] = math.sub(
+                                centre(partition_take(motion.point(j + 1, axis, order)), false),
+                                jet.translation[axis]);
+                    }
                 }
                 const auto original = chart.original().original_rows();
                 for (std::size_t row = 0; row < map.size(); ++row) {
                     math.visit(1);
                     for (std::size_t axis = 0; axis < axes; ++axis) {
                         auto& output = rhs.values()[row][axis];
-                        if (map[row].moving) {
-                            output = math.mul(translation[axis], map[row].translation);
+                        if (map[row].group) {
+                            const auto& jet = jets.values()[*map[row].group];
+                            output = math.mul(jet.translation[axis], map[row].translation);
                             for (std::size_t j = 0; j < axes; ++j)
-                                output = math.add(output, math.mul(rotation[axis][j],
+                                output = math.add(output, math.mul(jet.rotation[axis][j],
                                                                    map[row].reference_position[j]));
                         } else if (d == 0) {
                             output = math.copy(original[row].prescribed[axis]);

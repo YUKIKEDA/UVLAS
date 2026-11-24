@@ -2,6 +2,7 @@
 
 #include "case_flow_clock.hpp"
 
+#include <functional>
 #include <uvlas/structure/pg_chart_candidate.hpp>
 #include <uvlas/structure/pg_rigid_support_rows.hpp>
 
@@ -44,6 +45,7 @@ struct CaseStructuralSupportLimits {
     structure::PgRigidSupportLimits exact;
     structure::PgTraceLimits region_trace;
     std::uint64_t maximum_group_supports{}, maximum_group_work{};
+    std::size_t maximum_motion_groups{1};
 };
 
 namespace structural_support_detail {
@@ -67,12 +69,13 @@ public:
 
 private:
     friend struct structural_support_detail::Builder;
-    CaseStructuralSupport(case_clock_detail::Grid&& clock, CaseMotionReady&& motion,
+    CaseStructuralSupport(case_clock_detail::Grid&& clock,
+                          core::PlannedBuffer<std::optional<CaseMotionReady>>&& motions,
                           structure::PgRigidSupportRows&& support) noexcept
-        : clock_(std::move(clock)), motion_(std::move(motion)), support_(std::move(support)) {}
+        : clock_(std::move(clock)), motions_(std::move(motions)), support_(std::move(support)) {}
 
     case_clock_detail::Grid clock_;
-    CaseMotionReady motion_;
+    core::PlannedBuffer<std::optional<CaseMotionReady>> motions_;
     structure::PgRigidSupportRows support_;
 };
 
@@ -87,10 +90,13 @@ public:
         return node_;
     }
     [[nodiscard]] const CaseReferenceClockSample& node() const&& = delete;
-    [[nodiscard]] const CaseMotionEvaluation& motion() const& noexcept {
-        return motion_;
+    [[nodiscard]] std::size_t motion_count() const noexcept {
+        return motions_.size();
     }
-    [[nodiscard]] const CaseMotionEvaluation& motion() const&& = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseMotionEvaluation>>
+    motion(std::size_t group) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseMotionEvaluation>>
+    motion(std::size_t group) const&& = delete;
     [[nodiscard]] structure::PgSparseChartIdentity chart() const noexcept {
         return chart_;
     }
@@ -101,10 +107,10 @@ public:
     [[nodiscard]] io::SchemaIdentity source() const noexcept {
         return source_;
     }
-    [[nodiscard]] std::span<const bool> moving_rows() const& noexcept {
-        return moving_.values();
+    [[nodiscard]] std::span<const std::optional<std::size_t>> row_groups() const& noexcept {
+        return row_groups_.values();
     }
-    [[nodiscard]] std::span<const bool> moving_rows() const&& = delete;
+    [[nodiscard]] std::span<const std::optional<std::size_t>> row_groups() const&& = delete;
     [[nodiscard]] std::size_t rows() const noexcept {
         return rows_;
     }
@@ -114,31 +120,32 @@ public:
 
 private:
     friend struct structural_support_detail::Builder;
-    CaseStructuralSupportSample(CaseReferenceClockSample&& node, CaseMotionEvaluation&& motion,
+    CaseStructuralSupportSample(CaseReferenceClockSample&& node,
+                                core::PlannedBuffer<std::optional<CaseMotionEvaluation>>&& motions,
                                 structure::PgSparseChartIdentity chart, io::SchemaIdentity source,
                                 core::PlannedBuffer<io::SiEnclosure>&& rhs,
-                                core::PlannedBuffer<bool>&& moving, std::size_t rows,
-                                std::size_t orders) noexcept
+                                core::PlannedBuffer<std::optional<std::size_t>>&& row_groups,
+                                std::size_t rows, std::size_t orders) noexcept
         : node_(std::move(node)),
-          motion_(std::move(motion)),
+          motions_(std::move(motions)),
           chart_(chart),
           source_(source),
           original_rhs_(std::move(rhs)),
-          moving_(std::move(moving)),
+          row_groups_(std::move(row_groups)),
           rows_(rows),
           orders_(orders) {}
 
     CaseReferenceClockSample node_;
-    CaseMotionEvaluation motion_;
+    core::PlannedBuffer<std::optional<CaseMotionEvaluation>> motions_;
     structure::PgSparseChartIdentity chart_;
     io::SchemaIdentity source_;
     core::PlannedBuffer<io::SiEnclosure> original_rhs_; ///< Derivative, original row, axis.
-    core::PlannedBuffer<bool> moving_;
+    core::PlannedBuffer<std::optional<std::size_t>> row_groups_;
     std::size_t rows_, orders_;
 };
 
-/// Resolve actual SupportTraceConstraint IDs in this immutable case. All selected
-/// supports must use the same exact Motion recipe and complete named-edge trace.
+/// Resolve actual SupportTraceConstraint IDs in this immutable case.
+/// Supports use complete named-edge traces; each distinct Motion must be compatible by itself.
 [[nodiscard]] core::Result<CaseStructuralSupport> prepare_case_structural_pg_support(
     const io::SiCase&, structure::PgSparseChart&&,
     std::span<const structure::PgConstraintPatchBinding>,
