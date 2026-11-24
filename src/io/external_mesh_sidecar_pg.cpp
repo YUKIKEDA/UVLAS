@@ -479,18 +479,12 @@ void nastran_material(Preparation& p, const NastranSidecar& source, const Nastra
 struct QuantityCounts {
     bool thickness{};
     std::uint64_t materials{};
+    std::array<std::optional<NastranPcompGeometryMatch>, 2> laminate{};
 };
 
-[[nodiscard]] QuantityCounts nastran_quantities(
-    Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranSidecar& source,
-    const NastranShellView& original, const NastranLaminateView& deck, const schema::Model& model,
-    const schema::Shell& shell, const schema::GeometryPg& pg, const SiUnits& case_units) {
-    if (!original.input.bulk.same_snapshot(deck.input.input.input.bulk.location,
-                                           deck.input.input.input.bulk.digest)) {
-        p.reject(Code::StaleGeneration, Reason::Binding);
-    }
-    const auto target = MeshShellId{shell.id.unsigned_value()};
-    const NastranPshell* property = nullptr;
+[[nodiscard]] std::size_t same_property(Preparation& p, const ExternalMeshSidecarBinding& bound,
+                                        const NastranShellView& deck, MeshShellId target) {
+    std::optional<std::size_t> selected;
     for (const auto& face : bound.faces()) {
         p.step();
         if (face.shell != target) {
@@ -498,22 +492,15 @@ struct QuantityCounts {
         }
         p.detail.element = face.element;
         p.detail.node = face.sidecar_node;
-        const auto found = std::ranges::find_if(deck.input.input.elements, [&](const auto& value) {
+        const auto found = std::ranges::find_if(deck.elements, [&](const auto& element) {
             p.step();
-            return value.card_ordinal == face.source_ordinal;
+            return element.card_ordinal == face.source_ordinal;
         });
-        if (found == deck.input.input.elements.end()) {
+        if (found == deck.elements.end()) {
             p.reject(Code::InvalidInput, Reason::Binding);
         }
         const auto ordinal = found->property.property_ordinal;
-        const auto entry = std::ranges::find_if(deck.input.pshell, [&](const auto& value) {
-            p.step();
-            return value.property_ordinal == ordinal;
-        });
-        // This whole-patch comparison needs one uniform PSHELL. Per-corner fields
-        // and PCOMP require an admitted ply/field correspondence on each region.
-        if (entry == deck.input.pshell.end() ||
-            (property && property->property_ordinal != ordinal)) {
+        if (selected && *selected != ordinal) {
             p.reject(Code::Unsupported, Reason::Binding);
         }
         if (std::visit(
@@ -524,10 +511,106 @@ struct QuantityCounts {
                 found->corners)) {
             p.reject(Code::Unsupported, Reason::Binding);
         }
-        property = &*entry;
+        selected = ordinal;
     }
-    if (!property) {
-        p.reject(Code::InvalidInput);
+    return p.require(selected, Reason::Binding);
+}
+
+[[nodiscard]] NastranPcompGeometryMatch
+compare_laminate(Preparation& p, const NastranLaminateCards& deck, const NastranSidecar& source,
+                 std::size_t property, MeshSidecarOrientation winding,
+                 const structure::PgReferenceGeometry& reference) {
+    const NastranPcompGeometryLimits limits{p.limits.geometry.arithmetic.algebra,
+                                            p.limits.case_thickness_vertices,
+                                            p.limits.work - p.work};
+    std::optional<NastranPcompGeometryDiagnostic> detail;
+    auto match = compare_nastran_pcomp_geometry(deck, property, source.units.length, winding,
+                                                reference, limits, p.plan, p.stop, &detail);
+    if (detail) {
+        if (p.diagnostic) {
+            p.diagnostic->laminate = detail;
+        }
+        if (const auto field = detail->field) {
+            p.detail.byte = field->byte;
+        }
+        if (const auto layer = detail->case_layer) {
+            p.detail.target_namespace = SchemaNamespace::Layer;
+            p.detail.target = layer->value();
+        }
+    }
+    auto result = p.value(std::move(match), Reason::Binding);
+    p.work += result.work;
+    return result;
+}
+
+[[nodiscard]] QuantityCounts
+laminate_quantities(Preparation& p, const NastranLaminateCards& cards,
+                    const NastranLaminateView& deck, const NastranSidecar& source,
+                    std::size_t property, const schema::Model& model,
+                    std::span<const BoundExternalFace> original_faces, const schema::Shell& shell,
+                    const structure::PgReferenceGeometry& reference,
+                    const ExternalPlanarPg& corresponding, const SiUnits& case_units) {
+    QuantityCounts out;
+    out.thickness = true;
+    const auto view = p.require(corresponding.view(), Reason::Binding);
+    for (const auto& face : view.faces) {
+        p.step();
+        const bool reversed = face.winding == ExternalPgWinding::Reversed;
+        auto& accepted = out.laminate[reversed ? 1U : 0U];
+        if (accepted) {
+            continue;
+        }
+        p.detail.element = face.element;
+        const auto declaration = std::ranges::find_if(original_faces, [&](const auto& original) {
+            p.step();
+            return original.element == face.element;
+        });
+        if (declaration == original_faces.end()) {
+            p.reject(Code::InvalidInput, Reason::Binding);
+        }
+        p.detail.node = declaration->sidecar_node;
+        const auto orientation =
+            reversed ? MeshSidecarOrientation::Reversed : MeshSidecarOrientation::Same;
+        auto laminate = compare_laminate(p, cards, source, property, orientation, reference);
+        for (const auto& link : laminate.layers.values()) {
+            p.step();
+            const auto layer = p.value(shell.layers.at(static_cast<core::Index>(link.case_ordinal)),
+                                       Reason::CaseReference)
+                                   .record();
+            if (layer.id.unsigned_value() != link.layer.value()) {
+                p.reject(Code::StaleGeneration, Reason::CaseReference);
+            }
+            nastran_material(p, source, deck, link.material, model,
+                             MeshMaterialId{layer.material.unsigned_value()}, case_units);
+            ++out.materials;
+        }
+        accepted.emplace(std::move(laminate));
+    }
+    return out;
+}
+
+[[nodiscard]] QuantityCounts nastran_quantities(
+    Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranSidecar& source,
+    const NastranShellView& original, const NastranLaminateCards& cards, const schema::Model& model,
+    const schema::Shell& shell, const schema::GeometryPg& pg, const SiUnits& case_units,
+    const structure::PgReferenceGeometry& reference, const ExternalPlanarPg& corresponding) {
+    const auto deck = p.require(cards.view());
+    if (!original.input.bulk.same_snapshot(deck.input.input.input.bulk.location,
+                                           deck.input.input.input.bulk.digest)) {
+        p.reject(Code::StaleGeneration, Reason::Binding);
+    }
+    const auto target = MeshShellId{shell.id.unsigned_value()};
+    const auto ordinal = same_property(p, bound, deck.input.input, target);
+    if (deck.input.input.properties[ordinal].kind == NastranShellPropertyKind::Pcomp) {
+        return laminate_quantities(p, cards, deck, source, ordinal, model, bound.faces(), shell,
+                                   reference, corresponding, case_units);
+    }
+    const auto property = std::ranges::find_if(deck.input.pshell, [&](const auto& entry) {
+        p.step();
+        return entry.property_ordinal == ordinal;
+    });
+    if (property == deck.input.pshell.end()) {
+        p.reject(Code::Unsupported, Reason::Binding);
     }
     QuantityCounts out;
     if (const auto& thickness = property->thickness) {
@@ -598,10 +681,9 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                     }
                     const auto original =
                         call.require(std::get<NastranShellCards>(bound.source()).view());
-                    const auto deck = call.require(quantities->view());
-                    result =
-                        nastran_quantities(call, bound, std::get<NastranSidecar>(payload), original,
-                                           deck, model, selected, pg_record, case_units);
+                    result = nastran_quantities(call, bound, std::get<NastranSidecar>(payload),
+                                                original, *quantities, model, selected, pg_record,
+                                                case_units, pg, geometry);
                 }
                 call.step();
                 return QualifiedExternalSidecarPg{std::move(geometry),
@@ -611,7 +693,8 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                                                   bound.sidecar().digest(),
                                                   result.thickness,
                                                   result.materials,
-                                                  call.work};
+                                                  call.work,
+                                                  std::move(result.laminate)};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }
