@@ -20,7 +20,8 @@ struct Diagnosis {
     ExternalPgThicknessDiagnostic value{};
 
     void select(const ExternalPgThicknessClaim& claim) noexcept {
-        value = {Reason::Selection, claim.element, claim.sidecar_node, claim.field, {}, {}, {}, {}};
+        value = {Reason::Selection, claim.element, claim.sidecar_node, claim.field, {}, {}, {}, {},
+                 claim.property};
     }
 
     [[noreturn]] void fail(Reason reason, Code code) const {
@@ -167,8 +168,8 @@ void compare_nodal(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& pl
     validate_claim(face, claim, diagnosis);
     const auto outward = positive_ring(face);
     const auto domain = std::span{outward}.first(face.ring().size());
-    ExternalPgThicknessMatch match{face.element,       face.winding, {}, {}, 0, 0,
-                                   claim.sidecar_node, claim.field};
+    ExternalPgThicknessMatch match{face.element, face.winding,  {}, {}, 0, 0, claim.sidecar_node,
+                                   claim.field,  claim.property};
     for (const auto& triangle : pg.triangles) {
         math.visit(1);
         const chart::Triangle basis{&ref::reference_at(pg.vertices, triangle.vertices[0]),

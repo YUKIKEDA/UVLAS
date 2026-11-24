@@ -44,7 +44,7 @@ struct NastranPcompLayerMatch {
     structure::ExactRational ply_thickness_metres;
 };
 
-struct NastranPcompGeometryMatch {
+struct NastranPcompLayerSection {
     RootSnapshotLocation source;
     SourceDigest digest;
     NastranPropertyId property{0};
@@ -56,6 +56,15 @@ struct NastranPcompGeometryMatch {
     core::PlannedBuffer<NastranPcompLayerMatch> layers; // Case order.
     std::uint64_t work{};
 };
+
+// The layer-section result verifies the declared ply coordinates against the Case
+// layer intervals. Full thickness must still be checked over the selected element regions.
+[[nodiscard]] core::Result<NastranPcompLayerSection> compare_nastran_pcomp_layer_section(
+    const NastranLaminateCards&, std::size_t property_ordinal, SiLengthUnit, MeshSidecarOrientation,
+    const structure::PgReferenceGeometry&, const NastranPcompGeometryLimits&, core::ResourcePlan&,
+    const std::stop_token&, std::optional<NastranPcompGeometryDiagnostic>* = nullptr) noexcept;
+
+struct NastranPcompGeometryMatch : NastranPcompLayerSection {};
 
 // Compare an adopted PCOMP stack after its signed element reference plane and whole
 // region correspondence to the specified prepared PG have been certified. The original
