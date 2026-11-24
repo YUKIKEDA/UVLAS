@@ -871,3 +871,9 @@ uvlas_add_test(io.si_case_resources
 target_include_directories(uvlas_test_io_si_case_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 uvlas_enable_allocation_audit(uvlas_test_io_si_case_resources)
 uvlas_require_audited_dependencies(uvlas_test_io_si_case_resources)
+
+uvlas_add_test(io.nastran_number_fields
+    LABELS unit negative verification
+    SOURCES io/nastran_number_fields_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_nastran_number_fields PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
