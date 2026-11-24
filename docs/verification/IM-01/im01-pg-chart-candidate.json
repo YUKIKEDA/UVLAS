@@ -38,9 +38,20 @@
     "docs/verification/IM-01/pg-chart-candidate-series/result.json": "d4b7aa5b6e8ae24f3ea8ec4259834c832ceb50d41034f2702a3d548d6bc8c3c8",
     "docs/verification/IM-01/pg-chart-candidate-series/run-series.ps1.txt": "157d764477827836053177167d77503aece893b147a1d4292c9e416ab05b1f65",
     "docs/verification/IM-01/pg-chart-candidate-series/measure-candidate.cpp.txt": "da07e9d9c7593721761f9f7ebed930a23002b0aed9d7c89aaf6a6f0fa35fca42",
-    "docs/specs/structure/pg-chart-numerical-candidate-contract.md": "2ad6cb9cb9ff066293477bfe544077de536cc91e63a6e542c1230fe473ccecb9",
-    "include/uvlas/structure/pg_chart_candidate.hpp": "656fb6b402cdb67abb18907fede4be95fd89474c555ac0e79d92944d960f6e19",
-    "src/structure/pg_chart_candidate.cpp": "89eb181dcd9f849d836b61797ff259aa2106ea778dd7837e60279501d9a721fa",
-    "tests/structure/pg_chart_candidate_test.cpp": "513d403da5d355fc29c1f47ca713b18174bcf717d7164dbb2e397ae2691794ea"
+    "docs/specs/structure/pg-chart-numerical-candidate-contract.md": "2ad6cb9cb9ff066293477bfe544077de536cc91e63a6e542c1230fe473ccecb9"
+  },
+  "sources_at_tested_commit": {
+    "include/uvlas/structure/pg_chart_candidate.hpp": {
+      "commit": "ab9231b1edba011e1dcc470511dc77e573f1d74b",
+      "sha256": "656fb6b402cdb67abb18907fede4be95fd89474c555ac0e79d92944d960f6e19"
+    },
+    "src/structure/pg_chart_candidate.cpp": {
+      "commit": "ab9231b1edba011e1dcc470511dc77e573f1d74b",
+      "sha256": "89eb181dcd9f849d836b61797ff259aa2106ea778dd7837e60279501d9a721fa"
+    },
+    "tests/structure/pg_chart_candidate_test.cpp": {
+      "commit": "ab9231b1edba011e1dcc470511dc77e573f1d74b",
+      "sha256": "513d403da5d355fc29c1f47ca713b18174bcf717d7164dbb2e397ae2691794ea"
+    }
   }
 }

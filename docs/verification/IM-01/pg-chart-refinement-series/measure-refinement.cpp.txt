@@ -1,0 +1,118 @@
+using R02Buffer = numerics::PrecisionBuffer<double>;
+
+// Decode each retained binary64 word using its IEEE fields for the independent oracle.
+Q binary_word(double value) {
+    const auto word = std::bit_cast<std::uint64_t>(value);
+    const auto exponent = static_cast<int>((word >> 52) & 0x7ffU);
+    REQUIRE(exponent < 2047);
+    const auto fraction = word & 0xfffffffffffffULL;
+    boost::multiprecision::cpp_int mantissa = fraction;
+    if (exponent != 0)
+        mantissa += 1ULL << 52;
+    if (word >> 63)
+        mantissa = -mantissa;
+    const auto shift = (exponent == 0 ? 1 : exponent) - 1075;
+    if (shift >= 0)
+        return Q(mantissa << shift);
+    return Q(mantissa, boost::multiprecision::cpp_int(1) << -shift);
+}
+
+Q retained(const R02Buffer& value, std::size_t row, std::size_t axis) {
+    const auto offset = axis * static_cast<std::size_t>(value.shape().leading_dimension) + row;
+    if (const auto* single = std::get_if<numerics::Binary64<double>>(&value.storage()))
+        return binary_word(single->values.values()[offset]);
+    const auto& pair = std::get<numerics::TwoWord<double>>(value.storage());
+    return binary_word(pair.hi.values()[offset]) + binary_word(pair.lo.values()[offset]);
+}
+
+void verify_refinement(const PgChartCandidate& chart, const R02Buffer& r, const R02Buffer& c,
+                       const R02Buffer& f, const PgChartCandidateLift& primal,
+                       const PgChartCandidateDual& dual, double reported_work) {
+    const auto& original = chart.exact().original();
+    const auto dims = take(original.info());
+    const auto cols = static_cast<std::size_t>(dims.columns);
+    const auto rows = static_cast<std::size_t>(dims.rows);
+    const auto free = chart.exact().free_columns();
+    std::vector<bool> retained_rows(rows);
+    for (const auto& p : chart.exact().pivots())
+        retained_rows[static_cast<std::size_t>(p.original_row)] = true;
+    Q work = 0, defect = 0, balance = 0;
+    for (std::size_t axis = 0; axis < 3; ++axis) {
+        std::vector<Q> coordinates(cols), physical(cols);
+        for (std::size_t col = 0; col < cols; ++col) {
+            coordinates[col] = retained(primal.coordinates, col, axis);
+            physical[col] = retained(f, col, axis);
+            work += physical[col] * coordinates[col];
+        }
+        for (std::size_t row = 0; row < rows; ++row) {
+            const auto rhs = retained(c, row, axis);
+            const auto multiplier = retained(dual.original_multipliers, row, axis);
+            if (!retained_rows[row])
+                REQUIRE(multiplier == 0);
+            Q gap = rhs;
+            work -= multiplier * rhs;
+            for (const auto& term : take(original.row(static_cast<core::Index>(row)))) {
+                const auto col = static_cast<std::size_t>(term.column);
+                const auto coefficient = q(term.coefficient);
+                gap -= coefficient * coordinates[col];
+                physical[col] -= coefficient * multiplier;
+            }
+            defect = std::max(defect, Q(abs(gap)));
+        }
+        for (std::size_t i = 0; i < free.size(); ++i) {
+            const auto col = static_cast<std::size_t>(free[i]);
+            const auto force = retained(dual.independent_force, i, axis);
+            REQUIRE(coordinates[col] == retained(r, i, axis));
+            physical[col] -= force;
+            work -= force * coordinates[col];
+        }
+        for (const auto& x : physical)
+            balance = std::max(balance, Q(abs(x)));
+    }
+    REQUIRE(defect <= binary_word(primal.original_residual_upper));
+    REQUIRE(balance <= binary_word(dual.original_balance_upper));
+    REQUIRE(abs(work) <= binary_word(reported_work));
+    std::cout << ",\"independent_original_defect\":" << defect.convert_to<double>()
+              << ",\"independent_force_balance\":" << balance.convert_to<double>()
+              << ",\"independent_work_defect\":" << Q(abs(work)).convert_to<double>();
+}
+
+void measure_refinement(PgChartCandidate& candidate, PgSparseChartIdentity identity,
+                        const PgReferenceLimits& limits, const PgChartCandidateSolve& direct,
+                        const PgChartCandidateSolve& reverse, const R02Buffer& r,
+                        const R02Buffer& c, const R02Buffer& f, core::Workspace& workspace,
+                        core::ResourcePlan& plan) {
+    auto arithmetic = limits;
+    arithmetic.algebra.maximum_value_bits = 65536;
+    arithmetic.algebra.maximum_work_bits = 262144;
+    const PgChartRefinement refinement{arithmetic, 3};
+    auto forward = direct, transpose = reverse;
+    forward.maximum_absolute_original_defect = 1e-16;
+    transpose.maximum_absolute_original_defect = 1e-16;
+    auto before = plan.allocated_bytes();
+    auto time = Clock::now();
+    const auto primal = take(candidate.refine_lift({identity, r}, {identity, c}, forward,
+                                                   refinement, workspace, plan));
+    write_phase("refine_lift", finish(time, plan, before));
+    before = plan.allocated_bytes();
+    time = Clock::now();
+    const auto dual = take(candidate.refine_transpose({identity, f}, transpose, refinement,
+                                                      workspace, plan));
+    write_phase("refine_transpose", finish(time, plan, before));
+    before = plan.allocated_bytes();
+    time = Clock::now();
+    const auto work = take(candidate.work_defect({identity, f}, {identity, r}, {identity, c},
+                                                  primal.output, dual.output, 1e-6, 10'000, {}));
+    write_phase("refined_work", finish(time, plan, before));
+    const auto counters = [](std::string_view name, auto const& result) {
+        std::cout << ",\"" << name << "\":{\"corrections\":" << result.corrections
+                  << ",\"scalar_operations\":" << result.original_work.scalar_operations
+                  << ",\"partition_visits\":" << result.original_work.partition_visits << '}';
+    };
+    counters("lift_work", primal);
+    counters("transpose_work", dual);
+    std::cout << ",\"residual_upper\":" << primal.output.original_residual_upper
+              << ",\"balance_upper\":" << dual.output.original_balance_upper
+              << ",\"work_upper\":" << work;
+    verify_refinement(candidate, r, c, f, primal.output, dual.output, work);
+}
