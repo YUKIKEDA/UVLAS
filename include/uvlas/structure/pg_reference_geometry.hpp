@@ -121,9 +121,9 @@ struct PgReferenceCallInfo {
 struct PgReferenceValue {
     PgReferenceIdentity identity;
     PgCellIndex cell;
-    core::Index piece;
-    core::Index thickness_triangle;
-    core::Index partition_record;
+    core::Index piece{};
+    core::Index thickness_triangle{};
+    core::Index partition_record{};
     core::LayerId layer{0};
     ExactRational s, t, zeta;
     ExactRational full_thickness_metres;

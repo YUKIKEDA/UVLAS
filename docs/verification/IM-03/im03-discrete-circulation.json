@@ -1,0 +1,87 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-circulation-v1",
+  "ids": [
+    "UW-D01",
+    "UW-D03",
+    "UW-D06",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "f82eafdc67867a4449544f5f4c2919f57ffbf94a",
+  "claimed_state": "Real dense circulation solve for explicit discrete collocation, with independent admission of the projected linear solve and recertification of the native original residual against the retained solution.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config, Debug and Release 4/4 each.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2.0 Release, warnings as errors. 4/4.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "numerics.dense_solve"
+    ],
+    "catch": "Three discrete nonpenetration and circulation cases, 179 assertions per configuration, seed 23.",
+    "oracle": "60-digit direct finite-core line integral, tensor Gauss-Legendre wake area rules GL48/72/96 and direct 2-by-2 determinant. Observed circulation changes 1.02e-24 and 9.49e-36 m²/s for the one-row reference.",
+    "mutation": "Isolated GCC 14.2 Release: pass a zero enclosure to the native residual certification. Control 179/179, mutation incorrectly passes the zero native budget so the test rejects it (Catch2 exit 42).",
+    "static": "clang-format 21.1.2 and both OS clang-tidy 21.1.1 on affected TUs.",
+    "scope": "Explicit real dense discrete collocation and the existing finite induced velocity expressions. Continuous wake quadrature certification, PG material map, accepted wake-history evolution, and the full physical derivatives are downstream."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "90eee9ef0ab5d4ae0656119aaf2b7b00f69069bba5b98b15fad43f26ac91955c",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "src/coupling/discrete_nonpenetration.cpp": "5949768bdfd073fe780fbd15019a14591653cf279ad5a5c393712141e93a7b7b",
+    "src/coupling/discrete_nonpenetration.hpp": "402816b8cde7dee168fbaa72feb37b497dc2e74d3ed847e81aad5705bbe24709",
+    "tests/coupling/case_uniform_flow_test.cpp": "7a396d9274ac320458e1a1409f541c0d291461a8415d3c125777a120a2019b92"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-circulation-v1/reference.py": "a9f6901ea2d35ff6847f650ab847514b7df0c33a4f85e77f0af2c2a7bffa2dae",
+    "docs/verification/IM-03/discrete-circulation-v1/verification.md": "09be1cb7016d87c8dc08a607e2d97920c0b2707469ccfa186428b53a7a83aa85"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/foundation/dense-solve-contract.md",
+      "hint": "docs/specs/foundation/dense-solve-contract.md",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911"
+    },
+    {
+      "id": "docs/specs/foundation/linear-solve-qualification-contract.md",
+      "hint": "docs/specs/foundation/linear-solve-qualification-contract.md",
+      "sha256": "90eee9ef0ab5d4ae0656119aaf2b7b00f69069bba5b98b15fad43f26ac91955c"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "5949768bdfd073fe780fbd15019a14591653cf279ad5a5c393712141e93a7b7b"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "402816b8cde7dee168fbaa72feb37b497dc2e74d3ed847e81aad5705bbe24709"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "7a396d9274ac320458e1a1409f541c0d291461a8415d3c125777a120a2019b92"
+    }
+  ]
+}

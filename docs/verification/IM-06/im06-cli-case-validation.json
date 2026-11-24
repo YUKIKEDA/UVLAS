@@ -1,0 +1,44 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-cli-case-validation",
+  "ids": [
+    "IO4-01"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "be3a266eb9033a0feac718e3f1b3605c00e00be8",
+  "scope": "Read-only CLI validation of the full schema and empty external dependency graph; acquisition and authentication of declared external files",
+  "verification": {
+    "ctest_regex": "^(cli\\..*|io\\.(visualization_series|reference_input)|structure\\.pg_conditioning)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 10
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug",
+      "ctest_targets": 10,
+      "clang_tidy": "21.1.1 PASS on both CLI TUs before the CMake integration, with identical CLI sources"
+    },
+    "mutation": {
+      "source_commit": "c46b487885d09f9175bef784eae7aaafa21daddf",
+      "change": "Return success despite declarations of unaudited external dependencies",
+      "expected": "cli.validate rejects exit 0, expects exit 2",
+      "observed": "Failed with exit 0, expected 2; restored CLI passes"
+    }
+  },
+  "tested_target_registration": {
+    "commit": "be3a266eb9033a0feac718e3f1b3605c00e00be8",
+    "CMakeLists.txt": "5adb675ad5e886703d2cfa0d26691acab3c8ea276da84b3d659b29780e70b44f",
+    "tests/CMakeLists.txt": "3739d6b04e43c6700c0e2a5d101893e89cdf26adfd4100119e0aa0a5f2c2ceb9"
+  },
+  "sources": {
+    "src/app/main.cpp": "ee0ae310b6eb3e199f345be25ee2a57c801a5a5cc13fb64c739ce8247a36a8c0",
+    "src/app/validate_case.cpp": "9a49610c5c34489707372ebd28ae432ca965a016c0b6ccfdcbb57004a072c6c2",
+    "src/app/validate_case.hpp": "aba2d61b7e391389069d406a39518342e4e78d20152fc593bbb02efbe1ab7cf4",
+    "tests/check_cli_validate.cmake": "bad1f2371ff8ad92216935320841fc9fd91e29be264d5dc45ec7107af0462e89",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe"
+  }
+}

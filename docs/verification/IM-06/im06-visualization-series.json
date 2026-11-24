@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-visualization-series",
+  "ids": [
+    "IO4-05",
+    "QA-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "8e9b8d876c710438194983a5aed02107890295d7",
+  "scope": "Private owned ASCII VTU and segmented PVD XML from supplied qualified binary64 layer-side triangle samples",
+  "verification": {
+    "ctest_regex": "^io\\.visualization_series$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 1,
+      "cases": 3,
+      "assertions": 230
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 1,
+      "cases": 3,
+      "assertions": 230,
+      "clang_tidy": "21.1.1 PASS on the new implementation and test"
+    },
+    "independent_read": {
+      "parser": "Python stdlib xml.etree.ElementTree",
+      "pvd_files": 2,
+      "vtu_files": 6,
+      "paraView_renderer_exercised": false
+    }
+  },
+  "tested_target_registration": {
+    "commit": "8e9b8d876c710438194983a5aed02107890295d7",
+    "CMakeLists.txt": "a56ea5d3d7d04e9d1329b6aa5d67e9a89f745b6dc9949d8d56aa7de256eec75a",
+    "tests/CMakeLists.txt": "e12a236cc35154120595d30fe0b215cf71965137cef5e8e6ad0e331e7de4d753"
+  },
+  "sources": {
+    "src/io/visualization_series.cpp": "53b4713d3487b7b7c3875481b0e380ebb26f04ba6f23d60b51a7e64be5e64d21",
+    "src/io/visualization_series.hpp": "235a9bd6f39ab154ef2bf1252c1d701b0d2107671337b96dd0af584984ebdc8e",
+    "tests/io/visualization_series_test.cpp": "83bae0b287aef8b39f1b908cb65eafb2ea56c0ba305c5eab44e97b4e65989efc"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/visualization-series.md": "ab01669ff89142a27c6818e6cee31604ba81734688ebe0e756a0d4d340e146c7"
+  }
+}

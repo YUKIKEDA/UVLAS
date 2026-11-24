@@ -36,6 +36,21 @@ struct PgConditioningInfo {
     std::uint64_t steps;
 };
 
+/// One conditioned column at a point. Components use the corresponding point's g.
+struct PgConditionedReferenceColumn {
+    PgReferenceScalar value;                       ///< Dimensionless N.
+    PgReferenceVector physical_gradient_per_metre; ///< Global Cartesian G.
+};
+
+/// Owned point order and all conditioned columns in point-major order.
+/// Column j at point p is columns[p * column_count + j], zero-based.
+struct PgConditionedReferenceBatch {
+    std::uint64_t column_count;
+    core::PlannedBuffer<PgReferenceValue> points;
+    core::PlannedBuffer<PgConditionedReferenceColumn> columns;
+    PgReferenceCallInfo call_info;
+};
+
 namespace detail {
 struct PgConditioningState;
 }
@@ -73,6 +88,12 @@ public:
                                                                PgRankBasisColumn,
                                                                const PgReferenceLimits&,
                                                                core::ResourcePlan&) const noexcept;
+
+    /// Evaluate every conditioned column for every point in input order.
+    /// Points retain the requested layer/face side, and the whole batch shares one budget.
+    [[nodiscard]] core::Result<PgConditionedReferenceBatch>
+    evaluate_reference(std::span<const PgReferencePoint>, const PgReferenceLimits&,
+                       core::ResourcePlan&) const noexcept;
 
     /// Exact coefficient of B T, indexed by the original canonical coefficient row.
     [[nodiscard]] core::Result<ExactRational> coefficient(PgRankBasisColumn, core::Index row,

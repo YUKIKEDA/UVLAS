@@ -3,6 +3,8 @@
 #include "aero/p1_shared_action.hpp"
 #include "case_uniform_flow_projection.hpp"
 
+#include <uvlas/numerics/linear_solve.hpp>
+
 namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 
@@ -138,4 +140,81 @@ evaluate_discrete_nonpenetration(const DiscreteNonpenetrationInput&, ProjectedCa
                                  aero::detail::SharedP1Workspace&,
                                  aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&,
                                  core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+/// Explicit capacities and budgets for the real dense reference route. Matrix and
+/// RHS budgets bound their binary64 input projections in 1/m and m/s respectively.
+struct DiscreteCirculationRequest {
+    DiscreteCirculationRequest(numerics::linear::Scales physical_scales,
+                               const numerics::linear::Limits& dense_limits,
+                               numerics::linear::Accuracy algebraic_accuracy,
+                               core::RhsGeneration rhs, core::NumericalGeneration retained,
+                               double matrix_error, double rhs_error, double absolute,
+                               double relative) noexcept
+        : scales(physical_scales),
+          solver_limits(dense_limits),
+          algebraic(algebraic_accuracy),
+          rhs_generation(rhs),
+          retained_generation(retained),
+          matrix_absolute(matrix_error),
+          rhs_absolute(rhs_error),
+          original_absolute(absolute),
+          original_relative(relative) {}
+    numerics::linear::Scales scales; ///< Ordered by ascending bound physical face ID.
+    numerics::linear::Limits solver_limits;
+    numerics::linear::Accuracy algebraic;
+    core::RhsGeneration rhs_generation;
+    core::NumericalGeneration retained_generation;
+    double matrix_absolute;
+    double rhs_absolute;
+    double original_absolute; ///< Multiplier of the supplied velocity scales.
+    double original_relative; ///< Multiplier of the unprojected affine RHS magnitude.
+};
+
+struct CirculationResidualRow {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure original_residual; ///< m/s from the native finite expression.
+    bool includes_wake_quadrature;
+};
+
+/// Own both the LU-qualified retained words and the independent native residual
+/// check. No physical mapping or continuous wake-integral accuracy is inferred.
+class DiscreteCirculation {
+public:
+    DiscreteCirculation(DiscreteCirculation&&) noexcept = default;
+    DiscreteCirculation& operator=(DiscreteCirculation&&) noexcept = default;
+    DiscreteCirculation(const DiscreteCirculation&) = delete;
+    DiscreteCirculation& operator=(const DiscreteCirculation&) = delete;
+    [[nodiscard]] const numerics::linear::Solution<double>& solution() const& noexcept {
+        return solution_;
+    }
+    [[nodiscard]] const numerics::linear::Solution<double>& solution() const&& = delete;
+    [[nodiscard]] core::Result<CirculationResidualRow> row(std::size_t) const noexcept;
+    [[nodiscard]] const ProjectedCaseUniformFlow& flow() const& noexcept {
+        return flow_;
+    }
+    [[nodiscard]] const ProjectedCaseUniformFlow& flow() const&& = delete;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return steps_;
+    }
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
+                        core::PlannedBuffer<std::optional<CirculationResidualRow>>,
+                        std::optional<aero::detail::P1ActionValue>, std::uint64_t) noexcept;
+    numerics::linear::Solution<double> solution_;
+    ProjectedCaseUniformFlow flow_;
+    core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
+    std::optional<aero::detail::P1ActionValue> geometry_owner_;
+    std::uint64_t steps_;
+};
+
+/// Assemble and solve all bound rows, then check the actual returned circulation
+/// with the native original residual. Trial input circulation/direction is not
+/// used as a starting guess. Consume the flow only on complete success.
+[[nodiscard]] core::Result<DiscreteCirculation>
+solve_discrete_circulation(const DiscreteNonpenetrationInput&, ProjectedCaseUniformFlow&&,
+                           const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+                           aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+                           aero::detail::P1Workspace&, core::ResourcePlan&,
+                           const std::stop_token& = {}) noexcept;
 } // namespace uvlas::coupling::detail
