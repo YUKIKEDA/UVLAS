@@ -1,0 +1,42 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-gmsh-leaf-proof",
+  "ids": [
+    "IO4-01",
+    "IO4-04",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "737e2b754602e8466fecbd80046aeca80de55bdb",
+  "scope": "Dependency-free proof for the adopted Gmsh MSH 4.1 ASCII role, bound to the exact authenticated snapshot",
+  "verification": {
+    "ctest_regex": "^io\\.gmsh_mesh$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 1,
+      "cases": 8,
+      "assertions": 308
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 1,
+      "cases": 8,
+      "assertions": 308,
+      "clang_tidy": "21.1.1 PASS on the normal and allocation-audit parser and the regression test"
+    }
+  },
+  "sources": {
+    "src/io/gmsh_mesh.cpp": "d74083a3ed76adf34a1c13e5a351e8560498f4c3edaadd59afe49059f4086097",
+    "src/io/gmsh_mesh.hpp": "4ab6325db4de4397d251169da8e0df7ba021f3f15c0dc404dbea570b2acfc561",
+    "tests/io/gmsh_mesh_test.cpp": "c0d671f4210ca5fa1f4e60eaf82b2c6e0999d13dcbc3000cde07de7098646ff3",
+    "docs/specs/foundation/gmsh-mesh-input-contract.md": "4e79f6240ab02ba7f14a1f3a2c01352cb4efb5431efdd34d96eb836c4a34b069"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/gmsh-leaf-proof.md": "fcb339827f2f53ec6ba51843f60532a95213cd40bd1ee59404600680504654dc"
+  }
+}
