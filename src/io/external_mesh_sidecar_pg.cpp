@@ -389,45 +389,88 @@ void compare_conversion_bounds(Preparation& p, const ConversionGeometry& geometr
     return p.diagnostic == nullptr ? nullptr : &p.diagnostic->quantity;
 }
 
-[[nodiscard]] bool gmsh_quantities(Preparation& p, const GmshSidecar& source,
-                                   const schema::GeometryPg& pg, MeshShellId shell,
-                                   SiLengthUnit case_length) {
-    const structure::ExactRational* full = nullptr;
-    std::optional<core::Index> earliest_declaration;
-    std::optional<GmshKey> earliest_group;
-    bool missing = false;
-    for (const auto& row : source.shells.values()) {
+[[nodiscard]] structure::ExactRational length_scale(Preparation& p, SiLengthUnit length) {
+    const SiRecipeView recipe{
+        SiDecimalView{1, "1", 0},
+        {},
+        {length, SiMassUnit::Kilogram, SiTimeUnit::Second, SiAngleUnit::Radian},
+        SchemaDimension{{1, 0, 0, 0}},
+        0};
+    return p.value(materialize_rational(recipe, p.limits.geometry.arithmetic.algebra, p.plan));
+}
+
+[[nodiscard]] std::optional<ExternalPgThicknessReport>
+gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const GmshSidecar& source,
+                MeshShellId shell, const structure::PgReferenceGeometry& reference,
+                const ExternalPlanarPg& corresponding) {
+    const auto view = p.require(corresponding.view(), Reason::Binding);
+    const auto rows = source.shells.values();
+    if (std::ranges::none_of(rows, [&](const auto& row) {
+            p.step();
+            return row.full_thickness.has_value();
+        })) {
+        return {};
+    }
+    if (!std::in_range<core::Index>(rows.size()) ||
+        !std::in_range<core::Index>(view.faces.size())) {
+        p.reject(Code::ResourceExceeded, Reason::Resource);
+    }
+    auto claims = p.value(p.plan.allocate<ExternalPgThicknessClaim>(
+                              static_cast<core::Index>(view.faces.size()), operation),
+                          Reason::Resource);
+    auto metres = p.value(
+        p.plan.allocate<structure::ExactRational>(static_cast<core::Index>(rows.size()), operation),
+        Reason::Resource);
+    structure::ExactRational unit;
+    std::size_t declared = 0;
+    for (const auto& face : bound.faces()) {
         p.step();
-        if (row.shell != shell) {
+        if (face.shell != shell) {
             continue;
         }
-        p.detail.node = row.node;
-        p.detail.physical = row.physical;
-        if (const auto& thickness = row.full_thickness) {
-            if (full && *full != *thickness) {
-                p.reject(Code::Unsupported, Reason::Binding);
+        const auto group = rows[face.sidecar_row].physical;
+        const auto definition = std::ranges::find_if(rows, [&](const auto& row) {
+            p.step();
+            return row.physical == group && row.full_thickness.has_value();
+        });
+        if (definition == rows.end()) {
+            continue;
+        }
+        if (unit.sign() == 0) {
+            unit = length_scale(p, source.length);
+        }
+        const auto index = static_cast<std::size_t>(definition - rows.begin());
+        auto& value = metres.values()[index];
+        if (value.sign() == 0) {
+            const auto& input = definition->full_thickness;
+            if (!input) {
+                p.reject(Code::InvalidInput, Reason::Binding);
             }
-            if (!full) {
-                full = &*thickness;
-                earliest_declaration = row.full_thickness_node;
-                earliest_group = row.physical;
+            value = p.value(input->multiply(unit, p.limits.geometry.arithmetic.algebra, p.plan));
+        }
+        claims.values()[declared++] = {face.element, value, definition->full_thickness_node};
+    }
+    if (declared == 0) {
+        return {};
+    }
+    auto exact = p.limits.geometry.arithmetic;
+    exact.cancellation = p.stop;
+    const ExternalPgThicknessLimits limits{exact, p.limits.geometry.maximum_faces};
+    std::optional<ExternalPgThicknessDiagnostic> detail;
+    auto verified = compare_external_pg_regional_thickness(
+        corresponding, reference, claims.values().first(declared), limits, p.plan, &detail);
+    if (detail) {
+        p.detail.node = detail->sidecar_node;
+        p.detail.element = detail->element;
+        if (p.diagnostic) {
+            p.diagnostic->regional_thickness = detail;
+            if (detail->reason == ExternalPgThicknessFailure::Difference) {
+                p.diagnostic->quantity =
+                    ImportedQuantityMismatch{ImportedQuantityField::FullThickness, {}, {}};
             }
-        } else {
-            missing = true;
         }
     }
-    if (!full) {
-        return false;
-    }
-    if (missing) {
-        p.reject(Code::Unsupported, Reason::Binding);
-    }
-    p.detail.node = earliest_declaration;
-    p.detail.physical = earliest_group;
-    p.check(check_imported_uniform_thickness(
-        *full, source.length, pg.thickness.record(), case_length, p.limits.case_thickness_vertices,
-        p.limits.geometry.arithmetic.algebra, p.plan, p.stop, mismatch(p)));
-    return true;
+    return p.value(std::move(verified), Reason::Binding);
 }
 
 [[nodiscard]] const NastranSidecarMaterial& mapped_material(Preparation& p,
@@ -672,9 +715,10 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                 auto geometry = establish_geometry(call, bound, pg, shell, count);
                 const auto& payload = bound.sidecar().payload();
                 QuantityCounts result;
+                std::optional<ExternalPgThicknessReport> thickness_regions;
                 if (const auto* gmsh = std::get_if<GmshSidecar>(&payload)) {
-                    result.thickness =
-                        gmsh_quantities(call, *gmsh, pg_record, shell, case_units.length);
+                    thickness_regions = gmsh_quantities(call, bound, *gmsh, shell, pg, geometry);
+                    result.thickness = thickness_regions.has_value();
                 } else {
                     if (!quantities) {
                         call.reject(Code::Unsupported, Reason::Binding);
@@ -694,7 +738,8 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                                                   result.thickness,
                                                   result.materials,
                                                   call.work,
-                                                  std::move(result.laminate)};
+                                                  std::move(result.laminate),
+                                                  std::move(thickness_regions)};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }

@@ -284,6 +284,26 @@ void gmsh_boundary_group(Binding& b, const GmshMeshView& mesh, GmshKey group,
     }
 }
 
+void check_group_thickness(Binding& b, std::span<const GmshSidecarShell> rows) {
+    for (std::size_t i = 0; i < rows.size(); ++i) {
+        b.step();
+        const auto& current = rows[i];
+        if (const auto& value = current.full_thickness) {
+            for (const auto& previous : rows.first(i)) {
+                b.step();
+                if (previous.physical != current.physical) {
+                    continue;
+                }
+                if (const auto& earlier = previous.full_thickness; earlier && *earlier != *value) {
+                    b.row(current.full_thickness_node.value_or(current.node), current.physical);
+                    b.target(SchemaNamespace::Shell, current.shell.value());
+                    b.reject(Reason::Binding);
+                }
+            }
+        }
+    }
+}
+
 [[nodiscard]] core::PlannedBuffer<BoundExternalFace> gmsh_faces(Binding& b,
                                                                 const schema::Model& model,
                                                                 const GmshSidecar& input,
@@ -291,6 +311,7 @@ void gmsh_boundary_group(Binding& b, const GmshMeshView& mesh, GmshKey group,
     if (!mesh.entities_declared) {
         b.reject(Reason::Selection);
     }
+    check_group_thickness(b, input.shells.values());
     std::uint64_t count = 0;
     for (const auto& selection : input.shells.values()) {
         b.step();

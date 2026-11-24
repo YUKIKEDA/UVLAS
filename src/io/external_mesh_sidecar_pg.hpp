@@ -2,7 +2,7 @@
 
 #include "external_mesh_quantity.hpp"
 #include "external_mesh_sidecar_binding.hpp"
-#include "external_planar_pg.hpp"
+#include "external_pg_regional_thickness.hpp"
 #include "nastran_pcomp_physical.hpp"
 
 namespace uvlas::io::detail {
@@ -27,6 +27,7 @@ struct ExternalSidecarPgDiagnostic {
     std::optional<GmshTopologyDiagnostic> topology{};
     std::optional<ImportedQuantityMismatch> quantity{};
     std::optional<NastranPcompGeometryDiagnostic> laminate{};
+    std::optional<ExternalPgThicknessDiagnostic> regional_thickness{};
 };
 
 struct QualifiedExternalSidecarPg {
@@ -40,6 +41,7 @@ struct QualifiedExternalSidecarPg {
     std::uint64_t work{};
     // Original normal agrees with the PG normal in slot 0 and is reversed in slot 1.
     std::array<std::optional<NastranPcompGeometryMatch>, 2> laminate{};
+    std::optional<ExternalPgThicknessReport> thickness_regions{};
 };
 
 struct ExternalPgConversionObservation {
