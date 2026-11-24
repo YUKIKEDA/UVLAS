@@ -1042,6 +1042,70 @@ TEST_CASE("The exact transient stage evaluates known flow and prescribed wake to
     reject(run(other_wake, {stamp, 0, 1, Automatic}, middle_x), core::FailureCode::StaleGeneration);
 }
 
+TEST_CASE("The known-flow clock checks periodic model events without a prescribed attachment",
+          "[AE-07][BC-01][IO4-01][N4-06][verification][negative]") {
+    a::UniformFlowWorkspace work;
+    const cf::CaseClockedKnownFlowLimits clock_limits{{limits, 2, 4}, gust_limits};
+    const auto make = [&](const JsonToken& fixture) {
+        const auto si = materialize(fixture, io::SourceId{425});
+        core::ResourcePlan memory{budget};
+        return cf::prepare_case_clocked_known_flows(si, stamp, work, clock_limits, memory);
+    };
+    const auto intervals = [](bool split) {
+        return parse(
+            split
+                ? R"([{"start":-3.5,"end":-3,"step":0.5,"restart":"initial"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])"
+                : R"([{"start":-3.5,"end":-2.5,"step":1,"restart":"initial"}])");
+    };
+    const auto base = [&] {
+        auto fixture = source(R"({"kind":"constant","value":[0,0,0]})", "[]");
+        fixture.field("units").set("time", string("s"));
+        fixture.field("analysis")
+            .field("wake")
+            .set("convection",
+                 parse(R"({"kind":"prescribed","velocity":{"kind":"constant","value":[0,0,0]}})"));
+        fixture.field("analysis").set("intervals", intervals(false));
+        return fixture;
+    }();
+    CHECK(take(make(base)).interval_count() == 1);
+    constexpr std::string_view scalar =
+        R"({"kind":"pchip","times":[0,1,4],"values":[[0],[1],[0]],"outside":{"kind":"periodic","period":4}})";
+    constexpr std::string_view vector =
+        R"({"kind":"pchip","times":[0,1,4],"values":[[0,0,0],[1,0,0],[0,0,0]],"outside":{"kind":"periodic","period":4}})";
+    auto fixture = base;
+    SECTION("A structural support supplies the only periodic series") {
+        auto& support = fixture.field("model").field("supports").elements.front();
+        support.field("motion").set("translation", parse(vector));
+        support.field("motion").set("events", parse("[0,1,4]"));
+    }
+    SECTION("A shell load supplies the only periodic series") {
+        auto load = fragment("Load.pressure");
+        load.set("multiplier", parse(scalar));
+        fixture.field("model").field("shells").elements.front().field("loads").elements.push_back(
+            std::move(load));
+    }
+    SECTION("A beam load supplies the only periodic series") {
+        auto load = fragment("Load.point_force");
+        load.field("target").field("target").set("kind", string("beam"));
+        load.set("series", parse(vector));
+        auto beam = fragment("Beam");
+        beam.field("loads").elements.push_back(std::move(load));
+        fixture.field("model").field("beams").elements.push_back(std::move(beam));
+        auto& scales = fixture.field("numerics").field("scales").elements;
+        for (const auto field : {"beam_translation", "beam_rotation", "moment_balance",
+                                 "structural_angular_velocity"}) {
+            auto scale = fragment("Scale.uniform_components");
+            scale.set("field", string(field));
+            scale.set("targets", parse(R"([{"kind":"beam","id":"1"}])"));
+            scales.push_back(std::move(scale));
+        }
+    }
+    // The source knot at 1 s recurs at -3 s. A boundary there admits both sides.
+    reject(make(fixture), core::FailureCode::InvalidInput);
+    fixture.field("analysis").set("intervals", intervals(true));
+    CHECK(take(make(fixture)).interval_count() == 2);
+}
+
 TEST_CASE("A typed transient clock binds both flow fields to one exact stage",
           "[AE-07][UW-D02][IO4-01][N4-03][N4-06][verification][negative]") {
     a::UniformFlowWorkspace work;
