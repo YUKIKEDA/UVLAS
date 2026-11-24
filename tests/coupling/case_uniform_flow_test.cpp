@@ -5349,7 +5349,7 @@ void verify_finite_wing(const nlohmann::json& fixture, const nlohmann::json& win
     CHECK(std::holds_alternative<io::schema::ConvectionPrescribed>(wake_case.convection.record()));
     const auto model = typed.model.record();
     REQUIRE(model.aero_surfaces.size() == 2);
-    for (std::uint64_t half = 0; half < 2; ++half) {
+    for (core::Index half = 0; half < 2; ++half) {
         const auto surface = take(model.aero_surfaces.at(half)).record();
         CHECK(std::holds_alternative<io::schema::AeroAttachmentFixed>(surface.attachment.record()));
         CHECK(surface.chord.size() == 3);
