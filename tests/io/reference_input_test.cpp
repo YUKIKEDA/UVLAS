@@ -3,6 +3,7 @@
 #include "external_mesh_sidecar_pg.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
+#include "nastran_pg_material_axes.hpp"
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
 #include "reference_resolution.hpp"
@@ -1455,7 +1456,7 @@ TEST_CASE("A referenced Nastran deck survives native file removal and release of
 }
 
 TEST_CASE("Authenticated mesh sidecars bind original faces to existing Case PGs",
-          "[FD-03][IO4-01][IO4-03][IO4-04][R-05][integration][verification][negative]") {
+          "[FD-03][MAT-D05][IO4-01][IO4-03][IO4-04][R-05][integration][verification][negative]") {
     constexpr std::string_view mesh = R"MSH($MeshFormat
 4.1 0 8
 $EndMeshFormat
@@ -1542,6 +1543,23 @@ $EndElements
         MixedMaterial
     };
     Corners corners = Corners::None;
+    enum class Axes : std::uint8_t {
+        None,
+        Quarter,
+        CancelledAngles,
+        Reversed,
+        Mcid,
+        Difference,
+        Degenerate,
+        ResidualAngle,
+        Thirty,
+        Sixty,
+        WrongThirtySign,
+        FortyFive,
+        WrongFortyFiveQuadrant,
+        VariableThickness
+    };
+    Axes axes = Axes::None;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1694,8 +1712,67 @@ $EndElements
         physical = true;
         corners = Corners::MixedMaterial;
     }
+    SECTION("Element orientation and ply angle produce the same Case quarter turn") {
+        physical = true;
+        axes = Axes::Quarter;
+    }
+    SECTION("General source and Case rotations with the same exact angle cancel symbolically") {
+        physical = true;
+        axes = Axes::CancelledAngles;
+    }
+    SECTION("Reversed native winding reverses the represented angle about the Case normal") {
+        physical = true;
+        axes = Axes::Reversed;
+    }
+    SECTION("A translated rectangular MCID projects onto the Case explicit triad") {
+        physical = true;
+        axes = Axes::Mcid;
+    }
+    SECTION("Valid distinct material axes are rejected even with identical thickness") {
+        physical = true;
+        axes = Axes::Difference;
+    }
+    SECTION("A Case direction along the layer normal has a zero projection") {
+        physical = true;
+        axes = Axes::Degenerate;
+    }
+    SECTION("A rational direction cannot realize a fifteen-degree difference here") {
+        physical = true;
+        axes = Axes::ResidualAngle;
+    }
+    SECTION("Tilted rational directions realize an exact negative thirty degrees") {
+        physical = true;
+        axes = Axes::Thirty;
+    }
+    SECTION("Tilted rational tangents also realize an exact negative sixty degrees") {
+        physical = true;
+        axes = Axes::Sixty;
+    }
+    SECTION("Thirty degrees with the opposite sine sign cannot pass") {
+        physical = true;
+        axes = Axes::WrongThirtySign;
+    }
+    SECTION("Rational planar diagonals make an exact forty-five degrees") {
+        physical = true;
+        axes = Axes::FortyFive;
+    }
+    SECTION("The same squared cosine in the wrong quadrant cannot pass") {
+        physical = true;
+        axes = Axes::WrongFortyFiveQuadrant;
+    }
+    SECTION("Varying membrane thickness cannot certify one full-depth layer normal") {
+        physical = true;
+        axes = Axes::VariableThickness;
+        corners = Corners::Fraction;
+    }
+
     const bool corner_claim = corners != Corners::None;
-    const bool quad = corner_claim && corners != Corners::Absolute;
+    const bool axis_pcomp = axes != Axes::None && axes != Axes::VariableThickness;
+    const bool two_axis_layers = axes == Axes::Quarter || axes == Axes::Difference;
+    const bool tilted_axes =
+        axes == Axes::Thirty || axes == Axes::Sixty || axes == Axes::WrongThirtySign;
+    const bool forty_five_axes = axes == Axes::FortyFive || axes == Axes::WrongFortyFiveQuadrant;
+    const bool quad = axis_pcomp || (corner_claim && corners != Corners::Absolute);
     SECTION("Distinct PCOMP properties with the same physical layers cover a Case shell") {
         physical = true;
         pcomp = true;
@@ -1782,6 +1859,10 @@ $EndElements
             sidecar["shells"].erase(0);
             auto& vertices = sidecar["shells"][0]["chart"]["vertices"];
             vertices.push_back(nlohmann::json::array({zero, one}));
+            if (axes == Axes::Reversed) {
+                vertices[1].swap(vertices[3]);
+                sidecar["shells"][0]["chart"]["orientation"] = "reversed";
+            }
         }
         sidecar["materials"] = nlohmann::json::array({{{"mid", "6"}, {"material", "1"}}});
         if (corners == Corners::MixedMaterial) {
@@ -1848,6 +1929,50 @@ $EndElements
         replace_group("$Elements\n3 4 501 999\n", "$Elements\n4 4 501 999\n");
         replace_group("2 17 2 2\n702 10 40 99\n701 10 20 40\n",
                       "2 17 2 1\n702 10 40 99\n2 19 2 1\n701 10 20 40\n");
+    }
+    if (axis_pcomp) {
+        constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
+        const auto property = source_text.find(pshell);
+        REQUIRE(property != std::string::npos);
+        if (tilted_axes) {
+            const std::string_view layer =
+                axes == Axes::Thirty  ? "PCOMP,90,-.125,,,,,,\n,6,.25,-30.0\n"
+                : axes == Axes::Sixty ? "PCOMP,90,-.125,,,,,,\n,6,.25,-60.0\n"
+                                      : "PCOMP,90,-.125,,,,,,\n,6,.25,30.0\n";
+            source_text.replace(property, pshell.size(), layer);
+            source_text += "CORD2R,12,,1.0,2.0,3.0,1.0,2.0,8.0\n,2.0,3.0,3.0\n";
+            const auto world_grid = [&](std::string_view old_grid, std::string_view new_grid) {
+                const auto index = source_text.find(old_grid);
+                REQUIRE(index != std::string::npos);
+                source_text.replace(index, old_grid.size(), new_grid);
+            };
+            world_grid("GRID,20,,1.0,0.0,0.0\n", "GRID,20,,1.0,0.0,1.0\n");
+            world_grid("GRID,99,,0.0,1.0,0.0\n", "GRID,99,,0.0,1.0,-1.0\n");
+        } else if (forty_five_axes) {
+            source_text.replace(property, pshell.size(), "PCOMP,90,-.125,,,,,,\n,6,.25,30.0\n");
+        } else if (two_axis_layers) {
+            source_text.replace(property, pshell.size(),
+                                "PCOMP,90,-.125,,,,,,\n,6,.125,60.0,,6,.125,-30.0\n");
+        } else if (axes == Axes::CancelledAngles) {
+            source_text.replace(property, pshell.size(), "PCOMP,90,-.125,,,,,,\n,6,.25,10.0\n");
+        } else if (axes == Axes::Mcid) {
+            source_text.replace(property, pshell.size(),
+                                "PCOMP,90,-.125,,,,,,\n,6,.25\n"
+                                "CORD2R,12,,1.0,2.0,3.0,1.0,2.0,8.0\n,1.0,5.0,3.0\n");
+        } else {
+            source_text.replace(property, pshell.size(), "PCOMP,90,-.125,,,,,,\n,6,.25,60.0\n");
+        }
+        constexpr std::string_view triangles = "CTRIA3,701,90,10,20,40\nCTRIA3,702,90,10,40,99\n";
+        const auto position = source_text.find(triangles);
+        REQUIRE(position != std::string::npos);
+        const std::string_view face =
+            axes == Axes::Reversed                 ? "CQUAD4,701,90,10,99,40,20,30.0,0.0\n"
+            : (axes == Axes::Mcid || tilted_axes)  ? "CQUAD4,701,90,10,20,40,99,12,0.0\n"
+            : axes == Axes::CancelledAngles        ? "CQUAD4,701,90,10,20,40,99,20.0,0.0\n"
+            : axes == Axes::FortyFive              ? "CQUAD4,701,90,10,20,40,99,15.0,0.0\n"
+            : axes == Axes::WrongFortyFiveQuadrant ? "CQUAD4,701,90,10,20,40,99,105.0,0.0\n"
+                                                   : "CQUAD4,701,90,10,20,40,99,30.0,0.0\n";
+        source_text.replace(position, triangles.size(), face);
     }
     if (corner_claim) {
         constexpr std::string_view original = "PSHELL,90,6,0.25\n";
@@ -1934,6 +2059,53 @@ $EndElements
         .elements[0]
         .field("thickness")
         .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    if (tilted_axes) {
+        auto& surface = config.field("model").field("geometry").elements[0];
+        surface.set("degree", fixture::json("[1,1]"));
+        surface.set(
+            "coefficients",
+            fixture::json(
+                R"([{"powers":[0,1],"coefficient":{"numerator":"-1","denominator":"1"}},{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"1"}}])"));
+    }
+    if (axes != Axes::None) {
+        config.field("units").set("angle", fixture::json(R"("deg")"));
+        auto& layers = config.field("model").field("shells").elements[0].field("layers").elements;
+        auto& layer = layers.front();
+        if (axes == Axes::Mcid) {
+            layer.set(
+                "axis",
+                fixture::json(
+                    R"({"kind":"explicit","columns":{"kind":"constant","value":[0,-1,0,1,0,0,0,0,1]}})"));
+        } else {
+            const std::string_view direction =
+                axes == Axes::Degenerate                               ? "[0,0,1]"
+                : axes == Axes::Sixty                                  ? "[1,0,1]"
+                : tilted_axes                                          ? "[2,1,1]"
+                : forty_five_axes                                      ? "[1,1,0]"
+                : (two_axis_layers || axes == Axes::VariableThickness) ? "[0,1,2]"
+                                                                       : "[1,0,2]";
+            const std::string_view angle = axes == Axes::CancelledAngles ? "[30]"
+                                           : axes == Axes::ResidualAngle ? "[15]"
+                                                                         : "[0]";
+            layer.set(
+                "axis",
+                fixture::json(
+                    std::string{R"({"kind":"projected","direction":{"kind":"constant","value":)"} +
+                    std::string{direction} + R"(},"angle":{"kind":"constant","value":)" +
+                    std::string{angle} + "}}"));
+        }
+        if (two_axis_layers) {
+            auto top = layer;
+            top.set("id", fixture::json(R"("2")"));
+            auto interface = fixture::json(R"({"numerator":"0","denominator":"1"})");
+            layer.field("interval").elements[1] = interface;
+            top.field("interval").elements[0] = std::move(interface);
+            if (axes == Axes::Quarter) {
+                top.field("axis").field("direction").set("value", fixture::json("[1,0,1]"));
+            }
+            layers.push_back(std::move(top));
+        }
+    }
     if (frame_shift) {
         config.field("model")
             .field("geometry")
@@ -2097,7 +2269,10 @@ $EndElements
     CHECK(faces[0].shell == rd::MeshShellId{1});
     CHECK(faces[0].sidecar_row == 0);
     if (quad) {
-        CHECK(faces[0].nodes == std::array<std::uint64_t, 4>{10, 20, 40, 99});
+        const auto native_ring = axes == Axes::Reversed
+                                     ? std::array<std::uint64_t, 4>{10, 99, 40, 20}
+                                     : std::array<std::uint64_t, 4>{10, 20, 40, 99};
+        CHECK(faces[0].nodes == native_ring);
     } else {
         CHECK(faces[0].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 99, 40, 0}
                                           : std::array<std::uint64_t, 4>{10, 40, 99, 0}));
@@ -2197,8 +2372,89 @@ $EndElements
         const auto qualified = uvlas::coupling::detail::prepare_case_external_planar_pg(
             si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, preparation,
             qualification, workspace, plan, &failure);
-        if (corners == Corners::MissingBase || corners == Corners::MixedMaterial ||
-            corners == Corners::WrongFraction) {
+        if (axes != Axes::None) {
+            REQUIRE(qualified);
+            std::optional<rd::NastranPgAxisDiagnostic> axis_diagnostic;
+            const rd::NastranPgAxisLimits limits{pg_limits, two_axis_layers ? 2U : 1U};
+            const auto matched = rd::match_nastran_pg_material_axes(si, *result, qualified->match(),
+                                                                    limits, plan, &axis_diagnostic);
+            const bool unsupported = axes == Axes::VariableThickness;
+            const bool disagrees = axes == Axes::Difference || axes == Axes::ResidualAngle ||
+                                   axes == Axes::WrongThirtySign ||
+                                   axes == Axes::WrongFortyFiveQuadrant;
+            if (disagrees || axes == Axes::Degenerate || unsupported) {
+                REQUIRE_FALSE(matched);
+                CHECK(matched.error().code == (unsupported ? core::FailureCode::Unsupported
+                                                           : core::FailureCode::InvalidInput));
+                if (const auto& failure_detail = axis_diagnostic) {
+                    CHECK(failure_detail->element == 701);
+                    CHECK(failure_detail->property == rd::NastranPropertyId{90});
+                    CHECK(failure_detail->reason ==
+                          (disagrees                  ? rd::NastranPgAxisFailure::Difference
+                           : axes == Axes::Degenerate ? rd::NastranPgAxisFailure::CaseAxis
+                                                      : rd::NastranPgAxisFailure::Thickness));
+                    if (axes != Axes::VariableThickness) {
+                        CHECK(failure_detail->layer ==
+                              core::LayerId{axes == Axes::Difference ? 2U : 1U});
+                        CHECK(failure_detail->element_field);
+                        CHECK(failure_detail->ply_field);
+                    }
+                } else {
+                    FAIL("Missing material-axis provenance");
+                }
+            } else {
+                REQUIRE(matched);
+                CHECK_FALSE(axis_diagnostic);
+                CHECK(matched->pg == fixture::take(qualified->reference().identity()));
+                CHECK(matched->sidecar.source == io::SourceId{2});
+                CHECK(matched->deck.source == io::SourceId{1});
+                const auto records = matched->matches.values();
+                REQUIRE(records.size() == (two_axis_layers ? 2U : 1U));
+                const auto& row = records.front();
+                CHECK(row.element == 701);
+                CHECK(row.layer == core::LayerId{1});
+                CHECK(row.element_field);
+                CHECK(row.ply_field.has_value() == (axes != Axes::Mcid));
+                CHECK(row.normal[2].sign() > 0);
+                const std::string_view angle = axes == Axes::CancelledAngles ? "30"
+                                               : axes == Axes::Thirty        ? "-30"
+                                               : axes == Axes::Sixty         ? "-60"
+                                               : axes == Axes::FortyFive     ? "45"
+                                               : axes == Axes::Reversed      ? "-90"
+                                               : axes == Axes::Mcid          ? "0"
+                                                                             : "90";
+                CHECK(row.degrees ==
+                      fixture::take(ExactRational::from_decimal(angle, pg_limits.algebra, plan)));
+                if (axes == Axes::Mcid) {
+                    CHECK(row.tangent[0].sign() == 0);
+                    CHECK(row.tangent[1].sign() > 0);
+                } else if (tilted_axes) {
+                    CHECK(row.tangent[0].sign() > 0);
+                    CHECK(row.tangent[0] == row.tangent[1]);
+                    CHECK(row.tangent[2].sign() == 0);
+                }
+                if (axes == Axes::Quarter) {
+                    const auto& upper = records[1];
+                    CHECK(upper.layer == core::LayerId{2});
+                    CHECK(upper.degrees.sign() == 0);
+                    CHECK(upper.ply_field != row.ply_field);
+                    const auto shortage = rd::match_nastran_pg_material_axes(
+                        si, *result, qualified->match(), {pg_limits, 1}, plan);
+                    REQUIRE_FALSE(shortage);
+                    CHECK(shortage.error().code == core::FailureCode::ResourceExceeded);
+                    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+                    std::stop_source stopped;
+                    REQUIRE(stopped.request_stop());
+                    auto cancelled_limits = limits;
+                    cancelled_limits.arithmetic.cancellation = stopped.get_token();
+                    const auto cancelled = rd::match_nastran_pg_material_axes(
+                        si, *result, qualified->match(), cancelled_limits, plan);
+                    REQUIRE_FALSE(cancelled);
+                    CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+                }
+            }
+        } else if (corners == Corners::MissingBase || corners == Corners::MixedMaterial ||
+                   corners == Corners::WrongFraction) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == (corners == Corners::MixedMaterial
                                                  ? core::FailureCode::Unsupported
