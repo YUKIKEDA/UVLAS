@@ -503,6 +503,12 @@ struct LoadTotals {
         accumulate_vector(force, value, work);
         accumulate_vector(moment, cross(difference(position, origin, work), value, work), work);
     }
+
+    void add_direction(const Vector& position, const Vector& value, const Vector& dx,
+                       const Vector& df, const Vector& origin, p::Work& work) {
+        add(position, df, origin, work);
+        accumulate_vector(moment, cross(dx, value, work), work);
+    }
 };
 
 void distribute_load(std::span<NodalLoad> nodes, std::span<const a::PointId> vertices,
@@ -521,6 +527,45 @@ void distribute_load(std::span<NodalLoad> nodes, std::span<const a::PointId> ver
             reject(core::FailureCode::InvalidInput);
         accumulate_vector(it->force, piece, work);
     }
+}
+
+struct LoadDirections {
+    explicit LoadDirections(const DiscreteVectorLoadDirection& direction) noexcept
+        : input(direction) {}
+    const DiscreteVectorLoadDirection& input;
+    core::PlannedBuffer<p::Interval> gamma, rate, strength;
+    core::PlannedBuffer<NodalLoad> nodal;
+    core::PlannedBuffer<std::optional<DiscreteLoadSampleDirection>> edges, facets;
+    core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points;
+    std::optional<DiscreteLoadVector> force{}, moment{};
+    Vector ambient{};
+    LoadTotals totals{};
+};
+
+Vector add_vectors(Vector first, const Vector& second, p::Work& work) {
+    accumulate_vector(first, second, work);
+    return first;
+}
+
+Vector point_direction(const LoadDirections& direction, a::PointId id, p::Work& work) {
+    work.step();
+    const auto ids = direction.input.points;
+    const auto it =
+        std::lower_bound(ids.begin(), ids.end(), id, [&](a::PointId first, a::PointId second) {
+            work.step();
+            return first < second;
+        });
+    if (it == ids.end() || *it != id)
+        reject(core::FailureCode::InvalidInput);
+    return import(direction.input.displacements[static_cast<std::size_t>(it - ids.begin())], work);
+}
+
+Vector induction_direction(const a::P1ActionValue& induced, p::Work& work) {
+    const auto& jvp = induced.jvp();
+    if (!jvp)
+        reject(core::FailureCode::InvalidInput);
+    return {import((*jvp)[0].real, work), import((*jvp)[1].real, work),
+            import((*jvp)[2].real, work)};
 }
 
 a::ScalarWords retained_word(const numerics::PrecisionBuffer<double>& retained, std::size_t i) {
@@ -1275,7 +1320,8 @@ struct NonpenetrationBuilder {
     static void reduce_load_edges(std::span<LoadEdgeOccurrence> occurrences,
                                   std::span<const EdgeMidpointVelocity> velocities,
                                   std::span<LoadEdge> edges,
-                                  const linear::Solution<double>& solution, p::Work& work) {
+                                  const linear::Solution<double>& solution, p::Work& work,
+                                  LoadDirections* direction) {
         std::ranges::sort(
             occurrences, [&](const LoadEdgeOccurrence& left, const LoadEdgeOccurrence& right) {
                 work.step();
@@ -1285,7 +1331,7 @@ struct NonpenetrationBuilder {
         for (std::size_t i = 0; i < occurrences.size();) {
             work.step();
             const auto owner = occurrences[i];
-            p::Interval strength{};
+            p::Interval strength{}, d_strength{};
             bool exterior = false;
             while (i < occurrences.size() && occurrences[i].edge == owner.edge) {
                 const auto panel = occurrences[i].panel;
@@ -1304,12 +1350,20 @@ struct NonpenetrationBuilder {
                 const auto gamma = import(retained_word(solution.values(), panel), work);
                 strength = orientation == 1 ? p::add(strength, gamma, work)
                                             : p::subtract(strength, gamma, work);
+                if (direction != nullptr) {
+                    const auto& d_gamma = direction->gamma.values()[panel];
+                    d_strength = orientation == 1 ? p::add(d_strength, d_gamma, work)
+                                                  : p::subtract(d_strength, d_gamma, work);
+                }
             }
             if (exterior && !owner.trailing) {
                 if (emitted == velocities.size() || velocities[emitted].edge != owner.edge)
                     reject(core::FailureCode::InvalidInput);
                 (void)import(velocities[emitted].velocity, work);
-                edges[emitted++] = {owner.edge, owner.endpoints, strength};
+                edges[emitted] = {owner.edge, owner.endpoints, strength};
+                if (direction != nullptr)
+                    direction->strength.values()[emitted] = d_strength;
+                ++emitted;
             }
         }
         if (emitted != velocities.size())
@@ -1350,12 +1404,66 @@ struct NonpenetrationBuilder {
         return nodes.first(static_cast<std::size_t>(duplicates.begin() - nodes.begin()));
     }
 
+    static void prepare_load_directions(LoadDirections& direction, Assembly& assembly,
+                                        const DiscreteVectorLoadInput& loads,
+                                        const a::OwnedGeometry& geometry,
+                                        std::span<const NodalLoad> vertices,
+                                        core::ResourcePlan& memory, p::Work& work) {
+        const auto bound = std::span<const PanelRow>{assembly.bound.values()};
+        direction.gamma = allocate<p::Interval>(memory, bound.size());
+        direction.rate = allocate<p::Interval>(memory, bound.size());
+        direction.strength = allocate<p::Interval>(memory, loads.edges.size());
+        direction.nodal = allocate<NodalLoad>(memory, vertices.size());
+        direction.edges =
+            allocate<std::optional<DiscreteLoadSampleDirection>>(memory, loads.edges.size());
+        direction.facets =
+            allocate<std::optional<DiscreteLoadSampleDirection>>(memory, 2 * bound.size());
+        direction.points = allocate<std::optional<DiscreteNodalLoad>>(memory, vertices.size());
+        direction.ambient = import(direction.input.uniform_flow, work);
+        for (std::size_t i = 0; i < vertices.size(); ++i) {
+            work.step();
+            direction.nodal.values()[i].point = vertices[i].point;
+        }
+        for (std::size_t i = 0; i < direction.input.points.size(); ++i) {
+            work.step();
+            const auto point = direction.input.points[i];
+            if ((i != 0 && direction.input.points[i - 1] >= point) ||
+                require(geometry.owner(point)) != point)
+                reject(core::FailureCode::InvalidInput);
+            (void)import(direction.input.displacements[i], work);
+        }
+        for (std::size_t i = 0; i < loads.edges.size(); ++i) {
+            work.step();
+            if (direction.input.edges[i].edge != loads.edges[i].edge)
+                reject(core::FailureCode::InvalidInput);
+            (void)import(direction.input.edges[i].velocity, work);
+        }
+        for (std::size_t i = 0; i < bound.size(); ++i) {
+            work.step();
+            const auto& row = direction.input.bound[i];
+            if (row.face != bound[i].panel.face)
+                reject(core::FailureCode::InvalidInput);
+            direction.gamma.values()[i] = import(row.circulation, work);
+            direction.rate.values()[i] = import(row.circulation_rate, work);
+        }
+        for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
+            work.step();
+            const auto& transfer = assembly.traces.values()[i].transfer;
+            if (!transfer)
+                continue;
+            const auto& delta =
+                direction.input.bound[transfer_column(bound, *transfer, work)].circulation;
+            assembly.directions.values()[i].real = transfer->reverse ? negative(delta) : delta;
+        }
+    }
+
     static DiscreteCirculationLoads
     solve_loads(const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
                 ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
                 const DiscreteCirculationRequest& request, a::GeometryWorkspace& geometry_work,
                 a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local,
-                a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop) {
+                a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop,
+                LoadDirections* direction = nullptr) {
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto order = input.collocations.size();
@@ -1377,14 +1485,25 @@ struct NonpenetrationBuilder {
         const auto radius = import(require(geometry.core_radius()), work);
         if (!loads.edges.empty() && p::compare(radius.lower, {}) <= 0)
             reject(core::FailureCode::GeometryInvalid);
+        if (direction != nullptr) {
+            const auto& variation = direction->input;
+            if (variation.stamp != loads.stamp || variation.circulation != loads.circulation)
+                reject(core::FailureCode::StaleGeneration);
+            const auto counts = require(geometry.counts());
+            if (variation.points.size() != variation.displacements.size() ||
+                variation.points.size() > counts.points || variation.bound.size() != order ||
+                variation.edges.size() != loads.edges.size() ||
+                (order == 0 && !variation.points.empty()))
+                reject(core::FailureCode::InvalidInput);
+        }
 
         std::optional<Assembly> retained;
         auto primal = solve_data(input, flow, limits, request, shared, local, kernel, memory, work,
                                  nullptr, {}, nullptr, &retained);
         if (!retained)
             reject(core::FailureCode::InvalidInput);
-        const auto& assembly = *retained;
-        const auto bound = assembly.bound.values();
+        auto& assembly = *retained;
+        const auto bound = std::span<const PanelRow>{assembly.bound.values()};
         auto rates = allocate<p::Interval>(memory, order);
         for (std::size_t i = 0; i < order; ++i) {
             work.step();
@@ -1402,7 +1521,11 @@ struct NonpenetrationBuilder {
                                                         occurrences.values(), nodes.values(), work);
         auto point_loads = allocate<std::optional<DiscreteNodalLoad>>(memory, vertex_loads.size());
         auto edges = allocate<LoadEdge>(memory, loads.edges.size());
-        reduce_load_edges(occurrences.values(), loads.edges, edges.values(), primal.solution, work);
+        if (direction != nullptr)
+            prepare_load_directions(*direction, assembly, loads, geometry, vertex_loads, memory,
+                                    work);
+        reduce_load_edges(occurrences.values(), loads.edges, edges.values(), primal.solution, work,
+                          direction);
 
         a::LocalRootScratch rounding;
         const auto representation = limits.induction_accuracy.representation;
@@ -1438,14 +1561,50 @@ struct NonpenetrationBuilder {
                 kernel, memory, stop));
             const auto report = require(action.report());
             account(work, report.used_steps);
+            std::optional<a::P1ActionDirection> variation;
+            if (direction != nullptr) {
+                if (i == 0) {
+                    if (action.point_count() != direction->input.points.size())
+                        reject(core::FailureCode::InvalidInput);
+                    for (std::size_t point = 0; point < action.point_count(); ++point) {
+                        work.step();
+                        if (require(action.point(point)) != direction->input.points[point])
+                            reject(core::FailureCode::InvalidInput);
+                    }
+                }
+                variation.emplace(a::P1ActionDirection{direction->input.displacements,
+                                                       assembly.directions.values(), std::nullopt,
+                                                       a::SingleWord{0}});
+            }
             const auto induced = require(
-                a::apply_shared_p1(action, source, assembly.values.values(), std::nullopt,
+                a::apply_shared_p1(action, source, assembly.values.values(), variation,
                                    std::min(limits.action_steps, remaining(work)), shared, stop));
             account(work, induced.used_steps());
             const auto relative = difference(ambient, import(loads.edges[i].velocity, work), work);
-            const auto force = scale_vector(cross(native_velocity(relative, induced, work),
-                                                  difference(b_pos, a_pos, work), work),
-                                            p::multiply(density, edge.strength, work), work);
+            const auto effective = native_velocity(relative, induced, work);
+            const auto edge_vector = difference(b_pos, a_pos, work);
+            const auto velocity_cross_edge = cross(effective, edge_vector, work);
+            const auto factor = p::multiply(density, edge.strength, work);
+            const auto force = scale_vector(velocity_cross_edge, factor, work);
+            if (direction != nullptr) {
+                const auto da = point_direction(*direction, edge.endpoints[0], work);
+                const auto db = point_direction(*direction, edge.endpoints[1], work);
+                const auto dx = scale_vector(add_vectors(da, db, work), half, work);
+                const auto d_edge = difference(db, da, work);
+                const auto d_relative = difference(
+                    direction->ambient, import(direction->input.edges[i].velocity, work), work);
+                const auto d_effective =
+                    add_vectors(d_relative, induction_direction(induced, work), work);
+                const auto d_cross = add_vectors(cross(d_effective, edge_vector, work),
+                                                 cross(effective, d_edge, work), work);
+                const auto d_factor = p::multiply(density, direction->strength.values()[i], work);
+                const auto df = add_vectors(scale_vector(velocity_cross_edge, d_factor, work),
+                                            scale_vector(d_cross, factor, work), work);
+                direction->totals.add_direction(center, force, dx, df, origin, work);
+                distribute_load(direction->nodal.values(), edge.endpoints, df, half, work);
+                direction->edges.values()[i].emplace(
+                    DiscreteLoadSampleDirection{finish(dx), finish(df)});
+            }
             totals.add(center, force, origin, work);
             distribute_load(vertex_loads, edge.endpoints, force, half, work);
             edge_loads.values()[i].emplace(
@@ -1462,12 +1621,31 @@ struct NonpenetrationBuilder {
                 const auto x = point_position(geometry, points[0], work);
                 const auto y = point_position(geometry, points[1], work);
                 const auto z = point_position(geometry, points[2], work);
-                const auto force = scale_vector(
-                    cross(difference(y, x, work), difference(z, x, work), work), factor, work);
+                const auto xy = difference(y, x, work);
+                const auto xz = difference(z, x, work);
+                const auto doubled_area = cross(xy, xz, work);
+                const auto force = scale_vector(doubled_area, factor, work);
                 auto center = x;
                 accumulate_vector(center, y, work);
                 accumulate_vector(center, z, work);
                 center = scale_vector(center, third, work);
+                if (direction != nullptr) {
+                    const auto dx = point_direction(*direction, points[0], work);
+                    const auto dy = point_direction(*direction, points[1], work);
+                    const auto dz = point_direction(*direction, points[2], work);
+                    const auto dcenter =
+                        scale_vector(add_vectors(add_vectors(dx, dy, work), dz, work), third, work);
+                    const auto darea = add_vectors(cross(difference(dy, dx, work), xz, work),
+                                                   cross(xy, difference(dz, dx, work), work), work);
+                    const auto d_factor = p::multiply(
+                        half, p::multiply(density, direction->rate.values()[i], work), work);
+                    const auto df = add_vectors(scale_vector(doubled_area, d_factor, work),
+                                                scale_vector(darea, factor, work), work);
+                    direction->totals.add_direction(center, force, dcenter, df, origin, work);
+                    distribute_load(direction->nodal.values(), points, df, third, work);
+                    direction->facets.values()[2 * i + child].emplace(
+                        DiscreteLoadSampleDirection{finish(dcenter), finish(df)});
+                }
                 totals.add(center, force, origin, work);
                 distribute_load(vertex_loads, points, force, third, work);
                 facet_loads.values()[2 * i + child].emplace(DiscreteNoncirculatoryLoad{
@@ -1476,8 +1654,16 @@ struct NonpenetrationBuilder {
         }
         for (std::size_t i = 0; i < vertex_loads.size(); ++i) {
             work.step();
-            point_loads.values()[i].emplace(DiscreteNodalLoad{a::PointId{vertex_loads[i].point},
-                                                              finish(vertex_loads[i].force)});
+            const auto point = a::PointId{vertex_loads[i].point};
+            point_loads.values()[i].emplace(
+                DiscreteNodalLoad{point, finish(vertex_loads[i].force)});
+            if (direction != nullptr)
+                direction->points.values()[i].emplace(
+                    DiscreteNodalLoad{point, finish(direction->nodal.values()[i].force)});
+        }
+        if (direction != nullptr) {
+            direction->force.emplace(finish(direction->totals.force));
+            direction->moment.emplace(finish(direction->totals.moment));
         }
         const auto force = finish(totals.force);
         const auto moment = finish(totals.moment);
@@ -1491,6 +1677,26 @@ struct NonpenetrationBuilder {
                 moment,
                 reference,
                 work.used};
+    }
+
+    static DiscreteCirculationLoadJvp solve_load_direction(
+        const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+        const DiscreteVectorLoadDirection& variation, ProjectedCaseUniformFlow&& flow,
+        const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+        a::GeometryWorkspace& geometry_work, a::SharedP1Workspace& shared,
+        a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+        const std::stop_token& stop) {
+        LoadDirections direction{variation};
+        auto value = solve_loads(input, loads, std::move(flow), limits, request, geometry_work,
+                                 shared, local, kernel, memory, stop, &direction);
+        if (!direction.force || !direction.moment)
+            reject(core::FailureCode::InvalidInput);
+        return {std::move(value),
+                std::move(direction.edges),
+                std::move(direction.facets),
+                std::move(direction.points),
+                *direction.force,
+                *direction.moment};
     }
 
     static a::PhysicalFaceId face_at(std::span<const std::optional<CirculationResidualRow>> rows,
@@ -1811,6 +2017,53 @@ core::Result<DiscreteCirculationLoads> solve_discrete_circulation_loads(
         return NonpenetrationBuilder::solve_loads(input, loads, std::move(flow), limits, request,
                                                   geometry_work, shared, local, kernel, memory,
                                                   stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+DiscreteCirculationLoadJvp::DiscreteCirculationLoadJvp(
+    DiscreteCirculationLoads&& loads,
+    core::PlannedBuffer<std::optional<DiscreteLoadSampleDirection>> edges,
+    core::PlannedBuffer<std::optional<DiscreteLoadSampleDirection>> facets,
+    core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points, const DiscreteLoadVector& force,
+    const DiscreteLoadVector& moment) noexcept
+    : loads_(std::move(loads)),
+      edges_(std::move(edges)),
+      facets_(std::move(facets)),
+      points_(std::move(points)),
+      force_(force),
+      moment_(moment) {}
+
+core::Result<DiscreteLoadSampleDirection>
+DiscreteCirculationLoadJvp::edge(std::size_t i) const noexcept {
+    return load_row(edges_, i);
+}
+core::Result<DiscreteLoadSampleDirection>
+DiscreteCirculationLoadJvp::facet(std::size_t i) const noexcept {
+    return load_row(facets_, i);
+}
+core::Result<DiscreteNodalLoad> DiscreteCirculationLoadJvp::point(std::size_t i) const noexcept {
+    return load_row(points_, i);
+}
+
+core::Result<DiscreteCirculationLoadJvp> solve_discrete_circulation_load_direction(
+    const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+    const DiscreteVectorLoadDirection& direction, ProjectedCaseUniformFlow&& flow,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+    a::GeometryWorkspace& geometry_work, a::SharedP1Workspace& shared,
+    a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+    const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_load_direction(input, loads, direction, std::move(flow),
+                                                           limits, request, geometry_work, shared,
+                                                           local, kernel, memory, stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {

@@ -551,4 +551,89 @@ solve_discrete_circulation_loads(const DiscreteNonpenetrationInput&, const Discr
                                  aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&,
                                  core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
+struct BoundLoadDirection {
+    BoundLoadDirection(aero::detail::PhysicalFaceId id, const aero::detail::ScalarWords& gamma,
+                       const aero::detail::ScalarWords& rate) noexcept
+        : face(id), circulation(gamma), circulation_rate(rate) {}
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScalarWords circulation, circulation_rate; ///< m²/s and m²/s² directions.
+};
+
+/// Fixed-chart load direction at the same nominal circulation and trial.
+struct DiscreteVectorLoadDirection {
+    DiscreteVectorLoadDirection(aero::detail::P1ActionStamp trial,
+                                core::NumericalGeneration circulation_generation,
+                                std::span<const aero::detail::PointId> point_ids,
+                                std::span<const NonpenetrationVector> dx,
+                                std::span<const EdgeMidpointVelocity> dv,
+                                std::span<const BoundLoadDirection> gamma,
+                                const NonpenetrationVector& ambient) noexcept
+        : stamp(trial),
+          circulation(circulation_generation),
+          points(point_ids),
+          displacements(dx),
+          edges(dv),
+          bound(gamma),
+          uniform_flow(ambient) {}
+    aero::detail::P1ActionStamp stamp;
+    core::NumericalGeneration circulation;
+    std::span<const aero::detail::PointId> points;       ///< Ascending canonical geometry IDs.
+    std::span<const NonpenetrationVector> displacements; ///< SI point position directions.
+    std::span<const EdgeMidpointVelocity>
+        edges; ///< Midpoint-velocity directions in value edge order.
+    std::span<const BoundLoadDirection> bound; ///< Ascending bound face IDs.
+    NonpenetrationVector uniform_flow;         ///< Uniform velocity direction at fixed time, m/s.
+};
+
+struct DiscreteLoadSampleDirection {
+    DiscreteLoadVector position, force; ///< Direction of the same indexed value load sample.
+};
+
+/// Value loads and the matching forward direction. Indices follow the value result.
+class DiscreteCirculationLoadJvp {
+public:
+    DiscreteCirculationLoadJvp(DiscreteCirculationLoadJvp&&) noexcept = default;
+    DiscreteCirculationLoadJvp& operator=(DiscreteCirculationLoadJvp&&) noexcept = default;
+    DiscreteCirculationLoadJvp(const DiscreteCirculationLoadJvp&) = delete;
+    DiscreteCirculationLoadJvp& operator=(const DiscreteCirculationLoadJvp&) = delete;
+    [[nodiscard]] const DiscreteCirculationLoads& loads() const& noexcept {
+        return loads_;
+    }
+    [[nodiscard]] const DiscreteCirculationLoads& loads() const&& = delete;
+    [[nodiscard]] DiscreteLoadVector total_force_direction() const noexcept {
+        return force_;
+    }
+    [[nodiscard]] DiscreteLoadVector total_moment_direction() const noexcept {
+        return moment_;
+    }
+    [[nodiscard]] core::Result<DiscreteLoadSampleDirection> edge(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadSampleDirection> facet(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationLoadJvp(DiscreteCirculationLoads&&,
+                               core::PlannedBuffer<std::optional<DiscreteLoadSampleDirection>>,
+                               core::PlannedBuffer<std::optional<DiscreteLoadSampleDirection>>,
+                               core::PlannedBuffer<std::optional<DiscreteNodalLoad>>,
+                               const DiscreteLoadVector& force,
+                               const DiscreteLoadVector& moment) noexcept;
+    DiscreteCirculationLoads loads_;
+    core::PlannedBuffer<std::optional<DiscreteLoadSampleDirection>> edges_, facets_;
+    core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
+    DiscreteLoadVector force_, moment_;
+};
+
+/// Use supplied circulation/rate directions at the attained value circulation.
+/// Shared induction requires the complete canonical point order. Time, density,
+/// core radius, inherited wake strength, and moment origin remain fixed.
+/// Both value and direction must succeed before the flow is consumed.
+[[nodiscard]] core::Result<DiscreteCirculationLoadJvp> solve_discrete_circulation_load_direction(
+    const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+    const DiscreteVectorLoadDirection&, ProjectedCaseUniformFlow&&,
+    const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+    aero::detail::GeometryWorkspace&, aero::detail::SharedP1Workspace&,
+    aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
