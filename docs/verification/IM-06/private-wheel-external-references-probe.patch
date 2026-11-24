@@ -1,0 +1,159 @@
+--- a/probe.py
++++ b/probe.py
+@@ -23 +23 @@
+-COMMIT = "63df6cc00d7180725370201dca3454ad35073cfd"
++COMMIT = "3a140d7bfbffef797a3fb7b29187dc458e50f53a"
+@@ -204,0 +205,114 @@
++def check_external_frontends(cli, examples, workspace, uvlas):
++    case = copy.deepcopy(examples["schema_examples"]["structural_static"])
++    model = case["model"]
++    pg = model["geometry"][0]
++    pg["frame"] = {"origin": [1, 2, 3], "rotation": [[0, 0, 1], [1, 0, 0], [0, 1, 0]]}
++    pg["reference_length"] = 2
++    pg["thickness"]["values"] = [0.25] * 4
++    model["shells"][0]["layers"][0]["axis"]["direction"]["value"] = [0, 1, 0]
++    mesh = b"""$MeshFormat
++4.1 0 8
++$EndMeshFormat
++$Entities
++0 0 1 0
++17 1000 2000 3000 1000 4000 5000 1 7 0
++$EndEntities
++$Nodes
++1 4 10 99
++2 17 0 4
++10 20 40 99
++1000 2000 3000
++1000 4000 3000
++1000 4000 5000
++1000 2000 5000
++$EndNodes
++$Elements
++1 1 701 701
++2 17 3 1
++701 10 20 40 99
++$EndElements
++"""
++    deck = b"""GRID,10,,1.0,2.0,3.0
++GRID,20,,1.0,4.0,3.0
++GRID,40,,1.0,4.0,5.0
++GRID,99,,1.0,2.0,5.0
++CQUAD4,701,90,10,20,40,99,0.0
++MAT1,6,1.0,,0.0,1.0
++PSHELL,90,6,0.25
++"""
++    zero = {"numerator": "0", "denominator": "1"}
++    one = {"numerator": "1", "denominator": "1"}
++    chart = {"orientation": "same", "vertices": [[zero, zero], [one, zero], [one, one], [zero, one]]}
++    gmsh_map = {
++        "schema": "uvlas.gmsh-sidecar/1", "geometry": "2", "length": "mm",
++        "supports": [], "joints": [],
++        "shells": [{"physical": {"dimension": 2, "tag": 7}, "shell": "1", "full_thickness": 250,
++                    "faces": [{"element": "701", "chart": chart}],
++                    "material_layers": [{"layer": "1", "material": "1"}]}],
++    }
++    nastran_map = {
++        "schema": "uvlas.nastran-sidecar/1", "geometry": "3", "generator": "MSC Nastran 2022.1",
++        "units": {"length": "m", "mass": "kg", "time": "s", "angle": "deg"},
++        "shells": [{"element": "701", "shell": "1", "chart": chart}],
++        "materials": [{"mid": "6", "material": "1"}],
++        "supports": [], "joints": [], "beams": [], "masses": [],
++    }
++    gmsh = copy.deepcopy(examples["fragments"]["Geometry.gmsh"])
++    gmsh["reference"] = copy.deepcopy(examples["fragments"]["ReferenceGeometry.fit"])
++    nastran = copy.deepcopy(examples["fragments"]["Geometry.nastran"])
++    nastran["id"] = "3"
++    model["geometry"].extend([gmsh, nastran])
++    cases = [
++        (gmsh["mesh"], "wing.msh", "300", mesh),
++        (gmsh["sidecar"], "gmsh.json", "301", text_json(gmsh_map).encode()),
++        (nastran["deck"], "wing.bdf", "302", deck),
++        (nastran["sidecar"], "nastran.json", "303", text_json(nastran_map).encode()),
++    ]
++    for reference, name, source_id, data in cases:
++        reference.update(path=name, source_id=source_id, sha256=sha(data))
++        (workspace / name).write_bytes(data)
++
++    path = workspace / "external case.json"
++    wire = text_json(case).encode()
++    path.write_bytes(wire)
++    passed = run([str(cli), "validate", path.name], workspace)
++    assert "Case validation succeeded." in passed.stdout, passed.stdout
++    file_result = uvlas.load_case(path)
++    dict_result = uvlas.case_from_dict(case, reference_root=workspace)
++    assert file_result.ok and dict_result.ok, (file_result.failure, dict_result.failure)
++    assert file_result.value.source_sha256.hex() == sha(wire)
++    del file_result, dict_result
++
++    (workspace / "wing.bdf").write_bytes(deck + b"$ changed\n")
++    corrupted = run([str(cli), "validate", path.name], workspace, expected=2)
++    assert "reference SHA-256 mismatch at /model/geometry/2/deck" in corrupted.stderr
++    rejected = uvlas.load_case(path)
++    assert not rejected.ok and rejected.failure.code == uvlas.FailureCode.InvalidInput
++    del rejected
++    (workspace / "wing.bdf").write_bytes(deck)
++
++    broken = text_json({**gmsh_map, "geometry": "999"}).encode()
++    (workspace / "gmsh.json").write_bytes(broken)
++    gmsh["sidecar"]["sha256"] = sha(broken)
++    path.write_bytes(text_json(case).encode())
++    malformed = run([str(cli), "validate", path.name], workspace, expected=2)
++    assert "Gmsh sidecar" in malformed.stderr, malformed.stderr
++    rejected = uvlas.load_case(path)
++    assert not rejected.ok and rejected.failure.code == uvlas.FailureCode.InvalidInput
++    del rejected
++    (workspace / "gmsh.json").write_bytes(cases[1][3])
++    gmsh["sidecar"]["sha256"] = sha(cases[1][3])
++    path.write_bytes(wire)
++    restored = run([str(cli), "validate", path.name], workspace)
++    assert restored.stdout == passed.stdout
++    assert uvlas.load_case(path).ok
++    return {
++        "case_sha256": sha(wire),
++        "sources": {name: sha(data) for _, name, _, data in cases},
++        "accepted": {"cli": passed.returncode, "python_file": True, "python_dict": True},
++        "changed_deck": corrupted.stderr.strip(),
++        "different_gmsh_sidecar_geometry": malformed.stderr.strip(),
++        "restored_cli": restored.returncode,
++    }
++
++
+@@ -244,25 +358 @@
+-    case_file = workspace / "external case.json"
+-    case = copy.deepcopy(examples["schema_examples"]["coupled_transient"])
+-    geometry = copy.deepcopy(examples["fragments"]["Geometry.nastran"])
+-    bdf = b"BEGIN BULK\nGRID,1,,3.0,4.0,5.0\nENDDATA\n"
+-    sidecar = b"{}"
+-    deck = workspace / "skin.bdf"
+-    deck.write_bytes(bdf)
+-    (workspace / "sidecar.json").write_bytes(sidecar)
+-    geometry["deck"].update(source_id="300", path="skin.bdf", sha256=sha(bdf))
+-    geometry["sidecar"].update(source_id="301", path="sidecar.json", sha256=sha(sidecar))
+-    assert len(case["model"]["geometry"]) == 1
+-    case["model"]["geometry"].append(geometry)
+-    case_file.write_text(text_json(case), encoding="utf-8")
+-    unsupported = run([str(cli), "validate", case_file.name], workspace, expected=2)
+-    assert (
+-        "external reference dependency validation is unsupported at /model/geometry/1/sidecar"
+-        in unsupported.stderr
+-    )
+-    no_case = uvlas.load_case(case_file)
+-    assert not no_case.ok and no_case.failure.code == uvlas.FailureCode.Unsupported
+-    deck.write_bytes(bdf + b"$ changed\n")
+-    mismatch = run([str(cli), "validate", case_file.name], workspace, expected=2)
+-    assert "reference SHA-256 mismatch at /model/geometry/1/deck" in mismatch.stderr
+-    bad_digest = uvlas.load_case(case_file)
+-    assert not bad_digest.ok and bad_digest.failure.code == uvlas.FailureCode.InvalidInput
++    external = check_external_frontends(cli, examples, workspace, uvlas)
+@@ -340,10 +430 @@
+-        "matching_deck": {
+-            "exit": unsupported.returncode,
+-            "cli": unsupported.stderr.strip(),
+-            "python": "Unsupported",
+-        },
+-        "changed_deck": {
+-            "exit": mismatch.returncode,
+-            "cli": mismatch.stderr.strip(),
+-            "python": "InvalidInput",
+-        },
++        "external_references": external,

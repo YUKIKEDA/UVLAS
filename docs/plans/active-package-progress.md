@@ -71,7 +71,7 @@
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |
 | CLI | 実装中 | `validate` は全スキーマと対応する外部参照を検査し、未対応の役割を拒否する。直下の外部ファイルは SHA-256 を照合し、MSH 4.1 ASCII の節とタグ、Gmsh・Nastran の版付き対応表を検査する。`inspect` は保存済み状態と来歴を照合し、来歴に指紋がある場合は解決済みケースも確認する。Python と検査処理を共有する。形式別の子依存の検査、prepare／run／resume、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約) |
 | Python | 実装中 | ファイル・辞書の検査と結果確認に CLI と同じ C++ 処理を使い、検査済み入力と参照を所有する。物理準備・実行・再開、受理済み解析結果への接続が残る。 [入口の検証](../verification/IM-06/shared-case-frontends.md) |
-| ランタイムと新規環境 | 実装中 | WindowsとLinuxで実wheelを空のPython環境へオフライン導入し、移設CLIと同じケース検査、外部参照の診断、所有権を確認した。Linuxは開発ツールなしのUbuntu Base、Windowsは開発PATHを外した環境で計測した。一般配布ABI、Windowsの独立した非開発環境、外部参照の検証成功と導入後の実行・再開が残る。 [実wheelの導入試験](../verification/IM-06/private-wheel-rehearsal.md) |
+| ランタイムと新規環境 | 実装中 | WindowsとLinuxで実wheelを空のPython環境へオフライン導入した。移設CLIとPythonは実BDF・実MSHと両方の対応表を含む同一Caseを読み込み、改変や対応先の不一致を拒否し、復元後に再び成功した。Linuxは開発ツールなしのUbuntu Base、Windowsは開発PATHを外した環境で確認した。一般配布ABI、独立したWindows環境、導入後の求解と実状態からの再開が残る。 [実wheelの導入試験](../verification/IM-06/private-wheel-rehearsal.md)・[外部参照の成功と拒否](../verification/IM-06/private-wheel-external-references.md) |
 | 終了審査 | 残 | V-USE・V-STATEで3入力経路とCLI／Pythonの物理結果、両OSの導入・中断・再開を照合する |
 
 schemaのLinux sanitizerの2試験は [#143](https://github.com/YUKIKEDA/UVLAS/pull/143) の修正を含むmainで再計測し、49.51秒と53.22秒で通過した。Linux sanitizerだけ300秒、Linux Debug・ReleaseとWindows Debug・Releaseは60秒の登録を確認した。 [#142](https://github.com/YUKIKEDA/UVLAS/issues/142) 数値表では同じ段階の子Issueを重ねて加えない。
