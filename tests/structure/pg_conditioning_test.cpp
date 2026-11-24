@@ -121,6 +121,71 @@ std::vector<Q> analytic_gram(const std::vector<std::vector<Term>>& basis, const 
     return entries;
 }
 
+// The fixture cuts the chart by s+t <= 1+1/(4n). In local coordinates a
+// boundary cell is a square minus one corner triangle or the opposite corner
+// triangle alone. Integrate that triangle by successive exact integration:
+// I(a,b) = (1/(a+1) - B(b+2,a+1))/(b+1).
+Q fixture_corner_moment(core::Index a, core::Index b) {
+    Q beta = Q{1} / (b + 2);
+    for (core::Index k = 1; k <= a; ++k)
+        beta *= Q{k} / (b + 2 + k);
+    return (Q{1} / (a + 1) - beta) / (b + 1);
+}
+
+std::vector<Q> analytic_cut_gram(const std::vector<std::vector<Term>>& basis, core::Index n) {
+    constexpr core::Index maximum_degree = 42;
+    std::array<std::array<Q, maximum_degree + 1>, maximum_degree + 1> triangle{};
+    for (core::Index a = 0; a <= maximum_degree; ++a)
+        for (core::Index b = 0; b <= maximum_degree - a; ++b)
+            triangle[static_cast<std::size_t>(a)][static_cast<std::size_t>(b)] =
+                fixture_corner_moment(a, b);
+    const auto count = basis.size();
+    std::vector<Q> result(slot(0, count));
+    const auto measure = Q{1} / (16 * n * n);
+    for (std::size_t j = 0; j < count; ++j)
+        for (std::size_t i = 0; i <= j; ++i)
+            for (const auto& a : basis[i])
+                for (const auto& b : basis[j]) {
+                    if (a.row.cell != b.row.cell)
+                        continue;
+                    const auto field_a = static_cast<core::Index>(a.row.field);
+                    const auto field_b = static_cast<core::Index>(b.row.field);
+                    const auto z = field_a + field_b;
+                    if (z % 2 != 0)
+                        continue;
+                    const auto u = a.row.powers.first + b.row.powers.first;
+                    const auto v = a.row.powers.second + b.row.powers.second;
+                    const auto boundary = 4 * n - 1 - 2 * (a.row.cell.first + a.row.cell.second);
+                    Q planar;
+                    if (boundary >= 2) {
+                        planar = moment(u) * moment(v);
+                    } else {
+                        if (boundary != -1 && boundary != 1)
+                            throw std::runtime_error("Unexpected active cell in the cut oracle");
+                        const auto& corner =
+                            triangle[static_cast<std::size_t>(u)][static_cast<std::size_t>(v)];
+                        if (boundary == 1)
+                            planar = moment(u) * moment(v) - corner;
+                        else
+                            planar = (u + v) % 2 == 0 ? corner : -corner;
+                    }
+                    result[slot(i, j)] += a.value * b.value * planar * moment(z) * measure /
+                                          ((field_a == 2 ? 2 : 1) * (field_b == 2 ? 2 : 1));
+                }
+    return result;
+}
+
+void make_sloping_cut(Fixture& f, const I& denominator) {
+    f.domain.clear();
+    f.domain.push_back(f.point("0", "0"));
+    f.domain.push_back(f.point("1", "0"));
+    f.domain.push_back({f.r("1"), rat(f, I{1}, denominator)});
+    f.domain.push_back({rat(f, I{1}, denominator), f.r("1")});
+    f.domain.push_back(f.point("0", "1"));
+    for (auto& height : f.heights)
+        height = f.r("2");
+}
+
 Q exact_congruence_row(const std::vector<Q>& gram, std::span<const ExactRational> transform,
                        std::size_t i, std::size_t count) {
     std::vector<Q> left(count);
@@ -1020,13 +1085,6 @@ TEST_CASE("PG analytic Gram rejects unqualified shapes before consuming the refe
     SECTION("nonconstant thickness") {
         f.heights.front() = f.r("2");
     }
-    SECTION("partial cell coverage") {
-        f.domain.clear();
-        f.domain.push_back(f.point("0", "0"));
-        f.domain.push_back({f.r("1", "2"), f.r("0")});
-        f.domain.push_back({f.r("1", "2"), f.r("1", "2")});
-        f.domain.push_back({f.r("0"), f.r("1", "2")});
-    }
     SECTION("varying height") {
         const auto zero = f.r("0"), one = f.r("1"), height = f.r("1", "32");
         const std::array<ExactInputTerm, 1> terms{{{{2, 0}, height}}};
@@ -1211,4 +1269,116 @@ TEST_CASE("PG dyadic dot preserves cancellation and subnormal rounding",
     CHECK(paired.high == 1);
     CHECK(paired.low == 0x1p-53);
     check_failure(volume_finalize(tie, {}, {}, false), core::FailureCode::PrecisionUnresolved);
+}
+
+TEST_CASE("PG analytic Gram integrates a clipped constant-thickness plane",
+          "[SH-D03][SH-D07][N4-02][N4-08][verification]") {
+    for (const core::Index n : {1, 2, 4}) {
+        CAPTURE(n);
+        Fixture f{n};
+        make_sloping_cut(f, I{4 * n});
+        if (n == 1) {
+            f.cut_points.push_back({f.r("0"), f.r("1", "3")});
+            f.cut_points.push_back({f.r("1"), f.r("3", "7")});
+            f.refinements.push_back({23, 4, f.cut_points[0], f.cut_points[1]});
+        }
+        core::ResourcePlan plan{profile};
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        auto basis = make_basis(f, f.r("1"), workspace, plan);
+        const auto count = static_cast<std::size_t>(take(basis.size()));
+        const auto* rank = take(basis.rank());
+        const auto rows = take(rank->rows());
+        std::vector<std::size_t> selected;
+        if (n == 1) {
+            selected.resize(count);
+            for (std::size_t j = 0; j < count; ++j)
+                selected[j] = j;
+        } else {
+            selected = {0, 1, count / 2, count - 1};
+        }
+        std::vector<std::vector<Term>> independent(selected.size());
+        const auto arithmetic = query_limits();
+        for (std::size_t j = 0; j < selected.size(); ++j) {
+            const PgRankBasisColumn col{static_cast<core::Index>(selected[j])};
+            for (std::size_t row = 0; row < rows.size(); ++row) {
+                const auto x =
+                    take(rank->basis(col, static_cast<core::Index>(row), arithmetic.algebra, plan));
+                if (x.sign() != 0)
+                    independent[j].push_back({rows[row], q(x)});
+            }
+        }
+        const auto exact = analytic_cut_gram(independent, n);
+        const auto expected = enclose(f, exact);
+        const auto caps = PgFlatGramLimits{arithmetic, steps};
+        const auto prepare = [&](core::ResourcePlan& resources) {
+            return PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits, caps, workspace,
+                                       resources);
+        };
+        if (n == 1) {
+            core::ResourcePlan short_payload{1024};
+            check_failure(prepare(short_payload), core::FailureCode::ResourceExceeded);
+        }
+        auto flat = take(prepare(plan));
+        const auto supplied = take(flat.enclosure());
+        REQUIRE(supplied.upper_triangle.size() == slot(0, count));
+        for (std::size_t j = 0; j < selected.size(); ++j)
+            for (std::size_t i = 0; i <= j; ++i) {
+                const auto& actual = supplied.upper_triangle[slot(selected[i], selected[j])];
+                CHECK(actual.lower == expected[slot(i, j)].lower);
+                CHECK(actual.upper == expected[slot(i, j)].upper);
+            }
+        if (n == 1) {
+            const auto transform = proposal(f, exact, count);
+            const auto accepted = take(std::move(flat).certify(
+                {transform, dyadic_fractional_bits}, {profile, steps, {}}, workspace, plan));
+            CHECK(take(accepted.info()).rank == count);
+            CHECK(q(take(accepted.congruence_bound(arithmetic.algebra, plan))) <=
+                  Q("1/100000000000000000000"));
+            REQUIRE(accepted.reference_basis());
+        }
+    }
+}
+
+TEST_CASE("PG analytic Gram rejects a cut outside the fixed-width moment scale",
+          "[SH-D03][SH-D07][N4-02][N4-08][negative][verification]") {
+    Fixture f;
+    make_sloping_cut(f, I{1} << 190U);
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(f, f.r("1"), workspace, plan);
+    const auto project = [&](std::uint64_t limit) {
+        return PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits,
+                                   {query_limits(), limit}, workspace, plan);
+    };
+    check_failure(project(steps), core::FailureCode::ResourceExceeded);
+    REQUIRE(basis.source());
+}
+
+TEST_CASE("PG analytic Gram uses rectangular moments on a cell-aligned subdomain",
+          "[SH-D03][SH-D07][N4-02][verification]") {
+    Fixture f;
+    f.domain.clear();
+    f.domain.push_back(f.point("0", "0"));
+    f.domain.push_back({f.r("1", "2"), f.r("0")});
+    f.domain.push_back({f.r("1", "2"), f.r("1", "2")});
+    f.domain.push_back({f.r("0"), f.r("1", "2")});
+    for (auto& height : f.heights)
+        height = f.r("2");
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(f, f.r("1"), workspace, plan);
+    const auto count = static_cast<std::size_t>(take(basis.size()));
+    const auto independent = basis_terms(*take(basis.rank()), count, plan);
+    for (const auto& column : independent)
+        for (const auto& term : column)
+            REQUIRE(term.row.cell == PgCellIndex{0, 0});
+    const auto expected = enclose(f, analytic_gram(independent));
+    const auto flat = take(PgFlatGram::prepare(std::move(basis), dyadic_fractional_bits,
+                                               {query_limits(), steps}, workspace, plan));
+    const auto actual = take(flat.enclosure()).upper_triangle;
+    REQUIRE(actual.size() == expected.size());
+    for (std::size_t k = 0; k < actual.size(); ++k) {
+        CHECK(actual[k].lower == expected[k].lower);
+        CHECK(actual[k].upper == expected[k].upper);
+    }
 }

@@ -1,3 +1,4 @@
+#include "pg_flat_gram_cut_moments.hpp"
 #include "pg_rank_storage.hpp"
 #include "pg_reference_polynomials.hpp"
 
@@ -30,14 +31,13 @@ struct GramTerm {
     return rank_product(work, x, y);
 }
 
-[[nodiscard]] RankWide divide(GramWork& work, const RankWide& a, const RankWide& b) {
-    work.charge(partition_mul(a.backend().size(), b.backend().size()));
-    return RankWide{a / b};
-}
+struct FlatProfile {
+    const ExactRational& thickness;
+    GramCutLayout cuts;
+};
 
-[[nodiscard]] const ExactRational& full_flat_thickness(ReferenceArithmetic& math,
-                                                       const PgReferenceSource& source,
-                                                       const PgGraphView& graph) {
+[[nodiscard]] FlatProfile flat_profile(ReferenceArithmetic& math, const PgReferenceSource& source,
+                                       const PgGraphView& graph) {
     for (const auto& term : graph.height.terms()) {
         math.visit(1);
         if (term.powers.first != 0 || term.powers.second != 0)
@@ -54,10 +54,12 @@ struct GramTerm {
         math.visit(words(x.numerator_bits()) + words(x.denominator_bits()) +
                    words(y.numerator_bits()) + words(y.denominator_bits()));
     };
-    for (const auto& cell : activity) {
+    GramCutLayout cuts{2 * graph.n};
+    for (std::size_t i = 0; i < activity.size(); ++i) {
+        const auto& cell = activity[i];
         charge(cell.area, full_area);
-        if (!cell.active || cell.area != full_area)
-            partition_fail(core::FailureCode::Unsupported);
+        if (cell.active && cell.area != full_area)
+            cuts.slots[i] = partition_index(cuts.count++);
     }
     const auto thickness = partition_take(source.partition.thickness()).values;
     if (thickness.empty())
@@ -67,7 +69,7 @@ struct GramTerm {
         if (value != thickness.front())
             partition_fail(core::FailureCode::Unsupported);
     }
-    return thickness.front();
+    return {thickness.front(), cuts};
 }
 
 [[nodiscard]] auto cell_key(const GramTerm& term) {
@@ -80,11 +82,12 @@ struct GramScale {
     std::array<RankWide, maximum_moment_degree + 1> moment{};
     RankWide measure_numerator;
     RankWide denominator;
+    RankWide rectangular_multiplier{1};
 };
 
 [[nodiscard]] GramScale setup_scale(GramWork& work, const ExactRational& h,
                                     const ExactRational& measure, const RankWide& common,
-                                    std::span<GramTerm> terms) {
+                                    std::span<GramTerm> terms, const RankWide* cut_denominator) {
     if (h.numerator_bits() > 1536 || h.denominator_bits() > 1536 ||
         measure.numerator_bits() > 1536 || measure.denominator_bits() > 1536)
         partition_fail(core::FailureCode::ResourceExceeded);
@@ -99,7 +102,7 @@ struct GramScale {
         work.charge();
         const auto ordinal = static_cast<std::size_t>(term.key.field);
         const auto integer = product(work, RankWide{term.raw.numerator},
-                                     divide(work, common, RankWide{term.raw.denominator}));
+                                     gram_divide(work, common, RankWide{term.raw.denominator}));
         term.weighted = product(work, integer, field[ordinal]);
     }
     const auto value_denominator = product(work, common, field.front());
@@ -109,20 +112,29 @@ struct GramScale {
     GramScale scale{};
     for (std::size_t k = 0; k < scale.moment.size(); k += 2)
         scale.moment[k] =
-            product(work, RankWide{2}, divide(work, moment_denominator, RankWide{k + 1}));
+            product(work, RankWide{2}, gram_divide(work, moment_denominator, RankWide{k + 1}));
     auto denominator = volume.denominator;
     for (const auto* factor : {&value_denominator, &value_denominator})
         denominator = product(work, denominator, *factor);
-    for (std::size_t axis = 0; axis < 3; ++axis)
-        denominator = product(work, denominator, moment_denominator);
+    denominator = product(work, denominator, moment_denominator);
+    const auto planar = product(work, moment_denominator, moment_denominator);
+    if (cut_denominator == nullptr) {
+        denominator = product(work, denominator, planar);
+    } else {
+        scale.rectangular_multiplier = gram_divide(work, *cut_denominator, planar);
+        if (product(work, planar, scale.rectangular_multiplier) != *cut_denominator)
+            partition_fail(core::FailureCode::RankUnresolved);
+        denominator = product(work, denominator, *cut_denominator);
+    }
     scale.measure_numerator = volume.numerator;
     scale.denominator = std::move(denominator);
     return scale;
 }
 
 [[nodiscard]] RankWide integrate(GramWork& work, const GramScale& scale,
+                                 const GramCutLayout& layout, std::span<const RankWide> cuts,
                                  std::span<const GramTerm> a, std::span<const GramTerm> b) {
-    RankWide total{0};
+    RankWide rectangular{}, cut{};
     while (!a.empty() && !b.empty()) {
         work.charge();
         const auto x = cell_key(a.front()), y = cell_key(b.front());
@@ -143,6 +155,8 @@ struct GramScale {
             work.charge();
             ++bc;
         }
+        const auto slot = layout.slot(a.front().key.cell);
+        const auto cut_moments = slot >= 0 ? cut_cell(cuts, slot) : std::span<const RankWide>{};
         for (const auto& p : a.first(ac))
             for (const auto& q : b.first(bc)) {
                 work.charge();
@@ -150,24 +164,37 @@ struct GramScale {
                 const auto v = static_cast<std::size_t>(p.key.powers.second + q.key.powers.second);
                 const auto z =
                     static_cast<std::size_t>(p.key.field) + static_cast<std::size_t>(q.key.field);
-                if (scale.moment[u] == 0 || scale.moment[v] == 0 || scale.moment[z] == 0)
+                if (scale.moment[z] == 0)
                     continue;
-                auto term = product(work, p.weighted, q.weighted);
-                term = product(work, term, scale.moment[u]);
-                term = product(work, term, scale.moment[v]);
-                total += product(work, term, scale.moment[z]);
+                if (cut_moments.empty()) {
+                    if (scale.moment[u] == 0 || scale.moment[v] == 0)
+                        continue;
+                    auto term = product(work, p.weighted, q.weighted);
+                    term = product(work, term, scale.moment[u]);
+                    term = product(work, term, scale.moment[v]);
+                    rectangular += product(work, term, scale.moment[z]);
+                } else {
+                    const auto& planar = cut_moments[cut_index(u, v)];
+                    if (planar == 0)
+                        continue;
+                    auto term = product(work, p.weighted, q.weighted);
+                    term = product(work, term, planar);
+                    cut += product(work, term, scale.moment[z]);
+                }
             }
         a = a.subspan(ac);
         b = b.subspan(bc);
     }
-    return product(work, total, scale.measure_numerator);
+    if (scale.rectangular_multiplier != 1)
+        rectangular = product(work, rectangular, scale.rectangular_multiplier);
+    return product(work, rectangular + cut, scale.measure_numerator);
 }
 
 [[nodiscard]] PgGramEntry enclose(GramWork& work, const RankWide& numerator,
                                   const RankWide& denominator, std::uint32_t bits) {
     work.charge();
     const RankWide unsigned_scaled = rank_abs(numerator) << bits;
-    const auto quotient = divide(work, unsigned_scaled, denominator);
+    const auto quotient = gram_divide(work, unsigned_scaled, denominator);
     const bool remainder = product(work, quotient, denominator) != unsigned_scaled;
     auto lower = RankWide{numerator < 0 ? -quotient : quotient};
     auto upper = lower;
@@ -211,9 +238,10 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
             const auto entry_count = partition_mul(rank_count, rank_count + 1) / 2;
             // The enclosure owns up to two rational values per packed entry.
             math.admit(partition_add(reference_live_rationals, partition_mul(entry_count, 2)));
-            const auto& thickness = full_flat_thickness(math, reference, graph);
+            const auto profile = flat_profile(math, reference, graph);
             auto work = GramWork{math, limits.maximum_integer_steps};
-            const auto h = math.div(thickness, math.mul(math.constant("2"), basis.length_metres()));
+            const auto h =
+                math.div(profile.thickness, math.mul(math.constant("2"), basis.length_metres()));
             const auto four_n = index_value(math, 4 * graph.n);
             const auto measure = math.div(math.mul(graph.width, h), math.square(four_n));
             const auto rows = partition_take(rank->rows());
@@ -227,11 +255,18 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
             forecast.add<GramTerm>(nnz);
             forecast.add<std::size_t>(rank_count + 1);
             forecast.add<PgGramEntry>(entry_count);
+            const auto cut_count = partition_mul(profile.cuts.count, cut_slots);
+            forecast.add<RankWide>(cut_count);
             if (forecast.bytes > plan.remaining_bytes())
                 partition_fail(core::FailureCode::ResourceExceeded);
             auto terms = rank_allocate<GramTerm>(plan, nnz);
             auto offsets = rank_allocate<std::size_t>(plan, rank_count + 1);
             auto output = rank_allocate<PgGramEntry>(plan, entry_count);
+            auto moments = rank_allocate<RankWide>(plan, cut_count);
+            const auto cut_denominator = cut_count == 0
+                                             ? RankWide{1}
+                                             : generate_cut_moments(work, reference.partition,
+                                                                    profile.cuts, moments.values());
             auto common = RankWide{1};
             std::size_t at = 0;
             for (std::size_t k = 0; k < rank_count; ++k) {
@@ -257,7 +292,8 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
                     });
                 offsets.values()[k + 1] = at;
             }
-            const auto scale = setup_scale(work, h, measure, common, terms.values());
+            const auto scale = setup_scale(work, h, measure, common, terms.values(),
+                                           cut_count == 0 ? nullptr : &cut_denominator);
             const auto column = [&](std::size_t k) {
                 const auto begin = offsets.values()[k];
                 return terms.values().subspan(begin, offsets.values()[k + 1] - begin);
@@ -265,7 +301,8 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
             std::size_t entry = 0;
             for (std::size_t j = 0; j < rank_count; ++j)
                 for (std::size_t i = 0; i <= j; ++i) {
-                    const auto value = integrate(work, scale, column(i), column(j));
+                    const auto value = integrate(work, scale, profile.cuts, moments.values(),
+                                                 column(i), column(j));
                     output.values()[entry++] = enclose(work, value, scale.denominator, bits);
                 }
             math.cancel();

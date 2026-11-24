@@ -9,7 +9,8 @@ struct PgFlatGramLimits {
     std::uint64_t maximum_integer_steps = 0;
 };
 
-/// Density-one geometric Gram enclosure for a full, flat chart of constant thickness.
+/// Density-one geometric Gram enclosure on the actual domain of a flat chart
+/// with constant height and thickness.
 /// Preparation consumes the matching physical basis only on success.
 class PgFlatGram {
 public:
