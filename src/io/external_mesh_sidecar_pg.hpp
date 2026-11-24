@@ -42,6 +42,21 @@ struct QualifiedExternalSidecarPg {
     std::array<std::optional<NastranPcompGeometryMatch>, 2> laminate{};
 };
 
+struct ExternalPgConversionObservation {
+    core::ObservationId id{0};
+};
+
+struct CertifiedExternalSidecarPgBounds {
+    std::variant<GmshPgBounds, NastranPlanarPgBounds> geometry;
+    MeshShellId shell{0};
+    MeshGeometryId pg{0};
+    RootSnapshotLocation sidecar;
+    SourceDigest sidecar_digest;
+    structure::ExactRational distance_budget_metres;
+    structure::ExactRational normal_budget;
+    core::PlannedBuffer<ExternalPgConversionObservation> observations;
+};
+
 // The caller derives the PG reference and units from the specified Case and Shell.
 // The Nastran quantity owner must come from the same authenticated deck. Its material
 // table is required for Nastran; Gmsh uses the Case material IDs already bound by the sidecar.
@@ -51,6 +66,16 @@ struct QualifiedExternalSidecarPg {
     const SchemaCase&, const ExternalMeshSidecarBinding&, MeshShellId,
     const structure::PgReferenceGeometry&, const SiUnits&, const NastranLaminateCards*,
     const ExternalSidecarPgLimits&, core::ResourcePlan&, const std::stop_token&,
+    ExternalSidecarPgDiagnostic* = nullptr) noexcept;
+
+// Verify the whole-face positional and oriented unit-normal bounds against
+// the one declared Case or sidecar budget. The caller prepares pg from the
+// selected shell of this SI Case. The returned observation identifiers still
+// require independent physical evaluation before conversion acceptance.
+[[nodiscard]] core::Result<CertifiedExternalSidecarPgBounds> certify_external_sidecar_pg_bounds(
+    const SiCase&, const ExternalMeshSidecarBinding&, MeshShellId,
+    const structure::PgReferenceGeometry&, const ExternalSidecarPgLimits&,
+    std::uint64_t maximum_directed_work, core::ResourcePlan&, const std::stop_token&,
     ExternalSidecarPgDiagnostic* = nullptr) noexcept;
 
 } // namespace uvlas::io::detail

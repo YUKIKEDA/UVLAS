@@ -152,10 +152,9 @@ public:
     return count;
 }
 
-[[nodiscard]] ExternalPlanarPg establish_geometry(Preparation& p,
-                                                  const ExternalMeshSidecarBinding& bound,
-                                                  const structure::PgReferenceGeometry& pg,
-                                                  MeshShellId shell, std::size_t count) {
+template <class Evaluate>
+[[nodiscard]] auto with_face_selection(Preparation& p, const ExternalMeshSidecarBinding& bound,
+                                       MeshShellId shell, std::size_t count, Evaluate&& evaluate) {
     constexpr auto per_face = sizeof(ExternalPgFace) + 4 * sizeof(ExternalPgCorner);
     constexpr auto alignment = alignof(ExternalPgFace) + alignof(ExternalPgCorner);
     const auto bytes =
@@ -202,30 +201,188 @@ public:
         corner_index += face.count;
     }
 
-    auto geometry_limits = p.limits.geometry;
-    geometry_limits.arithmetic.cancellation = p.stop;
-    std::optional<ExternalPgDiagnostic>* geometry = nullptr;
-    if (p.diagnostic) {
-        geometry = &p.diagnostic->geometry;
+    return evaluate(std::span<const ExternalPgFace>{faces, count},
+                    std::span<const std::uint64_t>{tags.values()});
+}
+
+[[nodiscard]] GmshSurfaceTopology certify_topology(Preparation& p, const GmshMesh& mesh,
+                                                   std::span<const std::uint64_t> tags) {
+    GmshTopologyDiagnostic detail;
+    auto topology =
+        GmshSurfaceTopology::prepare(mesh, tags, p.limits.topology, p.plan, p.stop, &detail);
+    if (!topology && p.diagnostic) {
+        p.diagnostic->topology = detail;
     }
-    if (const auto* gmsh = std::get_if<GmshMesh>(&bound.source())) {
-        GmshTopologyDiagnostic detail;
-        auto topology = GmshSurfaceTopology::prepare(*gmsh, tags.values(), p.limits.topology,
-                                                     p.plan, p.stop, &detail);
-        if (!topology && p.diagnostic) {
-            p.diagnostic->topology = detail;
+    return p.value(std::move(topology), Reason::Selection);
+}
+
+[[nodiscard]] ExternalPlanarPg establish_geometry(Preparation& p,
+                                                  const ExternalMeshSidecarBinding& bound,
+                                                  const structure::PgReferenceGeometry& pg,
+                                                  MeshShellId shell, std::size_t count) {
+    auto limits = p.limits.geometry;
+    limits.arithmetic.cancellation = p.stop;
+    auto* diagnostics = p.diagnostic ? &p.diagnostic->geometry : nullptr;
+    const auto& payload = bound.sidecar().payload();
+    return with_face_selection(p, bound, shell, count, [&](auto faces, auto tags) {
+        if (const auto* gmsh = std::get_if<GmshMesh>(&bound.source())) {
+            const auto topology = certify_topology(p, *gmsh, tags);
+            return p.value(ExternalPlanarPg::prepare(pg, *gmsh, topology,
+                                                     std::get<GmshSidecar>(payload).length, faces,
+                                                     limits, p.plan, diagnostics),
+                           Reason::Selection);
         }
-        const auto certified = p.value(std::move(topology), Reason::Selection);
-        return p.value(ExternalPlanarPg::prepare(pg, *gmsh, certified,
-                                                 std::get<GmshSidecar>(payload).length,
-                                                 {faces, count}, geometry_limits, p.plan, geometry),
+        const auto& nastran = std::get<NastranShellCards>(bound.source());
+        return p.value(ExternalPlanarPg::prepare(pg, nastran,
+                                                 std::get<NastranSidecar>(payload).units.length,
+                                                 faces, limits, p.plan, diagnostics),
                        Reason::Selection);
+    });
+}
+
+using ConversionGeometry = std::variant<GmshPgBounds, NastranPlanarPgBounds>;
+using structure::ExactRational;
+
+struct ConversionBudget {
+    ExactRational distance;
+    ExactRational normal;
+    core::PlannedBuffer<ExternalPgConversionObservation> observations;
+};
+
+[[nodiscard]] schema::Case check_case(Preparation& p, const SchemaCase& schema,
+                                      const ExternalMeshSidecarBinding& bound) {
+    p.step();
+    const auto parent = p.value(schema.identity());
+    const auto source = bound.sidecar().source();
+    if (parent.source != source.parent.source ||
+        parent.contract_revision != source.parent.contract_revision ||
+        parent.representation_revision != source.parent.representation_revision) {
+        p.reject(Code::StaleGeneration, Reason::Binding);
     }
-    const auto& nastran = std::get<NastranShellCards>(bound.source());
-    return p.value(ExternalPlanarPg::prepare(pg, nastran,
-                                             std::get<NastranSidecar>(payload).units.length,
-                                             {faces, count}, geometry_limits, p.plan, geometry),
-                   Reason::Selection);
+    return p.value(schema.root(), Reason::CaseReference);
+}
+
+[[nodiscard]] std::optional<schema::ReferenceGeometryFit>
+find_fit(Preparation& p, const schema::Model& model, MeshGeometryId id) {
+    for (core::Index i = 0; std::cmp_less(i, model.geometry.size()); ++i) {
+        p.step();
+        const auto geometry = p.value(model.geometry.at(i), Reason::CaseReference).record();
+        if (const auto* gmsh = std::get_if<schema::GeometryGmsh>(&geometry);
+            gmsh && gmsh->id.unsigned_value() == id.value()) {
+            const auto reference = gmsh->reference.record();
+            if (const auto* fit = std::get_if<schema::ReferenceGeometryFit>(&reference)) {
+                return *fit;
+            }
+            return {};
+        }
+    }
+    p.reject(Code::InvalidInput, Reason::CaseReference);
+}
+
+template <class ReadObservation>
+[[nodiscard]] core::PlannedBuffer<ExternalPgConversionObservation>
+read_conversion_observations(Preparation& p, std::uint64_t count, ReadObservation read) {
+    if (count == 0) {
+        p.reject(Code::InvalidInput, Reason::CaseReference);
+    }
+    if (count > p.limits.work - p.work || !std::in_range<core::Index>(count)) {
+        p.reject(Code::ResourceExceeded, Reason::Resource);
+    }
+    auto rows = p.value(p.plan.allocate<ExternalPgConversionObservation>(
+                            static_cast<core::Index>(count), operation),
+                        Reason::Resource);
+    for (std::size_t i = 0; i < rows.size(); ++i) {
+        p.step();
+        rows.values()[i].id = read(i);
+    }
+    return rows;
+}
+
+[[nodiscard]] ConversionBudget read_conversion_budget(Preparation& p, const SiCase& si,
+                                                      const schema::Case& root,
+                                                      const ExternalMeshSidecarBinding& bound) {
+    const auto& exact = p.limits.geometry.arithmetic.algebra;
+    const auto& sidecar = bound.sidecar();
+    const auto& declared = sidecar.conversion();
+    const auto fit = std::holds_alternative<GmshMesh>(bound.source())
+                         ? find_fit(p, root.model.record(), sidecar.geometry())
+                         : std::nullopt;
+    if (fit && declared) {
+        p.reject(Code::InvalidInput, Reason::CaseReference);
+    }
+    if (fit) {
+        const auto distance = p.value(si.quantity(fit->distance_budget), Reason::CaseReference);
+        const auto normal = p.value(si.quantity(fit->normal_budget), Reason::CaseReference);
+        auto observations = read_conversion_observations(
+            p, fit->conversion_observations.size(), [&](std::size_t i) {
+                const auto field =
+                    p.value(fit->conversion_observations.at(static_cast<core::Index>(i)),
+                            Reason::CaseReference);
+                return core::ObservationId{field.unsigned_value()};
+            });
+        return {p.value(materialize_rational(distance.recipe, exact, p.plan)),
+                p.value(materialize_rational(normal.recipe, exact, p.plan)),
+                std::move(observations)};
+    }
+    if (!declared) {
+        p.reject(Code::Unsupported, Reason::CaseReference);
+    }
+    const auto length = static_cast<SiLengthUnit>(root.units.record().length.selected());
+    const SiUnits units{length, SiMassUnit::Kilogram, SiTimeUnit::Second, SiAngleUnit::Radian};
+    const SiRecipeView scale{SiDecimalView{1, "1", 0}, {}, units, {{1, 0, 0, 0}}, 0};
+    const auto metres = p.value(materialize_rational(scale, exact, p.plan));
+    auto observations =
+        read_conversion_observations(p, declared->observations.size(), [&](std::size_t i) {
+            return declared->observations.values()[i].id;
+        });
+    return {p.value(declared->distance.multiply(metres, exact, p.plan)),
+            p.value(declared->normal.clone(exact, p.plan)), std::move(observations)};
+}
+
+[[nodiscard]] ConversionGeometry bound_conversion_geometry(Preparation& p,
+                                                           const ExternalMeshSidecarBinding& bound,
+                                                           const structure::PgReferenceGeometry& pg,
+                                                           MeshShellId shell, std::size_t count,
+                                                           std::uint64_t maximum_directed_work) {
+    auto region = p.limits.geometry;
+    region.arithmetic.cancellation = p.stop;
+    const ExternalPgBoundLimits limits{region, maximum_directed_work};
+    auto* diagnostics = p.diagnostic ? &p.diagnostic->geometry : nullptr;
+    const auto& payload = bound.sidecar().payload();
+    return with_face_selection(
+        p, bound, shell, count, [&](auto faces, auto tags) -> ConversionGeometry {
+            if (const auto* gmsh = std::get_if<GmshMesh>(&bound.source())) {
+                const auto topology = certify_topology(p, *gmsh, tags);
+                return p.value(GmshPgBounds::prepare(pg, *gmsh, topology,
+                                                     std::get<GmshSidecar>(payload).length, faces,
+                                                     limits, p.plan, diagnostics),
+                               Reason::Selection);
+            }
+            const auto& nastran = std::get<NastranShellCards>(bound.source());
+            return p.value(NastranPlanarPgBounds::prepare(
+                               pg, nastran, std::get<NastranSidecar>(payload).units.length, faces,
+                               limits, p.plan, diagnostics),
+                           Reason::Selection);
+        });
+}
+
+void compare_conversion_bounds(Preparation& p, const ConversionGeometry& geometry,
+                               const ConversionBudget& budget) {
+    const auto& exact = p.limits.geometry.arithmetic.algebra;
+    std::visit(
+        [&](const auto& owner) {
+            const auto view = p.require(owner.view());
+            for (const auto& face : view.faces) {
+                p.step();
+                if (p.value(face.distance_upper_metres.compare(budget.distance, exact, p.plan)) >
+                        0 ||
+                    p.value(face.normal_chord_upper.compare(budget.normal, exact, p.plan)) > 0) {
+                    p.detail.element = face.element;
+                    p.reject(Code::PrecisionUnresolved, Reason::Chart);
+                }
+            }
+        },
+        geometry);
 }
 
 [[nodiscard]] std::optional<ImportedQuantityMismatch>* mismatch(Preparation& p) noexcept {
@@ -503,17 +660,11 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
         operation, Code::InvalidInput, {}, [&]() -> core::Result<QualifiedExternalSidecarPg> {
             try {
                 Preparation call{limits, plan, stop, bound.sidecar().source(), diagnosis};
-                call.step();
-                const auto parent = call.value(schema.identity());
+                const auto root = check_case(call, schema, bound);
                 const auto source = bound.sidecar().source();
-                if (parent.source != source.parent.source ||
-                    parent.contract_revision != source.parent.contract_revision ||
-                    parent.representation_revision != source.parent.representation_revision) {
-                    call.reject(Code::StaleGeneration, Reason::Binding);
-                }
                 call.detail.target_namespace = SchemaNamespace::Shell;
                 call.detail.target = shell.value();
-                const auto model = call.value(schema.root(), Reason::CaseReference).model.record();
+                const auto model = root.model.record();
                 const auto selected = find_shell(call, model, shell);
                 const auto pg_id = MeshGeometryId{selected.geometry.unsigned_value()};
                 const auto pg_record = find_pg(call, model, pg_id);
@@ -544,6 +695,45 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                                                   result.materials,
                                                   call.work,
                                                   std::move(result.laminate)};
+            } catch (const Rejected& error) {
+                return std::unexpected(error.error);
+            }
+        });
+}
+
+core::Result<CertifiedExternalSidecarPgBounds> certify_external_sidecar_pg_bounds(
+    const SiCase& si, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
+    const structure::PgReferenceGeometry& pg, const ExternalSidecarPgLimits& limits,
+    std::uint64_t maximum_directed_work, core::ResourcePlan& plan, const std::stop_token& stop,
+    ExternalSidecarPgDiagnostic* diagnosis) noexcept {
+    if (diagnosis) {
+        *diagnosis = {};
+    }
+    return core::guard_entry(
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<CertifiedExternalSidecarPgBounds> {
+            try {
+                const auto source = bound.sidecar().source();
+                Preparation call{limits, plan, stop, source, diagnosis};
+                const auto root = check_case(call, call.value(si.source_case()).get(), bound);
+                call.detail.target_namespace = SchemaNamespace::Shell;
+                call.detail.target = shell.value();
+                const auto model = root.model.record();
+                const auto selected = find_shell(call, model, shell);
+                const auto pg_id = MeshGeometryId{selected.geometry.unsigned_value()};
+                const auto count = selected_faces(call, bound, shell, pg_id);
+                auto budget = read_conversion_budget(call, si, root, bound);
+                auto geometry =
+                    bound_conversion_geometry(call, bound, pg, shell, count, maximum_directed_work);
+                compare_conversion_bounds(call, geometry, budget);
+                call.step();
+                return CertifiedExternalSidecarPgBounds{std::move(geometry),
+                                                        shell,
+                                                        pg_id,
+                                                        source,
+                                                        bound.sidecar().digest(),
+                                                        std::move(budget.distance),
+                                                        std::move(budget.normal),
+                                                        std::move(budget.observations)};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }
