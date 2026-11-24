@@ -1,5 +1,6 @@
 #pragma once
 
+#include "case_pg_reference.hpp"
 #include "external_mesh_quantity.hpp"
 #include "external_mesh_sidecar_binding.hpp"
 #include "external_pg_regional_thickness.hpp"
@@ -59,25 +60,33 @@ struct CertifiedExternalSidecarPgBounds {
     core::PlannedBuffer<ExternalPgConversionObservation> observations;
 };
 
-// The caller derives the PG reference and units from the specified Case and Shell.
+struct QualifiedCaseSidecarPg {
+    structure::PgReferenceGeometry reference;
+    QualifiedExternalSidecarPg match;
+};
+
+// Derive the PG reference and units from the same Case and Shell as the retained match.
 // The Nastran quantity owner must come from the same authenticated deck. Its material
 // table is required for Nastran; Gmsh uses the Case material IDs already bound by the sidecar.
 // This call certifies affine chart correspondence and supported explicit material and
 // uniform-thickness matches, including ordered PCOMP plies. It retains no borrows.
-[[nodiscard]] core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
-    const SchemaCase&, const ExternalMeshSidecarBinding&, MeshShellId,
-    const structure::PgReferenceGeometry&, const SiUnits&, const NastranLaminateCards*,
-    const ExternalSidecarPgLimits&, core::ResourcePlan&, const std::stop_token&,
-    ExternalSidecarPgDiagnostic* = nullptr) noexcept;
+[[nodiscard]] core::Result<QualifiedCaseSidecarPg> qualify_external_sidecar_planar_pg(
+    const SiCase&, const ExternalMeshSidecarBinding&, MeshShellId, const NastranLaminateCards*,
+    const CasePgReferenceLimits&, const ExternalSidecarPgLimits&, core::Workspace&,
+    core::ResourcePlan&, const std::stop_token&, ExternalSidecarPgDiagnostic* = nullptr) noexcept;
+
+struct CertifiedCaseSidecarPgBounds {
+    structure::PgReferenceGeometry reference;
+    CertifiedExternalSidecarPgBounds match;
+};
 
 // Verify the whole-face positional and oriented unit-normal bounds against
-// the one declared Case or sidecar budget. The caller prepares pg from the
-// selected shell of this SI Case. The returned observation identifiers still
+// the one declared Case or sidecar budget. Prepare the comparison reference from
+// the selected shell of this SI Case. The returned observation identifiers still
 // require independent physical evaluation before conversion acceptance.
-[[nodiscard]] core::Result<CertifiedExternalSidecarPgBounds> certify_external_sidecar_pg_bounds(
-    const SiCase&, const ExternalMeshSidecarBinding&, MeshShellId,
-    const structure::PgReferenceGeometry&, const ExternalSidecarPgLimits&,
-    std::uint64_t maximum_directed_work, core::ResourcePlan&, const std::stop_token&,
-    ExternalSidecarPgDiagnostic* = nullptr) noexcept;
+[[nodiscard]] core::Result<CertifiedCaseSidecarPgBounds> certify_external_sidecar_pg_bounds(
+    const SiCase&, const ExternalMeshSidecarBinding&, MeshShellId, const CasePgReferenceLimits&,
+    const ExternalSidecarPgLimits&, std::uint64_t maximum_directed_work, core::Workspace&,
+    core::ResourcePlan&, const std::stop_token&, ExternalSidecarPgDiagnostic* = nullptr) noexcept;
 
 } // namespace uvlas::io::detail

@@ -244,6 +244,72 @@ TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
     CHECK(take(ready.identity()) == identity);
 }
 
+namespace {
+void check_frozen_curved_point(const PgReferenceGeometry& ready, const PgReferenceLimits& limits,
+                               bool r4_interface, std::size_t shell, const Q& h, Fixture& fixture,
+                               core::ResourcePlan& plan) {
+    const Q s{3, 11}, t{5, 13};
+    const auto depth = fixture.r("2", "3");
+    const auto& partition = take(ready.source()).partition;
+    const auto volumes = take(partition.volumes());
+    const auto triangles = take(partition.triangles());
+    const auto vertices = take(partition.vertices());
+    std::optional<PgReferenceValue> observed;
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        const auto& triangle = triangles[static_cast<std::size_t>(volumes[i].triangle)];
+        const auto& a = vertices[static_cast<std::size_t>(triangle.vertices[0])];
+        const auto& b = vertices[static_cast<std::size_t>(triangle.vertices[1])];
+        const auto& c_ = vertices[static_cast<std::size_t>(triangle.vertices[2])];
+        const Q ds = s - q(a.s), dt = t - q(a.t);
+        const Q bs = q(b.s) - q(a.s), bt = q(b.t) - q(a.t);
+        const Q cs = q(c_.s) - q(a.s), ct = q(c_.t) - q(a.t);
+        const Q determinant = bs * ct - bt * cs;
+        REQUIRE(determinant > 0);
+        const Q u = (ds * ct - dt * cs) / determinant;
+        const Q v = (bs * dt - bt * ds) / determinant;
+        if (u <= 0 || v <= 0 || u + v >= 1)
+            continue;
+        REQUIRE_FALSE(observed);
+        const auto coordinate_u = rat(fixture, numerator(u), denominator(u));
+        const auto coordinate_v = rat(fixture, numerator(v), denominator(v));
+        observed.emplace(take(ready.evaluate(
+            PgReferenceVolumePoint{static_cast<core::Index>(i), coordinate_u, coordinate_v, depth},
+            std::nullopt, limits, plan)));
+    }
+    if (!observed) {
+        FAIL("The asymmetric frozen point must lie strictly inside one volume triangle");
+        return;
+    }
+    const auto& point = *observed;
+    CHECK(q(point.s) == s);
+    CHECK(q(point.t) == t);
+    CHECK(q(point.zeta) == Q{1} / 3);
+
+    // Frozen R4 interface and R5 share these world-height coefficients, except
+    // for the xy term. The formula does not read the Case chart's coefficient list.
+    const Q x = r4_interface ? Q((Q{shell} + s) / 2) : s;
+    const Q& y = t;
+    const Q xy_coefficient = r4_interface ? Q{7, 100} : Q{0};
+    const Q height = x * x / 5 + y * y / 10 + xy_coefficient * x * y + x * x * x / 30 -
+                     y * y * y / 50 + x * x * y * y / 40;
+    const Q fx = 2 * x / 5 + xy_coefficient * y + x * x / 10 + x * y * y / 20;
+    const Q fy = y / 5 + xy_coefficient * x - 3 * y * y / 50 + x * x * y / 20;
+    REQUIRE(fx != fy);
+    const Q g = 1 + fx * fx + fy * fy;
+    const Q z = r4_interface ? Q(h / 6) : Q(h * (1 + x / 10 + y / 20) / 6);
+    CHECK(q(point.g) == g);
+    const std::array<Q, 3> midsurface{x, y, height};
+    const std::array<Q, 3> direction{-fx, -fy, Q{1}};
+    for (std::size_t d = 0; d < direction.size(); ++d) {
+        CAPTURE(shell, d);
+        CHECK(point.normal[d].rational.sign() == 0);
+        CHECK(q(point.normal[d].radical) == direction[d] / g);
+        CHECK(q(point.position_metres[d].rational) == midsurface[d]);
+        CHECK(q(point.position_metres[d].radical) == z * direction[d] / g);
+    }
+}
+} // namespace
+
 TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
           "[.frozen-vpg][V-PG][FD-03][SH-D02][verification]") {
     std::ifstream manifest_file{"manifest.json", std::ios::binary};
@@ -256,6 +322,7 @@ TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
     const auto third = sample.r("1", "3");
     const auto half = sample.r("1", "2");
     std::size_t prepared_shells = 0;
+    std::size_t curved_points = 0;
     for (const auto& entry : cases) {
         const auto path = entry.at("case").get<std::string>();
         CAPTURE(path);
@@ -296,10 +363,17 @@ TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
             const Q expected = variable ? h * (1 + q(at.s) / 10 + q(at.t) / 20) : h;
             CHECK(q(at.full_thickness_metres) == expected);
             CHECK(at.layer == core::LayerId{shell + 1});
+            const bool r4_interface = path.starts_with("r4-interface-");
+            if (r4_interface || path.starts_with("r5-taper-")) {
+                check_frozen_curved_point(ready, limits.geometry, r4_interface, shell, h, sample,
+                                          plan);
+                ++curved_points;
+            }
             ++prepared_shells;
         }
     }
     CHECK(prepared_shells == 36);
+    CHECK(curved_points == 8);
 }
 
 TEST_CASE("Clocked rigid PG supports preserve original rows and reaction power",
