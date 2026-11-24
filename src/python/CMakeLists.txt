@@ -18,4 +18,10 @@ if(BUILD_TESTING)
         COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/python/test_ownership.py"
             "$<TARGET_FILE_DIR:uvlas_python>")
     set_tests_properties(python.ownership PROPERTIES LABELS "integration;negative" TIMEOUT 90)
+    add_test(NAME python.case_file_operations
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/python/test_case_file_operations.py"
+            "$<TARGET_FILE_DIR:uvlas_python>" "$<TARGET_FILE:uvlas_cli>"
+            "${PROJECT_SOURCE_DIR}/docs/specs/foundation/case-schema-examples.json")
+    set_tests_properties(python.case_file_operations PROPERTIES
+        LABELS "integration;negative;verification" TIMEOUT 30)
 endif()

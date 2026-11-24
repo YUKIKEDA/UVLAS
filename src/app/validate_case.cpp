@@ -66,22 +66,28 @@ int reject(const core::Failure& failure, std::string_view stage, std::string_vie
     return report(FailedResultExit::Input, stage, location);
 }
 
-int reject_manifest(const core::Failure& failure, const ReferenceInputDiagnostic& diagnostic) {
-    if (diagnostic.stage == ReferenceInputStage::Document) {
-        if (const auto byte = diagnostic.document ? diagnostic.document->byte_offset : std::nullopt;
-            byte) {
-            return reject(failure, "JSON document at byte " + std::to_string(*byte));
-        }
-        return reject(failure, "JSON document");
-    }
-    if (diagnostic.stage == ReferenceInputStage::Schema) {
-        return reject(failure, "case schema", diagnostic.schema.path().value_or(""));
-    }
-    return reject(failure, "manifest acquisition");
+std::unexpected<CaseValidationFailure> validation_failure(core::Failure failure,
+                                                          std::string_view stage,
+                                                          std::string_view location = {},
+                                                          std::optional<std::size_t> byte = {}) {
+    return std::unexpected(CaseValidationFailure{failure, stage, std::string{location}, byte});
 }
 
-int validate_references(const ReferenceInput& input, const ReferenceInputView& view,
-                        core::ResourcePlan& plan, const std::stop_token& stop) {
+std::unexpected<CaseValidationFailure> reject_manifest(const core::Failure& failure,
+                                                       const ReferenceInputDiagnostic& diagnostic) {
+    if (diagnostic.stage == ReferenceInputStage::Document) {
+        const auto byte = diagnostic.document ? diagnostic.document->byte_offset : std::nullopt;
+        return validation_failure(failure, "JSON document", {}, byte);
+    }
+    if (diagnostic.stage == ReferenceInputStage::Schema) {
+        return validation_failure(failure, "case schema", diagnostic.schema.path().value_or(""));
+    }
+    return validation_failure(failure, "manifest acquisition");
+}
+
+std::expected<ReferencedCase, CaseValidationFailure>
+validate_references(const ReferenceInput& input, const ReferenceInputView& view,
+                    core::ResourcePlan& plan, const std::stop_token& stop) {
     const DeclarationLimits declaration_limits{{maximum_nodes, 128, maximum_references,
                                                 manifest_cap, manifest_cap, 16 * mib, 16 * mib,
                                                 32 * mib, maximum_work, maximum_path}};
@@ -89,8 +95,8 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
     auto declarations = collect_case_file_references(view.schema, declaration_limits, plan, stop,
                                                      &declaration_diagnostic);
     if (!declarations) {
-        return reject(declarations.error(), "reference declarations",
-                      declaration_diagnostic.path().value_or(""));
+        return validation_failure(declarations.error(), "reference declarations",
+                                  declaration_diagnostic.path().value_or(""));
     }
     RootReferenceDiagnostic plan_diagnostic;
     auto prepared =
@@ -99,11 +105,12 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
                                  manifest_cap, 128, maximum_work, maximum_path},
                                 plan, stop, &plan_diagnostic);
     if (!prepared) {
-        return reject(prepared.error(), "reference paths", plan_diagnostic.pointer().value_or(""));
+        return validation_failure(prepared.error(), "reference paths",
+                                  plan_diagnostic.pointer().value_or(""));
     }
     RootSnapshotDiagnostic snapshot_diagnostic;
     LeafReferenceDiagnostic diagnostic;
-    const auto closed = resolve_leaf_references(
+    auto closed = resolve_leaf_references(
         input, std::move(*prepared),
         {{{reference_cap, reference_cap + 1, 8192, reference_cap},
           maximum_references,
@@ -121,56 +128,91 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
         plan, stop, &snapshot_diagnostic, &diagnostic);
     if (!closed) {
         if (diagnostic.reason == LeafReferenceFailure::UnsupportedRole) {
-            return reject(closed.error(), "external reference dependency validation is unsupported",
-                          diagnostic.pointer());
+            return validation_failure(closed.error(),
+                                      "external reference dependency validation is unsupported",
+                                      diagnostic.pointer());
         }
         if (diagnostic.reason == LeafReferenceFailure::Format) {
             const bool nastran =
                 diagnostic.location && diagnostic.location->role == ReferenceRole::NastranDeck;
-            std::string message = nastran ? "Nastran Bulk Data format" : "Gmsh mesh format";
-            if (diagnostic.format_offset) {
-                message += " at byte " + std::to_string(*diagnostic.format_offset);
-            }
-            return reject(closed.error(), message, diagnostic.pointer());
+            return validation_failure(closed.error(),
+                                      nastran ? "Nastran Bulk Data format" : "Gmsh mesh format",
+                                      diagnostic.pointer(), diagnostic.format_offset);
         }
         if (diagnostic.reason == LeafReferenceFailure::Graph) {
-            return reject(closed.error(), "external reference dependency graph",
-                          diagnostic.pointer());
+            return validation_failure(closed.error(), "external reference dependency graph",
+                                      diagnostic.pointer());
         }
         const auto message = snapshot_diagnostic.read && snapshot_diagnostic.read->reason ==
                                                              ReferenceFileFailure::DigestMismatch
                                  ? "reference SHA-256 mismatch"
                                  : "reference acquisition";
-        return reject(closed.error(), message, snapshot_diagnostic.pointer());
+        return validation_failure(closed.error(), message, snapshot_diagnostic.pointer());
     }
-    std::cout << "Case validation succeeded.\n";
-    return 0;
+    return std::move(*closed);
 }
 
 } // namespace
 
+std::expected<ValidatedCase, CaseValidationFailure>
+validate_case_file(const std::filesystem::path& path, const std::stop_token& stop) noexcept {
+    try {
+        auto parent = path.parent_path();
+        if (parent.empty()) {
+            parent = ".";
+        }
+        const auto filename = path.filename().u8string();
+        const std::string_view name{reinterpret_cast<const char*>(filename.data()),
+                                    filename.size()};
+        core::ResourcePlan plan{payload_cap};
+        ReferenceInputDiagnostic diagnostic;
+        auto input = ReferenceInput::from_file(
+            parent, name, io::SourceId{0},
+            {maximum_path, {manifest_cap, manifest_cap + 1, 4096, manifest_cap}}, input_limits(),
+            plan, stop, &diagnostic);
+        if (!input) {
+            return reject_manifest(input.error(), diagnostic);
+        }
+        const auto view = input->view();
+        if (!view) {
+            return validation_failure(view.error(), "manifest identity");
+        }
+        const auto identity = view->schema.identity();
+        if (!identity) {
+            return validation_failure(identity.error(), "manifest identity");
+        }
+        auto references = validate_references(*input, *view, plan, stop);
+        if (!references) {
+            return std::unexpected(std::move(references.error()));
+        }
+        return ValidatedCase{std::move(*input), std::move(*references), *identity};
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(CaseValidationFailure{
+            {core::FailureCode::ResourceExceeded, core::Operation::PrepareModel},
+            "case validation",
+            {},
+            {}});
+    } catch (...) {
+        return std::unexpected(
+            CaseValidationFailure{{core::FailureCode::InvalidInput, core::Operation::PrepareModel},
+                                  "manifest acquisition",
+                                  {},
+                                  {}});
+    }
+}
+
 int validate_case(const std::filesystem::path& path) {
-    auto parent = path.parent_path();
-    if (parent.empty()) {
-        parent = ".";
+    const auto result = validate_case_file(path);
+    if (!result) {
+        const auto& error = result.error();
+        if (error.byte) {
+            auto stage = std::string{error.stage} + " at byte " + std::to_string(*error.byte);
+            return reject(error.failure, stage, error.location);
+        }
+        return reject(error.failure, error.stage, error.location);
     }
-    const auto filename = path.filename().u8string();
-    const std::string_view name{reinterpret_cast<const char*>(filename.data()), filename.size()};
-    core::ResourcePlan plan{payload_cap};
-    const std::stop_token stop;
-    ReferenceInputDiagnostic diagnostic;
-    const auto input = ReferenceInput::from_file(
-        parent, name, io::SourceId{0},
-        {maximum_path, {manifest_cap, manifest_cap + 1, 4096, manifest_cap}}, input_limits(), plan,
-        stop, &diagnostic);
-    if (!input) {
-        return reject_manifest(input.error(), diagnostic);
-    }
-    const auto view = input->view();
-    if (!view) {
-        return reject(view.error(), "manifest identity");
-    }
-    return validate_references(*input, *view, plan, stop);
+    std::cout << "Case validation succeeded.\n";
+    return 0;
 }
 
 } // namespace uvlas::app

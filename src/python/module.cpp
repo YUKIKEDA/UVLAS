@@ -2,6 +2,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <algorithm>
 #include <array>
@@ -711,8 +712,7 @@ void bind_state(py::module_& module) {
 } // namespace
 
 PYBIND11_MODULE(_uvlas, module) {
-    module.doc() = "Low-level owning product storage/state protocols; physical analysis and file "
-                   "APIs are not implemented.";
+    module.doc() = "UVLAS owning storage, state protocols, and verified case and result inputs.";
     py::class_<Reply>(module, "Result",
                       "An owned success value or Failure. Inspect ok before value.")
         .def_property_readonly(
@@ -872,4 +872,53 @@ PYBIND11_MODULE(_uvlas, module) {
             },
             "Return a read-only uint8 view retaining the independent snapshot owner.");
     bind_state(module);
+    py::class_<uvlas::app::ValidatedCase>(module, "ValidatedCase",
+                                          "An owned case and its verified external file snapshots.")
+        .def_property_readonly("source_sha256",
+                               [](const uvlas::app::ValidatedCase& input) {
+                                   const auto& digest = input.identity.source.digest.bytes;
+                                   return py::bytes(reinterpret_cast<const char*>(digest.data()),
+                                                    digest.size());
+                               })
+        .def_property_readonly("source_byte_count", [](const uvlas::app::ValidatedCase& input) {
+            return input.identity.source.byte_count;
+        });
+    module.def(
+        "load_case",
+        [](const std::filesystem::path& path) {
+            return boundary(core::Operation::PrepareModel, [&] {
+                auto result = [&] {
+                    const py::gil_scoped_release release;
+                    return uvlas::app::validate_case_file(path);
+                }();
+                if (!result) {
+                    return Reply{result.error().failure};
+                }
+                return Reply{py::cast(std::move(*result))};
+            });
+        },
+        py::arg("path").none(false),
+        "Validate a case file and own its checked input and references.");
+    module.def(
+        "inspect_result",
+        [](const std::filesystem::path& directory) {
+            return boundary(core::Operation::WriteResults, [&] {
+                const auto result = [&] {
+                    const py::gil_scoped_release release;
+                    return uvlas::app::inspect_result_file(directory);
+                }();
+                if (!result) {
+                    return Reply{result.error().failure};
+                }
+                const auto status = result->view();
+                if (!status) {
+                    return invalid(core::Operation::WriteResults);
+                }
+                return Reply{py::bytes(reinterpret_cast<const char*>(status->bytes.data()),
+                                       status->bytes.size())};
+            });
+        },
+        py::arg("directory").none(false), "Return the verified status document as original bytes.");
 }
+#include "inspect_result.hpp"
+#include "validate_case.hpp"

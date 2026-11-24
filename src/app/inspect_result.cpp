@@ -17,6 +17,11 @@ namespace {
 
 using io::detail::FailedResultExit;
 
+std::unexpected<ResultInspectionFailure> inspection_failure(core::Failure failure,
+                                                            std::string_view subject) noexcept {
+    return std::unexpected(ResultInspectionFailure{failure, subject});
+}
+
 int reject(core::FailureCode reason, std::string_view name) {
     std::cerr << "inspect: ";
     if (reason == core::FailureCode::Cancelled) {
@@ -64,27 +69,28 @@ read(const ReadRoot& root, std::string_view filename, ReferenceFileLimits limits
 
 } // namespace
 
-int inspect_result(const std::filesystem::path& directory) {
+std::expected<io::detail::ReferenceFileSnapshot, ResultInspectionFailure>
+inspect_result_file(const std::filesystem::path& directory, const std::stop_token& stop) noexcept {
 #if defined(_WIN32) || defined(__linux__)
-    const std::stop_token stop;
     const auto root = ReadRoot::open(directory, stop);
     if (!root) {
-        return reject(root.error().code, "result directory");
+        return inspection_failure(root.error(), "result directory");
     }
     core::ResourcePlan plan{payload_cap};
     constexpr ReferenceFileLimits metadata_file{metadata_cap, metadata_cap + 1, 4096, metadata_cap};
-    const auto status_file = read(*root, "status.json", metadata_file, plan, stop);
+    auto status_file = read(*root, "status.json", metadata_file, plan, stop);
     if (!status_file) {
-        return reject(status_file.error().code, "status.json");
+        return inspection_failure(status_file.error(), "status.json");
     }
     const auto provenance_file = read(*root, "provenance.json", metadata_file, plan, stop);
     if (!provenance_file) {
-        return reject(provenance_file.error().code, "provenance.json");
+        return inspection_failure(provenance_file.error(), "provenance.json");
     }
     const auto status = status_file->view();
     const auto provenance = provenance_file->view();
     if (!status || !provenance) {
-        return reject(core::FailureCode::InvalidInput, "result metadata");
+        return inspection_failure({core::FailureCode::InvalidInput, core::Operation::WriteResults},
+                                  "result metadata");
     }
     const io::InputLimits syntax{
         metadata_cap, 32,  8192,         8192,
@@ -92,15 +98,37 @@ int inspect_result(const std::filesystem::path& directory) {
     const auto checked =
         read_result_documents(status->bytes, provenance->bytes, syntax, plan, stop);
     if (!checked) {
-        return reject(checked.error().code, "status.json and provenance.json");
+        return inspection_failure(checked.error(), "status.json and provenance.json");
     }
     if (const auto digest = checked->provenance().resolved_case) {
         const auto resolved =
             read(*root, "resolved-case.json", {resolved_cap, resolved_cap + 1, 8192, resolved_cap},
                  plan, stop, &*digest);
         if (!resolved) {
-            return reject(resolved.error().code, "resolved-case.json");
+            return inspection_failure(resolved.error(), "resolved-case.json");
         }
+    }
+    if (stop.stop_requested()) {
+        return inspection_failure({core::FailureCode::Cancelled, core::Operation::WriteResults},
+                                  "result metadata");
+    }
+    return std::move(*status_file);
+#else
+    static_cast<void>(directory);
+    static_cast<void>(stop);
+    return inspection_failure({core::FailureCode::Unsupported, core::Operation::WriteResults},
+                              "this platform's result directory reader");
+#endif
+}
+
+int inspect_result(const std::filesystem::path& directory) {
+    const auto result = inspect_result_file(directory);
+    if (!result) {
+        return reject(result.error().failure.code, result.error().subject);
+    }
+    const auto status = result->view();
+    if (!status) {
+        return reject(core::FailureCode::InvalidInput, "result metadata");
     }
     const std::string_view text{reinterpret_cast<const char*>(status->bytes.data()),
                                 status->bytes.size()};
@@ -111,10 +139,6 @@ int inspect_result(const std::filesystem::path& directory) {
 #endif
     std::cout << text << std::flush;
     return std::cout ? 0 : reject(core::FailureCode::InvalidInput, "status output");
-#else
-    static_cast<void>(directory);
-    return reject(core::FailureCode::Unsupported, "this platform's result directory reader");
-#endif
 }
 
 } // namespace uvlas::app
