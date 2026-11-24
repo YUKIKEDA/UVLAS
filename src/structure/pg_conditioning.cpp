@@ -1,4 +1,4 @@
-#include "pg_rank_storage.hpp"
+#include "pg_conditioning_factor.hpp"
 #include "pg_reference_arithmetic.hpp"
 
 #include <uvlas/structure/pg_conditioning.hpp>
@@ -40,10 +40,6 @@ template <class I>
 struct EnclosedInteger {
     I lower{}, upper{};
 };
-
-[[nodiscard]] std::size_t packed(std::size_t i, std::size_t j) noexcept {
-    return j * (j + 1) / 2 + i;
-}
 
 [[nodiscard]] std::size_t symmetric(std::size_t i, std::size_t j) noexcept {
     return i <= j ? packed(i, j) : packed(j, i);
@@ -143,6 +139,21 @@ PgConditioningCertificate::certify(PgReferenceBasis&& basis, PgDiscreteGramEnclo
                                    PgConditioningCandidate candidate,
                                    const PgConditioningLimits& limits, core::Workspace& workspace,
                                    core::ResourcePlan& plan) noexcept {
+    return certify_impl(std::move(basis), enclosure, candidate, limits, workspace, plan);
+}
+
+core::Result<PgConditioningCertificate> PgConditioningCertificate::generate_and_certify(
+    PgReferenceBasis&& basis, PgDiscreteGramEnclosure enclosure,
+    PgConditioningGeneration generation, const PgConditioningLimits& limits,
+    core::Workspace& workspace, core::ResourcePlan& plan) noexcept {
+    return certify_impl(std::move(basis), enclosure, generation, limits, workspace, plan);
+}
+
+core::Result<PgConditioningCertificate> PgConditioningCertificate::certify_impl(
+    PgReferenceBasis&& basis, PgDiscreteGramEnclosure enclosure,
+    std::variant<PgConditioningCandidate, PgConditioningGeneration> input,
+    const PgConditioningLimits& limits, core::Workspace& workspace,
+    core::ResourcePlan& plan) noexcept {
     return core::guard_entry(
         operation, core::FailureCode::InvalidInput, {},
         [&]() -> core::Result<PgConditioningCertificate> {
@@ -158,11 +169,18 @@ PgConditioningCertificate::certify(PgReferenceBasis&& basis, PgDiscreteGramEnclo
                     fail(core::FailureCode::RankUnresolved);
                 const auto count = static_cast<std::size_t>(info.rank);
                 const auto terms = packed(0, count);
+                const auto* generation = std::get_if<PgConditioningGeneration>(&input);
+                const auto* candidate = std::get_if<PgConditioningCandidate>(&input);
+                const auto transform_scale = generation != nullptr
+                                                 ? generation->candidate_fractional_bits
+                                                 : candidate->fractional_bits;
                 if (enclosure.upper_triangle.size() != terms ||
-                    candidate.upper_triangle.size() != terms)
+                    (candidate != nullptr && candidate->upper_triangle.size() != terms))
                     fail(core::FailureCode::InvalidInput);
                 if (enclosure.fractional_bits > maximum_fractional_bits ||
-                    candidate.fractional_bits > maximum_fractional_bits)
+                    transform_scale > maximum_fractional_bits ||
+                    (generation != nullptr &&
+                     generation->factor_fractional_bits > maximum_fractional_bits))
                     fail(core::FailureCode::ResourceExceeded);
 
                 RankSizer forecast;
@@ -171,6 +189,10 @@ PgConditioningCertificate::certify(PgReferenceBasis&& basis, PgDiscreteGramEnclo
                 forecast.add<EnclosedInteger<RankCell>>(terms);
                 forecast.add<EnclosedInteger<RankWide>>(count);
                 forecast.add<RankWide>(count);
+                if (generation != nullptr) {
+                    forecast.add<PgConditioningFactor>(terms);
+                    forecast.add<PgConditioningFactor>(count);
+                }
                 if (forecast.bytes > limits.maximum_payload_bytes ||
                     forecast.bytes > plan.remaining_bytes())
                     fail(core::FailureCode::ResourceExceeded);
@@ -200,17 +222,37 @@ PgConditioningCertificate::certify(PgReferenceBasis&& basis, PgDiscreteGramEnclo
                             dyadic_units(interval.lower, enclosure.fractional_bits, work);
                         bounds[k].upper =
                             dyadic_units(interval.upper, enclosure.fractional_bits, work);
-                        transform[k] = dyadic_units(candidate.upper_triangle[k],
-                                                    candidate.fractional_bits, work);
+                        if (candidate != nullptr)
+                            transform[k] =
+                                dyadic_units(candidate->upper_triangle[k], transform_scale, work);
                         if (bounds[k].lower > bounds[k].upper)
                             fail(core::FailureCode::InvalidInput);
                     }
-                    if (transform[packed(j, j)] <= 0)
+                    if (candidate != nullptr && transform[packed(j, j)] <= 0)
                         fail(core::FailureCode::RankUnresolved);
                 }
 
-                out.transform_scale = candidate.fractional_bits;
-                out.congruence_scale = enclosure.fractional_bits + 2 * candidate.fractional_bits;
+                if (generation != nullptr) {
+                    work.charge(0);
+                    auto factor = partition_take(
+                        plan.allocate<PgConditioningFactor>(partition_index(terms), operation));
+                    work.charge(0);
+                    auto inverse = partition_take(
+                        plan.allocate<PgConditioningFactor>(partition_index(count), operation));
+                    conditioning_factor(work, std::span<const EnclosedInteger<RankCell>>{bounds},
+                                        enclosure.fractional_bits,
+                                        generation->factor_fractional_bits, count, factor.values());
+                    conditioning_inverse(work, factor.values(), generation->factor_fractional_bits,
+                                         transform_scale, inverse.values(), transform);
+                    for (std::size_t j = 0; j < count; ++j) {
+                        work.charge();
+                        if (transform[packed(j, j)] <= 0)
+                            fail(core::FailureCode::RankUnresolved);
+                    }
+                }
+
+                out.transform_scale = transform_scale;
+                out.congruence_scale = enclosure.fractional_bits + 2 * transform_scale;
                 const RankWide one = RankWide{1} << out.congruence_scale;
                 out.bound = certify_congruence(bounds, transform, column.values(), rows.values(),
                                                one, work);

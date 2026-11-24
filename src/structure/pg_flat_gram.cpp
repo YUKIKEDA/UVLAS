@@ -366,4 +366,18 @@ core::Result<PgConditioningCertificate> PgFlatGram::certify(PgConditioningCandid
     });
 }
 
+core::Result<PgConditioningCertificate>
+PgFlatGram::generate_and_certify(PgConditioningGeneration generation,
+                                 const PgConditioningLimits& limits, core::Workspace& workspace,
+                                 core::ResourcePlan& plan) && noexcept {
+    return partition_entry([&]() -> core::Result<PgConditioningCertificate> {
+        const auto input = partition_take(enclosure());
+        auto accepted = PgConditioningCertificate::generate_and_certify(
+            std::move(basis_), input, generation, limits, workspace, plan);
+        if (accepted)
+            entries_ = {};
+        return accepted;
+    });
+}
+
 } // namespace uvlas::structure

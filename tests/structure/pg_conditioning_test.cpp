@@ -271,6 +271,42 @@ void check_failure(const core::Result<T>& failure, core::FailureCode expected) {
     REQUIRE_FALSE(failure);
     CHECK(failure.error().code == expected);
 }
+void check_generated_required(const PgConditioningCertificate& accepted, std::uint32_t bits,
+                              std::span<const ExactRational> independent,
+                              core::Workspace& workspace, core::ResourcePlan& plan) {
+    const auto info = take(accepted.info());
+    const auto count = static_cast<std::size_t>(info.rank);
+    const auto leading = static_cast<std::size_t>(info.protected_rank);
+    REQUIRE(independent.size() == slot(0, count));
+    const auto limits = query_limits();
+    const auto* basis = take(accepted.reference_basis());
+    const auto* rank = take(basis->rank());
+    const Q ulp = Q{1} / (I{1} << bits);
+    std::vector<Q> transform(independent.size());
+    for (std::size_t j = 0; j < count; ++j)
+        for (std::size_t i = 0; i <= j; ++i) {
+            const auto k = slot(i, j);
+            transform[k] = q(take(accepted.transform_coefficient({static_cast<core::Index>(i)},
+                                                                 {static_cast<core::Index>(j)},
+                                                                 limits.algebra, plan)));
+            CHECK(abs(transform[k] - q(independent[k])) <= ulp);
+        }
+    for (core::Index t = 0; t < 33; ++t) {
+        const auto coordinates = take(accepted.required_coordinates({t}, limits, workspace, plan));
+        REQUIRE(coordinates.size() == count);
+        for (std::size_t i = 0; i < count; ++i) {
+            if (i >= leading)
+                CHECK(coordinates.values()[i].sign() == 0);
+            Q restored{};
+            for (std::size_t j = i; j < leading; ++j)
+                restored += transform[slot(i, j)] * q(coordinates.values()[j]);
+            const auto expected =
+                take(rank->required({static_cast<core::Index>(i)}, {t}, limits.algebra, plan));
+            CHECK(restored == q(expected));
+        }
+    }
+}
+
 Q power(const Q& x, core::Index exponent) {
     Q result{1};
     for (core::Index i = 0; i < exponent; ++i)
@@ -1579,12 +1615,23 @@ TEST_CASE("PG analytic Gram integrates certified piecewise-affine thickness",
                 CHECK(actual.upper == expected[slot(i, j)].upper);
             }
         if (model.certify) {
-            const auto transform = proposal(f, exact, count, enclosure_bits);
-            const auto accepted = take(std::move(flat).certify(
-                {transform, enclosure_bits}, {profile, steps, {}}, workspace, plan));
+            std::vector<Q> midpoint;
+            midpoint.reserve(expected.size());
+            for (const auto& interval : expected)
+                midpoint.emplace_back((q(interval.lower) + q(interval.upper)) / 2);
+            const auto independent_transform = proposal(f, midpoint, count, enclosure_bits);
+            const PgConditioningGeneration grids{512, enclosure_bits};
+            const auto certify = [&](const PgConditioningLimits& limits) {
+                return std::move(flat).generate_and_certify(grids, limits, workspace, plan);
+            };
+            check_failure(certify({0, steps, {}}), core::FailureCode::ResourceExceeded);
+            REQUIRE(flat.enclosure());
+            const auto accepted = take(certify({profile, steps, {}}));
             CHECK(take(accepted.info()).rank == count);
             CHECK(q(take(accepted.congruence_bound(caps.arithmetic.algebra, plan))) <=
                   Q("1/100000000000000000000"));
+            check_generated_required(accepted, enclosure_bits, independent_transform, workspace,
+                                     plan);
         }
     }
 }
@@ -1603,4 +1650,73 @@ TEST_CASE("PG analytic Gram rejects affine thickness outside the fixed moment wi
     };
     check_failure(prepare(), core::FailureCode::ResourceExceeded);
     REQUIRE(basis.source());
+}
+
+TEST_CASE("PG generated factor certifies the original interval and uses one budget",
+          "[SH-D03][N4-02][N4-08][negative][verification]") {
+    // Synthetic dyadic unit control for R = [[2,3/4],[0,1/2]], padded
+    // with identity. This exercises the algebra, not geometric enclosure provenance.
+    Fixture f;
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan setup{profile};
+    auto basis = flat_basis(workspace, setup);
+    const auto rank = static_cast<std::size_t>(take(basis.size()));
+    std::vector<PgGramEntry> gram(slot(0, rank));
+    const auto exact_interval = [&](std::size_t k, std::string_view n, std::string_view d = "1") {
+        gram[k] = {f.r(n, d), f.r(n, d)};
+    };
+    for (std::size_t j = 0; j < rank; ++j)
+        exact_interval(slot(j, j), "1");
+    exact_interval(0, "4");
+    exact_interval(1, "3", "2");
+    exact_interval(2, "13", "16");
+    const PgConditioningGeneration grids{64, 16};
+    const PgConditioningLimits full{profile, steps, {}};
+    const auto certify = [&](PgConditioningGeneration generation,
+                             const PgConditioningLimits& limits, core::ResourcePlan& plan,
+                             std::span<const PgGramEntry> source) {
+        return PgConditioningCertificate::generate_and_certify(std::move(basis), {source, 16},
+                                                               generation, limits, workspace, plan);
+    };
+    core::ResourcePlan none{0}, refused{profile};
+    check_failure(certify(grids, full, none, std::span{gram}.first(1)),
+                  core::FailureCode::InvalidInput);
+    check_failure(certify({1536, 16}, full, none, gram), core::FailureCode::ResourceExceeded);
+    check_failure(certify(grids, {profile, steps, requested_stop_token()}, none, gram),
+                  core::FailureCode::Cancelled);
+    CHECK(none.allocated_bytes() == 0);
+
+    gram.front() = {f.r("3"), f.r("5")};
+    check_failure(certify(grids, full, refused, gram), core::FailureCode::PrecisionUnresolved);
+    gram.front() = {f.r("5"), f.r("3")};
+    check_failure(certify(grids, full, refused, gram), core::FailureCode::InvalidInput);
+    exact_interval(0, "1", "3");
+    check_failure(certify(grids, full, refused, gram), core::FailureCode::InvalidInput);
+    exact_interval(0, "1", "16");
+    check_failure(certify({0, 16}, full, refused, gram), core::FailureCode::PrecisionUnresolved);
+    exact_interval(0, "4");
+    REQUIRE(basis.size());
+
+    core::ResourcePlan observed{profile};
+    const auto accepted = take(certify(grids, full, observed, gram));
+    const auto used = take(accepted.info());
+    CHECK(used.payload_bytes == observed.allocated_bytes());
+    const auto exact = query_limits().algebra;
+    CHECK(take(accepted.congruence_bound(exact, setup)).sign() == 0);
+    CHECK(q(take(accepted.transform_coefficient({0}, {0}, exact, setup))) == Q("1/2"));
+    CHECK(q(take(accepted.transform_coefficient({0}, {1}, exact, setup))) == Q("-3/4"));
+    CHECK(q(take(accepted.transform_coefficient({1}, {1}, exact, setup))) == 2);
+    CHECK(take(accepted.transform_coefficient({1}, {0}, exact, setup)).sign() == 0);
+
+    basis = flat_basis(workspace, setup);
+    core::ResourcePlan one_byte_short{used.payload_bytes - 1};
+    check_failure(certify(grids, {used.payload_bytes, used.steps, {}}, one_byte_short, gram),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(one_byte_short.allocated_bytes() == 0);
+    check_failure(certify(grids, {used.payload_bytes, used.steps - 1, {}}, refused, gram),
+                  core::FailureCode::ResourceExceeded);
+    core::ResourcePlan equality{used.payload_bytes};
+    const auto replay = take(certify(grids, {used.payload_bytes, used.steps, {}}, equality, gram));
+    CHECK(take(replay.info()).steps == used.steps);
+    CHECK(take(replay.info()).payload_bytes == used.payload_bytes);
 }
