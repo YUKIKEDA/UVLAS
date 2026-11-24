@@ -492,6 +492,221 @@ EnclosedVector arm_moment(EnclosedVector point, const Point& origin, const Enclo
     return result;
 }
 
+using RationalPoint = std::array<Rat, 3>;
+
+struct WrenchBands {
+    Bands force, moment;
+};
+
+Rat band_border(std::size_t i) {
+    return Rat{-4} + Rat{2} * i / 5;
+}
+
+RationalPoint exact_position(const Point& words) {
+    return {rational_word(words[0]), rational_word(words[1]), rational_word(words[2])};
+}
+
+void accumulate(WrenchBands& bands, std::size_t band, const EnclosedVector& force,
+                const EnclosedVector& moment, const Rat& weight) {
+    for (std::size_t i = 0; i < force.size(); ++i) {
+        bands.force[band][i] = add(bands.force[band][i], scale(force[i], weight));
+        bands.moment[band][i] = add(bands.moment[band][i], scale(moment[i], weight));
+    }
+}
+
+void integrate_edge(WrenchBands& bands, const RationalPoint& first, const RationalPoint& last,
+                    const EnclosedVector& point, const EnclosedVector& force, const Point& origin) {
+    REQUIRE(first[1] >= band_border(0));
+    REQUIRE(last[1] >= band_border(0));
+    REQUIRE(first[1] <= band_border(band_count));
+    REQUIRE(last[1] <= band_border(band_count));
+    if (first[1] == last[1]) {
+        // The flow-aligned bound edges keep the point-force observation.
+        REQUIRE(point[1].radius == 0);
+        REQUIRE(point[1].center == first[1]);
+        std::size_t band = 0;
+        while (band + 1 < band_count && point[1].center >= band_border(band + 1))
+            ++band;
+        accumulate(bands, band, force, arm_moment(point, origin, force), Rat{1});
+        return;
+    }
+    RationalPoint delta{};
+    auto displaced = point;
+    for (std::size_t i = 0; i < delta.size(); ++i) {
+        delta[i] = last[i] - first[i];
+        displaced[i].center -= (first[i] + last[i]) / 2;
+    }
+    const auto couple = arm_moment(displaced, Point{}, force);
+    Rat total_weight{};
+    for (std::size_t band = 0; band < band_count; ++band) {
+        const Rat at_low = (band_border(band) - first[1]) / delta[1];
+        const Rat at_high = (band_border(band + 1) - first[1]) / delta[1];
+        const Rat low = std::max(Rat{0}, std::min(at_low, at_high));
+        const Rat high = std::min(Rat{1}, std::max(at_low, at_high));
+        if (low >= high)
+            continue;
+        const Rat middle = (low + high) / 2;
+        EnclosedVector location;
+        for (std::size_t i = 0; i < location.size(); ++i)
+            location[i] = {first[i] + middle * delta[i], Rat{0}};
+        auto moment = arm_moment(location, origin, force);
+        for (std::size_t i = 0; i < moment.size(); ++i)
+            moment[i] = add(moment[i], couple[i]);
+        const Rat weight = high - low;
+        total_weight += weight;
+        accumulate(bands, band, force, moment, weight);
+    }
+    CHECK(total_weight == 1);
+}
+
+[[maybe_unused]] void check_line_invariants() {
+    const RationalPoint first{0, -2, 0}, last{4, 2, 0};
+    const EnclosedVector load_point{{{1, 0}, {-1, 0}, {0, 0}}};
+    const EnclosedVector force{{{0, 0}, {0, 0}, {8, 0}}};
+    WrenchBands forward{}, backward{}, shifted{};
+    integrate_edge(forward, first, last, load_point, force, Point{});
+    integrate_edge(backward, last, first, load_point, force, Point{});
+    const Point shift{1., -.5, .25};
+    integrate_edge(shifted, first, last, load_point, force, shift);
+    EnclosedVector total_force{}, total_moment{};
+    for (std::size_t band = 0; band < band_count; ++band) {
+        CAPTURE(band);
+        const EnclosedVector offset{{{1, 0}, {-Rat{1} / 2, 0}, {Rat{1} / 4, 0}}};
+        const auto transport = arm_moment(offset, Point{}, forward.force[band]);
+        for (std::size_t i = 0; i < force.size(); ++i) {
+            check_within(subtract(forward.force[band][i], backward.force[band][i]), 0, 0);
+            check_within(subtract(forward.moment[band][i], backward.moment[band][i]), 0, 0);
+            check_within(
+                subtract(shifted.moment[band][i], subtract(forward.moment[band][i], transport[i])),
+                0, 0);
+            total_force[i] = add(total_force[i], forward.force[band][i]);
+            total_moment[i] = add(total_moment[i], forward.moment[band][i]);
+        }
+    }
+    const auto point_moment = arm_moment(load_point, Point{}, force);
+    for (std::size_t i = 0; i < force.size(); ++i) {
+        check_within(subtract(total_force[i], force[i]), 0, 0);
+        check_within(subtract(total_moment[i], point_moment[i]), 0, 0);
+    }
+    // The compensating couple shifts the moment in a strip without moving its force.
+    check_within(forward.force[7][2], Rat{4} / 5, 0);
+    check_within(forward.moment[7][0], -Rat{8} / 5, 0);
+    check_within(forward.moment[7][1], 0, 0);
+}
+
+RationalPoint endpoint(std::span<const Point> vertices, a::PointId id) {
+    REQUIRE(id.value() > 0);
+    REQUIRE(id.value() <= vertices.size());
+    return exact_position(vertices[static_cast<std::size_t>(id.value() - 1)]);
+}
+
+std::array<Enclosure, band_count>
+check_span_lines(const cf::DiscreteCirculationLoads& loads, std::span<const Point> vertices,
+                 const nlohmann::json& expected, const Point& origin, const Rat& cos_alpha,
+                 const Rat& sin_alpha, const Rat& force_tolerance, const Rat& moment_tolerance) {
+    std::array<bool, 18> found{};
+    const auto& edges = expected.at("edges");
+    REQUIRE(loads.edge_count() == found.size());
+    REQUIRE(edges.size() == found.size());
+    WrenchBands observed{};
+    for (std::size_t edge = 0; edge < loads.edge_count(); ++edge) {
+        const auto load = take(loads.edge(edge));
+        CAPTURE(load.edge.value());
+        auto pair = std::array{load.endpoints[0].value(), load.endpoints[1].value()};
+        std::ranges::sort(pair);
+        const auto reference = std::ranges::find_if(edges, [&](const auto& item) {
+            return item.at("endpoint_ids").template get<decltype(pair)>() == pair;
+        });
+        if (reference == edges.end())
+            FAIL("Every original load edge must have one independent reference");
+        const auto id = static_cast<std::size_t>(reference - edges.begin());
+        REQUIRE_FALSE(found.at(id));
+        found.at(id) = true;
+        const auto point = unpack_vector(load.position);
+        const auto force = unpack_vector(load.force);
+        const auto first = endpoint(vertices, load.endpoints[0]);
+        const auto last = endpoint(vertices, load.endpoints[1]);
+        CHECK(load.excluded_bound_occurrences > 0);
+        for (std::size_t i = 0; i < force.size(); ++i) {
+            const auto oracle_point = rational_word(reference->at("point_m").at(i).get<double>());
+            const auto oracle_force = rational_word(reference->at("force_N").at(i).get<double>());
+            check_within(point[i], oracle_point, rational_word(2e-14));
+            check_within(point[i], (first[i] + last[i]) / 2, rational_word(2e-14));
+            check_within(force[i], oracle_force, force_tolerance);
+        }
+        integrate_edge(observed, first, last, point, force, origin);
+    }
+    std::array<Enclosure, band_count> lift{};
+    EnclosedVector sum_force{}, sum_moment{};
+    for (std::size_t band = 0; band < band_count; ++band) {
+        CAPTURE(band);
+        lift[band] = add(scale(observed.force[band][0], -sin_alpha),
+                         scale(observed.force[band][2], cos_alpha));
+        check_within(lift[band], rational_word(expected.at("span_lift_N").at(band).get<double>()),
+                     force_tolerance);
+        for (std::size_t i = 0; i < sum_force.size(); ++i) {
+            CAPTURE(i);
+            const auto f = rational_word(expected.at("span_forces_N").at(band).at(i).get<double>());
+            const auto m =
+                rational_word(expected.at("span_moments_Nm").at(band).at(i).get<double>());
+            check_within(observed.force[band][i], f, force_tolerance);
+            check_within(observed.moment[band][i], m, moment_tolerance);
+            sum_force[i] = add(sum_force[i], observed.force[band][i]);
+            sum_moment[i] = add(sum_moment[i], observed.moment[band][i]);
+        }
+    }
+    const auto total_force = unpack_vector(loads.total_force());
+    const auto total_moment = unpack_vector(loads.total_moment());
+    for (std::size_t i = 0; i < sum_force.size(); ++i) {
+        check_within(subtract(sum_force[i], total_force[i]), 0, rational_word(1e-10));
+        check_within(subtract(sum_moment[i], total_moment[i]), 0, rational_word(1e-10));
+    }
+    return lift;
+}
+
+Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh& mesh,
+                     const a::GlobalContactState& contact, std::span<const Point> vertices,
+                     const Rat& density) {
+    constexpr std::size_t strips = 4;
+    std::array<RationalPoint, strips + 1> edge{};
+    std::array<Rat, strips> trace{};
+    for (std::size_t i = 0; i < strips; ++i) {
+        const auto wake =
+            take_global(contact.uvlm_quad(mesh.quads[columns + i].facets[0], 1000000));
+        const auto& owner = wake.attachment;
+        if (!owner)
+            FAIL("The Trefftz trace must come from a qualified trailing owner");
+        const auto first = endpoint(vertices, wake.corners[0]);
+        if (i != 0)
+            CHECK(edge[i] == first);
+        edge[i] = first;
+        edge[i + 1] = endpoint(vertices, wake.corners[1]);
+        const auto row = columns - strips + i;
+        REQUIRE(take(solved.row(row)).face == owner->bound_face);
+        trace[i] = exact_word(words(solved.solution(), row)) * owner->coefficient;
+    }
+    std::array<Rat, strips + 1> jumps{};
+    for (std::size_t i = 0; i < strips; ++i) {
+        jumps[i] -= trace[i];
+        jumps[i + 1] += trace[i];
+    }
+    Rat sum{};
+    for (std::size_t i = 0; i < strips; ++i) {
+        const Rat dy = edge[i + 1][1] - edge[i][1];
+        const Rat dz = edge[i + 1][2] - edge[i][2];
+        REQUIRE((dy != 0 || dz != 0));
+        const Rat y = edge[i][1] + dy / 2;
+        const Rat z = edge[i][2] + dz / 2;
+        for (std::size_t j = 0; j < edge.size(); ++j) {
+            const Rat ry = y - edge[j][1], rz = z - edge[j][2];
+            const Rat r2 = ry * ry + rz * rz;
+            REQUIRE(r2 > 0);
+            sum += trace[i] * jumps[j] * (ry * dy + rz * dz) / r2;
+        }
+    }
+    return -density * sum / (4 * rational_word(std::numbers::pi));
+}
+
 struct SpanObservation {
     Enclosure drag;
     Enclosure lift;
@@ -522,7 +737,7 @@ SpanObservation observe(const cf::DiscreteCirculationLoads& loads, const nlohman
         REQUIRE(y.center >= -4);
         REQUIRE(y.center <= 4);
         std::size_t band = 0;
-        while (band + 1 < band_count && y.center >= Rat{-4} + Rat{2} * (band + 1) / 5)
+        while (band + 1 < band_count && y.center >= band_border(band + 1))
             ++band;
         for (std::size_t k = 0; k < force.size(); ++k) {
             force_bands[band][k] = add(force_bands[band][k], force[k]);
@@ -600,6 +815,7 @@ struct WingCondition {
     double core_radius{};
     bool full_polar{};
     const nlohmann::json* ideal_angle{};
+    const nlohmann::json* span_reference{};
 };
 
 void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
@@ -798,6 +1014,8 @@ void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
     const auto& angles = polar.at("angles");
     REQUIRE(angles.size() == (condition.full_polar ? 5U : 1U));
     std::array<SpanObservation, 5> observed{};
+    std::array<std::array<Enclosure, band_count>, 5> line_lift{};
+    std::array<Rat, 5> far_drag{}, sine{}, cosine{};
     const auto velocity_scale = rational_word(read_value(reference.speed));
     const auto dynamic_area = rational_word(density) * velocity_scale * velocity_scale *
                               rational_word(read_value(reference.area)) / 2;
@@ -853,6 +1071,19 @@ void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
         }
         observed[i] = observe(loads, sample, origin, ux / velocity_scale, uz / velocity_scale,
                               force_tolerance, moment_tolerance);
+        if (condition.span_reference != nullptr) {
+            sine[i] = uz / velocity_scale;
+            cosine[i] = ux / velocity_scale;
+            const auto& line = condition.span_reference->at("angles").at(i);
+            REQUIRE(line.at("alpha_degrees").get<int>() == alpha);
+            line_lift[i] =
+                check_span_lines(loads, case_grid.vertices, line, origin, ux / velocity_scale,
+                                 uz / velocity_scale, force_tolerance, moment_tolerance);
+            far_drag[i] = trefftz_midpoint(loads.primal(), mesh, contact, case_grid.vertices,
+                                           rational_word(density));
+            check_within({far_drag[i], Rat{0}},
+                         rational_word(line.at("trefftz_drag_N").get<double>()), force_tolerance);
+        }
         if (condition.ideal_angle != nullptr)
             compare_ideal(observed[i], sample, *condition.ideal_angle, force_tolerance,
                           moment_tolerance);
@@ -905,6 +1136,55 @@ void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
         }
         REQUIRE(norm_squared > 0);
         CHECK(error_squared <= norm_squared / 2500);
+        if (condition.span_reference != nullptr) {
+            const auto& line = condition.span_reference->at("slopes").at(delta - 1);
+            REQUIRE(line.at("delta_degrees").get<std::size_t>() == delta);
+            Rat reference_norm{}, error_norm{};
+            for (std::size_t band = 0; band < band_count; ++band) {
+                CAPTURE(band);
+                const auto measured = slope(line_lift[2 - delta][band], line_lift[2 + delta][band]);
+                const auto band_reference =
+                    rational_word(line.at("span_lift_per_rad").at(band).get<double>());
+                const Rat error = abs(measured.center - band_reference) + measured.radius;
+                error_norm += inverse_width * error * error;
+                reference_norm += inverse_width * band_reference * band_reference;
+                check_within(measured, band_reference, slope_tolerance);
+            }
+            REQUIRE(reference_norm > 0);
+            CHECK(error_norm <= reference_norm / 2500);
+            const Rat radians = denominator / 2;
+            const Rat drag_scale = Rat{1} / (2 * radians * radians);
+            const Enclosure near =
+                scale(subtract(add(minus.drag, plus.drag), scale(observed[2].drag, 2)), drag_scale);
+            const Rat far =
+                (far_drag[2 - delta] + far_drag[2 + delta] - 2 * far_drag[2]) * drag_scale;
+            const Rat drag_tolerance = 4 * force_tolerance * drag_scale;
+            check_within(near, rational_word(line.at("near_drag_N_per_rad2").get<double>()),
+                         drag_tolerance);
+            check_within({far, Rat{0}},
+                         rational_word(line.at("trefftz_drag_N_per_rad2").get<double>()),
+                         drag_tolerance);
+            // Fixed geometry gives Gamma(alpha)=sin(alpha)*Gamma'(0). The
+            // ambient term is orthogonal to the wind-axis direction, and
+            // the opposite samples cancel the induced z-force projection.
+            REQUIRE(sine[2 - delta] == -sine[2 + delta]);
+            REQUIRE(cosine[2 - delta] == cosine[2 + delta]);
+            const Rat symmetric_sine = 2 * sine[2 + delta] * sine[2 + delta];
+            const Rat near_factor = symmetric_sine * cosine[2 + delta];
+            REQUIRE(near_factor > 0);
+            const auto near_quadratic = scale(near, 1 / (drag_scale * near_factor));
+            const Rat far_quadratic = far / (drag_scale * symmetric_sine);
+            check_within(
+                near_quadratic,
+                rational_word(
+                    condition.span_reference->at("quadratic_near_drag_N_per_rad2").get<double>()),
+                4 * force_tolerance / near_factor);
+            check_within(
+                {far_quadratic, Rat{0}},
+                rational_word(condition.span_reference->at("quadratic_trefftz_drag_N_per_rad2")
+                                  .get<double>()),
+                4 * force_tolerance / symmetric_sine);
+        }
     }
 }
 } // namespace
@@ -935,15 +1215,24 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
         REQUIRE(polars.at("cases").size() == 2);
         REQUIRE(polars.at("band_bounds_m").size() == 21);
         for (std::size_t i = 0; i <= band_count; ++i) {
-            const Rat boundary = Rat{-4} + Rat{2} * i / 5;
+            const Rat boundary = band_border(i);
             CHECK(abs(rational_word(polars.at("band_bounds_m").at(i).get<double>()) - boundary) <
                   rational_word(1e-15));
         }
         const auto& polar = polars.at("cases").at(wing_index);
         REQUIRE(wing.at("dihedral_degrees") == polar.at("dihedral_degrees"));
+        std::ifstream line_file{UVLAS_FINITE_WING_SPAN_LINES_FIXTURE};
+        REQUIRE(line_file);
+        const auto lines = nlohmann::json::parse(line_file);
+        REQUIRE(lines.at("cases").size() == 2);
+        const auto& line = lines.at("cases").at(wing_index);
+        REQUIRE(wing.at("dihedral_degrees") == line.at("dihedral_degrees"));
+        REQUIRE(line.at("angles").size() == 5);
+        REQUIRE(line.at("slopes").size() == 2);
+        check_line_invariants();
         run_wing(wing, row, expected, polar,
                  {frozen.at("wake_length_m").get<double>(),
-                  frozen.at("core_radius_m").get<double>(), true});
+                  frozen.at("core_radius_m").get<double>(), true, nullptr, &line});
     } else {
         std::ifstream sensitivity_file{UVLAS_FINITE_WING_SENSITIVITY_FIXTURE};
         REQUIRE(sensitivity_file);

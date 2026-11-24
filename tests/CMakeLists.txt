@@ -997,7 +997,8 @@ foreach(wing_index RANGE 0 1)
             UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
             UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json"
             UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json"
-            UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json")
+            UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
+            UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json")
         # Each shape keeps the paired angles or the members of a sensitivity series together.
         set_tests_properties(${test_name} PROPERTIES
             TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
