@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-material-physical-v1",
+  "ids": [
+    "IM-03",
+    "AE-02",
+    "FD-06",
+    "SH-D02",
+    "UW-D06",
+    "V-AERO",
+    "V-MULTI"
+  ],
+  "package": "IM-03",
+  "source_commit": "93034119dd33535f0906bad971e1208be109946b",
+  "claimed_state": "Whole-panel exact material-chart qualification against the same Case's PG, sided physical point selection and independent thin reference agreement, conditioned point kinematics and original-row force transpose, plus opt-in signed per-face aerodynamic contributions before canonical merging.",
+  "verification": {
+    "windows": "MSVC 19.51 Release, coupling.case_pg_support_motion and coupling.case_uniform_flow passed. Focused tests passed 374 and 5819 assertions with seed 23.",
+    "linux": "GCC 14.2 Release, same 2/2 targets and the same 374 and 5819 focused assertions.",
+    "mutation": "Removing force radius fails two independent work-bound checks. Removing negative signed incidence fails six original load pairing/sum checks in the registered alias fixture.",
+    "precision": "Binary64 and TwoWord kinematics and load work, original-sample and shape projection errors included.",
+    "static": "Pinned clang-format; changed translation units in the GCC compile database; Japanese prose lint; source/artifact byte hashes and trace check."
+  },
+  "sources": {
+    "CMakeLists.txt": "96a159b15d3674fd066b95e6167fd88d22674ac50465b8109a9813a63824c509",
+    "src/coupling/case_material_chart.cpp": "6996839b16ebdca666da081084418e7fab1161746fec0a0f2b438c588ad2e419",
+    "src/coupling/case_material_chart.hpp": "8d93b333223fb20cb6a693cf6838e06c9b21a693ffa0d2bf857318b9e9cc9664",
+    "src/coupling/case_material_reference.cpp": "f0242a6766252f1fbb24ec2ab64aa818d01ad45d0153bcd96225b76630571abd",
+    "src/coupling/case_material_reference.hpp": "d8e3da00de40cb06bc22e2eab41098fb3e6178777d5718931c8707ba399c9242",
+    "src/coupling/case_material_rows.cpp": "f3fe220f65ea3d41a9e131bf19a039ef1386bb34a54366282f56e89f25f1a0cd",
+    "src/coupling/case_material_rows.hpp": "eed191ca6a274e8dfdd7cce135247e8443867c1e0ef6bb9f3f3adc4e5e88520d",
+    "src/coupling/case_reference_graph.cpp": "8f381b7f7a28bb02252a05d1f812746fff3ca8d05911bd0e4a52a0077da07879",
+    "src/coupling/case_reference_graph.hpp": "3ebe8f191764bff26e2e38b654c88cc3e5f1cb949fabd075ea375564f2925408",
+    "src/coupling/discrete_nonpenetration.cpp": "41fbf4b5385d4c41a1918ece4633603e110c858dcc8e2cab1ec243d766dc94f5",
+    "src/coupling/discrete_nonpenetration.hpp": "8b809fb5917665e648ba5d98d9cff22ef1b5d565d1483ae93a7978462018d326",
+    "tests/coupling/case_pg_support_motion_test.cpp": "beb307565d59c46e25a6c34ffbc5ba94a0946587f908ff97ed741d906ff6d070",
+    "tests/coupling/case_uniform_flow_test.cpp": "340b966783c277175ae163dda3073e1aeae1777d6c2b1eae6d954acfa9a162b7"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-material-physical-v1.md": "63484c60efffcf1b1602e2b734763f19a0c608ebf51c16895d6ea0200dd18f4f"
+  }
+}
