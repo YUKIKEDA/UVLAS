@@ -540,11 +540,15 @@ struct NonpenetrationBuilder {
                 if (entry.coefficient == -1) {
                     const auto& collocation = input.collocations[source.caller];
                     leading = new_column();
-                    const auto zero = a::ScalarWords{a::SingleWord{0}};
-                    trace[num_traces++] = {
-                        leading, solve ? zero : negative(collocation.circulation),
-                        solve ? zero : negative(collocation.circulation_direction),
-                        Transfer{entry.bound_face, true}};
+                    const auto transfer = Transfer{entry.bound_face, true};
+                    if (solve) {
+                        trace[num_traces++] = {leading, a::DoubleWord{0, 0}, a::DoubleWord{0, 0},
+                                               transfer};
+                    } else {
+                        trace[num_traces++] = {leading, negative(collocation.circulation),
+                                               negative(collocation.circulation_direction),
+                                               transfer};
+                    }
                 } else {
                     leading = a::P1StrengthId::bound(entry.bound_face);
                 }
