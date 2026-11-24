@@ -95,6 +95,14 @@ struct UvlmQuad {
     std::optional<TrailingEdgeRow> attachment;
     std::uint64_t used_steps;
 };
+/// Canonical edge in the checked topology, with endpoints in the stored D2 order.
+struct UvlmLoadEdge {
+    EdgeId edge;
+    std::array<PointId, 2> endpoints;
+    bool trailing;
+    std::uint64_t used_steps;
+};
+
 /// Stable key of a released material point; no lossy packing or hash identity.
 struct MaterialReleaseKey {
     PointId point;      ///< Canonical physical TE point.
@@ -173,6 +181,9 @@ public:
     [[nodiscard]] GlobalResult<UvlmQuad> uvlm_quad(FacetId, std::uint64_t max_steps,
                                                    const std::stop_token& = {}) const noexcept;
     [[nodiscard]] std::size_t trailing_edge_count() const noexcept;
+    /// Resolve an original edge or explicit alias to the edge owner and TE classification.
+    [[nodiscard]] GlobalResult<UvlmLoadEdge>
+    uvlm_load_edge(EdgeId, std::uint64_t max_steps, const std::stop_token& = {}) const noexcept;
     /// Two-pass traversal, narrow-pair and planned-payload counters.
     [[nodiscard]] GlobalResult<GlobalWorkPlan> work_plan() const noexcept;
     /// Contact clearance does not certify physical mapping or state paths.

@@ -470,6 +470,59 @@ struct PullbackData {
     Vector flow{};
 };
 
+struct LoadEdgeOccurrence {
+    a::EdgeId edge{0};
+    std::array<a::PointId, 2> endpoints{a::PointId{0}, a::PointId{0}};
+    std::size_t panel = 0;
+    int vortex_sign = 0;
+    bool trailing = false;
+};
+struct LoadEdge {
+    a::EdgeId edge{0};
+    std::array<a::PointId, 2> endpoints{a::PointId{0}, a::PointId{0}};
+    p::Interval strength{};
+};
+struct NodalLoad {
+    std::uint64_t point = 0;
+    Vector force{};
+};
+
+Vector point_position(const a::OwnedGeometry& geometry, a::PointId point, p::Work& work) {
+    work.step();
+    return import(require(geometry.point_words(point, a::Configuration::Current)), work);
+}
+
+void accumulate_vector(Vector& destination, const Vector& source, p::Work& work) {
+    for (std::size_t axis = 0; axis < destination.size(); ++axis)
+        destination[axis] = p::add(destination[axis], source[axis], work);
+}
+
+struct LoadTotals {
+    Vector force{}, moment{};
+    void add(const Vector& position, const Vector& value, const Vector& origin, p::Work& work) {
+        accumulate_vector(force, value, work);
+        accumulate_vector(moment, cross(difference(position, origin, work), value, work), work);
+    }
+};
+
+void distribute_load(std::span<NodalLoad> nodes, std::span<const a::PointId> vertices,
+                     const Vector& force, const p::Interval& weight, p::Work& work) {
+    const auto piece = scale_vector(force, weight, work);
+    for (const auto point : vertices) {
+        work.step();
+        const auto it = std::ranges::lower_bound(
+            nodes, point.value(),
+            [&](std::uint64_t left, std::uint64_t right) {
+                work.step();
+                return left < right;
+            },
+            &NodalLoad::point);
+        if (it == nodes.end() || it->point != point.value())
+            reject(core::FailureCode::InvalidInput);
+        accumulate_vector(it->force, piece, work);
+    }
+}
+
 a::ScalarWords retained_word(const numerics::PrecisionBuffer<double>& retained, std::size_t i) {
     if (const auto* one = std::get_if<numerics::Binary64<double>>(&retained.storage()))
         return a::SingleWord{one->values.values()[i]};
@@ -966,7 +1019,8 @@ struct NonpenetrationBuilder {
                const DiscreteCirculationRequest& request, a::SharedP1Workspace& shared,
                a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
                p::Work& work, const DiscreteCirculationDirection* direction,
-               std::span<p::Interval> forcing, PullbackData* pullback = nullptr) {
+               std::span<p::Interval> forcing, PullbackData* pullback = nullptr,
+               std::optional<Assembly>* retained_assembly = nullptr) {
         const auto& stop = work.stop;
         work.step();
         const auto geometry_owner = require(input.contact.geometry());
@@ -1113,6 +1167,8 @@ struct NonpenetrationBuilder {
         }
         check.finish();
         work.step();
+        if (retained_assembly != nullptr)
+            retained_assembly->emplace(std::move(assembly));
         return {std::move(solution), std::move(results), std::move(geometry_parent),
                 std::move(influence), work.used};
     }
@@ -1213,6 +1269,227 @@ struct NonpenetrationBuilder {
                 std::move(points),
                 std::move(target.rows),
                 uniform,
+                work.used};
+    }
+
+    static void reduce_load_edges(std::span<LoadEdgeOccurrence> occurrences,
+                                  std::span<const EdgeMidpointVelocity> velocities,
+                                  std::span<LoadEdge> edges,
+                                  const linear::Solution<double>& solution, p::Work& work) {
+        std::ranges::sort(
+            occurrences, [&](const LoadEdgeOccurrence& left, const LoadEdgeOccurrence& right) {
+                work.step();
+                return std::pair{left.edge, left.panel} < std::pair{right.edge, right.panel};
+            });
+        std::size_t emitted = 0;
+        for (std::size_t i = 0; i < occurrences.size();) {
+            work.step();
+            const auto owner = occurrences[i];
+            p::Interval strength{};
+            bool exterior = false;
+            while (i < occurrences.size() && occurrences[i].edge == owner.edge) {
+                const auto panel = occurrences[i].panel;
+                int orientation = 0;
+                while (i < occurrences.size() && occurrences[i].edge == owner.edge &&
+                       occurrences[i].panel == panel) {
+                    work.step();
+                    orientation += occurrences[i].vortex_sign;
+                    ++i;
+                }
+                if (orientation == 0)
+                    continue; // The two occurrences of the same quad diagonal cancel exactly.
+                if (orientation != -1 && orientation != 1)
+                    reject(core::FailureCode::GeometryInvalid);
+                exterior = true;
+                const auto gamma = import(retained_word(solution.values(), panel), work);
+                strength = orientation == 1 ? p::add(strength, gamma, work)
+                                            : p::subtract(strength, gamma, work);
+            }
+            if (exterior && !owner.trailing) {
+                if (emitted == velocities.size() || velocities[emitted].edge != owner.edge)
+                    reject(core::FailureCode::InvalidInput);
+                (void)import(velocities[emitted].velocity, work);
+                edges[emitted++] = {owner.edge, owner.endpoints, strength};
+            }
+        }
+        if (emitted != velocities.size())
+            reject(core::FailureCode::InvalidInput);
+    }
+
+    static std::span<NodalLoad> prepare_load_topology(std::span<const PanelRow> bound,
+                                                      const a::OwnedGeometry& geometry,
+                                                      const a::GlobalContactState& contact,
+                                                      std::span<LoadEdgeOccurrence> occurrences,
+                                                      std::span<NodalLoad> nodes, p::Work& work) {
+        std::size_t k = 0;
+        for (std::size_t panel = 0; panel < bound.size(); ++panel)
+            for (const auto facet : bound[panel].panel.facets) {
+                work.step();
+                const auto points = require(geometry.facet_points(facet));
+                const auto edges = require(geometry.facet_edges(facet));
+                const auto incidence = require(geometry.incidence(facet));
+                for (std::size_t side = 0; side < edges.size(); ++side) {
+                    const auto edge =
+                        require(contact.uvlm_load_edge(edges[side], remaining(work), work.stop));
+                    account(work, edge.used_steps);
+                    occurrences[k] = {edge.edge, edge.endpoints, panel,
+                                      -static_cast<int>(incidence[side]), edge.trailing};
+                    nodes[k].point = points[side].value();
+                    ++k;
+                }
+            }
+        std::ranges::sort(nodes, [&](const NodalLoad& left, const NodalLoad& right) {
+            work.step();
+            return left.point < right.point;
+        });
+        const auto duplicates =
+            std::ranges::unique(nodes, [&](const NodalLoad& left, const NodalLoad& right) {
+                work.step();
+                return left.point == right.point;
+            });
+        return nodes.first(static_cast<std::size_t>(duplicates.begin() - nodes.begin()));
+    }
+
+    static DiscreteCirculationLoads
+    solve_loads(const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+                ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
+                const DiscreteCirculationRequest& request, a::GeometryWorkspace& geometry_work,
+                a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local,
+                a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop) {
+        p::Work work{0, limits.steps, stop};
+        work.step();
+        const auto order = input.collocations.size();
+        if (loads.stamp != input.trial_stamp || loads.circulation != request.retained_generation)
+            reject(core::FailureCode::StaleGeneration);
+        if (loads.rates.size() != order)
+            reject(core::FailureCode::InvalidInput);
+        const auto maximum = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
+        if (order > maximum / 6)
+            reject(core::FailureCode::ResourceExceeded);
+        if (loads.edges.size() > 6 * order)
+            reject(core::FailureCode::InvalidInput);
+        const auto density = import(loads.density, work);
+        if (p::compare(density.lower, {}) <= 0)
+            reject(core::FailureCode::InvalidInput);
+        const auto origin = import(loads.moment_origin, work);
+        const auto snapshot = require(input.contact.geometry());
+        const auto& geometry = snapshot.get();
+        const auto radius = import(require(geometry.core_radius()), work);
+        if (!loads.edges.empty() && p::compare(radius.lower, {}) <= 0)
+            reject(core::FailureCode::GeometryInvalid);
+
+        std::optional<Assembly> retained;
+        auto primal = solve_data(input, flow, limits, request, shared, local, kernel, memory, work,
+                                 nullptr, {}, nullptr, &retained);
+        if (!retained)
+            reject(core::FailureCode::InvalidInput);
+        const auto& assembly = *retained;
+        const auto bound = assembly.bound.values();
+        auto rates = allocate<p::Interval>(memory, order);
+        for (std::size_t i = 0; i < order; ++i) {
+            work.step();
+            if (loads.rates[i].face != bound[i].panel.face)
+                reject(core::FailureCode::InvalidInput);
+            rates.values()[i] = import(loads.rates[i].rate, work);
+        }
+
+        auto occurrences = allocate<LoadEdgeOccurrence>(memory, 6 * order);
+        auto nodes = allocate<NodalLoad>(memory, 6 * order);
+        auto edge_loads =
+            allocate<std::optional<DiscreteCirculatoryLoad>>(memory, loads.edges.size());
+        auto facet_loads = allocate<std::optional<DiscreteNoncirculatoryLoad>>(memory, 2 * order);
+        const auto vertex_loads = prepare_load_topology(bound, geometry, input.contact,
+                                                        occurrences.values(), nodes.values(), work);
+        auto point_loads = allocate<std::optional<DiscreteNodalLoad>>(memory, vertex_loads.size());
+        auto edges = allocate<LoadEdge>(memory, loads.edges.size());
+        reduce_load_edges(occurrences.values(), loads.edges, edges.values(), primal.solution, work);
+
+        a::LocalRootScratch rounding;
+        const auto representation = limits.induction_accuracy.representation;
+        const auto finish = [&](const Vector& value) {
+            return enclose_vector(value, representation, rounding, work);
+        };
+        const auto half = p::scale(p::integer(1), -1);
+        const auto third = p::divide(p::integer(1), p::integer(3), work);
+        LoadTotals totals;
+        const auto ambient = ambient_velocity(flow, work);
+        for (std::size_t i = 0; i < edges.size(); ++i) {
+            work.step();
+            const auto& edge = edges.values()[i];
+            const auto a_pos = point_position(geometry, edge.endpoints[0], work);
+            const auto b_pos = point_position(geometry, edge.endpoints[1], work);
+            auto center = a_pos;
+            accumulate_vector(center, b_pos, work);
+            center = scale_vector(center, half, work);
+            // The query API has no work readback. Charge its full explicit allowance.
+            auto query_limits = limits.induction.geometry;
+            query_limits.max_steps = std::min(query_limits.max_steps, remaining(work));
+            const auto query = require(a::resolve_query(
+                geometry,
+                {a::QueryId{edge.edge.value()}, a::SourceEdgePoint{edge.edge, a::SingleWord{.5}}},
+                geometry.context(), query_limits, geometry_work, memory, stop));
+            account(work, query_limits.max_steps);
+            const a::P1ActionSource source{input.contact, query, input.trial_stamp};
+            auto action_limits = limits.induction;
+            action_limits.steps = std::min(action_limits.steps, remaining(work));
+            const auto action = require(a::prepare_bound_wake_midpoint_induction(
+                source, edge.edge, assembly.maps.values(), assembly.ids.values(),
+                limits.geometry_accuracy, limits.induction_accuracy, action_limits, shared, local,
+                kernel, memory, stop));
+            const auto report = require(action.report());
+            account(work, report.used_steps);
+            const auto induced = require(
+                a::apply_shared_p1(action, source, assembly.values.values(), std::nullopt,
+                                   std::min(limits.action_steps, remaining(work)), shared, stop));
+            account(work, induced.used_steps());
+            const auto relative = difference(ambient, import(loads.edges[i].velocity, work), work);
+            const auto force = scale_vector(cross(native_velocity(relative, induced, work),
+                                                  difference(b_pos, a_pos, work), work),
+                                            p::multiply(density, edge.strength, work), work);
+            totals.add(center, force, origin, work);
+            distribute_load(vertex_loads, edge.endpoints, force, half, work);
+            edge_loads.values()[i].emplace(
+                DiscreteCirculatoryLoad{edge.edge, edge.endpoints, finish(center), finish(force),
+                                        report.excluded_bound_occurrences, report.far_facets != 0});
+        }
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto factor =
+                p::multiply(half, p::multiply(density, rates.values()[i], work), work);
+            for (std::size_t child = 0; child < bound[i].panel.facets.size(); ++child) {
+                work.step();
+                const auto facet = bound[i].panel.facets[child];
+                const auto points = require(geometry.facet_points(facet));
+                const auto x = point_position(geometry, points[0], work);
+                const auto y = point_position(geometry, points[1], work);
+                const auto z = point_position(geometry, points[2], work);
+                const auto force = scale_vector(
+                    cross(difference(y, x, work), difference(z, x, work), work), factor, work);
+                auto center = x;
+                accumulate_vector(center, y, work);
+                accumulate_vector(center, z, work);
+                center = scale_vector(center, third, work);
+                totals.add(center, force, origin, work);
+                distribute_load(vertex_loads, points, force, third, work);
+                facet_loads.values()[2 * i + child].emplace(DiscreteNoncirculatoryLoad{
+                    bound[i].panel.face, facet, points, finish(center), finish(force)});
+            }
+        }
+        for (std::size_t i = 0; i < vertex_loads.size(); ++i) {
+            work.step();
+            point_loads.values()[i].emplace(DiscreteNodalLoad{a::PointId{vertex_loads[i].point},
+                                                              finish(vertex_loads[i].force)});
+        }
+        const auto force = finish(totals.force);
+        const auto moment = finish(totals.moment);
+        const auto reference = finish(origin);
+        work.step();
+        return {finish_primal(std::move(primal), std::move(flow)),
+                std::move(edge_loads),
+                std::move(facet_loads),
+                std::move(point_loads),
+                force,
+                moment,
+                reference,
                 work.used};
     }
 
@@ -1474,6 +1751,66 @@ core::Result<DiscreteCirculationPullback> solve_discrete_circulation_pullback(
         return NonpenetrationBuilder::solve_pullback(input, seed, std::move(flow), limits, primal,
                                                      transpose, shared, local, kernel, memory,
                                                      stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+DiscreteCirculationLoads::DiscreteCirculationLoads(
+    DiscreteCirculation&& primal, core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges,
+    core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets,
+    core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points, const DiscreteLoadVector& force,
+    const DiscreteLoadVector& moment, const DiscreteLoadVector& origin,
+    std::uint64_t steps) noexcept
+    : primal_(std::move(primal)),
+      edges_(std::move(edges)),
+      facets_(std::move(facets)),
+      points_(std::move(points)),
+      force_(force),
+      moment_(moment),
+      origin_(origin),
+      steps_(steps) {}
+
+namespace {
+template <class T>
+core::Result<T> load_row(const core::PlannedBuffer<std::optional<T>>& rows,
+                         std::size_t i) noexcept {
+    if (i >= rows.size())
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    const auto& row = rows.values()[i];
+    if (!row)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    return *row;
+}
+} // namespace
+
+core::Result<DiscreteCirculatoryLoad> DiscreteCirculationLoads::edge(std::size_t i) const noexcept {
+    return load_row(edges_, i);
+}
+core::Result<DiscreteNoncirculatoryLoad>
+DiscreteCirculationLoads::facet(std::size_t i) const noexcept {
+    return load_row(facets_, i);
+}
+core::Result<DiscreteNodalLoad> DiscreteCirculationLoads::point(std::size_t i) const noexcept {
+    return load_row(points_, i);
+}
+
+core::Result<DiscreteCirculationLoads> solve_discrete_circulation_loads(
+    const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+    ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
+    const DiscreteCirculationRequest& request, a::GeometryWorkspace& geometry_work,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_loads(input, loads, std::move(flow), limits, request,
+                                                  geometry_work, shared, local, kernel, memory,
+                                                  stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {

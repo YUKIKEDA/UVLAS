@@ -83,6 +83,7 @@ struct P1AssemblyReport {
     P1AssemblyPlan plan;
     std::uint64_t facets = 0, far_facets = 0;
     std::uint64_t cancelled_analytic_pairs = 0, used_steps = 0;
+    std::uint64_t excluded_bound_occurrences = 0; ///< Structural midpoint self-edge only.
 };
 
 class SharedP1Workspace {
@@ -206,6 +207,14 @@ forecast_bound_wake_induction(const P1ActionSource&, std::span<const P1FaceStren
     const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
     LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
     P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+/// Prepare mixed induction at exactly the midpoint of a non-TE canonical bound edge.
+/// Exclude all occurrences of that bound contour only. Retain the full wake sheet.
+[[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
+    const P1ActionSource&, EdgeId self_edge, std::span<const P1FaceStrengths>,
+    std::span<const P1StrengthId>, LocalAccuracy, P1Accuracy, const P1AssemblyLimits&,
+    SharedP1Workspace&, LocalPacketWorkspace&, P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
 
 /// The input coefficient order matches the prepared IDs exactly. Geometry is unchanged.
 [[nodiscard]] AeroResult<P1ActionValue>

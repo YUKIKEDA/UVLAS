@@ -428,4 +428,127 @@ private:
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
+using DiscreteLoadVector = std::array<aero::detail::ScaledEnclosure, 3>;
+
+struct EdgeMidpointVelocity {
+    EdgeMidpointVelocity(aero::detail::EdgeId id, const NonpenetrationVector& v) noexcept
+        : edge(id), velocity(v) {}
+    aero::detail::EdgeId edge;     ///< Canonical non-TE bound edge.
+    NonpenetrationVector velocity; ///< Physical velocity at its exact midpoint, m/s.
+};
+
+struct BoundCirculationRate {
+    BoundCirculationRate(aero::detail::PhysicalFaceId id,
+                         const aero::detail::ScalarWords& value) noexcept
+        : face(id), rate(value) {}
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScalarWords rate; ///< Externally supplied Γdot, m²/s², for this discrete face.
+};
+
+struct DiscreteVectorLoadInput {
+    DiscreteVectorLoadInput(aero::detail::P1ActionStamp trial,
+                            core::NumericalGeneration circulation_generation,
+                            std::span<const EdgeMidpointVelocity> edge_velocities,
+                            std::span<const BoundCirculationRate> circulation_rates,
+                            const aero::detail::ScalarWords& rho,
+                            const NonpenetrationVector& origin) noexcept
+        : stamp(trial),
+          circulation(circulation_generation),
+          edges(edge_velocities),
+          rates(circulation_rates),
+          density(rho),
+          moment_origin(origin) {}
+    aero::detail::P1ActionStamp stamp;
+    core::NumericalGeneration circulation; ///< Generation of the accompanying circulation trial.
+    std::span<const EdgeMidpointVelocity> edges; ///< Ascending canonical force edge IDs.
+    std::span<const BoundCirculationRate> rates; ///< Ascending physical bound face IDs.
+    aero::detail::ScalarWords density;           ///< kg/m³, finite and strictly positive.
+    NonpenetrationVector moment_origin;          ///< Reference point in the geometry's SI frame.
+};
+
+struct DiscreteCirculatoryLoad {
+    aero::detail::EdgeId edge;
+    std::array<aero::detail::PointId, 2> endpoints;
+    DiscreteLoadVector position, force;
+    std::uint64_t excluded_bound_occurrences;
+    bool includes_wake_quadrature;
+};
+
+struct DiscreteNoncirculatoryLoad {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::FacetId facet;
+    std::array<aero::detail::PointId, 3> vertices;
+    DiscreteLoadVector position, force;
+};
+
+struct DiscreteNodalLoad {
+    aero::detail::PointId point;
+    DiscreteLoadVector force;
+};
+
+/// Own one certified circulation and its vector loads, in SI units.
+class DiscreteCirculationLoads {
+public:
+    DiscreteCirculationLoads(DiscreteCirculationLoads&&) noexcept = default;
+    DiscreteCirculationLoads& operator=(DiscreteCirculationLoads&&) noexcept = default;
+    DiscreteCirculationLoads(const DiscreteCirculationLoads&) = delete;
+    DiscreteCirculationLoads& operator=(const DiscreteCirculationLoads&) = delete;
+    [[nodiscard]] const DiscreteCirculation& primal() const& noexcept {
+        return primal_;
+    }
+    [[nodiscard]] const DiscreteCirculation& primal() const&& = delete;
+    [[nodiscard]] DiscreteLoadVector total_force() const noexcept {
+        return force_;
+    }
+    [[nodiscard]] DiscreteLoadVector total_moment() const noexcept {
+        return moment_;
+    }
+    [[nodiscard]] DiscreteLoadVector moment_origin() const noexcept {
+        return origin_;
+    }
+    [[nodiscard]] std::size_t edge_count() const noexcept {
+        return edges_.size();
+    }
+    [[nodiscard]] std::size_t facet_count() const noexcept {
+        return facets_.size();
+    }
+    [[nodiscard]] std::size_t point_count() const noexcept {
+        return points_.size();
+    }
+    [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return steps_;
+    }
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationLoads(DiscreteCirculation&&,
+                             core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>>,
+                             core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>>,
+                             core::PlannedBuffer<std::optional<DiscreteNodalLoad>>,
+                             const DiscreteLoadVector& force, const DiscreteLoadVector& moment,
+                             const DiscreteLoadVector& origin, std::uint64_t) noexcept;
+    DiscreteCirculation primal_;
+    core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges_;
+    core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets_;
+    core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
+    DiscreteLoadVector force_, moment_, origin_;
+    std::uint64_t steps_;
+};
+
+/// Evaluate adopted midpoint and triangle loads on the same solved discrete trial.
+/// The current geometry must have a positive regularization radius for incident
+/// midpoint queries. The caller supplies the rate and midpoint velocities;
+/// the same state, exact edge IDs and face order are required. No history is
+/// reconstructed. The flow is consumed only on complete success.
+[[nodiscard]] core::Result<DiscreteCirculationLoads>
+solve_discrete_circulation_loads(const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+                                 ProjectedCaseUniformFlow&&, const DiscreteNonpenetrationLimits&,
+                                 const DiscreteCirculationRequest&,
+                                 aero::detail::GeometryWorkspace&, aero::detail::SharedP1Workspace&,
+                                 aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&,
+                                 core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
