@@ -1,0 +1,46 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-gmsh-surface-topology",
+  "ids": [
+    "IO4-01",
+    "IO4-04",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "9b91fc289020821c48bd4d16e047214147516b21",
+  "scope": "Gmsh selected integer surface topology: checked faces and vertex fans, directed edge incidences, boundaries, and edge-connected components",
+  "verification": {
+    "ctest_regex": "^io\\.gmsh_(surface_topology|mesh)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 2,
+      "topology_cases": 5,
+      "topology_assertions": 165
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 2,
+      "topology_cases": 5,
+      "topology_assertions": 165,
+      "clang_tidy": "21.1.1 PASS on topology normal/audit and test"
+    }
+  },
+  "tested_target_registration": {
+    "commit": "9b91fc289020821c48bd4d16e047214147516b21",
+    "CMakeLists.txt": "77d60f7867679fda26aa634e03bb07cb1a9982a923e7411cb9c869b3c1cfe694",
+    "tests/CMakeLists.txt": "02539a1b17eb467d799e47d55df18556240c1ba65f94971a178ac446a6f28ce8"
+  },
+  "sources": {
+    "src/io/gmsh_surface_topology.cpp": "63a31df4a746d5c0acccbb5713d26441defa661287805bba41af5d2541dc3e34",
+    "src/io/gmsh_surface_topology.hpp": "1980b34ad2c43d6c150751a1461c0bafebbdd06195dbb22728048935c688d317",
+    "tests/io/gmsh_surface_topology_test.cpp": "c95248ab8a0aba0eba7fd093a9eec2e651f59d20e0b44ad2551b03df4206fdd3"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/gmsh-surface-topology.md": "83cce4a13c75ac7b9dbd8da7d5bf8f15af5ab6831a3428e5dcfcb1b3d092a1df"
+  }
+}
