@@ -59,8 +59,9 @@ bool missing_rule(const CasePgRuleBinding& rule) noexcept {
     if (const auto* points =
             std::get_if<std::span<const pg::PgDiscreteVolumePoint>>(&rule.quadrature))
         return points->empty();
-    const auto& product = std::get<pg::PgVolumeProductRule>(rule.quadrature);
-    return product.radial.empty() || product.transverse.empty() || product.depth.empty();
+    const auto* product = std::get_if<pg::PgVolumeProductRule>(&rule.quadrature);
+    return product == nullptr || product->radial.empty() || product->transverse.empty() ||
+           product->depth.empty();
 }
 pg::PgPreparedPatch prepare_patch(const io::SiCase& source, const CasePgRuleBinding& rule,
                                   const CasePgChartLimits& limits, core::Workspace& workspace,
