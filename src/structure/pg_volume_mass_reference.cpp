@@ -70,7 +70,7 @@ void project_shapes(ReferenceArithmetic& math, const PgConditionedReferenceBatch
     return PgReferenceVolumePoint{query.volume, query.u, query.v, query.depth};
 }
 
-[[nodiscard]] const PgReferencePoint& reference_query(const PgReferencePoint& query) {
+[[nodiscard]] PgReferencePoint reference_query(const PgReferencePoint& query) {
     return query;
 }
 
