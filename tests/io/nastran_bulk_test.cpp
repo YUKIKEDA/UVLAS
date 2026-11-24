@@ -123,8 +123,7 @@ TEST_CASE("Nastran root inspection rejects dependencies and unadopted cards thro
         REQUIRE_FALSE(outcome);
         const bool trailing = std::string_view{tail}.starts_with("ENDDATA");
         CHECK(outcome.error().code == (trailing ? InvalidInput : Unsupported));
-        REQUIRE(detail);
-        CHECK(detail->position.byte == head.size() + (trailing ? 8 : 0));
+        CHECK(take(detail).position.byte == head.size() + (trailing ? 8 : 0));
         CHECK(plan.allocated_bytes() == 0);
     }
 }
