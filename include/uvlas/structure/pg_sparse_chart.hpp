@@ -83,7 +83,7 @@ public:
 private:
     struct Data;
     PgSparseChart(PgGlobalConstraints&&, core::PlannedBuffer<Data>) noexcept;
-    enum class RhsKind { Fixed, Zero, Explicit };
+    enum class RhsKind : std::uint8_t { Fixed, Zero, Explicit };
     [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
     lift_impl(PgSparseChartInput, PgSparseChartInput, RhsKind, const PgReferenceLimits&,
               core::Workspace&, core::ResourcePlan&) const noexcept;

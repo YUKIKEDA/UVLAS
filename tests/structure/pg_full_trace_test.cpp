@@ -564,8 +564,10 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     auto chart_limits = PgSparseChartLimits{limits.arithmetic, 300, 400, 30'000, true};
     chart_limits.arithmetic.algebra.maximum_value_bits = 65536;
     chart_limits.arithmetic.algebra.maximum_work_bits = 262144;
-    check_failure(PgSparseChart::prepare(std::move(incompatible), chart_limits, workspace, plan),
-                  core::FailureCode::InvalidInput);
+    const auto prepare_chart = [&](PgGlobalConstraints& candidate, const PgSparseChartLimits& cap) {
+        return PgSparseChart::prepare(std::move(candidate), cap, workspace, plan);
+    };
+    check_failure(prepare_chart(incompatible, chart_limits), core::FailureCode::InvalidInput);
     REQUIRE(incompatible.info().has_value());
     auto no_pivots = chart_limits;
     no_pivots.maximum_pivots = 0;
@@ -575,8 +577,7 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     CHECK(empty_chart.pivots().empty());
     CHECK(empty_chart.free_columns().size() == column_count);
     CHECK_FALSE(take(empty_chart.preparation()).timing.has_value());
-    check_failure(PgSparseChart::prepare(std::move(global), no_pivots, workspace, plan),
-                  core::FailureCode::ResourceExceeded);
+    check_failure(prepare_chart(global, no_pivots), core::FailureCode::ResourceExceeded);
     REQUIRE(global.info().has_value());
     auto chart = take(PgSparseChart::prepare(std::move(global), chart_limits, workspace, plan));
     auto permuted =
