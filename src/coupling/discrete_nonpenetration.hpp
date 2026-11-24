@@ -506,6 +506,13 @@ struct DiscreteNodalLoad {
     DiscreteLoadVector force;
 };
 
+/// Exact adopted trial identity retained with assembled nodal forces.
+struct DiscreteLoadSource {
+    aero::detail::GeometryContext context;
+    std::array<std::byte, 32> geometry;
+    aero::detail::P1ActionStamp stamp;
+};
+
 /// Own one certified circulation and its vector loads, in SI units.
 class DiscreteCirculationLoads {
 public:
@@ -538,6 +545,9 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] DiscreteLoadSource source() const noexcept {
+        return source_;
+    }
     [[nodiscard]] std::uint64_t used_steps() const noexcept {
         return steps_;
     }
@@ -549,12 +559,14 @@ private:
                              core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>>,
                              core::PlannedBuffer<std::optional<DiscreteNodalLoad>>,
                              const DiscreteLoadVector& force, const DiscreteLoadVector& moment,
-                             const DiscreteLoadVector& origin, std::uint64_t) noexcept;
+                             const DiscreteLoadVector& origin, DiscreteLoadSource,
+                             std::uint64_t) noexcept;
     DiscreteCirculation primal_;
     core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges_;
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets_;
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
     DiscreteLoadVector force_, moment_, origin_;
+    DiscreteLoadSource source_;
     std::uint64_t steps_;
 };
 

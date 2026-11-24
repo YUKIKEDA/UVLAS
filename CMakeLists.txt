@@ -148,6 +148,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
+                         src/coupling/pg_aero_attachment.cpp
     src/coupling/case_known_flow.cpp
     src/coupling/case_aero_attachment.cpp
     src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp

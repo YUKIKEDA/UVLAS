@@ -2378,6 +2378,9 @@ struct NonpenetrationBuilder {
                 a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop,
                 LoadDirections* direction = nullptr, LoadPullbackData* pullback = nullptr,
                 PullbackData* implicit = nullptr, LoadTangentData* tangent = nullptr) {
+        const auto& geometry = require(input.contact.geometry()).get();
+        const DiscreteLoadSource source{geometry.context(), require(geometry.identity()),
+                                        input.trial_stamp};
         auto result = compute_loads(input, loads, &flow, limits, request, geometry_work, shared,
                                     local, kernel, memory, stop, direction, pullback, implicit,
                                     tangent, nullptr, {});
@@ -2389,6 +2392,7 @@ struct NonpenetrationBuilder {
                 values.force,
                 values.moment,
                 values.origin,
+                source,
                 result.steps};
     }
 
@@ -3102,7 +3106,7 @@ DiscreteCirculationLoads::DiscreteCirculationLoads(
     DiscreteCirculation&& primal, core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges,
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets,
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points, const DiscreteLoadVector& force,
-    const DiscreteLoadVector& moment, const DiscreteLoadVector& origin,
+    const DiscreteLoadVector& moment, const DiscreteLoadVector& origin, DiscreteLoadSource source,
     std::uint64_t steps) noexcept
     : primal_(std::move(primal)),
       edges_(std::move(edges)),
@@ -3111,6 +3115,7 @@ DiscreteCirculationLoads::DiscreteCirculationLoads(
       force_(force),
       moment_(moment),
       origin_(origin),
+      source_(source),
       steps_(steps) {}
 
 namespace {

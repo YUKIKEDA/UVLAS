@@ -3,6 +3,7 @@
 #include <array>
 #include <cstring>
 #include <uvlas/structure/pg_boundary_tangents.hpp>
+#include <uvlas/structure/pg_material_tangents.hpp>
 #include <uvlas/structure/pg_prepared_volume.hpp>
 
 namespace uvlas::structure {
@@ -162,7 +163,7 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
                 return valid;
 
             const auto epsilon = volume_decode(reference.maximum_coefficient_error);
-            const auto stride = rank + reference.prefix;
+            const auto stride = rank * reference.column_stride + reference.prefix;
             for (std::size_t i = 0; i < outer; ++i)
                 for (std::size_t axis = 0; axis < 3; ++axis) {
                     VolumeInteger sum{}, reference_error{};
@@ -172,7 +173,9 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
                         if (limits.cancellation.stop_requested())
                             return reject(core::FailureCode::Cancelled);
                         const auto coefficient =
-                            (forward ? i * stride + k : k * stride + i) + reference.prefix;
+                            (forward ? i * stride + k * reference.column_stride
+                                     : k * stride + i * reference.column_stride) +
+                            reference.prefix;
                         add_term(sum, reference_error, reference.high[coefficient],
                                  low_at(reference.low, coefficient), input, 3 * k + axis, epsilon);
                     }
@@ -250,6 +253,39 @@ core::Result<void> apply_pg_prepared_volume_position(const PgPreparedVolumeRefer
     const auto words = reference.words();
     return output.apply({nullptr, reference.column_count(), reference.points().size(), words.high,
                          words.low, 1, reference.projection().maximum_shape_error},
+                        direction, input, limits, workspace);
+}
+
+core::Result<void> apply_pg_prepared_reference_position(const PgProjectedReferenceBatch& reference,
+                                                        PgPreparedPatchIdentity source,
+                                                        PgVolumePositionDirection direction,
+                                                        PgCartesianWords input,
+                                                        const PgVolumePositionLimits& limits,
+                                                        core::Workspace& workspace,
+                                                        PgVolumePositionResult& output) noexcept {
+    if (limits.cancellation.stop_requested())
+        return reject(core::FailureCode::Cancelled);
+    if (source != reference.source())
+        return reject(core::FailureCode::StaleGeneration);
+    // X0[3] and measure precede N and the three gradient words per column.
+    return output.apply({nullptr, reference.column_count(), reference.points().size(),
+                         reference.high_words(), reference.low_words(), 4,
+                         reference.projection().maximum_shape_error, 4},
+                        direction, input, limits, workspace);
+}
+
+core::Result<void>
+apply_pg_material_tangents(const PgMaterialTangentReference& reference,
+                           PgPreparedPatchIdentity source, PgVolumePositionDirection direction,
+                           PgCartesianWords input, const PgVolumePositionLimits& limits,
+                           core::Workspace& workspace, PgVolumePositionResult& output) noexcept {
+    if (limits.cancellation.stop_requested())
+        return reject(core::FailureCode::Cancelled);
+    if (source != reference.source_)
+        return reject(core::FailureCode::StaleGeneration);
+    return output.apply({nullptr, reference.column_count_, 2 * reference.points_.size(),
+                         reference.high_.values(), reference.low_.values(), 0,
+                         reference.projection_.maximum_derivative_error},
                         direction, input, limits, workspace);
 }
 
