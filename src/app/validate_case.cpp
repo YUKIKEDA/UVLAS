@@ -115,8 +115,9 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
          reference_total_cap,
          maximum_references * maximum_references},
         {maximum_references, maximum_references, 1, maximum_work, maximum_path},
-        {reference_cap, maximum_nodes, maximum_nodes, 4 * maximum_nodes, maximum_nodes,
-         maximum_nodes, maximum_work},
+        {{reference_cap, maximum_nodes, maximum_nodes, 4 * maximum_nodes, maximum_nodes,
+          maximum_nodes, maximum_work},
+         {reference_cap, 64 * kib, maximum_nodes, maximum_nodes, 8 * maximum_nodes, maximum_work}},
         plan, stop, &snapshot_diagnostic, &diagnostic);
     if (!closed) {
         if (diagnostic.reason == LeafReferenceFailure::UnsupportedRole) {
@@ -124,10 +125,12 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
                           diagnostic.pointer());
         }
         if (diagnostic.reason == LeafReferenceFailure::Format) {
-            const auto message =
-                diagnostic.format_offset
-                    ? "Gmsh mesh format at byte " + std::to_string(*diagnostic.format_offset)
-                    : "Gmsh mesh format";
+            const bool nastran =
+                diagnostic.location && diagnostic.location->role == ReferenceRole::NastranDeck;
+            std::string message = nastran ? "Nastran Bulk Data format" : "Gmsh mesh format";
+            if (diagnostic.format_offset) {
+                message += " at byte " + std::to_string(*diagnostic.format_offset);
+            }
             return reject(closed.error(), message, diagnostic.pointer());
         }
         if (diagnostic.reason == LeafReferenceFailure::Graph) {

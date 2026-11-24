@@ -34,6 +34,7 @@ enum class NastranBulkFailure : std::uint8_t {
     Field,
     Continuation,
     UnsupportedForm,
+    UnsupportedCard,
     Limit
 };
 
@@ -50,6 +51,13 @@ struct NastranBulkLimits {
     std::uint64_t fields;
     std::uint64_t work;
 };
+
+// Verify that the authenticated snapshot is a standalone deck in the adopted Bulk Data
+// subset. Return the work charged for lexing and checking its card names.
+[[nodiscard]] core::Result<std::uint64_t>
+verify_nastran_bulk_leaf(const AcquiredRootSnapshot&, NastranBulkLimits, core::ResourcePlan&,
+                         const std::stop_token&,
+                         std::optional<NastranBulkDiagnostic>* = nullptr) noexcept;
 
 struct NastranBulkView {
     RootSnapshotLocation location;
