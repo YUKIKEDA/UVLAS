@@ -65,6 +65,24 @@ ReferenceInputLimits input_limits() noexcept {
     };
 }
 
+MeshSidecarLimits sidecar_limits() noexcept {
+    return {
+        {reference_cap,
+         case_manifest_max_depth,
+         maximum_nodes,
+         maximum_nodes,
+         case_manifest_max_string_bytes,
+         case_manifest_max_number_bytes,
+         reference_cap,
+         {io::ParserAllocationMode::EstimateAdmission, payload_cap}},
+        {case_manifest_max_number_bytes, 1, 1, 4, 4, 8192, 32768,
+         structure::ExactEstimateAdmission{payload_cap}, structure::ExactTimingMode::Disabled},
+        maximum_nodes,
+        maximum_nodes,
+        maximum_work,
+    };
+}
+
 int report(FailedResultExit exit, std::string_view message, std::string_view location = {}) {
     std::cerr << "validate: " << message;
     if (!location.empty()) {
@@ -142,7 +160,8 @@ validate_references(const ReferenceInput& input, const ReferenceInputView& view,
         {maximum_references, maximum_references, 1, maximum_work, maximum_path},
         {{reference_cap, maximum_nodes, maximum_nodes, 4 * maximum_nodes, maximum_nodes,
           maximum_nodes, maximum_work},
-         {reference_cap, 64 * kib, maximum_nodes, maximum_nodes, 8 * maximum_nodes, maximum_work}},
+         {reference_cap, 64 * kib, maximum_nodes, maximum_nodes, 8 * maximum_nodes, maximum_work},
+         sidecar_limits()},
         plan, stop, &snapshot_diagnostic, &diagnostic);
     if (!closed) {
         if (diagnostic.reason == LeafReferenceFailure::UnsupportedRole) {
@@ -156,6 +175,14 @@ validate_references(const ReferenceInput& input, const ReferenceInputView& view,
             return validation_failure(closed.error(),
                                       nastran ? "Nastran Bulk Data format" : "Gmsh mesh format",
                                       diagnostic.pointer(), diagnostic.format_offset);
+        }
+        if (diagnostic.reason == LeafReferenceFailure::Sidecar) {
+            const bool nastran =
+                diagnostic.location && diagnostic.location->role == ReferenceRole::NastranSidecar;
+            const auto byte = diagnostic.sidecar ? diagnostic.sidecar->byte : std::nullopt;
+            return validation_failure(closed.error(),
+                                      nastran ? "Nastran sidecar format" : "Gmsh sidecar format",
+                                      diagnostic.pointer(), byte);
         }
         if (diagnostic.reason == LeafReferenceFailure::Graph) {
             return validation_failure(closed.error(), "external reference dependency graph",
