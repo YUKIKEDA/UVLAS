@@ -109,35 +109,18 @@ std::size_t moving_index(std::span<const a::PointId> moving, a::PointId owner, m
     return static_cast<std::size_t>(at - moving.begin());
 }
 
-std::array<NonpenetrationVector, 2> tangents(const a::OwnedGeometry& geometry, a::FacetId facet,
-                                             a::LocalRootScratch& scratch, m::Work& work) {
+RoundedFacetTangents tangents(const a::OwnedGeometry& geometry, a::FacetId facet) {
     const auto ids = take(geometry.facet_points(facet));
-    const auto origin = take(geometry.point_words(ids[0], a::Configuration::Current));
-    std::array<NonpenetrationVector, 2> result{
-        NonpenetrationVector{a::SingleWord{0}, a::SingleWord{0}, a::SingleWord{0}},
-        NonpenetrationVector{a::SingleWord{0}, a::SingleWord{0}, a::SingleWord{0}}};
-    for (std::size_t t = 0; t < result.size(); ++t) {
-        const auto endpoint = take(geometry.point_words(ids[t + 1], a::Configuration::Current));
-        for (std::size_t k = 0; k < axes; ++k) {
-            const auto diff =
-                m::subtract(interval(endpoint[k], work), interval(origin[k], work), work);
-            const auto precise = a::enclose_p1_value(diff, core::Precision::TwoWord, scratch);
-            const auto words = precise.center();
-            const auto* pair = std::get_if<a::DoubleWord>(&words);
-            if (precise.radius() != 0 || pair == nullptr)
-                reject(PrecisionUnresolved);
-            result[t][k] = a::DoubleWord{unscale(pair->high, precise.exponent()),
-                                         unscale(pair->low, precise.exponent())};
-        }
-    }
-    return result;
+    return {{take(geometry.point_words(ids[0], a::Configuration::Current)),
+             take(geometry.point_words(ids[1], a::Configuration::Current)),
+             take(geometry.point_words(ids[2], a::Configuration::Current))}};
 }
 } // namespace
 
 namespace aero_attachment_detail {
 struct Row {
     a::ResolvedQuery point;
-    std::array<NonpenetrationVector, 2> surface;
+    RoundedFacetTangents surface;
     NonpenetrationVector velocity;
     PrescribedAeroRow source;
 };
@@ -309,7 +292,6 @@ struct Builder {
         auto& out = owner.values().front();
         out.rows = allocate<std::optional<Row>>(memory, rows.size());
         auto moved = allocate<std::uint8_t>(memory, moving.size());
-        a::LocalRootScratch scratch;
         for (std::size_t i = 0; i < rows.size(); ++i) {
             work.step();
             const auto& row = rows[i];
@@ -340,7 +322,7 @@ struct Builder {
                               projection.point[k], limits.motion.maximum_interval_input_bits, work);
             }
             out.rows.values()[i].emplace(Row{std::move(material),
-                                             tangents(geometry, facet, scratch, work),
+                                             tangents(geometry, facet),
                                              {velocity(0), velocity(1), velocity(2)},
                                              row});
         }
@@ -417,9 +399,9 @@ core::Result<DiscreteCollocation> PrescribedAeroTrial::collocation(std::size_t i
         const auto rows = data.front().rows.values();
         if (i < rows.size()) {
             if (const auto& row = rows[i])
-                return DiscreteCollocation{row->source.material_point.facet,
+                return DiscreteCollocation{row->surface,
+                                           row->source.material_point.facet,
                                            row->point,
-                                           row->surface,
                                            row->velocity,
                                            row->source.circulation,
                                            row->source.circulation_direction};

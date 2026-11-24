@@ -11,12 +11,29 @@ struct Interval;
 
 namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
+using ExplicitCollocationTangents = std::array<NonpenetrationVector, 2>;
+
+/// Retained current coordinates of an oriented facet. The tangents are the
+/// exact differences 1-0 and 2-0, evaluated without intermediate projection.
+struct RoundedFacetTangents {
+    std::array<NonpenetrationVector, 3> points;
+};
 
 /// Explicit discrete collocation in the current geometry. The tangents orient its
 /// normal and the velocity is in m/s. No physical PG mapping is inferred.
 struct DiscreteCollocation {
     DiscreteCollocation(aero::detail::FacetId source, const aero::detail::ResolvedQuery& point,
-                        const std::array<NonpenetrationVector, 2>& frame,
+                        const ExplicitCollocationTangents& frame,
+                        const NonpenetrationVector& motion, const aero::detail::ScalarWords& gamma,
+                        const aero::detail::ScalarWords& direction) noexcept
+        : facet(source),
+          query(point),
+          tangents(frame),
+          velocity(motion),
+          circulation(gamma),
+          circulation_direction(direction) {}
+    DiscreteCollocation(const RoundedFacetTangents& frame, aero::detail::FacetId source,
+                        const aero::detail::ResolvedQuery& point,
                         const NonpenetrationVector& motion, const aero::detail::ScalarWords& gamma,
                         const aero::detail::ScalarWords& direction) noexcept
         : facet(source),
@@ -27,7 +44,7 @@ struct DiscreteCollocation {
           circulation_direction(direction) {}
     aero::detail::FacetId facet; ///< Either child of the bound physical quadrilateral.
     const aero::detail::ResolvedQuery& query;
-    std::array<NonpenetrationVector, 2> tangents;
+    std::variant<ExplicitCollocationTangents, RoundedFacetTangents> tangents;
     NonpenetrationVector velocity;
     aero::detail::ScalarWords circulation;
     aero::detail::ScalarWords circulation_direction;

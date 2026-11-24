@@ -117,6 +117,15 @@ Vector difference(const Vector& a, const Vector& b, p::Work& work) {
     return {p::subtract(a[0], b[0], work), p::subtract(a[1], b[1], work),
             p::subtract(a[2], b[2], work)};
 }
+std::array<Vector, 2> import_collocation_tangents(const DiscreteCollocation& row, p::Work& work) {
+    if (const auto* explicit_words = std::get_if<ExplicitCollocationTangents>(&row.tangents))
+        return {import((*explicit_words)[0], work), import((*explicit_words)[1], work)};
+    const auto& points = std::get<RoundedFacetTangents>(row.tangents).points;
+    const auto x0 = import(points[0], work);
+    return {difference(import(points[1], work), x0, work),
+            difference(import(points[2], work), x0, work)};
+}
+
 void require_positive(const p::Interval& interval) {
     if (p::compare(interval.upper, {}) <= 0)
         reject(core::FailureCode::GeometryInvalid);
@@ -125,8 +134,7 @@ void require_positive(const p::Interval& interval) {
 }
 Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel,
                       const DiscreteCollocation& input, p::Work& work) {
-    const auto tx = import(input.tangents[0], work);
-    const auto ty = import(input.tangents[1], work);
+    const auto [tx, ty] = import_collocation_tangents(input, work);
     auto normal = cross(tx, ty, work);
     const auto length2 = dot(normal, normal, work);
     require_positive(length2);
@@ -452,8 +460,7 @@ p::Interval fixed_circulation_direction(const DiscreteCollocation& row,
                                         const Vector& normal, const Vector& relative,
                                         const Vector& ambient_direction,
                                         const a::P1ActionValue& induced, p::Work& work) {
-    const auto x = import(row.tangents[0], work);
-    const auto y = import(row.tangents[1], work);
+    const auto [x, y] = import_collocation_tangents(row, work);
     const auto dx = import(direction.tangents[0], work);
     const auto dy = import(direction.tangents[1], work);
     const auto length = tangent_length(x, y, work);
@@ -1253,8 +1260,7 @@ struct NonpenetrationBuilder {
         const auto weight =
             p::negate(import(retained_word(transpose->solution().values(), i), work), work);
         const auto velocity_dual = scale_vector(data.normal, weight, work);
-        const auto x = import(row.tangents[0], work);
-        const auto y = import(row.tangents[1], work);
+        const auto [x, y] = import_collocation_tangents(row, work);
         const auto direction = native_velocity(data.relative, primal, work);
         const auto area_dual = scale_vector(
             normal_projection(data.normal, direction, tangent_length(x, y, work), work), weight,

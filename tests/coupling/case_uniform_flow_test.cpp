@@ -1649,9 +1649,11 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         view.history.columns = invalid_history;
         reject(run(flow, residual_limits, memory), core::FailureCode::InvalidInput);
         view.history.columns = history;
-        collocation[0].tangents[1] = coordinates(0, -2, 0);
+        std::get<cf::ExplicitCollocationTangents>(collocation[0].tangents)[1] =
+            coordinates(0, -2, 0);
         reject(run(flow, residual_limits, memory), core::FailureCode::GeometryInvalid);
-        collocation[0].tangents[1] = coordinates(0, 2, 0);
+        std::get<cf::ExplicitCollocationTangents>(collocation[0].tangents)[1] =
+            coordinates(0, 2, 0);
         collocation[0].velocity[2] = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
         reject(run(flow, residual_limits, memory), core::FailureCode::Nonfinite);
         collocation[0].velocity[2] = a::SingleWord{.5};
@@ -1898,8 +1900,10 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                 geometry.context(), test_geometry::limits(), *geometry_work, memory));
             const auto& original_row = collocation[0];
             const std::array material_rows{cf::DiscreteCollocation{
-                original_row.facet, material, original_row.tangents, original_row.velocity,
-                original_row.circulation, original_row.circulation_direction}};
+                original_row.facet, material,
+                std::get<cf::ExplicitCollocationTangents>(original_row.tangents),
+                original_row.velocity, original_row.circulation,
+                original_row.circulation_direction}};
             auto material_input = view;
             material_input.collocations = material_rows;
             auto material_flow = projected_at(time);
@@ -3269,6 +3273,60 @@ TEST_CASE("Two discrete circulation rows consume their own known-flow values and
     const Rat transpose_work =
         solution_word(dv.solution(), 0) / 4 - 5 * solution_word(dv.solution(), 1) / 32;
     CHECK(abs(action - transpose_work) < rational_word(1e-12));
+
+    // The tilted direction uses nonzero tangent covectors. Match the exact
+    // coordinate difference route against explicit deltas for the same nominal
+    // chart, without folding the tangent axes into the point directions.
+    const auto scenario = [&](std::span<const cf::DiscreteCollocation> sites,
+                              const cf::KnownCirculationDerivative& derivative) {
+        auto view = input;
+        view.collocations = sites;
+        core::ResourcePlan trial_memory{128ULL * 1024 * 1024};
+        return cf::solve_discrete_known_circulation(view, flow, derivative, solve_limits,
+                                                    primal_request, shared, *local, *kernel,
+                                                    trial_memory);
+    };
+    const auto from_geometry = [&](a::FacetId facet, const a::ResolvedQuery& query) {
+        const auto ids = test_geometry::take(geometry.facet_points(facet));
+        const auto position = [&](std::size_t i) {
+            return test_geometry::take(geometry.point_words(ids[i], a::Configuration::Current));
+        };
+        const cf::RoundedFacetTangents nominal{{position(0), position(1), position(2)}};
+        return cf::DiscreteCollocation{
+            nominal, facet, query, coordinates(.25, 0, .5), a::SingleWord{0}, a::SingleWord{0}};
+    };
+    const std::array exact_sites{from_geometry(a::FacetId{202}, second),
+                                 from_geometry(a::FacetId{200}, first)};
+    auto explicit_sites = exact_sites;
+    for (auto& site : explicit_sites)
+        site.tangents = cf::ExplicitCollocationTangents{coordinates(1, 1, 0), coordinates(0, 1, 0)};
+    const auto dz = coordinates(0, 0, .125);
+    const std::array zero_points{zero, zero, zero, zero, zero, zero, zero, zero};
+    const std::array tilt{
+        cf::CirculationCollocationDirection{fixture.faces[0].id, zero, {dz, zero}, zero},
+        cf::CirculationCollocationDirection{fixture.faces[1].id, std::nullopt, {zero, zero}, zero}};
+    const cf::DiscreteCirculationDirection tilt_direction{fixture.points, zero_points, tilt, zero};
+    const cf::KnownCirculationTangent tilt_tangent{tilt_direction, a::SingleWord{0},
+                                                   tangent_request};
+    const cf::KnownCirculationAdjoint tilt_dual{seed, transpose_request};
+    const auto exact_forward = take(scenario(exact_sites, tilt_tangent));
+    const auto explicit_forward = take(scenario(explicit_sites, tilt_tangent));
+    const auto exact_reverse = take(scenario(exact_sites, tilt_dual));
+    const auto explicit_reverse = take(scenario(explicit_sites, tilt_dual));
+    const auto& exact_tangent = take(exact_forward.linearization()).get();
+    const auto& explicit_tangent = take(explicit_forward.linearization()).get();
+    const auto midpoint_covector = center(take(exact_reverse.collocation(0)).tangents[0][2]);
+    CHECK(abs(midpoint_covector) > rational_word(1e-6));
+    CHECK(midpoint_covector == center(take(explicit_reverse.collocation(0)).tangents[0][2]));
+    for (std::size_t i = 0; i < exact_sites.size(); ++i) {
+        CHECK(solution_word(take(exact_forward.solution()).get(), i) ==
+              solution_word(take(explicit_forward.solution()).get(), i));
+        CHECK(solution_word(exact_tangent.solution(), i) ==
+              solution_word(explicit_tangent.solution(), i));
+    }
+    CHECK(abs(solution_word(exact_tangent.solution(), 0) / 4 -
+              5 * solution_word(exact_tangent.solution(), 1) / 32 - midpoint_covector / 8) <
+          rational_word(1e-12));
 
     auto stale = tangent_request;
     stale.retained_generation = primal_request.retained_generation;
