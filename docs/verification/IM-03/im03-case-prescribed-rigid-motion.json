@@ -1,0 +1,60 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-prescribed-rigid-motion",
+  "ids": [
+    "AE-07",
+    "FD-02",
+    "IO4-01",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "SI-D07"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "9252b58468035c6168e5d6cfd0f0d735ad82f8af",
+  "claimed_state": "型付き指定運動から原点、姿勢、基準物質点を読み、厳密時刻の片側で二階微分まで評価する。",
+  "checks": {
+    "windows": {
+      "compiler": "MSVC 19.51",
+      "configuration": "Release",
+      "ctest_targets_passed": 6
+    },
+    "linux": {
+      "compiler": "GCC 14.2",
+      "configuration": "Release",
+      "ctest_targets_passed": 6
+    },
+    "assertions_per_platform": {
+      "rotation": 361,
+      "time_series_and_world_points": 203,
+      "frame": 96
+    },
+    "clang_tidy": [
+      "case_motion.cpp",
+      "case_motion_test.cpp",
+      "case_motion_time_series_test.cpp"
+    ]
+  },
+  "artifacts": {
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
+    "docs/specs/structure/structural-adopted-specification.md": "bdf9a4d81687b5a5b65dbef7a9426078e559de72734b773a68f89a4c140f073c",
+    "docs/verification/IM-03/case-motion-time-series.md": "11479c5f7997c53e1bd8b5b0596885ab499aed66e3fe2a8c11e4ed50751c7761",
+    "docs/verification/IM-03/case-prescribed-rigid-motion.md": "5a53d595aa3c0359a9894d1173023ddf3f8501c92510e9032419105977ba9358",
+    "src/coupling/case_component_precision_private.hpp": "8a7417d5f0d239b5784eda938e9da6ab3bec3e6a3bcd4c2159123012fb2e1b16",
+    "src/coupling/case_known_flow.cpp": "700eabb0dbcdea3913541c6ba6e9439b68bdebaa6885c902050099e9f5471254",
+    "src/coupling/case_motion_frame.cpp": "ce463c102495b4c9cf267a99a0afbdf5a30df88c6694a0c178d471c5bf584a78",
+    "src/coupling/case_motion_frame.hpp": "d734f5b430207ec32a5ac918037ae98e26ac171cf696128791c2aa4731f06fe5",
+    "src/coupling/case_motion_rotation_private.hpp": "41ac0ccd437a8ced266bdb2abcb432b5314f3e369b119f9122a37e08aa762540",
+    "src/coupling/case_motion_time_series.cpp": "19c07c81acd0eb8b1e2218f559b2e663d7cc1fb83a6e8413c0c1bf2d2e715484",
+    "src/coupling/case_motion_time_series.hpp": "063c80ee55a9b9ed848cb76365f9542587940931381bd74455827acff4cf1e84",
+    "src/coupling/case_motion.cpp": "b225c57423602d869150ac5f7a550e3221c98d79c7cccadec7148079a1f96100",
+    "src/coupling/case_motion.hpp": "f3c7f6b3de73b7307f4e1d14f33099ea23041790907da2574d14a07317f54256",
+    "tests/coupling/case_motion_frame_test.cpp": "6776decd1655c92644cfd27d15140c4614be2d6e2ea31c680591f8dd2e343a54",
+    "tests/coupling/case_motion_test.cpp": "af3dd6bcef353f459dd42ea1b57eeaddadc324ff4763d07d2e83bad2498a7bc9",
+    "tests/coupling/case_motion_time_series_test.cpp": "305ce9b8a1f55212a4be2d74fbf5fc950bbee181a5330b56fd3c748b392e8870"
+  }
+}

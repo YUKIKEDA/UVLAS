@@ -41,7 +41,7 @@
 | P1核と全13変数の微分 | 完了 | 3基底の局所誘導核と全Jacobian。 [#129](https://github.com/YUKIKEDA/UVLAS/pull/129) |
 | 共有辺・四辺形・全作用 | 完了 | 固定分割に従って全出現に散布し、核半径と強度トレースが一致する逆向きの解析辺を相殺する。値とJVPを独立面積分、VJPを双対内積で照合した。 [共有辺と四辺形の検証](../verification/IM-03/p1-shared-action-v1/verification.md) |
 | 大域幾何と後縁所有 | 完了 | 大域接触・不適格の検査、alias運動学、後縁の放出所有。 [#153](https://github.com/YUKIKEDA/UVLAS/pull/153) |
-| 既知流れと指定運動 | 実装中 | 型付きSIケースから一様流と解析突風の速度、空間偏微分、時間偏微分を返す。既知流れと指定移流は同じ厳密な時刻と片側で評価する。メモリ内の復元では入力と補間係数を照合する。指定SE(3)運動の座標規約と接続、J1の永続化と再開時照合が残る。 [既知流れと時刻の検証](../verification/IM-03/case-known-flow-sine-v1/verification.md) |
+| 既知流れと指定運動 | 実装中 | 一様流と解析突風の値・偏微分と、指定移流を厳密な時刻と片側で評価する。指定運動では Frame の局所軸の成分と PCHIP の導出勾配を使い、世界の原点・姿勢・物質点を二階微分まで評価する。取付モデルへの接続、イベントの合流と J1 の永続化・再開時照合が残る。 [既知流れと時刻の検証](../verification/IM-03/case-known-flow-sine-v1/verification.md)・[指定運動の検証](../verification/IM-03/case-prescribed-rigid-motion.md) |
 | 循環と全微分 | 実装中 | 接触済みの離散照会点ごとに非一様な既知流れを評価し、実数の非貫通式を解く。同じ試行の原残差を再評価し、位置と既知流れの時刻への接線・転置を独立参照と照合した。PGの物質点写像、幾何と後流輸送も含む時間微分、接触切替え、複素更新が残る。 [非一様流での循環と微分の検証](../verification/IM-03/discrete-known-flow-circulation-v1/verification.md) |
 | 全ベクトル荷重 | 実装中 | 同じ試行の循環と束縛辺の中点ごとの非一様な既知流れから、辺の力、節点力、合力、基準点モーメントを評価する。循環を介する寄与と中点からの直接寄与を接線・転置の双方で照合した。循環時間微分は独立入力として三角形の非定常荷重に使う。循環時間微分の時間法とPG構造への荷重の返却が残る。 [非一様流での中点荷重と微分の検証](../verification/IM-03/discrete-known-flow-loads-v1/verification.md) |
 | 後流値・移流・試行 | 実装中 | 型付き SI ケースの指定移流速度を定数・多項式・PCHIP で評価し、時間微分、現行入力との照合、Binary64／TwoWord への投影を検査した。同じ循環・荷重状態からの自由／指定輸送、全履歴、試行の親不変性と全微分が残る。 [指定移流速度](../verification/IM-03/case-prescribed-wake-velocity-v1/verification.md) |
