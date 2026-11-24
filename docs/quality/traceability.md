@@ -63,12 +63,12 @@
 | BM-D04 | [beam-adopted-specification.md:12](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | BM-D05 | [beam-adopted-specification.md:13](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | BM-D06 | [beam-adopted-specification.md:14](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
-| BM-D07 | [beam-adopted-specification.md:15](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
+| BM-D07 | [beam-adopted-specification.md:15](../specs/structure/beam-adopted-specification.md) | 2 | 0 | 0 |
 | BM-D08 | [beam-adopted-specification.md:16](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | BM-D09 | [beam-adopted-specification.md:17](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D01 | [connection-adopted-specification.md:9](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
-| CN-D02 | [connection-adopted-specification.md:10](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
-| CN-D03 | [connection-adopted-specification.md:11](../specs/structure/connection-adopted-specification.md) | 1 | 0 | 0 |
+| CN-D02 | [connection-adopted-specification.md:10](../specs/structure/connection-adopted-specification.md) | 1 | 0 | 0 |
+| CN-D03 | [connection-adopted-specification.md:11](../specs/structure/connection-adopted-specification.md) | 3 | 0 | 0 |
 | CN-D04 | [connection-adopted-specification.md:12](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D05 | [connection-adopted-specification.md:13](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D06 | [connection-adopted-specification.md:14](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
@@ -103,7 +103,7 @@
 | FD-12 | [case-schema-fields.md:330](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 181 | 47 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 12 | 0 |
-| IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 62 | 15 | 0 |
+| IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 67 | 15 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 22 | 7 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
 | IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 20 | 5 | 0 |
@@ -245,6 +245,6 @@
 | R-02 | [implementation-start-review.md:70](../plans/implementation-start-review.md) | 1 | 1 | 0 |
 | R-03 | [implementation-start-review.md:71](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | R-04 | [implementation-start-review.md:72](../plans/implementation-start-review.md) | 0 | 0 | 0 |
-| R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 1 | 0 | 0 |
+| R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 3 | 0 | 0 |
 | R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 6 | 0 |
 | R-07 | [implementation-start-review.md:75](../plans/implementation-start-review.md) | 0 | 0 | 0 |

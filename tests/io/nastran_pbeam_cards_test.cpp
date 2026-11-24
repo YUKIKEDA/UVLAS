@@ -1,4 +1,5 @@
-#include "nastran_pbeam_cards.hpp"
+#include "../../src/structure/exact_polynomial_detail.hpp"
+#include "nastran_beam_si.hpp"
 #include "source_digest.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -452,6 +453,251 @@ TEST_CASE("PBEAM checks source identity and exact resource limits before returni
     REQUIRE_FALSE(work_rejected);
     CHECK(work_rejected.error().code == ResourceExceeded);
     CHECK(take(input.materials.view()).input.input.bulk.bytes == source);
+}
+
+using BeamQ = structure::detail::Rational;
+using BeamSiReason = NastranBeamSiFailure;
+constexpr std::uint64_t si_budget = std::uint64_t{1} << 28U;
+constexpr SiUnits si_units{SiLengthUnit::Millimetre, SiMassUnit::Gram, SiTimeUnit::Second,
+                           SiAngleUnit::Degree};
+
+[[nodiscard]] NastranBeamSiLimits si_limits() noexcept {
+    const structure::ExactLimits algebra{512,
+                                         8,
+                                         32,
+                                         8,
+                                         8,
+                                         4096,
+                                         8192,
+                                         structure::ExactEstimateAdmission{si_budget},
+                                         structure::ExactTimingMode::Disabled};
+    return {{algebra, 60000, 60000, {}}, 150000, 4};
+}
+
+[[nodiscard]] const BeamQ& beam_q(const structure::ExactRational& value) {
+    return structure::detail::ExactFactory::value(value);
+}
+
+void beam_contains(const NastranCartesianInterval& interval, const BeamQ& expected) {
+    CHECK(beam_q(interval.lower) <= expected);
+    CHECK(beam_q(interval.upper) >= expected);
+    CHECK(beam_q(interval.upper) - beam_q(interval.lower) <
+          BeamQ("1/10000000000000000000000000000000000000000"));
+}
+
+void beam_contains(const NastranSiBeamVector& vector, const std::array<BeamQ, 3>& expected) {
+    for (std::size_t i = 0; i < vector.size(); ++i) {
+        beam_contains(vector[i], expected[i]);
+    }
+}
+
+constexpr std::string_view si_beam_source =
+    "CORD2C,20,0,1000.0,0.0,3000.0,1000.0,0.0,3100.0,1100.0,0.0,3000.0\n"
+    "GRID,11,20,2000.0,90.0,0.0,20\n"
+    "GRID,12,0,4000.0,2000.0,3000.0\n"
+    "GRID,13,0,1000.0,4000.0,3000.0\n"
+    "CBEAM,90,,11,12,13,,,GOO\n"
+    ",,,,1000.0,,1000.0,4000.0,\n"
+    "CBEAM,91,90,11,12,0.0,1.0,0.0,BOO\n"
+    ",,,,1000.0,,1000.0,4000.0,\n"
+    "CBEAM,92,90,11,12,1.0,0.0,0.0,GGO\n"
+    ",,,1000.0,,,1000.0,4000.0,\n"
+    "MAT1,6,2.1e11,,.25,.0078\n"
+    "PBEAM,90,6,1000.0,1.0e6,2.0e6,-5.0e5,3.0e6,2.0\n"
+    ",NO,1.0,3000.0,,4.0e6,,5.0e6,4.0\n"
+    ",NO,.25,,2.0e6,,,,\n"
+    ",.75,.5,,,1200.0,,0.0,0.0\n"
+    ",200.0,-100.0,,100.0,500.0,250.0,,\n";
+
+TEST_CASE("CBEAM SI input resolves eccentric end axes and exact PBEAM station products",
+          "[IO4-03][BM-D07][R-05][integration][verification]") {
+    const auto physical = [&] {
+        const auto input = parents(si_beam_source);
+        core::ResourcePlan plan{si_budget};
+        const auto property = take(
+            NastranPbeamCards::prepare(input.materials, input.beams, property_limits, plan, {}));
+        const auto read = [&](std::uint64_t id) {
+            return take(prepare_nastran_si_beam(input.materials, input.beams, property,
+                                                NastranElementId{id}, si_units, si_limits(), plan));
+        };
+        return std::array{read(90), read(91), read(92)};
+    }();
+
+    for (const auto& member : physical) {
+        CHECK(member.source.digest == source_digest(std::as_bytes(std::span{si_beam_source})));
+        CHECK(member.property.declaration.id == NastranPropertyId{90});
+        CHECK(member.beam.a.point.id == NastranGridId{11});
+        CHECK(member.directed_work > 0);
+        // Original GRID axis is +X. The independent 3-4-5 right triangle
+        // between the displaced shear-centre endpoints gives the new basis.
+        beam_contains(member.a.grid_metres, {BeamQ{1}, BeamQ{2}, BeamQ{3}});
+        beam_contains(member.b.grid_metres, {BeamQ{4}, BeamQ{2}, BeamQ{3}});
+        beam_contains(member.a.shear_centre_metres, {BeamQ{1}, BeamQ{3}, BeamQ{3}});
+        beam_contains(member.b.shear_centre_metres, {BeamQ{5}, BeamQ{6}, BeamQ{3}});
+        beam_contains(member.length_metres, BeamQ{5});
+        beam_contains(member.axes[0], {BeamQ{"4/5"}, BeamQ{"3/5"}, BeamQ{0}});
+        beam_contains(member.axes[1], {BeamQ{"-3/5"}, BeamQ{"4/5"}, BeamQ{0}});
+        beam_contains(member.axes[2], {BeamQ{0}, BeamQ{0}, BeamQ{1}});
+    }
+
+    const auto& member = physical.front();
+    CHECK(beam_q(member.material.young_pa) == BeamQ{"210000000000"});
+    CHECK(beam_q(member.material.shear_pa) == BeamQ{"84000000000"});
+    CHECK(beam_q(member.material.poisson) == BeamQ{"1/4"});
+    if (const auto& rho = member.material.density_kg_per_m3) {
+        CHECK(beam_q(*rho) == 7800);
+    } else {
+        FAIL("Explicit MAT1 density was lost");
+    }
+    CHECK_FALSE(member.material.source.shear);
+
+    const auto rows = member.stations.values();
+    REQUIRE(rows.size() == 3);
+    const auto& a = rows[0];
+    const auto& b = rows[1];
+    const auto& middle = rows[2];
+    CHECK(beam_q(a.fraction) == 0);
+    CHECK(beam_q(b.fraction) == 1);
+    CHECK(beam_q(middle.fraction) == BeamQ{"1/4"});
+    CHECK(beam_q(a.section.area_m2) == BeamQ{"1/1000"});
+    CHECK(beam_q(b.section.area_m2) == BeamQ{"3/1000"});
+    CHECK(beam_q(b.section.plane1_m4) == BeamQ{"1/1000000"});
+    CHECK_FALSE(b.source.i1);
+    CHECK(beam_q(middle.section.area_m2) == BeamQ{"3/2000"});
+    CHECK(beam_q(middle.section.plane1_m4) == BeamQ{"1/500000"});
+    CHECK(beam_q(middle.section.plane2_m4) == BeamQ{"1/400000"});
+    CHECK(beam_q(middle.section.product_m4) == BeamQ{"-1/2000000"});
+    CHECK(beam_q(middle.section.torsion_m4) == BeamQ{"7/2000000"});
+    CHECK(beam_q(middle.section.nonstructural_kg_per_m) == BeamQ{"5/2"});
+    CHECK_FALSE(middle.source.area);
+    CHECK(take(middle.fraction_field).line == 14);
+
+    CHECK(beam_q(a.stiffness.axial_n) == 210000000);
+    CHECK(beam_q(a.stiffness.shear_plane1_n) == 63000000);
+    CHECK(beam_q(a.stiffness.shear_plane2_n) == 42000000);
+    CHECK(beam_q(a.stiffness.torsion_nm2) == 252000);
+    CHECK(beam_q(a.stiffness.bend_plane1_nm2) == 210000);
+    CHECK(beam_q(a.stiffness.bend_plane2_nm2) == 420000);
+    CHECK(beam_q(a.stiffness.bend_product_nm2) == -105000);
+    if (const auto& mass = middle.line_mass_kg_per_m) {
+        CHECK(beam_q(*mass) == BeamQ{"71/5"});
+    } else {
+        FAIL("Explicit density did not yield a line mass");
+    }
+    CHECK(beam_q(member.section_offsets.nonstructural_rotary_kg_m[1]) == BeamQ{"3/2500"});
+    CHECK(beam_q(member.section_offsets.nonstructural_mass_centre_metres[2]) == BeamQ{"1/5"});
+    CHECK(beam_q(member.section_offsets.nonstructural_mass_centre_metres[3]) == BeamQ{"1/10"});
+    CHECK(beam_q(member.section_offsets.neutral_axis_metres[2]) == BeamQ{"1/2"});
+    CHECK(beam_q(member.section_offsets.neutral_axis_metres[3]) == BeamQ{"1/4"});
+}
+
+void replace_once(std::string& text, std::string_view old, std::string_view replacement) {
+    const auto position = text.find(old);
+    REQUIRE(position != std::string::npos);
+    text.replace(position, old.size(), replacement);
+}
+
+TEST_CASE("CBEAM SI input fails at unresolved axes and physical options with original fields",
+          "[IO4-03][BM-D07][integration][negative][verification]") {
+    std::string source{si_beam_source};
+    BeamSiReason reason{};
+    core::FailureCode code = Unsupported;
+    std::string_view origin;
+    auto units = si_units;
+    SECTION("release") {
+        replace_once(source, ",,,,1000.0,,1000.0,4000.0,", ",6,,,1000.0,,1000.0,4000.0,");
+        reason = BeamSiReason::Release;
+        origin = ",6,";
+    }
+    SECTION("shear without flexibility") {
+        replace_once(source, ",.75,.5,,,1200.0", ",0.0,.5,,,1200.0");
+        reason = BeamSiReason::Modifier;
+        origin = ",0.0,.5";
+    }
+    SECTION("nonzero warping") {
+        replace_once(source, "1200.0,,0.0,0.0", "1200.0,,2.0,0.0");
+        reason = BeamSiReason::Warping;
+        origin = ",2.0,0.0";
+    }
+    SECTION("stress recovery request") {
+        replace_once(source, ",NO,1.0", ",YESA,1.0");
+        reason = BeamSiReason::Recovery;
+        origin = ",YESA,";
+    }
+    SECTION("inconsistent isotropic inputs") {
+        replace_once(source, "MAT1,6,2.1e11,,.25,.0078", "MAT1,6,2.1e11,1.2e11,.25,.0078");
+        reason = BeamSiReason::Material;
+        code = InvalidInput;
+        origin = ",.25,.0078";
+    }
+    SECTION("nonphysical second moments") {
+        replace_once(source, ",-5.0e5,3.0e6", ",2.0e6,3.0e6");
+        reason = BeamSiReason::Section;
+        code = InvalidInput;
+        origin = ",2.0e6,3.0e6";
+    }
+    SECTION("collinear G0") {
+        replace_once(source, "GRID,11,20,2000.0,90.0,0.0,20", "GRID,11,0,1000.0,2000.0,3000.0,20");
+        replace_once(source, "GRID,13,0,1000.0,4000.0,3000.0", "GRID,13,0,5000.0,2000.0,3000.0");
+        reason = BeamSiReason::Orientation;
+        origin = ",13,,,GOO";
+        SECTION("exactly represented metres") {
+            units.length = SiLengthUnit::Metre;
+            code = GeometryInvalid;
+        }
+        SECTION("unit-conversion interval width") {
+            code = PrecisionUnresolved;
+        }
+    }
+    const auto input = parents(source);
+    core::ResourcePlan plan{si_budget};
+    const auto property =
+        take(NastranPbeamCards::prepare(input.materials, input.beams, property_limits, plan, {}));
+    std::optional<NastranBeamSiDiagnostic> problem;
+    const auto result =
+        prepare_nastran_si_beam(input.materials, input.beams, property, NastranElementId{90}, units,
+                                si_limits(), plan, &problem);
+    REQUIRE_FALSE(result);
+    CHECK(result.error().code == code);
+    const auto site = take(problem);
+    CHECK(site.reason == reason);
+    CHECK(site.beam == NastranElementId{90});
+    CHECK(take(site.position).byte == source.find(origin) + 1);
+    CHECK(take(input.materials.view()).input.input.bulk.bytes == source);
+}
+
+TEST_CASE("CBEAM SI input preserves its matched source and station budget",
+          "[IO4-03][integration][negative]") {
+    const auto input = parents(si_beam_source);
+    core::ResourcePlan plan{si_budget};
+    const auto property =
+        take(NastranPbeamCards::prepare(input.materials, input.beams, property_limits, plan, {}));
+    auto bounded_inputs = si_limits();
+    bounded_inputs.maximum_stations = 2;
+    std::optional<NastranBeamSiDiagnostic> problem;
+    const auto read = [&](const NastranIsotropicShellCards& model) {
+        return prepare_nastran_si_beam(model, input.beams, property, NastranElementId{90}, si_units,
+                                       bounded_inputs, plan, &problem);
+    };
+    const auto before = plan.allocated_bytes();
+    const auto bounded = read(input.materials);
+    REQUIRE_FALSE(bounded);
+    CHECK(bounded.error().code == ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+    ++bounded_inputs.maximum_stations;
+    const auto enough = take(read(input.materials));
+    CHECK_FALSE(problem);
+    bounded_inputs.maximum_directed_work = enough.directed_work - 1;
+    const auto exhausted = read(input.materials);
+    REQUIRE_FALSE(exhausted);
+    CHECK(exhausted.error().code == ResourceExceeded);
+    ++bounded_inputs.maximum_directed_work;
+    CHECK(read(input.materials));
+    const auto other = parents(std::string{si_beam_source} + "$ different snapshot\n");
+    const auto stale = read(other.materials);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == StaleGeneration);
+    CHECK(take(problem).reason == BeamSiReason::Source);
 }
 
 } // namespace

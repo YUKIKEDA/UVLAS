@@ -7,6 +7,8 @@
 
 namespace uvlas::io::detail {
 
+class NastranIsotropicShellCards;
+
 struct NastranCartesianInterval {
     structure::ExactRational lower, upper;
 };
@@ -72,6 +74,11 @@ public:
             const NastranPositionLimits&, core::ResourcePlan&,
             std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
 
+    [[nodiscard]] static core::Result<NastranPositionEnclosures>
+    prepare(const NastranIsotropicShellCards&, SiLengthUnit, std::span<const NastranGridId>,
+            const NastranPositionLimits&, core::ResourcePlan&,
+            std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
+
     [[nodiscard]] std::optional<NastranPositionView> view() const& noexcept;
     [[nodiscard]] std::optional<NastranPositionView> view() const&& = delete;
 
@@ -108,6 +115,26 @@ struct NastranSpcDirectionOrigin {
 enum class NastranSpcComponentKind : std::uint8_t { Translation, Rotation };
 
 using NastranComponentAxis = std::array<NastranCartesianInterval, 3>;
+
+struct NastranGridDisplacementAxes {
+    std::array<NastranComponentAxis, 3> directions;
+    std::uint64_t work = 0;
+};
+
+// The three low bits identify the GRID axes needed by a vector. Only those
+// directions are readable by the caller. A sole cylindrical axial request
+// remains defined on the polar axis.
+[[nodiscard]] core::Result<NastranGridDisplacementAxes>
+prepare_nastran_displacement_axes(const NastranIsotropicShellCards&, NastranGridId,
+                                  std::uint8_t required_axes, const NastranSpcDirectionLimits&,
+                                  core::ResourcePlan&,
+                                  std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
+
+[[nodiscard]] core::Result<NastranGridDisplacementAxes>
+prepare_nastran_displacement_axes(const NastranShellCards&, NastranGridId,
+                                  std::uint8_t required_axes, const NastranSpcDirectionLimits&,
+                                  core::ResourcePlan&,
+                                  std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
 
 struct NastranSpcComponentDirection {
     NastranSpcComponentKind kind;
