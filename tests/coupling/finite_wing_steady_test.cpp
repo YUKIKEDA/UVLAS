@@ -15,6 +15,7 @@
 #include <fstream>
 #include <limits>
 #include <map>
+#include <numbers>
 #include <ranges>
 #include <tuple>
 #include <uvlas/numerics/dense_solve.hpp>
@@ -219,9 +220,7 @@ using Circulation = std::array<a::ScalarWords, columns>;
 using Matrix = std::array<double, columns * columns>;
 namespace ls = numerics::linear;
 
-Rat as_rational(const Exact& exact, core::ResourcePlan& plan) {
-    const auto owner = take(io::detail::copy_rational_words(exact, plan, {}));
-    const auto words = owner.view();
+Rat rational_from_view(p::RationalView words) {
     const auto load = [](std::span<const std::uint32_t> limbs) {
         Big result = 0;
         for (const auto word : limbs | std::views::reverse) {
@@ -233,6 +232,11 @@ Rat as_rational(const Exact& exact, core::ResourcePlan& plan) {
     return Rat{load(words.numerator) * words.sign} / load(words.denominator);
 }
 
+Rat as_rational(const Exact& exact, core::ResourcePlan& plan) {
+    const auto owner = take(io::detail::copy_rational_words(exact, plan, {}));
+    const auto words = owner.view();
+    return rational_from_view({words.sign, words.numerator, words.denominator});
+}
 template <class Field>
 Exact exact_quantity(const io::SiCase& si, Field field, core::ResourcePlan& plan) {
     return take(io::materialize_rational(take(si.quantity(field)).recipe, exact_limits(), plan));
@@ -452,8 +456,120 @@ Circulation solve(const Matrix& values, const std::array<double, columns>& rhs,
     return result;
 }
 
+constexpr std::size_t band_count = 20;
+using EnclosedVector = std::array<Enclosure, 3>;
+using Bands = std::array<EnclosedVector, band_count>;
+
+Enclosure add(const Enclosure& a, const Enclosure& b) {
+    return {a.center + b.center, a.radius + b.radius};
+}
+
+Enclosure subtract(const Enclosure& a, const Enclosure& b) {
+    return {a.center - b.center, a.radius + b.radius};
+}
+
+Enclosure multiply(const Enclosure& a, const Enclosure& b) {
+    return {a.center * b.center,
+            abs(a.center) * b.radius + abs(b.center) * a.radius + a.radius * b.radius};
+}
+
+Enclosure scale(const Enclosure& value, const Rat& factor) {
+    return {value.center * factor, value.radius * abs(factor)};
+}
+
+EnclosedVector unpack_vector(const cf::DiscreteLoadVector& value) {
+    return {unpack(value[0]), unpack(value[1]), unpack(value[2])};
+}
+
+EnclosedVector arm_moment(EnclosedVector point, const Point& origin, const EnclosedVector& force) {
+    for (std::size_t i = 0; i < point.size(); ++i)
+        point[i].center -= rational_word(origin[i]);
+    EnclosedVector result;
+    for (std::size_t i = 0; i < result.size(); ++i) {
+        const auto j = (i + 1) % result.size(), k = (i + 2) % result.size();
+        result[i] = subtract(multiply(point[j], force[k]), multiply(point[k], force[j]));
+    }
+    return result;
+}
+
+struct SpanObservation {
+    Enclosure lift;
+    Enclosure pitching_moment;
+    std::array<Enclosure, band_count> band_lift;
+};
+
+SpanObservation observe(const cf::DiscreteCirculationLoads& loads, const nlohmann::json& expected,
+                        const Point& origin, const Rat& cos_alpha, const Rat& sin_alpha,
+                        const Rat& force_tolerance, const Rat& moment_tolerance) {
+    const auto lift = [&](const EnclosedVector& value) {
+        return add(scale(value[0], -sin_alpha), scale(value[2], cos_alpha));
+    };
+    const auto drag = [&](const EnclosedVector& value) {
+        return add(scale(value[0], cos_alpha), scale(value[2], sin_alpha));
+    };
+    REQUIRE(loads.edge_count() == 18);
+    Bands force_bands{}, moment_bands{};
+    for (std::size_t edge = 0; edge < loads.edge_count(); ++edge) {
+        const auto value = take(loads.edge(edge));
+        const auto point = unpack_vector(value.position);
+        const auto force = unpack_vector(value.force);
+        const auto moment = arm_moment(point, origin, force);
+        const auto& y = point[1];
+        // These frozen midpoints have exact dyadic y words. Never classify a
+        // range crossing a strip boundary by rounding its centre.
+        REQUIRE(y.radius == 0);
+        REQUIRE(y.center >= -4);
+        REQUIRE(y.center <= 4);
+        std::size_t band = 0;
+        while (band + 1 < band_count && y.center >= Rat{-4} + Rat{2} * (band + 1) / 5)
+            ++band;
+        for (std::size_t k = 0; k < force.size(); ++k) {
+            force_bands[band][k] = add(force_bands[band][k], force[k]);
+            moment_bands[band][k] = add(moment_bands[band][k], moment[k]);
+        }
+    }
+    const auto force = unpack_vector(loads.total_force());
+    const auto moment = unpack_vector(loads.total_moment());
+    EnclosedVector force_sum{}, moment_sum{};
+    SpanObservation result{lift(force), moment[1], {}};
+    check_within(drag(force), rational_word(expected.at("drag_lift_N").at(0).get<double>()),
+                 force_tolerance);
+    check_within(result.lift, rational_word(expected.at("drag_lift_N").at(1).get<double>()),
+                 force_tolerance);
+    for (std::size_t band = 0; band < band_count; ++band) {
+        CAPTURE(band);
+        result.band_lift[band] = lift(force_bands[band]);
+        check_within(result.band_lift[band],
+                     rational_word(expected.at("band_lift_N").at(band).get<double>()),
+                     force_tolerance);
+        for (std::size_t k = 0; k < force.size(); ++k) {
+            CAPTURE(k);
+            force_sum[k] = add(force_sum[k], force_bands[band][k]);
+            moment_sum[k] = add(moment_sum[k], moment_bands[band][k]);
+            check_within(force_bands[band][k],
+                         rational_word(expected.at("band_forces_N").at(band).at(k).get<double>()),
+                         force_tolerance);
+            check_within(moment_bands[band][k],
+                         rational_word(expected.at("band_moments_Nm").at(band).at(k).get<double>()),
+                         moment_tolerance);
+        }
+    }
+    const auto conservation = rational_word(1e-10);
+    for (std::size_t axis = 0; axis < force.size(); ++axis) {
+        CAPTURE(axis);
+        check_within(force[axis], rational_word(expected.at("force_N").at(axis).get<double>()),
+                     force_tolerance);
+        check_within(moment[axis], rational_word(expected.at("moment_Nm").at(axis).get<double>()),
+                     moment_tolerance);
+        check_within(subtract(force_sum[axis], force[axis]), Rat{0}, conservation);
+        check_within(subtract(moment_sum[axis], moment[axis]), Rat{0}, conservation);
+    }
+    return result;
+}
+
 void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
-              const nlohmann::json& expected, const nlohmann::json& reference_metadata) {
+              const nlohmann::json& expected, const nlohmann::json& reference_metadata,
+              const nlohmann::json& polar) {
     auto recipe = finite_wing_case(shape, wing);
     const auto si = materialize(recipe, io::SourceId{532});
     core::ResourcePlan memory{1024ULL * 1024 * 1024};
@@ -517,8 +633,8 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
         UINT64_C(1000000000000)};
     a::UniformFlowWorkspace flow_work;
     const auto flow = take(cf::prepare_case_uniform_flow(si, stamp, {}, flow_work, limits, memory));
-    const auto projected = [&] {
-        auto sampled = take(cf::evaluate_case_uniform_flow(flow, flow, {stamp, instant.view()},
+    const auto projected = [&](const cf::CaseUniformFlowReady& field) {
+        auto sampled = take(cf::evaluate_case_uniform_flow(field, field, {stamp, instant.view()},
                                                            flow_work, limits.flow, memory));
         const Number one{1}, absolute{1, 1000000000}, zero{0};
         const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
@@ -555,8 +671,8 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
                                                     trial,
                                                     stamp,
                                                     p::RequestedSide::Automatic};
-        return take(cf::evaluate_discrete_nonpenetration(input, projected(), caps, shared, *local,
-                                                         *kernel, memory));
+        return take(cf::evaluate_discrete_nonpenetration(input, projected(flow), caps, shared,
+                                                         *local, *kernel, memory));
     };
     Circulation basis{a::SingleWord{0}, a::SingleWord{0}, a::SingleWord{0}, a::SingleWord{0},
                       a::SingleWord{0}, a::SingleWord{0}, a::SingleWord{0}, a::SingleWord{0}};
@@ -591,12 +707,12 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
         }
     }
     const SolutionSetup setup{geometry.context()};
-    const auto gamma = solve(matrix, rhs, setup, memory);
-    const auto residual = evaluate(gamma);
+    const auto base_gamma = solve(matrix, rhs, setup, memory);
+    const auto residual = evaluate(base_gamma);
     for (std::size_t i = 0; i < columns; ++i) {
         CAPTURE(i);
         check_within(unpack(take(residual.row(i)).residual), Rat{0}, tolerance);
-        CHECK(abs(exact_word(gamma[i]) -
+        CHECK(abs(exact_word(base_gamma[i]) -
                   rational_word(expected.at("circulation_m2_s").at(i).get<double>())) <= tolerance);
     }
     // Release the same steady circulation into the fixed downstream trace, then
@@ -618,14 +734,6 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
         if (!is_trailing)
             midpoint.emplace_back(edge, xyz({}));
     }
-    const auto [rows, traces, wake] = parameters(gamma);
-    const cf::DiscreteNonpenetrationInput input{contact,
-                                                rows,
-                                                wake,
-                                                {core::AcceptedStateId{2}, traces},
-                                                trial,
-                                                stamp,
-                                                p::RequestedSide::Automatic};
     const auto fluid = std::get<io::schema::FlowKnown>(typed.flow.record());
     const auto reference = fluid.reference.record();
     const auto read_value = [&](auto field) {
@@ -648,40 +756,132 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
                                                  0.};
     const cf::DiscreteVectorLoadInput load_input{trial, request.retained_generation, midpoint,
                                                  rates, a::SingleWord{density},      xyz(origin)};
-    const auto loads =
-        take(cf::solve_discrete_circulation_loads(input, load_input, projected(), caps, request,
-                                                  *geometry_work, shared, *local, *kernel, memory));
-    for (std::size_t i = 0; i < columns; ++i) {
-        CAPTURE(i);
-        CHECK(abs(exact_word(words(loads.primal().solution(), i)) - exact_word(gamma[i])) <=
-              tolerance);
-        check_within(unpack(take(loads.primal().row(i)).original_residual), Rat{0}, tolerance);
+    REQUIRE(polar.at("angles").size() == 5);
+    std::array<SpanObservation, 5> observed{};
+    const auto velocity_scale = rational_word(read_value(reference.speed));
+    const auto dynamic_area = rational_word(density) * velocity_scale * velocity_scale *
+                              rational_word(read_value(reference.area)) / 2;
+    const auto chord = rational_word(read_value(reference.chord));
+    const auto force_tolerance = rational_word(2e-11) * dynamic_area;
+    const auto moment_tolerance = force_tolerance * chord;
+    const auto base_projection = projected(flow);
+    const auto base_z = rational_from_view(take(base_projection.source().jet.velocity(2)));
+    REQUIRE(base_z != 0);
+
+    for (std::size_t i = 0; i < observed.size(); ++i) {
+        const auto& sample = polar.at("angles").at(i);
+        const auto alpha = sample.at("alpha_degrees").get<int>();
+        CAPTURE(alpha);
+        REQUIRE(alpha == static_cast<int>(i) - 2);
+        auto angled = recipe;
+        angled.field("flow").field("uniform").set("value", parse(sample.at("flow_m_s").dump()));
+        const auto angled_si = materialize(angled, io::SourceId{532});
+        const auto angled_flow =
+            take(cf::prepare_case_uniform_flow(angled_si, stamp, {}, flow_work, limits, memory));
+        auto ambient = projected(angled_flow);
+        const auto ux = rational_from_view(take(ambient.source().jet.velocity(0)));
+        const auto uz = rational_from_view(take(ambient.source().jet.velocity(2)));
+
+        // The frozen sections have a chord tangent parallel to +x, hence their
+        // normals all have an exact zero x-component. Only U_z changes the RHS.
+        std::array<double, columns> angled_rhs{};
+        for (std::size_t row = 0; row < columns; ++row) {
+            const Rat value = -offsets[row].center * uz / base_z;
+            angled_rhs[row] = value.convert_to<double>();
+        }
+        const auto gamma = solve(matrix, angled_rhs, setup, memory);
+        const auto [rows, traces, wake] = parameters(gamma);
+        const cf::DiscreteNonpenetrationInput input{contact,
+                                                    rows,
+                                                    wake,
+                                                    {core::AcceptedStateId{2}, traces},
+                                                    trial,
+                                                    stamp,
+                                                    p::RequestedSide::Automatic};
+        const auto loads = take(cf::solve_discrete_circulation_loads(
+            input, load_input, std::move(ambient), caps, request, *geometry_work, shared, *local,
+            *kernel, memory));
+        for (std::size_t row = 0; row < columns; ++row) {
+            CAPTURE(row);
+            CHECK(abs(exact_word(gamma[row]) -
+                      rational_word(sample.at("circulation_m2_s").at(row).get<double>())) <=
+                  tolerance);
+            CHECK(abs(exact_word(words(loads.primal().solution(), row)) - exact_word(gamma[row])) <=
+                  tolerance);
+            check_within(unpack(take(loads.primal().row(row)).original_residual), Rat{0},
+                         tolerance);
+        }
+        observed[i] = observe(loads, sample, origin, ux / velocity_scale, uz / velocity_scale,
+                              force_tolerance, moment_tolerance);
+        if (alpha == 0) {
+            const auto force = unpack_vector(loads.total_force());
+            const auto moment = unpack_vector(loads.total_moment());
+            for (std::size_t k = 0; k < force.size(); ++k) {
+                check_within(force[k], Rat{0}, rational_word(1e-9) * dynamic_area);
+                check_within(moment[k], Rat{0}, rational_word(1e-9) * dynamic_area * chord);
+            }
+        }
     }
-    const auto total_force = loads.total_force(), total_moment = loads.total_moment();
-    // Apply the same frozen fractional budget to the reference force and moment scales.
-    const auto speed = read_value(reference.speed);
-    const auto force_tolerance =
-        rational_word(1e-11 * density * speed * speed * read_value(reference.area));
-    const auto moment_tolerance = force_tolerance * rational_word(read_value(reference.chord));
-    for (std::size_t axis = 0; axis < 3; ++axis) {
-        CAPTURE(axis);
-        check_within(unpack(total_force[axis]),
-                     rational_word(expected.at("force_N").at(axis).get<double>()), force_tolerance);
-        check_within(unpack(total_moment[axis]),
-                     rational_word(expected.at("moment_Nm").at(axis).get<double>()),
-                     moment_tolerance);
+
+    for (std::size_t delta = 1; delta <= 2; ++delta) {
+        CAPTURE(delta);
+        const auto& sample = polar.at("slopes").at(delta - 1);
+        REQUIRE(sample.at("delta_degrees").get<std::size_t>() == delta);
+        const auto& minus = observed[2 - delta];
+        const auto& plus = observed[2 + delta];
+        const Rat denominator = 2 * Rat{delta} * rational_word(std::numbers::pi) / 180;
+        const auto coefficient_scale = Rat{1} / (dynamic_area * denominator);
+        const auto slope_tolerance = rational_word(4e-11) / denominator;
+        const auto slope = [&](const Enclosure& neg, const Enclosure& pos) {
+            return scale(subtract(pos, neg), coefficient_scale);
+        };
+        const auto lift_slope = slope(minus.lift, plus.lift);
+        const auto moment_slope =
+            scale(slope(minus.pitching_moment, plus.pitching_moment), Rat{1} / chord);
+        const auto lift_reference = rational_word(sample.at("cl_per_rad").get<double>());
+        const auto moment_reference = rational_word(sample.at("cmy_per_rad").get<double>());
+        check_within(lift_slope, lift_reference, slope_tolerance);
+        check_within(moment_slope, moment_reference, slope_tolerance);
+        check_within(lift_slope, lift_reference, abs(lift_reference) / 100);
+        const Rat moment_scale = std::max(Rat{abs(moment_reference)}, Rat{1} / 10);
+        check_within(moment_slope, moment_reference, moment_scale / 100);
+        Rat norm_squared{};
+        Rat error_squared{};
+        const Rat inverse_width = Rat{5} / 2;
+        for (std::size_t band = 0; band < band_count; ++band) {
+            CAPTURE(band);
+            const auto band_slope = slope(minus.band_lift[band], plus.band_lift[band]);
+            const auto band_reference =
+                rational_word(sample.at("band_cl_per_rad").at(band).get<double>());
+            const Rat error = abs(band_slope.center - band_reference) + band_slope.radius;
+            error_squared += error * error * inverse_width;
+            norm_squared += band_reference * band_reference * inverse_width;
+            check_within(band_slope, band_reference, slope_tolerance);
+        }
+        REQUIRE(norm_squared > 0);
+        CHECK(error_squared <= norm_squared / 2500);
     }
 }
 } // namespace
 
 TEST_CASE("Frozen finite wings reproduce the complete steady circulation systems",
-          "[V-AERO][AE-02][UW-D03][N4-06][verification]") {
+          "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
     std::ifstream source{UVLAS_FINITE_WING_CASE_FIXTURE};
     std::ifstream observations{UVLAS_FINITE_WING_STEADY_FIXTURE};
     REQUIRE(source);
     REQUIRE(observations);
+    std::ifstream polar_file{UVLAS_FINITE_WING_POLARS_FIXTURE};
+    REQUIRE(polar_file);
     const auto frozen = nlohmann::json::parse(source);
     const auto expected = nlohmann::json::parse(observations);
+    const auto polars = nlohmann::json::parse(polar_file);
+    REQUIRE(polars.at("cases").size() == 2);
+    REQUIRE(polars.at("band_bounds_m").size() == 21);
+    for (std::size_t i = 0; i <= band_count; ++i) {
+        const Rat boundary = Rat{-4} + Rat{2} * i / 5;
+        CHECK(abs(rational_word(polars.at("band_bounds_m").at(i).get<double>()) - boundary) <
+              rational_word(1e-15));
+    }
     REQUIRE(frozen.at("cases").size() == 2);
     REQUIRE(expected.at("cases").size() == 2);
     for (std::size_t i = 0; i < 2; ++i) {
@@ -689,6 +889,8 @@ TEST_CASE("Frozen finite wings reproduce the complete steady circulation systems
         const auto& row = expected.at("cases").at(i);
         CAPTURE(wing.at("dihedral_degrees").get<int>());
         REQUIRE(wing.at("dihedral_degrees") == row.at("dihedral_degrees"));
-        run_wing(frozen, wing, row, expected);
+        const auto& polar = polars.at("cases").at(i);
+        REQUIRE(wing.at("dihedral_degrees") == polar.at("dihedral_degrees"));
+        run_wing(frozen, wing, row, expected, polar);
     }
 }

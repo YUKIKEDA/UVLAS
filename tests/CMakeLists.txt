@@ -957,11 +957,12 @@ target_include_directories(uvlas_test_coupling_finite_wing_steady PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 target_compile_definitions(uvlas_test_coupling_finite_wing_steady PRIVATE
     UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
-    UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json")
-# Both wings use all eight product basis probes and a separate load solve.
-# MSVC Release took 40 s locally. Keep extra time for checked fixed-word arithmetic.
+    UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json"
+    UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json")
+# Both wings use all eight product basis probes and a load solve at each of the five angles.
+# The Debug and instrumented configurations include checked fixed-word arithmetic.
 set_tests_properties(coupling.finite_wing_steady PROPERTIES
-    TIMEOUT "$<IF:$<CONFIG:Debug>,480,90>")
+    TIMEOUT "$<IF:$<CONFIG:Debug>,900,180>")
 uvlas_add_test(coupling.case_motion
     LABELS V-AERO property negative verification
     SOURCES coupling/case_motion_test.cpp
