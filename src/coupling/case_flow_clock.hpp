@@ -251,6 +251,31 @@ private:
     PrescribedAeroAttachment attachment_;
 };
 
+/// Owned input record for one clock and selected prescribed motion. An absent
+/// prescribed-transport record represents the already qualified free mode.
+class CaseClockedPrescribedSnapshot {
+public:
+    CaseClockedPrescribedSnapshot(CaseClockedPrescribedSnapshot&&) noexcept = default;
+    CaseClockedPrescribedSnapshot& operator=(CaseClockedPrescribedSnapshot&&) noexcept = default;
+    CaseClockedPrescribedSnapshot(const CaseClockedPrescribedSnapshot&) = delete;
+    CaseClockedPrescribedSnapshot& operator=(const CaseClockedPrescribedSnapshot&) = delete;
+
+private:
+    friend struct case_clock_detail::Builder;
+    CaseClockedPrescribedSnapshot(case_clock_detail::Grid&& clock, CaseKnownFlowSnapshot&& known,
+                                  std::optional<CasePrescribedWakeSnapshot>&& prescribed,
+                                  CaseMotionSnapshot&& motion) noexcept
+        : grid_(std::move(clock)),
+          ambient_(std::move(known)),
+          prescribed_(std::move(prescribed)),
+          motion_(std::move(motion)) {}
+
+    case_clock_detail::Grid grid_;
+    CaseKnownFlowSnapshot ambient_;
+    std::optional<CasePrescribedWakeSnapshot> prescribed_;
+    CaseMotionSnapshot motion_;
+};
+
 struct CaseClockedPrescribedSample {
     io::SchemaIdentity source;
     CaseFlowClockQuery address;
@@ -266,6 +291,19 @@ struct CaseClockedPrescribedSample {
     aero::detail::pchip::PchipInputStamp, aero::detail::UniformFlowWorkspace&,
     aero::detail::pchip::CurveWorkspace&, const CaseClockedPrescribedLimits&, core::ResourcePlan&,
     const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// Save input content, independently of any current clock node or accepted history.
+[[nodiscard]] core::Result<CaseClockedPrescribedSnapshot> snapshot_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs&, aero::detail::UniformFlowWorkspace&,
+    aero::detail::pchip::CurveWorkspace&, const CaseClockedPrescribedLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// Requalify the owned clock and all input roles before returning a new prepared owner.
+[[nodiscard]] core::Result<CaseClockedPrescribedInputs> restore_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedSnapshot&, const CaseClockedPrescribedInputs& current,
+    aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
+    const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
+    core::FailureDetails = {}) noexcept;
 
 [[nodiscard]] core::Result<CaseClockedPrescribedSample> evaluate_case_clocked_prescribed_inputs(
     const CaseClockedPrescribedInputs&, const CaseClockedPrescribedInputs& current,
