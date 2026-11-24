@@ -1,6 +1,7 @@
+#include "pg_reference_domain.hpp"
 #include "pg_reference_projection.hpp"
 
-#include <uvlas/structure/pg_boundary_position.hpp>
+#include <uvlas/structure/pg_boundary_tangents.hpp>
 
 namespace uvlas::structure {
 namespace {
@@ -74,12 +75,12 @@ template <class Record, class Query, class FillRow>
 [[nodiscard]] ProjectedRows<Record>
 project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditioning,
              std::uint64_t rank, std::span<const Query> queries, bool two_word,
-             std::uint64_t prefix, const FillRow& fill_row) {
+             std::uint64_t prefix, std::uint64_t directions, const FillRow& fill_row) {
     if (queries.empty())
         return {};
     auto& plan = math.plan;
     const auto rows = partition_index(queries.size());
-    const auto stride = partition_add(rank, prefix);
+    const auto stride = partition_add(partition_mul(rank, directions), prefix);
     const auto word_count = partition_index(partition_mul(queries.size(), stride));
     const auto point_bytes =
         partition_take(core::checked_byte_count(rows, sizeof(Record), partition_operation));
@@ -89,7 +90,10 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
         plan.remaining_bytes())
         partition_fail(core::FailureCode::ResourceExceeded);
     // Only one exact reference row remains alive while producing the rounded row.
-    math.admit(partition_add(reference_live_rationals + 74, partition_mul(8, rank)));
+    // For two directions, leave 32 additional Rational slots for the two
+    // Cartesian vectors and their construction and dot-product temporaries.
+    const auto extra = directions == 2 ? 32U : 0U;
+    math.admit(partition_add(reference_live_rationals + 74 + extra, partition_mul(8, rank)));
     const auto words = static_cast<std::uint64_t>(word_count);
     math.visit(partition_add(queries.size(), partition_mul(two_word ? 2 : 1, words)));
     auto points = partition_take(plan.allocate<Record>(rows, partition_operation));
@@ -128,6 +132,74 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
     partition_fail(core::FailureCode::InvalidInput);
 }
 
+[[nodiscard]] PgBoundaryPositionRecord boundary_record(const PgReferenceValue& point) {
+    return {point.identity, point.cell, point.partition_record, point.layer, boundary_side(point)};
+}
+
+[[nodiscard]] PgReferenceVector planar_direction(ReferenceRadicals& field,
+                                                 const PgReferenceValue& point,
+                                                 const PgPartitionPoint& from,
+                                                 const PgPartitionPoint& to) {
+    const auto ds = field.math.sub(to.s, from.s), dt = field.math.sub(to.t, from.t);
+    const auto& j = point.jacobian_columns_metres;
+    PgReferenceVector direction;
+    for (std::size_t axis = 0; axis < direction.size(); ++axis)
+        direction[axis] = field.add(field.scale(j[0][axis], ds), field.scale(j[1][axis], dt));
+    return direction;
+}
+
+[[nodiscard]] std::array<PgReferenceVector, 2>
+face_directions(ReferenceRadicals& field, const PgReferenceValue& point,
+                const PgIntegrationPartition& partition, PgBoundaryPositionSide side) {
+    auto& math = field.math;
+    math.visit(5); // Face plus triangle and three vertices, or edge, layer and two vertices.
+    const auto vertices = partition_take(partition.vertices());
+    if (side != PgBoundaryPositionSide::Lateral) {
+        const auto& face =
+            reference_at(partition_take(partition.horizontal_faces()), point.partition_record);
+        const auto& triangle = reference_at(partition_take(partition.triangles()), face.triangle);
+        const auto& a = reference_at(vertices, triangle.vertices[0]);
+        const auto& b = reference_at(vertices, triangle.vertices[1]);
+        const auto& c = reference_at(vertices, triangle.vertices[2]);
+        return {planar_direction(field, point, a, b), planar_direction(field, point, a, c)};
+    }
+    const auto& face =
+        reference_at(partition_take(partition.lateral_faces()), point.partition_record);
+    const auto& edge = reference_at(partition_take(partition.edges()), face.edge);
+    const auto& layer = reference_at(partition_take(partition.layers()), face.layer);
+    const auto first = face.canonical_direction ? 0U : 1U;
+    const auto& a = reference_at(vertices, edge.vertices[first]);
+    const auto& b = reference_at(vertices, edge.vertices[1 - first]);
+    const auto width = math.sub(layer.upper, layer.lower);
+    PgReferenceVector depth;
+    for (std::size_t axis = 0; axis < depth.size(); ++axis)
+        depth[axis] = field.scale(point.jacobian_columns_metres[2][axis], width);
+    return {planar_direction(field, point, a, b), std::move(depth)};
+}
+
+void project_tangents(ReferenceArithmetic& math, const PgConditionedReferenceBatch& batch,
+                      const PgIntegrationPartition& partition, PgBoundaryPositionSide side,
+                      const PgBoundaryTangentProjection& request, std::span<double> high,
+                      std::span<double> low) {
+    const auto& point = batch.points.values().front();
+    ReferenceRadicals field{math, point.g};
+    const auto directions = face_directions(field, point, partition, side);
+    const auto tolerance = reference_binary64(math, request.maximum_derivative_error);
+    const auto columns = batch.columns.values();
+    std::size_t k = 0;
+    for (const auto& direction : directions)
+        for (const auto& column : columns) {
+            math.visit(1);
+            const auto derivative = field.dot(column.physical_gradient_per_metre, direction);
+            const auto words =
+                pg_project_scalar(math, derivative, point.g, tolerance, request.representation);
+            high[k] = words.high;
+            if (!low.empty())
+                low[k] = words.low;
+            ++k;
+        }
+}
+
 } // namespace
 
 PgVolumeMassReference::PgVolumeMassReference(PgConditioningCertificate&& conditioning,
@@ -157,7 +229,7 @@ PgVolumeMassReference::prepare(PgConditioningCertificate&& conditioning,
         validate_tolerance(request.maximum_shape_error);
         validate_tolerance(request.maximum_volume_jacobian_error_metres_cubed);
         auto result = project_rows<PgVolumeMassPoint>(
-            math, conditioning, accepted.rank, queries, two_word, 1,
+            math, conditioning, accepted.rank, queries, two_word, 1, 1,
             [&](const PgConditionedReferenceBatch& point, std::span<double> high,
                 std::span<double> low) {
                 project_mass_point(math, point, request, high, low);
@@ -200,14 +272,12 @@ core::Result<PgBoundaryPositionReference> PgBoundaryPositionReference::prepare(
         const auto two_word = two_word_projection(request.representation);
         validate_tolerance(request.maximum_shape_error);
         auto result = project_rows<PgBoundaryPositionRecord>(
-            math, conditioning, accepted.rank, queries, two_word, 0,
+            math, conditioning, accepted.rank, queries, two_word, 0, 1,
             [&](const PgConditionedReferenceBatch& point, std::span<double> high,
                 std::span<double> low) {
                 project_shapes(math, point, request.maximum_shape_error, request.representation,
                                high, low);
-                const auto& geo = point.points.values().front();
-                return PgBoundaryPositionRecord{geo.identity, geo.cell, geo.partition_record,
-                                                geo.layer, boundary_side(geo)};
+                return boundary_record(point.points.values().front());
             });
         return PgBoundaryPositionReference{std::move(conditioning),
                                            static_cast<std::size_t>(accepted.rank),
@@ -216,6 +286,64 @@ core::Result<PgBoundaryPositionReference> PgBoundaryPositionReference::prepare(
                                            std::move(result.points),
                                            std::move(result.high),
                                            std::move(result.low)};
+    });
+}
+
+PgBoundaryTangentReference::PgBoundaryTangentReference(
+    std::size_t columns, PgBoundaryTangentProjection projection, PgReferenceCallInfo info,
+    core::PlannedBuffer<PgBoundaryPositionRecord> points, core::PlannedBuffer<double> high,
+    core::PlannedBuffer<double> low) noexcept
+    : column_count_(columns),
+      projection_(projection),
+      call_info_(info),
+      points_(std::move(points)),
+      high_(std::move(high)),
+      low_(std::move(low)) {}
+
+PgBoundaryTangentReference::PgBoundaryTangentReference(PgBoundaryTangentReference&& other) noexcept
+    : PgBoundaryTangentReference(std::exchange(other.column_count_, 0), other.projection_,
+                                 other.call_info_, std::move(other.points_), std::move(other.high_),
+                                 std::move(other.low_)) {}
+
+PgBoundaryTangentReference&
+PgBoundaryTangentReference::operator=(PgBoundaryTangentReference&& other) noexcept {
+    if (this != &other) {
+        column_count_ = std::exchange(other.column_count_, 0);
+        projection_ = other.projection_;
+        call_info_ = other.call_info_;
+        points_ = std::move(other.points_);
+        high_ = std::move(other.high_);
+        low_ = std::move(other.low_);
+    }
+    return *this;
+}
+
+core::Result<PgBoundaryTangentReference> PgBoundaryTangentReference::prepare(
+    const PgConditioningCertificate& conditioning, std::span<const PgBoundaryPositionPoint> queries,
+    const PgBoundaryTangentProjection& request, const PgReferenceLimits& limits,
+    core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgBoundaryTangentReference> {
+        auto math = ReferenceArithmetic{limits, plan};
+        math.cancel();
+        const auto accepted = partition_take(conditioning.info());
+        const auto two_word = two_word_projection(request.representation);
+        validate_tolerance(request.maximum_derivative_error);
+        const auto* basis = partition_take(conditioning.reference_basis());
+        const auto& partition = partition_take(basis->source()).partition;
+        auto result = project_rows<PgBoundaryPositionRecord>(
+            math, conditioning, accepted.rank, queries, two_word, 0, 2,
+            [&](const PgConditionedReferenceBatch& batch, std::span<double> high,
+                std::span<double> low) {
+                const auto record = boundary_record(batch.points.values().front());
+                project_tangents(math, batch, partition, record.side, request, high, low);
+                return record;
+            });
+        return PgBoundaryTangentReference{static_cast<std::size_t>(accepted.rank),
+                                          request,
+                                          math.info(),
+                                          std::move(result.points),
+                                          std::move(result.high),
+                                          std::move(result.low)};
     });
 }
 
