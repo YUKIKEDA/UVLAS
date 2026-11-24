@@ -45,14 +45,14 @@ struct PgChartCandidateDual {
 /// Bounds original rational arithmetic across one candidate and all its corrections.
 struct PgChartRefinement {
     PgReferenceLimits original_arithmetic;
-    std::uint64_t maximum_corrections;
+    std::uint64_t maximum_corrections{};
 };
 
 template <class Output>
 struct PgChartRefined {
     Output output;
     PgReferenceCallInfo original_work;
-    std::uint64_t corrections; ///< Additional solves using the original prepared factor.
+    std::uint64_t corrections{}; ///< Additional solves using the original prepared factor.
 };
 
 /// Fixed sparse projection candidate plus certificates in the original coefficient layout.
