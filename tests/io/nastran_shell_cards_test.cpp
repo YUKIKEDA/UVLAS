@@ -1,4 +1,5 @@
 #include "nastran_lumped_mass_cards.hpp"
+#include "nastran_rigid_link_cards.hpp"
 #include "nastran_shell_cards.hpp"
 #include "nastran_support_cards.hpp"
 #include "source_digest.hpp"
@@ -545,6 +546,120 @@ TEST_CASE("CONM2 identifies the field that blocks typed mass preparation", "[IO4
     const auto found = take(diagnostic);
     CHECK(found.reason == expected);
     CHECK(found.position.line == 5);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+TEST_CASE("RBE2 separates the ordered GRID list from thermal terms", "[IO4-03][verification]") {
+    const auto source = std::string{"RBE2,101,17,136,22,8,6.5-6,-273.15\n"} +
+                        fixed("RBE2", {"102", "8", "45", "41", "17", "22"}, 8) +
+                        fixed("RBE2", {"103", "17", "6", "22", "8", "41", "5", "6"}, 8, "+R1") +
+                        fixed("+R1", {"0.0", "15.0"}, 8) + std::string{grids} + "GRID,5\nGRID,6\n";
+    core::ResourcePlan shell_plan{memory}, plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    const auto shell = take(parent.view());
+    auto prepared = take(NastranRigidLinkCards::prepare(parent, {3, 10, 10000}, plan, {}));
+    const auto view = take(prepared.view());
+    CHECK(view.source.digest == shell.input.bulk.digest);
+    CHECK(view.source.location.source == shell.input.bulk.location.source);
+    REQUIRE(view.links.size() == 3);
+    REQUIRE(view.dependents.size() == 10);
+    const auto& first = view.links[0];
+    CHECK(first.id == NastranElementId{101});
+    CHECK(first.dependent_components == 0b100101);
+    CHECK(first.independent.id == NastranGridId{17});
+    CHECK(shell.input.grids[first.independent.ordinal].id == first.independent.id);
+    CHECK(first.first_dependent == 0);
+    CHECK(first.dependent_count == 2);
+    CHECK(view.dependents[0].id == NastranGridId{22});
+    CHECK(view.dependents[1].id == NastranGridId{8});
+    const auto alpha = take(first.alpha);
+    const auto tref = take(first.reference_temperature);
+    CHECK(alpha.value.decimal() == "6.5e-6");
+    CHECK(tref.value.decimal() == "-273.15");
+    CHECK(shell.input.bulk.text(alpha.field) == "6.5-6");
+    CHECK(view.links[1].first_dependent == 2);
+    CHECK(view.links[1].dependent_count == 3);
+    CHECK_FALSE(view.links[1].alpha);
+    CHECK_FALSE(view.links[1].reference_temperature);
+    CHECK(view.links[2].first_dependent == 5);
+    CHECK(view.links[2].dependent_count == 5);
+    CHECK(view.dependents[8].id == NastranGridId{5});
+    CHECK(view.dependents[9].id == NastranGridId{6});
+    const auto fixed_tref = take(view.links[2].reference_temperature);
+    CHECK(fixed_tref.field.position == NastranBulkPosition{source.find("15.0"), 4, 17});
+    CHECK(fixed_tref.value.decimal() == "15.0");
+    for (const auto& point : view.dependents)
+        CHECK(shell.input.grids[point.ordinal].id == point.id);
+
+    const auto moved = std::move(prepared);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old rigid-link view.
+    CHECK_FALSE(prepared.view());
+    CHECK(take(moved.view()).links.size() == 3);
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(NastranRigidLinkCards::prepare(parent, {3, 10, view.work}, exact, {}));
+    core::ResourcePlan short_memory{plan.allocated_bytes() - 1};
+    const auto constrained =
+        NastranRigidLinkCards::prepare(parent, {3, 10, view.work}, short_memory, {});
+    REQUIRE_FALSE(constrained);
+    CHECK(constrained.error().code == ResourceExceeded);
+    const auto short_members = NastranRigidLinkCards::prepare(parent, {3, 9, view.work}, plan, {});
+    REQUIRE_FALSE(short_members);
+    CHECK(short_members.error().code == ResourceExceeded);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+TEST_CASE("RBE2 rejects ambiguous thermal fields and inconsistent GRID references",
+          "[IO4-03][negative]") {
+    using RigidIssue = NastranRigidLinkFailure;
+    std::string_view line;
+    RigidIssue expected{};
+    auto code = InvalidInput;
+    SECTION("unknown independent GRID") {
+        line = "RBE2,11,99,1,22";
+        expected = RigidIssue::UnknownGrid;
+    }
+    SECTION("unknown dependent GRID") {
+        line = "RBE2,11,17,1,99";
+        expected = RigidIssue::UnknownGrid;
+    }
+    SECTION("independent GRID reused as a dependent") {
+        line = "RBE2,11,17,1,17";
+        expected = RigidIssue::RepeatedGrid;
+    }
+    SECTION("dependent GRID repeated") {
+        line = "RBE2,11,17,1,22,8,22";
+        expected = RigidIssue::RepeatedGrid;
+    }
+    SECTION("component repeated") {
+        line = "RBE2,11,17,66,22";
+        expected = RigidIssue::InvalidField;
+    }
+    SECTION("no dependent GRID") {
+        line = "RBE2,11,17,1,0.0";
+        expected = RigidIssue::MissingField;
+    }
+    SECTION("temperature without a spelled ALPHA") {
+        line = "RBE2,11,17,1,22,,15.0";
+        expected = RigidIssue::UnsupportedThermalForm;
+        code = Unsupported;
+    }
+    SECTION("more than two thermal fields") {
+        line = "RBE2,11,17,1,22,0.0,1.0,2.0";
+        expected = RigidIssue::ExtraField;
+    }
+    const auto source = std::string{grids} + std::string{line};
+    core::ResourcePlan shell_plan{memory}, plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    std::optional<NastranRigidLinkDiagnostic> diagnostic;
+    const auto result =
+        NastranRigidLinkCards::prepare(parent, {3, 10, 10000}, plan, {}, &diagnostic);
+    REQUIRE_FALSE(result);
+    CHECK(result.error().code == code);
+    const auto failure = take(diagnostic);
+    CHECK(failure.reason == expected);
+    CHECK(failure.position.line == 5);
     CHECK(take(parent.view()).input.bulk.bytes == source);
 }
 
