@@ -1,0 +1,53 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-multiple-surface-steady-v1",
+  "ids": [
+    "IM-03",
+    "A5-02",
+    "V-MULTI",
+    "PHY-02",
+    "UW-D01",
+    "UW-D02",
+    "UW-D05"
+  ],
+  "package": "IM-03",
+  "source_commit": "cbe429128c53ebf8ec0f7dbd5e5c69a56d1948b3",
+  "registration_commit": "5092b39d01c4ce220486f8e396275a88b94cd7dd",
+  "claimed_state": "The frozen M2/N12 main and tail wing case exercises the 48 by 48 finite-core physical system, mutual induction, the original residual, trailing-edge ownership, and operator work. The native load direction and nodal virtual work also agree on the same coupled geometry.",
+  "provenance": {
+    "prototype_source_sha256": "68eb8ebf3d2fa57838940a967feb1d7628617c0d52c6d3312df3d928b6cfd31f",
+    "prototype_raw_fixture_sha256": "be58dd9a4cbafdad45d7144bbe8c75dd772a851b7178684aadfc1fb907a8c194",
+    "normalization": "Only CRLF to LF; normalized prototype bytes equal the checked-in fixture.",
+    "arithmetic": "60 and 75 decimal precision, 2738 observations, maximum absolute change 3.353224035197250e-55"
+  },
+  "verification": {
+    "windows": "MSVC 19.51 Release は `coupling.multiple_surface_steady` と `coupling.multiple_surface_loads` を通過した。順に60.07秒と284.40秒、12,242と2,122アサーション。先行の荷重単独計測では141.73秒だった。",
+    "linux": "GCC 14.2 Release も同じ2件を通過した。順に55.57秒と278.21秒で、両試験のアサーション数は同じ。両構成の対象 clang-tidy も通過した。",
+    "debug": null,
+    "mutation": "GCC の別リンクで、正方向作用に入力する相手翼の全強度を零とした。独立行列との照合は主翼の受け行0で失敗し、元のバイナリは seed 23 で12,242アサーションを通過した。",
+    "commands": [
+      "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.multiple_surface_(steady|loads)$' -j 2",
+      "ctest --test-dir build -V -R '^coupling\\.multiple_surface_(steady|loads)$' -j 2",
+      "ctest --test-dir out/issue166-build -C Debug -V -R '^coupling\\.multiple_surface_steady$'",
+      "clang-tidy -p build --quiet source/tests/coupling/multiple_surface_steady_test.cpp",
+      "python -X utf8 -B docs/verification/IM-03/multiple-surface-steady-v1/reference.py --output <separate-output>/multiple-surface-steady-v1.json",
+      "just trace-check"
+    ],
+    "fixture": "Byte-identical regeneration: 595eeb7b6d9fde1ddc299e53c0c383ab5ca7bc4e3fd71ea8843543afa523752f.",
+    "scope": "One frozen positive-core fixed geometry and first-order steady loads. Larger frozen grids, harmonic responses, ideal-kernel uncertainty, and full coupled acceptance remain separate."
+  },
+  "sources": {
+    "tests/coupling/multiple_surface_steady_test.cpp": "5ca2754904817bcec14a3e1a160810f866f6c6d2adedfcd808202802034ea105",
+    "docs/verification/IM-03/multiple-surface-steady-v1/reference.py": "835a480819d4a7dddf6a487bfeacfe6a169b5f6c2b1f059c414fc5f09af6cd33",
+    "docs/verification/IM-03/finite-wing-steady-v1/reference.py": "7cd47141282ee114900b939405185feacb61fc782a269ca7c8b7d172aa7ead43",
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "rd/aero/finite-wing/records/finite-wing-specialization-result.json": "56da441111e16b149f6030916cb3decd3c091ba1744fa9073c22077188dca719",
+    "rd/aero/multi-surface/records/uvlm-multiple-surface-reference-protocol.md": "5b81937476fb53a7778a2981391fbc48cb003b5b05b71462e1c8d13747d9fc32"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/multiple-surface-steady-v1/verification.md": "ae8efdddecd7d10cbb1f1e0abad021ad8dd9f98f35e90ed5c7c3dcba85b5982a",
+    "tests/aero/fixtures/multiple-surface-steady-v1.json": "595eeb7b6d9fde1ddc299e53c0c383ab5ca7bc4e3fd71ea8843543afa523752f",
+    "rd/aero/multi-surface/records/multiple-surface-independent-result.json": "9375e2825da70fd9da4d057e2c36c6129bd7a5a47ebfb0d2e01160d4fadb4048",
+    "rd/aero/multi-surface/records/multiple-surface-harmonic-refined-result.json": "72427831e87dd0a25f98ebccd2d0e3dac6f3bcbeb3ffa4c7181f6ba5a5b537bf"
+  }
+}
