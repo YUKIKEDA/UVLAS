@@ -225,7 +225,8 @@ TEST_CASE("PG numerical chart keeps the exact sparse pattern and checks original
         CHECK(qwords(a, lift.coordinates, j) == qwords(a, r, i));
     }
     const auto exact_bound = [&](double upper) {
-        const auto value = take(ExactRational::from_binary64(upper, exact_limits(), a.input_plan));
+        const auto value =
+            take(ExactRational::from_binary64(upper, partition_test::exact_limits(), a.input_plan));
         return q(value);
     };
     const auto q_candidate = exact_words(a, lift.coordinates);
