@@ -599,7 +599,7 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
               [{"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}]])");
             if (subdivide)
                 knots.elements.push_back(a::parse(R"(
-                  [{"numerator":"7","denominator":"8"},{"numerator":"1","denominator":"4"}])"));
+                  [{"numerator":"15","denominator":"16"},{"numerator":"1","denominator":"3"}])"));
             thickness.set("vertices", knots);
             thickness.set("triangles",
                           a::parse(subdivide ? "[[0,1,4],[0,4,3],[1,2,6],[2,5,6],[5,1,6],[1,5,4]]"
