@@ -120,12 +120,12 @@ public:
         const auto outside = pchip->outside.record();
         const auto* periodic = std::get_if<s::OutsidePeriodic>(&outside);
         charge(1);
-        std::optional<structure::ExactRational> period;
-        std::optional<io::detail::SiRationalWords> period_words;
+        std::optional<Period> period;
         if (periodic != nullptr) {
-            period.emplace(
-                read_time(source_, periodic->period, conversion_, memory_, stop_, details_));
-            period_words.emplace(words(*period));
+            auto value =
+                read_time(source_, periodic->period, conversion_, memory_, stop_, details_);
+            auto encoded = words(value);
+            period.emplace(Period{std::move(value), std::move(encoded)});
         }
         // The last knot is the first knot one period later.
         const auto count = pchip->times.size() - (period ? 1U : 0U);
@@ -136,7 +136,7 @@ public:
             if (period) {
                 const auto knot_words = words(knot);
                 for (const auto& interval : intervals_)
-                    check_periodic(interval, knot, knot_words, *period, *period_words);
+                    check_periodic(interval, knot, knot_words, *period);
                 continue;
             }
             // The case schema already checks declared events. A time series
@@ -151,6 +151,11 @@ public:
     }
 
 private:
+    struct Period {
+        structure::ExactRational value;
+        io::detail::SiRationalWords encoded;
+    };
+
     void charge(std::uint64_t work) {
         check_stop(stop_, prepare, details_);
         if (work > work_)
@@ -162,14 +167,12 @@ private:
         return {value.numerator_bits(), value.denominator_bits()};
     }
 
-    io::detail::SiRationalWords words(const structure::ExactRational& value) const {
+    [[nodiscard]] io::detail::SiRationalWords words(const structure::ExactRational& value) const {
         return take(io::detail::copy_rational_words(value, memory_, stop_));
     }
 
     void check_periodic(const Grid::Interval& interval, const structure::ExactRational& knot,
-                        const io::detail::SiRationalWords& knot_words,
-                        const structure::ExactRational& period,
-                        const io::detail::SiRationalWords& period_words) {
+                        const io::detail::SiRationalWords& knot_words, const Period& period) {
         charge(1);
         auto limits = arithmetic_;
         limits.steps = std::min(limits.steps, work_);
@@ -177,7 +180,7 @@ private:
         const auto begin_bound = take(counter.input(bound(interval.begin)));
         const auto end_bound = take(counter.input(bound(interval.end)));
         const auto knot_bound = take(counter.input(bound(knot)));
-        const auto period_bound = take(counter.input(bound(period)));
+        const auto period_bound = take(counter.input(bound(period.value)));
         const auto next_bound = next_occurrence(counter, begin_bound, knot_bound, period_bound);
         if (auto compared = counter.compare(next_bound, end_bound); !compared)
             throw compared.error();
@@ -191,7 +194,7 @@ private:
         const auto begin = take(session.input(rational_view(begin_words)));
         const auto end = take(session.input(rational_view(end_words)));
         const auto source_knot = take(session.input(rational_view(knot_words)));
-        const auto source_period = take(session.input(rational_view(period_words)));
+        const auto source_period = take(session.input(rational_view(period.encoded)));
         const auto next = next_occurrence(session, begin, source_knot, source_period);
         if (take(session.compare(next, end)) < 0)
             fail(InvalidInput, prepare, details_);
@@ -306,7 +309,7 @@ struct Builder {
         const Grid::Interval& interval;
         std::optional<structure::ExactRational> interior;
 
-        const structure::ExactRational& time(std::uint64_t step) const noexcept {
+        [[nodiscard]] const structure::ExactRational& time(std::uint64_t step) const noexcept {
             if (interior)
                 return *interior;
             return step == 0 ? interval.begin : interval.end;
