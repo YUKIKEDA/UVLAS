@@ -1685,6 +1685,55 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::PrecisionUnresolved);
         }
         check.finish();
+        auto right = allocate<p::Interval>(memory, order);
+        for (std::size_t i = 0; i < order; ++i) {
+            work.step();
+            right.values()[i] = p::integer(static_cast<std::int64_t>(i) + 1);
+        }
+        const auto face = [&](std::size_t i) { return bound[i].panel.face; };
+        const auto row_at = [&](std::size_t i) -> std::span<const p::Interval> {
+            const auto& owned = data.values()[i];
+            if (!owned.query)
+                reject(core::FailureCode::InvalidInput);
+            const a::P1ActionSource source{input.contact, *owned.query, input.trial_stamp};
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+            assemble_influence(assembly, action, source, owned.coefficients.normal, shared, memory,
+                               limits, native_row.values(), work);
+            return native_row.values();
+        };
+        auto dual_unknown = allocate<linear::UnitDimensions>(memory, order);
+        auto dual_residual = allocate<linear::UnitDimensions>(memory, order);
+        std::ranges::fill(dual_unknown.values(), linear::UnitDimensions{-1, 0, 1, 0, 0, 0, 0});
+        std::ranges::fill(dual_residual.values(), linear::UnitDimensions{-2, 0, 1, 0, 0, 0, 0});
+        auto adjoint_request = request;
+        adjoint_request.scales.unknown_units = dual_unknown.values();
+        adjoint_request.scales.residual_units = dual_residual.values();
+        validate_circulation(adjoint_request, order, work, true);
+        admit(assembly, input, limits, memory, 4, 12, work);
+        for (const auto direction : {CirculationSense::Tangent, CirculationSense::Transpose}) {
+            const auto& settings =
+                direction == CirculationSense::Tangent ? request : adjoint_request;
+            const auto stored = linearize_native(direction, face, retained.influence_.values(),
+                                                 right.values(), settings, memory, rounding, work);
+            const auto replay = linearize_rows(direction, face, row_at, right.values(), settings,
+                                               memory, rounding, work);
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                const auto expected = require(stored.row(i));
+                const auto actual = require(replay.row(i));
+                if (!same_words(retained_word(stored.solution().values(), i),
+                                retained_word(replay.solution().values(), i)) ||
+                    actual.face != expected.face ||
+                    actual.original_residual.exponent() != expected.original_residual.exponent() ||
+                    !same_double(actual.original_residual.radius(),
+                                 expected.original_residual.radius()) ||
+                    !same_words(actual.original_residual.center(),
+                                expected.original_residual.center()))
+                    reject(core::FailureCode::PrecisionUnresolved);
+            }
+        }
+
         work.step();
         return {order,
                 retained.influence_.size(),
@@ -3186,6 +3235,54 @@ struct NonpenetrationBuilder {
         const auto face = [&](std::size_t i) { return face_at(primal.rows_.values(), i); };
         return linearize_native(sense, face, primal.influence_.values(), right.values(), request,
                                 memory, work);
+    }
+
+    template <class FaceAt, class RowAt>
+    static DiscreteCirculationLinearization
+    linearize_rows(CirculationSense sense, FaceAt face_at, RowAt row_at,
+                   std::span<const p::Interval> right, const DiscreteCirculationRequest& request,
+                   core::ResourcePlan& memory, a::LocalRootScratch& rounding, p::Work& work) {
+        const auto order = right.size();
+        const bool transposed = sense == CirculationSense::Transpose;
+        auto [matrix, rhs] = dense_inputs(order, memory);
+        auto results = allocate<std::optional<CirculationLinearRow>>(memory, order);
+        auto retained = allocate<p::Interval>(memory, order);
+        auto residual = allocate<p::Interval>(memory, order);
+        for (std::size_t i = 0; i < order; ++i) {
+            rhs.values()[i] = project_binary64(right[i], request.rhs_absolute, rounding, work);
+            residual.values()[i] = p::negate(right[i], work);
+            const auto row = row_at(i);
+            for (std::size_t j = 0; j < order; ++j) {
+                const auto index = transposed ? i * order + j : j * order + i;
+                matrix.values()[index] =
+                    project_binary64(row[j], request.matrix_absolute, rounding, work);
+            }
+        }
+        auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
+        for (std::size_t i = 0; i < order; ++i)
+            retained.values()[i] = import(retained_word(solution.values(), i), work);
+
+        // At every output, the products are accumulated in ascending input order,
+        // starting at -b. Visiting native rows preserves that order for A^T as well.
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto row = row_at(i);
+            for (std::size_t j = 0; j < order; ++j) {
+                const auto target = transposed ? j : i;
+                const auto source = transposed ? i : j;
+                auto& value = residual.values()[target];
+                value = p::add(value, p::multiply(row[j], retained.values()[source], work), work);
+            }
+        }
+        NativeResidualCheck check{request};
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& original = residual.values()[i];
+            check.add(original, right[i], i, work);
+            results.values()[i].emplace(CirculationLinearRow{
+                face_at(i), a::enclose_p1_value(original, core::Precision::TwoWord, rounding)});
+        }
+        check.finish();
+        work.step();
+        return {std::move(solution), std::move(results), sense, work.used};
     }
 
     template <class FaceAt>
