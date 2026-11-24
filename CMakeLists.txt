@@ -161,6 +161,7 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
                          src/coupling/case_material_rows.cpp
                          src/coupling/case_material_original_layout.cpp
                          src/coupling/case_material_alias.cpp
+                         src/coupling/case_material_surface_model.cpp
     src/coupling/fixed_bdf2_circulation.cpp
     src/coupling/fixed_wake_transport.cpp
     src/coupling/case_known_flow.cpp

@@ -538,6 +538,37 @@ GlobalResult<UvlmQuad> GlobalContactState::uvlm_quad(FacetId id, std::uint64_t m
                         used};
     });
 }
+GlobalResult<FaceRoleInput> GlobalContactState::face_role(std::size_t index) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<FaceRoleInput> {
+        const auto owner = geometry();
+        if (!owner)
+            return std::unexpected(owner.error());
+        const auto data = data_.values();
+        const auto& topology = data.front().topology;
+        const auto& source = GlobalEngine::source(owner->get());
+        if (!topology || !source || index >= source->faces.size())
+            reject(core::FailureCode::InvalidInput);
+        const auto id = PhysicalFaceId{source->faces.values()[index].id};
+        const auto role = topology->roles.values()[index] == GlobalTopologyData::bound_role
+                              ? AeroFaceRole::Bound
+                              : AeroFaceRole::Wake;
+        return FaceRoleInput{id, role};
+    });
+}
+
+GlobalResult<PhysicalFaceId>
+GlobalContactState::original_triangle_face(std::size_t index) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<PhysicalFaceId> {
+        const auto owner = geometry();
+        if (!owner)
+            return std::unexpected(owner.error());
+        const auto& source = GlobalEngine::source(owner->get());
+        if (!source || index >= source->triangles.size())
+            reject(core::FailureCode::InvalidInput);
+        return PhysicalFaceId{source->triangles.values()[index].parent};
+    });
+}
+
 GlobalResult<UvlmOriginalQuad>
 GlobalContactState::uvlm_original_quad(std::size_t index, std::uint64_t maximum,
                                        const std::stop_token& stop) const noexcept {

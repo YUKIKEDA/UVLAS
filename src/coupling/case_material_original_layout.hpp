@@ -33,6 +33,11 @@ public:
     [[nodiscard]] core::Result<CaseMaterialOriginalCorner>
     corner(aero::detail::FacetId, std::uint8_t local_vertex) const noexcept;
 
+    [[nodiscard]] std::span<const CaseMaterialOriginalCorner> original_corners() const& noexcept {
+        return corners_.values();
+    }
+    [[nodiscard]] std::span<const CaseMaterialOriginalCorner> original_corners() const&& = delete;
+
     /// Route an actual original aerodynamic contribution to the selected PG row.
     [[nodiscard]] core::Result<CaseMaterialOriginalEnclosedForce>
     pullback(const DiscreteCirculationLoads&, std::size_t, const CaseMaterialChart&,
