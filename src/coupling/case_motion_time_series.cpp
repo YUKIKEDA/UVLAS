@@ -515,6 +515,7 @@ struct SnapshotOwner {
     std::uint64_t declaration_ordinal{};
     Stamp stamp{p::PchipIssuerId{0}, p::PchipInputGeneration{0}};
     std::int16_t pi_power{};
+    CaseMotionContinuity continuity = CaseMotionContinuity::PiecewiseC2;
     Words begin, end;
     WordsAndViews events;
     RecordedSeries translation, rotation;
@@ -682,6 +683,7 @@ struct Builder {
         result.declaration_ordinal = owner.declaration_ordinal;
         result.stamp = owner.stamp;
         result.pi_power = owner.pi_power;
+        result.continuity = owner.continuity;
         result.begin = capture_words(owner.begin, call);
         result.end = capture_words(owner.end, call);
         result.events = copy_events(owner.events, call);
@@ -701,7 +703,8 @@ struct Builder {
         const auto& live = current.owner_.values().front();
         if (!live.declaration || !same_source(saved.source, live.declaration->source()) ||
             saved.declaration_ordinal != live.declaration_ordinal || saved.stamp != live.stamp ||
-            saved.pi_power != live.pi_power || saved.events.size() != live.events.views.size())
+            saved.pi_power != live.pi_power || saved.continuity != live.continuity ||
+            saved.events.size() != live.events.views.size())
             call.fail(Code::StaleGeneration);
         check_recipe_count(live, limits, call);
         const auto begin = capture_words(live.begin, call);
@@ -716,6 +719,7 @@ struct Builder {
         result.declaration_ordinal = live.declaration_ordinal;
         result.stamp = live.stamp;
         result.pi_power = live.pi_power;
+        result.continuity = live.continuity;
         result.begin = call.clone(live.begin);
         result.end = call.clone(live.end);
         result.events = copy_events(live.events, call);
@@ -873,6 +877,7 @@ core::Result<CaseMotionTimeSnapshotView> CaseMotionTimeSnapshot::view() const& n
                                       fields.declaration_ordinal,
                                       fields.stamp,
                                       fields.pi_power,
+                                      fields.continuity,
                                       motion_time_detail::rational_view(fields.begin),
                                       motion_time_detail::rational_view(fields.end),
                                       fields.events.views.values(),
