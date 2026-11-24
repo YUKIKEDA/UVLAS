@@ -1513,6 +1513,8 @@ $EndElements
     bool late_axis_mismatch = false;
     bool native_cards = false;
     bool thermal_link = false;
+    enum class ParticleCase : std::uint8_t { Matching, Decimal, Mass, Point, Lever };
+    auto particle_case = ParticleCase::Matching;
     bool case_millimetres = false;
     bool wrong_thickness_units = false;
     SECTION("Gmsh group expands and preserves the original rings") {
@@ -1741,6 +1743,32 @@ $EndElements
         physical = true;
         native_cards = true;
     }
+
+    SECTION("A particle at a nonbinary GRID uses the exact certified shell corner") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        particle_case = ParticleCase::Decimal;
+    }
+
+    SECTION("A particle binding identifies a different Case mass") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        particle_case = ParticleCase::Mass;
+    }
+    SECTION("A particle binding identifies the wrong shell point") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        particle_case = ParticleCase::Point;
+    }
+    SECTION("A CONM2 with an eccentric centre cannot certify a Case particle") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        particle_case = ParticleCase::Lever;
+    }
     SECTION("The late native RBE2 error keeps its source field and Case declaration") {
         shell_set = true;
         physical = true;
@@ -1958,9 +1986,19 @@ $EndElements
                             "CTRIA3,901,90,110,120,140,0\n");
     }
     if (native_cards) {
-        source_text += "CBEAM,905,95,10,20,99\nPBEAM,95,6,2.0,3.0,4.0,,5.0\n"
-                       "CONM2,906,10,0,2.0\n";
+        source_text += "CBEAM,905,95,10,20,99\nPBEAM,95,6,2.0,3.0,4.0,,5.0\n";
+        source_text += particle_case == ParticleCase::Lever ? "CONM2,906,10,0,2.0,0.125\n"
+                                                            : "CONM2,906,10,0,2.0\n";
         source_text += thermal_link ? "RBE2,907,10,123,20,0.001,293.15\n" : "RBE2,907,10,123,20\n";
+    }
+    if (particle_case == ParticleCase::Decimal) {
+        for (const auto* node : {"GRID,10,,", "GRID,20,,", "GRID,40,,", "GRID,99,,"}) {
+            const auto begin = source_text.find(node);
+            REQUIRE(begin != std::string::npos);
+            const auto end = source_text.find('\n', begin);
+            REQUIRE(end != std::string::npos);
+            source_text.replace(end - 3, 3, "0.1");
+        }
     }
     if (axis_pcomp) {
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
@@ -2240,9 +2278,16 @@ $EndElements
     }
     if (native_cards) {
         auto& model = config.field("model");
+        if (particle_case == ParticleCase::Decimal)
+            model.field("geometry")
+                .elements.front()
+                .field("frame")
+                .set("origin", fixture::json("[0,0,0.1]"));
         model.field("beams").elements.push_back(fixture::fragment("Beam"));
         auto mass = fixture::fragment("Mass.particle");
-        mass.set("mass", fixture::json("2"));
+        mass.set("mass", fixture::json(particle_case == ParticleCase::Mass ? "3" : "2"));
+        if (particle_case == ParticleCase::Point)
+            mass.field("target").set("coordinates", fixture::json("[1,0,0]"));
         model.field("masses").elements.push_back(std::move(mass));
         model.field("joints").elements.push_back(fixture::fragment("Joint.rigid_attachment"));
         auto& scales = config.field("numerics").field("scales").elements;
@@ -2516,7 +2561,10 @@ $EndElements
                 CHECK(same_inputs->size() == 2);
                 return;
             }
-            REQUIRE(native);
+            if (!native) {
+                FAIL("Native preparation failed");
+                return;
+            }
             CHECK_FALSE(provenance.selection);
             CHECK(native->sidecar_source().source == io::SourceId{2});
             CHECK(native->sidecar_digest() == result->sidecar().digest());
@@ -2551,6 +2599,52 @@ $EndElements
             } else {
                 FAIL("Missing owned native mass");
             }
+            using uvlas::coupling::detail::CaseNastranMassId;
+            using uvlas::coupling::detail::CaseNastranParticleDiagnostic;
+            using uvlas::coupling::detail::CaseNastranParticleFailure;
+            using uvlas::coupling::detail::certify_case_nastran_particle_mass;
+            CaseNastranParticleDiagnostic particle_detail;
+            const auto particle = certify_case_nastran_particle_mass(
+                si, *native, CaseNastranMassId{1}, pg_limits, plan, &particle_detail);
+            if (particle_case != ParticleCase::Matching && particle_case != ParticleCase::Decimal) {
+                REQUIRE_FALSE(particle);
+                CHECK(particle.error().code == core::FailureCode::InvalidInput);
+                CHECK(particle_detail.element == rd::NastranElementId{906});
+                auto reason = CaseNastranParticleFailure::Kind;
+                auto field = source_text.find("0.125", source_text.find("CONM2,906"));
+                if (particle_case == ParticleCase::Mass) {
+                    reason = CaseNastranParticleFailure::Mass;
+                    field = source_text.find("2.0", source_text.find("CONM2,906"));
+                }
+                if (particle_case == ParticleCase::Point) {
+                    reason = CaseNastranParticleFailure::Position;
+                    field = source_text.find("10", source_text.find("CONM2,906"));
+                }
+                CHECK(particle_detail.reason == reason);
+                if (const auto position = particle_detail.field)
+                    CHECK(position->byte == field);
+                else
+                    FAIL("Missing original CONM2 field");
+                return;
+            }
+            if (!particle) {
+                FAIL("A matching particle was rejected");
+                return;
+            }
+            CHECK(particle->mass_kg == exact("2"));
+            CHECK(particle->grid == rd::NastranGridId{10});
+            CHECK(particle->shell == rd::MeshShellId{1});
+            CHECK(particle->face == 701);
+            CHECK(particle->deck_digest == native->deck_digest());
+            CHECK(particle->sidecar_digest == native->sidecar_digest());
+            auto no_scan = pg_limits;
+            no_scan.maximum_partition_visits = 0;
+            core::ResourcePlan rejected_plan{fixture::budget};
+            const auto denied = certify_case_nastran_particle_mass(
+                si, *native, CaseNastranMassId{1}, no_scan, rejected_plan);
+            REQUIRE_FALSE(denied);
+            CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
+            CHECK(rejected_plan.allocated_bytes() == 0);
             REQUIRE(native->joints().size() == 1);
             if (const auto& joint = native->joints().front()) {
                 CHECK(joint->binding.element == rd::NastranElementId{907});
