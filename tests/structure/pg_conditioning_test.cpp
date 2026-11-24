@@ -299,8 +299,8 @@ void set_affine_thickness_fixture(Fixture& f, const AffineThicknessCase& model) 
     }
     f.thickness.clear();
     f.heights.clear();
-    for (const Q t : {Q{0}, Q{1}}) {
-        for (const Q s : {Q{0}, Q{"1/4"}, Q{1}}) {
+    for (const Q& t : {Q{0}, Q{1}}) {
+        for (const Q& s : {Q{0}, Q{"1/4"}, Q{1}}) {
             const Q h = s <= Q{"1/4"} ? Q{2 + 2 * s + t} : Q{1 + 6 * s + t};
             f.thickness.push_back({fixture_exact(f, s), fixture_exact(f, t)});
             f.heights.push_back(fixture_exact(f, h));
