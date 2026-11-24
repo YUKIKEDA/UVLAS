@@ -2369,15 +2369,18 @@ $EndElements
             quantities.emplace(fixture::take(
                 rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
         }
-        const auto qualified = uvlas::coupling::detail::prepare_case_external_planar_pg(
-            si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, preparation,
-            qualification, workspace, plan, &failure);
         if (axes != Axes::None) {
-            REQUIRE(qualified);
-            std::optional<rd::NastranPgAxisDiagnostic> axis_diagnostic;
-            const rd::NastranPgAxisLimits limits{pg_limits, two_axis_layers ? 2U : 1U};
-            const auto matched = rd::match_nastran_pg_material_axes(si, *result, qualified->match(),
-                                                                    limits, plan, &axis_diagnostic);
+            using uvlas::coupling::detail::prepare_case_nastran_planar_pg;
+            const auto* native_quantities = quantities ? &*quantities : nullptr;
+            REQUIRE(native_quantities != nullptr);
+            uvlas::coupling::detail::CaseNastranPgDiagnostic diagnostic_result;
+            const auto limit = two_axis_layers ? 2U : 1U;
+            const auto matched = prepare_case_nastran_planar_pg(
+                si, *result, rd::MeshShellId{1}, *native_quantities, preparation, qualification,
+                limit, workspace, plan, &diagnostic_result);
+            const auto& axis_diagnostic = diagnostic_result.material_axes;
+            CHECK_FALSE(diagnostic_result.planar.binding);
+            CHECK_FALSE(diagnostic_result.planar.geometry);
             const bool unsupported = axes == Axes::VariableThickness;
             const bool disagrees = axes == Axes::Difference || axes == Axes::ResidualAngle ||
                                    axes == Axes::WrongThirtySign ||
@@ -2402,13 +2405,49 @@ $EndElements
                 } else {
                     FAIL("Missing material-axis provenance");
                 }
+                if (axes == Axes::Difference) {
+                    const auto geometry_after =
+                        uvlas::coupling::detail::prepare_case_external_planar_pg(
+                            si, *result, rd::MeshShellId{1}, native_quantities, preparation,
+                            qualification, workspace, plan);
+                    REQUIRE(geometry_after);
+                    CHECK(geometry_after->match().thickness_compared);
+                    REQUIRE(geometry_after->match().laminate.size() == 1);
+                    if (const auto& section = geometry_after->match().laminate.values().front()) {
+                        REQUIRE(section->layers.size() == 2);
+                        CHECK(section->property == rd::NastranPropertyId{90});
+                    } else {
+                        FAIL("Missing laminate after rejected axis match");
+                    }
+                    const auto repeated = prepare_case_nastran_planar_pg(
+                        si, *result, rd::MeshShellId{1}, *native_quantities, preparation,
+                        qualification, limit, workspace, plan, &diagnostic_result);
+                    REQUIRE_FALSE(repeated);
+                    CHECK(repeated.error().code == matched.error().code);
+                    if (const auto& detail = diagnostic_result.material_axes) {
+                        CHECK(detail->layer == core::LayerId{2});
+                        CHECK(detail->reason == rd::NastranPgAxisFailure::Difference);
+                    } else {
+                        FAIL("Axis provenance changed after retry");
+                    }
+                }
             } else {
                 REQUIRE(matched);
                 CHECK_FALSE(axis_diagnostic);
-                CHECK(matched->pg == fixture::take(qualified->reference().identity()));
-                CHECK(matched->sidecar.source == io::SourceId{2});
-                CHECK(matched->deck.source == io::SourceId{1});
-                const auto records = matched->matches.values();
+                const auto& evidence = matched->match();
+                CHECK(evidence.material_axes.pg == fixture::take(matched->reference().identity()));
+                CHECK(evidence.material_axes.sidecar.source == io::SourceId{2});
+                CHECK(evidence.material_axes.deck.source == io::SourceId{1});
+                CHECK(evidence.planar.sidecar_digest == evidence.material_axes.sidecar_digest);
+                CHECK(evidence.planar.thickness_compared);
+                REQUIRE(evidence.planar.laminate.size() == 1);
+                if (const auto& section = evidence.planar.laminate.values().front()) {
+                    CHECK(section->pg == evidence.material_axes.pg);
+                    CHECK(section->layers.size() == limit);
+                } else {
+                    FAIL("Missing laminate in the combined result");
+                }
+                const auto records = evidence.material_axes.matches.values();
                 REQUIRE(records.size() == (two_axis_layers ? 2U : 1U));
                 const auto& row = records.front();
                 CHECK(row.element == 701);
@@ -2438,23 +2477,30 @@ $EndElements
                     CHECK(upper.layer == core::LayerId{2});
                     CHECK(upper.degrees.sign() == 0);
                     CHECK(upper.ply_field != row.ply_field);
-                    const auto shortage = rd::match_nastran_pg_material_axes(
-                        si, *result, qualified->match(), {pg_limits, 1}, plan);
+                    const auto shortage = prepare_case_nastran_planar_pg(
+                        si, *result, rd::MeshShellId{1}, *native_quantities, preparation,
+                        qualification, 1, workspace, plan);
                     REQUIRE_FALSE(shortage);
                     CHECK(shortage.error().code == core::FailureCode::ResourceExceeded);
                     // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
                     std::stop_source stopped;
                     REQUIRE(stopped.request_stop());
-                    auto cancelled_limits = limits;
-                    cancelled_limits.arithmetic.cancellation = stopped.get_token();
-                    const auto cancelled = rd::match_nastran_pg_material_axes(
-                        si, *result, qualified->match(), cancelled_limits, plan);
+                    auto cancelled_preparation = preparation;
+                    cancelled_preparation.cancellation = stopped.get_token();
+                    const auto cancelled = prepare_case_nastran_planar_pg(
+                        si, *result, rd::MeshShellId{1}, *native_quantities, cancelled_preparation,
+                        qualification, limit, workspace, plan);
                     REQUIRE_FALSE(cancelled);
                     CHECK(cancelled.error().code == core::FailureCode::Cancelled);
                 }
             }
-        } else if (corners == Corners::MissingBase || corners == Corners::MixedMaterial ||
-                   corners == Corners::WrongFraction) {
+            return;
+        }
+        const auto qualified = uvlas::coupling::detail::prepare_case_external_planar_pg(
+            si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, preparation,
+            qualification, workspace, plan, &failure);
+        if (corners == Corners::MissingBase || corners == Corners::MixedMaterial ||
+            corners == Corners::WrongFraction) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == (corners == Corners::MixedMaterial
                                                  ? core::FailureCode::Unsupported

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "case_pg_reference.hpp"
-#include "io/external_mesh_sidecar_pg.hpp"
+#include "io/nastran_pg_material_axes.hpp"
 
+#include <optional>
 #include <utility>
 
 namespace uvlas::coupling::detail {
@@ -38,6 +39,25 @@ prepare_case_external_planar_pg(const io::SiCase&, const io::detail::ExternalMes
                                 const io::detail::ExternalSidecarPgLimits&, core::Workspace&,
                                 core::ResourcePlan&,
                                 io::detail::ExternalSidecarPgDiagnostic* = nullptr) noexcept;
+
+struct CaseNastranPgMatch {
+    io::detail::QualifiedExternalSidecarPg planar;
+    io::detail::NastranPgMaterialAxes material_axes;
+};
+
+struct CaseNastranPgDiagnostic {
+    io::detail::ExternalSidecarPgDiagnostic planar{};
+    std::optional<io::detail::NastranPgAxisDiagnostic> material_axes{};
+};
+
+/// Prepare one Nastran shell with exact planar, thickness, layer and material-axis evidence.
+/// The authenticated quantity owner and the Case remain readable after success or failure.
+/// The Case preparation cancellation token also covers the material-axis comparison.
+[[nodiscard]] core::Result<CaseExternalPg<CaseNastranPgMatch>> prepare_case_nastran_planar_pg(
+    const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&, io::detail::MeshShellId,
+    const io::detail::NastranLaminateCards&, const CasePgReferenceLimits&,
+    const io::detail::ExternalSidecarPgLimits&, std::uint64_t maximum_axis_matches,
+    core::Workspace&, core::ResourcePlan&, CaseNastranPgDiagnostic* = nullptr) noexcept;
 
 /// Prepare the same reference for whole-face bounds against an explicit conversion budget.
 /// The retained observation IDs identify the remaining independent physical checks.
