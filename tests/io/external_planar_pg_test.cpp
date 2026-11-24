@@ -210,11 +210,14 @@ TEST_CASE("Gmsh and Nastran preserve differently oriented source quads on a rota
 
 TEST_CASE("Planar certification separates winding, coverage and overlap without a geometry fit",
           "[IO4-03][IO4-04][SH-D02][N4-02][integration][negative][verification]") {
-    Fixture fixture, alternate, subset;
+    Fixture fixture, alternate, subset, notched;
     core::ResourcePlan plan{budget};
     const auto target = pg(fixture, plan);
     const auto curved = pg(alternate, plan, true);
     const auto clipped = pg(subset, plan, false, true);
+    notched.domain.insert(notched.domain.begin() + 3,
+                          PgPartitionPoint{notched.r("1", "2"), notched.r("1", "3")});
+    const auto concave = pg(notched, plan);
     const Corners xy{fixture};
     const auto deck = cards("CQUAD4,101,20,10,40,90,95\n"
                             "CTRIA3,201,20,10,40,90\nCTRIA3,202,20,10,40,95\n"
@@ -246,6 +249,8 @@ TEST_CASE("Planar certification separates winding, coverage and overlap without 
     rejected(qualify(target, deck, reversed), Code::GeometryInvalid, diagnostic, Reason::Winding);
     rejected(qualify(target, deck, folded), Code::GeometryInvalid, diagnostic, Reason::Winding);
     rejected(qualify(clipped, deck, full), Code::GeometryInvalid, diagnostic, Reason::Outside);
+    // Every original corner belongs to this patch, but the edge CD crosses the notch.
+    rejected(qualify(concave, deck, full), Code::GeometryInvalid, diagnostic, Reason::Outside);
     rejected(qualify(target, deck, gap), Code::GeometryInvalid, diagnostic, Reason::Coverage);
     rejected(qualify(target, deck, overlap), Code::GeometryInvalid, diagnostic, Reason::Overlap);
     CHECK(take(diagnostic).other == 201);
