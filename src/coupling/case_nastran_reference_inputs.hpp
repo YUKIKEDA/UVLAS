@@ -14,10 +14,10 @@ namespace uvlas::coupling::detail {
 
 struct CaseNastranReferenceInputLimits {
     CaseNastranPgSetLimits shells;
-    io::detail::NastranBeamLimits beam_cards;
-    io::detail::NastranPbeamLimits beam_properties;
-    io::detail::NastranLumpedMassLimits mass_cards;
-    io::detail::NastranRigidLinkLimits rigid_cards;
+    io::detail::NastranBeamLimits beam_cards{};
+    io::detail::NastranPbeamLimits beam_properties{};
+    io::detail::NastranLumpedMassLimits mass_cards{};
+    io::detail::NastranRigidLinkLimits rigid_cards{};
     io::detail::NastranBeamSiLimits beam;
     io::detail::NastranMassGeometryLimits mass;
     io::detail::NastranRigidAttachmentLimits rigid;

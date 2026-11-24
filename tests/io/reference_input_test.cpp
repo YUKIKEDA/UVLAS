@@ -2473,7 +2473,6 @@ $EndElements
                 rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
         }
         if (native_cards) {
-            using uvlas::coupling::detail::CaseNastranPgSetLimits;
             using uvlas::coupling::detail::CaseNastranReferenceDiagnostic;
             using uvlas::coupling::detail::CaseNastranReferenceInputLimits;
             using uvlas::coupling::detail::CaseNastranReferenceInputs;
