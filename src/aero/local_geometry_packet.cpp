@@ -1,5 +1,6 @@
 #include "local_geometry_packet.hpp"
 
+#include "global_geometry.hpp"
 #include "local_geometry_bounds_private.hpp"
 #include "local_geometry_input_private.hpp"
 
@@ -87,26 +88,55 @@ struct LocalPacketStorage {
     std::optional<LocalPacketData> payload;
 };
 class LocalPacketEngine {
+    static bool midpoint(const QueryRequest& query, LocalRootScratch& scratch) {
+        const auto* edge = std::get_if<SourceEdgePoint>(&query.definition);
+        if (edge == nullptr)
+            return false;
+        if (const auto* single = std::get_if<SingleWord>(&edge->t))
+            return single->value == .5;
+        const auto* pair = std::get_if<DoubleWord>(&edge->t);
+        if (pair == nullptr)
+            return false;
+        auto& sum = scratch.integers[0];
+        auto& low = scratch.integers[1];
+        auto& half = scratch.integers[2];
+        local_decode(pair->high, sum);
+        local_decode(pair->low, low);
+        local_decode(.5, half);
+        sum += low;
+        return sum == half;
+    }
+
     static AeroResult<LocalQualification> qualify(const LocalGeometryInput& input,
                                                   const NondegenerateTriangle& relation, bool bound,
                                                   std::optional<EdgeId> alias) noexcept {
         const auto& data = *input.owner;
         const auto& facet = data.facets.values()[static_cast<std::size_t>(input.facet)];
         const auto& support = input.query.support;
+        if (alias) {
+            const auto* edge = std::get_if<EdgeSupportStorage>(&support);
+            constexpr std::array projection{ProjectionFeature::Edge01, ProjectionFeature::Edge12,
+                                            ProjectionFeature::Edge20};
+            if (edge != nullptr && relation.plane == PlaneSide::On) {
+                for (std::size_t i = 0; i < facet.edges.size(); ++i) {
+                    const auto id =
+                        data.edges.values()[static_cast<std::size_t>(facet.edges[i])].id;
+                    if (id == alias->value() && relation.projection == projection[i])
+                        return VerifiedIncidence{EdgeId{edge->id}};
+                }
+            }
+            return std::unexpected(packet_failure(core::FailureCode::GeometryInvalid, data.context,
+                                                  QueryId{input.query.id}));
+        }
         std::optional<std::variant<PointId, EdgeId, FacetId>> member;
         if (const auto* point = std::get_if<PointSupportStorage>(&support)) {
             for (const auto index : facet.points)
                 if (data.points.values()[static_cast<std::size_t>(index)].id == point->id)
                     member = PointId{point->id};
         } else if (const auto* edge = std::get_if<EdgeSupportStorage>(&support)) {
-            constexpr std::array projection{ProjectionFeature::Edge01, ProjectionFeature::Edge12,
-                                            ProjectionFeature::Edge20};
-            for (std::size_t i = 0; i < facet.edges.size(); ++i) {
-                const auto id = data.edges.values()[static_cast<std::size_t>(facet.edges[i])].id;
-                if (id == edge->id ||
-                    (alias && id == alias->value() && relation.projection == projection[i]))
+            for (const auto index : facet.edges)
+                if (data.edges.values()[static_cast<std::size_t>(index)].id == edge->id)
                     member = EdgeId{edge->id};
-            }
         } else if (const auto* face = std::get_if<FacetSupportStorage>(&support)) {
             if (facet.id == face->id)
                 member = FacetId{face->id};
@@ -170,7 +200,7 @@ public:
     prepare(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
             LocalAccuracy accuracy, const GeometryLimits& limits, LocalPacketWorkspace& workspace,
             core::ResourcePlan& plan, const std::stop_token& stop, bool bound = false,
-            std::optional<EdgeId> alias = {}) noexcept {
+            std::optional<EdgeId> alias = {}, std::uint64_t alias_steps = 0) noexcept {
         const auto context = geometry.context();
         auto lease = workspace.acquire(context.diagnostics);
         if (!lease)
@@ -178,7 +208,7 @@ public:
         try {
             if (stop.stop_requested())
                 return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
-            if (limits.max_steps < 3108)
+            if (alias_steps > limits.max_steps || limits.max_steps - alias_steps < 3108)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             if (const auto error = accuracy.validation_error())
@@ -186,11 +216,17 @@ public:
             auto expression = query.definition();
             if (!expression)
                 return std::unexpected(expression.error());
+            auto& scratch = workspace.scratch_.values()[0];
+            if (alias && !midpoint(*expression, scratch))
+                return std::unexpected(
+                    packet_failure(core::FailureCode::InvalidInput, context, expression->id));
+            auto local_limits = limits;
+            local_limits.max_steps -= alias_steps;
             LocalPacketTimings measured;
             auto input = [&] {
                 const LocalClock clock{accuracy.collect_timings ? &measured.classification
                                                                 : nullptr};
-                return GeometryPacketAccess::load(geometry, query, target, limits,
+                return GeometryPacketAccess::load(geometry, query, target, local_limits,
                                                   *workspace.geometry_, *lease, plan, stop);
             }();
             if (!input) {
@@ -214,7 +250,6 @@ public:
             }();
             if (!qualification)
                 return std::unexpected(qualification.error());
-            auto& scratch = workspace.scratch_.values()[0];
             auto& radius = scratch.integers[11];
             auto& temp = scratch.integers[12];
             const auto words = input->owner->radius;
@@ -231,8 +266,8 @@ public:
                     packet_failure(core::FailureCode::GeometryInvalid, context, target));
             if (stop.stop_requested())
                 return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
-            if (input->preparation_steps > limits.max_steps ||
-                limits.max_steps - input->preparation_steps < 3108)
+            if (input->preparation_steps > local_limits.max_steps ||
+                local_limits.max_steps - input->preparation_steps < 3108)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             const auto& facet =
@@ -287,7 +322,7 @@ public:
                 temp = component * component;
                 j2 += temp;
             }
-            LocalWork work{input->preparation_steps, limits.max_steps, stop};
+            LocalWork work{alias_steps + input->preparation_steps, limits.max_steps, stop};
             {
                 const LocalClock enclosure_clock{accuracy.collect_timings ? &measured.enclosure
                                                                           : nullptr};
@@ -514,12 +549,34 @@ prepare_bound_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& q
                                       stop, true);
 }
 AeroResult<LocalGeometryPacket>
-prepare_aliased_midpoint_packet(const OwnedGeometry& geometry, const ResolvedQuery& query,
+prepare_aliased_midpoint_packet(const GlobalContactState& contact, const ResolvedQuery& query,
                                 FacetId target, EdgeId raw_alias, bool bound,
                                 LocalAccuracy accuracy, const GeometryLimits& limits,
                                 LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
                                 const std::stop_token& stop) noexcept {
+    const auto checked = contact.geometry();
+    if (!checked)
+        return std::unexpected(checked.error().origin);
+    const auto& geometry = checked->get();
+    const auto context = geometry.context();
+    if (stop.stop_requested())
+        return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
+    if (limits.max_steps == 0)
+        return std::unexpected(packet_failure(core::FailureCode::ResourceExceeded, context));
+    const auto expression = query.definition();
+    if (!expression)
+        return std::unexpected(expression.error());
+    const auto* edge = std::get_if<SourceEdgePoint>(&expression->definition);
+    if (edge == nullptr || edge->edge == raw_alias)
+        return std::unexpected(
+            packet_failure(core::FailureCode::InvalidInput, context, expression->id));
+    const auto relationship = contact.uvlm_load_edge(raw_alias, limits.max_steps - 1, stop);
+    if (!relationship)
+        return std::unexpected(relationship.error().origin);
+    if (relationship->edge != edge->edge)
+        return std::unexpected(
+            packet_failure(core::FailureCode::GeometryInvalid, context, raw_alias));
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop, bound, raw_alias);
+                                      stop, bound, raw_alias, 1 + relationship->used_steps);
 }
 } // namespace uvlas::aero::detail

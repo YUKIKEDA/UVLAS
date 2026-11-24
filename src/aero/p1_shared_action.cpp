@@ -774,7 +774,7 @@ public:
                 }
                 const auto id = FacetId{original.id};
                 auto packet = needed(
-                    alias ? prepare_aliased_midpoint_packet(*verified.geometry, source.query, id,
+                    alias ? prepare_aliased_midpoint_packet(source.contact, source.query, id,
                                                             *alias, facet.bound, local_accuracy,
                                                             limits.geometry, local, memory, stop)
                           : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
