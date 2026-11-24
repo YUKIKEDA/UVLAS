@@ -3,12 +3,30 @@
 #include "case_pg_reference.hpp"
 #include "io/external_mesh_sidecar_pg.hpp"
 
+#include <utility>
+
 namespace uvlas::coupling::detail {
 
 template <class Match>
-struct CaseExternalPg {
-    structure::PgReferenceGeometry reference;
-    Match match;
+class CaseExternalPg {
+public:
+    [[nodiscard]] const structure::PgReferenceGeometry& reference() const& noexcept {
+        return reference_;
+    }
+    [[nodiscard]] const structure::PgReferenceGeometry& reference() const&& = delete;
+
+    [[nodiscard]] const Match& match() const& noexcept {
+        return match_;
+    }
+    [[nodiscard]] const Match& match() const&& = delete;
+
+private:
+    friend struct CaseExternalPgFactory;
+    CaseExternalPg(structure::PgReferenceGeometry&& reference, Match&& match) noexcept
+        : reference_(std::move(reference)), match_(std::move(match)) {}
+
+    structure::PgReferenceGeometry reference_;
+    Match match_;
 };
 
 /// Prepare the Case shell's own PG reference and verify exact planar correspondence and
