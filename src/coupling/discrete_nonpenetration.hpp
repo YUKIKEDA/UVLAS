@@ -638,6 +638,55 @@ private:
     aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;
 
+/// Shared fixed-chart circulation directions, with independent load-only inputs.
+struct DiscreteImplicitVectorLoadDirection {
+    aero::detail::P1ActionStamp stamp;
+    core::NumericalGeneration circulation; ///< Retained primal generation.
+    DiscreteCirculationDirection
+        state; ///< The points and ambient direction are shared by both stages.
+    std::span<const EdgeMidpointVelocity> edges; ///< Midpoint velocity directions, m/s.
+    std::span<const BoundCirculationRate> rates; ///< Independent Γdot directions, m²/s².
+};
+
+class DiscreteCirculationImplicitLoadJvp {
+public:
+    DiscreteCirculationImplicitLoadJvp(DiscreteCirculationImplicitLoadJvp&&) noexcept = default;
+    DiscreteCirculationImplicitLoadJvp&
+    operator=(DiscreteCirculationImplicitLoadJvp&&) noexcept = default;
+    DiscreteCirculationImplicitLoadJvp(const DiscreteCirculationImplicitLoadJvp&) = delete;
+    DiscreteCirculationImplicitLoadJvp&
+    operator=(const DiscreteCirculationImplicitLoadJvp&) = delete;
+    [[nodiscard]] const DiscreteCirculationLoadJvp& direction() const& noexcept {
+        return direction_;
+    }
+    [[nodiscard]] const DiscreteCirculationLoadJvp& direction() const&& = delete;
+    [[nodiscard]] const DiscreteCirculationLinearization& tangent() const& noexcept {
+        return tangent_;
+    }
+    [[nodiscard]] const DiscreteCirculationLinearization& tangent() const&& = delete;
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationImplicitLoadJvp(DiscreteCirculationLoadJvp&& direction,
+                                       DiscreteCirculationLinearization&& tangent) noexcept
+        : direction_(std::move(direction)), tangent_(std::move(tangent)) {}
+    DiscreteCirculationLoadJvp direction_;
+    DiscreteCirculationLinearization tangent_;
+};
+
+/// Solve one primal, then A_eff δΓ = −δR using its fixed-chart native forcing.
+/// Pass both retained tangent words to the load JVP. The tangent must use the
+/// primal operator identity and distinct RHS and retained generations. A shared
+/// scale generation requires the certified primal scales. Flow moves on success.
+[[nodiscard]] core::Result<DiscreteCirculationImplicitLoadJvp>
+solve_discrete_circulation_implicit_load_direction(
+    const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+    const DiscreteImplicitVectorLoadDirection&, ProjectedCaseUniformFlow&&,
+    const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest& primal,
+    const DiscreteCirculationRequest& tangent, aero::detail::GeometryWorkspace&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 struct DiscreteLoadSampleWeights {
     DiscreteLoadSampleWeights(const NonpenetrationVector& x, const NonpenetrationVector& f) noexcept
         : position(x), force(f) {}
