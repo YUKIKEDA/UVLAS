@@ -4,7 +4,6 @@
 #include <array>
 #include <cstddef>
 #include <future>
-#include <stop_token>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -26,8 +25,8 @@ struct Producers {
 
     explicit Producers(Fixture& f)
         : dictionary(take(PgCoefficientDictionary::prepare(
-              *f.graph, {partition_test::exact_limits(), 2000, 20000000, 100000, {}}, workspace,
-              plan))),
+              f.chart_graph(), {partition_test::exact_limits(), 2000, 20000000, 100000, {}},
+              workspace, plan))),
           partition(take(PgIntegrationPartition::prepare(f.request(), partition_test::limits(),
                                                          workspace, plan))) {}
 };
@@ -199,10 +198,8 @@ TEST_CASE("PG rank preparation rejects short budgets without changing sources",
                   core::FailureCode::ResourceExceeded);
     CHECK(comparison.allocated_bytes() == 0);
 
-    std::stop_source source;
-    REQUIRE(source.request_stop());
     cap = limits();
-    cap.cancellation = source.get_token();
+    cap.cancellation = partition_test::requested_stop_token();
     core::ResourcePlan cancelled{48 * gib};
     check_failure(PgRankPreparation::prepare(inputs.dictionary, mismatched.partition, cap,
                                              inputs.workspace, cancelled),
@@ -244,9 +241,7 @@ TEST_CASE("PG rank meters exact compatibility of separately owned input graphs",
         return PgRankPreparation::prepare(dictionary.dictionary, partition, cap, workspace, plan);
     };
     check_failure(run(equal.partition), core::FailureCode::ResourceExceeded);
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
-    cap.cancellation = stop.get_token();
+    cap.cancellation = partition_test::requested_stop_token();
     check_failure(run(equal.partition), core::FailureCode::Cancelled);
     cap.cancellation = {};
 
@@ -485,9 +480,7 @@ TEST_CASE("PG rank revalidates equivalence and rejects stale same-shape sources 
     check_failure(
         rank.validate_for(current.dictionary, current.partition, cap, workspace, negative),
         core::FailureCode::ResourceExceeded);
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
-    cap.cancellation = stop.get_token();
+    cap.cancellation = partition_test::requested_stop_token();
     check_failure(
         rank.validate_for(current.dictionary, reordered.partition, cap, workspace, negative),
         core::FailureCode::Cancelled);
