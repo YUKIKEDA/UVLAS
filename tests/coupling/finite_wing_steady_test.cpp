@@ -194,7 +194,7 @@ struct FiniteWingMesh {
     std::vector<a::TrailingEdgeInput> trailing;
 };
 
-JsonToken finite_wing_case(const nlohmann::json& fixture, const nlohmann::json& wing) {
+JsonToken finite_wing_case(const nlohmann::json& wing, double core_radius) {
     auto recipe = root("aerodynamic_steady");
     recipe.field("model").set("geometry", parse(wing.at("case_geometry").dump()));
     recipe.field("model").set("aero_surfaces", parse(wing.at("case_surfaces").dump()));
@@ -207,7 +207,7 @@ JsonToken finite_wing_case(const nlohmann::json& fixture, const nlohmann::json& 
     recipe.field("analysis").field("speed").set("value", parse("20"));
     recipe.field("observations").elements[0].set("surfaces", parse(R"(["1","2"])"));
     auto& wake = recipe.field("analysis").field("wake");
-    wake.set("core_radius", parse(fixture.at("core_radius_m").dump()));
+    wake.set("core_radius", parse(nlohmann::json(core_radius).dump()));
     wake.set("convection",
              parse(R"({"kind":"prescribed","velocity":{"kind":"constant","value":[20,0,0]}})"));
     return recipe;
@@ -493,6 +493,7 @@ EnclosedVector arm_moment(EnclosedVector point, const Point& origin, const Enclo
 }
 
 struct SpanObservation {
+    Enclosure drag;
     Enclosure lift;
     Enclosure pitching_moment;
     std::array<Enclosure, band_count> band_lift;
@@ -531,8 +532,8 @@ SpanObservation observe(const cf::DiscreteCirculationLoads& loads, const nlohman
     const auto force = unpack_vector(loads.total_force());
     const auto moment = unpack_vector(loads.total_moment());
     EnclosedVector force_sum{}, moment_sum{};
-    SpanObservation result{lift(force), moment[1], {}};
-    check_within(drag(force), rational_word(expected.at("drag_lift_N").at(0).get<double>()),
+    SpanObservation result{drag(force), lift(force), moment[1], {}};
+    check_within(result.drag, rational_word(expected.at("drag_lift_N").at(0).get<double>()),
                  force_tolerance);
     check_within(result.lift, rational_word(expected.at("drag_lift_N").at(1).get<double>()),
                  force_tolerance);
@@ -567,17 +568,55 @@ SpanObservation observe(const cf::DiscreteCirculationLoads& loads, const nlohman
     return result;
 }
 
-void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
-              const nlohmann::json& expected, const nlohmann::json& reference_metadata,
-              const nlohmann::json& polar) {
-    auto recipe = finite_wing_case(shape, wing);
+void compare_ideal(const SpanObservation& actual, const nlohmann::json& finite,
+                   const nlohmann::json& ideal, const Rat& force_tolerance,
+                   const Rat& moment_tolerance) {
+    const auto compare = [&](const Enclosure& computed, double finite_value, double ideal_value,
+                             const Rat& tolerance) {
+        const Rat exact_ideal = rational_word(ideal_value);
+        const Rat estimate = rational_word(finite_value) - exact_ideal;
+        check_within(computed, exact_ideal, abs(estimate) + tolerance);
+        if (abs(estimate) > tolerance) {
+            const auto difference =
+                scale(subtract(computed, {exact_ideal, Rat{0}}), estimate > 0 ? Rat{1} : Rat{-1});
+            CHECK(difference.center - difference.radius > 0);
+        }
+    };
+    compare(actual.drag, finite.at("drag_lift_N").at(0).get<double>(),
+            ideal.at("drag_lift_N").at(0).get<double>(), force_tolerance);
+    compare(actual.lift, finite.at("drag_lift_N").at(1).get<double>(),
+            ideal.at("drag_lift_N").at(1).get<double>(), force_tolerance);
+    compare(actual.pitching_moment, finite.at("moment_Nm").at(1).get<double>(),
+            ideal.at("moment_Nm").at(1).get<double>(), moment_tolerance);
+    for (std::size_t band = 0; band < band_count; ++band) {
+        CAPTURE(band);
+        compare(actual.band_lift[band], finite.at("band_lift_N").at(band).get<double>(),
+                ideal.at("band_lift_N").at(band).get<double>(), force_tolerance);
+    }
+}
+
+struct WingCondition {
+    double wake_length;
+    double core_radius;
+    bool full_polar;
+    const nlohmann::json* ideal_angle{};
+};
+
+void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
+              const nlohmann::json& reference_metadata, const nlohmann::json& polar,
+              const WingCondition& condition) {
+    auto recipe = finite_wing_case(wing, condition.core_radius);
     const auto si = materialize(recipe, io::SourceId{532});
     core::ResourcePlan memory{1024ULL * 1024 * 1024};
-    const auto case_grid = lattice(si, shape.at("wake_length_m").get<double>(), memory);
-    for (std::size_t i = 0; i < case_grid.vertices.size(); ++i)
+    const auto case_grid = lattice(si, condition.wake_length, memory);
+    for (std::size_t i = 0; i < case_grid.vertices.size(); ++i) {
+        const bool translated = !condition.full_polar && i >= 15;
+        auto reference = wing.at("vertices_m").at(translated ? i - 5 : i).get<Point>();
+        if (translated)
+            reference[0] += condition.wake_length;
         for (std::size_t axis = 0; axis < 3; ++axis)
-            CHECK(std::abs(case_grid.vertices[i][axis] -
-                           wing.at("vertices_m").at(i).at(axis).get<double>()) < 2e-14);
+            CHECK(std::abs(case_grid.vertices[i][axis] - reference[axis]) < 2e-14);
+    }
     for (std::size_t i = 0; i < case_grid.collocation.size(); ++i)
         for (std::size_t axis = 0; axis < 3; ++axis)
             CHECK(std::abs(case_grid.collocation[i][axis] -
@@ -593,7 +632,7 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
     const auto wake_input = std::get<io::schema::WakeActive>(analysis.wake.record());
     const auto radius = as_rational(exact_quantity(si, wake_input.core_radius, memory), memory)
                             .convert_to<double>();
-    CHECK(radius == shape.at("core_radius_m").get<double>());
+    CHECK(radius == condition.core_radius);
     const a::SinglePositions positions{mesh.xyz};
     const a::GeometryInput input_geometry{mesh.ids,
                                           mesh.bindings,
@@ -756,7 +795,8 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
                                                  0.};
     const cf::DiscreteVectorLoadInput load_input{trial, request.retained_generation, midpoint,
                                                  rates, a::SingleWord{density},      xyz(origin)};
-    REQUIRE(polar.at("angles").size() == 5);
+    const auto& angles = polar.at("angles");
+    REQUIRE(angles.size() == (condition.full_polar ? 5U : 1U));
     std::array<SpanObservation, 5> observed{};
     const auto velocity_scale = rational_word(read_value(reference.speed));
     const auto dynamic_area = rational_word(density) * velocity_scale * velocity_scale *
@@ -768,11 +808,11 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
     const auto base_z = rational_from_view(take(base_projection.source().jet.velocity(2)));
     REQUIRE(base_z != 0);
 
-    for (std::size_t i = 0; i < observed.size(); ++i) {
-        const auto& sample = polar.at("angles").at(i);
+    for (std::size_t i = 0; i < angles.size(); ++i) {
+        const auto& sample = angles.at(i);
         const auto alpha = sample.at("alpha_degrees").get<int>();
         CAPTURE(alpha);
-        REQUIRE(alpha == static_cast<int>(i) - 2);
+        REQUIRE(alpha == (condition.full_polar ? static_cast<int>(i) - 2 : 1));
         auto angled = recipe;
         angled.field("flow").field("uniform").set("value", parse(sample.at("flow_m_s").dump()));
         const auto angled_si = materialize(angled, io::SourceId{532});
@@ -813,6 +853,9 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
         }
         observed[i] = observe(loads, sample, origin, ux / velocity_scale, uz / velocity_scale,
                               force_tolerance, moment_tolerance);
+        if (condition.ideal_angle != nullptr)
+            compare_ideal(observed[i], sample, *condition.ideal_angle, force_tolerance,
+                          moment_tolerance);
         if (alpha == 0) {
             const auto force = unpack_vector(loads.total_force());
             const auto moment = unpack_vector(loads.total_moment());
@@ -823,6 +866,8 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
         }
     }
 
+    if (!condition.full_polar)
+        return;
     for (std::size_t delta = 1; delta <= 2; ++delta) {
         CAPTURE(delta);
         const auto& sample = polar.at("slopes").at(delta - 1);
@@ -870,18 +915,8 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
     std::ifstream observations{UVLAS_FINITE_WING_STEADY_FIXTURE};
     REQUIRE(source);
     REQUIRE(observations);
-    std::ifstream polar_file{UVLAS_FINITE_WING_POLARS_FIXTURE};
-    REQUIRE(polar_file);
     const auto frozen = nlohmann::json::parse(source);
     const auto expected = nlohmann::json::parse(observations);
-    const auto polars = nlohmann::json::parse(polar_file);
-    REQUIRE(polars.at("cases").size() == 2);
-    REQUIRE(polars.at("band_bounds_m").size() == 21);
-    for (std::size_t i = 0; i <= band_count; ++i) {
-        const Rat boundary = Rat{-4} + Rat{2} * i / 5;
-        CHECK(abs(rational_word(polars.at("band_bounds_m").at(i).get<double>()) - boundary) <
-              rational_word(1e-15));
-    }
     REQUIRE(frozen.at("cases").size() == 2);
     REQUIRE(expected.at("cases").size() == 2);
     constexpr std::size_t wing_index = UVLAS_FINITE_WING_INDEX;
@@ -890,7 +925,51 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
     const auto& row = expected.at("cases").at(wing_index);
     CAPTURE(wing.at("dihedral_degrees").get<int>());
     REQUIRE(wing.at("dihedral_degrees") == row.at("dihedral_degrees"));
-    const auto& polar = polars.at("cases").at(wing_index);
-    REQUIRE(wing.at("dihedral_degrees") == polar.at("dihedral_degrees"));
-    run_wing(frozen, wing, row, expected, polar);
+
+    constexpr int series = UVLAS_FINITE_WING_SERIES;
+    static_assert(series >= 0 && series <= 2);
+    if constexpr (series == 0) {
+        std::ifstream polar_file{UVLAS_FINITE_WING_POLARS_FIXTURE};
+        REQUIRE(polar_file);
+        const auto polars = nlohmann::json::parse(polar_file);
+        REQUIRE(polars.at("cases").size() == 2);
+        REQUIRE(polars.at("band_bounds_m").size() == 21);
+        for (std::size_t i = 0; i <= band_count; ++i) {
+            const Rat boundary = Rat{-4} + Rat{2} * i / 5;
+            CHECK(abs(rational_word(polars.at("band_bounds_m").at(i).get<double>()) - boundary) <
+                  rational_word(1e-15));
+        }
+        const auto& polar = polars.at("cases").at(wing_index);
+        REQUIRE(wing.at("dihedral_degrees") == polar.at("dihedral_degrees"));
+        run_wing(wing, row, expected, polar,
+                 {frozen.at("wake_length_m").get<double>(),
+                  frozen.at("core_radius_m").get<double>(), true});
+    } else {
+        std::ifstream sensitivity_file{UVLAS_FINITE_WING_SENSITIVITY_FIXTURE};
+        REQUIRE(sensitivity_file);
+        const auto sensitivity = nlohmann::json::parse(sensitivity_file);
+        REQUIRE(sensitivity.at("cases").size() == 2);
+        const auto& selected = sensitivity.at("cases").at(wing_index);
+        REQUIRE(wing.at("dihedral_degrees") == selected.at("dihedral_degrees"));
+        constexpr std::array closure_lengths{256., 512., 1024.};
+        constexpr std::array core_radii{1e-4, 1e-5};
+        const auto& ideal = selected.at("ideal_same_finite_closure");
+        REQUIRE(ideal.at("wake_length_m") == 512.);
+        REQUIRE(ideal.at("core_radius_m") == 0.);
+        REQUIRE(ideal.at("angles").size() == 1);
+        const auto& ideal_angle = ideal.at("angles").at(0);
+        REQUIRE(ideal_angle.at("alpha_degrees") == 1);
+        const auto& samples = selected.at(series == 1 ? "closure" : "core");
+        REQUIRE(samples.size() == (series == 1 ? closure_lengths.size() : core_radii.size()));
+        for (std::size_t i = 0; i < samples.size(); ++i) {
+            const auto& sample = samples.at(i);
+            const double length = series == 1 ? closure_lengths.at(i) : 512.;
+            const double radius = series == 1 ? 1e-3 : core_radii.at(i);
+            CAPTURE(length, radius);
+            REQUIRE(sample.at("wake_length_m") == length);
+            REQUIRE(sample.at("core_radius_m") == radius);
+            run_wing(wing, sample, expected, sample,
+                     {length, radius, false, length == 512. ? &ideal_angle : nullptr});
+        }
+    }
 }
