@@ -221,6 +221,52 @@ void check_curved_trace(Fixture& f, const PgPreparedPatch& left, const PgPrepare
                           curved_point_value(f, right, b.front(), s, root, q_right, plan));
 }
 
+void check_curved_area_projection(Fixture& f, const PgPreparedPatch& patch,
+                                  const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+    const auto& partition = trace_partition(patch);
+    const auto faces = take(partition.horizontal_faces());
+    const auto layers = take(partition.layers());
+    const auto selected = std::ranges::find_if(faces, [&](const auto& face) {
+        const auto& layer = layers[static_cast<std::size_t>(face.layer)];
+        return q(face.side == PgPartitionFaceSide::Lower ? layer.lower : layer.upper) != 0;
+    });
+    REQUIRE(selected != faces.end());
+    const auto& face = *selected;
+    const auto& tri = take(partition.triangles())[static_cast<std::size_t>(face.triangle)];
+    const auto& layer = layers[static_cast<std::size_t>(face.layer)];
+    const auto vertices = take(partition.vertices());
+    Q s;
+    for (const auto index : tri.vertices)
+        s += q(vertices[static_cast<std::size_t>(index)].s) / 3;
+    const Q z = q(face.side == PgPartitionFaceSide::Lower ? layer.lower : layer.upper) / 2;
+    REQUIRE(z != 0);
+    const Q g = 1 + s * s / 64;
+    const I grid = I{1} << 256;
+    const Dec approximate = sqrt(numerator(g).convert_to<Dec>() / denominator(g).convert_to<Dec>());
+    const auto floor_root = floor(approximate * grid.convert_to<Dec>()).convert_to<I>();
+    const Q lower_root = Q{floor_root} / grid, upper_root = Q{floor_root + 1} / grid;
+    REQUIRE(lower_root * lower_root < g);
+    REQUIRE(upper_root * upper_root > g);
+    // For X(s,t,z) = 2(s,t,s²/16) + z n, the tangent lengths on a
+    // fixed-z face are 2 sqrt(g) - z/(8g) and 2, in orthogonal directions.
+    const auto area = [&](const Q& root) -> Q {
+        return q(tri.twice_area) * (4 * root - z / (4 * g));
+    };
+    const auto third = f.r("1", "3");
+    const PgReferencePoint query = PgReferenceHorizontalPoint{
+        static_cast<core::Index>(selected - faces.begin()), third, third};
+    constexpr double tolerance = 0x1p-72;
+    const PgPreparedReferenceProjection projection{
+        core::Precision::TwoWord, tolerance, tolerance, tolerance, tolerance, tolerance};
+    const auto projected =
+        take(patch.project_reference(std::span{&query, 1}, projection, limits, plan));
+    const Q measure = independent_double(projected.high_words()[3]) +
+                      independent_double(projected.low_words()[3]);
+    const Q budget = independent_double(tolerance);
+    CHECK(measure - budget <= area(lower_root));
+    CHECK(measure + budget >= area(upper_root));
+}
+
 void check_fixed_projection(const PgPreparedPatch& patch, std::span<const CurvedRulePoint> rule,
                             const PgReferenceLimits& limits, core::ResourcePlan& plan) {
     REQUIRE(rule.size() > 2);
@@ -500,6 +546,7 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
         PgPreparedPatch::prepare(std::move(adjacent_certificate), caps.arithmetic, scratch, plan));
     check_curved_trace(f, patch, adjacent_patch, caps.arithmetic, scratch, plan);
     check_fixed_projection(patch, rule, caps.arithmetic, plan);
+    check_curved_area_projection(f, patch, caps.arithmetic, plan);
 }
 
 TEST_CASE("PG irrational curved samples enclose signed Gram entries",
@@ -579,7 +626,7 @@ TEST_CASE("PG irrational curved samples enclose signed Gram entries",
         ExactEstimateAdmission{std::uint64_t{32} * 1024 * 1024};
     core::ResourcePlan rejected_plan{profile};
     check_failure(PgDiscreteGram::prepare(std::move(basis), points, {224, 152}, limited, scratch,
-                                         rejected_plan),
+                                          rejected_plan),
                   core::FailureCode::ResourceExceeded);
     CHECK(rejected_plan.allocated_bytes() == 0);
     REQUIRE(take(basis.size()) == rank);

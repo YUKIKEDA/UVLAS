@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <span>
 #include <uvlas/structure/pg_discrete_gram.hpp>
 
 namespace uvlas::structure {
@@ -18,6 +21,74 @@ struct PgPreparedPatchInfo {
 };
 
 using PgCartesianExactPosition = std::array<ExactRational, 3>;
+
+enum class PgProjectedReferenceDomain : std::uint8_t { Volume, Lower, Upper, Lateral };
+
+struct PgProjectedReferencePoint {
+    PgCellIndex cell;
+    core::Index partition_record{};
+    core::LayerId layer{0};
+    PgProjectedReferenceDomain domain = PgProjectedReferenceDomain::Volume;
+};
+
+/// Componentwise absolute errors in the recorded physical units.
+struct PgPreparedReferenceProjection {
+    core::Precision representation;
+    double maximum_position_error_metres;
+    double maximum_shape_error;
+    double maximum_gradient_error_per_metre;
+    double maximum_volume_error_metres_cubed;
+    double maximum_area_error_metres_squared;
+};
+
+/// Point-major words. Each row is X0[3], positive measure, then (N, G[3]) per column.
+class PgProjectedReferenceBatch {
+public:
+    PgProjectedReferenceBatch(PgProjectedReferenceBatch&&) noexcept = default;
+    PgProjectedReferenceBatch& operator=(PgProjectedReferenceBatch&&) noexcept = default;
+    PgProjectedReferenceBatch(const PgProjectedReferenceBatch&) = delete;
+    PgProjectedReferenceBatch& operator=(const PgProjectedReferenceBatch&) = delete;
+
+    [[nodiscard]] PgPreparedPatchIdentity source() const noexcept {
+        return source_;
+    }
+    [[nodiscard]] std::size_t column_count() const noexcept {
+        return columns_;
+    }
+    [[nodiscard]] PgPreparedReferenceProjection projection() const noexcept {
+        return projection_;
+    }
+    [[nodiscard]] PgReferenceCallInfo call_info() const noexcept {
+        return call_info_;
+    }
+
+    [[nodiscard]] std::span<const PgProjectedReferencePoint> points() const& noexcept {
+        return points_.values();
+    }
+    [[nodiscard]] std::span<const PgProjectedReferencePoint> points() const&& = delete;
+    [[nodiscard]] std::span<const double> high_words() const& noexcept {
+        return high_.values();
+    }
+    [[nodiscard]] std::span<const double> high_words() const&& = delete;
+    /// Empty in Binary64. TwoWord keeps the same layout as high_words().
+    [[nodiscard]] std::span<const double> low_words() const& noexcept {
+        return low_.values();
+    }
+    [[nodiscard]] std::span<const double> low_words() const&& = delete;
+
+private:
+    friend class PgPreparedPatch;
+    PgProjectedReferenceBatch(PgPreparedPatchIdentity, std::size_t, PgPreparedReferenceProjection,
+                              PgReferenceCallInfo, core::PlannedBuffer<PgProjectedReferencePoint>,
+                              core::PlannedBuffer<double>, core::PlannedBuffer<double>) noexcept;
+
+    PgPreparedPatchIdentity source_;
+    std::size_t columns_;
+    PgPreparedReferenceProjection projection_;
+    PgReferenceCallInfo call_info_;
+    core::PlannedBuffer<PgProjectedReferencePoint> points_;
+    core::PlannedBuffer<double> high_, low_;
+};
 
 /// Immutable reference patch. q0 is Cartesian metres, by column and axis.
 class PgPreparedPatch {
@@ -64,6 +135,11 @@ public:
     [[nodiscard]] core::Result<PgConditionedReferenceBatch>
     evaluate_reference(std::span<const PgReferencePoint>, const PgReferenceLimits&,
                        core::ResourcePlan&) const noexcept;
+
+    /// Project the same qualified point order without changing or consuming this patch.
+    [[nodiscard]] core::Result<PgProjectedReferenceBatch>
+    project_reference(std::span<const PgReferencePoint>, const PgPreparedReferenceProjection&,
+                      const PgReferenceLimits&, core::ResourcePlan&) const noexcept;
 
 private:
     struct Coordinates;

@@ -1,5 +1,6 @@
 #include "pg_conditioning_test_support.hpp"
 
+#include <algorithm>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_prepared_patch.hpp>
 
@@ -116,5 +117,84 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
             for (std::size_t j = 0; j < expected.size(); ++j)
                 CHECK(derivative[j][a] == (j == a ? 1 : 0));
         }
+    }
+
+    const auto interior = std::ranges::find_if(
+        faces, [&](const auto& face) { return face.side != faces.front().side; });
+    REQUIRE(interior != faces.end());
+    const auto opposite_face = static_cast<core::Index>(interior - faces.begin());
+    const std::array<PgReferencePoint, 4> mixed{queries[0], queries[1],
+                                                PgReferenceHorizontalPoint{opposite_face, u, v},
+                                                PgReferenceLateralPoint{0, u, depth}};
+    const auto exact = take(patch.evaluate_reference(mixed, caps, setup));
+    const auto first_side = faces.front().side == PgPartitionFaceSide::Lower
+                                ? PgProjectedReferenceDomain::Lower
+                                : PgProjectedReferenceDomain::Upper;
+    const auto opposite_side = first_side == PgProjectedReferenceDomain::Lower
+                                   ? PgProjectedReferenceDomain::Upper
+                                   : PgProjectedReferenceDomain::Lower;
+    const std::array domains{PgProjectedReferenceDomain::Volume, first_side, opposite_side,
+                             PgProjectedReferenceDomain::Lateral};
+    const auto stride = 4 * (static_cast<std::size_t>(exact.column_count) + 1);
+    for (const auto precision : {core::Precision::Binary64, core::Precision::TwoWord}) {
+        const auto paired = precision == core::Precision::TwoWord;
+        const double requested = paired ? 0x1p-72 : 0x1p-32;
+        const Q tolerance = independent_double(requested);
+        const PgPreparedReferenceProjection projection{precision, requested, requested,
+                                                       requested, requested, requested};
+        const auto result = take(patch.project_reference(mixed, projection, caps, setup));
+        CHECK(result.source() == recorded.identity);
+        CHECK(result.column_count() == exact.column_count);
+        REQUIRE(result.points().size() == mixed.size());
+        REQUIRE(result.high_words().size() == stride * mixed.size());
+        REQUIRE(result.low_words().size() == (paired ? stride * mixed.size() : 0));
+        for (std::size_t p = 0; p < mixed.size(); ++p) {
+            CAPTURE(p);
+            const auto& record = result.points()[p];
+            const auto& point = exact.points.values()[p];
+            CHECK(record.domain == domains[p]);
+            CHECK(record.layer == point.layer);
+            CHECK(record.partition_record == point.partition_record);
+            std::size_t slot = p * stride;
+            const auto read = [&] {
+                Q value = independent_double(result.high_words()[slot]);
+                if (paired)
+                    value += independent_double(result.low_words()[slot]);
+                ++slot;
+                return value;
+            };
+            const auto check_scalar = [&](const PgReferenceScalar& component) {
+                CHECK(abs(read() - flat(component)) <= tolerance);
+            };
+            REQUIRE(q(point.g) == 1);
+            for (const auto& position : point.position_metres)
+                check_scalar(position);
+            if (const auto* volume = std::get_if<PgReferenceVolumeMeasure>(&point.measure)) {
+                check_scalar(volume->jacobian);
+            } else {
+                const auto* side = std::get_if<PgReferenceHorizontalMeasure>(&point.measure);
+                const auto& area =
+                    side ? side->area : std::get<PgReferenceLateralMeasure>(point.measure).area;
+                const Q kept = read();
+                CHECK(kept > tolerance);
+                CHECK((kept - tolerance) * (kept - tolerance) <= flat(area.squared_norm));
+                CHECK((kept + tolerance) * (kept + tolerance) >= flat(area.squared_norm));
+            }
+            const auto columns =
+                exact.columns.values().subspan(p * result.column_count(), result.column_count());
+            for (const auto& column : columns) {
+                check_scalar(column.value);
+                for (const auto& gradient : column.physical_gradient_per_metre)
+                    check_scalar(gradient);
+            }
+            CHECK(slot == (p + 1) * stride);
+        }
+        check_failure(patch.project_reference(mixed, projection, caps, none),
+                      core::FailureCode::ResourceExceeded);
+        auto strict = projection;
+        strict.maximum_position_error_metres = 0;
+        check_failure(patch.project_reference(mixed, strict, caps, setup),
+                      core::FailureCode::PrecisionUnresolved);
+        CHECK(take(patch.info()).identity == recorded.identity);
     }
 }

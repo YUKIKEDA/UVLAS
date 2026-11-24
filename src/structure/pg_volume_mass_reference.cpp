@@ -70,6 +70,10 @@ void project_shapes(ReferenceArithmetic& math, const PgConditionedReferenceBatch
     return PgReferenceVolumePoint{query.volume, query.u, query.v, query.depth};
 }
 
+[[nodiscard]] const PgReferencePoint& reference_query(const PgReferencePoint& query) {
+    return query;
+}
+
 template <class Record>
 struct ProjectedRows {
     core::PlannedBuffer<Record> points;
@@ -96,9 +100,8 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
         plan.remaining_bytes())
         partition_fail(core::FailureCode::ResourceExceeded);
     // Only one exact reference row remains alive while producing the rounded row.
-    // For two directions, leave 32 additional Rational slots for the two
-    // Cartesian vectors and their construction and dot-product temporaries.
-    const auto extra = directions == 2 ? 32U : 0U;
+    // Multicomponent projections also need their Cartesian and area temporaries.
+    const auto extra = directions > 1 ? 32U : 0U;
     math.admit(
         partition_add(partition_add(reference_live_rationals + 74 + extra, retained_rationals),
                       partition_mul(8, rank)));
@@ -208,7 +211,100 @@ void project_tangents(ReferenceArithmetic& math, const PgConditionedReferenceBat
         }
 }
 
+[[nodiscard]] PgProjectedReferencePoint
+project_reference_row(ReferenceArithmetic& math, const PgConditionedReferenceBatch& batch,
+                      const PgPreparedReferenceProjection& request, std::span<double> high,
+                      std::span<double> low) {
+    const auto& point = batch.points.values().front();
+    const auto precision = request.representation;
+    const auto position_error = reference_binary64(math, request.maximum_position_error_metres);
+    const auto shape_error = reference_binary64(math, request.maximum_shape_error);
+    const auto gradient_error = reference_binary64(math, request.maximum_gradient_error_per_metre);
+    std::size_t slot = 0;
+    const auto write = [&](PgProjectedWord words) {
+        high[slot] = words.high;
+        if (!low.empty())
+            low[slot] = words.low;
+        ++slot;
+    };
+    const auto scalar = [&](const PgReferenceScalar& value, const ExactRational& error) {
+        return pg_project_scalar(math, value, point.g, error, precision);
+    };
+    for (const auto& position : point.position_metres)
+        write(scalar(position, position_error));
+
+    PgProjectedReferenceDomain domain = PgProjectedReferenceDomain::Volume;
+    PgProjectedWord measure;
+    if (const auto* volume = std::get_if<PgReferenceVolumeMeasure>(&point.measure)) {
+        const auto error = reference_binary64(math, request.maximum_volume_error_metres_cubed);
+        measure = scalar(volume->jacobian, error);
+    } else {
+        const auto* side = std::get_if<PgReferenceHorizontalMeasure>(&point.measure);
+        const auto& area =
+            side ? side->area : std::get<PgReferenceLateralMeasure>(point.measure).area;
+        domain =
+            side ? (side->side == PgPartitionFaceSide::Lower ? PgProjectedReferenceDomain::Lower
+                                                             : PgProjectedReferenceDomain::Upper)
+                 : PgProjectedReferenceDomain::Lateral;
+        const auto error = reference_binary64(math, request.maximum_area_error_metres_squared);
+        measure = pg_project_positive_root(math, area.squared_norm, point.g, error, precision);
+    }
+    const auto measure_bits = std::bit_cast<std::uint64_t>(measure.high);
+    if (measure_bits == 0 || (measure_bits & pg_binary64_sign) != 0)
+        partition_fail(core::FailureCode::PrecisionUnresolved);
+    write(measure);
+    for (const auto& column : batch.columns.values()) {
+        math.visit(1);
+        write(scalar(column.value, shape_error));
+        for (const auto& gradient : column.physical_gradient_per_metre)
+            write(scalar(gradient, gradient_error));
+    }
+    return {point.cell, point.partition_record, point.layer, domain};
+}
+
 } // namespace
+
+PgProjectedReferenceBatch::PgProjectedReferenceBatch(
+    PgPreparedPatchIdentity source, std::size_t columns, PgPreparedReferenceProjection projection,
+    PgReferenceCallInfo call_info, core::PlannedBuffer<PgProjectedReferencePoint> points,
+    core::PlannedBuffer<double> high, core::PlannedBuffer<double> low) noexcept
+    : source_(source),
+      columns_(columns),
+      projection_(projection),
+      call_info_(call_info),
+      points_(std::move(points)),
+      high_(std::move(high)),
+      low_(std::move(low)) {}
+
+core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_reference(
+    std::span<const PgReferencePoint> queries, const PgPreparedReferenceProjection& projection,
+    const PgReferenceLimits& limits, core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<PgProjectedReferenceBatch> {
+        auto math = ReferenceArithmetic{limits, plan};
+        math.cancel();
+        const auto source = partition_take(info());
+        const auto two_word = two_word_projection(projection.representation);
+        for (const auto tolerance :
+             {projection.maximum_position_error_metres, projection.maximum_shape_error,
+              projection.maximum_gradient_error_per_metre,
+              projection.maximum_volume_error_metres_cubed,
+              projection.maximum_area_error_metres_squared})
+            validate_tolerance(tolerance);
+        auto rows = project_rows<PgProjectedReferencePoint>(
+            math, conditioning(), source.basis.rank, queries, two_word, 4, 4,
+            [&](const PgConditionedReferenceBatch& batch, std::span<double> high,
+                std::span<double> low) {
+                return project_reference_row(math, batch, projection, high, low);
+            });
+        return PgProjectedReferenceBatch{source.identity,
+                                         static_cast<std::size_t>(source.basis.rank),
+                                         projection,
+                                         math.info(),
+                                         std::move(rows.points),
+                                         std::move(rows.high),
+                                         std::move(rows.low)};
+    });
+}
 
 PgVolumeMassReference::PgVolumeMassReference(PgConditioningCertificate&& conditioning,
                                              std::size_t columns, PgVolumeMassProjection projection,
