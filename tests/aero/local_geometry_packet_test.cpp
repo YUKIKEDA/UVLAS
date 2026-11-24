@@ -1,3 +1,4 @@
+#include "aero/global_geometry.hpp"
 #include "aero/local_geometry_bounds_private.hpp"
 #include "geometry_snapshot_fixture.hpp"
 
@@ -70,6 +71,112 @@ TEST_CASE("Local packet LG-F01 owns exact geometry and verified face incidence",
     CHECK(take(packet.snapshot_identity()) == take(geometry.identity()));
     CHECK(take(packet.query()).id == QueryId{5});
 }
+
+TEST_CASE("Local alias packet verifies the registered canonical midpoint at its own entry",
+          "[UI-D03][UW-D07][N4-02][negative][verification]") {
+    core::ResourcePlan setup{budget}, packets{budget};
+    auto query_workspace = workspace(setup);
+    auto local = packet_workspace(setup);
+    const TriangleFixture fixture;
+    const EdgeId canonical{10}, raw{40};
+    const std::array edges{fixture.edges[0], fixture.edges[1], fixture.edges[2],
+                           EdgeInput{raw, {fixture.points[1], fixture.points[0]}}};
+    auto facets = fixture.triangles;
+    facets[0].edges[0] = raw;
+    auto specification = fixture.input();
+    specification.edges = edges;
+    specification.triangles = facets;
+    const auto geometry =
+        take(prepare_owned_geometry(specification, limits(), *query_workspace, setup));
+
+    const std::array roles{FaceRoleInput{fixture.faces[0].id, AeroFaceRole::Bound}};
+    const std::array registered{EdgeBindingInput{canonical, CanonicalEdge{}},
+                                EdgeBindingInput{fixture.edges[1].id, CanonicalEdge{}},
+                                EdgeBindingInput{fixture.edges[2].id, CanonicalEdge{}},
+                                EdgeBindingInput{raw, canonical}};
+    auto unregistered = registered;
+    unregistered.back().ownership = CanonicalEdge{};
+    const GlobalLimits cap{UINT64_C(100000000), numerics::linear::EstimateAdmission{4096}};
+    auto global = GlobalWorkspace::create(setup, cap.metadata);
+    if (!global)
+        FAIL("Global workspace creation failed");
+    const auto checked = [&](std::span<const EdgeBindingInput> bindings) {
+        auto topology =
+            build_global_topology(geometry, {roles, bindings, {}}, cap, **global, setup);
+        if (!topology)
+            FAIL("External topology could not be qualified");
+        auto contact = check_global_geometry(*topology, geometry, cap, **global, setup);
+        if (!contact)
+            FAIL("Global contact could not be qualified");
+        return std::move(*contact);
+    };
+    const auto active = checked(registered);
+    const auto absent = checked(unregistered);
+    const auto query_at = [&](const OwnedGeometry& owner, QueryDefinition expression) {
+        return take(resolve_query(owner, {QueryId{95}, expression}, owner.context(), limits(),
+                                  *query_workspace, setup));
+    };
+    const auto at_midpoint = query_at(geometry, SourceEdgePoint{canonical, SingleWord{.5}});
+    const auto qualify = [&](const GlobalContactState& contact, const ResolvedQuery& query,
+                             const GeometryLimits& cap_for_packet = limits(),
+                             const std::stop_token& stop = {}) {
+        return prepare_aliased_midpoint_packet(contact, query, FacetId{70}, true,
+                                               {core::Precision::TwoWord, 1e-10}, cap_for_packet,
+                                               *local, packets, stop);
+    };
+    const auto accepted = take(qualify(active, at_midpoint));
+    const auto verify = [&](const LocalGeometryPacket& packet) {
+        const auto incidence = take(packet.qualification());
+        const auto* member = std::get_if<VerifiedIncidence>(&incidence);
+        REQUIRE(member != nullptr);
+        CHECK(member->support == std::variant<PointId, EdgeId, FacetId>{canonical});
+        contains(packet_value(packet, LocalQuantity::PositionX), Rat{3, 2});
+        contains(packet_value(packet, LocalQuantity::PositionY), Rat{0});
+    };
+    verify(accepted);
+    CHECK(take(accepted.steps()) <= limits().max_steps);
+    const auto split =
+        query_at(geometry, SourceEdgePoint{canonical, DoubleWord{.5 + 0x1p-53, -0x1p-53}});
+    verify(take(qualify(active, split)));
+
+    const auto bytes = packets.allocated_bytes();
+    failure(qualify(absent, at_midpoint), core::FailureCode::GeometryInvalid);
+    const auto from_alias = query_at(geometry, SourceEdgePoint{raw, SingleWord{.5}});
+    failure(qualify(active, from_alias), core::FailureCode::GeometryInvalid);
+    for (const auto coordinate : {0., .25, 1.}) {
+        const auto on_edge = query_at(geometry, SourceEdgePoint{canonical, SingleWord{coordinate}});
+        failure(qualify(active, on_edge), core::FailureCode::InvalidInput);
+    }
+    const auto near_half = query_at(geometry, SourceEdgePoint{canonical, DoubleWord{.5, 0x1p-75}});
+    failure(qualify(active, near_half), core::FailureCode::InvalidInput);
+    const auto face =
+        query_at(geometry, SourceFacePoint{FacetId{70}, SingleWord{.5}, SingleWord{0}});
+    failure(qualify(active, face), core::FailureCode::InvalidInput);
+
+    auto changed_reference = fixture.reference;
+    changed_reference[8] = .125;
+    auto other_specification = specification;
+    other_specification.reference = SinglePositions{changed_reference};
+    const auto other =
+        take(prepare_owned_geometry(other_specification, limits(), *query_workspace, setup));
+    const auto foreign = query_at(other, SourceEdgePoint{canonical, SingleWord{.5}});
+    failure(qualify(active, foreign), core::FailureCode::StaleGeneration);
+    auto short_budget = limits();
+    short_budget.max_steps = 1;
+    failure(qualify(active, at_midpoint, short_budget), core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+    std::stop_source cancel;
+    REQUIRE(cancel.request_stop());
+    failure(qualify(active, at_midpoint, limits(), cancel.get_token()),
+            core::FailureCode::Cancelled);
+    CHECK(packets.allocated_bytes() == bytes);
+    CHECK(active.active());
+    CHECK(absent.active());
+    CHECK(at_midpoint.active());
+    verify(accepted);
+    verify(take(qualify(active, at_midpoint)));
+}
+
 TEST_CASE("Local packet LG-F02 F03 and F05 distinguish self contact and detached",
           "[UI-D03][UI-D05][UI-D06][N4-03][negative][verification]") {
     for (const double radius : {0., .25}) {
@@ -314,7 +421,7 @@ TEST_CASE("Local packet owns both quad ambient orders and all LR basis scatterin
     const std::array<double, 12> xyz{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0};
     const std::array edges{EdgeInput{EdgeId{1}, {p[0], p[1]}}, EdgeInput{EdgeId{2}, {p[1], p[2]}},
                            EdgeInput{EdgeId{3}, {p[2], p[3]}}, EdgeInput{EdgeId{4}, {p[3], p[0]}},
-                           EdgeInput{EdgeId{5}, {p[0], p[2]}}};
+                           EdgeInput{EdgeId{5}, {p[0], p[2]}}, EdgeInput{EdgeId{6}, {p[2], p[0]}}};
     const std::array faces{FaceInput{PhysicalFaceId{8}, BandId{0}}};
     const std::array bands{BandId{0}};
     const std::array quads{QuadInput{faces[0].id,
@@ -337,7 +444,32 @@ TEST_CASE("Local packet owns both quad ambient orders and all LR basis scatterin
     auto old = workspace(plan);
     auto current = packet_workspace(plan);
     auto geometry = take(prepare_owned_geometry(input, limits(), *old, plan));
+    const std::array roles{FaceRoleInput{faces[0].id, AeroFaceRole::Bound}};
+    const std::array edge_bindings{EdgeBindingInput{edges[0].id, CanonicalEdge{}},
+                                   EdgeBindingInput{edges[1].id, CanonicalEdge{}},
+                                   EdgeBindingInput{edges[2].id, CanonicalEdge{}},
+                                   EdgeBindingInput{edges[3].id, CanonicalEdge{}},
+                                   EdgeBindingInput{edges[4].id, edges[5].id},
+                                   EdgeBindingInput{edges[5].id, CanonicalEdge{}}};
+    const GlobalLimits cap{UINT64_C(100000000000), numerics::linear::EstimateAdmission{4096}};
+    auto global = GlobalWorkspace::create(plan, cap.metadata);
+    if (!global)
+        FAIL("Global workspace creation failed");
+    const auto topology =
+        build_global_topology(geometry, {roles, edge_bindings, {}}, cap, **global, plan);
+    if (!topology)
+        FAIL("Quad topology could not be qualified");
+    const auto contact = check_global_geometry(*topology, geometry, cap, **global, plan);
+    if (!contact)
+        FAIL("Quad contact could not be qualified");
+    const auto midpoint =
+        take(resolve_query(geometry, {QueryId{6}, SourceEdgePoint{edges[5].id, SingleWord{.5}}},
+                           geometry.context(), limits(), *old, plan));
     for (const auto target : quads[0].facets) {
+        const auto aliased = take(prepare_aliased_midpoint_packet(*contact, midpoint, target, true,
+                                                                  {core::Precision::TwoWord, 1e-10},
+                                                                  limits(), *current, plan, {}));
+        CHECK(std::holds_alternative<BoundInterior>(take(aliased.qualification())));
         auto query = take(resolve_query(
             geometry, {QueryId{5}, SourceFacePoint{target, SingleWord{.25}, SingleWord{.25}}},
             geometry.context(), limits(), *old, plan));
