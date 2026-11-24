@@ -261,7 +261,8 @@ TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
         for (std::size_t shell = 0; shell < count; ++shell) {
             core::ResourcePlan plan{profile};
             core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
-            const auto result = c::prepare_case_pg_reference(si, shell + 1, limits, workspace, plan);
+            const auto result =
+                c::prepare_case_pg_reference(si, shell + 1, limits, workspace, plan);
             if (!result)
                 UNSCOPED_INFO("Preparation failure " << static_cast<unsigned>(result.error().code));
             REQUIRE(result);
