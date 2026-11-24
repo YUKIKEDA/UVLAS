@@ -138,4 +138,11 @@ resolve_leaf_references(const ReferenceInput&, PreparedRootReferences&&, RootInv
                         const std::stop_token&, RootSnapshotDiagnostic*,
                         LeafReferenceDiagnostic*) noexcept;
 
+// Resolve the authenticated deck from the same case and retain its immutable bytes for
+// typed clients. The input graph can be destroyed after a successful call.
+[[nodiscard]] core::Result<NastranBulkDeck>
+prepare_referenced_nastran_deck(const ReferencedCase&, const SchemaIdentity&, SourceId,
+                                NastranBulkLimits, core::ResourcePlan&, const std::stop_token&,
+                                std::optional<NastranBulkDiagnostic>* = nullptr) noexcept;
+
 } // namespace uvlas::io::detail

@@ -440,6 +440,7 @@ std::string_view text_of(std::span<const std::byte> bytes) noexcept {
 }
 
 enum class DeckScope : std::uint8_t { Lexical, Standalone };
+enum class SnapshotRetention : std::uint8_t { Existing, Copy };
 
 [[nodiscard]] bool adopted_card(std::string_view name) noexcept {
     constexpr std::array<std::string_view, 17> names{
@@ -458,7 +459,7 @@ struct BulkRecords {
 
 [[nodiscard]] core::Result<BulkRecords>
 read_records(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits, DeckScope scope,
-             core::ResourcePlan& plan, const std::stop_token& stop,
+             SnapshotRetention retention, core::ResourcePlan& plan, const std::stop_token& stop,
              std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
     if (diagnostic)
         diagnostic->reset();
@@ -493,6 +494,10 @@ read_records(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits, Dec
             if (counts.rows == 0)
                 reject(Code::InvalidInput, Reason::Header);
             auto remaining = plan.remaining_bytes();
+            if (retention == SnapshotRetention::Copy) {
+                admit<std::byte>(source->bytes.size(), remaining, work);
+                admit<char>(snapshot.declaration_pointer.size(), remaining, work);
+            }
             admit<Row>(counts.rows, remaining, work);
             admit<Continuation>(counts.labels, remaining, work);
             admit<NastranBulkCard>(counts.cards, remaining, work);
@@ -513,6 +518,33 @@ read_records(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits, Dec
             return std::unexpected(error.failure);
         }
     });
+}
+
+template <class T>
+[[nodiscard]] core::Result<core::PlannedBuffer<T>>
+copy_snapshot_bytes(std::span<const T> source, core::ResourcePlan& plan,
+                    const std::stop_token& stop) noexcept {
+    if (stop.stop_requested()) {
+        return std::unexpected(core::Failure{Code::Cancelled, operation});
+    }
+    auto result = plan.allocate<T>(static_cast<core::Index>(source.size()), operation);
+    if (!result) {
+        return std::unexpected(result.error());
+    }
+    constexpr std::size_t copy_chunk = 65536;
+    auto target = result->values();
+    for (std::size_t offset = 0; offset < source.size();) {
+        if (stop.stop_requested()) {
+            return std::unexpected(core::Failure{Code::Cancelled, operation});
+        }
+        const auto count = std::min(copy_chunk, source.size() - offset);
+        std::ranges::copy(source.subspan(offset, count), target.subspan(offset, count).begin());
+        offset += count;
+    }
+    if (stop.stop_requested()) {
+        return std::unexpected(core::Failure{Code::Cancelled, operation});
+    }
+    return std::move(*result);
 }
 
 } // namespace
@@ -543,27 +575,66 @@ std::optional<NastranBulkView> NastranBulkDeck::view() const& noexcept {
     const auto view = source_.file.view();
     if (!view)
         return std::nullopt;
-    return NastranBulkView{source_.location, view->digest,     text_of(view->bytes),
-                           cards_.values(),  fields_.values(), work_};
+    return NastranBulkView{source_.location, view->digest, text_of(view->bytes), cards_.values(),
+                           fields_.values(), work_,        source_.pointer()};
 }
 
 core::Result<NastranBulkDeck>
 NastranBulkDeck::prepare(AcquiredRootSnapshot&& snapshot, NastranBulkLimits limits,
                          core::ResourcePlan& plan, const std::stop_token& stop,
                          std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
-    auto result = read_records(snapshot, limits, DeckScope::Lexical, plan, stop, diagnostic);
+    auto result = read_records(snapshot, limits, DeckScope::Lexical, SnapshotRetention::Existing,
+                               plan, stop, diagnostic);
     if (!result)
         return std::unexpected(result.error());
     return NastranBulkDeck{std::move(snapshot), std::move(result->cards), std::move(result->fields),
                            result->work};
 }
 
+core::Result<NastranBulkDeck>
+NastranBulkDeck::prepare(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits,
+                         core::ResourcePlan& plan, const std::stop_token& stop,
+                         std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
+    auto records = read_records(snapshot, limits, DeckScope::Lexical, SnapshotRetention::Copy, plan,
+                                stop, diagnostic);
+    if (!records) {
+        return std::unexpected(records.error());
+    }
+    const auto source = snapshot.file.view();
+    if (!source) {
+        if (diagnostic) {
+            *diagnostic = NastranBulkDiagnostic{Reason::Snapshot, {}};
+        }
+        return std::unexpected(core::Failure{Code::InvalidInput, operation});
+    }
+    const auto on_copy_failure = [&](core::Failure failure) noexcept {
+        if (diagnostic && failure.code != Code::Cancelled) {
+            *diagnostic = NastranBulkDiagnostic{Reason::Limit, {}};
+        }
+        return std::unexpected(failure);
+    };
+    auto bytes = copy_snapshot_bytes(source->bytes, plan, stop);
+    if (!bytes) {
+        return on_copy_failure(bytes.error());
+    }
+    auto pointer = copy_snapshot_bytes(snapshot.declaration_pointer.values(), plan, stop);
+    if (!pointer) {
+        return on_copy_failure(pointer.error());
+    }
+    AcquiredRootSnapshot owner{
+        snapshot.location,
+        {std::move(*bytes), source->digest, source->file_info, source->read_calls},
+        std::move(*pointer)};
+    return NastranBulkDeck{std::move(owner), std::move(records->cards), std::move(records->fields),
+                           records->work};
+}
+
 core::Result<std::uint64_t>
 verify_nastran_bulk_leaf(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits,
                          core::ResourcePlan& plan, const std::stop_token& stop,
                          std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
-    const auto result =
-        read_records(snapshot, limits, DeckScope::Standalone, plan, stop, diagnostic);
+    const auto result = read_records(snapshot, limits, DeckScope::Standalone,
+                                     SnapshotRetention::Existing, plan, stop, diagnostic);
     if (!result)
         return std::unexpected(result.error());
     return result->work;

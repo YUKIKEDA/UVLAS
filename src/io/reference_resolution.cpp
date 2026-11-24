@@ -865,4 +865,19 @@ resolve_leaf_references(const ReferenceInput& input, PreparedRootReferences&& pr
                                    inspector, plan, stop, acquisition, diagnostic);
 }
 
+core::Result<NastranBulkDeck>
+prepare_referenced_nastran_deck(const ReferencedCase& references, const SchemaIdentity& parent,
+                                SourceId source, NastranBulkLimits limits, core::ResourcePlan& plan,
+                                const std::stop_token& stop,
+                                std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
+    if (diagnostic) {
+        diagnostic->reset();
+    }
+    const auto snapshot = references.find(parent, source, ReferenceRole::NastranDeck, stop);
+    if (!snapshot) {
+        return std::unexpected(snapshot.error());
+    }
+    return NastranBulkDeck::prepare(snapshot->get(), limits, plan, stop, diagnostic);
+}
+
 } // namespace uvlas::io::detail
