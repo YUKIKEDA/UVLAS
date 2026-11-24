@@ -705,7 +705,9 @@ struct ResidualFixture {
     }
 };
 
-void residual_expected(const a::ScaledEnclosure& value, const Rat& oracle) {
+void residual_expected(const a::ScaledEnclosure& value, const Rat& oracle,
+                       const Rat& comparison_uncertainty = Rat{Big{1},
+                                                               Big{"1000000000000000000000000"}}) {
     const auto center =
         std::visit(
             [](const auto& word) -> Rat {
@@ -717,7 +719,6 @@ void residual_expected(const a::ScaledEnclosure& value, const Rat& oracle) {
             value.center()) *
         two_power(value.exponent());
     const auto radius = rational_word(value.radius()) * two_power(value.exponent());
-    const Rat comparison_uncertainty{Big{1}, Big{"1000000000000000000000000"}};
     CHECK(abs(center - oracle) <= radius + comparison_uncertainty);
     CHECK(radius < comparison_uncertainty);
 }
@@ -946,6 +947,116 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                                    Big{"1000000000000000000000000000000000000"}};
         CHECK(abs(solution_word(tangent.solution(), 0) - expected_tangent) <= rational_word(1e-15));
         residual_small(take(tangent.row(0)).original_residual, rational_word(1e-13));
+
+        const auto displacement = [&](std::size_t i) {
+            const auto x = fixture.points[3 * i];
+            const auto y = fixture.points[3 * i + 1];
+            return coordinates(x / 8 + y / 16, -x / 32 + y / 8, x / 16 + y / 32);
+        };
+        const std::array displacements{displacement(0), displacement(1), displacement(2),
+                                       displacement(3), displacement(4), displacement(5)};
+        std::array row_directions{cf::CirculationCollocationDirection{
+            row.face,
+            coordinates(-.03125, .0625, .125),
+            {coordinates(.0625, -.0625, .125), coordinates(-.125, .125, -.0625)},
+            coordinates(0, .0625, .03125)}};
+        const cf::DiscreteCirculationDirection direction{fixture.id, displacements, row_directions,
+                                                         coordinates(.125, 0, .09375)};
+        auto tangent_request = request;
+        tangent_request.rhs_generation = core::RhsGeneration{78};
+        tangent_request.retained_generation = core::NumericalGeneration{79};
+        const auto run_direction = [&](const cf::DiscreteNonpenetrationInput& current_input,
+                                       const cf::DiscreteCirculationDirection& selected_direction,
+                                       cf::ProjectedCaseUniformFlow& projected,
+                                       const cf::DiscreteCirculationRequest& selected_request) {
+            return cf::solve_discrete_circulation_direction(
+                current_input, selected_direction, std::move(projected), solve_limits, request,
+                selected_request, shared, *local, *kernel, memory);
+        };
+
+        auto direction_flow = projected_at(time);
+        auto zero_projection = tangent_request;
+        zero_projection.rhs_absolute = 0;
+        reject(run_direction(view, direction, direction_flow, zero_projection),
+               core::FailureCode::PrecisionUnresolved);
+        CHECK(direction_flow.source().jet.active());
+        auto stale_tangent = tangent_request;
+        stale_tangent.scales.context.cache.matrix = core::NumericalGeneration{80};
+        reject(run_direction(view, direction, direction_flow, stale_tangent),
+               core::FailureCode::StaleGeneration);
+        const std::array changed_scale{2 * tangent_request.scales.unknown.front()};
+        stale_tangent = tangent_request;
+        stale_tangent.scales.unknown = changed_scale;
+        reject(run_direction(view, direction, direction_flow, stale_tangent),
+               core::FailureCode::StaleGeneration);
+        CHECK(direction_flow.source().jet.active());
+        auto no_query_direction = direction;
+        auto other_rows = row_directions;
+        other_rows[0].free_query.reset();
+        no_query_direction.rows = other_rows;
+        reject(run_direction(view, no_query_direction, direction_flow, tangent_request),
+               core::FailureCode::InvalidInput);
+        if (!reversed) {
+            auto bad_order = direction;
+            auto ids = fixture.id;
+            std::swap(ids[0], ids[1]);
+            bad_order.points = ids;
+            reject(run_direction(view, bad_order, direction_flow, tangent_request),
+                   core::FailureCode::InvalidInput);
+            auto bad_flow_direction = direction;
+            bad_flow_direction.uniform_flow[2] =
+                a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+            reject(run_direction(view, bad_flow_direction, direction_flow, tangent_request),
+                   core::FailureCode::Nonfinite);
+        }
+        CHECK(direction_flow.source().jet.active());
+
+        const Rat reference_scale{Big{"1000000000000000000000000000000000000"}};
+        const Rat expected_forcing =
+            Rat{Big{"94584593959108917494617025902198312"}} / reference_scale;
+        const Rat expected_direction =
+            Rat{Big{"126773703590472725301051768620706643"}} / reference_scale;
+        const auto checked = take(run_direction(view, direction, direction_flow, tangent_request));
+        CHECK_FALSE(direction_flow.source().jet.active());
+        CHECK(checked.used_steps() <= solve_limits.steps);
+        CHECK(checked.tangent().used_steps() < checked.used_steps());
+        CHECK(checked.primal().flow().source().jet.active());
+        CHECK(abs(solution_word(checked.primal().solution(), 0) - expected) <=
+              rational_word(1e-15));
+        CHECK(abs(solution_word(checked.tangent().solution(), 0) - expected_direction) <=
+              rational_word(1e-15));
+        const auto forcing = take(checked.forcing(0));
+        CHECK(forcing.face == row.face);
+        residual_expected(forcing.residual_direction, expected_forcing, rational_word(1e-16));
+        residual_small(take(checked.tangent().row(0)).original_residual, rational_word(1e-13));
+        reject(checked.forcing(1), core::FailureCode::InvalidInput);
+
+        if (!reversed) {
+            const auto material = test_geometry::take(a::resolve_query(
+                geometry,
+                {a::QueryId{30},
+                 a::SourceFacePoint{a::FacetId{201}, a::SingleWord{.25}, a::SingleWord{.5}}},
+                geometry.context(), test_geometry::limits(), *geometry_work, memory));
+            const auto& original_row = collocation[0];
+            const std::array material_rows{cf::DiscreteCollocation{
+                original_row.facet, material, original_row.tangents, original_row.velocity,
+                original_row.circulation, original_row.circulation_direction}};
+            auto material_input = view;
+            material_input.collocations = material_rows;
+            auto material_flow = projected_at(time);
+            reject(run_direction(material_input, direction, material_flow, tangent_request),
+                   core::FailureCode::InvalidInput);
+            const auto material_result = take(
+                run_direction(material_input, no_query_direction, material_flow, tangent_request));
+            const Rat material_forcing =
+                Rat{Big{"86343522569361124446608159993825338"}} / reference_scale;
+            const Rat material_tangent =
+                Rat{Big{"115728023761435433573650003286112081"}} / reference_scale;
+            residual_expected(take(material_result.forcing(0)).residual_direction, material_forcing,
+                              rational_word(1e-16));
+            CHECK(abs(solution_word(material_result.tangent().solution(), 0) - material_tangent) <=
+                  rational_word(1e-15));
+        }
     }
 }
 
@@ -1292,6 +1403,29 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     auto stale = transpose_request;
     stale.scales.context.cache.matrix = scales.context.cache.matrix;
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    stale = transpose_request;
+    stale.scales.context.cache.scales = scales.context.cache.scales;
+    reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    auto changed_unknown = unknown_scales;
+    changed_unknown.front() *= 2;
+    auto stale_tangent = tangent_request;
+    stale_tangent.scales.unknown = changed_unknown;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+    auto changed_residual = residual_scales;
+    changed_residual.back() *= 2;
+    stale_tangent = tangent_request;
+    stale_tangent.scales.residual = changed_residual;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+    stale_tangent = tangent_request;
+    stale_tangent.scales.unknown_units = velocity_units;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+
+    auto fresh_tangent = tangent_request;
+    fresh_tangent.scales.unknown = changed_unknown;
+    fresh_tangent.scales.context.cache.scales = core::ScaleGeneration{38};
+    const auto fresh = take(linearize(tangent_sense, forcing, fresh_tangent));
+    CHECK(fresh.solution().certificate().context().cache.scales == core::ScaleGeneration{38});
+    CHECK(std::ranges::equal(fresh.solution().certificate().unknown_scales(), changed_unknown));
     stale = transpose_request;
     stale.scales.context.trial = core::TrialId{99};
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);

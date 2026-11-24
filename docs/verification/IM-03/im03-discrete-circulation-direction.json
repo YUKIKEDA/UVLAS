@@ -1,0 +1,97 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-circulation-direction-v1",
+  "ids": [
+    "AE-07",
+    "UW-D01",
+    "UW-D03",
+    "UW-D06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "316202bca8c6d46fda7e50c3b917796b03b8e34c",
+  "claimed_state": "Implicit circulation directions from explicit canonical geometry and uniform-flow and material-velocity variations on one fixed contact chart, with native δR envelopes and independent primal and tangent original-residual qualification.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config. Debug and Release 4/4 each.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release, warnings as errors. 4/4.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "numerics.dense_solve"
+    ],
+    "catch": "The discrete nonpenetration and circulation filter passed 378 assertions in 3 cases in each configuration, seed 23.",
+    "oracle": "65-digit centered differences of direct regularized line and wake surface integrals. Tensor Gauss-Legendre GL48/72/96 and steps 1e-12/1e-15/1e-18. Largest GL72-to-96 observation change 1.8e-33, a convergence check. Free queries at both edge signs and a triangle-barycentric material query.",
+    "mutations": [
+      "Omit variation of the unit normal: all six independent δR and implicit tangent comparisons fail; Catch2 exit 42.",
+      "Halve the induced-velocity direction: the six comparisons fail; Catch2 exit 42.",
+      "Omit the induced-velocity direction: the zero-error tangent RHS projection unexpectedly succeeds and the negative control fails; Catch2 exit 42."
+    ],
+    "static": "clang-format 21.1.2 and Windows and Linux clang-tidy 21.1.1 for the two changed translation units.",
+    "scope": "A fixed alias/contact branch and finite mixed-induction formula, with explicit point, frame, ambient and collocation-velocity directions. Time, core radius, inherited strength and wake history are fixed. PG material mapping, branch changes and transported history are downstream."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "src/aero/p1_shared_action.cpp": "77e1d5eebc0b11c28011fe1f4853b9fb4d2f231feff9778f2ab533895bd885d8",
+    "src/aero/p1_shared_action.hpp": "8efee2a3825e61dd7469faf037d454a5489999af99b6a178d3ee75958a30b64c",
+    "src/coupling/discrete_nonpenetration.cpp": "12f08ef45ca491ea0e1c98a6211cec5efea670424e9af3292611f13715337142",
+    "src/coupling/discrete_nonpenetration.hpp": "f8c0900af843a41dc989b1689ed407a22d8349b1e683e434a961b89a1f7d2f28",
+    "tests/coupling/case_uniform_flow_test.cpp": "5720ad2e599718f7665303995e8221d130f08a40601ad1172a011b951b7b2251"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-circulation-direction-v1/reference.py": "06b5f387e64cee0da14cbd4186168d5c922b448dd39a453e88ba6ac80f5807d8",
+    "docs/verification/IM-03/discrete-circulation-direction-v1/verification.md": "3bb103e6bca42ca4e639f38daf11d002c734df6d4c732b484982b098c6abf5da"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/foundation/dense-solve-contract.md",
+      "hint": "docs/specs/foundation/dense-solve-contract.md",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "77e1d5eebc0b11c28011fe1f4853b9fb4d2f231feff9778f2ab533895bd885d8"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "8efee2a3825e61dd7469faf037d454a5489999af99b6a178d3ee75958a30b64c"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "12f08ef45ca491ea0e1c98a6211cec5efea670424e9af3292611f13715337142"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "f8c0900af843a41dc989b1689ed407a22d8349b1e683e434a961b89a1f7d2f28"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "5720ad2e599718f7665303995e8221d130f08a40601ad1172a011b951b7b2251"
+    }
+  ]
+}

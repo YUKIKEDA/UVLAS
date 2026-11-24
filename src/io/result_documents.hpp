@@ -89,4 +89,46 @@ write_result_documents(const ResultStatus&, const ResultProvenance&,
                        std::uint64_t maximum_output_bytes, core::ResourcePlan&,
                        const std::stop_token&) noexcept;
 
+struct InspectedResultStatus {
+    std::uint8_t exit_code;
+    std::optional<core::Failure> failure;
+    std::optional<core::AcceptedStateId> last_accepted_id;
+    std::optional<AcceptedResultIdentity> accepted;
+};
+
+class InspectedResultDocuments {
+public:
+    InspectedResultDocuments(InspectedResultDocuments&&) noexcept = default;
+    InspectedResultDocuments& operator=(InspectedResultDocuments&&) noexcept = default;
+
+    [[nodiscard]] InspectedResultStatus status() const noexcept {
+        return status_;
+    }
+    [[nodiscard]] ResultProvenance provenance() const noexcept {
+        return provenance_;
+    }
+    [[nodiscard]] std::optional<InputObjectView> build_info() const& noexcept;
+    [[nodiscard]] std::optional<InputObjectView> build_info() const&& = delete;
+
+private:
+    friend core::Result<InspectedResultDocuments>
+    read_result_documents(std::span<const std::byte>, std::span<const std::byte>,
+                          const InputLimits&, core::ResourcePlan&, const std::stop_token&) noexcept;
+
+    InspectedResultDocuments(InspectedResultStatus status, ResultProvenance provenance,
+                             InputDocument build_owner) noexcept;
+
+    InspectedResultStatus status_;
+    ResultProvenance provenance_;
+    InputDocument build_owner_;
+};
+
+// Inspect the existing result projection. The historical exit and accepted identity are
+// metadata; the reader neither restores state nor establishes compatibility with this build.
+// Both inputs must stay stable during the call. Existing parser limits apply to each document;
+// the Plan covers both. The status digest must match the exact provenance bytes.
+[[nodiscard]] core::Result<InspectedResultDocuments>
+read_result_documents(std::span<const std::byte> status, std::span<const std::byte> provenance,
+                      const InputLimits&, core::ResourcePlan&,
+                      const std::stop_token& = {}) noexcept;
 } // namespace uvlas::io::detail
