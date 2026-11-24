@@ -4954,9 +4954,11 @@ void observe_wake_cost(std::size_t rows) {
         a::check_global_geometry(topology, geometry, contact_caps, *global, preparation));
     const auto history = [&](const Number& time, double elapsed_seconds, double shift) {
         auto xyz = mesh.xyz;
-        for (std::size_t i = 0; i < mesh.ids.size(); ++i)
-            if (i >= 4)
-                xyz[3 * i] -= static_cast<double>(i / 2 - 1) * shift;
+        for (std::size_t line = 2; line < mesh.ids.size() / 2; ++line) {
+            const auto dx = static_cast<double>(line - 1) * shift;
+            xyz[6 * line] -= dx;
+            xyz[6 * line + 3] -= dx;
+        }
         const auto sample = test_geometry::take(a::prepare_owned_geometry(
             mesh.input(xyz, time, elapsed_seconds), geometry_caps, *geometry_work, preparation));
         return take_global(
