@@ -30,7 +30,7 @@ struct GramCutLayout {
     }
 };
 
-[[nodiscard]] inline std::size_t cut_index(std::size_t u, std::size_t v) noexcept {
+[[nodiscard]] constexpr std::size_t cut_index(std::size_t u, std::size_t v) noexcept {
     const auto degree = u + v;
     return degree * (degree + 1) / 2 + u;
 }
@@ -91,8 +91,9 @@ template <class Budget>
            rank_product(work, scale, RankWide{2 * cell_index + 1});
 }
 
+template <std::size_t Degree>
 struct CutPolynomial {
-    std::array<RankWide, cut_edge_degree + 1> terms{};
+    std::array<RankWide, Degree + 2> terms{};
 
     template <class Budget>
     void extend(Budget& work, std::size_t degree, const RankWide& origin, const RankWide& delta) {
@@ -106,26 +107,27 @@ struct CutPolynomial {
     }
 };
 
+template <std::size_t Degree>
 struct CutScale {
-    std::array<RankWide, cut_denominator_power + 1> powers{};
-    std::array<RankWide, cut_edge_degree + 1> integration{};
-    std::array<RankWide, cut_degree + 1> green{};
+    std::array<RankWide, Degree + 3> powers{};
+    std::array<RankWide, Degree + 2> integration{};
+    std::array<RankWide, Degree + 1> green{};
     RankWide denominator;
 };
 
-template <class Budget>
-void accumulate_cut_edge(Budget& work, const CutScale& scale, std::span<RankWide> moments,
+template <class Budget, std::size_t Degree>
+void accumulate_cut_edge(Budget& work, const CutScale<Degree>& scale, std::span<RankWide> moments,
                          const RankWide& u0, const RankWide& u_delta, const RankWide& v0,
                          const RankWide& v_delta) {
     if (v_delta == 0)
         return;
-    CutPolynomial u{}, uv{};
+    CutPolynomial<Degree> u{}, uv{};
     u.terms[0] = 1;
-    for (std::size_t a = 0; a <= cut_degree; ++a) {
+    for (std::size_t a = 0; a <= Degree; ++a) {
         u.extend(work, a, u0, u_delta);
         work.charge(a + 2);
         std::ranges::copy(std::span{u.terms}.first(a + 2), uv.terms.begin());
-        for (std::size_t b = 0; b <= cut_degree - a; ++b) {
+        for (std::size_t b = 0; b <= Degree - a; ++b) {
             const auto degree = a + b + 1;
             RankWide integral{};
             for (std::size_t k = 0; k <= degree; ++k) {
@@ -134,13 +136,55 @@ void accumulate_cut_edge(Budget& work, const CutScale& scale, std::span<RankWide
             }
             auto scaled = rank_product(work, integral, v_delta);
             scaled = rank_product(work, scaled, scale.green[a]);
-            scaled = rank_product(work, scaled, scale.powers[cut_denominator_power - degree - 1]);
+            scaled = rank_product(work, scaled, scale.powers[Degree + 1 - degree]);
             work.charge();
             moments[cut_index(a, b)] += scaled;
-            if (b < cut_degree - a)
+            if (b < Degree - a)
                 uv.extend(work, degree, v0, v_delta);
         }
     }
+}
+
+template <std::size_t Degree, class Budget>
+[[nodiscard]] CutScale<Degree> setup_cut_scale(Budget& work, const RankWide& common,
+                                               std::uint64_t side_count,
+                                               std::uint64_t weighted_bits = 0) {
+    RankWide green_denominator{1};
+    for (std::size_t k = 1; k <= (Degree + 1); ++k)
+        green_denominator = rank_lcm(work, green_denominator, RankWide{k});
+    const auto integration_denominator = rank_lcm(work, green_denominator, RankWide{(Degree + 2)});
+    // Endpoint local numerators are at most S in magnitude and increments at
+    // most 2*S. The coefficient L1-norm is bounded by (3*S)^degree.
+    // Include the edge derivative, both LCMs, and accumulation across all sides.
+    const auto power_bits = partition_mul((Degree + 2), rank_bits(common) + 2);
+    const auto extra_bits = rank_bits(green_denominator) + rank_bits(integration_denominator) +
+                            partition_log(std::max(side_count, std::uint64_t{1}));
+    if (partition_add(partition_add(power_bits, extra_bits), weighted_bits) > 8192)
+        partition_fail(core::FailureCode::ResourceExceeded);
+
+    CutScale<Degree> scale{};
+    scale.powers.front() = 1;
+    for (std::size_t k = 1; k < scale.powers.size(); ++k)
+        scale.powers[k] = rank_product(work, scale.powers[k - 1], common);
+    for (std::size_t k = 0; k < scale.integration.size(); ++k)
+        scale.integration[k] = gram_divide(work, integration_denominator, RankWide{k + 1});
+    for (std::size_t k = 0; k < scale.green.size(); ++k)
+        scale.green[k] = gram_divide(work, green_denominator, RankWide{k + 1});
+    scale.denominator = rank_product(
+        work, rank_product(work, green_denominator, integration_denominator), scale.powers.back());
+
+    return scale;
+}
+
+template <class Budget>
+void verify_cut_area(Budget& work, const ExactRational& exact, core::Index four_n,
+                     const RankWide& denominator, const RankWide& moment) {
+    const auto area = cut_fraction(work, exact);
+    const auto local_num = rank_product(work, area.numerator, RankWide{four_n * four_n});
+    const auto factor = gram_divide(work, denominator, area.denominator);
+    if (rank_product(work, area.denominator, factor) != denominator ||
+        rank_product(work, local_num, factor) != moment)
+        partition_fail(core::FailureCode::RankUnresolved);
 }
 
 template <class Budget>
@@ -159,30 +203,7 @@ template <class Budget>
                 common = rank_lcm(work, common, rank_copy_integer<RankWide>(source));
             }
         });
-    RankWide green_denominator{1};
-    for (std::size_t k = 1; k <= cut_edge_degree; ++k)
-        green_denominator = rank_lcm(work, green_denominator, RankWide{k});
-    const auto integration_denominator =
-        rank_lcm(work, green_denominator, RankWide{cut_denominator_power});
-    // Endpoint local numerators are at most S in magnitude and increments at
-    // most 2*S. The coefficient L1-norm is bounded by (3*S)^degree.
-    // Include the edge derivative, both LCMs, and accumulation across all sides.
-    const auto power_bits = partition_mul(cut_denominator_power, rank_bits(common) + 2);
-    const auto extra_bits = rank_bits(green_denominator) + rank_bits(integration_denominator) +
-                            partition_log(std::max(side_count, std::uint64_t{1}));
-    if (partition_add(power_bits, extra_bits) > 8192)
-        partition_fail(core::FailureCode::ResourceExceeded);
-
-    CutScale scale{};
-    scale.powers.front() = 1;
-    for (std::size_t k = 1; k < scale.powers.size(); ++k)
-        scale.powers[k] = rank_product(work, scale.powers[k - 1], common);
-    for (std::size_t k = 0; k < scale.integration.size(); ++k)
-        scale.integration[k] = gram_divide(work, integration_denominator, RankWide{k + 1});
-    for (std::size_t k = 0; k < scale.green.size(); ++k)
-        scale.green[k] = gram_divide(work, green_denominator, RankWide{k + 1});
-    scale.denominator = rank_product(
-        work, rank_product(work, green_denominator, integration_denominator), scale.powers.back());
+    const auto scale = setup_cut_scale<cut_degree>(work, common, side_count);
 
     const auto four_n = 2 * layout.axis;
     visit_cut_boundary(
@@ -207,14 +228,10 @@ template <class Budget>
         const auto slot = layout.slots[c];
         if (slot < 0)
             continue;
-        const auto area = cut_fraction(work, activity[c].area);
-        const auto local_num = rank_product(work, area.numerator, RankWide{four_n * four_n});
-        const auto factor = gram_divide(work, scale.denominator, area.denominator);
-        if (rank_product(work, area.denominator, factor) != scale.denominator ||
-            rank_product(work, local_num, factor) != cut_cell(moments, slot).front())
-            partition_fail(core::FailureCode::RankUnresolved);
+        verify_cut_area(work, activity[c].area, four_n, scale.denominator,
+                        cut_cell(moments, slot).front());
     }
-    return std::move(scale.denominator);
+    return scale.denominator;
 }
 
 } // namespace uvlas::structure::detail
