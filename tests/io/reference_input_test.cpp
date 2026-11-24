@@ -584,6 +584,7 @@ TEST_CASE("Direct inventory checks cumulative limits and retains the input on an
     auto prepared = prepare(input);
     auto bounds = memory_inventory_bounds;
     auto budget = fixture::budget;
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() is non-const.
     std::stop_source cancelled;
     auto expected = ResourceExceeded;
     auto stage = rd::RootSnapshotFailure::Read;
