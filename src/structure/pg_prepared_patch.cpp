@@ -43,8 +43,8 @@ PgPreparedPatch::Coordinates PgPreparedPatch::derive(
     }
 
     constexpr core::Index normal_start = 27;
-    for (core::Index target : {core::Index{0}, core::Index{1}, core::Index{2}, normal_start,
-                               normal_start + 1, normal_start + 2}) {
+    for (const core::Index target : {core::Index{0}, core::Index{1}, core::Index{2}, normal_start,
+                                     normal_start + 1, normal_start + 2}) {
         const auto axis = static_cast<std::size_t>(target % 3);
         std::array<ExactRational, 3> factor;
         for (std::size_t d = 0; d < factor.size(); ++d)
@@ -114,7 +114,8 @@ core::Result<PgPreparedPatchInfo> PgPreparedPatch::info() const noexcept {
 const PgConditioningCertificate& PgPreparedPatch::conditioning() const& noexcept {
     if (const auto* fixed = std::get_if<PgFixedDiscreteGramCertificate>(&conditioning_))
         return fixed->conditioning();
-    return std::get<PgConditioningCertificate>(conditioning_);
+    // Both alternatives have nonthrowing move construction and assignment.
+    return *std::get_if<PgConditioningCertificate>(&conditioning_);
 }
 
 std::optional<std::span<const PgOwnedDiscreteVolumePoint>>

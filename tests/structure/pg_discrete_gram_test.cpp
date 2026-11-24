@@ -473,10 +473,11 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     auto patch =
         take(PgPreparedPatch::prepare(std::move(certified), caps.arithmetic, scratch, plan));
     CHECK(take(patch.info()).geometry == source_basis);
-    const auto owned_rule = patch.fixed_rule();
-    REQUIRE(owned_rule);
-    REQUIRE(owned_rule->size() == rule.size());
-    const auto& p = owned_rule->front();
+    const auto available_rule = patch.fixed_rule();
+    REQUIRE(available_rule.has_value());
+    const auto owned_rule = available_rule.value_or(std::span<const PgOwnedDiscreteVolumePoint>{});
+    REQUIRE(owned_rule.size() == rule.size());
+    const auto& p = owned_rule.front();
     const auto& exact = rule.front();
     const PgReferencePoint query = PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth};
     const auto evaluated =

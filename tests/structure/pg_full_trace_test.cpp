@@ -171,6 +171,35 @@ TEST_CASE("PG nonconforming full trace owns coefficient rows and the original du
     REQUIRE(a.info());
     REQUIRE(b.info());
 
+    const auto partial_first = left.r("1", "8"), partial_last = left.r("1", "4");
+    // The physical endpoints are inside the first atomic edge of each unlike partition.
+    const auto along_at = [&](const PgTraceEdgeSpan& span, const ExactRational& eta) {
+        const Q fraction = (q(eta) - q(span.first)) / (q(span.last) - q(span.first));
+        const Q value = q(span.along_first) + fraction * (q(span.along_last) - q(span.along_first));
+        return rat(left, numerator(value), denominator(value));
+    };
+    const auto a_first = along_at(as.front(), partial_first);
+    const auto a_last = along_at(as.front(), partial_last);
+    const auto b_first = along_at(bs.front(), partial_first);
+    const auto b_last = along_at(bs.front(), partial_last);
+    const std::array partial_a{PgTraceEdgeSpan{as.front().edge, partial_first, partial_last,
+                                               a_first, a_last, core::Index{0}}};
+    const std::array partial_b{PgTraceEdgeSpan{bs.front().edge, partial_first, partial_last,
+                                               b_first, b_last, core::Index{0}}};
+    auto partial = take(verify(partial_a, partial_b, limits, plan));
+    REQUIRE(partial.overlaps().size() == 1);
+    const auto& clip = partial.overlaps().front();
+    CHECK(q(clip.first) == Q("1/8"));
+    CHECK(q(clip.last) == Q("1/4"));
+    CHECK(clip.left_layer == 0);
+    CHECK(clip.right_layer == 0);
+    CHECK(q(clip.left_depth.lower_first) == -1);
+    CHECK(q(clip.right_depth.lower_first) == Q("-1/2"));
+    CHECK(q(clip.left_depth.upper_last) == Q("-1/3"));
+    CHECK(q(clip.right_depth.upper_last) == Q("-1/6"));
+    check_failure(PgFullTrace::prepare(a, partial_a, a, partial_a, limits, ws, plan),
+                  core::FailureCode::GeometryInvalid);
+
     auto connection = take(verify(as, bs, limits, plan));
     const auto info = take(connection.info());
     REQUIRE(info.overlaps == 4);

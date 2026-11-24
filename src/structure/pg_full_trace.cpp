@@ -9,12 +9,22 @@ namespace {
 using namespace detail;
 
 struct TracePatch {
+    TracePatch(const PgPreparedPatch& owner, const PgRankPreparation& preparation,
+               const PgIntegrationPartition& cells, PgReferenceFrame physical_frame,
+               PgGraphView shape, std::uint64_t count) noexcept
+        : patch(owner),
+          rank(preparation),
+          partition(cells),
+          frame(physical_frame),
+          graph(shape),
+          columns(count) {}
+
     const PgPreparedPatch& patch;
     const PgRankPreparation& rank;
     const PgIntegrationPartition& partition;
     PgReferenceFrame frame;
     PgGraphView graph;
-    std::uint64_t columns = 0;
+    std::uint64_t columns;
 };
 
 [[nodiscard]] TracePatch trace_patch(const PgPreparedPatch& patch) {

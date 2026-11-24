@@ -6,7 +6,7 @@ namespace uvlas::structure {
 
 /// Part of an external edge. Along coordinates use the canonical vertex order.
 struct PgTraceEdgeSpan {
-    core::Index edge;
+    core::Index edge{};
     const ExactRational& first;
     const ExactRational& last;
     const ExactRational& along_first;
