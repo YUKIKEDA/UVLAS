@@ -56,19 +56,36 @@ struct ReferenceArithmetic {
             partition_fail(core::FailureCode::ResourceExceeded);
         scalar_operations += count;
     }
+    [[nodiscard]] std::uint64_t external_integer_payload(std::uint64_t slots) const {
+        constexpr std::uint64_t limb_bits = IntegerBackend::limb_bits;
+        constexpr auto limb_bytes = sizeof(boost::multiprecision::limb_type);
+        const auto limbs = limits.algebra.maximum_work_bits / limb_bits;
+        return partition_mul(partition_mul(slots, partition_mul(4, limbs)), limb_bytes);
+    }
+    /// Charge only the caller's live rational numerators and denominators to
+    /// a nested call. The nested admission accounts for its own spare slot.
+    void reserve_nested_rationals(ExactLimits& nested, std::uint64_t live_rationals) const {
+        if (live_rationals == 0)
+            return;
+        auto* estimate = std::get_if<ExactEstimateAdmission>(&nested.external_memory);
+        if (estimate == nullptr)
+            partition_fail(core::FailureCode::Unsupported);
+        const auto held = external_integer_payload(partition_mul(2, live_rationals));
+        if (held > estimate->bytes)
+            partition_fail(core::FailureCode::ResourceExceeded);
+        estimate->bytes -= held;
+    }
     void admit(std::uint64_t live_rationals = reference_live_rationals) {
         cancel();
         if (!std::holds_alternative<ExactEstimateAdmission>(limits.algebra.external_memory))
             partition_fail(core::FailureCode::Unsupported);
         constexpr std::uint64_t limb_bits = IntegerBackend::limb_bits;
-        constexpr auto limb_bytes = sizeof(boost::multiprecision::limb_type);
         const auto limbs = limits.algebra.maximum_work_bits / limb_bits;
         if (limbs < 3)
             partition_fail(core::FailureCode::ResourceExceeded);
-        const auto grown = partition_mul(4, limbs);
         // Two integers per live rational and one spare backend slot for add/sub.
-        const auto extra = partition_mul(
-            partition_mul(partition_add(partition_mul(2, live_rationals), 1), grown), limb_bytes);
+        const auto extra =
+            external_integer_payload(partition_add(partition_mul(2, live_rationals), 1));
         partition_take(exact_rational_admission(limits.algebra, (limbs - 2) * limb_bits, extra));
         // Leave the same held-slot allowance in place when a leaf measures the
         // actual borrowed limbs of the participating operands.
