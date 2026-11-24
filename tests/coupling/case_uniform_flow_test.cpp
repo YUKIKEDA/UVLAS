@@ -3763,14 +3763,15 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
         return take_global(a::check_global_geometry(topology, snapshot, cap, *global, memory));
     };
     const auto previous = history_contact(Number{9, 8}, 1.125, 1.875);
-    const auto older = history_contact(Number{1}, 1., 1.75);
+    // The position and direction have nonzero second differences on the same time grid.
+    const auto older = history_contact(Number{1}, 1., 1.625);
     const auto release = take_global(topology.release_key(id[2], a::ReleaseEpoch{8}));
     const std::array material{cf::WakeMaterialPoint{release, id[4], a::FacetId{202}}};
     const std::array stages{cf::WakeMaterialSnapshot{contact, material},
                             cf::WakeMaterialSnapshot{previous, material},
                             cf::WakeMaterialSnapshot{older, material}};
     const std::array<cf::NonpenetrationVector, 1> dprevious{coordinates(.25, 0, 0)},
-        dolder{coordinates(.375, 0, 0)};
+        dolder{coordinates(.5, 0, 0)};
     const cf::WakeTransportHistoryDirection history_direction{dprevious, dolder};
     const std::array<cf::NonpenetrationVector, 1> transport_seeds{seeds[1]};
     const std::array selected{id[4]};
@@ -3795,7 +3796,7 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto advected = take(run_material(stages));
     const auto transported = take(advected.row(0));
     CHECK(transported.release == release);
-    near(center(transported.residual[0]), 1.);
+    residual_expected(transported.residual[0], Rat{1, 2});
     near(center(transported.residual[1]), 0.);
     near(center(transported.residual[2]), -vz[1]);
     if (!transported.direction) {
@@ -3803,11 +3804,14 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
         return;
     }
     const auto& tangent = transported.direction.value();
-    near(center(tangent[0]), -1.125);
+    residual_expected(tangent[0], Rat{-5, 8});
     near(center(tangent[1]), .0625);
     near(center(tangent[2]), -dvz[1]);
     const auto& actual_velocity = take(advected.free_velocity()).get();
     const auto time_dual = take(advected.position_dual(0));
+    residual_expected(time_dual.stencil[0][0], Rat{-3, 2});
+    residual_expected(time_dual.stencil[1][0], Rat{2});
+    residual_expected(time_dual.stencil[2][0], Rat{-1, 2});
     WorkEnclosure left, right;
     left.add(tangent, transport_seeds[0]);
     right.add(time_dual.stencil[0], dx);
@@ -3821,7 +3825,7 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     right.add(field_dual.uniform_flow, dambient);
     right.add(field_dual.flow_time, d.flow_time);
     right.add(field_dual.core_radius, d.core_radius);
-    near(left.value, .180645889468151347);
+    near(left.value, .118145889468151347);
     CHECK(abs(left.value - right.value) <= left.radius + right.radius + rational_word(1e-15));
 
     auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
@@ -3890,16 +3894,19 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
         memory));
     const auto row = take(prescribed.row(0));
     CHECK(row.release == release);
-    residual_expected(row.residual[0], Rat{-1, 2});
+    residual_expected(row.residual[0], Rat{-1});
     residual_expected(row.residual[2], Rat{0});
     if (!row.prescribed_position || !row.direction || !row.prescribed_position_direction) {
         FAIL("Expected the prescribed position and both transport directions");
         return;
     }
-    residual_expected(row.prescribed_position.value()[0], Rat{49, 24});
-    residual_expected(row.direction.value()[0], Rat{-3, 2});
-    residual_expected(row.prescribed_position_direction.value()[0], Rat{1, 4});
+    residual_expected(row.prescribed_position.value()[0], Rat{25, 12});
+    residual_expected(row.direction.value()[0], Rat{-1});
+    residual_expected(row.prescribed_position_direction.value()[0], Rat{5, 24});
     const auto prescribed_dual = take(prescribed.position_dual(0));
+    residual_expected(prescribed_dual.stencil[0][0], Rat{24});
+    residual_expected(prescribed_dual.stencil[1][0], Rat{-32});
+    residual_expected(prescribed_dual.stencil[2][0], Rat{8});
     residual_expected(take(prescribed.prescribed_time_dual()), Rat{-4});
     WorkEnclosure prescribed_lhs, prescribed_rhs;
     prescribed_lhs.add(row.direction.value(), prescribed_seeds[0]);

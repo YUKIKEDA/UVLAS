@@ -22,8 +22,12 @@ def main():
         str(Path(__file__).resolve().parents[1] / "discrete-free-wake-velocity-v1/reference.py")
     )
     t, h = Q(5, 4), Q(1, 8)
-    x = (Q(2), Q(15, 8), Q(7, 4))
-    dx = (Q(1, 8), Q(1, 4), Q(3, 8))
+    x = (Q(2), Q(15, 8), Q(13, 8))
+    dx = (Q(1, 8), Q(1, 4), Q(1, 2))
+    backward_velocity = (x[0] - x[1]) / h
+    backward_direction = (dx[0] - dx[1]) / h
+    assert rate(x, h) != backward_velocity
+    assert rate(dx, h) != backward_direction
     prescribed_v = 1 + 2 * (t - 1)
     prescribed_dv = 2 * Q(1, 4)
     seed = (-Q(1, 8), Q(1, 4), -Q(3, 8))
@@ -42,6 +46,10 @@ def main():
             "step_s": str(h),
             "x_m": list(map(str, x)),
             "dx_m": list(map(str, dx)),
+            "backward_euler_time_derivative": {
+                "position_x_m_s": str(backward_velocity),
+                "direction_x_m_s": str(backward_direction),
+            },
             "free": {
                 "velocity_source": (
                     "fixed geometry from discrete-free-wake-velocity-v1, second receiver, GL88"
