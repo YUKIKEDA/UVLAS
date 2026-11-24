@@ -27,12 +27,19 @@ struct CaseGmshSupportBoundaryDiagnostic {
     std::optional<std::uint64_t> line{};
     std::optional<std::uint64_t> face{};
     std::optional<core::Index> boundary{};
+    std::optional<std::uint8_t> world_component{}; // Zero-based Cartesian mismatch.
+};
+
+enum class CaseGmshSupportPositionEvidence : std::uint8_t {
+    FaceEquality,
+    EdgePolynomial,
 };
 
 struct CaseGmshSupportLine {
     std::uint64_t element{};
     std::array<std::uint64_t, 2> nodes{}; // Original Gmsh line order.
     std::uint64_t incident_face{};
+    CaseGmshSupportPositionEvidence position = CaseGmshSupportPositionEvidence::FaceEquality;
 };
 
 struct CaseGmshSupportBoundary {
@@ -50,8 +57,9 @@ struct CaseGmshSupportBoundary {
 };
 
 // Certify the original Gmsh line set against a named Case Shell outer boundary.
-// A fit certificate is admissible here only if its relevant face has zero distance
-// bound. The result attests to center-surface boundary provenance and coverage.
+// A zero face distance bound suffices. Otherwise the original affine line and
+// the restricted PG position must have identical exact polynomial coefficients.
+// The result attests to center-surface boundary provenance and coverage.
 [[nodiscard]] core::Result<CaseGmshSupportBoundary> certify_case_gmsh_support_boundary(
     const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&, const CaseGmshPgSet&,
     io::detail::MeshSupportId, io::detail::GmshKey, const CaseGmshSupportBoundaryLimits&,

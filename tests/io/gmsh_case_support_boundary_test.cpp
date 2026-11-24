@@ -15,7 +15,15 @@ using namespace uvlas::structure;
 using Reason = coupling::CaseGmshSupportBoundaryFailure;
 using Code = core::FailureCode;
 
-enum class Variant : std::uint8_t { Complete, Missing, WrongEdge, Duplicate, Interior, CurvedFit };
+enum class Variant : std::uint8_t {
+    Complete,
+    Missing,
+    WrongEdge,
+    Duplicate,
+    Interior,
+    CurvedExact,
+    CurvedGap
+};
 
 std::string mesh(Variant variant) {
     constexpr std::string_view prefix = R"msh($MeshFormat
@@ -23,19 +31,19 @@ std::string mesh(Variant variant) {
 $EndMeshFormat
 $Entities
 0 1 1 0
-11 0 0 0 1000 1000 0 1 7 0
-17 0 0 0 1000 1000 0 1 7 0
+11 1000 2000 3000 1000 4000 5000 1 7 0
+17 1000 2000 3000 1000 4000 5000 1 7 0
 $EndEntities
 $Nodes
 1 6 10 60
 2 17 0 6
 10 20 30 40 50 60
-0 0 0
-1000 0 0
-0 500 0
-1000 500 0
-0 1000 0
-1000 1000 0
+1000 2000 3000
+1000 4000 3000
+1000 2000 4000
+1000 4000 4000
+1000 2000 5000
+1000 4000 5000
 $EndNodes
 $Elements
 )msh";
@@ -123,8 +131,11 @@ TEST_CASE("A Gmsh support group covers the exact named Case boundary",
     SECTION("A line touching two selected faces is interior") {
         variant = Variant::Interior;
     }
-    SECTION("A whole-face fit interval cannot attest exact edge positions") {
-        variant = Variant::CurvedFit;
+    SECTION("A nonzero face gap vanishes along the whole support line") {
+        variant = Variant::CurvedExact;
+    }
+    SECTION("Matching endpoints conceal a curved gap along the support line") {
+        variant = Variant::CurvedGap;
     }
 
     auto config = fixture::root("coupled_transient");
@@ -132,14 +143,27 @@ TEST_CASE("A Gmsh support group covers the exact named Case boundary",
     model.field("supports").elements[0] = fixture::fragment("Support.trace_constraint");
     auto external = fixture::fragment("Geometry.gmsh");
     auto fit = fixture::fragment("ReferenceGeometry.fit");
-    if (variant == Variant::CurvedFit) {
-        auto& pg = model.field("geometry").elements.front();
+    auto& pg = model.field("geometry").elements.front();
+    pg.field("frame").set("origin", fixture::json("[1,2,3]"));
+    pg.field("frame").set("rotation", fixture::json("[[0,0,1],[1,0,0],[0,1,0]]"));
+    pg.set("reference_length", fixture::json("2"));
+    if (variant == Variant::CurvedExact) {
         pg.set("degree", fixture::json("[2,0]"));
         pg.set(
             "coefficients",
             fixture::json(
                 R"([{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"10"}},{"powers":[2,0],"coefficient":{"numerator":"-1","denominator":"10"}}])"));
         fit.set("degree", fixture::json("2"));
+    }
+    if (variant == Variant::CurvedGap) {
+        // t(t-1/2)(t-1)/10. Every native endpoint is on the PG,
+        // but the physical +X gap at t=1/4 is 2*(3/640) metres.
+        pg.set("degree", fixture::json("[0,3]"));
+        pg.set(
+            "coefficients",
+            fixture::json(
+                R"([{"powers":[0,1],"coefficient":{"numerator":"1","denominator":"20"}},{"powers":[0,2],"coefficient":{"numerator":"-3","denominator":"20"}},{"powers":[0,3],"coefficient":{"numerator":"1","denominator":"10"}}])"));
+        fit.set("degree", fixture::json("3"));
     }
     const auto msh_text = mesh(variant);
     const auto map_text = sidecar().dump();
@@ -204,11 +228,27 @@ TEST_CASE("A Gmsh support group covers the exact named Case boundary",
         return coupling::certify_case_gmsh_support_boundary(
             si, bound, set, support, rd::GmshKey{1, 7}, limits, plan, &diagnostic);
     };
-    if (variant != Variant::Complete) {
+    const bool curved = variant == Variant::CurvedExact || variant == Variant::CurvedGap;
+    if (curved) {
+        const auto& shell = fixture::take(set.at(0)).get();
+        const auto& conversion = std::get<rd::GmshPgConversionEvidence>(shell.match().geometry);
+        if (const auto view = conversion.geometry.view()) {
+            REQUIRE(view->faces.size() == 2);
+            const auto gap = fixture::take(ExactRational::from_integer_pair(
+                variant == Variant::CurvedExact ? "1" : "3",
+                variant == Variant::CurvedExact ? "20" : "320", arithmetic.algebra, plan));
+            for (const auto& face : view->faces) {
+                CHECK(std::is_gteq(fixture::take(
+                    face.distance_upper_metres.compare(gap, arithmetic.algebra, plan))));
+            }
+        } else {
+            FAIL("Missing authenticated fit geometry");
+        }
+    }
+    if (variant != Variant::Complete && variant != Variant::CurvedExact) {
         const auto result = choose({arithmetic, 2});
         REQUIRE_FALSE(result);
-        const auto curved = variant == Variant::CurvedFit;
-        CHECK(result.error().code == (curved ? Code::Unsupported : Code::InvalidInput));
+        CHECK(result.error().code == Code::InvalidInput);
         if (const auto& problem = diagnostic) {
             CHECK(problem->support == support);
             CHECK(problem->physical == rd::GmshKey{1, 7});
@@ -232,10 +272,13 @@ TEST_CASE("A Gmsh support group covers the exact named Case boundary",
                 CHECK(problem->reason == Reason::Incidence);
                 CHECK(problem->line == 501);
                 break;
-            case Variant::CurvedFit:
+            case Variant::CurvedGap:
                 CHECK(problem->reason == Reason::Geometry);
                 CHECK(problem->line == 501);
+                CHECK(problem->face == 701);
+                CHECK(problem->world_component == 0);
                 break;
+            case Variant::CurvedExact:
             case Variant::Complete:
                 FAIL("Unexpected complete case in failure check");
             }
@@ -282,5 +325,9 @@ TEST_CASE("A Gmsh support group covers the exact named Case boundary",
     CHECK(lines[1].element == 502);
     CHECK(lines[1].nodes == std::array<std::uint64_t, 2>{30, 50});
     CHECK(lines[1].incident_face == 702);
+    const auto expected = curved ? coupling::CaseGmshSupportPositionEvidence::EdgePolynomial
+                                 : coupling::CaseGmshSupportPositionEvidence::FaceEquality;
+    CHECK(lines[0].position == expected);
+    CHECK(lines[1].position == expected);
 }
 } // namespace
