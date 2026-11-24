@@ -1,0 +1,165 @@
+import sys
+from collections import defaultdict
+from decimal import Decimal, localcontext
+from fractions import Fraction as F
+from pathlib import Path
+
+
+def word(value: str):
+    return F(float.fromhex(value))
+
+
+def show(value):
+    if not value:
+        return "0"
+    with localcontext() as context:
+        context.prec = 16
+        return f"{Decimal(value.numerator) / Decimal(value.denominator):.10e}"
+
+
+B, C = defaultdict(dict), defaultdict(dict)
+pivots, p_rhs, states, owned, exact_rhs = {}, defaultdict(dict), defaultdict(dict), {}, {}
+for line in Path(sys.argv[1]).read_text(encoding="utf-8-sig").splitlines():
+    key, *row = line.split(",")
+    if key == "BMAT":
+        i, j, a = row
+        B[int(i)][int(j)] = word(a)
+    elif key == "WORDS":
+        d, i, hi, lo, bhi, blo = row
+        states[int(d)][int(i)] = word(hi) + word(lo)
+        p_rhs[int(d)][int(i)] = word(bhi) + word(blo)
+    elif key == "PIVOT":
+        i, row_id, column, source, *_ = row
+        pivots[int(i)] = (int(row_id), int(column), int(source))
+    elif key == "OWNED_Q":
+        i, *values = row
+        owned[int(i)] = tuple(map(F, values))
+    elif key == "OWNED_C":
+        i, *values = row
+        exact_rhs[int(i)] = tuple(map(F, values))
+    elif key == "OWNED_CSR":
+        i, j, a = row
+        C[int(i)][int(j)] = F(a)
+
+assert len(pivots) == len(B) == 74
+assert [len(states[d]) for d in range(3)] == [74] * 3
+assert len(exact_rhs) == 192 and owned
+
+
+def criterion(terms, values, rhs):
+    contributions = [a * values[j] for j, a in terms.items()]
+    res = abs(rhs - sum(contributions))
+    den = abs(rhs) + sum(map(abs, contributions))
+    return res / den if den else F(0), res, den
+
+
+for d in range(3):
+    kept = {j: owned[col][d] for j, (_, col, _) in pivots.items()}
+    product_max = max((*criterion(B[i], kept, p_rhs[d][i]), i) for i in B)
+    bound = F("1e-12")
+    assert product_max[0] <= bound
+    print(
+        "OWNED_FULL",
+        d,
+        "projected backward",
+        show(product_max[0]),
+        "largest original residual",
+        show(
+            max(
+                criterion(C[i], {j: q[d] for j, q in owned.items()}, c[d])[1]
+                for i, c in exact_rhs.items()
+            )
+        ),
+    )
+    failure = max((*criterion(B[i], states[d], p_rhs[d][i]), i) for i in B)
+    i = failure[-1]
+    row = pivots[i][0]
+    assembled = {j: q[d] for j, q in owned.items()} | {
+        col: states[d][k] for k, (_, col, _) in pivots.items()
+    }
+    original = criterion(C[row], assembled, exact_rhs[row][d])
+    print(
+        "FAILED_B",
+        d,
+        "pivot",
+        i,
+        "row/column/source",
+        pivots[i],
+        "ratio/residual/denominator",
+        [show(t) for t in failure[:-1]],
+        "CSR",
+        [show(t) for t in original],
+    )
+    print("OWNED_AT_PIVOT", d, criterion(B[i], kept, p_rhs[d][i]))
+
+
+def solve_exact(system, right_sides):
+    n = len(system)
+    # Complete exact arithmetic oracle. Pivoting here only chooses algebraic elimination
+    # order of an independent solve of the already selected square system.
+    work = [dict(system[i]) for i in range(n)]
+    bs = [list(rhs) for rhs in right_sides]
+    for k in range(n):
+        p = max(range(k, n), key=lambda i: abs(work[i].get(k, 0)))
+        if not work[p].get(k):
+            raise RuntimeError(f"singular remaining column {k}")
+        work[k], work[p] = work[p], work[k]
+        for b in bs:
+            b[k], b[p] = b[p], b[k]
+        pivot = work[k][k]
+        for i in range(k + 1, n):
+            a = work[i].pop(k, 0)
+            if not a:
+                continue
+            scale = a / pivot
+            for j, m in work[k].items():
+                if j == k:
+                    continue
+                entry = work[i].get(j, 0) - scale * m
+                if entry:
+                    work[i][j] = entry
+                else:
+                    work[i].pop(j, None)
+            for b in bs:
+                b[i] -= scale * b[k]
+    for b in bs:
+        for i in range(n - 1, -1, -1):
+            b[i] = (b[i] - sum(x * b[j] for j, x in work[i].items() if j > i)) / work[i][i]
+    return bs
+
+
+def retain(x):
+    hi = F(float(x))
+    lo = F(float(x - hi))
+    return hi + lo
+
+
+limit = F("1e-12")
+right = [[p_rhs[d][i] for i in range(len(B))] for d in range(3)]
+for d, solution in enumerate(solve_exact(B, right)):
+    assert all(
+        right[d][i] == sum(a * solution[j] for j, a in terms.items()) for i, terms in B.items()
+    )
+    assert all(solution[j] == 0 for j in B[58])
+    represented = list(map(retain, solution))
+    result = max((*criterion(B[i], represented, right[d][i]), i) for i in B)
+    assert result[0] <= limit
+    print("INDEPENDENT_EXACT_B", d, result[-1], [show(v) for v in result[:-1]])
+
+    actual = states[d]
+    failing = [i for i in B if criterion(B[i], actual, right[d][i])[0] > limit]
+    if not failing:
+        continue
+    assert all(right[d][i] == 0 for i in failing)
+    zero_candidate = {j for i in failing for j in B[i] if actual[j]}
+    trial = {j: value if j not in zero_candidate else F(0) for j, value in actual.items()}
+    result = max((*criterion(B[i], trial, right[d][i]), i) for i in B)
+    assert result[0] <= limit
+    print(
+        "HOMOGENEOUS_TRIAL",
+        d,
+        sorted(failing),
+        len(zero_candidate),
+        show(result[0]),
+        show(max(abs(trial[j] - actual[j]) for j in actual)),
+    )

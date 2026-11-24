@@ -1,0 +1,65 @@
+diff --git a/docs/verification/IM-01/pg-case-moving-chart/run-case-numerical.cpp.txt b/docs/verification/IM-01/pg-case-moving-chart/run-case-numerical.cpp.txt
+index e97d1294..385493fa 100644
+--- a/docs/verification/IM-01/pg-case-moving-chart/run-case-numerical.cpp.txt
++++ b/docs/verification/IM-01/pg-case-moving-chart/run-case-numerical.cpp.txt
+@@ -232,6 +232,42 @@ void check_numerical_actions(cc::CasePgChart& ready, const cc::CaseStructuralSup
+         motion_rhs.emplace(take(cc::retain_case_structural_pg_rhs(
+             *sample, Value, core::NumericalGeneration{109}, 120'000, plan)));
+     const auto* rhs = motion_rhs ? &*motion_rhs : nullptr;
++    const auto& exact_matrix = ready.chart().original();
++    const auto p_rows = ready.chart().pivots();
++    const auto f_columns = ready.chart().free_columns();
++    for (std::size_t k = 0; k < f_columns.size(); ++k) {
++        std::clog << "FCOL," << f_columns[k];
++        for (std::size_t d = 0; d < 3; ++d)
++            std::clog << ',' << retained_component(r, k, d);
++        std::clog << '\n';
++    }
++    for (std::size_t k = 0; k < p_rows.size(); ++k) {
++        const auto& pv = p_rows[k];
++        const auto& row = exact_matrix.original_rows()[static_cast<std::size_t>(pv.original_row)];
++        std::clog << "PIVOT," << k << ',' << pv.original_row << ',' << pv.dependent_column
++                  << ',' << row.source;
++        for (std::size_t d = 0; d < 3; ++d)
++            std::clog << ',' << retained_component(rhs->centre(), static_cast<std::size_t>(pv.original_row), d);
++        std::clog << '\n';
++        for (const auto& term : take(exact_matrix.row(pv.original_row)))
++            std::clog << "ORIG," << k << ',' << term.column << ',' << q(term.coefficient) << '\n';
++    }
++    const auto projected_exact = retained(exact_before.coordinates.values(), plan);
++    for (std::size_t i = 0; i < exact_before.coordinates.size(); ++i) {
++        std::clog << "OWNED_Q," << i;
++        for (std::size_t d = 0; d < 3; ++d)
++            std::clog << ',' << retained_component(projected_exact, i, d);
++        std::clog << '\n';
++    }
++    for (std::size_t i = 0; i < exact_before.original_rhs.size(); ++i) {
++        std::clog << "OWNED_C," << i;
++        for (std::size_t d = 0; d < 3; ++d)
++            std::clog << ',' << q(exact_before.original_rhs.values()[i][d]);
++        std::clog << '\n';
++        for (const auto& term : take(exact_matrix.row(static_cast<core::Index>(i))))
++            std::clog << "OWNED_CSR," << i << ',' << term.column << ',' << q(term.coefficient)
++                      << '\n';
++    }
+     const auto lift_result =
+         rhs != nullptr
+             ? cc::lift_case_structural_pg_support(*prepared, {id, r}, *rhs, primal, ws, plan)
+@@ -313,7 +349,7 @@ void check_single_support_jets(const cc::CasePgChart& ready,
+     REQUIRE(sample.orders() == 3);
+     REQUIRE(sample.rows() == original.original_rows().size());
+     const auto* left = take(ready.patch(0));
+-    const std::array changes{0, 2, 0};
++    const std::array changes{1, 2, -1};
+     const std::array derivatives{1, 2, 2};
+     for (std::size_t row = 0; row < sample.rows(); ++row) {
+         const auto& entry = original.original_rows()[row];
+@@ -374,7 +410,7 @@ TEST_CASE("The typed Case uses the same moving chart for retained motion lift an
+     auto wire = moving_case(false, Geometry::Flat);
+     wire.at("model").at("supports").erase(1);
+     wire.at("model").at("supports").at(0).at("motion").at("translation").at("coefficients") =
+-        Json::parse(R"([[0,0,0],[0,0,0],[0,2,0]])");
++        Json::parse(R"([[0,0,0],[0,0,0],[1,2,-1]])");
+     wire.at("model").at("geometry").at(1).at("boundaries").erase(1);
+     auto moving = take(prepare_product_fixture(wire, &motion_workspace, ws, plan));
+     const auto* motion = moving.motion();
