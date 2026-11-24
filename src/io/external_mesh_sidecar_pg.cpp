@@ -19,12 +19,31 @@ struct Rejected {
     core::Failure error;
 };
 
+struct ForwardStop {
+    std::stop_source& source;
+
+    void operator()() const noexcept {
+        source.request_stop();
+    }
+};
+
 class Preparation {
+    std::stop_source cancellation_;
+    std::stop_callback<ForwardStop> caller_stop_;
+    std::stop_callback<ForwardStop> geometry_stop_;
+    std::stop_callback<ForwardStop> reference_stop_;
+
 public:
     Preparation(const ExternalSidecarPgLimits& configured, core::ResourcePlan& resources,
                 const std::stop_token& token, RootSnapshotLocation location,
-                ExternalSidecarPgDiagnostic* output) noexcept
-        : limits(configured), plan(resources), stop(token), diagnostic(output) {
+                ExternalSidecarPgDiagnostic* output, const std::stop_token& reference = {})
+        : caller_stop_(token, ForwardStop{cancellation_}),
+          geometry_stop_(configured.geometry.arithmetic.cancellation, ForwardStop{cancellation_}),
+          reference_stop_(reference, ForwardStop{cancellation_}),
+          limits(configured),
+          plan(resources),
+          stop(cancellation_.get_token()),
+          diagnostic(output) {
         detail.source = location;
     }
 
@@ -78,7 +97,7 @@ public:
 
     const ExternalSidecarPgLimits& limits;
     core::ResourcePlan& plan;
-    const std::stop_token& stop;
+    const std::stop_token stop;
     ExternalSidecarPgDiagnostic* diagnostic;
     MeshSidecarDiagnostic detail{};
     std::uint64_t work = 0;
@@ -386,14 +405,24 @@ void compare_conversion_bounds(Preparation& p, const ConversionGeometry& geometr
     return p.diagnostic == nullptr ? nullptr : &p.diagnostic->quantity;
 }
 
-[[nodiscard]] structure::ExactRational length_scale(Preparation& p, SiLengthUnit length) {
+[[nodiscard]] structure::ExactRational length_scale(Preparation& p, SiLengthUnit length,
+                                                    const structure::ExactLimits& exact) {
     const SiRecipeView recipe{
         SiDecimalView{1, "1", 0},
         {},
         {length, SiMassUnit::Kilogram, SiTimeUnit::Second, SiAngleUnit::Radian},
         SchemaDimension{{1, 0, 0, 0}},
         0};
-    return p.value(materialize_rational(recipe, p.limits.geometry.arithmetic.algebra, p.plan));
+    return p.value(materialize_rational(recipe, exact, p.plan));
+}
+
+[[nodiscard]] structure::ExactLimits
+thickness_input_limits(Preparation& p, std::uint64_t uniform_values, std::uint64_t nodal_faces) {
+    auto arithmetic = p.limits.geometry.arithmetic;
+    arithmetic.cancellation = p.stop;
+    return p.value(
+        admit_external_pg_thickness_inputs(arithmetic, uniform_values, nodal_faces, p.plan),
+        Reason::Resource);
 }
 
 template <class Geometry>
@@ -445,6 +474,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
         !std::in_range<core::Index>(view.faces.size())) {
         p.reject(Code::ResourceExceeded, Reason::Resource);
     }
+    const auto exact = thickness_input_limits(p, std::min(rows.size(), view.faces.size()), 0);
     auto claims = p.value(p.plan.allocate<ExternalPgThicknessClaim>(
                               static_cast<core::Index>(view.faces.size()), operation),
                           Reason::Resource);
@@ -467,7 +497,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
             continue;
         }
         if (unit.sign() == 0) {
-            unit = length_scale(p, source.length);
+            unit = length_scale(p, source.length, exact);
         }
         const auto index = static_cast<std::size_t>(definition - rows.begin());
         auto& value = metres.values()[index];
@@ -476,7 +506,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
             if (!input) {
                 p.reject(Code::InvalidInput, Reason::Binding);
             }
-            value = p.value(input->multiply(unit, p.limits.geometry.arithmetic.algebra, p.plan));
+            value = p.value(input->multiply(unit, exact, p.plan));
         }
         claims.values()[declared++] = {face.element, value, definition->full_thickness_node};
     }
@@ -764,7 +794,8 @@ struct PshellCornerBuffer {
 
 void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
                                 const NastranLaminateView& deck, const NastranPshell& property,
-                                const schema::Model& model, const schema::Shell& shell) {
+                                const schema::Model& model, const schema::Shell& shell,
+                                const structure::ExactLimits& exact) {
     p.detail.byte = deck.input.input.properties[property.property_ordinal].id_field.position.byte;
     const auto* bending = std::get_if<NastranMaterialReference>(&property.bending);
     if (!property.membrane || !bending || !property.transverse_shear) {
@@ -788,7 +819,6 @@ void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
         p.reject(Code::Unsupported, Reason::Binding);
     }
     if (const auto& ratio = property.bending_ratio) {
-        const auto& exact = p.limits.geometry.arithmetic.algebra;
         const auto value =
             p.value(structure::ExactRational::from_decimal(ratio->value.decimal(), exact, p.plan));
         const auto one =
@@ -814,7 +844,8 @@ void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
 [[nodiscard]] ExternalPgThicknessClaim corner_claim(Preparation& p, const NastranRegionalFace& face,
                                                     const PshellRegion& group,
                                                     const structure::ExactRational& unit,
-                                                    PshellCornerBuffer& storage) {
+                                                    PshellCornerBuffer& storage,
+                                                    const structure::ExactLimits& exact) {
     const auto& element = *face.element;
     const auto position = group.property->thickness.transform(
         [](const NastranShellReal& source) { return source.field.position; });
@@ -837,13 +868,11 @@ void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
                 }
                 auto& value = storage.metres[i];
                 if (field) {
-                    const auto& exact = p.limits.geometry.arithmetic.algebra;
                     const auto number = p.value(structure::ExactRational::from_decimal(
                         field->value.decimal(), exact, p.plan));
                     value = p.value(number.multiply(fraction ? group.metres : unit, exact, p.plan));
                 } else {
-                    value =
-                        p.value(group.metres.clone(p.limits.geometry.arithmetic.algebra, p.plan));
+                    value = p.value(group.metres.clone(exact, p.plan));
                 }
                 storage.fields[i] = {corner.id.value(), &value,
                                      field ? std::optional{field->field.position} : position,
@@ -873,8 +902,6 @@ struct PshellClaims {
     if (pshell_faces == 0) {
         return {};
     }
-    auto regions =
-        p.value(p.plan.allocate<PshellRegion>(pshell_faces, operation), Reason::Resource);
     std::uint64_t corner_count = 0;
     for (const auto& face : faces) {
         p.step();
@@ -882,6 +909,10 @@ struct PshellClaims {
             ++corner_count;
         }
     }
+    const auto exact =
+        thickness_input_limits(p, static_cast<std::uint64_t>(pshell_faces), corner_count);
+    auto regions =
+        p.value(p.plan.allocate<PshellRegion>(pshell_faces, operation), Reason::Resource);
     auto corners = p.value(
         p.plan.allocate<PshellCornerBuffer>(static_cast<core::Index>(corner_count), operation),
         Reason::Resource);
@@ -915,9 +946,8 @@ struct PshellClaims {
             new_group.node = face.node;
             if (const auto& declared = property->thickness) {
                 if (unit.sign() == 0) {
-                    unit = length_scale(p, source.units.length);
+                    unit = length_scale(p, source.units.length, exact);
                 }
-                const auto& exact = p.limits.geometry.arithmetic.algebra;
                 const auto input = p.value(structure::ExactRational::from_decimal(
                     declared->value.decimal(), exact, p.plan));
                 new_group.metres = p.value(input.multiply(unit, exact, p.plan));
@@ -926,13 +956,13 @@ struct PshellClaims {
         }
         if (has_corner_thickness(*face.element)) {
             if (!group->corner_qualified) {
-                require_homogeneous_pshell(p, source, deck, *group->property, model, shell);
+                require_homogeneous_pshell(p, source, deck, *group->property, model, shell, exact);
                 group->corner_qualified = true;
             }
             if (unit.sign() == 0) {
-                unit = length_scale(p, source.units.length);
+                unit = length_scale(p, source.units.length, exact);
             }
-            claims[i] = corner_claim(p, face, *group, unit, corners.values()[next_corner++]);
+            claims[i] = corner_claim(p, face, *group, unit, corners.values()[next_corner++], exact);
         } else if (const auto& declared = group->property->thickness) {
             claims[i] = {face.element->id.value(), group->metres, face.node,
                          declared->field.position};
@@ -995,28 +1025,39 @@ struct PshellClaims {
 
 } // namespace
 
-core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
-    const SchemaCase& schema, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
-    const structure::PgReferenceGeometry& pg, const SiUnits& case_units,
-    const NastranLaminateCards* quantities, const ExternalSidecarPgLimits& limits,
-    core::ResourcePlan& plan, const std::stop_token& stop,
-    ExternalSidecarPgDiagnostic* diagnosis) noexcept {
+core::Result<QualifiedCaseSidecarPg> qualify_external_sidecar_planar_pg(
+    const SiCase& si, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
+    const NastranLaminateCards* quantities, const CasePgReferenceLimits& reference_limits,
+    const ExternalSidecarPgLimits& limits, core::Workspace& workspace, core::ResourcePlan& plan,
+    const std::stop_token& stop, ExternalSidecarPgDiagnostic* diagnosis) noexcept {
     if (diagnosis) {
         *diagnosis = {};
     }
     return core::guard_entry(
-        operation, Code::InvalidInput, {}, [&]() -> core::Result<QualifiedExternalSidecarPg> {
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<QualifiedCaseSidecarPg> {
             try {
-                Preparation call{limits, plan, stop, bound.sidecar().source(), diagnosis};
-                const auto root = check_case(call, schema, bound);
+                Preparation call{limits,    plan,
+                                 stop,      bound.sidecar().source(),
+                                 diagnosis, reference_limits.cancellation};
+                const auto root = check_case(call, call.value(si.source_case()).get(), bound);
                 const auto source = bound.sidecar().source();
                 call.detail.target_namespace = SchemaNamespace::Shell;
                 call.detail.target = shell.value();
+                const auto units = root.units.record();
+                const SiUnits case_units{static_cast<SiLengthUnit>(units.length.selected()),
+                                         static_cast<SiMassUnit>(units.mass.selected()),
+                                         static_cast<SiTimeUnit>(units.time.selected()),
+                                         static_cast<SiAngleUnit>(units.angle.selected())};
                 const auto model = root.model.record();
                 const auto selected = find_shell(call, model, shell);
                 const auto pg_id = MeshGeometryId{selected.geometry.unsigned_value()};
                 static_cast<void>(find_pg(call, model, pg_id));
                 const auto count = selected_faces(call, bound, shell, pg_id);
+                auto preparation = reference_limits;
+                preparation.cancellation = call.stop;
+                auto pg = call.value(
+                    prepare_case_pg_reference(si, shell.value(), preparation, workspace, plan),
+                    Reason::CaseReference);
                 auto geometry = establish_geometry(call, bound, pg, shell, count);
                 const auto& payload = bound.sidecar().payload();
                 QuantityCounts result;
@@ -1034,35 +1075,31 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                                            *quantities, model, selected, case_units, pg, geometry);
                 }
                 call.step();
-                return QualifiedExternalSidecarPg{std::move(geometry),
-                                                  shell,
-                                                  pg_id,
-                                                  source,
-                                                  bound.sidecar().digest(),
-                                                  result.thickness,
-                                                  result.materials,
-                                                  call.work,
-                                                  std::move(result.laminate),
-                                                  std::move(result.regional)};
+                return QualifiedCaseSidecarPg{
+                    std::move(pg),
+                    {std::move(geometry), shell, pg_id, source, bound.sidecar().digest(),
+                     result.thickness, result.materials, call.work, std::move(result.laminate),
+                     std::move(result.regional)}};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }
         });
 }
 
-core::Result<CertifiedExternalSidecarPgBounds> certify_external_sidecar_pg_bounds(
+core::Result<CertifiedCaseSidecarPgBounds> certify_external_sidecar_pg_bounds(
     const SiCase& si, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
-    const structure::PgReferenceGeometry& pg, const ExternalSidecarPgLimits& limits,
-    std::uint64_t maximum_directed_work, core::ResourcePlan& plan, const std::stop_token& stop,
-    ExternalSidecarPgDiagnostic* diagnosis) noexcept {
+    const CasePgReferenceLimits& reference_limits, const ExternalSidecarPgLimits& limits,
+    std::uint64_t maximum_directed_work, core::Workspace& workspace, core::ResourcePlan& plan,
+    const std::stop_token& stop, ExternalSidecarPgDiagnostic* diagnosis) noexcept {
     if (diagnosis) {
         *diagnosis = {};
     }
     return core::guard_entry(
-        operation, Code::InvalidInput, {}, [&]() -> core::Result<CertifiedExternalSidecarPgBounds> {
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<CertifiedCaseSidecarPgBounds> {
             try {
                 const auto source = bound.sidecar().source();
-                Preparation call{limits, plan, stop, source, diagnosis};
+                Preparation call{limits, plan,      stop,
+                                 source, diagnosis, reference_limits.cancellation};
                 const auto root = check_case(call, call.value(si.source_case()).get(), bound);
                 call.detail.target_namespace = SchemaNamespace::Shell;
                 call.detail.target = shell.value();
@@ -1075,18 +1112,20 @@ core::Result<CertifiedExternalSidecarPgBounds> certify_external_sidecar_pg_bound
                                      ? find_fit(call, model, sidecar.geometry())
                                      : std::nullopt;
                 auto budget = read_conversion_budget(call, si, root, sidecar, fit);
+                auto preparation = reference_limits;
+                preparation.cancellation = call.stop;
+                auto pg = call.value(
+                    prepare_case_pg_reference(si, shell.value(), preparation, workspace, plan),
+                    Reason::CaseReference);
                 auto geometry =
                     bound_conversion_geometry(call, bound, pg, shell, count, maximum_directed_work);
                 compare_conversion_bounds(call, geometry, budget);
                 call.step();
-                return CertifiedExternalSidecarPgBounds{std::move(geometry),
-                                                        shell,
-                                                        pg_id,
-                                                        source,
-                                                        bound.sidecar().digest(),
-                                                        std::move(budget.distance),
-                                                        std::move(budget.normal),
-                                                        std::move(budget.observations)};
+                return CertifiedCaseSidecarPgBounds{
+                    std::move(pg),
+                    {std::move(geometry), shell, pg_id, source, bound.sidecar().digest(),
+                     std::move(budget.distance), std::move(budget.normal),
+                     std::move(budget.observations)}};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }

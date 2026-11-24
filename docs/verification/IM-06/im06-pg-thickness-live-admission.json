@@ -1,0 +1,32 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-pg-thickness-live-admission",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "IO4-04",
+    "N4-02",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "342fca193840b4f0e31aa13ed5bd29e779db6bde",
+  "claimed_state": "元厚さの生成と比較で同時生存する角値・コピー・報告面積を、演算開始前に算術見積りへ入れる。",
+  "checks": {
+    "previous_windows_debug_targets_passed": 4,
+    "previous_windows_release_targets_passed": 4,
+    "previous_gcc_asan_ubsan_targets_passed": 4,
+    "final_regional_assertions": 131,
+    "live_estimate_mutations_detected": 2,
+    "broad_runtime_and_mutation_source": "fad39c37df3e1d3e246ffd092efeae5049814b8c"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/pg-thickness-live-admission.md": "2f5d58bd07ca54edf2590a1c95a0ecc0cdbf324aea707beb417d70e8467e1255",
+    "src/io/external_mesh_sidecar_pg.cpp": "d260f1846988d758ac94a602830f155d71ecfa1359a4e68a88a79356200c807f",
+    "src/io/external_pg_regional_thickness.cpp": "e70a88f3dcbe30491e6f9ffc3ef5bc27df8d3e3e5d84380da173b8fcfa4ef2e8",
+    "src/io/external_pg_regional_thickness.hpp": "0f084b634f75c7b2fb4ba0e317978c1b2a66721d82d0d1ff4caf5ed3932f066e",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "tests/io/external_pg_regional_thickness_test.cpp": "dbf70662744ee5083d5306ff8cd023e2bfae74e2a91a6ec075d83a7fe9b3bdaf"
+  }
+}

@@ -87,6 +87,13 @@ struct ExternalPgThicknessReport {
     structure::PgReferenceCallInfo work;
 };
 
+// Reserve every staged uniform value and four slots per optional original-node
+// face. The returned leaf limits retain that reservation while values are built.
+[[nodiscard]] core::Result<structure::ExactLimits>
+admit_external_pg_thickness_inputs(const structure::PgReferenceLimits&,
+                                   std::uint64_t uniform_values, std::uint64_t nodal_faces,
+                                   core::ResourcePlan&) noexcept;
+
 // Compare a constant or original-node thickness on the exact common subdivision
 // of the certified face and PG. Original triangles use affine interpolation and
 // original quadrilaterals use their bilinear chart map without a diagonal split.

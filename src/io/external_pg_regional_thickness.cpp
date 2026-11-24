@@ -212,6 +212,20 @@ compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg, const Face& face,
     return match;
 }
 
+void admit_comparison(ref::ReferenceArithmetic& math,
+                      std::span<const ExternalPgThicknessClaim> claims) {
+    // The source values and each reported copy can be live together. Allow
+    // one further rational per match for the accumulated chart area.
+    auto live = ref::partition_add(ref::reference_live_rationals, claims.size());
+    for (const auto& claim : claims) {
+        math.visit(1);
+        const auto values =
+            claim.value_metres ? std::size_t{1} : std::min(claim.corners.size(), std::size_t{4});
+        live = ref::partition_add(live, ref::partition_mul(2, values));
+    }
+    math.admit(live);
+}
+
 template <class Certified>
 core::Result<ExternalPgThicknessReport>
 compare_regions(const Certified& certified, const structure::PgReferenceGeometry& reference,
@@ -238,10 +252,12 @@ compare_regions(const Certified& certified, const structure::PgReferenceGeometry
                 if (claims.size() > limits.maximum_claims) {
                     partition_fail(Code::ResourceExceeded);
                 }
+                if (!claims.empty()) {
+                    admit_comparison(math, claims);
+                }
                 auto match = partition_take(plan.allocate<ExternalPgThicknessMatch>(
                     ref::partition_index(claims.size()), operation));
                 if (!claims.empty()) {
-                    math.admit();
                     const auto input = partition_take(reference.source());
                     CasePlanes pg{input.partition, plan, limits.case_vertices};
                     for (std::size_t i = 0; i < claims.size(); ++i) {
@@ -263,6 +279,24 @@ compare_regions(const Certified& certified, const structure::PgReferenceGeometry
 }
 
 } // namespace
+
+core::Result<structure::ExactLimits>
+admit_external_pg_thickness_inputs(const structure::PgReferenceLimits& limits,
+                                   std::uint64_t uniform_values, std::uint64_t nodal_faces,
+                                   core::ResourcePlan& plan) noexcept {
+    return core::guard_entry(
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<structure::ExactLimits> {
+            try {
+                ref::ReferenceArithmetic math{limits, plan};
+                const auto uniform =
+                    ref::partition_add(ref::reference_live_rationals, uniform_values);
+                math.admit(ref::partition_add(uniform, ref::partition_mul(4, nodal_faces)));
+                return math.leaf_limits;
+            } catch (const ref::PartitionAbort& error) {
+                return std::unexpected(error.failure);
+            }
+        });
+}
 
 core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
     const ExternalPlanarPg& certified, const structure::PgReferenceGeometry& reference,
