@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <compare>
 #include <fstream>
 #include <type_traits>
 
@@ -1517,6 +1518,9 @@ $EndElements
     bool thickness_shift = false;
     bool material_shift = false;
     bool chart_shift = false;
+    bool conversion = false;
+    bool distance_short = false;
+    bool normal_short = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1580,6 +1584,26 @@ $EndElements
         physical = true;
         material_shift = true;
     }
+    SECTION("A Gmsh fit budget admits a curved PG above the original planar faces") {
+        is_gmsh = true;
+        physical = true;
+        conversion = true;
+    }
+    SECTION("A Gmsh fit budget below the independent interior difference rejects the face") {
+        is_gmsh = true;
+        physical = true;
+        conversion = true;
+        distance_short = true;
+    }
+    SECTION("A Nastran sidecar budget admits the same curved PG in Case units") {
+        physical = true;
+        conversion = true;
+    }
+    SECTION("A Nastran normal budget below the true slope difference rejects the face") {
+        physical = true;
+        conversion = true;
+        normal_short = true;
+    }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1640,6 +1664,11 @@ $EndElements
               {"support", "1"},
               {"components", wrong_components ? nlohmann::json::array({1, 3})
                                               : nlohmann::json::array({1, 3, 6})}}});
+        if (conversion) {
+            sidecar["conversion"] = {{"distance_budget", 26},
+                                     {"normal_budget", normal_short ? 0.01 : 1.0},
+                                     {"conversion_observations", nlohmann::json::array({"1"})}};
+        }
     }
 
     const auto hex = [](std::string_view body) {
@@ -1681,6 +1710,22 @@ $EndElements
     auto external = fixture::fragment(is_gmsh ? "Geometry.gmsh" : "Geometry.nastran");
     if (is_gmsh) {
         external.set("reference", fixture::fragment("ReferenceGeometry.fit"));
+    }
+    if (conversion) {
+        config.field("units").set("length", fixture::json(R"("mm")"));
+        auto& reference = config.field("model").field("geometry").elements[0];
+        reference.set("reference_length", fixture::json("1000"));
+        reference.field("thickness").set("values", fixture::json("[250,250,250,250]"));
+        reference.set("degree", fixture::json("[2,0]"));
+        reference.set(
+            "coefficients",
+            fixture::json(
+                R"([{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"10"}},{"powers":[2,0],"coefficient":{"numerator":"-1","denominator":"10"}}])"));
+        if (is_gmsh) {
+            auto& fit = external.field("reference");
+            fit.set("degree", fixture::json("2"));
+            fit.set("distance_budget", fixture::json(distance_short ? "24" : "26"));
+        }
     }
     declare_path(external.field(is_gmsh ? "mesh" : "deck"), "external.dat", hex(source_text));
     declare_path(external.field("sidecar"), "sidecar.json", hex(sidecar_text));
@@ -1794,6 +1839,18 @@ $EndElements
                               pg_input.r("0"), pg_input.r("0"), pg_input.r("1")};
         const PgReferenceLimits pg_limits{
             partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+        if (conversion) {
+            const auto linear = pg_input.r("1", "10");
+            const auto quadratic = pg_input.r("-1", "10");
+            const std::array terms{ExactInputTerm{{1, 0}, linear},
+                                   ExactInputTerm{{2, 0}, quadratic}};
+            const auto height =
+                fixture::take(ExactChartPolynomial::make(terms, pg_limits.algebra, plan));
+            const auto graph_zero = pg_input.r("0");
+            pg_input.graph = fixture::take(PgGraph::prepare(
+                {graph_zero, unit, graph_zero, height, 1, PgGraphConvention::Version1},
+                {pg_limits.algebra, 4, {}}, plan));
+        }
         core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
         auto coefficients = fixture::take(PgCoefficientDictionary::prepare(
             pg_input.chart_graph(), {partition_test::exact_limits(), 2000, 20'000'000, 100'000, {}},
@@ -1804,6 +1861,56 @@ $EndElements
                                   std::move(partition)};
         const auto pg = fixture::take(PgReferenceGeometry::prepare(
             std::move(initial), {axes, origin, unit}, pg_limits, plan));
+        const rd::ExternalSidecarPgLimits qualification{
+            {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+        rd::ExternalSidecarPgDiagnostic failure;
+        if (conversion) {
+            std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
+            si_caps.fill(fixture::budget);
+            const io::SiLimits si_limits{si_caps, pg_limits.algebra};
+            const auto catalog =
+                fixture::take(io::make_si_catalog(schema, si_limits, plan, nullptr));
+            std::vector<io::SiRequirementRow> requirements;
+            for (std::uint64_t i = 0; i < fixture::take(catalog.size()); ++i) {
+                const auto entry = fixture::take(catalog.entry(i));
+                requirements.push_back({entry.key,
+                                        {io::SiDecimalInput{"1"}, entry.recipe.dimensions},
+                                        io::SiDecimalInput{"1e-25"},
+                                        io::SiDecimalInput{"1e-25"}});
+            }
+            const auto request =
+                fixture::take(io::make_si_request(catalog, requirements, si_limits, plan, nullptr));
+            const auto si = fixture::take(
+                io::convert_case_to_si(schema, catalog, request, si_limits, plan, nullptr));
+            const auto admitted = rd::certify_external_sidecar_pg_bounds(
+                si, *result, rd::MeshShellId{1}, pg, qualification, 200'000, plan, {}, &failure);
+            if (distance_short || normal_short) {
+                REQUIRE_FALSE(admitted);
+                CHECK(admitted.error().code == core::FailureCode::PrecisionUnresolved);
+                REQUIRE(failure.binding);
+                CHECK(failure.binding->reason == rd::MeshSidecarFailure::Chart);
+                CHECK(failure.binding->element.has_value());
+                return;
+            }
+            REQUIRE(admitted);
+            CHECK(admitted->distance_budget_metres == pg_input.r("13", "500"));
+            REQUIRE(admitted->observations.size() == 1);
+            CHECK(admitted->observations.values()[0].id == core::ObservationId{1});
+            std::visit(
+                [&](const auto& original) {
+                    const auto view = original.view();
+                    REQUIRE(view);
+                    REQUIRE(view->faces.size() == 2);
+                    const auto interior_distance = pg_input.r("1", "40");
+                    for (const auto& face : view->faces) {
+                        CHECK(fixture::take(face.distance_upper_metres.compare(
+                                  interior_distance, pg_limits.algebra, plan)) !=
+                              std::strong_ordering::less);
+                    }
+                },
+                admitted->geometry);
+            return;
+        }
         std::optional<rd::NastranLaminateCards> quantities;
         if (!is_gmsh) {
             auto from_snapshot = fixture::take(
@@ -1820,9 +1927,6 @@ $EndElements
         }
         const io::SiUnits case_units{io::SiLengthUnit::Metre, io::SiMassUnit::Kilogram,
                                      io::SiTimeUnit::Second, io::SiAngleUnit::Radian};
-        const rd::ExternalSidecarPgLimits qualification{
-            {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
-        rd::ExternalSidecarPgDiagnostic failure;
         const auto qualified = rd::qualify_external_sidecar_planar_pg(
             schema, *result, rd::MeshShellId{1}, pg, case_units,
             quantities ? &*quantities : nullptr, qualification, plan, {}, &failure);
