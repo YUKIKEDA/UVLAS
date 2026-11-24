@@ -1027,8 +1027,9 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         const auto check_collision = [&](const cf::DiscreteCirculationRequest& collision) {
             auto collision_flow = projected_at(time);
             const auto allocated = memory.allocated_bytes();
-            const auto result = run_direction(view, direction, collision_flow, collision);
-            CHECK((!result && result.error().code == core::FailureCode::StaleGeneration));
+            const auto collision_result = run_direction(view, direction, collision_flow, collision);
+            CHECK((!collision_result &&
+                   collision_result.error().code == core::FailureCode::StaleGeneration));
             CHECK(collision_flow.source().jet.active());
             CHECK(memory.allocated_bytes() == allocated);
         };
