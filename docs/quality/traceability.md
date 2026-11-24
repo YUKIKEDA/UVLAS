@@ -66,7 +66,7 @@
 | BM-D07 | [beam-adopted-specification.md:15](../specs/structure/beam-adopted-specification.md) | 2 | 0 | 0 |
 | BM-D08 | [beam-adopted-specification.md:16](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | BM-D09 | [beam-adopted-specification.md:17](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
-| CN-D01 | [connection-adopted-specification.md:9](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
+| CN-D01 | [connection-adopted-specification.md:9](../specs/structure/connection-adopted-specification.md) | 0 | 1 | 0 |
 | CN-D02 | [connection-adopted-specification.md:10](../specs/structure/connection-adopted-specification.md) | 1 | 0 | 0 |
 | CN-D03 | [connection-adopted-specification.md:11](../specs/structure/connection-adopted-specification.md) | 3 | 0 | 0 |
 | CN-D04 | [connection-adopted-specification.md:12](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
@@ -133,7 +133,7 @@
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 14 | 4 | 0 |
 | N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 284 | 107 | 4 |
 | N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 154 | 67 | 2 |
-| N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 8 | 10 | 0 |
+| N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 8 | 11 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 108 | 23 | 0 |
 | N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 209 | 85 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
@@ -151,12 +151,12 @@
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 7 | 0 |
 | QA-10 | [quality-plan.md:100](../quality/quality-plan.md) | 0 | 0 | 0 |
 | SH-D01 | [main-shell-adopted-specification.md:11](../specs/structure/main-shell-adopted-specification.md) | 7 | 2 | 0 |
-| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 31 | 22 | 0 |
-| SH-D03 | [main-shell-adopted-specification.md:13](../specs/structure/main-shell-adopted-specification.md) | 60 | 49 | 0 |
+| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 31 | 23 | 0 |
+| SH-D03 | [main-shell-adopted-specification.md:13](../specs/structure/main-shell-adopted-specification.md) | 60 | 50 | 0 |
 | SH-D04 | [main-shell-adopted-specification.md:14](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
-| SH-D05 | [main-shell-adopted-specification.md:15](../specs/structure/main-shell-adopted-specification.md) | 17 | 20 | 0 |
+| SH-D05 | [main-shell-adopted-specification.md:15](../specs/structure/main-shell-adopted-specification.md) | 17 | 21 | 0 |
 | SH-D06 | [main-shell-adopted-specification.md:16](../specs/structure/main-shell-adopted-specification.md) | 6 | 11 | 0 |
-| SH-D07 | [main-shell-adopted-specification.md:17](../specs/structure/main-shell-adopted-specification.md) | 40 | 27 | 0 |
+| SH-D07 | [main-shell-adopted-specification.md:17](../specs/structure/main-shell-adopted-specification.md) | 40 | 28 | 0 |
 | SH-D08 | [main-shell-adopted-specification.md:18](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D01 | [structural-adopted-specification.md:9](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D02 | [structural-adopted-specification.md:10](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
@@ -212,7 +212,7 @@
 | V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 1 | 1 | 0 |
-| V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 14 | 7 | 0 |
+| V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 14 | 8 | 0 |
 | V-RECOVER | [practical-acceptance-plan.md:35](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-SEARCH | [practical-acceptance-plan.md:39](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-STATE | [practical-acceptance-plan.md:40](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
