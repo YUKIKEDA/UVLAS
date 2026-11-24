@@ -596,9 +596,9 @@ void compare_ideal(const SpanObservation& actual, const nlohmann::json& finite,
 }
 
 struct WingCondition {
-    double wake_length;
-    double core_radius;
-    bool full_polar;
+    double wake_length{};
+    double core_radius{};
+    bool full_polar{};
     const nlohmann::json* ideal_angle{};
 };
 
