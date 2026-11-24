@@ -56,6 +56,10 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
     const auto zero = fixture.r("0"), half = fixture.r("1", "2"), one = fixture.r("1");
     const auto quarter = fixture.r("1", "4"), three_quarters = fixture.r("3", "4");
     const std::array depth{PgLineQuadratureNode{half, one}};
+    const auto five_sixths = fixture.r("5", "6");
+    const auto depth_left_weight = fixture.r("4", "7"), depth_right_weight = fixture.r("3", "7");
+    const std::array depth_pair{PgLineQuadratureNode{quarter, depth_left_weight},
+                                PgLineQuadratureNode{five_sixths, depth_right_weight}};
     const std::array low{PgLineQuadratureNode{quarter, half},
                          PgLineQuadratureNode{three_quarters, half}};
     const PgDiscreteGramGrid grid{260, 192};
@@ -63,39 +67,51 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
     const std::array wrong_moment{PgLineQuadratureNode{quarter, one}};
     const std::array duplicate{PgLineQuadratureNode{half, half}, PgLineQuadratureNode{half, half}};
     const std::array zero_weight{PgLineQuadratureNode{half, zero}};
+    const auto prepare = [&](PgReferenceBasis& basis, PgVolumeProductRule input,
+                             core::ResourcePlan& plan) {
+        return PgDiscreteGram::prepare_product(std::move(basis), input, grid, limits, scratch,
+                                               plan);
+    };
     core::ResourcePlan rejected{profile};
     for (const auto& input : std::array{PgVolumeProductRule{wrong_moment, low, depth},
                                         PgVolumeProductRule{low, duplicate, depth},
                                         PgVolumeProductRule{low, low, zero_weight},
                                         PgVolumeProductRule{low, low, {}}}) {
-        check_failure(PgDiscreteGram::prepare_product(std::move(low_basis), input, grid, limits,
-                                                      scratch, rejected),
-                      core::FailureCode::InvalidInput);
+        check_failure(prepare(low_basis, input, rejected), core::FailureCode::InvalidInput);
         CHECK(take(low_basis.size()) == size);
     }
     core::ResourcePlan no_storage{0};
-    check_failure(PgDiscreteGram::prepare_product(std::move(low_basis), {low, low, depth}, grid,
-                                                  limits, scratch, no_storage),
+    check_failure(prepare(low_basis, {low, low, depth_pair}, no_storage),
+                  core::FailureCode::ResourceExceeded);
+    // Payload admission precedes exact verification of the radial moment.
+    check_failure(prepare(low_basis, {wrong_moment, low, depth}, no_storage),
                   core::FailureCode::ResourceExceeded);
     CHECK(no_storage.allocated_bytes() == 0);
-    auto low_gram = take(PgDiscreteGram::prepare_product(std::move(low_basis), {low, low, depth},
-                                                         grid, limits, scratch, low_plan));
-    REQUIRE(low_gram.rule().size() == 4 * volumes);
+    auto low_gram = take(prepare(low_basis, {low, low, depth_pair}, low_plan));
+    REQUIRE(low_gram.rule().size() == 8 * volumes);
     CHECK(low_gram.info().points == low_gram.rule().size());
     const std::array<Q, 4> u{Q("1/4"), Q("1/4"), Q("3/4"), Q("3/4")};
     const std::array<Q, 4> v{Q("3/16"), Q("9/16"), Q("1/16"), Q("3/16")};
+    const std::array<Q, 2> d{Q("1/4"), Q("5/6")};
+    const std::array<Q, 2> depth_weights{Q("4/7"), Q("3/7")};
     for (std::size_t i = 0; i < volumes; ++i) {
-        Q weight_sum;
+        Q weight_sum, depth_first, depth_second;
         for (std::size_t j = 0; j < 4; ++j) {
-            const auto& point = low_gram.rule()[4 * i + j];
-            CHECK(point.volume == static_cast<core::Index>(i));
-            CHECK(q(point.u) == u[j]);
-            CHECK(q(point.v) == v[j]);
-            CHECK(q(point.depth) == Q("1/2"));
-            CHECK(q(point.weight) == (1 - u[j]) / 4);
-            weight_sum += q(point.weight);
+            for (std::size_t k = 0; k < d.size(); ++k) {
+                const auto& point = low_gram.rule()[8 * i + 2 * j + k];
+                CHECK(point.volume == static_cast<core::Index>(i));
+                CHECK(q(point.u) == u[j]);
+                CHECK(q(point.v) == v[j]);
+                CHECK(q(point.depth) == d[k]);
+                CHECK(q(point.weight) == (1 - u[j]) * depth_weights[k] / 4);
+                weight_sum += q(point.weight);
+                depth_first += q(point.depth) * q(point.weight);
+                depth_second += q(point.depth) * q(point.depth) * q(point.weight);
+            }
         }
         CHECK(weight_sum == Q("1/2"));
+        CHECK(depth_first == Q("1/4"));
+        CHECK(depth_second == Q("1/6"));
     }
 
     // A symmetric five-point Gauss approximation to 42 decimal places.
@@ -113,8 +129,7 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
     const std::array high{PgLineQuadratureNode{x1, a}, PgLineQuadratureNode{x2, b},
                           PgLineQuadratureNode{half, c}, PgLineQuadratureNode{x4, b},
                           PgLineQuadratureNode{x5, a}};
-    auto high_gram = take(PgDiscreteGram::prepare_product(
-        std::move(high_basis), {high, high, depth}, grid, limits, scratch, high_plan));
+    auto high_gram = take(prepare(high_basis, {high, high, depth}, high_plan));
     REQUIRE(high_gram.rule().size() == 25 * volumes);
     CHECK(high_gram.info().points == high_gram.rule().size());
 

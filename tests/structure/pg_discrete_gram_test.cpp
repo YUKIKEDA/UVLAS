@@ -655,9 +655,11 @@ TEST_CASE("PG irrational curved samples enclose signed Gram entries",
     limited.arithmetic.algebra.external_memory =
         ExactEstimateAdmission{std::uint64_t{32} * 1024 * 1024};
     core::ResourcePlan rejected_plan{profile};
-    check_failure(PgDiscreteGram::prepare(std::move(basis), points, {224, 152}, limited, scratch,
-                                          rejected_plan),
-                  core::FailureCode::ResourceExceeded);
+    const auto prepare = [&](PgReferenceBasis& candidate) {
+        return PgDiscreteGram::prepare(std::move(candidate), points, {224, 152}, limited, scratch,
+                                       rejected_plan);
+    };
+    check_failure(prepare(basis), core::FailureCode::ResourceExceeded);
     CHECK(rejected_plan.allocated_bytes() == 0);
     REQUIRE(take(basis.size()) == rank);
 
