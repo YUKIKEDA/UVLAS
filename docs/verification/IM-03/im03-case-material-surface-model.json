@@ -1,0 +1,38 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-material-surface-model-v1",
+  "ids": [
+    "IM-03",
+    "AE-02",
+    "FD-06",
+    "SH-D02",
+    "SH-D05",
+    "SH-D06",
+    "UW-D06",
+    "V-MULTI"
+  ],
+  "package": "IM-03",
+  "source_commit": "ef73afc543a97057c52c4e864a6abe4f8b3e2634",
+  "claimed_state": "Qualify the full checked Case surface ownership table before publishing structural original-vertex routes, then prove registered aliases against a single Case structural support owner.",
+  "verification": {
+    "windows": "MSVC 19.51 Release, coupling.case_pg_support_motion and coupling.case_uniform_flow: 2/2. Focused material layout, cross-support and full-surface checks: 463 assertions, seed 23.",
+    "linux": "GCC 14.2 Release, same 2/2 CTest targets and 463 focused assertions, seed 23.",
+    "independent_control": "Two exact two-layer material sites use two actual aerodynamic quads and one typed structural support. Moving one sheet by 2^-23 m keeps both single-surface geometry qualifications valid, and the exact full-model alias rejects the unequal shape actions. Incomplete and repeated associations are also rejected.",
+    "static": "clang-tidy over the four affected translation units; rerun on the sole changed unit at ef73afc5. Pinned clang-format, Japanese lint, and trace check.",
+    "mutation": "Omitting only the alias identity comparison makes the nearby unequal two-surface case succeed and the negative test fail. Restoring the exact source bytes passes all 20 full-surface assertions."
+  },
+  "sources": {
+    "src/aero/global_geometry.cpp": "f2529df7ef94699d64bd644625023a3b8636ab69c306eeeffc49539ae88a7c03",
+    "src/aero/global_geometry.hpp": "997ac5a50a8220c1aebaf39e7bb40806b084ed0c8df8fa153ed1ddee856e1a29",
+    "src/coupling/case_material_alias.cpp": "26afa13e3564c813c7ed932cb499c2fd689cdb65d3760b5a50e40630c410f64d",
+    "src/coupling/case_material_alias.hpp": "cc1fdb30d4603d87af9a802cacc239bda02978a832103695302f97212e97aaf1",
+    "src/coupling/case_material_original_layout.cpp": "d27d4eb1ad52e87901d6f9de9b3f2dfd530a1923dab0291837cc5a71d73dadf2",
+    "src/coupling/case_material_original_layout.hpp": "e417e3c98c089112760c478648682647ebb58da04f6988ff2a4c2f0d2327da35",
+    "src/coupling/case_material_surface_model.cpp": "61e40176ddc3b97b27004cc2a65e98ef4494e59d44295733fd5f2a837250e117",
+    "src/coupling/case_material_surface_model.hpp": "b0ecded89651d357d542519346ff7efe27fe1b68c04d0e03829604d0067719f5",
+    "tests/coupling/case_pg_support_motion_test.cpp": "f950c006c093b3b63e48f7f463ffeb9cecfd6c0b8afaf3ad766017597a4681bb"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-material-surface-model.md": "8bc0e30c6965479840a7b01065fd24f7f5e7afbcb12ac3a7a0bc57a95c52e8c7"
+  }
+}

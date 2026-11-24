@@ -161,6 +161,20 @@ core::Result<CaseMaterialOriginalLayout> CaseMaterialOriginalLayout::prepare(
             const auto f = panel.ordinal;
             const auto chord = f / ns, span = f % ns;
             const auto& quad = *panel.quad;
+            const auto current_limits = [&] {
+                auto caps = limits;
+                caps.maximum_scalar_operations -= math.scalar_operations;
+                caps.maximum_partition_visits -= math.partition_visits;
+                return caps;
+            };
+            const auto collocation_work =
+                partition_take(qualify_case_material_collocation_reference(
+                                   chart, thin, partition_index(chord), partition_index(span),
+                                   current_limits(), plan))
+                    .call_info;
+            math.charge(collocation_work.scalar_operations);
+            math.visit(collocation_work.partition_visits);
+
             std::array<a::PointId, 4> owners{a::PointId{0}, a::PointId{0}, a::PointId{0},
                                              a::PointId{0}};
             std::array<CaseMaterialVertexSite, 4> sites;
@@ -172,12 +186,9 @@ core::Result<CaseMaterialOriginalLayout> CaseMaterialOriginalLayout::prepare(
                 if (shared && *shared != owners[i])
                     partition_fail(FailureCode::GeometryInvalid);
                 shared = owners[i];
-                auto caps = limits;
-                caps.maximum_scalar_operations -= math.scalar_operations;
-                caps.maximum_partition_visits -= math.partition_visits;
                 const auto point = partition_take(qualify_case_material_vertex_reference(
                     chart, thin, sites[i].chord_column, sites[i].span_knot,
-                    sites[i].original_span_cell, caps, plan));
+                    sites[i].original_span_cell, current_limits(), plan));
                 math.charge(point.call_info.scalar_operations);
                 math.visit(point.call_info.partition_visits);
                 match_corner(

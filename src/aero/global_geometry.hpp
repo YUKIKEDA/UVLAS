@@ -205,6 +205,10 @@ public:
     /// Inspect the fixed quad of a source facet. A wake's L edge uses quad vertices 0→1.
     [[nodiscard]] GlobalResult<UvlmQuad> uvlm_quad(FacetId, std::uint64_t max_steps,
                                                    const std::stop_token& = {}) const noexcept;
+    [[nodiscard]] GlobalResult<FaceRoleInput>
+    face_role(std::size_t original_face_ordinal) const noexcept;
+    [[nodiscard]] GlobalResult<PhysicalFaceId>
+    original_triangle_face(std::size_t original_triangle_ordinal) const noexcept;
     [[nodiscard]] GlobalResult<UvlmOriginalQuad>
     uvlm_original_quad(std::size_t, std::uint64_t max_steps,
                        const std::stop_token& = {}) const noexcept;

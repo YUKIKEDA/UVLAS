@@ -7,6 +7,7 @@
 #include "coupling/case_material_original_layout.hpp"
 #include "coupling/case_material_reference.hpp"
 #include "coupling/case_material_rows.hpp"
+#include "coupling/case_material_surface_model.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "io/case_schema_test_adapter.hpp"
@@ -308,6 +309,77 @@ a::JsonToken material_chart_fixture() {
     attachment.set("material_map", map);
     return wire;
 }
+uvlas::aero::detail::GlobalContactState material_quad_contact(core::ResourcePlan& plan) {
+    namespace ae = uvlas::aero::detail;
+    constexpr std::array ids{ae::PointId{101}, ae::PointId{102}, ae::PointId{103},
+                             ae::PointId{104}, ae::PointId{105}, ae::PointId{106}};
+    const auto binding = test_geometry::binding();
+    const std::array bindings{binding, binding, binding, binding, binding, binding};
+    constexpr std::array<double, 18> xyz{3.75, -4., 4.9375, 3.75, -3., 5., 3.75, -2., 5.0625,
+                                         4.5,  -4., 4.9375, 4.5,  -3., 5., 4.5,  -2., 5.0625};
+    constexpr auto band = ae::BandId{12};
+    constexpr std::array faces{ae::PhysicalFaceId{17}, ae::PhysicalFaceId{8}};
+    const std::array face_data{ae::FaceInput{faces[0], band}, ae::FaceInput{faces[1], band}};
+    constexpr std::array roles{ae::FaceRoleInput{faces[0], ae::AeroFaceRole::Bound},
+                               ae::FaceRoleInput{faces[1], ae::AeroFaceRole::Bound}};
+    constexpr std::array<std::array<std::size_t, 2>, 9> links{
+        {{0, 1}, {1, 4}, {4, 3}, {3, 0}, {0, 4}, {1, 2}, {2, 5}, {5, 4}, {1, 5}}};
+    const std::array edges{ae::EdgeInput{ae::EdgeId{1}, {ids[links[0][0]], ids[links[0][1]]}},
+                           ae::EdgeInput{ae::EdgeId{2}, {ids[links[1][0]], ids[links[1][1]]}},
+                           ae::EdgeInput{ae::EdgeId{3}, {ids[links[2][0]], ids[links[2][1]]}},
+                           ae::EdgeInput{ae::EdgeId{4}, {ids[links[3][0]], ids[links[3][1]]}},
+                           ae::EdgeInput{ae::EdgeId{5}, {ids[links[4][0]], ids[links[4][1]]}},
+                           ae::EdgeInput{ae::EdgeId{6}, {ids[links[5][0]], ids[links[5][1]]}},
+                           ae::EdgeInput{ae::EdgeId{7}, {ids[links[6][0]], ids[links[6][1]]}},
+                           ae::EdgeInput{ae::EdgeId{8}, {ids[links[7][0]], ids[links[7][1]]}},
+                           ae::EdgeInput{ae::EdgeId{9}, {ids[links[8][0]], ids[links[8][1]]}}};
+    const std::array edge_roles{ae::EdgeBindingInput{edges[0].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[1].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[2].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[3].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[4].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[5].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[6].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[7].id, ae::CanonicalEdge{}},
+                                ae::EdgeBindingInput{edges[8].id, ae::CanonicalEdge{}}};
+    constexpr auto facet_left = ae::FacetId{200}, facet_right = ae::FacetId{202};
+    const std::array quads{ae::QuadInput{faces[0],
+                                         {ids[0], ids[1], ids[4], ids[3]},
+                                         {edges[0].id, edges[1].id, edges[2].id, edges[3].id},
+                                         edges[4].id,
+                                         {facet_left, ae::FacetId{201}}},
+                           ae::QuadInput{faces[1],
+                                         {ids[1], ids[2], ids[5], ids[4]},
+                                         {edges[5].id, edges[6].id, edges[7].id, edges[1].id},
+                                         edges[8].id,
+                                         {facet_right, ae::FacetId{203}}}};
+    const std::array bands{band};
+    const ae::SinglePositions points{xyz};
+    const ae::GeometryInput input{ids,
+                                  bindings,
+                                  points,
+                                  points,
+                                  edges,
+                                  face_data,
+                                  bands,
+                                  {},
+                                  quads,
+                                  ae::SingleWord{.125},
+                                  test_geometry::context()};
+    auto geometry_work = test_geometry::workspace(plan);
+    const auto owned = test_geometry::take(
+        ae::prepare_owned_geometry(input, test_geometry::limits(), *geometry_work, plan));
+    const ae::GlobalLimits bounds{steps, numerics::linear::EstimateAdmission{4096}};
+    auto global = take(ae::GlobalWorkspace::create(plan, bounds.metadata));
+    const auto topology = ae::build_global_topology(
+        owned, ae::GlobalTopologyInput{roles, edge_roles, {}}, bounds, *global, plan);
+    if (!topology)
+        throw std::runtime_error("Case panel fixture topology failed");
+    auto contact = ae::check_global_geometry(*topology, owned, bounds, *global, plan);
+    if (!contact)
+        throw std::runtime_error("Case panel fixture contact failed");
+    return std::move(*contact);
+}
 } // namespace
 
 TEST_CASE("Case material chart owns the selected PG and preserves both sides at a shared vertex",
@@ -394,85 +466,17 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
     };
     SECTION("The owned quad derives both original seam roles") {
         namespace ae = uvlas::aero::detail;
-        constexpr std::array ids{ae::PointId{101}, ae::PointId{102}, ae::PointId{103},
-                                 ae::PointId{104}, ae::PointId{105}, ae::PointId{106}};
-        const auto binding = test_geometry::binding();
-        const std::array bindings{binding, binding, binding, binding, binding, binding};
-        constexpr std::array<double, 18> xyz{3.75, -4., 4.9375, 3.75, -3., 5., 3.75, -2., 5.0625,
-                                             4.5,  -4., 4.9375, 4.5,  -3., 5., 4.5,  -2., 5.0625};
-        constexpr auto band = ae::BandId{12};
         constexpr std::array faces{ae::PhysicalFaceId{17}, ae::PhysicalFaceId{8}};
-        const std::array face_data{ae::FaceInput{faces[0], band}, ae::FaceInput{faces[1], band}};
-        constexpr std::array roles{ae::FaceRoleInput{faces[0], ae::AeroFaceRole::Bound},
-                                   ae::FaceRoleInput{faces[1], ae::AeroFaceRole::Bound}};
-        constexpr std::array<std::array<std::size_t, 2>, 9> links{
-            {{0, 1}, {1, 4}, {4, 3}, {3, 0}, {0, 4}, {1, 2}, {2, 5}, {5, 4}, {1, 5}}};
-        const std::array edges{ae::EdgeInput{ae::EdgeId{1}, {ids[links[0][0]], ids[links[0][1]]}},
-                               ae::EdgeInput{ae::EdgeId{2}, {ids[links[1][0]], ids[links[1][1]]}},
-                               ae::EdgeInput{ae::EdgeId{3}, {ids[links[2][0]], ids[links[2][1]]}},
-                               ae::EdgeInput{ae::EdgeId{4}, {ids[links[3][0]], ids[links[3][1]]}},
-                               ae::EdgeInput{ae::EdgeId{5}, {ids[links[4][0]], ids[links[4][1]]}},
-                               ae::EdgeInput{ae::EdgeId{6}, {ids[links[5][0]], ids[links[5][1]]}},
-                               ae::EdgeInput{ae::EdgeId{7}, {ids[links[6][0]], ids[links[6][1]]}},
-                               ae::EdgeInput{ae::EdgeId{8}, {ids[links[7][0]], ids[links[7][1]]}},
-                               ae::EdgeInput{ae::EdgeId{9}, {ids[links[8][0]], ids[links[8][1]]}}};
-        const std::array edge_roles{ae::EdgeBindingInput{edges[0].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[1].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[2].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[3].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[4].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[5].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[6].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[7].id, ae::CanonicalEdge{}},
-                                    ae::EdgeBindingInput{edges[8].id, ae::CanonicalEdge{}}};
         constexpr auto facet_left = ae::FacetId{200}, facet_right = ae::FacetId{202};
-        const std::array quads{ae::QuadInput{faces[0],
-                                             {ids[0], ids[1], ids[4], ids[3]},
-                                             {edges[0].id, edges[1].id, edges[2].id, edges[3].id},
-                                             edges[4].id,
-                                             {facet_left, ae::FacetId{201}}},
-                               ae::QuadInput{faces[1],
-                                             {ids[1], ids[2], ids[5], ids[4]},
-                                             {edges[5].id, edges[6].id, edges[7].id, edges[1].id},
-                                             edges[8].id,
-                                             {facet_right, ae::FacetId{203}}}};
-        const std::array bands{band};
-        const ae::SinglePositions points{xyz};
-        const ae::GeometryInput input{ids,
-                                      bindings,
-                                      points,
-                                      points,
-                                      edges,
-                                      face_data,
-                                      bands,
-                                      {},
-                                      quads,
-                                      ae::SingleWord{.125},
-                                      test_geometry::context()};
-        auto geometry_work = test_geometry::workspace(plan);
-        const auto owned = test_geometry::take(
-            ae::prepare_owned_geometry(input, test_geometry::limits(), *geometry_work, plan));
-        const ae::GlobalLimits bounds{steps, numerics::linear::EstimateAdmission{4096}};
-        auto global = take(ae::GlobalWorkspace::create(plan, bounds.metadata));
-        const auto topology = ae::build_global_topology(
-            owned, ae::GlobalTopologyInput{roles, edge_roles, {}}, bounds, *global, plan);
-        if (!topology) {
-            FAIL(static_cast<int>(topology.error().origin.cause.code));
-            return;
-        }
-        const auto contact = ae::check_global_geometry(*topology, owned, bounds, *global, plan);
-        if (!contact) {
-            FAIL(static_cast<int>(contact.error().origin.cause.code));
-            return;
-        }
-        const auto layout = take(c::CaseMaterialOriginalLayout::prepare(ready, thin, *contact,
-                                                                        faces, limits.chart, plan));
+        const auto contact = material_quad_contact(plan);
+        const auto layout = take(c::CaseMaterialOriginalLayout::prepare(ready, thin, contact, faces,
+                                                                        limits.chart, plan));
         const auto old_left = take(layout.corner(facet_left, 2));
         const auto old_right = take(layout.corner(facet_right, 0));
         CHECK(old_left.face == faces[0]);
         CHECK(old_right.face == faces[1]);
-        CHECK(old_left.canonical == ids[1]);
-        CHECK(old_right.canonical == ids[1]);
+        CHECK(old_left.canonical == ae::PointId{102});
+        CHECK(old_right.canonical == ae::PointId{102});
         CHECK(old_left.site.chord_column == 0);
         CHECK(old_left.site.span_knot == 1);
         CHECK(old_left.site.original_span_cell == 0);
@@ -487,13 +491,11 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
         CHECK(brow.material == right.material);
         CHECK(brow.layer == right.layer);
         CHECK(brow.side == right.side);
-        check_failure(c::CaseMaterialOriginalLayout::prepare(ready, thin, *contact,
-                                                             std::array{faces[1], faces[0]},
-                                                             limits.chart, plan),
+        check_failure(c::CaseMaterialOriginalLayout::prepare(
+                          ready, thin, contact, std::array{faces[1], faces[0]}, limits.chart, plan),
                       core::FailureCode::GeometryInvalid);
-        check_failure(c::CaseMaterialOriginalLayout::prepare(ready, thin, *contact,
-                                                             std::array{faces[0], faces[0]},
-                                                             limits.chart, plan),
+        check_failure(c::CaseMaterialOriginalLayout::prepare(
+                          ready, thin, contact, std::array{faces[0], faces[0]}, limits.chart, plan),
                       core::FailureCode::InvalidInput);
         check_failure(layout.corner(facet_right, 3), core::FailureCode::InvalidInput);
     }
@@ -1131,4 +1133,166 @@ TEST_CASE(
         c::qualify_case_material_constraint_alias(ea, eb, shared, no_work, workspace, plan),
         core::FailureCode::ResourceExceeded);
     REQUIRE(check(shared));
+}
+
+TEST_CASE("Case material assembly qualifies every surface and its shared original vertices",
+          "[verification][negative][AE-02][SH-D05][SH-D06][V-MULTI]") {
+    namespace ae = uvlas::aero::detail;
+    bool displaced = false;
+    SECTION("The two qualified sides share the same exact row") {}
+    SECTION("Individually qualified nearby sides cannot share one canonical point") {
+        displaced = true;
+    }
+    auto wire = a::root("coupled_transient");
+    wire.field("units").set("length", a::string("m"));
+    wire.field("numerics").field("patch").set("geometry_error", a::parse("0.000001"));
+    wire.set("model", material_chart_fixture().field("model"));
+    auto& model = wire.field("model");
+    auto& first_geometry = model.field("geometry").elements[1];
+    first_geometry.set("reference_length", a::parse("1"));
+    first_geometry.set("width", a::parse(R"({"numerator":"1","denominator":"1"})"));
+    auto second_geometry = first_geometry;
+    second_geometry.set("id", a::string("3"));
+    second_geometry.field("frame").set(
+        "origin", a::parse(displaced ? "[3.5,-3,5.00000011920928955078125]" : "[3.5,-3,5]"));
+    model.field("geometry").elements.push_back(std::move(second_geometry));
+
+    auto& first_surface = model.field("aero_surfaces").elements.front();
+    auto second_surface = first_surface;
+    first_surface.set("span", a::parse("[0,1]"));
+    second_surface.set("span", a::parse("[0,1]"));
+    second_surface.set("id", a::string("2"));
+    second_surface.set("geometry", a::string("3"));
+    const auto trim_half = [&](a::JsonToken& surface, bool second) {
+        auto& pieces = surface.field("attachment").field("material_map").field("pieces").elements;
+        auto piece = pieces[0];
+        if (second)
+            piece.set("layer", a::string("9"));
+        piece.set("span_cells", a::parse("[0,1]"));
+        auto& terms = piece.field("terms").elements;
+        terms[0].field("coefficient").elements[1].set("numerator", a::string(second ? "1" : "0"));
+        terms[0].field("coefficient").elements[1].set("denominator", a::string(second ? "2" : "1"));
+        if (second) {
+            terms[0]
+                .field("coefficient")
+                .elements[2]
+                .set("numerator", a::string(displaced ? "1" : "0"));
+            terms[0]
+                .field("coefficient")
+                .elements[2]
+                .set("denominator", a::string(displaced ? "1048576" : "1"));
+        }
+        terms[2].field("coefficient").elements[1].set("denominator", a::string("2"));
+        terms[2].field("coefficient").elements[2].set("denominator", a::string("2"));
+        pieces = {std::move(piece)};
+    };
+    trim_half(first_surface, false);
+    trim_half(second_surface, true);
+    model.field("aero_surfaces").elements.push_back(std::move(second_surface));
+
+    const auto typed = checked_case(wire);
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const c::CaseMaterialChartLimits material{case_pg_reference_limits(), query_limits(), 8};
+    auto exact = material.chart;
+    exact.maximum_scalar_operations = 300'000'000;
+    exact.maximum_partition_visits = 100'000'000;
+    exact.algebra.maximum_value_bits = 65536;
+    exact.algebra.maximum_work_bits = 262144;
+    auto reference =
+        take(c::prepare_case_pg_reference(typed, 1, material.support, workspace, plan));
+    const auto original = take(reference.source());
+    const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
+    auto rank = take(PgRankPreparation::prepare(original.dictionary, original.partition,
+                                                rank_limits, workspace, plan));
+    auto basis = take(PgReferenceBasis::prepare(std::move(reference), std::move(rank), rank_limits,
+                                                workspace, plan));
+    auto gram =
+        take(PgFlatGram::prepare(std::move(basis), 256, {material.chart, steps}, workspace, plan));
+    auto conditioned = take(
+        std::move(gram).generate_and_certify({320, 246}, {profile, steps, {}}, workspace, plan));
+    const auto patch_ready =
+        take(PgPreparedPatch::prepare(std::move(conditioned), material.chart, workspace, plan));
+
+    Fixture fixture;
+    const auto zero = fixture.r("0"), one = fixture.r("1");
+    const auto ranges = vertical_edges(fixture, patch_ready, Q{0}, Q{1});
+    const auto geometry_spans = edge_spans(ranges, zero, one);
+    const PgTraceLimits trace_limits{exact, 30000};
+    const auto trace = take(PgFullTrace::prepare_support(
+        patch_ready, geometry_spans, take(patch_ready.info()).identity,
+        patch_ready.reference_coordinates(), trace_limits, workspace, plan));
+    constexpr PgConstraintId trace_id{1};
+    const std::array patches{PgConstraintPatchBinding{numerics::PatchId{1}, patch_ready}};
+    const std::array traces{PgConstraintTraceBinding{trace_id, trace, 0, {}}};
+    auto constraints = take(
+        PgGlobalConstraints::prepare(patches, traces, {exact, 1, 1, 4096, 30000}, workspace, plan));
+    auto chart = take(
+        PgSparseChart::prepare(std::move(constraints), {exact, 140, 140, 12000}, workspace, plan));
+    const c::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+    const c::CaseClockedPrescribedLimits clock{
+        {{uniform, 8, 8}, {uniform, 2048, 50'000}},
+        {{motion_exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+         motion_limits,
+         2048,
+         50'000},
+        case_budget};
+    const auto original_rows = chart.original().original_rows().size();
+    const c::CaseStructuralSupportLimits support_limits{{clock, 2048, 2'000'000, original_rows},
+                                                        {exact, exact, original_rows},
+                                                        trace_limits,
+                                                        1,
+                                                        100'000};
+    p::CurveWorkspace curves;
+    const auto support = take(c::prepare_case_structural_pg_support(
+        typed, std::move(chart), patches, std::array{trace_id}, stamp, workspace, curves,
+        support_limits, plan));
+
+    const auto contact = material_quad_contact(plan);
+    constexpr std::array left{ae::PhysicalFaceId{17}}, right{ae::PhysicalFaceId{8}};
+    const std::array mapping{c::CaseAeroSurfacePanels{2, right}, c::CaseAeroSurfacePanels{1, left}};
+    const c::CaseMaterialSurfaceModelLimits limits{material, exact, 2, 2, 16, 1000};
+    auto candidate = c::CaseMaterialSurfaceModel::prepare(typed, mapping, contact, support, patches,
+                                                          limits, workspace, plan);
+    if (displaced) {
+        for (const auto& by_surface : mapping) {
+            const auto selected = take(c::CaseMaterialChart::prepare(typed, by_surface.surface,
+                                                                     material, workspace, plan));
+            const auto geometry = take(selected.identity()).geometry_id;
+            const auto thin =
+                take(c::CaseReferenceSurface::prepare(typed, geometry, material.chart, plan));
+            REQUIRE(c::CaseMaterialOriginalLayout::prepare(
+                selected, thin, contact, by_surface.physical_panels, material.chart, plan));
+        }
+        check_failure(candidate, core::FailureCode::GeometryInvalid);
+        return;
+    }
+    const auto prepared = take(std::move(candidate));
+    CHECK(prepared.surface_count() == 2);
+    const auto original_left = take(prepared.corner(ae::FacetId{200}, 2));
+    const auto original_right = take(prepared.corner(ae::FacetId{202}, 0));
+    CHECK(original_left.surface.surface_id == 1);
+    CHECK(original_right.surface.surface_id == 2);
+    CHECK(original_left.original.canonical == ae::PointId{102});
+    CHECK(original_right.original.canonical == original_left.original.canonical);
+    CHECK(original_left.original.site.span_knot == 1);
+    CHECK(original_right.original.site.span_knot == 0);
+    check_failure(c::CaseMaterialSurfaceModel::prepare(typed, std::span{mapping}.first(1), contact,
+                                                       support, patches, limits, workspace, plan),
+                  core::FailureCode::InvalidInput);
+    const std::array duplicate{c::CaseAeroSurfacePanels{2, right},
+                               c::CaseAeroSurfacePanels{1, right}};
+    check_failure(c::CaseMaterialSurfaceModel::prepare(typed, duplicate, contact, support, patches,
+                                                       limits, workspace, plan),
+                  core::FailureCode::InvalidInput);
+    const std::array missing{c::CaseAeroSurfacePanels{2, {}}, c::CaseAeroSurfacePanels{1, left}};
+    check_failure(c::CaseMaterialSurfaceModel::prepare(typed, missing, contact, support, patches,
+                                                       limits, workspace, plan),
+                  core::FailureCode::GeometryInvalid);
+    auto without_alias_checks = limits;
+    without_alias_checks.maximum_alias_checks = 0;
+    check_failure(c::CaseMaterialSurfaceModel::prepare(typed, mapping, contact, support, patches,
+                                                       without_alias_checks, workspace, plan),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(take(prepared.corner(ae::FacetId{202}, 0)).original.canonical == ae::PointId{102});
 }
