@@ -35,7 +35,11 @@ struct CaseMotionFrameInfo {
 
 /// Borrowed save of the three world-origin and nine row-major rotation components.
 struct CaseMotionFrameSnapshotView {
-    io::SchemaIdentity source{};
+    CaseMotionFrameSnapshotView(io::SchemaIdentity identity, std::uint64_t origin_node,
+                                std::array<aero::detail::pchip::RationalView, 12> values) noexcept
+        : source(identity), origin_component_node(origin_node), components(values) {}
+
+    io::SchemaIdentity source;
     std::uint64_t origin_component_node{};
     std::array<aero::detail::pchip::RationalView, 12> components;
 };
