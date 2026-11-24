@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <tuple>
 
 namespace {
 using namespace uvlas;
@@ -85,17 +86,18 @@ io::SiCase checked_case(const a::JsonToken& input) {
     return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan, nullptr));
 }
 
-io::schema::AeroAttachmentPrescribed attachment_field(const io::SiCase& source) {
+io::schema::AeroAttachmentPrescribed attachment_field(const io::SiCase& source,
+                                                      core::Index index = 0) {
     const auto root = take(take(source.source_case()).get().root());
     const auto model = root.model.record();
-    const auto object = take(model.aero_surfaces.at(0)).record().attachment.record();
+    const auto object = take(model.aero_surfaces.at(index)).record().attachment.record();
     if (const auto* motion = std::get_if<io::schema::AeroAttachmentPrescribed>(&object))
         return *motion;
     FAIL("Missing prescribed attachment");
 }
 
-c::CaseMotionField motion_field(const io::SiCase& source) {
-    return attachment_field(source).motion;
+c::CaseMotionField motion_field(const io::SiCase& source, core::Index index = 0) {
+    return attachment_field(source, index).motion;
 }
 
 a::JsonToken& motion_json(a::JsonToken& root) {
@@ -227,6 +229,33 @@ TEST_CASE("Typed Motion PCHIP preserves both accelerations and a shared physical
     const auto field = take(c::prepare_case_motion_time_series(si, motion_field(si), {begin, end},
                                                                stamp, workspace, limits, plan));
     REQUIRE(field.events().size() == 3);
+    constexpr auto continuous = c::CaseMotionContinuity::ContinuousC2;
+    const auto require_c2 = [&](const io::SiCase& candidate,
+                                const structure::ExactRational& finish) {
+        return c::prepare_case_motion_time_series(candidate, motion_field(candidate),
+                                                  {begin, finish, continuous}, stamp, workspace,
+                                                  limits, plan);
+    };
+    const auto discontinuity = require_c2(si, end);
+    rejected(discontinuity, core::FailureCode::InvalidInput);
+    CHECK(discontinuity.error().operation == core::Operation::PrepareModel);
+    CHECK(require_c2(si, at)); // The unequal second derivative is now at the window endpoint.
+
+    // A linear translation cannot hide a discontinuous rotation.
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[2,0,0]],"outside":{"kind":"reject"}})"));
+    rejected(require_c2(checked_case(input), end), core::FailureCode::InvalidInput);
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[90,0,0],[180,0,0]],"outside":{"kind":"reject"}})"));
+    const auto consistent = take(require_c2(checked_case(input), end));
+    const auto smooth = take(c::evaluate_case_motion_time_series(
+        consistent, consistent, {stamp, at, Second}, workspace, limits, plan));
+    exact(smooth.translation(0, Second), 0);
+    exact(smooth.rotation_coefficient(0, Second), 0);
     const auto evaluate = [&](p::JetOrder order, p::RequestedSide side) {
         return c::evaluate_case_motion_time_series(field, field, {stamp, at, order, side},
                                                    workspace, limits, plan);
@@ -290,6 +319,76 @@ TEST_CASE("Typed Motion retains Hold and periodic knot accelerations in SI time"
     exact(repeated_left.rotation_coefficient(0, Second), 2);
     exact(repeated_right.rotation_coefficient(0, Second), 2, 1, -1);
     exact(repeated_right.translation(0, Second), 0);
+
+    constexpr auto continuous = c::CaseMotionContinuity::ContinuousC2;
+    const auto hold_start = exact_time("-0.5", plan);
+    const auto hold_end = exact_time("0.5", plan);
+    const auto periodic_start = exact_time("-3.5", plan);
+    const auto periodic_end = exact_time("-2.5", plan);
+    const auto check_window = [&](const io::SiCase& candidate,
+                                  const structure::ExactRational& first,
+                                  const structure::ExactRational& last) {
+        return c::prepare_case_motion_time_series(candidate, motion_field(candidate),
+                                                  {first, last, continuous}, stamp, workspace,
+                                                  limits, plan);
+    };
+    motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+    const auto hold_only = checked_case(input);
+    rejected(check_window(hold_only, hold_start, hold_end), core::FailureCode::InvalidInput);
+    rejected(check_window(si, periodic_start, periodic_end), core::FailureCode::InvalidInput);
+    const auto before_seam = exact_time("-3.25", plan);
+    CHECK(check_window(si, periodic_start, before_seam));
+}
+
+TEST_CASE("Constant Motion jets retain their declaration and caller generation",
+          "[AE-07][IO4-01][N4-03][verification][negative]") {
+    constexpr p::PchipInputStamp newer{stamp.issuer, p::PchipInputGeneration{9}};
+    const auto [first, second, advanced, first_source, second_source] = [&] {
+        auto input = a::root("aerodynamic_prescribed_transient");
+        auto& surfaces = input.field("model").field("aero_surfaces").elements;
+        auto& motion = motion_json(input);
+        motion.set("translation", a::parse(R"({"kind":"constant","value":[1,2,3]})"));
+        motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+        motion.set("events", a::parse("[]"));
+        auto surface = surfaces.front();
+        surface.set("id", a::string("2"));
+        surfaces.push_back(std::move(surface));
+
+        const auto si = checked_case(input);
+        core::ResourcePlan plan{budget};
+        p::CurveWorkspace workspace;
+        const auto begin = exact_time("0", plan);
+        const auto end = exact_time("1", plan);
+        const auto make = [&](core::Index index, p::PchipInputStamp supplied) {
+            return take(c::prepare_case_motion_time_series(
+                si, motion_field(si, index), {begin, end}, supplied, workspace, limits, plan));
+        };
+        const auto first_motion = make(0, stamp);
+        const auto second_motion = make(1, stamp);
+        const auto newer_motion = make(0, newer);
+        const auto eval = [&](const c::CaseMotionTimeSeries& series, p::PchipInputStamp supplied) {
+            return take(c::evaluate_case_motion_time_series(
+                series, series, {supplied, begin, Second}, workspace, limits, plan));
+        };
+        rejected(c::evaluate_case_motion_time_series(first_motion, second_motion, {stamp, begin},
+                                                     workspace, limits, plan),
+                 core::FailureCode::StaleGeneration);
+        return std::tuple{eval(first_motion, stamp), eval(second_motion, stamp),
+                          eval(newer_motion, newer), take(first_motion.declaration()),
+                          take(second_motion.declaration())};
+    }();
+    CHECK(first_source != second_source);
+    CHECK(first.declaration() == first_source);
+    CHECK(second.declaration() == second_source);
+    CHECK(advanced.declaration() == first_source);
+    CHECK(first.stamp() == stamp);
+    CHECK(second.stamp() == stamp);
+    CHECK(advanced.stamp() == newer);
+    for (const auto* jet : {&first, &second, &advanced}) {
+        exact(jet->translation(1, Value), 2);
+        exact(jet->translation(1, Second), 0);
+        exact(jet->rotation_coefficient(0, Value), 0);
+    }
 }
 
 TEST_CASE("Clocked prescribed inputs share one exact node and event side",
