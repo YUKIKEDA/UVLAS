@@ -5,7 +5,7 @@
 
 namespace uvlas::io::detail {
 
-enum class NastranBulkFormat : std::uint8_t { Small, Large, Free };
+enum class NastranBulkFormat : std::uint8_t { Small, Large, Free, FreeLarge };
 
 struct NastranBulkPosition {
     std::size_t byte = 0;   // Zero based.
@@ -20,7 +20,7 @@ struct NastranBulkLexeme {
 };
 
 struct NastranBulkCard {
-    NastranBulkFormat format = NastranBulkFormat::Small;
+    NastranBulkFormat format = NastranBulkFormat::Small; // Format of the first physical line.
     NastranBulkLexeme name;
     std::size_t first_field = 0;
     std::size_t field_count = 0;
