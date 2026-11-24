@@ -1,6 +1,7 @@
 #pragma once
 
 #include "case_known_flow.hpp"
+#include "case_motion.hpp"
 #include "io/si_exact_words.hpp"
 
 namespace uvlas::coupling::detail {
@@ -219,5 +220,60 @@ prepare_case_clocked_known_flows(const io::SiCase&, aero::detail::pchip::PchipIn
     const CaseKnownFlowProjection& ambient, const CaseFlowProjectionRequest& wake,
     aero::detail::UniformFlowWorkspace&, const CaseClockedKnownFlowLimits&, core::ResourcePlan&,
     const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+struct CaseClockedPrescribedLimits {
+    CaseClockedKnownFlowLimits flow;
+    CaseMotionLimits motion;
+    /// Preparation cap shared by event visits and the periodic arithmetic forecast.
+    std::uint64_t maximum_event_work{};
+};
+
+class CaseClockedPrescribedInputs {
+public:
+    CaseClockedPrescribedInputs(CaseClockedPrescribedInputs&&) noexcept = default;
+    CaseClockedPrescribedInputs& operator=(CaseClockedPrescribedInputs&&) noexcept = default;
+    CaseClockedPrescribedInputs(const CaseClockedPrescribedInputs&) = delete;
+    CaseClockedPrescribedInputs& operator=(const CaseClockedPrescribedInputs&) = delete;
+
+private:
+    friend struct case_clock_detail::Builder;
+    CaseClockedPrescribedInputs(case_clock_detail::Grid&& grid, CaseKnownFlowReady&& ambient,
+                                std::optional<CasePrescribedWakeReady>&& prescribed,
+                                CaseMotionReady&& motion) noexcept
+        : grid_(std::move(grid)),
+          ambient_(std::move(ambient)),
+          prescribed_(std::move(prescribed)),
+          motion_(std::move(motion)) {}
+
+    case_clock_detail::Grid grid_;
+    CaseKnownFlowReady ambient_;
+    std::optional<CasePrescribedWakeReady> prescribed_;
+    CaseMotionReady motion_;
+};
+
+struct CaseClockedPrescribedSample {
+    io::SchemaIdentity source;
+    CaseFlowClockQuery address;
+    CaseClockRestart restart;
+    io::detail::SiRationalWords step;
+    CaseKnownFlowJet ambient;
+    std::optional<ProjectedCasePrescribedWake> prescribed;
+    CaseMotionEvaluation motion;
+};
+
+[[nodiscard]] core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs(
+    const io::SiCase&, CaseMotionField, aero::detail::pchip::PchipInputStamp,
+    aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
+    const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
+    core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseClockedPrescribedSample> evaluate_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs&, const CaseClockedPrescribedInputs& current,
+    CaseFlowClockQuery, const std::array<aero::detail::pchip::RationalView, 3>& position,
+    const CaseKnownFlowProjection&, const std::optional<CaseFlowProjectionRequest>& wake,
+    aero::detail::pchip::JetOrder motion_order, const CaseMotionProjection&,
+    aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
+    const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
+    core::FailureDetails = {}) noexcept;
 
 } // namespace uvlas::coupling::detail

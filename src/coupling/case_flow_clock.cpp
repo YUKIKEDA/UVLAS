@@ -56,6 +56,18 @@ structure::ExactRational read_time(const io::SiCase& source, decltype(s::TimeInt
     return take(io::materialize_rational(quantity.recipe, limits, plan));
 }
 
+template <class Arithmetic, class Value>
+Value next_occurrence(Arithmetic& arithmetic, Value after, Value knot, Value period) {
+    using enum p::RationalOp;
+    const auto phase = take(arithmetic.binary(Subtract, after, knot));
+    const auto cycles = take(arithmetic.binary(Divide, phase, period));
+    const auto last = take(arithmetic.floor(cycles));
+    const auto one = take(arithmetic.integer(1));
+    const auto next = take(arithmetic.binary(Add, last, one));
+    const auto offset = take(arithmetic.binary(Multiply, next, period));
+    return take(arithmetic.binary(Add, knot, offset));
+}
+
 std::uint64_t step_count(const structure::ExactRational& count, std::uint64_t cap,
                          core::ResourcePlan& plan, const std::stop_token& stop,
                          core::FailureDetails details) {
@@ -85,6 +97,116 @@ structure::ExactRational exact_index(std::uint64_t index, const structure::Exact
 } // namespace
 
 namespace case_clock_detail {
+class TimeSeriesEventCheck {
+public:
+    TimeSeriesEventCheck(const io::SiCase& source, std::span<const Grid::Interval> intervals,
+                         const structure::ExactLimits& conversion, p::RationalLimits arithmetic,
+                         std::uint64_t work, core::ResourcePlan& memory,
+                         const std::stop_token& stop, core::FailureDetails details) noexcept
+        : source_(source),
+          intervals_(intervals),
+          conversion_(conversion),
+          arithmetic_(arithmetic),
+          work_(work),
+          memory_(memory),
+          stop_(stop),
+          details_(details) {}
+
+    template <class Series>
+    void check(const Series& series) {
+        const auto* pchip = std::get_if<s::TimeSeriesPchip>(&series);
+        if (pchip == nullptr)
+            return;
+        const auto outside = pchip->outside.record();
+        const auto* periodic = std::get_if<s::OutsidePeriodic>(&outside);
+        charge(1);
+        std::optional<structure::ExactRational> period;
+        std::optional<io::detail::SiRationalWords> period_words;
+        if (periodic != nullptr) {
+            period.emplace(
+                read_time(source_, periodic->period, conversion_, memory_, stop_, details_));
+            period_words.emplace(words(*period));
+        }
+        // The last knot is the first knot one period later.
+        const auto count = pchip->times.size() - (period ? 1U : 0U);
+        for (core::Index i = 0; std::cmp_less(i, count); ++i) {
+            charge(1);
+            const auto knot =
+                read_time(source_, take(pchip->times.at(i)), conversion_, memory_, stop_, details_);
+            if (period) {
+                const auto knot_words = words(knot);
+                for (const auto& interval : intervals_)
+                    check_periodic(interval, knot, knot_words, *period, *period_words);
+                continue;
+            }
+            // The case schema already checks declared events. A time series
+            // (for example prescribed wake) can still have an undeclared knot.
+            for (const auto& interval : intervals_) {
+                charge(1);
+                if (take(interval.begin.compare(knot, conversion_, memory_)) < 0 &&
+                    take(knot.compare(interval.end, conversion_, memory_)) < 0)
+                    fail(InvalidInput, prepare, details_);
+            }
+        }
+    }
+
+private:
+    void charge(std::uint64_t work) {
+        check_stop(stop_, prepare, details_);
+        if (work > work_)
+            fail(ResourceExceeded, prepare, details_);
+        work_ -= work;
+    }
+
+    static p::BitBound bound(const structure::ExactRational& value) noexcept {
+        return {value.numerator_bits(), value.denominator_bits()};
+    }
+
+    io::detail::SiRationalWords words(const structure::ExactRational& value) const {
+        return take(io::detail::copy_rational_words(value, memory_, stop_));
+    }
+
+    void check_periodic(const Grid::Interval& interval, const structure::ExactRational& knot,
+                        const io::detail::SiRationalWords& knot_words,
+                        const structure::ExactRational& period,
+                        const io::detail::SiRationalWords& period_words) {
+        charge(1);
+        auto limits = arithmetic_;
+        limits.steps = std::min(limits.steps, work_);
+        p::Counter counter{limits, details_};
+        const auto begin_bound = take(counter.input(bound(interval.begin)));
+        const auto end_bound = take(counter.input(bound(interval.end)));
+        const auto knot_bound = take(counter.input(bound(knot)));
+        const auto period_bound = take(counter.input(bound(period)));
+        const auto next_bound = next_occurrence(counter, begin_bound, knot_bound, period_bound);
+        if (auto compared = counter.compare(next_bound, end_bound); !compared)
+            throw compared.error();
+        const auto plan = take(counter.finish());
+        charge(plan.reserved_steps());
+
+        const auto begin_words = words(interval.begin);
+        const auto end_words = words(interval.end);
+        auto workspace = take(p::Workspace::create(plan, memory_, details_, stop_));
+        auto session = take(workspace.begin(stop_, details_));
+        const auto begin = take(session.input(rational_view(begin_words)));
+        const auto end = take(session.input(rational_view(end_words)));
+        const auto source_knot = take(session.input(rational_view(knot_words)));
+        const auto source_period = take(session.input(rational_view(period_words)));
+        const auto next = next_occurrence(session, begin, source_knot, source_period);
+        if (take(session.compare(next, end)) < 0)
+            fail(InvalidInput, prepare, details_);
+    }
+
+    const io::SiCase& source_;
+    std::span<const Grid::Interval> intervals_;
+    const structure::ExactLimits& conversion_;
+    p::RationalLimits arithmetic_;
+    std::uint64_t work_;
+    core::ResourcePlan& memory_;
+    const std::stop_token& stop_;
+    core::FailureDetails details_;
+};
+
 struct Builder {
     static Grid make_grid(const io::SiCase& source, p::PchipInputStamp stamp,
                           const CaseFlowClockLimits& limits, core::ResourcePlan& memory,
@@ -181,8 +303,14 @@ struct Builder {
     }
 
     struct Node {
-        io::detail::SiRationalWords time;
         const Grid::Interval& interval;
+        std::optional<structure::ExactRational> interior;
+
+        const structure::ExactRational& time(std::uint64_t step) const noexcept {
+            if (interior)
+                return *interior;
+            return step == 0 ? interval.begin : interval.end;
+        }
     };
 
     static Node locate(const Grid& field, const Grid& current, CaseFlowClockQuery address,
@@ -200,18 +328,12 @@ struct Builder {
             (address.step == interval.steps && address.side != Left))
             fail(InvalidInput, evaluate, details);
 
+        if (address.step == 0 || address.step == interval.steps)
+            return {interval, std::nullopt};
         const auto& arithmetic = limits.fields.conversion;
-        auto time = [&]() -> io::detail::SiRationalWords {
-            if (address.step == 0)
-                return take(io::detail::copy_rational_words(interval.begin, memory, stop));
-            if (address.step == interval.steps)
-                return take(io::detail::copy_rational_words(interval.end, memory, stop));
-            const auto k = exact_index(address.step, arithmetic, memory, details);
-            const auto offset = take(interval.step.multiply(k, arithmetic, memory));
-            const auto instant = take(interval.begin.add(offset, arithmetic, memory));
-            return take(io::detail::copy_rational_words(instant, memory, stop));
-        }();
-        return {std::move(time), interval};
+        const auto k = exact_index(address.step, arithmetic, memory, details);
+        const auto offset = take(interval.step.multiply(k, arithmetic, memory));
+        return {interval, take(interval.begin.add(offset, arithmetic, memory))};
     }
 
     static p::CurveLimits execution_limits(p::CurveLimits limits, const p::CurveAdmission& forecast,
@@ -230,8 +352,10 @@ struct Builder {
            const CaseFlowProjectionRequest& wake, a::UniformFlowWorkspace& workspace,
            const CaseFlowClockLimits& limits, core::ResourcePlan& memory,
            const std::stop_token& stop, core::FailureDetails details) {
-        auto [time, interval] =
+        const auto node =
             locate(field.grid_, current.grid_, address, limits, memory, stop, details);
+        const auto& interval = node.interval;
+        auto time = take(io::detail::copy_rational_words(node.time(address.step), memory, stop));
         const CaseUniformFlowQuery query{address.stamp, rational_view(time), address.side};
         const auto ambient_plan = take(forecast_case_uniform_flow(
             field.ambient_, current.ambient_, query, limits.fields.flow, stop, details));
@@ -266,8 +390,11 @@ struct Builder {
            const CaseKnownFlowProjection& ambient, const CaseFlowProjectionRequest& wake,
            a::UniformFlowWorkspace& workspace, const CaseClockedKnownFlowLimits& limits,
            core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details) {
-        auto [time, interval] = locate(field.grid_, current.grid_, address, limits.clock_and_wake,
-                                       memory, stop, details);
+        const auto node = locate(field.grid_, current.grid_, address, limits.clock_and_wake, memory,
+                                 stop, details);
+        const auto& interval = node.interval;
+        const auto time =
+            take(io::detail::copy_rational_words(node.time(address.step), memory, stop));
         const CaseUniformFlowQuery query{address.stamp, rational_view(time), address.side};
         const auto& wake_limits = limits.clock_and_wake.fields.flow;
         auto step = take(io::detail::copy_rational_words(interval.step, memory, stop));
@@ -282,6 +409,92 @@ struct Builder {
         return {field.grid_.source,  address,
                 interval.restart,    std::move(step),
                 std::move(physical), std::move(projected_wake)};
+    }
+
+    static CaseClockedPrescribedInputs
+    make(const io::SiCase& source, CaseMotionField motion_field, p::PchipInputStamp stamp,
+         a::UniformFlowWorkspace& flow_workspace, p::CurveWorkspace& motion_workspace,
+         const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+         const std::stop_token& stop, core::FailureDetails details) {
+        const auto& clock = limits.flow.clock_and_wake;
+        auto grid = make_grid(source, stamp, clock, memory, stop, details);
+        const auto intervals = grid.intervals.values();
+        auto flow = take(prepare_case_known_flow(source, stamp, {}, flow_workspace,
+                                                 limits.flow.ambient, memory, stop, details));
+        auto motion = take(prepare_case_motion(
+            source, motion_field, {intervals.front().begin, intervals.back().end}, stamp,
+            motion_workspace, limits.motion, memory, stop, details));
+        const auto motion_inputs = motion_field.record();
+        const auto root = take(take(source.source_case()).get().root());
+        // Grid and ambient preparation already qualified these variants.
+        const auto ambient = std::get<s::FlowKnown>(root.flow.record());
+        const auto gust = ambient.gust.record();
+        const auto transient = std::get<s::AnalysisTransient>(root.analysis.record());
+        const auto wake = transient.wake.record();
+        const auto* active = std::get_if<s::WakeActive>(&wake);
+        if (active == nullptr)
+            fail(Unsupported, prepare, details);
+        const auto convection = active->convection.record();
+        const auto* prescribed = std::get_if<s::ConvectionPrescribed>(&convection);
+        TimeSeriesEventCheck events{source,
+                                    intervals,
+                                    clock.fields.conversion,
+                                    clock.fields.flow.arithmetic,
+                                    limits.maximum_event_work,
+                                    memory,
+                                    stop,
+                                    details};
+        events.check(motion_inputs.translation.record());
+        events.check(motion_inputs.rotation_vector.record());
+        events.check(ambient.uniform.record());
+        if (const auto* sine = std::get_if<s::GustSine>(&gust))
+            events.check(sine->amplitude.record());
+        std::optional<CasePrescribedWakeReady> transport;
+        if (prescribed != nullptr) {
+            transport.emplace(take(prepare_case_prescribed_wake(
+                source, stamp, {}, flow_workspace, clock.fields, memory, stop, details)));
+            events.check(prescribed->velocity.record());
+        }
+        check_stop(stop, prepare, details);
+        return {std::move(grid), std::move(flow), std::move(transport), std::move(motion)};
+    }
+
+    static CaseClockedPrescribedSample
+    sample(const CaseClockedPrescribedInputs& field, const CaseClockedPrescribedInputs& current,
+           CaseFlowClockQuery address, const std::array<p::RationalView, 3>& position,
+           const CaseKnownFlowProjection& ambient,
+           const std::optional<CaseFlowProjectionRequest>& wake, p::JetOrder motion_order,
+           const CaseMotionProjection& motion_projection, a::UniformFlowWorkspace& flow_workspace,
+           p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+           core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details) {
+        const auto node = locate(field.grid_, current.grid_, address, limits.flow.clock_and_wake,
+                                 memory, stop, details);
+        if (field.prescribed_.has_value() != current.prescribed_.has_value())
+            fail(StaleGeneration, evaluate, details);
+        if (field.prescribed_.has_value() != wake.has_value())
+            fail(InvalidInput, evaluate, details);
+        const auto& instant = node.time(address.step);
+        auto motion = take(evaluate_case_motion(
+            field.motion_, current.motion_, {address.stamp, instant, motion_order, address.side},
+            motion_projection, motion_workspace, limits.motion, memory, stop, details));
+        const auto words = take(io::detail::copy_rational_words(instant, memory, stop));
+        const CaseUniformFlowQuery time{address.stamp, rational_view(words), address.side};
+        auto flow = take(evaluate_case_known_flow(field.ambient_, current.ambient_,
+                                                  {time, position}, ambient, flow_workspace,
+                                                  limits.flow.ambient, memory, stop, details));
+        auto step = take(io::detail::copy_rational_words(node.interval.step, memory, stop));
+        std::optional<ProjectedCasePrescribedWake> transport;
+        if (wake) {
+            auto exact = take(evaluate_case_prescribed_wake(
+                *field.prescribed_, *current.prescribed_, time, flow_workspace,
+                limits.flow.clock_and_wake.fields.flow, memory, stop, details));
+            transport.emplace(
+                take(project_case_prescribed_wake(std::move(exact), *wake, stop, details)));
+        }
+        check_stop(stop, evaluate, details);
+        return {field.grid_.source, address,         node.interval.restart,
+                std::move(step),    std::move(flow), std::move(transport),
+                std::move(motion)};
     }
 };
 } // namespace case_clock_detail
@@ -378,6 +591,32 @@ core::Result<CaseClockedKnownFlowSample> evaluate_case_clocked_known_flows(
     return guarded<CaseClockedKnownFlowSample>(evaluate, details, [&] {
         return case_clock_detail::Builder::sample(field, current, address, position, ambient, wake,
                                                   workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs(
+    const io::SiCase& source, CaseMotionField motion, p::PchipInputStamp stamp,
+    a::UniformFlowWorkspace& flow_workspace, p::CurveWorkspace& motion_workspace,
+    const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CaseClockedPrescribedInputs>(prepare, details, [&] {
+        return case_clock_detail::Builder::make(source, motion, stamp, flow_workspace,
+                                                motion_workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<CaseClockedPrescribedSample> evaluate_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs& field, const CaseClockedPrescribedInputs& current,
+    CaseFlowClockQuery address, const std::array<p::RationalView, 3>& position,
+    const CaseKnownFlowProjection& ambient, const std::optional<CaseFlowProjectionRequest>& wake,
+    p::JetOrder motion_order, const CaseMotionProjection& motion,
+    a::UniformFlowWorkspace& flow_workspace, p::CurveWorkspace& motion_workspace,
+    const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CaseClockedPrescribedSample>(evaluate, details, [&] {
+        return case_clock_detail::Builder::sample(field, current, address, position, ambient, wake,
+                                                  motion_order, motion, flow_workspace,
+                                                  motion_workspace, limits, memory, stop, details);
     });
 }
 
