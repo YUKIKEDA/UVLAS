@@ -56,7 +56,7 @@
 | AE-04 | [design-decisions.md:57](../specs/design-decisions.md) | 0 | 0 | 0 |
 | AE-05 | [design-decisions.md:58](../specs/design-decisions.md) | 0 | 0 | 0 |
 | AE-06 | [design-decisions.md:59](../specs/design-decisions.md) | 0 | 0 | 0 |
-| AE-07 | [uvlm-integrated-specification.md:73](../specs/aero/uvlm-integrated-specification.md) | 71 | 26 | 1 |
+| AE-07 | [uvlm-integrated-specification.md:73](../specs/aero/uvlm-integrated-specification.md) | 73 | 26 | 1 |
 | BM-D01 | [beam-adopted-specification.md:9](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | BM-D02 | [beam-adopted-specification.md:10](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | BM-D03 | [beam-adopted-specification.md:11](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
@@ -68,7 +68,7 @@
 | BM-D09 | [beam-adopted-specification.md:17](../specs/structure/beam-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D01 | [connection-adopted-specification.md:9](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D02 | [connection-adopted-specification.md:10](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
-| CN-D03 | [connection-adopted-specification.md:11](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
+| CN-D03 | [connection-adopted-specification.md:11](../specs/structure/connection-adopted-specification.md) | 1 | 0 | 0 |
 | CN-D04 | [connection-adopted-specification.md:12](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D05 | [connection-adopted-specification.md:13](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
 | CN-D06 | [connection-adopted-specification.md:14](../specs/structure/connection-adopted-specification.md) | 0 | 0 | 0 |
@@ -119,13 +119,13 @@
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 14 | 4 | 0 |
-| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 263 | 95 | 4 |
+| N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 264 | 95 | 4 |
 | N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 149 | 62 | 2 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 106 | 20 | 0 |
 | N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 196 | 69 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
-| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 193 | 81 | 1 |
+| N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 194 | 81 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 89 | 48 | 1 |
 | N4-10 | [numerical-foundation-adoption-specification.md:130](../specs/foundation/numerical-foundation-adoption-specification.md) | 11 | 7 | 0 |
 | QA-01 | [quality-plan.md:13](../quality/quality-plan.md) | 0 | 0 | 0 |
@@ -152,7 +152,7 @@
 | SI-D04 | [structural-adopted-specification.md:12](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D05 | [structural-adopted-specification.md:13](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D06 | [structural-adopted-specification.md:14](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
-| SI-D07 | [structural-adopted-specification.md:15](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
+| SI-D07 | [structural-adopted-specification.md:15](../specs/structure/structural-adopted-specification.md) | 2 | 0 | 0 |
 | SI-D08 | [structural-adopted-specification.md:16](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D09 | [structural-adopted-specification.md:17](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
 | ST-01 | [design-decisions.md:39](../specs/design-decisions.md) | 0 | 0 | 0 |
