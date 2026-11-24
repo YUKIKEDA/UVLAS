@@ -864,7 +864,7 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
 }
 } // namespace
 
-TEST_CASE("Frozen finite wings reproduce the complete steady circulation systems",
+TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
           "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
     std::ifstream source{UVLAS_FINITE_WING_CASE_FIXTURE};
     std::ifstream observations{UVLAS_FINITE_WING_STEADY_FIXTURE};
@@ -884,13 +884,13 @@ TEST_CASE("Frozen finite wings reproduce the complete steady circulation systems
     }
     REQUIRE(frozen.at("cases").size() == 2);
     REQUIRE(expected.at("cases").size() == 2);
-    for (std::size_t i = 0; i < 2; ++i) {
-        const auto& wing = frozen.at("cases").at(i);
-        const auto& row = expected.at("cases").at(i);
-        CAPTURE(wing.at("dihedral_degrees").get<int>());
-        REQUIRE(wing.at("dihedral_degrees") == row.at("dihedral_degrees"));
-        const auto& polar = polars.at("cases").at(i);
-        REQUIRE(wing.at("dihedral_degrees") == polar.at("dihedral_degrees"));
-        run_wing(frozen, wing, row, expected, polar);
-    }
+    constexpr std::size_t wing_index = UVLAS_FINITE_WING_INDEX;
+    static_assert(wing_index < 2);
+    const auto& wing = frozen.at("cases").at(wing_index);
+    const auto& row = expected.at("cases").at(wing_index);
+    CAPTURE(wing.at("dihedral_degrees").get<int>());
+    REQUIRE(wing.at("dihedral_degrees") == row.at("dihedral_degrees"));
+    const auto& polar = polars.at("cases").at(wing_index);
+    REQUIRE(wing.at("dihedral_degrees") == polar.at("dihedral_degrees"));
+    run_wing(frozen, wing, row, expected, polar);
 }
