@@ -424,19 +424,53 @@ core::Result<a::ScaledEnclosure> WakeTransportResult::prescribed_time_dual() con
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
-core::Result<FirstFreeWakePoint> GrowingWakeTransition::row(std::size_t i) const noexcept {
+core::Result<FirstFreeWakePoint> WakeMaterialTransition::row(std::size_t i) const noexcept {
     const auto rows = rows_.values();
     if (i < rows.size() && rows[i])
         return *rows[i];
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
+core::Result<WakeMaterialPoint> WakeMaterialTransition::retired(std::size_t i) const noexcept {
+    const auto rows = retired_.values();
+    if (i < rows.size() && rows[i])
+        return *rows[i];
+    return std::unexpected(core::Failure{InvalidInput, operation});
+}
+
 struct WakeTransportBuilder {
-    static GrowingWakeTransition
-    growing_transition(const io::SiCase& si, const WakeTransportClock& clock,
-                       const WakeMaterialSnapshot& parent, const WakeMaterialSnapshot& trial,
-                       a::ReleaseEpoch epoch, const WakeTransportLimits& limits,
-                       core::ResourcePlan& memory, const std::stop_token& stop) {
+    static std::uint64_t fixed_window_rows(const io::SiCase& si,
+                                           const io::schema::RetentionWindow& window,
+                                           const WakeTransportClock& clock,
+                                           const WakeTransportLimits& limits,
+                                           core::ResourcePlan& memory, m::Work& work) {
+        const auto intervals = clock.clock.intervals.values();
+        const auto& step = intervals[static_cast<std::size_t>(clock.destination.interval)].step;
+        for (const auto& interval : intervals) {
+            work.step();
+            if (interval.step != step)
+                reject(Unsupported);
+        }
+        const auto arithmetic = limits.clock.fields.conversion;
+        const auto duration = read(io::materialize_rational(
+            read(si.quantity(window.duration)).recipe, arithmetic, memory));
+        const auto count = read(duration.divide(step, arithmetic, memory));
+        if (count.sign() != 1 || count.denominator_bits() != 1)
+            reject(InvalidInput);
+        if (count.numerator_bits() > std::numeric_limits<std::uint64_t>::digits)
+            reject(ResourceExceeded);
+        const auto words = read(io::detail::copy_rational_words(count, memory, work.stop));
+        const auto numerator = words.view().numerator;
+        auto rows = static_cast<std::uint64_t>(numerator[0]);
+        if (numerator.size() == 2)
+            rows |= static_cast<std::uint64_t>(numerator[1]) << 32U;
+        return rows;
+    }
+    static WakeMaterialTransition
+    material_transition(const io::SiCase& si, const WakeTransportClock& clock,
+                        const WakeMaterialSnapshot& parent, const WakeMaterialSnapshot& trial,
+                        a::ReleaseEpoch epoch, const WakeTransportLimits& limits,
+                        core::ResourcePlan& memory, const std::stop_token& stop) {
         m::Work work{0, limits.maximum_steps, stop};
         work.step();
         if (clock.destination.step == 0 || parent.preceding_births || trial.preceding_births)
@@ -455,9 +489,10 @@ struct WakeTransportBuilder {
             reject(Unsupported);
         const auto wake = transient->wake.record();
         const auto* active = std::get_if<io::schema::WakeActive>(&wake);
-        if (!active ||
-            !std::holds_alternative<io::schema::RetentionAll>(active->retention.record()))
+        if (!active)
             reject(Unsupported);
+        const auto retention = active->retention.record();
+        const auto* window = std::get_if<io::schema::RetentionWindow>(&retention);
 
         auto earlier = clock.destination;
         --earlier.step;
@@ -481,11 +516,11 @@ struct WakeTransportBuilder {
         const auto from = read(parent.contact.reference_topology());
         const auto to = read(trial.contact.reference_topology());
         const auto births = from.trailing_point_count();
-        if (births != to.trailing_point_count() || parent.points.size() > trial.points.size() ||
-            trial.points.size() - parent.points.size() != births)
+        if (births != to.trailing_point_count())
             reject(StaleGeneration);
 
-        auto visited = allocate<std::uint64_t>(memory, trial.points.size());
+        auto visited =
+            allocate<std::uint64_t>(memory, std::max(parent.points.size(), trial.points.size()));
         const auto unique_owners = [&](std::span<std::uint64_t> points) {
             std::ranges::sort(points, [&](auto lhs, auto rhs) {
                 work.step();
@@ -508,8 +543,62 @@ struct WakeTransportBuilder {
         }
         unique_owners(visited.values().first(parent.points.size()));
 
+        auto epochs = visited.values().first(parent.points.size());
+        for (std::size_t i = 0; i < epochs.size(); ++i) {
+            work.step();
+            epochs[i] = parent.points[i].release.epoch.value();
+        }
+        std::ranges::sort(epochs, [&](auto lhs, auto rhs) {
+            work.step();
+            return lhs < rhs;
+        });
+        const auto distinct = std::ranges::unique(epochs, [&](auto lhs, auto rhs) {
+            work.step();
+            return lhs == rhs;
+        });
+        auto rows = static_cast<std::uint64_t>(distinct.begin() - epochs.begin());
+        std::optional<a::ReleaseEpoch> retire;
+        if (window != nullptr) {
+            const auto capacity = fixed_window_rows(si, *window, clock, limits, memory, work);
+            if (rows > capacity || (rows != 0 && (parent.points.size() / rows != births ||
+                                                  parent.points.size() % rows != 0)))
+                reject(StaleGeneration);
+            if (rows == capacity && births != 0) {
+                retire.emplace(epochs.front());
+                --rows;
+            }
+        }
+        if (births != 0)
+            ++rows;
+        const auto row_capacity = input.numerics.record().wake_rows.record();
+        if (const auto* limited = std::get_if<io::schema::WakeCapacityLimited>(&row_capacity);
+            limited != nullptr && rows > limited->maximum_rows.unsigned_value())
+            reject(ResourceExceeded);
+
+        const auto expires = [retire](const WakeMaterialPoint& point) {
+            return retire && point.release.epoch == *retire;
+        };
+        std::size_t retired_count = 0;
+        if (retire) {
+            for (const auto& point : parent.points) {
+                work.step();
+                if (expires(point))
+                    ++retired_count;
+            }
+        }
+        const auto retained_count = parent.points.size() - retired_count;
+        if (retained_count > trial.points.size() || trial.points.size() - retained_count != births)
+            reject(StaleGeneration);
+
+        auto retired = allocate<std::optional<WakeMaterialPoint>>(memory, retired_count);
         auto output = allocate<std::optional<FirstFreeWakePoint>>(memory, trial.points.size());
-        std::size_t previous = 0;
+        std::size_t previous = 0, retired_index = 0;
+        const auto skip_retired = [&] {
+            while (previous < parent.points.size() && expires(parent.points[previous])) {
+                work.step();
+                retired.values()[retired_index++].emplace(parent.points[previous++]);
+            }
+        };
         for (std::size_t i = 0; i < trial.points.size(); ++i) {
             work.step();
             const auto& row = trial.points[i];
@@ -521,6 +610,7 @@ struct WakeTransportBuilder {
                     reject(StaleGeneration);
                 output.values()[i].emplace(row, std::nullopt);
             } else {
+                skip_retired();
                 if (previous == parent.points.size() ||
                     row.release != parent.points[previous].release)
                     reject(StaleGeneration);
@@ -528,31 +618,12 @@ struct WakeTransportBuilder {
                 ++previous;
             }
         }
+        skip_retired();
         if (previous != parent.points.size())
             reject(StaleGeneration);
-        unique_owners(visited.values());
-
-        const auto row_capacity = input.numerics.record().wake_rows.record();
-        if (const auto* limited = std::get_if<io::schema::WakeCapacityLimited>(&row_capacity)) {
-            auto epochs = visited.values();
-            for (std::size_t i = 0; i < epochs.size(); ++i) {
-                work.step();
-                epochs[i] = trial.points[i].release.epoch.value();
-            }
-            std::ranges::sort(epochs, [&](auto lhs, auto rhs) {
-                work.step();
-                return lhs < rhs;
-            });
-            const auto distinct = std::ranges::unique(epochs, [&](auto lhs, auto rhs) {
-                work.step();
-                return lhs == rhs;
-            });
-            const auto rows = static_cast<std::uint64_t>(distinct.begin() - epochs.begin());
-            if (rows > limited->maximum_rows.unsigned_value())
-                reject(ResourceExceeded);
-        }
+        unique_owners(visited.values().first(trial.points.size()));
         work.step();
-        return GrowingWakeTransition{std::move(output)};
+        return WakeMaterialTransition{std::move(output), std::move(retired)};
     }
 
     static const a::OwnedGeometry& first_geometry(const WakeTransportClock& clock,
@@ -916,13 +987,13 @@ core::Result<WakeTransportResult> evaluate_fixed_free_wake_transport(
     });
 }
 
-core::Result<GrowingWakeTransition> prepare_growing_wake_transition(
+core::Result<WakeMaterialTransition> prepare_wake_material_transition(
     const io::SiCase& si, const WakeTransportClock& clock, const WakeMaterialSnapshot& parent,
     const WakeMaterialSnapshot& trial, a::ReleaseEpoch epoch, const WakeTransportLimits& limits,
     core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
     return guarded([&] {
-        return WakeTransportBuilder::growing_transition(si, clock, parent, trial, epoch, limits,
-                                                        memory, stop);
+        return WakeTransportBuilder::material_transition(si, clock, parent, trial, epoch, limits,
+                                                         memory, stop);
     });
 }
 

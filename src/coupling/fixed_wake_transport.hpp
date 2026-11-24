@@ -119,29 +119,34 @@ struct FirstFreeWakePoint {
     std::optional<WakeMaterialPoint> parent;
 };
 
-/// Complete material correspondence between a parent and its growing-wake trial.
+/// Complete material correspondence between a parent and its wake trial.
 /// Each row pairs a retained owner with its parent, or identifies a new trailing-edge release.
-class GrowingWakeTransition {
+class WakeMaterialTransition {
 public:
-    GrowingWakeTransition(GrowingWakeTransition&&) noexcept = default;
-    GrowingWakeTransition& operator=(GrowingWakeTransition&&) noexcept = default;
+    WakeMaterialTransition(WakeMaterialTransition&&) noexcept = default;
+    WakeMaterialTransition& operator=(WakeMaterialTransition&&) noexcept = default;
 
     [[nodiscard]] std::size_t size() const noexcept {
         return rows_.size();
     }
     [[nodiscard]] core::Result<FirstFreeWakePoint> row(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t retired_count() const noexcept {
+        return retired_.size();
+    }
+    [[nodiscard]] core::Result<WakeMaterialPoint> retired(std::size_t) const noexcept;
 
 private:
     friend struct WakeTransportBuilder;
-    explicit GrowingWakeTransition(
-        core::PlannedBuffer<std::optional<FirstFreeWakePoint>>&& rows) noexcept
-        : rows_(std::move(rows)) {}
+    WakeMaterialTransition(core::PlannedBuffer<std::optional<FirstFreeWakePoint>>&& rows,
+                           core::PlannedBuffer<std::optional<WakeMaterialPoint>>&& retired) noexcept
+        : rows_(std::move(rows)), retired_(std::move(retired)) {}
     core::PlannedBuffer<std::optional<FirstFreeWakePoint>> rows_;
+    core::PlannedBuffer<std::optional<WakeMaterialPoint>> retired_;
 };
 
 /// Check complete material-key coverage at the next Case clock node. This identifies
 /// the rows to transport; the resulting positions and solver state are still a trial.
-[[nodiscard]] core::Result<GrowingWakeTransition> prepare_growing_wake_transition(
+[[nodiscard]] core::Result<WakeMaterialTransition> prepare_wake_material_transition(
     const io::SiCase&, const WakeTransportClock&, const WakeMaterialSnapshot& parent,
     const WakeMaterialSnapshot& trial, aero::detail::ReleaseEpoch, const WakeTransportLimits&,
     core::ResourcePlan&, const std::stop_token& = {}) noexcept;

@@ -4154,8 +4154,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     auto growth_limits = transport_limits;
     growth_limits.maximum_particles = 2;
     const auto growth = [&](const auto& parent_sample, const auto& trial_sample, auto epoch) {
-        return cf::prepare_growing_wake_transition(wake_si, first_interval, parent_sample,
-                                                   trial_sample, epoch, growth_limits, memory);
+        return cf::prepare_wake_material_transition(wake_si, first_interval, parent_sample,
+                                                    trial_sample, epoch, growth_limits, memory);
     };
     const auto transition = take(growth(growth_parent, growth_trial, release.epoch));
     REQUIRE(transition.size() == 2);
@@ -4185,8 +4185,9 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
            core::FailureCode::StaleGeneration);
     reject(growth(growth_parent, growth_trial, a::ReleaseEpoch{9}),
            core::FailureCode::StaleGeneration);
-    reject(cf::prepare_growing_wake_transition(wake_si, first_interval, growth_parent, growth_trial,
-                                               release.epoch, transport_limits, memory),
+    reject(cf::prepare_wake_material_transition(wake_si, first_interval, growth_parent,
+                                                growth_trial, release.epoch, transport_limits,
+                                                memory),
            core::FailureCode::ResourceExceeded);
 
     const a::PointId far_up{9}, far_down{10};
@@ -4272,8 +4273,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     auto extended_limits = growth_limits;
     extended_limits.maximum_particles = 4;
     const auto extended = take(
-        cf::prepare_growing_wake_transition(wake_si, transport_clock, growth_trial, extended_trial,
-                                            next_epoch, extended_limits, memory));
+        cf::prepare_wake_material_transition(wake_si, transport_clock, growth_trial, extended_trial,
+                                             next_epoch, extended_limits, memory));
     REQUIRE(extended.size() == 4);
     const auto inherited = take(extended.row(0));
     REQUIRE(inherited.parent);
@@ -4291,12 +4292,64 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const cf::WakeTransportClock limited_first{limited_grid, limited_grid,
                                                first_interval.destination};
     const cf::WakeTransportClock limited_second{limited_grid, limited_grid, destination};
-    CHECK(take(cf::prepare_growing_wake_transition(limited_si, limited_first, growth_parent,
-                                                   growth_trial, release.epoch, extended_limits,
-                                                   memory))
+    CHECK(take(cf::prepare_wake_material_transition(limited_si, limited_first, growth_parent,
+                                                    growth_trial, release.epoch, extended_limits,
+                                                    memory))
               .size() == 2);
-    reject(cf::prepare_growing_wake_transition(limited_si, limited_second, growth_trial,
-                                               extended_trial, next_epoch, extended_limits, memory),
+    reject(cf::prepare_wake_material_transition(limited_si, limited_second, growth_trial,
+                                                extended_trial, next_epoch, extended_limits,
+                                                memory),
+           core::FailureCode::ResourceExceeded);
+
+    auto window_case = limited_case;
+    window_case.field("analysis")
+        .field("wake")
+        .set(
+            "retention",
+            parse(R"({"kind":"closed_window","duration":0.125,"distance":1,"error_budget":0.01})"));
+    const auto window_si = materialize(window_case, io::SourceId{487});
+    const auto window_grid = take(cf::prepare_case_reference_clock(
+        window_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock window_first{window_grid, window_grid, first_interval.destination};
+    const cf::WakeTransportClock window_second{window_grid, window_grid, destination};
+    CHECK(take(cf::prepare_wake_material_transition(window_si, window_first, growth_parent,
+                                                    growth_trial, release.epoch, extended_limits,
+                                                    memory))
+              .retired_count() == 0);
+    const std::array window_points{extended_points[1], extended_points[3]};
+    const cf::WakeMaterialSnapshot window_trial{contact, window_points};
+    const auto window = take(cf::prepare_wake_material_transition(
+        window_si, window_second, growth_trial, window_trial, next_epoch, extended_limits, memory));
+    CHECK(window.size() == 2);
+    REQUIRE(window.retired_count() == 2);
+    CHECK(take(window.retired(0)).release == release);
+    CHECK(take(window.retired(1)).release == second_release);
+    CHECK(take(window.retired(0)).point == id[4]);
+    CHECK(take(window.row(0)).current.release.epoch == next_epoch);
+    const cf::WakeMaterialSnapshot partial_window{previous, material};
+    reject(cf::prepare_wake_material_transition(window_si, window_second, partial_window,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+
+    auto fractional_case = window_case;
+    fractional_case.field("analysis")
+        .field("wake")
+        .field("retention")
+        .set("duration", parse("0.1875"));
+    const auto fractional_si = materialize(fractional_case, io::SourceId{488});
+    const auto fractional_grid = take(cf::prepare_case_reference_clock(
+        fractional_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock fractional_clock{fractional_grid, fractional_grid, destination};
+    reject(cf::prepare_wake_material_transition(fractional_si, fractional_clock, growth_trial,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::InvalidInput);
+
+    reject(cf::prepare_wake_material_transition(window_si, window_second, growth_trial,
+                                                extended_trial, next_epoch, extended_limits,
+                                                memory),
+           core::FailureCode::StaleGeneration);
+    reject(cf::prepare_wake_material_transition(limited_si, limited_second, growth_trial,
+                                                window_trial, next_epoch, extended_limits, memory),
            core::FailureCode::ResourceExceeded);
 
     const std::array birth_origin{cf::WakeMaterialPoint{release, release.point, std::nullopt}};
@@ -4379,6 +4432,21 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     residual_expected(take(post_event.row(0)).residual[0], Rat{1});
     const auto& event_parent = take(post_event.parent_free_velocity()).get();
     exact(take(take(event_parent.ambient(0)).get().time()), previous_time);
+    event_case.field("analysis")
+        .field("wake")
+        .set("retention",
+             parse(R"({"kind":"closed_window","duration":0.25,"distance":1,"error_budget":0.01})"));
+    const auto event_window_si = materialize(event_case, io::SourceId{489});
+    const auto event_window_grid = take(cf::prepare_case_reference_clock(
+        event_window_si, stamp, event_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock event_window_clock{event_window_grid, event_window_grid,
+                                                    event_clock.destination};
+    auto event_window_limits = event_limits;
+    event_window_limits.maximum_particles = 2;
+    reject(cf::prepare_wake_material_transition(event_window_si, event_window_clock, growth_trial,
+                                                window_trial, next_epoch, event_window_limits,
+                                                memory),
+           core::FailureCode::Unsupported);
 
     auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
                                   R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
