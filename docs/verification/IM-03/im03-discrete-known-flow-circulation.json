@@ -1,0 +1,109 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-known-flow-circulation-v1",
+  "ids": [
+    "AE-07",
+    "UW-D01",
+    "UW-D06",
+    "N4-03",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "ace702ae61d17a3483f7e6f7759e76361a41d0fd",
+  "claimed_state": "Row-specific nonuniform known flow in the explicit fixed-contact discrete real circulation solve, including spatial and ambient-time chain terms in the qualified tangent and transpose.",
+  "verification": {
+    "msvc": "MSVC 19.51 Windows x64. Selected CTest 7/7 in Debug and Release at 51911ea6. Debug coupling suite 55.92 s under the existing 90-s cap. Rebuilt and ran the affected native case after the named-view and generation-check changes, Debug and Release.",
+    "gcc": "GCC 14.2 Ubuntu Noble x64 Release, warnings as errors. Selected CTest 7/7 at 51911ea6 and ace702ae.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.geometry_snapshot",
+      "aero.geometry_snapshot_resources",
+      "aero.global_geometry",
+      "aero.local_geometry_packet",
+      "aero.p1_shared_action",
+      "numerics.dense_solve"
+    ],
+    "catch": "The row-specific case passed 139 assertions, seed 23, in each final configuration.",
+    "oracle": "80-decimal independent closed segment integrals and determinant solve for two asymmetric finite-core P0 panels. Gust phases pi/4 and zero are exact in the two rows. Uniform translation leaves the induction derivative zero, giving analytic combined position/time forcing. Separate centered increments check a free point and a material point individually. The analytical time covector and a forward/transpose work pairing are also checked.",
+    "negative": "Wrong time; tangent retained generation reused; transpose RHS or retained generation reused; mode without requested derivatives returns no derivative values.",
+    "mutation": "On a duplicate GCC tree at 2ba873e6, suppressing U_t times the time direction failed the two independent tangent values and the work pairing (Catch2 exit 42, three assertions). Reinstating the exact source passed all 137 assertions of that parent.",
+    "static": "Pinned clang-format 21.1.2 and Windows/Linux clang-tidy 21.1.1 on the modified product and test translation units."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "src/aero/geometry_snapshot.cpp": "a4690237f6bb37571da8c11b3160530994b75f2d6ff4b033c2fa3e744fe0192b",
+    "src/aero/query_coordinates_private.hpp": "2d618cfdc773347554a68bd4b6e9a26a86f901391456f62e00f43aac3896fa83",
+    "src/coupling/case_known_flow.cpp": "a3357c834a4dd0ae1b242bb32de2721593be637aa2a30fb19146b8c66dced8bf",
+    "src/coupling/discrete_nonpenetration.cpp": "67e38ee17d0c4013e675b3a8666738eb02bb727dd41f830550b11c51a3905cb9",
+    "src/coupling/discrete_nonpenetration.hpp": "289a3d2d4b354b1c0bec279e15afc818e270f97b7f2685268317935eef569db1",
+    "tests/coupling/case_uniform_flow_test.cpp": "19df7ae0e9b9c6d63b8d8c83bd9788c9d9500120852f206098a8a218410085ed"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-known-flow-circulation-v1/reference.py": "a2a340b4a7f4fecd163026917497004f6f72766f41aa19a5ae922f0e64b73b0e",
+    "docs/verification/IM-03/discrete-known-flow-circulation-v1/verification.md": "1fddcfdf0d16f45ebf7e3bbcbcab8136e9abaf01b090bd8521c17b02aa59a862"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/foundation/dense-solve-contract.md",
+      "hint": "docs/specs/foundation/dense-solve-contract.md",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911"
+    },
+    {
+      "id": "src/aero/geometry_snapshot.cpp",
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "sha256": "a4690237f6bb37571da8c11b3160530994b75f2d6ff4b033c2fa3e744fe0192b"
+    },
+    {
+      "id": "src/aero/query_coordinates_private.hpp",
+      "hint": "src/aero/query_coordinates_private.hpp",
+      "sha256": "2d618cfdc773347554a68bd4b6e9a26a86f901391456f62e00f43aac3896fa83"
+    },
+    {
+      "id": "src/coupling/case_known_flow.cpp",
+      "hint": "src/coupling/case_known_flow.cpp",
+      "sha256": "a3357c834a4dd0ae1b242bb32de2721593be637aa2a30fb19146b8c66dced8bf"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "67e38ee17d0c4013e675b3a8666738eb02bb727dd41f830550b11c51a3905cb9"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "289a3d2d4b354b1c0bec279e15afc818e270f97b7f2685268317935eef569db1"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "19df7ae0e9b9c6d63b8d8c83bd9788c9d9500120852f206098a8a218410085ed"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/discrete-known-flow-circulation-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-known-flow-circulation-v1/reference.py",
+      "sha256": "a2a340b4a7f4fecd163026917497004f6f72766f41aa19a5ae922f0e64b73b0e"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-known-flow-circulation-v1/verification.md",
+      "hint": "docs/verification/IM-03/discrete-known-flow-circulation-v1/verification.md",
+      "sha256": "1fddcfdf0d16f45ebf7e3bbcbcab8136e9abaf01b090bd8521c17b02aa59a862"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-known-flow-loads-v1",
+  "ids": [
+    "AE-07",
+    "UW-D05",
+    "UW-D06",
+    "N4-03",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "babd5f0efb10547689cd2d06212f59744e9a6c35",
+  "claimed_state": "Known flow at each exact midpoint from the same fixed-contact nominal circulation solve, with implicit tangent and transpose including the matching spatial and ambient-time derivatives.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 5/5 each. Debug coupling suite 52.78 s within 90 s, Release 5.61 s.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, warnings as errors, affected CTest 5/5. Coupling suite 4.45 s.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.global_geometry",
+      "aero.local_geometry_packet",
+      "aero.p1_shared_action",
+      "numerics.dense_solve"
+    ],
+    "catch": "Known flow drives discrete midpoint loads and their implicit actions, 1 case, 217 assertions per configuration, seed 23.",
+    "oracle": "Independent 80-decimal analytic straight finite-core line integrals for a unit bound panel. Exact midpoint ambient speeds 1, 2, 1, 2 and collocation phase 135 degrees. The fixed-chart translation and ambient time direction use algebraic sine/cosine values, with an independent Gamma-dot direction. Check strengths, midpoint force, total force and moment, time and rate covectors and paired forward/transpose work.",
+    "negative": "Reusing the primal RHS generation in the load transpose is refused. Primal-only evaluations cannot return directional results.",
+    "mutation": "In a separate Linux tree, substituting the circulation collocation velocity for the midpoint velocity failed five assertions, exit 42. Restoring byte-identical product sources passed all 217 assertions.",
+    "static": "Pinned clang-format 21.1.2, both Windows and Linux clang-tidy 21.1.1 on modified product and regression units, plus independent reference reproduction and trace-check."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "src/aero/query_coordinates_private.hpp": "2d618cfdc773347554a68bd4b6e9a26a86f901391456f62e00f43aac3896fa83",
+    "src/coupling/case_known_flow.cpp": "a3357c834a4dd0ae1b242bb32de2721593be637aa2a30fb19146b8c66dced8bf",
+    "src/coupling/discrete_nonpenetration.cpp": "d11406df22a3a77fa488c52ca81967d9be060d13b0986ba00e5f29ce789ae2ad",
+    "src/coupling/discrete_nonpenetration.hpp": "74bc9c612dfabea2c6027f251d800047972d51e82fedc74a13ca747f0b8a37f5",
+    "tests/coupling/case_uniform_flow_test.cpp": "97b3668bba0bbd56438e6f0494ab2824b94f81ca0713411c0a8e5ec7e3acd5db"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-known-flow-loads-v1/reference.py": "3a236b38887a823f867616320b90d1f69d924065da1ccd5f9ba4156cc8acce69",
+    "docs/verification/IM-03/discrete-known-flow-loads-v1/verification.md": "ddf8f2fae25c3060d4200621062c34f2212461c68671de842f2db2d8689a3cf5"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "src/aero/query_coordinates_private.hpp",
+      "hint": "src/aero/query_coordinates_private.hpp",
+      "sha256": "2d618cfdc773347554a68bd4b6e9a26a86f901391456f62e00f43aac3896fa83"
+    },
+    {
+      "id": "src/coupling/case_known_flow.cpp",
+      "hint": "src/coupling/case_known_flow.cpp",
+      "sha256": "a3357c834a4dd0ae1b242bb32de2721593be637aa2a30fb19146b8c66dced8bf"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "d11406df22a3a77fa488c52ca81967d9be060d13b0986ba00e5f29ce789ae2ad"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "74bc9c612dfabea2c6027f251d800047972d51e82fedc74a13ca747f0b8a37f5"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "97b3668bba0bbd56438e6f0494ab2824b94f81ca0713411c0a8e5ec7e3acd5db"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/discrete-known-flow-loads-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-known-flow-loads-v1/reference.py",
+      "sha256": "3a236b38887a823f867616320b90d1f69d924065da1ccd5f9ba4156cc8acce69"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-known-flow-loads-v1/verification.md",
+      "hint": "docs/verification/IM-03/discrete-known-flow-loads-v1/verification.md",
+      "sha256": "ddf8f2fae25c3060d4200621062c34f2212461c68671de842f2db2d8689a3cf5"
+    }
+  ]
+}
