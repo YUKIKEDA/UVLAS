@@ -3084,3 +3084,169 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     CHECK(relocated.flow().source().jet.active());
     CHECK(abs(solution_word(tangent.solution(), 0) - tangent_reference[0]) <= rational_word(1e-14));
 }
+
+TEST_CASE("Two discrete circulation rows consume their own known-flow values and derivatives",
+          "[AE-07][UW-D01][UW-D06][N4-03][N4-05][N4-06][verification][negative]") {
+    auto input_case = gust_case("deg", R"({"kind":"constant","value":[2]})");
+    input_case.field("analysis").field("intervals").elements[0].set("end", parse("2"));
+    input_case.field("flow").set("uniform", parse(R"({"kind":"constant","value":[0,0,1]})"));
+    auto& gust = input_case.field("flow").field("gust");
+    gust.set("direction", parse("[0,0,1]"));
+    gust.set("wavevector", parse("[360,0,0]"));
+    gust.set("phase", parse("0"));
+    gust.set("origin", parse("[0.625,0,0]"));
+    gust.set("time_origin", parse("1.25"));
+
+    const DisjointCirculationPanels fixture;
+    const a::GlobalLimits cap{std::numeric_limits<std::uint64_t>::max() / 4,
+                              numerics::linear::EstimateAdmission{4096}};
+    core::ResourcePlan memory{128ULL * 1024 * 1024};
+    auto geometry_work = test_geometry::workspace(memory);
+    const auto geometry = test_geometry::take(a::prepare_owned_geometry(
+        fixture.input(), test_geometry::limits(), *geometry_work, memory));
+    auto global = take(a::GlobalWorkspace::create(memory, cap.metadata));
+    const auto topology = take_global(a::build_global_topology(
+        geometry, {fixture.roles, fixture.owners, {}}, cap, *global, memory));
+    const auto contact =
+        take_global(a::check_global_geometry(topology, geometry, cap, *global, memory));
+    const auto resolve = [&](a::QueryId id, a::QueryDefinition expression) {
+        return test_geometry::take(a::resolve_query(geometry, {id, expression}, geometry.context(),
+                                                    test_geometry::limits(), *geometry_work,
+                                                    memory));
+    };
+    const auto first = resolve(a::QueryId{1}, a::FreePoint{a::FreeSingle{{.75, .5, 0.}}});
+    const auto second =
+        resolve(a::QueryId{2},
+                a::SourceFacePoint{a::FacetId{203}, a::SingleWord{.25}, a::SingleWord{.375}});
+    const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
+    const std::array collocations{
+        cf::DiscreteCollocation{a::FacetId{202}, second, frame, coordinates(0, 0, .75),
+                                a::SingleWord{9}, a::SingleWord{0}},
+        cf::DiscreteCollocation{a::FacetId{200}, first, frame, coordinates(0, 0, .5),
+                                a::SingleWord{7}, a::SingleWord{0}}};
+    const cf::DiscreteNonpenetrationInput input{contact,
+                                                collocations,
+                                                {},
+                                                {core::AcceptedStateId{2}, {}},
+                                                {7, 11},
+                                                stamp,
+                                                p::RequestedSide::Automatic};
+
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = prepare_gust(input_case, io::SourceId{441}, flow_workspace, memory);
+    const auto current = prepare_gust(input_case, io::SourceId{442}, flow_workspace, memory);
+    const Number time{5, 4}, absolute{1, 1000000000};
+    cf::DiscreteKnownFlowInput flow{provider,
+                                    current,
+                                    {stamp, time.view()},
+                                    gust_projection(core::Precision::TwoWord, absolute),
+                                    gust_limits,
+                                    test_geometry::limits(),
+                                    *geometry_work,
+                                    flow_workspace};
+    const cf::DiscreteNonpenetrationLimits solve_limits{
+        {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10},
+        {test_geometry::limits(),
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(24000000000)};
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const std::array unknown{.5, 2.}, residual{1., .125};
+    const std::array<ls::UnitDimensions, 2> gamma{{{2, 0, -1, 0, 0, 0, 0}, {2, 0, -1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 2> speed{{{1, 0, -1, 0, 0, 0, 0}, {1, 0, -1, 0, 0, 0, 0}}};
+    const ls::Scales scales{unknown, residual, gamma, speed,
+                            circulation_context(geometry.context())};
+    const auto primal_request = circulation_request(scales, 2, ls::Norm::L2);
+    auto tangent_request = primal_request;
+    tangent_request.rhs_generation = core::RhsGeneration{30};
+    tangent_request.retained_generation = core::NumericalGeneration{31};
+    const std::array<ls::UnitDimensions, 2> dual_gamma{
+        {{-2, 0, 1, 0, 0, 0, 0}, {-2, 0, 1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 2> dual_speed{
+        {{-1, 0, 1, 0, 0, 0, 0}, {-1, 0, 1, 0, 0, 0, 0}}};
+    auto dual_context = scales.context;
+    dual_context.cache.matrix = core::NumericalGeneration{32};
+    dual_context.cache.scales = core::ScaleGeneration{33};
+    dual_context.unknown_layout = core::ScopeId{34};
+    dual_context.residual_layout = core::ScopeId{35};
+    const ls::Scales dual_scales{residual, unknown, dual_speed, dual_gamma, dual_context};
+    auto transpose_request = circulation_request(dual_scales, 2, ls::Norm::L2);
+    transpose_request.rhs_generation = core::RhsGeneration{36};
+    transpose_request.retained_generation = core::NumericalGeneration{37};
+
+    const auto run = [&](const cf::KnownCirculationDerivative& derivative) {
+        core::ResourcePlan trial_memory{128ULL * 1024 * 1024};
+        return cf::solve_discrete_known_circulation(input, flow, derivative, solve_limits,
+                                                    primal_request, shared, *local, *kernel,
+                                                    trial_memory);
+    };
+    const auto dx = coordinates(.25, 0, 0);
+    const auto zero = coordinates(0, 0, 0);
+    const std::array displacements{dx, dx, dx, dx, dx, dx, dx, dx};
+    const std::array d_rows{
+        cf::CirculationCollocationDirection{fixture.faces[0].id, dx, {zero, zero}, zero},
+        cf::CirculationCollocationDirection{fixture.faces[1].id, std::nullopt, {zero, zero}, zero}};
+    const cf::DiscreteCirculationDirection state{fixture.points, displacements, d_rows, zero};
+    const auto tangent =
+        take(run(cf::KnownCirculationTangent{state, a::SingleWord{.5}, tangent_request}));
+    const std::array seed{cf::CirculationLinearRhs{fixture.faces[0].id, a::SingleWord{.25}},
+                          cf::CirculationLinearRhs{fixture.faces[1].id, a::SingleWord{-.15625}}};
+    const auto dual = take(run(cf::KnownCirculationAdjoint{seed, transpose_request}));
+    const auto just_primal = take(run(std::monostate{}));
+    reject(just_primal.linearization(), core::FailureCode::InvalidInput);
+    const auto& values = take(tangent.solution()).get();
+    const auto& dv = take(tangent.linearization()).get();
+    const auto& lambda = take(dual.linearization()).get();
+    const auto approx = [](const Rat& actual, double expected) {
+        CHECK(abs(actual - rational_word(expected)) < rational_word(1e-12));
+    };
+    const auto center = [](const a::ScaledEnclosure& value) {
+        return sum_words(value.center()) * two_power(value.exponent());
+    };
+    const std::array primal_truth{2.049364665787067014, .313915922823822824};
+    const std::array tangent_truth{1.207196834651639385, 1.800156984102001041};
+    const std::array dual_truth{-.264772325234835974, .174155889600154652};
+    for (std::size_t i = 0; i < primal_truth.size(); ++i) {
+        approx(solution_word(values, i), primal_truth[i]);
+        approx(solution_word(take(dual.solution()).get(), i), primal_truth[i]);
+        approx(solution_word(take(just_primal.solution()).get(), i), primal_truth[i]);
+        approx(solution_word(dv.solution(), i), tangent_truth[i]);
+        approx(solution_word(lambda.solution(), i), dual_truth[i]);
+        CHECK(take(tangent.row(i)).face == fixture.faces[i].id);
+        CHECK(take(tangent.forcing(i)).face == fixture.faces[i].id);
+        residual_small(take(tangent.row(i)).original_residual, rational_word(1e-13));
+        residual_small(take(dv.row(i)).original_residual, rational_word(1e-13));
+        residual_small(take(lambda.row(i)).original_residual, rational_word(1e-13));
+    }
+    exact(take(take(tangent.flow(0)).get().position(0)), Number{3, 4});
+    exact(take(take(tangent.flow(1)).get().position(0)), Number{5, 8});
+    exact(take(take(tangent.flow(1)).get().position(1)), Number{19, 8});
+    const auto free = take(dual.collocation(0)).free_query;
+    REQUIRE(free);
+    CHECK_FALSE(take(dual.collocation(1)).free_query.has_value());
+    const auto point = take(dual.point(6));
+    CHECK(point.point == a::PointId{7});
+    const auto time_dual = center(take(dual.flow_time_dual()));
+    approx(time_dual, -.041049359793944367);
+    approx(center((*free)[0]), 1.895651483847442373);
+    approx(center(point.position[0]), -.826374462193735972);
+
+    Rat action = center((*free)[0]) / 4 + time_dual / 2;
+    for (std::size_t i = 0; i < fixture.points.size(); ++i)
+        action += center(take(dual.point(i)).position[0]) / 4;
+    const Rat transpose_work =
+        solution_word(dv.solution(), 0) / 4 - 5 * solution_word(dv.solution(), 1) / 32;
+    CHECK(abs(action - transpose_work) < rational_word(1e-12));
+
+    auto stale = tangent_request;
+    stale.retained_generation = primal_request.retained_generation;
+    reject(run(cf::KnownCirculationTangent{state, a::SingleWord{.5}, stale}),
+           core::FailureCode::StaleGeneration);
+    const Number wrong_time{1};
+    flow.time.time = wrong_time.view();
+    reject(run(std::monostate{}), core::FailureCode::StaleGeneration);
+}

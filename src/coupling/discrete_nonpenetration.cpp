@@ -3,6 +3,7 @@
 #include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
+#include "aero/query_coordinates_private.hpp"
 
 #include <algorithm>
 #include <bit>
@@ -472,6 +473,128 @@ p::Interval fixed_circulation_direction(const DiscreteCollocation& row,
                   dot(normal, d_total, work), work);
 }
 
+struct DyadicWords {
+    std::array<std::uint32_t, 128> numerator{}, denominator{};
+    std::size_t numerator_size = 0, denominator_size = 1;
+    int sign = 0;
+
+    DyadicWords(a::ExactInteger number, unsigned shift, p::Work& work) {
+        work.step();
+        denominator[0] = 1;
+        if (number == 0)
+            return;
+        sign = number < 0 ? -1 : 1;
+        if (sign < 0)
+            number = -number;
+        const auto trim =
+            std::min(shift, static_cast<unsigned>(boost::multiprecision::lsb(number)));
+        number >>= trim;
+        shift -= trim;
+        const auto word = shift / 32U;
+        if (word >= denominator.size())
+            reject(core::FailureCode::ResourceExceeded);
+        denominator[0] = 0;
+        denominator[word] = std::uint32_t{1} << (shift % 32U);
+        denominator_size = static_cast<std::size_t>(word) + 1;
+        while (number != 0) {
+            work.step();
+            if (numerator_size == numerator.size())
+                reject(core::FailureCode::ResourceExceeded);
+            numerator[numerator_size++] = (number & 0xffffffffU).convert_to<std::uint32_t>();
+            number >>= 32U;
+        }
+    }
+
+    [[nodiscard]] a::pchip::RationalView view() const noexcept {
+        return {sign, std::span{numerator}.first(numerator_size),
+                std::span{denominator}.first(denominator_size)};
+    }
+};
+
+struct KnownRowData {
+    std::optional<CaseKnownFlowJet> jet;
+    Vector velocity{}, time{};
+    std::array<Vector, 3> spatial{};
+    std::array<std::uint64_t, 3> points{};
+    Vector weights{};
+    std::size_t point_count = 0;
+};
+
+struct KnownBoundary {
+    const DiscreteKnownFlowInput& source;
+    std::span<KnownRowData> rows;
+    p::Interval time_direction;
+};
+
+KnownRowData evaluate_known_row(const a::OwnedGeometry& geometry, const a::ResolvedQuery& query,
+                                const DiscreteKnownFlowInput& input, core::ResourcePlan& memory,
+                                p::Work& work) {
+    auto coordinate_limits = input.coordinate_limits;
+    coordinate_limits.max_steps = std::min(coordinate_limits.max_steps, remaining(work));
+    const auto position = require(a::exact_query_coordinates(geometry, query, coordinate_limits,
+                                                             input.coordinates, work.stop));
+    account(work, position.used_steps);
+    const std::array xyz{
+        DyadicWords{position.numerator[0], a::ExactQueryCoordinates::denominator_shift, work},
+        DyadicWords{position.numerator[1], a::ExactQueryCoordinates::denominator_shift, work},
+        DyadicWords{position.numerator[2], a::ExactQueryCoordinates::denominator_shift, work}};
+    auto sampled = require(evaluate_case_known_flow(
+        input.source, input.current, {input.time, {xyz[0].view(), xyz[1].view(), xyz[2].view()}},
+        input.projection, input.workspace, input.flow_limits, memory, work.stop,
+        geometry.context().diagnostics));
+    KnownRowData result{};
+    for (std::size_t i = 0; i < result.velocity.size(); ++i) {
+        result.velocity[i] = import(require(sampled.velocity(i)), work);
+        result.time[i] = import(require(sampled.time_partial(i)), work);
+        for (std::size_t j = 0; j < result.velocity.size(); ++j)
+            result.spatial[i][j] = import(require(sampled.spatial_partial(i, j)), work);
+    }
+    for (std::size_t i = 0; i < position.point_count; ++i) {
+        work.step();
+        result.points[i] = position.point_ids[i];
+        result.weights[i] = p::exact(position.weights[i],
+                                     -static_cast<int>(a::ExactQueryCoordinates::weight_shift));
+    }
+    result.point_count = position.point_count;
+    result.jet.emplace(std::move(sampled));
+    return result;
+}
+
+template <class Id>
+std::size_t material_column(std::span<const Id> points, Id id, p::Work& work) {
+    const auto found =
+        std::lower_bound(points.begin(), points.end(), id, [&](auto left, auto right) {
+            work.step();
+            return left < right;
+        });
+    if (found == points.end() || *found != id)
+        reject(core::FailureCode::InvalidInput);
+    return static_cast<std::size_t>(found - points.begin());
+}
+
+Vector ambient_direction_at(const KnownRowData& known, const DiscreteCirculationDirection& dir,
+                            std::size_t row, const Vector& uniform, const p::Interval& time,
+                            p::Work& work) {
+    Vector dx{};
+    if (const auto& free = dir.rows[row].free_query) {
+        dx = import(*free, work);
+    } else {
+        for (std::size_t i = 0; i < known.point_count; ++i) {
+            const auto column = material_column(dir.points, a::PointId{known.points[i]}, work);
+            const auto point = import(dir.displacements[column], work);
+            for (std::size_t axis = 0; axis < dx.size(); ++axis)
+                dx[axis] = p::add(dx[axis], p::multiply(known.weights[i], point[axis], work), work);
+        }
+    }
+    Vector result{};
+    for (std::size_t i = 0; i < result.size(); ++i)
+        result[i] = p::add(
+            uniform[i],
+            p::add(dot(known.spatial[i], dx, work), p::multiply(known.time[i], time, work), work),
+            work);
+    return result;
+}
+
 struct PrimalCirculationData {
     linear::Solution<double> solution;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows;
@@ -491,6 +614,7 @@ struct PullbackData {
     core::PlannedBuffer<Vector> point_covectors;
     core::PlannedBuffer<std::optional<CirculationCollocationCovector>> rows;
     Vector flow{};
+    p::Interval flow_time{};
 };
 
 struct LoadEdgeOccurrence {
@@ -703,6 +827,17 @@ private:
 
 } // namespace
 
+struct KnownCirculationRun {
+    std::optional<PrimalCirculationData> primal;
+    std::optional<DiscreteCirculationLinearization> linearization;
+    core::PlannedBuffer<KnownRowData> known;
+    core::PlannedBuffer<std::optional<CirculationForcingRow>> forcing;
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points;
+    core::PlannedBuffer<std::optional<CirculationCollocationCovector>> dual_rows;
+    std::optional<CirculationVectorCovector> uniform;
+    std::optional<a::ScaledEnclosure> time;
+};
+
 struct NonpenetrationStorage {
     std::optional<DiscreteNonpenetrationRow> value;
 };
@@ -748,7 +883,6 @@ a::P1ActionStamp DiscreteNonpenetration::trial_stamp() const noexcept {
 
 struct NonpenetrationBuilder {
     static Assembly assemble(const DiscreteNonpenetrationInput& input,
-                             const ProjectedCaseUniformFlow& flow,
                              const DiscreteNonpenetrationLimits& limits, core::ResourcePlan& memory,
                              p::Work& work, bool solve) {
         const auto& stop = work.stop;
@@ -761,11 +895,6 @@ struct NonpenetrationBuilder {
             reject(*invalid);
         const auto geometry_owner = require(input.contact.geometry());
         const auto& geometry = geometry_owner.get();
-        const auto& jet = flow.source().jet;
-        if (require(jet.stamp()) != input.flow_stamp ||
-            flow.source().requested_side != input.flow_side ||
-            !same_time(geometry, require(jet.time()), work))
-            reject(core::FailureCode::StaleGeneration);
         if (!input.wake.empty() && geometry.context().diagnostics.parent != input.history.parent)
             reject(core::FailureCode::StaleGeneration);
 
@@ -960,6 +1089,22 @@ struct NonpenetrationBuilder {
         return action;
     }
 
+    static void match_flow(const DiscreteNonpenetrationInput& input,
+                           a::pchip::PchipInputStamp stamp, a::pchip::RequestedSide side,
+                           a::pchip::RationalView time, p::Work& work) {
+        const auto owner = require(input.contact.geometry());
+        if (stamp != input.flow_stamp || side != input.flow_side ||
+            !same_time(owner.get(), time, work))
+            reject(core::FailureCode::StaleGeneration);
+    }
+
+    static void match_flow(const DiscreteNonpenetrationInput& input,
+                           const ProjectedCaseUniformFlow& flow, p::Work& work) {
+        const auto& jet = flow.source().jet;
+        match_flow(input, require(jet.stamp()), flow.source().requested_side, require(jet.time()),
+                   work);
+    }
+
     static Vector ambient_velocity(const ProjectedCaseUniformFlow& flow, p::Work& work) {
         return {import(require(flow.velocity(0)), work), import(require(flow.velocity(1)), work),
                 import(require(flow.velocity(2)), work)};
@@ -973,7 +1118,8 @@ struct NonpenetrationBuilder {
         p::Work work{0, limits.steps, stop};
         const auto geometry_owner = require(input.contact.geometry());
         const auto& geometry = geometry_owner.get();
-        const auto assembly = assemble(input, flow, limits, memory, work, false);
+        match_flow(input, flow, work);
+        const auto assembly = assemble(input, limits, memory, work, false);
         const auto bound = assembly.bound.values();
         auto rows = allocate<NonpenetrationStorage>(memory, bound.size());
         admit(assembly, input, limits, memory, 1, 2, work);
@@ -1067,7 +1213,8 @@ struct NonpenetrationBuilder {
                  const a::P1ActionValue& primal, const a::SharedP1Action& action,
                  const a::P1ActionSource& source, const Assembly& assembly,
                  const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
-                 core::ResourcePlan& memory, a::LocalRootScratch& rounding, p::Work& work) {
+                 core::ResourcePlan& memory, a::LocalRootScratch& rounding, p::Work& work,
+                 const KnownRowData* known = nullptr) {
         const auto& transpose = target.transpose;
         if (!transpose)
             reject(core::FailureCode::InvalidInput);
@@ -1097,6 +1244,30 @@ struct NonpenetrationBuilder {
                                            shared, memory, work);
             scatter_geometry(dual, velocity_dual[axis], target.point_covectors.values(), query,
                              work);
+        }
+        if (known != nullptr) {
+            target.flow_time =
+                p::add(target.flow_time, dot(velocity_dual, known->time, work), work);
+            Vector spatial_dual{};
+            for (std::size_t j = 0; j < spatial_dual.size(); ++j)
+                for (std::size_t d = 0; d < velocity_dual.size(); ++d)
+                    spatial_dual[j] =
+                        p::add(spatial_dual[j],
+                               p::multiply(known->spatial[d][j], velocity_dual[d], work), work);
+            if (query) {
+                for (std::size_t j = 0; j < spatial_dual.size(); ++j)
+                    (*query)[j] = p::add((*query)[j], spatial_dual[j], work);
+            } else {
+                const std::span<const std::uint64_t> ids = target.point_ids.values();
+                for (std::size_t j = 0; j < known->point_count; ++j) {
+                    const auto column = material_column(ids, known->points[j], work);
+                    auto& point = target.point_covectors.values()[column];
+                    for (std::size_t axis = 0; axis < point.size(); ++axis)
+                        point[axis] =
+                            p::add(point[axis],
+                                   p::multiply(known->weights[j], spatial_dual[axis], work), work);
+                }
+            }
         }
         const auto representation = limits.induction_accuracy.representation;
         std::optional<CirculationVectorCovector> enclosed_query;
@@ -1141,14 +1312,13 @@ struct NonpenetrationBuilder {
         }
     }
 
-    static PrimalCirculationData
-    solve_data(const DiscreteNonpenetrationInput& input, const ProjectedCaseUniformFlow& flow,
-               const DiscreteNonpenetrationLimits& limits,
-               const DiscreteCirculationRequest& request, a::SharedP1Workspace& shared,
-               a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
-               p::Work& work, const DiscreteCirculationDirection* direction,
-               std::span<p::Interval> forcing, PullbackData* pullback = nullptr,
-               std::optional<Assembly>* retained_assembly = nullptr) {
+    static PrimalCirculationData solve_data(
+        const DiscreteNonpenetrationInput& input, const ProjectedCaseUniformFlow* flow,
+        const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+        a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+        core::ResourcePlan& memory, p::Work& work, const DiscreteCirculationDirection* direction,
+        std::span<p::Interval> forcing, PullbackData* pullback = nullptr,
+        std::optional<Assembly>* retained_assembly = nullptr, KnownBoundary* known = nullptr) {
         const auto& stop = work.stop;
         work.step();
         const auto geometry_owner = require(input.contact.geometry());
@@ -1157,7 +1327,15 @@ struct NonpenetrationBuilder {
         match_circulation_geometry(request, geometry.context());
         validate_circulation(request, order, work);
         auto [matrix, rhs] = dense_inputs(order, memory);
-        auto assembly = assemble(input, flow, limits, memory, work, true);
+        if (known != nullptr) {
+            const auto& time = known->source.time;
+            match_flow(input, time.stamp, time.side, time.time, work);
+        } else {
+            if (flow == nullptr)
+                reject(core::FailureCode::InvalidInput);
+            match_flow(input, *flow, work);
+        }
+        auto assembly = assemble(input, limits, memory, work, true);
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
         auto data = allocate<CirculationRowData>(memory, order);
         auto results = allocate<std::optional<CirculationResidualRow>>(memory, order);
@@ -1199,7 +1377,7 @@ struct NonpenetrationBuilder {
         }
         admit(assembly, input, limits, memory, 2, pullback != nullptr ? 8U : 5U, work);
 
-        const auto ambient = ambient_velocity(flow, work);
+        const auto ambient = flow != nullptr ? ambient_velocity(*flow, work) : Vector{};
         a::LocalRootScratch rounding;
         const auto apply = [&](const a::SharedP1Action& action, const a::P1ActionSource& source,
                                const std::optional<a::P1ActionDirection>& variation) {
@@ -1215,7 +1393,14 @@ struct NonpenetrationBuilder {
             const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
             auto& record = data.values()[i];
             record.normal = qualify_normal(geometry, item.panel, row, work);
-            record.relative = difference(ambient, import(row.velocity, work), work);
+            const auto& known_velocity = [&]() -> const Vector& {
+                if (known == nullptr)
+                    return ambient;
+                auto& sample = known->rows[i];
+                sample = evaluate_known_row(geometry, row.query, known->source, memory, work);
+                return sample.velocity;
+            }();
+            record.relative = difference(known_velocity, import(row.velocity, work), work);
             const auto action =
                 prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
             if (direction != nullptr && i == 0) {
@@ -1276,16 +1461,23 @@ struct NonpenetrationBuilder {
                     a::P1ActionDirection{direction->displacements, assembly.directions.values(),
                                          direction->rows[i].free_query, a::SingleWord{0}});
             auto full = apply(action, source, variation);
-            if (direction != nullptr)
+            const auto* sample = known != nullptr ? &known->rows[i] : nullptr;
+            if (direction != nullptr) {
+                const auto flow_direction =
+                    known != nullptr
+                        ? ambient_direction_at(known->rows[i], *direction, i, ambient_direction,
+                                               known->time_direction, work)
+                        : ambient_direction;
                 forcing[i] =
                     fixed_circulation_direction(row, direction->rows[i], record.normal,
-                                                record.relative, ambient_direction, full, work);
+                                                record.relative, flow_direction, full, work);
+            }
             const auto original = native_residual(record.normal, record.relative, full, work);
             check.add(original, record.rhs, i, work);
             if (pullback != nullptr)
                 pullback->rows.values()[i].emplace(
                     pullback_row(*pullback, i, item, row, record, full, action, source, assembly,
-                                 limits, shared, memory, rounding, work));
+                                 limits, shared, memory, rounding, work, sample));
             const auto enclosed =
                 a::enclose_p1_value(original, limits.induction_accuracy.representation, rounding);
             results.values()[i].emplace(CirculationResidualRow{
@@ -1313,7 +1505,7 @@ struct NonpenetrationBuilder {
           a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
           core::ResourcePlan& memory, const std::stop_token& stop) {
         p::Work work{0, limits.steps, stop};
-        auto data = solve_data(input, flow, limits, request, shared, local, kernel, memory, work,
+        auto data = solve_data(input, &flow, limits, request, shared, local, kernel, memory, work,
                                nullptr, {});
         return finish_primal(std::move(data), std::move(flow));
     }
@@ -1357,8 +1549,8 @@ struct NonpenetrationBuilder {
         validate_tangent(tangent_request, primal_request, order, work);
         auto native_rhs = allocate<p::Interval>(memory, order);
         auto forcing = allocate<std::optional<CirculationForcingRow>>(memory, order);
-        auto primal = solve_data(input, flow, limits, primal_request, shared, local, kernel, memory,
-                                 work, &direction, native_rhs.values());
+        auto primal = solve_data(input, &flow, limits, primal_request, shared, local, kernel,
+                                 memory, work, &direction, native_rhs.values());
         match_reused_scales(tangent_request.scales, primal.solution.certificate(), work);
         a::LocalRootScratch rounding;
         for (std::size_t i = 0; i < order; ++i) {
@@ -1393,8 +1585,8 @@ struct NonpenetrationBuilder {
         validate_circulation(transpose_request, order, work, true);
         PullbackData target{transpose_request, seed};
         target.rows = allocate<std::optional<CirculationCollocationCovector>>(memory, order);
-        auto primal = solve_data(input, flow, limits, primal_request, shared, local, kernel, memory,
-                                 work, nullptr, {}, &target);
+        auto primal = solve_data(input, &flow, limits, primal_request, shared, local, kernel,
+                                 memory, work, nullptr, {}, &target);
         auto& transpose = target.transpose;
         if (!transpose)
             reject(core::FailureCode::InvalidInput);
@@ -1417,6 +1609,85 @@ struct NonpenetrationBuilder {
                 std::move(target.rows),
                 uniform,
                 work.used};
+    }
+
+    static DiscreteKnownCirculation
+    solve_known(const DiscreteNonpenetrationInput& input, const DiscreteKnownFlowInput& flow,
+                const KnownCirculationDerivative& derivative,
+                const DiscreteNonpenetrationLimits& limits,
+                const DiscreteCirculationRequest& request, a::SharedP1Workspace& shared,
+                a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+                const std::stop_token& stop) {
+        p::Work work{0, limits.steps, stop};
+        work.step();
+        const auto order = input.collocations.size();
+        if (order == 0)
+            reject(core::FailureCode::InvalidInput);
+        const auto* tangent = std::get_if<KnownCirculationTangent>(&derivative);
+        const auto* adjoint = std::get_if<KnownCirculationAdjoint>(&derivative);
+        if (tangent != nullptr)
+            validate_tangent(tangent->request, request, order, work);
+        if (adjoint != nullptr) {
+            if (adjoint->seed.size() != order)
+                reject(core::FailureCode::InvalidInput);
+            match_linearization_context(adjoint->request.scales.context, request.scales.context,
+                                        true);
+            validate_circulation(adjoint->request, order, work, true);
+        }
+
+        auto output = allocate<KnownCirculationRun>(memory, 1);
+        auto& result = output.values().front();
+        result.known = allocate<KnownRowData>(memory, order);
+        KnownBoundary known{flow, result.known.values(),
+                            tangent == nullptr ? p::Interval{} : import(tangent->flow_time, work)};
+        core::PlannedBuffer<p::Interval> native_rhs;
+        if (tangent != nullptr) {
+            native_rhs = allocate<p::Interval>(memory, order);
+            result.forcing = allocate<std::optional<CirculationForcingRow>>(memory, order);
+        }
+        std::optional<PullbackData> pullback;
+        if (adjoint != nullptr) {
+            pullback.emplace(adjoint->request, adjoint->seed);
+            pullback->rows = allocate<std::optional<CirculationCollocationCovector>>(memory, order);
+        }
+        auto primal =
+            solve_data(input, nullptr, limits, request, shared, local, kernel, memory, work,
+                       tangent == nullptr ? nullptr : &tangent->state, native_rhs.values(),
+                       pullback ? &*pullback : nullptr, nullptr, &known);
+        a::LocalRootScratch rounding;
+        const auto representation = limits.induction_accuracy.representation;
+        if (tangent != nullptr) {
+            match_reused_scales(tangent->request.scales, primal.solution.certificate(), work);
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                result.forcing.values()[i].emplace(CirculationForcingRow{
+                    face_at(primal.rows.values(), i),
+                    a::enclose_p1_value(native_rhs.values()[i], representation, rounding)});
+            }
+            result.linearization.emplace(solve_retained_tangent(primal, native_rhs.values(),
+                                                                tangent->request, memory, work));
+        }
+        if (pullback) {
+            auto& transpose = pullback->transpose;
+            if (!transpose)
+                reject(core::FailureCode::InvalidInput);
+            result.linearization.emplace(std::move(*transpose));
+            result.dual_rows = std::move(pullback->rows);
+            result.points = allocate<std::optional<CirculationPointCovector>>(
+                memory, pullback->point_ids.size());
+            for (std::size_t i = 0; i < result.points.size(); ++i) {
+                work.step();
+                result.points.values()[i].emplace(
+                    CirculationPointCovector{a::PointId{pullback->point_ids.values()[i]},
+                                             enclose_vector(pullback->point_covectors.values()[i],
+                                                            representation, rounding, work)});
+            }
+            result.uniform.emplace(enclose_vector(pullback->flow, representation, rounding, work));
+            result.time.emplace(a::enclose_p1_value(pullback->flow_time, representation, rounding));
+        }
+        result.primal.emplace(std::move(primal));
+        work.step();
+        return DiscreteKnownCirculation{std::move(output)};
     }
 
     static std::pair<std::size_t, int>
@@ -1805,7 +2076,7 @@ struct NonpenetrationBuilder {
         if (tangent != nullptr)
             forcing = allocate<p::Interval>(memory, order);
         const auto* state = tangent == nullptr ? nullptr : &tangent->input.state;
-        auto primal = solve_data(input, flow, limits, request, shared, local, kernel, memory, work,
+        auto primal = solve_data(input, &flow, limits, request, shared, local, kernel, memory, work,
                                  state, forcing.values(), nullptr, &retained);
         if (tangent != nullptr) {
             match_reused_scales(tangent->request.scales, primal.solution.certificate(), work);
@@ -2608,4 +2879,119 @@ core::Result<DiscreteCirculationImplicitLoadJvp> solve_discrete_circulation_impl
     }
 }
 
+DiscreteKnownCirculation::DiscreteKnownCirculation(
+    core::PlannedBuffer<KnownCirculationRun>&& data) noexcept
+    : data_(std::move(data)) {}
+DiscreteKnownCirculation::DiscreteKnownCirculation(DiscreteKnownCirculation&&) noexcept = default;
+DiscreteKnownCirculation&
+DiscreteKnownCirculation::operator=(DiscreteKnownCirculation&&) noexcept = default;
+DiscreteKnownCirculation::~DiscreteKnownCirculation() = default;
+
+namespace {
+core::Failure absent() noexcept {
+    return {core::FailureCode::InvalidInput, evaluate};
+}
+} // namespace
+core::Result<std::reference_wrapper<const linear::Solution<double>>>
+DiscreteKnownCirculation::solution() const& noexcept {
+    if (data_.values().empty())
+        return std::unexpected(absent());
+    const auto& primal = data_.values().front().primal;
+    if (!primal)
+        return std::unexpected(absent());
+    return std::cref(primal->solution);
+}
+core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
+DiscreteKnownCirculation::linearization() const& noexcept {
+    if (data_.values().empty())
+        return std::unexpected(absent());
+    const auto& result = data_.values().front().linearization;
+    if (!result)
+        return std::unexpected(absent());
+    return std::cref(*result);
+}
+core::Result<CirculationResidualRow> DiscreteKnownCirculation::row(std::size_t i) const noexcept {
+    if (data_.values().empty())
+        return std::unexpected(absent());
+    const auto& primal = data_.values().front().primal;
+    if (!primal || i >= primal->rows.size())
+        return std::unexpected(absent());
+    const auto& row = primal->rows.values()[i];
+    if (!row)
+        return std::unexpected(absent());
+    return *row;
+}
+core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+DiscreteKnownCirculation::flow(std::size_t i) const& noexcept {
+    if (data_.values().empty() || i >= data_.values().front().known.size())
+        return std::unexpected(absent());
+    const auto& jet = data_.values().front().known.values()[i].jet;
+    if (!jet)
+        return std::unexpected(absent());
+    return std::cref(*jet);
+}
+core::Result<CirculationForcingRow>
+DiscreteKnownCirculation::forcing(std::size_t i) const noexcept {
+    if (data_.values().empty() || i >= data_.values().front().forcing.size())
+        return std::unexpected(absent());
+    const auto& result = data_.values().front().forcing.values()[i];
+    if (!result)
+        return std::unexpected(absent());
+    return *result;
+}
+core::Result<CirculationPointCovector>
+DiscreteKnownCirculation::point(std::size_t i) const noexcept {
+    if (data_.values().empty() || i >= data_.values().front().points.size())
+        return std::unexpected(absent());
+    const auto& result = data_.values().front().points.values()[i];
+    if (!result)
+        return std::unexpected(absent());
+    return *result;
+}
+core::Result<CirculationCollocationCovector>
+DiscreteKnownCirculation::collocation(std::size_t i) const noexcept {
+    if (data_.values().empty() || i >= data_.values().front().dual_rows.size())
+        return std::unexpected(absent());
+    const auto& result = data_.values().front().dual_rows.values()[i];
+    if (!result)
+        return std::unexpected(absent());
+    return *result;
+}
+core::Result<CirculationVectorCovector>
+DiscreteKnownCirculation::uniform_component_dual() const noexcept {
+    if (data_.values().empty())
+        return std::unexpected(absent());
+    const auto& result = data_.values().front().uniform;
+    if (!result)
+        return std::unexpected(absent());
+    return *result;
+}
+core::Result<a::ScaledEnclosure> DiscreteKnownCirculation::flow_time_dual() const noexcept {
+    if (data_.values().empty())
+        return std::unexpected(absent());
+    const auto& result = data_.values().front().time;
+    if (!result)
+        return std::unexpected(absent());
+    return *result;
+}
+
+core::Result<DiscreteKnownCirculation> solve_discrete_known_circulation(
+    const DiscreteNonpenetrationInput& input, const DiscreteKnownFlowInput& flow,
+    const KnownCirculationDerivative& derivative, const DiscreteNonpenetrationLimits& limits,
+    const DiscreteCirculationRequest& primal, a::SharedP1Workspace& shared,
+    a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+    const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_known(input, flow, derivative, limits, primal, shared,
+                                                  local, kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
 } // namespace uvlas::coupling::detail

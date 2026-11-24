@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aero/p1_shared_action.hpp"
-#include "case_uniform_flow_projection.hpp"
+#include "case_known_flow.hpp"
 
 #include <uvlas/numerics/linear_solve.hpp>
 
@@ -845,5 +845,77 @@ solve_discrete_circulation_implicit_load_pullback(
     const DiscreteCirculationRequest& transpose, aero::detail::GeometryWorkspace&,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+struct DiscreteKnownFlowInput {
+    const CaseKnownFlowReady& source;
+    const CaseKnownFlowReady& current;
+    CaseUniformFlowQuery time;
+    CaseKnownFlowProjection projection;
+    CaseKnownFlowLimits flow_limits; ///< Provider caps per collocation.
+    aero::detail::GeometryLimits coordinate_limits;
+    aero::detail::GeometryWorkspace& coordinates;
+    aero::detail::UniformFlowWorkspace& workspace;
+};
+
+struct KnownCirculationTangent {
+    const DiscreteCirculationDirection& state;
+    aero::detail::ScalarWords flow_time; ///< Variation of ambient time only, in seconds.
+    const DiscreteCirculationRequest& request;
+};
+
+struct KnownCirculationAdjoint {
+    std::span<const CirculationLinearRhs> seed;
+    const DiscreteCirculationRequest& request;
+};
+
+using KnownCirculationDerivative =
+    std::variant<std::monostate, KnownCirculationTangent, KnownCirculationAdjoint>;
+struct KnownCirculationRun;
+
+/// Real discrete solve with the known flow sampled once at each qualified collocation.
+/// Holds the native original residual, input jets, and the selected fixed-chart derivative.
+class DiscreteKnownCirculation {
+public:
+    DiscreteKnownCirculation(DiscreteKnownCirculation&&) noexcept;
+    DiscreteKnownCirculation& operator=(DiscreteKnownCirculation&&) noexcept;
+    ~DiscreteKnownCirculation();
+    DiscreteKnownCirculation(const DiscreteKnownCirculation&) = delete;
+    DiscreteKnownCirculation& operator=(const DiscreteKnownCirculation&) = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const numerics::linear::Solution<double>>>
+    solution() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const numerics::linear::Solution<double>>>
+    solution() const&& = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
+    linearization() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
+    linearization() const&& = delete;
+    [[nodiscard]] core::Result<CirculationResidualRow> row(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    flow(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    flow(std::size_t) const&& = delete;
+    [[nodiscard]] core::Result<CirculationForcingRow> forcing(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationPointCovector> point(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationCollocationCovector>
+    collocation(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationVectorCovector> uniform_component_dual() const noexcept;
+    /// Covector to a common ambient time shift, in inverse seconds.
+    [[nodiscard]] core::Result<aero::detail::ScaledEnclosure> flow_time_dual() const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    explicit DiscreteKnownCirculation(core::PlannedBuffer<KnownCirculationRun>&&) noexcept;
+    core::PlannedBuffer<KnownCirculationRun> data_;
+};
+
+/// Requires at least one bound row. Geometry, attached-wake chart, core radius and wake history
+/// remain those of this trial.
+/// The time direction differentiates only the analytic known-flow input at its requested side.
+[[nodiscard]] core::Result<DiscreteKnownCirculation> solve_discrete_known_circulation(
+    const DiscreteNonpenetrationInput&, const DiscreteKnownFlowInput&,
+    const KnownCirculationDerivative&, const DiscreteNonpenetrationLimits&,
+    const DiscreteCirculationRequest&, aero::detail::SharedP1Workspace&,
+    aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
 
 } // namespace uvlas::coupling::detail
