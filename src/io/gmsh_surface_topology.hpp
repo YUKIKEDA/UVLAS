@@ -55,6 +55,18 @@ struct GmshTopologyLimits {
 };
 
 struct GmshTopologyView {
+    GmshTopologyView(GmshTopologySource owner, std::span<const GmshTopologyFace> face_records,
+                     std::span<const GmshTopologyEdge> edge_records,
+                     std::span<const std::size_t> boundary_records,
+                     std::span<const GmshTopologyComponent> component_records,
+                     std::uint64_t executed_work) noexcept
+        : source(owner),
+          faces(face_records),
+          edges(edge_records),
+          boundary(boundary_records),
+          components(component_records),
+          work(executed_work) {}
+
     GmshTopologySource source;
     // Faces retain explicit selection order and their original element rings.
     std::span<const GmshTopologyFace> faces;

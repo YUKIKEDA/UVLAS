@@ -66,6 +66,11 @@ struct NastranSupportOrigin {
 };
 
 struct NastranSupportView {
+    NastranSupportView(NastranSupportOrigin owner, std::span<const NastranSupportTerm> term_records,
+                       std::span<const NastranSupportUnionMember> member_records,
+                       std::uint64_t executed_work) noexcept
+        : source(owner), terms(term_records), union_members(member_records), work(executed_work) {}
+
     NastranSupportOrigin source;
     std::span<const NastranSupportTerm> terms;
     std::span<const NastranSupportUnionMember> union_members;

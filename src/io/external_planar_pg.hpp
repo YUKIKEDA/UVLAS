@@ -16,6 +16,10 @@ struct ExternalPgCorner {
 };
 
 struct ExternalPgFace {
+    ExternalPgFace(std::uint64_t element_id, ExternalPgWinding declared_winding,
+                   std::span<const ExternalPgCorner> declared_corners) noexcept
+        : element(element_id), winding(declared_winding), corners(declared_corners) {}
+
     std::uint64_t element;
     ExternalPgWinding winding;
     std::span<const ExternalPgCorner> corners; // Original element ring, not sorted by tag.
