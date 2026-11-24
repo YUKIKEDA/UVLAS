@@ -227,6 +227,24 @@ AcquiredRootReferences::declaration(core::Index ordinal) const& noexcept {
     return declarations_.declaration(ordinal);
 }
 
+core::Result<RootReferenceSourceView>
+AcquiredRootReferences::source(core::Index ordinal) const& noexcept {
+    return declarations_.source(ordinal);
+}
+
+core::Result<std::reference_wrapper<const AcquiredRootSnapshot>>
+AcquiredRootReferences::snapshot(core::Index ordinal) const& noexcept {
+    if (!std::in_range<std::size_t>(ordinal) ||
+        static_cast<std::size_t>(ordinal) >= sources_.size()) {
+        return failure(core::FailureCode::InvalidInput);
+    }
+    const auto& source = sources_.values()[static_cast<std::size_t>(ordinal)];
+    if (!source) {
+        return failure(core::FailureCode::InvalidInput);
+    }
+    return std::cref(*source);
+}
+
 core::Result<std::reference_wrapper<const AcquiredRootSnapshot>>
 AcquiredRootReferences::find(const SchemaIdentity& parent, SourceId source, ReferenceRole role,
                              const std::stop_token& stop) const& noexcept {

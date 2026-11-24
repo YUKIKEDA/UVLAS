@@ -1,6 +1,7 @@
 #include "gmsh_mesh.hpp"
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
+#include "reference_resolution.hpp"
 #include "reference_root_snapshot.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -922,6 +923,74 @@ TEST_CASE("An empty root walk still requires the original checked parent",
         FAIL("Missing empty traversal");
     }
     CHECK(plan.allocated_bytes() == 0);
+}
+
+TEST_CASE("Only format-proven root leaves enter a closed reference graph",
+          "[IO4-01][IO4-04][N4-02][integration][verification][negative]") {
+    const auto empty = [] {
+        core::ResourcePlan input_plan{fixture::budget};
+        const auto input = fixture::take(rd::ReferenceInput::from_memory(
+            bytes_of(static_case()), source, std::nullopt, limits(), input_plan, {}, nullptr));
+        auto roots = prepare(input);
+        core::ResourcePlan no_storage{0};
+        auto inventory = fixture::take(
+            rd::acquire_root_references(input, std::move(roots), {}, no_storage, {}, nullptr));
+        auto closed = fixture::take(rd::close_leaf_reference_inventory(std::move(inventory), {}, {},
+                                                                       no_storage, {}, nullptr));
+        CHECK(no_storage.allocated_bytes() == 0);
+        return closed;
+    }();
+    CHECK(fixture::take(empty.roots().identity()).source.source == source);
+    CHECK(fixture::take(empty.roots().report()).declarations == 0);
+    CHECK(empty.dependency_first().empty());
+    CHECK_FALSE(empty.roots().snapshot(0));
+
+    const Tree tree;
+    const auto wire = write_root_inventory(tree.root);
+    write_file(tree.root / "case.json", wire);
+    core::ResourcePlan input_plan{fixture::budget};
+    const auto input = fixture::take(rd::ReferenceInput::from_file(
+        tree.root, "case.json", source, manifest_limits, limits(), input_plan, {}, nullptr));
+    auto roots = prepare(input);
+    auto acquisition = memory_inventory_bounds;
+    acquisition.total_identity_comparisons += inventory_ids.size();
+    core::ResourcePlan inventory_plan{fixture::budget};
+    auto inventory = fixture::take(rd::acquire_root_references(input, std::move(roots), acquisition,
+                                                               inventory_plan, {}, nullptr));
+    constexpr rd::GmshLimits gmsh{1024, 16, 16, 32, 16, 16, 4096};
+    constexpr rd::DependencyWalkLimits closure{8, 9, 1, 128, 128};
+    core::ResourcePlan graph_plan{fixture::budget};
+    rd::LeafReferenceDiagnostic diagnostic;
+    check_acquisition_failure(rd::close_leaf_reference_inventory(std::move(inventory), closure,
+                                                                 gmsh, graph_plan, {}, &diagnostic),
+                              core::FailureCode::Unsupported);
+    CHECK(diagnostic.reason == rd::LeafReferenceFailure::UnsupportedRole);
+    CHECK(diagnostic.pointer() == "/model/geometry/0/sidecar");
+    if (const auto location = diagnostic.location) {
+        CHECK(location->source == io::SourceId{301});
+        CHECK(location->role == rd::ReferenceRole::GmshSidecar);
+    } else {
+        FAIL("Missing unsupported declaration");
+    }
+    CHECK(fixture::take(inventory.source(0)).path.text() == "skin.msh");
+    const auto mesh = fixture::take(inventory.snapshot(0));
+    CHECK(mesh.get().location.source == io::SourceId{300});
+    CHECK_FALSE(inventory.snapshot(-1));
+
+    auto first_edge = closure;
+    first_edge.edges = 1;
+    check_acquisition_failure(rd::close_leaf_reference_inventory(std::move(inventory), first_edge,
+                                                                 gmsh, graph_plan, {}, &diagnostic),
+                              core::FailureCode::ResourceExceeded);
+    CHECK(diagnostic.reason == rd::LeafReferenceFailure::Graph);
+    CHECK(diagnostic.walk.reason == rd::DependencyWalkFailure::EdgeLimit);
+    if (const auto edge = diagnostic.walk.edge) {
+        CHECK(edge->declaring_source == source);
+        CHECK(edge->dependency == 1);
+    } else {
+        FAIL("Missing original manifest edge");
+    }
+    CHECK(diagnostic.pointer() == "/model/geometry/0/sidecar");
 }
 
 TEST_CASE("Root walk applies preflight, snapshot, and edge failures in order",

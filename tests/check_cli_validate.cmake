@@ -58,6 +58,56 @@ check(2 "reference SHA-256 mismatch at /observations/0/comparison/reference/sour
 file(REMOVE "${source_path}")
 check(2 "reference acquisition at /observations/0/comparison/reference/source" "${case_name}")
 
+set(mesh [=[$MeshFormat
+4.1 0 8
+$EndMeshFormat
+$Nodes
+1 3 1 3
+2 1 0 3
+1
+2
+3
+0 0 0
+1 0 0
+0 1 0
+$EndNodes
+$Elements
+1 1 1 1
+2 1 2 1
+1 1 2 3
+$EndElements
+]=])
+file(WRITE "${CASE_DIRECTORY}/skin.msh" "${mesh}")
+file(WRITE "${CASE_DIRECTORY}/sidecar.json" "{}")
+file(WRITE "${CASE_DIRECTORY}/reference.dat" "surface")
+file(SHA256 "${CASE_DIRECTORY}/skin.msh" mesh_digest)
+file(SHA256 "${CASE_DIRECTORY}/sidecar.json" sidecar_digest)
+file(SHA256 "${CASE_DIRECTORY}/reference.dat" geometry_digest)
+string(JSON coupled GET "${examples}" schema_examples coupled_transient)
+string(JSON gmsh GET "${examples}" fragments "Geometry.gmsh")
+string(JSON gmsh SET "${gmsh}" mesh source_id "\"300\"")
+string(JSON gmsh SET "${gmsh}" mesh path "\"skin.msh\"")
+string(JSON gmsh SET "${gmsh}" mesh sha256 "\"${mesh_digest}\"")
+string(JSON gmsh SET "${gmsh}" sidecar source_id "\"301\"")
+string(JSON gmsh SET "${gmsh}" sidecar path "\"sidecar.json\"")
+string(JSON gmsh SET "${gmsh}" sidecar sha256 "\"${sidecar_digest}\"")
+string(JSON gmsh SET "${gmsh}" reference file source_id "\"302\"")
+string(JSON gmsh SET "${gmsh}" reference file path "\"reference.dat\"")
+string(JSON gmsh SET "${gmsh}" reference file sha256 "\"${geometry_digest}\"")
+string(JSON external SET "${coupled}" model geometry 1 "${gmsh}")
+file(WRITE "${case_path}" "${external}")
+check(2 "external reference dependency validation is unsupported at /model/geometry/1/sidecar"
+    "${case_name}")
+
+string(REPLACE "1 1 2 3" "1 1 2 9" bad_mesh "${mesh}")
+file(WRITE "${CASE_DIRECTORY}/skin.msh" "${bad_mesh}")
+file(SHA256 "${CASE_DIRECTORY}/skin.msh" mesh_digest)
+string(JSON external SET "${external}" model geometry 1 mesh sha256 "\"${mesh_digest}\"")
+file(WRITE "${case_path}" "${external}")
+check(2 "Gmsh mesh format at byte" "${case_name}")
+file(REMOVE "${CASE_DIRECTORY}/skin.msh" "${CASE_DIRECTORY}/sidecar.json"
+    "${CASE_DIRECTORY}/reference.dat")
+
 math(EXPR oversized "8 * 1024 * 1024 + 1")
 string(REPEAT " " ${oversized} invalid)
 file(WRITE "${case_path}" "${invalid}")

@@ -87,6 +87,12 @@ public:
         declaration(core::Index) const& noexcept;
     [[nodiscard]] core::Result<RootReferenceDeclarationView>
         declaration(core::Index) const&& = delete;
+    [[nodiscard]] core::Result<RootReferenceSourceView> source(core::Index) const& noexcept;
+    [[nodiscard]] core::Result<RootReferenceSourceView> source(core::Index) const&& = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const AcquiredRootSnapshot>>
+        snapshot(core::Index) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const AcquiredRootSnapshot>>
+        snapshot(core::Index) const&& = delete;
     [[nodiscard]] core::Result<std::reference_wrapper<const AcquiredRootSnapshot>>
     find(const SchemaIdentity& parent, SourceId source, ReferenceRole role,
          const std::stop_token& stop) const& noexcept;
