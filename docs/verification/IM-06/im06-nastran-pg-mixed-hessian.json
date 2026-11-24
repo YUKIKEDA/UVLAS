@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-pg-mixed-hessian",
+  "date": "2026-11-24",
+  "package": "IM-06",
+  "ids": [
+    "IO4-03",
+    "IO4-04",
+    "N4-02",
+    "R-05"
+  ],
+  "source_commit": "80d952541eb81e679e52bf50f59173e938268e95",
+  "scope": "Same-chart distance from a single flat CTRIA3 to the unit-scale PG height st.",
+  "checks": {
+    "normal_test": {
+      "cases": 7,
+      "assertions": 168
+    },
+    "windows": "MSVC 19.51.36260 Debug",
+    "linux": "GCC 14.2.0 Debug ASan and UBSan",
+    "exact_max_gap_metres": "1/4",
+    "mixed_term_only_zeroed": {
+      "focused_failed_assertions": 1,
+      "exit": 42,
+      "prior_cases_passed": 6,
+      "prior_assertions_passed": 165
+    },
+    "original_source_restored": {
+      "cases": 1,
+      "assertions": 3,
+      "exit": 0
+    }
+  },
+  "sources": {
+    "src/io/external_planar_pg.cpp": "6e10e45ea8207b788d3f1aae63d3a3a5e1786048a13b7d90fe91f3e9a7e07097",
+    "tests/io/external_planar_pg_test.cpp": "28b0683d545bf6f9c678aec8b7501e9c7a728853e355f674e4201ab4c6f934fd"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-pg-mixed-hessian.md": "2ff796bbb770f122080ddb34c1f9cc8aedc8db00ea6414e03b78e67a17add5bb"
+  }
+}
