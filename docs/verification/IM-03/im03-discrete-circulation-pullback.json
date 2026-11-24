@@ -1,0 +1,103 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-circulation-pullback-v1",
+  "ids": [
+    "AE-07",
+    "UW-D01",
+    "UW-D03",
+    "UW-D06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "52f903c12a458723455a441a342f963c09fce186",
+  "claimed_state": "Owned pullback of a real dense implicit circulation solution to the explicit current chart point, query, tangent, surface-velocity and uniform-flow inputs, with native primal and transpose original-residual checks.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config Debug/Release. Four selected CTests passed on predecessor d546cb8bf3f0c1b23d2c62c9374ed95cba3db45e; affected coupling rerun after the ownership cleanup passed in both configurations.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release, warnings as errors. Four selected CTests passed on the same predecessor source; affected coupling rerun after the ownership cleanup passed.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "numerics.dense_solve"
+    ],
+    "catch": "938 assertions in 3 discrete nonpenetration/circulation cases on each final configuration, seed 23.",
+    "oracle": "Exact rational seed-displacement and adjoint work contractions compared to the independent 65-digit finite-core circulation difference and the forward direction. Both attached wake signs and a triangle material query; analytic signs and tangent factors; two-row uniform-flow summation.",
+    "mutations": [
+      "Reverse the tangent cross-product order: 8 checks fail.",
+      "Omit canonical point covectors: 6 work checks fail.",
+      "Overwrite rather than sum the uniform-flow covector: 1 two-row check fails."
+    ],
+    "mutation_environment": "GCC 14.2 Release, isolated copies. Each mutant exits Catch2 with status 42.",
+    "static": "clang-format 21.1.2; Windows and Linux clang-tidy 21.1.1 on affected translation units.",
+    "scope": "Fixed real contact and alias chart, current explicit uniform-flow and collocation velocity, and finite mixed-induction expression. PG material mapping, time/core and old-trace cotangents, transported history and physical continuum accuracy are downstream."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "docs/verification/IM-03/discrete-circulation-direction-v1/reference.py": "06b5f387e64cee0da14cbd4186168d5c922b448dd39a453e88ba6ac80f5807d8",
+    "src/aero/p1_shared_action.cpp": "77e1d5eebc0b11c28011fe1f4853b9fb4d2f231feff9778f2ab533895bd885d8",
+    "src/aero/p1_shared_action.hpp": "8efee2a3825e61dd7469faf037d454a5489999af99b6a178d3ee75958a30b64c",
+    "src/coupling/discrete_nonpenetration.cpp": "5acfb8b7a51c4566521194f59df807bfe14aa80103524dad5b14f96e30739407",
+    "src/coupling/discrete_nonpenetration.hpp": "29cfc8acdf08ce325a6abdf7071265ac19ca6f9a46910575de7e71c6455557bc",
+    "tests/coupling/case_uniform_flow_test.cpp": "dbd3a1f3db2dffced193c69c420265defb686ee2d72aae041a024a42498a842e"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-circulation-pullback-v1/verification.md": "1f2df1bad6fb75de645b71ab4bd4e02c921fafbee8ae5be99d8b303e0a7cae1a"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/foundation/dense-solve-contract.md",
+      "hint": "docs/specs/foundation/dense-solve-contract.md",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-circulation-direction-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-circulation-direction-v1/reference.py",
+      "sha256": "06b5f387e64cee0da14cbd4186168d5c922b448dd39a453e88ba6ac80f5807d8"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "77e1d5eebc0b11c28011fe1f4853b9fb4d2f231feff9778f2ab533895bd885d8"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "8efee2a3825e61dd7469faf037d454a5489999af99b6a178d3ee75958a30b64c"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "5acfb8b7a51c4566521194f59df807bfe14aa80103524dad5b14f96e30739407"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "29cfc8acdf08ce325a6abdf7071265ac19ca6f9a46910575de7e71c6455557bc"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "dbd3a1f3db2dffced193c69c420265defb686ee2d72aae041a024a42498a842e"
+    }
+  ]
+}

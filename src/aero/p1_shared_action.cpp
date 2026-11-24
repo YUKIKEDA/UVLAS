@@ -678,7 +678,8 @@ public:
             std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
             P1Accuracy accuracy, const P1AssemblyLimits& limits, SharedP1Workspace& workspace,
             LocalPacketWorkspace& local, P1Workspace& kernel, core::ResourcePlan& memory,
-            const std::stop_token& stop, bool mixed = false) noexcept {
+            const std::stop_token& stop, bool mixed = false,
+            std::optional<EdgeId> self = {}) noexcept {
         const auto context = source.query.context();
         if (workspace.entered_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, context));
@@ -690,12 +691,42 @@ public:
             if (const auto error = accuracy.validation_error())
                 throw ArithmeticFailure{*error};
             Work work{0, limits.steps, stop};
-            const auto plan = count(source, faces, strengths, limits, work, mixed);
+            auto plan = count(source, faces, strengths, limits, work, mixed);
             (void)checked_limit(plan.payload_bytes, memory.remaining_bytes());
             const auto& verified = source_data(source);
             if (!verified.geometry || !verified.geometry->data_)
                 throw ArithmeticFailure{invalid};
             const auto& geometry = *verified.geometry->data_;
+            std::optional<std::size_t> excluded;
+            if (self) {
+                const auto extra = sum(sum(logarithmic_visits(geometry.edge_lookup.size()),
+                                           logarithmic_visits(verified.topology->trailing.size())),
+                                       sum(1, product(geometry.facets.size(), 6)));
+                plan.reserved_steps = sum(plan.reserved_steps, extra);
+                (void)checked_limit(plan.reserved_steps, limits.steps);
+                work.step();
+                const auto definition = needed(source.query.definition());
+                const auto* edge = std::get_if<SourceEdgePoint>(&definition.definition);
+                const auto* fraction =
+                    edge != nullptr ? std::get_if<SingleWord>(&edge->t) : nullptr;
+                if (edge == nullptr || fraction == nullptr || edge->edge != *self ||
+                    fraction->value != .5)
+                    throw ArithmeticFailure{invalid};
+                const auto lookup = geometry.edge_lookup.values();
+                const auto index = locate(lookup, self->value(), &IdLookup::id, work);
+                const auto ordinal = static_cast<std::size_t>(lookup[index].ordinal);
+                if (verified.topology->edges.values()[ordinal].owner != ordinal)
+                    throw ArithmeticFailure{invalid};
+                const auto trailing = verified.topology->trailing.values();
+                const auto te = std::lower_bound(trailing.begin(), trailing.end(), *self,
+                                                 [&](const TrailingEdgeRow& row, EdgeId id) {
+                                                     work.step();
+                                                     return row.edge < id;
+                                                 });
+                if (te != trailing.end() && te->edge == *self)
+                    throw ArithmeticFailure{invalid};
+                excluded = ordinal;
+            }
             const auto facet_count = geometry.facets.size();
             const auto point_slots = geometry.points.size();
             const auto edges = product(facet_count, 3);
@@ -730,9 +761,24 @@ public:
                 auto& facet = data.facets.values()[i];
                 const auto prepare_packet =
                     facet.bound ? prepare_bound_local_packet : prepare_local_packet;
-                auto packet = needed(prepare_packet(
-                    *verified.geometry, source.query, FacetId{geometry.facets.values()[i].id},
-                    local_accuracy, limits.geometry, local, memory, stop));
+                const auto& original = geometry.facets.values()[i];
+                std::optional<EdgeId> alias;
+                if (excluded) {
+                    for (const auto edge : original.edges) {
+                        work.step();
+                        const auto raw = static_cast<std::size_t>(edge);
+                        if (raw != *excluded &&
+                            data.topology->edges.values()[raw].owner == *excluded)
+                            alias = EdgeId{geometry.edges.values()[raw].id};
+                    }
+                }
+                const auto id = FacetId{original.id};
+                auto packet = needed(
+                    alias ? prepare_aliased_midpoint_packet(*verified.geometry, source.query, id,
+                                                            *alias, facet.bound, local_accuracy,
+                                                            limits.geometry, local, memory, stop)
+                          : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
+                                           limits.geometry, local, memory, stop));
                 charge(work, needed(packet.steps()));
                 const bool far = !facet.bound && needed(packet.far()) == FarRelation::Far;
                 facet.far = far;
@@ -743,6 +789,18 @@ public:
             const auto ordered = sort_edges(occurrences.values(), sorting.values(), work);
             data.report.cancelled_analytic_pairs =
                 cancel_pairs(ordered, data.facets.values(), work);
+            if (excluded) {
+                for (const auto& edge : ordered) {
+                    work.step();
+                    auto& facet = data.facets.values()[edge.facet];
+                    if (edge.owner == *excluded && facet.bound) {
+                        facet.boundary[edge.edge] = false;
+                        ++data.report.excluded_bound_occurrences;
+                    }
+                }
+                if (data.report.excluded_bound_occurrences == 0)
+                    throw ArithmeticFailure{invalid};
+            }
             if (mixed) {
                 group_bound_edges(ordered, data.facets.values(), work);
                 data.occurrences = ordered.data() == occurrences.values().data()
@@ -1121,6 +1179,15 @@ AeroResult<SharedP1Action> prepare_bound_wake_induction(
     P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
     return SharedP1Engine::prepare(source, faces, strengths, local_accuracy, accuracy, limits,
                                    workspace, local, kernel, memory, stop, true);
+}
+
+AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
+    const P1ActionSource& source, EdgeId self, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
+    const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+    P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    return SharedP1Engine::prepare(source, faces, strengths, local_accuracy, accuracy, limits,
+                                   workspace, local, kernel, memory, stop, true, self);
 }
 
 AeroResult<P1ActionValue> apply_shared_p1(const SharedP1Action& action,

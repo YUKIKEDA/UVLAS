@@ -108,8 +108,9 @@ core::Result<std::int64_t> read_nastran_integer_field(std::string_view field) no
         return failure();
     }
     std::int64_t value{};
-    const auto end = field.data() + field.size();
-    const auto parsed = std::from_chars(field.data(), end, value);
+    const auto begin = field.data();
+    const auto end = begin + field.size();
+    const auto parsed = std::from_chars(begin, end, value);
     if (parsed.ec != std::errc{} || parsed.ptr != end) {
         return failure();
     }

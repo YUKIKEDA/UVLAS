@@ -527,6 +527,52 @@ std::size_t GlobalContactState::trailing_edge_count() const noexcept {
     return data_.values()[0].topology->trailing.size();
 }
 
+GlobalResult<UvlmLoadEdge>
+GlobalContactState::uvlm_load_edge(EdgeId id, std::uint64_t max_steps,
+                                   const std::stop_token& stop) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<UvlmLoadEdge> {
+        const auto geometry_owner = geometry();
+        if (!geometry_owner)
+            return std::unexpected(geometry_owner.error());
+        const auto& source = GlobalEngine::source(geometry_owner->get());
+        const auto& topology = data_.values()[0].topology;
+        if (!source || !topology)
+            reject(core::FailureCode::InvalidInput, id);
+        std::uint64_t used = 0;
+        const auto step = [&] {
+            if (stop.stop_requested())
+                reject(core::FailureCode::Cancelled, id);
+            if (used == max_steps)
+                reject(core::FailureCode::ResourceExceeded, id);
+            ++used;
+        };
+        step();
+        const auto lookup = source->edge_lookup.values();
+        const auto entry = std::lower_bound(lookup.begin(), lookup.end(), id.value(),
+                                            [&](const IdLookup& value, std::uint64_t key) {
+                                                step();
+                                                return value.id < key;
+                                            });
+        if (entry == lookup.end() || entry->id != id.value())
+            reject(core::FailureCode::InvalidInput, id);
+        const auto owner = topology->edges.values()[static_cast<std::size_t>(entry->ordinal)].owner;
+        const auto& edge = source->edges.values()[static_cast<std::size_t>(owner)];
+        const auto key = EdgeId{edge.id};
+        const auto rows = topology->trailing.values();
+        const auto te = std::lower_bound(rows.begin(), rows.end(), key,
+                                         [&](const TrailingEdgeRow& row, EdgeId edge_id) {
+                                             step();
+                                             return row.edge < edge_id;
+                                         });
+        const auto points = source->points.values();
+        return UvlmLoadEdge{key,
+                            {PointId{points[static_cast<std::size_t>(edge.points[0])].id},
+                             PointId{points[static_cast<std::size_t>(edge.points[1])].id}},
+                            te != rows.end() && te->edge == key,
+                            used};
+    });
+}
+
 GlobalResult<GlobalWorkPlan> GlobalContactState::work_plan() const noexcept {
     if (!active())
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));

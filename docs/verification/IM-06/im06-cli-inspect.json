@@ -1,0 +1,42 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-cli-inspect",
+  "ids": [
+    "IO4-01",
+    "IO4-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "b0ebec92fab4807cfad11e37180ff0092d3e5cd5",
+  "scope": "Read and authenticate the saved result metadata through the executable using one native result-directory root",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 10
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 10,
+      "clang_tidy": "21.1.1 PASS on both CLI translation units"
+    },
+    "checks": [
+      "Read relative and absolute native paths containing spaces and Japanese text",
+      "Emit the verified status bytes unmodified, including a historical exit 4 and UINT64_MAX accepted ID",
+      "Reject mismatched provenance and resolved bytes, missing resolved artifact, inconsistent completion, duplicate keys and oversized status"
+    ]
+  },
+  "tested_target_registration": {
+    "commit": "b0ebec92fab4807cfad11e37180ff0092d3e5cd5",
+    "CMakeLists.txt": "84f97cc88b39cfd0a4333869874a92d7388edc9b6adf7a552872e3aa8294aabf",
+    "tests/CMakeLists.txt": "c7096547d302306a044d4762ad0449cbf4cdefcbe2581ef6f361b5f349a31eb5"
+  },
+  "sources": {
+    "src/app/main.cpp": "427d586d74879bad7ea5dc0f722f8fd11d88237772527a4b2059ef79fb8b3525",
+    "src/app/inspect_result.cpp": "cbd1a2d8cab86e1f006d7bae69518d4026d7c4342785df203d941ba2d2aa57b5",
+    "src/app/inspect_result.hpp": "f8267440cd3d7257210c346f15f3abee13eae7cfd19066ae896dadf379d98272",
+    "tests/check_cli_inspect.cmake": "df48cf543dc2c81d15abf300e6d97b84c94a9dd2556bf3815d2ebd15777df325"
+  }
+}
