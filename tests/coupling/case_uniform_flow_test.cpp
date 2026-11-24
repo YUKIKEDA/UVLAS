@@ -1046,6 +1046,70 @@ TEST_CASE("The exact transient stage evaluates known flow and prescribed wake to
     reject(run(other_wake, {stamp, 0, 1, Automatic}, middle_x), core::FailureCode::StaleGeneration);
 }
 
+TEST_CASE("The known-flow clock checks periodic model events without a prescribed attachment",
+          "[AE-07][BC-01][IO4-01][N4-06][verification][negative]") {
+    a::UniformFlowWorkspace work;
+    const cf::CaseClockedKnownFlowLimits clock_limits{{limits, 2, 4}, gust_limits};
+    const auto make = [&](const JsonToken& fixture) {
+        const auto si = materialize(fixture, io::SourceId{425});
+        core::ResourcePlan memory{budget};
+        return cf::prepare_case_clocked_known_flows(si, stamp, work, clock_limits, memory);
+    };
+    const auto intervals = [](bool split) {
+        return parse(
+            split
+                ? R"([{"start":-3.5,"end":-3,"step":0.5,"restart":"initial"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])"
+                : R"([{"start":-3.5,"end":-2.5,"step":1,"restart":"initial"}])");
+    };
+    const auto base = [&] {
+        auto fixture = source(R"({"kind":"constant","value":[0,0,0]})", "[]");
+        fixture.field("units").set("time", string("s"));
+        fixture.field("analysis")
+            .field("wake")
+            .set("convection",
+                 parse(R"({"kind":"prescribed","velocity":{"kind":"constant","value":[0,0,0]}})"));
+        fixture.field("analysis").set("intervals", intervals(false));
+        return fixture;
+    }();
+    CHECK(take(make(base)).interval_count() == 1);
+    constexpr std::string_view scalar =
+        R"({"kind":"pchip","times":[0,1,4],"values":[[0],[1],[0]],"outside":{"kind":"periodic","period":4}})";
+    constexpr std::string_view vector =
+        R"({"kind":"pchip","times":[0,1,4],"values":[[0,0,0],[1,0,0],[0,0,0]],"outside":{"kind":"periodic","period":4}})";
+    auto fixture = base;
+    SECTION("A structural support supplies the only periodic series") {
+        auto& support = fixture.field("model").field("supports").elements.front();
+        support.field("motion").set("translation", parse(vector));
+        support.field("motion").set("events", parse("[0,1,4]"));
+    }
+    SECTION("A shell load supplies the only periodic series") {
+        auto load = fragment("Load.pressure");
+        load.set("multiplier", parse(scalar));
+        fixture.field("model").field("shells").elements.front().field("loads").elements.push_back(
+            std::move(load));
+    }
+    SECTION("A beam load supplies the only periodic series") {
+        auto load = fragment("Load.point_force");
+        load.field("target").field("target").set("kind", string("beam"));
+        load.set("series", parse(vector));
+        auto beam = fragment("Beam");
+        beam.field("loads").elements.push_back(std::move(load));
+        fixture.field("model").field("beams").elements.push_back(std::move(beam));
+        auto& scales = fixture.field("numerics").field("scales").elements;
+        for (const auto field : {"beam_translation", "beam_rotation", "moment_balance",
+                                 "structural_angular_velocity"}) {
+            auto scale = fragment("Scale.uniform_components");
+            scale.set("field", string(field));
+            scale.set("targets", parse(R"([{"kind":"beam","id":"1"}])"));
+            scales.push_back(std::move(scale));
+        }
+    }
+    // The source knot at 1 s recurs at -3 s. A boundary there admits both sides.
+    reject(make(fixture), core::FailureCode::InvalidInput);
+    fixture.field("analysis").set("intervals", intervals(true));
+    CHECK(take(make(fixture)).interval_count() == 2);
+}
+
 TEST_CASE("A typed transient clock binds both flow fields to one exact stage",
           "[AE-07][UW-D02][IO4-01][N4-03][N4-06][verification][negative]") {
     a::UniformFlowWorkspace work;
@@ -3512,9 +3576,12 @@ TEST_CASE("Known flow drives discrete midpoint loads and their implicit actions"
     vector(take(tangent.force_direction()), {-1.528893291646792808, 0, .15625});
     vector(take(tangent.moment_direction()), {.09765625, .608196645823396404, .955558307279245505});
     const auto time_dual = center(take(dual.flow_time_dual()));
-    const auto rate_dual = center(take(dual.circulation_dual(0)).circulation_rate);
+    const cf::LoadCirculationRateCovector rate_covector = take(dual.circulation_dual(0));
+    CHECK(rate_covector.face == take(circ.row(0)).face);
+    residual_expected(rate_covector.rate, Rat{1005, 256});
+    reject(dual.circulation_dual(1), core::FailureCode::InvalidInput);
+    const auto rate_dual = center(rate_covector.rate);
     compare(time_dual, 8.095466005886887656);
-    compare(rate_dual, 3.92578125);
     const auto free = take(dual.collocation_dual(0)).free_query;
     if (!free)
         FAIL("Expected free collocation coordinate dual");
@@ -3720,6 +3787,15 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto nominal = take(run(canonical, nullptr, {}, cap_velocity));
     near(center(take(nominal.row(0)).velocity[2]), vz[0]);
     CHECK_FALSE(take(nominal.row(0)).direction.has_value());
+    auto generous_coordinates = flow;
+    generous_coordinates.coordinate_limits.max_steps = cap_velocity.action.steps;
+    const auto with_generous_cap = take(cf::evaluate_discrete_free_wake_velocity(
+        input, generous_coordinates, canonical, nullptr, {}, cap_velocity, shared, *local, *kernel,
+        memory));
+    const auto nominal_velocity = take(nominal.row(0)).velocity;
+    const auto generous_velocity = take(with_generous_cap.row(0)).velocity;
+    for (std::size_t axis = 0; axis < nominal_velocity.size(); ++axis)
+        CHECK(center(generous_velocity[axis]) == center(nominal_velocity[axis]));
     reject(nominal.field_dual(), core::FailureCode::InvalidInput);
     const std::array duplicate{alias, id[3]};
     reject(run(duplicate, nullptr, {}, cap_velocity), core::FailureCode::InvalidInput);
@@ -3875,6 +3951,16 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     const auto row = take(state.collocation(0));
     const auto& contact = take(state.contact()).get();
     const auto& geometry = take_global(contact.geometry()).get();
+    auto larger_geometry_cap = caps;
+    larger_geometry_cap.geometry.max_steps = caps.work;
+    const auto same_trial =
+        take(run_clocked(current_clock, arrival, model, projection, larger_geometry_cap, memory));
+    const auto& same_geometry = take_global(take(same_trial.contact()).get().geometry()).get();
+    CHECK(test_geometry::take(same_geometry.identity()) ==
+          test_geometry::take(geometry.identity()));
+    const auto same_row = take(same_trial.collocation(0));
+    for (std::size_t axis = 0; axis < row.velocity.size(); ++axis)
+        CHECK(sum_words(same_row.velocity[axis]) == sum_words(row.velocity[axis]));
     CHECK(test_geometry::take(geometry.owner(alias)) == id[3]);
     const auto alias_position =
         test_geometry::take(geometry.point_words(alias, a::Configuration::Current));

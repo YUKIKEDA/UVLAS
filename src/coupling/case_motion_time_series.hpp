@@ -15,9 +15,15 @@ struct Builder;
 
 using CaseMotionField = decltype(io::schema::AeroAttachmentPrescribed::motion);
 
+enum class CaseMotionContinuity : std::uint8_t {
+    PiecewiseC2, ///< At a join the caller can request either one-sided second derivative.
+    ContinuousC2 ///< The second derivatives on both sides agree at every interior join.
+};
+
 struct CaseMotionTimeWindow {
     const structure::ExactRational& begin;
     const structure::ExactRational& end;
+    CaseMotionContinuity continuity = CaseMotionContinuity::PiecewiseC2;
 };
 
 struct CaseMotionTimeLimits {
@@ -108,6 +114,12 @@ public:
     CaseMotionTimeJet(const CaseMotionTimeJet&) = delete;
     CaseMotionTimeJet& operator=(const CaseMotionTimeJet&) = delete;
 
+    [[nodiscard]] io::SiQuantityKey declaration() const noexcept {
+        return declaration_;
+    }
+    [[nodiscard]] aero::detail::pchip::PchipInputStamp stamp() const noexcept {
+        return stamp_;
+    }
     [[nodiscard]] std::int16_t rotation_pi_power() const noexcept {
         return pi_power_;
     }
@@ -136,7 +148,8 @@ private:
     friend struct motion_time_detail::Builder;
     using FormulaValues = std::array<io::detail::SiRationalWords, 9>;
     using SeriesJet = std::variant<FormulaValues, aero::detail::pchip::ExactPchipJet>;
-    CaseMotionTimeJet(SeriesJet, SeriesJet, io::detail::SiRationalWords, std::int16_t,
+    CaseMotionTimeJet(SeriesJet, SeriesJet, io::detail::SiRationalWords, io::SiQuantityKey,
+                      aero::detail::pchip::PchipInputStamp, std::int16_t,
                       aero::detail::pchip::JetOrder, aero::detail::pchip::RequestedSide) noexcept;
     [[nodiscard]] core::Result<aero::detail::pchip::RationalView>
     component(const SeriesJet&, std::uint64_t, aero::detail::pchip::JetOrder) const noexcept;
@@ -145,6 +158,8 @@ private:
     SeriesJet translation_;
     SeriesJet rotation_;
     io::detail::SiRationalWords time_;
+    io::SiQuantityKey declaration_;
+    aero::detail::pchip::PchipInputStamp stamp_;
     std::int16_t pi_power_;
     aero::detail::pchip::JetOrder order_;
     aero::detail::pchip::RequestedSide side_;

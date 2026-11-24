@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-bound-edge-incidence",
+  "date": "2026-11-24",
+  "package": "IM-06",
+  "ids": [
+    "IO4-03",
+    "IO4-04",
+    "N4-02",
+    "SH-D02",
+    "R-05"
+  ],
+  "source_commit": "8e1eebee48903184b0ba12619219a1255d4e5942",
+  "scope": "The exact correspondence and the directed Nastran bounds share the original edge check. The latter retains its earlier SourceOrder diagnostic for duplicate GRID positions.",
+  "checks": {
+    "windows": {
+      "compiler": "MSVC",
+      "configuration": "Debug",
+      "cases": 7,
+      "assertions": 169
+    },
+    "linux": {
+      "compiler": "GCC 14.2",
+      "configuration": "Debug ASan and UBSan",
+      "cases": 7,
+      "assertions": 169
+    },
+    "omit_unmatched_interior_edge_rejection": {
+      "failed_checks": [
+        "exact duplicate GRID slit",
+        "exact T-junction",
+        "bounded T-junction"
+      ],
+      "failed_assertions": 3,
+      "exit": 42
+    },
+    "restored_control": {
+      "cases": 2,
+      "assertions": 30,
+      "exit": 0
+    }
+  },
+  "sources": {
+    "src/io/external_planar_pg.cpp": "c3dfefe2fb488894dd67ea8426d652b5797ef745fa8accb2c49b757eece4dec6",
+    "src/io/external_planar_pg.hpp": "041c9550a9743fbbfbbc3f9f926b9d454f8406b76a6194e7051e0685d442350e",
+    "tests/io/external_planar_pg_test.cpp": "7fe51446d192e01768c1fea7129a68569d3669af6cdb83e208d916dc6049710e"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/external-pg-edge-incidence.md": "af747efccea84d500e64b4bf93b913105eba90bca65f5ecac9a6eaafc9043de6"
+  }
+}
