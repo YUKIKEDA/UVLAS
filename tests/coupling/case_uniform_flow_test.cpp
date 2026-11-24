@@ -10,6 +10,7 @@
 #include "coupling/fixed_bdf2_circulation.hpp"
 #include "coupling/fixed_wake_transport.hpp"
 #include "coupling/pg_aero_attachment.hpp"
+#include "coupling/wake_strength_transition.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "io/si_rational_projection.hpp"
 #include "structure/pg_conditioning_test_support.hpp"
@@ -3734,7 +3735,8 @@ TEST_CASE("Known flow drives discrete midpoint loads and their implicit actions"
 }
 
 TEST_CASE("Free wake motion uses all sources at attached and inherited material points",
-          "[AE-07][UW-D01][UW-D02][UW-D04][UW-D07][N4-06][J1-D01][FD-07][verification][negative]") {
+          "[AE-07][UW-D01][UW-D02][UW-D03][UW-D04][UW-D07][N4-06][J1-D01][FD-07][verification]["
+          "negative]") {
     auto source_case = gust_case("deg", R"({"kind":"constant","value":[1]})");
     const auto schedule = parse(R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
     source_case.field("analysis").set("intervals", schedule);
@@ -4295,6 +4297,85 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK_FALSE(take(extended.row(1)).parent);
     CHECK(take(extended.row(2)).current.point == far_down);
 
+    const auto low_word = std::ldexp(1., -90);
+    auto parent_gamma = previous_bound;
+    parent_gamma[0].circulation = a::DoubleWord{.5, low_word};
+    const std::array parent_trace{cf::FrozenWakeTrace{old_id, a::DoubleWord{-.25, -low_word}}};
+    const cf::DiscreteNonpenetrationInput parent_strength{previous,
+                                                          parent_gamma,
+                                                          wake,
+                                                          {input.history.parent, parent_trace},
+                                                          previous_source.trial_stamp,
+                                                          stamp,
+                                                          p::RequestedSide::Automatic};
+    const auto extended_query = earlier_collocation(extended_geometry);
+    const std::array trial_gamma{cf::DiscreteCollocation{
+        a::FacetId{200}, extended_query, frame, zero, a::SingleWord{.75}, a::SingleWord{0}}};
+    const a::P1StrengthId newest_id{56}, mapped_old_id{57};
+    const std::array extended_panels{
+        cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, newest_id},
+        cf::DiscreteWakePanel{far_facet, newest_id, mapped_old_id}};
+    const std::array extended_trace{
+        cf::FrozenWakeTrace{newest_id, a::DoubleWord{.5, low_word}},
+        cf::FrozenWakeTrace{mapped_old_id, a::DoubleWord{-.25, -low_word}}};
+    const auto strengths = [&](const auto& columns, const auto& panels) {
+        const cf::DiscreteNonpenetrationInput next_source{extended_contact,
+                                                          trial_gamma,
+                                                          panels,
+                                                          {input.history.parent, columns},
+                                                          input.trial_stamp,
+                                                          stamp,
+                                                          p::RequestedSide::Automatic};
+        return cf::prepare_wake_strength_transition(
+            wake_si, transport_clock, {parent_strength, growth_points},
+            {next_source, extended_points}, next_epoch, extended_limits, memory);
+    };
+    auto mutated_trace = extended_trace;
+    const auto qualified_strengths = take(strengths(mutated_trace, extended_panels));
+    REQUIRE(qualified_strengths.history().size() == 2);
+    CHECK(qualified_strengths.material().size() == extended.size());
+    CHECK(qualified_strengths.history()[1].id == mapped_old_id);
+    const auto held = std::get<a::DoubleWord>(qualified_strengths.history()[1].strength);
+    CHECK(held.high == -.25);
+    CHECK(held.low == -low_word);
+    mutated_trace[0].strength = a::SingleWord{.75};
+    reject(strengths(mutated_trace, extended_panels), core::FailureCode::StaleGeneration);
+    mutated_trace = extended_trace;
+    mutated_trace[0].strength = a::SingleWord{.5};
+    reject(strengths(mutated_trace, extended_panels), core::FailureCode::StaleGeneration);
+    mutated_trace = extended_trace;
+    mutated_trace[1].strength = a::DoubleWord{-.25, low_word};
+    reject(strengths(mutated_trace, extended_panels), core::FailureCode::StaleGeneration);
+    CHECK(std::get<a::DoubleWord>(qualified_strengths.history()[1].strength).low == -low_word);
+    const cf::DiscreteNonpenetrationInput with_owned_history{
+        extended_contact,
+        trial_gamma,
+        extended_panels,
+        {input.history.parent, qualified_strengths.history()},
+        input.trial_stamp,
+        stamp,
+        p::RequestedSide::Automatic};
+    const std::array historical_probe{far_up};
+    auto extended_velocity_limits = cap_velocity;
+    extended_velocity_limits.action.induction.steps *= 3;
+    extended_velocity_limits.action.steps *= 3;
+    extended_velocity_limits.action.action_steps *= 2;
+    core::ResourcePlan extended_velocity_memory{512ULL * 1024 * 1024};
+    auto evaluated_velocity = cf::evaluate_discrete_free_wake_velocity(
+        with_owned_history, flow, historical_probe, nullptr, {}, extended_velocity_limits, shared,
+        *local, *kernel, extended_velocity_memory);
+    if (!evaluated_velocity && evaluated_velocity.error().details.resources) {
+        const auto& observed = *evaluated_velocity.error().details.resources;
+        INFO("Resource demand " << observed.required << ", usage " << observed.observed);
+        REQUIRE(evaluated_velocity);
+    }
+    const auto growing_velocity = take(std::move(evaluated_velocity));
+    CHECK(take(growing_velocity.row(0)).owner == far_up);
+
+    auto wrong_link = extended_panels;
+    wrong_link[1].leading = mapped_old_id;
+    reject(strengths(extended_trace, wrong_link), core::FailureCode::StaleGeneration);
+
     auto limited_case = source_case;
     limited_case.field("numerics")
         .set("wake_rows", parse(R"({"kind":"limited","maximum_rows":1})"));
@@ -4338,6 +4419,73 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(take(window.retired(1)).release == second_release);
     CHECK(take(window.retired(0)).point == id[4]);
     CHECK(take(window.row(0)).current.release.epoch == next_epoch);
+    const std::array window_panels{
+        cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, newest_id}};
+    const std::array window_history{extended_trace.front()};
+    const cf::DiscreteNonpenetrationInput next_window_source{contact,
+                                                             bound,
+                                                             window_panels,
+                                                             {input.history.parent, window_history},
+                                                             input.trial_stamp,
+                                                             stamp,
+                                                             p::RequestedSide::Automatic};
+    const auto window_strengths = take(cf::prepare_wake_strength_transition(
+        window_si, window_second, {parent_strength, growth_points},
+        {next_window_source, window_points}, next_epoch, extended_limits, memory));
+    CHECK(window_strengths.material().retired_count() == 2);
+    REQUIRE(window_strengths.history().size() == 1);
+    CHECK(window_strengths.history().front().id == newest_id);
+    ResidualFixture reversed_fixture;
+    reversed_fixture.reverse_wake();
+    auto reversed_geometry_input = reversed_fixture.input();
+    reversed_geometry_input.context.time = 1.25;
+    reversed_geometry_input.exact_time = time.view();
+    const auto reverse_now = test_geometry::take(a::prepare_owned_geometry(
+        reversed_geometry_input, test_geometry::limits(), *geometry_work, memory));
+    const auto reverse_topology = take_global(
+        a::build_global_topology(reverse_now, reversed_fixture.topology(), cap, *global, memory));
+    REQUIRE(reverse_topology.trailing_edges().size() == 1);
+    REQUIRE(reverse_topology.trailing_edges().front().coefficient == -1);
+    const auto reverse_trial =
+        take_global(a::check_global_geometry(reverse_topology, reverse_now, cap, *global, memory));
+    reversed_geometry_input.context.time = 1.125;
+    reversed_geometry_input.exact_time = previous_time.view();
+    const auto reverse_previous = test_geometry::take(a::prepare_owned_geometry(
+        reversed_geometry_input, test_geometry::limits(), *geometry_work, memory));
+    const auto reverse_parent = take_global(
+        a::check_global_geometry(reverse_topology, reverse_previous, cap, *global, memory));
+    const auto reverse_query = earlier_collocation(reverse_now);
+    const auto reverse_previous_query = earlier_collocation(reverse_previous);
+    const std::array reverse_parent_gamma{
+        cf::DiscreteCollocation{a::FacetId{200}, reverse_previous_query, frame, zero,
+                                a::DoubleWord{.5, low_word}, a::SingleWord{0}}};
+    const std::array reverse_trial_gamma{cf::DiscreteCollocation{
+        a::FacetId{200}, reverse_query, frame, zero, a::SingleWord{.75}, a::SingleWord{0}}};
+    const cf::DiscreteNonpenetrationInput reverse_parent_source{
+        reverse_parent,
+        reverse_parent_gamma,
+        wake,
+        {input.history.parent, parent_trace},
+        previous_source.trial_stamp,
+        stamp,
+        p::RequestedSide::Automatic};
+    const auto reverse_strengths = [&](const auto& columns) {
+        const cf::DiscreteNonpenetrationInput reverse_trial_source{reverse_trial,
+                                                                   reverse_trial_gamma,
+                                                                   window_panels,
+                                                                   {input.history.parent, columns},
+                                                                   input.trial_stamp,
+                                                                   stamp,
+                                                                   p::RequestedSide::Automatic};
+        return cf::prepare_wake_strength_transition(
+            window_si, window_second, {reverse_parent_source, growth_points},
+            {reverse_trial_source, window_points}, next_epoch, extended_limits, memory);
+    };
+    const std::array reversed_trace{cf::FrozenWakeTrace{newest_id, a::DoubleWord{-.5, -low_word}}};
+    const auto signed_strengths = take(reverse_strengths(reversed_trace));
+    CHECK(std::get<a::DoubleWord>(signed_strengths.history().front().strength).low == -low_word);
+    reject(reverse_strengths(window_history), core::FailureCode::StaleGeneration);
+
     const cf::WakeMaterialSnapshot omitted_window{previous, {}};
     reject(cf::prepare_wake_material_transition(window_si, window_second, omitted_window,
                                                 window_trial, next_epoch, extended_limits, memory),

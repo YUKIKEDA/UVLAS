@@ -63,7 +63,7 @@ struct DiscreteWakePanel {
 
 struct FrozenWakeTrace {
     aero::detail::P1StrengthId id;
-    aero::detail::ScalarWords strength;
+    aero::detail::ScalarWords strength{aero::detail::SingleWord{0}};
 };
 struct FrozenWakeTraces {
     FrozenWakeTraces(core::AcceptedStateId accepted,

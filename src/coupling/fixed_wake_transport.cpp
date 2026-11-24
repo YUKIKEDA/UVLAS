@@ -651,7 +651,7 @@ struct WakeTransportBuilder {
             reject(StaleGeneration);
         unique_owners(visited.values().first(trial.points.size()));
         work.step();
-        return WakeMaterialTransition{std::move(output), std::move(retired)};
+        return WakeMaterialTransition{std::move(output), std::move(retired), work.used};
     }
 
     static const a::OwnedGeometry& first_geometry(const WakeTransportClock& clock,

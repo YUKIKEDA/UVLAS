@@ -185,7 +185,7 @@
 | UI-D06 | [uvlm-induction-adopted-specification.md:14](../specs/aero/uvlm-induction-adopted-specification.md) | 55 | 11 | 0 |
 | UW-D01 | [uvlm-wake-adopted-specification.md:9](../specs/aero/uvlm-wake-adopted-specification.md) | 9 | 15 | 1 |
 | UW-D02 | [uvlm-wake-adopted-specification.md:10](../specs/aero/uvlm-wake-adopted-specification.md) | 7 | 7 | 0 |
-| UW-D03 | [uvlm-wake-adopted-specification.md:11](../specs/aero/uvlm-wake-adopted-specification.md) | 4 | 11 | 0 |
+| UW-D03 | [uvlm-wake-adopted-specification.md:11](../specs/aero/uvlm-wake-adopted-specification.md) | 5 | 11 | 0 |
 | UW-D04 | [uvlm-wake-adopted-specification.md:12](../specs/aero/uvlm-wake-adopted-specification.md) | 4 | 4 | 0 |
 | UW-D05 | [uvlm-wake-adopted-specification.md:13](../specs/aero/uvlm-wake-adopted-specification.md) | 2 | 6 | 0 |
 | UW-D06 | [uvlm-wake-adopted-specification.md:14](../specs/aero/uvlm-wake-adopted-specification.md) | 8 | 19 | 0 |

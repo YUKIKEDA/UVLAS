@@ -134,14 +134,19 @@ public:
         return retired_.size();
     }
     [[nodiscard]] core::Result<WakeMaterialPoint> retired(std::size_t) const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return used_steps_;
+    }
 
 private:
     friend struct WakeTransportBuilder;
     WakeMaterialTransition(core::PlannedBuffer<std::optional<FirstFreeWakePoint>>&& rows,
-                           core::PlannedBuffer<std::optional<WakeMaterialPoint>>&& retired) noexcept
-        : rows_(std::move(rows)), retired_(std::move(retired)) {}
+                           core::PlannedBuffer<std::optional<WakeMaterialPoint>>&& retired,
+                           std::uint64_t used_steps) noexcept
+        : rows_(std::move(rows)), retired_(std::move(retired)), used_steps_(used_steps) {}
     core::PlannedBuffer<std::optional<FirstFreeWakePoint>> rows_;
     core::PlannedBuffer<std::optional<WakeMaterialPoint>> retired_;
+    std::uint64_t used_steps_;
 };
 
 /// Check complete material-key coverage at the next Case clock node. This identifies
