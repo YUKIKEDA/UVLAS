@@ -143,6 +143,8 @@ struct PgChartCandidate::Data {
         auto owned = buffer(rank, rhs, true, request.rhs_buffer_generation, plan);
         if (rank == 0)
             return Solved{std::move(owned)};
+        if (!forward || !factor)
+            partition_fail(core::FailureCode::StaleGeneration);
         const linear::SparseOperator a{matrix, *forward};
         const linear::Rhs<double> b{owned, *expected, request.rhs_generation};
         auto result = partition_take(

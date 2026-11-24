@@ -8,7 +8,7 @@ namespace uvlas::structure {
 /// Explicit provisional coefficient tolerance, before production physical qualification.
 struct PgChartCandidatePreparation {
     PgReferenceLimits projection;
-    double maximum_absolute_coefficient_error;
+    double maximum_absolute_coefficient_error{};
     numerics::linear::Limits solver;
 };
 
