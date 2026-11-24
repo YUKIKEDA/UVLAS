@@ -139,7 +139,7 @@ MSH 4.1 ASCII は節とタグを検査し、Nastran の単一ファイル Bulk D
 
 `_uvlas.load_case(path)` は CLI の `validate` と同じ C++ 処理を呼ぶ。成功値の `ValidatedCase` は検査済み入力と外部参照を所有し、入力バイト数と SHA-256 を返す。`_uvlas.inspect_result(directory)` は CLI の `inspect` と同じ照合を行い、`status.json` のバイト列を返す。
 
-`_uvlas.case_from_dict(document, reference_root=None)` は組み込みの辞書とリスト、文字列キー、JSON に対応する組み込みの値から UTF-8 の入力を作り、同じ検査へ渡す。有限の `float` は binary64 に往復できる最短の十進表記で渡す。入力バイト数と SHA-256 は、キーの挿入順を保って生成した入力の値である。外部参照がある場合は `reference_root` に読み取り元のディレクトリを指定する。呼び出し後に元の辞書やリストを書き換えても、検査済み入力は変わらない。
+`_uvlas.case_from_dict(document, reference_root=None)` は組み込みの辞書とリスト、文字列キー、JSON に対応する組み込みの値から UTF-8 の入力を作り、同じ検査へ渡す。有限の `float` は、binary64 が表す値と厳密に等しい有限十進数で渡す。入力バイト数と SHA-256 は、キーの挿入順を保って生成した入力の値である。外部参照がある場合は `reference_root` に読み取り元のディレクトリを指定する。呼び出し後に元の辞書やリストを書き換えても、検査済み入力は変わらない。
 
 非公開ランタイムの配置検査に `--case-validation-suite tests/python/test_case_file_operations.py docs/specs/foundation/case-schema-examples.json` を加えると、移設した CLI と新規仮想環境に導入した Python 拡張で、この入口を再検証する。
 

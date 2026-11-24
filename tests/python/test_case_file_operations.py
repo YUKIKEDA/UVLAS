@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(sys.argv.pop(1)).resolve()))
@@ -26,6 +27,24 @@ def cli(*args, directory=None):
 
 def json_bytes(value):
     return json.dumps(value, ensure_ascii=False).encode("utf-8")
+
+
+def expected_dictionary_source(value):
+    if isinstance(value, dict):
+        members = [
+            json.dumps(key, ensure_ascii=False) + ":" + expected_dictionary_source(item)
+            for key, item in value.items()
+        ]
+        return "{" + ",".join(members) + "}"
+    if isinstance(value, list):
+        return "[" + ",".join(map(expected_dictionary_source, value)) + "]"
+    if isinstance(value, float):
+        number = Decimal(value)
+        sign, digits, exponent = number.as_tuple()
+        if exponent >= 0:
+            return format(number, ".1f")
+        return ("-" if sign else "") + "".join(map(str, digits)) + "e" + str(exponent)
+    return json.dumps(value, ensure_ascii=False)
 
 
 class CaseFileOperations(unittest.TestCase):
@@ -94,7 +113,7 @@ class CaseFileOperations(unittest.TestCase):
         result = uvlas.case_from_dict(case)
         self.assertTrue(result.ok)
         checked = result.value
-        expected = json.dumps(case, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        expected = expected_dictionary_source(case).encode("utf-8")
         with tempfile.TemporaryDirectory() as workspace:
             path = Path(workspace) / "expected.json"
             path.write_bytes(expected)
@@ -107,6 +126,28 @@ class CaseFileOperations(unittest.TestCase):
         self.assert_failure(uvlas.case_from_dict(case), uvlas.FailureCode.Unsupported)
         self.assertEqual(checked.source_sha256, hashlib.sha256(expected).digest())
         self.assertEqual(checked.source_byte_count, len(expected))
+
+    def test_dictionary_preserves_binary64_and_ignores_the_python_digit_setting(self):
+        integer = 2**63
+        case = copy.deepcopy(EXAMPLES["schema_examples"]["structural_static"])
+        comparison = case["observations"][0]["comparison"]
+        comparison["window"] = [float(integer), integer]
+        result = uvlas.case_from_dict(case)
+        self.assertTrue(result.ok)
+        expected = expected_dictionary_source(case).encode("utf-8")
+        self.assertEqual(result.value.source_sha256, hashlib.sha256(expected).digest())
+
+        comparison["window"] = [10**700] * 2
+        with tempfile.TemporaryDirectory() as workspace:
+            path = Path(workspace) / "large.json"
+            path.write_bytes(json_bytes(case))
+            self.assert_failure(uvlas.load_case(path), uvlas.FailureCode.Nonfinite)
+            limit = sys.get_int_max_str_digits()
+            try:
+                sys.set_int_max_str_digits(640)
+                self.assert_failure(uvlas.case_from_dict(case), uvlas.FailureCode.Nonfinite)
+            finally:
+                sys.set_int_max_str_digits(limit)
 
     def test_dictionary_rejects_non_json_values_and_over_budget_input(self):
         cycle = []

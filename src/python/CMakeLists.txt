@@ -7,7 +7,7 @@ find_package(pybind11 3.1.0 EXACT CONFIG REQUIRED)
 
 pybind11_add_module(uvlas_python MODULE NO_EXTRAS module.cpp case_dictionary.cpp)
 uvlas_configure_target(uvlas_python)
-target_link_libraries(uvlas_python PRIVATE uvlas_core uvlas_numerics)
+target_link_libraries(uvlas_python PRIVATE uvlas_core uvlas_numerics Boost::multiprecision)
 set_target_properties(uvlas_python PROPERTIES OUTPUT_NAME _uvlas)
 if(NOT CMAKE_CROSSCOMPILING)
     uvlas_record_runtime_link(uvlas_python)

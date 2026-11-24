@@ -2,10 +2,14 @@
 
 #include "validate_case.hpp"
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 #include <algorithm>
 #include <array>
-#include <charconv>
+#include <bit>
 #include <cmath>
+#include <cstdint>
+#include <limits>
 #include <string_view>
 #include <utility>
 
@@ -13,6 +17,7 @@ namespace uvlas::python {
 namespace {
 
 namespace py = pybind11;
+using boost::multiprecision::cpp_int;
 
 struct EncodingFailure {
     core::FailureCode code;
@@ -88,29 +93,37 @@ private:
     }
 
     void integer(PyObject* object) {
-        // Use the pinned CPython 3.12 API to avoid calling Python while
-        // borrowing dictionary entries. A decimal digit needs fewer than four bits.
+        int overflow = 0;
+        const auto small = PyLong_AsLongLongAndOverflow(object, &overflow);
+        if (overflow == 0) {
+            if (PyErr_Occurred() != nullptr) {
+                throw py::error_already_set{};
+            }
+            append(std::to_string(small));
+            return;
+        }
+        // Use the pinned CPython 3.12 API to copy the integer without calling
+        // Python or relying on the interpreter's decimal conversion setting.
+        constexpr auto bit_limit = 4 * app::case_manifest_max_number_bytes;
         const auto bits = _PyLong_NumBits(object);
-        if (bits > 4 * app::case_manifest_max_number_bytes) {
+        if (bits > bit_limit) {
             if (PyErr_Occurred() != nullptr) {
                 PyErr_Clear();
             }
             exhausted();
         }
-        const auto text = py::reinterpret_steal<py::str>(PyObject_Str(object));
-        if (!text) {
-            if (!PyErr_ExceptionMatches(PyExc_ValueError)) {
-                throw py::error_already_set{};
-            }
-            PyErr_Clear();
-            exhausted();
-        }
-        Py_ssize_t size = 0;
-        const char* data = PyUnicode_AsUTF8AndSize(text.ptr(), &size);
-        if (data == nullptr) {
+        std::array<unsigned char, bit_limit / 8 + 1> bytes{};
+        const auto size = bits / 8 + 1;
+        if (_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(object), bytes.data(), size, 1,
+                                1) != 0) {
             throw py::error_already_set{};
         }
-        const std::string_view digits{data, static_cast<std::size_t>(size)};
+        cpp_int integer;
+        import_bits(integer, bytes.data(), bytes.data() + size, 8, false);
+        if (overflow < 0) {
+            integer -= cpp_int{1} << (8 * size);
+        }
+        const auto digits = integer.str();
         if (digits.size() > app::case_manifest_max_number_bytes) {
             exhausted();
         }
@@ -121,17 +134,36 @@ private:
         if (!std::isfinite(number)) {
             invalid();
         }
-        std::array<char, 32> buffer{};
-        const auto converted = std::to_chars(buffer.data(), buffer.data() + buffer.size(), number,
-                                             std::chars_format::general);
-        if (converted.ec != std::errc{}) {
-            invalid();
+        static_assert(std::numeric_limits<double>::is_iec559 &&
+                      std::numeric_limits<double>::digits == 53);
+        const auto bits = std::bit_cast<std::uint64_t>(number);
+        if (std::signbit(number)) {
+            append("-");
         }
-        const std::string_view digits{buffer.data(),
-                                      static_cast<std::size_t>(converted.ptr - buffer.data())};
-        append(digits);
-        if (digits.find_first_of(".eE") == std::string_view::npos) {
+        constexpr int fraction_bits = 52;
+        constexpr int exponent_bias = 1023;
+        constexpr std::uint64_t hidden = std::uint64_t{1} << fraction_bits;
+        const auto biased = static_cast<int>((bits >> fraction_bits) & 0x7ff);
+        auto significand = (bits & (hidden - 1)) + (biased == 0 ? 0 : hidden);
+        if (significand == 0) {
+            append("0.0");
+            return;
+        }
+        const auto trailing = std::countr_zero(significand);
+        significand >>= trailing;
+        const auto exponent = std::max(1, biased) - exponent_bias - fraction_bits + trailing;
+        cpp_int coefficient{significand};
+        if (exponent >= 0) {
+            coefficient <<= static_cast<unsigned>(exponent);
+            append(coefficient.str());
             append(".0");
+        } else {
+            // Replace 2^-n with 5^n * 10^-n so schema comparisons use the
+            // exact binary64 value, including when compared with an integer.
+            coefficient *= boost::multiprecision::pow(cpp_int{5}, static_cast<unsigned>(-exponent));
+            append(coefficient.str());
+            append("e");
+            append(std::to_string(exponent));
         }
     }
 
