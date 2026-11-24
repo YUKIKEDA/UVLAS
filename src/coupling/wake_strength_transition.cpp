@@ -6,6 +6,8 @@
 #include <cmath>
 #include <functional>
 #include <limits>
+#include <memory_resource>
+#include <vector>
 
 namespace uvlas::coupling::detail {
 namespace {
@@ -326,6 +328,140 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                 work.step();
                 return WakeStrengthTransition{std::move(material), std::move(history),
                                               std::move(identities), std::move(retired_history)};
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            } catch (const a::p1::ArithmeticFailure& failure) {
+                return std::unexpected(core::Failure{failure.code, operation});
+            }
+        });
+}
+
+core::Result<FreeWakeTrial> evaluate_free_wake_trial(
+    const io::SiCase& si, const WakeTransportClock& clock, const FreeWakeTrialEndpoint& parent,
+    const FreeWakeTrialEndpoint& trial, const FreeWakeTrialHistory& history, a::ReleaseEpoch epoch,
+    std::span<const NonpenetrationVector> seeds, const FreeWakeTrialLimits& limits,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    return core::guard_entry(
+        operation, PrecisionUnresolved, {}, [&]() -> core::Result<FreeWakeTrial> {
+            try {
+                auto strength = read(prepare_wake_strength_transition(
+                    si, clock, parent.wake, trial.wake, epoch, limits.material, memory, stop));
+                const auto& links = strength.material();
+                const auto count = links.size();
+                Work dispatch{0, limits.transport.maximum_steps, stop};
+                dispatch.step();
+                if (count > limits.transport.maximum_particles)
+                    reject(ResourceExceeded);
+                if (!seeds.empty() && seeds.size() != count)
+                    reject(InvalidInput);
+
+                const bool restart = clock.destination.step == 1;
+                std::size_t first_count = 0;
+                for (std::size_t i = 0; i < count; ++i) {
+                    dispatch.step();
+                    if (restart || !read(links.row(i)).parent)
+                        ++first_count;
+                }
+                const auto retained = count - first_count;
+                const auto& previous_direction = history.retained_direction.previous;
+                const auto& older_direction = history.retained_direction.older;
+                const auto direction_count = trial.direction == nullptr ? 0 : retained;
+                if (previous_direction.size() != direction_count ||
+                    older_direction.size() != direction_count ||
+                    (retained != 0 && history.older == nullptr) ||
+                    (restart && history.older != nullptr))
+                    reject(InvalidInput);
+
+                const auto seed_bytes = seeds.empty() ? 0 : sizeof(NonpenetrationVector);
+                const auto first_bytes = read(core::checked_byte_count(
+                    static_cast<core::Index>(first_count),
+                    sizeof(FirstFreeWakePoint) + 2 * sizeof(a::PointId) + seed_bytes, operation));
+                const auto retained_bytes = read(core::checked_byte_count(
+                    static_cast<core::Index>(retained),
+                    3 * sizeof(WakeMaterialPoint) + sizeof(a::PointId) + seed_bytes, operation));
+                if (retained_bytes > std::numeric_limits<std::size_t>::max() - first_bytes)
+                    reject(ResourceExceeded);
+                auto storage = allocate<std::byte>(memory, first_bytes + retained_bytes);
+                std::pmr::monotonic_buffer_resource arena{storage.values().data(), storage.size(),
+                                                          std::pmr::null_memory_resource()};
+                std::pmr::vector<FirstFreeWakePoint> first_points{&arena};
+                std::pmr::vector<a::PointId> from{&arena}, at{&arena}, old_particles{&arena};
+                std::pmr::vector<WakeMaterialPoint> current{&arena}, previous{&arena},
+                    older{&arena};
+                first_points.reserve(first_count);
+                from.reserve(first_count);
+                at.reserve(first_count);
+                current.reserve(retained);
+                previous.reserve(retained);
+                older.reserve(retained);
+                old_particles.reserve(retained);
+                std::pmr::vector<NonpenetrationVector> first_seeds{&arena}, old_seeds{&arena};
+                if (!seeds.empty()) {
+                    first_seeds.reserve(first_count);
+                    old_seeds.reserve(retained);
+                }
+                const auto available_older = history.older == nullptr
+                                                 ? std::span<const WakeMaterialPoint>{}
+                                                 : history.older->points;
+                for (std::size_t i = 1; i < available_older.size() && retained != 0; ++i) {
+                    dispatch.step();
+                    if (available_older[i - 1].release >= available_older[i].release)
+                        reject(StaleGeneration);
+                }
+                for (std::size_t i = 0; i < count; ++i) {
+                    dispatch.step();
+                    const auto row = read(links.row(i));
+                    if (restart || !row.parent) {
+                        first_points.push_back(row);
+                        from.push_back(row.parent ? row.parent->point : row.current.release.point);
+                        at.push_back(row.current.point);
+                        if (!seeds.empty())
+                            first_seeds.push_back(seeds[i]);
+                        continue;
+                    }
+                    const auto key = row.current.release;
+                    const auto found =
+                        find(available_older, key, &WakeMaterialPoint::release, dispatch);
+                    if (found == available_older.end() || found->release != key)
+                        reject(StaleGeneration);
+                    current.push_back(row.current);
+                    previous.push_back(*row.parent);
+                    older.push_back(*found);
+                    old_particles.push_back(row.current.point);
+                    if (!seeds.empty())
+                        old_seeds.push_back(seeds[i]);
+                }
+                auto evaluation = limits.transport;
+                evaluation.maximum_steps -= dispatch.used;
+                const DiscreteNonpenetrationInput source{
+                    trial.wake.source.contact,
+                    trial.wake.source.collocations,
+                    trial.wake.source.wake,
+                    {trial.wake.source.history.parent, strength.history()},
+                    trial.wake.source.trial_stamp,
+                    trial.wake.source.flow_stamp,
+                    trial.wake.source.flow_side};
+                std::optional<WakeTransportResult> trapezoid, bdf2;
+                if (first_count != 0) {
+                    trapezoid.emplace(read(evaluate_first_free_wake_transport(
+                        clock, {source, trial.flow, at, trial.direction},
+                        {parent.wake.source, parent.flow, from, parent.direction}, epoch,
+                        first_points, first_seeds, evaluation, limits.velocity, shared, local,
+                        kernel, memory, stop)));
+                }
+                if (retained != 0) {
+                    const std::array<WakeMaterialSnapshot, 3> snapshots{
+                        {{source.contact, current},
+                         {parent.wake.source.contact, previous},
+                         {history.older->contact, older, history.older->preceding_births}}};
+                    bdf2.emplace(read(evaluate_fixed_free_wake_transport(
+                        clock, snapshots, source, trial.flow, old_particles, trial.direction,
+                        history.retained_direction, old_seeds, evaluation, limits.velocity, shared,
+                        local, kernel, memory, stop)));
+                }
+                dispatch.step();
+                return FreeWakeTrial{std::move(strength), std::move(trapezoid), std::move(bdf2)};
             } catch (const core::Failure& failure) {
                 return std::unexpected(failure);
             } catch (const a::p1::ArithmeticFailure& failure) {

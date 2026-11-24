@@ -4379,6 +4379,42 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto growing_velocity = take(std::move(evaluated_velocity));
     CHECK(take(growing_velocity.row(0)).owner == far_up);
 
+    const std::array birth_origins{cf::WakeMaterialPoint{release, release.point, {}},
+                                   cf::WakeMaterialPoint{second_release, second_release.point, {}}};
+    const cf::WakeMaterialSnapshot preceding{older, birth_origins, &growth_residual};
+    const cf::FreeWakeTrialEndpoint parent_trial{{parent_strength, growth_points}, previous_flow};
+    const cf::FreeWakeTrialEndpoint current_trial{{with_owned_history, extended_points}, flow};
+    const cf::FreeWakeTrialLimits trial_limits{extended_limits, extended_limits,
+                                               extended_velocity_limits};
+    const std::array trial_seeds{coordinates(1, 0, 0), coordinates(2, 0, 0), coordinates(3, 0, 0),
+                                 coordinates(4, 0, 0)};
+    core::ResourcePlan trial_memory{1024ULL * 1024 * 1024};
+    const auto step = take(cf::evaluate_free_wake_trial(
+        wake_si, transport_clock, parent_trial, current_trial, {&preceding, {}}, next_epoch,
+        trial_seeds, trial_limits, shared, *local, *kernel, trial_memory));
+    REQUIRE(step.trapezoid);
+    REQUIRE(step.bdf2);
+    REQUIRE(step.trapezoid->size() == 2);
+    REQUIRE(step.bdf2->size() == 2);
+    CHECK(step.strength.history_material()[0].epoch == next_epoch);
+    CHECK(take(step.trapezoid->row(0)).release == extended_points[1].release);
+    CHECK(take(step.trapezoid->row(1)).release == extended_points[3].release);
+    CHECK(take(step.bdf2->row(0)).release == release);
+    CHECK(take(step.bdf2->row(1)).release == second_release);
+    residual_expected(take(step.trapezoid->row(0)).residual[0], Rat{8});
+    residual_expected(take(step.trapezoid->row(1)).residual[0], Rat{8});
+    residual_expected(take(step.bdf2->row(0)).residual[0], Rat{10});
+    residual_expected(take(step.bdf2->row(1)).residual[0], Rat{8});
+    residual_expected(take(step.trapezoid->position_dual(0)).stencil[0][0], Rat{16});
+    residual_expected(take(step.trapezoid->position_dual(1)).stencil[0][0], Rat{32});
+    residual_expected(take(step.bdf2->position_dual(0)).stencil[0][0], Rat{12});
+    residual_expected(take(step.bdf2->position_dual(1)).stencil[0][0], Rat{36});
+
+    reject(cf::evaluate_free_wake_trial(wake_si, transport_clock, parent_trial, current_trial, {},
+                                        next_epoch, trial_seeds, trial_limits, shared, *local,
+                                        *kernel, trial_memory),
+           core::FailureCode::InvalidInput);
+
     auto wrong_link = extended_panels;
     wrong_link[1].leading = mapped_old_id;
     reject(strengths(extended_trace, wrong_link), core::FailureCode::StaleGeneration);

@@ -73,4 +73,38 @@ private:
     const WakeStrengthEndpoint& trial, aero::detail::ReleaseEpoch, const WakeTransportLimits&,
     core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
+struct FreeWakeTrialEndpoint {
+    WakeStrengthEndpoint wake;
+    const DiscreteKnownFlowInput& flow;
+    const DiscreteFreeWakeDirection* direction{};
+};
+
+/// Only BDF2 rows use older positions or the explicit two history directions.
+struct FreeWakeTrialHistory {
+    const WakeMaterialSnapshot* older{};
+    WakeTransportHistoryDirection retained_direction;
+};
+
+struct FreeWakeTrialLimits {
+    WakeTransportLimits material;
+    WakeTransportLimits transport; ///< Each independent stencil evaluation.
+    DiscreteFreeWakeLimits velocity;
+};
+
+/// Both parts use the same checked trial geometry, circulation and released keys.
+struct FreeWakeTrial {
+    WakeStrengthTransition strength;
+    std::optional<WakeTransportResult> trapezoid;
+    std::optional<WakeTransportResult> bdf2;
+};
+
+/// New releases use the trapezoid; retained points do so only at an interval
+/// restart. Seeds use trial material order. Each returned part retains key order.
+[[nodiscard]] core::Result<FreeWakeTrial> evaluate_free_wake_trial(
+    const io::SiCase&, const WakeTransportClock&, const FreeWakeTrialEndpoint& parent,
+    const FreeWakeTrialEndpoint& trial, const FreeWakeTrialHistory&, aero::detail::ReleaseEpoch,
+    std::span<const NonpenetrationVector> seeds, const FreeWakeTrialLimits&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
