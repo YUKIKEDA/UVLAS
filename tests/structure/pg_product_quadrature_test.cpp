@@ -10,6 +10,39 @@ using namespace uvlas::structure;
 using namespace partition_test;
 using namespace pg_conditioning_test;
 
+TEST_CASE("PG common denominators admit guarded work before evaluating any term",
+          "[SH-D07][N4-08][verification][negative]") {
+    using Reuse = detail::PgRankMonomialPowers::Reuse;
+    constexpr auto limb_bits = std::numeric_limits<detail::RankWord>::digits;
+    const I denominator = I{1} << (4 * limb_bits);
+    Fixture fixture;
+    const auto u = rat(fixture, I{1}, denominator);
+    const auto v = fixture.r("0");
+    const std::array rows{PgRankRow{PgCoefficientField::R, {0, 0}, {1, 0}},
+                          PgRankRow{PgCoefficientField::R, {0, 0}, {2, 0}}};
+    const std::array<std::uint32_t, 2> indices{0, 1};
+    using Coefficient = detail::RankFraction<detail::RankCell>;
+    const std::array coefficients{Coefficient{1, 1}, Coefficient{1, 1}};
+    core::ResourcePlan plan{profile};
+    auto limits = query_limits();
+    limits.algebra.maximum_value_bits = 11 * limb_bits;
+
+    // The bound is 8 limbs plus 5 bits. The next limb and both guard limbs
+    // must fit, even though the final reduced fraction has a smaller width.
+    limits.algebra.maximum_work_bits = 10 * limb_bits;
+    detail::ReferenceArithmetic rejected{limits, plan};
+    detail::PgRankMonomialPowers powers{u, v, Reuse::CommonDenominator};
+    CHECK_FALSE(powers.common_sum(rejected, rows, indices, coefficients));
+    CHECK(rejected.info().scalar_operations == 0);
+    CHECK(plan.allocated_bytes() == 0);
+
+    limits.algebra.maximum_work_bits = 11 * limb_bits;
+    detail::ReferenceArithmetic admitted{limits, plan};
+    const auto result = powers.common_sum(admitted, rows, indices, coefficients);
+    REQUIRE(result);
+    CHECK(q(*result) == Q{denominator + 1} / (denominator * denominator));
+}
+
 TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes",
           "[SH-D03][SH-D07][N4-02][N4-08][verification][negative]") {
     Fixture fixture;

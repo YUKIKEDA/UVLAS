@@ -85,10 +85,18 @@ struct Interval {
 
 [[nodiscard]] Interval interval_product(IntegerWork& work, const Interval& left,
                                         const Interval& right) {
-    if (left.lower == 0 && left.upper == 0)
-        return {};
-    if (right.lower == 0 && right.upper == 0)
-        return {};
+    if (right.lower >= 0)
+        return with_positive(work, left, right);
+    if (left.lower >= 0)
+        return with_positive(work, right, left);
+    if (left.upper <= 0) {
+        const auto& minimum = right.upper <= 0 ? left.upper : left.lower;
+        return {rank_product(work, minimum, right.upper),
+                rank_product(work, left.lower, right.lower)};
+    }
+    if (right.upper <= 0)
+        return {rank_product(work, left.upper, right.lower),
+                rank_product(work, left.lower, right.lower)};
     const std::array endpoints{
         rank_product(work, left.lower, right.lower), rank_product(work, left.lower, right.upper),
         rank_product(work, left.upper, right.lower), rank_product(work, left.upper, right.upper)};
@@ -192,15 +200,19 @@ void fill_product(ReferenceArithmetic& math, PgVolumeProductRule input, core::In
 
 void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
                        std::span<const Interval> values, const Interval& weight) {
-    for (std::size_t j = 0; j < values.size(); ++j)
+    for (std::size_t j = 0; j < values.size(); ++j) {
+        const auto& right = values[j];
+        // No rounding occurs on these integer grids. Interval multiplication
+        // is associative, so the weighted column can be shared by the row.
+        const auto weighted =
+            right.lower == 0 && right.upper == 0 ? Interval{} : with_positive(work, right, weight);
         for (std::size_t i = 0; i <= j; ++i) {
             work.charge();
             const auto& left = values[i];
-            const auto& right = values[j];
-            if ((left.lower == 0 && left.upper == 0) || (right.lower == 0 && right.upper == 0))
+            if ((left.lower == 0 && left.upper == 0) ||
+                (weighted.lower == 0 && weighted.upper == 0))
                 continue;
-            const auto contribution =
-                with_positive(work, interval_product(work, left, right), weight);
+            const auto contribution = interval_product(work, left, weighted);
             auto& entry = entries[packed(i, j)];
             work.charge(
                 std::max(entry.lower.backend().size(), contribution.lower.backend().size()) +
@@ -208,6 +220,7 @@ void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
             entry.lower += contribution.lower;
             entry.upper += contribution.upper;
         }
+    }
 }
 
 } // namespace

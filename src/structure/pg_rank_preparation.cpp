@@ -639,38 +639,45 @@ PgRankMonomialPowers::common_sum(ReferenceArithmetic& math, std::span<const PgRa
     if (steps > math.limits.maximum_scalar_operations - math.scalar_operations)
         return std::nullopt;
 
-    const auto bit_limit =
-        std::min(math.leaf_limits.maximum_work_bits, math.leaf_limits.maximum_value_bits);
-    Integer coefficient_denominator = 1;
     std::size_t max_u = 0, max_v = 0;
-    std::uint64_t numerator_bits = 0;
+    std::uint64_t numerator_bits = 0, coefficient_denominator_bits = 1;
     for (std::size_t i = 0; i < indices.size(); ++i) {
         math.cancel();
         const auto powers = rows[indices[i]].powers;
         max_u = std::max(max_u, static_cast<std::size_t>(powers.first));
         max_v = std::max(max_v, static_cast<std::size_t>(powers.second));
         numerator_bits = std::max(numerator_bits, rank_bits(coefficients[i].numerator));
-        const Integer denominator{coefficients[i].denominator};
-        if (coefficient_denominator % denominator != 0) {
-            const Integer divisor =
-                boost::multiprecision::gcd(coefficient_denominator, denominator);
-            const Integer multiplier = denominator / divisor;
-            if (partition_add(rank_bits(coefficient_denominator), rank_bits(multiplier)) >
-                bit_limit)
-                return std::nullopt;
-            coefficient_denominator *= multiplier;
-        }
+        const auto bits = rank_bits(coefficients[i].denominator);
+        if (bits > 1)
+            coefficient_denominator_bits = partition_add(coefficient_denominator_bits, bits);
     }
     const auto coordinate_bits = partition_add(partition_mul(max_u, partition_bits(u_.coordinate)),
                                                partition_mul(max_v, partition_bits(v_.coordinate)));
     const auto numerator_bound = partition_add(numerator_bits, partition_log(indices.size()));
-    const auto denominator_bound =
-        partition_add(coordinate_bits, rank_bits(coefficient_denominator));
-    if (partition_add(denominator_bound, numerator_bound) > bit_limit)
+    const auto denominator_bound = partition_add(coordinate_bits, coefficient_denominator_bits);
+    const auto width = partition_add(denominator_bound, numerator_bound);
+    if (width > math.leaf_limits.maximum_value_bits)
         return std::nullopt;
+    const auto admitted = exact_rational_admission(math.leaf_limits, width, 0);
+    if (!admitted) {
+        if (admitted.error().code == core::FailureCode::ResourceExceeded)
+            return std::nullopt;
+        throw PartitionAbort{admitted.error()};
+    }
 
-    // The unreduced denominator bounds every term. Reduce just once after the integer sum.
+    // The product bounds the coefficient LCM before any arbitrary-precision
+    // arithmetic. Reduce the completed sum just once.
     math.charge(steps);
+    Integer coefficient_denominator = 1;
+    for (const auto& coefficient : coefficients) {
+        math.cancel();
+        const Integer denominator{coefficient.denominator};
+        if (coefficient_denominator % denominator != 0) {
+            const Integer divisor =
+                boost::multiprecision::gcd(coefficient_denominator, denominator);
+            coefficient_denominator *= denominator / divisor;
+        }
+    }
     const auto& u = ExactFactory::value(u_.coordinate).backend();
     const auto& v = ExactFactory::value(v_.coordinate).backend();
     Integer sum = 0;
