@@ -1,3 +1,5 @@
+#include "case_schema_test_adapter.hpp"
+#include "external_mesh_quantity.hpp"
 #include "nastran_laminate_cards.hpp"
 #include "source_digest.hpp"
 
@@ -372,6 +374,177 @@ TEST_CASE("Nastran laminate counts declared plies and bounds memory, work and ca
     const auto work_rejected = run({1, work - 1}, full_memory);
     REQUIRE_FALSE(work_rejected);
     CHECK(work_rejected.error().code == ResourceExceeded);
+}
+
+namespace a = uvlas::test::schema_adapter;
+constexpr std::uint64_t reconciliation_budget = 256ULL * 1024 * 1024;
+constexpr SiUnits si{SiLengthUnit::Metre, SiMassUnit::Kilogram, SiTimeUnit::Second,
+                     SiAngleUnit::Radian};
+constexpr SiUnits deck_units{SiLengthUnit::Millimetre, SiMassUnit::Tonne, SiTimeUnit::Second,
+                             SiAngleUnit::Degree};
+
+structure::ExactLimits comparison_limits() noexcept {
+    return {256,
+            0,
+            0,
+            0,
+            0,
+            4096,
+            8192,
+            structure::ExactEstimateAdmission{reconciliation_budget},
+            structure::ExactTimingMode::Disabled};
+}
+
+SchemaCase checked_case(const a::JsonToken& input) {
+    const auto wire = input.wire();
+    const InputLimits syntax{
+        1000000, 256,
+        100000,  100000,
+        1000000, 1000000,
+        1000000, {ParserAllocationMode::EstimateAdmission, reconciliation_budget}};
+    core::ResourcePlan plan{reconciliation_budget};
+    std::optional<InputDiagnostic> parsing;
+    const auto doc = take(
+        read_input_document(std::as_bytes(std::span{wire}), SourceId{83}, syntax, plan, parsing));
+    std::array<std::uint64_t, static_cast<std::size_t>(SchemaQuota::Count)> caps{};
+    caps.fill(reconciliation_budget);
+    SchemaDiagnostic diagnostic;
+    auto result = validate_case_schema(doc, SchemaLimits{caps}, plan, &diagnostic);
+    INFO("Schema fixture field " << diagnostic.path().value_or(""));
+    return take(std::move(result));
+}
+
+TEST_CASE("External explicit material fields must agree in exact SI with the case",
+          "[IO4-03][IO4-04][IO4-01][N4-02][verification][negative]") {
+    auto input = a::root();
+    auto& materials = input.field("model").field("materials").elements;
+    auto& isotropic = materials.at(0);
+    isotropic.set("young", a::parse("200000000000"));
+    isotropic.set("poisson", a::parse("0.25"));
+    isotropic.set("density", a::parse("7850"));
+    auto orthotropic = a::fragment("Material.orthotropic3d");
+    orthotropic.set("id", a::string("67"));
+    orthotropic.set("young", a::parse("[130000000000,9000000000,11000000000]"));
+    orthotropic.set("shear", a::parse("[4000000000,5000000000,6000000000]"));
+    orthotropic.set("poisson", a::parse("[0.28,0.15,0.11]"));
+    orthotropic.set("density", a::parse("1560"));
+    materials.push_back(std::move(orthotropic));
+    const auto schema = checked_case(input);
+    const auto case_model = take(schema.root()).model.record();
+    const auto case_mat1 = take(case_model.materials.at(0)).record();
+    const auto case_mat8 = take(case_model.materials.at(1)).record();
+
+    core::ResourcePlan plan{reconciliation_budget};
+    const auto check = [&](std::string_view mat1_e, std::string_view mat8_g13) {
+        const auto deck = std::string{"MAT1,9,"} + std::string{mat1_e} +
+                          ",80000.0,.25,7.85D-9\nMAT8,10,130000.0,9000.0,.28,6000.0," +
+                          std::string{mat8_g13} + ",4000.0,1.56D-9\n";
+        auto card_input = material_cards(deck);
+        return take(
+            NastranLaminateCards::prepare(std::move(card_input), laminate_limits, plan, {}));
+    };
+
+    const auto same_deck = check("200000.0", "5000.0");
+    const auto same = take(same_deck.view());
+    std::optional<ImportedQuantityMismatch> diagnostic;
+    REQUIRE(check_imported_material(same.input.mat1.front(), case_mat1, deck_units, si,
+                                    comparison_limits(), plan, {}, &diagnostic));
+    REQUIRE(check_imported_material(same.mat8.front(), case_mat8, deck_units, si,
+                                    comparison_limits(), plan, {}, &diagnostic));
+    CHECK_FALSE(diagnostic);
+
+    const auto changed_deck = check("200000.00000000001", "5100.0");
+    const auto changed = take(changed_deck.view());
+    const auto differing_young =
+        check_imported_material(changed.input.mat1.front(), case_mat1, deck_units, si,
+                                comparison_limits(), plan, {}, &diagnostic);
+    REQUIRE_FALSE(differing_young);
+    CHECK(differing_young.error().code == InvalidInput);
+    const auto young_detail = take(diagnostic);
+    CHECK(young_detail.quantity == ImportedQuantityField::Young1);
+    CHECK(young_detail.card_position == take(changed.input.mat1.front().young).field.position);
+
+    const auto differing_shear =
+        check_imported_material(changed.mat8.front(), case_mat8, deck_units, si,
+                                comparison_limits(), plan, {}, &diagnostic);
+    REQUIRE_FALSE(differing_shear);
+    CHECK(differing_shear.error().code == InvalidInput);
+    const auto shear_detail = take(diagnostic);
+    CHECK(shear_detail.quantity == ImportedQuantityField::Shear13);
+    CHECK(shear_detail.card_position == take(changed.mat8.front().shear_1z).field.position);
+}
+
+TEST_CASE("A declared constant whole-region full thickness compares with every case PG vertex",
+          "[IO4-03][IO4-04][N4-02][verification][negative]") {
+    auto input = a::root();
+    auto& values =
+        input.field("model").field("geometry").elements.at(0).field("thickness").field("values");
+    for (auto& value : values.elements) {
+        value = a::parse("0.00254");
+    }
+    const auto constant = checked_case(input);
+    const auto thickness = [](const SchemaCase& schema) {
+        const auto model = take(schema.root()).model.record();
+        const auto geometry = take(model.geometry.at(0)).record();
+        return std::get<schema::GeometryPg>(geometry).thickness.record();
+    };
+    const auto expected = thickness(constant);
+    constexpr ImportedUniformThickness declared{"0.1", SiLengthUnit::Inch};
+    std::optional<ImportedQuantityMismatch> diagnostic;
+    core::ResourcePlan plan{reconciliation_budget};
+    REQUIRE(check_imported_uniform_thickness(declared, expected, si.length, expected.values.size(),
+                                             comparison_limits(), plan, {}, &diagnostic));
+    CHECK_FALSE(diagnostic);
+    const auto insufficient =
+        check_imported_uniform_thickness(declared, expected, si.length, expected.values.size() - 1,
+                                         comparison_limits(), plan, {}, &diagnostic);
+    REQUIRE_FALSE(insufficient);
+    CHECK(insufficient.error().code == ResourceExceeded);
+    CHECK_FALSE(diagnostic);
+
+    values.elements.back() = a::parse("0.00254000000000000000000000000001");
+    const auto varying = checked_case(input);
+    const auto vertices = thickness(varying);
+    const auto disagreement =
+        check_imported_uniform_thickness(declared, vertices, si.length, vertices.values.size(),
+                                         comparison_limits(), plan, {}, &diagnostic);
+    REQUIRE_FALSE(disagreement);
+    CHECK(disagreement.error().code == InvalidInput);
+    const auto sidecar_detail = take(diagnostic);
+    CHECK(sidecar_detail.quantity == ImportedQuantityField::FullThickness);
+    CHECK(sidecar_detail.vertex == static_cast<core::Index>(vertices.values.size() - 1));
+
+    const auto pshell = [](std::string_view thick, bool corner = false) {
+        const auto element = corner ? "CTRIA3,50,91,1,2,3,,,\n,,,3.0\n" : "CTRIA3,50,91,1,2,3\n";
+        const auto deck = std::string{"GRID,1\nGRID,2\nGRID,3\n"} + element + "PSHELL,91,9," +
+                          std::string{thick} + "\nMAT1,9,1.0\n";
+        return material_cards(deck);
+    };
+    const auto candidate = pshell("2.54");
+    const auto source = take(candidate.view());
+    REQUIRE(check_imported_pshell_thickness(
+        source.input.elements.front(), source.pshell.front(), SiLengthUnit::Millimetre, expected,
+        si.length, expected.values.size(), comparison_limits(), plan, {}, &diagnostic));
+    const auto wrong = pshell("2.5400000000000000000000000000001");
+    const auto wrong_source = take(wrong.view());
+    const auto wrong_result = check_imported_pshell_thickness(
+        wrong_source.input.elements.front(), wrong_source.pshell.front(), SiLengthUnit::Millimetre,
+        expected, si.length, expected.values.size(), comparison_limits(), plan, {}, &diagnostic);
+    REQUIRE_FALSE(wrong_result);
+    CHECK(wrong_result.error().code == InvalidInput);
+    const auto deck_detail = take(diagnostic);
+    CHECK(deck_detail.card_position == take(wrong_source.pshell.front().thickness).field.position);
+    CHECK(deck_detail.vertex == 0);
+
+    const auto corner = pshell("2.54", true);
+    const auto corner_source = take(corner.view());
+    const auto unqualified = check_imported_pshell_thickness(
+        corner_source.input.elements.front(), corner_source.pshell.front(),
+        SiLengthUnit::Millimetre, expected, si.length, expected.values.size(), comparison_limits(),
+        plan, {}, &diagnostic);
+    REQUIRE_FALSE(unqualified);
+    CHECK(unqualified.error().code == Unsupported);
+    CHECK_FALSE(diagnostic);
 }
 
 } // namespace

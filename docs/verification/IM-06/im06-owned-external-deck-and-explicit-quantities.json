@@ -1,0 +1,34 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-owned-external-deck-and-explicit-quantities",
+  "ids": [
+    "FD-03",
+    "FD-04",
+    "IO4-03",
+    "IO4-04",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "027ed1d20aceb344adec0349667a0231a7b8e381",
+  "claimed_state": "認証済み参照のNastranデッキを所有し、明示した材料と全厚の厳密SI一致を照合する。",
+  "checks": {
+    "windows_release_targets_passed": 5,
+    "gcc_release_targets_passed": 5,
+    "standalone_debug_and_gcc_sanitizer_targets_passed": 3,
+    "owned_deck_assertions": 39,
+    "material_and_thickness_assertions": 441
+  },
+  "artifacts": {
+    "docs/verification/IM-06/external-mesh-explicit-quantities.md": "ffc932637b2beba21e9849560aeabecc176197a075ef9da5284e0a898ff271ad",
+    "src/io/external_mesh_quantity.cpp": "952bfe8df067c1487042ea9bfc2a6e4dcef5bba6f86d5c306b2fd1f5807aae18",
+    "src/io/external_mesh_quantity.hpp": "5ff65db7e68e50c9856d428df770fe201a7ec678a9d6ae2cf6218d24e0eb83b4",
+    "src/io/nastran_bulk.cpp": "da7988e2578cc8f03471d80d7e7b292970bd68705a0fa1823d6ff358d33cf3e2",
+    "src/io/nastran_bulk.hpp": "65809c11df4316bc9d173b6bc512d143ec13086198249d9c5378d199e44c6905",
+    "src/io/reference_resolution.cpp": "85b593b2beeb2882972c1cb30ae6ba350b8ffe065768c3496b270246fa5928b1",
+    "src/io/reference_resolution.hpp": "93bec6bf74f8e68df63a21400f2901f168401c8aa128af73e290f2376faa713a",
+    "tests/io/nastran_laminate_cards_test.cpp": "e3db67ce21c3f9377e9aaae68931a5dd329b91a11e310486984c11e7ba736602",
+    "tests/io/reference_input_test.cpp": "11c7dde4e21421fcca98355d34c21c3385fc4b24f12ef29096e15dfef2cfa442"
+  }
+}

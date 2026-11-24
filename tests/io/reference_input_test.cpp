@@ -1,4 +1,5 @@
 #include "gmsh_mesh.hpp"
+#include "nastran_coordinate_cards.hpp"
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
 #include "reference_resolution.hpp"
@@ -460,7 +461,8 @@ constexpr rd::RootInventoryLimits memory_inventory_bounds{
     inventory_payload,
     28};
 
-std::string write_root_inventory(const fs::path& directory) {
+std::string write_root_inventory(const fs::path& directory, std::string_view deck_body = "abc",
+                                 std::string_view deck_hash = abc_hex) {
     auto json = fixture::all_roles();
     auto& geometry = json.field("model").field("geometry").elements;
     auto& observation = json.field("observations")
@@ -476,7 +478,7 @@ std::string write_root_inventory(const fs::path& directory) {
     write(geometry[0].field("mesh"), "skin.msh", inventory_mesh, inventory_mesh_hash);
     write(geometry[0].field("sidecar"), "sidecar.json");
     write(geometry[0].field("reference").field("file"), "geometry.json");
-    write(geometry[1].field("deck"), "model.bdf");
+    write(geometry[1].field("deck"), "model.bdf", deck_body, deck_hash);
     write(geometry[1].field("sidecar"), "model-sidecar.json");
     write(json.field("analysis").field("branch").field("seed").field("history"), "seed.history");
     write(observation, "observation.dat");
@@ -1317,4 +1319,132 @@ TEST_CASE("Reference DFS rejects the first child failure and publishes no partia
     }
     CHECK_FALSE(acquisition.reason);
     CHECK(fixture::take(prepared.report()).unique_sources == 8);
+}
+
+namespace {
+constexpr std::string_view owned_deck_source = "GRID,10,,1.25,0.0,0.0\n";
+constexpr std::string_view owned_deck_digest =
+    "e1b714a50b5bebe1ff4a43cdaaf7749bfed4b197393ad567165ea106584ae09a";
+constexpr rd::NastranBulkLimits owned_deck_limits{128, 80, 4, 4, 32, 4096};
+
+// Other roles are test fixtures. The admitted deck runs the production leaf verifier.
+class DeckFixtureLeaves final : public rd::ReferenceDependencyExtractor {
+public:
+    explicit DeckFixtureLeaves(core::ResourcePlan& plan) noexcept : plan_(plan) {}
+
+    core::Result<rd::ExtractedReferenceDependencies>
+    extract(const rd::AcquiredRootSnapshot& snapshot) noexcept override {
+        if (snapshot.location.role == rd::ReferenceRole::NastranDeck) {
+            const auto accepted =
+                rd::verify_nastran_bulk_leaf(snapshot, owned_deck_limits, plan_, {});
+            if (!accepted) {
+                return std::unexpected(accepted.error());
+            }
+        }
+        return rd::ExtractedReferenceDependencies{};
+    }
+
+private:
+    core::ResourcePlan& plan_;
+};
+} // namespace
+
+TEST_CASE("A referenced Nastran deck survives native file removal and release of the graph",
+          "[IO4-01][IO4-03][integration][negative][verification]") {
+    constexpr io::SourceId deck_id{200};
+    const auto graph_and_path = [] {
+        const Tree tree;
+        const auto wire = write_root_inventory(tree.root, owned_deck_source, owned_deck_digest);
+        const auto input = from_memory(tree.root, wire);
+        auto prepared = prepare(input);
+        auto caps = design_limits();
+        constexpr auto extra = owned_deck_source.size() - 3;
+        caps.inventory.total_payload_bytes += extra;
+        caps.inventory.total_read_bytes += extra;
+        caps.inventory.total_hash_bytes += extra;
+        core::ResourcePlan plan{fixture::budget};
+        DeckFixtureLeaves extractor{plan};
+        auto graph = fixture::take(rd::resolve_reference_graph(
+            input, std::move(prepared), caps, extractor, plan, {}, nullptr, nullptr));
+        return std::pair{std::move(graph), tree.root / "model.bdf"};
+    };
+
+    auto deck = [&] {
+        const auto [graph, old_path] = graph_and_path();
+        REQUIRE_FALSE(fs::exists(old_path));
+        const auto identity = fixture::take(graph.identity());
+        const auto original =
+            fixture::take(graph.find(identity, deck_id, rd::ReferenceRole::NastranDeck, {}));
+        const auto authenticated = original.get().file.view();
+        if (!authenticated) {
+            FAIL("Missing authenticated deck bytes");
+        }
+        CHECK(authenticated->digest == digest_literal(owned_deck_digest));
+
+        auto other = identity;
+        ++other.representation_revision;
+        core::ResourcePlan plan{fixture::budget};
+        const auto stale =
+            rd::prepare_referenced_nastran_deck(graph, other, deck_id, owned_deck_limits, plan, {});
+        check_acquisition_failure(stale, core::FailureCode::StaleGeneration);
+        const auto wrong_role = rd::prepare_referenced_nastran_deck(
+            graph, identity, io::SourceId{201}, owned_deck_limits, plan, {});
+        check_acquisition_failure(wrong_role, core::FailureCode::InvalidInput);
+        CHECK(plan.allocated_bytes() == 0);
+
+        const auto acquired = rd::prepare_referenced_nastran_deck(graph, identity, deck_id,
+                                                                  owned_deck_limits, plan, {});
+        REQUIRE(acquired);
+        if (const auto view = acquired->view()) {
+            CHECK(view->bytes == owned_deck_source);
+            CHECK(view->digest == authenticated->digest);
+            CHECK(view->location.declaration_node == original.get().location.declaration_node);
+            CHECK(view->declaration_pointer == "/model/geometry/1/deck");
+            CHECK(view->declaration_pointer == original.get().pointer());
+            CHECK(view->declaration_pointer.data() != original.get().pointer().data());
+            CHECK(bytes_of(view->bytes).data() != authenticated->bytes.data());
+        } else {
+            FAIL("Missing owned Nastran bytes");
+        }
+
+        const auto required = plan.allocated_bytes();
+        REQUIRE(required > owned_deck_source.size());
+        core::ResourcePlan short_plan{required - 1};
+        std::optional<rd::NastranBulkDiagnostic> diagnostic;
+        const auto short_copy = rd::prepare_referenced_nastran_deck(
+            graph, identity, deck_id, owned_deck_limits, short_plan, {}, &diagnostic);
+        check_acquisition_failure(short_copy, core::FailureCode::ResourceExceeded);
+        if (diagnostic) {
+            CHECK(diagnostic->reason == rd::NastranBulkFailure::Limit);
+        } else {
+            FAIL("Missing retained-byte admission diagnostic");
+        }
+        CHECK(short_plan.allocated_bytes() == 0);
+
+        core::ResourcePlan exact_plan{required};
+        auto result = fixture::take(rd::prepare_referenced_nastran_deck(
+            graph, identity, deck_id, owned_deck_limits, exact_plan, {}, &diagnostic));
+        CHECK(exact_plan.remaining_bytes() == 0);
+        CHECK_FALSE(diagnostic);
+        const auto still_authenticated = original.get().file.view();
+        if (still_authenticated) {
+            CHECK(std::ranges::equal(still_authenticated->bytes, bytes_of(owned_deck_source)));
+        } else {
+            FAIL("Import changed its parent snapshot");
+        }
+        return result;
+    }();
+
+    core::ResourcePlan grid_plan{fixture::budget};
+    const auto coordinates = fixture::take(
+        rd::NastranCoordinateCards::prepare(std::move(deck), {4, 4, 4, 4096}, grid_plan, {}));
+    if (const auto values = coordinates.view()) {
+        REQUIRE(values->grids.size() == 1);
+        CHECK(values->grids.front().id == rd::NastranGridId{10});
+        CHECK(values->grids.front().position[0].decimal() == "1.25");
+        CHECK(values->bulk.bytes == owned_deck_source);
+        CHECK(values->bulk.declaration_pointer == "/model/geometry/1/deck");
+    } else {
+        FAIL("The card owner did not survive graph release");
+    }
 }
