@@ -1,3 +1,4 @@
+#include "../../src/structure/pg_reference_arithmetic.hpp"
 #include "../structure/pg_partition_test_support.hpp"
 #include "external_pg_regional_thickness.hpp"
 #include "source_digest.hpp"
@@ -208,4 +209,50 @@ TEST_CASE("Regional exterior thickness is compared only over positive exact over
     CHECK(stale.error().code == Code::StaleGeneration);
 }
 
+TEST_CASE("Reported regional thickness and area both fit the shared memory estimate",
+          "[FD-03][IO4-04][R-05][N4-02][integration][verification][negative]") {
+    partition_test::Fixture input;
+    core::ResourcePlan plan{partition_test::cap};
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const auto reference = pg(input, false, arithmetic, plan);
+    const auto evidence = geometry(reference, input, false, false, {arithmetic, 4}, plan);
+    const auto one = input.r("1");
+    const std::array claims{ExternalPgThicknessClaim{17, one}, ExternalPgThicknessClaim{41, one}};
+    const auto single = std::span{claims}.first(1);
+
+    using Limb = boost::multiprecision::limb_type;
+    constexpr auto width = std::numeric_limits<Limb>::digits;
+    const auto limbs = arithmetic.algebra.maximum_work_bits / width;
+    const auto live = structure::detail::reference_live_rationals + 2;
+    // One report row needs both the thickness and area in addition to the
+    // fixed scratch envelope. Also keep one integer slot for add/sub.
+    const auto held = (2 * live + 1) * 4 * limbs * sizeof(Limb);
+    const auto budget = take(structure::detail::exact_rational_admission(arithmetic.algebra,
+                                                                         (limbs - 2) * width, held))
+                            .estimated_external_payload_bytes;
+    auto limited = arithmetic;
+    limited.algebra.external_memory = ExactEstimateAdmission{budget};
+    const auto admitted =
+        compare_external_pg_regional_thickness(evidence, reference, single, {limited, 2, 4}, plan);
+    REQUIRE(admitted);
+    REQUIRE(admitted->matches.size() == 1);
+    CHECK(admitted->matches.values().front().value_metres == one);
+    CHECK(admitted->matches.values().front().twice_chart_area == one);
+    const auto before = plan.allocated_bytes();
+    const auto excess =
+        compare_external_pg_regional_thickness(evidence, reference, claims, {limited, 2, 4}, plan);
+    REQUIRE_FALSE(excess);
+    CHECK(excess.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+    limited.algebra.external_memory = ExactEstimateAdmission{budget - 1};
+    const auto shortage =
+        compare_external_pg_regional_thickness(evidence, reference, single, {limited, 2, 4}, plan);
+    REQUIRE_FALSE(shortage);
+    CHECK(shortage.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+    const auto again = compare_external_pg_regional_thickness(evidence, reference, claims,
+                                                              {arithmetic, 2, 4}, plan);
+    REQUIRE(again);
+    CHECK(again->matches.size() == 2);
+}
 } // namespace
