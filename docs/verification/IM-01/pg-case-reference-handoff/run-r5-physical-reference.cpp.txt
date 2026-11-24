@@ -23,19 +23,40 @@ FieldJet independent_field(const Point& xy, const Decimal& depth, const Decimal&
     const Decimal H = h * (1 + s / 10 + t / 20), z = (depth - Decimal("0.5")) * H;
     const Decimal zs = (depth - Decimal("0.5")) * h / 10;
     const Decimal zt = (depth - Decimal("0.5")) * h / 20;
-    const Decimal integral = mode == 0 ? s : Decimal(s * s - s);
-    const Decimal curvature = mode == 0 ? Decimal(1) : Decimal(2 * s - 1);
-    const Decimal b = mode == 0 ? Decimal(s * s / 2) : Decimal(s * s * (s / 3 - Decimal("0.5")));
-    const Decimal p = -fs * integral / g32;
-    const Decimal ps = -(fss * integral + fs * curvature - 3 * fs * integral * gs / (2 * g)) / g32;
-    const Decimal pt = -(fst * integral - 3 * fs * integral * gt / (2 * g)) / g32;
+    // Antiderivatives of sigma^m k(sigma), independent of the dictionary expansion.
+    std::array<Decimal, 4> moments{};
+    Decimal power = s;
+    for (std::size_t m = 0; m < moments.size(); ++m) {
+        const Decimal d = m + 1;
+        moments[m] = power / d;
+        if (mode == 1)
+            moments[m] = 2 * s * power / (d + 1) - moments[m];
+        power *= s;
+    }
+    const auto& [I0, I1, I2, I3] = moments;
+    const Decimal k = mode == 0 ? Decimal(1) : Decimal(2 * s - 1);
+    const Decimal U = (t / 5 - 3 * t * t / 50) * I0 + t * I2 / 20;  // integral f_t k
+    const Decimal V = (Decimal(1) / 5 - 3 * t / 25) * I0 + I2 / 20; // integral f_tt k
+    const Decimal W = (Decimal(1) / 5 - 3 * t / 25) * I1 + I3 / 20; // integral sigma f_tt k
+    const Decimal b = s * I0 - I1;
+    const Decimal A = ft * I0 - U, B = s * V - W;
+    const Decimal tx = (1 + fs * fs) * I0 + ft * U;
+    const Decimal ty = fs * A + ft * B;
+    const Decimal txs = (1 + fs * fs) * k + 2 * fs * fss * I0 + fst * U + ft * ft * k;
+    const Decimal txt = 2 * fs * fst * I0 + ftt * U + ft * V;
+    const Decimal tys = fss * A + fs * fst * I0 + fst * B + ft * V;
+    const Decimal tyt = fst * A + fs * (ftt * I0 - V) + ftt * B - 3 * ft * b / 25;
+    const Decimal numerator = -fs * tx - ft * ty;
+    const Decimal p = numerator / g32;
+    const Decimal ps = (-fss * tx - fs * txs - fst * ty - ft * tys) / g32 - 3 * p * gs / (2 * g);
+    const Decimal pt = (-fst * tx - fs * txt - ftt * ty - ft * tyt) / g32 - 3 * p * gt / (2 * g);
     const auto along_s = cross(reference.along_t, reference.along_depth);
     const auto along_t = cross(reference.along_depth, reference.along_s);
     const auto along_depth = cross(reference.along_s, reference.along_t);
     FieldJet output{b + z * p, {}};
     for (std::size_t d = 0; d < output.gradient.size(); ++d) {
-        output.gradient[d] = (along_s[d] * (integral + zs * p + z * ps) +
-                              along_t[d] * (zt * p + z * pt) + along_depth[d] * H * p) /
+        output.gradient[d] = (along_s[d] * (I0 + zs * p + z * ps) + along_t[d] * (zt * p + z * pt) +
+                              along_depth[d] * H * p) /
                              reference.volume_density;
     }
     return output;
