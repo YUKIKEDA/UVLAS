@@ -2,14 +2,16 @@
 
 namespace {
 using Json = nlohmann::json;
+enum class Geometry { Flat, FrozenCurve };
 
-Json moving_case(bool coincident) {
+Json moving_case(bool coincident, Geometry shape) {
     auto document = Json::parse(frozen_interface(0));
     auto& model = document.at("model");
-    for (auto& geometry : model.at("geometry")) {
-        geometry.at("coefficients") = Json::array();
-        geometry.at("degree") = {0, 0};
-    }
+    if (shape == Geometry::Flat)
+        for (auto& geometry : model.at("geometry")) {
+            geometry.at("coefficients") = Json::array();
+            geometry.at("degree") = {0, 0};
+        }
     auto& right = model.at("geometry").at(1);
     const auto& domain = right.at("domain");
     right.at("boundaries")
@@ -57,12 +59,13 @@ cc::CaseStructuralSupportLimits motion_chart_limits() {
     return {{clocks, 65'536, 2'000'000, 500}, {math, math, 500}, {math, 120'000}, 2, 100'000, 1};
 }
 
-core::Result<cc::CasePgChart> prepare_moving(bool coincident, core::Workspace& workspace,
+core::Result<cc::CasePgChart> prepare_moving(bool coincident, Geometry shape,
+                                             core::Workspace& workspace,
                                              p::CurveWorkspace& motion_workspace,
                                              core::ResourcePlan& plan) {
-    const auto wire = moving_case(coincident).dump();
+    const auto wire = moving_case(coincident, shape).dump();
     const auto source = checked_case_wire(wire);
-    auto limits = chart_limits(1);
+    auto limits = chart_limits(shape == Geometry::FrozenCurve ? 2 : 1);
     limits.constraints.maximum_sources = 3;
     Fixture fixture;
     core::ResourcePlan selection{profile};
@@ -158,12 +161,12 @@ void compare_position_jets(const cc::CasePgChart& ready, const cc::CaseStructura
 }
 } // namespace
 
-TEST_CASE("The Case chart retains stationary and moving full-thickness support together",
-          "[.case-pg-moving-chart][V-PG][CN-D01][CN-D03][SH-D05][N4-04][verification]") {
+namespace {
+void verify_motion_chart(Geometry shape, std::string_view result_tag) {
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
     p::CurveWorkspace motion_workspace;
     core::ResourcePlan plan{profile};
-    const auto candidate = prepare_moving(false, workspace, motion_workspace, plan);
+    const auto candidate = prepare_moving(false, shape, workspace, motion_workspace, plan);
     if (!candidate)
         UNSCOPED_INFO(
             "Moving chart preparation: " << static_cast<unsigned>(candidate.error().code));
@@ -188,9 +191,21 @@ TEST_CASE("The Case chart retains stationary and moving full-thickness support t
         CHECK(q(sample.node().seconds) == 1);
         compare_position_jets(*candidate, sample, workspace, plan);
     }
-    std::clog << "CASE_PG_MOTION_ACCEPT," << candidate->chart().original().original_rows().size()
-              << ',' << candidate->chart().pivots().size() << ',' << plan.allocated_bytes() << '\n'
+    std::clog << result_tag << ',' << candidate->chart().original().original_rows().size() << ','
+              << candidate->chart().pivots().size() << ',' << plan.allocated_bytes() << '\n'
               << std::flush;
+}
+
+} // namespace
+
+TEST_CASE("The Case chart retains stationary and moving full-thickness support together",
+          "[.case-pg-moving-chart][V-PG][CN-D01][CN-D03][SH-D05][N4-04][verification]") {
+    verify_motion_chart(Geometry::Flat, "CASE_PG_MOTION_ACCEPT");
+}
+
+TEST_CASE("The frozen R4 curved Case keeps one chart for the support jets",
+          "[.case-pg-moving-curve][V-PG][CN-D01][CN-D03][SH-D05][N4-04][verification]") {
+    verify_motion_chart(Geometry::FrozenCurve, "CASE_PG_CURVED_MOTION_ACCEPT");
 }
 
 TEST_CASE("A moving Case support cannot share all rows with a stationary support",
@@ -198,6 +213,6 @@ TEST_CASE("A moving Case support cannot share all rows with a stationary support
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
     p::CurveWorkspace motion_workspace;
     core::ResourcePlan plan{profile};
-    check_failure(prepare_moving(true, workspace, motion_workspace, plan),
+    check_failure(prepare_moving(true, Geometry::Flat, workspace, motion_workspace, plan),
                   core::FailureCode::InvalidInput);
 }
