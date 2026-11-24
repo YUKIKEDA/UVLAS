@@ -4096,6 +4096,11 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto parent_row = take(parent_velocity.row(0));
     const auto trial_row = take(trial_velocity.row(0));
     CHECK(parent_row.owner == release.point);
+    near(center(parent_row.velocity[2]), 1.024661130622405660);
+    REQUIRE(parent_row.direction);
+    near(center((*parent_row.direction)[2]), -.064175653096249599);
+    near(center(birth_row.residual[2]), -1.559233165679606171);
+    near(center((*birth_row.direction)[2]), -.000440026076076997);
     CHECK(trial_row.owner == material[0].point);
     exact(take(take(parent_velocity.ambient(0)).get().time()), previous_time);
     CHECK(abs(center(birth_row.residual[2]) +
