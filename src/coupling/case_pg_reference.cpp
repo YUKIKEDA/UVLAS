@@ -3,7 +3,9 @@
 #include "structure/pg_partition_common.hpp"
 
 #include <array>
+#include <memory>
 #include <memory_resource>
+#include <type_traits>
 #include <utility>
 
 namespace uvlas::coupling::detail {
@@ -27,10 +29,7 @@ struct InputReader {
     std::uint64_t work_left;
 
     void charge(std::uint64_t work = 1) {
-        if (limits.cancellation.stop_requested() || limits.graph.cancellation.stop_requested() ||
-            limits.coefficients.cancellation.stop_requested() ||
-            limits.partition.cancellation.stop_requested() ||
-            limits.geometry.cancellation.stop_requested())
+        if (limits.cancellation.stop_requested())
             partition_fail(FailureCode::Cancelled);
         if (work > work_left)
             partition_fail(FailureCode::ResourceExceeded);
@@ -82,10 +81,11 @@ struct InputReader {
     }
 };
 
-/// A contiguous buffer for views with mandatory references. The vectors reserve
-/// once and the arena has no upstream allocator.
+/// A contiguous buffer for views with mandatory references. Only the view
+/// objects use the arena, including in iterator-checking builds.
 template <class T>
 std::uint64_t view_storage_bytes(std::uint64_t count) {
+    static_assert(std::is_trivially_destructible_v<T>);
     return partition_add(partition_mul(count, sizeof(T)), alignof(T) - 1);
 }
 
@@ -119,17 +119,20 @@ pg::PgGraph prepare_graph(schema::GeometryPg geometry, InputReader& reader) {
     auto storage = reader.allocate<std::byte>(view_storage_bytes<pg::ExactInputTerm>(count));
     std::pmr::monotonic_buffer_resource arena{storage.values().data(), storage.size(),
                                               std::pmr::null_memory_resource()};
-    std::pmr::vector<pg::ExactInputTerm> terms{&arena};
-    terms.reserve(values.size());
+    auto* terms =
+        values.size() == 0
+            ? nullptr
+            : std::pmr::polymorphic_allocator<pg::ExactInputTerm>{&arena}.allocate(values.size());
     for (std::size_t i = 0; i < values.size(); ++i) {
         const auto term = partition_take(geometry.coefficients.at(partition_index(i))).record();
         values.values()[i] = reader.rational(term.coefficient);
-        terms.push_back({{partition_index(partition_take(term.powers.at(0)).unsigned_value()),
-                          partition_index(partition_take(term.powers.at(1)).unsigned_value())},
-                         values.values()[i]});
+        const pg::ExactPowers powers{
+            partition_index(partition_take(term.powers.at(0)).unsigned_value()),
+            partition_index(partition_take(term.powers.at(1)).unsigned_value())};
+        std::construct_at(terms + i, powers, values.values()[i]);
     }
-    const auto height = partition_take(
-        pg::ExactChartPolynomial::make(terms, reader.limits.graph.algebra, reader.plan));
+    const auto height = partition_take(pg::ExactChartPolynomial::make(
+        {terms, values.size()}, reader.limits.graph.algebra, reader.plan));
     const auto x0 = reader.rational(geometry.x0);
     const auto width = reader.rational(geometry.width);
     const auto skew = reader.rational(geometry.skew);
@@ -208,15 +211,15 @@ pg::PgIntegrationPartition prepare_partition(const pg::PgGraph& graph, schema::G
     auto storage = reader.allocate<std::byte>(view_storage_bytes<pg::PgPartitionLayer>(count));
     std::pmr::monotonic_buffer_resource arena{storage.values().data(), storage.size(),
                                               std::pmr::null_memory_resource()};
-    std::pmr::vector<pg::PgPartitionLayer> layers{&arena};
-    layers.reserve(endpoints.size());
+    auto* layers =
+        std::pmr::polymorphic_allocator<pg::PgPartitionLayer>{&arena}.allocate(endpoints.size());
     for (std::size_t i = 0; i < endpoints.size(); ++i) {
         const auto layer = partition_take(shell.layers.at(partition_index(i))).record();
         auto& endpoint_pair = endpoints.values()[i];
         endpoint_pair[0] = reader.rational(partition_take(layer.interval.at(0)));
         endpoint_pair[1] = reader.rational(partition_take(layer.interval.at(1)));
-        layers.emplace_back(core::LayerId{layer.id.unsigned_value()}, endpoint_pair[0],
-                            endpoint_pair[1]);
+        std::construct_at(layers + i, core::LayerId{layer.id.unsigned_value()}, endpoint_pair[0],
+                          endpoint_pair[1]);
     }
     const auto input = read_partition(geometry, reader);
     const pg::PgPartitionRequest request{
@@ -224,7 +227,7 @@ pg::PgIntegrationPartition prepare_partition(const pg::PgGraph& graph, schema::G
         input.domain.values(),
         {input.thickness_vertices.values(), input.thickness_triangles.values(),
          input.thickness_values.values()},
-        layers,
+        {layers, endpoints.size()},
         input.boundaries.values(),
         {},
     };
@@ -233,14 +236,28 @@ pg::PgIntegrationPartition prepare_partition(const pg::PgGraph& graph, schema::G
 }
 } // namespace
 
-core::Result<pg::PgReferenceGeometry> prepare_case_pg_reference(const io::SiCase& source,
-                                                                std::uint64_t shell_id,
-                                                                const CasePgReferenceLimits& limits,
-                                                                core::Workspace& workspace,
-                                                                core::ResourcePlan& plan) noexcept {
+core::Result<pg::PgReferenceGeometry>
+prepare_case_pg_reference(const io::SiCase& source, std::uint64_t shell_id,
+                          const CasePgReferenceLimits& caller_limits, core::Workspace& workspace,
+                          core::ResourcePlan& plan) noexcept {
     return core::guard_entry(
         operation, FailureCode::InvalidInput, {}, [&]() -> core::Result<pg::PgReferenceGeometry> {
             try {
+                std::stop_source cancellation;
+                const auto stop = [&cancellation]() noexcept { cancellation.request_stop(); };
+                const std::stop_callback input_stop{caller_limits.cancellation, stop};
+                const std::stop_callback graph_stop{caller_limits.graph.cancellation, stop};
+                const std::stop_callback coefficient_stop{caller_limits.coefficients.cancellation,
+                                                          stop};
+                const std::stop_callback partition_stop{caller_limits.partition.cancellation, stop};
+                const std::stop_callback geometry_stop{caller_limits.geometry.cancellation, stop};
+                const auto token = cancellation.get_token();
+                auto limits = caller_limits;
+                limits.cancellation = token;
+                limits.graph.cancellation = token;
+                limits.coefficients.cancellation = token;
+                limits.partition.cancellation = token;
+                limits.geometry.cancellation = token;
                 InputReader reader{source, limits, plan, limits.maximum_input_work};
                 reader.charge();
                 const auto model = partition_take(partition_take(source.source_case()).get().root())

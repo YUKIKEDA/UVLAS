@@ -19,6 +19,7 @@ struct CasePgReferenceLimits {
 /// Prepare the local reference of a Case shell whose geometry is an explicit PG.
 /// Cross-patch continuity, basis qualification and constraints are separate stages.
 /// The result owns its graph, dictionary, partition and physical frame.
+/// Cancellation from the entry or any stage token is forwarded to all stages.
 [[nodiscard]] core::Result<structure::PgReferenceGeometry>
 prepare_case_pg_reference(const io::SiCase&, std::uint64_t shell_id, const CasePgReferenceLimits&,
                           core::Workspace&, core::ResourcePlan&) noexcept;
