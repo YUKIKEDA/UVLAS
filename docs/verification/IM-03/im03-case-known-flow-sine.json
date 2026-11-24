@@ -40,9 +40,7 @@
     "src/coupling/case_known_flow.hpp": "5c9b5bfc36afe0a2d2026f1c49b6be4455f3a91cf3f38f6082d7d49f700af0f8",
     "src/coupling/case_flow_series_private.hpp": "27878e0659eed84187dca9ce6c5ba9ea9091925c044a38f66a9d6cf993feb595",
     "src/coupling/case_uniform_flow.cpp": "03abc740baa66bdfcd01e3d16167fab502cef01d519578c6c0a2d1fb4865833d",
-    "tests/coupling/case_uniform_flow_test.cpp": "00a50770972b475f497279ba7610f73af7e270358879fa4334676fc5c2328af0",
-    "src/coupling/case_flow_clock.cpp": "a4ecf9c749dc321d1f515d3ba44adc50f7960c7f9b38f48c0a5b33b53e77a407",
-    "src/coupling/case_flow_clock.hpp": "d0531cb5bb94ae82884e83f319bcb66c164b060ef865e2dcd9836d57828aed99"
+    "tests/coupling/case_uniform_flow_test.cpp": "00a50770972b475f497279ba7610f73af7e270358879fa4334676fc5c2328af0"
   },
   "artifacts": {
     "docs/verification/IM-03/case-known-flow-sine-v1/reference.py": "64f93461616b59ceae9cd035a6cccf3c571b1fb14cb0f3def245b402f94d10c3",
@@ -116,5 +114,15 @@
       "hint": "docs/verification/IM-03/case-known-flow-sine-v1/verification.md",
       "sha256": "95c1188015ab61eaf00b33ed32287fc7b6d4a8b94fc6be65b66132d5aeea7042"
     }
-  ]
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "fcf71f338e816ffd88ac30ebb64cd213a1e6fabc",
+      "sha256": "a4ecf9c749dc321d1f515d3ba44adc50f7960c7f9b38f48c0a5b33b53e77a407"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "fcf71f338e816ffd88ac30ebb64cd213a1e6fabc",
+      "sha256": "d0531cb5bb94ae82884e83f319bcb66c164b060ef865e2dcd9836d57828aed99"
+    }
+  }
 }
