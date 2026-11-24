@@ -559,7 +559,7 @@ void integrate_edge(WrenchBands& bands, const RationalPoint& first, const Ration
     CHECK(total_weight == 1);
 }
 
-void check_line_invariants() {
+[[maybe_unused]] void check_line_invariants() {
     const RationalPoint first{0, -2, 0}, last{4, 2, 0};
     const EnclosedVector load_point{{{1, 0}, {-1, 0}, {0, 0}}};
     const EnclosedVector force{{{0, 0}, {0, 0}, {8, 0}}};
