@@ -239,6 +239,19 @@ private:
     std::uint64_t steps_;
 };
 
+/// Synchronous witness for replay of one exact qualified real operator. The legacy
+/// solution and its dense native coefficients are only the witness's comparison data.
+struct CirculationRowReplay {
+    std::size_t rows, coefficients;
+    std::uint64_t replay_row_bytes, retained_dense_bytes, allocated_bytes, used_steps;
+};
+
+[[nodiscard]] core::Result<CirculationRowReplay> verify_discrete_circulation_row_replay(
+    const DiscreteNonpenetrationInput&, const DiscreteCirculation&,
+    const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 /// Assemble and solve all bound rows, then check the actual returned circulation
 /// with the native original residual. Trial input circulation/direction is not
 /// used as a starting guess. Consume the flow only on complete success.

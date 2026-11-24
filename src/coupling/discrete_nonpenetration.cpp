@@ -1541,6 +1541,133 @@ struct NonpenetrationBuilder {
                 work.used};
     }
 
+    static CirculationRowReplay replay_native_rows(
+        const DiscreteNonpenetrationInput& input, const DiscreteCirculation& retained,
+        const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+        a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+        core::ResourcePlan& memory, const std::stop_token& stop) {
+        p::Work work{0, limits.steps, stop};
+        work.step();
+        const auto& geometry = require(input.contact.geometry()).get();
+        const auto order = input.collocations.size();
+        if (retained.rows_.size() != order)
+            reject(core::FailureCode::InvalidInput);
+        if (!retained.source_.same_owner(require(input.contact.reference_topology())) ||
+            retained.solution_.certificate().context() != request.scales.context)
+            reject(core::FailureCode::StaleGeneration);
+        match_circulation_geometry(request, geometry.context());
+        validate_circulation(request, order, work);
+        match_flow(input, retained.flow_, work);
+
+        const auto initial_bytes = memory.allocated_bytes();
+        auto [matrix, rhs] = dense_inputs(order, memory);
+        auto assembly = assemble(input, limits, memory, work, true);
+        const auto bound = std::span<const PanelRow>{assembly.bound.values()};
+        admit(assembly, input, limits, memory, 2, 2, work);
+        const auto row_bytes_before = memory.allocated_bytes();
+        auto native_row = allocate<p::Interval>(memory, order);
+        const auto row_bytes = memory.allocated_bytes() - row_bytes_before;
+        auto data = allocate<CirculationRowData>(memory, order);
+        const auto ambient = ambient_velocity(retained.flow_, work);
+        a::LocalRootScratch rounding;
+        const auto forward = [&](const a::SharedP1Action& action, const a::P1ActionSource& source) {
+            auto value = require(
+                a::apply_shared_p1(action, source, assembly.values.values(), std::nullopt,
+                                   std::min(limits.action_steps, remaining(work)), shared, stop));
+            account(work, value.used_steps());
+            return value;
+        };
+        const auto same_bound = [](const p::Bound& first, const p::Bound& second) {
+            return first.power == second.power && first.mantissa == second.mantissa;
+        };
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& item = bound[i];
+            const auto& row = input.collocations[item.caller];
+            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
+            auto& record = data.values()[i];
+            record.normal = qualify_normal(geometry, item.panel, row, work);
+            record.relative = difference(ambient, import(row.velocity, work), work);
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+            const auto known = forward(action, source);
+            record.rhs =
+                p::negate(native_residual(record.normal, record.relative, known, work), work);
+            rhs.values()[i] = project_binary64(record.rhs, request.rhs_absolute, rounding, work);
+            assemble_influence(assembly, action, source, record.normal, shared, memory, limits,
+                               native_row.values(), work);
+            const auto previous = retained.influence_.values().subspan(i * order, order);
+            for (std::size_t j = 0; j < order; ++j) {
+                work.step();
+                const auto& current = native_row.values()[j];
+                if (!same_bound(current.lower, previous[j].lower) ||
+                    !same_bound(current.upper, previous[j].upper))
+                    reject(core::FailureCode::StaleGeneration);
+                matrix.values()[j * order + i] =
+                    project_binary64(current, request.matrix_absolute, rounding, work);
+            }
+        }
+
+        auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
+        const auto same_double = [](double first, double second) {
+            return std::bit_cast<std::uint64_t>(first) == std::bit_cast<std::uint64_t>(second);
+        };
+        const auto same_words = [&](const a::ScalarWords& first, const a::ScalarWords& second) {
+            if (const auto* one = std::get_if<a::SingleWord>(&first)) {
+                const auto* other = std::get_if<a::SingleWord>(&second);
+                return other != nullptr && same_double(one->value, other->value);
+            }
+            const auto* two = std::get_if<a::DoubleWord>(&first);
+            const auto* other = std::get_if<a::DoubleWord>(&second);
+            return two != nullptr && other != nullptr && same_double(two->high, other->high) &&
+                   same_double(two->low, other->low);
+        };
+        for (std::size_t i = 0; i < order; ++i) {
+            work.step();
+            if (!same_words(retained_word(solution.values(), i),
+                            retained_word(retained.solution_.values(), i)))
+                reject(core::FailureCode::PrecisionUnresolved);
+        }
+        for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
+            work.step();
+            const auto& transfer = assembly.traces.values()[i].transfer;
+            if (!transfer)
+                continue;
+            const auto value =
+                retained_word(solution.values(), transfer_column(bound, *transfer, work));
+            assembly.values.values()[i].real = transfer->reverse ? negative(value) : value;
+        }
+
+        NativeResidualCheck check{request};
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& item = bound[i];
+            const auto& row = input.collocations[item.caller];
+            const auto& record = data.values()[i];
+            const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
+            const auto action =
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+            const auto result = forward(action, source);
+            const auto residual = native_residual(record.normal, record.relative, result, work);
+            check.add(residual, record.rhs, i, work);
+            const auto replay =
+                a::enclose_p1_value(residual, limits.induction_accuracy.representation, rounding);
+            const auto original = require(retained.row(i));
+            const auto& saved = original.original_residual;
+            if (original.face != item.panel.face || replay.exponent() != saved.exponent() ||
+                !same_double(replay.radius(), saved.radius()) ||
+                !same_words(replay.center(), saved.center()) ||
+                original.includes_wake_quadrature != (require(action.report()).far_facets != 0))
+                reject(core::FailureCode::PrecisionUnresolved);
+        }
+        check.finish();
+        work.step();
+        return {order,
+                retained.influence_.size(),
+                row_bytes,
+                static_cast<std::uint64_t>(retained.influence_.size()) * sizeof(p::Interval),
+                memory.allocated_bytes() - initial_bytes,
+                work.used};
+    }
+
     static DiscreteCirculation finish_primal(PrimalCirculationData&& data,
                                              ProjectedCaseUniformFlow&& flow) noexcept {
         return {std::move(data.solution),
@@ -3083,6 +3210,25 @@ struct NonpenetrationBuilder {
         return {std::move(solution), std::move(rows), sense, work.used};
     }
 };
+
+core::Result<CirculationRowReplay> verify_discrete_circulation_row_replay(
+    const DiscreteNonpenetrationInput& input, const DiscreteCirculation& retained,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::replay_native_rows(input, retained, limits, request, shared,
+                                                         local, kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
 
 core::Result<DiscreteNonpenetration> evaluate_discrete_nonpenetration(
     const DiscreteNonpenetrationInput& input, ProjectedCaseUniformFlow&& flow,
