@@ -1024,6 +1024,9 @@ struct NonpenetrationBuilder {
         const auto order = input.collocations.size();
         match_linearization_context(tangent_request.scales.context, primal_request.scales.context,
                                     false);
+        if (tangent_request.rhs_generation == primal_request.rhs_generation ||
+            tangent_request.retained_generation == primal_request.retained_generation)
+            reject(core::FailureCode::StaleGeneration);
         validate_circulation(tangent_request, order, work);
         auto native_rhs = allocate<p::Interval>(memory, order);
         auto forcing = allocate<std::optional<CirculationForcingRow>>(memory, order);
