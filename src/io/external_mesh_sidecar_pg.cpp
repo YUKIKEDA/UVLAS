@@ -386,14 +386,24 @@ void compare_conversion_bounds(Preparation& p, const ConversionGeometry& geometr
     return p.diagnostic == nullptr ? nullptr : &p.diagnostic->quantity;
 }
 
-[[nodiscard]] structure::ExactRational length_scale(Preparation& p, SiLengthUnit length) {
+[[nodiscard]] structure::ExactRational length_scale(Preparation& p, SiLengthUnit length,
+                                                    const structure::ExactLimits& exact) {
     const SiRecipeView recipe{
         SiDecimalView{1, "1", 0},
         {},
         {length, SiMassUnit::Kilogram, SiTimeUnit::Second, SiAngleUnit::Radian},
         SchemaDimension{{1, 0, 0, 0}},
         0};
-    return p.value(materialize_rational(recipe, p.limits.geometry.arithmetic.algebra, p.plan));
+    return p.value(materialize_rational(recipe, exact, p.plan));
+}
+
+[[nodiscard]] structure::ExactLimits
+thickness_input_limits(Preparation& p, std::uint64_t uniform_values, std::uint64_t nodal_faces) {
+    auto arithmetic = p.limits.geometry.arithmetic;
+    arithmetic.cancellation = p.stop;
+    return p.value(
+        admit_external_pg_thickness_inputs(arithmetic, uniform_values, nodal_faces, p.plan),
+        Reason::Resource);
 }
 
 template <class Geometry>
@@ -445,6 +455,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
         !std::in_range<core::Index>(view.faces.size())) {
         p.reject(Code::ResourceExceeded, Reason::Resource);
     }
+    const auto exact = thickness_input_limits(p, std::min(rows.size(), view.faces.size()), 0);
     auto claims = p.value(p.plan.allocate<ExternalPgThicknessClaim>(
                               static_cast<core::Index>(view.faces.size()), operation),
                           Reason::Resource);
@@ -467,7 +478,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
             continue;
         }
         if (unit.sign() == 0) {
-            unit = length_scale(p, source.length);
+            unit = length_scale(p, source.length, exact);
         }
         const auto index = static_cast<std::size_t>(definition - rows.begin());
         auto& value = metres.values()[index];
@@ -476,7 +487,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
             if (!input) {
                 p.reject(Code::InvalidInput, Reason::Binding);
             }
-            value = p.value(input->multiply(unit, p.limits.geometry.arithmetic.algebra, p.plan));
+            value = p.value(input->multiply(unit, exact, p.plan));
         }
         claims.values()[declared++] = {face.element, value, definition->full_thickness_node};
     }
@@ -764,7 +775,8 @@ struct PshellCornerBuffer {
 
 void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
                                 const NastranLaminateView& deck, const NastranPshell& property,
-                                const schema::Model& model, const schema::Shell& shell) {
+                                const schema::Model& model, const schema::Shell& shell,
+                                const structure::ExactLimits& exact) {
     p.detail.byte = deck.input.input.properties[property.property_ordinal].id_field.position.byte;
     const auto* bending = std::get_if<NastranMaterialReference>(&property.bending);
     if (!property.membrane || !bending || !property.transverse_shear) {
@@ -788,7 +800,6 @@ void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
         p.reject(Code::Unsupported, Reason::Binding);
     }
     if (const auto& ratio = property.bending_ratio) {
-        const auto& exact = p.limits.geometry.arithmetic.algebra;
         const auto value =
             p.value(structure::ExactRational::from_decimal(ratio->value.decimal(), exact, p.plan));
         const auto one =
@@ -814,7 +825,8 @@ void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
 [[nodiscard]] ExternalPgThicknessClaim corner_claim(Preparation& p, const NastranRegionalFace& face,
                                                     const PshellRegion& group,
                                                     const structure::ExactRational& unit,
-                                                    PshellCornerBuffer& storage) {
+                                                    PshellCornerBuffer& storage,
+                                                    const structure::ExactLimits& exact) {
     const auto& element = *face.element;
     const auto position = group.property->thickness.transform(
         [](const NastranShellReal& source) { return source.field.position; });
@@ -837,13 +849,11 @@ void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
                 }
                 auto& value = storage.metres[i];
                 if (field) {
-                    const auto& exact = p.limits.geometry.arithmetic.algebra;
                     const auto number = p.value(structure::ExactRational::from_decimal(
                         field->value.decimal(), exact, p.plan));
                     value = p.value(number.multiply(fraction ? group.metres : unit, exact, p.plan));
                 } else {
-                    value =
-                        p.value(group.metres.clone(p.limits.geometry.arithmetic.algebra, p.plan));
+                    value = p.value(group.metres.clone(exact, p.plan));
                 }
                 storage.fields[i] = {corner.id.value(), &value,
                                      field ? std::optional{field->field.position} : position,
@@ -873,8 +883,6 @@ struct PshellClaims {
     if (pshell_faces == 0) {
         return {};
     }
-    auto regions =
-        p.value(p.plan.allocate<PshellRegion>(pshell_faces, operation), Reason::Resource);
     std::uint64_t corner_count = 0;
     for (const auto& face : faces) {
         p.step();
@@ -882,6 +890,10 @@ struct PshellClaims {
             ++corner_count;
         }
     }
+    const auto exact =
+        thickness_input_limits(p, static_cast<std::uint64_t>(pshell_faces), corner_count);
+    auto regions =
+        p.value(p.plan.allocate<PshellRegion>(pshell_faces, operation), Reason::Resource);
     auto corners = p.value(
         p.plan.allocate<PshellCornerBuffer>(static_cast<core::Index>(corner_count), operation),
         Reason::Resource);
@@ -915,9 +927,8 @@ struct PshellClaims {
             new_group.node = face.node;
             if (const auto& declared = property->thickness) {
                 if (unit.sign() == 0) {
-                    unit = length_scale(p, source.units.length);
+                    unit = length_scale(p, source.units.length, exact);
                 }
-                const auto& exact = p.limits.geometry.arithmetic.algebra;
                 const auto input = p.value(structure::ExactRational::from_decimal(
                     declared->value.decimal(), exact, p.plan));
                 new_group.metres = p.value(input.multiply(unit, exact, p.plan));
@@ -926,13 +937,13 @@ struct PshellClaims {
         }
         if (has_corner_thickness(*face.element)) {
             if (!group->corner_qualified) {
-                require_homogeneous_pshell(p, source, deck, *group->property, model, shell);
+                require_homogeneous_pshell(p, source, deck, *group->property, model, shell, exact);
                 group->corner_qualified = true;
             }
             if (unit.sign() == 0) {
-                unit = length_scale(p, source.units.length);
+                unit = length_scale(p, source.units.length, exact);
             }
-            claims[i] = corner_claim(p, face, *group, unit, corners.values()[next_corner++]);
+            claims[i] = corner_claim(p, face, *group, unit, corners.values()[next_corner++], exact);
         } else if (const auto& declared = group->property->thickness) {
             claims[i] = {face.element->id.value(), group->metres, face.node,
                          declared->field.position};
