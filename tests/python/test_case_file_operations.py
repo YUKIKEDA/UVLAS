@@ -116,7 +116,7 @@ class CaseFileOperations(unittest.TestCase):
             source_id="300", path="skin.bdf", sha256=hashlib.sha256(deck).hexdigest()
         )
         geometry["sidecar"].update(source_id="301", path="skin.json")
-        case["model"]["geometry"][1] = geometry
+        case["model"]["geometry"].append(geometry)
         sidecar = {
             "schema": "uvlas.nastran-sidecar/1",
             "geometry": geometry["id"],
