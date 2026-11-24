@@ -421,6 +421,12 @@ TEST_CASE("Whole-face thickness comparison charges inputs and reported copies to
     CHECK(
         std::get<ExternalPgNodalThickness>(admitted->matches.values().front().value_metres).count ==
         4);
+    // The shared budget still rejects two faces, even though it could admit both
+    // if the owned copies were omitted from the estimate.
+    limited.algebra.external_memory =
+        ExactEstimateAdmission{required_estimate(arithmetic.algebra, 2 * (4 + 1))};
+    REQUIRE(
+        compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4}, plan));
     const auto before = plan.allocated_bytes();
     const auto excess =
         compare_external_pg_regional_thickness(evidence, reference, claims, {limited, 2, 4}, plan);
