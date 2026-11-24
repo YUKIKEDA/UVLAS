@@ -1029,6 +1029,7 @@ struct NonpenetrationBuilder {
         auto forcing = allocate<std::optional<CirculationForcingRow>>(memory, order);
         auto primal = solve_data(input, flow, limits, primal_request, shared, local, kernel, memory,
                                  work, &direction, native_rhs.values());
+        match_reused_scales(tangent_request.scales, primal.solution.certificate(), work);
         a::LocalRootScratch rounding;
         for (std::size_t i = 0; i < order; ++i) {
             const auto& row = primal.rows.values()[i];

@@ -984,6 +984,12 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         stale_tangent.scales.context.cache.matrix = core::NumericalGeneration{80};
         reject(run_direction(view, direction, direction_flow, stale_tangent),
                core::FailureCode::StaleGeneration);
+        const std::array changed_scale{2 * tangent_request.scales.unknown.front()};
+        stale_tangent = tangent_request;
+        stale_tangent.scales.unknown = changed_scale;
+        reject(run_direction(view, direction, direction_flow, stale_tangent),
+               core::FailureCode::StaleGeneration);
+        CHECK(direction_flow.source().jet.active());
         auto no_query_direction = direction;
         auto other_rows = row_directions;
         other_rows[0].free_query.reset();
