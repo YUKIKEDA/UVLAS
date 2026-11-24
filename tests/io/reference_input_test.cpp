@@ -1353,7 +1353,7 @@ TEST_CASE("A referenced Nastran deck survives native file removal and release of
           "[IO4-01][IO4-03][integration][negative][verification]") {
     constexpr io::SourceId deck_id{200};
     const auto graph_and_path = [] {
-        Tree tree;
+        const Tree tree;
         const auto wire = write_root_inventory(tree.root, owned_deck_source, owned_deck_digest);
         const auto input = from_memory(tree.root, wire);
         auto prepared = prepare(input);
