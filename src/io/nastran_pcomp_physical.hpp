@@ -1,7 +1,9 @@
 #pragma once
 
-#include "external_planar_pg.hpp"
+#include "external_mesh_sidecar.hpp"
 #include "nastran_laminate_cards.hpp"
+
+#include <uvlas/structure/pg_reference_geometry.hpp>
 
 namespace uvlas::io::detail {
 
@@ -45,7 +47,7 @@ struct NastranPcompGeometryMatch {
     RootSnapshotLocation source;
     SourceDigest digest;
     structure::PgReferenceIdentity pg;
-    ExternalPgWinding winding = ExternalPgWinding::Forward;
+    MeshSidecarOrientation winding = MeshSidecarOrientation::Same;
     structure::ExactRational full_thickness_metres;
     core::PlannedBuffer<NastranPcompLayerMatch> layers; // Case order.
     std::uint64_t work{};
@@ -56,7 +58,7 @@ struct NastranPcompGeometryMatch {
 // winding determines the Case order. This certifies thickness and interfaces, and hands
 // off source-ply material identities for comparison to the Case material declarations.
 [[nodiscard]] core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
-    const NastranLaminateCards&, std::size_t property_ordinal, SiLengthUnit, ExternalPgWinding,
+    const NastranLaminateCards&, std::size_t property_ordinal, SiLengthUnit, MeshSidecarOrientation,
     const structure::PgReferenceGeometry&, const NastranPcompGeometryLimits&, core::ResourcePlan&,
     const std::stop_token&, std::optional<NastranPcompGeometryDiagnostic>* = nullptr) noexcept;
 

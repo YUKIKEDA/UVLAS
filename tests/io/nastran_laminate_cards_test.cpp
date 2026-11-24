@@ -549,11 +549,10 @@ TEST_CASE("A declared constant whole-region full thickness compares with every c
     CHECK_FALSE(diagnostic);
 }
 
-[[nodiscard]] structure::PgReferenceGeometry pcomp_pg(partition_test::Fixture& input,
-                                                      std::span<const std::string_view> endpoints,
-                                                      std::string_view full_numerator,
-                                                      std::string_view full_denominator,
-                                                      bool varying, core::ResourcePlan& plan) {
+[[nodiscard]] structure::PgReferenceGeometry
+pcomp_pg(partition_test::Fixture& input, std::span<const std::string_view> endpoints,
+         std::string_view full_numerator, std::string_view full_denominator, bool varying,
+         bool cropped, core::ResourcePlan& plan) {
     auto number = [&](std::string_view value) {
         const auto slash = value.find('/');
         if (slash != std::string_view::npos) {
@@ -576,6 +575,9 @@ TEST_CASE("A declared constant whole-region full thickness compares with every c
     if (varying) {
         input.heights[3] = input.r("41", "100");
     }
+    if (cropped) {
+        input.domain.resize(3);
+    }
     const auto exact = partition_test::exact_limits();
     const structure::PgReferenceLimits reference{exact, 20'000'000, 10'000'000, {}};
     const auto one = input.r("1");
@@ -596,16 +598,19 @@ TEST_CASE("A declared constant whole-region full thickness compares with every c
 
 TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply order",
           "[IO4-03][FD-03][R-05][N4-02][integration][verification][negative]") {
-    constexpr auto forward = ExternalPgWinding::Forward;
-    constexpr auto reverse = ExternalPgWinding::Reversed;
+    constexpr auto forward = MeshSidecarOrientation::Same;
+    constexpr auto reverse = MeshSidecarOrientation::Reversed;
     constexpr std::array<std::string_view, 3> forward_intervals{"-1", "-1/2", "1"};
     constexpr std::array<std::string_view, 3> reverse_intervals{"-1", "1/2", "1"};
     constexpr std::array<std::string_view, 5> split_intervals{"-1", "-3/4", "0", "3/4", "1"};
     constexpr std::array<std::string_view, 4> joined_intervals{"-1", "-3/4", "3/4", "1"};
+    constexpr std::array<std::string_view, 3> same_thickness{"-1", "0", "1"};
     auto endpoints = std::span<const std::string_view>{forward_intervals};
     std::string_view z0 = "-200.", mode, first = "100.", second = "300.";
-    ExternalPgWinding direction = forward;
+    MeshSidecarOrientation direction = forward;
     bool variable_case = false;
+    bool cropped = false;
+    bool inherited = false;
     using Failure = NastranPcompGeometryFailure;
     std::optional<Failure> failure;
     SECTION("Explicit centered offset with asymmetric plies") {}
@@ -631,6 +636,16 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
     SECTION("The actual positive-area PG thickness is compared") {
         variable_case = true;
         failure = Failure::FullThickness;
+    }
+    SECTION("A difference in a wholly inactive thickness triangle does not change the comparison") {
+        variable_case = true;
+        cropped = true;
+    }
+    SECTION("The later layer can inherit the earlier explicit thickness field") {
+        endpoints = same_thickness;
+        second = {};
+        z0 = {};
+        inherited = true;
     }
     SECTION("An explicit bottom shift cannot match the prepared reference plane") {
         z0 = "-199.";
@@ -667,8 +682,10 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
     const auto property = deck.pcomp.front().property_ordinal;
     partition_test::Fixture input;
     const bool symmetric = mode == "SYM";
-    const auto pg = pcomp_pg(input, endpoints, symmetric ? "4" : "2", "5", variable_case, plan);
-    const NastranPcompGeometryLimits bounds{comparison_limits(), 4, 128};
+    const auto full_numerator = symmetric ? "4" : inherited ? "1" : "2";
+    const auto pg = pcomp_pg(input, endpoints, full_numerator, "5", variable_case, cropped, plan);
+    const auto vertex_count = cropped ? std::uint64_t{3} : std::uint64_t{4};
+    const NastranPcompGeometryLimits bounds{comparison_limits(), vertex_count, 128};
     std::optional<NastranPcompGeometryDiagnostic> diagnostic;
     const auto compare = [&](const NastranPcompGeometryLimits& quota,
                              const std::stop_token& stop = {}) {
@@ -697,7 +714,7 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
     CHECK(result->digest == expected_hash);
     CHECK(result->pg == take(pg.identity()));
     CHECK(result->winding == direction);
-    CHECK(result->full_thickness_metres == input.r(symmetric ? "4" : "2", "5"));
+    CHECK(result->full_thickness_metres == input.r(full_numerator, "5"));
     const auto match = result->layers.values();
     REQUIRE(match.size() == endpoints.size() - 1);
     for (std::size_t i = 0; i < match.size(); ++i) {
@@ -707,7 +724,8 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
         REQUIRE(declared < 2);
         const auto ply = deck.layers(deck.pcomp.front());
         CHECK(match[i].material.id == take(ply[declared].material).id);
-        CHECK(match[i].thickness == take(ply[declared].thickness).field.position);
+        CHECK(match[i].thickness ==
+              take(ply[ply[declared].thickness_source_ply].thickness).field.position);
     }
     if (symmetric) {
         CHECK(match.front().material.id == NastranMaterialId{81});
@@ -727,7 +745,7 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
     REQUIRE_FALSE(exhausted);
     CHECK(exhausted.error().code == ResourceExceeded);
     exact = bounds;
-    exact.thickness_vertices = 3;
+    exact.thickness_vertices = vertex_count - 1;
     const auto vertices = compare(exact);
     REQUIRE_FALSE(vertices);
     CHECK(vertices.error().code == ResourceExceeded);

@@ -221,7 +221,7 @@ void check_active_thickness(Comparison& check, const structure::PgIntegrationPar
 compare_layers(Comparison& check, std::span<const NastranPcompPly> stack,
                std::span<const Exact> plies,
                std::span<const structure::PgPartitionOwnedLayer> layers, const Exact& total,
-               bool joined_center, ExternalPgWinding winding) {
+               bool joined_center, MeshSidecarOrientation winding) {
     auto matches = check.memory<NastranPcompLayerMatch>(layers.size());
     const auto one = check.number("1");
     const Exact zero;
@@ -229,7 +229,7 @@ compare_layers(Comparison& check, std::span<const NastranPcompPly> stack,
     Exact elapsed;
     for (std::size_t i = 0; i < layers.size(); ++i) {
         check.step();
-        const auto original = winding == ExternalPgWinding::Forward ? i : layers.size() - 1 - i;
+        const auto original = winding == MeshSidecarOrientation::Same ? i : layers.size() - 1 - i;
         const auto index = original < stack.size() ? original : layers.size() - 1 - original;
         const auto& ply = stack[index];
         const auto& source = thickness(check, stack, ply);
@@ -260,7 +260,7 @@ compare_layers(Comparison& check, std::span<const NastranPcompPly> stack,
 
 core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
     const NastranLaminateCards& input, std::size_t property_ordinal, SiLengthUnit length,
-    ExternalPgWinding winding, const structure::PgReferenceGeometry& pg,
+    MeshSidecarOrientation winding, const structure::PgReferenceGeometry& pg,
     const NastranPcompGeometryLimits& limits, core::ResourcePlan& plan, const std::stop_token& stop,
     std::optional<NastranPcompGeometryDiagnostic>* diagnostic) noexcept {
     if (diagnostic) {
