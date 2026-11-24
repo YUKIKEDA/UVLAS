@@ -720,6 +720,7 @@ uvlas_require_audited_dependencies(uvlas_test_structure_pg_rank_preparation_reso
 
 uvlas_add_test(structure.pg_reference_geometry
     LABELS unit property negative verification V-PG
+    TIMEOUT 180
     SOURCES structure/pg_reference_geometry_test.cpp
     LIBS uvlas_structure Boost::multiprecision)
 target_include_directories(uvlas_test_structure_pg_reference_geometry
