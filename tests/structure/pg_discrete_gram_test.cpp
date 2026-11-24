@@ -654,17 +654,17 @@ TEST_CASE("PG irrational curved samples enclose signed Gram entries",
     PgDiscreteGramLimits limited{query_limits(), steps};
     limited.arithmetic.algebra.external_memory =
         ExactEstimateAdmission{std::uint64_t{32} * 1024 * 1024};
-    core::ResourcePlan rejected_plan{profile};
-    const auto prepare = [&](PgReferenceBasis& candidate) {
-        return PgDiscreteGram::prepare(std::move(candidate), points, {224, 152}, limited, scratch,
-                                       rejected_plan);
+    // Preparation transfers the basis only after all admission checks succeed.
+    const auto prepare_gram = [&](const PgDiscreteGramLimits& limits, core::ResourcePlan& memory) {
+        return PgDiscreteGram::prepare(std::move(basis), points, {224, 152}, limits, scratch,
+                                       memory);
     };
-    check_failure(prepare(basis), core::FailureCode::ResourceExceeded);
+    core::ResourcePlan rejected_plan{profile};
+    check_failure(prepare_gram(limited, rejected_plan), core::FailureCode::ResourceExceeded);
     CHECK(rejected_plan.allocated_bytes() == 0);
     REQUIRE(take(basis.size()) == rank);
 
-    auto gram = take(PgDiscreteGram::prepare(std::move(basis), points, {224, 152},
-                                             {query_limits(), steps}, scratch, plan));
+    auto gram = take(prepare_gram({query_limits(), steps}, plan));
     const auto entries = take(gram.enclosure()).upper_triangle;
     for (std::size_t i = 0; i < checks.size(); ++i) {
         const auto& entry = entries[slot(checks[i].first, checks[i].second)];
