@@ -142,6 +142,42 @@ io::SiCase checked_case(const a::JsonToken& input) {
 
 } // namespace
 
+TEST_CASE("The structural reference clock checks a shell-only periodic load",
+          "[BC-01][SH-D05][N4-04][verification][negative]") {
+    auto input = a::root("structural_static");
+    input.set("initial",
+              a::parse(R"({"kind":"equilibrium","branch":"1","perturbation":{"kind":"none"}})"));
+    auto& analysis = input.field("analysis");
+    analysis.set("kind", a::string("transient"));
+    analysis.erase("speed");
+    analysis.set("intervals",
+                 a::parse(R"([{"start":-3.5,"end":-2.5,"step":1,"restart":"initial"}])"));
+    input.field("numerics").field("scales").elements.push_back(a::scale("structural_velocity"));
+    auto load = a::fragment("Load.pressure");
+    load.set(
+        "multiplier",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,4],"values":[[0],[1],[0]],"outside":{"kind":"periodic","period":4}})"));
+    input.field("model").field("shells").elements.front().field("loads").elements.push_back(
+        std::move(load));
+
+    const c::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+    const c::CaseFlowClockLimits limits{uniform, 2, 2};
+    const auto prepare = [&](const a::JsonToken& source) {
+        const auto si = checked_case(source);
+        core::ResourcePlan memory{profile};
+        return c::prepare_case_reference_clock(si, stamp, limits, case_budget, memory);
+    };
+    const auto crossed = prepare(input);
+    REQUIRE_FALSE(crossed);
+    CHECK(crossed.error().code == core::FailureCode::InvalidInput);
+    analysis.set(
+        "intervals",
+        a::parse(
+            R"([{"start":-3.5,"end":-3,"step":0.5,"restart":"initial"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])"));
+    REQUIRE(prepare(input));
+}
+
 TEST_CASE("Actual structural Support declarations use the case clock without aerodynamic inputs",
           "[SH-D05][SH-D06][N4-04][verification][negative]") {
     auto input = a::root("structural_static");
