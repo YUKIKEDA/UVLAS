@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <array>
+#include <type_traits>
 #include <utility>
 
 namespace uvlas::io::detail {
@@ -73,6 +74,11 @@ template <class T>
     return limits;
 }
 
+template <class Char>
+[[nodiscard]] unsigned unsigned_code_unit(Char value) noexcept {
+    return static_cast<std::make_unsigned_t<Char>>(value);
+}
+
 [[nodiscard]] std::optional<std::uint64_t> checkpoint_number(const std::filesystem::path& path) {
     const auto name = path.filename();
     const auto& native = name.native();
@@ -80,7 +86,7 @@ template <class T>
     if (native.size() >= ascii.size())
         return std::nullopt;
     for (std::size_t i = 0; i < native.size(); ++i) {
-        if (static_cast<std::uint32_t>(native[i]) > 127)
+        if (unsigned_code_unit(native[i]) > 127)
             return std::nullopt;
         ascii[i] = static_cast<char>(native[i]);
     }
@@ -94,9 +100,9 @@ template <class T>
 template <class Char>
 [[nodiscard]] bool resembles_chunk(std::basic_string_view<Char> name) noexcept {
     const auto same_letter = [](Char actual, char expected) {
-        const auto value = static_cast<std::uint32_t>(actual);
+        const auto value = unsigned_code_unit(actual);
         const auto lower = value >= 'A' && value <= 'Z' ? value + ('a' - 'A') : value;
-        return lower == static_cast<std::uint32_t>(expected);
+        return lower == unsigned_code_unit(expected);
     };
     return name.size() >= chunk_prefix.size() + chunk_suffix.size() &&
            std::ranges::equal(name.substr(0, chunk_prefix.size()), chunk_prefix, same_letter) &&
@@ -126,7 +132,7 @@ public:
         if (name.size() > ascii.size())
             reject(corrupt);
         for (std::size_t i = 0; i < name.size(); ++i) {
-            if (static_cast<std::uint32_t>(name[i]) > 127)
+            if (unsigned_code_unit(name[i]) > 127)
                 reject(corrupt);
             ascii[i] = static_cast<char>(name[i]);
         }
@@ -222,6 +228,9 @@ void inspect_directory(int directory, DirectoryEntries& entries) {
     for (;;) {
         entries.poll();
         errno = 0;
+        // glibc readdir(3) is thread-safe for distinct streams. This scan owns its
+        // stream exclusively and consumes the returned entry before the next call.
+        // NOLINTNEXTLINE(concurrency-mt-unsafe)
         const auto* entry = ::readdir(owned.get());
         if (entry == nullptr) {
             const auto error = errno;

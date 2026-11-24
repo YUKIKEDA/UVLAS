@@ -15,7 +15,7 @@ constexpr auto operation = core::Operation::PrepareModel;
 
 struct Abort {
     core::Failure failure;
-    std::size_t offset;
+    std::size_t offset = 0;
 };
 
 [[noreturn]] void reject(core::FailureCode code, std::size_t offset) {
@@ -596,7 +596,7 @@ core::Result<GmshMesh> GmshMesh::prepare(const AcquiredRootSnapshot& snapshot, G
 }
 
 std::optional<GmshMeshView> GmshMesh::view() const& noexcept {
-    if (bytes_.size() == 0)
+    if (!location_ || bytes_.size() == 0)
         return std::nullopt;
     const auto bytes = bytes_.values();
     return GmshMeshView{*location_,

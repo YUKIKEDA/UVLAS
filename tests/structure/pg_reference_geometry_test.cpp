@@ -5,7 +5,6 @@
 #include <array>
 #include <optional>
 #include <span>
-#include <stop_token>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -31,11 +30,11 @@ constexpr auto cap = partition_test::cap;
     auto workspace = core::Workspace{core::PlannedBuffer<std::byte>{}};
     const auto coefficient_limits =
         PgCoefficientLimits{partition_test::exact_limits(), 2000, 20000000, 100000, {}};
-    auto dictionary =
-        take(PgCoefficientDictionary::prepare(*fixture.graph, coefficient_limits, workspace, plan));
+    auto dictionary = take(PgCoefficientDictionary::prepare(fixture.chart_graph(),
+                                                            coefficient_limits, workspace, plan));
     auto partition = take(PgIntegrationPartition::prepare(
         fixture.request(), partition_test::limits(), workspace, plan));
-    auto graph = std::move(*fixture.graph);
+    auto graph = std::move(fixture.chart_graph());
     return {std::move(graph), std::move(dictionary), std::move(partition)};
 }
 
@@ -519,18 +518,16 @@ TEST_CASE("PG exact frames and reference candidates survive rejected preparation
     const auto source_liveness = take(inputs.graph.view()).identity;
     const auto w = f.r("1"), a = f.r("1", "10");
     set_graph(f, 1, w, a, {});
-    std::swap(inputs.graph, *f.graph);
+    std::swap(inputs.graph, f.chart_graph());
     const auto stale = prepare_candidate(inputs, frame.view(), reference_limits(), plan);
     REQUIRE_FALSE(stale);
     CHECK(stale.error().code == core::FailureCode::StaleGeneration);
-    std::swap(inputs.graph, *f.graph);
+    std::swap(inputs.graph, f.chart_graph());
     CHECK(take(inputs.graph.view()).identity == source_liveness);
     CHECK(take(inputs.partition.identity()) == initial_identity);
 
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
     auto limits = reference_limits();
-    limits.cancellation = stop.get_token();
+    limits.cancellation = partition_test::requested_stop_token();
     const auto previous_plan = plan.allocated_bytes();
     const auto cancelled = prepare_candidate(inputs, frame.view(), limits, plan);
     REQUIRE_FALSE(cancelled);
@@ -673,17 +670,15 @@ TEST_CASE("PG reference caps and cancels distinct graph comparison before geomet
     // A cancelled request takes precedence over a stale graph, even when no
     // comparison budget is available.
     set_graph(f, 1, width, skew, {});
-    std::swap(inputs.graph, *f.graph);
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
-    limits.cancellation = stop.get_token();
+    std::swap(inputs.graph, f.chart_graph());
+    limits.cancellation = partition_test::requested_stop_token();
     limits.maximum_partition_visits = 0;
     check_code(prepare_candidate(inputs, frame.view(), limits, call_plan),
                core::FailureCode::Cancelled);
     check_code(PgReferenceGeometry::diagnose_point(inputs, frame.view(), query, limits, call_plan),
                core::FailureCode::Cancelled);
     CHECK(call_plan.allocated_bytes() == 0);
-    std::swap(inputs.graph, *f.graph);
+    std::swap(inputs.graph, f.chart_graph());
 
     const auto pieces = take(inputs.partition.pieces()).size();
     const auto vertices = take(inputs.partition.piece_vertex_indices()).size();
@@ -802,9 +797,7 @@ TEST_CASE("Selected PG director basis satisfies the quartic physical gradient eq
         const auto visit_failure = basis.evaluate(query, column, exact_caps, plan);
         REQUIRE_FALSE(visit_failure);
         CHECK(visit_failure.error().code == core::FailureCode::ResourceExceeded);
-        std::stop_source stop;
-        REQUIRE(stop.request_stop());
-        exact_caps.cancellation = stop.get_token();
+        exact_caps.cancellation = partition_test::requested_stop_token();
         core::ResourcePlan no_allocations{0};
         const auto stopped = basis.evaluate(query, column, exact_caps, no_allocations);
         REQUIRE_FALSE(stopped);
@@ -916,9 +909,7 @@ TEST_CASE("PG basis binding rejects stale rank or work limits before moving the 
     CHECK(capped.error().code == core::FailureCode::ResourceExceeded);
     REQUIRE(geometry.source());
     REQUIRE(rank.preparation());
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
-    limit.cancellation = stop.get_token();
+    limit.cancellation = partition_test::requested_stop_token();
     const auto stopped = bind_basis(geometry, rank, limit, workspace, no_allocations);
     REQUIRE_FALSE(stopped);
     CHECK(stopped.error().code == core::FailureCode::Cancelled);
