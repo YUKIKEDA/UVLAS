@@ -1,0 +1,366 @@
+{
+  "source_commit": "63df6cc00d7180725370201dca3454ad35073cfd",
+  "windows": {
+    "os": "Windows 11 Home 10.0.26300 AMD64",
+    "isolation": "Fresh venv on the development host; System32-only process PATH and no PYTHONPATH",
+    "pe": {
+      "cli": {
+        "format": "PE32+",
+        "machine": "AMD64",
+        "imports": [
+          "ntdll.dll",
+          "KERNEL32.dll",
+          "MSVCP140.dll",
+          "VCRUNTIME140.dll",
+          "VCRUNTIME140_1.dll",
+          "api-ms-win-crt-heap-l1-1-0.dll",
+          "api-ms-win-crt-string-l1-1-0.dll",
+          "api-ms-win-crt-stdio-l1-1-0.dll",
+          "api-ms-win-crt-runtime-l1-1-0.dll",
+          "api-ms-win-crt-convert-l1-1-0.dll",
+          "api-ms-win-crt-locale-l1-1-0.dll",
+          "api-ms-win-crt-math-l1-1-0.dll"
+        ]
+      },
+      "extension": {
+        "format": "PE32+",
+        "machine": "AMD64",
+        "imports": [
+          "python312.dll",
+          "ntdll.dll",
+          "KERNEL32.dll",
+          "MSVCP140.dll",
+          "VCRUNTIME140.dll",
+          "VCRUNTIME140_1.dll",
+          "api-ms-win-crt-heap-l1-1-0.dll",
+          "api-ms-win-crt-string-l1-1-0.dll",
+          "api-ms-win-crt-math-l1-1-0.dll",
+          "api-ms-win-crt-stdio-l1-1-0.dll",
+          "api-ms-win-crt-runtime-l1-1-0.dll",
+          "api-ms-win-crt-convert-l1-1-0.dll",
+          "api-ms-win-crt-locale-l1-1-0.dll"
+        ]
+      }
+    },
+    "loaded_dependencies": {
+      "extension_loaded_modules": {
+        "KERNEL32.dll": "windows/System32/kernel32.dll",
+        "MSVCP140.dll": "windows/System32/msvcp140.dll",
+        "VCRUNTIME140.dll": "base_python/vcruntime140.dll",
+        "VCRUNTIME140_1.dll": "base_python/vcruntime140_1.dll",
+        "ntdll.dll": "windows/System32/ntdll.dll",
+        "python312.dll": "base_python/python312.dll"
+      },
+      "extension_suffix": ".cp312-win_amd64.pyd",
+      "implementation": "cpython",
+      "isolated": true,
+      "loaded_extension": "_uvlas.cp312-win_amd64.pyd",
+      "numpy": "2.3.5",
+      "numpy_bundled_runtimes": {
+        "libscipy_openblas64_-9e3e5a4229c1ca39f10dc82bba9e2b2b.dll": "9e3e5a4229c1ca39f10dc82bba9e2b2bf48037790932566f37aff1a7ccf3588f",
+        "msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+      },
+      "numpy_license_expression": null,
+      "numpy_license_files": {
+        "LICENSE.txt": "596b953e1dcbe829b32ae444387efa15003fc6abdeca8a2179f364a6364c286e"
+      },
+      "numpy_wheel_tags": [
+        "cp312-cp312-win_amd64"
+      ],
+      "python_license": {
+        "file": "LICENSE.txt",
+        "path": "base_python/LICENSE.txt",
+        "sha256": "886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a"
+      },
+      "soabi": null,
+      "venv": true,
+      "version": "3.12.8",
+      "windows_loader_probe": {
+        "KERNEL32.dll": "windows/System32/kernel32.dll",
+        "MSVCP140.dll": "windows/System32/msvcp140.dll",
+        "VCRUNTIME140.dll": "base_python/vcruntime140.dll",
+        "VCRUNTIME140_1.dll": "base_python/vcruntime140_1.dll",
+        "api-ms-win-crt-convert-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-math-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "api-ms-win-crt-string-l1-1-0.dll": "windows/System32/ucrtbase.dll",
+        "ntdll.dll": "windows/System32/ntdll.dll",
+        "python312.dll": "base_python/python312.dll"
+      }
+    },
+    "result": {
+      "build_info": {
+        "commit": "63df6cc00d7180725370201dca3454ad35073cfd",
+        "compiler": "MSVC 19.51.36260.0",
+        "configuration": "Release",
+        "dependencies": {
+          "boost": "1.92.0",
+          "eigen": "5.0.1",
+          "nlohmann_json": "3.12.0",
+          "spectra": "1.2.0"
+        },
+        "dependency_repairs": {
+          "nlohmann_json_sax_allocation": 1
+        },
+        "floating_point": "/fp:strict",
+        "instruction_set": "sse2",
+        "platform": "Windows AMD64",
+        "platform_key": "windows-x64-msvc19.51-sse2",
+        "schema": "uvlas.build-info/1",
+        "uncommitted_changes": false,
+        "version": "0.1.0-dev"
+      },
+      "manifest_sha256": "fa6fbd39674980f179ef11090976ee8a3df60377baea2046e798b30a6e6dc01b",
+      "artifact_hashes": {
+        "cli": "09ab9ff3597fb0680087710eec0451af8ea6c816e6388ecaefc1c624cdd7813f",
+        "extension": "392bca0bde5480625ce6bf9a5fe2ec990b966d103ecfeb6d7b7dece65039541e"
+      },
+      "python": "3.12.8 (main, Dec 19 2024, 14:41:01) [MSC v.1942 64 bit (AMD64)]",
+      "soabi": null,
+      "machine": "AMD64",
+      "numpy": "2.3.5",
+      "wheel_license_count": 38,
+      "python_notice_sha256": "886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a",
+      "provider_hashes": {
+        "python312.dll": "fbddf09b578bc1489827bcc19f591e2cd6be687f3db26b60e4dfca15f331800b",
+        "msvcp140.dll": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca",
+        "vcruntime140.dll": "bb2281b178b5c47fc98e4cf4293e59a07684e6c6d929d1c2f0acdcb245211417",
+        "vcruntime140_1.dll": "c2fa6e9ad1b41bd3f7621ba7cb6cddfc10903b73a33c36d7b13afcf3ff99dbf8",
+        "ucrtbase.dll": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca"
+      },
+      "ordinary_cli": {
+        "exit": 0,
+        "stdout": "Case validation succeeded."
+      },
+      "ordinary_owned_case": {
+        "sha256": "677503399e07e07f0e012c830dbc8711d75ebab1a87d27ad8e31699dc09f4c62",
+        "bytes": 19823
+      },
+      "ordinary_manifest_remove": "after_owner_release",
+      "matching_deck": {
+        "exit": 2,
+        "cli": "validate: external reference dependency validation is unsupported at /model/geometry/1/sidecar",
+        "python": "Unsupported"
+      },
+      "changed_deck": {
+        "exit": 2,
+        "cli": "validate: reference SHA-256 mismatch at /model/geometry/1/deck",
+        "python": "InvalidInput"
+      },
+      "ownership": [
+        "..........",
+        "----------------------------------------------------------------------",
+        "Ran 10 tests in 1.231s",
+        "",
+        "OK"
+      ],
+      "wheel_name": "uvlas_private_rehearsal-0.1.0.dev0+g63df6cc00d71-cp312-cp312-win_amd64.whl",
+      "wheel_sha256": "b934e98ffe7057e21d72f60e3ba6fe1077143ab3a4b32716d555c656a05039fe",
+      "numpy_wheel_sha256": "86945f2ee6d10cdfd67bcb4069c1662dd711f7e2a4343db5cecec06b87cf31aa",
+      "developer_tools": {
+        "cl": null,
+        "gcc": null,
+        "g++": null,
+        "cmake": null,
+        "ninja": null,
+        "git": null,
+        "vcpkg": null,
+        "dumpbin": null
+      },
+      "pip_install": "Successfully installed numpy-2.3.5 uvlas-private-rehearsal-0.1.0.dev0+g63df6cc00d71",
+      "pip_check": "No broken requirements found."
+    }
+  },
+  "linux": {
+    "os": "Ubuntu 24.04.5 Base x86-64",
+    "base_image_sha256": "e77b6f10c2590cef872b33ee9f635a0e3fd1f57fb074c0e52b5c7f56147a0c86",
+    "isolation": "Fresh Ubuntu Base chroot on WSL 2; no build tree, toolchain or development headers; copied CPython and native shared runtime; fresh venv",
+    "glibc": "2.39-0ubuntu8.12",
+    "elf": {
+      "cli": {
+        "format": "ELF64",
+        "machine": "x86_64",
+        "interpreter": "/lib64/ld-linux-x86-64.so.2",
+        "needed": [
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "search_paths": [],
+        "required_symbol_versions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.8",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GCC_4.3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.14",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.26",
+          "GLIBCXX_3.4.29",
+          "GLIBCXX_3.4.31",
+          "GLIBCXX_3.4.32",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4"
+        ],
+        "ldd": [
+          "linux-vdso.so.1",
+          "libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6",
+          "libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6",
+          "libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6",
+          "/lib64/ld-linux-x86-64.so.2"
+        ]
+      },
+      "extension": {
+        "format": "ELF64",
+        "machine": "x86_64",
+        "interpreter": null,
+        "needed": [
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "search_paths": [],
+        "required_symbol_versions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.11",
+          "CXXABI_1.3.13",
+          "CXXABI_1.3.15",
+          "CXXABI_1.3.2",
+          "CXXABI_1.3.3",
+          "CXXABI_1.3.5",
+          "CXXABI_1.3.8",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GCC_4.3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.14",
+          "GLIBCXX_3.4.15",
+          "GLIBCXX_3.4.18",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.26",
+          "GLIBCXX_3.4.29",
+          "GLIBCXX_3.4.31",
+          "GLIBCXX_3.4.32",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.3",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4"
+        ],
+        "ldd": [
+          "linux-vdso.so.1",
+          "libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6",
+          "libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6",
+          "libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6",
+          "/lib64/ld-linux-x86-64.so.2"
+        ]
+      }
+    },
+    "result": {
+      "build_info": {
+        "commit": "63df6cc00d7180725370201dca3454ad35073cfd",
+        "compiler": "GNU 14.2.0",
+        "configuration": "Release",
+        "dependencies": {
+          "boost": "1.92.0",
+          "eigen": "5.0.1",
+          "nlohmann_json": "3.12.0",
+          "spectra": "1.2.0"
+        },
+        "dependency_repairs": {
+          "nlohmann_json_sax_allocation": 1
+        },
+        "floating_point": "-ffp-contract=off -fno-fast-math",
+        "instruction_set": "sse2",
+        "platform": "Linux x86_64",
+        "platform_key": "linux-x64-gnu14.2-sse2",
+        "schema": "uvlas.build-info/1",
+        "uncommitted_changes": false,
+        "version": "0.1.0-dev"
+      },
+      "manifest_sha256": "8c5d5195d1ad7ea89d57146a14459a6e643b6443d7635131ae3fc01c856ee32e",
+      "artifact_hashes": {
+        "cli": "37249f4ff31bea6d2c87f01f68f2a9c6563f8dacf8e4197ad2de2addb67fffb0",
+        "extension": "f2a255103f638523f7b6bafd90e2758ed00b916b6d7ca96de354c9a74601a588"
+      },
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "soabi": "cpython-312-x86_64-linux-gnu",
+      "machine": "x86_64",
+      "numpy": "2.3.5",
+      "wheel_license_count": 38,
+      "python_notice_sha256": "f1cbf908e1daa8789b389fdcf17811ed36b675d736b39a103591399861350382",
+      "provider_hashes": {
+        "libstdc++.so.6.0.33": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11",
+        "libgcc_s.so.1": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb",
+        "libc.so.6": "755a371e86cc9f564ab54f66140747700fb0a103f698f659f2060f707897e09a",
+        "libm.so.6": "5dcc4d25466e29ca390ed6fabb371c69b65dff6fa4e91c34561057a020d6994a",
+        "ld-linux-x86-64.so.2": "5fc0940888e9d2e1a00e66d6b1a559c36364ee867683652e1074fa576952cc3f"
+      },
+      "ordinary_cli": {
+        "exit": 0,
+        "stdout": "Case validation succeeded."
+      },
+      "ordinary_owned_case": {
+        "sha256": "677503399e07e07f0e012c830dbc8711d75ebab1a87d27ad8e31699dc09f4c62",
+        "bytes": 19823
+      },
+      "ordinary_manifest_remove": "while_owned",
+      "matching_deck": {
+        "exit": 2,
+        "cli": "validate: external reference dependency validation is unsupported at /model/geometry/1/sidecar",
+        "python": "Unsupported"
+      },
+      "changed_deck": {
+        "exit": 2,
+        "cli": "validate: reference SHA-256 mismatch at /model/geometry/1/deck",
+        "python": "InvalidInput"
+      },
+      "ownership": [
+        "..........",
+        "----------------------------------------------------------------------",
+        "Ran 10 tests in 0.843s",
+        "",
+        "OK"
+      ],
+      "wheel_name": "uvlas_private_rehearsal-0.1.0.dev0+g63df6cc00d71-cp312-cp312-linux_x86_64.whl",
+      "wheel_sha256": "48118bea51229aff6d06b0946d1f9ec05c8ba51862a8c51c2288cf02d4a7b3a3",
+      "numpy_wheel_sha256": "0d8163f43acde9a73c2a33605353a4f1bc4798745a8b1d73183b28e5b435ae28",
+      "developer_tools": {
+        "cl": null,
+        "gcc": null,
+        "g++": null,
+        "cmake": null,
+        "ninja": null,
+        "git": null,
+        "vcpkg": null,
+        "dumpbin": null
+      },
+      "pip_install": "Successfully installed numpy-2.3.5 uvlas-private-rehearsal-0.1.0.dev0+g63df6cc00d71",
+      "pip_check": "No broken requirements found."
+    }
+  }
+}
