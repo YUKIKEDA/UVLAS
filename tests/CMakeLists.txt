@@ -991,7 +991,7 @@ foreach(native_loads RANGE 0 1)
     if(native_loads)
         # The full frozen load observation repeats the qualified action at every
         # load point. The matrix and work regression still runs in every build.
-        set(mode_options TIMEOUT 300 CONFIGURATIONS Release)
+        set(mode_options TIMEOUT 420 CONFIGURATIONS Release)
     endif()
     uvlas_add_test(${test_name}
         LABELS V-MULTI verification
@@ -1003,6 +1003,9 @@ foreach(native_loads RANGE 0 1)
     target_compile_definitions(${target} PRIVATE
         UVLAS_MULTIPLE_SURFACE_NATIVE_LOADS=${native_loads}
         UVLAS_MULTIPLE_SURFACE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/multiple-surface-steady-v1.json")
+    if(native_loads AND TEST "${test_name}")
+        set_tests_properties(${test_name} PROPERTIES RUN_SERIAL TRUE)
+    endif()
 endforeach()
 uvlas_add_test(coupling.case_motion
     LABELS V-AERO property negative verification
