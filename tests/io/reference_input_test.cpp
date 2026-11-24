@@ -1517,6 +1517,9 @@ $EndElements
     bool thickness_shift = false;
     bool material_shift = false;
     bool chart_shift = false;
+    bool pcomp = false;
+    bool reversed = false;
+    bool wrong_layer_material = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1580,6 +1583,27 @@ $EndElements
         physical = true;
         material_shift = true;
     }
+    SECTION("PCOMP compares distinct MAT1 and MAT8 plies in Case order") {
+        physical = true;
+        pcomp = true;
+    }
+    SECTION("Opposite Nastran rings reverse the explicit materials and thickness intervals") {
+        physical = true;
+        pcomp = true;
+        reversed = true;
+    }
+    SECTION("A reversed stack still detects a changed MAT8 constitutive value") {
+        physical = true;
+        pcomp = true;
+        reversed = true;
+        material_shift = true;
+    }
+    SECTION("A source MID mapped to the wrong Case layer is rejected") {
+        physical = true;
+        pcomp = true;
+        reversed = true;
+        wrong_layer_material = true;
+    }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1632,6 +1656,17 @@ $EndElements
         sidecar["shells"].push_back({{"element", "702"}, {"shell", "1"}, {"chart", chart(true)}});
         sidecar["shells"].push_back({{"element", "701"}, {"shell", "1"}, {"chart", chart(false)}});
         sidecar["materials"] = nlohmann::json::array({{{"mid", "6"}, {"material", "1"}}});
+        if (pcomp) {
+            sidecar["materials"].push_back(
+                {{"mid", "9"}, {"material", wrong_layer_material ? "1" : "2"}});
+        }
+        if (reversed) {
+            for (auto& row : sidecar["shells"]) {
+                auto& mapping = row["chart"];
+                mapping["orientation"] = "reversed";
+                mapping["vertices"][1].swap(mapping["vertices"][2]);
+            }
+        }
         sidecar["beams"] = empty;
         sidecar["masses"] = empty;
         sidecar["supports"] = nlohmann::json::array(
@@ -1666,11 +1701,32 @@ $EndElements
         }
     }
     std::string source_text{is_gmsh ? mesh : bulk};
+    if (pcomp) {
+        constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
+        const auto offset = source_text.find(pshell);
+        REQUIRE(offset != std::string::npos);
+        source_text.replace(offset, pshell.size(),
+                            "PCOMP,90,-.125,,,,,,\n,6,.0625,,,9,.1875\n"
+                            "MAT8,9,130.0,9.0,.28\n");
+    }
+    if (reversed) {
+        constexpr std::array originals{std::string_view{"701,90,10,20,40"},
+                                       std::string_view{"702,90,10,40,99"}};
+        constexpr std::array opposites{std::string_view{"701,90,10,40,20"},
+                                       std::string_view{"702,90,10,99,40"}};
+        for (std::size_t i = 0; i < originals.size(); ++i) {
+            const auto offset = source_text.find(originals[i]);
+            REQUIRE(offset != std::string::npos);
+            source_text.replace(offset, originals[i].size(), opposites[i]);
+        }
+    }
     if (material_shift) {
-        constexpr std::string_view original = "MAT1,6,1.0";
+        const std::string_view original = pcomp ? "MAT8,9,130.0" : "MAT1,6,1.0";
         const auto offset = source_text.find(original);
         REQUIRE(offset != std::string::npos);
-        source_text.replace(offset, original.size(), "MAT1,6,1.0000000000000000001");
+        source_text.replace(offset, original.size(),
+                            pcomp ? "MAT8,9,130.0000000000000000001"
+                                  : "MAT1,6,1.0000000000000000001");
     }
     auto config = fixture::root("coupled_transient");
     config.field("model")
@@ -1678,6 +1734,29 @@ $EndElements
         .elements[0]
         .field("thickness")
         .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    if (pcomp) {
+        auto orthotropic = fixture::fragment("Material.orthotropic3d");
+        orthotropic.set("id", fixture::json(R"("2")"));
+        orthotropic.set("young", fixture::json("[130,9,1]"));
+        orthotropic.set("poisson", fixture::json("[0.28,0,0]"));
+        auto& model = config.field("model");
+        model.field("materials").elements.push_back(std::move(orthotropic));
+        auto& layers = model.field("shells").elements[0].field("layers").elements;
+        auto top = layers.front();
+        top.set("id", fixture::json(R"("2")"));
+        const std::string sign = reversed ? "1" : "-1";
+        auto interface =
+            fixture::json(std::string{R"({"numerator":")"} + sign + R"(","denominator":"2"})");
+        auto& bottom = layers.front();
+        bottom.field("interval").elements[1] = interface;
+        top.field("interval").elements[0] = std::move(interface);
+        if (reversed) {
+            bottom.set("material", fixture::json(R"("2")"));
+        } else {
+            top.set("material", fixture::json(R"("2")"));
+        }
+        layers.push_back(std::move(top));
+    }
     auto external = fixture::fragment(is_gmsh ? "Geometry.gmsh" : "Geometry.nastran");
     if (is_gmsh) {
         external.set("reference", fixture::fragment("ReferenceGeometry.fit"));
@@ -1773,9 +1852,11 @@ $EndElements
     CHECK(faces[0].element == 702);
     CHECK(faces[0].pg == rd::MeshGeometryId{1});
     CHECK(faces[0].shell == rd::MeshShellId{1});
-    CHECK(faces[0].nodes == std::array<std::uint64_t, 4>{10, 40, 99, 0});
+    CHECK(faces[0].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 99, 40, 0}
+                                      : std::array<std::uint64_t, 4>{10, 40, 99, 0}));
     CHECK(faces[1].element == 701);
-    CHECK(faces[1].nodes == std::array<std::uint64_t, 4>{10, 20, 40, 0});
+    CHECK(faces[1].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 40, 20, 0}
+                                      : std::array<std::uint64_t, 4>{10, 20, 40, 0}));
     CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
     CHECK(faces[0].sidecar_row == 0);
     CHECK(faces[1].sidecar_row == 1);
@@ -1786,7 +1867,13 @@ $EndElements
             value = pg_input.r("1", "4");
         }
         pg_input.layers.clear();
-        pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[2]});
+        if (pcomp) {
+            pg_input.zeta[1] = pg_input.r(reversed ? "1" : "-1", "2");
+            pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[1]});
+            pg_input.layers.push_back({core::LayerId{2}, pg_input.zeta[1], pg_input.zeta[2]});
+        } else {
+            pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[2]});
+        }
         const auto unit = pg_input.r("1");
         const std::array origin{pg_input.r("0"), pg_input.r("0"), pg_input.r("0")};
         const std::array axes{pg_input.r("1"), pg_input.r("0"), pg_input.r("0"),
@@ -1826,7 +1913,17 @@ $EndElements
         const auto qualified = rd::qualify_external_sidecar_planar_pg(
             schema, *result, rd::MeshShellId{1}, pg, case_units,
             quantities ? &*quantities : nullptr, qualification, plan, {}, &failure);
-        if (material_shift || thickness_shift) {
+        if (wrong_layer_material) {
+            REQUIRE_FALSE(qualified);
+            CHECK(qualified.error().code == core::FailureCode::InvalidInput);
+            if (const auto& binding_error = failure.binding) {
+                CHECK(binding_error->target_namespace == io::SchemaNamespace::Material);
+                CHECK(binding_error->target == 2);
+                CHECK(binding_error->node);
+            } else {
+                FAIL("Missing mapped material disagreement");
+            }
+        } else if (material_shift || thickness_shift) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == (chart_shift ? core::FailureCode::GeometryInvalid
                                                          : core::FailureCode::InvalidInput));
@@ -1848,7 +1945,21 @@ $EndElements
         } else {
             REQUIRE(qualified);
             CHECK(qualified->thickness_compared);
-            CHECK(qualified->materials_compared == (is_gmsh ? 0 : 1));
+            CHECK(qualified->materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
+            if (pcomp) {
+                REQUIRE_FALSE(qualified->laminate[reversed ? 0U : 1U]);
+                if (const auto& matched = qualified->laminate[reversed ? 1U : 0U]) {
+                    const auto plies = matched->layers.values();
+                    REQUIRE(plies.size() == 2);
+                    CHECK(plies.front().material.id == rd::NastranMaterialId{reversed ? 9U : 6U});
+                    CHECK(plies.front().ply_thickness_metres ==
+                          pg_input.r(reversed ? "3" : "1", "16"));
+                    CHECK(plies.back().material.id == rd::NastranMaterialId{reversed ? 6U : 9U});
+                    CHECK(matched->pg == fixture::take(pg.identity()));
+                } else {
+                    FAIL("Missing exact PCOMP layer comparison");
+                }
+            }
             CHECK(qualified->pg == rd::MeshGeometryId{1});
             if (const auto admitted = qualified->geometry.view()) {
                 CHECK(admitted->faces.size() == 2);

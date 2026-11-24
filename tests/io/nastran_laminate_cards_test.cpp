@@ -673,7 +673,7 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
     const auto head =
         std::string{"PCOMP,30,"} + std::string{z0} + ",,,,,," + std::string{mode} + "\n";
     const auto bulk = head + ",81," + std::string{first} + ",,,52," + std::string{second} +
-                      "\nMAT8,81,130.0,9.0,.28\nMAT1,52,1.0\n";
+                      ",17.5\nMAT8,81,130.0,9.0,.28\nMAT1,52,1.0\n";
     core::ResourcePlan plan{partition_test::cap};
     const auto cards =
         take(NastranLaminateCards::prepare(material_cards(bulk), laminate_limits, plan, {}));
@@ -712,6 +712,8 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
     CHECK_FALSE(diagnostic);
     CHECK(result->source.source == SourceId{99});
     CHECK(result->digest == expected_hash);
+    CHECK(result->property == NastranPropertyId{30});
+    CHECK(result->bottom_offset_field.has_value() == !z0.empty());
     CHECK(result->pg == take(pg.identity()));
     CHECK(result->winding == direction);
     CHECK(result->full_thickness_metres == input.r(full_numerator, "5"));
@@ -724,6 +726,12 @@ TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply orde
         REQUIRE(declared < 2);
         const auto ply = deck.layers(deck.pcomp.front());
         CHECK(match[i].material.id == take(ply[declared].material).id);
+        if (const auto& angle = match[i].source_angle) {
+            CHECK(declared == 1);
+            CHECK(angle->value.decimal() == "17.5");
+        } else {
+            CHECK(declared == 0);
+        }
         CHECK(match[i].thickness ==
               take(ply[ply[declared].thickness_source_ply].thickness).field.position);
     }

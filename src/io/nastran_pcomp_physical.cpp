@@ -249,9 +249,13 @@ compare_layers(Comparison& check, std::span<const NastranPcompPly> stack,
         if (boundary != layer.upper) {
             check.reject(Reason::Interface);
         }
-        matches.values()[i] = {
-            layer.id,           i, index, material(check, stack, ply), source.field.position,
-            std::move(realised)};
+        matches.values()[i] = {layer.id,
+                               i,
+                               index,
+                               material(check, stack, ply),
+                               source.field.position,
+                               ply.angle,
+                               std::move(realised)};
     }
     return matches;
 }
@@ -295,8 +299,17 @@ core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
                 check.step();
                 const auto& bulk = deck.input.input.input.bulk;
                 return NastranPcompGeometryMatch{
-                    bulk.location,    bulk.digest,        identity,  winding,
-                    std::move(total), std::move(matches), check.work};
+                    bulk.location,
+                    bulk.digest,
+                    base.id,
+                    base.id_field.position,
+                    property.bottom_offset.transform(
+                        [](const NastranShellReal& field) { return field.field.position; }),
+                    identity,
+                    winding,
+                    std::move(total),
+                    std::move(matches),
+                    check.work};
             } catch (const Stop& error) {
                 return std::unexpected(error.error);
             }

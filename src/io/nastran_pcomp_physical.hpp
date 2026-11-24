@@ -40,12 +40,16 @@ struct NastranPcompLayerMatch {
     std::size_t declared_ply{};
     NastranMaterialReference material;
     NastranBulkPosition thickness;
+    std::optional<NastranShellReal> source_angle{};
     structure::ExactRational ply_thickness_metres;
 };
 
 struct NastranPcompGeometryMatch {
     RootSnapshotLocation source;
     SourceDigest digest;
+    NastranPropertyId property{0};
+    NastranBulkPosition property_field;
+    std::optional<NastranBulkPosition> bottom_offset_field{};
     structure::PgReferenceIdentity pg;
     MeshSidecarOrientation winding = MeshSidecarOrientation::Same;
     structure::ExactRational full_thickness_metres;
