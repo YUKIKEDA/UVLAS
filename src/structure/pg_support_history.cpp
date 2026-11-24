@@ -175,9 +175,9 @@ core::Result<PgSupportHistory> PgSupportHistory::prepare(PgSparseChart&& chart,
             for (const auto& track : tracks) {
                 const auto s = std::ranges::find_if(sources, [&](const auto& source) {
                     math.visit(1);
-                    return source.id == track.id;
+                    return source.kind == PgTraceKind::Support && source.id == track.id;
                 });
-                if (s == sources.end() || s->kind != PgTraceKind::Support)
+                if (s == sources.end())
                     partition_fail(core::FailureCode::InvalidInput);
                 auto& mapped = by_source.values()[static_cast<std::size_t>(s - sources.begin())];
                 if (mapped != nullptr)
