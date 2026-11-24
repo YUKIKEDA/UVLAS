@@ -340,7 +340,7 @@ template <class... Id>
 
 struct DecodedStatus {
     InspectedResultStatus status;
-    SourceDigest digest;
+    SourceDigest digest{};
 };
 
 [[nodiscard]] DecodedStatus decode_status(const InputNodeView& node) {
