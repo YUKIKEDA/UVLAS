@@ -2051,7 +2051,8 @@ $EndElements
                     REQUIRE(plies.size() == 2);
                     CHECK(plies.front().material.id == rd::NastranMaterialId{reversed ? 9U : 6U});
                     CHECK(plies.front().ply_thickness_metres ==
-                          pg_input.r(reversed ? "3" : "1", "16"));
+                          fixture::take(ExactRational::from_integer_pair(reversed ? "3" : "1", "16",
+                                                                         pg_limits.algebra, plan)));
                     CHECK(plies.back().material.id == rd::NastranMaterialId{reversed ? 6U : 9U});
                     CHECK(matched->pg == fixture::take(qualified->reference().identity()));
                 } else {
