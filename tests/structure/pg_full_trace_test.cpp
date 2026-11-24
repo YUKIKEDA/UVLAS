@@ -701,6 +701,57 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     const auto compatible =
         take(chart.lift_rhs(rb, {identity, forward.values()}, limits_for_action, workspace, plan));
     CHECK(std::ranges::equal(compatible.values(), values));
+
+    // Strictly convex on C_s q=c_s: the R selector is injective on ker(C_s).
+    // Plant an independent exact KKT solution for energy ||R q-d||^2/2 - f^T q.
+    // Use original rows to form c=Cq and f=C_s^T lambda+R^T h, where d=R q-h.
+    auto reactions = states(f, chart.pivots().size(), 11);
+    std::vector<PgCartesianExactPosition> expected_multipliers(static_cast<std::size_t>(info.rows));
+    for (std::size_t i = 0; i < reactions.size(); ++i)
+        expected_multipliers[static_cast<std::size_t>(chart.pivots()[i].original_row)] =
+            std::move(reactions[i]);
+    const auto expected_free_force = states(f, independent_state.size(), 13);
+    std::vector<std::array<Q, 3>> kkt_force(column_count);
+    std::vector<std::array<Q, 3>> kkt_rhs(static_cast<std::size_t>(info.rows));
+    for (std::size_t row = 0; row < kkt_rhs.size(); ++row)
+        for (const auto& term : take(original.row(static_cast<core::Index>(row)))) {
+            const auto column = static_cast<std::size_t>(term.column);
+            const auto coefficient = q(term.coefficient);
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                kkt_rhs[row][axis] += coefficient * q(values[column][axis]);
+                kkt_force[column][axis] += coefficient * q(expected_multipliers[row][axis]);
+            }
+        }
+    for (std::size_t i = 0; i < expected_free_force.size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            kkt_force[static_cast<std::size_t>(chart.free_columns()[i])][axis] +=
+                q(expected_free_force[i][axis]);
+    const auto exact_kkt = [&](const auto& source) {
+        std::vector<PgCartesianExactPosition> result(source.size());
+        for (std::size_t i = 0; i < source.size(); ++i)
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                const auto& value = source[i][axis];
+                result[i][axis] = rat(f, numerator(value), denominator(value));
+            }
+        return result;
+    };
+    const auto kkt_force_exact = exact_kkt(kkt_force);
+    const auto kkt_rhs_exact = exact_kkt(kkt_rhs);
+    const auto kkt_dual =
+        take(chart.transpose({identity, kkt_force_exact}, limits_for_action, workspace, plan));
+    CHECK(std::ranges::equal(kkt_dual.original_multipliers.values(), expected_multipliers));
+    CHECK(std::ranges::equal(kkt_dual.independent_force.values(), expected_free_force));
+    std::vector<std::array<Q, 3>> kkt_free(independent_state.size());
+    for (std::size_t i = 0; i < kkt_free.size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            const Q d = q(independent_state[i][axis]) - q(expected_free_force[i][axis]);
+            kkt_free[i][axis] = d + q(kkt_dual.independent_force.values()[i][axis]);
+        }
+    const auto kkt_free_exact = exact_kkt(kkt_free);
+    const auto kkt_primal = take(chart.lift_rhs(
+        {identity, kkt_free_exact}, {identity, kkt_rhs_exact}, limits_for_action, workspace, plan));
+    CHECK(std::ranges::equal(kkt_primal.values(), values));
+
     std::vector<PgCartesianExactPosition> inconsistent(static_cast<std::size_t>(info.rows));
     const auto original_ab = original.sources().back();
     bool have_duplicate = false;

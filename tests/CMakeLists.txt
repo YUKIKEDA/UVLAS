@@ -725,6 +725,12 @@ uvlas_add_test(structure.pg_reference_geometry
     LIBS uvlas_structure Boost::multiprecision)
 target_include_directories(uvlas_test_structure_pg_reference_geometry
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_reference_geometry PROPERTIES TIMEOUT 600)
+else()
+    set_tests_properties(structure.pg_reference_geometry PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,360,180>")
+endif()
 
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG

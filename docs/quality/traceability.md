@@ -15,7 +15,7 @@
 | DIST-02 | [product-requirements.md:46](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | ENV-01 | [product-requirements.md:40](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | ENV-02 | [product-requirements.md:41](../requirements/product-requirements.md) | 0 | 0 | 0 |
-| GEO-01 | [product-requirements.md:19](../requirements/product-requirements.md) | 1 | 0 | 0 |
+| GEO-01 | [product-requirements.md:19](../requirements/product-requirements.md) | 2 | 0 | 0 |
 | IO-01 | [product-requirements.md:33](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | IO-02 | [product-requirements.md:34](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | IO-03 | [product-requirements.md:35](../requirements/product-requirements.md) | 0 | 0 | 0 |
@@ -151,12 +151,12 @@
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 6 | 0 |
 | QA-10 | [quality-plan.md:100](../quality/quality-plan.md) | 0 | 0 | 0 |
 | SH-D01 | [main-shell-adopted-specification.md:11](../specs/structure/main-shell-adopted-specification.md) | 7 | 2 | 0 |
-| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 19 | 11 | 0 |
+| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 20 | 11 | 0 |
 | SH-D03 | [main-shell-adopted-specification.md:13](../specs/structure/main-shell-adopted-specification.md) | 60 | 47 | 0 |
 | SH-D04 | [main-shell-adopted-specification.md:14](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
 | SH-D05 | [main-shell-adopted-specification.md:15](../specs/structure/main-shell-adopted-specification.md) | 16 | 16 | 0 |
 | SH-D06 | [main-shell-adopted-specification.md:16](../specs/structure/main-shell-adopted-specification.md) | 6 | 8 | 0 |
-| SH-D07 | [main-shell-adopted-specification.md:17](../specs/structure/main-shell-adopted-specification.md) | 38 | 22 | 0 |
+| SH-D07 | [main-shell-adopted-specification.md:17](../specs/structure/main-shell-adopted-specification.md) | 39 | 22 | 0 |
 | SH-D08 | [main-shell-adopted-specification.md:18](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D01 | [structural-adopted-specification.md:9](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
 | SI-D02 | [structural-adopted-specification.md:10](../specs/structure/structural-adopted-specification.md) | 0 | 0 | 0 |
@@ -212,7 +212,7 @@
 | V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 10 | 0 | 0 |
+| V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 11 | 0 | 0 |
 | V-RECOVER | [practical-acceptance-plan.md:35](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-SEARCH | [practical-acceptance-plan.md:39](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-STATE | [practical-acceptance-plan.md:40](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
