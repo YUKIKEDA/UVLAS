@@ -27,6 +27,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <source_location>
 #include <uvlas/core/instrumentation.hpp>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <vector>
@@ -58,9 +59,17 @@ const cf::CaseUniformFlowLimits limits{
     100};
 
 template <class T>
-T take(core::Result<T> value) {
-    if (!value)
+T take(core::Result<T> value, const std::source_location at = std::source_location::current()) {
+    if (!value) {
+        INFO(at.file_name() << ':' << at.line());
+        if (value.error().details.resources) {
+            const auto& usage = *value.error().details.resources;
+            INFO("Resource kind " << static_cast<int>(usage.kind) << ", required " << usage.required
+                                  << ", observed " << usage.observed);
+            FAIL("Unexpected case-flow failure " << static_cast<int>(value.error().code));
+        }
         FAIL("Unexpected case-flow failure " << static_cast<int>(value.error().code));
+    }
     return std::move(*value);
 }
 
@@ -4385,15 +4394,29 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const std::array birth_origins{cf::WakeMaterialPoint{release, release.point, {}},
                                    cf::WakeMaterialPoint{second_release, second_release.point, {}}};
     const cf::WakeMaterialSnapshot preceding{older, birth_origins, &growth_residual};
-    const cf::FreeWakeTrialEndpoint parent_trial{{parent_strength, growth_points}, previous_flow};
-    const cf::FreeWakeTrialEndpoint current_trial{{with_owned_history, extended_points}, flow};
+    const std::array extended_direction_points{id[0], id[1],      id[2],  id[3],   id[4],
+                                               id[5], coincident, far_up, far_down};
+    const std::array extended_displacements{dx, dx, dx, dx, dx, dx, dx, dx, dx};
+    const cf::DiscreteFreeWakeDirection trial_direction{extended_direction_points,
+                                                        extended_displacements,
+                                                        {},
+                                                        dambient,
+                                                        d.flow_time,
+                                                        d.core_radius};
+    const cf::FreeWakeTrialEndpoint parent_trial{
+        {parent_strength, growth_points}, previous_flow, &d};
+    const cf::FreeWakeTrialEndpoint current_trial{
+        {with_owned_history, extended_points}, flow, &trial_direction};
+    const std::array retained_previous_direction{dprevious[0], dolder[0]};
+    const std::array retained_older_direction{dolder[0], dprevious[0]};
     const cf::FreeWakeTrialLimits trial_limits{extended_limits, extended_limits,
                                                extended_velocity_limits};
-    const std::array trial_seeds{coordinates(1, 0, 0), coordinates(2, 0, 0), coordinates(3, 0, 0),
-                                 coordinates(4, 0, 0)};
+    const std::array trial_seeds{coordinates(1, 0, .125), coordinates(2, 0, -.25),
+                                 coordinates(3, 0, .5), coordinates(4, 0, -.125)};
     core::ResourcePlan trial_memory{1024ULL * 1024 * 1024};
     const auto step = take(cf::evaluate_free_wake_trial(
-        wake_si, transport_clock, parent_trial, current_trial, {&preceding, {}}, next_epoch,
+        wake_si, transport_clock, parent_trial, current_trial,
+        {&preceding, {retained_previous_direction, retained_older_direction}}, next_epoch,
         trial_seeds, trial_limits, shared, *local, *kernel, trial_memory));
     if (!step.trapezoid || !step.bdf2) {
         FAIL("An interior trial must include both the released and retained rows");
@@ -4414,6 +4437,51 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     residual_expected(take(step.trapezoid->position_dual(1)).stencil[0][0], Rat{32});
     residual_expected(take(step.bdf2->position_dual(0)).stencil[0][0], Rat{12});
     residual_expected(take(step.bdf2->position_dual(1)).stencil[0][0], Rat{36});
+
+    const auto detached = take(step.trapezoid->row(0));
+    const auto retained_top = take(step.bdf2->row(0));
+    const auto retained_bottom = take(step.bdf2->row(1));
+    if (!detached.direction || !retained_top.direction || !retained_bottom.direction) {
+        FAIL("Expected directions for the released and retained rows");
+        return;
+    }
+    residual_expected((*detached.direction)[0], Rat{-1, 8});
+    residual_expected((*retained_top.direction)[0], Rat{-5, 8});
+    residual_expected((*retained_bottom.direction)[0], Rat{-45, 8});
+
+    const auto parent_bound = a::P1StrengthId::bound(fixture.faces[0].id);
+    const std::array parent_directions{
+        dhistory[0], cf::FrozenWakeTrace{parent_bound, parent_gamma[0].circulation_direction}};
+    const auto transferred = take(cf::apply_wake_strength_transfer(
+        step.strength, parent_directions, extended_limits.maximum_steps, trial_memory));
+    REQUIRE(transferred.size() == 2);
+    CHECK(transferred.values()[0].id == newest_id);
+    CHECK(sum_words(transferred.values()[0].strength) == Rat{1, 8});
+    CHECK(transferred.values()[1].id == mapped_old_id);
+    CHECK(sum_words(transferred.values()[1].strength) == Rat{5, 16});
+    for (const auto* transport : std::array{&*step.trapezoid, &*step.bdf2}) {
+        const auto& velocity = take(transport->free_velocity()).get();
+        auto covectors =
+            std::array{take(velocity.strength_dual(0)), take(velocity.strength_dual(1))};
+        const auto reversed = take(
+            cf::pullback_wake_strength_transfer(step.strength, covectors, core::Precision::TwoWord,
+                                                extended_limits.maximum_steps, trial_memory));
+        REQUIRE(reversed.size() == 2);
+        WorkEnclosure trial_work, parent_work;
+        for (std::size_t i = 0; i < covectors.size(); ++i) {
+            const auto seed = take(reversed.row(i));
+            CHECK(seed.id == parent_directions[i].id);
+            trial_work.add(covectors[i].value, transferred.values()[i].strength);
+            parent_work.add(seed.value, parent_directions[i].strength);
+        }
+        CHECK(trial_work.value != 0);
+        CHECK(abs(trial_work.value - parent_work.value) <= trial_work.radius + parent_work.radius);
+        std::swap(covectors[0], covectors[1]);
+        reject(cf::pullback_wake_strength_transfer(step.strength, covectors,
+                                                   core::Precision::TwoWord,
+                                                   extended_limits.maximum_steps, trial_memory),
+               core::FailureCode::StaleGeneration);
+    }
 
     reject(cf::evaluate_free_wake_trial(wake_si, transport_clock, parent_trial, current_trial, {},
                                         next_epoch, trial_seeds, trial_limits, shared, *local,
@@ -4539,6 +4607,28 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const std::array reversed_trace{cf::FrozenWakeTrace{newest_id, a::DoubleWord{-.5, -low_word}}};
     const auto signed_strengths = take(reverse_strengths(reversed_trace));
     CHECK(std::get<a::DoubleWord>(signed_strengths.history().front().strength).low == -low_word);
+    const std::array bound_direction{
+        cf::FrozenWakeTrace{parent_bound, a::DoubleWord{.5, low_word}}};
+    const auto signed_direction = take(cf::apply_wake_strength_transfer(
+        signed_strengths, bound_direction, extended_limits.maximum_steps, trial_memory));
+    REQUIRE(signed_direction.size() == 1);
+    const auto signed_value = std::get<a::DoubleWord>(signed_direction.values()[0].strength);
+    CHECK(signed_value.high == -.5);
+    CHECK(signed_value.low == -low_word);
+    const auto& newest_velocity = take(step.trapezoid->free_velocity()).get();
+    const std::array newest_covector{take(newest_velocity.strength_dual(0))};
+    const auto signed_dual = take(cf::pullback_wake_strength_transfer(
+        signed_strengths, newest_covector, core::Precision::TwoWord, extended_limits.maximum_steps,
+        trial_memory));
+    REQUIRE(signed_dual.size() == 1);
+    const auto parent_covector = take(signed_dual.row(0));
+    CHECK(parent_covector.id == parent_bound);
+    WorkEnclosure newest_work, signed_parent_work;
+    newest_work.add(newest_covector[0].value, signed_direction.values()[0].strength);
+    signed_parent_work.add(parent_covector.value, bound_direction[0].strength);
+    CHECK(newest_work.value != 0);
+    CHECK(abs(newest_work.value - signed_parent_work.value) <=
+          newest_work.radius + signed_parent_work.radius);
     reject(reverse_strengths(window_history), core::FailureCode::StaleGeneration);
 
     const cf::WakeMaterialSnapshot omitted_window{previous, {}};

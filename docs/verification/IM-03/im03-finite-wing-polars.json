@@ -16,7 +16,7 @@
   "verification": {
     "windows": "MSVC 19.51 Release は `coupling.finite_wing_steady.fw_v01` と `.fw_v02` の2件が通過した。各5,032アサーション、順に63.37秒と73.71秒だった。",
     "linux": "GCC 14.2 Release も同じ2件が通過した。各5,032アサーション、順に55.13秒と59.10秒だった。GCC のコンパイルデータで両構成の試験ソースを clang-tidy でも確認した。",
-    "debug": "CTest は形状ごとに一つとし、中央差分に必要な5迎角を同じ実行に含めた。各試験の制限は Release 150秒、Debug 720秒。MSVC Debug では2件のビルドと登録を確認した。",
+    "debug": "CTest は形状ごとに一つとし、中央差分に必要な5迎角を同じ実行に含めた。各試験の制限は Release 150秒、Debug 720秒。MSVC Debugも同じ2件が通過し、順に352.18秒と428.24秒だった。各5,032アサーション。",
     "mutation": "GCC 14.2 Release の作業複製で境界点を −y 側へ入れるよう変更すると、上反角0度・迎角−2度・帯4（0始まり）の y 方向力が独立参照との照合に失敗した。ソースを SHA-256 が一致する元の状態へ戻し、同じ seed 23 で5,032アサーションが通過した。",
     "commands": [
       "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.finite_wing_steady\\.fw_v0[12]$' -j 1",
@@ -39,7 +39,7 @@
     "tests/aero/fixtures/finite-wing-steady-v1.json": "e4c0246d5ef9ddd978294d753e03ddc8831f44d0aac62824f04ca3707da9d667"
   },
   "artifacts": {
-    "docs/verification/IM-03/finite-wing-polars-v1/verification.md": "60715685b6d65f8639d10a644661714159bc95a88b2a9af6a1eb1a961bdf791a",
+    "docs/verification/IM-03/finite-wing-polars-v1/verification.md": "2a03bdf578ec7fdf6a1e7c9e90eba6447baa7f97713c0a55cdafee0fbc566971",
     "tests/aero/fixtures/finite-wing-polars-v1.json": "50bf3906dfc16c81eb1eb8bbf53b0c2424cdb4b6d45b5f7db7c4566962146a13"
   }
 }

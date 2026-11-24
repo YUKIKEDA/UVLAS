@@ -1,13 +1,16 @@
 #include "wake_strength_transition.hpp"
 
+#include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_interval_private.hpp"
+#include "aero/p1_shared_kernel.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <functional>
 #include <limits>
+#include <memory>
 #include <memory_resource>
-#include <vector>
+#include <tuple>
 
 namespace uvlas::coupling::detail {
 namespace {
@@ -85,12 +88,14 @@ struct Column {
     a::ScalarWords strength{a::SingleWord{0}};
     std::optional<MaterialTraceKey> leading_key;
     std::optional<a::P1StrengthId> leading_id;
+    std::optional<WakeStrengthParent> parent;
 };
 
 struct AttachedColumn {
     a::EdgeId edge{0};
     WakeSpanBand band;
     std::array<double, 2> value{};
+    WakeStrengthParent parent;
 };
 
 struct Section {
@@ -192,7 +197,7 @@ Section describe(const WakeStrengthEndpoint& endpoint, core::ResourcePlan& memor
             reject(InvalidInput);
         auto& trace = traces.values()[i];
         (void)words(at->strength);
-        trace = {back, row.trailing, at->strength, {}, {}};
+        trace = {back, row.trailing, at->strength, {}, {}, {}};
         identifiers.values()[i] = row.trailing;
         if (quad.attachment) {
             if (!std::holds_alternative<AttachedWakeFront>(row.leading) || front >= attached.size())
@@ -205,8 +210,11 @@ Section describe(const WakeStrengthEndpoint& endpoint, core::ResourcePlan& memor
             const auto gamma = find(bound.values(), transfer.bound_face, &Bound::face, work);
             if (gamma == bound.values().end() || gamma->face != transfer.bound_face)
                 reject(InvalidInput);
-            attached.values()[front++] = {transfer.edge, band,
-                                          words(gamma->gamma, transfer.coefficient)};
+            attached.values()[front++] = {
+                transfer.edge,
+                band,
+                words(gamma->gamma, transfer.coefficient),
+                {a::P1StrengthId::bound(transfer.bound_face), transfer.coefficient < 0}};
         } else {
             const auto* leading = std::get_if<a::P1StrengthId>(&row.leading);
             if (!leading)
@@ -270,6 +278,7 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                     if (row == after.frozen.values().end() || row->key != newborn ||
                         words(row->strength) != old.value)
                         reject(StaleGeneration);
+                    row->parent = old.parent;
                 }
 
                 auto retired = allocate<std::optional<a::MaterialReleaseKey>>(
@@ -296,6 +305,9 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                     if (row == after.frozen.values().end() || row->key != old.key ||
                         words(row->strength) != words(old.strength))
                         reject(StaleGeneration);
+                    if (row->parent)
+                        reject(StaleGeneration);
+                    row->parent.emplace(old.id, false);
                     ++retained;
                 }
                 if (after.frozen.size() < retained ||
@@ -320,17 +332,143 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                 });
                 auto history = allocate<FrozenWakeTrace>(memory, columns.size());
                 auto identities = allocate<WakeTraceMaterial>(memory, columns.size());
+                auto parents = allocate<WakeStrengthParent>(memory, columns.size());
                 for (std::size_t i = 0; i < columns.size(); ++i) {
                     work.step();
+                    if (!columns[i].parent)
+                        reject(StaleGeneration);
                     history.values()[i] = {columns[i].id, columns[i].strength};
                     identities.values()[i] = physical(columns[i].key);
+                    parents.values()[i] = *columns[i].parent;
                 }
                 work.step();
                 return WakeStrengthTransition{std::move(material), std::move(history),
-                                              std::move(identities), std::move(retired_history)};
+                                              std::move(identities), std::move(retired_history),
+                                              std::move(parents)};
             } catch (const core::Failure& failure) {
                 return std::unexpected(failure);
             } catch (const a::p1::ArithmeticFailure& failure) {
+                return std::unexpected(core::Failure{failure.code, operation});
+            }
+        });
+}
+
+core::Result<core::PlannedBuffer<FrozenWakeTrace>> apply_wake_strength_transfer(
+    const WakeStrengthTransition& transition, std::span<const FrozenWakeTrace> parent_direction,
+    std::uint64_t maximum_steps, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    return core::guard_entry(
+        operation, PrecisionUnresolved, {},
+        [&]() -> core::Result<core::PlannedBuffer<FrozenWakeTrace>> {
+            try {
+                Work work{0, maximum_steps, stop};
+                work.step();
+                for (std::size_t i = 0; i < parent_direction.size(); ++i) {
+                    work.step();
+                    if (i != 0 && parent_direction[i - 1].id >= parent_direction[i].id)
+                        reject(InvalidInput);
+                    (void)words(parent_direction[i].strength);
+                }
+                const auto columns = transition.history();
+                const auto parents = transition.parents();
+                auto output = allocate<FrozenWakeTrace>(memory, columns.size());
+                for (std::size_t i = 0; i < columns.size(); ++i) {
+                    work.step();
+                    const auto& parent = parents[i];
+                    const auto found =
+                        find(parent_direction, parent.id, &FrozenWakeTrace::id, work);
+                    a::ScalarWords variation{a::SingleWord{0.}};
+                    if (found != parent_direction.end() && found->id == parent.id) {
+                        const auto value = words(found->strength, parent.reversed ? -1. : 1.);
+                        variation = std::holds_alternative<a::DoubleWord>(found->strength)
+                                        ? a::ScalarWords{a::DoubleWord{value[0], value[1]}}
+                                        : a::ScalarWords{a::SingleWord{value[0]}};
+                    }
+                    output.values()[i] = {columns[i].id, variation};
+                }
+                work.step();
+                return output;
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            } catch (const a::p1::ArithmeticFailure& failure) {
+                return std::unexpected(core::Failure{failure.code, operation});
+            }
+        });
+}
+
+core::Result<FreeWakeStrengthCovector> WakeStrengthPullback::row(std::size_t i) const noexcept {
+    const auto rows = rows_.values();
+    if (i >= rows.size() || !rows[i])
+        return std::unexpected(core::Failure{InvalidInput, operation});
+    return *rows[i];
+}
+
+core::Result<WakeStrengthPullback>
+pullback_wake_strength_transfer(const WakeStrengthTransition& transition,
+                                std::span<const FreeWakeStrengthCovector> seeds,
+                                core::Precision format, std::uint64_t maximum_steps,
+                                core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    namespace p = a::p1;
+    return core::guard_entry(
+        operation, PrecisionUnresolved, {}, [&]() -> core::Result<WakeStrengthPullback> {
+            try {
+                Work work{0, maximum_steps, stop};
+                work.step();
+                if (!a::p1_environment_supported() ||
+                    (format != core::Precision::Binary64 && format != core::Precision::TwoWord))
+                    reject(PrecisionUnsupported);
+                const auto columns = transition.history();
+                const auto parents = transition.parents();
+                if (seeds.size() != columns.size())
+                    reject(InvalidInput);
+                struct Weight {
+                    a::P1StrengthId parent;
+                    std::size_t trial{};
+                };
+                auto ordered = allocate<Weight>(memory, columns.size());
+                for (std::size_t i = 0; i < seeds.size(); ++i) {
+                    work.step();
+                    if (seeds[i].id != columns[i].id)
+                        reject(StaleGeneration);
+                    ordered.values()[i] = {parents[i].id, i};
+                }
+                const auto rows = ordered.values();
+                std::ranges::sort(rows, [&](const Weight& lhs, const Weight& rhs) {
+                    work.step();
+                    return std::tie(lhs.parent, lhs.trial) < std::tie(rhs.parent, rhs.trial);
+                });
+                std::size_t count = 0;
+                for (std::size_t i = 0; i < rows.size(); ++i) {
+                    work.step();
+                    if (i == 0 || rows[i - 1].parent != rows[i].parent)
+                        ++count;
+                }
+                auto output = allocate<std::optional<FreeWakeStrengthCovector>>(memory, count);
+                a::LocalRootScratch scratch;
+                std::size_t next = 0;
+                for (std::size_t i = 0; i < rows.size();) {
+                    const auto id = rows[i].parent;
+                    p::Interval sum{};
+                    do {
+                        work.step();
+                        const auto j = rows[i++].trial;
+                        const auto& source = seeds[j].value;
+                        const auto center = words(source.center());
+                        const auto value = p::add(a::decode_p1_word(center[0]),
+                                                  a::decode_p1_word(center[1]), work);
+                        const auto radius = a::decode_p1_word(source.radius());
+                        const auto interval = p::scale({p::subtract(value, radius, work).lower,
+                                                        p::add(value, radius, work).upper},
+                                                       source.exponent());
+                        sum = p::add(
+                            sum, parents[j].reversed ? p::negate(interval, work) : interval, work);
+                    } while (i < rows.size() && rows[i].parent == id);
+                    output.values()[next++].emplace(id, a::enclose_p1_value(sum, format, scratch));
+                }
+                work.step();
+                return WakeStrengthPullback{std::move(output)};
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            } catch (const p::ArithmeticFailure& failure) {
                 return std::unexpected(core::Failure{failure.code, operation});
             }
         });
@@ -370,7 +508,9 @@ core::Result<FreeWakeTrial> evaluate_free_wake_trial(
                 if (previous_direction.size() != direction_count ||
                     older_direction.size() != direction_count ||
                     (retained != 0 && history.older == nullptr) ||
-                    (restart && history.older != nullptr))
+                    (restart && history.older != nullptr) ||
+                    (parent.direction != nullptr && trial.direction == nullptr) ||
+                    (trial.direction != nullptr && !trial.direction->history.empty()))
                     reject(InvalidInput);
 
                 const auto seed_bytes = seeds.empty() ? 0 : sizeof(NonpenetrationVector);
@@ -385,22 +525,28 @@ core::Result<FreeWakeTrial> evaluate_free_wake_trial(
                 auto storage = allocate<std::byte>(memory, first_bytes + retained_bytes);
                 std::pmr::monotonic_buffer_resource arena{storage.values().data(), storage.size(),
                                                           std::pmr::null_memory_resource()};
-                std::pmr::vector<FirstFreeWakePoint> first_points{&arena};
-                std::pmr::vector<a::PointId> from{&arena}, at{&arena}, old_particles{&arena};
-                std::pmr::vector<WakeMaterialPoint> current{&arena}, previous{&arena},
-                    older{&arena};
-                first_points.reserve(first_count);
-                from.reserve(first_count);
-                at.reserve(first_count);
-                current.reserve(retained);
-                previous.reserve(retained);
-                older.reserve(retained);
-                old_particles.reserve(retained);
-                std::pmr::vector<NonpenetrationVector> first_seeds{&arena}, old_seeds{&arena};
-                if (!seeds.empty()) {
-                    first_seeds.reserve(first_count);
-                    old_seeds.reserve(retained);
-                }
+                const auto staging = [&]<class T>(std::in_place_type_t<T>, std::size_t size) {
+                    static_assert(std::is_trivially_destructible_v<T>);
+                    // Every array begins at the same alignment; the budget is exactly payload.
+                    static_assert(alignof(T) == alignof(a::PointId));
+                    return size == 0
+                               ? std::span<T>{}
+                               : std::span<T>{
+                                     std::pmr::polymorphic_allocator<T>{&arena}.allocate(size),
+                                     size};
+                };
+                const auto first_points =
+                    staging(std::in_place_type<FirstFreeWakePoint>, first_count);
+                const auto from = staging(std::in_place_type<a::PointId>, first_count);
+                const auto at = staging(std::in_place_type<a::PointId>, first_count);
+                const auto current = staging(std::in_place_type<WakeMaterialPoint>, retained);
+                const auto previous = staging(std::in_place_type<WakeMaterialPoint>, retained);
+                const auto older = staging(std::in_place_type<WakeMaterialPoint>, retained);
+                const auto old_particles = staging(std::in_place_type<a::PointId>, retained);
+                const auto first_seeds = staging(std::in_place_type<NonpenetrationVector>,
+                                                 seeds.empty() ? 0 : first_count);
+                const auto old_seeds =
+                    staging(std::in_place_type<NonpenetrationVector>, seeds.empty() ? 0 : retained);
                 const auto available_older = history.older == nullptr
                                                  ? std::span<const WakeMaterialPoint>{}
                                                  : history.older->points;
@@ -409,15 +555,19 @@ core::Result<FreeWakeTrial> evaluate_free_wake_trial(
                     if (available_older[i - 1].release >= available_older[i].release)
                         reject(StaleGeneration);
                 }
+                std::size_t first_row = 0, retained_row = 0;
                 for (std::size_t i = 0; i < count; ++i) {
                     dispatch.step();
                     const auto row = read(links.row(i));
                     if (restart || !row.parent) {
-                        first_points.push_back(row);
-                        from.push_back(row.parent ? row.parent->point : row.current.release.point);
-                        at.push_back(row.current.point);
+                        std::construct_at(first_points.data() + first_row, row);
+                        std::construct_at(from.data() + first_row, row.parent
+                                                                       ? row.parent->point
+                                                                       : row.current.release.point);
+                        std::construct_at(at.data() + first_row, row.current.point);
                         if (!seeds.empty())
-                            first_seeds.push_back(seeds[i]);
+                            std::construct_at(first_seeds.data() + first_row, seeds[i]);
+                        ++first_row;
                         continue;
                     }
                     const auto key = row.current.release;
@@ -425,12 +575,49 @@ core::Result<FreeWakeTrial> evaluate_free_wake_trial(
                         find(available_older, key, &WakeMaterialPoint::release, dispatch);
                     if (found == available_older.end() || found->release != key)
                         reject(StaleGeneration);
-                    current.push_back(row.current);
-                    previous.push_back(*row.parent);
-                    older.push_back(*found);
-                    old_particles.push_back(row.current.point);
+                    std::construct_at(current.data() + retained_row, row.current);
+                    std::construct_at(previous.data() + retained_row, *row.parent);
+                    std::construct_at(older.data() + retained_row, *found);
+                    std::construct_at(old_particles.data() + retained_row, row.current.point);
                     if (!seeds.empty())
-                        old_seeds.push_back(seeds[i]);
+                        std::construct_at(old_seeds.data() + retained_row, seeds[i]);
+                    ++retained_row;
+                }
+                core::PlannedBuffer<FrozenWakeTrace> trial_history_direction;
+                std::optional<DiscreteFreeWakeDirection> current_direction;
+                if (trial.direction != nullptr) {
+                    core::PlannedBuffer<FrozenWakeTrace> parent_direction;
+                    if (parent.direction != nullptr) {
+                        const auto& before = parent.wake.source;
+                        const auto old = parent.direction->history;
+                        if (old.size() != before.history.columns.size())
+                            reject(InvalidInput);
+                        if (old.size() >
+                            std::numeric_limits<std::size_t>::max() - before.collocations.size())
+                            reject(ResourceExceeded);
+                        parent_direction = allocate<FrozenWakeTrace>(
+                            memory, old.size() + before.collocations.size());
+                        auto values = parent_direction.values();
+                        for (std::size_t i = 0; i < old.size(); ++i) {
+                            dispatch.step();
+                            if (old[i].id != before.history.columns[i].id)
+                                reject(StaleGeneration);
+                            values[i] = old[i];
+                        }
+                        for (std::size_t i = 0; i < before.collocations.size(); ++i) {
+                            dispatch.step();
+                            const auto& bound = before.collocations[i];
+                            const auto face = panel(before.contact, bound.facet, dispatch).face;
+                            values[old.size() + i] = {a::P1StrengthId::bound(face),
+                                                      bound.circulation_direction};
+                        }
+                        sort_unique(values, &FrozenWakeTrace::id, dispatch);
+                    }
+                    trial_history_direction = read(
+                        apply_wake_strength_transfer(strength, parent_direction.values(),
+                                                     limits.material.maximum_steps, memory, stop));
+                    current_direction = *trial.direction;
+                    current_direction->history = trial_history_direction.values();
                 }
                 auto evaluation = limits.transport;
                 evaluation.maximum_steps -= dispatch.used;
@@ -445,7 +632,8 @@ core::Result<FreeWakeTrial> evaluate_free_wake_trial(
                 std::optional<WakeTransportResult> trapezoid, bdf2;
                 if (first_count != 0) {
                     trapezoid.emplace(read(evaluate_first_free_wake_transport(
-                        clock, {source, trial.flow, at, trial.direction},
+                        clock,
+                        {source, trial.flow, at, current_direction ? &*current_direction : nullptr},
                         {parent.wake.source, parent.flow, from, parent.direction}, epoch,
                         first_points, first_seeds, evaluation, limits.velocity, shared, local,
                         kernel, memory, stop)));
@@ -456,7 +644,8 @@ core::Result<FreeWakeTrial> evaluate_free_wake_trial(
                          {parent.wake.source.contact, previous},
                          {history.older->contact, older, history.older->preceding_births}}};
                     bdf2.emplace(read(evaluate_fixed_free_wake_transport(
-                        clock, snapshots, source, trial.flow, old_particles, trial.direction,
+                        clock, snapshots, source, trial.flow, old_particles,
+                        current_direction ? &*current_direction : nullptr,
                         history.retained_direction, old_seeds, evaluation, limits.velocity, shared,
                         local, kernel, memory, stop)));
                 }

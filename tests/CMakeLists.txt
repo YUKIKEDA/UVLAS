@@ -951,6 +951,9 @@ if(MSVC)
     # The full MSVC Debug test including PG material preparation took 79 s locally.
     set_tests_properties(coupling.case_uniform_flow PROPERTIES
         TIMEOUT "$<IF:$<CONFIG:Debug>,120,60>")
+    # The unoptimized exact-interval test call chain exceeds the default stack.
+    target_link_options(uvlas_test_coupling_case_uniform_flow PRIVATE
+        "$<$<CONFIG:Debug>:/STACK:8388608>")
 endif()
 
 set(finite_wing_shapes fw_v01 fw_v02)
