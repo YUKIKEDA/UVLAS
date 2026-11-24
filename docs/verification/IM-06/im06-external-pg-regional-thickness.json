@@ -1,0 +1,43 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-external-pg-regional-thickness",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "IO4-04",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "8f3250760f34e247b66715560fa30fcc068f8f24",
+  "claimed_state": "認証済みの平面外部面に明示した厚さを、Case PGとの正面積の厳密共通細分上で照合する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_release_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "regional_assertions": 59,
+    "real_file_assertions": 751,
+    "removed_positive_overlap_filter_failures": 2,
+    "restored_regional_assertions": 59
+  },
+  "artifacts": {
+    "CMakeLists.txt": "45f6b0b663ebb2cf6a0d41800739af2517f3ce9b56b959149cdee11abbf207c8",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "docs/verification/IM-06/external-pg-regional-thickness.md": "2349972e5c6c81aba328947d03a530f10678cdd9209809688871327541d3d78e",
+    "src/io/external_pg_chart_clip.hpp": "c2f3174f6ea2cda95bf1d3895c940bcc2c53a9d957f73fa58acd51565872107b",
+    "src/io/external_pg_regional_thickness.cpp": "7d7615f7a7447c5842b57e2a7ed84c281b4dfd6b9d5186178358cde6ec40a030",
+    "src/io/external_pg_regional_thickness.hpp": "4ea787c323176c6d3fa703a61d5bf17cd6fe26cbd8737477b9e3fd348f4c9210",
+    "src/io/external_planar_pg.cpp": "85b8ec021962d97604616065cdb68fd2a4ca0b459302927f86fe6cfcb4217c10",
+    "src/io/external_planar_pg.hpp": "942b4c9e8cc906865b21cda5e4e3a339b204efc86e9e1341c8703e37f88a5b5b",
+    "src/io/external_mesh_sidecar_binding.cpp": "af973ca65c706bb62798bd98aec41f57372df75256ffd72db9a8c2fe3e5443eb",
+    "src/io/external_mesh_sidecar_pg.cpp": "5e5c24749baaa2f44186346f8c78c249f2d9678e14bba7d01645c899f37302e3",
+    "src/io/external_mesh_sidecar_pg.hpp": "fe7df41e278273ad9da8e6900610b5b190d9aefa5f805552bfa2162f4493999e",
+    "src/coupling/case_external_pg.cpp": "5858290149f7b88316a7f19497c2e25febb2ae8dbcdd6bc65087e4c56ff23969",
+    "src/coupling/case_external_pg.hpp": "6b4c6bb68be462312b099995eadb25ac672511599fc922e6c5f0559117fb68fd",
+    "tests/io/external_pg_regional_thickness_test.cpp": "e16642379c6f794f8dd6c7be54f6c60f638e7d7ed8a8b9904874bd700feb7c32",
+    "tests/io/reference_input_test.cpp": "b818d979d9ed848da4272f05b24ca8fae1b99d1ecdb3a6d28a9a61ccd9439528"
+  }
+}

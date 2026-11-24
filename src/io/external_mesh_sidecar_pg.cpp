@@ -542,6 +542,15 @@ struct NastranRegionalFace {
     core::Index node{};
 };
 
+[[nodiscard]] bool has_corner_thickness(const NastranShellElement& element) {
+    return std::visit(
+        [](const auto& ring) {
+            return std::ranges::any_of(
+                ring, [](const auto& corner) { return corner.thickness.has_value(); });
+        },
+        element.corners);
+}
+
 [[nodiscard]] core::PlannedBuffer<NastranRegionalFace>
 nastran_faces(Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranShellView& deck,
               MeshShellId target, std::size_t count) {
@@ -565,14 +574,6 @@ nastran_faces(Preparation& p, const ExternalMeshSidecarBinding& bound, const Nas
         });
         if (element == deck.elements.end() || next == count) {
             p.reject(Code::InvalidInput, Reason::Binding);
-        }
-        if (std::visit(
-                [](const auto& ring) {
-                    return std::ranges::any_of(
-                        ring, [](const auto& corner) { return corner.thickness.has_value(); });
-                },
-                element->corners)) {
-            p.reject(Code::Unsupported, Reason::Binding);
         }
         selected.values()[next++] = {&*element, face.sidecar_node};
     }
@@ -660,6 +661,7 @@ struct PshellRegion {
     std::uint64_t first_element{};
     core::Index node{};
     structure::ExactRational metres;
+    bool corner_qualified{};
 };
 
 [[nodiscard]] std::uint64_t check_pshell_materials(Preparation& p, const NastranSidecar& source,
@@ -697,6 +699,107 @@ struct PshellRegion {
     return comparisons;
 }
 
+struct PshellCornerBuffer {
+    std::array<structure::ExactRational, 4> metres;
+    std::array<ExternalPgCornerThicknessClaim, 4> fields{};
+};
+
+void require_homogeneous_pshell(Preparation& p, const NastranSidecar& source,
+                                const NastranLaminateView& deck, const NastranPshell& property,
+                                const schema::Model& model, const schema::Shell& shell) {
+    p.detail.byte = deck.input.input.properties[property.property_ordinal].id_field.position.byte;
+    const auto* bending = std::get_if<NastranMaterialReference>(&property.bending);
+    if (!property.membrane || !bending || !property.transverse_shear) {
+        if (const auto* designation = std::get_if<NastranBendingDesignation>(&property.bending)) {
+            p.detail.byte = designation->field.position.byte;
+        }
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    const auto& membrane = *property.membrane;
+    const auto& shear = *property.transverse_shear;
+    if (bending->id != membrane.id || shear.id != membrane.id) {
+        p.detail.byte = (bending->id != membrane.id ? bending->field : shear.field).position.byte;
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    if (const auto& coupling = property.coupling) {
+        p.detail.byte = coupling->field.position.byte;
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    if (const auto& shear_ratio = property.shear_ratio) {
+        p.detail.byte = shear_ratio->field.position.byte;
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    if (const auto& ratio = property.bending_ratio) {
+        const auto& exact = p.limits.geometry.arithmetic.algebra;
+        const auto value =
+            p.value(structure::ExactRational::from_decimal(ratio->value.decimal(), exact, p.plan));
+        const auto one =
+            p.value(structure::ExactRational::from_integer_pair("1", "1", exact, p.plan));
+        if (value != one) {
+            p.detail.byte = ratio->field.position.byte;
+            p.reject(Code::Unsupported, Reason::Binding);
+        }
+    }
+    if (shell.layers.size() != 1 ||
+        deck.input.materials[membrane.declaration_ordinal].kind != NastranMaterialKind::Mat1) {
+        p.detail.byte = membrane.field.position.byte;
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    const auto layer = p.value(shell.layers.at(0), Reason::CaseReference).record();
+    const auto expected = MeshMaterialId{layer.material.unsigned_value()};
+    static_cast<void>(mapped_material(p, source, membrane.id, expected));
+    if (!std::holds_alternative<schema::MaterialIsotropic>(find_material(p, model, expected))) {
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+}
+
+[[nodiscard]] ExternalPgThicknessClaim corner_claim(Preparation& p, const NastranRegionalFace& face,
+                                                    const PshellRegion& group,
+                                                    const structure::ExactRational& unit,
+                                                    PshellCornerBuffer& storage) {
+    const auto& element = *face.element;
+    const auto position = group.property->thickness.transform(
+        [](const NastranShellReal& source) { return source.field.position; });
+    const bool fraction = element.thickness_mode == NastranShellThicknessMode::Fraction;
+    const auto mode_field = element.thickness_mode_field.transform(
+        [](const NastranBulkLexeme& field) { return field.position; });
+    const auto count = std::visit(
+        [&](const auto& ring) {
+            for (std::size_t i = 0; i < ring.size(); ++i) {
+                p.step();
+                const auto& corner = ring[i];
+                const auto& field = corner.thickness;
+                if (field) {
+                    p.detail.byte = field->field.position.byte;
+                } else if (const auto original = mode_field) {
+                    p.detail.byte = original->byte;
+                }
+                if ((fraction || !field) && !position) {
+                    p.reject(Code::InvalidInput, Reason::Binding);
+                }
+                auto& value = storage.metres[i];
+                if (field) {
+                    const auto& exact = p.limits.geometry.arithmetic.algebra;
+                    const auto number = p.value(structure::ExactRational::from_decimal(
+                        field->value.decimal(), exact, p.plan));
+                    value = p.value(number.multiply(fraction ? group.metres : unit, exact, p.plan));
+                } else {
+                    value =
+                        p.value(group.metres.clone(p.limits.geometry.arithmetic.algebra, p.plan));
+                }
+                storage.fields[i] = {corner.id.value(), &value,
+                                     field ? std::optional{field->field.position} : position,
+                                     (field && fraction) ? position : std::nullopt};
+            }
+            return ring.size();
+        },
+        element.corners);
+    auto claim = ExternalPgThicknessClaim{element.id.value(),
+                                          std::span{storage.fields}.first(count), face.node};
+    claim.field = mode_field;
+    return claim;
+}
+
 [[nodiscard]] QuantityCounts
 pshell_quantities(Preparation& p, const NastranSidecar& source, const NastranLaminateView& deck,
                   std::span<const NastranRegionalFace> faces, const schema::Model& model,
@@ -707,12 +810,24 @@ pshell_quantities(Preparation& p, const NastranSidecar& source, const NastranLam
     auto regions = p.value(p.plan.allocate<PshellRegion>(size, operation), Reason::Resource);
     auto claims =
         p.value(p.plan.allocate<ExternalPgThicknessClaim>(size, operation), Reason::Resource);
+    std::uint64_t corner_count = 0;
+    for (const auto& face : faces) {
+        p.step();
+        if (has_corner_thickness(*face.element)) {
+            ++corner_count;
+        }
+    }
+    auto corners = p.value(
+        p.plan.allocate<PshellCornerBuffer>(static_cast<core::Index>(corner_count), operation),
+        Reason::Resource);
+    std::size_t next_corner = 0;
     structure::ExactRational unit;
     std::size_t groups = 0, comparisons = 0;
     for (const auto& face : faces) {
         p.step();
         p.detail.element = face.element->id.value();
         p.detail.node = face.node;
+        p.detail.byte.reset();
         const auto ordinal = face.element->property.property_ordinal;
         const auto previous = regions.values().first(groups);
         auto group = std::ranges::find_if(previous, [&](const PshellRegion& candidate) {
@@ -742,7 +857,17 @@ pshell_quantities(Preparation& p, const NastranSidecar& source, const NastranLam
             }
             group = regions.values().begin() + static_cast<std::ptrdiff_t>(groups - 1);
         }
-        if (const auto& declared = group->property->thickness) {
+        if (has_corner_thickness(*face.element)) {
+            if (!group->corner_qualified) {
+                require_homogeneous_pshell(p, source, deck, *group->property, model, shell);
+                group->corner_qualified = true;
+            }
+            if (unit.sign() == 0) {
+                unit = length_scale(p, source.units.length);
+            }
+            claims.values()[comparisons++] =
+                corner_claim(p, face, *group, unit, corners.values()[next_corner++]);
+        } else if (const auto& declared = group->property->thickness) {
             claims.values()[comparisons++] = {face.element->id.value(), group->metres, face.node,
                                               declared->field.position};
         }
@@ -788,7 +913,8 @@ pshell_quantities(Preparation& p, const NastranSidecar& source, const NastranLam
     const auto ordinal = pcomp->element->property.property_ordinal;
     for (const auto& face : faces) {
         p.step();
-        if (face.element->property.property_ordinal != ordinal) {
+        if (face.element->property.property_ordinal != ordinal ||
+            has_corner_thickness(*face.element)) {
             p.detail.element = face.element->id.value();
             p.detail.node = face.node;
             p.reject(Code::Unsupported, Reason::Binding);
