@@ -4324,6 +4324,8 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     const auto residual = take(cf::evaluate_discrete_nonpenetration(
         mid_input, std::move(mid_flow), load_limits, shared, *local, *kernel, memory));
     REQUIRE(residual.size() == 1);
-    residual_expected(take(residual.row(0)).residual, rational_word(23. / (16. * std::sqrt(2.))),
-                      rational_word(1e-15));
+    // The typed case supplies 2 ft/min, so the physical wind is 127/12500 m/s.
+    const double source_mps = 127. / 12500.;
+    residual_expected(take(residual.row(0)).residual,
+                      rational_word((source_mps - 9. / 16.) / std::sqrt(2.)), rational_word(1e-15));
 }
