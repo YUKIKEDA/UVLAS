@@ -143,6 +143,14 @@ struct MeshSidecarDiagnostic {
 };
 
 struct MeshSidecarLimits {
+    MeshSidecarLimits(InputLimits document, structure::ExactLimits algebra, std::uint64_t rows,
+                      std::uint64_t faces, std::uint64_t work) noexcept
+        : json(document),
+          exact(algebra),
+          maximum_rows(rows),
+          maximum_faces(faces),
+          maximum_work(work) {}
+
     InputLimits json;
     structure::ExactLimits exact;
     std::uint64_t maximum_rows;

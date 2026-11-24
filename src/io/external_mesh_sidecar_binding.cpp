@@ -93,7 +93,7 @@ private:
 };
 
 template <class Record>
-[[nodiscard]] std::uint64_t record_id(const Record& record) noexcept {
+[[nodiscard]] std::uint64_t record_id(const Record& record) {
     if constexpr (requires { record.id; }) {
         return record.id.unsigned_value();
     } else {

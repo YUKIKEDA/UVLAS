@@ -9,8 +9,8 @@ namespace uvlas::io::detail {
 enum class LeafReferenceFailure : std::uint8_t { UnsupportedRole, Format, Graph, Sidecar };
 
 struct LeafFormatLimits {
-    GmshLimits gmsh;
-    NastranBulkLimits nastran;
+    GmshLimits gmsh{};
+    NastranBulkLimits nastran{};
     std::optional<MeshSidecarLimits> sidecar{};
 };
 

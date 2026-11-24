@@ -1698,13 +1698,16 @@ $EndElements
         CHECK(result.error().operation == core::Operation::PrepareModel);
         CHECK(result.error().code ==
               (wrong_case ? core::FailureCode::StaleGeneration : core::FailureCode::InvalidInput));
-        REQUIRE(diagnostic);
-        if (omitted || duplicate || foreign_element || wrong_components || wrong_dimension) {
-            CHECK(diagnostic->reason == rd::MeshSidecarFailure::Selection);
-            CHECK(diagnostic->node);
-        }
-        if (omitted || duplicate || foreign_element) {
-            CHECK(diagnostic->element == (foreign_element ? 999U : omitted ? 701U : 702U));
+        if (const auto& detail = diagnostic) {
+            if (omitted || duplicate || foreign_element || wrong_components || wrong_dimension) {
+                CHECK(detail->reason == rd::MeshSidecarFailure::Selection);
+                CHECK(detail->node);
+            }
+            if (omitted || duplicate || foreign_element) {
+                CHECK(detail->element == (foreign_element ? 999U : omitted ? 701U : 702U));
+            }
+        } else {
+            FAIL("Expected the sidecar binding diagnostic");
         }
         return;
     }

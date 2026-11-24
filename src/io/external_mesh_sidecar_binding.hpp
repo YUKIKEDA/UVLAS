@@ -5,6 +5,19 @@
 namespace uvlas::io::detail {
 
 struct MeshSidecarBindingLimits {
+    MeshSidecarBindingLimits(MeshSidecarLimits mapping, GmshLimits mesh, NastranBulkLimits bulk,
+                             NastranCoordinateLimits systems, NastranShellLimits elements,
+                             NastranSupportLimits supports, std::uint64_t face_limit,
+                             std::uint64_t work_limit) noexcept
+        : sidecar(mapping),
+          gmsh(mesh),
+          nastran(bulk),
+          coordinates(systems),
+          shells(elements),
+          support(supports),
+          faces(face_limit),
+          work(work_limit) {}
+
     MeshSidecarLimits sidecar;
     GmshLimits gmsh;
     NastranBulkLimits nastran;
