@@ -3448,9 +3448,12 @@ TEST_CASE("Known flow drives discrete midpoint loads and their implicit actions"
     vector(take(tangent.force_direction()), {-1.528893291646792808, 0, .15625});
     vector(take(tangent.moment_direction()), {.09765625, .608196645823396404, .955558307279245505});
     const auto time_dual = center(take(dual.flow_time_dual()));
-    const auto rate_dual = center(take(dual.circulation_dual(0)).circulation_rate);
+    const cf::LoadCirculationRateCovector rate = take(dual.circulation_dual(0));
+    CHECK(rate.face == take(circ.row(0)).face);
+    residual_expected(rate.rate, Rat{1005, 256});
+    reject(dual.circulation_dual(1), core::FailureCode::InvalidInput);
+    const auto rate_dual = center(rate.rate);
     compare(time_dual, 8.095466005886887656);
-    compare(rate_dual, 3.92578125);
     const auto free = take(dual.collocation_dual(0)).free_query;
     if (!free)
         FAIL("Expected free collocation coordinate dual");

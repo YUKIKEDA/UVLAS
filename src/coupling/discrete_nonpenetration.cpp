@@ -3286,12 +3286,15 @@ DiscreteKnownLoads::midpoint_velocity_dual(std::size_t i) const noexcept {
     return known_load_item(records.front().edges_dual, i);
 }
 
-core::Result<LoadCirculationCovector>
+core::Result<LoadCirculationRateCovector>
 DiscreteKnownLoads::circulation_dual(std::size_t i) const noexcept {
     const auto records = data_.values();
     if (records.empty())
         return std::unexpected(absent());
-    return known_load_item(records.front().rates_dual, i);
+    const auto dual = known_load_item(records.front().rates_dual, i);
+    if (!dual)
+        return std::unexpected(dual.error());
+    return LoadCirculationRateCovector{dual->face, dual->circulation_rate};
 }
 
 core::Result<CirculationCollocationCovector>
