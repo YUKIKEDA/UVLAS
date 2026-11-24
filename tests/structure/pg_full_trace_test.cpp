@@ -564,8 +564,9 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     auto chart_limits = PgSparseChartLimits{limits.arithmetic, 300, 400, 30'000, true};
     chart_limits.arithmetic.algebra.maximum_value_bits = 65536;
     chart_limits.arithmetic.algebra.maximum_work_bits = 262144;
-    const auto prepare_chart = [&](PgGlobalConstraints& candidate, const PgSparseChartLimits& cap) {
-        return PgSparseChart::prepare(std::move(candidate), cap, workspace, plan);
+    const auto prepare_chart = [&](PgGlobalConstraints& candidate,
+                                   const PgSparseChartLimits& chart_bounds) {
+        return PgSparseChart::prepare(std::move(candidate), chart_bounds, workspace, plan);
     };
     check_failure(prepare_chart(incompatible, chart_limits), core::FailureCode::InvalidInput);
     REQUIRE(incompatible.info().has_value());
