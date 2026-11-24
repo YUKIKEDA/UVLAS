@@ -64,6 +64,7 @@ struct CaseMotionTimeSnapshotView {
     aero::detail::pchip::PchipInputStamp stamp{aero::detail::pchip::PchipIssuerId{0},
                                                aero::detail::pchip::PchipInputGeneration{0}};
     std::int16_t pi_power{};
+    CaseMotionContinuity continuity = CaseMotionContinuity::PiecewiseC2;
     aero::detail::pchip::RationalView begin, end;
     std::span<const aero::detail::pchip::RationalView> events;
     CaseMotionSeriesSnapshotView translation, rotation;
