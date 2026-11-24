@@ -517,9 +517,9 @@ struct Builder {
             const auto declaration = from_case(model, id, work);
             const auto source = std::ranges::find_if(sources, [&](const auto& x) {
                 work.step();
-                return x.id == id;
+                return x.kind == PgTraceKind::Support && x.id == id;
             });
-            if (source == sources.end() || source->kind != PgTraceKind::Support)
+            if (source == sources.end())
                 case_components::reject(StaleGeneration);
             require_whole_edge(declaration, model, *source, work);
             const auto patch = std::ranges::find_if(patches, [&](const auto& x) {

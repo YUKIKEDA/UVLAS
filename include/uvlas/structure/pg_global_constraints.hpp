@@ -20,6 +20,7 @@ struct PgConstraintPatchBinding {
 };
 
 /// Endpoints index the patch binding list supplied to the same preparation.
+/// The ID is unique within the trace kind, preserving separate Joint and Support namespaces.
 struct PgConstraintTraceBinding {
     PgConstraintTraceBinding(PgConstraintId physical_id, const PgFullTrace& constraint,
                              core::Index left, std::optional<core::Index> right) noexcept

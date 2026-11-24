@@ -1,6 +1,7 @@
 #include "pg_reference_arithmetic.hpp"
 
 #include <algorithm>
+#include <utility>
 #include <uvlas/structure/pg_global_constraints.hpp>
 
 namespace uvlas::structure {
@@ -18,19 +19,20 @@ std::size_t checked_index(core::Index i, std::size_t size) {
     return static_cast<std::size_t>(i);
 }
 
-template <class Binding>
-void unique_ids(std::span<const Binding> bindings, ReferenceArithmetic& math) {
+template <class Binding, class Key>
+void unique_ids(std::span<const Binding> bindings, ReferenceArithmetic& math, Key key) {
     if (bindings.size() < 2)
         return;
     math.visit(bindings.size());
+    using Identity = decltype(key(bindings.front()));
     auto scratch = partition_take(
-        math.plan.allocate<std::uint64_t>(partition_index(bindings.size()), partition_operation));
+        math.plan.allocate<Identity>(partition_index(bindings.size()), partition_operation));
     auto ids = scratch.values();
     for (std::size_t i = 0; i < bindings.size(); ++i) {
         math.cancel();
-        ids[i] = bindings[i].id.value();
+        ids[i] = key(bindings[i]);
     }
-    const auto less = [&](std::uint64_t a, std::uint64_t b) {
+    const auto less = [&](const Identity& a, const Identity& b) {
         math.visit(1);
         return a < b;
     };
@@ -153,8 +155,10 @@ PgGlobalConstraints::prepare(std::span<const PgConstraintPatchBinding> patches,
         static_cast<void>(lease);
         require_capacity(patches.size(), limits.maximum_patches);
         require_capacity(bindings.size(), limits.maximum_sources);
-        unique_ids(patches, math);
-        unique_ids(bindings, math);
+        unique_ids(patches, math, [](const auto& binding) { return binding.id.value(); });
+        unique_ids(bindings, math, [](const auto& binding) {
+            return std::pair{partition_take(binding.trace.info()).kind, binding.id.value()};
+        });
 
         auto owner = partition_take(plan.allocate<Data>(1, partition_operation));
         auto& data = owner.values().front();
