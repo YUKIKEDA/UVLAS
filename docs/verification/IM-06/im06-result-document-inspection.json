@@ -1,0 +1,44 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-result-document-inspection",
+  "ids": [
+    "IO4-01",
+    "IO4-05",
+    "N4-02",
+    "QA-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "340bcc51fd5714848b000fca4784de94d5cad645",
+  "scope": "Typed inspection of linked historical status and provenance using the existing writer wire shape",
+  "verification": {
+    "ctest_regex": "^io\\.(result_documents|resolved_case_document)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 2,
+      "result_document_cases": 8,
+      "result_document_assertions": 409
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 2,
+      "result_document_cases": 8,
+      "result_document_assertions": 409,
+      "clang_tidy": "21.1.1 PASS on the implementation and test"
+    }
+  },
+  "sources": {
+    "src/io/result_documents.cpp": "d91f4388d200143f2120b799ba14d5b8f26b29c3c88d20e49c121bc1c497fbf7",
+    "src/io/result_documents.hpp": "581abed53d8d3ca95eb46087e6cd0d76fe9cf1bc556a4eddb99019738aa1f19a",
+    "src/io/json_object_reader.hpp": "20fd792aaeacac52127382fb3abf937fbcd1e7d27e45dbec6b1149a90439f1f8",
+    "tests/io/result_documents_test.cpp": "08080bcf34f39a9b881b547c57dd06e52ef9b535f0ced936983223f946ac66ed",
+    "tests/io/resolved_case_document_test.cpp": "e0e12ef62ac112c5e2cf137e5900cfa4605d61736a14155932339c33317b7f27"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/result-document-inspection.md": "49a8c7145391c7b3e83a0d8430b236f4f18f4a6f296f72558d092f11169f9a96"
+  }
+}

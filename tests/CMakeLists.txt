@@ -90,6 +90,12 @@ target_include_directories(uvlas_test_io_reference_file_snapshot PRIVATE "${PROJ
 uvlas_enable_allocation_audit(uvlas_test_io_reference_file_snapshot)
 uvlas_require_audited_dependencies(uvlas_test_io_reference_file_snapshot)
 
+uvlas_add_test(io.nastran_bulk
+    LABELS unit integration negative verification
+    SOURCES io/nastran_bulk_test.cpp
+    LIBS uvlas_io Boost::hash2)
+target_include_directories(uvlas_test_io_nastran_bulk PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.gmsh_mesh
     LABELS unit property negative verification
     SOURCES io/gmsh_mesh_test.cpp support/allocation_audit.cpp
@@ -170,6 +176,13 @@ add_test(NAME cli.validate
         "-DCASE_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}/cli-validate-$<CONFIG>"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_validate.cmake")
 set_tests_properties(cli.validate PROPERTIES TIMEOUT 30 LABELS "integration")
+
+add_test(NAME cli.inspect
+    COMMAND "${CMAKE_COMMAND}"
+        "-DUVLAS_EXECUTABLE=$<TARGET_FILE:uvlas_cli>"
+        "-DCASE_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}/cli-inspect-$<CONFIG>"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_inspect.cmake")
+set_tests_properties(cli.inspect PROPERTIES TIMEOUT 30 LABELS "integration")
 
 # QA-04: results must equal the baseline of this platform bit for bit.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
@@ -873,3 +886,9 @@ uvlas_add_test(io.si_case_resources
 target_include_directories(uvlas_test_io_si_case_resources PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 uvlas_enable_allocation_audit(uvlas_test_io_si_case_resources)
 uvlas_require_audited_dependencies(uvlas_test_io_si_case_resources)
+
+uvlas_add_test(io.nastran_number_fields
+    LABELS unit negative verification
+    SOURCES io/nastran_number_fields_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_nastran_number_fields PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
