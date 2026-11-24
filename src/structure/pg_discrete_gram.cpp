@@ -207,8 +207,10 @@ PgDiscreteGram::prepare(PgReferenceBasis&& basis, std::span<const PgDiscreteVolu
                 partition_mul(points.size(), sizeof(PgOwnedDiscreteVolumePoint));
             if (partition_add(storage, rule_bytes) > plan.remaining_bytes())
                 partition_fail(core::FailureCode::ResourceExceeded);
-            // Allow for the exact rule and one active physical point and basis sample.
-            math.admit(partition_add(basis_live_rationals + 16, partition_mul(4, points.size())));
+            // The exact rule and both endpoints of every result entry can coexist.
+            const auto held_rationals =
+                partition_add(partition_mul(4, points.size()), partition_mul(2, entries));
+            math.admit(partition_add(basis_live_rationals + 16, held_rationals));
             auto rule = partition_take(
                 plan.allocate<PgOwnedDiscreteVolumePoint>(point_count, partition_operation));
             for (std::size_t i = 0; i < points.size(); ++i) {
