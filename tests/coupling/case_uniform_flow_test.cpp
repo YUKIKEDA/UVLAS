@@ -4395,10 +4395,14 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     wider.position.maximum_steps = wider.maximum_steps;
     wider.velocity.maximum_steps = wider.maximum_steps;
     wider.tangents.maximum_steps = wider.maximum_steps;
-    const auto check_wider = [&](const cf::PgAeroMap& mapping, const cf::PgAeroChart& bound_chart,
-                                 const cf::PgAeroTrial& initial) {
+    auto wider_geometry = kinematic_limits;
+    wider_geometry.geometry.max_steps = wider_geometry.maximum_steps;
+    const auto check_with_limits = [&](const cf::PgAeroMap& mapping,
+                                       const cf::PgAeroChart& bound_chart,
+                                       const cf::PgAeroTrial& initial,
+                                       const cf::PgAeroLimits& adjusted) {
         const auto again = take(cf::evaluate_pg_aero_trial(
-            mapping, state, bound_chart, wider, scratch, *geometry_work, *global, memory));
+            mapping, state, bound_chart, adjusted, scratch, *geometry_work, *global, memory));
         const auto& initial_geometry = take_global(take(initial.contact()).get().geometry()).get();
         const auto& again_geometry = take_global(take(again.contact()).get().geometry()).get();
         CHECK(test_geometry::take(again_geometry.identity()) ==
@@ -4424,7 +4428,8 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
                                       *global, memory),
            core::FailureCode::ResourceExceeded);
     const auto trial = take(run(map, state));
-    check_wider(map, chart, trial);
+    check_with_limits(map, chart, trial, wider);
+    check_with_limits(map, chart, trial, wider_geometry);
     const auto& contact = take(trial.contact()).get();
     const auto& current = take_global(contact.geometry()).get();
     REQUIRE(trial.collocation_count() == 1);
@@ -4590,7 +4595,8 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     const auto mid_trial =
         take(cf::evaluate_pg_aero_trial(material_map, state, mid_chart, kinematic_limits, scratch,
                                         *geometry_work, *global, memory));
-    check_wider(material_map, mid_chart, mid_trial);
+    check_with_limits(material_map, mid_chart, mid_trial, wider);
+    check_with_limits(material_map, mid_chart, mid_trial, wider_geometry);
     const std::array mid_rows{take(mid_trial.collocation(0))};
     const auto& mid_contact = take(mid_trial.contact()).get();
     const auto& mid_geometry = take_global(mid_contact.geometry()).get();
