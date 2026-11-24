@@ -9,12 +9,17 @@ namespace uvlas::coupling::detail {
 struct WakeMaterialPoint {
     aero::detail::MaterialReleaseKey release;
     aero::detail::PointId point;
-    aero::detail::FacetId wake_facet;
+    // The empty facet is reserved for the true trailing-edge origin stored at birth.
+    std::optional<aero::detail::FacetId> wake_facet;
 };
+
+class WakeTransportResult;
 
 struct WakeMaterialSnapshot {
     const aero::detail::GlobalContactState& contact;
     std::span<const WakeMaterialPoint> points; ///< Strictly ascending release keys.
+    // Only the older sample may use the preceding first-step result for birth origins.
+    const WakeTransportResult* preceding_births{};
 };
 
 struct WakeTransportClock {
@@ -66,6 +71,9 @@ public:
 
     [[nodiscard]] std::size_t size() const noexcept;
     [[nodiscard]] core::Result<WakeTransportRow> row(std::size_t) const noexcept;
+    [[nodiscard]] bool has_birth(aero::detail::MaterialReleaseKey,
+                                 const std::array<std::byte, 32>& origin_geometry,
+                                 const std::array<std::byte, 32>& detached_geometry) const noexcept;
     [[nodiscard]] core::Result<WakeTransportPositionDual> position_dual(std::size_t) const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
     parent_free_velocity() const& noexcept;

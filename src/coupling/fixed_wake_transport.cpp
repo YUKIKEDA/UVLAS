@@ -144,7 +144,9 @@ a::PointId certify_particle(const WakeMaterialPoint& point, const a::OwnedGeomet
         !trailing_point(topology, point.release.point, work) ||
         trailing_point(topology, canonical, work))
         reject(InvalidInput);
-    const auto wake = read(contact.uvlm_quad(point.wake_facet, work.limit - work.used, work.stop));
+    if (!point.wake_facet)
+        reject(InvalidInput);
+    const auto wake = read(contact.uvlm_quad(*point.wake_facet, work.limit - work.used, work.stop));
     work.used += wake.used_steps;
     if (wake.role != a::AeroFaceRole::Wake)
         reject(InvalidInput);
@@ -161,7 +163,7 @@ a::PointId certify_particle(const WakeMaterialPoint& point, const a::OwnedGeomet
 TransportStencil prepare_stencil(const WakeTransportClock& clock,
                                  const std::array<WakeMaterialSnapshot, 3>& snapshots,
                                  const WakeTransportLimits& limits, core::ResourcePlan& memory,
-                                 m::Work& work) {
+                                 m::Work& work, bool allow_births = false) {
     work.step();
     const auto count = snapshots.front().points.size();
     if (count > limits.maximum_particles)
@@ -178,7 +180,8 @@ TransportStencil prepare_stencil(const WakeTransportClock& clock,
     for (std::size_t k = 0; k < snapshots.size(); ++k) {
         work.step();
         const auto& snapshot = snapshots[k];
-        if (snapshot.points.size() != count)
+        if (snapshot.points.size() != count ||
+            (snapshot.preceding_births && (!allow_births || k != 2)))
             reject(InvalidInput);
         auto address = clock.destination;
         if (k != 0) {
@@ -201,8 +204,21 @@ TransportStencil prepare_stencil(const WakeTransportClock& clock,
             if ((i != 0 && snapshot.points[i - 1].release >= point.release) ||
                 point.release != snapshots.front().points[i].release)
                 reject(StaleGeneration);
-            const auto canonical =
-                certify_particle(point, geometry, snapshot.contact, topology, work);
+            const auto canonical = [&] {
+                if (point.wake_facet)
+                    return certify_particle(point, geometry, snapshot.contact, topology, work);
+                if (!snapshot.preceding_births || k != 2 || point.point != point.release.point ||
+                    read(geometry.owner(point.point)) != point.point ||
+                    !trailing_point(topology, point.point, work))
+                    reject(InvalidInput);
+                const auto& detached = read(snapshots[1].contact.geometry()).get();
+                for (int bit = 0; bit <= std::numeric_limits<std::size_t>::digits; ++bit)
+                    work.step();
+                if (!snapshot.preceding_births->has_birth(point.release, read(geometry.identity()),
+                                                          read(detached.identity())))
+                    reject(StaleGeneration);
+                return point.point;
+            }();
             const auto row = retained.values();
             row[i].release = point.release;
             row[i].point[k] = canonical;
@@ -290,11 +306,18 @@ Vector current_direction(const DiscreteFreeWakeDirection& direction, a::PointId 
 }
 } // namespace
 
+struct WakeBirthHistory {
+    std::array<std::byte, 32> origin_geometry;
+    std::array<std::byte, 32> detached_geometry;
+    core::PlannedBuffer<std::uint8_t> born;
+};
+
 struct WakeTransportData {
     core::PlannedBuffer<std::optional<WakeTransportRow>> rows;
     core::PlannedBuffer<std::optional<WakeTransportPositionDual>> dual;
     std::optional<DiscreteFreeWakeVelocity> free;
     std::optional<DiscreteFreeWakeVelocity> parent_free;
+    std::optional<WakeBirthHistory> birth_history;
     std::optional<a::ScaledEnclosure> prescribed_time;
 };
 
@@ -315,6 +338,27 @@ core::Result<WakeTransportRow> WakeTransportResult::row(std::size_t i) const noe
     }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
+bool WakeTransportResult::has_birth(
+    a::MaterialReleaseKey key, const std::array<std::byte, 32>& origin_geometry,
+    const std::array<std::byte, 32>& detached_geometry) const noexcept {
+    if (data_.size() == 0)
+        return false;
+    const auto& data = data_.values().front();
+    const auto& birth = data.birth_history;
+    if (!birth || birth->origin_geometry != origin_geometry ||
+        birth->detached_geometry != detached_geometry)
+        return false;
+    const auto rows = data.rows.values();
+    const auto at = std::ranges::lower_bound(
+        rows, std::optional{key}, {}, [](const auto& row) -> std::optional<a::MaterialReleaseKey> {
+            if (row)
+                return row->release;
+            return std::nullopt;
+        });
+    return at != rows.end() && *at && (*at)->release == key &&
+           birth->born.values()[static_cast<std::size_t>(at - rows.begin())] != 0;
+}
+
 core::Result<WakeTransportPositionDual>
 WakeTransportResult::position_dual(std::size_t i) const noexcept {
     if (data_.size() != 0) {
@@ -464,6 +508,9 @@ struct WakeTransportBuilder {
         auto& out = owner.values().front();
         out.rows = allocate<std::optional<WakeTransportRow>>(memory, points.size());
         out.dual = allocate<std::optional<WakeTransportPositionDual>>(memory, seeds.size());
+        if (birth_epoch)
+            out.birth_history.emplace(read(y.identity()), read(x.identity()),
+                                      allocate<std::uint8_t>(memory, points.size()));
         a::LocalRootScratch scratch;
         for (std::size_t i = 0; i < points.size(); ++i) {
             work.step();
@@ -492,6 +539,8 @@ struct WakeTransportBuilder {
                                      scratch, work));
             }
             const auto key = points[i].current.release;
+            if (out.birth_history && !points[i].parent)
+                out.birth_history->born.values()[i] = 1;
             out.rows.values()[i].emplace(WakeTransportRow{
                 key, keep(residual, limits.representation, scratch, work), tangent, {}, {}});
             if (!seeds.empty()) {
@@ -523,7 +572,7 @@ struct WakeTransportBuilder {
          a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
          core::ResourcePlan& memory, const std::stop_token& stop) {
         m::Work work{0, limits.maximum_steps, stop};
-        auto stencil = prepare_stencil(clock, snapshots, limits, memory, work);
+        auto stencil = prepare_stencil(clock, snapshots, limits, memory, work, true);
         const auto size = stencil.rows.size();
         if ((direction == nullptr
                  ? !history.previous.empty() || !history.older.empty()

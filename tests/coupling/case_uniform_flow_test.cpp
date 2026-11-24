@@ -4135,6 +4135,25 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     reject(first(first_interval, retained_previous, retained_start, release.epoch, restarted),
            core::FailureCode::StaleGeneration);
 
+    const cf::FirstFreeWakeEndpoint trailing_start{start_source, start_flow, trailing_point, &d};
+    const auto interval_birth =
+        take(first(first_interval, retained_previous, trailing_start, release.epoch, born));
+    const std::array birth_origin{cf::WakeMaterialPoint{release, release.point, std::nullopt}};
+    auto from_origin = stages;
+    from_origin[2].points = birth_origin;
+    reject(run_material(from_origin), core::FailureCode::InvalidInput);
+    from_origin[2].preceding_births = &birth;
+    reject(run_material(from_origin), core::FailureCode::StaleGeneration);
+    from_origin[2].preceding_births = &interval_birth;
+    const auto after_birth = take(run_material(from_origin));
+    const auto after_birth_row = take(after_birth.row(0));
+    // Xn=2, Xn-1=15/8, and the only Xn-2 is the authenticated TE origin at x=1.
+    residual_expected(after_birth_row.residual[0], Rat{-2});
+    near(center(after_birth_row.residual[2]), -vz[1]);
+    CHECK(take(after_birth.position_dual(0)).release == release);
+    const std::array origin_as_current{from_origin[2], from_origin[1], from_origin[2]};
+    reject(run_material(origin_as_current), core::FailureCode::InvalidInput);
+
     auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
                                   R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
     prescribed_case.field("units").set("length", string("m"));
