@@ -1,6 +1,6 @@
 #pragma once
-
 #include "exact_triangle_predicates.hpp"
+#include "pchip_rational_slots.hpp"
 
 #include <array>
 #include <memory>
@@ -157,11 +157,13 @@ struct GeometryInput {
     std::span<const QuadInput> quads;
     ScalarWords core_radius;
     GeometryContext context;
+    std::optional<pchip::RationalView>
+        exact_time; ///< Original canonical SI instant, copied on preparation.
     GeometryInput(std::span<const PointId> p, std::span<const PointBinding> binding, PositionView r,
                   PositionView c, std::span<const EdgeInput> e, std::span<const FaceInput> f,
                   std::span<const BandId> b, std::span<const TriangleInput> t,
-                  std::span<const QuadInput> q, ScalarWords radius_words,
-                  GeometryContext stamp) noexcept
+                  std::span<const QuadInput> q, ScalarWords radius_words, GeometryContext stamp,
+                  std::optional<pchip::RationalView> instant = {}) noexcept
         : points(p),
           bindings(binding),
           reference(r),
@@ -172,7 +174,8 @@ struct GeometryInput {
           triangles(t),
           quads(q),
           core_radius(radius_words),
-          context(stamp) {}
+          context(stamp),
+          exact_time(instant) {}
 };
 struct GeometryCounts {
     std::uint64_t points, edges, faces, bands, triangles, quads;
@@ -253,6 +256,8 @@ public:
         return context_;
     }
     [[nodiscard]] AeroResult<std::array<std::byte, 32>> identity() const noexcept;
+    [[nodiscard]] AeroResult<std::optional<pchip::RationalView>> exact_time() const& noexcept;
+    [[nodiscard]] AeroResult<std::optional<pchip::RationalView>> exact_time() const&& = delete;
     [[nodiscard]] AeroResult<GeometryCounts> counts() const noexcept;
     [[nodiscard]] AeroResult<std::uint64_t> payload_bytes() const noexcept;
     [[nodiscard]] AeroResult<PointId> owner(PointId point) const noexcept;

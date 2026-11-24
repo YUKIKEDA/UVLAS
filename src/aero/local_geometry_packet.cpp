@@ -88,7 +88,8 @@ struct LocalPacketStorage {
 };
 class LocalPacketEngine {
     static AeroResult<LocalQualification> qualify(const LocalGeometryInput& input,
-                                                  const NondegenerateTriangle& relation) noexcept {
+                                                  const NondegenerateTriangle& relation,
+                                                  bool bound) noexcept {
         const auto& data = *input.owner;
         const auto& facet = data.facets.values()[static_cast<std::size_t>(input.facet)];
         const auto& support = input.query.support;
@@ -107,6 +108,22 @@ class LocalPacketEngine {
         }
         const bool on =
             relation.plane == PlaneSide::On && relation.projection != ProjectionFeature::Outside;
+        if (bound && on) {
+            if (relation.projection == ProjectionFeature::Face)
+                return BoundInterior{};
+            const auto* origin = std::get_if<QuadOrigin>(&facet.origin);
+            constexpr std::array projection{ProjectionFeature::Edge01, ProjectionFeature::Edge12,
+                                            ProjectionFeature::Edge20};
+            if (origin != nullptr) {
+                const auto diagonal =
+                    data.quads.values()[static_cast<std::size_t>(origin->source)].diagonal;
+                for (std::size_t edge = 0; edge < projection.size(); ++edge)
+                    if (relation.projection == projection[edge] &&
+                        data.edges.values()[static_cast<std::size_t>(facet.edges[edge])].id ==
+                            diagonal)
+                        return BoundInterior{};
+            }
+        }
         if (member) {
             if (!on)
                 return std::unexpected(packet_failure(core::FailureCode::GeometryInvalid,
@@ -147,7 +164,7 @@ public:
     static AeroResult<LocalGeometryPacket>
     prepare(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
             LocalAccuracy accuracy, const GeometryLimits& limits, LocalPacketWorkspace& workspace,
-            core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
+            core::ResourcePlan& plan, const std::stop_token& stop, bool bound = false) noexcept {
         const auto context = geometry.context();
         auto lease = workspace.acquire(context.diagnostics);
         if (!lease)
@@ -187,7 +204,7 @@ public:
             auto qualification = [&] {
                 const LocalClock clock{accuracy.collect_timings ? &measured.qualification
                                                                 : nullptr};
-                return qualify(*input, *relation);
+                return qualify(*input, *relation, bound);
             }();
             if (!qualification)
                 return std::unexpected(qualification.error());
@@ -481,5 +498,13 @@ prepare_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& query, 
                      const std::stop_token& stop) noexcept {
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
                                       stop);
+}
+AeroResult<LocalGeometryPacket>
+prepare_bound_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& query,
+                           FacetId target, LocalAccuracy accuracy, const GeometryLimits& limits,
+                           LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
+                           const std::stop_token& stop) noexcept {
+    return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
+                                      stop, true);
 }
 } // namespace uvlas::aero::detail

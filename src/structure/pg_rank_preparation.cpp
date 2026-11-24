@@ -554,6 +554,17 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
     return jet;
 }
 
+core::Result<std::span<const std::uint32_t>>
+PgRankPreparation::basis_indices(PgRankBasisColumn column) const& noexcept {
+    return partition_entry([&]() -> core::Result<std::span<const std::uint32_t>> {
+        const auto& state = rank_state(state_);
+        const auto k = rank_index(column.value, state.info.rank);
+        const auto start = static_cast<std::size_t>(state.basis_offsets.values()[k]);
+        const auto end = static_cast<std::size_t>(state.basis_offsets.values()[k + 1]);
+        return state.basis_rows.values().subspan(start, end - start);
+    });
+}
+
 core::Result<ExactRational> PgRankPreparation::basis(PgRankBasisColumn column, core::Index row,
                                                      const ExactLimits& limits,
                                                      core::ResourcePlan& plan) const noexcept {

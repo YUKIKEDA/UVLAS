@@ -66,20 +66,6 @@ struct EnclosedInteger {
 }
 
 template <class I>
-[[nodiscard]] ExactRational materialize(const I& units, std::uint32_t scale,
-                                        const ExactLimits& limits, core::ResourcePlan& plan) {
-    if (units == 0)
-        return {};
-    const auto magnitude = rank_abs(units);
-    const auto trailing = std::min<std::uint64_t>(scale, boost::multiprecision::lsb(magnitude));
-    auto numerator = I{magnitude >> trailing};
-    if (units < 0)
-        numerator = -numerator;
-    return rank_exact(RankFraction<I>{std::move(numerator), I{I{1} << (scale - trailing)}}, limits,
-                      plan);
-}
-
-template <class I>
 void accumulate(EnclosedInteger<RankWide>& out, const EnclosedInteger<I>& entry,
                 const RankCell& factor, ConditioningBudget& work) {
     const bool positive = factor > 0;
@@ -137,8 +123,8 @@ state(const core::PlannedBuffer<PgConditioningState>& buffer) {
 [[nodiscard]] ExactRational entry(ReferenceArithmetic& math, const PgConditioningState& source,
                                   std::size_t i, std::size_t j) {
     math.charge();
-    return materialize(source.transform.values()[packed(i, j)], source.transform_scale,
-                       math.leaf_limits, math.plan);
+    return rank_materialize_dyadic(source.transform.values()[packed(i, j)], source.transform_scale,
+                                   math.leaf_limits, math.plan);
 }
 
 } // namespace
@@ -257,7 +243,7 @@ PgConditioningCertificate::congruence_bound(const ExactLimits& limits,
                                             core::ResourcePlan& plan) const noexcept {
     return partition_entry([&]() -> core::Result<ExactRational> {
         const auto& accepted = state(state_);
-        return materialize(accepted.bound, accepted.congruence_scale, limits, plan);
+        return rank_materialize_dyadic(accepted.bound, accepted.congruence_scale, limits, plan);
     });
 }
 
@@ -280,9 +266,41 @@ PgConditioningCertificate::transform_coefficient(PgRankBasisColumn row, PgRankBa
             fail(core::FailureCode::InvalidInput);
         if (i > j)
             return ExactRational{};
-        return materialize(accepted.transform.values()[packed(static_cast<std::size_t>(i),
-                                                              static_cast<std::size_t>(j))],
-                           accepted.transform_scale, limits, plan);
+        return rank_materialize_dyadic(
+            accepted.transform
+                .values()[packed(static_cast<std::size_t>(i), static_cast<std::size_t>(j))],
+            accepted.transform_scale, limits, plan);
+    });
+}
+
+core::Result<PgReferenceBasisValue>
+PgConditioningCertificate::evaluate(const PgReferencePoint& query, PgRankBasisColumn column,
+                                    const PgReferenceLimits& limits,
+                                    core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<PgReferenceBasisValue> {
+        auto math = ReferenceArithmetic{limits, plan};
+        // Besides the ordinary point path: nine accumulated values, an exact
+        // weight, and the two arithmetic operands/result during accumulation.
+        math.admit(basis_live_rationals + 16);
+        const auto& accepted = state(state_);
+        if (column.value < 0 || static_cast<std::uint64_t>(column.value) >= accepted.info.rank)
+            fail(core::FailureCode::InvalidInput);
+        auto point = basis_.locate(math, query);
+        std::array<std::array<ExactRational, 3>, 3> combined{};
+        const auto j = static_cast<std::size_t>(column.value);
+        for (std::size_t i = 0; i <= j; ++i) {
+            math.visit(1);
+            if (accepted.transform.values()[packed(i, j)] == 0)
+                continue;
+            const auto weight = entry(math, accepted, i, j);
+            const auto source = basis_.numerator_jet(math, {partition_index(i)}, point);
+            for (std::size_t field = 0; field < combined.size(); ++field)
+                for (std::size_t d = 0; d < combined[field].size(); ++d)
+                    if (source[field][d].sign() != 0)
+                        combined[field][d] =
+                            math.add(combined[field][d], math.mul(weight, source[field][d]));
+        }
+        return basis_.assemble(math, std::move(point), column, combined);
     });
 }
 

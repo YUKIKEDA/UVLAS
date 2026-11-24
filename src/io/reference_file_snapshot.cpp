@@ -20,19 +20,25 @@ constexpr std::size_t read_chunk = 65'536;
 
 ReferenceFileSnapshot::ReferenceFileSnapshot(core::PlannedBuffer<std::byte> payload,
                                              SourceDigest verified_digest,
-                                             ReferenceFileInfo verified_info) noexcept
-    : bytes_(std::move(payload)), digest_(verified_digest), info_(verified_info) {}
+                                             ReferenceFileInfo verified_info,
+                                             std::uint64_t verified_reads) noexcept
+    : bytes_(std::move(payload)),
+      digest_(verified_digest),
+      info_(verified_info),
+      read_calls_(verified_reads) {}
 
 ReferenceFileSnapshot::ReferenceFileSnapshot(ReferenceFileSnapshot&& other) noexcept
     : bytes_(std::move(other.bytes_)),
       digest_(other.digest_),
-      info_(std::exchange(other.info_, std::nullopt)) {}
+      info_(std::exchange(other.info_, std::nullopt)),
+      read_calls_(other.read_calls_) {}
 
 ReferenceFileSnapshot& ReferenceFileSnapshot::operator=(ReferenceFileSnapshot&& other) noexcept {
     if (this != &other) {
         bytes_ = std::move(other.bytes_);
         digest_ = other.digest_;
         info_ = std::exchange(other.info_, std::nullopt);
+        read_calls_ = other.read_calls_;
     }
     return *this;
 }
@@ -42,7 +48,7 @@ std::optional<ReferenceFileView> ReferenceFileSnapshot::view() const& noexcept {
     if (!stable_info) {
         return std::nullopt;
     }
-    return ReferenceFileView{bytes_.values(), digest_, *stable_info};
+    return ReferenceFileView{bytes_.values(), digest_, *stable_info, read_calls_};
 }
 
 core::Result<ReferenceFileSnapshot> ReferenceFileSnapshot::read_from_handle(
@@ -221,7 +227,8 @@ core::Result<ReferenceFileSnapshot> ReferenceFileSnapshot::read_from_handle(
     if (declared_digest != nullptr && digest != *declared_digest) {
         return reject(ReferenceFileFailure::DigestMismatch);
     }
-    return ReferenceFileSnapshot{std::move(*storage), digest, *before};
+    return ReferenceFileSnapshot{std::move(*storage), digest, *before,
+                                 limits.maximum_read_calls - remaining_calls};
 }
 
 core::Result<ReferenceFileSnapshot>

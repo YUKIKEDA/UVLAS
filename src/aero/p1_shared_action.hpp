@@ -8,15 +8,50 @@ class SharedP1Engine;
 struct SharedP1Data;
 struct SharedP1AdjointData;
 struct P1StrengthTag;
-using P1StrengthId = core::Identifier<P1StrengthTag>;
+/// Independent wake identifiers and bound circulation identities have disjoint domains.
+class P1StrengthId {
+    using WakeId = core::Identifier<P1StrengthTag>;
 
-/// Independent triangles hold all three columns; each fixed quad holds its ordered L/R.
-using P1FaceColumns = std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>>;
+public:
+    P1StrengthId() noexcept = default;
+    explicit P1StrengthId(std::uint64_t wake) noexcept : identity_(WakeId{wake}) {}
+
+    /// Explicitly tie a trace to a bound circulation column.
+    [[nodiscard]] static P1StrengthId bound(PhysicalFaceId face) noexcept {
+        return P1StrengthId{face};
+    }
+
+    [[nodiscard]] std::optional<PhysicalFaceId> bound_face() const noexcept {
+        if (const auto* face = std::get_if<PhysicalFaceId>(&identity_))
+            return *face;
+        return std::nullopt;
+    }
+
+    [[nodiscard]] std::optional<std::uint64_t> wake_value() const noexcept {
+        if (const auto* wake = std::get_if<WakeId>(&identity_))
+            return wake->value();
+        return std::nullopt;
+    }
+
+    /// Wake IDs sort first. Each domain uses its own stable numeric order.
+    auto operator<=>(const P1StrengthId&) const = default;
+
+private:
+    explicit P1StrengthId(PhysicalFaceId face) noexcept : identity_(face) {}
+    std::variant<WakeId, PhysicalFaceId> identity_{WakeId{0}};
+};
+
+/// One independent circulation column, keyed by its physical face identifier.
+struct P0BoundColumn {};
+/// Wake triangles hold three columns and wake quads hold their ordered L/R.
+using P1FaceColumns =
+    std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>, P0BoundColumn>;
 struct P1FaceStrengths {
+    P1FaceStrengths() noexcept = default; ///< Empty staging slot filled before qualification.
     P1FaceStrengths(PhysicalFaceId physical, const P1FaceColumns& basis) noexcept
         : face(physical), columns(basis) {}
-    PhysicalFaceId face;
-    P1FaceColumns columns;
+    PhysicalFaceId face{0};
+    P1FaceColumns columns{P0BoundColumn{}};
 };
 
 struct P1ActionStamp {
@@ -41,6 +76,7 @@ struct P1AssemblyPlan {
     std::uint64_t payload_bytes = 0;
     std::uint64_t estimated_metadata_bytes = 0;
     std::uint64_t reserved_steps = 0;
+    std::uint64_t preflight_steps = 0; ///< Measured visits spent producing the forecast.
 };
 
 struct P1AssemblyReport {
@@ -60,7 +96,7 @@ private:
     std::atomic_flag entered_ = ATOMIC_FLAG_INIT;
 };
 
-/// Retain an immutable, sparse P1 action and all local evaluation qualifications.
+/// Retain the immutable sparse induction action and all local qualifications.
 class SharedP1Action {
 public:
     SharedP1Action(SharedP1Action&&) noexcept = default;
@@ -158,6 +194,18 @@ prepare_shared_p1(const P1ActionSource&, std::span<const P1FaceStrengths>,
                   std::span<const P1StrengthId>, LocalAccuracy, P1Accuracy, const P1AssemblyLimits&,
                   SharedP1Workspace&, LocalPacketWorkspace&, P1Workspace&, core::ResourcePlan&,
                   const std::stop_token& = {}) noexcept;
+
+/// Forecast or prepare the UW-D01 mixed action. Bound quadrilaterals require
+/// P0BoundColumn, while wake faces retain their existing P1 scatter.
+[[nodiscard]] AeroResult<P1AssemblyPlan>
+forecast_bound_wake_induction(const P1ActionSource&, std::span<const P1FaceStrengths>,
+                              std::span<const P1StrengthId>, const P1AssemblyLimits&,
+                              const std::stop_token& = {}) noexcept;
+
+[[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_induction(
+    const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
+    LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
+    P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
 /// The input coefficient order matches the prepared IDs exactly. Geometry is unchanged.
 [[nodiscard]] AeroResult<P1ActionValue>

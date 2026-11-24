@@ -772,7 +772,8 @@ PYBIND11_MODULE(_uvlas, module) {
         .value("Recover", core::Operation::Recover)
         .value("CertifyError", core::Operation::CertifyError)
         .value("ExtractEigen", core::Operation::ExtractEigen)
-        .value("SaveCheckpoint", core::Operation::SaveCheckpoint);
+        .value("SaveCheckpoint", core::Operation::SaveCheckpoint)
+        .value("WriteResults", core::Operation::WriteResults);
     py::enum_<core::ResourceKind>(module, "ResourceKind",
                                   "Unit shared by required and observed resource counts.")
         .value("Bytes", core::ResourceKind::Bytes)

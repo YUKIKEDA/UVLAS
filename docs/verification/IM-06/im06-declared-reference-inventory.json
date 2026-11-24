@@ -1,0 +1,46 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-declared-reference-inventory",
+  "ids": [
+    "IO4-01",
+    "IO4-04",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-06",
+  "date": "2026-11-24",
+  "source_commit": "6465e360e308f50f1cb9863cc230301edb510098",
+  "scope": "Ownership and authentication of directly declared sources and Gmsh access by bound case identity, source and role",
+  "verification": {
+    "windows": {
+      "toolchain": "MSVC 19.51.36260 Release",
+      "ctest_regex": "^io\\.(reference_input|reference_file_snapshot|gmsh_mesh|checkpoint_directory)$",
+      "ctest_passed": 4,
+      "clang_tidy": "21.1.1 PASS (3 translation units)"
+    },
+    "linux": {
+      "toolchain": "Ubuntu 24.04 x64 GCC 14.2.0 Release",
+      "ctest_regex": "^io\\.(reference_input|checkpoint_directory)$",
+      "ctest_passed": 2
+    },
+    "inventory_cases_each": 2,
+    "inventory_assertions_each": 258,
+    "oracle": "Independent SHA-256 of sample input bytes and hand-written role, tag, connectivity, location, and lexeme expectations; exact comparison",
+    "negative_control": "Remove subtraction of actual read calls from the remaining cumulative limit; targeted assertion fails, Catch exit 42",
+    "boundary": "Nested dependencies, sidecar semantics, and physical import qualification are IM06-0 work"
+  },
+  "tested_contract": {
+    "path": "docs/specs/foundation/reference-snapshot-start-contract.md",
+    "sha256": "b4a1180ffcc96db869ce348f2884b0312832629675749e7a861387b2169a60da"
+  },
+  "sources": {
+    "src/io/reference_file_snapshot.cpp": "b2c45a6aa9ff9c6c039be279106c37d3e1f52f19c599118f9b905c50b8aab359",
+    "src/io/reference_file_snapshot.hpp": "ea2f82f6f152d9990a3ae0fb196d0342c4ae875e598c61e01830e64f46bc94d2",
+    "src/io/reference_root_snapshot.cpp": "9594e26e2b89aaeab1e2c2bbc807b413696cd6dbb15197ec4394525d12f5dacb",
+    "src/io/reference_root_snapshot.hpp": "fcfa368c5ff758effb190c1f42eb9ded4108396024b36344a8776a320e2c9cbb",
+    "tests/io/reference_input_test.cpp": "c24cee094425bef891cfc59651277f30795d69c929f8a0b5a371cd4ea3554645"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/declared-reference-inventory.md": "16ee2f84d437d9a040362698a7a387d007dba8c7920b43a520ad6fc1258a4aa2"
+  }
+}

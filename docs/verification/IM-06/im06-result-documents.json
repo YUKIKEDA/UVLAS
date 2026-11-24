@@ -1,0 +1,55 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-result-documents",
+  "ids": [
+    "IO4-05",
+    "N4-08",
+    "QA-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "d6e165c2f2cfda53b75d1d9ea869825cb01324fb",
+  "scope": "Owned private status and provenance JSON documents from submitted runtime outcome and validated core accepted-state identity",
+  "verification": {
+    "ctest_regex": "^io\\.result_documents$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "cases": 5,
+      "assertions": 108
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "cases": 5,
+      "assertions": 108,
+      "clang_tidy": "21.1.1 PASS"
+    },
+    "python": {
+      "platform": "Windows",
+      "configuration": "Release",
+      "implementation": "CPython 3.12.8",
+      "source_commit": "c3842510c212c2ce74cc9ebc883a3a2e6e618542",
+      "cases": 10,
+      "stable_operation_name": "WriteResults"
+    }
+  },
+  "tested_target_registration": {
+    "commit": "d6e165c2f2cfda53b75d1d9ea869825cb01324fb",
+    "CMakeLists.txt": "c574a1ef3fd3d82d18b18111d1ceb59f82744b7bbdebf7af3ea06f5b2eeddc04",
+    "tests/CMakeLists.txt": "6039b375dcaed8f12132d55daad9c94cdae4dca910d10686420f316879bd1466"
+  },
+  "sources": {
+    "src/io/result_documents.cpp": "a53fbd382a2a7d98d5d94838f29efd08360cd2fa3e46835ce1fe7970e9848995",
+    "src/io/result_documents.hpp": "627376817b7d57a029d49e31ac93093bd8a37d4d322616632d747bedbae4c959",
+    "src/core/build_info.cpp": "78ba2a6cd427f6d9f447e83f883a521e18cfd9459ca2169e3e13aa40c8998588",
+    "include/uvlas/core/failure.hpp": "ca766486b00bf71a906baea3d87c2b53fe0773eece6538508531659055404661",
+    "tests/io/result_documents_test.cpp": "e7abdbd8bb4b19e042be23fbb29823b48068376c8cbbd8c06797adbb1e6e52d7",
+    "src/python/module.cpp": "599af75b36e7901516694add1804a0a52224595d62cd9a7ecb52684a9d5ff124",
+    "tests/python/test_ownership.py": "8ab9bcc9fd9903f101c33b273102ee6241d04162d57afed79963728abf1ee703"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/result-documents.md": "f56b18359a19a731dbc4eba172e4198e31c1fde44af024148d2c84b52c928361"
+  }
+}

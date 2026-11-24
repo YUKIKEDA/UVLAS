@@ -65,7 +65,7 @@ target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spec
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
-    src/structure/pg_conditioning.cpp)
+    src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -117,9 +117,10 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_rational_projection.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
     src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp
-    src/io/checkpoint_manifest.cpp)
+    src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
+target_sources(uvlas_io PRIVATE src/io/result_documents.cpp src/io/resolved_case_document.cpp)
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_io PUBLIC uvlas_core uvlas_structure PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
@@ -135,10 +136,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp
-    src/coupling/case_uniform_flow_projection.cpp)
+    src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero)
+target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero PRIVATE Boost::multiprecision)
 
 add_executable(uvlas_cli src/app/main.cpp)
 uvlas_configure_target(uvlas_cli)

@@ -44,6 +44,8 @@ std::uint64_t linear_geometry_work(std::uint64_t f) {
 void same_model(const GeometryData& a, const GeometryData& b, Run& r) {
     auto ca = a.context, cb = b.context;
     ca.current = cb.current;
+    // Reference compatibility ignores both trial time representations. The
+    // current geometry owner retains its own exact-time identity.
     ca.time = cb.time;
     ca.diagnostics = cb.diagnostics;
     if (ca != cb)
@@ -184,7 +186,8 @@ GlobalResult<GlobalTopology> GlobalEngine::build(const OwnedGeometry& source,
             const auto i = lookup(g.face_lookup.values(), role.face.value(), run, role.face);
             if (data.roles.values()[i] != 0 || static_cast<unsigned>(role.role) > 1)
                 reject(core::FailureCode::InvalidInput, role.face);
-            data.roles.values()[i] = role.role == AeroFaceRole::Bound ? 1 : 2;
+            data.roles.values()[i] =
+                role.role == AeroFaceRole::Bound ? GlobalTopologyData::bound_role : 2;
         }
         for (const auto& binding : input.edges) {
             const auto i = lookup(g.edge_lookup.values(), binding.edge.value(), run, binding.edge);
@@ -265,7 +268,8 @@ GlobalResult<GlobalTopology> GlobalEngine::build(const OwnedGeometry& source,
             for (const auto& facet : g.facets.values())
                 for (std::size_t k = 0; k < 3; ++k) {
                     run.step();
-                    if (data.roles.values()[static_cast<std::size_t>(facet.face)] == 1 &&
+                    if (data.roles.values()[static_cast<std::size_t>(facet.face)] ==
+                            GlobalTopologyData::bound_role &&
                         data.edges.values()[static_cast<std::size_t>(facet.edges[k])].owner ==
                             owner) {
                         ++count;
@@ -446,6 +450,83 @@ GlobalContactState::geometry() const& noexcept {
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
     return std::cref(*owner);
 }
+
+GlobalResult<UvlmQuad> GlobalContactState::uvlm_quad(FacetId id, std::uint64_t max_steps,
+                                                     const std::stop_token& stop) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<UvlmQuad> {
+        const auto geometry_owner = geometry();
+        if (!geometry_owner)
+            return std::unexpected(geometry_owner.error());
+        const auto& topology = data_.values()[0].topology;
+        const auto& source = GlobalEngine::source(geometry_owner->get());
+        if (!topology || !source)
+            reject(core::FailureCode::InvalidInput, id);
+        std::uint64_t used = 0;
+        const auto step = [&] {
+            if (stop.stop_requested())
+                reject(core::FailureCode::Cancelled, id);
+            if (used == max_steps)
+                reject(core::FailureCode::ResourceExceeded, id);
+            ++used;
+        };
+        const auto find = [&](std::span<const IdLookup> rows, std::uint64_t key) {
+            const auto it = std::lower_bound(rows.begin(), rows.end(), key,
+                                             [&](const IdLookup& row, std::uint64_t value) {
+                                                 step();
+                                                 return row.id < value;
+                                             });
+            if (it == rows.end() || it->id != key)
+                reject(core::FailureCode::InvalidInput, id);
+            return static_cast<std::size_t>(it->ordinal);
+        };
+        step();
+        const auto& facet =
+            source->facets.values()[find(source->facet_lookup.values(), id.value())];
+        const auto* origin = std::get_if<QuadOrigin>(&facet.origin);
+        if (origin == nullptr)
+            reject(core::FailureCode::InvalidInput, id);
+        const auto& quad = source->quads.values()[static_cast<std::size_t>(origin->source)];
+        const bool bound = topology->roles.values()[static_cast<std::size_t>(facet.face)] ==
+                           GlobalTopologyData::bound_role;
+        std::optional<TrailingEdgeRow> attachment;
+        if (!bound) {
+            const auto rows = topology->trailing.values();
+            for (std::size_t side = 0; side < quad.edges.size(); ++side) {
+                step();
+                const auto raw = find(source->edge_lookup.values(), quad.edges[side]);
+                const auto owner = static_cast<std::size_t>(topology->edges.values()[raw].owner);
+                const auto& edge = source->edges.values()[owner];
+                const auto entry = std::lower_bound(rows.begin(), rows.end(), EdgeId{edge.id},
+                                                    [&](const TrailingEdgeRow& row, EdgeId value) {
+                                                        step();
+                                                        return row.edge < value;
+                                                    });
+                if (entry == rows.end() || entry->edge.value() != edge.id)
+                    continue;
+                if (side != 0)
+                    reject(core::FailureCode::GeometryInvalid, id);
+                const auto from =
+                    source->points.values()[find(source->point_lookup.values(), quad.points[0])]
+                        .owner;
+                const bool positive = from == edge.points[0];
+                if ((entry->wake_sign == 1) != positive)
+                    reject(core::FailureCode::GeometryInvalid, id);
+                attachment = *entry;
+            }
+        }
+        return UvlmQuad{PhysicalFaceId{quad.parent},
+                        bound ? AeroFaceRole::Bound : AeroFaceRole::Wake,
+                        {FacetId{quad.facets[0]}, FacetId{quad.facets[1]}},
+                        attachment,
+                        used};
+    });
+}
+std::size_t GlobalContactState::trailing_edge_count() const noexcept {
+    if (!active() || !data_.values()[0].topology)
+        return 0;
+    return data_.values()[0].topology->trailing.size();
+}
+
 GlobalResult<GlobalWorkPlan> GlobalContactState::work_plan() const noexcept {
     if (!active())
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));

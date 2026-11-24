@@ -92,12 +92,16 @@ struct ReferenceFileDiagnostic {
 
 struct ReferenceFileView {
     ReferenceFileView(std::span<const std::byte> payload, SourceDigest verified_digest,
-                      ReferenceFileInfo verified_info) noexcept
-        : bytes(payload), digest(verified_digest), file_info(verified_info) {}
+                      ReferenceFileInfo verified_info, std::uint64_t verified_reads) noexcept
+        : bytes(payload),
+          digest(verified_digest),
+          file_info(verified_info),
+          read_calls(verified_reads) {}
 
     std::span<const std::byte> bytes;
     SourceDigest digest;
     ReferenceFileInfo file_info;
+    std::uint64_t read_calls; // Includes the successful EOF probe.
 };
 
 // Owns the exact payload read from a stable handle and the SHA-256 of those bytes.
@@ -130,10 +134,11 @@ private:
                      const ReferenceFileIdentityChecks&) noexcept;
 
     ReferenceFileSnapshot(core::PlannedBuffer<std::byte> payload, SourceDigest verified_digest,
-                          ReferenceFileInfo verified_info) noexcept;
+                          ReferenceFileInfo verified_info, std::uint64_t verified_reads) noexcept;
     core::PlannedBuffer<std::byte> bytes_;
     SourceDigest digest_;
     std::optional<ReferenceFileInfo> info_;
+    std::uint64_t read_calls_;
 };
 
 // Reads and verifies one handle. On failure, successful allocations stay charged but no

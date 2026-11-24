@@ -17,6 +17,11 @@ constexpr auto operation = core::Operation::PrepareModel;
     return std::unexpected(core::Failure{code, operation});
 }
 
+[[nodiscard]] bool same_parent(const SchemaIdentity& left, const SchemaIdentity& right) noexcept {
+    return left.source == right.source && left.contract_revision == right.contract_revision &&
+           left.representation_revision == right.representation_revision;
+}
+
 void mark(RootSnapshotDiagnostic* diagnostic, RootSnapshotFailure reason) noexcept {
     if (diagnostic) {
         diagnostic->reason = reason;
@@ -85,6 +90,7 @@ void RootSnapshotDiagnostic::reset() noexcept {
     location.reset();
     open.reset();
     read.reset();
+    source_quota.reset();
     declaration_pointer = {};
 }
 
@@ -113,9 +119,7 @@ struct BoundRoot {
         mark(diagnostic, RootSnapshotFailure::InvalidSelection);
         return failure(core::FailureCode::InvalidInput);
     }
-    if (input_parent->source != declared_parent->source ||
-        input_parent->contract_revision != declared_parent->contract_revision ||
-        input_parent->representation_revision != declared_parent->representation_revision) {
+    if (!same_parent(*input_parent, *declared_parent)) {
         mark(diagnostic, RootSnapshotFailure::StaleParent);
         return failure(core::FailureCode::StaleGeneration);
     }
@@ -203,6 +207,126 @@ acquire_root_snapshot(const ReferenceInput& input, const PreparedRootReferences&
     }
     return acquire_bound_root_snapshot(*bound, prepared, source_ordinal, earlier_sources, limits,
                                        plan, stop, diagnostic);
+}
+
+AcquiredRootReferences::AcquiredRootReferences(
+    PreparedRootReferences declarations,
+    core::PlannedBuffer<std::optional<AcquiredRootSnapshot>> sources) noexcept
+    : declarations_(std::move(declarations)), sources_(std::move(sources)) {}
+
+core::Result<SchemaIdentity> AcquiredRootReferences::identity() const noexcept {
+    return declarations_.identity();
+}
+
+core::Result<RootReferenceReport> AcquiredRootReferences::report() const noexcept {
+    return declarations_.report();
+}
+
+core::Result<RootReferenceDeclarationView>
+AcquiredRootReferences::declaration(core::Index ordinal) const& noexcept {
+    return declarations_.declaration(ordinal);
+}
+
+core::Result<std::reference_wrapper<const AcquiredRootSnapshot>>
+AcquiredRootReferences::find(const SchemaIdentity& parent, SourceId source, ReferenceRole role,
+                             const std::stop_token& stop) const& noexcept {
+    using Code = core::FailureCode;
+    if (stop.stop_requested()) {
+        return failure(Code::Cancelled);
+    }
+    const auto actual = identity();
+    if (!actual) {
+        return std::unexpected(actual.error());
+    }
+    if (!same_parent(parent, *actual)) {
+        return failure(Code::StaleGeneration);
+    }
+    for (const auto& entry : sources_.values()) {
+        if (stop.stop_requested()) {
+            return failure(Code::Cancelled);
+        }
+        if (entry && entry->location.source == source && entry->location.role == role) {
+            return std::cref(*entry);
+        }
+    }
+    return failure(Code::InvalidInput);
+}
+
+core::Result<AcquiredRootReferences>
+acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& prepared,
+                        RootInventoryLimits limits, core::ResourcePlan& plan,
+                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic) noexcept {
+    using Code = core::FailureCode;
+    if (diagnostic) {
+        diagnostic->reset();
+    }
+    if (stop.stop_requested()) {
+        return failure(Code::Cancelled);
+    }
+    const auto bound = bind_root(input, prepared, diagnostic);
+    if (!bound) {
+        return std::unexpected(bound.error());
+    }
+    const auto report = prepared.report();
+    if (!report) {
+        return std::unexpected(report.error());
+    }
+    const auto count = report->unique_sources;
+    if (count > limits.maximum_sources || !std::in_range<core::Index>(count)) {
+        mark(diagnostic, RootSnapshotFailure::SourceLimit);
+        if (diagnostic) {
+            diagnostic->source_quota = ReferenceFileQuota{count, limits.maximum_sources};
+        }
+        return failure(Code::ResourceExceeded);
+    }
+    const auto extent = static_cast<core::Index>(count);
+    auto files = plan.allocate<std::optional<AcquiredRootSnapshot>>(extent, operation);
+    if (!files) {
+        mark(diagnostic, RootSnapshotFailure::InventoryStorage);
+        return std::unexpected(files.error());
+    }
+    auto previous = plan.allocate<ReferenceFileId>(extent, operation);
+    if (!previous) {
+        mark(diagnostic, RootSnapshotFailure::InventoryStorage);
+        return std::unexpected(previous.error());
+    }
+    const std::uint64_t manifest_checks = bound->origin.manifest_identity.has_value() ? 1 : 0;
+    for (std::size_t i = 0; i < files->size(); ++i) {
+        if (cancelled(stop, diagnostic)) {
+            return failure(Code::Cancelled);
+        }
+        const auto& per_file = limits.per_source.file;
+        const RootSnapshotLimits admitted{
+            {std::min(per_file.maximum_file_bytes, limits.total_payload_bytes),
+             std::min(per_file.maximum_read_bytes, limits.total_read_bytes),
+             std::min(per_file.maximum_read_calls, limits.total_read_calls),
+             std::min(per_file.maximum_hash_bytes, limits.total_hash_bytes)},
+            std::min(limits.per_source.maximum_identity_comparisons,
+                     limits.total_identity_comparisons),
+            limits.per_source.diagnostic_bytes};
+        auto acquired = acquire_bound_root_snapshot(*bound, prepared, static_cast<core::Index>(i),
+                                                    previous->values().first(i), admitted, plan,
+                                                    stop, diagnostic);
+        if (!acquired) {
+            return std::unexpected(acquired.error());
+        }
+        const auto file = acquired->file.view();
+        if (!file) {
+            return failure(Code::InvalidInput);
+        }
+        const auto bytes = file->file_info.byte_count;
+        limits.total_payload_bytes -= bytes;
+        limits.total_read_bytes -= bytes + 1;
+        limits.total_read_calls -= file->read_calls;
+        limits.total_hash_bytes -= bytes;
+        limits.total_identity_comparisons -= i + manifest_checks;
+        previous->values()[i] = file->file_info.identity;
+        files->values()[i].emplace(std::move(*acquired));
+    }
+    if (cancelled(stop, diagnostic)) {
+        return failure(Code::Cancelled);
+    }
+    return AcquiredRootReferences{std::move(prepared), std::move(*files)};
 }
 
 std::string_view ReferenceWalkStartDiagnostic::pointer() const& noexcept {

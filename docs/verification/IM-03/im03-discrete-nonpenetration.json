@@ -1,0 +1,119 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-nonpenetration-v1",
+  "ids": [
+    "AE-07",
+    "UW-D01",
+    "UW-D03",
+    "UW-D06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "45d3c8e1eb33880d890c76777a4b346a85339406",
+  "claimed_state": "Original finite nonpenetration residual and circulation action on explicit discrete collocation, signed implicit TE transfer, frozen input wake traces and projected typed SI uniform flow.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config. Debug and Release 4/4 each.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2.0 Release, warnings as errors. 4/4.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "aero.uniform_flow"
+    ],
+    "catch_new": "Each configuration 1 case and 76 assertions for the discrete nonpenetration filter, seed 23.",
+    "oracle": "60-digit direct finite-core line integral plus rectangular wake surface quadrature GL48/72/96. Observed residual changes 4.87e-23 and 4.75e-34 m/s. Comparison allowance 1e-24 m/s plus propagated enclosure.",
+    "mutation": "Isolated GCC 14 Release: replace the positive signed implicit front coefficient with an old trace. Control 76/76; mutation fails two comparisons of the original residual and the linear circulation action, Catch exit 42.",
+    "static": "clang-format 21.1.2; both OS clang-tidy 21.1.1 for affected translation units.",
+    "scope": "Explicit discrete collocation on retained contact-qualified quadrilaterals. The original exact SI time, when supplied at geometry preparation, is owned and compared without rounding against the projected case jet. Legacy binary64 instants retain exact dyadic comparison. PG material-map kinematics, accepted history production, solving and certifying circulation, and full geometry/time derivatives remain downstream.",
+    "identity_recheck": "Merged typed IDs, explicit alias only at T=+1 and collision-free independent column at T=-1. Same numerical old and bound IDs coexist and typed bound history/trailing is rejected. MSVC Debug/Release and GCC 14.2 Release each 4/4, discrete nonpenetration 1 case and 80 assertions in each, seed 23. Windows and Linux clang-tidy 21.1.1 passed on both affected coupling translation units. A prior-stage isolated GCC mutant mapped the bound basis to the same-number independent trace, failing 25 of 82 assertions, Catch exit 42. Original numerical baseline: e33c3d49eaf3375e69cb0df180110bb718ce968c.",
+    "exact_event_recheck": "The owned 0.1 s PCHIP event with Right side passes. A distinct exact event within the same binary64 rounding cell and the Left side are rejected. Changing and releasing the input time words preserves the owned time. Same-context distinct exact times have distinct snapshot identities. Limb work and hash visits are bounded; a 200-step empty-geometry control distinguishes the explicit and legacy paths. MSVC Debug/Release and GCC 14.2 Release each 5/5, discrete nonpenetration 2 cases and 109 assertions, seed 23. Prior source: 20d19133804a5bd5ab58ebfc9feee778abdd3bdd."
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "src/aero/geometry_snapshot_storage.hpp",
+      "hint": "src/aero/geometry_snapshot_storage.hpp",
+      "sha256": "fda1182e6ce0cd57bd084c374dfe154b3315de18f0bc7b40b8fd2e16daf07302"
+    },
+    {
+      "id": "src/aero/geometry_snapshot.cpp",
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "sha256": "9cb6a8917f4bc4964d68d648280efea0c8a672f691421c5e4cc0b01d98ceef5f"
+    },
+    {
+      "id": "src/aero/geometry_snapshot.hpp",
+      "hint": "src/aero/geometry_snapshot.hpp",
+      "sha256": "2cd7ac78988ede7abc2e9dfd08e5db3be32d4b3e9a399ae4057eac7310c5752f"
+    },
+    {
+      "id": "src/aero/global_geometry.cpp",
+      "hint": "src/aero/global_geometry.cpp",
+      "sha256": "bc73d430be4893ec27197cb78bad585d2d51c494c86038ba5c7a83cb710e5e77"
+    },
+    {
+      "id": "src/aero/global_geometry.hpp",
+      "hint": "src/aero/global_geometry.hpp",
+      "sha256": "7ddb2cf582b8a370f96bd1d3c72eebf63c1bd9ef8e633b034333570f59d709d6"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "77e1d5eebc0b11c28011fe1f4853b9fb4d2f231feff9778f2ab533895bd885d8"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "8efee2a3825e61dd7469faf037d454a5489999af99b6a178d3ee75958a30b64c"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "319dcbb9bfef1e2c41b4be9872057eef779be48f7989c6795138dffc4c7c2c5c"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "f101817e7c7daec83843720144818743424c74690b0f7252deb21bfcfc90b822"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "bc3575d13e8a1ed782674198bb8a7d745fd9acb826c419e838f73c51b34cc93c"
+    }
+  ],
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "src/aero/global_geometry.cpp": "bc73d430be4893ec27197cb78bad585d2d51c494c86038ba5c7a83cb710e5e77",
+    "src/aero/global_geometry.hpp": "7ddb2cf582b8a370f96bd1d3c72eebf63c1bd9ef8e633b034333570f59d709d6",
+    "src/aero/p1_shared_action.cpp": "77e1d5eebc0b11c28011fe1f4853b9fb4d2f231feff9778f2ab533895bd885d8",
+    "src/aero/p1_shared_action.hpp": "8efee2a3825e61dd7469faf037d454a5489999af99b6a178d3ee75958a30b64c",
+    "src/coupling/discrete_nonpenetration.cpp": "319dcbb9bfef1e2c41b4be9872057eef779be48f7989c6795138dffc4c7c2c5c",
+    "src/coupling/discrete_nonpenetration.hpp": "f101817e7c7daec83843720144818743424c74690b0f7252deb21bfcfc90b822",
+    "tests/coupling/case_uniform_flow_test.cpp": "bc3575d13e8a1ed782674198bb8a7d745fd9acb826c419e838f73c51b34cc93c",
+    "src/aero/geometry_snapshot.cpp": "9cb6a8917f4bc4964d68d648280efea0c8a672f691421c5e4cc0b01d98ceef5f",
+    "src/aero/geometry_snapshot.hpp": "2cd7ac78988ede7abc2e9dfd08e5db3be32d4b3e9a399ae4057eac7310c5752f",
+    "src/aero/geometry_snapshot_storage.hpp": "fda1182e6ce0cd57bd084c374dfe154b3315de18f0bc7b40b8fd2e16daf07302"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-nonpenetration-v1/reference.py": "78ee0980803c1087c6a868582021c913775272367dae14290a4bcdab7aec7026",
+    "docs/verification/IM-03/discrete-nonpenetration-v1/verification.md": "45bbd2cea0661ae8c43b35eff30bd149f8696385d6ebccecf424cfd784988f3d"
+  }
+}

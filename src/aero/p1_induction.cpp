@@ -58,6 +58,17 @@ Shape maximum_shape() {
             maximum.work = std::max(maximum.work, count.work);
         }
     }
+    // The contour has three independent edge expressions. Taking all three
+    // branches alike covers the maximal node and work sums.
+    for (const std::int8_t sign : {std::int8_t{0}, std::int8_t{1}}) {
+        p1::Options options;
+        options.start_sign.fill(sign);
+        options.end_sign.fill(sign);
+        p1::Program contour{{}};
+        (void)p1::bound_program(contour, options);
+        maximum.nodes = std::max(maximum.nodes, contour.count);
+        maximum.work = std::max(maximum.work, contour.work);
+    }
     p1::Program far{{}};
     const auto output = p1::far_program(far);
     (void)output;
@@ -445,7 +456,7 @@ private:
 public:
     static AeroResult<P1Basis> evaluate(const LocalGeometryPacket&, P1Accuracy, P1Limits,
                                         P1Workspace&, core::ResourcePlan&, const std::stop_token&,
-                                        const std::array<bool, 3>&) noexcept;
+                                        const std::array<bool, 3>&, bool bound = false) noexcept;
 };
 std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
     if (!std::isfinite(tau_basis) || !std::isfinite(tau_jacobian))
@@ -460,7 +471,7 @@ std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
 AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accuracy accuracy,
                                        P1Limits limits, P1Workspace& workspace,
                                        core::ResourcePlan& plan, const std::stop_token& stop,
-                                       const std::array<bool, 3>& boundary) noexcept {
+                                       const std::array<bool, 3>& boundary, bool bound) noexcept {
     const auto context = packet.context();
     if (workspace.entered_.test_and_set())
         return std::unexpected(failed(core::FailureCode::InvalidInput, context));
@@ -475,6 +486,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
         if (!packet.active())
             return std::unexpected(failed(core::FailureCode::InvalidInput, context));
+        if (!bound && std::holds_alternative<BoundInterior>(needed(packet.qualification())))
+            return std::unexpected(failed(core::FailureCode::GeometryInvalid, context));
         if (const auto error = accuracy.validation_error())
             return std::unexpected(failed(*error, context));
         if (stop.stop_requested())
@@ -495,7 +508,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             return std::unexpected(failed(core::FailureCode::StaleGeneration, context));
         const auto query = needed(packet.query());
         const auto ambient = needed(packet.ambient());
-        const auto far = needed(packet.far());
+        const bool far = !bound && needed(packet.far()) == FarRelation::Far;
         auto reserved = plan.allocate<P1Storage>(1, operation);
         if (!reserved)
             return std::unexpected(OwnedGeometryFailure{reserved.error(), {}, context});
@@ -508,10 +521,13 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         auto [options, scale] = prepare_input(scratch, work);
         options.boundary = boundary;
         scratch.pi = p1::pi_constant(work);
-        scratch.ln2 = p1::logarithm_series(p1::divide(p1::integer(1), p1::integer(3), work), work);
+        if (!bound)
+            scratch.ln2 =
+                p1::logarithm_series(p1::divide(p1::integer(1), p1::integer(3), work), work);
         p1::Program program{scratch.program.values()};
-        const auto output =
-            far == FarRelation::Far ? p1::far_program(program) : p1::near_program(program, options);
+        const auto output = bound ? p1::bound_program(program, options)
+                            : far ? p1::far_program(program)
+                                  : p1::near_program(program, options);
         if (program.count > scratch.jets.size())
             return std::unexpected(failed(core::FailureCode::ResourceExceeded, context));
         const auto evaluate = [&]() {
@@ -521,7 +537,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         };
         P1EvaluationDiagnostic diagnostic = P1AnalyticEvaluation{};
         const std::size_t base = program.count;
-        if (far == FarRelation::Far) {
+        if (far) {
             p1::build_rule(p1::gauss_8, scratch.low, work);
             p1::build_rule(p1::gauss_12, scratch.high, work);
             for (std::size_t i = 0; i < 18; ++i)
@@ -558,10 +574,13 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             diagnostic = p1::qualify_far(scratch.low_values, scratch.high_values, ell, scale, work);
         } else
             evaluate();
-        const auto selected =
-            far == FarRelation::Far
-                ? P1Branch::FarGauss12
-                : (options.exterior ? P1Branch::IdealCoplanarExterior : P1Branch::Analytic);
+        auto selected = P1Branch::Analytic;
+        if (bound)
+            selected = P1Branch::BoundContour;
+        else if (far)
+            selected = P1Branch::FarGauss12;
+        else if (options.exterior)
+            selected = P1Branch::IdealCoplanarExterior;
         const P1WorkPlan admitted{shape.nodes, shape.work,
                                   p1::checked_sum(shape_payload(shape), sizeof(P1Storage))};
         auto& result = reserved->values()[0].data.emplace(OwnedGeometry{geometry.data_, context},
@@ -569,8 +588,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
                                                           diagnostic, admitted, 0);
         for (std::size_t component = 0; component < 9; ++component) {
             const auto& evaluated =
-                scratch.jets.values()[far == FarRelation::Far ? base + 9 + component
-                                                              : output.nodes[component]];
+                scratch.jets.values()[far ? base + 9 + component : output.nodes[component]];
             for (std::size_t jet = 0; jet < 14; ++jet) {
                 work.step();
                 auto value = enclosure(p1::scale(evaluated.components[jet], -scale),
@@ -754,5 +772,12 @@ AeroResult<P1Basis> evaluate_p1_partition(const LocalGeometryPacket& packet,
                                           core::ResourcePlan& plan,
                                           const std::stop_token& stop) noexcept {
     return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary);
+}
+AeroResult<P1Basis> evaluate_bound_partition(const LocalGeometryPacket& packet,
+                                             const std::array<bool, 3>& boundary,
+                                             P1Accuracy accuracy, P1Limits limits,
+                                             P1Workspace& workspace, core::ResourcePlan& plan,
+                                             const std::stop_token& stop) noexcept {
+    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary, true);
 }
 } // namespace uvlas::aero::detail

@@ -30,6 +30,18 @@ function(uvlas_add_test name)
     set_tests_properties(${name} PROPERTIES LABELS "${arg_LABELS}" TIMEOUT ${arg_TIMEOUT})
 endfunction()
 
+uvlas_add_test(io.result_documents
+    LABELS unit integration negative verification
+    SOURCES io/result_documents_test.cpp
+    LIBS uvlas_io nlohmann_json::nlohmann_json Boost::hash2)
+target_include_directories(uvlas_test_io_result_documents PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(io.resolved_case_document
+    LABELS unit integration negative verification
+    SOURCES io/resolved_case_document_test.cpp
+    LIBS uvlas_io nlohmann_json::nlohmann_json Boost::hash2)
+target_include_directories(uvlas_test_io_resolved_case_document PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.input_scalar
     LABELS unit property negative verification
     SOURCES io/input_scalar_test.cpp
@@ -91,6 +103,12 @@ uvlas_add_test(io.checkpoint_manifest
     SOURCES io/checkpoint_manifest_test.cpp
     LIBS uvlas_io)
 target_include_directories(uvlas_test_io_checkpoint_manifest PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(io.observation_csv
+    LABELS unit property negative verification
+    SOURCES io/observation_csv_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_observation_csv PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.checkpoint_publication
