@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <optional>
 #include <span>
 #include <string>
@@ -216,6 +217,49 @@ struct IndependentRadical {
     return product;
 }
 
+double r5_quadrature_volume(Fixture& fixture, const PgReferenceGeometry& geometry,
+                            std::size_t volume_count, core::ResourcePlan& plan) {
+    constexpr std::array<std::array<std::string_view, 2>, 9> plane{{
+        {"0.015919880246186955082212", "0.040637194180787205985946"},
+        {"0.081984446336682102850285", "0.090324080347428702029236"},
+        {"0.193314283649704801345649", "0.130305348201467731159371"},
+        {"0.337873288298095535480731", "0.156173538520001420034315"},
+        {"0.500000000000000000000000", "0.165119677500629881582264"},
+        {"0.662126711701904464519269", "0.156173538520001420034315"},
+        {"0.806685716350295198654351", "0.130305348201467731159371"},
+        {"0.918015553663317897149715", "0.090324080347428702029236"},
+        {"0.984080119753813044917788", "0.040637194180787205985946"},
+    }};
+    const auto exact_decimal = [&](std::string_view value) {
+        return take(R::from_decimal(value, partition_test::exact_limits(), fixture.input_plan));
+    };
+    const std::array depth{exact_decimal("0.211324865405187117745426"),
+                           exact_decimal("0.788675134594812882254574")};
+    double result = 0.0;
+    for (const auto& radial : plane) {
+        const auto u = exact_decimal(radial[0]);
+        const Q first_weight = rational(exact_decimal(radial[1])) * (1 - rational(u));
+        for (const auto& transverse : plane) {
+            const auto v =
+                fraction(fixture, (1 - rational(u)) * rational(exact_decimal(transverse[0])));
+            const double weight =
+                Q(first_weight * rational(exact_decimal(transverse[1])) / 2).convert_to<double>();
+            for (std::size_t i = 0; i < volume_count; ++i)
+                for (const auto& d : depth) {
+                    const auto sample = take(geometry.evaluate(
+                        PgReferenceVolumePoint{static_cast<core::Index>(i), u, v, d}, std::nullopt,
+                        reference_limits(), plan));
+                    const auto& jacobian =
+                        std::get<PgReferenceVolumeMeasure>(sample.measure).jacobian;
+                    result += weight * (rational(jacobian.rational).convert_to<double>() +
+                                        rational(jacobian.radical).convert_to<double>() *
+                                            std::sqrt(rational(sample.g).convert_to<double>()));
+                }
+        }
+    }
+    return result;
+}
+
 } // namespace
 
 TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
@@ -309,6 +353,12 @@ TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
             CHECK(area == Q("4/5"));
             CHECK(first_s == Q("11/30"));
             CHECK(first_t == Q("131/300"));
+            // Independently integrated over chart strips and exact depth moments.
+            constexpr double full_volume = 0.008930137852542443516987;
+            constexpr double thin_volume = 0.000089301323707466072234;
+            const auto expected = base_thickness == Q("1/100") ? full_volume : thin_volume;
+            const auto integrated = r5_quadrature_volume(fixture, geometry, volumes.size(), plan);
+            CHECK(std::abs(integrated - expected) <= 1e-12 * expected);
         }
     }
 }
