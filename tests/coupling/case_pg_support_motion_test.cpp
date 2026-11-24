@@ -1,3 +1,4 @@
+#include "coupling/case_material_chart.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "io/case_schema_test_adapter.hpp"
@@ -231,6 +232,132 @@ TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
     REQUIRE_FALSE(missing);
     CHECK(missing.error().code == core::FailureCode::InvalidInput);
     CHECK(take(ready.identity()) == identity);
+}
+
+TEST_CASE("Case material chart owns the selected PG and preserves both sides at a shared vertex",
+          "[verification][negative][AE-02][SH-D02][FD-06][V-MULTI]") {
+    auto wire = a::root("coupled_flutter");
+    auto& model = wire.field("model");
+    auto& layers = model.field("shells").elements.at(0).field("layers").elements;
+    auto high = layers.at(0);
+    layers.at(0).set(
+        "interval",
+        a::parse(R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
+    high.set("id", a::string("9"));
+    high.set(
+        "interval",
+        a::parse(R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
+    layers.push_back(std::move(high));
+    auto& surface = model.field("aero_surfaces").elements.at(0);
+    surface.set("span", a::parse("[0,0.5,1]"));
+    auto& attachment = surface.field("attachment");
+    auto piece = a::parse(R"({
+        "chord_cells":[0,1],"span_cells":[0,1],"layer":"1","side":"interior","terms":[
+          {"powers":[0,0],"coefficient":[{"numerator":"1","denominator":"4"},
+            {"numerator":"0","denominator":"1"},{"numerator":"-1","denominator":"2"}]},
+          {"powers":[1,0],"coefficient":[{"numerator":"1","denominator":"2"},
+            {"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]},
+          {"powers":[0,1],"coefficient":[{"numerator":"0","denominator":"1"},
+            {"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}]}]})");
+    auto other = piece;
+    other.set("layer", a::string("9"));
+    other.set("span_cells", a::parse("[1,2]"));
+    auto map = a::parse(R"({"pieces":[]})");
+    map.field("pieces").elements = {piece, other};
+    attachment.set("material_map", map);
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const c::CaseMaterialChartLimits limits{case_pg_reference_limits(), query_limits(), 8};
+    const auto ready = [&] {
+        const auto si = checked_case(wire);
+        return take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+    }();
+    CHECK(take(ready.identity()).shell_id == 1);
+    CHECK(take(ready.identity()).surface_id == 1);
+    const auto left = take(ready.vertex(0, 1, 0, limits.chart, plan));
+    const auto right = take(ready.vertex(0, 1, 1, limits.chart, plan));
+    CHECK(left.material == right.material);
+    CHECK(q(left.material[0]) == Q{3} / 8);
+    CHECK(q(left.material[1]) == Q{1} / 2);
+    CHECK(q(left.material[2]) == 0);
+    CHECK(left.layer == core::LayerId{1});
+    CHECK(right.layer == core::LayerId{9});
+    CHECK(left.side == c::CaseMaterialSide::Upper);
+    CHECK(right.side == c::CaseMaterialSide::Lower);
+    const auto collocation = take(ready.collocation(0, 1, limits.chart, plan));
+    CHECK(q(collocation.aerodynamic[0]) == Q{3} / 4);
+    CHECK(q(collocation.aerodynamic[1]) == Q{3} / 4);
+    CHECK(q(collocation.material[0]) == Q{5} / 8);
+    CHECK(q(collocation.material[2]) == Q{1} / 4);
+    CHECK(q(collocation.chord_tangent[0]) == Q{1} / 2);
+    CHECK(q(collocation.span_tangent[1]) == 1);
+    CHECK(q(collocation.span_tangent[2]) == 1);
+    CHECK(collocation.side == c::CaseMaterialSide::Interior);
+    CHECK(q(take(ready.vertex(1, 2, 1, limits.chart, plan)).aerodynamic[0]) == 1);
+    const auto misplaced = ready.vertex(0, 2, 0, limits.chart, plan);
+    REQUIRE_FALSE(misplaced);
+    CHECK(misplaced.error().code == core::FailureCode::InvalidInput);
+    const auto wrong = [&](core::FailureCode expected) {
+        const auto si = checked_case(wire);
+        const auto failure = c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan);
+        REQUIRE_FALSE(failure);
+        CHECK(failure.error().code == expected);
+    };
+    SECTION("Legacy syntax needs an explicit map at physical preparation") {
+        attachment.erase("material_map");
+        wrong(core::FailureCode::InvalidInput);
+    }
+    SECTION("A constant shift on only one side cannot match the seam") {
+        attachment.field("material_map")
+            .field("pieces")
+            .elements.at(1)
+            .field("terms")
+            .elements.at(0)
+            .field("coefficient")
+            .elements.at(0)
+            .set("numerator", a::string("2"));
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("A point on the wrong layer side cannot qualify") {
+        attachment.field("material_map")
+            .field("pieces")
+            .elements.at(0)
+            .set("side", a::string("upper"));
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("A hidden zero Jacobian invalidates the entire panel") {
+        // s = 1/4 + xi/2 - xi^2/2. The derivative vanishes at the panel centre.
+        const auto quadratic = a::parse(R"({"powers":[2,0],"coefficient":[
+          {"numerator":"-1","denominator":"2"},{"numerator":"0","denominator":"1"},
+          {"numerator":"0","denominator":"1"}]})");
+        for (auto& row : attachment.field("material_map").field("pieces").elements)
+            row.field("terms").elements.push_back(quadratic);
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("The subdivision allowance distinguishes uncertainty from a proved domain") {
+        const auto nonlinear = a::parse(R"([
+          {"powers":[2,0],"coefficient":[{"numerator":"-1","denominator":"2"},
+             {"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]},
+          {"powers":[3,0],"coefficient":[{"numerator":"1","denominator":"3"},
+             {"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]}])");
+        // ds/dxi = (xi-1/2)^2 + 1/64. The degree-six whole-panel Bernstein
+        // coefficients straddle zero, while the two half-panels certify positivity.
+        for (auto& row : attachment.field("material_map").field("pieces").elements) {
+            auto& terms = row.field("terms").elements;
+            terms.at(1).field("coefficient").elements.at(0).set("numerator", a::string("17"));
+            terms.at(1).field("coefficient").elements.at(0).set("denominator", a::string("64"));
+            terms.insert(terms.end(), nonlinear.elements.begin(), nonlinear.elements.end());
+        }
+        const auto si = checked_case(wire);
+        auto no_split = limits;
+        no_split.maximum_subdivisions = 0;
+        const auto unresolved = c::CaseMaterialChart::prepare(si, 1, no_split, workspace, plan);
+        REQUIRE_FALSE(unresolved);
+        CHECK(unresolved.error().code == core::FailureCode::PrecisionUnresolved);
+        const auto proved = take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+        const auto right_mid = take(proved.collocation(0, 1, limits.chart, plan));
+        CHECK(q(right_mid.chord_tangent[0]) == Q{5} / 64);
+    }
 }
 
 TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
