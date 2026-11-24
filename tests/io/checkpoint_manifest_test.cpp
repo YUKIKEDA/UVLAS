@@ -197,6 +197,7 @@ TEST_CASE("Checkpoint recovery validates every named payload before publishing a
                         cp::CheckpointPayload{"extra", one}};
     auto input = std::span<const cp::CheckpointPayload>{payloads}.first(2);
     auto code = core::FailureCode::CheckpointCorrupt;
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() requires a mutable source.
     std::stop_source stop;
     SECTION("missing entry") {
         input = input.first(1);

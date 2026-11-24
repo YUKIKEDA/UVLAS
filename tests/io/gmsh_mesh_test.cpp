@@ -407,6 +407,7 @@ TEST_CASE("Gmsh mesh resource bounds include the saved bytes and both syntax and
     CHECK(rejected_count.error().code == ResourceExceeded);
     CHECK(short_count.allocated_bytes() == 0);
 
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() requires a mutable source.
     std::stop_source stop;
     REQUIRE(stop.request_stop());
     core::ResourcePlan cancelled{0};

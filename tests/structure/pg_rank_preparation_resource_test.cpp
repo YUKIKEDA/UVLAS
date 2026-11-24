@@ -61,7 +61,7 @@ TEST_CASE("PG local rank abandons a partial result after allocation failure",
     core::ResourcePlan producers{cap};
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
     const auto dictionary = take(PgCoefficientDictionary::prepare(
-        *f.graph, {partition_test::exact_limits(), 2000, 20000000, 100000, {}}, workspace,
+        f.chart_graph(), {partition_test::exact_limits(), 2000, 20000000, 100000, {}}, workspace,
         producers));
     const auto partition = take(PgIntegrationPartition::prepare(
         f.request(), partition_test::limits(), workspace, producers));
