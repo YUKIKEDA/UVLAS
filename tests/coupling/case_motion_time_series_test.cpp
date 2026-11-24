@@ -809,6 +809,60 @@ TEST_CASE("Prepared Motion projects a rotated Frame and PCHIP side accelerations
              core::FailureCode::PrecisionUnresolved);
 }
 
+TEST_CASE("Prescribed Motion restores the requested continuity of the same curves",
+          "[AE-07][IO4-06][FD-06][verification][negative]") {
+    auto input = a::root("aerodynamic_prescribed_transient");
+    input.field("analysis")
+        .set(
+            "intervals",
+            a::parse(
+                R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"event"}])"));
+    auto& motion = motion_json(input);
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[2,0,0]],"outside":{"kind":"reject"}})"));
+    motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+    motion.set("events", a::parse("[0,1,2]"));
+
+    core::ResourcePlan plan{budget};
+    p::CurveWorkspace workspace;
+    const auto begin = exact_time("0", plan);
+    const auto end = exact_time("2", plan);
+    const auto knot = exact_time("1", plan);
+    const auto source = checked_case(input);
+    const auto prepare = [&](c::CaseMotionContinuity continuity) {
+        return take(c::prepare_case_motion_time_series(source, motion_field(source),
+                                                       {begin, end, continuity}, stamp, workspace,
+                                                       limits, plan));
+    };
+    using enum c::CaseMotionContinuity;
+    const auto piecewise = prepare(PiecewiseC2);
+    const auto continuous = prepare(ContinuousC2);
+    const auto piecewise_archive =
+        take(c::snapshot_case_motion_time_series(piecewise, workspace, limits, plan));
+    const auto continuous_archive =
+        take(c::snapshot_case_motion_time_series(continuous, workspace, limits, plan));
+    const auto piecewise_record = take(piecewise_archive.view());
+    const auto continuous_record = take(continuous_archive.view());
+    CHECK(piecewise_record.continuity == PiecewiseC2);
+    CHECK(continuous_record.continuity == ContinuousC2);
+    const auto restore = [&](const c::CaseMotionTimeSnapshotView& record,
+                             const c::CaseMotionTimeSeries& current) {
+        return c::restore_case_motion_time_series(record, current, workspace, limits, plan);
+    };
+    rejected(restore(piecewise_record, continuous), core::FailureCode::StaleGeneration);
+    rejected(restore(continuous_record, piecewise), core::FailureCode::StaleGeneration);
+    const auto restored = take(restore(continuous_record, continuous));
+    const auto resumed = take(c::evaluate_case_motion_time_series(
+        restored, continuous, {stamp, knot, Second}, workspace, limits, plan));
+    CHECK(resumed.stamp() == stamp);
+    CHECK(resumed.declaration() == take(continuous.declaration()));
+    exact(resumed.translation(0, Value), 1);
+    exact(resumed.translation(0, First), 1);
+    exact(resumed.translation(0, Second), 0);
+}
+
 TEST_CASE("Prescribed Motion restores owned exact inputs and requalifies saved coefficients",
           "[AE-07][IO4-06][FD-05][FD-06][N4-06][verification][negative]") {
     auto input = a::root("aerodynamic_prescribed_transient");

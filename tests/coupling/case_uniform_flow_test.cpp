@@ -4225,17 +4225,17 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
         const auto& again_geometry = take_global(take(again.contact()).get().geometry()).get();
         CHECK(test_geometry::take(again_geometry.identity()) ==
               test_geometry::take(initial_geometry.identity()));
-        const auto first = take(initial.collocation(0));
-        const auto second = take(again.collocation(0));
+        const auto baseline_row = take(initial.collocation(0));
+        const auto wider_row = take(again.collocation(0));
         const auto first_position = test_geometry::take(a::exact_query_coordinates(
-            initial_geometry, first.query, test_geometry::limits(), *geometry_work));
+            initial_geometry, baseline_row.query, test_geometry::limits(), *geometry_work));
         const auto second_position = test_geometry::take(a::exact_query_coordinates(
-            again_geometry, second.query, test_geometry::limits(), *geometry_work));
+            again_geometry, wider_row.query, test_geometry::limits(), *geometry_work));
         CHECK(first_position.numerator == second_position.numerator);
-        const auto& first_frame = std::get<cf::ExplicitCollocationTangents>(first.tangents);
-        const auto& second_frame = std::get<cf::ExplicitCollocationTangents>(second.tangents);
+        const auto& first_frame = std::get<cf::ExplicitCollocationTangents>(baseline_row.tangents);
+        const auto& second_frame = std::get<cf::ExplicitCollocationTangents>(wider_row.tangents);
         for (std::size_t k = 0; k < 3; ++k) {
-            CHECK(sum_words(first.velocity[k]) == sum_words(second.velocity[k]));
+            CHECK(sum_words(baseline_row.velocity[k]) == sum_words(wider_row.velocity[k]));
             CHECK(sum_words(first_frame[0][k]) == sum_words(second_frame[0][k]));
             CHECK(sum_words(first_frame[1][k]) == sum_words(second_frame[1][k]));
         }

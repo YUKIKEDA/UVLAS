@@ -1,0 +1,65 @@
+--- a/docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt
++++ b/docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt
+@@ -114,7 +114,6 @@
+     });
+ }
+
+-#ifdef UVLAS_R02_MEASURE_REUSE
+ Q work(std::span<const PgCartesianExactPosition> a, std::span<const PgCartesianExactPosition> b) {
+     REQUIRE(a.size() == b.size());
+     Q result{0};
+@@ -132,6 +131,7 @@
+     return result;
+ }
+
++#ifdef UVLAS_R02_MEASURE_REUSE
+ std::uint64_t external_forecast(const PgReferenceLimits& limits, std::uint64_t live_rationals,
+                                 core::ResourcePlan& plan) {
+     detail::ReferenceArithmetic admission{limits, plan};
+@@ -289,6 +289,12 @@
+     PgSparseChartPreparation measured;
+     PgSparseChartIdentity identity;
+     Phase chart_phase;
++    const auto columns = static_cast<std::size_t>(original_info.columns);
++    const auto rows = static_cast<std::size_t>(original_info.rows);
++    std::vector<PgCartesianExactPosition> independent;
++    const auto force = sample(fixtures[0], columns, 3);
++    core::PlannedBuffer<PgCartesianExactPosition> loose_positions;
++    PgSparseChartDual loose_dual;
+     {
+         const auto chart = take(prepare(original));
+         chart_phase = finish(begin, plan, bytes_before);
+@@ -304,6 +310,17 @@
+                       fixtures[0], chart_limits.arithmetic, workspace, plan);
+         return;
+ #endif
++        independent = sample(fixtures[0], chart.free_columns().size(), 1);
++        loose_positions = take(chart.lift({identity, independent}, chart_limits.arithmetic,
++                                          workspace, plan));
++        loose_dual = take(chart.transpose({identity, force}, chart_limits.arithmetic,
++                                         workspace, plan));
++        REQUIRE(loose_positions.size() == columns);
++        REQUIRE(loose_dual.independent_force.size() == independent.size());
++        REQUIRE(loose_dual.original_multipliers.size() == rows);
++        const auto direct = work(loose_positions.values(), force);
++        REQUIRE(direct != 0);
++        REQUIRE(direct == work(independent, loose_dual.independent_force.values()));
+     }
+
+     const auto exact_capacity = measured.lower_terms + measured.upper_terms;
+@@ -317,6 +334,15 @@
+         REQUIRE(info.lower_terms == measured.lower_terms);
+         REQUIRE(info.upper_terms == measured.upper_terms);
+         REQUIRE(info.factor_term_capacity == exact_capacity);
++        const auto positions = take(exact.lift({identity, independent}, chart_limits.arithmetic,
++                                              workspace, plan));
++        const auto dual = take(exact.transpose({identity, force}, chart_limits.arithmetic,
++                                             workspace, plan));
++        REQUIRE(std::ranges::equal(positions.values(), loose_positions.values()));
++        REQUIRE(std::ranges::equal(dual.independent_force.values(),
++                                  loose_dual.independent_force.values()));
++        REQUIRE(std::ranges::equal(dual.original_multipliers.values(),
++                                  loose_dual.original_multipliers.values()));
+     }
+     chart_limits.maximum_factor_terms = exact_capacity - 1;
+     auto short_original = aggregate();
