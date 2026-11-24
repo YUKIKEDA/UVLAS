@@ -10,6 +10,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <uvlas/structure/pg_reference_basis.hpp>
 
@@ -360,12 +361,14 @@ TEST_CASE("PG reproduces the independent reference geometry across all frozen R4
     using Complex = std::complex<double>;
     for (const auto& input : inputs) {
         const Q skew(input.skew);
+        std::array<Q, exponents.size()> world_coefficients{};
         std::array<double, exponents.size()> physical_coefficients{};
         std::map<std::pair<unsigned, unsigned>, Q> chart_coefficients;
         for (std::size_t k = 0; k < exponents.size(); ++k) {
             if (input.coefficients[k].empty())
                 continue;
             const Q coefficient(input.coefficients[k]);
+            world_coefficients[k] = coefficient;
             physical_coefficients[k] = coefficient.convert_to<double>();
             const auto [px, py] = exponents[k];
             Q skew_power(1);
@@ -435,49 +438,213 @@ TEST_CASE("PG reproduces the independent reference geometry across all frozen R4
                                         (2.0 * std::sqrt(1.0 + hx * hx + hy * hy));
                     return std::array{x - offset * hx, y - offset * hy, h + offset};
                 };
-                for (const auto i : {std::size_t{0}, volumes.size() - 1}) {
+                const auto tri_position = [&](const PgPartitionTriangle& triangle) {
+                    const auto& a = vertices[static_cast<std::size_t>(triangle.vertices[0])];
+                    const auto& b = vertices[static_cast<std::size_t>(triangle.vertices[1])];
+                    const auto& c = vertices[static_cast<std::size_t>(triangle.vertices[2])];
+                    const auto coordinate = [&](auto member) -> Q {
+                        return (7 * rational(a.*member) + 5 * rational(b.*member) +
+                                3 * rational(c.*member)) /
+                               15;
+                    };
+                    const Q twice_area =
+                        (rational(b.s) - rational(a.s)) * (rational(c.t) - rational(a.t)) -
+                        (rational(b.t) - rational(a.t)) * (rational(c.s) - rational(a.s));
+                    return std::tuple{coordinate(&PgPartitionPoint::s),
+                                      coordinate(&PgPartitionPoint::t), twice_area};
+                };
+                const auto depth = [](const PgPartitionLayer& layer) -> Q {
+                    return (rational(layer.lower) + 2 * rational(layer.upper)) / 3;
+                };
+                struct Metric {
+                    Q g, det_a, det_b;
+                };
+                const auto compare_point = [&](const PgReferenceValue& actual, const Q& s,
+                                               const Q& t, const Q& zeta) {
+                    CHECK(rational(actual.s) == s);
+                    CHECK(rational(actual.t) == t);
+                    CHECK(rational(actual.zeta) == zeta);
+                    const Q x = s + skew * t;
+                    std::array<Q, 5> xp{Q(1)}, yp{Q(1)};
+                    for (std::size_t k = 1; k < xp.size(); ++k) {
+                        xp[k] = xp[k - 1] * x;
+                        yp[k] = yp[k - 1] * t;
+                    }
+                    Q h, hx, hy, hxx, hxy, hyy;
+                    for (std::size_t k = 0; k < exponents.size(); ++k) {
+                        const auto [px, py] = exponents[k];
+                        const auto& coefficient = world_coefficients[k];
+                        h += coefficient * xp[px] * yp[py];
+                        if (px > 0)
+                            hx += coefficient * px * xp[px - 1] * yp[py];
+                        if (py > 0)
+                            hy += coefficient * py * xp[px] * yp[py - 1];
+                        if (px > 1)
+                            hxx += coefficient * px * (px - 1) * xp[px - 2] * yp[py];
+                        if (px > 0 && py > 0)
+                            hxy += coefficient * px * py * xp[px - 1] * yp[py - 1];
+                        if (py > 1)
+                            hyy += coefficient * py * (py - 1) * xp[px] * yp[py - 2];
+                    }
+                    const Q H = input.tapered ? Q(base * (1 + s / 10 + t / 20)) : base;
+                    const Q z = zeta * H / 2;
+                    const Q g = 1 + hx * hx + hy * hy;
+                    const std::array<Q, 3> midsurface{x, t, h};
+                    const std::array<Q, 3> normal_numerator{Q(-hx), Q(-hy), Q(1)};
+                    CHECK(rational(actual.full_thickness_metres) == H);
+                    CHECK(rational(actual.g) == g);
+                    for (std::size_t axis = 0; axis < 3; ++axis) {
+                        const Q normal_b = normal_numerator[axis] / g;
+                        CHECK(rational(actual.normal[axis].rational) == 0);
+                        CHECK(rational(actual.normal[axis].radical) == normal_b);
+                        CHECK(rational(actual.position_metres[axis].rational) == midsurface[axis]);
+                        CHECK(rational(actual.position_metres[axis].radical) == z * normal_b);
+                    }
+                    // Trace of the second fundamental form's numerator against the
+                    // first fundamental form's adjugate, and the Hessian determinant.
+                    const Q mean_numerator =
+                        (1 + hy * hy) * hxx - 2 * hx * hy * hxy + (1 + hx * hx) * hyy;
+                    const Q gaussian_numerator = hxx * hyy - hxy * hxy;
+                    const Metric metric{g, Q(-H * z * mean_numerator / (2 * g)),
+                                        Q(H * (1 + z * z * gaussian_numerator / (g * g)) / 2)};
+                    CHECK(rational(actual.determinant_metres_cubed.rational) == metric.det_a);
+                    CHECK(rational(actual.determinant_metres_cubed.radical) == metric.det_b);
+                    return metric;
+                };
+                const auto jacobian = [&](const Q& s, const Q& t, const Q& zeta) {
+                    const std::array<Complex, 3> point{
+                        s.convert_to<double>(), t.convert_to<double>(), zeta.convert_to<double>()};
+                    constexpr double step = 1e-20;
+                    std::array<std::array<double, 3>, 3> columns{};
+                    for (std::size_t axis = 0; axis < point.size(); ++axis) {
+                        auto shifted = point;
+                        shifted[axis] += Complex{0.0, step};
+                        const auto derivative = continuum(shifted);
+                        for (std::size_t k = 0; k < derivative.size(); ++k)
+                            columns[axis][k] = derivative[k].imag() / step;
+                    }
+                    return columns;
+                };
+                const auto physical = [](const PgReferenceScalar& value, double sqrt_g) {
+                    return rational(value.rational).convert_to<double>() +
+                           rational(value.radical).convert_to<double>() * sqrt_g;
+                };
+                const auto check_area = [&](const PgReferenceAreaMeasure& area,
+                                            const std::array<double, 3>& left,
+                                            const std::array<double, 3>& right, double scale,
+                                            const Q& g) {
+                    const auto sqrt_g = std::sqrt(g.convert_to<double>());
+                    double squared = 0.0;
+                    for (std::size_t axis = 0; axis < 3; ++axis) {
+                        const auto b = (axis + 1) % 3, c = (axis + 2) % 3;
+                        const auto expected = scale * (left[b] * right[c] - left[c] * right[b]);
+                        CHECK(std::abs(physical(area.outward[axis], sqrt_g) - expected) < 2e-14);
+                        squared += expected * expected;
+                    }
+                    CHECK(std::abs(physical(area.squared_norm, sqrt_g) - squared) < 2e-14);
+                };
+                std::array<Q, 2> chart_areas{};
+                REQUIRE(fixture.layers.size() == chart_areas.size());
+                for (std::size_t i = 0; i < volumes.size(); ++i) {
+                    CAPTURE(i);
                     const auto& volume = volumes[i];
                     const auto& tri = triangles[static_cast<std::size_t>(volume.triangle)];
-                    const auto& a = vertices[static_cast<std::size_t>(tri.vertices[0])];
-                    const auto& b = vertices[static_cast<std::size_t>(tri.vertices[1])];
-                    const auto& c = vertices[static_cast<std::size_t>(tri.vertices[2])];
-                    const auto chart = [&](auto field) {
-                        return Q((7 * rational(a.*field) + 5 * rational(b.*field) +
-                                  3 * rational(c.*field)) /
-                                 15)
-                            .convert_to<double>();
-                    };
-                    const auto& frozen_layer =
-                        fixture.layers[static_cast<std::size_t>(volume.layer)];
-                    const auto zeta =
-                        Q((rational(frozen_layer.lower) + 2 * rational(frozen_layer.upper)) / 3)
-                            .convert_to<double>();
-                    const std::array<Complex, 3> point{chart(&PgPartitionPoint::s),
-                                                       chart(&PgPartitionPoint::t), zeta};
-                    const auto reference = continuum(point);
+                    const auto layer_index = static_cast<std::size_t>(volume.layer);
+                    const auto& layer = fixture.layers[layer_index];
+                    const auto [s, t, twice_area] = tri_position(tri);
+                    chart_areas[layer_index] += twice_area / 2;
+                    const auto zeta = depth(layer);
                     const auto actual = take(geometry.evaluate(
                         PgReferenceVolumePoint{static_cast<core::Index>(i), u, v, d}, std::nullopt,
                         reference_limits(), plan));
-                    const auto sqrt_g = std::sqrt(rational(actual.g).convert_to<double>());
-                    const auto physical = [&](const PgReferenceScalar& value) {
-                        return rational(value.rational).convert_to<double>() +
-                               rational(value.radical).convert_to<double>() * sqrt_g;
-                    };
-                    for (std::size_t k = 0; k < reference.size(); ++k)
-                        CHECK(std::abs(physical(actual.position_metres[k]) - reference[k].real()) <
-                              2e-14);
-                    constexpr double step = 1e-20;
-                    for (std::size_t axis = 0; axis < point.size(); ++axis) {
-                        auto shifted = point;
-                        shifted[axis] += Complex{0, step};
-                        const auto derivative = continuum(shifted);
-                        for (std::size_t k = 0; k < derivative.size(); ++k) {
-                            const auto expected = derivative[k].imag() / step;
-                            CHECK(std::abs(physical(actual.jacobian_columns_metres[axis][k]) -
-                                           expected) < 2e-14);
-                        }
+                    const auto metric = compare_point(actual, s, t, zeta);
+                    CHECK(actual.layer == layer.id);
+                    const auto& measure = std::get<PgReferenceVolumeMeasure>(actual.measure);
+                    const Q weight = twice_area * (rational(layer.upper) - rational(layer.lower));
+                    CHECK(weight > 0);
+                    CHECK(rational(measure.jacobian.rational) == metric.det_a * weight);
+                    CHECK(rational(measure.jacobian.radical) == metric.det_b * weight);
+                    if (i == 0 || i == volumes.size() - 1) {
+                        const auto expected = jacobian(s, t, zeta);
+                        const auto sqrt_g = std::sqrt(metric.g.convert_to<double>());
+                        for (std::size_t axis = 0; axis < 3; ++axis)
+                            for (std::size_t k = 0; k < 3; ++k)
+                                CHECK(std::abs(physical(actual.jacobian_columns_metres[axis][k],
+                                                        sqrt_g) -
+                                               expected[axis][k]) < 2e-14);
                     }
                 }
+
+                for (const auto& area : chart_areas)
+                    CHECK(area == 1);
+
+                const auto horizontal = take(partition.horizontal_faces());
+                std::size_t tested_horizontal = 0;
+                for (std::size_t i = 0; i < horizontal.size(); ++i) {
+                    const auto& face = horizontal[i];
+                    if (face.triangle != 0)
+                        continue;
+                    const auto [s, t, twice_area] = tri_position(triangles.front());
+                    const auto& layer = fixture.layers[static_cast<std::size_t>(face.layer)];
+                    const auto lower = face.side == PgPartitionFaceSide::Lower;
+                    const auto& zeta = rational(lower ? layer.lower : layer.upper);
+                    const auto actual = take(geometry.evaluate(
+                        PgReferenceHorizontalPoint{static_cast<core::Index>(i), u, v}, std::nullopt,
+                        reference_limits(), plan));
+                    const auto metric = compare_point(actual, s, t, zeta);
+                    const auto& measure = std::get<PgReferenceHorizontalMeasure>(actual.measure);
+                    const auto columns = jacobian(s, t, zeta);
+                    CHECK(actual.layer == layer.id);
+                    CHECK(measure.side == face.side);
+                    check_area(measure.area, columns[0], columns[1],
+                               (lower ? -1.0 : 1.0) * twice_area.convert_to<double>(), metric.g);
+                    ++tested_horizontal;
+                }
+                CHECK(tested_horizontal == 2 * fixture.layers.size());
+
+                const auto lateral = take(partition.lateral_faces());
+                const auto edges = take(partition.edges());
+                std::array<std::array<bool, 4>, 2> boundary_tested{};
+                for (std::size_t i = 0; i < lateral.size(); ++i) {
+                    const auto& face = lateral[i];
+                    const auto& edge = edges[static_cast<std::size_t>(face.edge)];
+                    const auto& a = vertices[static_cast<std::size_t>(
+                        edge.vertices[face.canonical_direction ? 0 : 1])];
+                    const auto& b = vertices[static_cast<std::size_t>(
+                        edge.vertices[face.canonical_direction ? 1 : 0])];
+                    const Q ds = rational(b.s) - rational(a.s);
+                    const Q dt = rational(b.t) - rational(a.t);
+                    REQUIRE((ds == 0) != (dt == 0));
+                    const auto& fixed = rational(ds == 0 ? a.s : a.t);
+                    REQUIRE((fixed == 0 || fixed == 1));
+                    // On the unit square, the original counterclockwise direction
+                    // is known from the fixed coordinate, independently of edge flags.
+                    const auto boundary = ds == 0 ? (fixed == 1 ? 0U : 1U) : (fixed == 0 ? 2U : 3U);
+                    CHECK((ds == 0 ? dt > 0 : ds > 0) == (boundary % 2 == 0));
+                    auto& tested = boundary_tested[static_cast<std::size_t>(face.layer)][boundary];
+                    if (tested)
+                        continue;
+                    tested = true;
+                    const Q s = rational(a.s) + ds / 3;
+                    const Q t = rational(a.t) + dt / 3;
+                    const auto& layer = fixture.layers[static_cast<std::size_t>(face.layer)];
+                    const auto zeta = depth(layer);
+                    const auto actual = take(geometry.evaluate(
+                        PgReferenceLateralPoint{static_cast<core::Index>(i), u, d}, std::nullopt,
+                        reference_limits(), plan));
+                    const auto metric = compare_point(actual, s, t, zeta);
+                    const auto columns = jacobian(s, t, zeta);
+                    std::array<double, 3> tangent{};
+                    for (std::size_t axis = 0; axis < tangent.size(); ++axis)
+                        tangent[axis] = ds.convert_to<double>() * columns[0][axis] +
+                                        dt.convert_to<double>() * columns[1][axis];
+                    const Q zeta_span = rational(layer.upper) - rational(layer.lower);
+                    CHECK(actual.layer == layer.id);
+                    check_area(std::get<PgReferenceLateralMeasure>(actual.measure).area, tangent,
+                               columns[2], zeta_span.convert_to<double>(), metric.g);
+                }
+                for (const auto& layer_edges : boundary_tested)
+                    CHECK(std::ranges::all_of(layer_edges, [](bool tested) { return tested; }));
             }
         }
     }
