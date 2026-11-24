@@ -998,7 +998,7 @@ struct DiscreteFreeWakeDirection {
 
 struct DiscreteFreeWakeLimits {
     DiscreteNonpenetrationLimits action;
-    std::uint64_t max_particles;
+    std::uint64_t max_particles{};
 };
 
 struct FreeWakeVelocitySource {
