@@ -1776,27 +1776,87 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
         auto tangent_request = request;
         tangent_request.rhs_generation = core::RhsGeneration{1100};
         tangent_request.retained_generation = core::NumericalGeneration{1101};
+        const std::array rate_directions{
+            cf::BoundCirculationRate{gamma_directions[0].face,
+                                     gamma_directions[0].circulation_rate},
+            cf::BoundCirculationRate{gamma_directions[1].face,
+                                     gamma_directions[1].circulation_rate}};
+        const cf::DiscreteImplicitVectorLoadDirection implicit_variation{
+            variation.stamp, variation.circulation, circulation_direction, variation.edges,
+            std::span{rate_directions}.first(count)};
         auto tangent_flow = flow_at();
-        const auto tangent = take(cf::solve_discrete_circulation_direction(
-            input, circulation_direction, std::move(tangent_flow), load_limits, request,
-            tangent_request, shared, *local, *kernel, memory));
-        const auto& storage = tangent.tangent().solution().values().storage();
-        auto solved_directions = gamma_directions;
-        for (std::size_t i = 0; i < count; ++i) {
-            if (const auto* words = std::get_if<numerics::TwoWord<double>>(&storage))
-                solved_directions[i].circulation =
-                    a::DoubleWord{words->hi.values()[i], words->lo.values()[i]};
-            else
-                solved_directions[i].circulation =
-                    a::SingleWord{std::get<numerics::Binary64<double>>(storage).values.values()[i]};
+        const auto run_tangent = [&](const cf::DiscreteCirculationRequest& settings,
+                                     const cf::DiscreteImplicitVectorLoadDirection& direction,
+                                     const std::stop_token& stop = {}) {
+            return cf::solve_discrete_circulation_implicit_load_direction(
+                input, load_input, direction, std::move(tangent_flow), load_limits, request,
+                settings, *geometry_work, shared, *local, *kernel, memory, stop);
+        };
+        if (has_wake) {
+            const auto before = memory.allocated_bytes();
+            auto stale = tangent_request;
+            stale.rhs_generation = request.rhs_generation;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            stale = tangent_request;
+            stale.retained_generation = request.retained_generation;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            stale = tangent_request;
+            stale.scales.context.cache.matrix = transpose_request.scales.context.cache.matrix;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            auto missing = implicit_variation;
+            missing.rates = {};
+            reject(run_tangent(tangent_request, missing), core::FailureCode::InvalidInput);
+            // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+            std::stop_source cancel;
+            REQUIRE(cancel.request_stop());
+            reject(run_tangent(tangent_request, implicit_variation, cancel.get_token()),
+                   core::FailureCode::Cancelled);
+            CHECK(memory.allocated_bytes() == before);
+
+            const std::array bad_scale{2.};
+            stale = tangent_request;
+            stale.scales.unknown = bad_scale;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            auto strict = tangent_request;
+            strict.rhs_absolute = 0;
+            reject(run_tangent(strict, implicit_variation), core::FailureCode::PrecisionUnresolved);
+            strict = tangent_request;
+            strict.original_absolute = 0;
+            reject(run_tangent(strict, implicit_variation), core::FailureCode::LinearUnconverged);
+            CHECK(tangent_flow.source().jet.active());
+            CHECK(result.primal().flow().source().jet.active());
         }
-        auto implicit_variation = variation;
-        implicit_variation.bound = std::span{solved_directions}.first(count);
-        auto comparison_flow = flow_at();
-        const auto comparison = take(cf::solve_discrete_circulation_load_direction(
-            input, load_input, implicit_variation, std::move(comparison_flow), load_limits, request,
-            *geometry_work, shared, *local, *kernel, memory));
-        const auto implicit_forward = load_work(comparison);
+        const auto tangent = take(run_tangent(tangent_request, implicit_variation));
+        CHECK_FALSE(tangent_flow.source().jet.active());
+        CHECK(tangent.direction().loads().primal().flow().source().jet.active());
+        CHECK(tangent.direction().loads().used_steps() <= load_limits.steps);
+        CHECK(tangent.tangent().sense() == cf::CirculationSense::Tangent);
+        CHECK(tangent.tangent().solution().certificate().context() == model.context);
+        CHECK(tangent.tangent().solution().certificate().rhs_generation() ==
+              tangent_request.rhs_generation);
+        CHECK(tangent.tangent().solution().values().generation() ==
+              tangent_request.retained_generation);
+        const auto implicit_forward = load_work(tangent.direction());
+        if (has_wake) {
+            const auto& storage = tangent.tangent().solution().values().storage();
+            const auto* words = std::get_if<numerics::TwoWord<double>>(&storage);
+            if (words == nullptr)
+                FAIL("Expected a retained two-word tangent");
+            CHECK(words->lo.values()[0] != 0.);
+            auto exact_directions = gamma_directions;
+            exact_directions[0].circulation =
+                a::DoubleWord{words->hi.values()[0], words->lo.values()[0]};
+            auto explicit_variation = variation;
+            explicit_variation.bound = std::span{exact_directions}.first(count);
+            auto explicit_flow = flow_at();
+            const auto explicit_path = take(cf::solve_discrete_circulation_load_direction(
+                input, load_input, explicit_variation, std::move(explicit_flow), load_limits,
+                request, *geometry_work, shared, *local, *kernel, memory));
+            const auto explicit_work = load_work(explicit_path);
+            CHECK(abs(explicit_work.value - implicit_forward.value) <=
+                  explicit_work.radius + implicit_forward.radius);
+            CHECK(implicit_forward.radius < rational_word(1e-24));
+        }
         WorkEnclosure implicit_reverse;
         implicit_reverse.add(combined.uniform_flow(), variation.uniform_flow);
         REQUIRE(combined.point_count() == variation.points.size());
@@ -1811,6 +1871,9 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             implicit_reverse.add(dual.velocity, variation.edges[i].velocity);
         }
         for (std::size_t i = 0; i < count; ++i) {
+            const auto tangent_row = take(tangent.tangent().row(i));
+            CHECK(tangent_row.face == variation.bound[i].face);
+            residual_expected(tangent_row.original_residual, Rat{0}, rational_word(5e-15));
             const auto check = take(combined.transpose().row(i));
             CHECK(check.face == variation.bound[i].face);
             residual_expected(check.original_residual, Rat{0}, rational_word(5e-15));
@@ -1833,6 +1896,8 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
         CHECK(implicit_reverse.radius < rational_word(1e-24));
         const auto independently_solved =
             rational_word(has_wake ? -.0552599357049885265356 : -.0753320247028545422098);
+        CHECK(abs(implicit_forward.value - independently_solved) <=
+              implicit_forward.radius + rational_word(5e-15));
         CHECK(abs(implicit_reverse.value - independently_solved) <=
               implicit_reverse.radius + rational_word(5e-15));
         CHECK(abs(implicit_reverse.value - reverse.value) > rational_word(1e-4));

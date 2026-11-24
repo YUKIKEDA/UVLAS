@@ -556,6 +556,12 @@ void distribute_load(std::span<NodalLoad> nodes, std::span<const a::PointId> ver
     }
 }
 
+struct LoadTangentData {
+    const DiscreteImplicitVectorLoadDirection& input;
+    const DiscreteCirculationRequest& request;
+    std::optional<DiscreteCirculationLinearization> result{};
+};
+
 struct LoadDirections {
     explicit LoadDirections(const DiscreteVectorLoadDirection& direction) noexcept
         : input(direction) {}
@@ -1312,6 +1318,31 @@ struct NonpenetrationBuilder {
         return finish_primal(std::move(data), std::move(flow));
     }
 
+    static void validate_tangent(const DiscreteCirculationRequest& tangent,
+                                 const DiscreteCirculationRequest& primal, std::size_t order,
+                                 p::Work& work) {
+        match_linearization_context(tangent.scales.context, primal.scales.context, false);
+        if (tangent.rhs_generation == primal.rhs_generation ||
+            tangent.retained_generation == primal.retained_generation)
+            reject(core::FailureCode::StaleGeneration);
+        validate_circulation(tangent, order, work);
+    }
+
+    static DiscreteCirculationLinearization
+    solve_retained_tangent(const PrimalCirculationData& primal, std::span<p::Interval> forcing,
+                           const DiscreteCirculationRequest& tangent_request,
+                           core::ResourcePlan& memory, p::Work& work) {
+        for (auto& row : forcing)
+            row = p::negate(row, work);
+        const auto before = work.used;
+        const auto face = [&](std::size_t i) { return face_at(primal.rows.values(), i); };
+        auto tangent = linearize_native(CirculationSense::Tangent, face, primal.influence.values(),
+                                        forcing, tangent_request, memory, work);
+        work.step();
+        tangent.steps_ = work.used - before;
+        return tangent;
+    }
+
     static DiscreteCirculationDirectionalSolve
     solve_direction(const DiscreteNonpenetrationInput& input,
                     const DiscreteCirculationDirection& direction, ProjectedCaseUniformFlow&& flow,
@@ -1323,12 +1354,7 @@ struct NonpenetrationBuilder {
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto order = input.collocations.size();
-        match_linearization_context(tangent_request.scales.context, primal_request.scales.context,
-                                    false);
-        if (tangent_request.rhs_generation == primal_request.rhs_generation ||
-            tangent_request.retained_generation == primal_request.retained_generation)
-            reject(core::FailureCode::StaleGeneration);
-        validate_circulation(tangent_request, order, work);
+        validate_tangent(tangent_request, primal_request, order, work);
         auto native_rhs = allocate<p::Interval>(memory, order);
         auto forcing = allocate<std::optional<CirculationForcingRow>>(memory, order);
         auto primal = solve_data(input, flow, limits, primal_request, shared, local, kernel, memory,
@@ -1343,14 +1369,9 @@ struct NonpenetrationBuilder {
                 row->face,
                 a::enclose_p1_value(native_rhs.values()[i],
                                     limits.induction_accuracy.representation, rounding)});
-            native_rhs.values()[i] = p::negate(native_rhs.values()[i], work);
         }
-        const auto before_tangent = work.used;
-        const auto face = [&](std::size_t i) { return face_at(primal.rows.values(), i); };
-        auto tangent = linearize_native(CirculationSense::Tangent, face, primal.influence.values(),
-                                        native_rhs.values(), tangent_request, memory, work);
-        work.step();
-        tangent.steps_ = work.used - before_tangent;
+        auto tangent =
+            solve_retained_tangent(primal, native_rhs.values(), tangent_request, memory, work);
         return {finish_primal(std::move(primal), std::move(flow)), std::move(tangent),
                 std::move(forcing), work.used};
     }
@@ -1497,7 +1518,8 @@ struct NonpenetrationBuilder {
                                         const DiscreteVectorLoadInput& loads,
                                         const a::OwnedGeometry& geometry,
                                         std::span<const NodalLoad> vertices,
-                                        core::ResourcePlan& memory, p::Work& work) {
+                                        const LoadTangentData* tangent, core::ResourcePlan& memory,
+                                        p::Work& work) {
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
         direction.gamma = allocate<p::Interval>(memory, bound.size());
         direction.rate = allocate<p::Interval>(memory, bound.size());
@@ -1527,21 +1549,32 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::InvalidInput);
             (void)import(direction.input.edges[i].velocity, work);
         }
+        const auto gamma = [&](std::size_t i) {
+            if (tangent == nullptr)
+                return direction.input.bound[i].circulation;
+            if (!tangent->result)
+                reject(core::FailureCode::InvalidInput);
+            return retained_word(tangent->result->solution().values(), i);
+        };
         for (std::size_t i = 0; i < bound.size(); ++i) {
             work.step();
-            const auto& row = direction.input.bound[i];
-            if (row.face != bound[i].panel.face)
+            const auto rate = [&] {
+                if (tangent != nullptr)
+                    return tangent->input.rates[i];
+                const auto& row = direction.input.bound[i];
+                return BoundCirculationRate{row.face, row.circulation_rate};
+            }();
+            if (rate.face != bound[i].panel.face)
                 reject(core::FailureCode::InvalidInput);
-            direction.gamma.values()[i] = import(row.circulation, work);
-            direction.rate.values()[i] = import(row.circulation_rate, work);
+            direction.gamma.values()[i] = import(gamma(i), work);
+            direction.rate.values()[i] = import(rate.rate, work);
         }
         for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
             work.step();
             const auto& transfer = assembly.traces.values()[i].transfer;
             if (!transfer)
                 continue;
-            const auto& delta =
-                direction.input.bound[transfer_column(bound, *transfer, work)].circulation;
+            const auto delta = gamma(transfer_column(bound, *transfer, work));
             assembly.directions.values()[i].real = transfer->reverse ? negative(delta) : delta;
         }
     }
@@ -1714,7 +1747,7 @@ struct NonpenetrationBuilder {
                 a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local,
                 a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop,
                 LoadDirections* direction = nullptr, LoadPullbackData* pullback = nullptr,
-                PullbackData* implicit = nullptr) {
+                PullbackData* implicit = nullptr, LoadTangentData* tangent = nullptr) {
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto order = input.collocations.size();
@@ -1726,6 +1759,8 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::StaleGeneration);
             validate_circulation(implicit->request, order, work, true);
         }
+        if (tangent != nullptr)
+            validate_tangent(tangent->request, request, order, work);
         if (loads.stamp != input.trial_stamp || loads.circulation != request.retained_generation)
             reject(core::FailureCode::StaleGeneration);
         if (loads.rates.size() != order)
@@ -1756,16 +1791,27 @@ struct NonpenetrationBuilder {
             if (variation.stamp != loads.stamp || variation.circulation != loads.circulation)
                 reject(core::FailureCode::StaleGeneration);
             const auto counts = require(geometry.counts());
+            const auto rate_count =
+                tangent == nullptr ? variation.bound.size() : tangent->input.rates.size();
             if (variation.points.size() != variation.displacements.size() ||
-                variation.points.size() > counts.points || variation.bound.size() != order ||
+                variation.points.size() > counts.points || rate_count != order ||
                 variation.edges.size() != loads.edges.size() ||
                 (order == 0 && !variation.points.empty()))
                 reject(core::FailureCode::InvalidInput);
         }
 
         std::optional<Assembly> retained;
+        core::PlannedBuffer<p::Interval> forcing;
+        if (tangent != nullptr)
+            forcing = allocate<p::Interval>(memory, order);
+        const auto* state = tangent == nullptr ? nullptr : &tangent->input.state;
         auto primal = solve_data(input, flow, limits, request, shared, local, kernel, memory, work,
-                                 nullptr, {}, nullptr, &retained);
+                                 state, forcing.values(), nullptr, &retained);
+        if (tangent != nullptr) {
+            match_reused_scales(tangent->request.scales, primal.solution.certificate(), work);
+            tangent->result.emplace(
+                solve_retained_tangent(primal, forcing.values(), tangent->request, memory, work));
+        }
         if (!retained)
             reject(core::FailureCode::InvalidInput);
         auto& assembly = *retained;
@@ -1790,8 +1836,8 @@ struct NonpenetrationBuilder {
         auto point_loads = allocate<std::optional<DiscreteNodalLoad>>(memory, vertex_loads.size());
         auto edges = allocate<LoadEdge>(memory, loads.edges.size());
         if (direction != nullptr)
-            prepare_load_directions(*direction, assembly, loads, geometry, vertex_loads, memory,
-                                    work);
+            prepare_load_directions(*direction, assembly, loads, geometry, vertex_loads, tangent,
+                                    memory, work);
         reduce_load_edges(occurrences.values(), loads.edges, edges.values(), primal.solution, work,
                           direction);
 
@@ -2007,6 +2053,11 @@ struct NonpenetrationBuilder {
         LoadDirections direction{variation};
         auto value = solve_loads(input, loads, std::move(flow), limits, request, geometry_work,
                                  shared, local, kernel, memory, stop, &direction);
+        return finish_load_direction(std::move(value), direction);
+    }
+
+    static DiscreteCirculationLoadJvp finish_load_direction(DiscreteCirculationLoads&& value,
+                                                            LoadDirections& direction) {
         if (!direction.force || !direction.moment)
             reject(core::FailureCode::InvalidInput);
         return {std::move(value),
@@ -2015,6 +2066,30 @@ struct NonpenetrationBuilder {
                 std::move(direction.points),
                 *direction.force,
                 *direction.moment};
+    }
+
+    static DiscreteCirculationImplicitLoadJvp solve_implicit_load_direction(
+        const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+        const DiscreteImplicitVectorLoadDirection& variation, ProjectedCaseUniformFlow&& flow,
+        const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+        const DiscreteCirculationRequest& tangent, a::GeometryWorkspace& geometry_work,
+        a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+        core::ResourcePlan& memory, const std::stop_token& stop) {
+        LoadTangentData stage{variation, tangent};
+        const DiscreteVectorLoadDirection load_stage{variation.stamp,
+                                                     variation.circulation,
+                                                     variation.state.points,
+                                                     variation.state.displacements,
+                                                     variation.edges,
+                                                     {},
+                                                     variation.state.uniform_flow};
+        LoadDirections direction{load_stage};
+        auto value =
+            solve_loads(input, loads, std::move(flow), limits, request, geometry_work, shared,
+                        local, kernel, memory, stop, &direction, nullptr, nullptr, &stage);
+        if (!stage.result)
+            reject(core::FailureCode::InvalidInput);
+        return {finish_load_direction(std::move(value), direction), std::move(*stage.result)};
     }
 
     static DiscreteCirculationLoadVjp solve_load_pullback(
@@ -2499,6 +2574,28 @@ core::Result<DiscreteCirculationImplicitLoadVjp> solve_discrete_circulation_impl
     try {
         return NonpenetrationBuilder::solve_implicit_load_pullback(
             input, loads, weights, std::move(flow), limits, primal, transpose, geometry_work,
+            shared, local, kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+core::Result<DiscreteCirculationImplicitLoadJvp> solve_discrete_circulation_implicit_load_direction(
+    const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+    const DiscreteImplicitVectorLoadDirection& variation, ProjectedCaseUniformFlow&& flow,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& primal,
+    const DiscreteCirculationRequest& tangent, a::GeometryWorkspace& geometry_work,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_implicit_load_direction(
+            input, loads, variation, std::move(flow), limits, primal, tangent, geometry_work,
             shared, local, kernel, memory, stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
