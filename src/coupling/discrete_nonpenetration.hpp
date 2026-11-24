@@ -918,4 +918,73 @@ private:
     aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;
 
+struct KnownLoadTangent {
+    const DiscreteImplicitVectorLoadDirection& state;
+    aero::detail::ScalarWords flow_time; ///< Ambient-time direction only, in seconds.
+    const DiscreteCirculationRequest& request;
+};
+struct KnownLoadAdjoint {
+    const DiscreteVectorLoadWeights& weights;
+    const DiscreteCirculationRequest& request;
+};
+using KnownLoadDerivative = std::variant<std::monostate, KnownLoadTangent, KnownLoadAdjoint>;
+
+struct KnownLoadRun;
+
+/// Own the solved circulation, the flow at all used midpoints, and the matching loads.
+class DiscreteKnownLoads {
+public:
+    DiscreteKnownLoads(DiscreteKnownLoads&&) noexcept;
+    DiscreteKnownLoads& operator=(DiscreteKnownLoads&&) noexcept;
+    DiscreteKnownLoads(const DiscreteKnownLoads&) = delete;
+    DiscreteKnownLoads& operator=(const DiscreteKnownLoads&) = delete;
+    ~DiscreteKnownLoads();
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteKnownCirculation>>
+    circulation() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteKnownCirculation>>
+    circulation() const&& = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    midpoint_flow(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    midpoint_flow(std::size_t) const&& = delete;
+    [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> total_force() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> total_moment() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> moment_origin() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadSampleDirection>
+    edge_direction(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadSampleDirection>
+    facet_direction(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNodalLoad> point_direction(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> force_direction() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> moment_direction() const noexcept;
+    [[nodiscard]] core::Result<CirculationPointCovector> point_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<LoadEdgeVelocityCovector>
+    midpoint_velocity_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<LoadCirculationCovector>
+    circulation_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationCollocationCovector>
+    collocation_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> uniform_component_dual() const noexcept;
+    [[nodiscard]] core::Result<aero::detail::ScaledEnclosure> flow_time_dual() const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    explicit DiscreteKnownLoads(core::PlannedBuffer<KnownLoadRun>&&) noexcept;
+    core::PlannedBuffer<KnownLoadRun> data_;
+};
+
+/// One nominal circulation solve, then fixed-chart loads and the selected implicit action.
+/// Circulation rate and midpoint wing velocity remain explicit independent inputs.
+[[nodiscard]] core::Result<DiscreteKnownLoads>
+solve_discrete_known_loads(const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+                           const DiscreteKnownFlowInput&, const KnownLoadDerivative&,
+                           const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+                           aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+                           aero::detail::P1Workspace&, core::ResourcePlan&,
+                           const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
