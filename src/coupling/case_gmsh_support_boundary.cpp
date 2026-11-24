@@ -3,6 +3,7 @@
 #include "io/external_pg_chart_clip.hpp"
 #include "io/gmsh_entity_physical.hpp"
 #include "structure/pg_reference_domain.hpp"
+#include "structure/pg_trace_polynomial.hpp"
 
 #include <algorithm>
 
@@ -144,8 +145,12 @@ struct ChartBoundary {
     return q.math.add(along(&Point::s), along(&Point::t));
 }
 
+using Position = std::array<Rational, 3>;
+
 struct Incident {
     Segment chart;
+    const Position* first{};
+    const Position* second{};
     std::uint64_t face{};
     bool exact{};
 };
@@ -171,7 +176,13 @@ struct Incident {
                 if (found) {
                     q.reject(Reason::Incidence);
                 }
-                found = Incident{{&a.chart, &b.chart}, face.element, exact_face(face)};
+                const auto& first = a.node == nodes[0] ? a : b;
+                const auto& second = a.node == nodes[0] ? b : a;
+                found = Incident{{&first.chart, &second.chart},
+                                 &first.position_metres,
+                                 &second.position_metres,
+                                 face.element,
+                                 exact_face(face)};
             }
         }
     }
@@ -181,9 +192,42 @@ struct Incident {
     return *found;
 }
 
+void compare_edge_position(Query& q, const Incident& edge, const structure::PgGraphView& graph,
+                           const structure::PgReferenceFrame& frame) {
+    auto& math = q.math;
+    const auto s = ref::trace_affine(math, edge.chart.a->s, edge.chart.b->s);
+    const auto t = ref::trace_affine(math, edge.chart.a->t, edge.chart.b->t);
+    // PG attests to a graph of total degree at most four. The two power
+    // tables retain at most 30 populated coefficients together, and the
+    // remaining degree-four and affine temporaries fit the reference envelope.
+    const auto s_powers = ref::trace_powers(math, s, 4);
+    const auto t_powers = ref::trace_powers(math, t, 4);
+    const auto height = ref::trace_restrict(math, graph.height, s_powers, t_powers);
+    auto x = ref::trace_affine(math, graph.x0, graph.x0);
+    ref::trace_add_scaled(math, x, s, graph.width);
+    ref::trace_add_scaled(math, x, t, graph.skew);
+
+    for (std::size_t axis = 0; axis < 3; ++axis) {
+        math.visit(1);
+        const auto original = ref::trace_affine(math, (*edge.first)[axis], (*edge.second)[axis]);
+        auto world = ref::trace_affine(math, frame.origin_metres[axis], frame.origin_metres[axis]);
+        ref::trace_add_scaled(math, world, x,
+                              math.mul(frame.length_metres, frame.rotation[3 * axis]));
+        ref::trace_add_scaled(math, world, t,
+                              math.mul(frame.length_metres, frame.rotation[3 * axis + 1]));
+        ref::trace_add_scaled(math, world, height,
+                              math.mul(frame.length_metres, frame.rotation[3 * axis + 2]));
+        if (!ref::trace_same(math, world, original)) {
+            q.detail.world_component = static_cast<std::uint8_t>(axis);
+            q.reject(Reason::Geometry);
+        }
+    }
+}
+
 [[nodiscard]] core::PlannedBuffer<CaseGmshSupportLine>
 cover(Query& q, const in::GmshMeshView& source, in::GmshKey group, const auto faces,
-      const ChartBoundary& chart, std::uint64_t maximum_lines) {
+      const ChartBoundary& chart, const structure::PgGraphView& graph,
+      const structure::PgReferenceFrame& frame, std::uint64_t maximum_lines) {
     const auto member = [&](const in::GmshElement& element) {
         q.math.visit(1);
         return in::gmsh_element_in_physical_group(source, element, group, [&] { q.math.visit(1); });
@@ -226,7 +270,7 @@ cover(Query& q, const in::GmshMeshView& source, in::GmshKey group, const auto fa
         const auto edge = incident(q, faces, nodes);
         q.detail.face = edge.face;
         if (!edge.exact) {
-            q.reject(Reason::Geometry, Code::Unsupported);
+            compare_edge_position(q, edge, graph, frame);
         }
         Rational covered;
         for (const auto& atomic : chart.edges) {
@@ -239,7 +283,9 @@ cover(Query& q, const in::GmshMeshView& source, in::GmshKey group, const auto fa
             q.reject(Reason::OutsideBoundary);
         }
         total = q.math.add(total, covered);
-        result.values()[written++] = {element.tag, {nodes[0], nodes[1]}, edge.face};
+        const auto evidence = edge.exact ? CaseGmshSupportPositionEvidence::FaceEquality
+                                         : CaseGmshSupportPositionEvidence::EdgePolynomial;
+        result.values()[written++] = {element.tag, {nodes[0], nodes[1]}, edge.face, evidence};
     }
 
     q.detail.line.reset();
@@ -301,7 +347,10 @@ core::Result<CaseGmshSupportBoundary> certify_case_gmsh_support_boundary(
 
         const auto& original = prepared_shell(q, set, bound, shell, pg);
         const auto patch = partition_take(original.reference().identity());
-        const auto& partition = partition_take(original.reference().source()).partition;
+        const auto reference = partition_take(original.reference().source());
+        const auto graph = partition_take(reference.graph.view());
+        const auto frame = partition_take(original.reference().frame());
+        const auto& partition = reference.partition;
         const ChartBoundary chart{partition_take(partition.edges()),
                                   partition_take(partition.sources()),
                                   partition_take(partition.edge_source_indices()),
@@ -327,7 +376,8 @@ core::Result<CaseGmshSupportBoundary> certify_case_gmsh_support_boundary(
                     view->digest != source->digest) {
                     q.reject(Reason::Binding, Code::StaleGeneration);
                 }
-                return cover(q, *source, row->physical, view->faces, chart, limits.maximum_lines);
+                return cover(q, *source, row->physical, view->faces, chart, graph, frame,
+                             limits.maximum_lines);
             },
             original.match().geometry);
         q.math.cancel();
