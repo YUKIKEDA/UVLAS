@@ -268,6 +268,14 @@ TEST_CASE("PG numerical chart keeps the exact sparse pattern and checks original
         for (std::size_t axis = 0; axis < 3; ++axis)
             original_work -= q(r_exact[col][axis]) * q(h_candidate[col][axis]);
     CHECK(abs(original_work) <= exact_bound(work));
+    auto binary_request = request(fwd);
+    binary_request.precision.returned =
+        linear::Binary64Projection{core::NumericalGeneration{101}, core::NumericalGeneration{102}};
+    const auto r_binary = words(independent, 74, 0, true, false, plan);
+    const auto binary =
+        take(candidate.lift({id, r_binary}, {id, c}, binary_request, workspace, plan));
+    CHECK(binary.coordinates.precision() == core::Precision::Binary64);
+    CHECK(binary.original_residual_upper <= binary_request.maximum_absolute_original_defect);
     primal.maximum_absolute_original_defect = 0;
     check_failure(candidate.lift({id, r}, {id, c}, primal, workspace, plan),
                   core::FailureCode::PrecisionUnresolved);
