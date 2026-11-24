@@ -974,6 +974,21 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                 selected_request, shared, *local, *kernel, memory);
         };
 
+        const auto check_collision = [&](const cf::DiscreteCirculationRequest& collision) {
+            auto collision_flow = projected_at(time);
+            const auto allocated = memory.allocated_bytes();
+            const auto result = run_direction(view, direction, collision_flow, collision);
+            CHECK((!result && result.error().code == core::FailureCode::StaleGeneration));
+            CHECK(collision_flow.source().jet.active());
+            CHECK(memory.allocated_bytes() == allocated);
+        };
+        auto rhs_collision = tangent_request;
+        rhs_collision.rhs_generation = request.rhs_generation;
+        check_collision(rhs_collision);
+        auto retained_collision = tangent_request;
+        retained_collision.retained_generation = request.retained_generation;
+        check_collision(retained_collision);
+
         auto direction_flow = projected_at(time);
         auto zero_projection = tangent_request;
         zero_projection.rhs_absolute = 0;
@@ -1021,6 +1036,12 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         CHECK(checked.used_steps() <= solve_limits.steps);
         CHECK(checked.tangent().used_steps() < checked.used_steps());
         CHECK(checked.primal().flow().source().jet.active());
+        CHECK(checked.primal().solution().certificate().rhs_generation() == request.rhs_generation);
+        CHECK(checked.tangent().solution().certificate().rhs_generation() ==
+              tangent_request.rhs_generation);
+        CHECK(checked.primal().solution().values().generation() == request.retained_generation);
+        CHECK(checked.tangent().solution().values().generation() ==
+              tangent_request.retained_generation);
         CHECK(abs(solution_word(checked.primal().solution(), 0) - expected) <=
               rational_word(1e-15));
         CHECK(abs(solution_word(checked.tangent().solution(), 0) - expected_direction) <=

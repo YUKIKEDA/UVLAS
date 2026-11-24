@@ -350,6 +350,7 @@ private:
 /// signed attached wake fronts and fixed history. The unprojected δR enclosure
 /// is checked with the attained tangent. Both use limits.steps cumulatively.
 /// Time, radius and old wake strengths are fixed. No PG mapping is inferred.
+/// The primal and tangent must have distinct RHS and retained-value generations.
 /// Consume the supplied flow only once both original residual checks succeed.
 [[nodiscard]] core::Result<DiscreteCirculationDirectionalSolve>
 solve_discrete_circulation_direction(
