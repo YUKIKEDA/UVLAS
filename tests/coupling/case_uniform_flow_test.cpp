@@ -3535,7 +3535,7 @@ TEST_CASE("Known flow drives discrete midpoint loads and their implicit actions"
 }
 
 TEST_CASE("Free wake motion uses all sources at attached and inherited material points",
-          "[AE-07][UW-D01][UW-D02][UW-D04][UW-D07][N4-06][verification][negative]") {
+          "[AE-07][UW-D01][UW-D02][UW-D04][UW-D07][N4-06][J1-D01][FD-07][verification][negative]") {
     auto source_case = gust_case("deg", R"({"kind":"constant","value":[1]})");
     const auto schedule = parse(R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
     source_case.field("analysis").set("intervals", schedule);
