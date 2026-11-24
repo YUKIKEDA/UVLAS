@@ -217,8 +217,15 @@ struct IndependentRadical {
     return product;
 }
 
-double r5_quadrature_volume(Fixture& fixture, const PgReferenceGeometry& geometry,
-                            std::size_t volume_count, core::ResourcePlan& plan) {
+struct R5Integrals {
+    double volume{};
+    double load_work{};
+    double weak_work{};
+    std::array<double, 3> load_resultant{};
+};
+
+R5Integrals r5_quadrature(Fixture& fixture, const PgReferenceGeometry& geometry,
+                          const PgIntegrationPartition& partition, core::ResourcePlan& plan) {
     constexpr std::array<std::array<std::string_view, 2>, 7> plane{{
         {"0.0254460438286207", "0.0647424830844348"},
         {"0.1292344072003028", "0.1398526957446383"},
@@ -231,28 +238,76 @@ double r5_quadrature_volume(Fixture& fixture, const PgReferenceGeometry& geometr
     const auto exact_decimal = [&](std::string_view value) {
         return take(R::from_decimal(value, partition_test::exact_limits(), fixture.input_plan));
     };
-    const std::array depth{exact_decimal("0.2113248654051871"),
-                           exact_decimal("0.7886751345948129")};
-    double result = 0.0;
+    const std::array depth{exact_decimal("0.1127016653792583"), exact_decimal("0.5"),
+                           exact_decimal("0.8872983346207417")};
+    constexpr std::array depth_weight{5.0 / 18, 4.0 / 9, 5.0 / 18};
+    const auto evaluate = [&](const PgReferenceScalar& value, double sqrt_g) {
+        return rational(value.rational).convert_to<double>() +
+               rational(value.radical).convert_to<double>() * sqrt_g;
+    };
+    // Frozen R5 continuum load: u_x = a X_x^2, b = -div(sigma), t = sigma n.
+    constexpr double amplitude = 0.01;
+    constexpr double lame = 0.3 / (1.3 * 0.4);
+    constexpr double uniaxial = lame + 2.0 / 2.6;
+    constexpr double body_x = -2 * amplitude * uniaxial;
+    R5Integrals result;
+    const auto add_surface = [&](const PgReferenceValue& value, const PgReferenceAreaMeasure& area,
+                                 double weight) {
+        const auto sqrt_g = std::sqrt(rational(value.g).convert_to<double>());
+        const auto x = evaluate(value.position_metres[0], sqrt_g);
+        const auto strain = 2 * amplitude * x;
+        for (std::size_t axis = 0; axis < result.load_resultant.size(); ++axis) {
+            const auto stress = strain * (axis == 0 ? uniaxial : lame);
+            const auto force = weight * stress * evaluate(area.outward[axis], sqrt_g);
+            result.load_resultant[axis] += force;
+            if (axis == 0)
+                result.load_work += force * amplitude * x * x;
+        }
+    };
+    const auto volume_count = take(partition.volumes()).size();
+    const auto horizontal_count = take(partition.horizontal_faces()).size();
+    const auto lateral_count = take(partition.lateral_faces()).size();
     for (const auto& radial : plane) {
         const auto u = exact_decimal(radial[0]);
-        const Q first_weight = rational(exact_decimal(radial[1])) * (1 - rational(u));
+        const auto radial_weight = rational(exact_decimal(radial[1])).convert_to<double>();
         for (const auto& transverse : plane) {
             const auto v =
                 fraction(fixture, (1 - rational(u)) * rational(exact_decimal(transverse[0])));
-            const double weight =
-                Q(first_weight * rational(exact_decimal(transverse[1])) / 2).convert_to<double>();
-            for (std::size_t i = 0; i < volume_count; ++i)
-                for (const auto& d : depth) {
+            const double weight = radial_weight * Q(1 - rational(u)).convert_to<double>() *
+                                  rational(exact_decimal(transverse[1])).convert_to<double>();
+            for (std::size_t i = 0; i < volume_count; ++i) {
+                for (std::size_t k = 0; k < depth.size(); ++k) {
                     const auto sample = take(geometry.evaluate(
-                        PgReferenceVolumePoint{static_cast<core::Index>(i), u, v, d}, std::nullopt,
-                        reference_limits(), plan));
+                        PgReferenceVolumePoint{static_cast<core::Index>(i), u, v, depth[k]},
+                        std::nullopt, reference_limits(), plan));
                     const auto& jacobian =
                         std::get<PgReferenceVolumeMeasure>(sample.measure).jacobian;
-                    result += weight * (rational(jacobian.rational).convert_to<double>() +
-                                        rational(jacobian.radical).convert_to<double>() *
-                                            std::sqrt(rational(sample.g).convert_to<double>()));
+                    const auto sqrt_g = std::sqrt(rational(sample.g).convert_to<double>());
+                    const auto volume = weight * depth_weight[k] * evaluate(jacobian, sqrt_g);
+                    const auto x = evaluate(sample.position_metres[0], sqrt_g);
+                    const auto strain = 2 * amplitude * x;
+                    result.volume += volume;
+                    result.load_resultant[0] += volume * body_x;
+                    result.load_work += volume * body_x * amplitude * x * x;
+                    result.weak_work += volume * strain * uniaxial * strain;
                 }
+            }
+            for (std::size_t i = 0; i < horizontal_count; ++i) {
+                const auto sample = take(
+                    geometry.evaluate(PgReferenceHorizontalPoint{static_cast<core::Index>(i), u, v},
+                                      std::nullopt, reference_limits(), plan));
+                add_surface(sample, std::get<PgReferenceHorizontalMeasure>(sample.measure).area,
+                            weight);
+            }
+        }
+        for (std::size_t i = 0; i < lateral_count; ++i) {
+            for (std::size_t k = 0; k < depth.size(); ++k) {
+                const auto sample = take(geometry.evaluate(
+                    PgReferenceLateralPoint{static_cast<core::Index>(i), u, depth[k]}, std::nullopt,
+                    reference_limits(), plan));
+                add_surface(sample, std::get<PgReferenceLateralMeasure>(sample.measure).area,
+                            radial_weight * depth_weight[k]);
+            }
         }
     }
     return result;
@@ -261,7 +316,7 @@ double r5_quadrature_volume(Fixture& fixture, const PgReferenceGeometry& geometr
 } // namespace
 
 TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
-          "[GEO-01][SH-D02][SH-D07][verification]") {
+          "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
     for (const core::Index resolution : {1, 2}) {
         for (const auto denominator : {"100", "10000"}) {
             CAPTURE(resolution, denominator);
@@ -354,9 +409,18 @@ TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
             // Independently integrated over chart strips and exact depth moments.
             constexpr double full_volume = 0.008930137852542443516987;
             constexpr double thin_volume = 0.000089301323707466072234;
-            const auto expected = base_thickness == Q("1/100") ? full_volume : thin_volume;
-            const auto integrated = r5_quadrature_volume(fixture, geometry, volumes.size(), plan);
-            CHECK(std::abs(integrated - expected) <= 1e-12 * expected);
+            const bool full = base_thickness == Q("1/100");
+            const auto expected_volume = full ? full_volume : thin_volume;
+            // R5 v2, records[].loads.exact_external_work, at this n and thickness.
+            constexpr std::array work_n1{1.4885875544444301e-6, 1.4885750872609408e-8};
+            constexpr std::array work_n2{1.4885875544444367e-6, 1.4885750872613537e-8};
+            const auto expected_work = (resolution == 1 ? work_n1 : work_n2)[full ? 0 : 1];
+            const auto integrated = r5_quadrature(fixture, geometry, partition, plan);
+            CHECK(std::abs(integrated.volume - expected_volume) <= 1e-12 * expected_volume);
+            CHECK(std::abs(integrated.load_work - expected_work) <= 1e-9 * expected_work);
+            CHECK(std::abs(integrated.weak_work - expected_work) <= 1e-9 * expected_work);
+            for (const auto component : integrated.load_resultant)
+                CHECK(std::abs(component) <= 1e-10 * expected_volume);
         }
     }
 }
