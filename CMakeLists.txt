@@ -145,6 +145,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
+    src/coupling/case_known_flow.cpp
     src/coupling/case_uniform_flow.cpp
     src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)

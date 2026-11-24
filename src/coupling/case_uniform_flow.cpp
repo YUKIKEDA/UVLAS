@@ -1,5 +1,6 @@
 #include "case_uniform_flow.hpp"
 
+#include "case_flow_series_private.hpp"
 #include "io/si_exact_words.hpp"
 
 #include <limits>
@@ -17,6 +18,8 @@ constexpr auto preparation = core::Operation::PrepareModel;
 constexpr auto evaluation = core::Operation::EvaluateAero;
 constexpr auto index_max = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
 constexpr std::size_t xyz = 3;
+constexpr std::array<std::uint32_t, 1> canonical_one{1};
+constexpr RationalView canonical_zero{0, {}, canonical_one};
 constexpr io::SchemaDimension seconds{{0, 0, 1, 0}};
 constexpr io::SchemaDimension velocity{{1, 0, -1, 0}};
 using enum core::FailureCode;
@@ -158,20 +161,26 @@ public:
     }
 
     template <class Array>
-    std::array<RationalView, xyz> row(Array array) {
-        if (array.size() != xyz)
+    std::array<RationalView, xyz> row(Array array, std::size_t columns) {
+        if (array.size() != columns)
             fail(InvalidInput, preparation, details_);
         std::array<RationalView, xyz> result{};
-        for (std::size_t i = 0; i < xyz; ++i)
+        for (std::size_t i = 0; i < columns; ++i)
             result[i] = read(take(array.at(static_cast<core::Index>(i))), velocity);
+        for (std::size_t i = columns; i < xyz; ++i) {
+            if (cursor_ == records_.values().size())
+                fail(ResourceExceeded, preparation, details_);
+            result[i] = canonical_zero;
+            records_.values()[cursor_++] = canonical_zero;
+        }
         return result;
     }
 
     template <class Array>
-    std::span<const RationalView> grid(Array array) {
+    std::span<const RationalView> grid(Array array, std::size_t columns) {
         const auto start = cursor_;
         for (std::uint64_t i = 0; i < array.size(); ++i)
-            (void)row(take(array.at(static_cast<core::Index>(i))));
+            (void)row(take(array.at(static_cast<core::Index>(i))), columns);
         return records_.values().subspan(start, cursor_ - start);
     }
 
@@ -220,6 +229,7 @@ struct ImportContext {
     core::ResourcePlan& memory;
     const std::stop_token& stop;
     core::FailureDetails details;
+    std::size_t columns = xyz;
 
     [[nodiscard]] a::UniformFlowReady prepare(const a::UniformFlowInput& request) const {
         return take(
@@ -242,7 +252,8 @@ struct ImportContext {
             SiSeries values{source, add_count(event_count(), xyz, details), limits, memory, stop,
                             details};
             const auto declared = read_events(values);
-            return prepare({stamp, declared, a::ConstantUniformFlow{values.row(series.value)}});
+            return prepare(
+                {stamp, declared, a::ConstantUniformFlow{values.row(series.value, columns)}});
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPolynomial>) {
             const auto count = add_count(
                 4,
@@ -258,11 +269,11 @@ struct ImportContext {
                 return std::pair{values.retain(lower), values.retain(upper)};
             }();
             const auto declared = read_events(values);
-            return prepare(
-                {stamp, declared,
-                 a::PolynomialUniformFlow{values.read(series.origin, seconds),
-                                          values.read(series.scale, seconds), domain.first,
-                                          domain.second, values.grid(series.coefficients)}});
+            return prepare({stamp, declared,
+                            a::PolynomialUniformFlow{values.read(series.origin, seconds),
+                                                     values.read(series.scale, seconds),
+                                                     domain.first, domain.second,
+                                                     values.grid(series.coefficients, columns)}});
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPchip>) {
             const auto requested = window_for(root, window, details);
             const auto outside = series.outside.record();
@@ -275,7 +286,7 @@ struct ImportContext {
             SiSeries values{source, count, limits, memory, stop, details};
             const auto declared = read_events(values);
             const auto times = values.sequence(series.times, seconds);
-            const auto samples = values.grid(series.values);
+            const auto samples = values.grid(series.values, columns);
             const auto interval = canonical_window(requested, values);
             const auto policy = outside_policy(outside, values);
             return prepare({stamp, declared,
@@ -329,6 +340,33 @@ struct Builder {
         const ImportContext session{source,    root,   &known->events, stamp, window,
                                     workspace, limits, memory,         stop,  details};
         return CaseUniformFlowReady{std::visit(session, known->uniform.record())};
+    }
+
+    static KnownSeries prepare_known(const io::SiCase& source, p::PchipInputStamp stamp,
+                                     std::optional<CaseUniformTimeWindow> window,
+                                     a::UniformFlowWorkspace& workspace,
+                                     const CaseUniformFlowLimits& limits,
+                                     core::ResourcePlan& memory, const std::stop_token& stop,
+                                     core::FailureDetails details) {
+        if (stop.stop_requested())
+            fail(Cancelled, preparation, details);
+        const auto schema = take(source.source_case());
+        const auto root = take(schema.get().root());
+        const auto flow = root.flow.record();
+        const auto* known = std::get_if<s::FlowKnown>(&flow);
+        if (known == nullptr)
+            fail(Unsupported, preparation, details);
+        ImportContext session{source,    root,   &known->events, stamp, window,
+                              workspace, limits, memory,         stop,  details};
+        CaseUniformFlowReady ambient{std::visit(session, known->uniform.record())};
+        const auto gust = known->gust.record();
+        std::optional<CaseUniformFlowReady> amplitude;
+        if (const auto* sine = std::get_if<s::GustSine>(&gust)) {
+            // Reuse the qualified time-curve engine with two exact zero channels.
+            session.columns = 1;
+            amplitude.emplace(CaseUniformFlowReady{std::visit(session, sine->amplitude.record())});
+        }
+        return {std::move(ambient), std::move(amplitude)};
     }
 
     static CasePrescribedWakeReady
@@ -386,6 +424,17 @@ struct Builder {
     }
 };
 } // namespace case_flow_detail
+
+core::Result<case_flow_detail::KnownSeries> case_flow_detail::prepare_known_series(
+    const io::SiCase& source, p::PchipInputStamp stamp, std::optional<CaseUniformTimeWindow> window,
+    a::UniformFlowWorkspace& workspace, const CaseUniformFlowLimits& limits,
+    core::ResourcePlan& memory, const std::stop_token& stop,
+    core::FailureDetails details) noexcept {
+    return guarded<KnownSeries>(preparation, details, [&] {
+        return Builder::prepare_known(source, stamp, window, workspace, limits, memory, stop,
+                                      details);
+    });
+}
 
 CaseUniformFlowReady::CaseUniformFlowReady(a::UniformFlowReady flow) noexcept
     : flow_(std::move(flow)) {}
